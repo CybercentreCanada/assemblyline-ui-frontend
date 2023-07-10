@@ -11,6 +11,7 @@ import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
+import { FileResult } from 'components/visual/SearchResult/files';
 import RetrohuntTable from 'components/visual/SearchResult/retrohunt';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
@@ -38,25 +39,29 @@ const useStyles = makeStyles(theme => ({
   tableContainer: { paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }
 }));
 
+export type RetrohuntPhase = null | 'submitted' | 'error' | 'yara' | 'finished';
+
 export type RetrohuntResult = {
   archive_only?: boolean;
   classification?: string;
   code?: string;
   created?: string;
   creator?: string;
-  description?: any;
-  errors?: any;
-  finished?: any;
-  hits?: any;
+  description?: string;
+  errors?: string[];
+  finished?: boolean;
+  hits?: FileResult[];
   id?: string;
   pending_candidates?: any;
   pending_indices?: any;
-  raw_query?: any;
-  tags?: any;
+  phase?: RetrohuntPhase;
+  progress?: [number, number];
+  raw_query?: string;
+  tags?: object;
   total_hits?: number;
-  total_indices?: any;
+  total_indices?: number;
   truncated?: boolean;
-  yara_signature?: any;
+  yara_signature?: string;
 };
 
 type SearchResults = {
@@ -65,6 +70,8 @@ type SearchResults = {
   rows: number;
   total: number;
 };
+
+const RELOAD_DELAY = 5000;
 
 export default function Retrohunt() {
   const { t } = useTranslation(['retrohunt']);
@@ -81,6 +88,7 @@ export default function Retrohunt() {
   const [pageSize] = useState<number>(PAGE_SIZE);
   const [searching, setSearching] = useState<boolean>(false);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
+  const timer = useRef<boolean>(false);
 
   const [suggestions] = useState([
     ...Object.keys(indexes.retrohunt).filter(name => indexes.retrohunt[name].indexed),
@@ -186,6 +194,16 @@ export default function Retrohunt() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash, retrohuntRef]);
+
+  useEffect(() => {
+    if (!timer.current && retrohuntResults && retrohuntResults?.items.some(item => !item?.finished)) {
+      timer.current = true;
+      setTimeout(() => {
+        handleReload(retrohuntResults ? retrohuntResults.offset : 0);
+        timer.current = false;
+      }, RELOAD_DELAY);
+    }
+  }, [handleReload, retrohuntResults]);
 
   if (!configuration?.datastore?.retrohunt?.enabled) return <Navigate to="/notfound" replace />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <Navigate to="/forbidden" replace />;

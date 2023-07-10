@@ -1,6 +1,9 @@
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import DoneOutlinedIcon from '@mui/icons-material/DoneOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import UpdateOutlinedIcon from '@mui/icons-material/UpdateOutlined';
 import { AlertTitle, Collapse, Divider, Grid, Paper, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
 import makeStyles from '@mui/styles/makeStyles';
@@ -11,6 +14,8 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
+import NotFoundPage from 'components/routes/404';
+import { RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
@@ -67,32 +72,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type RetrohuntPhase = null | 'submitted' | 'error' | 'yara' | 'finished';
-
 type OpenSection = { [K in 'information' | 'signature' | 'results' | 'errors']: boolean };
-
-export type Retrohunt = {
-  archive_only?: boolean;
-  classification?: string;
-  code?: string;
-  created?: string;
-  creator?: string;
-  description?: any;
-  errors?: any;
-  finished?: any;
-  hits?: any;
-  id?: string;
-  pending_candidates?: any;
-  pending_indices?: any;
-  phase?: RetrohuntPhase;
-  progress?: [number, number];
-  raw_query?: any;
-  tags?: any;
-  total_hits?: number;
-  total_indices?: any;
-  truncated?: boolean;
-  yara_signature?: any;
-};
 
 type ParamProps = {
   code: string;
@@ -119,11 +99,11 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const classes = useStyles();
   const { apiCall } = useMyAPI();
 
-  const { c12nDef } = useALContext();
+  const { c12nDef, configuration } = useALContext();
   const { code: paramCode } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [retrohunt, setRetrohunt] = useState<Retrohunt>(null);
+  const [retrohunt, setRetrohunt] = useState<RetrohuntResult>(null);
   const [hits, setHits] = useState<FileResult[]>([]);
   const [isOpen, setIsOpen] = useState<OpenSection>({
     information: true,
@@ -137,7 +117,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const isFetching = useRef<boolean>(false);
   const offsetRef = useRef<number>(0);
 
-  const DEFAULT_RETROHUNT = useMemo<Retrohunt>(
+  const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
       archive_only: false,
       classification: c12nDef.UNRESTRICTED,
@@ -161,18 +141,18 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [c12nDef.UNRESTRICTED]
   );
 
-  const phase = useMemo<RetrohuntPhase>(
-    () => (retrohunt && 'phase' in retrohunt ? (retrohunt.phase as RetrohuntPhase) : null),
-    [retrohunt]
-  );
+  // const phase = useMemo<RetrohuntPhase>(
+  //   () => (retrohunt && 'phase' in retrohunt ? (retrohunt.phase as RetrohuntPhase) : null),
+  //   [retrohunt]
+  // );
 
-  const progress = useMemo<[number, number]>(
-    () =>
-      retrohunt && 'progress' in retrohunt && Array.isArray(retrohunt.progress) && retrohunt.progress.length === 2
-        ? retrohunt.progress
-        : [0, 0],
-    [retrohunt]
-  );
+  // const progress = useMemo<[number, number]>(
+  //   () =>
+  //     retrohunt && 'progress' in retrohunt && Array.isArray(retrohunt.progress) && retrohunt.progress.length === 2
+  //       ? retrohunt.progress
+  //       : [0, 0],
+  //   [retrohunt]
+  // );
 
   const handleIsOpenChange = useCallback(
     (key: keyof OpenSection) => () => setIsOpen(o => ({ ...o, [key]: !o[key] })),
@@ -180,15 +160,15 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   );
 
   const handleReload = useCallback(
-    (jobCode: string) => {
+    (resultCode: string) => {
       if (currentUser.roles.includes('retrohunt_view')) {
         isFetching.current = true;
         apiCall({
-          url: `/api/v4/retrohunt/${jobCode}/?offset=${offsetRef.current}&rows=${PAGE_SIZE}`,
+          url: `/api/v4/retrohunt/${resultCode}/?offset=${offsetRef.current}&rows=${PAGE_SIZE}`,
           onSuccess: api_data => {
-            const job: Retrohunt = api_data.api_response;
-            setRetrohunt({ ...DEFAULT_RETROHUNT, ...job });
-            setHits([...previousHits.current, ...job?.hits]);
+            const result: RetrohuntResult = api_data.api_response;
+            setRetrohunt({ ...DEFAULT_RETROHUNT, ...result });
+            setHits([...previousHits.current, ...result?.hits]);
             offsetRef.current = offsetRef.current + PAGE_SIZE;
           },
           onExit: () => {
@@ -246,250 +226,289 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     handleHitsScroll();
   }, [handleHitsScroll]);
 
-  return currentUser.roles.includes('retrohunt_view') ? (
-    <PageFullSize margin={isDrawer ? 2 : 4}>
-      <Grid container flexDirection="column" flexWrap="nowrap" flex={1} spacing={2}>
-        {c12nDef.enforce && (
-          <Grid item paddingBottom={theme.spacing(2)}>
-            <Classification
-              format="long"
-              type="pill"
-              c12n={retrohunt && 'classification' in retrohunt ? retrohunt.classification : null}
-            />
-          </Grid>
-        )}
-
-        <Grid item>
-          <Grid container flexDirection="row">
-            <Grid item flexGrow={1}>
-              <Typography variant="h4" children={!retrohunt ? <Skeleton width="30rem" /> : t('header.view')} />
-              <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.code} />
-            </Grid>
-            <Grid item>
-              <CustomChip
-                icon={!retrohunt ? <Skeleton variant="circular" width="1rem" height="1rem" /> : null}
-                label={!retrohunt ? <Skeleton width="5rem" /> : `${progress[0]} - ${progress[1]} : ${phase} `}
-                color={!retrohunt ? 'default' : 'primary'}
-                variant="outlined"
+  if (!configuration?.datastore?.retrohunt?.enabled) return <NotFoundPage />;
+  else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
+  else
+    return (
+      <PageFullSize margin={isDrawer ? 2 : 4}>
+        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} spacing={2}>
+          {c12nDef.enforce && (
+            <Grid item paddingBottom={theme.spacing(2)}>
+              <Classification
+                format="long"
+                type="pill"
+                c12n={retrohunt && 'classification' in retrohunt ? retrohunt.classification : null}
               />
-              {/* <CustomChip
+            </Grid>
+          )}
+
+          <Grid item>
+            <Grid container flexDirection="row">
+              <Grid item flexGrow={1}>
+                <Typography variant="h4" children={!retrohunt ? <Skeleton width="30rem" /> : t('header.view')} />
+                <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.code} />
+              </Grid>
+              <Grid item>
+                <CustomChip
+                  icon={
+                    !retrohunt ? (
+                      <Skeleton variant="circular" width="1rem" height="1rem" />
+                    ) : 'finished' in retrohunt ? (
+                      retrohunt.finished ? (
+                        <DoneOutlinedIcon color="primary" />
+                      ) : (
+                        <UpdateOutlinedIcon color="action" />
+                      )
+                    ) : (
+                      <ClearOutlinedIcon color="error" />
+                    )
+                  }
+                  label={
+                    !retrohunt ? (
+                      <Skeleton width="5rem" />
+                    ) : 'finished' in retrohunt && retrohunt.finished ? (
+                      t('status.completed')
+                    ) : (
+                      t('status.submitted')
+                    )
+                  }
+                  color={retrohunt && 'finished' in retrohunt && retrohunt.finished ? 'primary' : 'default'}
+                  variant="outlined"
+                />
+                {/* <CustomChip
                   icon={isLoading ? <Skeleton variant="circular" width="1rem" height="1rem" /> : PHASE_MAP[phase]?.icon}
                   label={isLoading ? <Skeleton width="5rem" /> : `${pourcentage}% ${t(`phase.${phase}`)} `}
                   color={isLoading ? 'default' : PHASE_MAP[phase]?.color}
                   variant="outlined"
                 /> */}
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
 
-        <Grid item>
-          <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('information')}>
-            <span>{t('header.information')}</span>
-            {isOpen.information ? <ExpandLess /> : <ExpandMore />}
-          </Typography>
-          <Divider />
-          <Collapse in={isOpen.information} timeout="auto">
-            <div className={classes.collapse}>
-              <Grid container>
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span className={classes.title}>{t('details.creator')}</span>
-                </Grid>
-                <Grid className={classes.value} item xs={8} sm={9} lg={10}>
-                  {!retrohunt ? <Skeleton width="auto" /> : 'creator' in retrohunt ? retrohunt.creator : null}
-                </Grid>
-
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span className={classes.title}>{t('details.created')}</span>
-                </Grid>
-                <Grid className={classes.value} item xs={8} sm={9} lg={10}>
-                  {!retrohunt ? (
-                    <Skeleton width="auto" />
-                  ) : 'created' in retrohunt ? (
-                    <Moment locale={i18n.language} format="YYYY-MM-DD HH:mm:ss.SSS">
-                      {retrohunt.created}
-                    </Moment>
-                  ) : null}
-                </Grid>
-
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span className={classes.title}>{t('details.tags')}</span>
-                </Grid>
-                <Grid className={classes.value} item xs={8} sm={9} lg={10}>
-                  {!retrohunt ? (
-                    <Skeleton width="auto" />
-                  ) : 'tags' in retrohunt && Object.keys(retrohunt.tags).length > 0 ? (
-                    Object.keys(retrohunt.tags).join(', ')
-                  ) : (
-                    t('details.none')
-                  )}
-                </Grid>
-
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span className={classes.title}>{t('details.truncated')}</span>
-                </Grid>
-                <Grid className={classes.value} item xs={8} sm={9} lg={10}>
-                  {!retrohunt ? <Skeleton width="auto" /> : 'truncated' in retrohunt ? retrohunt.truncated : null}
-                </Grid>
-
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span className={classes.title}>{t('details.description')}</span>
-                </Grid>
-                <Grid className={classes.value} item xs={8} sm={9} lg={10}>
-                  {!retrohunt ? <Skeleton width="auto" /> : 'description' in retrohunt ? retrohunt.description : null}
-                </Grid>
-              </Grid>
-            </div>
-          </Collapse>
-        </Grid>
-
-        <Grid item>
-          <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('signature')}>
-            <span>{t('header.signature')}</span>
-            {isOpen.signature ? <ExpandLess /> : <ExpandMore />}
-          </Typography>
-          <Divider />
-          <Collapse in={isOpen.signature} timeout="auto">
-            <div className={classes.collapse}>
-              {!retrohunt ? (
-                <Skeleton style={{ height: '10rem', transform: 'none', marginTop: theme.spacing(1) }} />
-              ) : (
-                <Grid container flexDirection="column" height="100%" minHeight="500px">
-                  <MonacoEditor
-                    language="yara"
-                    value={'yara_signature' in retrohunt ? retrohunt.yara_signature : ''}
-                    options={{ readOnly: true }}
-                  />
-                </Grid>
-              )}
-            </div>
-          </Collapse>
-        </Grid>
-
-        <Grid item>
-          <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('results')}>
-            <span>{t('header.results')}</span>
-            {isOpen.results ? <ExpandLess /> : <ExpandMore />}
-          </Typography>
-          <Divider />
-          <Collapse in={isOpen.results} timeout="auto">
-            <Grid container className={classes.collapse}>
-              <Grid item xs={4} sm={3} lg={2}>
-                <span className={classes.title}>{t('details.hit-count')}</span>
-              </Grid>
-              <Grid className={classes.value} item xs={8} sm={9} lg={10}>
-                {!retrohunt ? <Skeleton width="auto" /> : 'total_hits' in retrohunt ? retrohunt.total_hits : null}
-              </Grid>
-
-              <Grid className={clsx(classes.value, classes.containerSpacer)} item xs={12}>
-                {hits.length > 0 ? (
-                  <TableContainer
-                    id="hits-table"
-                    className={classes.tableContainer}
-                    component={Paper}
-                    onScroll={handleHitsScroll}
-                  >
-                    <DivTable stickyHeader>
-                      <DivTableHead>
-                        <DivTableRow>
-                          <DivTableCell children={t('details.lasttimeseen')} />
-                          <DivTableCell children={t('details.count')} />
-                          <DivTableCell children={t('details.sha256')} />
-                          <DivTableCell children={t('details.filetype')} />
-                          <DivTableCell children={t('details.size')} />
-                          {c12nDef.enforce && <DivTableCell children={t('details.classification')} />}
-                          <DivTableCell />
-                        </DivTableRow>
-                      </DivTableHead>
-                      <DivTableBody id="hit-body">
-                        {hits.map((file, id) => (
-                          <LinkRow
-                            key={id}
-                            component={Link}
-                            to={`/file/detail/${file.sha256}`}
-                            hover
-                            style={{ textDecoration: 'none' }}
-                          >
-                            <DivTableCell>
-                              <Tooltip title={file.seen.last}>
-                                <>
-                                  <Moment fromNow locale={i18n.language}>
-                                    {file.seen.last}
-                                  </Moment>
-                                </>
-                              </Tooltip>
-                            </DivTableCell>
-                            <DivTableCell>{file.seen.count}</DivTableCell>
-                            <DivTableCell breakable>{file.sha256}</DivTableCell>
-                            <DivTableCell>{file.type}</DivTableCell>
-                            <DivTableCell>{file.size}</DivTableCell>
-                            {c12nDef.enforce && (
-                              <DivTableCell>
-                                <Classification type="text" size="tiny" c12n={file.classification} format="short" />
-                              </DivTableCell>
-                            )}
-                            <DivTableCell style={{ textAlign: 'center' }}>
-                              {file.from_archive && (
-                                <Tooltip title={t('archive')}>
-                                  <ArchiveOutlinedIcon />
-                                </Tooltip>
-                              )}
-                            </DivTableCell>
-                          </LinkRow>
-                        ))}
-                      </DivTableBody>
-                    </DivTable>
-                  </TableContainer>
-                ) : (
-                  <div style={{ width: '100%' }}>
-                    <InformativeAlert>
-                      <AlertTitle>{t('no_results_title')}</AlertTitle>
-                      {t('no_results_desc')}
-                    </InformativeAlert>
-                  </div>
-                )}
-              </Grid>
-            </Grid>
-          </Collapse>
-        </Grid>
-
-        {retrohunt && 'errors' in retrohunt && Array.isArray(retrohunt.errors) && retrohunt.errors.length > 0 && (
           <Grid item>
-            <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('errors')}>
-              <span>{t('header.errors')}</span>
-              {isOpen.errors ? <ExpandLess /> : <ExpandMore />}
+            <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('information')}>
+              <span>{t('header.information')}</span>
+              {isOpen.information ? <ExpandLess /> : <ExpandMore />}
             </Typography>
             <Divider />
-            <Collapse in={isOpen.errors} timeout="auto">
+            <Collapse in={isOpen.information} timeout="auto">
+              <div className={classes.collapse}>
+                <Grid container>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span className={classes.title}>{t('details.creator')}</span>
+                  </Grid>
+                  <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                    {!retrohunt ? <Skeleton width="auto" /> : 'creator' in retrohunt ? retrohunt.creator : null}
+                  </Grid>
+
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span className={classes.title}>{t('details.created')}</span>
+                  </Grid>
+                  <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                    {!retrohunt ? (
+                      <Skeleton width="auto" />
+                    ) : 'created' in retrohunt ? (
+                      <Moment locale={i18n.language} format="YYYY-MM-DD HH:mm:ss.SSS">
+                        {retrohunt.created}
+                      </Moment>
+                    ) : null}
+                  </Grid>
+
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span className={classes.title}>{t('details.phase')}</span>
+                  </Grid>
+                  <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                    {!retrohunt ? <Skeleton width="auto" /> : 'phase' in retrohunt ? retrohunt.phase : null}
+                  </Grid>
+
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span className={classes.title}>{t('details.progress')}</span>
+                  </Grid>
+                  <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                    {!retrohunt ? (
+                      <Skeleton width="auto" />
+                    ) : 'progress' in retrohunt ? (
+                      retrohunt.progress.join(', ')
+                    ) : null}
+                  </Grid>
+
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span className={classes.title}>{t('details.tags')}</span>
+                  </Grid>
+                  <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                    {!retrohunt ? (
+                      <Skeleton width="auto" />
+                    ) : 'tags' in retrohunt && Object.keys(retrohunt.tags).length > 0 ? (
+                      Object.keys(retrohunt.tags).join(', ')
+                    ) : (
+                      t('details.none')
+                    )}
+                  </Grid>
+
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span className={classes.title}>{t('details.truncated')}</span>
+                  </Grid>
+                  <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                    {!retrohunt ? <Skeleton width="auto" /> : 'truncated' in retrohunt ? retrohunt.truncated : null}
+                  </Grid>
+
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span className={classes.title}>{t('details.description')}</span>
+                  </Grid>
+                  <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                    {!retrohunt ? <Skeleton width="auto" /> : 'description' in retrohunt ? retrohunt.description : null}
+                  </Grid>
+                </Grid>
+              </div>
+            </Collapse>
+          </Grid>
+
+          <Grid item>
+            <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('signature')}>
+              <span>{t('header.signature')}</span>
+              {isOpen.signature ? <ExpandLess /> : <ExpandMore />}
+            </Typography>
+            <Divider />
+            <Collapse in={isOpen.signature} timeout="auto">
+              <div className={classes.collapse}>
+                {!retrohunt ? (
+                  <Skeleton style={{ height: '10rem', transform: 'none', marginTop: theme.spacing(1) }} />
+                ) : (
+                  <Grid container flexDirection="column" height="100%" minHeight="500px">
+                    <MonacoEditor
+                      language="yara"
+                      value={'yara_signature' in retrohunt ? retrohunt.yara_signature : ''}
+                      options={{ readOnly: true }}
+                    />
+                  </Grid>
+                )}
+              </div>
+            </Collapse>
+          </Grid>
+
+          <Grid item>
+            <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('results')}>
+              <span>{t('header.results')}</span>
+              {isOpen.results ? <ExpandLess /> : <ExpandMore />}
+            </Typography>
+            <Divider />
+            <Collapse in={isOpen.results} timeout="auto">
               <Grid container className={classes.collapse}>
                 <Grid item xs={4} sm={3} lg={2}>
-                  <span className={classes.title}>{t('details.error-count')}</span>
+                  <span className={classes.title}>{t('details.hit-count')}</span>
                 </Grid>
                 <Grid className={classes.value} item xs={8} sm={9} lg={10}>
-                  {retrohunt.errors.length}
+                  {!retrohunt ? <Skeleton width="auto" /> : 'total_hits' in retrohunt ? retrohunt.total_hits : null}
                 </Grid>
 
                 <Grid className={clsx(classes.value, classes.containerSpacer)} item xs={12}>
-                  <TableContainer className={classes.tableContainer} component={Paper}>
-                    <DivTable>
-                      <DivTableBody>
-                        {retrohunt.errors.map((error, i) => (
-                          <DivTableRow key={`${i}`}>
-                            <DivTableCell className={classes.tableCell}>{error}</DivTableCell>
+                  {retrohunt && 'total_hits' in retrohunt && retrohunt.total_hits > 0 ? (
+                    <TableContainer
+                      id="hits-table"
+                      className={classes.tableContainer}
+                      component={Paper}
+                      onScroll={handleHitsScroll}
+                    >
+                      <DivTable stickyHeader>
+                        <DivTableHead>
+                          <DivTableRow>
+                            <DivTableCell children={t('details.lasttimeseen')} />
+                            <DivTableCell children={t('details.count')} />
+                            <DivTableCell children={t('details.sha256')} />
+                            <DivTableCell children={t('details.filetype')} />
+                            <DivTableCell children={t('details.size')} />
+                            {c12nDef.enforce && <DivTableCell children={t('details.classification')} />}
+                            <DivTableCell />
                           </DivTableRow>
-                        ))}
-                      </DivTableBody>
-                    </DivTable>
-                  </TableContainer>
+                        </DivTableHead>
+                        <DivTableBody id="hit-body">
+                          {hits.map((file, id) => (
+                            <LinkRow
+                              key={id}
+                              component={Link}
+                              to={`/file/detail/${file.sha256}`}
+                              hover
+                              style={{ textDecoration: 'none' }}
+                            >
+                              <DivTableCell>
+                                <Tooltip title={file.seen.last}>
+                                  <>
+                                    <Moment fromNow locale={i18n.language}>
+                                      {file.seen.last}
+                                    </Moment>
+                                  </>
+                                </Tooltip>
+                              </DivTableCell>
+                              <DivTableCell>{file.seen.count}</DivTableCell>
+                              <DivTableCell breakable>{file.sha256}</DivTableCell>
+                              <DivTableCell>{file.type}</DivTableCell>
+                              <DivTableCell>{file.size}</DivTableCell>
+                              {c12nDef.enforce && (
+                                <DivTableCell>
+                                  <Classification type="text" size="tiny" c12n={file.classification} format="short" />
+                                </DivTableCell>
+                              )}
+                              <DivTableCell style={{ textAlign: 'center' }}>
+                                {file.from_archive && (
+                                  <Tooltip title={t('archive')}>
+                                    <ArchiveOutlinedIcon />
+                                  </Tooltip>
+                                )}
+                              </DivTableCell>
+                            </LinkRow>
+                          ))}
+                        </DivTableBody>
+                      </DivTable>
+                    </TableContainer>
+                  ) : (
+                    <div style={{ width: '100%' }}>
+                      <InformativeAlert>
+                        <AlertTitle>{t('no_results_title')}</AlertTitle>
+                        {t('no_results_desc')}
+                      </InformativeAlert>
+                    </div>
+                  )}
                 </Grid>
               </Grid>
             </Collapse>
           </Grid>
-        )}
-      </Grid>
-    </PageFullSize>
-  ) : (
-    <ForbiddenPage />
-  );
+
+          {retrohunt && 'errors' in retrohunt && Array.isArray(retrohunt.errors) && retrohunt.errors.length > 0 && (
+            <Grid item>
+              <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('errors')}>
+                <span>{t('header.errors')}</span>
+                {isOpen.errors ? <ExpandLess /> : <ExpandMore />}
+              </Typography>
+              <Divider />
+              <Collapse in={isOpen.errors} timeout="auto">
+                <Grid container className={classes.collapse}>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span className={classes.title}>{t('details.error-count')}</span>
+                  </Grid>
+                  <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                    {retrohunt.errors.length}
+                  </Grid>
+
+                  <Grid className={clsx(classes.value, classes.containerSpacer)} item xs={12}>
+                    <TableContainer className={classes.tableContainer} component={Paper}>
+                      <DivTable>
+                        <DivTableBody>
+                          {retrohunt.errors.map((error, i) => (
+                            <DivTableRow key={`${i}`}>
+                              <DivTableCell className={classes.tableCell}>{error}</DivTableCell>
+                            </DivTableRow>
+                          ))}
+                        </DivTableBody>
+                      </DivTable>
+                    </TableContainer>
+                  </Grid>
+                </Grid>
+              </Collapse>
+            </Grid>
+          )}
+        </Grid>
+      </PageFullSize>
+    );
 }
 
 export const RetrohuntDetail = React.memo(WrappedRetrohuntDetail);
