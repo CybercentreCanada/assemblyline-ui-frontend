@@ -28,6 +28,7 @@ import React, { MutableRefObject, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
+import { RetrohuntDetail } from './detail';
 
 const useStyles = makeStyles(theme => ({
   circularProgress: {
@@ -52,7 +53,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null }: Props
   const navigate = useNavigate();
   const location = useLocation();
   const { apiCall } = useMyAPI();
-  const { closeGlobalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
   const { c12nDef } = useALContext();
@@ -109,9 +110,15 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null }: Props
           setIsModified(false);
           setIsConfirmationOpen(false);
           closeGlobalDrawer();
-          window.dispatchEvent(new CustomEvent('reloadRetrohunts'));
           setTimeout(() => {
-            navigate(`${location.pathname}${location.search ? location.search : ''}#${newCode}`);
+            window.dispatchEvent(new CustomEvent('reloadRetrohunts'));
+            setGlobalDrawer(<RetrohuntDetail code={newCode} isDrawer />);
+            window.history.pushState(
+              {},
+              undefined,
+              `${location.pathname}${location.search ? location.search : ''}#${newCode}`
+            );
+            // navigate(`${locatiopathname}${location.search ? location.search : ''}#${newCode}`);
           }, 100);
         },
         onFailure: api_data => {
