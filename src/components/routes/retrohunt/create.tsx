@@ -103,16 +103,16 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null }: Props
         },
         onSuccess: api_data => {
           const newCode: string = api_data.api_response?.code ? api_data.api_response?.code : 'new';
-          showSuccessMessage('add.success');
-          // setRetrohunt({ ...DEFAULT_RETROHUNT });
-          // retrohuntRef.current = { ...DEFAULT_RETROHUNT };
-          // setIsModified(false);
+          showSuccessMessage(t('add.success'));
+          setRetrohunt({ ...DEFAULT_RETROHUNT });
+          retrohuntRef.current = { ...DEFAULT_RETROHUNT };
+          setIsModified(false);
           setIsConfirmationOpen(false);
           closeGlobalDrawer();
           window.dispatchEvent(new CustomEvent('reloadRetrohunts'));
           setTimeout(() => {
             navigate(`${location.pathname}${location.search ? location.search : ''}#${newCode}`);
-          }, 20);
+          }, 100);
         },
         onFailure: api_data => {
           showErrorMessage(api_data.api_error_message);
