@@ -5,7 +5,7 @@ import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
-import { Divider, ListSubheader, Menu, MenuItem } from '@mui/material';
+import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
@@ -18,6 +18,7 @@ import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { HiOutlineExternalLink } from 'react-icons/hi';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
@@ -31,6 +32,9 @@ const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px'
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
 const SUBMIT_ICON = <PublishOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
+const EXTERNAL_ICON = (
+  <HiOutlineExternalLink style={{ marginRight: '16px', fontSize: '22px', verticalAlign: 'middle' }} />
+);
 const initialMenuState = {
   mouseX: null,
   mouseY: null
@@ -271,6 +275,28 @@ const WrappedTag: React.FC<TagProps> = ({
               ))}
             </div>
           )}
+        {!!currentUserConfig.ui.external_links?.tag?.hasOwnProperty(type) && (
+          <div>
+            <Divider />
+            <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
+              {t('external_link')}
+            </ListSubheader>
+
+            {currentUserConfig.ui.external_links?.tag?.[type]?.map((link, i) => (
+              <MenuItem dense key={`source_${i}`}>
+                <MaterialLink
+                  style={{ color: 'inherit', textDecoration: 'none' }}
+                  href={link.url.replace(
+                    link.replace_pattern,
+                    encodeURIComponent(link.double_encode ? encodeURIComponent(value) : value)
+                  )}
+                >
+                  {EXTERNAL_ICON} {link.name}
+                </MaterialLink>
+              </MenuItem>
+            ))}
+          </div>
+        )}
       </Menu>
       <CustomChip
         wrap
