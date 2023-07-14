@@ -24,6 +24,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { AlertItem, DetailedItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
+import ActionableText from 'components/visual/ActionableText';
 import { ChipList, ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
@@ -68,6 +69,7 @@ type AlertDetailsProps = {
 
 type AutoHideChipListProps = {
   items: DetailedItem[];
+  type?: string;
 };
 
 const SkeletonInline = () => <Skeleton style={{ display: 'inline-block', width: '10rem' }} />;
@@ -77,7 +79,7 @@ type AutoHideChipListState = {
   fullChipList: CustomChipProps[];
 };
 
-const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => {
+const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items, type }) => {
   const { t } = useTranslation();
   const [state, setState] = useState<AutoHideChipListState | null>(null);
   const [shownChips, setShownChips] = useState<CustomChipProps[]>([]);
@@ -86,7 +88,8 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
     const fullChipList = items.sort(detailedItemCompare).map(item => ({
       label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
       variant: 'outlined' as 'outlined',
-      color: verdictToColor(item.verdict)
+      color: verdictToColor(item.verdict),
+      tooltip: 'bob'
     }));
     const showExtra = items.length <= TARGET_RESULT_COUNT;
 
@@ -399,7 +402,16 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                 </Typography>
               </Grid>
               <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
-                {item ? item.file.md5 : <SkeletonInline />}
+                {item ? (
+                  <ActionableText
+                    category="hash"
+                    type="md5"
+                    value={item.file.md5}
+                    classification={item.classification}
+                  />
+                ) : (
+                  <SkeletonInline />
+                )}
               </Grid>
               <Grid item xs={3} sm={2}>
                 <BsClipboard
@@ -411,7 +423,16 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                 </Typography>
               </Grid>
               <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
-                {item ? item.file.sha1 : <SkeletonInline />}
+                {item ? (
+                  <ActionableText
+                    category="hash"
+                    type="sha1"
+                    value={item.file.sha1}
+                    classification={item.classification}
+                  />
+                ) : (
+                  <SkeletonInline />
+                )}
               </Grid>
               <Grid item xs={3} sm={2}>
                 <BsClipboard
@@ -423,7 +444,16 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                 </Typography>
               </Grid>
               <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
-                {item ? item.file.sha256 : <SkeletonInline />}
+                {item ? (
+                  <ActionableText
+                    category="hash"
+                    type="sha256"
+                    value={item.file.sha256}
+                    classification={item.classification}
+                  />
+                ) : (
+                  <SkeletonInline />
+                )}
               </Grid>
             </Grid>
           </div>
@@ -479,7 +509,12 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                           {k}
                         </Grid>
                         <Grid item xs={9} sm={10}>
-                          {item.metadata[k]}
+                          <ActionableText
+                            category="metadata"
+                            type={k}
+                            value={item.metadata[k]}
+                            classification={item.classification}
+                          />
                         </Grid>
                       </Grid>
                     ))
@@ -508,7 +543,12 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                 {k}
                               </Grid>
                               <Grid item xs={9} sm={10}>
-                                {item.metadata[k]}
+                                <ActionableText
+                                  category="metadata"
+                                  type={k}
+                                  value={item.metadata[k]}
+                                  classification={item.classification}
+                                />
                               </Grid>
                             </Grid>
                           ))
