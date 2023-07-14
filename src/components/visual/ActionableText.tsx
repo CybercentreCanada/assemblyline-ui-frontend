@@ -101,86 +101,98 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, clas
     [searchTagExternal, handleClose, type, value, classification]
   );
 
+  const hasExternalQuery =
+    !!currentUser.roles.includes('external_query') &&
+    !!currentUserConfig.ui.external_sources?.length &&
+    !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type);
+
+  const hasExternalLinks =
+    !!currentUserConfig.ui.external_links?.hasOwnProperty(category) &&
+    !!currentUserConfig.ui.external_links[category].hasOwnProperty(type);
+
   return (
     <>
-      <Menu
-        open={state.mouseY !== null}
-        onClose={handleClose}
-        anchorReference="anchorPosition"
-        anchorPosition={
-          state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
-        }
-      >
-        <MenuItem id="clipID" dense onClick={handleMenuCopy}>
-          {CLIPBOARD_ICON}
-          {t('clipboard')}
-        </MenuItem>
-        {currentUser.roles.includes('submission_view') && (
-          <MenuItem dense onClick={handleMenuSearch}>
-            {SEARCH_ICON}
-            {t('related')}
-          </MenuItem>
-        )}
-        {!!currentUser.roles.includes('external_query') &&
-          !!currentUserConfig.ui.external_sources?.length &&
-          !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type) && (
-            <div>
-              <Divider />
-              <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
-                {t('related_external')}
-              </ListSubheader>
-
-              <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
-                {TRAVEL_EXPLORE_ICON} {t('related_external.all')}
-              </MenuItem>
-
-              {currentUserConfig.ui.external_source_tags?.[type]?.sort().map((source, i) => (
-                <MenuItem dense key={`source_${i}`} onClick={() => handleMenuExternalSearch(source)}>
-                  {TRAVEL_EXPLORE_ICON} {toTitleCase(source)}
-                </MenuItem>
-              ))}
-            </div>
-          )}
-        {!!currentUserConfig.ui.external_links?.hasOwnProperty(category) &&
-          !!currentUserConfig.ui.external_links[category].hasOwnProperty(type) && (
-            <div>
-              <Divider />
-              <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
-                {t('external_link')}
-              </ListSubheader>
-
-              {currentUserConfig.ui.external_links[category][type].map((link, i) => (
-                <MenuItem dense key={`source_${i}`}>
-                  <MaterialLink
-                    onClick={handleClose}
-                    target="_blank"
-                    underline="none"
-                    rel="noopener noreferrer"
-                    color="inherit"
-                    href={link.url.replace(
-                      link.replace_pattern,
-                      encodeURIComponent(link.double_encode ? encodeURIComponent(value) : value)
-                    )}
-                  >
-                    {EXTERNAL_ICON} {link.name}
-                  </MaterialLink>
-                </MenuItem>
-              ))}
-            </div>
-          )}
-      </Menu>
       {value ? (
-        <MaterialLink className={classes.link} onClick={handleMenuClick} onContextMenu={handleMenuClick}>
-          {value}
-          {lookupState && lookupState[type] ? (
-            <ExternalLinks
-              success={lookupState[type].success}
-              results={lookupState[type].results}
-              errors={lookupState[type].errors}
-              iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'text-bottom' }}
-            />
-          ) : null}
-        </MaterialLink>
+        hasExternalLinks || hasExternalQuery ? (
+          <>
+            <Menu
+              open={state.mouseY !== null}
+              onClose={handleClose}
+              anchorReference="anchorPosition"
+              anchorPosition={
+                state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
+              }
+            >
+              <MenuItem id="clipID" dense onClick={handleMenuCopy}>
+                {CLIPBOARD_ICON}
+                {t('clipboard')}
+              </MenuItem>
+              {currentUser.roles.includes('submission_view') && (
+                <MenuItem dense onClick={handleMenuSearch}>
+                  {SEARCH_ICON}
+                  {t('related')}
+                </MenuItem>
+              )}
+              {hasExternalQuery && (
+                <div>
+                  <Divider />
+                  <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
+                    {t('related_external')}
+                  </ListSubheader>
+
+                  <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
+                    {TRAVEL_EXPLORE_ICON} {t('related_external.all')}
+                  </MenuItem>
+
+                  {currentUserConfig.ui.external_source_tags?.[type]?.sort().map((source, i) => (
+                    <MenuItem dense key={`source_${i}`} onClick={() => handleMenuExternalSearch(source)}>
+                      {TRAVEL_EXPLORE_ICON} {toTitleCase(source)}
+                    </MenuItem>
+                  ))}
+                </div>
+              )}
+              {hasExternalLinks && (
+                <div>
+                  <Divider />
+                  <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
+                    {t('external_link')}
+                  </ListSubheader>
+
+                  {currentUserConfig.ui.external_links[category][type].map((link, i) => (
+                    <MenuItem dense key={`source_${i}`}>
+                      <MaterialLink
+                        onClick={handleClose}
+                        target="_blank"
+                        underline="none"
+                        rel="noopener noreferrer"
+                        color="inherit"
+                        href={link.url.replace(
+                          link.replace_pattern,
+                          encodeURIComponent(link.double_encode ? encodeURIComponent(value) : value)
+                        )}
+                      >
+                        {EXTERNAL_ICON} {link.name}
+                      </MaterialLink>
+                    </MenuItem>
+                  ))}
+                </div>
+              )}
+            </Menu>
+            <MaterialLink className={classes.link} onClick={handleMenuClick} onContextMenu={handleMenuClick}>
+              {value}
+              {lookupState && lookupState[type] ? (
+                <ExternalLinks
+                  success={lookupState[type].success}
+                  results={lookupState[type].results}
+                  errors={lookupState[type].errors}
+                  iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'text-bottom' }}
+                />
+              ) : null}
+            </MaterialLink>
+          </>
+        ) : (
+          value
+        )
       ) : (
         <Skeleton />
       )}
