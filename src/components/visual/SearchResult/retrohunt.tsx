@@ -1,12 +1,10 @@
-import ClearIcon from '@mui/icons-material/Clear';
-import DoneIcon from '@mui/icons-material/Done';
-import UpdateIcon from '@mui/icons-material/Update';
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import { RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
+import CustomChip from 'components/visual/CustomChip';
 import 'moment/locale/fr';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,38 +26,41 @@ type SearchResults = {
   total: number;
 };
 
-type RetrohuntStatusProp = {
-  result: RetrohuntResult;
-};
-
-type RetrohuntTableProps = {
+type Props = {
   retrohuntResults: SearchResults;
   allowSort?: boolean;
   onRowClick?: (retrohunt: RetrohuntResult) => void;
 };
 
-const STATE_ICON_MAP = {
-  completed: <DoneIcon color="primary" />,
-  error: <ClearIcon color="error" />,
-  submitted: <UpdateIcon color="action" />
-};
-
-const WrappedRetrohuntTable: React.FC<RetrohuntTableProps> = ({
-  retrohuntResults,
-  allowSort = true,
-  onRowClick = null
-}) => {
+const WrappedRetrohuntTable: React.FC<Props> = ({ retrohuntResults, allowSort = true, onRowClick = null }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
-  const RetrohuntStatus = useCallback(
-    ({ result }: RetrohuntStatusProp) => {
-      const status = (
-        result ? (result?.finished ? (result?.truncated ? 'error' : 'completed') : 'submitted') : null
-      ) as keyof typeof STATE_ICON_MAP;
+  const RetrohuntStatus = useCallback<React.FC<{ result: RetrohuntResult }>>(
+    (prop = { result: null }) => {
+      const finished = 'finished' in prop.result ? prop.result.finished : null;
 
-      if (status) return <Tooltip title={t(`status.${status}`)}>{STATE_ICON_MAP[status]}</Tooltip>;
-      else return null;
+      const phase =
+        'phase' in prop.result && ['filtering', 'yara', 'finished'].includes(prop.result.phase)
+          ? prop.result.phase
+          : null;
+
+      let pourcentage = 0;
+      const progress = 'progress' in prop.result ? prop.result.progress : null;
+      if (phase && !finished && Array.isArray(progress) && progress.length === 2) {
+        if (phase === 'finished') pourcentage = 100;
+        else if (phase === 'yara') pourcentage = Math.floor((100 * (progress[0] - progress[1])) / progress[0]);
+        else if (phase === 'filtering') pourcentage = Math.floor((100 * progress[0]) / progress[1]);
+      }
+
+      return (
+        <CustomChip
+          label={finished ? t('status.finished') : `${pourcentage}% ${phase ? t(`status.${phase}`) : null}`}
+          color={finished ? 'primary' : 'default'}
+          size="small"
+          variant="outlined"
+        />
+      );
     },
     [t]
   );
