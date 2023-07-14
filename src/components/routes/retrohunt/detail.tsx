@@ -1,10 +1,22 @@
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
-import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DoneOutlinedIcon from '@mui/icons-material/DoneOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import UpdateOutlinedIcon from '@mui/icons-material/UpdateOutlined';
-import { AlertTitle, Collapse, Divider, Grid, Paper, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
+import {
+  AlertTitle,
+  Collapse,
+  Divider,
+  Grid,
+  LinearProgress,
+  Pagination,
+  Paper,
+  Skeleton,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
@@ -15,13 +27,12 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
-import { RetrohuntResult } from 'components/routes/retrohunt';
+import { RetrohuntPhase, RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
-import CustomChip from 'components/visual/CustomChip';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import MonacoEditor from 'components/visual/MonacoEditor';
-import { FileResult } from 'components/visual/SearchResult/files';
+import SteppedProgress from 'components/visual/SteppedProgress';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,19 +62,10 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: theme.spacing(2),
     paddingTop: theme.spacing(2)
   },
-  circularProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  },
   containerSpacer: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2)
+    marginTop: theme.spacing(2)
   },
   tableContainer: {
-    // maxHeight: `calc(${10} * 32.34px)`
     maxHeight: `50vh`
   },
   tableCell: {
@@ -85,13 +87,9 @@ type Props = {
 
 const PAGE_SIZE = 10;
 
-const RELOAD_DELAY = 5000;
+const MAX_TRACKED_RECORDS = 10000;
 
-// const PHASE_MAP: { [K in Phase]: { color: PossibleColors; label: string; icon: React.ReactNode } } = {
-//   submitted: { color: 'default', label: 'submitted', icon: <UpdateIcon color="action" /> },
-//   error: { color: 'error', label: 'error', icon: <ClearIcon color="error" /> },
-//   finished: { color: 'primary', label: 'completed', icon: <DoneIcon color="primary" /> }
-// };
+const RELOAD_DELAY = 5000;
 
 function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Props) {
   const { t, i18n } = useTranslation(['retrohunt']);
@@ -104,7 +102,8 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [retrohunt, setRetrohunt] = useState<RetrohuntResult>(null);
-  const [hits, setHits] = useState<FileResult[]>([]);
+  const [offset, setOffset] = useState<number>(0);
+  const [isReloading, setIsReloading] = useState<boolean>(true);
   const [isOpen, setIsOpen] = useState<OpenSection>({
     information: true,
     signature: false,
@@ -112,15 +111,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     errors: false
   });
 
-  const previousHits = useRef<FileResult[]>([]);
   const timer = useRef<boolean>(false);
-  const isFetching = useRef<boolean>(false);
-  const offsetRef = useRef<number>(0);
-
-  const momentFormat = useMemo(
-    () => (i18n.language === 'fr' ? 'dddd D MMMM YYYY [à] h[h]mm' : 'dddd, MMMM D, YYYY [at] h:mm'),
-    [i18n.language]
-  );
 
   const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
@@ -146,97 +137,86 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [c12nDef.UNRESTRICTED]
   );
 
-  // const phase = useMemo<RetrohuntPhase>(
-  //   () => (retrohunt && 'phase' in retrohunt ? (retrohunt.phase as RetrohuntPhase) : null),
-  //   [retrohunt]
-  // );
+  const momentFormat = useMemo(
+    () => (i18n.language === 'fr' ? 'dddd D MMMM YYYY [à] h[h]mm' : 'dddd, MMMM D, YYYY [at] h:mm'),
+    [i18n.language]
+  );
 
-  // const progress = useMemo<[number, number]>(
-  //   () =>
-  //     retrohunt && 'progress' in retrohunt && Array.isArray(retrohunt.progress) && retrohunt.progress.length === 2
-  //       ? retrohunt.progress
-  //       : [0, 0],
-  //   [retrohunt]
-  // );
+  const phase = useMemo<RetrohuntPhase>(
+    () =>
+      retrohunt && 'phase' in retrohunt && ['filtering', 'yara', 'finished'].includes(retrohunt.phase)
+        ? retrohunt.phase
+        : null,
+    [retrohunt]
+  );
+
+  const progress = useMemo<number>(() => {
+    if (!phase || !retrohunt || !Array.isArray(retrohunt?.progress) || retrohunt?.progress.length !== 2) return null;
+    else if (phase === 'finished') return 100;
+    else if (phase === 'yara')
+      return Math.floor((100 * (retrohunt.progress[0] - retrohunt.progress[1])) / retrohunt.progress[0]);
+    else if (phase === 'filtering') return Math.floor((100 * retrohunt.progress[0]) / retrohunt.progress[1]);
+    else return null;
+  }, [phase, retrohunt]);
+
+  const nbOfPages = useMemo<number>(
+    () =>
+      retrohunt && 'total_hits' in retrohunt
+        ? Math.ceil(Math.min(retrohunt.total_hits, MAX_TRACKED_RECORDS) / PAGE_SIZE)
+        : 0,
+    [retrohunt]
+  );
+
+  const handleReload: (prop: { code: string; offset?: number }) => void = useCallback(
+    prop => {
+      if (currentUser.roles.includes('retrohunt_view')) {
+        apiCall({
+          url: `/api/v4/retrohunt/${prop.code}/?offset=${prop.offset}&rows=${PAGE_SIZE}`,
+          onSuccess: api_data => {
+            setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response });
+          },
+          onEnter: () => {
+            setIsReloading(true);
+          },
+          onExit: () => {
+            setIsReloading(false);
+          }
+        });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [DEFAULT_RETROHUNT, currentUser.roles]
+  );
 
   const handleIsOpenChange = useCallback(
     (key: keyof OpenSection) => () => setIsOpen(o => ({ ...o, [key]: !o[key] })),
     []
   );
 
-  const handleReload = useCallback(
-    (resultCode: string) => {
-      if (currentUser.roles.includes('retrohunt_view')) {
-        isFetching.current = true;
-        apiCall({
-          url: `/api/v4/retrohunt/${resultCode}/?offset=${offsetRef.current}&rows=${PAGE_SIZE}`,
-          onSuccess: api_data => {
-            const result: RetrohuntResult = api_data.api_response;
-            setRetrohunt({ ...DEFAULT_RETROHUNT, ...result });
-            setHits([...previousHits.current, ...result?.hits]);
-            offsetRef.current = offsetRef.current + PAGE_SIZE;
-          },
-          onExit: () => {
-            isFetching.current = false;
-          }
-        });
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [DEFAULT_RETROHUNT, currentUser]
-  );
-
-  const handleShouldFetch = useCallback((total_hits: number): boolean => {
-    if (offsetRef.current + PAGE_SIZE >= total_hits) return false;
-
-    const tableEl = document.getElementById('hits-table');
-    if (!tableEl) return false;
-
-    const tableRect = tableEl.getBoundingClientRect();
-    const lastEl = document.getElementById('hit-body').lastElementChild;
-    if (!lastEl) return true;
-
-    const lastRect = lastEl.getBoundingClientRect();
-    if (tableRect.bottom > lastRect.top && lastRect.bottom > tableRect.top) return true;
-
-    return false;
+  const handlePageChange = useCallback((event: React.ChangeEvent<unknown>, value: number) => {
+    setOffset((value - 1) * PAGE_SIZE);
   }, []);
 
-  const handleHitsScroll = useCallback(() => {
-    if (!isFetching.current && retrohunt && 'total_hits' in retrohunt && handleShouldFetch(retrohunt?.total_hits)) {
-      previousHits.current = hits;
-      handleReload(retrohunt?.code);
-    }
-  }, [handleReload, handleShouldFetch, hits, retrohunt]);
-
   useEffect(() => {
-    previousHits.current = [];
-    offsetRef.current = 0;
-    handleReload(propCode || paramCode);
-  }, [handleReload, propCode, paramCode]);
+    handleReload({ code: propCode || paramCode, offset: offset });
+  }, [handleReload, offset, paramCode, propCode]);
 
   useEffect(() => {
     if (!timer.current && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
       timer.current = true;
       setTimeout(() => {
-        previousHits.current = [];
-        offsetRef.current = 0;
-        handleReload(retrohunt?.code);
+        handleReload({ code: retrohunt.code, offset: offset });
         timer.current = false;
       }, RELOAD_DELAY);
     }
-  }, [handleReload, retrohunt]);
-
-  useEffect(() => {
-    handleHitsScroll();
-  }, [handleHitsScroll]);
+  }, [handleReload, offset, retrohunt]);
 
   if (!configuration?.datastore?.retrohunt?.enabled) return <NotFoundPage />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
   else
     return (
       <PageFullSize margin={isDrawer ? 2 : 4}>
-        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} spacing={2}>
+        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} spacing={2} marginBottom={theme.spacing(4)}>
           {c12nDef.enforce && (
             <Grid item paddingBottom={theme.spacing(2)}>
               <Classification
@@ -253,41 +233,48 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                 <Typography variant="h4" children={!retrohunt ? <Skeleton width="30rem" /> : t('header.view')} />
                 <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.code} />
               </Grid>
-              <Grid item>
-                <CustomChip
-                  icon={
-                    !retrohunt ? (
-                      <Skeleton variant="circular" width="1rem" height="1rem" />
-                    ) : 'finished' in retrohunt ? (
-                      retrohunt.finished ? (
-                        <DoneOutlinedIcon color="primary" />
+              {/* <Grid item>
+                {(!retrohunt || (retrohunt && 'finished' in retrohunt && retrohunt.finished)) && (
+                  <CustomChip
+                    icon={
+                      !retrohunt ? (
+                        <Skeleton variant="circular" width="1rem" height="1rem" />
                       ) : (
-                        <UpdateOutlinedIcon color="action" />
+                        'finished' in retrohunt && retrohunt.finished && <DoneOutlinedIcon color="primary" />
                       )
-                    ) : (
-                      <ClearOutlinedIcon color="error" />
-                    )
-                  }
-                  label={
-                    !retrohunt ? (
-                      <Skeleton width="5rem" />
-                    ) : 'finished' in retrohunt && retrohunt.finished ? (
-                      t('status.completed')
-                    ) : (
-                      t('status.submitted')
-                    )
-                  }
-                  color={retrohunt && 'finished' in retrohunt && retrohunt.finished ? 'primary' : 'default'}
-                  variant="outlined"
-                />
-                {/* <CustomChip
-                  icon={isLoading ? <Skeleton variant="circular" width="1rem" height="1rem" /> : PHASE_MAP[phase]?.icon}
-                  label={isLoading ? <Skeleton width="5rem" /> : `${pourcentage}% ${t(`phase.${phase}`)} `}
-                  color={isLoading ? 'default' : PHASE_MAP[phase]?.color}
-                  variant="outlined"
-                /> */}
-              </Grid>
+                    }
+                    label={
+                      !retrohunt ? (
+                        <Skeleton width="5rem" />
+                      ) : (
+                        'finished' in retrohunt && retrohunt.finished && t('status.completed')
+                      )
+                    }
+                    color={retrohunt && 'finished' in retrohunt && retrohunt.finished ? 'primary' : 'default'}
+                    variant="outlined"
+                  />
+                )}
+              </Grid> */}
             </Grid>
+
+            {retrohunt && 'finished' in retrohunt && !retrohunt.finished && (
+              <Grid item paddingTop={2}>
+                <Grid container flexDirection="row" justifyContent="center">
+                  <Grid item xs={12} sm={11} lg={10}>
+                    <SteppedProgress
+                      activeStep={['filtering', 'yara', 'finished'].indexOf(phase)}
+                      progress={progress}
+                      loading={!retrohunt}
+                      steps={[
+                        { label: t('phase.filtering'), icon: <FilterAltOutlinedIcon /> },
+                        { label: t('phase.yara'), icon: <DataObjectOutlinedIcon /> },
+                        { label: t('phase.finished'), icon: <DoneOutlinedIcon /> }
+                      ]}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
+            )}
           </Grid>
 
           <Grid item>
@@ -320,21 +307,16 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                   </Grid>
 
                   <Grid item xs={4} sm={3} lg={2}>
-                    <span className={classes.title}>{t('details.phase')}</span>
-                  </Grid>
-                  <Grid className={classes.value} item xs={8} sm={9} lg={10}>
-                    {!retrohunt ? <Skeleton width="auto" /> : 'phase' in retrohunt ? retrohunt.phase : null}
-                  </Grid>
-
-                  <Grid item xs={4} sm={3} lg={2}>
-                    <span className={classes.title}>{t('details.progress')}</span>
+                    <span className={classes.title}>{t('details.search')}</span>
                   </Grid>
                   <Grid className={classes.value} item xs={8} sm={9} lg={10}>
                     {!retrohunt ? (
                       <Skeleton width="auto" />
-                    ) : 'progress' in retrohunt ? (
-                      retrohunt.progress.join(', ')
-                    ) : null}
+                    ) : !('archive_only' in retrohunt) ? null : retrohunt.archive_only ? (
+                      t('details.archive_only')
+                    ) : (
+                      t('details.all')
+                    )}
                   </Grid>
 
                   <Grid item xs={4} sm={3} lg={2}>
@@ -354,7 +336,13 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                     <span className={classes.title}>{t('details.truncated')}</span>
                   </Grid>
                   <Grid className={classes.value} item xs={8} sm={9} lg={10}>
-                    {!retrohunt ? <Skeleton width="auto" /> : 'truncated' in retrohunt ? retrohunt.truncated : null}
+                    {!retrohunt ? (
+                      <Skeleton width="auto" />
+                    ) : !('truncated' in retrohunt) ? null : retrohunt.truncated ? (
+                      t('details.yes')
+                    ) : (
+                      t('details.no')
+                    )}
                   </Grid>
 
                   <Grid item xs={4} sm={3} lg={2}>
@@ -398,7 +386,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             </Typography>
             <Divider />
             <Collapse in={isOpen.results} timeout="auto">
-              <Grid container className={classes.collapse}>
+              <Grid container className={classes.collapse} justifyContent="center">
                 <Grid item xs={4} sm={3} lg={2}>
                   <span className={classes.title}>{t('details.hit-count')}</span>
                 </Grid>
@@ -406,72 +394,95 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                   {!retrohunt ? <Skeleton width="auto" /> : 'total_hits' in retrohunt ? retrohunt.total_hits : null}
                 </Grid>
 
-                <Grid className={clsx(classes.value, classes.containerSpacer)} item xs={12}>
-                  {retrohunt && 'total_hits' in retrohunt && retrohunt.total_hits > 0 ? (
-                    <TableContainer
-                      id="hits-table"
-                      className={classes.tableContainer}
-                      component={Paper}
-                      onScroll={handleHitsScroll}
-                    >
-                      <DivTable stickyHeader>
-                        <DivTableHead>
-                          <DivTableRow>
-                            <DivTableCell children={t('details.lasttimeseen')} />
-                            <DivTableCell children={t('details.count')} />
-                            <DivTableCell children={t('details.sha256')} />
-                            <DivTableCell children={t('details.filetype')} />
-                            <DivTableCell children={t('details.size')} />
-                            {c12nDef.enforce && <DivTableCell children={t('details.classification')} />}
-                            <DivTableCell />
-                          </DivTableRow>
-                        </DivTableHead>
-                        <DivTableBody id="hit-body">
-                          {hits.map((file, id) => (
-                            <LinkRow
-                              key={id}
-                              component={Link}
-                              to={`/file/detail/${file.sha256}`}
-                              hover
-                              style={{ textDecoration: 'none' }}
-                            >
-                              <DivTableCell>
-                                <Tooltip title={file.seen.last}>
-                                  <>
-                                    <Moment fromNow locale={i18n.language}>
-                                      {file.seen.last}
-                                    </Moment>
-                                  </>
-                                </Tooltip>
-                              </DivTableCell>
-                              <DivTableCell>{file.seen.count}</DivTableCell>
-                              <DivTableCell breakable>{file.sha256}</DivTableCell>
-                              <DivTableCell>{file.type}</DivTableCell>
-                              <DivTableCell>{file.size}</DivTableCell>
-                              {c12nDef.enforce && (
-                                <DivTableCell>
-                                  <Classification type="text" size="tiny" c12n={file.classification} format="short" />
-                                </DivTableCell>
-                              )}
-                              <DivTableCell style={{ textAlign: 'center' }}>
-                                {file.from_archive && (
-                                  <Tooltip title={t('archive')}>
-                                    <ArchiveOutlinedIcon />
-                                  </Tooltip>
-                                )}
-                              </DivTableCell>
-                            </LinkRow>
-                          ))}
-                        </DivTableBody>
-                      </DivTable>
-                    </TableContainer>
+                <Grid className={clsx(classes.value, classes.containerSpacer)} item marginBottom={theme.spacing(0.25)}>
+                  {nbOfPages > 1 && (
+                    <Pagination
+                      count={nbOfPages}
+                      onChange={handlePageChange}
+                      shape="rounded"
+                      size="small"
+                      sx={{ textAlign: 'center', justifySelf: 'center' }}
+                    />
+                  )}
+                </Grid>
+
+                <Grid className={clsx(classes.value)} item xs={12}>
+                  {!retrohunt ? (
+                    <Skeleton
+                      className={classes.containerSpacer}
+                      variant="rectangular"
+                      style={{ height: '6rem', borderRadius: '4px' }}
+                    />
                   ) : (
-                    <div style={{ width: '100%' }}>
-                      <InformativeAlert>
-                        <AlertTitle>{t('no_results_title')}</AlertTitle>
-                        {t('no_results_desc')}
-                      </InformativeAlert>
-                    </div>
+                    <>
+                      <div style={{ height: '4px' }}>{isReloading && <LinearProgress />}</div>
+                      {'total_hits' in retrohunt && retrohunt.total_hits > 0 ? (
+                        <TableContainer id="hits-table" component={Paper}>
+                          <DivTable stickyHeader>
+                            <DivTableHead>
+                              <DivTableRow>
+                                <DivTableCell children={t('details.lasttimeseen')} />
+                                <DivTableCell children={t('details.count')} />
+                                <DivTableCell children={t('details.sha256')} />
+                                <DivTableCell children={t('details.filetype')} />
+                                <DivTableCell children={t('details.size')} />
+                                {c12nDef.enforce && <DivTableCell children={t('details.classification')} />}
+                                <DivTableCell />
+                              </DivTableRow>
+                            </DivTableHead>
+                            <DivTableBody id="hit-body">
+                              {retrohunt.hits.map((file, id) => (
+                                <LinkRow
+                                  key={id}
+                                  component={Link}
+                                  to={`/file/detail/${file.sha256}`}
+                                  hover
+                                  style={{ textDecoration: 'none' }}
+                                >
+                                  <DivTableCell>
+                                    <Tooltip title={file.seen.last}>
+                                      <>
+                                        <Moment fromNow locale={i18n.language}>
+                                          {file.seen.last}
+                                        </Moment>
+                                      </>
+                                    </Tooltip>
+                                  </DivTableCell>
+                                  <DivTableCell>{file.seen.count}</DivTableCell>
+                                  <DivTableCell breakable>{file.sha256}</DivTableCell>
+                                  <DivTableCell>{file.type}</DivTableCell>
+                                  <DivTableCell>{file.size}</DivTableCell>
+                                  {c12nDef.enforce && (
+                                    <DivTableCell>
+                                      <Classification
+                                        type="text"
+                                        size="tiny"
+                                        c12n={file.classification}
+                                        format="short"
+                                      />
+                                    </DivTableCell>
+                                  )}
+                                  <DivTableCell style={{ textAlign: 'center' }}>
+                                    {file.from_archive && (
+                                      <Tooltip title={t('archive')}>
+                                        <ArchiveOutlinedIcon />
+                                      </Tooltip>
+                                    )}
+                                  </DivTableCell>
+                                </LinkRow>
+                              ))}
+                            </DivTableBody>
+                          </DivTable>
+                        </TableContainer>
+                      ) : (
+                        <div style={{ width: '100%' }}>
+                          <InformativeAlert>
+                            <AlertTitle>{t('no_results_title')}</AlertTitle>
+                            {t('no_results_desc')}
+                          </InformativeAlert>
+                        </div>
+                      )}
+                    </>
                   )}
                 </Grid>
               </Grid>

@@ -25,10 +25,19 @@ import { RetrohuntDetail } from './retrohunt/detail';
 const PAGE_SIZE = 25;
 
 const useStyles = makeStyles(theme => ({
-  header: { paddingBottom: theme.spacing(2) },
-  headerButton: { textAlign: 'right', flexGrow: 0 },
-  headerIconButton: { color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark },
-  searchContainer: { paddingTop: theme.spacing(1) },
+  header: {
+    paddingBottom: theme.spacing(2)
+  },
+  headerButton: {
+    textAlign: 'right',
+    flexGrow: 0
+  },
+  headerIconButton: {
+    color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+  },
+  searchContainer: {
+    paddingTop: theme.spacing(1)
+  },
   searchBar: {
     fontStyle: 'italic',
     paddingTop: theme.spacing(0.5),
@@ -36,10 +45,14 @@ const useStyles = makeStyles(theme => ({
     flexWrap: 'wrap',
     justifyContent: 'flex-end'
   },
-  tableContainer: { paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }
+  tableContainer: {
+    paddingTop: theme.spacing(2),
+    paddingLeft: theme.spacing(0.5),
+    paddingRight: theme.spacing(0.5)
+  }
 }));
 
-export type RetrohuntPhase = null | 'submitted' | 'error' | 'yara' | 'finished';
+export type RetrohuntPhase = null | 'filtering' | 'yara' | 'finished';
 
 export type RetrohuntResult = {
   archive_only?: boolean;
@@ -84,7 +97,6 @@ export default function Retrohunt() {
   const { user: currentUser, indexes, configuration } = useALContext();
 
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
-  const retrohuntRef = useRef<RetrohuntResult>(null);
   const [pageSize] = useState<number>(PAGE_SIZE);
   const [searching, setSearching] = useState<boolean>(false);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
@@ -121,39 +133,41 @@ export default function Retrohunt() {
     [query]
   );
 
-  const handleCreate = useCallback(() => {
+  const handleCreateRetrohunt = useCallback(
+    (retrohunt: RetrohuntResult) => {
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${retrohunt?.code}`);
+    },
+    [location.pathname, location.search, navigate]
+  );
+
+  const handleOpenCreatePage = useCallback(() => {
     if (currentUser.roles.includes('retrohunt_run')) {
-      window.history.pushState({}, undefined, `${location.pathname}${location.search ? location.search : ''}`);
-      setGlobalDrawer(<RetrohuntCreate retrohuntRef={retrohuntRef} isDrawer onSetGlobalDrawer={setGlobalDrawer} />);
+      navigate(`${location.pathname}?${query.toString()}`);
+      setGlobalDrawer(<RetrohuntCreate isDrawer onCreateRetrohunt={handleCreateRetrohunt} />);
     }
-  }, [currentUser.roles, location.pathname, location.search, setGlobalDrawer]);
+  }, [currentUser.roles, handleCreateRetrohunt, location.pathname, navigate, query, setGlobalDrawer]);
 
   const handleClear = useCallback(
     () => navigate(`${location.pathname}${location.hash}`),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.pathname, location.hash]
+    [navigate, location.pathname, location.hash]
   );
 
-  const handleSearch = useCallback(
-    () => {
-      if (filterValue.current !== '') {
-        query.set('query', filterValue.current);
-        navigate(`${location.pathname}?${query.toString()}${location.hash}`);
-      } else {
-        handleClear();
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query, navigate, location.pathname, location.hash, handleClear]
-  );
+  const handleSearch = useCallback(() => {
+    if (filterValue.current !== '') {
+      query.set('query', filterValue.current);
+      navigate(`${location.pathname}?${query.toString()}${location.hash}`);
+    } else {
+      handleClear();
+    }
+  }, [query, navigate, location.pathname, location.hash, handleClear]);
 
   const handleFilterValueChange = useCallback((inputValue: string) => {
     filterValue.current = inputValue;
   }, []);
 
-  const openRetrohuntDrawer = useCallback(
-    (rh: RetrohuntResult) => {
-      navigate(`${location.pathname}${location.search ? location.search : ''}#${rh?.code}`);
+  const handleRowClick = useCallback(
+    (retrohunt: RetrohuntResult) => {
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${retrohunt?.code}`);
     },
     [location, navigate]
   );
@@ -177,8 +191,7 @@ export default function Retrohunt() {
     return () => {
       window.removeEventListener('reloadRetrohunts', reload);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleReload, query, retrohuntResults]);
+  }, [handleReload, retrohuntResults]);
 
   useEffect(() => {
     if (retrohuntResults !== null && !globalDrawerOpened && location.hash) {
@@ -191,10 +204,10 @@ export default function Retrohunt() {
     if (location.hash) {
       setGlobalDrawer(<RetrohuntDetail code={location.hash.substr(1)} isDrawer />);
     }
-  }, [location.hash, retrohuntRef, setGlobalDrawer]);
+  }, [location.hash, setGlobalDrawer]);
 
   useEffect(() => {
-    if (!timer.current && retrohuntResults && retrohuntResults?.items.some(item => !item?.finished)) {
+    if (!timer.current && retrohuntResults && retrohuntResults.items.some(item => !item?.finished)) {
       timer.current = true;
       setTimeout(() => {
         handleReload(retrohuntResults ? retrohuntResults.offset : 0);
@@ -216,7 +229,7 @@ export default function Retrohunt() {
             {currentUser.roles.includes('retrohunt_run') && (
               <Grid className={classes.headerButton} item xs>
                 <Tooltip title={t('tooltip.add')}>
-                  <IconButton className={classes.headerIconButton} onClick={handleCreate} size="large">
+                  <IconButton className={classes.headerIconButton} onClick={handleOpenCreatePage} size="large">
                     <AddCircleOutlineOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -268,7 +281,7 @@ export default function Retrohunt() {
         </PageHeader>
 
         <div className={classes.tableContainer}>
-          <RetrohuntTable retrohuntResults={retrohuntResults} onRowClick={rh => openRetrohuntDrawer(rh)} />
+          <RetrohuntTable retrohuntResults={retrohuntResults} onRowClick={item => handleRowClick(item)} />
         </div>
       </PageFullWidth>
     );

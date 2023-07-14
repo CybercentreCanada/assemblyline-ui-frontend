@@ -23,11 +23,8 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { MonacoEditor } from 'components/visual/MonacoEditor';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import 'moment/locale/fr';
-import React, { MutableRefObject, useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
-import { RetrohuntDetail } from './detail';
 
 const useStyles = makeStyles(theme => ({
   circularProgress: {
@@ -41,16 +38,13 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   isDrawer?: boolean;
-  retrohuntRef?: MutableRefObject<RetrohuntResult>;
-  onSetGlobalDrawer?: (prop: any) => void;
+  onCreateRetrohunt?: (retrohunt: RetrohuntResult) => void;
 };
 
-function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null, onSetGlobalDrawer = null }: Props) {
+function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => null }: Props) {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const classes = useStyles();
-  const navigate = useNavigate();
-  const location = useLocation();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
@@ -59,6 +53,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null, onSetGl
 
   const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
+      code: null,
       archive_only: false,
       classification: c12nDef?.UNRESTRICTED,
       description: '',
@@ -67,50 +62,31 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null, onSetGl
     [c12nDef?.UNRESTRICTED]
   );
 
+  const [retrohunt, setRetrohunt] = useState<RetrohuntResult>({ ...DEFAULT_RETROHUNT });
   const [isModified, setIsModified] = useState<boolean>(false);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState<boolean>(false);
-  const [retrohunt, setRetrohunt] = useState<RetrohuntResult>({
-    ...DEFAULT_RETROHUNT,
-    ...retrohuntRef.current
-  });
 
-  const onRetrohuntChange = useCallback(
-    (newRetrohunt: Partial<RetrohuntResult>) => {
-      setRetrohunt(rh => ({ ...rh, ...newRetrohunt }));
-      retrohuntRef.current = { ...retrohuntRef.current, ...newRetrohunt };
-      setIsModified(true);
-    },
-    [retrohuntRef]
-  );
-
-  const onCancelRetrohuntConfirmation = useCallback(() => {
-    setIsConfirmationOpen(false);
-  }, []);
-
-  const onCreateRetrohunt = useCallback(
-    (rh: RetrohuntResult) => {
+  const handleCreateRetrohunt = useCallback(
+    (result: RetrohuntResult) => {
       if (!currentUser.roles.includes('retrohunt_run')) return;
       apiCall({
         url: `/api/v4/retrohunt/`,
         method: 'POST',
         body: {
-          classification: rh.classification,
-          description: rh.description,
-          archive_only: rh.archive_only ? rh.archive_only : false,
-          yara_signature: rh.yara_signature
+          classification: result.classification,
+          description: result.description,
+          archive_only: result.archive_only,
+          yara_signature: result.yara_signature
         },
         onSuccess: api_data => {
-          const newCode: string = api_data.api_response?.code ? api_data.api_response?.code : 'new';
           showSuccessMessage(t('add.success'));
-          retrohuntRef.current = { ...DEFAULT_RETROHUNT };
+          setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response });
           setIsModified(false);
+          setIsDisabled(true);
           setIsConfirmationOpen(false);
-          setTimeout(() => {
-            window.dispatchEvent(new CustomEvent('reloadRetrohunts'));
-            onSetGlobalDrawer(<RetrohuntDetail code={newCode} isDrawer />);
-            navigate(`${location.pathname}${location.search ? location.search : ''}#${newCode}`);
-          }, 10);
+          setTimeout(() => window.dispatchEvent(new CustomEvent('reloadRetrohunts')), 1000);
         },
         onFailure: api_data => {
           showErrorMessage(api_data.api_error_message);
@@ -121,19 +97,27 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null, onSetGl
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      DEFAULT_RETROHUNT,
-      currentUser.roles,
-      location.pathname,
-      location.search,
-      navigate,
-      onSetGlobalDrawer,
-      retrohuntRef,
-      showErrorMessage,
-      showSuccessMessage,
-      t
-    ]
+    [DEFAULT_RETROHUNT, currentUser.roles, onCreateRetrohunt, showErrorMessage, showSuccessMessage, t]
   );
+
+  const handleRetrohuntChange = useCallback((newRetrohunt: Partial<RetrohuntResult>) => {
+    setRetrohunt(rh => ({ ...rh, ...newRetrohunt }));
+    setIsModified(true);
+  }, []);
+  const handleCloseConfirmation = useCallback(() => () => setIsConfirmationOpen(false), []);
+
+  const handleCancelConfirmation = useCallback(() => () => setIsConfirmationOpen(false), []);
+
+  const handleAcceptConfirmation = useCallback(
+    (result: RetrohuntResult) => () => handleCreateRetrohunt(result),
+    [handleCreateRetrohunt]
+  );
+
+  useEffect(() => {
+    if (retrohunt && retrohunt?.code) {
+      onCreateRetrohunt(retrohunt);
+    }
+  }, [onCreateRetrohunt, retrohunt]);
 
   if (currentUser.roles.includes('retrohunt_run'))
     return (
@@ -141,9 +125,9 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null, onSetGl
         <RouterPrompt when={isModified} />
         <ConfirmationDialog
           open={isConfirmationOpen}
-          handleClose={_event => setIsConfirmationOpen(false)}
-          handleCancel={onCancelRetrohuntConfirmation}
-          handleAccept={() => onCreateRetrohunt(retrohunt)}
+          handleClose={handleCloseConfirmation()}
+          handleCancel={handleCancelConfirmation()}
+          handleAccept={handleAcceptConfirmation(retrohunt)}
           title={t('validate.title')}
           cancelText={t('validate.cancelText')}
           acceptText={t('validate.acceptText')}
@@ -157,8 +141,8 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null, onSetGl
                 format="long"
                 type="picker"
                 c12n={retrohunt.classification}
-                setClassification={(c12n: string) => onRetrohuntChange({ classification: c12n })}
-                disabled={!currentUser.roles.includes('retrohunt_run')}
+                setClassification={(c12n: string) => handleRetrohuntChange({ classification: c12n })}
+                disabled={!currentUser.roles.includes('retrohunt_run') || isDisabled}
               />
             </Grid>
           )}
@@ -192,7 +176,8 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null, onSetGl
               margin="dense"
               variant="outlined"
               value={retrohunt.description}
-              onChange={event => onRetrohuntChange({ description: event.target.value })}
+              onChange={event => handleRetrohuntChange({ description: event.target.value })}
+              disabled={isDisabled}
             />
           </Grid>
 
@@ -201,10 +186,15 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null, onSetGl
             <RadioGroup
               row
               value={retrohunt.archive_only ? 'archive_only' : 'all'}
-              onChange={(_, value) => onRetrohuntChange({ archive_only: value === 'archive_only' })}
+              onChange={(_, value) => handleRetrohuntChange({ archive_only: value === 'archive_only' })}
             >
-              <FormControlLabel value="all" control={<Radio />} label={t('details.all')} />
-              <FormControlLabel value="archive_only" control={<Radio />} label={t('details.archive_only')} />
+              <FormControlLabel value="all" control={<Radio />} label={t('details.all')} disabled={isDisabled} />
+              <FormControlLabel
+                value="archive_only"
+                control={<Radio />}
+                label={t('details.archive_only')}
+                disabled={isDisabled}
+              />
             </RadioGroup>
           </Grid>
 
@@ -214,7 +204,8 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null, onSetGl
               <MonacoEditor
                 language="yara"
                 value={retrohunt.yara_signature}
-                onChange={data => onRetrohuntChange({ yara_signature: data })}
+                onChange={data => handleRetrohuntChange({ yara_signature: data })}
+                options={{ readOnly: isDisabled }}
               />
             </Grid>
           </Grid>
