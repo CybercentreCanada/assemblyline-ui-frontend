@@ -5,12 +5,12 @@ import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem, Skeleton 
 import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
-import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { useNavigate } from 'react-router';
+import ExternalLinks from './ExternalLookup/ExternalLinks';
 import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -29,6 +29,9 @@ const useStyles = makeStyles(theme => ({
     lineHeight: '32px'
   },
   link: {
+    marginLeft: theme.spacing(-0.5),
+    paddingLeft: theme.spacing(0.5),
+    borderRadius: theme.spacing(0.5),
     textDecoration: 'none',
     color: 'inherit',
     display: 'flex',
@@ -43,11 +46,10 @@ type TagProps = {
   category: 'metadata' | 'hash';
   type: string;
   value: string;
-  fullWidth?: boolean;
   classification?: string | null;
 };
 
-const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, fullWidth = false, classification }) => {
+const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, classification }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
   const navigate = useNavigate();
@@ -122,7 +124,7 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, full
         {!!currentUser.roles.includes('external_query') &&
           !!currentUserConfig.ui.external_sources?.length &&
           !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type) && (
-            <>
+            <div>
               <Divider />
               <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
                 {t('related_external')}
@@ -137,11 +139,11 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, full
                   {TRAVEL_EXPLORE_ICON} {toTitleCase(source)}
                 </MenuItem>
               ))}
-            </>
+            </div>
           )}
         {!!currentUserConfig.ui.external_links?.hasOwnProperty(category) &&
           !!currentUserConfig.ui.external_links[category].hasOwnProperty(type) && (
-            <>
+            <div>
               <Divider />
               <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
                 {t('external_link')}
@@ -164,20 +166,24 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, full
                   </MaterialLink>
                 </MenuItem>
               ))}
-            </>
+            </div>
           )}
       </Menu>
-      <MaterialLink className={classes.link} onClick={handleMenuClick} onContextMenu={handleMenuClick}>
-        {value ? value : <Skeleton />}
-        {lookupState && lookupState[type] ? (
-          <ExternalLinks
-            success={lookupState[type].success}
-            results={lookupState[type].results}
-            errors={lookupState[type].errors}
-            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'text-bottom' }}
-          />
-        ) : null}
-      </MaterialLink>
+      {value ? (
+        <MaterialLink className={classes.link} onClick={handleMenuClick} onContextMenu={handleMenuClick}>
+          {value}
+          {lookupState && lookupState[type] ? (
+            <ExternalLinks
+              success={lookupState[type].success}
+              results={lookupState[type].results}
+              errors={lookupState[type].errors}
+              iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'text-bottom' }}
+            />
+          ) : null}
+        </MaterialLink>
+      ) : (
+        <Skeleton />
+      )}
     </>
   );
 };

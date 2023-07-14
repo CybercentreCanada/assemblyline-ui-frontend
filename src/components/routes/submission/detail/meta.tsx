@@ -3,6 +3,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Button, Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
+import ActionableText from 'components/visual/ActionableText';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -85,7 +86,11 @@ const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata }) => {
                     <span style={{ fontWeight: 500 }}>{meta}</span>
                   </Grid>
                   <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                    {metadata[meta]}
+                    {configuration.ui.external_links.metadata?.hasOwnProperty(meta) ? (
+                      <ActionableText category="metadata" type={meta} value={metadata[meta]} />
+                    ) : (
+                      metadata[meta]
+                    )}
                   </Grid>
                 </Grid>
               ))
@@ -118,7 +123,11 @@ const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata }) => {
                       <span style={{ fontWeight: 500 }}>{meta}</span>
                     </Grid>
                     <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                      {metadata[meta]}
+                      {configuration.ui.external_links.metadata?.hasOwnProperty(meta) ? (
+                        <ActionableText category="metadata" type={meta} value={metadata[meta]} />
+                      ) : (
+                        metadata[meta]
+                      )}
                     </Grid>
                   </Grid>
                 ))}
