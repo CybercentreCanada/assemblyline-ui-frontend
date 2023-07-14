@@ -86,11 +86,7 @@ const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata }) => {
                     <span style={{ fontWeight: 500 }}>{meta}</span>
                   </Grid>
                   <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                    {configuration.ui.external_links.metadata?.hasOwnProperty(meta) ? (
-                      <ActionableText category="metadata" type={meta} value={metadata[meta]} />
-                    ) : (
-                      metadata[meta]
-                    )}
+                    <ActionableText category="metadata" type={meta} value={metadata[meta]} />
                   </Grid>
                 </Grid>
               ))
@@ -123,11 +119,7 @@ const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata }) => {
                       <span style={{ fontWeight: 500 }}>{meta}</span>
                     </Grid>
                     <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                      {configuration.ui.external_links.metadata?.hasOwnProperty(meta) ? (
-                        <ActionableText category="metadata" type={meta} value={metadata[meta]} />
-                      ) : (
-                        metadata[meta]
-                      )}
+                      <ActionableText category="metadata" type={meta} value={metadata[meta]} />
                     </Grid>
                   </Grid>
                 ))}
