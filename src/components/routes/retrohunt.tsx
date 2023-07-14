@@ -113,7 +113,7 @@ export default function Retrohunt() {
     (offset: number) => {
       query.set('rows', PAGE_SIZE);
       query.set('offset', offset);
-      query.set('fl', 'created,creator,description,classification,total_hits,phase,progress,finished');
+      query.set('fl', 'id,code,created,creator,description,classification,total_hits,phase,progress,finished');
       apiCall({
         method: 'POST',
         url: '/api/v4/search/retrohunt/',
