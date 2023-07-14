@@ -36,27 +36,30 @@ const WrappedRetrohuntTable: React.FC<Props> = ({ retrohuntResults, allowSort = 
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
-  const RetrohuntStatus = useCallback<React.FC<{ result: RetrohuntResult }>>(
-    (prop = { result: null }) => {
-      const finished = 'finished' in prop.result ? prop.result.finished : null;
+  const RetrohuntStatus = useCallback<React.FC<{ result?: RetrohuntResult }>>(
+    (prop = { result: {} }) => {
+      const result = { finished: false, phase: null, progress: null, ...prop.result };
+      const finished = 'finished' in result ? result.finished : null;
+      if (finished === null) return null;
 
       const phase =
-        'phase' in prop.result && ['filtering', 'yara', 'finished'].includes(prop.result.phase)
-          ? prop.result.phase
-          : null;
+        'phase' in result && ['filtering', 'yara', 'finished'].includes(result.phase)
+          ? result.phase
+          : finished
+          ? 'finished'
+          : 'submitted';
 
-      let pourcentage = 0;
-      const progress = 'progress' in prop.result ? prop.result.progress : null;
+      let pourcentage = '';
+      const progress = 'progress' in result ? result.progress : null;
       if (phase && !finished && Array.isArray(progress) && progress.length === 2) {
-        if (phase === 'finished') pourcentage = 100;
-        else if (phase === 'yara') pourcentage = Math.floor((100 * (progress[0] - progress[1])) / progress[0]);
-        else if (phase === 'filtering') pourcentage = Math.floor((100 * progress[0]) / progress[1]);
+        if (phase === 'yara') pourcentage = `${Math.floor((100 * (progress[0] - progress[1])) / progress[0])}% `;
+        else if (phase === 'filtering') pourcentage = `${Math.floor((100 * progress[0]) / progress[1])}% `;
       }
 
       return (
         <CustomChip
-          label={finished ? t('status.finished') : `${pourcentage}% ${phase ? t(`status.${phase}`) : null}`}
-          color={finished ? 'primary' : 'default'}
+          label={`${pourcentage}${t(`status.${phase}`)}`}
+          color={finished || phase === 'finished' ? 'primary' : 'default'}
           size="small"
           variant="outlined"
         />

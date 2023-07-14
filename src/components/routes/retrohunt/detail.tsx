@@ -38,6 +38,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useParams } from 'react-router-dom';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { FixedSizeList as List } from 'react-window';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -71,6 +73,12 @@ const useStyles = makeStyles(theme => ({
   tableCell: {
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2)
+  },
+  windowCell: {
+    display: 'block',
+    overflowX: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis'
   }
 }));
 
@@ -508,12 +516,20 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                   <Grid className={clsx(classes.value, classes.containerSpacer)} item xs={12}>
                     <TableContainer className={classes.tableContainer} component={Paper}>
                       <DivTable>
-                        <DivTableBody>
-                          {retrohunt.errors.map((error, i) => (
-                            <DivTableRow key={`${i}`}>
-                              <DivTableCell className={classes.tableCell}>{error}</DivTableCell>
-                            </DivTableRow>
-                          ))}
+                        <DivTableBody style={{ height: '50vh', overflow: 'hidden' }}>
+                          <AutoSizer>
+                            {({ height, width }) => (
+                              <List height={height} width={width} itemSize={32.75} itemCount={retrohunt.errors.length}>
+                                {({ index, style }) => (
+                                  <DivTableRow key={`${index}`} style={{ ...style }}>
+                                    <DivTableCell className={clsx(classes.tableCell, classes.windowCell)}>
+                                      {retrohunt.errors[index]}
+                                    </DivTableCell>
+                                  </DivTableRow>
+                                )}
+                              </List>
+                            )}
+                          </AutoSizer>
                         </DivTableBody>
                       </DivTable>
                     </TableContainer>
