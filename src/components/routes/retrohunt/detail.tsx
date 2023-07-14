@@ -514,8 +514,8 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                   </Grid>
 
                   <Grid className={clsx(classes.value, classes.containerSpacer)} item xs={12}>
-                    <TableContainer className={classes.tableContainer} component={Paper}>
-                      <DivTable>
+                    <TableContainer className={classes.tableContainer} component={Paper} style={{ overflow: 'hidden' }}>
+                      <DivTable style={{ overflow: 'hidden' }}>
                         <DivTableBody style={{ height: '50vh', overflow: 'hidden' }}>
                           <AutoSizer>
                             {({ height, width }) => (
