@@ -258,7 +258,7 @@ const WrappedTag: React.FC<TagProps> = ({
         {!!currentUser.roles.includes('external_query') &&
           !!currentUserConfig.ui.external_sources?.length &&
           !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type) && (
-            <>
+            <div>
               <Divider />
               <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
                 {t('related_external')}
@@ -273,10 +273,10 @@ const WrappedTag: React.FC<TagProps> = ({
                   {TRAVEL_EXPLORE_ICON} {toTitleCase(source)}
                 </MenuItem>
               ))}
-            </>
+            </div>
           )}
         {!!currentUserConfig.ui.external_links?.tag?.hasOwnProperty(type) && (
-          <>
+          <div>
             <Divider />
             <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
               {t('external_link')}
@@ -299,7 +299,7 @@ const WrappedTag: React.FC<TagProps> = ({
                 </MaterialLink>
               </MenuItem>
             ))}
-          </>
+          </div>
         )}
       </Menu>
       <CustomChip
