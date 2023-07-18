@@ -9,7 +9,6 @@ import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 
@@ -79,7 +78,6 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   searchTagExternal
 }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { copy } = useClipboard();
   const classes = useStyles();
