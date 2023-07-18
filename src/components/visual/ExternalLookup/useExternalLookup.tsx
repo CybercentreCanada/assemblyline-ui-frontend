@@ -59,7 +59,7 @@ export function useSearchTagExternal(initialState: ExternalLookupResults, key: s
         category !== null &&
         type !== null &&
         value !== undefined &&
-        ((hasExternalQuery && hasExternalLinks) || category === 'tag')
+        (hasExternalQuery || hasExternalLinks || category === 'tag')
       );
     },
 

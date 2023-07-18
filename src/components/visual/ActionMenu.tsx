@@ -10,9 +10,10 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 
-const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
+const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px', verticalAlign: 'middle' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const EXTERNAL_ICON = (
@@ -83,15 +84,6 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { copy } = useClipboard();
   const classes = useStyles();
 
-  const searchItem = useCallback(
-    () =>
-      navigate(
-        `/search${categoryIndex[category]}?query=${categoryPrefix[category]}${type}:${safeFieldValueURI(value)}`
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [category, type, value]
-  );
-
   const { toTitleCase } = useSearchTagExternal({
     [type]: {
       results: {},
@@ -108,11 +100,6 @@ const WrappedActionMenu: React.FC<TagProps> = ({
     copy(value, 'clipID');
     handleClose();
   }, [copy, handleClose, value]);
-
-  const handleMenuSearch = useCallback(() => {
-    searchItem();
-    handleClose();
-  }, [searchItem, handleClose]);
 
   const handleMenuExternalSearch = useCallback(
     source => {
@@ -145,9 +132,16 @@ const WrappedActionMenu: React.FC<TagProps> = ({
         {t('clipboard')}
       </MenuItem>
       {currentUser.roles.includes('submission_view') && (
-        <MenuItem dense onClick={handleMenuSearch}>
-          {SEARCH_ICON}
-          {t('related')}
+        <MenuItem dense>
+          <Link
+            style={{ color: 'inherit', textDecoration: 'none' }}
+            to={`/search${categoryIndex[category]}?query=${categoryPrefix[category]}${type}:${safeFieldValueURI(
+              value
+            )}`}
+          >
+            {SEARCH_ICON}
+            {t('related')}
+          </Link>
         </MenuItem>
       )}
       {hasExternalQuery && (
