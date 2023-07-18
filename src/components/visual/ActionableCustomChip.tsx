@@ -7,6 +7,7 @@ import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 export interface ActionableCustomChipProps extends CustomChipProps {
   data_type?: string;
   category?: 'hash' | 'metadata' | 'tag';
+  classification?: string;
 }
 
 const initialMenuState = {
@@ -18,6 +19,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
   children,
   data_type = null,
   category = null,
+  classification,
   ...otherProps
 }) => {
   const [state, setState] = React.useState(initialMenuState);
@@ -51,6 +53,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
           state={state}
           setState={setState}
           searchTagExternal={searchTagExternal}
+          classification={classification}
         />
       )}
       <CustomChip
