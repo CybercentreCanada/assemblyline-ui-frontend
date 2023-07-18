@@ -12,12 +12,10 @@ import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 
-const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px', verticalAlign: 'middle' }} />;
+const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
-const EXTERNAL_ICON = (
-  <HiOutlineExternalLink style={{ marginRight: '16px', fontSize: '22px', verticalAlign: 'middle' }} />
-);
+const EXTERNAL_ICON = <HiOutlineExternalLink style={{ marginRight: '16px', fontSize: '22px' }} />;
 const initialMenuState = {
   mouseX: null,
   mouseY: null
@@ -130,16 +128,13 @@ const WrappedActionMenu: React.FC<TagProps> = ({
         {t('clipboard')}
       </MenuItem>
       {currentUser.roles.includes('submission_view') && (
-        <MenuItem dense>
-          <Link
-            style={{ color: 'inherit', textDecoration: 'none' }}
-            to={`/search${categoryIndex[category]}?query=${categoryPrefix[category]}${type}:${safeFieldValueURI(
-              value
-            )}`}
-          >
-            {SEARCH_ICON}
-            {t('related')}
-          </Link>
+        <MenuItem
+          dense
+          component={Link}
+          to={`/search${categoryIndex[category]}?query=${categoryPrefix[category]}${type}:${safeFieldValueURI(value)}`}
+        >
+          {SEARCH_ICON}
+          {t('related')}
         </MenuItem>
       )}
       {hasExternalQuery && (
@@ -168,20 +163,19 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           </ListSubheader>
 
           {currentUserConfig.ui.external_links[category][type].map((link, i) => (
-            <MenuItem dense key={`source_${i}`}>
-              <MaterialLink
-                onClick={handleClose}
-                target="_blank"
-                underline="none"
-                rel="noopener noreferrer"
-                color="inherit"
-                href={link.url.replace(
-                  link.replace_pattern,
-                  encodeURIComponent(link.double_encode ? encodeURIComponent(value) : value)
-                )}
-              >
-                {EXTERNAL_ICON} {link.name}
-              </MaterialLink>
+            <MenuItem
+              dense
+              component={MaterialLink}
+              key={`source_${i}`}
+              rel="noopener noreferrer"
+              target="_blank"
+              href={link.url.replace(
+                link.replace_pattern,
+                encodeURIComponent(link.double_encode ? encodeURIComponent(value) : value)
+              )}
+              onClick={handleClose}
+            >
+              {EXTERNAL_ICON} {link.name}
             </MenuItem>
           ))}
         </div>
