@@ -79,22 +79,23 @@ type AutoHideChipListState = {
   fullChipList: CustomChipProps[];
 };
 
-const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items, type }) => {
+const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items, type = null }) => {
   const { t } = useTranslation();
   const [state, setState] = useState<AutoHideChipListState | null>(null);
   const [shownChips, setShownChips] = useState<CustomChipProps[]>([]);
 
   useEffect(() => {
     const fullChipList = items.sort(detailedItemCompare).map(item => ({
+      category: 'tag',
+      data_type: type,
       label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
       variant: 'outlined' as 'outlined',
-      color: verdictToColor(item.verdict),
-      tooltip: 'bob'
+      color: verdictToColor(item.verdict)
     }));
     const showExtra = items.length <= TARGET_RESULT_COUNT;
 
     setState({ showExtra, fullChipList });
-  }, [items]);
+  }, [items, type]);
 
   useEffect(() => {
     if (state !== null) {
@@ -607,7 +608,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   <Grid item xs={9} sm={10}>
                     <div className={classes.sectionContent}>
                       {item && item.al.detailed ? (
-                        <AutoHideChipList items={item.al.detailed.av} />
+                        <AutoHideChipList items={item.al.detailed.av} type="av.virus_name" />
                       ) : (
                         <ChipList items={item ? item.al.av.map(label => ({ label, variant: 'outlined' })) : null} />
                       )}
@@ -633,6 +634,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                             {item && item.al.detailed ? (
                               <AutoHideChipList
                                 items={item.al.detailed.ip.filter(ip => ip.type === 'network.dynamic.ip')}
+                                type="network.dynamic.ip"
                               />
                             ) : (
                               <ChipList
@@ -656,6 +658,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                             {item && item.al.detailed ? (
                               <AutoHideChipList
                                 items={item.al.detailed.ip.filter(ip => ip.type === 'network.static.ip')}
+                                type="network.static.ip"
                               />
                             ) : (
                               <ChipList
@@ -696,6 +699,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                 items={item.al.detailed.domain.filter(
                                   domain => domain.type === 'network.dynamic.domain'
                                 )}
+                                type="network.dynamic.domain"
                               />
                             ) : (
                               <ChipList
@@ -721,6 +725,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                 items={item.al.detailed.domain.filter(
                                   domain => domain.type === 'network.static.domain'
                                 )}
+                                type="network.static.domain"
                               />
                             ) : (
                               <ChipList
@@ -759,6 +764,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                             {item && item.al.detailed ? (
                               <AutoHideChipList
                                 items={item.al.detailed.uri.filter(uri => uri.type === 'network.dynamic.uri')}
+                                type="network.dynamic.uri"
                               />
                             ) : (
                               <ChipList
@@ -782,6 +788,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                             {item && item.al.detailed ? (
                               <AutoHideChipList
                                 items={item.al.detailed.uri.filter(uri => uri.type === 'network.static.uri')}
+                                type="network.static.uri"
                               />
                             ) : (
                               <ChipList
@@ -832,7 +839,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   <Grid item xs={9} sm={10}>
                     <div className={classes.sectionContent}>
                       {item && item.al.detailed ? (
-                        <AutoHideChipList items={item.al.detailed.behavior} />
+                        <AutoHideChipList items={item.al.detailed.behavior} type="file.behavior" />
                       ) : (
                         <ChipList
                           items={item ? item.al.behavior.map(label => ({ label, variant: 'outlined' })) : null}
@@ -852,7 +859,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   <Grid item xs={9} sm={10}>
                     <div className={classes.sectionContent}>
                       {item && item.al.detailed ? (
-                        <AutoHideChipList items={item.al.detailed.yara} />
+                        <AutoHideChipList items={item.al.detailed.yara} type="file.rule.yara" />
                       ) : (
                         <ChipList items={item ? item.al.yara.map(label => ({ label, variant: 'outlined' })) : null} />
                       )}
