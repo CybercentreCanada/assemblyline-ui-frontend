@@ -75,7 +75,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({ retrohuntResults, allowSort = 
           <DivTableHead>
             <DivTableRow>
               <SortableHeaderCell children={t('header.created')} sortField="created" allowSort={allowSort} />
-              <SortableHeaderCell children={t('header.description')} sortField="code" allowSort={allowSort} />
+              <SortableHeaderCell children={t('header.description')} sortField="description" allowSort={allowSort} />
               <SortableHeaderCell children={t('header.creator')} sortField="creator" allowSort={allowSort} />
               {c12nDef.enforce && (
                 <SortableHeaderCell
