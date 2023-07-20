@@ -15,7 +15,7 @@ import { FileResult } from 'components/visual/SearchResult/files';
 import RetrohuntTable from 'components/visual/SearchResult/retrohunt';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
@@ -61,9 +61,19 @@ export type RetrohuntResult = {
   created?: string;
   creator?: string;
   description?: string;
-  errors?: string[];
+  errors?: {
+    items: string[];
+    offset: number;
+    rows: number;
+    total: number;
+  };
   finished?: boolean;
-  hits?: FileResult[];
+  hits?: {
+    items: FileResult[];
+    offset: number;
+    rows: number;
+    total: number;
+  };
   id?: string;
   pending_candidates?: any;
   pending_indices?: any;
@@ -86,117 +96,119 @@ type SearchResults = {
 
 const RELOAD_DELAY = 5000;
 
+const DEFAULT_PARAMS: object = {
+  fl: 'id,code,created,creator,description,classification,total_hits,phase,progress,finished',
+  offset: 0,
+  query: '*',
+  rows: PAGE_SIZE,
+  sort: 'created+desc'
+};
+
+const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
+  .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
+  .join('&');
+
 export default function Retrohunt() {
   const { t } = useTranslation(['retrohunt']);
   const classes = useStyles();
   const location = useLocation();
   const navigate = useNavigate();
-
   const { apiCall } = useMyAPI();
   const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const { user: currentUser, indexes, configuration } = useALContext();
 
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
+  const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
   const [pageSize] = useState<number>(PAGE_SIZE);
   const [searching, setSearching] = useState<boolean>(false);
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const timer = useRef<boolean>(false);
-
-  const [suggestions] = useState([
-    ...Object.keys(indexes.retrohunt).filter(name => indexes.retrohunt[name].indexed),
-    ...DEFAULT_SUGGESTION
-  ]);
 
   const filterValue = useRef<string>('');
+  const timer = useRef<boolean>(false);
+
+  const suggestions = useMemo<string[]>(
+    () => [...Object.keys(indexes.retrohunt).filter(name => indexes.retrohunt[name].indexed), ...DEFAULT_SUGGESTION],
+    [indexes.retrohunt]
+  );
+
+  const handleQueryChange = useCallback((key: string, value: string | number) => {
+    setQuery(prev => {
+      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
+      q.set(key, value);
+      return q;
+    });
+  }, []);
+
+  const handleQueryRemove = useCallback((key: string | string[]) => {
+    setQuery(prev => {
+      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
+      if (typeof key === 'string') q.delete(key);
+      else key.forEach(k => q.delete(k));
+      return q;
+    });
+  }, []);
 
   const handleReload = useCallback(
-    (offset: number) => {
-      query.set('rows', PAGE_SIZE);
-      query.set('offset', offset);
-      query.set('fl', 'id,code,created,creator,description,classification,total_hits,phase,progress,finished');
-      apiCall({
-        method: 'POST',
-        url: '/api/v4/search/retrohunt/',
-        body: query.getParams(),
-        onSuccess: api_data => {
-          const { items, total, rows, offset: ofs } = api_data.api_response;
-          if (items.length === 0 && ofs !== 0 && ofs >= total) {
-            handleReload(Math.max(0, ofs - rows));
-          } else {
-            setRetrohuntResults(api_data.api_response);
-          }
-        },
-        onEnter: () => setSearching(true),
-        onExit: () => setSearching(false)
-      });
+    () => {
+      if (query && currentUser.roles.includes('retrohunt_view')) {
+        const curQuery = new SimpleSearchQuery(query.toString(), DEFAULT_QUERY);
+        curQuery.set('rows', PAGE_SIZE);
+        apiCall({
+          method: 'POST',
+          url: `/api/v4/search/retrohunt/`,
+          body: curQuery.getParams(),
+          onSuccess: api_data => {
+            const { items, total, rows, offset: ofs } = api_data.api_response;
+            if (items.length === 0 && ofs !== 0 && ofs >= total) {
+              handleQueryChange('offset', ofs - rows);
+            } else {
+              setRetrohuntResults(api_data.api_response);
+            }
+          },
+          onEnter: () => setSearching(true),
+          onExit: () => setSearching(false)
+        });
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query]
+    [currentUser.roles, query]
   );
 
   const handleCreateRetrohunt = useCallback(
     (retrohunt: RetrohuntResult) => {
-      navigate(`${location.pathname}${location.search ? location.search : ''}#${retrohunt?.code}`);
+      navigate(`${location.pathname}${location.search}#${retrohunt?.code}`);
     },
     [location.pathname, location.search, navigate]
   );
 
   const handleOpenCreatePage = useCallback(() => {
     if (currentUser.roles.includes('retrohunt_run')) {
-      navigate(`${location.pathname}?${query.toString()}`);
       setGlobalDrawer(<RetrohuntCreate isDrawer onCreateRetrohunt={handleCreateRetrohunt} />);
+      navigate(`${location.pathname}?${query.getDeltaString()}`);
     }
   }, [currentUser.roles, handleCreateRetrohunt, location.pathname, navigate, query, setGlobalDrawer]);
 
-  const handleClear = useCallback(
-    () => navigate(`${location.pathname}${location.hash}`),
-    [navigate, location.pathname, location.hash]
-  );
-
-  const handleSearch = useCallback(() => {
-    if (filterValue.current !== '') {
-      query.set('query', filterValue.current);
-      navigate(`${location.pathname}?${query.toString()}${location.hash}`);
-    } else {
-      handleClear();
-    }
-  }, [query, navigate, location.pathname, location.hash, handleClear]);
-
-  const handleFilterValueChange = useCallback((inputValue: string) => {
-    filterValue.current = inputValue;
-  }, []);
-
-  const handleRowClick = useCallback(
-    (retrohunt: RetrohuntResult) => {
-      navigate(`${location.pathname}${location.search ? location.search : ''}#${retrohunt?.code}`);
-    },
-    [location, navigate]
-  );
+  useEffect(() => {
+    if (query) handleReload();
+  }, [handleReload, query]);
 
   useEffect(() => {
-    setSearching(true);
-    setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
-  }, [location.pathname, location.search, pageSize]);
-
-  useEffect(() => {
-    if (query && currentUser.roles.includes('retrohunt_view')) {
-      handleReload(0);
-    }
-  }, [currentUser.roles, handleReload, query]);
+    const search = query.getDeltaString() === '' ? '' : `?${query.getDeltaString()}`;
+    navigate(`${location.pathname}${search}${location.hash}`);
+  }, [location.hash, location.pathname, navigate, query]);
 
   useEffect(() => {
     function reload() {
-      handleReload(retrohuntResults ? retrohuntResults.offset : 0);
+      handleReload();
     }
     window.addEventListener('reloadRetrohunts', reload);
     return () => {
       window.removeEventListener('reloadRetrohunts', reload);
     };
-  }, [handleReload, retrohuntResults]);
+  }, [handleReload]);
 
   useEffect(() => {
     if (retrohuntResults !== null && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search ? location.search : ''}`);
+      navigate(`${location.pathname}${location.search}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalDrawerOpened]);
@@ -211,7 +223,7 @@ export default function Retrohunt() {
     if (!timer.current && retrohuntResults && retrohuntResults.items.some(item => !item?.finished)) {
       timer.current = true;
       setTimeout(() => {
-        handleReload(retrohuntResults ? retrohuntResults.offset : 0);
+        handleReload();
         timer.current = false;
       }, RELOAD_DELAY);
     }
@@ -246,9 +258,16 @@ export default function Retrohunt() {
               placeholder={t('filter')}
               searching={searching}
               suggestions={suggestions}
-              onClear={handleClear}
-              onSearch={handleSearch}
-              onValueChange={handleFilterValueChange}
+              onValueChange={value => {
+                filterValue.current = value;
+              }}
+              onClear={() => handleQueryRemove(['query', 'rows', 'offset'])}
+              onSearch={() => {
+                if (filterValue.current !== '') {
+                  handleQueryChange('query', filterValue.current);
+                  handleQueryChange('offset', 0);
+                } else handleQueryRemove(['query', 'rows', 'offset']);
+              }}
             >
               {retrohuntResults !== null && (
                 <div className={classes.searchBar}>
@@ -282,7 +301,10 @@ export default function Retrohunt() {
         </PageHeader>
 
         <div className={classes.tableContainer}>
-          <RetrohuntTable retrohuntResults={retrohuntResults} onRowClick={item => handleRowClick(item)} />
+          <RetrohuntTable
+            retrohuntResults={retrohuntResults}
+            onRowClick={item => navigate(`${location.pathname}${location.search}#${item?.code}`)}
+          />
         </div>
       </PageFullWidth>
     );

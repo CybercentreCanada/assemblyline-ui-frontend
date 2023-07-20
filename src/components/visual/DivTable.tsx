@@ -1,6 +1,7 @@
-import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Theme } from '@mui/material';
+import { Table, TableBody, TableCell, TableCellProps, TableHead, TableRow, TableSortLabel, Theme } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
+import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import 'moment/locale/fr';
 import React from 'react';
 import { useNavigate } from 'react-router';
@@ -57,22 +58,43 @@ DivTableCell.defaultProps = {
   breakable: false
 };
 
-export const SortableHeaderCell = ({ children, sortField, allowSort = true, ...other }) => {
+type SortableHeaderCellProps = TableCellProps & {
+  query?: SimpleSearchQuery;
+  sortName?: string;
+  sortField: string;
+  allowSort?: boolean;
+  disableNavigation?: boolean;
+  onSort?: (event: React.MouseEvent<HTMLSpanElement, MouseEvent>, value: { name: string; field: string }) => void;
+};
+
+export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
+  allowSort = true,
+  children,
+  disableNavigation = false,
+  query = null,
+  sortField,
+  sortName = 'sort',
+  onSort = () => null,
+  ...other
+}) => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const curSort = searchParams.get('sort');
+  const curSort = query ? query.get(sortName) : searchParams.get(sortName);
   const navigate = useNavigate();
   const active = curSort && curSort.indexOf(sortField) !== -1;
   const dir = active && curSort.indexOf('asc') !== -1 ? 'asc' : 'desc';
 
-  const triggerSort = () => {
+  const triggerSort = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     if (curSort && curSort.indexOf(sortField) !== -1 && curSort.indexOf('asc') === -1) {
-      searchParams.set('sort', `${sortField} asc`);
+      searchParams.set(sortName, `${sortField} asc`);
+      onSort(event, { name: sortName, field: `${sortField} asc` });
     } else {
-      searchParams.set('sort', `${sortField} desc`);
+      searchParams.set(sortName, `${sortField} desc`);
+      onSort(event, { name: sortName, field: `${sortField} desc` });
     }
-    navigate(`${location.pathname}?${searchParams.toString()}`);
+    if (!disableNavigation) navigate(`${location.pathname}?${searchParams.toString()}${location.hash}`);
   };
+
   return (
     <StyledTableCell {...other} component="div">
       {allowSort ? (

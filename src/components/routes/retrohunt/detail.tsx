@@ -9,7 +9,6 @@ import {
   Collapse,
   Divider,
   Grid,
-  LinearProgress,
   Pagination,
   Paper,
   Skeleton,
@@ -23,23 +22,36 @@ import clsx from 'clsx';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
+import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
 import { RetrohuntPhase, RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
+import {
+  DivTable,
+  DivTableBody,
+  DivTableCell,
+  DivTableHead,
+  DivTableRow,
+  LinkRow,
+  SortableHeaderCell
+} from 'components/visual/DivTable';
+import FileDetail from 'components/visual/FileDetail';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import MonacoEditor from 'components/visual/MonacoEditor';
+import SearchBar from 'components/visual/SearchBar/search-bar';
+import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
+import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
+import { FileResult } from 'components/visual/SearchResult/files';
+import SearchResultCount from 'components/visual/SearchResultCount';
 import SteppedProgress from 'components/visual/SteppedProgress';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Link, useParams } from 'react-router-dom';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList as List } from 'react-window';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -79,6 +91,13 @@ const useStyles = makeStyles(theme => ({
     overflowX: 'hidden',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis'
+  },
+  results: {
+    fontStyle: 'italic',
+    paddingTop: theme.spacing(0.5),
+    display: 'flex',
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap'
   }
 }));
 
@@ -99,19 +118,40 @@ const MAX_TRACKED_RECORDS = 10000;
 
 const RELOAD_DELAY = 5000;
 
+const DEFAULT_PARAMS: object = {
+  'errors.offset': 0,
+  'errors.query': '.*',
+  'errors.rows': PAGE_SIZE,
+  'hits.fl': 'seen.last,seen.count,sha256,type,size,classification,from_archive',
+  'hits.offset': 0,
+  'hits.query': '*',
+  'hits.rows': PAGE_SIZE,
+  'hits.sort': 'seen.last+desc'
+};
+
+const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
+  .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
+  .join('&');
+
 function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Props) {
   const { t, i18n } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const classes = useStyles();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { apiCall } = useMyAPI();
+  const { setGlobalDrawer } = useDrawer();
+  const { indexes } = useALContext();
 
   const { c12nDef, configuration } = useALContext();
   const { code: paramCode } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [retrohunt, setRetrohunt] = useState<RetrohuntResult>(null);
-  const [offset, setOffset] = useState<number>(0);
   const [isReloading, setIsReloading] = useState<boolean>(true);
+  const [query, setQuery] = useState<SimpleSearchQuery>(
+    new SimpleSearchQuery(isDrawer ? '' : location.search, DEFAULT_QUERY)
+  );
   const [isOpen, setIsOpen] = useState<OpenSection>({
     information: true,
     signature: false,
@@ -119,6 +159,8 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     errors: false
   });
 
+  const prevQuery = useRef<SimpleSearchQuery>(null);
+  const filterValue = useRef<string>('');
   const timer = useRef<boolean>(false);
 
   const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
@@ -129,9 +171,19 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       created: '2020-01-01T00:00:00.000000Z',
       creator: null,
       description: '',
-      errors: [],
+      errors: {
+        items: [],
+        offset: 0,
+        rows: PAGE_SIZE,
+        total: null
+      },
       finished: false,
-      hits: [],
+      hits: {
+        items: [],
+        offset: 0,
+        rows: PAGE_SIZE,
+        total: null
+      },
       pending_candidates: 0,
       pending_indices: 0,
       phase: 'finished',
@@ -143,6 +195,11 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       yara_signature: ''
     }),
     [c12nDef.UNRESTRICTED]
+  );
+
+  const hitsSuggestions = useMemo<string[]>(
+    () => [...Object.keys(indexes.file).filter(name => indexes.file[name].indexed), ...DEFAULT_SUGGESTION],
+    [indexes.file]
   );
 
   const momentFormat = useMemo(
@@ -167,21 +224,52 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     else return null;
   }, [phase, retrohunt]);
 
-  const nbOfPages = useMemo<number>(
+  const hitPageCount = useMemo<number>(
     () =>
-      retrohunt && 'total_hits' in retrohunt
-        ? Math.ceil(Math.min(retrohunt.total_hits, MAX_TRACKED_RECORDS) / PAGE_SIZE)
+      retrohunt && 'hits' in retrohunt && 'total' in retrohunt.hits
+        ? Math.ceil(Math.min(retrohunt.hits.total, MAX_TRACKED_RECORDS) / PAGE_SIZE)
         : 0,
     [retrohunt]
   );
 
-  const handleReload: (prop: { code: string; offset?: number }) => void = useCallback(
-    prop => {
-      if (currentUser.roles.includes('retrohunt_view')) {
+  const errorPageCount = useMemo<number>(
+    () =>
+      retrohunt && 'errors' in retrohunt && 'total' in retrohunt.errors
+        ? Math.ceil(Math.min(retrohunt.errors.total, MAX_TRACKED_RECORDS) / PAGE_SIZE)
+        : 0,
+    [retrohunt]
+  );
+
+  const handleQueryChange = useCallback((key: string, value: string | number) => {
+    setQuery(prev => {
+      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
+      q.set(key, value);
+      return q;
+    });
+  }, []);
+
+  const handleQueryRemove = useCallback((key: string | string[]) => {
+    setQuery(prev => {
+      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
+      if (typeof key === 'string') q.delete(key);
+      else key.forEach(k => q.delete(k));
+      return q;
+    });
+  }, []);
+
+  const handleReload = useCallback(
+    (curCode: string, searchParam: string) => {
+      const curQuery = new SimpleSearchQuery(searchParam, DEFAULT_QUERY);
+      const sameQuery = Object.is(curQuery?.toString(), prevQuery.current?.toString());
+
+      if (currentUser.roles.includes('retrohunt_view') && (!sameQuery || curCode !== retrohunt?.code)) {
         apiCall({
-          url: `/api/v4/retrohunt/${prop.code}/?offset=${prop.offset}&rows=${PAGE_SIZE}`,
+          method: 'POST',
+          url: `/api/v4/retrohunt/${curCode}/`,
+          body: curQuery.getParams(),
           onSuccess: api_data => {
             setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response });
+            prevQuery.current = curQuery;
           },
           onEnter: () => {
             setIsReloading(true);
@@ -193,7 +281,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [DEFAULT_RETROHUNT, currentUser.roles]
+    [DEFAULT_RETROHUNT, currentUser.roles, retrohunt?.code]
   );
 
   const handleIsOpenChange = useCallback(
@@ -201,23 +289,42 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     []
   );
 
-  const handlePageChange = useCallback((event: React.ChangeEvent<unknown>, value: number) => {
-    setOffset((value - 1) * PAGE_SIZE);
-  }, []);
+  const handleHitRowClick = useCallback(
+    (file: FileResult) => {
+      if (isDrawer) navigate(`/file/detail/${file.sha256}`);
+      else navigate(`${location.pathname}${location.search}#${file.sha256}`);
+    },
+    [isDrawer, location, navigate]
+  );
 
   useEffect(() => {
-    handleReload({ code: propCode || paramCode, offset: offset });
-  }, [handleReload, offset, paramCode, propCode]);
+    if (isDrawer) handleReload(propCode, query.toString());
+    else handleReload(paramCode, query.toString());
+  }, [handleReload, isDrawer, paramCode, propCode, query]);
 
   useEffect(() => {
     if (!timer.current && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
       timer.current = true;
       setTimeout(() => {
-        handleReload({ code: retrohunt.code, offset: offset });
+        if (isDrawer) handleReload(retrohunt.code, query.toString());
+        else handleReload(retrohunt.code, location.search);
         timer.current = false;
       }, RELOAD_DELAY);
     }
-  }, [handleReload, offset, retrohunt]);
+  }, [handleReload, isDrawer, location.search, query, retrohunt]);
+
+  useEffect(() => {
+    if (!isDrawer && query) {
+      const search = query.getDeltaString() === '' ? '' : `?${query.getDeltaString()}`;
+      navigate(`${location.pathname}${search}${location.hash}`);
+    }
+  }, [isDrawer, location.hash, location.pathname, navigate, query]);
+
+  useEffect(() => {
+    if (!isDrawer && location.hash) {
+      setGlobalDrawer(<FileDetail sha256={location.hash.substr(1)} />);
+    }
+  }, [isDrawer, location.hash, setGlobalDrawer]);
 
   if (!configuration?.datastore?.retrohunt?.enabled) return <NotFoundPage />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
@@ -396,22 +503,10 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             <Collapse in={isOpen.results} timeout="auto">
               <Grid container className={classes.collapse} justifyContent="center">
                 <Grid item xs={4} sm={3} lg={2}>
-                  <span className={classes.title}>{t('details.hit-count')}</span>
+                  <span className={classes.title}>{t('details.total')}</span>
                 </Grid>
                 <Grid className={classes.value} item xs={8} sm={9} lg={10}>
                   {!retrohunt ? <Skeleton width="auto" /> : 'total_hits' in retrohunt ? retrohunt.total_hits : null}
-                </Grid>
-
-                <Grid className={clsx(classes.value, classes.containerSpacer)} item marginBottom={theme.spacing(0.25)}>
-                  {nbOfPages > 1 && (
-                    <Pagination
-                      count={nbOfPages}
-                      onChange={handlePageChange}
-                      shape="rounded"
-                      size="small"
-                      sx={{ textAlign: 'center', justifySelf: 'center' }}
-                    />
-                  )}
                 </Grid>
 
                 <Grid className={clsx(classes.value)} item xs={12}>
@@ -423,29 +518,133 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                     />
                   ) : (
                     <>
-                      <div style={{ height: '4px' }}>{isReloading && <LinearProgress />}</div>
-                      {'total_hits' in retrohunt && retrohunt.total_hits > 0 ? (
+                      <div style={{ paddingTop: theme.spacing(1) }}>
+                        <SearchBar
+                          initValue={query ? query.get('hits.query', '') : ''}
+                          placeholder={t('hits.filter')}
+                          searching={isReloading}
+                          suggestions={hitsSuggestions}
+                          onValueChange={value => {
+                            filterValue.current = value;
+                          }}
+                          onClear={() => handleQueryRemove(['hits.query', 'hits.rows', 'hits.offset'])}
+                          onSearch={() => {
+                            if (filterValue.current !== '') {
+                              handleQueryChange('hits.query', filterValue.current);
+                              handleQueryChange('hits.offset', 0);
+                            } else handleQueryRemove(['hits.query', 'hits.rows', 'hits.offset']);
+                          }}
+                        >
+                          <div className={classes.results}>
+                            {retrohunt.hits.total !== 0 && (
+                              <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                                {isReloading ? (
+                                  <span>{t('searching')}</span>
+                                ) : (
+                                  <span>
+                                    <SearchResultCount count={retrohunt.hits.total} />
+                                    {query.get('query')
+                                      ? t(`hits.filtered${retrohunt.hits.total === 1 ? '' : 's'}`)
+                                      : t(`hits.total${retrohunt.hits.total === 1 ? '' : 's'}`)}
+                                  </span>
+                                )}
+                              </Typography>
+                            )}
+                            {hitPageCount > 1 && (
+                              <Pagination
+                                page={Math.ceil(1 + query.get('hits.offset') / PAGE_SIZE)}
+                                onChange={(e, value) => handleQueryChange('hits.offset', (value - 1) * PAGE_SIZE)}
+                                count={hitPageCount}
+                                shape="rounded"
+                                size="small"
+                              />
+                            )}
+                          </div>
+                        </SearchBar>
+                      </div>
+                      {!('hits' in retrohunt) || retrohunt.hits.total === 0 ? (
+                        <div style={{ width: '100%' }}>
+                          <InformativeAlert>
+                            <AlertTitle>{t('no_results_title')}</AlertTitle>
+                            {t('no_results_desc')}
+                          </InformativeAlert>
+                        </div>
+                      ) : (
                         <TableContainer id="hits-table" component={Paper}>
                           <DivTable stickyHeader>
                             <DivTableHead>
                               <DivTableRow>
-                                <DivTableCell children={t('details.lasttimeseen')} />
-                                <DivTableCell children={t('details.count')} />
-                                <DivTableCell children={t('details.sha256')} />
-                                <DivTableCell children={t('details.filetype')} />
-                                <DivTableCell children={t('details.size')} />
-                                {c12nDef.enforce && <DivTableCell children={t('details.classification')} />}
-                                <DivTableCell />
+                                <SortableHeaderCell
+                                  query={query}
+                                  children={t('details.lasttimeseen')}
+                                  sortName="hits.sort"
+                                  sortField="seen.last"
+                                  disableNavigation={isDrawer}
+                                  onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                                  sx={{ zIndex: 'auto' }}
+                                />
+                                <SortableHeaderCell
+                                  query={query}
+                                  children={t('details.count')}
+                                  sortName="hits.sort"
+                                  sortField="seen.count"
+                                  disableNavigation={isDrawer}
+                                  onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                                  sx={{ zIndex: 'auto' }}
+                                />
+                                <SortableHeaderCell
+                                  query={query}
+                                  children={t('details.sha256')}
+                                  sortName="hits.sort"
+                                  sortField="sha256"
+                                  disableNavigation={isDrawer}
+                                  onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                                  sx={{ zIndex: 'auto' }}
+                                />
+                                <SortableHeaderCell
+                                  query={query}
+                                  children={t('details.filetype')}
+                                  sortName="hits.sort"
+                                  sortField="type"
+                                  disableNavigation={isDrawer}
+                                  onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                                  sx={{ zIndex: 'auto' }}
+                                />
+                                <SortableHeaderCell
+                                  query={query}
+                                  children={t('details.size')}
+                                  sortName="hits.sort"
+                                  sortField="size"
+                                  disableNavigation={isDrawer}
+                                  onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                                  sx={{ zIndex: 'auto' }}
+                                />
+                                {c12nDef.enforce && (
+                                  <SortableHeaderCell
+                                    query={query}
+                                    children={t('details.classification')}
+                                    sortName="hits.sort"
+                                    sortField="classification"
+                                    disableNavigation={isDrawer}
+                                    onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                                    sx={{ zIndex: 'auto' }}
+                                  />
+                                )}
+                                <DivTableCell sx={{ zIndex: 'auto' }} />
                               </DivTableRow>
                             </DivTableHead>
                             <DivTableBody id="hit-body">
-                              {retrohunt.hits.map((file, id) => (
+                              {retrohunt.hits.items.map((file, id) => (
                                 <LinkRow
                                   key={id}
                                   component={Link}
                                   to={`/file/detail/${file.sha256}`}
                                   hover
                                   style={{ textDecoration: 'none' }}
+                                  onClick={event => {
+                                    event.preventDefault();
+                                    handleHitRowClick(file);
+                                  }}
                                 >
                                   <DivTableCell>
                                     <Tooltip title={file.seen.last}>
@@ -482,13 +681,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                             </DivTableBody>
                           </DivTable>
                         </TableContainer>
-                      ) : (
-                        <div style={{ width: '100%' }}>
-                          <InformativeAlert>
-                            <AlertTitle>{t('no_results_title')}</AlertTitle>
-                            {t('no_results_desc')}
-                          </InformativeAlert>
-                        </div>
                       )}
                     </>
                   )}
@@ -497,7 +689,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             </Collapse>
           </Grid>
 
-          {retrohunt && 'errors' in retrohunt && Array.isArray(retrohunt.errors) && retrohunt.errors.length > 0 && (
+          {retrohunt && 'errors' in retrohunt && retrohunt.errors.total !== 0 && (
             <Grid item>
               <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('errors')}>
                 <span>{t('header.errors')}</span>
@@ -505,31 +697,81 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
               </Typography>
               <Divider />
               <Collapse in={isOpen.errors} timeout="auto">
-                <Grid container className={classes.collapse}>
+                <Grid container className={classes.collapse} justifyContent="center">
                   <Grid item xs={4} sm={3} lg={2}>
-                    <span className={classes.title}>{t('details.error-count')}</span>
+                    <span className={classes.title}>{t('details.total')}</span>
                   </Grid>
                   <Grid className={classes.value} item xs={8} sm={9} lg={10}>
-                    {retrohunt.errors.length}
+                    {retrohunt.errors?.total}
                   </Grid>
 
-                  <Grid className={clsx(classes.value, classes.containerSpacer)} item xs={12}>
+                  <Grid className={clsx(classes.value)} item xs={12}>
+                    <div style={{ paddingTop: theme.spacing(1) }}>
+                      <SearchBar
+                        initValue={query ? query.get('errors.query', '') : ''}
+                        placeholder={t('errors.filter')}
+                        searching={isReloading}
+                        suggestions={[]}
+                        onValueChange={value => (filterValue.current = value)}
+                        onClear={() => handleQueryRemove(['errors.query', 'errors.rows', 'errors.offset'])}
+                        onSearch={() => {
+                          if (filterValue.current !== '') {
+                            handleQueryChange('errors.query', filterValue.current);
+                            handleQueryChange('errors.offset', 0);
+                          } else handleQueryRemove(['errors.query', 'errors.rows', 'errors.offset']);
+                        }}
+                      >
+                        <div className={classes.results}>
+                          {retrohunt.errors.total !== 0 && (
+                            <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                              {isReloading ? (
+                                <span>{t('searching')}</span>
+                              ) : (
+                                <span>
+                                  <SearchResultCount count={retrohunt.errors.total} />
+                                  {query.get('query')
+                                    ? t(`errors.filtered${retrohunt.errors.total === 1 ? '' : 's'}`)
+                                    : t(`errors.total${retrohunt.errors.total === 1 ? '' : 's'}`)}
+                                </span>
+                              )}
+                            </Typography>
+                          )}
+                          {errorPageCount > 1 && (
+                            <Grid className={clsx(classes.value)} item>
+                              <Pagination
+                                page={Math.ceil(1 + query.get('errors.offset') / PAGE_SIZE)}
+                                onChange={(e, value) => handleQueryChange('errors.offset', (value - 1) * PAGE_SIZE)}
+                                count={errorPageCount}
+                                shape="rounded"
+                                size="small"
+                                sx={{ textAlign: 'center', justifySelf: 'center' }}
+                              />
+                            </Grid>
+                          )}
+                        </div>
+                      </SearchBar>
+                    </div>
+
                     <TableContainer className={classes.tableContainer} component={Paper} style={{ overflow: 'hidden' }}>
                       <DivTable style={{ overflow: 'hidden' }}>
-                        <DivTableBody style={{ height: '50vh', overflow: 'hidden' }}>
-                          <AutoSizer>
-                            {({ height, width }) => (
-                              <List height={height} width={width} itemSize={32.75} itemCount={retrohunt.errors.length}>
-                                {({ index, style }) => (
-                                  <DivTableRow key={`${index}`} style={{ ...style }}>
-                                    <DivTableCell className={clsx(classes.tableCell, classes.windowCell)}>
-                                      {retrohunt.errors[index]}
-                                    </DivTableCell>
-                                  </DivTableRow>
-                                )}
-                              </List>
-                            )}
-                          </AutoSizer>
+                        <DivTableHead>
+                          <DivTableRow>
+                            <SortableHeaderCell
+                              query={query}
+                              children={t('details.error')}
+                              sortName="errors.sort"
+                              sortField="error"
+                              disableNavigation={isDrawer}
+                              onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                            />
+                          </DivTableRow>
+                        </DivTableHead>
+                        <DivTableBody id="error-body">
+                          {retrohunt.errors.items.map((error, id) => (
+                            <DivTableRow key={id} hover style={{ textDecoration: 'none' }}>
+                              <DivTableCell>{error}</DivTableCell>
+                            </DivTableRow>
+                          ))}
                         </DivTableBody>
                       </DivTable>
                     </TableContainer>
@@ -545,10 +787,9 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
 
 export const RetrohuntDetail = React.memo(WrappedRetrohuntDetail);
 
-WrappedRetrohuntDetail.defaultProps = {
-  pageType: 'page',
-  retrohuntCode: null,
-  retrohuntRef: null
-} as Props;
-
+const defaultProps: Props = {
+  code: null,
+  isDrawer: false
+};
+WrappedRetrohuntDetail.defaultProps = defaultProps;
 export default WrappedRetrohuntDetail;
