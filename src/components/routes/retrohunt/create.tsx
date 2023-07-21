@@ -104,14 +104,6 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
     setRetrohunt(rh => ({ ...rh, ...newRetrohunt }));
     setIsModified(true);
   }, []);
-  const handleCloseConfirmation = useCallback(() => () => setIsConfirmationOpen(false), []);
-
-  const handleCancelConfirmation = useCallback(() => () => setIsConfirmationOpen(false), []);
-
-  const handleAcceptConfirmation = useCallback(
-    (result: RetrohuntResult) => () => handleCreateRetrohunt(result),
-    [handleCreateRetrohunt]
-  );
 
   useEffect(() => {
     if (retrohunt && retrohunt?.code) {
@@ -125,9 +117,9 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
         <RouterPrompt when={isModified} />
         <ConfirmationDialog
           open={isConfirmationOpen}
-          handleClose={handleCloseConfirmation()}
-          handleCancel={handleCancelConfirmation()}
-          handleAccept={handleAcceptConfirmation(retrohunt)}
+          handleClose={() => setIsConfirmationOpen(false)}
+          handleCancel={() => setIsConfirmationOpen(false)}
+          handleAccept={() => handleCreateRetrohunt(retrohunt)}
           title={t('validate.title')}
           cancelText={t('validate.cancelText')}
           acceptText={t('validate.acceptText')}
