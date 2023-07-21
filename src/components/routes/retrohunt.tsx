@@ -100,8 +100,7 @@ const DEFAULT_PARAMS: object = {
   fl: 'id,code,created,creator,description,classification,total_hits,phase,progress,finished',
   offset: 0,
   query: '*',
-  rows: PAGE_SIZE,
-  sort: 'created+desc'
+  rows: PAGE_SIZE
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -304,6 +303,7 @@ export default function Retrohunt() {
           <RetrohuntTable
             retrohuntResults={retrohuntResults}
             onRowClick={item => navigate(`${location.pathname}${location.search}#${item?.code}`)}
+            onSort={({ name, field }) => handleQueryChange(name, field)}
           />
         </div>
       </PageFullWidth>

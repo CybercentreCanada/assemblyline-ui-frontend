@@ -82,16 +82,6 @@ const useStyles = makeStyles(theme => ({
   tableContainer: {
     maxHeight: `50vh`
   },
-  tableCell: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2)
-  },
-  windowCell: {
-    display: 'block',
-    overflowX: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis'
-  },
   results: {
     fontStyle: 'italic',
     paddingTop: theme.spacing(0.5),
@@ -159,7 +149,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     errors: false
   });
 
-  const prevQuery = useRef<SimpleSearchQuery>(null);
   const filterValue = useRef<string>('');
   const timer = useRef<boolean>(false);
 
@@ -260,23 +249,17 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const handleReload = useCallback(
     (curCode: string, searchParam: string) => {
       const curQuery = new SimpleSearchQuery(searchParam, DEFAULT_QUERY);
-      const sameQuery = Object.is(curQuery?.toString(), prevQuery.current?.toString());
 
-      if (currentUser.roles.includes('retrohunt_view') && (!sameQuery || curCode !== retrohunt?.code)) {
+      if (currentUser.roles.includes('retrohunt_view')) {
         apiCall({
           method: 'POST',
           url: `/api/v4/retrohunt/${curCode}/`,
           body: curQuery.getParams(),
           onSuccess: api_data => {
             setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response });
-            prevQuery.current = curQuery;
           },
-          onEnter: () => {
-            setIsReloading(true);
-          },
-          onExit: () => {
-            setIsReloading(false);
-          }
+          onEnter: () => setIsReloading(true),
+          onExit: () => setIsReloading(false)
         });
       }
     },
@@ -298,16 +281,14 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   );
 
   useEffect(() => {
-    if (isDrawer) handleReload(propCode, query.toString());
-    else handleReload(paramCode, query.toString());
+    handleReload(isDrawer ? propCode : paramCode, query.toString());
   }, [handleReload, isDrawer, paramCode, propCode, query]);
 
   useEffect(() => {
     if (!timer.current && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
       timer.current = true;
       setTimeout(() => {
-        if (isDrawer) handleReload(retrohunt.code, query.toString());
-        else handleReload(retrohunt.code, location.search);
+        handleReload(retrohunt.code, isDrawer ? query.toString() : location.search);
         timer.current = false;
       }, RELOAD_DELAY);
     }
@@ -348,28 +329,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                 <Typography variant="h4" children={!retrohunt ? <Skeleton width="30rem" /> : t('header.view')} />
                 <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.code} />
               </Grid>
-              {/* <Grid item>
-                {(!retrohunt || (retrohunt && 'finished' in retrohunt && retrohunt.finished)) && (
-                  <CustomChip
-                    icon={
-                      !retrohunt ? (
-                        <Skeleton variant="circular" width="1rem" height="1rem" />
-                      ) : (
-                        'finished' in retrohunt && retrohunt.finished && <DoneOutlinedIcon color="primary" />
-                      )
-                    }
-                    label={
-                      !retrohunt ? (
-                        <Skeleton width="5rem" />
-                      ) : (
-                        'finished' in retrohunt && retrohunt.finished && t('status.completed')
-                      )
-                    }
-                    color={retrohunt && 'finished' in retrohunt && retrohunt.finished ? 'primary' : 'default'}
-                    variant="outlined"
-                  />
-                )}
-              </Grid> */}
             </Grid>
 
             {retrohunt && 'finished' in retrohunt && !retrohunt.finished && (
@@ -419,19 +378,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                         {retrohunt.created}
                       </Moment>
                     ) : null}
-                  </Grid>
-
-                  <Grid item xs={4} sm={3} lg={2}>
-                    <span className={classes.title}>{t('details.search')}</span>
-                  </Grid>
-                  <Grid className={classes.value} item xs={8} sm={9} lg={10}>
-                    {!retrohunt ? (
-                      <Skeleton width="auto" />
-                    ) : !('archive_only' in retrohunt) ? null : retrohunt.archive_only ? (
-                      t('details.archive_only')
-                    ) : (
-                      t('details.all')
-                    )}
                   </Grid>
 
                   <Grid item xs={4} sm={3} lg={2}>

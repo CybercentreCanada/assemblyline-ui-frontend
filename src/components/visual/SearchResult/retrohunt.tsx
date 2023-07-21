@@ -30,9 +30,15 @@ type Props = {
   retrohuntResults: SearchResults;
   allowSort?: boolean;
   onRowClick?: (retrohunt: RetrohuntResult) => void;
+  onSort?: (value: { name: string; field: string }) => void;
 };
 
-const WrappedRetrohuntTable: React.FC<Props> = ({ retrohuntResults, allowSort = true, onRowClick = null }) => {
+const WrappedRetrohuntTable: React.FC<Props> = ({
+  retrohuntResults,
+  allowSort = true,
+  onRowClick = null,
+  onSort = () => null
+}) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
@@ -74,18 +80,39 @@ const WrappedRetrohuntTable: React.FC<Props> = ({ retrohuntResults, allowSort = 
         <DivTable>
           <DivTableHead>
             <DivTableRow>
-              <SortableHeaderCell children={t('header.created')} sortField="created" allowSort={allowSort} />
-              <SortableHeaderCell children={t('header.description')} sortField="description" allowSort={allowSort} />
-              <SortableHeaderCell children={t('header.creator')} sortField="creator" allowSort={allowSort} />
+              <SortableHeaderCell
+                children={t('header.created')}
+                sortField="created"
+                allowSort={allowSort}
+                onSort={(_, value) => onSort(value)}
+              />
+              <DivTableCell children={t('header.description')} />
+              <SortableHeaderCell
+                children={t('header.creator')}
+                sortField="creator"
+                allowSort={allowSort}
+                onSort={(_, value) => onSort(value)}
+              />
               {c12nDef.enforce && (
                 <SortableHeaderCell
                   children={t('header.classification')}
                   sortField="classification"
                   allowSort={allowSort}
+                  onSort={(_, value) => onSort(value)}
                 />
               )}
-              <SortableHeaderCell children={t('header.numfiles')} sortField="total_hits" allowSort={allowSort} />
-              <SortableHeaderCell children={t('header.status')} sortField="finished" allowSort={allowSort} />
+              <SortableHeaderCell
+                children={t('header.numfiles')}
+                sortField="total_hits"
+                allowSort={allowSort}
+                onSort={(_, value) => onSort(value)}
+              />
+              <SortableHeaderCell
+                children={t('header.status')}
+                sortField="finished"
+                allowSort={allowSort}
+                onSort={(_, value) => onSort(value)}
+              />
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
