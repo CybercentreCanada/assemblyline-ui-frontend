@@ -1,8 +1,8 @@
-import { Box, Tooltip } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
+import { Box, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
@@ -56,16 +56,22 @@ type AlertPriorityProps = {
   name: string;
   withChip?: boolean;
   size?: 'tiny' | 'small' | 'medium';
+  wrap?: boolean;
 };
 
-const WrappedAlertPriority: React.FC<AlertPriorityProps> = ({ name, withChip = false, size = 'small' }) => {
+const WrappedAlertPriority: React.FC<AlertPriorityProps> = ({
+  name,
+  withChip = false,
+  size = 'small',
+  wrap = true
+}) => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
 
   const priorityData = COLOR_MAP[name];
   return withChip ? (
     <CustomChip
-      wrap
+      wrap={wrap}
       size={size}
       variant="outlined"
       color={priorityData.color}
