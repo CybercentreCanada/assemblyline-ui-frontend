@@ -1,3 +1,4 @@
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import {
@@ -76,7 +77,7 @@ type ParamProps = {
 type WorkflowDetailProps = {
   workflow_id?: string;
   close?: () => void;
-  mode?: string;
+  mode?: 'read' | 'write';
 };
 
 const MyMenuItem = withStyles((theme: Theme) =>
@@ -97,7 +98,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailProps) => {
+const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailProps) => {
   const { t, i18n } = useTranslation(['manageWorkflowDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -109,6 +110,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [viewMode, setViewMode] = useState(mode);
   const { c12nDef } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage } = useMySnackbar();
@@ -235,6 +237,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
         showSuccessMessage(t(workflow_id || id ? 'save.success' : 'add.success'));
         setModified(false);
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
+        setViewMode('read');
         if (!(workflow_id || id)) close();
       },
       onEnter: () => setButtonLoading(true),
@@ -261,7 +264,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
             type="picker"
             c12n={workflow ? workflow.classification : null}
             setClassification={setClassification}
-            disabled={!currentUser.roles.includes('workflow_manage')}
+            disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
           />
         </div>
       )}
@@ -274,7 +277,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                 {workflow ? workflow.workflow_id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
-            {currentUser.roles.includes('workflow_view') && mode === 'edit' && (
+            {(workflow_id || id) && currentUser.roles.includes('workflow_view') && (
               <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
                 {workflow ? (
                   <Tooltip title={t('usage')}>
@@ -285,6 +288,23 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                       size="large"
                     >
                       <YoutubeSearchedForIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : null}
+              </Grid>
+            )}
+            {(workflow_id || id) && currentUser.roles.includes('workflow_manage') && viewMode === 'read' && (
+              <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
+                {workflow ? (
+                  <Tooltip title={t('edit')}>
+                    <IconButton
+                      style={{
+                        color: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark
+                      }}
+                      onClick={() => setViewMode('write')}
+                      size="large"
+                    >
+                      <EditOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                 ) : (
@@ -324,7 +344,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                 variant="outlined"
                 onChange={handleNameChange}
                 value={workflow.name}
-                disabled={!currentUser.roles.includes('workflow_manage')}
+                disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -352,7 +372,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                   });
                 }}
                 value={workflow.query}
-                disabled={!currentUser.roles.includes('workflow_manage')}
+                disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -369,7 +389,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                 value={workflow.labels}
                 renderInput={params => <TextField {...params} variant="outlined" />}
                 onChange={(event, value) => handleLabelsChange(value as string[])}
-                disabled={!currentUser.roles.includes('workflow_manage')}
+                disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -385,7 +405,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                   value={workflow.priority}
                   onChange={handlePriorityChange}
                   variant="outlined"
-                  disabled={!currentUser.roles.includes('workflow_manage')}
+                  disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
                 >
                   <MyMenuItem value="">{t('priority.null')}</MyMenuItem>
                   <MyMenuItem value="LOW">{t('priority.LOW')}</MyMenuItem>
@@ -408,7 +428,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                   value={workflow.status}
                   onChange={handleStatusChange}
                   variant="outlined"
-                  disabled={!currentUser.roles.includes('workflow_manage')}
+                  disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
                 >
                   <MyMenuItem value="">{t('status.null')}</MyMenuItem>
                   <MyMenuItem value="MALICIOUS">{t('status.MALICIOUS')}</MyMenuItem>
@@ -421,7 +441,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
             )}
           </Grid>
         </Grid>
-        <div style={{ textAlign: 'center', paddingTop: theme.spacing(3) }}>
+        {/* <div style={{ textAlign: 'center', paddingTop: theme.spacing(3) }}>
           {workflow ? (
             workflow.creator && (
               <Typography variant="subtitle2" color="textSecondary">
@@ -446,7 +466,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
           ) : (
             <Skeleton />
           )}
-        </div>
+        </div> */}
 
         <RouterPrompt when={modified} />
 
@@ -494,43 +514,108 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
             </div>
           </>
         ) : null}
-        {mode === 'edit' ? (
-          <div style={{ textAlign: 'left' }}>
-            <Grid item xs={12}>
-              <Typography variant="h6">{t('statistics')}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Grid container style={{ placeContent: 'center' }}>
-                <Grid item xs={3} sm={4} md={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>
-                    {t('hit.count')} {workflow ? workflow.hit_count : 0}
-                  </span>
+        {viewMode === 'read' ? (
+          <Grid style={{ paddingTop: theme.spacing(4) }}>
+            <Grid container>
+              <Grid item xs={12}>
+                <Typography variant="h6">{t('statistics')}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
+                  {t('hits')}
+                </Typography>
+                <Grid container>
+                  <Grid item xs={3} sm={4} md={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
+                  </Grid>
+                  <Grid item xs={9} sm={8} md={9} lg={10}>
+                    {workflow ? workflow.hit_count : 0}
+                  </Grid>
+                  <Grid item xs={3} sm={4} md={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
+                  </Grid>
+                  <Grid item xs={9} sm={8} md={9} lg={10}>
+                    {workflow && workflow.first_seen ? (
+                      <Moment fromNow locale={i18n.language}>
+                        {workflow.first_seen}
+                      </Moment>
+                    ) : (
+                      t('hit.none')
+                    )}
+                  </Grid>
+                  <Grid item xs={3} sm={4} md={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
+                  </Grid>
+                  <Grid item xs={9} sm={8} md={9} lg={10}>
+                    {workflow && workflow.last_seen ? (
+                      <Moment fromNow locale={i18n.language}>
+                        {workflow.last_seen}
+                      </Moment>
+                    ) : (
+                      t('hit.none')
+                    )}
+                  </Grid>
                 </Grid>
-                <Grid item xs={3} sm={4} md={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>{t('hit.first')} </span>
-                  {workflow && workflow.first_seen ? (
-                    <Moment fromNow locale={i18n.language}>
-                      {workflow.first_seen}
-                    </Moment>
-                  ) : (
-                    t('hit.none')
-                  )}
-                </Grid>
-                <Grid item xs={3} sm={4} md={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>{t('hit.last')} </span>
-                  {workflow && workflow.last_seen ? (
-                    <Moment fromNow locale={i18n.language}>
-                      {workflow.last_seen}
-                    </Moment>
-                  ) : (
-                    t('hit.none')
-                  )}
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
+                  {t('details')}
+                </Typography>
+                <Grid container>
+                  <Grid item xs={3} sm={4} md={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('created_by')}:</span>
+                  </Grid>
+                  <Grid item xs={9} sm={8} md={9} lg={10}>
+                    {workflow && workflow.creator ? (
+                      <>
+                        <Tooltip
+                          title={
+                            <Moment fromNow locale={i18n.language}>
+                              {workflow.creation_date}
+                            </Moment>
+                          }
+                          placement="bottom-start"
+                        >
+                          <Typography>{workflow.creator}</Typography>
+                        </Tooltip>
+                      </>
+                    ) : (
+                      <Skeleton />
+                    )}
+                  </Grid>
+                  <Grid item xs={3} sm={4} md={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('edited_by')}:</span>
+                  </Grid>
+                  <Grid item xs={9} sm={8} md={9} lg={10}>
+                    {workflow && workflow.edited_by ? (
+                      <>
+                        <Tooltip
+                          title={
+                            <Moment fromNow locale={i18n.language}>
+                              {workflow.last_edit}
+                            </Moment>
+                          }
+                          placement="bottom-start"
+                        >
+                          <Typography>{workflow.edited_by}</Typography>
+                        </Tooltip>
+                      </>
+                    ) : (
+                      <Skeleton />
+                    )}
+                  </Grid>
+                  <Grid item xs={3} sm={4} md={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('origin')}:</span>
+                  </Grid>
+                  <Grid item xs={9} sm={8} md={9} lg={10}>
+                    {workflow && workflow ? workflow.origin : <Skeleton />}
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-          </div>
+          </Grid>
         ) : null}
-        {currentUser.roles.includes('alert_view') && mode === 'edit' ? (
+        {currentUser.roles.includes('alert_view') && viewMode === 'read' ? (
           <>
             <Grid item xs={12} style={{ paddingTop: '10px' }}>
               <Histogram
