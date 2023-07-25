@@ -4,6 +4,7 @@
   "add.title": "Adding a workflow",
   "backport_workflow_prompt": "Apply workflow to all existing alerts?",
   "backport_workflow_matching": "matching alerts",
+  "cancel": "Cancel changes",
   "chart.title": "Number of hits in the last 30 days",
   "created_by": "Created by",
   "delete.acceptText": "Yes, remove it!",

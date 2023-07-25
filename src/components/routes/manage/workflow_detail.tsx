@@ -1,3 +1,4 @@
+import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
@@ -277,7 +278,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
                 {workflow ? workflow.workflow_id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
-            {(workflow_id || id) && currentUser.roles.includes('workflow_view') && (
+            {(workflow_id || id) && currentUser.roles.includes('workflow_view') && viewMode === 'read' && (
               <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
                 {workflow ? (
                   <Tooltip title={t('usage')}>
@@ -293,18 +294,25 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
                 ) : null}
               </Grid>
             )}
-            {(workflow_id || id) && currentUser.roles.includes('workflow_manage') && viewMode === 'read' && (
+            {(workflow_id || id) && currentUser.roles.includes('workflow_manage') && (
               <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
                 {workflow ? (
-                  <Tooltip title={t('edit')}>
+                  <Tooltip title={t(viewMode === 'read' ? 'edit' : 'cancel')}>
                     <IconButton
                       style={{
-                        color: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark
+                        color:
+                          viewMode === 'read'
+                            ? theme.palette.mode === 'dark'
+                              ? theme.palette.info.light
+                              : theme.palette.info.dark
+                            : theme.palette.mode === 'dark'
+                            ? theme.palette.error.light
+                            : theme.palette.error.dark
                       }}
-                      onClick={() => setViewMode('write')}
+                      onClick={() => setViewMode(viewMode === 'read' ? 'write' : 'read')}
                       size="large"
                     >
-                      <EditOutlinedIcon />
+                      {viewMode === 'read' ? <EditOutlinedIcon /> : <EditOffOutlinedIcon />}
                     </IconButton>
                   </Tooltip>
                 ) : (
@@ -312,7 +320,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
                 )}
               </Grid>
             )}
-            {(workflow_id || id) && currentUser.roles.includes('workflow_manage') && (
+            {(workflow_id || id) && currentUser.roles.includes('workflow_manage') && viewMode === 'read' && (
               <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
                 {workflow ? (
                   <Tooltip title={t('remove')}>
@@ -441,47 +449,15 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
             )}
           </Grid>
         </Grid>
-        {/* <div style={{ textAlign: 'center', paddingTop: theme.spacing(3) }}>
-          {workflow ? (
-            workflow.creator && (
-              <Typography variant="subtitle2" color="textSecondary">
-                {`${t('created_by')} ${workflow.creator} [${workflow.origin}] `}
-                <Moment fromNow locale={i18n.language}>
-                  {workflow.creation_date}
-                </Moment>
-              </Typography>
-            )
-          ) : (
-            <Skeleton />
-          )}
-          {workflow ? (
-            workflow.edited_by && (
-              <Typography variant="subtitle2" color="textSecondary">
-                {`${t('edited_by')} ${workflow.edited_by} `}
-                <Moment fromNow locale={i18n.language}>
-                  {workflow.last_edit}
-                </Moment>
-              </Typography>
-            )
-          ) : (
-            <Skeleton />
-          )}
-        </div> */}
 
         <RouterPrompt when={modified} />
 
-        {workflow && modified && workflow.name && workflow.query ? (
+        {workflow && modified && workflow.name && workflow.query && (
           <>
             <div
               style={{
-                position: id ? 'fixed' : 'inherit',
-                bottom: id ? 0 : 'inherit',
-                left: id ? 0 : 'inherit',
-                width: id ? '100%' : 'inherit',
-                textAlign: id ? 'center' : 'left',
-                zIndex: id ? theme.zIndex.drawer - 1 : 'auto',
-                backgroundColor: id ? theme.palette.background.default : 'inherit',
-                boxShadow: id ? theme.shadows[4] : 'inherit'
+                position: 'inherit',
+                textAlign: 'left'
               }}
             >
               <FormControlLabel
@@ -513,7 +489,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
               </Button>
             </div>
           </>
-        ) : null}
+        )}
         {viewMode === 'read' ? (
           <Grid style={{ paddingTop: theme.spacing(4) }}>
             <Grid container>

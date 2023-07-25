@@ -4,6 +4,7 @@
   "add.title": "Ajouter un flux de travail",
   "backport_workflow_prompt": "Appliquer le flux de travail à toutes les alertes existantes ?",
   "backport_workflow_matching": "alertes correspondantes",
+  "cancel": "Annuler les modifications",
   "chart.title": "Nombre de fois utilisé dans les derniers 30 jours",
   "created_by": "Créé par",
   "delete.acceptText": "Oui, supprimez-le !",
