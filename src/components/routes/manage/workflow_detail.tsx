@@ -104,6 +104,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [workflow, setWorkflow] = useState<Workflow>(null);
+  const [originalWorkflow, setOriginalWorkflow] = useState<Workflow>(null);
   const [histogram, setHistogram] = useState(null);
   const [results, setResults] = useState<any>(null);
   const [hits, setHits] = useState(0);
@@ -136,6 +137,11 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
         url: `/api/v4/workflow/${workflow_id || id}/`,
         onSuccess: api_data => {
           setWorkflow({
+            ...api_data.api_response,
+            status: api_data.api_response.status || '',
+            priority: api_data.api_response.priority || ''
+          });
+          setOriginalWorkflow({
             ...api_data.api_response,
             status: api_data.api_response.status || '',
             priority: api_data.api_response.priority || ''
@@ -309,7 +315,17 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
                             ? theme.palette.error.light
                             : theme.palette.error.dark
                       }}
-                      onClick={() => setViewMode(viewMode === 'read' ? 'write' : 'read')}
+                      onClick={() => {
+                        if (viewMode === 'read') {
+                          // Switch to write mode
+                          setViewMode('write');
+                        } else {
+                          // Reset the state of the workflow, cancel changes
+                          setViewMode('read');
+                          setWorkflow(originalWorkflow);
+                          setModified(false);
+                        }
+                      }}
                       size="large"
                     >
                       {viewMode === 'read' ? <EditOutlinedIcon /> : <EditOffOutlinedIcon />}
