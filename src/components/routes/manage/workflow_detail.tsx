@@ -144,7 +144,8 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
           setOriginalWorkflow({
             ...api_data.api_response,
             status: api_data.api_response.status || '',
-            priority: api_data.api_response.priority || ''
+            priority: api_data.api_response.priority || '',
+            labels: api_data.api_response.labels || []
           });
         }
       });
@@ -517,16 +518,16 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
                   {t('hits')}
                 </Typography>
                 <Grid container>
-                  <Grid item xs={3} sm={4} md={3} lg={2}>
+                  <Grid item xs={3} sm={4} md={3} lg={3}>
                     <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
                   </Grid>
-                  <Grid item xs={9} sm={8} md={9} lg={10}>
+                  <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow ? workflow.hit_count : 0}
                   </Grid>
-                  <Grid item xs={3} sm={4} md={3} lg={2}>
+                  <Grid item xs={3} sm={4} md={3} lg={3}>
                     <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
                   </Grid>
-                  <Grid item xs={9} sm={8} md={9} lg={10}>
+                  <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.first_seen ? (
                       <Moment fromNow locale={i18n.language}>
                         {workflow.first_seen}
@@ -535,10 +536,10 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
                       t('hit.none')
                     )}
                   </Grid>
-                  <Grid item xs={3} sm={4} md={3} lg={2}>
+                  <Grid item xs={3} sm={4} md={3} lg={3}>
                     <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
                   </Grid>
-                  <Grid item xs={9} sm={8} md={9} lg={10}>
+                  <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.last_seen ? (
                       <Moment fromNow locale={i18n.language}>
                         {workflow.last_seen}
@@ -554,52 +555,42 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
                   {t('details')}
                 </Typography>
                 <Grid container>
-                  <Grid item xs={3} sm={4} md={3} lg={2}>
+                  <Grid item xs={3} sm={4} md={3} lg={3}>
                     <span style={{ fontWeight: 500 }}>{t('created_by')}:</span>
                   </Grid>
-                  <Grid item xs={9} sm={8} md={9} lg={10}>
+                  <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.creator ? (
                       <>
-                        <Tooltip
-                          title={
-                            <Moment fromNow locale={i18n.language}>
-                              {workflow.creation_date}
-                            </Moment>
-                          }
-                          placement="bottom-start"
-                        >
-                          <Typography>{workflow.creator}</Typography>
-                        </Tooltip>
+                        {workflow.creator} [
+                        <Moment fromNow locale={i18n.language}>
+                          {workflow.creation_date}
+                        </Moment>
+                        ]
                       </>
                     ) : (
                       <Skeleton />
                     )}
                   </Grid>
-                  <Grid item xs={3} sm={4} md={3} lg={2}>
+                  <Grid item xs={3} sm={4} md={3} lg={3}>
                     <span style={{ fontWeight: 500 }}>{t('edited_by')}:</span>
                   </Grid>
-                  <Grid item xs={9} sm={8} md={9} lg={10}>
+                  <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.edited_by ? (
                       <>
-                        <Tooltip
-                          title={
-                            <Moment fromNow locale={i18n.language}>
-                              {workflow.last_edit}
-                            </Moment>
-                          }
-                          placement="bottom-start"
-                        >
-                          <Typography>{workflow.edited_by}</Typography>
-                        </Tooltip>
+                        {workflow.edited_by} [
+                        <Moment fromNow locale={i18n.language}>
+                          {workflow.last_edit}
+                        </Moment>
+                        ]
                       </>
                     ) : (
                       <Skeleton />
                     )}
                   </Grid>
-                  <Grid item xs={3} sm={4} md={3} lg={2}>
+                  <Grid item xs={3} sm={4} md={3} lg={3}>
                     <span style={{ fontWeight: 500 }}>{t('origin')}:</span>
                   </Grid>
-                  <Grid item xs={9} sm={8} md={9} lg={10}>
+                  <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow ? workflow.origin : <Skeleton />}
                   </Grid>
                 </Grid>
