@@ -96,7 +96,7 @@ const WrappedAlertEventsTable = ({ alert, viewHistory, setViewHistory }) => {
                             ) : null}
                           </TableCell>
                           <TableCell>
-                            {event.entity_type === 'workflow' ? (
+                            {event.entity_type === 'workflow' && event.entity_id !== 'DEFAULT' ? (
                               <Tooltip
                                 title={t('workflow')}
                                 onClick={() => {
