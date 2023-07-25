@@ -186,35 +186,37 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
         position: 'relative'
       }}
     >
-      <AutoSizer>
-        {({ width, height }) =>
-          diff ? (
-            <DiffEditor
-              language={language}
-              width={width}
-              height={height}
-              theme={isDarkTheme ? 'vs-dark' : 'vs'}
-              original={original}
-              modified={modified}
-              loading={t('loading')}
-              options={{ links: false, renderSideBySide: false, readOnly: true }}
-            />
-          ) : (
-            <Editor
-              language={language}
-              width={width}
-              height={height}
-              theme={isDarkTheme ? 'vs-dark' : 'vs'}
-              loading={t('loading')}
-              value={language === 'json' && options.beautify ? beautifyJSON(value) : value}
-              onChange={v => onChange(v)}
-              beforeMount={beforeMount}
-              onMount={onMount}
-              options={{ links: false, readOnly: false, ...options }}
-            />
-          )
-        }
-      </AutoSizer>
+      <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+        <AutoSizer>
+          {({ width, height }) =>
+            diff ? (
+              <DiffEditor
+                language={language}
+                width={width}
+                height={height}
+                theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                original={original}
+                modified={modified}
+                loading={t('loading')}
+                options={{ links: false, renderSideBySide: false, readOnly: true }}
+              />
+            ) : (
+              <Editor
+                language={language}
+                width={width}
+                height={height}
+                theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                loading={t('loading')}
+                value={language === 'json' && options.beautify ? beautifyJSON(value) : value}
+                onChange={v => onChange(v)}
+                beforeMount={beforeMount}
+                onMount={onMount}
+                options={{ links: false, readOnly: false, ...options }}
+              />
+            )
+          }
+        </AutoSizer>
+      </div>
     </div>
   );
 };
