@@ -3,9 +3,9 @@ import { useTheme } from '@mui/material';
 import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import { registerYaraCompletionItemProvider, yaraConfig, yaraDef } from 'helpers/yara';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactResizeDetector from 'react-resize-detector';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
@@ -140,7 +140,6 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
 }: EditorProps & DiffEditorProps) => {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
-  const containerEL = useRef<HTMLDivElement>();
   const { isDark: isDarkTheme } = useAppTheme();
 
   useEffect(() => {
@@ -181,54 +180,41 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
 
   return (
     <div
-      ref={containerEL}
       style={{
         flexGrow: 1,
         border: `1px solid ${theme.palette.divider}`,
         position: 'relative'
       }}
     >
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0
-        }}
-      >
-        <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
-          {({ width, height }) => (
-            <div ref={containerEL}>
-              {diff ? (
-                <DiffEditor
-                  language={language}
-                  width={width}
-                  height={height}
-                  theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                  original={original}
-                  modified={modified}
-                  loading={t('loading')}
-                  options={{ links: false, renderSideBySide: false, readOnly: true }}
-                />
-              ) : (
-                <Editor
-                  language={language}
-                  width={width}
-                  height={height}
-                  theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                  loading={t('loading')}
-                  value={language === 'json' && options.beautify ? beautifyJSON(value) : value}
-                  onChange={v => onChange(v)}
-                  beforeMount={beforeMount}
-                  onMount={onMount}
-                  options={{ links: false, readOnly: false, ...options }}
-                />
-              )}
-            </div>
-          )}
-        </ReactResizeDetector>
-      </div>
+      <AutoSizer>
+        {({ width, height }) =>
+          diff ? (
+            <DiffEditor
+              language={language}
+              width={width}
+              height={height}
+              theme={isDarkTheme ? 'vs-dark' : 'vs'}
+              original={original}
+              modified={modified}
+              loading={t('loading')}
+              options={{ links: false, renderSideBySide: false, readOnly: true }}
+            />
+          ) : (
+            <Editor
+              language={language}
+              width={width}
+              height={height}
+              theme={isDarkTheme ? 'vs-dark' : 'vs'}
+              loading={t('loading')}
+              value={language === 'json' && options.beautify ? beautifyJSON(value) : value}
+              onChange={v => onChange(v)}
+              beforeMount={beforeMount}
+              onMount={onMount}
+              options={{ links: false, readOnly: false, ...options }}
+            />
+          )
+        }
+      </AutoSizer>
     </div>
   );
 };
