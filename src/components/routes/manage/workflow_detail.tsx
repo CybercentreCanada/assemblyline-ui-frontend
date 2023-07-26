@@ -170,7 +170,9 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
           setResults(api_data.api_response);
         }
       });
+      setViewMode('read');
     } else {
+      setViewMode('write');
       setWorkflow({ ...DEFAULT_WORKFLOW });
     }
 
@@ -467,7 +469,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
 
         <RouterPrompt when={modified} />
 
-        {workflow && modified && workflow.name && workflow.query && (
+        {workflow && viewMode === 'write' && (
           <>
             <div
               style={{
