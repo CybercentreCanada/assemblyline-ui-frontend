@@ -147,6 +147,7 @@ export default function Workflows() {
 
   const setWorkflowID = useCallback(
     (wf_id: string) => {
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${wf_id}`);
       setGlobalDrawer(<WorkflowDetail workflow_id={wf_id} close={closeGlobalDrawer} mode="read" />);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
