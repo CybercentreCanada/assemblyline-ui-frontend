@@ -2,6 +2,7 @@
 export type AppUserValidatedProp = {
   prop: string; // the key of the AppUser property.
   value: any; // the value it should compare with the AppUser's property.
+  enforce?: boolean; // Determines if this AppUser property has to be validated. Otherwise, it is optional with only one property needed to be validated.
 };
 
 // Specification interface describing an application user.
