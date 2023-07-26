@@ -185,6 +185,16 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
   const handleQueryChange = event => {
     setModified(true);
     setWorkflow({ ...workflow, query: event.target.value });
+    apiCall({
+      method: 'GET',
+      url: `/api/v4/search/alert/?query=${encodeURI(event.target.value)}&track_total_hits=true`,
+      onSuccess: api_data => {
+        setHits(api_data.api_response.total || 0);
+      },
+      onFailure: () => {
+        setResults(0);
+      }
+    });
   };
 
   const handleCheckboxChange = () => {
@@ -384,18 +394,6 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
                 margin="dense"
                 variant="outlined"
                 onChange={handleQueryChange}
-                onBlur={() => {
-                  apiCall({
-                    method: 'GET',
-                    url: `/api/v4/search/alert/?query=${encodeURI(workflow.query)}&track_total_hits=true`,
-                    onSuccess: api_data => {
-                      setHits(api_data.api_response.total || 0);
-                    },
-                    onFailure: () => {
-                      setResults(0);
-                    }
-                  });
-                }}
                 value={workflow.query}
                 disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
               />
