@@ -294,6 +294,31 @@ export function getParts(
   };
 }
 
+export function canSeeRequired(user_req, req) {
+  const userSet = new Set(user_req);
+  const reqSet = new Set(req);
+
+  for (let elem of userSet) {
+    if (!reqSet.has(elem)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+export function canSeeGroups(user_groups, req) {
+  if (req.length === 0) return true;
+  const reqSet = new Set(req);
+
+  for (let elem of user_groups) {
+    if (reqSet.has(elem)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export function normalizedClassification(
   parts: ClassificationParts,
   c12nDef: ClassificationDefinition,
@@ -521,4 +546,36 @@ export function getMaxClassification(
   }
 
   return normalizedClassification(out, c12nDef, format, isMobile);
+}
+
+export function isAccessible(
+  user_c12n: string,
+  c12n: string,
+  c12nDef: ClassificationDefinition,
+  enforce: boolean = false
+) {
+  if (!enforce) {
+    return true;
+  }
+
+  if (c12n === null || c12n === undefined) {
+    return true;
+  }
+
+  user_c12n = normalizedClassification(getParts(user_c12n, c12nDef, 'long', false), c12nDef, 'long', false);
+  c12n = normalizedClassification(getParts(c12n, c12nDef, 'long', false), c12nDef, 'long', false);
+
+  const userReq = getRequired(user_c12n, c12nDef, 'long', false);
+  const { groups: userGroups, subgroups: userSubgroups } = getGroups(user_c12n, c12nDef, 'long', false);
+  const req = getRequired(c12n, c12nDef, 'long', false);
+  const { groups, subgroups } = getGroups(c12n, c12nDef, 'long', false);
+
+  if (getLevelIndex(user_c12n, c12nDef) >= getLevelIndex(c12n, c12nDef)) {
+    if (!canSeeRequired(userReq, req)) return false;
+    if (!canSeeGroups(userGroups, groups)) return false;
+    if (!canSeeGroups(userSubgroups, subgroups)) return false;
+    return true;
+  }
+
+  return false;
 }
