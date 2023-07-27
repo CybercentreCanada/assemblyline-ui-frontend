@@ -522,7 +522,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
               <Button
                 variant="contained"
                 color="primary"
-                disabled={buttonLoading || !modified || workflow?.query === '' || workflow?.name === ''}
+                disabled={buttonLoading || !modified || badQuery || workflow?.query === '' || workflow?.name === ''}
                 onClick={saveWorkflow}
               >
                 {t(workflow_id || id ? 'save' : 'add.button')}
