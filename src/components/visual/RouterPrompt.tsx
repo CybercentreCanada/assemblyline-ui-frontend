@@ -68,7 +68,7 @@ export function RouterPrompt(props) {
       if (canRoute) {
         setCancel(true);
         window.dispatchEvent(new CustomEvent(GD_EVENT_PROCEED));
-        if (currentTX) currentTX.retry();
+        if (currentTX) setTimeout(() => currentTX.retry(), 250);
       }
     },
     [currentTX]
