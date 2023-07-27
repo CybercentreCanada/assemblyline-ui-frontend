@@ -92,6 +92,11 @@ const WrappedSourceDetail = ({
     setModified(true);
   };
 
+  const handleSyncChange = event => {
+    setSource({ ...source, sync: event.target.checked });
+    setModified(true);
+  };
+
   const handleClassificationChange = c12n => {
     setSource({ ...source, default_classification: c12n });
     setModified(true);
@@ -403,7 +408,7 @@ const WrappedSourceDetail = ({
             onChange={handleCAChange}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <FormControlLabel
             control={
               <Checkbox size="small" checked={source.ssl_ignore_errors} name="label" onChange={handleSSLChange} />
@@ -417,6 +422,26 @@ const WrappedSourceDetail = ({
                   field="ssl_ignore_errors"
                   reset={() => {
                     setSource({ ...source, ssl_ignore_errors: defaults.ssl_ignore_errors });
+                    setModified(true);
+                  }}
+                />
+              </Typography>
+            }
+            className={classes.checkbox}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <FormControlLabel
+            control={<Checkbox size="small" checked={source.sync} name="label" onChange={handleSyncChange} />}
+            label={
+              <Typography variant="body2">
+                {t('sync')}
+                <ResetButton
+                  service={source}
+                  defaults={defaults}
+                  field="sync"
+                  reset={() => {
+                    setSource({ ...source, sync: defaults.sync });
                     setModified(true);
                   }}
                 />

@@ -31,6 +31,7 @@
   "proxy": "Proxy server",
   "proxy.placeholder": "scheme://user:pass@proxy:port",
   "proxy_used": "A proxy server will be used to connect to the source",
+  "sync": "Synchronizing with source",
   "title": "Update sources",
   "update": "Update the current signature source",
   "update.response.success": "The following source was triggered for update",
