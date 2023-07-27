@@ -23,6 +23,7 @@ import FormControl from '@mui/material/FormControl';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
+import Throttler from 'commons/addons/utils/throttler';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -35,7 +36,7 @@ import Histogram from 'components/visual/Histogram';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import AlertsTable from 'components/visual/SearchResult/alerts';
 import 'moment/locale/fr';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
@@ -99,7 +100,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailProps) => {
+const THROTTLER = new Throttler(250);
+
+const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailProps) => {
   const { t, i18n } = useTranslation(['manageWorkflowDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -110,12 +113,13 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
   const [hits, setHits] = useState(0);
   const [runWorkflow, setRunWorkflow] = useState(false);
   const [modified, setModified] = useState(false);
+  const [badQuery, setBadQuery] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [viewMode, setViewMode] = useState(mode);
   const { c12nDef } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { showSuccessMessage } = useMySnackbar();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
   const navigate = useNavigate();
@@ -147,27 +151,32 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
             priority: api_data.api_response.priority || '',
             labels: api_data.api_response.labels || []
           });
-        }
-      });
-      apiCall({
-        method: 'POST',
-        url: '/api/v4/search/histogram/alert/events.ts/',
-        body: {
-          query: `events.entity_id:${workflow_id || id}`,
-          mincount: 0,
-          start: 'now-30d/d',
-          end: 'now+1d/d-1s',
-          gap: '+1d'
+
+          apiCall({
+            method: 'POST',
+            url: '/api/v4/search/histogram/alert/events.ts/',
+            body: {
+              query: `events.entity_id:${workflow_id || id}`,
+              mincount: 0,
+              start: 'now-30d/d',
+              end: 'now+1d/d-1s',
+              gap: '+1d'
+            },
+            onSuccess: hist_data => {
+              setHistogram(hist_data.api_response);
+            }
+          });
+          apiCall({
+            method: 'GET',
+            url: `/api/v4/search/alert/?query=events.entity_id:${workflow_id || id}&rows=10`,
+            onSuccess: top_data => {
+              setResults(top_data.api_response);
+            }
+          });
         },
-        onSuccess: api_data => {
-          setHistogram(api_data.api_response);
-        }
-      });
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/search/alert/?query=events.entity_id:${workflow_id || id}&rows=10`,
-        onSuccess: api_data => {
-          setResults(api_data.api_response);
+        onFailure: api_data => {
+          showErrorMessage(api_data.api_error_message);
+          close();
         }
       });
       setViewMode('read');
@@ -187,14 +196,23 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
   const handleQueryChange = event => {
     setModified(true);
     setWorkflow({ ...workflow, query: event.target.value });
-    apiCall({
-      method: 'GET',
-      url: `/api/v4/search/alert/?query=${encodeURI(event.target.value)}&track_total_hits=true`,
-      onSuccess: api_data => {
-        setHits(api_data.api_response.total || 0);
-      },
-      onFailure: () => {
+    THROTTLER.delay(() => {
+      if (event.target.value !== '') {
+        apiCall({
+          method: 'GET',
+          url: `/api/v4/search/alert/?query=${encodeURI(event.target.value)}&rows=0&track_total_hits=true`,
+          onSuccess: api_data => {
+            setHits(api_data.api_response.total || 0);
+            setBadQuery(false);
+          },
+          onFailure: () => {
+            setResults(0);
+            setBadQuery(true);
+          }
+        });
+      } else {
         setResults(0);
+        setBadQuery(false);
       }
     });
   };
@@ -395,6 +413,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
                 size="small"
                 margin="dense"
                 variant="outlined"
+                error={badQuery}
                 onChange={handleQueryChange}
                 value={workflow.query}
                 disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
@@ -500,7 +519,12 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
                 boxShadow: id ? theme.shadows[4] : 'inherit'
               }}
             >
-              <Button variant="contained" color="primary" disabled={buttonLoading} onClick={saveWorkflow}>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={buttonLoading || !modified || workflow?.query === '' || workflow?.name === ''}
+                onClick={saveWorkflow}
+              >
                 {t(workflow_id || id ? 'save' : 'add.button')}
                 {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
               </Button>
@@ -624,9 +648,10 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailPro
   );
 };
 
-WorkflowDetail.defaultProps = {
+WrappedWorkflowDetail.defaultProps = {
   workflow_id: null,
   close: () => {}
 };
 
+const WorkflowDetail = React.memo(WrappedWorkflowDetail);
 export default WorkflowDetail;
