@@ -35,7 +35,7 @@ import { JSONFeedItem, useNotificationFeed } from 'components/visual/ServiceMana
 import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 
 export default function Services() {
   const { t } = useTranslation(['adminServices']);
@@ -51,7 +51,9 @@ export default function Services() {
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { setGlobalDrawer, closeGlobalDrawer } = useDrawer();
+  const { setGlobalDrawer, closeGlobalDrawer, globalDrawerOpened } = useDrawer();
+  const location = useLocation();
+  const navigate = useNavigate();
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const { configuration } = useALContext();
   const { fetchJSONNotifications } = useNotificationFeed();
@@ -213,11 +215,28 @@ export default function Services() {
     setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
   }, [closeGlobalDrawer]);
 
+  useEffect(() => {
+    if (serviceResults !== null && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawerOpened]);
+
+  useEffect(() => {
+    if (location.hash) {
+      setGlobalDrawer(<Service name={location.hash.slice(1)} onDeleted={onDeleted} onUpdated={onUpdated} />);
+    } else {
+      closeGlobalDrawer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.hash]);
+
   const setService = useCallback(
     (service_name: string) => {
-      setGlobalDrawer(<Service name={service_name} onDeleted={onDeleted} onUpdated={onUpdated} />);
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${service_name}`);
     },
-    [onDeleted, onUpdated, setGlobalDrawer]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.pathname, location.search]
   );
 
   useEffect(() => {

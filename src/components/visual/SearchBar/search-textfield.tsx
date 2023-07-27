@@ -98,6 +98,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     const { isCtrl, isTab, isEnter, isEscape, isArrowUp, isArrowDown, isArrowLeft, isArrowRight } = parseEvent(event);
 
     if (isEnter) {
+      event.preventDefault();
       // key[ENTER ]: handler
       if (open && cursor !== -1) {
         onOptionSelection(filteredOptions.start, filteredOptions.end, filteredOptions.items[cursor]);

@@ -65,7 +65,7 @@ export default function Workflows() {
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [suggestions] = useState([
     ...Object.keys(indexes.workflow).filter(name => indexes.workflow[name].indexed),
     ...DEFAULT_SUGGESTION
@@ -120,38 +120,53 @@ export default function Workflows() {
     });
   };
 
-  const onClear = useCallback(
-    () => {
-      navigate(location.pathname);
-    },
+  const onClear = useCallback(() => {
+    navigate(`${location.pathname}${location.hash ? location.hash : ''}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.pathname]
-  );
+  }, [location.hash, location.pathname]);
 
-  const onSearch = useCallback(
-    () => {
-      if (filterValue.current !== '') {
-        query.set('query', filterValue.current);
-        navigate(`${location.pathname}?${query.toString()}`);
-      } else {
-        onClear();
-      }
-    },
+  const onSearch = useCallback(() => {
+    if (filterValue.current !== '') {
+      query.set('query', filterValue.current);
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
+    } else {
+      onClear();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query, location.pathname, onClear]
-  );
+  }, [query, location.pathname, location.hash, onClear]);
 
   const onFilterValueChange = (inputValue: string) => {
     filterValue.current = inputValue;
   };
 
+  useEffect(() => {
+    if (workflowResults !== null && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawerOpened]);
+
+  useEffect(() => {
+    if (location.hash) {
+      setGlobalDrawer(
+        <WorkflowDetail
+          workflow_id={location.hash === '#new' ? null : location.hash.slice(1)}
+          close={closeGlobalDrawer}
+          mode={location.hash === '#new' ? 'write' : 'read'}
+        />
+      );
+    } else {
+      closeGlobalDrawer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.hash]);
+
   const setWorkflowID = useCallback(
     (wf_id: string) => {
       navigate(`${location.pathname}${location.search ? location.search : ''}#${wf_id}`);
-      setGlobalDrawer(<WorkflowDetail workflow_id={wf_id} close={closeGlobalDrawer} mode="read" />);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [location.pathname, location.search]
   );
 
   return currentUser.roles.includes('workflow_view') ? (
@@ -168,9 +183,7 @@ export default function Workflows() {
                   style={{
                     color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                   }}
-                  onClick={() =>
-                    setGlobalDrawer(<WorkflowDetail workflow_id={null} close={closeGlobalDrawer} mode="write" />)
-                  }
+                  onClick={() => navigate(`${location.pathname}${location.search ? location.search : ''}#new`)}
                   size="large"
                 >
                   <AddCircleOutlineOutlinedIcon />
@@ -198,7 +211,7 @@ export default function Workflows() {
                 props: {
                   onClick: () => {
                     query.set('query', 'hit_count:0');
-                    navigate(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
                   }
                 }
               },
@@ -208,7 +221,7 @@ export default function Workflows() {
                 props: {
                   onClick: () => {
                     query.set('query', 'last_seen:[* TO now-3m]');
-                    navigate(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
                   }
                 }
               }
