@@ -139,6 +139,7 @@ export type ServiceDetail = {
   enabled: boolean;
   is_external: boolean;
   licence_count: number;
+  min_instances?: number;
   max_queue_length: number;
   name: string;
   privileged: boolean;
@@ -172,6 +173,8 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
   const [service, setService] = useState<ServiceDetail>(null);
   const [serviceDefault, setServiceDefault] = useState<ServiceDetail>(null);
   const [serviceVersion, setServiceVersion] = useState<string>(null);
+  const [serviceGeneralError, setServiceGeneralError] = useState<boolean>(false);
+  const [overallError, setOverallError] = useState<boolean>(false);
   const [constants, setConstants] = useState<ServiceConstants>(null);
   const [versions, setVersions] = useState<string[]>(null);
   const [tab, setTab] = useState('general');
@@ -271,6 +274,13 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
     }
     // eslint-disable-next-line
   }, [serviceVersion]);
+
+  useEffect(() => {
+    // Set the global error flag based on each sub-error value
+    setOverallError(serviceGeneralError);
+
+    // eslint-disable-next-line
+  }, [serviceGeneralError]);
 
   useEffectOnce(() => {
     // Load constants on page load
@@ -384,6 +394,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
               setModified={setModified}
               constants={constants}
               versions={versions}
+              setError={setServiceGeneralError}
             />
           </TabPanel>
           <TabPanel value="docker" style={{ paddingLeft: 0, paddingRight: 0 }}>
@@ -429,7 +440,12 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
             boxShadow: theme.shadows[4]
           }}
         >
-          <Button variant="contained" color="primary" disabled={buttonLoading || !modified} onClick={saveService}>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={overallError || buttonLoading || !modified}
+            onClick={saveService}
+          >
             {t('save')}
             {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
           </Button>
