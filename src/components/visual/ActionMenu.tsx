@@ -12,11 +12,13 @@ import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { isAccessible } from 'helpers/classificationParser';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
+import ClassificationMismatchDialog from './ClassificationMismatchDialog';
 import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 import InputDialog from './InputDialog';
 
@@ -91,9 +93,12 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   highlight_key = null
 }) => {
   const { t } = useTranslation();
-  const { user: currentUser, configuration: currentUserConfig } = useALContext();
+  const { user: currentUser, configuration: currentUserConfig, c12nDef } = useALContext();
   const { copy } = useClipboard();
   const classes = useStyles();
+  const [confirmationDialog, setConfirmationDialog] = React.useState(false);
+  const [currentEvent, setCurrentEvent] = React.useState<Event>(null);
+  const [currentLinkClassification, setCurrentLinkClassification] = React.useState('');
   const [safelistDialog, setSafelistDialog] = React.useState(false);
   const [safelistReason, setSafelistReason] = React.useState(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
@@ -112,6 +117,25 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const handleClose = useCallback(() => {
     setState(initialMenuState);
   }, [setState]);
+
+  const proceed = useCallback(() => {
+    const target = currentEvent.target as HTMLElement;
+    target.click();
+    setConfirmationDialog(false);
+  }, [currentEvent]);
+
+  const checkClassification = useCallback(
+    (event: MouseEvent, link_classification) => {
+      if (!isAccessible(link_classification, classification, c12nDef, c12nDef.enforce)) {
+        event.preventDefault();
+        setCurrentEvent(event);
+        setCurrentLinkClassification(link_classification);
+        setConfirmationDialog(true);
+      }
+      handleClose();
+    },
+    [c12nDef, classification, handleClose]
+  );
 
   const handleMenuCopy = useCallback(() => {
     copy(value, 'clipID');
@@ -179,6 +203,17 @@ const WrappedActionMenu: React.FC<TagProps> = ({
 
   return hasExternalLinks || hasExternalQuery || category === 'tag' ? (
     <>
+      <ClassificationMismatchDialog
+        open={confirmationDialog}
+        handleClose={() => setConfirmationDialog(false)}
+        handleAccept={proceed}
+        title={t('classification.title')}
+        dataClassification={classification}
+        targetClassification={currentLinkClassification}
+        cancelText={t('classification.cancelText')}
+        acceptText={t('classification.acceptText')}
+        text={t('classification.text')}
+      />
       {category === 'tag' && (
         <InputDialog
           open={safelistDialog}
@@ -294,7 +329,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
                   link.replace_pattern,
                   encodeURIComponent(link.double_encode ? encodeURIComponent(value) : value)
                 )}
-                onClick={handleClose}
+                onClick={event => checkClassification(event, link.max_classification)}
               >
                 {EXTERNAL_ICON} {link.name}
               </MenuItem>

@@ -558,7 +558,7 @@ export function isAccessible(
     return true;
   }
 
-  if (c12n === null || c12n === undefined) {
+  if (c12n === null || c12n === undefined || user_c12n === null || user_c12n === undefined) {
     return true;
   }
 
