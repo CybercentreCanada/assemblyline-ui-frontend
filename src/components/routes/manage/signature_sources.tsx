@@ -356,7 +356,7 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
               </Tooltip>
             )}
             {source.sync && (
-              <Tooltip title={t('sync')}>
+              <Tooltip title={t('sync_used')}>
                 <SyncOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
               </Tooltip>
             )}
