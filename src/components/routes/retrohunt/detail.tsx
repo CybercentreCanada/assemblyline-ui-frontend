@@ -491,7 +491,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
 
           <Grid item>
             <Grid container gap={1}>
-              <Grid item xs={12}>
+              <Grid item xs={12} marginTop={2}>
                 <Typography variant="h6">{t('header.results')}</Typography>
               </Grid>
               {!retrohunt ? (
