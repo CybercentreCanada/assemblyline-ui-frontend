@@ -26,6 +26,7 @@ import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
 import { RetrohuntPhase, RetrohuntResult } from 'components/routes/retrohunt';
 import RetrohuntErrors from 'components/routes/retrohunt/errors';
+import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import {
@@ -323,6 +324,34 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     });
   }, []);
 
+  const handleFilterAdd = useCallback((filter: string) => {
+    setQuery(prev => {
+      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
+      q.add('filters', `type:${safeFieldValue(filter)}`);
+      return q;
+    });
+  }, []);
+
+  const handleFilterChange = useCallback((filter: string) => {
+    setQuery(prev => {
+      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
+      q.replace(
+        'filters',
+        filter,
+        filter.indexOf('NOT ') === 0 ? filter.substring(5, filter.length - 1) : `NOT (${filter})`
+      );
+      return q;
+    });
+  }, []);
+
+  const handleFilterRemove = useCallback((filter: string) => {
+    setQuery(prev => {
+      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
+      q.remove('filters', filter);
+      return q;
+    });
+  }, []);
+
   const handleIsOpenChange = useCallback(
     (key: keyof OpenSection) => () => setIsOpen(o => ({ ...o, [key]: !o[key] })),
     []
@@ -364,12 +393,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       setGlobalDrawer(<FileDetail sha256={location.hash.substr(1)} />);
     }
   }, [isDrawer, location.hash, setGlobalDrawer]);
-
-  const params = useMemo(() => query.getParams(), [query ? query?.getParams() : null]);
-
-  useEffect(() => {
-    console.log(params);
-  }, [params]);
 
   if (!configuration?.datastore?.retrohunt?.enabled) return <NotFoundPage />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
@@ -572,6 +595,19 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                     />
                   )}
                 </div>
+                {query && (
+                  <div>
+                    <ChipList
+                      items={query.getAll('filters', []).map(v => ({
+                        variant: 'outlined',
+                        label: `${v}`,
+                        color: v.indexOf('NOT ') === 0 ? 'error' : null,
+                        onClick: () => handleFilterChange(v),
+                        onDelete: () => handleFilterRemove(v)
+                      }))}
+                    />
+                  </div>
+                )}
               </SearchBar>
             )}
           </Grid>
@@ -585,8 +621,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
               onClick={(evt, element) => {
                 if (!isReloading && element.length > 0) {
                   var ind = element[0].index;
-                  query.add('filters', `type:${safeFieldValue(Object.keys(types)[ind])}`);
-                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                  handleFilterAdd(Object.keys(types)[ind]);
                 }
               }}
             />
