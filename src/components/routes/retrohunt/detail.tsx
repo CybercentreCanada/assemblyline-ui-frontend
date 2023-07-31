@@ -370,11 +370,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   else
     return (
       <PageFullSize margin={isDrawer ? 2 : 4}>
-        <RetrohuntErrors
-          code={isDrawer ? propCode : paramCode}
-          open={isErrorOpen}
-          onClose={() => setIsErrorOpen(false)}
-        />
+        <RetrohuntErrors retrohunt={retrohunt} open={isErrorOpen} onClose={() => setIsErrorOpen(false)} />
         <Grid container flexDirection="column" flexWrap="nowrap" flex={1} spacing={5} marginBottom={theme.spacing(4)}>
           {c12nDef.enforce && (
             <Grid item>
