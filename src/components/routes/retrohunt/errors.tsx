@@ -8,7 +8,8 @@ import {
   Pagination,
   Paper,
   Skeleton,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
 import TableContainer from '@mui/material/TableContainer';
@@ -134,13 +135,17 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle className={classes.dialogTitle}>
         <div className={classes.titleContainer}>
-          <div>
-            {retrohunt && 'total_errors' in retrohunt
-              ? retrohunt?.total_errors > 1
-                ? `${retrohunt?.total_errors} ${t('errors.totals')}`
-                : `${retrohunt?.total_errors} ${t('errors.total')}`
-              : t('errors.view.title')}
-          </div>
+          <div>{t('errors.view.title')}</div>
+          {retrohunt && 'total_errors' in retrohunt && (
+            <Typography
+              variant="caption"
+              children={
+                retrohunt?.total_errors > 1
+                  ? `${retrohunt?.total_errors} ${t('errors')}`
+                  : `${retrohunt?.total_errors} ${t('error')}`
+              }
+            />
+          )}
         </div>
         <div>
           <Tooltip title={t('errors.close')}>

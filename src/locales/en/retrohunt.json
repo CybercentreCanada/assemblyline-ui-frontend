@@ -31,6 +31,8 @@
   "details.truncated": "Truncated",
   "details.yara_signature": "YARA signature",
   "details.yes": "Yes",
+  "error": "error",
+  "errors": "errors",
   "errors.close": "Close Retrohunt errors",
   "errors.filter": "Filter Retrohunt errors...",
   "errors.filtered": "Retrohunt error matching filter",
