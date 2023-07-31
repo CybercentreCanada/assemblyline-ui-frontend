@@ -44,6 +44,7 @@
   "filter": "Filtrer les tâches Rétrohunt...",
   "filtered": "tâche Rétrohunt correspondant au filtre",
   "filtereds": "tâches Rétrohunt correspondant au filtre",
+  "graph.type.datatype": "Fichiers",
   "graph.type.title": "Répartition des types des résultats",
   "header.add": "Ajouter une tâche Rétrohunt",
   "header.errors": "Erreurs",
