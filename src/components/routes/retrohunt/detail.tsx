@@ -121,8 +121,6 @@ type RetrohuntHitResult = {
   total: number;
 };
 
-type OpenSection = { [K in 'information' | 'signature' | 'results' | 'errors']: boolean };
-
 type ParamProps = {
   code: string;
 };
@@ -172,12 +170,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const [query, setQuery] = useState<SimpleSearchQuery>(
     new SimpleSearchQuery(isDrawer ? '' : location.search, DEFAULT_QUERY)
   );
-  const [isOpen, setIsOpen] = useState<OpenSection>({
-    information: true,
-    signature: false,
-    results: true,
-    errors: false
-  });
 
   const filterValue = useRef<string>('');
   const timer = useRef<boolean>(false);
@@ -218,16 +210,9 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [c12nDef.UNRESTRICTED]
   );
 
-  const code = useMemo<string>(() => propCode || paramCode, [paramCode, propCode]);
-
   const hitsSuggestions = useMemo<string[]>(
     () => [...Object.keys(indexes.file).filter(name => indexes.file[name].indexed), ...DEFAULT_SUGGESTION],
     [indexes.file]
-  );
-
-  const momentFormat = useMemo(
-    () => (i18n.language === 'fr' ? 'dddd D MMMM YYYY [à] h[h]mm' : 'dddd, MMMM D, YYYY [at] h:mm'),
-    [i18n.language]
   );
 
   const phase = useMemo<RetrohuntPhase>(
@@ -252,19 +237,10 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [hits]
   );
 
-  const errorPageCount = useMemo<number>(
-    () =>
-      retrohunt && 'errors' in retrohunt && 'total' in retrohunt.errors
-        ? Math.ceil(Math.min(retrohunt.errors.total, MAX_TRACKED_RECORDS) / PAGE_SIZE)
-        : 0,
-    [retrohunt]
-  );
-
   const reloadData = useCallback(
     (curCode: string) => {
       if (currentUser.roles.includes('retrohunt_view')) {
         apiCall({
-          method: 'GET',
           url: `/api/v4/retrohunt/${curCode}/`,
           onSuccess: api_data => setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response }),
           onEnter: () => setIsReloading(true),
@@ -354,11 +330,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       return q;
     });
   }, []);
-
-  const handleIsOpenChange = useCallback(
-    (key: keyof OpenSection) => () => setIsOpen(o => ({ ...o, [key]: !o[key] })),
-    []
-  );
 
   const handleHitRowClick = useCallback(
     (file: FileResult) => {
