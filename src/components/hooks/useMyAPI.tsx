@@ -1,3 +1,4 @@
+import { getFileName } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
 import useALContext from './useALContext';
@@ -332,9 +333,7 @@ export default function useMyAPI() {
           };
         } else if (res.status === 200) {
           const header = res.headers.get('Content-Disposition');
-          const parts = header!.split(';');
-          let filename = parts[1].split('=')[1];
-          filename = filename.replace(/"/g, '');
+          const filename = getFileName(header);
           return {
             api_error_message: '',
             api_response: res.body,
