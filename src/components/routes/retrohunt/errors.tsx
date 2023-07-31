@@ -96,9 +96,7 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
       if (currentUser.roles.includes('retrohunt_view')) {
         const curQuery = new SimpleSearchQuery(searchParam, DEFAULT_QUERY);
         apiCall({
-          method: 'POST',
-          url: `/api/v4/retrohunt/errors/${curCode}/`,
-          body: curQuery.getParams(),
+          url: `/api/v4/retrohunt/errors/${curCode}/?${curQuery.toString()}`,
           onSuccess: api_data => setErrors(api_data.api_response),
           onEnter: () => setIsReloading(true),
           onExit: () => setIsReloading(false)
