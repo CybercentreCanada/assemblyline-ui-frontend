@@ -601,7 +601,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
               dataset={types}
               height="200px"
               title={t('graph.type.title')}
-              datatype={t('graph.datatype')}
+              datatype={t('graph.type.datatype')}
               onClick={(evt, element) => {
                 if (!isReloading && element.length > 0) {
                   var ind = element[0].index;
