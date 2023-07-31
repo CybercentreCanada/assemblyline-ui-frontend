@@ -98,7 +98,6 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const classes = useStyles();
   const [confirmationDialog, setConfirmationDialog] = React.useState(false);
   const [currentEvent, setCurrentEvent] = React.useState<Event>(null);
-  const [currentProceedFunction, setCurrentProceedFunction] = React.useState(null);
   const [currentAllowBypass, setCurrentAllowBypass] = React.useState(false);
   const [currentLinkClassification, setCurrentLinkClassification] = React.useState('');
   const [safelistDialog, setSafelistDialog] = React.useState(false);
@@ -131,14 +130,13 @@ const WrappedActionMenu: React.FC<TagProps> = ({
       if (!isAccessible(link_classification, classification, c12nDef, c12nDef.enforce)) {
         event.preventDefault();
         setCurrentEvent(event);
-        setCurrentProceedFunction(proceedExternalLink);
         setCurrentAllowBypass(allow_bypass);
         setCurrentLinkClassification(link_classification);
         setConfirmationDialog(true);
       }
       handleClose();
     },
-    [c12nDef, classification, handleClose, proceedExternalLink]
+    [c12nDef, classification, handleClose]
   );
 
   const handleMenuCopy = useCallback(() => {
@@ -210,7 +208,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
       <ClassificationMismatchDialog
         open={confirmationDialog}
         handleClose={() => setConfirmationDialog(false)}
-        handleAccept={currentAllowBypass ? currentProceedFunction : null}
+        handleAccept={currentAllowBypass ? proceedExternalLink : null}
         dataClassification={classification}
         targetClassification={currentLinkClassification}
       />
