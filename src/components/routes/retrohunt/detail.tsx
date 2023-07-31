@@ -282,15 +282,18 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
 
       if (currentUser.roles.includes('retrohunt_view')) {
         apiCall({
-          method: 'POST',
-          url: `/api/v4/search/file/`,
-          body: curQuery.getParams(),
+          url: `/api/v4/retrohunt/hits/${curCode}/?${curQuery.toString()}`,
           onSuccess: api_data => setHits(api_data.api_response),
           onEnter: () => setIsReloading(true),
           onExit: () => setIsReloading(false)
         });
         apiCall({
-          url: `/api/v4/search/facet/file/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+          url: `/api/v4/retrohunt/types/${curCode}/?${curQuery.toString([
+            'rows',
+            'offset',
+            'sort',
+            'track_total_hits'
+          ])}`,
           onSuccess: api_data => {
             let newTypes: { [k: string]: number } = api_data.api_response;
             newTypes = Object.fromEntries(
@@ -367,8 +370,11 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
 
   useEffect(() => {
     reloadData(isDrawer ? propCode : paramCode);
+  }, [isDrawer, paramCode, propCode, reloadData]);
+
+  useEffect(() => {
     reloadHits(isDrawer ? propCode : paramCode, query.toString());
-  }, [reloadData, reloadHits, isDrawer, paramCode, propCode, query]);
+  }, [isDrawer, paramCode, propCode, query, reloadHits]);
 
   useEffect(() => {
     if (!timer.current && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
