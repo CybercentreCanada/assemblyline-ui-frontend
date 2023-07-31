@@ -1,6 +1,4 @@
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
-import CheckBoxOutlineBlankOutlinedIcon from '@mui/icons-material/CheckBoxOutlineBlankOutlined';
-import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DoneOutlinedIcon from '@mui/icons-material/DoneOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
@@ -29,6 +27,7 @@ import NotFoundPage from 'components/routes/404';
 import { RetrohuntPhase, RetrohuntResult } from 'components/routes/retrohunt';
 import RetrohuntErrors from 'components/routes/retrohunt/errors';
 import Classification from 'components/visual/Classification';
+import CustomChip from 'components/visual/CustomChip';
 import {
   DivTable,
   DivTableBody,
@@ -95,6 +94,13 @@ const useStyles = makeStyles(theme => ({
     height: '2.5rem',
     width: '2.5rem',
     margin: theme.spacing(0.5)
+  },
+  skeletonCustomChip: {
+    height: '1.5rem',
+    width: '2rem',
+    borderRadius: '4px',
+    display: 'inline-block',
+    verticalAlign: 'middle'
   },
   errorButton: {
     color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
@@ -476,34 +482,47 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             )}
           </Grid>
 
-          <Grid item xs={12}>
-            <Typography variant="h6">{t('header.results')}</Typography>
-          </Grid>
-
           <Grid item>
-            <Grid container>
-              <Grid item xs={2}>
-                <span className={classes.title}>{t('details.truncated')}</span>
+            <Grid container gap={1}>
+              <Grid item xs={12}>
+                <Typography variant="h6">{t('header.results')}</Typography>
               </Grid>
-              <Grid className={classes.value} item xs={4}>
-                {!retrohunt ? (
-                  <Skeleton width="auto" />
-                ) : !('truncated' in retrohunt) ? null : retrohunt.truncated ? (
-                  <CheckBoxOutlinedIcon />
-                ) : (
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                )}
-              </Grid>
+              {!retrohunt ? (
+                <Grid item>
+                  <Skeleton className={classes.skeletonCustomChip} variant="rectangular" />
+                </Grid>
+              ) : (
+                'truncated' in retrohunt &&
+                retrohunt.truncated && (
+                  <Grid item>
+                    <Tooltip title={t('truncated.tooltip')}>
+                      <span>
+                        <CustomChip type="round" size="small" variant="outlined" color="error" label={t('truncated')} />
+                      </span>
+                    </Tooltip>
+                  </Grid>
+                )
+              )}
 
-              {retrohunt && 'tags' in retrohunt && Object.keys(retrohunt.tags).length > 0 && (
-                <>
-                  <Grid item xs={2}>
-                    <span className={classes.title}>{t('details.tags')}</span>
+              {!retrohunt ? (
+                <Grid item>
+                  <Skeleton className={classes.skeletonCustomChip} variant="rectangular" />
+                </Grid>
+              ) : (
+                'tags' in retrohunt &&
+                Object.keys(retrohunt.tags).length > 0 &&
+                Object.keys(retrohunt.tags).map((key, i) => (
+                  <Grid item>
+                    <CustomChip
+                      key={'tag-' + i}
+                      type="round"
+                      size="small"
+                      variant="outlined"
+                      color="default"
+                      label={key}
+                    />
                   </Grid>
-                  <Grid className={classes.value} item xs={4}>
-                    {Object.keys(retrohunt.tags).join(', ')}
-                  </Grid>
-                </>
+                ))
               )}
             </Grid>
           </Grid>

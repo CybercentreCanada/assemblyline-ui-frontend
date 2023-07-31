@@ -74,6 +74,8 @@
   "tooltip.view": "View this Retrohunt job in a new page",
   "total": "Retrohunt job",
   "totals": "Retrohunt jobs",
+  "truncated": "truncated",
+  "truncated.tooltip": "This Retrohunt job was not able to analyse all the files within the search space",
   "validate.acceptText": "Create",
   "validate.cancelText": "Cancel",
   "validate.text": "You want to create a new Retrohunt job. Do you want to continue?",

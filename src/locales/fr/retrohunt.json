@@ -74,6 +74,8 @@
   "tooltip.view": "Afficher cette tâche Rétrohunt dans une nouvelle page",
   "total": "tâche Rétrohunt",
   "totals": "tâches Rétrohunt",
+  "truncated": "tronqué",
+  "truncated.tooltip": "La tâche Rétrohunt n'a pas été capable d'analyser tous les fichiers dans l'espace de recherche",
   "validate.acceptText": "Créer",
   "validate.cancelText": "Annuler",
   "validate.text": "Vous souhaitez créer une nouvelle tâche Rétrohunt. Voulez-vous continuer?",
