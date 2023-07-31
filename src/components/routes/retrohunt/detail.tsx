@@ -18,6 +18,7 @@ import TableContainer from '@mui/material/TableContainer';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -110,7 +111,8 @@ const useStyles = makeStyles(theme => ({
     margin: 0,
     padding: theme.spacing(0.75, 1),
     whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
+    wordBreak: 'break-word',
+    backgroundColor: 'inherit'
   }
 }));
 
@@ -235,6 +237,11 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const hitPageCount = useMemo<number>(
     () => (hits && 'total' in hits ? Math.ceil(Math.min(hits.total, MAX_TRACKED_RECORDS) / PAGE_SIZE) : 0),
     [hits]
+  );
+
+  const PageLayout = useCallback<React.FC<any>>(
+    props => (isDrawer ? <PageFullSize margin={2} {...props} /> : <PageFullWidth margin={4} {...props} />),
+    [isDrawer]
   );
 
   const reloadData = useCallback(
@@ -375,9 +382,9 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
   else
     return (
-      <PageFullSize margin={isDrawer ? 2 : 4}>
+      <PageLayout>
         <RetrohuntErrors retrohunt={retrohunt} open={isErrorOpen} onClose={() => setIsErrorOpen(false)} />
-        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} spacing={5} marginBottom={theme.spacing(4)}>
+        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} spacing={1} marginBottom={theme.spacing(4)}>
           {c12nDef.enforce && (
             <Grid item>
               <Classification
@@ -722,7 +729,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             )}
           </Grid>
         </Grid>
-      </PageFullSize>
+      </PageLayout>
     );
 }
 
