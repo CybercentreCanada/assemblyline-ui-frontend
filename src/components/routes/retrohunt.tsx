@@ -81,6 +81,7 @@ export type RetrohuntResult = {
   progress?: [number, number];
   raw_query?: string;
   tags?: object;
+  total_errors?: number;
   total_hits?: number;
   total_indices?: number;
   truncated?: boolean;
@@ -207,7 +208,7 @@ export default function Retrohunt() {
 
   useEffect(() => {
     if (retrohuntResults !== null && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search}`);
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalDrawerOpened]);
