@@ -44,6 +44,7 @@
   "filter": "Filter Retrohunt jobs...",
   "filtered": "Retrohunt job matching filter",
   "filtereds": "Retrohunt jobs matching filter",
+  "graph.type.datatype": "Files",
   "graph.type.title": "Results Type Distribution",
   "header.add": "Adding a Retrohunt Job",
   "header.errors": "Errors",
