@@ -612,7 +612,9 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
           </Grid>
 
           <Grid item>
-            {!hits || hits.total === 0 ? (
+            {!hits ? (
+              <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
+            ) : hits.total === 0 ? (
               <div style={{ width: '100%' }}>
                 <InformativeAlert>
                   <AlertTitle>{t('no_results_title')}</AlertTitle>
