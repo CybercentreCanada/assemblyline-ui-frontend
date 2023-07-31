@@ -462,7 +462,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             )}
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item>
             <Typography variant="subtitle2">{t('details.description')}</Typography>
             {retrohunt ? (
               <Paper component="pre" variant="outlined" className={classes.preview}>
