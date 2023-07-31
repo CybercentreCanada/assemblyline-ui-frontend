@@ -98,6 +98,8 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const classes = useStyles();
   const [confirmationDialog, setConfirmationDialog] = React.useState(false);
   const [currentEvent, setCurrentEvent] = React.useState<Event>(null);
+  const [currentProceedFunction, setCurrentProceedFunction] = React.useState(null);
+  const [currentAllowBypass, setCurrentAllowBypass] = React.useState(false);
   const [currentLinkClassification, setCurrentLinkClassification] = React.useState('');
   const [safelistDialog, setSafelistDialog] = React.useState(false);
   const [safelistReason, setSafelistReason] = React.useState(null);
@@ -118,23 +120,25 @@ const WrappedActionMenu: React.FC<TagProps> = ({
     setState(initialMenuState);
   }, [setState]);
 
-  const proceed = useCallback(() => {
+  const proceedExternalLink = useCallback(() => {
     const target = currentEvent.target as HTMLElement;
     target.click();
     setConfirmationDialog(false);
   }, [currentEvent]);
 
   const checkClassification = useCallback(
-    (event: MouseEvent, link_classification) => {
+    (event: MouseEvent, link_classification, allow_bypass) => {
       if (!isAccessible(link_classification, classification, c12nDef, c12nDef.enforce)) {
         event.preventDefault();
         setCurrentEvent(event);
+        setCurrentProceedFunction(proceedExternalLink);
+        setCurrentAllowBypass(allow_bypass);
         setCurrentLinkClassification(link_classification);
         setConfirmationDialog(true);
       }
       handleClose();
     },
-    [c12nDef, classification, handleClose]
+    [c12nDef, classification, handleClose, proceedExternalLink]
   );
 
   const handleMenuCopy = useCallback(() => {
@@ -206,13 +210,9 @@ const WrappedActionMenu: React.FC<TagProps> = ({
       <ClassificationMismatchDialog
         open={confirmationDialog}
         handleClose={() => setConfirmationDialog(false)}
-        handleAccept={proceed}
-        title={t('classification.title')}
+        handleAccept={currentAllowBypass ? currentProceedFunction : null}
         dataClassification={classification}
         targetClassification={currentLinkClassification}
-        cancelText={t('classification.cancelText')}
-        acceptText={t('classification.acceptText')}
-        text={t('classification.text')}
       />
       {category === 'tag' && (
         <InputDialog
@@ -329,7 +329,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
                   link.replace_pattern,
                   encodeURIComponent(link.double_encode ? encodeURIComponent(value) : value)
                 )}
-                onClick={event => checkClassification(event, link.max_classification)}
+                onClick={event => checkClassification(event, link.max_classification, link.allow_bypass)}
               >
                 {EXTERNAL_ICON} {link.name}
               </MenuItem>

@@ -52,6 +52,7 @@ export type SystemMessageDefinition = {
 };
 
 export type ExternalLink = {
+  allow_bypass: boolean;
   double_encode: boolean;
   max_classification: string;
   name: string;
