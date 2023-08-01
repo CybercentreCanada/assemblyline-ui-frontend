@@ -11,9 +11,11 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
+import InputAdornment from '@mui/material/InputAdornment';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceConstants, ServiceDetail } from '../service_detail';
 import ResetButton from './reset_button';
@@ -25,12 +27,22 @@ type ServiceGeneralProps = {
   versions: string[];
   setService: (value: ServiceDetail) => void;
   setModified: (value: boolean) => void;
+  setError: (value: boolean) => void;
 };
 
-const ServiceGeneral = ({ service, defaults, constants, versions, setService, setModified }: ServiceGeneralProps) => {
+const ServiceGeneral = ({
+  service,
+  defaults,
+  constants,
+  versions,
+  setService,
+  setModified,
+  setError
+}: ServiceGeneralProps) => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
+  const [instancesError, setInstancesError] = useState<boolean>(false);
 
   const handleDescriptionChange = event => {
     setModified(true);
@@ -67,6 +79,11 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
     setService({ ...service, timeout: event.target.value });
   };
 
+  const handleMinInstancesChange = event => {
+    setModified(true);
+    setService({ ...service, min_instances: event.target.value === '' ? null : event.target.value });
+  };
+
   const handleLicenceChange = event => {
     setModified(true);
     setService({ ...service, licence_count: event.target.value });
@@ -96,6 +113,27 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
     setModified(true);
     setService({ ...service, classification });
   };
+
+  useEffect(() => {
+    // Set global error flag to be communicated back to main page
+    setError(instancesError);
+
+    // eslint-disable-next-line
+  }, [instancesError]);
+
+  useEffect(() => {
+    // Check for issues with range selection
+    if (service.licence_count < 1) {
+      // Maximum has no limit, so settings are always valid
+    } else if (service.min_instances >= 0 && service.min_instances > service.licence_count) {
+      // Minimum number of instances should never surpass maximum
+      setInstancesError(true);
+      return;
+    }
+    setInstancesError(false);
+
+    // eslint-disable-next-line
+  }, [service.min_instances, service.licence_count]);
 
   return (
     <div>
@@ -369,31 +407,65 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
         </Grid>
         <Grid item xs={12} sm={4}>
           <Typography variant="subtitle2" noWrap>
-            {t('general.licence')}
+            {t('general.instances')}
             <ResetButton
               service={service}
               defaults={defaults}
-              field="licence_count"
+              field={['licence_count', 'min_instances']}
               reset={() => {
                 setModified(true);
-                setService({ ...service, licence_count: defaults.licence_count });
+                setService({
+                  ...service,
+                  licence_count: defaults.licence_count,
+                  min_instances: defaults.min_instances
+                });
               }}
             />
           </Typography>
-          {service ? (
-            <TextField
-              fullWidth
-              type="number"
-              margin="dense"
-              size="small"
-              variant="outlined"
-              InputProps={{ inputProps: { min: 0 } }}
-              onChange={handleLicenceChange}
-              value={service.licence_count}
-            />
-          ) : (
-            <Skeleton style={{ height: '2.5rem' }} />
-          )}
+          <Grid container spacing={theme.spacing(1)}>
+            <Grid item xs={12} sm={6}>
+              {service ? (
+                <TextField
+                  fullWidth
+                  type="number"
+                  margin="dense"
+                  size="small"
+                  variant="outlined"
+                  placeholder={t('limit.system_default')}
+                  InputProps={{
+                    inputProps: { min: 0, max: service.licence_count },
+                    endAdornment: <InputAdornment position="end">↓</InputAdornment>
+                  }}
+                  onChange={handleMinInstancesChange}
+                  value={service.min_instances}
+                  error={instancesError}
+                />
+              ) : (
+                <Skeleton style={{ height: '2.5rem' }} />
+              )}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              {service ? (
+                <TextField
+                  fullWidth
+                  type="number"
+                  margin="dense"
+                  size="small"
+                  variant="outlined"
+                  InputProps={{
+                    inputProps: { min: 0 },
+                    endAdornment: <InputAdornment position="end">↑</InputAdornment>
+                  }}
+                  onChange={handleLicenceChange}
+                  value={service.licence_count > 1 ? service.licence_count : ''}
+                  placeholder={t('limit.none')}
+                  error={instancesError}
+                />
+              ) : (
+                <Skeleton style={{ height: '2.5rem' }} />
+              )}
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item xs={12} sm={4}>
           <Typography variant="subtitle2" noWrap>
@@ -415,9 +487,10 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
               margin="dense"
               size="small"
               variant="outlined"
+              placeholder={t('limit.none')}
               InputProps={{ inputProps: { min: 0 } }}
               onChange={handleMaxQueueSizeChange}
-              value={service.max_queue_length}
+              value={service.max_queue_length > 0 ? service.licence_count : ''}
             />
           ) : (
             <Skeleton style={{ height: '2.5rem' }} />

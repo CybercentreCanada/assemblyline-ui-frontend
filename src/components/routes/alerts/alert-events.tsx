@@ -1,7 +1,9 @@
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import {
   Dialog,
   DialogContent,
   DialogTitle,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -40,74 +42,88 @@ const WrappedAlertEventsTable = ({ alert, viewHistory, setViewHistory }) => {
         maxWidth="xl"
         fullWidth
       >
-        <DialogTitle id="alert-dialog-title">{t('history.events')}</DialogTitle>
-        <DialogContent>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  {['ts', 'workflow_or_user', 'priority', 'status', 'labels'].map(column => (
-                    <TableCell key={column}>
-                      <Typography sx={{ fontWeight: 'bold' }}>{t(column)}</Typography>
-                    </TableCell>
-                  ))}
-                  <TableCell></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {alert.events
-                  .sort((a, b) => a.ts.localeCompare(b.ts) || b.ts.localeCompare(a.ts))
-                  .reverse()
-                  .map(event => {
-                    return (
-                      <TableRow hover tabIndex={-1}>
-                        <Tooltip title={event.ts}>
+        <div>
+          <IconButton
+            style={{ float: 'right', padding: theme.spacing(2) }}
+            onClick={() => {
+              setViewHistory(false);
+            }}
+            size="large"
+          >
+            <CloseOutlinedIcon />
+          </IconButton>
+          <DialogTitle id="alert-dialog-title">{t('history.events')}</DialogTitle>
+          <DialogContent>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    {['ts', 'workflow_or_user', 'priority', 'status', 'labels'].map(column => (
+                      <TableCell key={column}>
+                        <Typography sx={{ fontWeight: 'bold' }}>{t(column)}</Typography>
+                      </TableCell>
+                    ))}
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {alert.events
+                    .sort((a, b) => a.ts.localeCompare(b.ts) || b.ts.localeCompare(a.ts))
+                    .reverse()
+                    .map(event => {
+                      return (
+                        <TableRow hover tabIndex={-1}>
+                          <Tooltip title={event.ts}>
+                            <TableCell>
+                              <Moment fromNow locale={i18n.language}>
+                                {event.ts}
+                              </Moment>
+                            </TableCell>
+                          </Tooltip>
+                          <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
+                            <TableCell>{event.entity_name}</TableCell>
+                          </Tooltip>
                           <TableCell>
-                            <Moment fromNow locale={i18n.language}>
-                              {event.ts}
-                            </Moment>
+                            {event.priority ? <AlertPriority name={event.priority} withChip wrap={false} /> : null}
                           </TableCell>
-                        </Tooltip>
-                        <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
-                          <TableCell>{event.entity_name}</TableCell>
-                        </Tooltip>
-                        <TableCell>
-                          {event.priority ? <AlertPriority name={event.priority} withChip /> : null}
-                        </TableCell>
-                        <TableCell>{event.status ? <AlertStatus name={event.status} /> : null}</TableCell>
-                        <TableCell width="40%">
-                          {event.labels ? (
-                            <ChipList items={event.labels.map(label => ({ label, variant: 'outlined' }))} />
-                          ) : null}
-                        </TableCell>
-                        <TableCell>
-                          {event.entity_type === 'workflow' ? (
-                            <Tooltip
-                              title={t('workflow')}
-                              onClick={() => {
-                                navigate(`/manage/workflow/${event.entity_id}`);
-                                setViewHistory(false);
-                              }}
-                            >
-                              <div>
-                                <HiOutlineExternalLink
-                                  style={{
-                                    fontSize: 'x-large',
-                                    verticalAlign: 'middle',
-                                    color: theme.palette.primary.main
-                                  }}
-                                />
-                              </div>
-                            </Tooltip>
-                          ) : null}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </DialogContent>
+                          <TableCell>{event.status ? <AlertStatus name={event.status} /> : null}</TableCell>
+                          <TableCell width="40%">
+                            {event.labels ? (
+                              <ChipList
+                                items={event.labels.map(label => ({ label, variant: 'outlined' }))}
+                                wrap={false}
+                              />
+                            ) : null}
+                          </TableCell>
+                          <TableCell>
+                            {event.entity_type === 'workflow' && event.entity_id !== 'DEFAULT' ? (
+                              <Tooltip
+                                title={t('workflow')}
+                                onClick={() => {
+                                  navigate(`/manage/workflow/${event.entity_id}`);
+                                  setViewHistory(false);
+                                }}
+                              >
+                                <div>
+                                  <HiOutlineExternalLink
+                                    style={{
+                                      fontSize: 'x-large',
+                                      verticalAlign: 'middle',
+                                      color: theme.palette.primary.main
+                                    }}
+                                  />
+                                </div>
+                              </Tooltip>
+                            ) : null}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+        </div>
       </Dialog>
     )
   );

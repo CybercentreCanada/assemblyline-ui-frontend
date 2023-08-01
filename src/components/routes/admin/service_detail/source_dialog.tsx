@@ -24,7 +24,8 @@ const DEFAULT_SOURCE: Source = {
     message: '',
     state: '',
     ts: ''
-  }
+  },
+  sync: false
 };
 
 type SourceDialogProps = {

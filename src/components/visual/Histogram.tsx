@@ -1,10 +1,19 @@
 import { alpha, Skeleton, useTheme } from '@mui/material';
-import { CategoryScale, Chart as ChartJS, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
+import {
+  CategoryScale,
+  Chart as ChartJS,
+  Filler,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip
+} from 'chart.js';
 import 'chartjs-adapter-moment';
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip);
+ChartJS.register(CategoryScale, Filler, LinearScale, PointElement, LineElement, Title, Tooltip);
 
 type TooltipVertLinePluginConfig = {
   color: string;

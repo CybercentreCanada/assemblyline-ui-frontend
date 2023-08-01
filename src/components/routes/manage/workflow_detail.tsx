@@ -1,3 +1,5 @@
+import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import {
@@ -21,6 +23,7 @@ import FormControl from '@mui/material/FormControl';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
+import Throttler from 'commons/addons/utils/throttler';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -33,7 +36,7 @@ import Histogram from 'components/visual/Histogram';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import AlertsTable from 'components/visual/SearchResult/alerts';
 import 'moment/locale/fr';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
@@ -76,7 +79,7 @@ type ParamProps = {
 type WorkflowDetailProps = {
   workflow_id?: string;
   close?: () => void;
-  mode?: string;
+  mode?: 'read' | 'write';
 };
 
 const MyMenuItem = withStyles((theme: Theme) =>
@@ -97,21 +100,26 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailProps) => {
+const THROTTLER = new Throttler(250);
+
+const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailProps) => {
   const { t, i18n } = useTranslation(['manageWorkflowDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [workflow, setWorkflow] = useState<Workflow>(null);
+  const [originalWorkflow, setOriginalWorkflow] = useState<Workflow>(null);
   const [histogram, setHistogram] = useState(null);
   const [results, setResults] = useState<any>(null);
   const [hits, setHits] = useState(0);
   const [runWorkflow, setRunWorkflow] = useState(false);
   const [modified, setModified] = useState(false);
+  const [badQuery, setBadQuery] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [viewMode, setViewMode] = useState(mode);
   const { c12nDef } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { showSuccessMessage } = useMySnackbar();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
   const navigate = useNavigate();
@@ -137,30 +145,43 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
             status: api_data.api_response.status || '',
             priority: api_data.api_response.priority || ''
           });
-        }
-      });
-      apiCall({
-        method: 'POST',
-        url: '/api/v4/search/histogram/alert/events.ts/',
-        body: {
-          query: `events.entity_id:${workflow_id || id}`,
-          mincount: 0,
-          start: 'now-30d/d',
-          end: 'now+1d/d-1s',
-          gap: '+1d'
+          setOriginalWorkflow({
+            ...api_data.api_response,
+            status: api_data.api_response.status || '',
+            priority: api_data.api_response.priority || '',
+            labels: api_data.api_response.labels || []
+          });
+
+          apiCall({
+            method: 'POST',
+            url: '/api/v4/search/histogram/alert/events.ts/',
+            body: {
+              query: `events.entity_id:${workflow_id || id}`,
+              mincount: 0,
+              start: 'now-30d/d',
+              end: 'now+1d/d-1s',
+              gap: '+1d'
+            },
+            onSuccess: hist_data => {
+              setHistogram(hist_data.api_response);
+            }
+          });
+          apiCall({
+            method: 'GET',
+            url: `/api/v4/search/alert/?query=events.entity_id:${workflow_id || id}&rows=10`,
+            onSuccess: top_data => {
+              setResults(top_data.api_response);
+            }
+          });
         },
-        onSuccess: api_data => {
-          setHistogram(api_data.api_response);
+        onFailure: api_data => {
+          showErrorMessage(api_data.api_error_message);
+          close();
         }
       });
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/search/alert/?query=events.entity_id:${workflow_id || id}&rows=10`,
-        onSuccess: api_data => {
-          setResults(api_data.api_response);
-        }
-      });
+      setViewMode('read');
     } else {
+      setViewMode('write');
       setWorkflow({ ...DEFAULT_WORKFLOW });
     }
 
@@ -175,6 +196,25 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
   const handleQueryChange = event => {
     setModified(true);
     setWorkflow({ ...workflow, query: event.target.value });
+    THROTTLER.delay(() => {
+      if (event.target.value !== '') {
+        apiCall({
+          method: 'GET',
+          url: `/api/v4/search/alert/?query=${encodeURI(event.target.value)}&rows=0&track_total_hits=true`,
+          onSuccess: api_data => {
+            setHits(api_data.api_response.total || 0);
+            setBadQuery(false);
+          },
+          onFailure: () => {
+            setResults(0);
+            setBadQuery(true);
+          }
+        });
+      } else {
+        setResults(0);
+        setBadQuery(false);
+      }
+    });
   };
 
   const handleCheckboxChange = () => {
@@ -235,6 +275,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
         showSuccessMessage(t(workflow_id || id ? 'save.success' : 'add.success'));
         setModified(false);
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
+        setViewMode('read');
         if (!(workflow_id || id)) close();
       },
       onEnter: () => setButtonLoading(true),
@@ -261,7 +302,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
             type="picker"
             c12n={workflow ? workflow.classification : null}
             setClassification={setClassification}
-            disabled={!currentUser.roles.includes('workflow_manage')}
+            disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
           />
         </div>
       )}
@@ -274,7 +315,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                 {workflow ? workflow.workflow_id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
-            {currentUser.roles.includes('workflow_view') && mode === 'edit' && (
+            {(workflow_id || id) && currentUser.roles.includes('workflow_view') && viewMode === 'read' && (
               <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
                 {workflow ? (
                   <Tooltip title={t('usage')}>
@@ -287,12 +328,46 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                       <YoutubeSearchedForIcon />
                     </IconButton>
                   </Tooltip>
+                ) : null}
+              </Grid>
+            )}
+            {(workflow_id || id) && currentUser.roles.includes('workflow_manage') && (
+              <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
+                {workflow ? (
+                  <Tooltip title={t(viewMode === 'read' ? 'edit' : 'cancel')}>
+                    <IconButton
+                      style={{
+                        color:
+                          viewMode === 'read'
+                            ? theme.palette.mode === 'dark'
+                              ? theme.palette.info.light
+                              : theme.palette.info.dark
+                            : theme.palette.mode === 'dark'
+                            ? theme.palette.error.light
+                            : theme.palette.error.dark
+                      }}
+                      onClick={() => {
+                        if (viewMode === 'read') {
+                          // Switch to write mode
+                          setViewMode('write');
+                        } else {
+                          // Reset the state of the workflow, cancel changes
+                          setViewMode('read');
+                          setWorkflow(originalWorkflow);
+                          setModified(false);
+                        }
+                      }}
+                      size="large"
+                    >
+                      {viewMode === 'read' ? <EditOutlinedIcon /> : <EditOffOutlinedIcon />}
+                    </IconButton>
+                  </Tooltip>
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
                 )}
               </Grid>
             )}
-            {(workflow_id || id) && currentUser.roles.includes('workflow_manage') && (
+            {(workflow_id || id) && currentUser.roles.includes('workflow_manage') && viewMode === 'read' && (
               <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
                 {workflow ? (
                   <Tooltip title={t('remove')}>
@@ -324,7 +399,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                 variant="outlined"
                 onChange={handleNameChange}
                 value={workflow.name}
-                disabled={!currentUser.roles.includes('workflow_manage')}
+                disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -338,21 +413,10 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                 size="small"
                 margin="dense"
                 variant="outlined"
+                error={badQuery}
                 onChange={handleQueryChange}
-                onBlur={() => {
-                  apiCall({
-                    method: 'GET',
-                    url: `/api/v4/search/alert/?query=${encodeURI(workflow.query)}&track_total_hits=true`,
-                    onSuccess: api_data => {
-                      setHits(api_data.api_response.total || 0);
-                    },
-                    onFailure: () => {
-                      setResults(0);
-                    }
-                  });
-                }}
                 value={workflow.query}
-                disabled={!currentUser.roles.includes('workflow_manage')}
+                disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -369,7 +433,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                 value={workflow.labels}
                 renderInput={params => <TextField {...params} variant="outlined" />}
                 onChange={(event, value) => handleLabelsChange(value as string[])}
-                disabled={!currentUser.roles.includes('workflow_manage')}
+                disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -385,7 +449,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                   value={workflow.priority}
                   onChange={handlePriorityChange}
                   variant="outlined"
-                  disabled={!currentUser.roles.includes('workflow_manage')}
+                  disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
                 >
                   <MyMenuItem value="">{t('priority.null')}</MyMenuItem>
                   <MyMenuItem value="LOW">{t('priority.LOW')}</MyMenuItem>
@@ -408,7 +472,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                   value={workflow.status}
                   onChange={handleStatusChange}
                   variant="outlined"
-                  disabled={!currentUser.roles.includes('workflow_manage')}
+                  disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
                 >
                   <MyMenuItem value="">{t('status.null')}</MyMenuItem>
                   <MyMenuItem value="MALICIOUS">{t('status.MALICIOUS')}</MyMenuItem>
@@ -421,47 +485,15 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
             )}
           </Grid>
         </Grid>
-        <div style={{ textAlign: 'center', paddingTop: theme.spacing(3) }}>
-          {workflow ? (
-            workflow.creator && (
-              <Typography variant="subtitle2" color="textSecondary">
-                {`${t('created_by')} ${workflow.creator} [${workflow.origin}] `}
-                <Moment fromNow locale={i18n.language}>
-                  {workflow.creation_date}
-                </Moment>
-              </Typography>
-            )
-          ) : (
-            <Skeleton />
-          )}
-          {workflow ? (
-            workflow.edited_by && (
-              <Typography variant="subtitle2" color="textSecondary">
-                {`${t('edited_by')} ${workflow.edited_by} `}
-                <Moment fromNow locale={i18n.language}>
-                  {workflow.last_edit}
-                </Moment>
-              </Typography>
-            )
-          ) : (
-            <Skeleton />
-          )}
-        </div>
 
         <RouterPrompt when={modified} />
 
-        {workflow && modified && workflow.name && workflow.query ? (
+        {workflow && viewMode === 'write' && (
           <>
             <div
               style={{
-                position: id ? 'fixed' : 'inherit',
-                bottom: id ? 0 : 'inherit',
-                left: id ? 0 : 'inherit',
-                width: id ? '100%' : 'inherit',
-                textAlign: id ? 'center' : 'left',
-                zIndex: id ? theme.zIndex.drawer - 1 : 'auto',
-                backgroundColor: id ? theme.palette.background.default : 'inherit',
-                boxShadow: id ? theme.shadows[4] : 'inherit'
+                position: 'inherit',
+                textAlign: 'left'
               }}
             >
               <FormControlLabel
@@ -487,50 +519,110 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                 boxShadow: id ? theme.shadows[4] : 'inherit'
               }}
             >
-              <Button variant="contained" color="primary" disabled={buttonLoading} onClick={saveWorkflow}>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={buttonLoading || !modified || badQuery || workflow?.query === '' || workflow?.name === ''}
+                onClick={saveWorkflow}
+              >
                 {t(workflow_id || id ? 'save' : 'add.button')}
                 {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
               </Button>
             </div>
           </>
-        ) : null}
-        {mode === 'edit' ? (
-          <div style={{ textAlign: 'left' }}>
-            <Grid item xs={12}>
-              <Typography variant="h6">{t('statistics')}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Grid container style={{ placeContent: 'center' }}>
-                <Grid item xs={3} sm={4} md={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>
-                    {t('hit.count')} {workflow ? workflow.hit_count : 0}
-                  </span>
+        )}
+        {viewMode === 'read' ? (
+          <Grid style={{ paddingTop: theme.spacing(4) }}>
+            <Grid container>
+              <Grid item xs={12}>
+                <Typography variant="h6">{t('statistics')}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
+                  {t('hits')}
+                </Typography>
+                <Grid container>
+                  <Grid item xs={3} sm={4} md={3} lg={3}>
+                    <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
+                  </Grid>
+                  <Grid item xs={9} sm={8} md={9} lg={9}>
+                    {workflow ? workflow.hit_count : 0}
+                  </Grid>
+                  <Grid item xs={3} sm={4} md={3} lg={3}>
+                    <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
+                  </Grid>
+                  <Grid item xs={9} sm={8} md={9} lg={9}>
+                    {workflow && workflow.first_seen ? (
+                      <Moment fromNow locale={i18n.language}>
+                        {workflow.first_seen}
+                      </Moment>
+                    ) : (
+                      t('hit.none')
+                    )}
+                  </Grid>
+                  <Grid item xs={3} sm={4} md={3} lg={3}>
+                    <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
+                  </Grid>
+                  <Grid item xs={9} sm={8} md={9} lg={9}>
+                    {workflow && workflow.last_seen ? (
+                      <Moment fromNow locale={i18n.language}>
+                        {workflow.last_seen}
+                      </Moment>
+                    ) : (
+                      t('hit.none')
+                    )}
+                  </Grid>
                 </Grid>
-                <Grid item xs={3} sm={4} md={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>{t('hit.first')} </span>
-                  {workflow && workflow.first_seen ? (
-                    <Moment fromNow locale={i18n.language}>
-                      {workflow.first_seen}
-                    </Moment>
-                  ) : (
-                    t('hit.none')
-                  )}
-                </Grid>
-                <Grid item xs={3} sm={4} md={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>{t('hit.last')} </span>
-                  {workflow && workflow.last_seen ? (
-                    <Moment fromNow locale={i18n.language}>
-                      {workflow.last_seen}
-                    </Moment>
-                  ) : (
-                    t('hit.none')
-                  )}
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
+                  {t('details')}
+                </Typography>
+                <Grid container>
+                  <Grid item xs={3} sm={4} md={3} lg={3}>
+                    <span style={{ fontWeight: 500 }}>{t('created_by')}:</span>
+                  </Grid>
+                  <Grid item xs={9} sm={8} md={9} lg={9}>
+                    {workflow && workflow.creator ? (
+                      <>
+                        {workflow.creator} [
+                        <Moment fromNow locale={i18n.language}>
+                          {workflow.creation_date}
+                        </Moment>
+                        ]
+                      </>
+                    ) : (
+                      <Skeleton />
+                    )}
+                  </Grid>
+                  <Grid item xs={3} sm={4} md={3} lg={3}>
+                    <span style={{ fontWeight: 500 }}>{t('edited_by')}:</span>
+                  </Grid>
+                  <Grid item xs={9} sm={8} md={9} lg={9}>
+                    {workflow && workflow.edited_by ? (
+                      <>
+                        {workflow.edited_by} [
+                        <Moment fromNow locale={i18n.language}>
+                          {workflow.last_edit}
+                        </Moment>
+                        ]
+                      </>
+                    ) : (
+                      <Skeleton />
+                    )}
+                  </Grid>
+                  <Grid item xs={3} sm={4} md={3} lg={3}>
+                    <span style={{ fontWeight: 500 }}>{t('origin')}:</span>
+                  </Grid>
+                  <Grid item xs={9} sm={8} md={9} lg={9}>
+                    {workflow && workflow ? workflow.origin : <Skeleton />}
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-          </div>
+          </Grid>
         ) : null}
-        {currentUser.roles.includes('alert_view') && mode === 'edit' ? (
+        {currentUser.roles.includes('alert_view') && viewMode === 'read' ? (
           <>
             <Grid item xs={12} style={{ paddingTop: '10px' }}>
               <Histogram
@@ -556,9 +648,10 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
   );
 };
 
-WorkflowDetail.defaultProps = {
+WrappedWorkflowDetail.defaultProps = {
   workflow_id: null,
   close: () => {}
 };
 
+const WorkflowDetail = React.memo(WrappedWorkflowDetail);
 export default WorkflowDetail;
