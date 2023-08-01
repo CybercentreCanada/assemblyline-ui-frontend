@@ -17,6 +17,7 @@ import SearchPager from 'components/visual/SearchPager';
 import AlertsTable from 'components/visual/SearchResult/alerts';
 import FilesTable from 'components/visual/SearchResult/files';
 import ResultsTable from 'components/visual/SearchResult/results';
+import RetrohuntTable from 'components/visual/SearchResult/retrohunt';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import SearchResultCount from 'components/visual/SearchResultCount';
@@ -96,13 +97,15 @@ function Search({ index }: SearchProps) {
   const [resultResults, setResultResults] = useState<SearchResults>(null);
   const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
   const [alertResults, setAlertResults] = useState<SearchResults>(null);
+  const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
 
   const stateMap = {
     submission: setSubmissionResults,
     file: setFileResults,
     result: setResultResults,
     signature: setSignatureResults,
-    alert: setAlertResults
+    alert: setAlertResults,
+    retrohunt: setRetrohuntResults
   };
 
   const resMap = {
@@ -110,7 +113,8 @@ function Search({ index }: SearchProps) {
     file: fileResults,
     result: resultResults,
     signature: signatureResults,
-    alert: alertResults
+    alert: alertResults,
+    retrohunt: retrohuntResults
   };
 
   const permissionMap = {
@@ -118,7 +122,8 @@ function Search({ index }: SearchProps) {
     file: 'submission_view',
     result: 'submission_view',
     signature: 'signature_view',
-    alert: 'alert_view'
+    alert: 'alert_view',
+    retrohunt: 'retrohunt_view'
   };
 
   const queryValue = useRef<string>('');
@@ -146,11 +151,12 @@ function Search({ index }: SearchProps) {
   };
 
   const resetResults = () => {
-    setSubmissionResults(null);
+    setAlertResults(null);
     setFileResults(null);
     setResultResults(null);
+    setRetrohuntResults(null);
     setSignatureResults(null);
-    setAlertResults(null);
+    setSubmissionResults(null);
   };
 
   useEffect(() => {
@@ -329,6 +335,16 @@ function Search({ index }: SearchProps) {
                 ) : (
                   <Empty />
                 )}
+                {currentUser.roles.includes(permissionMap.retrohunt) ? (
+                  <Tab
+                    label={`${t('retrohunt')} (${
+                      retrohuntResults ? searchResultsDisplay(retrohuntResults.total) : '...'
+                    })`}
+                    value="retrohunt"
+                  />
+                ) : (
+                  <Empty />
+                )}
                 <TabSpacer />
                 <SpecialTab>
                   <Tooltip title={t('focus_search')}>
@@ -375,8 +391,8 @@ function Search({ index }: SearchProps) {
         </div>
       </PageHeader>
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        {tab === 'submission' && query && query.get('query') && (
-          <SubmissionsTable submissionResults={submissionResults} allowSort={!!(index || id)} />
+        {tab === 'alert' && query && query.get('query') && (
+          <AlertsTable alertResults={alertResults} allowSort={!!(index || id)} />
         )}
         {tab === 'file' && query && query.get('query') && (
           <FilesTable fileResults={fileResults} allowSort={!!(index || id)} />
@@ -384,11 +400,14 @@ function Search({ index }: SearchProps) {
         {tab === 'result' && query && query.get('query') && (
           <ResultsTable resultResults={resultResults} allowSort={!!(index || id)} />
         )}
+        {tab === 'retrohunt' && query && query.get('query') && (
+          <RetrohuntTable retrohuntResults={retrohuntResults} allowSort={!!(index || id)} />
+        )}
         {tab === 'signature' && query && query.get('query') && (
           <SignaturesTable signatureResults={signatureResults} allowSort={!!(index || id)} />
         )}
-        {tab === 'alert' && query && query.get('query') && (
-          <AlertsTable alertResults={alertResults} allowSort={!!(index || id)} />
+        {tab === 'submission' && query && query.get('query') && (
+          <SubmissionsTable submissionResults={submissionResults} allowSort={!!(index || id)} />
         )}
       </div>
     </PageFullWidth>

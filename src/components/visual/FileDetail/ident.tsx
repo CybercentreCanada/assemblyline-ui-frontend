@@ -1,9 +1,32 @@
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
+import {
+  Autocomplete,
+  Collapse,
+  Divider,
+  Grid,
+  IconButton,
+  ListSubheader,
+  Menu,
+  MenuItem,
+  Skeleton,
+  TextField,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useALContext from 'components/hooks/useALContext';
+import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
+import CustomChip from 'components/visual/CustomChip';
+import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import { bytesToSize } from 'helpers/utils';
-import React from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ActionableText from '../ActionableText';
 
@@ -16,19 +39,89 @@ const useStyles = makeStyles(theme => ({
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
     }
+  },
+  labels: {
+    display: 'flex',
+    alignItems: 'center'
   }
 }));
 
 type IdentificationSectionProps = {
   fileinfo: any;
+  isArchive?: boolean;
 };
 
-const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo }) => {
+const LABELS_COLOR_MAP = {
+  info: 'default',
+  technique: 'secondary',
+  attribution: 'primary'
+};
+
+type LabelCategories = {
+  info?: string[];
+  technique?: string[];
+  attribution?: string[];
+};
+
+const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo, isArchive = false }) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
+
+  const { apiCall } = useMyAPI();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+  const [labels, setLabels] = useState<LabelCategories>(null);
+  const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);
+  const prevLabels = useRef<LabelCategories>(null);
+
+  const sortingLabels = useCallback(
+    (data: LabelCategories): LabelCategories =>
+      Object.fromEntries(
+        Object.entries(data).map(([category, l]: [string, string[]]) => [
+          category,
+          l.sort((a, b) => a.localeCompare(b))
+        ])
+      ),
+    []
+  );
+
+  useEffect(() => {
+    if (!fileinfo || !('label_categories' in fileinfo)) return;
+    setLabels(sortingLabels(fileinfo.label_categories));
+  }, [fileinfo, sortingLabels]);
+
+  const handleEditingLabels = useCallback((data: LabelCategories) => {
+    setIsEditingLabels(true);
+    prevLabels.current = data;
+  }, []);
+
+  const handleSaveLabels = useCallback(
+    (data: LabelCategories) => {
+      if (!fileinfo) return;
+      apiCall({
+        method: 'POST',
+        url: `/api/v4/file/label/${fileinfo.sha256}/`,
+        body: { ...data },
+        onSuccess: api_data => {
+          showSuccessMessage(t('labels.success'));
+          setLabels(sortingLabels(api_data.api_response?.response?.label_categories));
+          setIsEditingLabels(false);
+        },
+        onFailure(api_data) {
+          showErrorMessage(api_data.api_response);
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fileinfo?.sha256, showErrorMessage, showSuccessMessage, sortingLabels, t]
+  );
+
+  const handleCancelLabels = useCallback(() => {
+    setLabels(prevLabels.current);
+    setIsEditingLabels(false);
+  }, []);
 
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -152,6 +245,94 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
             </Grid>
             <Grid item xs={8} sm={9} lg={10}>
               {fileinfo ? fileinfo.entropy : <Skeleton />}
+            </Grid>
+            <Grid item xs={4} sm={3} lg={2}>
+              <div className={classes.labels}>
+                <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}>{t('labels')}</span>
+                {!isEditingLabels && (
+                  <IconButton
+                    children={<CreateOutlinedIcon fontSize="small" />}
+                    size="small"
+                    onClick={() => handleEditingLabels(labels)}
+                  />
+                )}
+                {isEditingLabels && (
+                  <IconButton
+                    children={<SaveOutlinedIcon fontSize="small" />}
+                    size="small"
+                    onClick={() => handleSaveLabels(labels)}
+                  />
+                )}
+                {isEditingLabels && (
+                  <IconButton
+                    children={<ClearOutlinedIcon fontSize="small" />}
+                    size="small"
+                    onClick={() => handleCancelLabels()}
+                  />
+                )}
+              </div>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10}>
+              {fileinfo ? (
+                <>
+                  <Collapse in={!isEditingLabels} timeout="auto">
+                    <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
+                      {labels &&
+                        ['attribution', 'technique', 'info'].map(
+                          category =>
+                            category in labels &&
+                            labels[category].map((label, i) => (
+                              <CustomChip
+                                key={i}
+                                wrap
+                                variant="outlined"
+                                size="tiny"
+                                type="rounded"
+                                color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                                label={label}
+                                style={{ height: 'auto', minHeight: '20px' }}
+                              />
+                            ))
+                        )}
+                    </div>
+                  </Collapse>
+                  <Collapse in={isEditingLabels} timeout="auto">
+                    <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
+                      {labels &&
+                        ['attribution', 'technique', 'info'].map(category => (
+                          <Autocomplete
+                            key={category}
+                            options={[]}
+                            multiple
+                            fullWidth
+                            freeSolo
+                            value={labels[category]}
+                            onChange={(e, newValue) => setLabels(l => ({ ...l, [category]: newValue }))}
+                            renderInput={p => <TextField {...p} variant="standard" />}
+                            renderTags={(value: readonly string[], getTagProps) =>
+                              value.map((option: string, index: number) => (
+                                <CustomChip
+                                  key={`${category}-${index}`}
+                                  component="div"
+                                  wrap
+                                  variant="outlined"
+                                  size="small"
+                                  type="rounded"
+                                  color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                                  label={option}
+                                  style={{ height: 'auto', minHeight: '20px' }}
+                                  {...getTagProps({ index })}
+                                />
+                              ))
+                            }
+                          />
+                        ))}
+                    </div>
+                  </Collapse>
+                </>
+              ) : (
+                <Skeleton />
+              )}
             </Grid>
           </Grid>
         </div>

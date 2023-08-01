@@ -1,5 +1,6 @@
 {
   "classification": "La classification suivante sera appliquée à votre soumission:",
+  "egress": "Envoyé de",
   "file": "Fichier",
   "file.button": "Téléverser et Analyser",
   "file.cancel": "Annuler",
