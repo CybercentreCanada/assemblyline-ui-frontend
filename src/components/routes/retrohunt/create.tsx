@@ -73,7 +73,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
       if (!currentUser.roles.includes('retrohunt_run')) return;
       apiCall({
         url: `/api/v4/retrohunt/`,
-        method: 'POST',
+        method: 'PUT',
         body: {
           classification: result.classification,
           description: result.description,

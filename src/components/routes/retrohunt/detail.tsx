@@ -184,19 +184,9 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       created: '2020-01-01T00:00:00.000000Z',
       creator: null,
       description: '',
-      errors: {
-        items: [],
-        offset: 0,
-        rows: PAGE_SIZE,
-        total: null
-      },
+      errors: [],
       finished: false,
-      hits: {
-        items: [],
-        offset: 0,
-        rows: PAGE_SIZE,
-        total: null
-      },
+      hits: [],
       pending_candidates: 0,
       pending_indices: 0,
       phase: 'finished',
@@ -212,7 +202,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [c12nDef.UNRESTRICTED]
   );
 
-  const hitsSuggestions = useMemo<string[]>(
+  const suggestions = useMemo<string[]>(
     () => [...Object.keys(indexes.file).filter(name => indexes.file[name].indexed), ...DEFAULT_SUGGESTION],
     [indexes.file]
   );
@@ -462,6 +452,22 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             )}
           </Grid>
 
+          {!retrohunt ? (
+            <Grid item>
+              <Typography variant="subtitle2">{t('details.search')}</Typography>
+              <Skeleton style={{ height: '2.5rem' }} />
+            </Grid>
+          ) : (
+            'archive_only' in retrohunt && (
+              <Grid item alignSelf="flex-start">
+                <Typography variant="subtitle2">{t('details.search')}</Typography>
+                <Paper component="pre" variant="outlined" className={classes.preview}>
+                  {retrohunt?.archive_only ? t('details.archive_only') : t('details.all')}
+                </Paper>
+              </Grid>
+            )
+          )}
+
           <Grid item>
             <Typography variant="subtitle2">{t('details.description')}</Typography>
             {retrohunt ? (
@@ -542,7 +548,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                 initValue={query ? query.get('query', '') : ''}
                 placeholder={t('filter')}
                 searching={isReloading}
-                suggestions={hitsSuggestions}
+                suggestions={suggestions}
                 onValueChange={value => {
                   filterValue.current = value;
                 }}
