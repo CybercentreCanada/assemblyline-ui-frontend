@@ -42,30 +42,19 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
-  const RetrohuntStatus = useCallback<React.FC<{ result?: RetrohuntResult }>>(
-    (prop = { result: {} }) => {
-      const result = { finished: false, phase: null, progress: null, ...prop.result };
-      const finished = 'finished' in result ? result.finished : null;
-      if (finished === null) return null;
-
-      const phase =
-        'phase' in result && ['filtering', 'yara', 'finished'].includes(result.phase)
-          ? result.phase
-          : finished
-          ? 'finished'
-          : 'submitted';
-
-      let pourcentage = '';
-      const progress = 'progress' in result ? result.progress : null;
-      if (phase && !finished && Array.isArray(progress) && progress.length === 2) {
-        if (phase === 'yara') pourcentage = `${Math.floor((100 * (progress[0] - progress[1])) / progress[0])}% `;
-        else if (phase === 'filtering') pourcentage = `${Math.floor((100 * progress[0]) / progress[1])}% `;
-      }
+  const RetrohuntStatus = useCallback<React.FC<{ result: RetrohuntResult }>>(
+    (prop = { result: { finished: false, phase: 'finished', pourcentage: 100 } }) => {
+      let { finished = false, phase = null, pourcentage = null } = prop.result;
+      phase = finished ? 'finished' : ['filtering', 'yara', 'finished'].includes(phase) ? phase : 'finished';
 
       return (
         <CustomChip
-          label={`${pourcentage}${t(`status.${phase}`)}`}
-          color={finished || phase === 'finished' ? 'primary' : 'default'}
+          label={
+            phase === 'finished' || !pourcentage
+              ? t(`status.${phase}`)
+              : `${Math.floor(pourcentage)}% ${t(`status.${phase}`)}`
+          }
+          color={phase === 'finished' ? 'primary' : 'default'}
           size="small"
           variant="outlined"
         />
