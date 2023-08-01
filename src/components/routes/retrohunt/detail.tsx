@@ -215,15 +215,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [retrohunt]
   );
 
-  const progress = useMemo<number>(() => {
-    if (!phase || !retrohunt || !Array.isArray(retrohunt?.progress) || retrohunt?.progress.length !== 2) return null;
-    else if (phase === 'finished') return 100;
-    else if (phase === 'yara')
-      return Math.floor((100 * (retrohunt.progress[0] - retrohunt.progress[1])) / retrohunt.progress[0]);
-    else if (phase === 'filtering') return Math.floor((100 * retrohunt.progress[0]) / retrohunt.progress[1]);
-    else return null;
-  }, [phase, retrohunt]);
-
   const hitPageCount = useMemo<number>(
     () => (hits && 'total' in hits ? Math.ceil(Math.min(hits.total, MAX_TRACKED_RECORDS) / PAGE_SIZE) : 0),
     [hits]
@@ -417,24 +408,28 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
               )}
             </Grid>
 
-            {retrohunt && 'finished' in retrohunt && !retrohunt.finished && (
-              <Grid item paddingTop={2}>
-                <Grid container flexDirection="row" justifyContent="center">
-                  <Grid item xs={12} sm={11} lg={10}>
-                    <SteppedProgress
-                      activeStep={['filtering', 'yara', 'finished'].indexOf(phase)}
-                      progress={progress}
-                      loading={!retrohunt}
-                      steps={[
-                        { label: t('phase.filtering'), icon: <FilterAltOutlinedIcon /> },
-                        { label: t('phase.yara'), icon: <DataObjectOutlinedIcon /> },
-                        { label: t('phase.finished'), icon: <DoneOutlinedIcon /> }
-                      ]}
-                    />
+            {retrohunt &&
+              'finished' in retrohunt &&
+              !retrohunt.finished &&
+              'percentage' in retrohunt &&
+              'phase' in retrohunt && (
+                <Grid item paddingTop={2}>
+                  <Grid container flexDirection="row" justifyContent="center">
+                    <Grid item xs={12} sm={11} lg={10}>
+                      <SteppedProgress
+                        activeStep={['filtering', 'yara', 'finished'].indexOf(phase)}
+                        percentage={retrohunt?.percentage}
+                        loading={!retrohunt}
+                        steps={[
+                          { label: t('phase.filtering'), icon: <FilterAltOutlinedIcon /> },
+                          { label: t('phase.yara'), icon: <DataObjectOutlinedIcon /> },
+                          { label: t('phase.finished'), icon: <DoneOutlinedIcon /> }
+                        ]}
+                      />
+                    </Grid>
                   </Grid>
                 </Grid>
-              </Grid>
-            )}
+              )}
           </Grid>
 
           <Grid item style={{ textAlign: 'center' }}>
