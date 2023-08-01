@@ -452,6 +452,22 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             )}
           </Grid>
 
+          {!retrohunt ? (
+            <Grid item>
+              <Typography variant="subtitle2">{t('details.search')}</Typography>
+              <Skeleton style={{ height: '2.5rem' }} />
+            </Grid>
+          ) : (
+            'archive_only' in retrohunt && (
+              <Grid item alignSelf="flex-start">
+                <Typography variant="subtitle2">{t('details.search')}</Typography>
+                <Paper component="pre" variant="outlined" className={classes.preview}>
+                  {retrohunt?.archive_only ? t('details.archive_only') : t('details.all')}
+                </Paper>
+              </Grid>
+            )
+          )}
+
           <Grid item>
             <Typography variant="subtitle2">{t('details.description')}</Typography>
             {retrohunt ? (
