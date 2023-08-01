@@ -4,6 +4,7 @@ import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 import {
@@ -132,7 +133,8 @@ const DEFAULT_SOURCE: Source = {
     message: '',
     state: '',
     ts: ''
-  }
+  },
+  sync: false
 };
 
 const isSourceUpdating = (source: Source) => source.status.state === 'UPDATING';
@@ -351,6 +353,11 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
             {source.ssl_ignore_errors && (
               <Tooltip title={t('ignore_ssl_used')}>
                 <NoEncryptionOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
+              </Tooltip>
+            )}
+            {source.sync && (
+              <Tooltip title={t('sync_used')}>
+                <SyncOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
               </Tooltip>
             )}
             {showDetails && (

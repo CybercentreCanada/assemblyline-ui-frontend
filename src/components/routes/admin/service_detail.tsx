@@ -102,6 +102,7 @@ export type Source = {
   username: string;
   git_branch: string;
   status: SourceStatus;
+  sync: boolean;
 };
 
 type UpdateConfig = {
