@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.common.white
   },
-  progressContainer: {
+  percentageContainer: {
     position: 'absolute',
     top: '14px',
     left: 'calc(-50% + 22px)',
@@ -53,19 +53,19 @@ type Props = {
   steps?: Step[];
   loading?: boolean;
   activeStep?: number;
-  progress?: number;
+  percentage?: number;
 };
 
-const WrappedSteppedProgress: React.FC<Props> = ({
+const WrappedSteppedPercentage: React.FC<Props> = ({
   steps = [],
   loading = false,
   activeStep = 0,
-  progress: progressProp = 10
+  percentage: percentageProp = 0
 }) => {
   const theme = useTheme();
   const classes = useStyles();
 
-  const progress = useMemo(() => Math.min(Math.max(progressProp, 0), 100), [progressProp]);
+  const percentage = useMemo(() => Math.min(Math.max(percentageProp, 0), 100), [percentageProp]);
 
   const StepComponent = useCallback<React.FC<{ step: Step; index: number; loading?: boolean; completed?: boolean }>>(
     (prop = { step: null, index: 0, loading: false, completed: false }) => (
@@ -90,12 +90,12 @@ const WrappedSteppedProgress: React.FC<Props> = ({
     [classes, theme]
   );
 
-  const ProgressComponent = useCallback<React.FC<{ progress: number; loading?: boolean }>>(
-    (prop = { progress: 0, loading: false }) => (
-      <span className={classes.progressContainer}>
-        <LinearProgress variant={prop.loading ? 'indeterminate' : 'determinate'} value={prop.progress} />
-        {!prop.loading && 0 < prop.progress && prop.progress < 100 ? (
-          <Typography variant="subtitle2">{`${prop.progress}%`}</Typography>
+  const PercentageComponent = useCallback<React.FC<{ percentage: number; loading?: boolean }>>(
+    (prop = { percentage: 0, loading: false }) => (
+      <span className={classes.percentageContainer}>
+        <LinearProgress variant={prop.loading ? 'indeterminate' : 'determinate'} value={prop.percentage} />
+        {!prop.loading && 0 < prop.percentage && prop.percentage < 100 ? (
+          <Typography variant="subtitle2">{`${prop.percentage}%`}</Typography>
         ) : null}
       </span>
     ),
@@ -110,7 +110,10 @@ const WrappedSteppedProgress: React.FC<Props> = ({
         </div>
         {steps.slice(1).map((step, i) => (
           <div key={i} className={classes.item}>
-            <ProgressComponent progress={i < activeStep ? 100 : activeStep < i ? 0 : progress} loading={loading} />
+            <PercentageComponent
+              percentage={i < activeStep ? 100 : activeStep < i ? 0 : percentage}
+              loading={loading}
+            />
             <StepComponent step={step} index={i + 1} loading={loading} completed={i < activeStep} />
           </div>
         ))}
@@ -118,5 +121,5 @@ const WrappedSteppedProgress: React.FC<Props> = ({
     );
 };
 
-export const SteppedProgress = React.memo(WrappedSteppedProgress);
-export default SteppedProgress;
+export const SteppedPercentage = React.memo(WrappedSteppedPercentage);
+export default SteppedPercentage;
