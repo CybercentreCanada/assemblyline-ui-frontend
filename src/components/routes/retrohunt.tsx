@@ -64,8 +64,8 @@ export type RetrohuntResult = {
   finished?: boolean;
   hits?: string[];
   id?: string;
+  percentage?: number;
   phase?: RetrohuntPhase;
-  pourcentage?: number;
   progress?: [number, number];
   raw_query?: string;
   tags?: object;
