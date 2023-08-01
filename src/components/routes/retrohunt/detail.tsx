@@ -184,19 +184,9 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       created: '2020-01-01T00:00:00.000000Z',
       creator: null,
       description: '',
-      errors: {
-        items: [],
-        offset: 0,
-        rows: PAGE_SIZE,
-        total: null
-      },
+      errors: [],
       finished: false,
-      hits: {
-        items: [],
-        offset: 0,
-        rows: PAGE_SIZE,
-        total: null
-      },
+      hits: [],
       pending_candidates: 0,
       pending_indices: 0,
       phase: 'finished',

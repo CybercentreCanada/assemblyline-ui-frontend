@@ -11,7 +11,6 @@ import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
-import { FileResult } from 'components/visual/SearchResult/files';
 import RetrohuntTable from 'components/visual/SearchResult/retrohunt';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
@@ -61,29 +60,17 @@ export type RetrohuntResult = {
   created?: string;
   creator?: string;
   description?: string;
-  errors?: {
-    items: string[];
-    offset: number;
-    rows: number;
-    total: number;
-  };
+  errors?: string[];
   finished?: boolean;
-  hits?: {
-    items: FileResult[];
-    offset: number;
-    rows: number;
-    total: number;
-  };
+  hits?: string[];
   id?: string;
-  pending_candidates?: any;
-  pending_indices?: any;
   phase?: RetrohuntPhase;
+  pourcentage?: number;
   progress?: [number, number];
   raw_query?: string;
   tags?: object;
   total_errors?: number;
   total_hits?: number;
-  total_indices?: number;
   truncated?: boolean;
   yara_signature?: string;
 };
@@ -154,7 +141,7 @@ export default function Retrohunt() {
         curQuery.set('rows', PAGE_SIZE);
         apiCall({
           method: 'POST',
-          url: `/api/v4/search/retrohunt/`,
+          url: `/api/v4/retrohunt/`,
           body: curQuery.getParams(),
           onSuccess: api_data => {
             const { items, total, rows, offset: ofs } = api_data.api_response;
