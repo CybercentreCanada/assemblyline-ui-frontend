@@ -212,7 +212,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [c12nDef.UNRESTRICTED]
   );
 
-  const hitsSuggestions = useMemo<string[]>(
+  const suggestions = useMemo<string[]>(
     () => [...Object.keys(indexes.file).filter(name => indexes.file[name].indexed), ...DEFAULT_SUGGESTION],
     [indexes.file]
   );
@@ -542,7 +542,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                 initValue={query ? query.get('query', '') : ''}
                 placeholder={t('filter')}
                 searching={isReloading}
-                suggestions={hitsSuggestions}
+                suggestions={suggestions}
                 onValueChange={value => {
                   filterValue.current = value;
                 }}
