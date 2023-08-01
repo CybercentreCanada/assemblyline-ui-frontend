@@ -602,8 +602,6 @@ export default function SubmissionReport() {
     }
   });
 
-  console.log(report);
-
   return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
       <div className={classes.page}>
