@@ -13,13 +13,12 @@ import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { isAccessible } from 'helpers/classificationParser';
-import { safeFieldValueURI } from 'helpers/utils';
+import { safeFieldValueURI, toTitleCase } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import ClassificationMismatchDialog from './ClassificationMismatchDialog';
-import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 import InputDialog from './InputDialog';
 
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -106,14 +105,6 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { showSuccessMessage } = useMySnackbar();
   const { triggerHighlight } = useHighlighter();
   const { apiCall } = useMyAPI();
-
-  const { toTitleCase } = useSearchTagExternal({
-    [type]: {
-      results: {},
-      errors: {},
-      success: null
-    }
-  });
 
   const handleClose = useCallback(() => {
     setState(initialMenuState);
