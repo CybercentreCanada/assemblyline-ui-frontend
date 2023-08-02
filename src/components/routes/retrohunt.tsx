@@ -140,9 +140,7 @@ export default function Retrohunt() {
         const curQuery = new SimpleSearchQuery(query.toString(), DEFAULT_QUERY);
         curQuery.set('rows', PAGE_SIZE);
         apiCall({
-          method: 'POST',
-          url: `/api/v4/retrohunt/`,
-          body: curQuery.getParams(),
+          url: `/api/v4/retrohunt/?${curQuery.toString()}`,
           onSuccess: api_data => {
             const { items, total, rows, offset: ofs } = api_data.api_response;
             if (items.length === 0 && ofs !== 0 && ofs >= total) {
