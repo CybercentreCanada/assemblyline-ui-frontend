@@ -116,18 +116,18 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
   }, []);
 
   useEffect(() => {
-    if (retrohunt && 'code' in retrohunt) reloadErrors(retrohunt.code, query.getDeltaString());
-  }, [query, reloadErrors, retrohunt]);
+    if (open && retrohunt && 'code' in retrohunt) reloadErrors(retrohunt.code, query.getDeltaString());
+  }, [open, query, reloadErrors, retrohunt]);
 
   useEffect(() => {
-    if (!timer.current && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
+    if (!timer.current && open && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
       timer.current = true;
       setTimeout(() => {
         reloadErrors(retrohunt.code, query.toString());
         timer.current = false;
       }, RELOAD_DELAY);
     }
-  }, [query, reloadErrors, retrohunt]);
+  }, [open, query, reloadErrors, retrohunt]);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
