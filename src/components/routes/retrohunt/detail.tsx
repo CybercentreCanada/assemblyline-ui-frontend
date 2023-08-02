@@ -494,6 +494,17 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             <Grid container gap={1}>
               <Grid item xs={12} marginTop={2}>
                 <Typography variant="h6">{t('header.results')}</Typography>
+                <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.code} />
+                {!retrohunt ? (
+                  <Skeleton width="20rem" />
+                ) : (
+                  'total_hits' in retrohunt &&
+                  retrohunt?.total_hits > 0 && (
+                    <Typography variant="caption">{`${retrohunt?.total_hits} ${
+                      retrohunt?.total_hits > 1 ? t('initial_hits') : t('initial_hit')
+                    }`}</Typography>
+                  )
+                )}
               </Grid>
               {!retrohunt ? (
                 <Grid item>
@@ -541,7 +552,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             ) : (
               <SearchBar
                 initValue={query ? query.get('query', '') : ''}
-                placeholder={t('filter')}
+                placeholder={t('hits.filter')}
                 searching={isReloading}
                 suggestions={suggestions}
                 onValueChange={value => {
