@@ -57,6 +57,8 @@
   "hits.filtereds": "résultats Rétrohunt correspondant au filtre",
   "hits.total": "résultat Rétrohunt",
   "hits.totals": "résultats Rétrohunt",
+  "initial_hit": "résultat initial",
+  "initial_hits": "résultats initiaux",
   "loading.yara": "Chargement",
   "never_used": "Tâches Rétrohunt qui n'ont jamais été utilisées",
   "no_results_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat.",

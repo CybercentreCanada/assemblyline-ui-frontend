@@ -85,7 +85,7 @@ type SearchResults = {
 const RELOAD_DELAY = 5000;
 
 const DEFAULT_PARAMS: object = {
-  fl: 'id,code,created,creator,description,classification,total_hits,phase,progress,finished',
+  fl: 'archive_only,classification,code,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated',
   offset: 0,
   query: '*',
   rows: PAGE_SIZE
@@ -140,9 +140,7 @@ export default function Retrohunt() {
         const curQuery = new SimpleSearchQuery(query.toString(), DEFAULT_QUERY);
         curQuery.set('rows', PAGE_SIZE);
         apiCall({
-          method: 'POST',
-          url: `/api/v4/retrohunt/`,
-          body: curQuery.getParams(),
+          url: `/api/v4/retrohunt/?${curQuery.toString()}`,
           onSuccess: api_data => {
             const { items, total, rows, offset: ofs } = api_data.api_response;
             if (items.length === 0 && ofs !== 0 && ofs >= total) {
