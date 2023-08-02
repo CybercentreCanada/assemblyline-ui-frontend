@@ -85,7 +85,7 @@ type SearchResults = {
 const RELOAD_DELAY = 5000;
 
 const DEFAULT_PARAMS: object = {
-  fl: 'id,code,created,creator,description,classification,total_hits,phase,progress,finished',
+  fl: 'archive_only,classification,code,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated',
   offset: 0,
   query: '*',
   rows: PAGE_SIZE
