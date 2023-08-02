@@ -1,7 +1,7 @@
 import { Skeleton, Theme, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
 import React from 'react';
+import ActionableCustomChip, { ActionableCustomChipProps } from './ActionableCustomChip';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chiplist: {
@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type ChipListProps = {
-  items: CustomChipProps[];
+  items: ActionableCustomChipProps[];
   wrap?: boolean;
 };
 
@@ -44,7 +44,7 @@ const ChipList: React.FC<ChipListProps> = ({ items, wrap = true }) => {
       {items
         ? items.map((cp, i) => (
             <li key={`chiplist-${i}`}>
-              <CustomChip size="small" className={classes.chip} wrap={wrap} {...cp} />
+              <ActionableCustomChip size="small" className={classes.chip} wrap={wrap} {...cp} />
             </li>
           ))
         : [...Array(3)].map((k, i) => (

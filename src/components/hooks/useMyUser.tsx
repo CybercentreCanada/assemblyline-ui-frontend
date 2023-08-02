@@ -51,6 +51,15 @@ export type SystemMessageDefinition = {
   message: string;
 };
 
+export type ExternalLink = {
+  allow_bypass: boolean;
+  double_encode: boolean;
+  max_classification: string;
+  name: string;
+  replace_pattern: string;
+  url: string;
+};
+
 export type ConfigurationDefinition = {
   auth: {
     allow_2fa: boolean;
@@ -95,6 +104,11 @@ export type ConfigurationDefinition = {
       [lang: string]: string;
     };
     banner_level: 'info' | 'warning' | 'error' | 'success';
+    external_links: {
+      tag: { [key: string]: ExternalLink[] };
+      hash: { [key: string]: ExternalLink[] };
+      metadata: { [key: string]: ExternalLink[] };
+    };
     external_sources: string[];
     external_source_tags: {
       [tag_name: string]: string[];

@@ -103,9 +103,7 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }
                 <strong>
                   <MaterialLink
                     component={Link}
-                    style={{
-                      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                    }}
+                    color={theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}
                     to={`/submission/detail/${sid}/${getHashFromKey(error)}`}
                   >
                     {getHashFromKey(error)}

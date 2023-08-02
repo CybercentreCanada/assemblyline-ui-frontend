@@ -1,11 +1,11 @@
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import LaunchOutlinedIcon from '@mui/icons-material/LaunchOutlined';
 import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
-import { Link, Popover, SvgIconTypeMap, Typography } from '@mui/material';
+import { Box, Link, Popover, SvgIconTypeMap, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import { toTitleCase } from 'helpers/utils';
 import React, { forwardRef } from 'react';
-import { useSearchTagExternal } from './useExternalLookup';
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -79,7 +79,6 @@ const EXTERNAL_RESULTS_ICON = forwardRef<SvgIconTypeMap | null, any>((props, ref
 
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, success, iconStyle }) => {
   const classes = useStyles();
-  const { toTitleCase } = useSearchTagExternal({});
   const [openedPopover, setOpenedPopover] = React.useState(false);
   const popoverAnchor = React.useRef(null);
 
@@ -127,7 +126,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, 
         PaperProps={{ onMouseEnter: popoverEnter, onMouseLeave: popoverLeave }}
         onClick={event => event.stopPropagation()}
       >
-        <Typography sx={{ p: 1 }}>
+        <Box sx={{ p: 1 }}>
           {[...Object.keys(results)]?.sort().map((sourceName: keyof LookupSourceDetails, i) => (
             <div key={`success_${i}`}>
               <Typography className={clsx(classes.title)} sx={{ display: 'inline' }}>
@@ -159,7 +158,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, 
               ))}
             </>
           )}
-        </Typography>
+        </Box>
       </Popover>
     </div>
   );

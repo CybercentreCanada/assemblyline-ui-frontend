@@ -1234,7 +1234,10 @@ function WrappedSubmissionDetail() {
           </div>
         )}
 
-        <MetaSection metadata={submission ? submission.metadata : null} />
+        <MetaSection
+          metadata={submission ? submission.metadata : null}
+          classification={submission ? submission.classification : null}
+        />
         <Detection
           section_map={summary ? summary.heuristic_sections : null}
           heuristics={summary ? summary.heuristics : null}

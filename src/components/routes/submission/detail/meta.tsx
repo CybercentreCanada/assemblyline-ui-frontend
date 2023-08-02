@@ -3,6 +3,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Button, Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
+import ActionableText from 'components/visual/ActionableText';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -34,9 +35,10 @@ const useStyles = makeStyles(theme => ({
 
 type MetaSectionProps = {
   metadata: any;
+  classification: string;
 };
 
-const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata }) => {
+const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata, classification }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const classes = useStyles();
@@ -85,7 +87,12 @@ const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata }) => {
                     <span style={{ fontWeight: 500 }}>{meta}</span>
                   </Grid>
                   <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                    {metadata[meta]}
+                    <ActionableText
+                      category="metadata"
+                      type={meta}
+                      value={metadata[meta]}
+                      classification={classification}
+                    />
                   </Grid>
                 </Grid>
               ))
@@ -118,7 +125,12 @@ const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata }) => {
                       <span style={{ fontWeight: 500 }}>{meta}</span>
                     </Grid>
                     <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                      {metadata[meta]}
+                      <ActionableText
+                        category="metadata"
+                        type={meta}
+                        value={metadata[meta]}
+                        classification={classification}
+                      />
                     </Grid>
                   </Grid>
                 ))}

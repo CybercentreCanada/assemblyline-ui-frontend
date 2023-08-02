@@ -1,46 +1,17 @@
-import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
-import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
-import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
-import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
-import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
-import { Divider, ListSubheader, Menu, MenuItem } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
-import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
-import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
+import ActionMenu from './ActionMenu';
 import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
-import InputDialog from './InputDialog';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
-const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
-const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
-const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />;
-const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
-const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
-const SUBMIT_ICON = <PublishOutlinedIcon style={{ marginRight: '16px' }} />;
-const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const initialMenuState = {
   mouseX: null,
   mouseY: null
 };
-
-const useStyles = makeStyles(theme => ({
-  listSubHeaderRoot: {
-    lineHeight: '32px'
-  }
-}));
 
 type TagProps = {
   type: string;
@@ -67,29 +38,14 @@ const WrappedTag: React.FC<TagProps> = ({
   force = false,
   classification
 }) => {
-  const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
-  const [safelistDialog, setSafelistDialog] = React.useState(false);
-  const [safelistReason, setSafelistReason] = React.useState(null);
-  const [waitingDialog, setWaitingDialog] = React.useState(false);
-  const navigate = useNavigate();
-  const { user: currentUser, configuration: currentUserConfig, scoreToVerdict } = useALContext();
-  const { apiCall } = useMyAPI();
-  const { showSuccessMessage } = useMySnackbar();
+  const { scoreToVerdict } = useALContext();
   const { isHighlighted, triggerHighlight } = useHighlighter();
-  const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
-  const classes = useStyles();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
-  const searchTag = useCallback(
-    () => navigate(`/search/result?query=result.sections.tags.${type}:${safeFieldValueURI(value)}`),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [type, value]
-  );
-
-  const { lookupState, searchTagExternal, toTitleCase } = useSearchTagExternal({
+  const { lookupState, searchTagExternal } = useSearchTagExternal({
     [type]: {
       results: {},
       errors: {},
@@ -118,160 +74,18 @@ const WrappedTag: React.FC<TagProps> = ({
     });
   }, []);
 
-  const handleClose = useCallback(() => {
-    setState(initialMenuState);
-  }, []);
-
-  const handleMenuCopy = useCallback(() => {
-    copy(value, 'clipID');
-    handleClose();
-  }, [copy, handleClose, value]);
-
-  const handleMenuSearch = useCallback(() => {
-    searchTag();
-    handleClose();
-  }, [searchTag, handleClose]);
-
-  const handleMenuExternalSearch = useCallback(
-    source => {
-      searchTagExternal(source, type, value, classification);
-      handleClose();
-    },
-    [searchTagExternal, handleClose, type, value, classification]
-  );
-
-  const handleMenuHighlight = useCallback(() => {
-    handleClick();
-    handleClose();
-  }, [handleClick, handleClose]);
-
-  const handleMenuSafelist = useCallback(() => {
-    setSafelistDialog(true);
-    handleClose();
-  }, [setSafelistDialog, handleClose]);
-
-  const addToSafelist = useCallback(() => {
-    const data = {
-      tag: {
-        type,
-        value
-      },
-      sources: [
-        {
-          name: currentUser.username,
-          reason: [safelistReason],
-          type: 'user'
-        }
-      ],
-      type: 'tag'
-    };
-
-    apiCall({
-      url: `/api/v4/safelist/`,
-      method: 'PUT',
-      body: data,
-      onSuccess: _ => {
-        setSafelistDialog(false);
-        showSuccessMessage(t('safelist.success'));
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safelistReason, t, type, value]);
-
   return maliciousness === 'safe' && !showSafeResults && !force ? null : (
     <>
-      <InputDialog
-        open={safelistDialog}
-        handleClose={() => setSafelistDialog(false)}
-        handleAccept={addToSafelist}
-        handleInputChange={event => setSafelistReason(event.target.value)}
-        inputValue={safelistReason}
-        title={t('safelist.title')}
-        cancelText={t('safelist.cancelText')}
-        acceptText={t('safelist.acceptText')}
-        inputLabel={t('safelist.input')}
-        text={t('safelist.text')}
-        waiting={waitingDialog}
+      <ActionMenu
+        category={'tag'}
+        type={type}
+        value={value}
+        state={state}
+        setState={setState}
+        searchTagExternal={searchTagExternal}
+        classification={classification}
+        highlight_key={highlight_key}
       />
-      <Menu
-        open={state.mouseY !== null}
-        onClose={handleClose}
-        anchorReference="anchorPosition"
-        anchorPosition={
-          state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
-        }
-      >
-        {type.startsWith('file.rule.') && currentUser.roles.includes('signature_view') && (
-          <MenuItem
-            id="clipID"
-            dense
-            component={Link}
-            to={`/manage/signature/${type.substring(10)}/${value.substring(0, value.indexOf('.'))}/${value.substring(
-              value.indexOf('.') + 1
-            )}`}
-          >
-            {SIGNATURE_ICON}
-            {t('goto_signature')}
-          </MenuItem>
-        )}
-        <MenuItem id="clipID" dense onClick={handleMenuCopy}>
-          {CLIPBOARD_ICON}
-          {t('clipboard')}
-        </MenuItem>
-        {currentUser.roles.includes('submission_view') && (
-          <MenuItem dense onClick={handleMenuSearch}>
-            {SEARCH_ICON}
-            {t('related')}
-          </MenuItem>
-        )}
-        <MenuItem dense onClick={handleMenuHighlight}>
-          {HIGHLIGHT_ICON}
-          {t('highlight')}
-        </MenuItem>
-        {currentUser.roles.includes('safelist_manage') && (
-          <MenuItem dense onClick={handleMenuSafelist}>
-            {SAFELIST_ICON}
-            {t('safelist')}
-          </MenuItem>
-        )}
-        {type.endsWith('uri') && (
-          <MenuItem
-            dense
-            component={Link}
-            to="/submit"
-            state={{
-              hash: value,
-              tabContext: '1',
-              c12n: classification
-            }}
-          >
-            {SUBMIT_ICON}
-            {t('submit_uri')}
-          </MenuItem>
-        )}
-        {!!currentUser.roles.includes('external_query') &&
-          !!currentUserConfig.ui.external_sources?.length &&
-          !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type) && (
-            <div>
-              <Divider />
-              <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
-                {t('related_external')}
-              </ListSubheader>
-
-              <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
-                {TRAVEL_EXPLORE_ICON} {t('related_external.all')}
-              </MenuItem>
-
-              {currentUserConfig.ui.external_source_tags?.[type]?.sort().map((source, i) => (
-                <MenuItem dense key={`source_${i}`} onClick={() => handleMenuExternalSearch(source)}>
-                  {TRAVEL_EXPLORE_ICON} {toTitleCase(source)}
-                </MenuItem>
-              ))}
-            </div>
-          )}
-      </Menu>
       <CustomChip
         wrap
         variant={safelisted ? 'outlined' : 'filled'}
