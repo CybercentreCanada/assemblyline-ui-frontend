@@ -4,8 +4,8 @@ import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import { Box, Link, Popover, SvgIconTypeMap, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import { toTitleCase } from 'helpers/utils';
 import React, { forwardRef } from 'react';
-import { useSearchTagExternal } from './useExternalLookup';
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -79,7 +79,6 @@ const EXTERNAL_RESULTS_ICON = forwardRef<SvgIconTypeMap | null, any>((props, ref
 
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, success, iconStyle }) => {
   const classes = useStyles();
-  const { toTitleCase } = useSearchTagExternal({});
   const [openedPopover, setOpenedPopover] = React.useState(false);
   const popoverAnchor = React.useRef(null);
 

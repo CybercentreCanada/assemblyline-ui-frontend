@@ -1,5 +1,13 @@
 import { PossibleColors } from 'components/visual/CustomChip';
 
+export function toTitleCase(s: string) {
+  return s
+    .replace(/_/g, ' ')
+    .split(' ')
+    .map(w => w[0].toUpperCase() + w.substring(1).toLowerCase())
+    .join(' ');
+}
+
 export function getFileName(disposition: string): string {
   const utf8FilenameRegex = /filename\*=UTF-8''([\w%\-.]+)(?:; ?|$)/i;
   const asciiFilenameRegex = /^filename=(["']?)(.*?[^\\])\1(?:; ?|$)/i;
