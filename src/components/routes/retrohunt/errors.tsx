@@ -28,6 +28,7 @@ import {
 } from 'components/visual/DivTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
+import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,6 +43,13 @@ const useStyles = makeStyles(theme => ({
   },
   pagination: {
     justifyContent: 'center'
+  },
+  searchBar: {
+    fontStyle: 'italic',
+    paddingTop: theme.spacing(0.5),
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end'
   }
 }));
 
@@ -80,15 +88,18 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [errors, setErrors] = useState<RetrohuntErrorResult>(null);
+  const [errorResults, setErrorResults] = useState<RetrohuntErrorResult>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
   const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(DEFAULT_QUERY));
 
   const timer = useRef<boolean>(false);
 
   const errorPageCount = useMemo<number>(
-    () => (errors && 'total' in errors ? Math.ceil(Math.min(errors.total, MAX_TRACKED_RECORDS) / PAGE_SIZE) : 0),
-    [errors]
+    () =>
+      errorResults && 'total' in errorResults
+        ? Math.ceil(Math.min(errorResults.total, MAX_TRACKED_RECORDS) / PAGE_SIZE)
+        : 0,
+    [errorResults]
   );
 
   const reloadErrors = useCallback(
@@ -99,14 +110,14 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
           method: 'POST',
           url: `/api/v4/retrohunt/errors/${curCode}/`,
           body: curQuery.getParams(),
-          onSuccess: api_data => setErrors(api_data.api_response),
+          onSuccess: api_data => setErrorResults(api_data.api_response),
           onEnter: () => setIsReloading(true),
           onExit: () => setIsReloading(false)
         });
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.roles]
+    [currentUser?.roles]
   );
 
   const handleQueryChange = useCallback((key: string, value: string | number) => {
@@ -136,16 +147,6 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
       <DialogTitle className={classes.dialogTitle}>
         <div className={classes.titleContainer}>
           <div>{t('errors.view.title')}</div>
-          {retrohunt && 'total_errors' in retrohunt && (
-            <Typography
-              variant="caption"
-              children={
-                retrohunt?.total_errors > 1
-                  ? `${retrohunt?.total_errors} ${t('errors')}`
-                  : `${retrohunt?.total_errors} ${t('error')}`
-              }
-            />
-          )}
         </div>
         <div>
           <Tooltip title={t('errors.close')}>
@@ -158,9 +159,9 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
         </div>
       </DialogTitle>
       <DialogContent>
-        {!errors ? (
+        {!errorResults ? (
           <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-        ) : !('total' in errors) || errors.total === 0 ? (
+        ) : !('total' in errorResults) || errorResults.total === 0 ? (
           <div style={{ width: '100%' }}>
             <InformativeAlert>
               <AlertTitle>{t('no_results_title')}</AlertTitle>
@@ -169,18 +170,34 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
           </div>
         ) : (
           <>
-            {errorPageCount > 1 && (
-              <Pagination
-                page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
-                onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
-                count={errorPageCount}
-                shape="rounded"
-                size="small"
-                classes={{
-                  ul: classes.pagination
-                }}
-              />
-            )}
+            <div className={classes.searchBar}>
+              {errorResults && 'total' in errorResults && errorResults.total !== 0 && (
+                <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                  {isReloading ? (
+                    <span>{t('searching')}</span>
+                  ) : (
+                    <span>
+                      <SearchResultCount count={errorResults.total} />
+                      {query.get('query')
+                        ? t(`errors.filtered${errorResults.total === 1 ? '' : 's'}`)
+                        : t(`errors.total${errorResults.total === 1 ? '' : 's'}`)}
+                    </span>
+                  )}
+                </Typography>
+              )}
+              {errorPageCount > 1 && (
+                <Pagination
+                  page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
+                  onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
+                  count={errorPageCount}
+                  shape="rounded"
+                  size="small"
+                  classes={{
+                    ul: classes.pagination
+                  }}
+                />
+              )}
+            </div>
             <div style={{ height: '4px' }}>{isReloading && <LinearProgress />}</div>
             <TableContainer component={Paper}>
               <DivTable>
@@ -197,7 +214,7 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
                   </DivTableRow>
                 </DivTableHead>
                 <DivTableBody>
-                  {errors.items.map((error, id) => (
+                  {errorResults.items.map((error, id) => (
                     <DivTableRow key={id} hover style={{ textDecoration: 'none' }}>
                       <DivTableCell>{error}</DivTableCell>
                     </DivTableRow>

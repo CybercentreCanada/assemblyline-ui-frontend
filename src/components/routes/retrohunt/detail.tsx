@@ -143,8 +143,7 @@ const DEFAULT_PARAMS: object = {
   offset: 0,
   rows: PAGE_SIZE,
   sort: 'seen.last+desc',
-  fl: 'seen.last,seen.count,sha256,type,size,classification,from_archive',
-  mincount: 0
+  fl: 'seen.last,seen.count,sha256,type,size,classification,from_archive'
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -166,9 +165,9 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [retrohunt, setRetrohunt] = useState<RetrohuntResult>(null);
-  const [hits, setHits] = useState<RetrohuntHitResult>(null);
+  const [hitResults, setHitResults] = useState<RetrohuntHitResult>(null);
   const [isErrorOpen, setIsErrorOpen] = useState<boolean>(false);
-  const [types, setTypes] = useState<{ [k: string]: number }>(null);
+  const [typeDataSet, setTypeDataSet] = useState<{ [k: string]: number }>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
   const [query, setQuery] = useState<SimpleSearchQuery>(
     new SimpleSearchQuery(isDrawer ? '' : location.search, DEFAULT_QUERY)
@@ -217,8 +216,9 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   );
 
   const hitPageCount = useMemo<number>(
-    () => (hits && 'total' in hits ? Math.ceil(Math.min(hits.total, MAX_TRACKED_RECORDS) / PAGE_SIZE) : 0),
-    [hits]
+    () =>
+      hitResults && 'total' in hitResults ? Math.ceil(Math.min(hitResults.total, MAX_TRACKED_RECORDS) / PAGE_SIZE) : 0,
+    [hitResults]
   );
 
   const PageLayout = useCallback<React.FC<any>>(
@@ -247,6 +247,14 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [DEFAULT_RETROHUNT, currentUser.roles, retrohunt?.code]
   );
 
+  const handleQueryChange = useCallback((key: string, value: string | number) => {
+    setQuery(prev => {
+      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
+      q.set(key, value);
+      return q;
+    });
+  }, []);
+
   const reloadHits = useCallback(
     (curCode: string, searchParam: string) => {
       const curQuery = new SimpleSearchQuery(searchParam, DEFAULT_QUERY);
@@ -256,37 +264,36 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
           method: 'POST',
           url: `/api/v4/retrohunt/hits/${curCode}/`,
           body: curQuery.getParams(),
-          onSuccess: api_data => setHits(api_data.api_response),
+          onSuccess: api_data => {
+            const { items, total, rows, offset } = api_data.api_response;
+            if (items.length === 0 && offset !== 0 && offset >= total) {
+              handleQueryChange('offset', Math.floor(total / rows) * rows);
+            } else {
+              setHitResults(api_data.api_response);
+            }
+          },
           onEnter: () => setIsReloading(true),
           onExit: () => setIsReloading(false)
         });
         apiCall({
           method: 'POST',
           url: `/api/v4/retrohunt/types/${curCode}/`,
-          body: getFilteredParams(curQuery, ['query', 'mincount', 'filters']),
+          body: getFilteredParams(curQuery, ['query', 'filters']),
           onSuccess: api_data => {
-            let newTypes: { [k: string]: number } = api_data.api_response;
-            newTypes = Object.fromEntries(
-              Object.keys(newTypes)
-                .sort((a, b) => newTypes[b] - newTypes[a])
-                .map(k => [k, newTypes[k]])
+            let dataset: { [k: string]: number } = api_data.api_response;
+            dataset = Object.fromEntries(
+              Object.keys(dataset)
+                .sort((a, b) => dataset[b] - dataset[a])
+                .map(k => [k, dataset[k]])
             );
-            setTypes(newTypes);
+            setTypeDataSet(dataset);
           }
         });
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [DEFAULT_RETROHUNT, currentUser.roles, retrohunt?.code]
+    [currentUser?.roles, getFilteredParams, handleQueryChange, retrohunt?.code]
   );
-
-  const handleQueryChange = useCallback((key: string, value: string | number) => {
-    setQuery(prev => {
-      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
-      q.set(key, value);
-      return q;
-    });
-  }, []);
 
   const handleQueryRemove = useCallback((key: string | string[]) => {
     setQuery(prev => {
@@ -453,31 +460,30 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             )}
           </Grid>
 
-          {!retrohunt ? (
-            <Grid item>
-              <Typography variant="subtitle2">{t('details.search')}</Typography>
-              <Skeleton style={{ height: '2.5rem' }} />
-            </Grid>
-          ) : (
-            'archive_only' in retrohunt && (
-              <Grid item alignSelf="flex-start">
-                <Typography variant="subtitle2">{t('details.search')}</Typography>
-                <Paper component="pre" variant="outlined" className={classes.preview}>
-                  {retrohunt?.archive_only ? t('details.archive_only') : t('details.all')}
-                </Paper>
-              </Grid>
-            )
-          )}
-
           <Grid item>
-            <Typography variant="subtitle2">{t('details.description')}</Typography>
-            {retrohunt ? (
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {retrohunt?.description}
-              </Paper>
-            ) : (
-              <Skeleton style={{ height: '2.5rem' }} />
-            )}
+            <Grid container flexDirection="row" rowGap={1} columnGap={3}>
+              <Grid item sm={12} md={6} lg={8}>
+                <Typography variant="subtitle2">{t('details.description')}</Typography>
+                {!retrohunt ? (
+                  <Skeleton style={{ height: '2.5rem' }} />
+                ) : (
+                  <Paper component="pre" variant="outlined" className={classes.preview}>
+                    {retrohunt?.description}
+                  </Paper>
+                )}
+              </Grid>
+
+              <Grid item flex={1}>
+                <Typography variant="subtitle2">{t('details.search')}</Typography>
+                {!retrohunt ? (
+                  <Skeleton style={{ height: '2.5rem' }} />
+                ) : (
+                  <Paper component="pre" variant="outlined" className={classes.preview}>
+                    {retrohunt?.archive_only ? t('details.archive_only') : t('details.all')}
+                  </Paper>
+                )}
+              </Grid>
+            </Grid>
           </Grid>
 
           <Grid item>
@@ -500,17 +506,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             <Grid container gap={1}>
               <Grid item xs={12} marginTop={2}>
                 <Typography variant="h6">{t('header.results')}</Typography>
-                <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.code} />
-                {!retrohunt ? (
-                  <Skeleton width="20rem" />
-                ) : (
-                  'total_hits' in retrohunt &&
-                  retrohunt?.total_hits > 0 && (
-                    <Typography variant="caption">{`${retrohunt?.total_hits} ${
-                      retrohunt?.total_hits > 1 ? t('initial_hits') : t('initial_hit')
-                    }`}</Typography>
-                  )
-                )}
               </Grid>
               {!retrohunt ? (
                 <Grid item>
@@ -573,16 +568,24 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                 }}
               >
                 <div className={classes.results}>
-                  {hits && 'total' in hits && hits.total !== 0 && (
+                  {hitResults && 'total' in hitResults && hitResults.total !== 0 && (
                     <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                       {isReloading ? (
                         <span>{t('searching')}</span>
                       ) : (
                         <span>
-                          <SearchResultCount count={hits.total} />
-                          {query.get('query')
-                            ? t(`hits.filtered${hits.total === 1 ? '' : 's'}`)
-                            : t(`hits.total${hits.total === 1 ? '' : 's'}`)}
+                          <SearchResultCount count={hitResults.total} />
+                          {query.get('query') || query.get('filters')
+                            ? t(`hits.filtered${hitResults.total === 1 ? '' : 's'}`)
+                            : t(`hits.total${hitResults.total === 1 ? '' : 's'}`)}
+                          {retrohunt?.total_hits && (
+                            <>
+                              {` (`}
+                              <SearchResultCount count={retrohunt.total_hits} />
+                              {t(`total_hits.total${retrohunt.total_hits === 1 ? '' : 's'}`)}
+                              {')'}
+                            </>
+                          )}
                         </span>
                       )}
                     </Typography>
@@ -616,23 +619,23 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
 
           <Grid item>
             <LineGraph
-              dataset={types}
+              dataset={typeDataSet}
               height="200px"
               title={t('graph.type.title')}
               datatype={t('graph.type.datatype')}
               onClick={(evt, element) => {
                 if (!isReloading && element.length > 0) {
                   var ind = element[0].index;
-                  handleFilterAdd(Object.keys(types)[ind]);
+                  handleFilterAdd(Object.keys(typeDataSet)[ind]);
                 }
               }}
             />
           </Grid>
 
           <Grid item>
-            {!hits ? (
+            {!hitResults ? (
               <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-            ) : hits.total === 0 ? (
+            ) : hitResults.total === 0 ? (
               <div style={{ width: '100%' }}>
                 <InformativeAlert>
                   <AlertTitle>{t('no_results_title')}</AlertTitle>
@@ -704,7 +707,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                     </DivTableRow>
                   </DivTableHead>
                   <DivTableBody id="hit-body">
-                    {hits.items.map((file, id) => (
+                    {hitResults.items.map((file, id) => (
                       <LinkRow
                         key={id}
                         component={Link}
