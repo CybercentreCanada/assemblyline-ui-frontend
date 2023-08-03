@@ -271,7 +271,7 @@ export default function Retrohunt() {
                       ) : (
                         <span>
                           <SearchResultCount count={retrohuntResults.total} />
-                          {query.get('query')
+                          {query.get('query') || query.get('filters')
                             ? t(`filtered${retrohuntResults.total === 1 ? '' : 's'}`)
                             : t(`total${retrohuntResults.total === 1 ? '' : 's'}`)}
                         </span>
