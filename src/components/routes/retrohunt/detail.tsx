@@ -139,11 +139,12 @@ const MAX_TRACKED_RECORDS = 10000;
 const RELOAD_DELAY = 5000;
 
 const DEFAULT_PARAMS: object = {
-  fl: 'seen.last,seen.count,sha256,type,size,classification,from_archive',
-  offset: 0,
   query: '*',
+  offset: 0,
   rows: PAGE_SIZE,
-  sort: 'seen.last+desc'
+  sort: 'seen.last+desc',
+  fl: 'seen.last,seen.count,sha256,type,size,classification,from_archive',
+  mincount: 0
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -225,6 +226,12 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [isDrawer]
   );
 
+  const getFilteredParams = useCallback(
+    (q: SimpleSearchQuery, filters: string[]) =>
+      Object.fromEntries(Object.entries(q.getParams()).filter(v => filters.includes(v[0]))),
+    []
+  );
+
   const reloadData = useCallback(
     (curCode: string) => {
       if (currentUser.roles.includes('retrohunt_view')) {
@@ -246,18 +253,17 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
 
       if (currentUser.roles.includes('retrohunt_view')) {
         apiCall({
-          url: `/api/v4/retrohunt/hits/${curCode}/?${curQuery.toString()}`,
+          method: 'POST',
+          url: `/api/v4/retrohunt/hits/${curCode}/`,
+          body: curQuery.getParams(),
           onSuccess: api_data => setHits(api_data.api_response),
           onEnter: () => setIsReloading(true),
           onExit: () => setIsReloading(false)
         });
         apiCall({
-          url: `/api/v4/retrohunt/types/${curCode}/?${curQuery.toString([
-            'rows',
-            'offset',
-            'sort',
-            'track_total_hits'
-          ])}`,
+          method: 'POST',
+          url: `/api/v4/retrohunt/types/${curCode}/`,
+          body: getFilteredParams(curQuery, ['query', 'mincount', 'filters']),
           onSuccess: api_data => {
             let newTypes: { [k: string]: number } = api_data.api_response;
             newTypes = Object.fromEntries(
