@@ -344,7 +344,7 @@ const Submit: React.FC<any> = () => {
     }
 
     if (sha256) {
-      data = { ui_params: settings, name: urlHash, sha256: urlHash, metadata: submissionMetadata };
+      data = { ui_params: settings, name: sha256, sha256: sha256, metadata: submissionMetadata };
     } else {
       data = {
         ui_params: settings,
