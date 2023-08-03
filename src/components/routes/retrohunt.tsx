@@ -150,9 +150,9 @@ export default function Retrohunt() {
           url: `/api/v4/retrohunt/`,
           body: curQuery.getParams(),
           onSuccess: api_data => {
-            const { items, total, rows, offset: ofs } = api_data.api_response;
-            if (items.length === 0 && ofs !== 0 && ofs >= total) {
-              handleQueryChange('offset', ofs - rows);
+            const { items, total, rows, offset } = api_data.api_response;
+            if (items.length === 0 && offset !== 0 && offset >= total) {
+              handleQueryChange('offset', Math.floor(total / rows) * rows);
             } else {
               setRetrohuntResults(api_data.api_response);
             }
@@ -163,7 +163,7 @@ export default function Retrohunt() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.roles, query]
+    [currentUser.roles, handleQueryChange, query]
   );
 
   const handleCreateRetrohunt = useCallback(
