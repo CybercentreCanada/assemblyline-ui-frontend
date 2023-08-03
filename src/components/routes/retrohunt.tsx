@@ -1,16 +1,16 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import { Grid, IconButton, Tooltip } from '@mui/material';
-import Typography from '@mui/material/Typography';
+import { Grid, IconButton, Pagination, Tooltip, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { RetrohuntCreate } from 'components/routes/retrohunt/create';
+import { RetrohuntDetail } from 'components/routes/retrohunt/detail';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import SearchPager from 'components/visual/SearchPager';
 import RetrohuntTable from 'components/visual/SearchResult/retrohunt';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
@@ -18,10 +18,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import { RetrohuntCreate } from './retrohunt/create';
-import { RetrohuntDetail } from './retrohunt/detail';
-
-const PAGE_SIZE = 25;
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -82,13 +78,17 @@ type SearchResults = {
   total: number;
 };
 
+const PAGE_SIZE = 25;
+
+const MAX_TRACKED_RECORDS = 10000;
+
 const RELOAD_DELAY = 5000;
 
 const DEFAULT_PARAMS: object = {
-  fl: 'archive_only,classification,code,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated',
-  offset: 0,
   query: '*',
-  rows: PAGE_SIZE
+  offset: 0,
+  rows: PAGE_SIZE,
+  fl: 'archive_only,classification,code,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated'
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -106,7 +106,6 @@ export default function Retrohunt() {
 
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
-  const [pageSize] = useState<number>(PAGE_SIZE);
   const [searching, setSearching] = useState<boolean>(false);
 
   const filterValue = useRef<string>('');
@@ -115,6 +114,14 @@ export default function Retrohunt() {
   const suggestions = useMemo<string[]>(
     () => [...Object.keys(indexes.retrohunt).filter(name => indexes.retrohunt[name].indexed), ...DEFAULT_SUGGESTION],
     [indexes.retrohunt]
+  );
+
+  const pageCount = useMemo<number>(
+    () =>
+      retrohuntResults && 'total' in retrohuntResults
+        ? Math.ceil(Math.min(retrohuntResults.total, MAX_TRACKED_RECORDS) / PAGE_SIZE)
+        : 0,
+    [retrohuntResults]
   );
 
   const handleQueryChange = useCallback((key: string, value: string | number) => {
@@ -138,9 +145,10 @@ export default function Retrohunt() {
     () => {
       if (query && currentUser.roles.includes('retrohunt_view')) {
         const curQuery = new SimpleSearchQuery(query.toString(), DEFAULT_QUERY);
-        curQuery.set('rows', PAGE_SIZE);
         apiCall({
-          url: `/api/v4/retrohunt/?${curQuery.toString()}`,
+          method: 'POST',
+          url: `/api/v4/retrohunt/`,
+          body: curQuery.getParams(),
           onSuccess: api_data => {
             const { items, total, rows, offset: ofs } = api_data.api_response;
             if (items.length === 0 && ofs !== 0 && ofs >= total) {
@@ -271,14 +279,15 @@ export default function Retrohunt() {
                     </Typography>
                   )}
 
-                  <SearchPager
-                    total={retrohuntResults.total}
-                    setResults={setRetrohuntResults}
-                    pageSize={pageSize}
-                    index="retrohunt"
-                    query={query}
-                    setSearching={setSearching}
-                  />
+                  {pageCount > 1 && (
+                    <Pagination
+                      page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
+                      onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
+                      count={pageCount}
+                      shape="rounded"
+                      size="small"
+                    />
+                  )}
                 </div>
               )}
             </SearchBar>
