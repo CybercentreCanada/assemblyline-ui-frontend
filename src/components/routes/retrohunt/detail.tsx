@@ -607,8 +607,17 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                         variant: 'outlined',
                         label: `${v}`,
                         color: v.indexOf('NOT ') === 0 ? 'error' : null,
-                        onClick: () => handleFilterChange(v),
-                        onDelete: () => handleFilterRemove(v)
+                        onClick: () => {
+                          query.replace(
+                            'filters',
+                            v,
+                            v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
+                          );
+                          handleFilterChange(v);
+                        },
+                        onDelete: () => {
+                          handleFilterRemove(v);
+                        }
                       }))}
                     />
                   </div>
