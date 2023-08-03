@@ -29,7 +29,7 @@ import { RetrohuntPhase, RetrohuntResult } from 'components/routes/retrohunt';
 import RetrohuntErrors from 'components/routes/retrohunt/errors';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
-import CustomChip from 'components/visual/CustomChip';
+import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
 import {
   DivTable,
   DivTableBody,
@@ -603,22 +603,17 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                 {query && (
                   <div>
                     <ChipList
-                      items={query.getAll('filters', []).map(v => ({
-                        variant: 'outlined',
-                        label: `${v}`,
-                        color: v.indexOf('NOT ') === 0 ? 'error' : null,
-                        onClick: () => {
-                          query.replace(
-                            'filters',
-                            v,
-                            v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
-                          );
-                          handleFilterChange(v);
-                        },
-                        onDelete: () => {
-                          handleFilterRemove(v);
-                        }
-                      }))}
+                      items={query.getAll('filters', []).map(
+                        v =>
+                          ({
+                            clickable: true,
+                            color: v.indexOf('NOT ') === 0 ? 'error' : null,
+                            label: `${v}`,
+                            variant: 'outlined',
+                            onClick: () => handleFilterChange(v),
+                            onDelete: () => handleFilterRemove(v)
+                          } as CustomChipProps)
+                      )}
                     />
                   </div>
                 )}

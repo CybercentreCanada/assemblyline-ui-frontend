@@ -12,6 +12,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { ChipList } from 'components/visual/ChipList';
+import { CustomChipProps } from 'components/visual/CustomChip';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchBar from 'components/visual/SearchBar/search-bar';
@@ -323,23 +324,27 @@ export default function ErrorViewer() {
             {query && (
               <div>
                 <ChipList
-                  items={query.getAll('filters', []).map(v => ({
-                    variant: 'outlined',
-                    label: `${v}`,
-                    color: v.indexOf('NOT ') === 0 ? 'error' : null,
-                    onClick: () => {
-                      query.replace(
-                        'filters',
-                        v,
-                        v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
-                      );
-                      navigate(`${location.pathname}?${query.getDeltaString()}`);
-                    },
-                    onDelete: () => {
-                      query.remove('filters', v);
-                      navigate(`${location.pathname}?${query.getDeltaString()}`);
-                    }
-                  }))}
+                  items={query.getAll('filters', []).map(
+                    v =>
+                      ({
+                        variant: 'outlined',
+                        label: `${v}`,
+                        color: v.indexOf('NOT ') === 0 ? 'error' : null,
+                        clickable: true,
+                        onClick: () => {
+                          query.replace(
+                            'filters',
+                            v,
+                            v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
+                          );
+                          navigate(`${location.pathname}?${query.getDeltaString()}`);
+                        },
+                        onDelete: () => {
+                          query.remove('filters', v);
+                          navigate(`${location.pathname}?${query.getDeltaString()}`);
+                        }
+                      } as CustomChipProps)
+                  )}
                 />
               </div>
             )}
