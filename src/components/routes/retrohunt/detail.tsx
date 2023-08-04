@@ -138,7 +138,7 @@ const MAX_TRACKED_RECORDS = 10000;
 
 const RELOAD_DELAY = 5000;
 
-const DEFAULT_PARAMS: object = {
+const DEFAULT_PARAMS = {
   query: '*',
   offset: 0,
   rows: PAGE_SIZE,
@@ -263,7 +263,10 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
         apiCall({
           method: 'POST',
           url: `/api/v4/retrohunt/hits/${curCode}/`,
-          body: curQuery.getParams(),
+          body: {
+            ...curQuery.getParams(),
+            filters: curQuery.getAll('filters', [])
+          },
           onSuccess: api_data => {
             const { items, total, rows, offset } = api_data.api_response;
             if (items.length === 0 && offset !== 0 && offset >= total) {
@@ -278,7 +281,10 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
         apiCall({
           method: 'POST',
           url: `/api/v4/retrohunt/types/${curCode}/`,
-          body: getFilteredParams(curQuery, ['query', 'filters']),
+          body: {
+            query: curQuery.get('query', DEFAULT_PARAMS?.query),
+            filters: curQuery.getAll('filters', [])
+          },
           onSuccess: api_data => {
             let dataset: { [k: string]: number } = api_data.api_response;
             dataset = Object.fromEntries(
