@@ -1,5 +1,6 @@
-import { Skeleton, Theme, useTheme } from '@mui/material';
+import { Theme, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { Skeleton } from '@mui/material';
 import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
 import React from 'react';
 

@@ -8,7 +8,6 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { ChipList } from 'components/visual/ChipList';
-import { CustomChipProps } from 'components/visual/CustomChip';
 import FileDetail from 'components/visual/FileDetail';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
@@ -313,27 +312,23 @@ export default function MalwareArchive() {
               {query && (
                 <div>
                   <ChipList
-                    items={query.getAll('filters', []).map(
-                      v =>
-                        ({
-                          variant: 'outlined',
-                          label: `${v}`,
-                          color: v.indexOf('NOT ') === 0 ? 'error' : null,
-                          clickable: true,
-                          onClick: () => {
-                            query.replace(
-                              'filters',
-                              v,
-                              v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
-                            );
-                            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                          },
-                          onDelete: () => {
-                            query.remove('filters', v);
-                            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                          }
-                        } as CustomChipProps)
-                    )}
+                    items={query.getAll('filters', []).map(v => ({
+                      variant: 'outlined',
+                      label: `${v}`,
+                      color: v.indexOf('NOT ') === 0 ? 'error' : null,
+                      onClick: () => {
+                        query.replace(
+                          'filters',
+                          v,
+                          v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
+                        );
+                        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                      },
+                      onDelete: () => {
+                        query.remove('filters', v);
+                        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                      }
+                    }))}
                   />
                 </div>
               )}

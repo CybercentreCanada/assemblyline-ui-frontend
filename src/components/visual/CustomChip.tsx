@@ -1,14 +1,9 @@
-import { Chip, ChipProps, Tooltip } from '@mui/material';
+import { Tooltip } from '@mui/material';
+import Chip from '@mui/material/Chip';
 import { darken } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import React from 'react';
-
-declare module '@mui/material/Chip' {
-  interface ChipPropsSizeOverrides {
-    tiny: true;
-  }
-}
+import React, { ReactNode } from 'react';
 
 export const ColorMap = {
   'label-default': 'default' as 'default',
@@ -28,10 +23,14 @@ export const ColorMap = {
 };
 export type PossibleColors = 'default' | 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'error';
 
-export type CustomChipProps = {
-  component?: React.ElementType;
-  fullWidth?: boolean;
+export interface CustomChipProps {
+  className?: string;
+  type?: 'round' | 'square' | 'rounded';
+  size?: 'tiny' | 'small' | 'medium';
+  color?: PossibleColors;
+  variant?: 'filled' | 'outlined';
   mono?: boolean;
+  wrap?: boolean;
   tooltip?: string;
   tooltipPlacement?:
     | 'bottom-end'
@@ -46,9 +45,10 @@ export type CustomChipProps = {
     | 'top-end'
     | 'top-start'
     | 'top';
-  type?: 'round' | 'square' | 'rounded';
-  wrap?: boolean;
-} & ChipProps;
+  fullWidth?: boolean;
+  children?: ReactNode;
+  [propName: string]: any;
+}
 
 const useStyles = makeStyles(theme => ({
   auto_height: {

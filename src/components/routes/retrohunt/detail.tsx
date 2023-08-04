@@ -606,7 +606,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                       items={query.getAll('filters', []).map(
                         v =>
                           ({
-                            clickable: true,
                             color: v.indexOf('NOT ') === 0 ? 'error' : null,
                             label: `${v}`,
                             variant: 'outlined',
