@@ -1,11 +1,11 @@
-import { Grid, Tooltip, useTheme } from '@mui/material';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
+import { Grid, Tooltip, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { AlertItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
-import { ChipList } from 'components/visual/ChipList';
+import { ActionableChipList } from 'components/visual/ActionableChipList';
 import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
 import { verdictToColor } from 'helpers/utils';
@@ -132,7 +132,7 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           </Grid>
         </Grid>
         <Grid item xs={12} md={6}>
-          <ChipList
+          <ActionableChipList
             items={item.label
               .sort()
               .map(label => ({
