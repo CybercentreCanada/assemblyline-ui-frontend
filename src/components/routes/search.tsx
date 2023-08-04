@@ -99,21 +99,26 @@ function Search({ index }: SearchProps) {
     number: number;
     filters: string[];
     ids: number[];
-  }>('query=*&rows=20&test=20', 'query=*');
-
-  console.log('state change');
-
-  console.log(query2.get('query'));
+    test: number;
+  }>(
+    { query: '*', rows: 20, offset: 7, filters: ['asd', 'qwe', 'ewq'], test: 0, ids: [1, 2, 3] },
+    'query=*&rows=20&offset=7&number=123'
+  );
 
   useEffect(() => {
-    query2.pop('test');
-    query2.set('offset', 1);
-    query2.add('asdasd', 2);
+    console.log('\n\n\n\nstate change');
+    console.log('getDefaultString:', query2.getDefaultString());
+    console.log('getDeltaString:', query2.getDeltaString());
+    console.log('get offset:', query2.get('offset'));
+    console.log('get test:', query2.get('test'));
+    console.log('get ids:', query2.get('ids'));
 
-    console.log(query2.toString(['filters']));
+    // query2.pop('test');
+    query2.set('test', 123);
+
+    console.log('has(ids):', query2.has('ids'));
+    console.log('toString:', query2.toString(['query']));
   }, [query2]);
-
-  console.log(query2.getDeltaString());
 
   // Result lists
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
