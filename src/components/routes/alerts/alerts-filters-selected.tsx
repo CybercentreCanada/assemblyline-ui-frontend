@@ -1,4 +1,4 @@
-import { ActionableChipList } from 'components/visual/ActionableChipList';
+import { ChipList } from 'components/visual/ChipList';
 import SearchQuery, { SearchFilter, SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +60,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
       <div>
         {query && !hideQuery && (
           <div style={{ display: 'inline-block' }}>
-            <ActionableChipList
+            <ChipList
               items={[query].map(v => ({
                 variant: 'outlined',
                 label: `${v}`,
@@ -71,7 +71,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
         )}
         {filters && filters.tc && (
           <div style={{ display: 'inline-block' }}>
-            <ActionableChipList
+            <ChipList
               items={[filters.tc].map(v => ({
                 variant: 'outlined',
                 label: `${t('tc')}=${v}`,
@@ -82,7 +82,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
         )}
         {filters && filters.groupBy && !hideGroupBy && (
           <div style={{ display: 'inline-block' }}>
-            <ActionableChipList
+            <ChipList
               items={[filters.groupBy].map(v => ({
                 variant: 'outlined',
                 label: `${t('groupBy')}=${v}`,
@@ -93,7 +93,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
         )}
         {filters && filters.statuses.length !== 0 && (
           <div style={{ display: 'inline-block' }}>
-            <ActionableChipList
+            <ChipList
               items={filters.statuses.map(v => ({
                 variant: 'outlined',
                 label: v.value,
@@ -104,7 +104,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
         )}
         {filters && filters.priorities.length !== 0 && (
           <div style={{ display: 'inline-block' }}>
-            <ActionableChipList
+            <ChipList
               items={filters.priorities.map(v => ({
                 variant: 'outlined',
                 label: v.value,
@@ -115,7 +115,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
         )}
         {filters && filters.labels.length !== 0 && (
           <div style={{ display: 'inline-block' }}>
-            <ActionableChipList
+            <ChipList
               items={filters.labels.map(v => ({
                 variant: 'outlined',
                 label: v.value,
@@ -126,7 +126,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
         )}
         {filters && filters.queries.length !== 0 && (
           <div style={{ display: 'inline-block' }}>
-            <ActionableChipList
+            <ChipList
               items={filters.queries.map(v => ({
                 variant: 'outlined',
                 label: v.value,
