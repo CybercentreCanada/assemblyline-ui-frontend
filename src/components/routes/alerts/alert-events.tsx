@@ -14,7 +14,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { ActionableChipList } from 'components/visual/ActionableChipList';
+import { ChipList } from 'components/visual/ChipList';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
@@ -84,15 +84,12 @@ const WrappedAlertEventsTable = ({ alert, viewHistory, setViewHistory }) => {
                             <TableCell>{event.entity_name}</TableCell>
                           </Tooltip>
                           <TableCell>
-                            {event.priority ? <AlertPriority name={event.priority} withChip wrap={false} /> : null}
+                            {event.priority ? <AlertPriority name={event.priority} withChip /> : null}
                           </TableCell>
                           <TableCell>{event.status ? <AlertStatus name={event.status} /> : null}</TableCell>
                           <TableCell width="40%">
                             {event.labels ? (
-                              <ActionableChipList
-                                items={event.labels.map(label => ({ label, variant: 'outlined' }))}
-                                wrap={false}
-                              />
+                              <ChipList items={event.labels.map(label => ({ label, variant: 'outlined' }))} nowrap />
                             ) : null}
                           </TableCell>
                           <TableCell>

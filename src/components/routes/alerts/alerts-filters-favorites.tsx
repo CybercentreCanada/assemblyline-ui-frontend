@@ -3,7 +3,7 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
-import { ActionableChipList } from 'components/visual/ActionableChipList';
+import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useState } from 'react';
@@ -187,7 +187,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       <Typography variant="h6">{t('yourfavorites')}</Typography>
       <Divider />
       <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(4) }}>
-        <ActionableChipList
+        <ChipList
           items={userFavorites.map(f => ({
             size: 'medium',
             variant: 'outlined',
@@ -203,7 +203,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       <Typography variant="h6">{t('globalfavorites')}</Typography>
       <Divider />
       <div style={{ marginTop: theme.spacing(1) }}>
-        <ActionableChipList
+        <ChipList
           items={globalFavorites.map(f => ({
             size: 'medium',
             variant: 'outlined',
