@@ -49,36 +49,52 @@ type UseQueryReturn<Params extends object> = {
   toString?: <Key extends keyof Params>(strip?: (Key | 'group_by')[], fill?: Key[]) => string;
 };
 
+type UseQueryOptions = {
+  detached?: boolean;
+};
+
 const useStateRef = <O extends object>(
   initialState: O
-): [O, (value: O | ((prevState: O) => O)) => void, MutableRefObject<O>] => {
+): [O, (value: O | ((prev: O) => O)) => void, MutableRefObject<O>] => {
   const [state, setState] = useState<O>(initialState);
   const ref = useRef<O>(initialState);
 
-  const toString = useCallback(
-    (unordered: O) =>
-      JSON.stringify(
-        Object.fromEntries(
-          Object.keys(unordered)
-            .sort()
-            .map(key => [key, unordered[key]])
-        )
-      ),
-    []
+  const isObject = useCallback((object: O): boolean => object != null && typeof object === 'object', []);
+
+  const deepEqual = useCallback(
+    (object1: O, object2: O): boolean => {
+      const keys1 = Object.keys(object1);
+      const keys2 = Object.keys(object2);
+
+      if (keys1.length !== keys2.length) {
+        return false;
+      }
+
+      for (const key of keys1) {
+        const val1 = object1[key];
+        const val2 = object2[key];
+        const areObjects = isObject(val1) && isObject(val2);
+        if ((areObjects && !deepEqual(val1, val2)) || (!areObjects && val1 !== val2)) {
+          return false;
+        }
+      }
+
+      return true;
+    },
+    [isObject]
   );
 
   const paramsChange = useCallback(
     (value: O | ((prevState: O) => O)): void => {
-      if (typeof value === 'function' && toString(value(ref.current)) !== toString(ref.current)) {
+      if (typeof value === 'function' && deepEqual(value(ref.current), ref.current)) {
         ref.current = value(ref.current);
         setState(p => value(p));
-      }
-      if (typeof value === 'object' && toString(value) !== toString(ref.current)) {
+      } else if (typeof value === 'object' && deepEqual(value, ref.current)) {
         ref.current = value;
         setState(value);
       }
     },
-    [toString]
+    [deepEqual]
   );
 
   return [state, paramsChange, ref];
@@ -86,10 +102,11 @@ const useStateRef = <O extends object>(
 
 export const useQuery = <Params extends object>(
   baseSearch: string | Partial<Params>,
-  defaults: string | Partial<Params>
+  defaults: string | Partial<Params>,
+  options: UseQueryOptions = {
+    detached: false
+  }
 ): UseQueryReturn<Params> => {
-  const basicSearchParams = new URLSearchParams('asdasd=0');
-
   const convertNumber = useCallback((value: any): number | string => (isNaN(value) ? value : parseFloat(value)), []);
 
   const parseSearchParam = useCallback(
