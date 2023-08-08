@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 type ChipListProps = {
   items: CustomChipProps[];
+  nowrap?: boolean;
 };
 
 const ChipSkeleton = () => (
@@ -35,7 +36,7 @@ const ChipSkeletonInline = () => (
   />
 );
 
-const ChipList: React.FC<ChipListProps> = ({ items }) => {
+const ChipList: React.FC<ChipListProps> = ({ items, nowrap = false }) => {
   const theme = useTheme();
   const classes = useStyles();
   return (
@@ -43,7 +44,7 @@ const ChipList: React.FC<ChipListProps> = ({ items }) => {
       {items
         ? items.map((cp, i) => (
             <li key={`chiplist-${i}`}>
-              <CustomChip size="small" className={classes.chip} wrap {...cp} />
+              <CustomChip size="small" className={classes.chip} wrap={!nowrap} {...cp} />
             </li>
           ))
         : [...Array(3)].map((k, i) => (
