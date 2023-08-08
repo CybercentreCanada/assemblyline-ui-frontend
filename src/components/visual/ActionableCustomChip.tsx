@@ -4,13 +4,6 @@ import CustomChip, { CustomChipProps } from './CustomChip';
 import ExternalLinks from './ExternalLookup/ExternalLinks';
 import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 
-// export interface ActionableCustomChipProps extends CustomChipProps {
-//   data_type?: string;
-//   category?: 'hash' | 'metadata' | 'tag';
-//   classification?: string;
-//   label?: string;
-// }
-
 export type ActionableCustomChipProps = CustomChipProps & {
   data_type?: string;
   category?: 'hash' | 'metadata' | 'tag';
@@ -76,6 +69,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
             />
           ) : null
         }
+        label={label}
         {...otherProps}
         onClick={actionable ? handleMenuClick : null}
         onContextMenu={actionable ? handleMenuClick : null}
