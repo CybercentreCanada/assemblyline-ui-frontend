@@ -14,7 +14,7 @@ import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { yaraConfig, yaraDef } from 'helpers/yara';
+import { registerYaraCompletionItemProvider, yaraConfig, yaraDef } from 'helpers/yara';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
@@ -63,6 +63,8 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
       monaco.languages.setMonarchTokensProvider('yara', yaraDef);
       // Set the editing configuration for the language
       monaco.languages.setLanguageConfiguration('yara', yaraConfig);
+      // Set the yara snippets
+      monaco.languages.registerCompletionItemProvider('yara', registerYaraCompletionItemProvider(monaco));
     }
   };
 

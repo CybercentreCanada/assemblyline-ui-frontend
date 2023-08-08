@@ -4,6 +4,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
   Alert,
   Button,
+  capitalize,
   Checkbox,
   CircularProgress,
   FormControlLabel,
@@ -22,6 +23,7 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 import { makeStyles } from '@mui/styles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
@@ -108,9 +110,18 @@ const Submit: React.FC<any> = () => {
   const [urlHash, setUrlHash] = useState(state ? state.hash : '');
   const [submissionMetadata, setSubmissionMetadata] = useState(state ? state.metadata : undefined);
   const [urlHashHasError, setUrlHashHasError] = useState(false);
+  const [urlProxy, setUrlProxy] = useState(null);
   const [value, setValue] = useState(state ? state.tabContext : '0');
   const classification = useState(state ? state.c12n : null)[0];
   const banner = useAppBanner();
+
+  const capitalizeWords = (sentence: string) => {
+    return sentence
+      .toLowerCase()
+      .split('_')
+      .map(word => capitalize(word))
+      .join(' ');
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -333,13 +344,14 @@ const Submit: React.FC<any> = () => {
     }
 
     if (sha256) {
-      data = { ui_params: settings, name: urlHash, sha256: urlHash, metadata: submissionMetadata };
+      data = { ui_params: settings, name: sha256, sha256: sha256, metadata: submissionMetadata };
     } else {
       data = {
         ui_params: settings,
         name: url[15] === undefined || url[15] === '' ? 'file' : url[15],
         url: urlHash,
-        metadata: submissionMetadata
+        metadata: submissionMetadata,
+        proxy: urlProxy
       };
     }
 
@@ -549,6 +561,27 @@ const Submit: React.FC<any> = () => {
                     </div>
                   ))}
                 </div>
+              )}
+            {matchURL(urlHash) &&
+              configuration.ui.url_egress_proxies &&
+              configuration.ui.url_egress_proxies.length !== 0 && (
+                <FormControl variant="outlined" fullWidth style={{ paddingTop: sp2 }}>
+                  <InputLabel style={{ paddingTop: sp2 }}>{t('egress')}</InputLabel>
+                  <Select
+                    label={t('egress')}
+                    value={urlProxy}
+                    onChange={event => {
+                      setUrlProxy(event.target.value);
+                    }}
+                  >
+                    <MenuItem value={null}>
+                      <em>None</em>
+                    </MenuItem>
+                    {configuration.ui.url_egress_proxies.map(proxy => (
+                      <MenuItem value={proxy}>{capitalizeWords(proxy)}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               )}
             {submissionMetadata && Object.keys(submissionMetadata).length !== 0 && (
               <div style={{ textAlign: 'start', marginTop: theme.spacing(2) }}>

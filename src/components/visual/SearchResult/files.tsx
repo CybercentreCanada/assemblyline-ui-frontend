@@ -1,11 +1,10 @@
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
-import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
-import Paper from '@mui/material/Paper';
+import { AlertTitle, Paper, Skeleton, Tooltip } from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
-import React from 'react';
+import React, { ElementType } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
@@ -45,15 +44,16 @@ type SearchResults = {
 type FilesTableProps = {
   fileResults: SearchResults;
   allowSort?: boolean;
+  component?: ElementType<any>;
 };
 
-const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort = true }) => {
+const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort = true, component = Paper }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
   return fileResults ? (
     fileResults.total !== 0 ? (
-      <TableContainer component={Paper}>
+      <TableContainer component={component}>
         <DivTable>
           <DivTableHead>
             <DivTableRow>
