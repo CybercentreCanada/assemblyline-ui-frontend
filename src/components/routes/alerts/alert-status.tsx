@@ -18,6 +18,7 @@ const WrappedAlertStatus: React.FC<AlertStatusProps> = ({ name, size = 'small' a
   const { t } = useTranslation('alerts');
   return name ? (
     <CustomChip
+      wrap={false}
       size={size}
       variant="outlined"
       color={COLOR_MAP[name]}
