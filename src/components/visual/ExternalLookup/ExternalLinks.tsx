@@ -124,28 +124,29 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
         onClick={event => event.stopPropagation()}
       >
         <Box sx={{ p: 1 }}>
-          {[...Object.keys(externalLookupResults.results)]?.sort().map((sourceName: keyof LookupSourceDetails, i) => (
-            <div key={`success_${i}`}>
-              <Typography className={clsx(classes.title)} sx={{ display: 'inline' }}>
-                {toTitleCase(sourceName)} :
-              </Typography>
-              <Link
-                className={clsx(classes.link)}
-                href={externalLookupResults.results[sourceName].link}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Typography
-                  className={clsx(classes.content, classes.launch)}
-                  sx={{ display: 'inline', marginLeft: '8px' }}
-                >
-                  {externalLookupResults.results[sourceName].count} results{' '}
-                  <LaunchOutlinedIcon sx={{ verticalAlign: 'middle', height: '16px' }} />
+          {externalLookupResults.results &&
+            [...Object.keys(externalLookupResults.results)]?.sort().map((sourceName: keyof LookupSourceDetails, i) => (
+              <div key={`success_${i}`}>
+                <Typography className={clsx(classes.title)} sx={{ display: 'inline' }}>
+                  {toTitleCase(sourceName)} :
                 </Typography>
-              </Link>
-            </div>
-          ))}
-          {!!Object.keys(externalLookupResults.errors).length && (
+                <Link
+                  className={clsx(classes.link)}
+                  href={externalLookupResults.results[sourceName].link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Typography
+                    className={clsx(classes.content, classes.launch)}
+                    sx={{ display: 'inline', marginLeft: '8px' }}
+                  >
+                    {externalLookupResults.results[sourceName].count} results{' '}
+                    <LaunchOutlinedIcon sx={{ verticalAlign: 'middle', height: '16px' }} />
+                  </Typography>
+                </Link>
+              </div>
+            ))}
+          {externalLookupResults.errors && !!Object.keys(externalLookupResults.errors).length && (
             <>
               <Typography className={clsx(classes.title)}>Errors:</Typography>
               {[...Object.keys(externalLookupResults.errors)].sort().map((sourceName: keyof LookupSourceDetails, i) => (
