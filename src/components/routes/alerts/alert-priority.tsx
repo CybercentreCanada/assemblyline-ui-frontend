@@ -56,22 +56,16 @@ type AlertPriorityProps = {
   name: string;
   withChip?: boolean;
   size?: 'tiny' | 'small' | 'medium';
-  wrap?: boolean;
 };
 
-const WrappedAlertPriority: React.FC<AlertPriorityProps> = ({
-  name,
-  withChip = false,
-  size = 'small',
-  wrap = true
-}) => {
+const WrappedAlertPriority: React.FC<AlertPriorityProps> = ({ name, withChip = false, size = 'small' }) => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
 
   const priorityData = COLOR_MAP[name];
   return withChip ? (
     <CustomChip
-      wrap={wrap}
+      wrap={false}
       size={size}
       variant="outlined"
       color={priorityData.color}

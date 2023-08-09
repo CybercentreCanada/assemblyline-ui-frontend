@@ -1,7 +1,7 @@
 import { Skeleton, Theme, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
 import React from 'react';
+import ActionableCustomChip, { ActionableCustomChipProps } from './ActionableCustomChip';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chiplist: {
@@ -18,8 +18,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-type ChipListProps = {
-  items: CustomChipProps[];
+type ActionableChipListProps = {
+  items: ActionableCustomChipProps[];
   nowrap?: boolean;
 };
 
@@ -36,7 +36,7 @@ const ChipSkeletonInline = () => (
   />
 );
 
-const ChipList: React.FC<ChipListProps> = ({ items, nowrap = false }) => {
+const ActionableChipList: React.FC<ActionableChipListProps> = ({ items, nowrap = false }) => {
   const theme = useTheme();
   const classes = useStyles();
   return (
@@ -44,7 +44,7 @@ const ChipList: React.FC<ChipListProps> = ({ items, nowrap = false }) => {
       {items
         ? items.map((cp, i) => (
             <li key={`chiplist-${i}`}>
-              <CustomChip size="small" className={classes.chip} wrap={!nowrap} {...cp} />
+              <ActionableCustomChip size="small" className={classes.chip} wrap={!nowrap} {...cp} />
             </li>
           ))
         : [...Array(3)].map((k, i) => (
@@ -65,4 +65,4 @@ const ChipList: React.FC<ChipListProps> = ({ items, nowrap = false }) => {
   );
 };
 
-export { ChipList, ChipSkeleton, ChipSkeletonInline };
+export { ActionableChipList, ChipSkeleton, ChipSkeletonInline };

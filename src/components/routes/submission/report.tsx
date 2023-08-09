@@ -375,7 +375,9 @@ function TagTable({ group, items }) {
                 <span className={classes.tag_type}>{t(orderedItems[k].type)}</span>
               </div>
 
-              <div style={{ marginLeft: theme.spacing(3.5), display: 'flex', flexWrap: 'wrap' }}>
+              <div
+                style={{ marginLeft: theme.spacing(3.5), display: 'flex', flexWrap: 'wrap', gap: theme.spacing(1.5) }}
+              >
                 {orderedItems[k].values.map((v, vidx) => (
                   <div
                     key={vidx}

@@ -1,9 +1,9 @@
-import { Box, Tooltip } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import BlockIcon from '@mui/icons-material/Block';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import SlowMotionVideoIcon from '@mui/icons-material/SlowMotionVideo';
+import { Box, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
@@ -66,7 +66,7 @@ const WrappedAlertExtendedScan: React.FC<AlertExtendedScanProps> = ({ name, with
 
   return withChip ? (
     <CustomChip
-      wrap
+      wrap={false}
       size={size}
       variant="outlined"
       color={extendedData.color}
