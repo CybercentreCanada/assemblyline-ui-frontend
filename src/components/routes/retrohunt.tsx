@@ -223,7 +223,7 @@ export default function Retrohunt() {
     }
   }, [handleReload, retrohuntResults]);
 
-  if (!configuration?.datastore?.retrohunt?.enabled) return <Navigate to="/notfound" replace />;
+  if (!configuration?.retrohunt?.enabled) return <Navigate to="/notfound" replace />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <Navigate to="/forbidden" replace />;
   else
     return (
