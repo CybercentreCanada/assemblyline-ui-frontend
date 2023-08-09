@@ -72,10 +72,11 @@ export type ConfigurationDefinition = {
     archive: {
       enabled: boolean;
     };
-    retrohunt: {
-      enabled: boolean;
-      max_dtl: number;
-    };
+  };
+  retrohunt: {
+    enabled: boolean;
+    dtl: number;
+    max_dtl: number;
   };
   submission: {
     dtl: number;

@@ -123,7 +123,10 @@ const useMyPreferences = () => {
         element: {
           id: 'retrohunt',
           i18nKey: 'drawer.retrohunt',
-          userPropValidators: [{ prop: 'user.roles', value: 'retrohunt_view' }],
+          userPropValidators: [
+            { prop: 'user.roles', value: 'retrohunt_view' },
+            { prop: 'configuration.retrohunt.enabled', value: true, enforce: true }
+          ],
           icon: <DataObjectOutlinedIcon />,
           route: '/retrohunt',
           nested: false
@@ -172,7 +175,10 @@ const useMyPreferences = () => {
             {
               id: 'search.retrohunt',
               i18nKey: 'drawer.search.retrohunt',
-              userPropValidators: [{ prop: 'user.roles', value: 'retrohunt_view' }],
+              userPropValidators: [
+                { prop: 'user.roles', value: 'retrohunt_view' },
+                { prop: 'configuration.retrohunt.enabled', value: true, enforce: true }
+              ],
               route: '/search/retrohunt',
               nested: true
             },

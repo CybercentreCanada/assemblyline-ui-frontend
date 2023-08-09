@@ -58,10 +58,10 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
       classification: c12nDef?.UNRESTRICTED,
       code: null,
       description: '',
-      ttl: 30,
+      ttl: !configuration.retrohunt.dtl ? 30 : configuration.retrohunt.dtl,
       yara_signature: ''
     }),
-    [c12nDef?.UNRESTRICTED]
+    [c12nDef?.UNRESTRICTED, configuration.retrohunt.dtl]
   );
 
   const [retrohunt, setRetrohunt] = useState<RetrohuntResult>({ ...DEFAULT_RETROHUNT });
@@ -71,8 +71,8 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
   const [isConfirmationOpen, setIsConfirmationOpen] = useState<boolean>(false);
 
   const maxDaysToLive = useMemo<number>(
-    () => (!configuration.datastore.retrohunt.max_dtl ? null : configuration.datastore.retrohunt.max_dtl),
-    [configuration.datastore.retrohunt.max_dtl]
+    () => (!configuration.retrohunt.max_dtl ? null : configuration.retrohunt.max_dtl),
+    [configuration.retrohunt.max_dtl]
   );
 
   const handleCreateRetrohunt = useCallback(
@@ -119,7 +119,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
     }
   }, [onCreateRetrohunt, retrohunt]);
 
-  if (currentUser.roles.includes('retrohunt_run'))
+  if (configuration?.retrohunt?.enabled && currentUser.roles.includes('retrohunt_run'))
     return (
       <PageFullSize margin={isDrawer ? 2 : 4}>
         <RouterPrompt when={isModified} />

@@ -372,15 +372,13 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     }
   }, [isDrawer, location.hash, location.pathname, navigate, query]);
 
-  console.log(location.search);
-
   useEffect(() => {
     if (!isDrawer && location.hash) {
       setGlobalDrawer(<FileDetail sha256={location.hash.substr(1)} />);
     }
   }, [isDrawer, location.hash, setGlobalDrawer]);
 
-  if (!configuration?.datastore?.retrohunt?.enabled) return <NotFoundPage />;
+  if (!configuration?.retrohunt?.enabled) return <NotFoundPage />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
   else
     return (
