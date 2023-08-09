@@ -47,10 +47,8 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, clas
     });
   }, []);
 
-  const { lookupState, isActionable, searchTagExternal, getKey } = useExternalLookup();
-
+  const { isActionable } = useExternalLookup();
   const actionable = isActionable(category, type, value);
-  const externalLookupKey = getKey(type, value);
 
   return (
     <>
@@ -63,19 +61,16 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, clas
               value={value}
               state={state}
               setState={setState}
-              searchTagExternal={searchTagExternal}
               classification={classification}
             />
             <MaterialLink className={classes.link} onClick={handleMenuClick} onContextMenu={handleMenuClick}>
               {value}
-              {lookupState && lookupState[externalLookupKey] ? (
-                <ExternalLinks
-                  success={lookupState[externalLookupKey].success}
-                  results={lookupState[externalLookupKey].results}
-                  errors={lookupState[externalLookupKey].errors}
-                  iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'text-bottom' }}
-                />
-              ) : null}
+              <ExternalLinks
+                category={category}
+                type={type}
+                value={value}
+                iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'text-bottom' }}
+              />
             </MaterialLink>
           </>
         ) : (

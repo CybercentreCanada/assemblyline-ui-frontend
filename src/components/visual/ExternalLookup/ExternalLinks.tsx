@@ -4,6 +4,7 @@ import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import { Box, Link, Popover, SvgIconTypeMap, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import useExternalLookup from 'components/hooks/useExternalLookup';
 import { toTitleCase } from 'helpers/utils';
 import React, { forwardRef } from 'react';
 
@@ -52,16 +53,9 @@ type LookupSourceDetails = {
 };
 
 type ExternalLookupProps = {
-  results: {
-    [sourceName: string]: {
-      link: string;
-      count: number;
-    };
-  };
-  errors: {
-    [sourceName: string]: string;
-  };
-  success: null | boolean;
+  category: string;
+  type: string;
+  value: string;
   iconStyle?: null | Object;
 };
 
@@ -77,7 +71,7 @@ const EXTERNAL_RESULTS_ICON = forwardRef<SvgIconTypeMap | null, any>((props, ref
   );
 });
 
-const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, success, iconStyle }) => {
+const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, value, iconStyle }) => {
   const classes = useStyles();
   const [openedPopover, setOpenedPopover] = React.useState(false);
   const popoverAnchor = React.useRef(null);
@@ -90,13 +84,16 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, 
     setOpenedPopover(false);
   };
 
+  const { lookupState, isActionable, getKey } = useExternalLookup();
+  const actionable = isActionable(category, type, value);
+  const externalLookupResults = lookupState[getKey(type, value)];
   const id = openedPopover ? 'external-result-popover' : undefined;
 
-  return (
+  return actionable && externalLookupResults ? (
     <div>
-      {success !== null ? (
+      {externalLookupResults.success !== null ? (
         <EXTERNAL_RESULTS_ICON
-          success={success}
+          success={externalLookupResults.success}
           style={iconStyle}
           aria-owns={id}
           aria-haspopup="true"
@@ -127,14 +124,14 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, 
         onClick={event => event.stopPropagation()}
       >
         <Box sx={{ p: 1 }}>
-          {[...Object.keys(results)]?.sort().map((sourceName: keyof LookupSourceDetails, i) => (
+          {[...Object.keys(externalLookupResults.results)]?.sort().map((sourceName: keyof LookupSourceDetails, i) => (
             <div key={`success_${i}`}>
               <Typography className={clsx(classes.title)} sx={{ display: 'inline' }}>
                 {toTitleCase(sourceName)} :
               </Typography>
               <Link
                 className={clsx(classes.link)}
-                href={results[sourceName].link}
+                href={externalLookupResults.results[sourceName].link}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -142,18 +139,18 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, 
                   className={clsx(classes.content, classes.launch)}
                   sx={{ display: 'inline', marginLeft: '8px' }}
                 >
-                  {results[sourceName].count} results{' '}
+                  {externalLookupResults.results[sourceName].count} results{' '}
                   <LaunchOutlinedIcon sx={{ verticalAlign: 'middle', height: '16px' }} />
                 </Typography>
               </Link>
             </div>
           ))}
-          {!!Object.keys(errors).length && (
+          {!!Object.keys(externalLookupResults.errors).length && (
             <>
               <Typography className={clsx(classes.title)}>Errors:</Typography>
-              {[...Object.keys(errors)].sort().map((sourceName: keyof LookupSourceDetails, i) => (
+              {[...Object.keys(externalLookupResults.errors)].sort().map((sourceName: keyof LookupSourceDetails, i) => (
                 <Typography key={`error_${i}`} className={clsx(classes.error)}>
-                  {errors[sourceName]}
+                  {externalLookupResults.errors[sourceName]}
                 </Typography>
               ))}
             </>
@@ -161,7 +158,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, 
         </Box>
       </Popover>
     </div>
-  );
+  ) : null;
 };
 
 const ExternalLinks = React.memo(WrappedExternalLinks);

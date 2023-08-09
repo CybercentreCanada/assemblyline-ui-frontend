@@ -1,5 +1,4 @@
 import useALContext from 'components/hooks/useALContext';
-import useExternalLookup from 'components/hooks/useExternalLookup';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
@@ -45,9 +44,6 @@ const WrappedTag: React.FC<TagProps> = ({
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
-  const { lookupState, searchTagExternal, getKey } = useExternalLookup();
-  const externalLookupKey = getKey(type, value);
-
   let maliciousness = lvl || scoreToVerdict(score);
   if (safelisted) {
     maliciousness = 'safe';
@@ -77,7 +73,6 @@ const WrappedTag: React.FC<TagProps> = ({
         value={value}
         state={state}
         setState={setState}
-        searchTagExternal={searchTagExternal}
         classification={classification}
         highlight_key={highlight_key}
       />
@@ -93,14 +88,12 @@ const WrappedTag: React.FC<TagProps> = ({
         fullWidth={fullWidth}
         onContextMenu={handleMenuClick}
         icon={
-          lookupState && lookupState[externalLookupKey] ? (
-            <ExternalLinks
-              success={lookupState[externalLookupKey].success}
-              results={lookupState[externalLookupKey].results}
-              errors={lookupState[externalLookupKey].errors}
-              iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
-            />
-          ) : null
+          <ExternalLinks
+            category={'tag'}
+            type={type}
+            value={value}
+            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
+          />
         }
       />
     </>

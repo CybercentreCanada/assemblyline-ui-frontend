@@ -34,10 +34,8 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
     });
   }, []);
 
-  const { lookupState, isActionable, searchTagExternal, getKey } = useExternalLookup();
-
+  const { isActionable } = useExternalLookup();
   const actionable = isActionable(category, data_type, label);
-  const externalLookupKey = getKey(data_type, label);
 
   // Do the menu rendering here
   return (
@@ -49,20 +47,17 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
           value={label}
           state={state}
           setState={setState}
-          searchTagExternal={searchTagExternal}
           classification={classification}
         />
       )}
       <CustomChip
         icon={
-          actionable && lookupState && lookupState[externalLookupKey] ? (
-            <ExternalLinks
-              success={lookupState[externalLookupKey].success}
-              results={lookupState[externalLookupKey].results}
-              errors={lookupState[externalLookupKey].errors}
-              iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
-            />
-          ) : null
+          <ExternalLinks
+            category={category}
+            type={data_type}
+            value={label}
+            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
+          />
         }
         label={label}
         {...otherProps}

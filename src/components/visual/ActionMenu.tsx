@@ -9,6 +9,7 @@ import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem } from '@m
 import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
+import useExternalLookup from 'components/hooks/useExternalLookup';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -65,7 +66,6 @@ type TagProps = {
   classification?: string | null;
   state: Coordinates;
   setState: (Coordinates) => void;
-  searchTagExternal: (source: any, type: any, value: any, classification: any) => void;
   highlight_key?: string;
 };
 
@@ -88,7 +88,6 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   classification = null,
   state,
   setState,
-  searchTagExternal,
   highlight_key = null
 }) => {
   const { t } = useTranslation();
@@ -105,6 +104,8 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { showSuccessMessage } = useMySnackbar();
   const { triggerHighlight } = useHighlighter();
   const { apiCall } = useMyAPI();
+
+  const { searchTagExternal } = useExternalLookup();
 
   const handleClose = useCallback(() => {
     setState(initialMenuState);
