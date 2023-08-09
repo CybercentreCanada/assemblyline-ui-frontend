@@ -70,17 +70,19 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
-  const [lookupState, setLookupState] = React.useState<ExternalLookupResults>(null);
-  const [enrichmentState, setEnrichmentState] = React.useState<ExternalEnrichmentResults>();
+  const [lookupState, setLookupState] = React.useState<ExternalLookupResults>({});
+  const [enrichmentState, setEnrichmentState] = React.useState<ExternalEnrichmentResults>({});
 
   const isActionable = useCallback(
     (category, type, value) => {
       const hasExternalQuery =
+        !!currentUser &&
         !!currentUser.roles.includes('external_query') &&
         !!currentUserConfig.ui.external_sources?.length &&
         !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type);
 
       const hasExternalLinks =
+        !!currentUserConfig &&
         !!currentUserConfig.ui.external_links?.hasOwnProperty(category) &&
         !!currentUserConfig.ui.external_links[category].hasOwnProperty(type);
 
@@ -124,11 +126,11 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
                 ...prevState,
                 [stateKey]: {
                   results: {
-                    ...prevState[stateKey].results,
+                    ...prevState[stateKey]?.results,
                     ...api_data.api_response
                   },
                   errors: {
-                    ...prevState[stateKey].errors,
+                    ...prevState[stateKey]?.errors,
                     ...errors
                   },
                   success: true
@@ -150,16 +152,28 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
                 [stateKey]: {
                   ...prevState[stateKey],
                   errors: {
-                    ...prevState[stateKey].errors,
+                    ...prevState[stateKey]?.errors,
                     ...errors
                   },
                   // take existing success from previous source search if available
-                  success: prevState[stateKey].success || false
+                  success: prevState[stateKey]?.success || false
                 }
               };
             });
           } else {
             showWarningMessage(t('related_external.notfound'));
+            setLookupState(prevState => {
+              return {
+                ...prevState,
+                [stateKey]: {
+                  results: {},
+                  errors: { [source]: t('related_external.notfound') },
+                  ...prevState[stateKey],
+                  // take existing success from previous source search if available
+                  success: prevState[stateKey]?.success || false
+                }
+              };
+            });
           }
         }
       });
