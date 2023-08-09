@@ -94,8 +94,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
       );
     },
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [currentUser, currentUserConfig]
   );
   const getKey = (tagName: string, tagValue: string) => `${tagName}_${tagValue}`;
 
