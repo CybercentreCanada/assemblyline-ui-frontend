@@ -3,6 +3,7 @@ import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'common
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
 import CarouselProvider from 'components/providers/CarouselProvider';
 import DrawerProvider from 'components/providers/DrawerProvider';
+import { ExternalLookupProvider } from 'components/providers/ExternalLookupProvider';
 import HighlightProvider from 'components/providers/HighlightProvider';
 import i18n from 'i18n';
 import { createContext, ReactNode, useCallback, useMemo } from 'react';
@@ -79,15 +80,17 @@ export default function AppProvider<U extends AppUser>({
             <AppSnackbarProvider>
               <AppUserProvider service={user}>
                 <HighlightProvider>
-                  <CarouselProvider>
-                    <DrawerProvider>
-                      <AppBarProvider search={search}>
-                        <AppLeftNavProvider>
-                          <AppLayoutProvider>{children}</AppLayoutProvider>
-                        </AppLeftNavProvider>
-                      </AppBarProvider>
-                    </DrawerProvider>
-                  </CarouselProvider>
+                  <ExternalLookupProvider>
+                    <CarouselProvider>
+                      <DrawerProvider>
+                        <AppBarProvider search={search}>
+                          <AppLeftNavProvider>
+                            <AppLayoutProvider>{children}</AppLayoutProvider>
+                          </AppLeftNavProvider>
+                        </AppBarProvider>
+                      </DrawerProvider>
+                    </CarouselProvider>
+                  </ExternalLookupProvider>
                 </HighlightProvider>
               </AppUserProvider>
             </AppSnackbarProvider>

@@ -1,8 +1,8 @@
+import useExternalLookup from 'components/hooks/useExternalLookup';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
 import CustomChip, { CustomChipProps } from './CustomChip';
 import ExternalLinks from './ExternalLookup/ExternalLinks';
-import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 
 export interface ActionableCustomChipProps extends CustomChipProps {
   data_type?: string;
@@ -32,15 +32,10 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
     });
   }, []);
 
-  const { lookupState, isActionable, searchTagExternal } = useSearchTagExternal({
-    [data_type]: {
-      results: {},
-      errors: {},
-      success: null
-    }
-  });
+  const { lookupState, isActionable, searchTagExternal, getKey } = useExternalLookup();
 
   const actionable = isActionable(category, data_type, otherProps.label);
+  const externalLookupKey = getKey(data_type, otherProps.label);
 
   // Do the menu rendering here
   return (
@@ -58,11 +53,11 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
       )}
       <CustomChip
         icon={
-          actionable && lookupState && lookupState[data_type] ? (
+          actionable && lookupState && lookupState[externalLookupKey] ? (
             <ExternalLinks
-              success={lookupState[data_type].success}
-              results={lookupState[data_type].results}
-              errors={lookupState[data_type].errors}
+              success={lookupState[externalLookupKey].success}
+              results={lookupState[externalLookupKey].results}
+              errors={lookupState[externalLookupKey].errors}
               iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
             />
           ) : null

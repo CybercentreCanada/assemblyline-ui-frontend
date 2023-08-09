@@ -1,7 +1,7 @@
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ExternalLookupResult = {
@@ -49,21 +49,29 @@ export type ExternalEnrichmentResults = {
   [tagName: string]: ExternalEnrichmentSource;
 };
 
-export function useSearchTagExternal(initialState: ExternalLookupResults, key: string = null) {
+export type ExternalLookupContextProps = {
+  isActionable: (category: string, type: string, value: string) => boolean;
+  searchTagExternal: (source: string, tagName: string, tagValue: string, classification: string) => void;
+  enrichTagExternal: (source: string, tagName: string, tagValue: string, classification: string) => void;
+  getKey: (tagName: string, tagValue: string) => string;
+  lookupState: ExternalLookupResults;
+  enrichmentState: ExternalEnrichmentResults;
+};
+
+export interface ExternalLookupProps {
+  children: React.ReactNode;
+}
+
+export const ExternalLookupContext = React.createContext<ExternalLookupContextProps>(null);
+
+export function ExternalLookupProvider(props: ExternalLookupProps) {
+  const { children } = props;
   const { t } = useTranslation();
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
-  const [lookupState, setLookupState] = React.useState<ExternalLookupResults>(initialState);
+  const [lookupState, setLookupState] = React.useState<ExternalLookupResults>(null);
   const [enrichmentState, setEnrichmentState] = React.useState<ExternalEnrichmentResults>();
-
-  useEffect(
-    () => {
-      setLookupState(initialState);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [key]
-  );
 
   const isActionable = useCallback(
     (category, type, value) => {
@@ -87,9 +95,11 @@ export function useSearchTagExternal(initialState: ExternalLookupResults, key: s
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
+  const getKey = (tagName: string, tagValue: string) => `${tagName}_${tagValue}`;
 
   const searchTagExternal = useCallback(
     (source: string, tagName: string, tagValue: string, classification: string) => {
+      const stateKey = getKey(tagName, tagValue);
       let url = `/api/v4/federated_lookup/search/${tagName}/${encodeURIComponent(tagValue)}/`;
       // construct approporiate query param string
       let qs = `classification=${encodeURIComponent(classification)}`;
@@ -112,13 +122,13 @@ export function useSearchTagExternal(initialState: ExternalLookupResults, key: s
             setLookupState(prevState => {
               return {
                 ...prevState,
-                [tagName]: {
+                [stateKey]: {
                   results: {
-                    ...prevState[tagName].results,
+                    ...prevState[stateKey].results,
                     ...api_data.api_response
                   },
                   errors: {
-                    ...prevState[tagName].errors,
+                    ...prevState[stateKey].errors,
                     ...errors
                   },
                   success: true
@@ -137,14 +147,14 @@ export function useSearchTagExternal(initialState: ExternalLookupResults, key: s
             setLookupState(prevState => {
               return {
                 ...prevState,
-                [tagName]: {
-                  ...prevState[tagName],
+                [stateKey]: {
+                  ...prevState[stateKey],
                   errors: {
-                    ...prevState[tagName].errors,
+                    ...prevState[stateKey].errors,
                     ...errors
                   },
                   // take existing success from previous source search if available
-                  success: prevState[tagName].success || false
+                  success: prevState[stateKey].success || false
                 }
               };
             });
@@ -196,11 +206,11 @@ export function useSearchTagExternal(initialState: ExternalLookupResults, key: s
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [showErrorMessage, showSuccessMessage, showWarningMessage, t]
   );
-  return {
-    isActionable,
-    lookupState,
-    searchTagExternal,
-    enrichmentState,
-    enrichTagExternal
-  };
+  return (
+    <ExternalLookupContext.Provider
+      value={{ getKey, isActionable, lookupState, searchTagExternal, enrichmentState, enrichTagExternal }}
+    >
+      {children}
+    </ExternalLookupContext.Provider>
+  );
 }

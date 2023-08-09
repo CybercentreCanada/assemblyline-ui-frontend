@@ -1,11 +1,11 @@
 import useALContext from 'components/hooks/useALContext';
+import useExternalLookup from 'components/hooks/useExternalLookup';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
-import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const initialMenuState = {
@@ -45,13 +45,8 @@ const WrappedTag: React.FC<TagProps> = ({
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
-  const { lookupState, searchTagExternal } = useSearchTagExternal({
-    [type]: {
-      results: {},
-      errors: {},
-      success: null
-    }
-  });
+  const { lookupState, searchTagExternal, getKey } = useExternalLookup();
+  const externalLookupKey = getKey(type, value);
 
   let maliciousness = lvl || scoreToVerdict(score);
   if (safelisted) {
@@ -98,11 +93,11 @@ const WrappedTag: React.FC<TagProps> = ({
         fullWidth={fullWidth}
         onContextMenu={handleMenuClick}
         icon={
-          lookupState && lookupState[type] ? (
+          lookupState && lookupState[externalLookupKey] ? (
             <ExternalLinks
-              success={lookupState[type].success}
-              results={lookupState[type].results}
-              errors={lookupState[type].errors}
+              success={lookupState[externalLookupKey].success}
+              results={lookupState[externalLookupKey].results}
+              errors={lookupState[externalLookupKey].errors}
               iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
             />
           ) : null

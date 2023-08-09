@@ -13,7 +13,7 @@ import { verdictToColor } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ExternalEnrichmentSource } from './useExternalLookup';
+import { ExternalEnrichmentSource } from '../../providers/ExternalLookupProvider';
 
 const TARGET_RESULT_COUNT = 10;
 
@@ -105,20 +105,20 @@ const WrappedTagEnrichmentDetails: React.FC<TagEnrichmentDetailsProps> = ({ enri
   // {src: {..., enrichment: [{group: str, name: str, name_description: str, value: str, value_description}]}}
   //   -> {source: [[key, desc], [[value, desc], ...]]}
   let enrichmentInfo = [];
-  for (const [source, enrichmentResults] of Object.entries(enrichmentState)) {
-    let k = {};
-    let details = [];
-    for (const result of enrichmentResults.items) {
-      // gather values
-      for (const item of result.enrichment) {
-        k_d = [item.name, item.name_description];
-        v_d = [item.value, item.value_description];
-      }
-      // arrange in order
-      for (const item of result.enrichment) {
-      }
-    }
-  }
+  // for (const [source, enrichmentResults] of Object.entries(enrichmentState)) {
+  //   let k = {};
+  //   let details = [];
+  //   for (const result of enrichmentResults.items) {
+  //     // gather values
+  //     for (const item of result.enrichment) {
+  //       k_d = [item.name, item.name_description];
+  //       v_d = [item.value, item.value_description];
+  //     }
+  //     // arrange in order
+  //     for (const item of result.enrichment) {
+  //     }
+  //   }
+  // }
 
   return (
     <PageFullWidth margin={!alert ? 4 : 1}>
@@ -166,7 +166,7 @@ const WrappedTagEnrichmentDetails: React.FC<TagEnrichmentDetailsProps> = ({ enri
                           </Grid>
                           <Grid item xs={9} sm={10}>
                             <div className={classes.sectionContent}>
-                              <AutoHideChipList items={enrichmentResult.value} />
+                              {/* <AutoHideChipList items={enrichmentResult.value} /> */}
                             </div>
                           </Grid>
                         </Grid>

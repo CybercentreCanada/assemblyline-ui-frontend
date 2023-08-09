@@ -1,9 +1,9 @@
 import { Link as MaterialLink, Skeleton } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import useExternalLookup from 'components/hooks/useExternalLookup';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
 import ExternalLinks from './ExternalLookup/ExternalLinks';
-import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 
 const initialMenuState = {
   mouseX: null,
@@ -47,15 +47,10 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, clas
     });
   }, []);
 
-  const { lookupState, isActionable, searchTagExternal } = useSearchTagExternal({
-    [type]: {
-      results: {},
-      errors: {},
-      success: null
-    }
-  });
+  const { lookupState, isActionable, searchTagExternal, getKey } = useExternalLookup();
 
   const actionable = isActionable(category, type, value);
+  const externalLookupKey = getKey(type, value);
 
   return (
     <>
@@ -73,11 +68,11 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, clas
             />
             <MaterialLink className={classes.link} onClick={handleMenuClick} onContextMenu={handleMenuClick}>
               {value}
-              {lookupState && lookupState[type] ? (
+              {lookupState && lookupState[externalLookupKey] ? (
                 <ExternalLinks
-                  success={lookupState[type].success}
-                  results={lookupState[type].results}
-                  errors={lookupState[type].errors}
+                  success={lookupState[externalLookupKey].success}
+                  results={lookupState[externalLookupKey].results}
+                  errors={lookupState[externalLookupKey].errors}
                   iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'text-bottom' }}
                 />
               ) : null}
