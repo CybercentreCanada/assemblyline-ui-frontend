@@ -372,6 +372,8 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     }
   }, [isDrawer, location.hash, location.pathname, navigate, query]);
 
+  console.log(location.search);
+
   useEffect(() => {
     if (!isDrawer && location.hash) {
       setGlobalDrawer(<FileDetail sha256={location.hash.substr(1)} />);
