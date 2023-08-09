@@ -168,8 +168,9 @@ export function safeFieldValueURI(data: string | number | boolean) {
 }
 
 export function matchSHA256(data: string) {
-  const sha256ParseRE = /^[a-fA-F0-9]{64}$/;
-  return sha256ParseRE.exec(data);
+  const sha256ParseRE = /^\s*([a-fA-F0-9]{64})\s*$/;
+  const output = sha256ParseRE.exec(data);
+  return output ? output[1] : output;
 }
 
 export function matchURL(data: string) {

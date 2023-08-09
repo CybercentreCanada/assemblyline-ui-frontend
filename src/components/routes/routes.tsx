@@ -17,7 +17,6 @@ import AdminTagSafelist from 'components/routes/admin/tag_safelist';
 import AdminUsers from 'components/routes/admin/users';
 import AlertDetails from 'components/routes/alerts/alert-details';
 import Alerts from 'components/routes/alerts/alerts';
-import AlertsLegacy from 'components/routes/alerts/legacy-alert';
 import AppRegistration from 'components/routes/authorize';
 import CrashTest from 'components/routes/crash';
 import Dashboard from 'components/routes/dashboard';
@@ -94,7 +93,6 @@ const WrappedRoutes = () => {
         <Route path="/" element={<Submit />} />
         <Route path="/account" element={<Account />} />
         <Route path="/alerts" element={<Alerts />} />
-        <Route path="/alerts/legacy" element={<AlertsLegacy />} />
         <Route path="/alerts/:id" element={<AlertDetails />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/actions" element={<AdminActions />} />

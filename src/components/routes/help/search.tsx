@@ -498,6 +498,10 @@ export default function Search() {
           <Card variant="outlined" className={classes.pre}>
             {t('ranges.ex10')}
           </Card>
+          <div className={classes.padded}>{t('ranges.text5')}</div>
+          <Card variant="outlined" className={classes.pre}>
+            {t('ranges.ex11')}
+          </Card>
         </Paragraph>
 
         <Paragraph id="ranges.datemath">
