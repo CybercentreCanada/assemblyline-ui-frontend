@@ -45,18 +45,20 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const classes = useStyles();
+
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
-  const { c12nDef } = useALContext();
+  const { c12nDef, configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
-      code: null,
       archive_only: false,
       classification: c12nDef?.UNRESTRICTED,
+      code: null,
       description: '',
+      ttl: 30,
       yara_signature: ''
     }),
     [c12nDef?.UNRESTRICTED]
@@ -68,6 +70,11 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
   const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState<boolean>(false);
 
+  const maxDaysToLive = useMemo<number>(
+    () => (!configuration.datastore.retrohunt.max_dtl ? null : configuration.datastore.retrohunt.max_dtl),
+    [configuration.datastore.retrohunt.max_dtl]
+  );
+
   const handleCreateRetrohunt = useCallback(
     (result: RetrohuntResult) => {
       if (!currentUser.roles.includes('retrohunt_run')) return;
@@ -75,9 +82,10 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
         method: 'PUT',
         url: `/api/v4/retrohunt/`,
         body: {
+          archive_only: result.archive_only,
           classification: result.classification,
           description: result.description,
-          archive_only: result.archive_only,
+          ttl: result.ttl,
           yara_signature: result.yara_signature
         },
         onSuccess: api_data => {
@@ -126,7 +134,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
           text={t('validate.text')}
         />
 
-        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} spacing={2}>
+        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={2}>
           {c12nDef.enforce && (
             <Grid item paddingBottom={theme.spacing(2)}>
               <Classification
@@ -174,20 +182,43 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
           </Grid>
 
           <Grid item>
-            <Typography variant="subtitle2">{t('details.search')}</Typography>
-            <RadioGroup
-              row
-              value={retrohunt.archive_only ? 'archive_only' : 'all'}
-              onChange={(_, value) => handleRetrohuntChange({ archive_only: value === 'archive_only' })}
-            >
-              <FormControlLabel value="all" control={<Radio />} label={t('details.all')} disabled={isDisabled} />
-              <FormControlLabel
-                value="archive_only"
-                control={<Radio />}
-                label={t('details.archive_only')}
-                disabled={isDisabled}
-              />
-            </RadioGroup>
+            <Grid container flexDirection="row" rowGap={2}>
+              <Grid item flexGrow={1}>
+                <Typography variant="subtitle2">{t('details.search')}</Typography>
+                <RadioGroup
+                  row
+                  value={retrohunt.archive_only ? 'archive_only' : 'all'}
+                  onChange={(_, value) => handleRetrohuntChange({ archive_only: value === 'archive_only' })}
+                >
+                  <FormControlLabel value="all" control={<Radio />} label={t('details.all')} disabled={isDisabled} />
+                  <FormControlLabel
+                    value="archive_only"
+                    control={<Radio />}
+                    label={t('details.archive_only')}
+                    disabled={isDisabled}
+                  />
+                </RadioGroup>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Typography variant="subtitle2">
+                  {`${t('ttl')} (${maxDaysToLive ? `${t('ttl.max')}: ${maxDaysToLive}` : t('ttl.forever')})`}
+                </Typography>
+                <TextField
+                  id="ttl"
+                  type="number"
+                  margin="dense"
+                  size="small"
+                  inputProps={{
+                    min: maxDaysToLive ? 1 : 0,
+                    max: maxDaysToLive ? maxDaysToLive : 365
+                  }}
+                  defaultValue={retrohunt.ttl}
+                  onChange={event => handleRetrohuntChange({ ttl: parseInt(event.target.value) })}
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+            </Grid>
           </Grid>
 
           <Grid item flex={1}>

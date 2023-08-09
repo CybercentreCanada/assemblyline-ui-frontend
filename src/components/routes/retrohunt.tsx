@@ -68,6 +68,7 @@ export type RetrohuntResult = {
   total_errors?: number;
   total_hits?: number;
   truncated?: boolean;
+  ttl?: number;
   yara_signature?: string;
 };
 
