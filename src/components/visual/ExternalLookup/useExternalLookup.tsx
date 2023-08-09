@@ -21,12 +21,41 @@ type ExternalLookupResults = {
   [tagName: string]: ExternalLookupResult;
 };
 
+type ExternalEnrichmentItem = {
+  group: string; // type or grouping for the result
+  name: string; // name key
+  name_description: string; // info/help for what the name key is
+  value: string; // enrichment value
+  value_description: string; // info/help for what the value is
+  classification: string;
+};
+
+type ExternalEnrichmentResult = {
+  confirmed: boolean; // if result is confirmed malicious
+  description: string; // summary/description of the findings
+  malicious: string; // if the result is malicious or not
+  enrichment: Array<ExternalEnrichmentItem>;
+};
+
+export type ExternalEnrichmentSource = {
+  [sourceName: string]: {
+    // Data source of query
+    error: null | string; // error message returned by data source
+    items: Array<ExternalEnrichmentResult>;
+  };
+};
+
+export type ExternalEnrichmentResults = {
+  [tagName: string]: ExternalEnrichmentSource;
+};
+
 export function useSearchTagExternal(initialState: ExternalLookupResults, key: string = null) {
   const { t } = useTranslation();
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
   const [lookupState, setLookupState] = React.useState<ExternalLookupResults>(initialState);
+  const [enrichmentState, setEnrichmentState] = React.useState<ExternalEnrichmentResults>();
 
   useEffect(
     () => {
@@ -129,9 +158,49 @@ export function useSearchTagExternal(initialState: ExternalLookupResults, key: s
     [showErrorMessage, showSuccessMessage, showWarningMessage, t]
   );
 
+  const enrichTagExternal = useCallback(
+    (source: string, tagName: string, tagValue: string, classification: string) => {
+      let url = `/api/v4/federated_lookup/enrich/${tagName}/${encodeURIComponent(tagValue)}/`;
+      // construct approporiate query param string
+      let qs = `classification=${encodeURIComponent(classification)}`;
+      if (!!source) {
+        qs += `&sources=${encodeURIComponent(source)}`;
+      }
+      url += `?${qs}`;
+
+      apiCall({
+        method: 'GET',
+        url: url,
+        onSuccess: api_data => {
+          if (Object.keys(api_data.api_response).length !== 0) {
+            showSuccessMessage(t('related_external.found'));
+
+            let res = api_data.api_response as ExternalEnrichmentSource;
+            setEnrichmentState(prevState => {
+              return {
+                ...prevState,
+                [tagName]: res
+              };
+            });
+          }
+        },
+        onFailure: api_data => {
+          if (Object.keys(api_data.api_error_message).length !== 0) {
+            showErrorMessage(t('related_external.error'));
+          } else {
+            showWarningMessage(t('related_external.notfound'));
+          }
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [showErrorMessage, showSuccessMessage, showWarningMessage, t]
+  );
   return {
     isActionable,
     lookupState,
-    searchTagExternal
+    searchTagExternal,
+    enrichmentState,
+    enrichTagExternal
   };
 }
