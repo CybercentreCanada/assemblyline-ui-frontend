@@ -74,6 +74,7 @@ export type ConfigurationDefinition = {
     };
     retrohunt: {
       enabled: boolean;
+      max_dtl: number;
     };
   };
   submission: {
