@@ -139,7 +139,7 @@ const useMyPreferences = () => {
           id: 'retrohunt',
           i18nKey: 'drawer.retrohunt',
           userPropValidators: [
-            { prop: 'user.roles', value: 'retrohunt_view' },
+            { prop: 'user.roles', value: 'retrohunt_view', enforce: true },
             { prop: 'configuration.retrohunt.enabled', value: true, enforce: true }
           ],
           icon: <DataObjectOutlinedIcon />,
