@@ -13,7 +13,6 @@ import Empty from 'components/visual/Empty';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import useQuery from 'components/visual/SearchBar/useQuery';
 import SearchPager from 'components/visual/SearchPager';
 import AlertsTable from 'components/visual/SearchResult/alerts';
 import FilesTable from 'components/visual/SearchResult/files';
@@ -91,34 +90,6 @@ function Search({ index }: SearchProps) {
   const [tab, setTab] = useState(null);
   const { showErrorMessage } = useMySnackbar();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
-
-  const query2 = useQuery<{
-    query: string;
-    rows: number;
-    offset: number;
-    number: number;
-    filters: string[];
-    ids: number[];
-    test: number;
-  }>(
-    { query: '*', rows: 20, offset: 7, filters: ['asd', 'qwe', 'ewq'], test: 0, ids: [1, 2, 3] },
-    'query=*&rows=20&offset=7&number=123'
-  );
-
-  useEffect(() => {
-    console.log('\n\n\n\nstate change');
-    console.log('getDefaultString:', query2.getDefaultString());
-    console.log('getDeltaString:', query2.getDeltaString());
-    console.log('get offset:', query2.get('offset'));
-    console.log('get test:', query2.get('test'));
-    console.log('get ids:', query2.get('ids'));
-
-    // query2.pop('test');
-    query2.set('test', 123);
-
-    console.log('has(ids):', query2.has('ids'));
-    console.log('toString:', query2.toString(['query']));
-  }, [query2]);
 
   // Result lists
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
