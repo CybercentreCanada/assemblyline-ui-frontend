@@ -8,6 +8,7 @@ import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
@@ -133,6 +134,20 @@ const useMyPreferences = () => {
         }
       },
       {
+        type: 'item' as 'item',
+        element: {
+          id: 'retrohunt',
+          i18nKey: 'drawer.retrohunt',
+          userPropValidators: [
+            { prop: 'user.roles', value: 'retrohunt_view', enforce: true },
+            { prop: 'configuration.retrohunt.enabled', value: true, enforce: true }
+          ],
+          icon: <DataObjectOutlinedIcon />,
+          route: '/retrohunt',
+          nested: false
+        }
+      },
+      {
         type: 'group' as 'group',
         element: {
           id: 'search',
@@ -140,7 +155,8 @@ const useMyPreferences = () => {
           userPropValidators: [
             { prop: 'user.roles', value: 'alert_view' },
             { prop: 'user.roles', value: 'signature_view' },
-            { prop: 'user.roles', value: 'submission_view' }
+            { prop: 'user.roles', value: 'submission_view' },
+            { prop: 'user.roles', value: 'retrohunt_view' }
           ],
           icon: <SearchIcon />,
           items: [
@@ -169,6 +185,16 @@ const useMyPreferences = () => {
               i18nKey: 'drawer.search.result',
               userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
               route: '/search/result',
+              nested: true
+            },
+            {
+              id: 'search.retrohunt',
+              i18nKey: 'drawer.search.retrohunt',
+              userPropValidators: [
+                { prop: 'user.roles', value: 'retrohunt_view' },
+                { prop: 'configuration.retrohunt.enabled', value: true, enforce: true }
+              ],
+              route: '/search/retrohunt',
               nested: true
             },
             {

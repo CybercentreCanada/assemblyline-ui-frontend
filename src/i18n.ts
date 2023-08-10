@@ -37,6 +37,7 @@ import manageSignatureSourcesEN from 'locales/en/manage/signature_sources.json';
 import manageWorkflowsEN from 'locales/en/manage/workflows.json';
 import manageWorkflowDetailEN from 'locales/en/manage/workflow_detail.json';
 import notificationEN from 'locales/en/notification.json';
+import retrohuntEN from 'locales/en/retrohunt.json';
 import searchEN from 'locales/en/search.json';
 import settingsEN from 'locales/en/settings.json';
 import statisticsHeuristicsEN from 'locales/en/statistics/heuristics.json';
@@ -85,6 +86,7 @@ import manageSignatureSourcesFR from 'locales/fr/manage/signature_sources.json';
 import manageWorkflowsFR from 'locales/fr/manage/workflows.json';
 import manageWorkflowDetailFR from 'locales/fr/manage/workflow_detail.json';
 import notificationFR from 'locales/fr/notification.json';
+import retrohuntFR from 'locales/fr/retrohunt.json';
 import searchFR from 'locales/fr/search.json';
 import settingsFR from 'locales/fr/settings.json';
 import statisticsHeuristicsFR from 'locales/fr/statistics/heuristics.json';
@@ -135,6 +137,7 @@ const resources = {
     manageSafelistDetail: manageSafelistDetailEN,
     manageSafelist: manageSafelistEN,
     notification: notificationEN,
+    retrohunt: retrohuntEN,
     search: searchEN,
     settings: settingsEN,
     statisticsHeuristics: statisticsHeuristicsEN,
@@ -185,6 +188,7 @@ const resources = {
     manageSafelistDetail: manageSafelistDetailFR,
     manageSafelist: manageSafelistFR,
     notification: notificationFR,
+    retrohunt: retrohuntFR,
     search: searchFR,
     settings: settingsFR,
     statisticsHeuristics: statisticsHeuristicsFR,

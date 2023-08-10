@@ -1,3 +1,4 @@
+/* eslint-disable no-template-curly-in-string */
 export const yaraDef = {
   defaultToken: 'invalid',
   octaldigits: /-?0o[0-7]+/,
@@ -578,3 +579,265 @@ export const yaraConfig = {
     ['/', '/']
   ]
 };
+
+/**
+ * The following configuration is based on the VSCode extension for the YARA pattern matching language made by infosec-intern on Github
+ *
+ * Source :
+ *  - Author: infosec-intern
+ *  - Extension: infosec-intern.yara
+ *  - Repository: https://github.com/infosec-intern/vscode-yara
+ */
+
+type Snippet = {
+  prefix: string;
+  description: string;
+  insert: string | string[];
+  detail: string;
+  kind: CompletionItemKind;
+};
+
+interface CompletionList {
+  suggestions: CompletionItem[];
+  incomplete?: boolean;
+  dispose?(): void;
+}
+
+interface CompletionItem {
+  label: string | CompletionItemLabel;
+  kind: CompletionItemKind;
+  detail?: string;
+  documentation?: string | IMarkdownString;
+  sortText?: string;
+  filterText?: string;
+  preselect?: boolean;
+  insertText: string;
+  insertTextRules?: CompletionItemInsertTextRule;
+  range: IRange;
+  commitCharacters?: string[];
+}
+
+interface CompletionItemLabel {
+  label: string;
+  detail?: string;
+  description?: string;
+}
+
+interface IMarkdownString {
+  readonly value: string;
+  readonly supportThemeIcons?: boolean;
+  readonly supportHtml?: boolean;
+}
+
+interface IWordAtPosition {
+  readonly word: string;
+  readonly startColumn: number;
+  readonly endColumn: number;
+}
+
+interface IRange {
+  readonly startLineNumber: number;
+  readonly startColumn: number;
+  readonly endLineNumber: number;
+  readonly endColumn: number;
+}
+
+enum CompletionItemKind {
+  Method = 0,
+  Function = 1,
+  Constructor = 2,
+  Field = 3,
+  Variable = 4,
+  Class = 5,
+  Struct = 6,
+  Interface = 7,
+  Module = 8,
+  Property = 9,
+  Event = 10,
+  Operator = 11,
+  Unit = 12,
+  Value = 13,
+  Constant = 14,
+  Enum = 15,
+  EnumMember = 16,
+  Keyword = 17,
+  Text = 18,
+  Color = 19,
+  File = 20,
+  Reference = 21,
+  Customcolor = 22,
+  Folder = 23,
+  TypeParameter = 24,
+  User = 25,
+  Issue = 26,
+  Snippet = 27
+}
+
+enum CompletionItemInsertTextRule {
+  None = 0,
+  KeepWhitespace = 1,
+  InsertAsSnippet = 4
+}
+
+export const registerYaraCompletionItemProvider = monaco => ({
+  provideCompletionItems: (model, position, context): CompletionList => {
+    const word: IWordAtPosition = model.getWordUntilPosition(position);
+    const range: IRange = {
+      startLineNumber: position.lineNumber,
+      startColumn: word.startColumn,
+      endLineNumber: position.lineNumber,
+      endColumn: word.endColumn
+    };
+
+    const snippets: Snippet[] = [
+      {
+        prefix: 'import',
+        description: 'Import',
+        insert: 'import "${1|pe,elf,cuckoo,magic,hash,math,dotnet,time,console,vt|}"',
+        detail: 'Import a YARA module',
+        kind: CompletionItemKind.Module
+      },
+      {
+        prefix: 'include',
+        description: 'Include',
+        insert: 'include "external_rules.yara"',
+        detail: 'Include an external YARA file',
+        kind: CompletionItemKind.Module
+      },
+      {
+        prefix: 'for_of',
+        description: 'for..of',
+        insert: ['for ${1:any} of ${2:them} : (', '\t${3:boolean_expression}', ')'],
+        detail: 'Apply the same condition to many strings',
+        kind: CompletionItemKind.Method
+      },
+      {
+        prefix: 'for_in',
+        description: 'for..in',
+        insert: ['for ${1:any i} in ( ${2:them} ) : (', '\t${3:boolean_expression}', ')'],
+        detail: 'Loop over items',
+        kind: CompletionItemKind.Method
+      },
+      {
+        prefix: 'any',
+        description: 'any',
+        insert: 'any of ${them}',
+        detail: 'String set keyword: any',
+        kind: CompletionItemKind.Operator
+      },
+      {
+        prefix: 'all',
+        description: 'all',
+        insert: 'all of ${them}',
+        detail: 'String set keyword: all',
+        kind: CompletionItemKind.Operator
+      },
+      {
+        prefix: 'header_pe',
+        description: 'PE Header',
+        insert: 'uint16(0) == 0x5A4D ',
+        detail: 'Generate a condition to check for a PE file header',
+        kind: CompletionItemKind.Variable
+      },
+      {
+        prefix: 'header_elf',
+        description: 'ELF Header',
+        insert: 'uint32(0) == 0x464C457F ',
+        detail: 'Generate a condition to check for an ELF file header',
+        kind: CompletionItemKind.Variable
+      },
+      {
+        prefix: 'header_macho',
+        description: 'Mach-O Header',
+        insert: 'uint32(0) == 0xFEEDFACF ',
+        detail: 'Generate a condition to check for a Mach-O file header',
+        kind: CompletionItemKind.Variable
+      },
+      {
+        prefix: '$str',
+        description: 'string',
+        insert: ['\\$${1:str} = "${2}" ${3|ascii,wide|} ${4:fullword}'],
+        detail: 'Generate a new string',
+        kind: CompletionItemKind.Snippet
+      },
+      {
+        prefix: '$re',
+        description: 'regex',
+        insert: ['\\$${1:re} = /${2}/'],
+        detail: 'Generate a new regex string',
+        kind: CompletionItemKind.Snippet
+      },
+      {
+        prefix: '$hex',
+        description: 'hex-string',
+        insert: ['\\$${1:hex} = { ${2} }'],
+        detail: 'Generate a new hex-string',
+        kind: CompletionItemKind.Snippet
+      },
+      {
+        prefix: 'condition',
+        description: '',
+        insert: ['condition:', '\t${6:any of them}'],
+        detail: 'Generate a condition section (YARA)',
+        kind: CompletionItemKind.Snippet
+      },
+      {
+        prefix: 'meta',
+        description: '',
+        insert: ['meta:', '\t${2:KEY} = ${3:"VALUE"}'],
+        detail: 'Generate a meta section (YARA)',
+        kind: CompletionItemKind.Snippet
+      },
+      {
+        prefix: 'strings',
+        description: '',
+        insert: ['strings:', '\t$${4:name} = ${5|"string",/regex/,{ HEX }|}'],
+        detail: 'Generate a strings section (YARA)',
+        kind: CompletionItemKind.Snippet
+      },
+      {
+        prefix: 'rule',
+        description: '',
+        insert: [
+          'rule ${1:my_rule} {',
+          '\tmeta:',
+          '\t\t${2:KEY} = ${3:"VALUE"}',
+          '\tstrings:',
+          '\t\t$${4:name} = ${5|"string",/regex/,{ HEX }|}',
+          '\tcondition:',
+          '\t\t${6:any of them}',
+          '}'
+        ],
+        detail: 'Generate a rule skeleton (YARA)',
+        kind: CompletionItemKind.Snippet
+      }
+    ];
+
+    const parseInsertText = snippet =>
+      'insert' in snippet
+        ? typeof snippet.insert === 'string'
+          ? snippet.insert
+          : Array.isArray(snippet.insert)
+          ? snippet.insert.join('\n')
+          : `${JSON.stringify(snippet.insert)}`
+        : '';
+
+    const suggestions: CompletionItem[] = snippets.map(snippet => ({
+      label: {
+        label: 'prefix' in snippet ? snippet.prefix : '',
+        description: 'description' in snippet ? snippet.description : ''
+      },
+      insertText: parseInsertText(snippet),
+      kind: 'kind' in snippet ? snippet.kind : CompletionItemKind.Text,
+      detail: 'detail' in snippet ? snippet.detail : '',
+      documentation: {
+        value: `<pre>${parseInsertText(snippet)}</pre>`,
+        supportHtml: true,
+        supportThemeIcons: true
+      },
+      insertTextRules: CompletionItemInsertTextRule.InsertAsSnippet,
+      range: range
+    }));
+    return { suggestions };
+  }
+});
