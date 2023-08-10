@@ -124,10 +124,8 @@ const useMyPreferences = () => {
           id: 'archive',
           text: t('drawer.archive'),
           userPropValidators: [
-            // { prop: 'user.roles', value: 'archive_view', enforce: true },
-            // { prop: 'configuration.datastore.archive.enabled', value: true, enforce: true }
-            { prop: 'user.roles', value: 'archive_view' },
-            { prop: 'configuration.datastore.archive.enabled', value: true }
+            { prop: 'user.roles', value: 'archive_view', enforce: true },
+            { prop: 'configuration.datastore.archive.enabled', value: true, enforce: true }
           ],
           icon: <ArchiveOutlinedIcon />,
           route: '/archive',
