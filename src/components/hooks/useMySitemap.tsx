@@ -9,6 +9,7 @@ import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOu
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
@@ -91,6 +92,13 @@ export default function useMySitemap() {
         breadcrumbs: ['/submissions']
       },
       { path: '/alerts', title: t('drawer.alerts'), isRoot: true, icon: <NotificationImportantOutlinedIcon /> },
+      { path: '/retrohunt', title: t('drawer.retrohunt'), isRoot: true, icon: <DataObjectOutlinedIcon /> },
+      {
+        path: '/retrohunt/:code',
+        title: t('breadcrumb.workflow.detail'),
+        icon: <ListOutlinedIcon />,
+        breadcrumbs: ['/retrohunt']
+      },
       {
         path: '/alerts/:id',
         title: t('breadcrumb.alert.detail'),
