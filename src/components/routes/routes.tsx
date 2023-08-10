@@ -44,6 +44,8 @@ const SignatureDetail = lazy(() => import('components/routes/manage/signature_de
 const ManageSignatureSources = lazy(() => import('components/routes/manage/signature_sources'));
 const ManageWorkflows = lazy(() => import('components/routes/manage/workflows'));
 const WorkflowDetail = lazy(() => import('components/routes/manage/workflow_detail'));
+const RetroHunt = lazy(() => import('components/routes/retrohunt'));
+const RetroHuntDetail = lazy(() => import('components/routes/retrohunt/detail'));
 const Search = lazy(() => import('components/routes/search'));
 const Settings = lazy(() => import('components/routes/settings'));
 const SubmissionDetail = lazy(() => import('components/routes/submission/detail'));
@@ -131,6 +133,8 @@ const WrappedRoutes = () => {
         <Route path="/manage/safelist/:id" element={<SafelistDetail />} />
         <Route path="/manage/safelist" element={<ManageSafelist />} />
         <Route path="/manage" element={<Manage />} />
+        <Route path="/retrohunt" element={<RetroHunt />} />
+        <Route path="/retrohunt/:code" element={<RetroHuntDetail />} />
         <Route path="/search" element={<Search />} />
         <Route path="/search/:id" element={<Search />} />
         <Route path="/settings" element={<Settings />} />
