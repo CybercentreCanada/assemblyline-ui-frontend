@@ -15,6 +15,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import TableContainer from '@mui/material/TableContainer';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { RetrohuntResult } from 'components/routes/retrohunt';
@@ -86,6 +87,7 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
   const { t } = useTranslation(['retrohunt']);
   const classes = useStyles();
   const { apiCall } = useMyAPI();
+  const { configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [errorResults, setErrorResults] = useState<RetrohuntErrorResult>(null);
@@ -104,7 +106,7 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
 
   const reloadErrors = useCallback(
     (curCode: string, searchParam: string) => {
-      if (currentUser.roles.includes('retrohunt_view')) {
+      if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         const curQuery = new SimpleSearchQuery(searchParam, DEFAULT_QUERY);
         apiCall({
           method: 'POST',
