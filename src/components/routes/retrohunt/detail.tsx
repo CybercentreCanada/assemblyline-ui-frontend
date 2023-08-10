@@ -170,7 +170,9 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const [typeDataSet, setTypeDataSet] = useState<{ [k: string]: number }>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
   const [query, setQuery] = useState<SimpleSearchQuery>(
-    new SimpleSearchQuery(isDrawer ? '' : location.search, DEFAULT_QUERY)
+    isDrawer
+      ? new SimpleSearchQuery(new URL(`${window.location.origin}/${location.hash.slice(1)}`).search, DEFAULT_QUERY)
+      : new SimpleSearchQuery(location.search, DEFAULT_QUERY)
   );
 
   const filterValue = useRef<string>('');
@@ -201,6 +203,8 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     }),
     [c12nDef.UNRESTRICTED]
   );
+
+  const code = useMemo<string>(() => (isDrawer ? propCode.split('?')[0] : paramCode), [isDrawer, paramCode, propCode]);
 
   const suggestions = useMemo<string[]>(
     () => [...Object.keys(indexes.file).filter(name => indexes.file[name].indexed), ...DEFAULT_SUGGESTION],
@@ -247,13 +251,62 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [DEFAULT_RETROHUNT, currentUser.roles, retrohunt?.code]
   );
 
-  const handleQueryChange = useCallback((key: string, value: string | number) => {
-    setQuery(prev => {
-      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
-      q.set(key, value);
-      return q;
-    });
-  }, []);
+  const handleNavigate = useCallback(
+    (searchQuery: SimpleSearchQuery) => {
+      const search = new SimpleSearchQuery(searchQuery.toString(), DEFAULT_QUERY);
+      if (isDrawer) {
+        const delta = search.getDeltaString();
+        const searchParam = delta && delta !== '' ? `?${delta}` : '';
+        navigate(`${location.pathname}${location.search}#${code}${searchParam}`);
+      } else navigate(`${location.pathname}?${search.getDeltaString()}${location.hash}`);
+    },
+    [code, isDrawer, location, navigate]
+  );
+
+  const handleQueryChange = useCallback(
+    (key: string, value: string | number) => {
+      query.set(key, value);
+      handleNavigate(query);
+    },
+    [handleNavigate, query]
+  );
+
+  const handleQueryRemove = useCallback(
+    (key: string | string[]) => {
+      if (typeof key === 'string') query.delete(key);
+      else key.forEach(k => query.delete(k));
+      handleNavigate(query);
+    },
+    [handleNavigate, query]
+  );
+
+  const handleFilterAdd = useCallback(
+    (filter: string) => {
+      query.add('filters', `type:${safeFieldValue(filter)}`);
+      handleNavigate(query);
+    },
+    [handleNavigate, query]
+  );
+
+  const handleFilterChange = useCallback(
+    (filter: string) => {
+      query.replace(
+        'filters',
+        filter,
+        filter.indexOf('NOT ') === 0 ? filter.substring(5, filter.length - 1) : `NOT (${filter})`
+      );
+      handleNavigate(query);
+    },
+    [handleNavigate, query]
+  );
+
+  const handleFilterRemove = useCallback(
+    (filter: string) => {
+      query.remove('filters', filter);
+      handleNavigate(query);
+    },
+    [handleNavigate, query]
+  );
 
   const reloadHits = useCallback(
     (curCode: string, searchParam: string) => {
@@ -301,43 +354,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [currentUser?.roles, getFilteredParams, handleQueryChange, retrohunt?.code]
   );
 
-  const handleQueryRemove = useCallback((key: string | string[]) => {
-    setQuery(prev => {
-      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
-      if (typeof key === 'string') q.delete(key);
-      else key.forEach(k => q.delete(k));
-      return q;
-    });
-  }, []);
-
-  const handleFilterAdd = useCallback((filter: string) => {
-    setQuery(prev => {
-      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
-      q.add('filters', `type:${safeFieldValue(filter)}`);
-      return q;
-    });
-  }, []);
-
-  const handleFilterChange = useCallback((filter: string) => {
-    setQuery(prev => {
-      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
-      q.replace(
-        'filters',
-        filter,
-        filter.indexOf('NOT ') === 0 ? filter.substring(5, filter.length - 1) : `NOT (${filter})`
-      );
-      return q;
-    });
-  }, []);
-
-  const handleFilterRemove = useCallback((filter: string) => {
-    setQuery(prev => {
-      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
-      q.remove('filters', filter);
-      return q;
-    });
-  }, []);
-
   const handleHitRowClick = useCallback(
     (file: FileResult) => {
       if (isDrawer) navigate(`/file/detail/${file.sha256}`);
@@ -347,12 +363,21 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   );
 
   useEffect(() => {
-    reloadData(isDrawer ? propCode : paramCode);
-  }, [isDrawer, paramCode, propCode, reloadData]);
+    if (isDrawer) {
+      const url = new URL(`${window.location.origin}/${location.hash.slice(1)}`);
+      setQuery(new SimpleSearchQuery(url.search, DEFAULT_QUERY));
+    } else {
+      setQuery(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
+    }
+  }, [isDrawer, location.hash, location, location.pathname, location.search]);
 
   useEffect(() => {
-    reloadHits(isDrawer ? propCode : paramCode, query.toString());
-  }, [isDrawer, paramCode, propCode, query, reloadHits]);
+    reloadData(code);
+  }, [code, reloadData]);
+
+  useEffect(() => {
+    reloadHits(code, query.toString());
+  }, [code, query, reloadHits]);
 
   useEffect(() => {
     if (!timer.current && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
