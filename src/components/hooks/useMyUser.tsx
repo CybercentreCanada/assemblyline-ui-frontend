@@ -125,6 +125,7 @@ export type ConfigurationDefinition = {
     tos: boolean;
     tos_lockout: boolean;
     tos_lockout_notify: boolean;
+    url_egress_proxies?: string[];
   };
   user: {
     api_priv_map: {
