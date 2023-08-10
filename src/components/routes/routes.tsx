@@ -1,55 +1,57 @@
 import RedirectSubmission from 'commons/components/utils/RedirectSubmission';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
-import ForbiddenPage from 'components/routes/403';
-import NotFoundPage from 'components/routes/404_dl';
-import Account from 'components/routes/account';
-import Admin from 'components/routes/admin';
-import AdminActions from 'components/routes/admin/actions';
-import AdminErrorDetail from 'components/routes/admin/error_detail';
-import AdminErrorViewer from 'components/routes/admin/error_viewer';
-import AdminIdentify from 'components/routes/admin/identify';
-import AdminServices from 'components/routes/admin/services';
-import Service from 'components/routes/admin/service_detail';
-import ServiceReview from 'components/routes/admin/service_review';
-import AdminSiteMap from 'components/routes/admin/site_map';
-import AdminTagSafelist from 'components/routes/admin/tag_safelist';
-import AdminUsers from 'components/routes/admin/users';
-import AlertDetails from 'components/routes/alerts/alert-details';
-import Alerts from 'components/routes/alerts/alerts';
-import AppRegistration from 'components/routes/authorize';
-import CrashTest from 'components/routes/crash';
-import Dashboard from 'components/routes/dashboard';
-import FileFullDetail from 'components/routes/file/detail';
-import FileViewer from 'components/routes/file/viewer';
-import Help from 'components/routes/help';
-import HelpApiDoc from 'components/routes/help/api';
-import HelpClassification from 'components/routes/help/classification';
-import HelpConfiguration from 'components/routes/help/configuration';
-import HelpSearch from 'components/routes/help/search';
-import HelpServices from 'components/routes/help/services';
-import Logout from 'components/routes/logout';
-import Manage from 'components/routes/manage';
-import ManageHeuristics from 'components/routes/manage/heuristics';
-import HeuristicDetail from 'components/routes/manage/heuristic_detail';
-import ManageSafelist from 'components/routes/manage/safelist';
-import SafelistDetail from 'components/routes/manage/safelist_detail';
-import ManageSignatures from 'components/routes/manage/signatures';
-import SignatureDetail from 'components/routes/manage/signature_detail';
-import ManageSignatureSources from 'components/routes/manage/signature_sources';
-import ManageWorkflows from 'components/routes/manage/workflows';
-import WorkflowDetail from 'components/routes/manage/workflow_detail';
-import Search from 'components/routes/search';
-import Settings from 'components/routes/settings';
-import SubmissionDetail from 'components/routes/submission/detail';
-import SubmissionReport from 'components/routes/submission/report';
-import Submissions from 'components/routes/submissions';
-import Submit from 'components/routes/submit';
-import Tos from 'components/routes/tos';
-import User from 'components/routes/user';
 import { resetFavicon } from 'helpers/utils';
-import { memo, useEffect, useState } from 'react';
+import { lazy, memo, Suspense, useEffect, useState } from 'react';
 import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router';
+import LoadingScreen from './loading';
+
+const ForbiddenPage = lazy(() => import('components/routes/403'));
+const NotFoundPage = lazy(() => import('components/routes/404_dl'));
+const Account = lazy(() => import('components/routes/account'));
+const Admin = lazy(() => import('components/routes/admin'));
+const AdminActions = lazy(() => import('components/routes/admin/actions'));
+const AdminErrorDetail = lazy(() => import('components/routes/admin/error_detail'));
+const AdminErrorViewer = lazy(() => import('components/routes/admin/error_viewer'));
+const AdminIdentify = lazy(() => import('components/routes/admin/identify'));
+const AdminServices = lazy(() => import('components/routes/admin/services'));
+const Service = lazy(() => import('components/routes/admin/service_detail'));
+const ServiceReview = lazy(() => import('components/routes/admin/service_review'));
+const AdminSiteMap = lazy(() => import('components/routes/admin/site_map'));
+const AdminTagSafelist = lazy(() => import('components/routes/admin/tag_safelist'));
+const AdminUsers = lazy(() => import('components/routes/admin/users'));
+const AlertDetails = lazy(() => import('components/routes/alerts/alert-details'));
+const Alerts = lazy(() => import('components/routes/alerts/alerts'));
+const AppRegistration = lazy(() => import('components/routes/authorize'));
+const CrashTest = lazy(() => import('components/routes/crash'));
+const Dashboard = lazy(() => import('components/routes/dashboard'));
+const FileFullDetail = lazy(() => import('components/routes/file/detail'));
+const FileViewer = lazy(() => import('components/routes/file/viewer'));
+const Help = lazy(() => import('components/routes/help'));
+const HelpApiDoc = lazy(() => import('components/routes/help/api'));
+const HelpClassification = lazy(() => import('components/routes/help/classification'));
+const HelpConfiguration = lazy(() => import('components/routes/help/configuration'));
+const HelpSearch = lazy(() => import('components/routes/help/search'));
+const HelpServices = lazy(() => import('components/routes/help/services'));
+const Logout = lazy(() => import('components/routes/logout'));
+const Manage = lazy(() => import('components/routes/manage'));
+const ManageHeuristics = lazy(() => import('components/routes/manage/heuristics'));
+const HeuristicDetail = lazy(() => import('components/routes/manage/heuristic_detail'));
+const ManageSafelist = lazy(() => import('components/routes/manage/safelist'));
+const SafelistDetail = lazy(() => import('components/routes/manage/safelist_detail'));
+const ManageSignatures = lazy(() => import('components/routes/manage/signatures'));
+const SignatureDetail = lazy(() => import('components/routes/manage/signature_detail'));
+const ManageSignatureSources = lazy(() => import('components/routes/manage/signature_sources'));
+const ManageWorkflows = lazy(() => import('components/routes/manage/workflows'));
+const WorkflowDetail = lazy(() => import('components/routes/manage/workflow_detail'));
+const Search = lazy(() => import('components/routes/search'));
+const Settings = lazy(() => import('components/routes/settings'));
+const SubmissionDetail = lazy(() => import('components/routes/submission/detail'));
+const SubmissionReport = lazy(() => import('components/routes/submission/report'));
+const Submissions = lazy(() => import('components/routes/submissions'));
+const Submit = lazy(() => import('components/routes/submit'));
+const Tos = lazy(() => import('components/routes/tos'));
+const User = lazy(() => import('components/routes/user'));
 
 const APP_NAME = 'AL4';
 
@@ -87,7 +89,7 @@ const WrappedRoutes = () => {
   const { configuration } = useALContext();
 
   return (
-    <>
+    <Suspense fallback={<LoadingScreen showImage={false} />}>
       <RouteActions />
       <Routes>
         <Route path="/" element={<Submit />} />
@@ -162,7 +164,7 @@ const WrappedRoutes = () => {
           <span style={{ textTransform: 'capitalize' }}>{configuration.system.type}</span>
         </div>
       )}
-    </>
+    </Suspense>
   );
 };
 
