@@ -88,8 +88,7 @@ const RELOAD_DELAY = 5000;
 const DEFAULT_PARAMS: object = {
   query: '*',
   offset: 0,
-  rows: PAGE_SIZE,
-  fl: 'archive_only,classification,code,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated'
+  rows: PAGE_SIZE
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -125,22 +124,24 @@ export default function Retrohunt() {
     [retrohuntResults]
   );
 
-  const handleQueryChange = useCallback((key: string, value: string | number) => {
-    setQuery(prev => {
-      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
-      q.set(key, value);
-      return q;
-    });
-  }, []);
+  const handleQueryChange = useCallback(
+    (key: string, value: string | number) => {
+      query.set(key, value);
+      const q = new SimpleSearchQuery(query.toString(), DEFAULT_QUERY);
+      navigate(`${location.pathname}?${q.getDeltaString()}${location.hash}`);
+    },
+    [location.hash, location.pathname, navigate, query]
+  );
 
-  const handleQueryRemove = useCallback((key: string | string[]) => {
-    setQuery(prev => {
-      const q = new SimpleSearchQuery(prev.toString(), DEFAULT_QUERY);
-      if (typeof key === 'string') q.delete(key);
-      else key.forEach(k => q.delete(k));
-      return q;
-    });
-  }, []);
+  const handleQueryRemove = useCallback(
+    (key: string | string[]) => {
+      if (typeof key === 'string') query.delete(key);
+      else key.forEach(k => query.delete(k));
+      const q = new SimpleSearchQuery(query.toString(), DEFAULT_QUERY);
+      navigate(`${location.pathname}?${q.getDeltaString()}${location.hash}`);
+    },
+    [location.hash, location.pathname, navigate, query]
+  );
 
   const handleReload = useCallback(
     () => {
@@ -207,6 +208,10 @@ export default function Retrohunt() {
       window.removeEventListener('reloadRetrohunts', reload);
     };
   }, [handleReload]);
+
+  useEffect(() => {
+    setQuery(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
+  }, [location.search]);
 
   useEffect(() => {
     if (retrohuntResults !== null && !globalDrawerOpened && location.hash) {
