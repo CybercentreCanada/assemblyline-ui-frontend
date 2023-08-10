@@ -174,7 +174,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
       {searching && (
         <LinearProgress
           style={{
-            position: 'absolute',
             height: theme.spacing(upMD ? 0.5 : 0.25),
             marginTop: theme.spacing(upMD ? -0.5 : -0.25),
             width: '100%',
