@@ -31,13 +31,16 @@ type ExternalEnrichmentItem = {
 };
 
 type ExternalEnrichmentResult = {
+  link: string; // link to results
+  count: number; // number of hits from the search
+  classification: string; // classification of the item searched
   confirmed: boolean; // if result is confirmed malicious
   description: string; // summary/description of the findings
   malicious: string; // if the result is malicious or not
   enrichment: Array<ExternalEnrichmentItem>;
 };
 
-export type ExternalEnrichmentSource = {
+export type ExternalEnrichmentResults = {
   [sourceName: string]: {
     // Data source of query
     error: null | string; // error message returned by data source
@@ -45,8 +48,8 @@ export type ExternalEnrichmentSource = {
   };
 };
 
-export type ExternalEnrichmentResults = {
-  [tagName: string]: ExternalEnrichmentSource;
+export type ExternalEnrichmentState = {
+  [tagName: string]: ExternalEnrichmentResults;
 };
 
 export type ExternalLookupContextProps = {
@@ -55,7 +58,7 @@ export type ExternalLookupContextProps = {
   enrichTagExternal: (source: string, tagName: string, tagValue: string, classification: string) => void;
   getKey: (tagName: string, tagValue: string) => string;
   lookupState: ExternalLookupResults;
-  enrichmentState: ExternalEnrichmentResults;
+  enrichmentState: ExternalEnrichmentState;
 };
 
 export interface ExternalLookupProps {
@@ -71,7 +74,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
   const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
   const [lookupState, setLookupState] = React.useState<ExternalLookupResults>({});
-  const [enrichmentState, setEnrichmentState] = React.useState<ExternalEnrichmentResults>({});
+  const [enrichmentState, setEnrichmentState] = React.useState<ExternalEnrichmentState>({});
 
   const isActionable = useCallback(
     (category, type, value) => {
@@ -183,6 +186,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
 
   const enrichTagExternal = useCallback(
     (source: string, tagName: string, tagValue: string, classification: string) => {
+      const stateKey = getKey(tagName, tagValue);
       let url = `/api/v4/federated_lookup/enrich/${tagName}/${encodeURIComponent(tagValue)}/`;
       // construct approporiate query param string
       let qs = `classification=${encodeURIComponent(classification)}`;
@@ -195,14 +199,17 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
         method: 'GET',
         url: url,
         onSuccess: api_data => {
-          if (Object.keys(api_data.api_response).length !== 0) {
+          let res = api_data.api_response as ExternalEnrichmentResults;
+          if (Object.keys(res).length !== 0) {
             showSuccessMessage(t('related_external.found'));
 
-            let res = api_data.api_response as ExternalEnrichmentSource;
             setEnrichmentState(prevState => {
               return {
                 ...prevState,
-                [tagName]: res
+                [stateKey]: {
+                  ...prevState[stateKey],
+                  ...res
+                }
               };
             });
           }

@@ -105,7 +105,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { triggerHighlight } = useHighlighter();
   const { apiCall } = useMyAPI();
 
-  const { searchTagExternal } = useExternalLookup();
+  const { enrichTagExternal } = useExternalLookup();
 
   const handleClose = useCallback(() => {
     setState(initialMenuState);
@@ -138,10 +138,10 @@ const WrappedActionMenu: React.FC<TagProps> = ({
 
   const handleMenuExternalSearch = useCallback(
     source => {
-      searchTagExternal(source, type, value, classification);
+      enrichTagExternal(source, type, value, classification);
       handleClose();
     },
-    [searchTagExternal, handleClose, type, value, classification]
+    [enrichTagExternal, handleClose, type, value, classification]
   );
 
   const handleHighLight = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);

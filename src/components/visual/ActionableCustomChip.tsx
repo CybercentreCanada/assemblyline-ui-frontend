@@ -2,7 +2,7 @@ import useExternalLookup from 'components/hooks/useExternalLookup';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
 import CustomChip, { CustomChipProps } from './CustomChip';
-import ExternalLinks from './ExternalLookup/ExternalLinks';
+import ExternalLinks from './ExternalSearch';
 
 export type ActionableCustomChipProps = CustomChipProps & {
   data_type?: string;

@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
-import ExternalLinks from './ExternalLookup/ExternalLinks';
+import ExternalLinks from './ExternalSearch';
 
 const initialMenuState = {
   mouseX: null,

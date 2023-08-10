@@ -13,7 +13,7 @@ import { verdictToColor } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ExternalEnrichmentSource } from '../../providers/ExternalLookupProvider';
+import { ExternalEnrichmentResults } from '../../providers/ExternalLookupProvider';
 
 const TARGET_RESULT_COUNT = 10;
 
@@ -44,7 +44,7 @@ type AutoHideChipListState = {
 };
 
 type TagEnrichmentDetailsProps = {
-  enrichmentState: ExternalEnrichmentSource;
+  enrichmentState: ExternalEnrichmentResults;
 };
 
 const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items, type = null }) => {
