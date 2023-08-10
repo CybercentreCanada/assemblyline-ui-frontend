@@ -114,22 +114,20 @@ type File = {
   };
 };
 
-type FileDetailProps = {
+type ArchiveDetailProps = {
   sha256: string;
   sid?: string;
   liveResultKeys?: string[];
   liveErrors?: Error[];
   force?: boolean;
-  isArchive?: boolean;
 };
 
-const WrappedFileDetail: React.FC<FileDetailProps> = ({
+const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
   sha256,
   sid = null,
   liveResultKeys = null,
   liveErrors = null,
-  force = false,
-  isArchive = false
+  force = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
@@ -426,6 +424,6 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   );
 };
 
-const FileDetail = React.memo(WrappedFileDetail);
+const ArchiveDetail = React.memo(WrappedArchiveDetail);
 
-export default FileDetail;
+export default ArchiveDetail;
