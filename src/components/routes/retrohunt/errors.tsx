@@ -208,7 +208,6 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
                       children={t('details.message')}
                       sortName="sort"
                       sortField="error"
-                      disableNavigation={true}
                       onSort={(e, { name, field }) => handleQueryChange(name, field)}
                     />
                   </DivTableRow>

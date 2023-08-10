@@ -661,7 +661,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                         children={t('details.lasttimeseen')}
                         sortName="sort"
                         sortField="seen.last"
-                        disableNavigation={isDrawer}
                         onSort={(e, { name, field }) => handleQueryChange(name, field)}
                         sx={{ zIndex: 'auto' }}
                       />
@@ -670,7 +669,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                         children={t('details.count')}
                         sortName="sort"
                         sortField="seen.count"
-                        disableNavigation={isDrawer}
                         onSort={(e, { name, field }) => handleQueryChange(name, field)}
                         sx={{ zIndex: 'auto' }}
                       />
@@ -679,7 +677,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                         children={t('details.sha256')}
                         sortName="sort"
                         sortField="sha256"
-                        disableNavigation={isDrawer}
                         onSort={(e, { name, field }) => handleQueryChange(name, field)}
                         sx={{ zIndex: 'auto' }}
                       />
@@ -688,7 +685,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                         children={t('details.filetype')}
                         sortName="sort"
                         sortField="type"
-                        disableNavigation={isDrawer}
                         onSort={(e, { name, field }) => handleQueryChange(name, field)}
                         sx={{ zIndex: 'auto' }}
                       />
@@ -697,7 +693,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                         children={t('details.size')}
                         sortName="sort"
                         sortField="size"
-                        disableNavigation={isDrawer}
                         onSort={(e, { name, field }) => handleQueryChange(name, field)}
                         sx={{ zIndex: 'auto' }}
                       />
@@ -707,7 +702,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                           children={t('details.classification')}
                           sortName="sort"
                           sortField="classification"
-                          disableNavigation={isDrawer}
                           onSort={(e, { name, field }) => handleQueryChange(name, field)}
                           sx={{ zIndex: 'auto' }}
                         />
