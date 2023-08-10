@@ -144,7 +144,7 @@ export default function Retrohunt() {
 
   const handleReload = useCallback(
     () => {
-      if (query && currentUser.roles.includes('retrohunt_view')) {
+      if (query && currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         const curQuery = new SimpleSearchQuery(query.toString(), DEFAULT_QUERY);
         apiCall({
           method: 'POST',
@@ -175,11 +175,19 @@ export default function Retrohunt() {
   );
 
   const handleOpenCreatePage = useCallback(() => {
-    if (currentUser.roles.includes('retrohunt_run')) {
+    if (currentUser.roles.includes('retrohunt_run') && configuration?.retrohunt?.enabled) {
       setGlobalDrawer(<RetrohuntCreate isDrawer onCreateRetrohunt={handleCreateRetrohunt} />);
       navigate(`${location.pathname}?${query.getDeltaString()}`);
     }
-  }, [currentUser.roles, handleCreateRetrohunt, location.pathname, navigate, query, setGlobalDrawer]);
+  }, [
+    configuration?.retrohunt?.enabled,
+    currentUser.roles,
+    handleCreateRetrohunt,
+    location.pathname,
+    navigate,
+    query,
+    setGlobalDrawer
+  ]);
 
   useEffect(() => {
     if (query) handleReload();

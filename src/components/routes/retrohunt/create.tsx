@@ -77,7 +77,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
 
   const handleCreateRetrohunt = useCallback(
     (result: RetrohuntResult) => {
-      if (!currentUser.roles.includes('retrohunt_run')) return;
+      if (!currentUser.roles.includes('retrohunt_run') && configuration?.retrohunt?.enabled) return;
       apiCall({
         method: 'PUT',
         url: `/api/v4/retrohunt/`,

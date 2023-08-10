@@ -234,7 +234,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
 
   const reloadData = useCallback(
     (curCode: string) => {
-      if (currentUser.roles.includes('retrohunt_view')) {
+      if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
           url: `/api/v4/retrohunt/${curCode}/`,
           onSuccess: api_data => setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response }),
@@ -259,7 +259,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     (curCode: string, searchParam: string) => {
       const curQuery = new SimpleSearchQuery(searchParam, DEFAULT_QUERY);
 
-      if (currentUser.roles.includes('retrohunt_view')) {
+      if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
           method: 'POST',
           url: `/api/v4/retrohunt/hits/${curCode}/`,
