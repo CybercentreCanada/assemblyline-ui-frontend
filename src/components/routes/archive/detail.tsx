@@ -1,7 +1,7 @@
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { CustomUser } from 'components/hooks/useMyUser';
-import FileDetail from 'components/visual/FileDetail';
+import ArchiveDetail from 'components/visual/ArchiveDetail';
 import { useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
@@ -15,7 +15,7 @@ function ArchiveFullDetail() {
 
   return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
-      <FileDetail sha256={id} />
+      <ArchiveDetail sha256={id} />
     </PageCenter>
   ) : (
     <ForbiddenPage />
