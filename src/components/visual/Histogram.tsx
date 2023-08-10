@@ -6,6 +6,7 @@ import {
   LinearScale,
   LineElement,
   PointElement,
+  TimeScale,
   Title,
   Tooltip
 } from 'chart.js';
@@ -13,7 +14,7 @@ import 'chartjs-adapter-moment';
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 
-ChartJS.register(CategoryScale, Filler, LinearScale, PointElement, LineElement, Title, Tooltip);
+ChartJS.register(CategoryScale, Filler, LinearScale, PointElement, LineElement, TimeScale, Title, Tooltip);
 
 type TooltipVertLinePluginConfig = {
   color: string;

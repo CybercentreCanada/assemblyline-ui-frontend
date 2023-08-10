@@ -2,7 +2,7 @@ import { CircularProgress } from '@mui/material';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import { memo } from 'react';
 
-const WrappedLoadingScreen: React.FC = () => {
+const WrappedLoadingScreen = ({ showImage = true }) => {
   const banner = useAppBanner();
   return (
     <div
@@ -14,7 +14,7 @@ const WrappedLoadingScreen: React.FC = () => {
         transform: 'translate(-50%, -50%)'
       }}
     >
-      {banner}
+      {showImage && banner}
       <CircularProgress variant="indeterminate" />
     </div>
   );
