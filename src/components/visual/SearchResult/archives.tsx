@@ -100,7 +100,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
               <LinkRow
                 key={`${file.id}-${i}`}
                 component={Link}
-                to={`/file/detail/${file.id}`}
+                to={`/archive/${file.id}`}
                 onClick={event => {
                   if (setFileID) {
                     event.preventDefault();

@@ -7,8 +7,8 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import ArchiveDetail from 'components/visual/ArchiveDetail';
 import { ChipList } from 'components/visual/ChipList';
-import FileDetail from 'components/visual/FileDetail';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchBar from 'components/visual/SearchBar/search-bar';
@@ -159,7 +159,7 @@ export default function MalwareArchive() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<FileDetail sha256={location.hash.substr(1)} isArchive />);
+      setGlobalDrawer(<ArchiveDetail sha256={location.hash.substr(1)} />);
     } else {
       closeGlobalDrawer();
     }
