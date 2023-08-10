@@ -35,11 +35,12 @@ import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
+import CommentSection from './FileDetail/comments';
 import Detection from './FileDetail/detection';
 import EmptySection from './FileDetail/emptys';
 import ErrorSection from './FileDetail/errors';
 import FrequencySection from './FileDetail/frequency';
-import IdentificationSection from './FileDetail/ident';
+import IdentificationSection from './FileDetail/ident_archive';
 import MetadataSection from './FileDetail/metadata';
 import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
@@ -401,7 +402,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         </Grid>
       </div>
       <div style={{ paddingBottom: sp2 }}>
-        <IdentificationSection fileinfo={file ? file.file_info : null} />
+        <IdentificationSection fileinfo={file ? file.file_info : null} isArchive />
         <FrequencySection fileinfo={file ? file.file_info : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
         <ChildrenSection childrens={file ? file.childrens : null} />
@@ -417,6 +418,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         />
         <EmptySection emptys={file ? file.emptys : null} sid={sid} />
         <ErrorSection errors={file ? file.errors : null} />
+        <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
       </div>
     </div>
   ) : (
