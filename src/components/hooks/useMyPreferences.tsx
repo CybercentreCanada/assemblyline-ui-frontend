@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
@@ -115,6 +116,20 @@ const useMyPreferences = () => {
           userPropValidators: [{ prop: 'user.roles', value: 'alert_view' }],
           icon: <NotificationImportantOutlinedIcon />,
           route: '/alerts',
+          nested: false
+        }
+      },
+      {
+        type: 'item' as 'item',
+        element: {
+          id: 'archive',
+          text: t('drawer.archive'),
+          userPropValidators: [
+            { prop: 'user.roles', value: 'archive_view', enforce: true },
+            { prop: 'configuration.datastore.archive.enabled', value: true, enforce: true }
+          ],
+          icon: <ArchiveOutlinedIcon />,
+          route: '/archive',
           nested: false
         }
       },
