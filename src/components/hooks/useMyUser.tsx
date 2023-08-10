@@ -257,8 +257,16 @@ export default function useMyUser(): CustomAppUserService {
   };
 
   const validateProps = (props: AppUserValidatedProp[]) => {
-    if (props === undefined) return true;
-    return props.some(validateProp);
+    if (props === undefined || !Array.isArray(props)) return true;
+
+    let enforcedProps: AppUserValidatedProp[] = [];
+    let unEnforcedProps: AppUserValidatedProp[] = [];
+    props.forEach(prop => (prop?.enforce ? enforcedProps.push(prop) : unEnforcedProps.push(prop)));
+
+    const enforcedValidated = enforcedProps.length > 0 ? enforcedProps.every(validateProp) : true;
+    const unEnforcedValidated = unEnforcedProps.length > 0 ? unEnforcedProps.some(validateProp) : true;
+
+    return enforcedValidated && unEnforcedValidated;
   };
 
   const isReady = () => {
