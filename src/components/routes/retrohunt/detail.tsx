@@ -187,6 +187,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       creator: null,
       description: '',
       errors: [],
+      expiry_ts: '2030-01-01T00:00:00.000000Z',
       finished: false,
       hits: [],
       pending_candidates: 0,
@@ -483,6 +484,21 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                   {`${t('created_by')} ${retrohunt.creator} `}
                   <Moment fromNow locale={i18n.language}>
                     {retrohunt.created}
+                  </Moment>
+                </Typography>
+              )
+            ) : (
+              <Skeleton />
+            )}
+          </Grid>
+
+          <Grid item style={{ textAlign: 'center' }}>
+            {retrohunt ? (
+              retrohunt.expiry_ts && (
+                <Typography variant="subtitle2" color="textSecondary">
+                  {`${t('expire')} `}
+                  <Moment fromNow locale={i18n.language}>
+                    {retrohunt.expiry_ts}
                   </Moment>
                 </Typography>
               )

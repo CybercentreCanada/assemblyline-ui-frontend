@@ -39,6 +39,7 @@
   "errors.total": "error",
   "errors.totals": "errors",
   "errors.view.title": "Retrohunt Job Errors",
+  "expire": "Expires",
   "filter": "Filter Retrohunt jobs...",
   "filtered": "Retrohunt job matching filter",
   "filtereds": "Retrohunt jobs matching filter",

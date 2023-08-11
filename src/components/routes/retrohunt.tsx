@@ -57,6 +57,7 @@ export type RetrohuntResult = {
   creator?: string;
   description?: string;
   errors?: string[];
+  expiry_ts?: string;
   finished?: boolean;
   hits?: string[];
   id?: string;
