@@ -227,7 +227,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       isDrawer ? (
         <PageFullSize margin={2} {...props} />
       ) : (
-        <PageCenter margin={4} width="100%" textAlign="left" {...props} />
+        <PageCenter mb={4} ml={0} mr={0} mt={4} width="100%" textAlign="left" {...props} />
       ),
     [isDrawer]
   );
@@ -391,12 +391,20 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     return (
       <PageLayout>
         <RetrohuntErrors retrohunt={retrohunt} open={isErrorOpen} onClose={() => setIsErrorOpen(false)} />
-        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} spacing={1} marginBottom={theme.spacing(4)}>
+        <Grid
+          container
+          flexDirection="column"
+          flexWrap="nowrap"
+          flex={1}
+          rowSpacing={1}
+          marginBottom={theme.spacing(4)}
+        >
           {c12nDef.enforce && (
-            <Grid item>
+            <Grid item paddingBottom={4}>
               <Classification
                 format="long"
                 type="pill"
+                size="tiny"
                 c12n={retrohunt && 'classification' in retrohunt ? retrohunt.classification : null}
               />
             </Grid>
