@@ -192,6 +192,14 @@ export default function Retrohunt() {
     setGlobalDrawer
   ]);
 
+  const handleRowClick = useCallback(
+    (item: RetrohuntResult) => {
+      const hashSearch = new URL(`${window.location.origin}/${location.hash.slice(1)}`);
+      navigate(`${location.pathname}${location.search}#${item?.code}${hashSearch.search}`);
+    },
+    [location, navigate]
+  );
+
   useEffect(() => {
     if (query) handleReload();
   }, [handleReload, query]);
@@ -313,7 +321,7 @@ export default function Retrohunt() {
         <div className={classes.tableContainer}>
           <RetrohuntTable
             retrohuntResults={retrohuntResults}
-            onRowClick={item => navigate(`${location.pathname}${location.search}#${item?.code}`)}
+            onRowClick={handleRowClick}
             onSort={({ name, field }) => handleQueryChange(name, field)}
           />
         </div>
