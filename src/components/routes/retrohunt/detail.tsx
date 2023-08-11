@@ -17,8 +17,8 @@ import {
 import TableContainer from '@mui/material/TableContainer';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageCenter from 'commons/components/pages/PageCenter';
 import PageFullSize from 'commons/components/pages/PageFullSize';
-import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -157,7 +157,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const location = useLocation();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
-  const { setGlobalDrawer, closeGlobalDrawer } = useDrawer();
+  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer, subscribeCloseDrawer } = useDrawer();
   const { indexes } = useALContext();
 
   const { c12nDef, configuration } = useALContext();
@@ -183,7 +183,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       creator: null,
       description: '',
       errors: [],
-      expiry_ts: '2030-01-01T00:00:00.000000Z',
+      expiry_ts: null,
       finished: false,
       hits: [],
       pending_candidates: 0,
@@ -223,7 +223,12 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   );
 
   const PageLayout = useCallback<React.FC<any>>(
-    props => (isDrawer ? <PageFullSize margin={2} {...props} /> : <PageFullWidth margin={4} {...props} />),
+    props =>
+      isDrawer ? (
+        <PageFullSize margin={2} {...props} />
+      ) : (
+        <PageCenter margin={4} width="100%" textAlign="left" {...props} />
+      ),
     [isDrawer]
   );
 
@@ -359,6 +364,22 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       setGlobalDrawer(<FileDetail sha256={location.hash.substr(1)} />);
     }
   }, [isDrawer, location.hash, setGlobalDrawer]);
+
+  useEffect(() => {
+    if (hitResults !== null && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawerOpened]);
+
+  useEffect(() => {
+    if (isDrawer) {
+      subscribeCloseDrawer(() =>
+        navigate(`${window.location.pathname}${window.location.search ? window.location.search : ''}`)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDrawer, subscribeCloseDrawer]);
 
   useEffect(() => {
     if (!['/retrohunt', '/file/detail'].some(p => location.pathname.startsWith(p))) closeGlobalDrawer();
@@ -664,7 +685,11 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                 </InformativeAlert>
               </div>
             ) : (
-              <TableContainer id="hits-table" component={Paper}>
+              <TableContainer
+                id="hits-table"
+                component={Paper}
+                sx={{ border: isDrawer && `1px solid ${theme.palette.divider}` }}
+              >
                 <DivTable stickyHeader>
                   <DivTableHead>
                     <DivTableRow>
@@ -733,6 +758,11 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                           event.preventDefault();
                           handleHitRowClick(file);
                         }}
+                        selected={
+                          isDrawer
+                            ? location.pathname.endsWith(`/${file?.sha256}`)
+                            : location.hash.startsWith(`#${file?.sha256}`)
+                        }
                       >
                         <DivTableCell>
                           <Tooltip title={file.seen.last}>
