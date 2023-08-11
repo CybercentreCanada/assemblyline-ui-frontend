@@ -183,7 +183,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
 
           <Grid item>
             <Grid container flexDirection="row" rowGap={2}>
-              <Grid item flexGrow={1}>
+              <Grid item flexGrow={3}>
                 <Typography variant="subtitle2">{t('details.search')}</Typography>
                 <RadioGroup
                   row
@@ -199,7 +199,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
                   />
                 </RadioGroup>
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item flexGrow={2}>
                 <Typography variant="subtitle2">
                   {`${t('ttl')} (${maxDaysToLive ? `${t('ttl.max')}: ${maxDaysToLive}` : t('ttl.forever')})`}
                 </Typography>
