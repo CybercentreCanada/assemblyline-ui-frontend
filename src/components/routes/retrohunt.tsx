@@ -88,7 +88,8 @@ const RELOAD_DELAY = 5000;
 const DEFAULT_PARAMS: object = {
   query: '*',
   offset: 0,
-  rows: PAGE_SIZE
+  rows: PAGE_SIZE,
+  fl: 'archive_only,classification,code,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated'
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
