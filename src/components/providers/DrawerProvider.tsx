@@ -1,7 +1,7 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { Drawer, IconButton, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export const GD_EVENT_PREVENTED = 'GlobalDrawerClose.Prevented';
 export const GD_EVENT_PROCEED = 'GlobalDrawerClose.Proceed';
@@ -60,6 +60,7 @@ export type DrawerContextProps = {
   closeTemporaryDrawer: () => void;
   setGlobalDrawer: (elements: React.ReactElement<any>) => void;
   setDrawerClosePrompt: (boolean) => void;
+  subscribeCloseDrawer: (callback: () => void) => () => boolean;
   globalDrawer: React.ReactElement<any>;
   globalDrawerOpened: boolean;
 };
@@ -81,6 +82,8 @@ function DrawerProvider(props: DrawerProviderProps) {
   const isMD = useMediaQuery(theme.breakpoints.only('md'));
   const isLG = useMediaQuery(theme.breakpoints.only('lg'));
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
+
+  const subscribers = useRef(new Set<() => void>());
 
   const drawerWidth = isXL ? XLWidth : isLG ? LGWidth : isMD ? MDWidth : SMWidth;
 
@@ -113,12 +116,18 @@ function DrawerProvider(props: DrawerProviderProps) {
   }, [globalDrawer]);
 
   const closeGlobalDrawer = useCallback(() => {
+    subscribers.current.forEach(callback => callback());
     setGlobalDrawer(null);
   }, [setGlobalDrawer]);
 
   const closeTemporaryDrawer = useCallback(() => {
     if (!isXL) setGlobalDrawer(null);
   }, [isXL, setGlobalDrawer]);
+
+  const subscribeCloseDrawer = useCallback((callback: () => void) => {
+    subscribers.current.add(callback);
+    return () => subscribers.current.delete(callback);
+  }, []);
 
   return (
     <DrawerContext.Provider
@@ -127,6 +136,7 @@ function DrawerProvider(props: DrawerProviderProps) {
         closeTemporaryDrawer,
         setGlobalDrawer,
         setDrawerClosePrompt,
+        subscribeCloseDrawer,
         globalDrawer,
         globalDrawerOpened
       }}
