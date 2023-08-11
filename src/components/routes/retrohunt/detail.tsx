@@ -157,7 +157,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const location = useLocation();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
-  const { setGlobalDrawer } = useDrawer();
+  const { setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { indexes } = useALContext();
 
   const { c12nDef, configuration } = useALContext();
@@ -227,21 +227,6 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [isDrawer]
   );
 
-  const reloadData = useCallback(
-    () => {
-      if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
-        apiCall({
-          url: `/api/v4/retrohunt/${code}/`,
-          onSuccess: api_data => setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response }),
-          onEnter: () => setIsReloading(true),
-          onExit: () => setIsReloading(false)
-        });
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [DEFAULT_RETROHUNT, code, configuration?.retrohunt?.enabled, currentUser.roles]
-  );
-
   const handleNavigate = useCallback(
     (searchQuery: SimpleSearchQuery) => {
       const search = new SimpleSearchQuery(searchQuery.toString(), DEFAULT_QUERY);
@@ -271,32 +256,19 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [handleNavigate, query]
   );
 
-  const handleFilterAdd = useCallback(
-    (filter: string) => {
-      query.add('filters', `type:${safeFieldValue(filter)}`);
-      handleNavigate(query);
+  const reloadData = useCallback(
+    () => {
+      if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
+        apiCall({
+          url: `/api/v4/retrohunt/${code}/`,
+          onSuccess: api_data => setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response }),
+          onEnter: () => setIsReloading(true),
+          onExit: () => setIsReloading(false)
+        });
+      }
     },
-    [handleNavigate, query]
-  );
-
-  const handleFilterChange = useCallback(
-    (filter: string) => {
-      query.replace(
-        'filters',
-        filter,
-        filter.indexOf('NOT ') === 0 ? filter.substring(5, filter.length - 1) : `NOT (${filter})`
-      );
-      handleNavigate(query);
-    },
-    [handleNavigate, query]
-  );
-
-  const handleFilterRemove = useCallback(
-    (filter: string) => {
-      query.remove('filters', filter);
-      handleNavigate(query);
-    },
-    [handleNavigate, query]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [DEFAULT_RETROHUNT, code, configuration?.retrohunt?.enabled, currentUser.roles]
   );
 
   const reloadHits = useCallback(
@@ -346,10 +318,10 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
 
   const handleHitRowClick = useCallback(
     (file: FileResult) => {
-      if (isDrawer) navigate(`/file/detail/${file.sha256}`);
+      if (isDrawer) navigate(`/file/detail/${file.sha256}${location.hash}`);
       else navigate(`${location.pathname}${location.search}#${file.sha256}`);
     },
-    [isDrawer, location.pathname, location.search, navigate]
+    [isDrawer, location.hash, location.pathname, location.search, navigate]
   );
 
   useEffect(() => {
@@ -387,6 +359,10 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       setGlobalDrawer(<FileDetail sha256={location.hash.substr(1)} />);
     }
   }, [isDrawer, location.hash, setGlobalDrawer]);
+
+  useEffect(() => {
+    if (!['/retrohunt', '/file/detail'].some(p => location.pathname.startsWith(p))) closeGlobalDrawer();
+  }, [closeGlobalDrawer, location.pathname]);
 
   if (!configuration?.retrohunt?.enabled) return <NotFoundPage />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
@@ -635,13 +611,23 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                   <div>
                     <ChipList
                       items={query.getAll('filters', []).map(
-                        v =>
+                        f =>
                           ({
-                            color: v.indexOf('NOT ') === 0 ? 'error' : null,
-                            label: `${v}`,
+                            color: f.indexOf('NOT ') === 0 ? 'error' : null,
+                            label: `${f}`,
                             variant: 'outlined',
-                            onClick: () => handleFilterChange(v),
-                            onDelete: () => handleFilterRemove(v)
+                            onClick: () => {
+                              query.replace(
+                                'filters',
+                                f,
+                                f.indexOf('NOT ') === 0 ? f.substring(5, f.length - 1) : `NOT (${f})`
+                              );
+                              handleNavigate(query);
+                            },
+                            onDelete: () => {
+                              query.remove('filters', f);
+                              handleNavigate(query);
+                            }
                           } as CustomChipProps)
                       )}
                     />
@@ -660,7 +646,8 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
               onClick={(evt, element) => {
                 if (!isReloading && element.length > 0) {
                   var ind = element[0].index;
-                  handleFilterAdd(Object.keys(typeDataSet)[ind]);
+                  query.add('filters', `type:${safeFieldValue(Object.keys(typeDataSet)[ind])}`);
+                  handleNavigate(query);
                 }
               }}
             />
