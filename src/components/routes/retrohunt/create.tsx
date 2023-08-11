@@ -13,6 +13,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
+import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -25,6 +26,7 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   circularProgress: {
@@ -45,8 +47,9 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const classes = useStyles();
-
+  const location = useLocation();
   const { apiCall } = useMyAPI();
+  const { closeGlobalDrawer } = useDrawer();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
   const { c12nDef, configuration } = useALContext();
@@ -119,6 +122,10 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
     }
   }, [onCreateRetrohunt, retrohunt]);
 
+  useEffect(() => {
+    if (!location.pathname.startsWith('/retrohunt')) closeGlobalDrawer();
+  }, [closeGlobalDrawer, location.pathname]);
+
   if (configuration?.retrohunt?.enabled && currentUser.roles.includes('retrohunt_run'))
     return (
       <PageFullSize margin={isDrawer ? 2 : 4}>
@@ -183,7 +190,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
 
           <Grid item>
             <Grid container flexDirection="row" rowGap={2}>
-              <Grid item flexGrow={1}>
+              <Grid item flexGrow={3}>
                 <Typography variant="subtitle2">{t('details.search')}</Typography>
                 <RadioGroup
                   row
@@ -199,7 +206,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
                   />
                 </RadioGroup>
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item flexGrow={2}>
                 <Typography variant="subtitle2">
                   {`${t('ttl')} (${maxDaysToLive ? `${t('ttl.max')}: ${maxDaysToLive}` : t('ttl.forever')})`}
                 </Typography>
