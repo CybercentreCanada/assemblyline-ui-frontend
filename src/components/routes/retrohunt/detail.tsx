@@ -758,6 +758,11 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                           event.preventDefault();
                           handleHitRowClick(file);
                         }}
+                        selected={
+                          isDrawer
+                            ? location.pathname.endsWith(`/${file?.sha256}`)
+                            : location.hash.startsWith(`#${file?.sha256}`)
+                        }
                       >
                         <DivTableCell>
                           <Tooltip title={file.seen.last}>

@@ -9,7 +9,7 @@ import 'moment/locale/fr';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   DivTable,
   DivTableBody,
@@ -40,6 +40,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
   onSort = () => null
 }) => {
   const { t, i18n } = useTranslation(['search']);
+  const location = useLocation();
   const { c12nDef } = useALContext();
 
   const RetrohuntStatus = useCallback<React.FC<{ result: RetrohuntResult }>>(
@@ -117,6 +118,9 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                 }}
                 hover
                 style={{ textDecoration: 'none' }}
+                selected={new URL(`${window.location.origin}/${location.hash.slice(1)}`).pathname.endsWith(
+                  `/${retrohunt?.code}`
+                )}
               >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                   <Tooltip title={retrohunt.created}>
