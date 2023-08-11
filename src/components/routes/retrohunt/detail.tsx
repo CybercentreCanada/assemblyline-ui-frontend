@@ -169,11 +169,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const [isErrorOpen, setIsErrorOpen] = useState<boolean>(false);
   const [typeDataSet, setTypeDataSet] = useState<{ [k: string]: number }>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
-  const [query, setQuery] = useState<SimpleSearchQuery>(
-    isDrawer
-      ? new SimpleSearchQuery(new URL(`${window.location.origin}/${location.hash.slice(1)}`).search, DEFAULT_QUERY)
-      : new SimpleSearchQuery(location.search, DEFAULT_QUERY)
-  );
+  const [query, setQuery] = useState<SimpleSearchQuery>(null);
 
   const filterValue = useRef<string>('');
   const timer = useRef<boolean>(false);
@@ -231,17 +227,11 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [isDrawer]
   );
 
-  const getFilteredParams = useCallback(
-    (q: SimpleSearchQuery, filters: string[]) =>
-      Object.fromEntries(Object.entries(q.getParams()).filter(v => filters.includes(v[0]))),
-    []
-  );
-
   const reloadData = useCallback(
-    (curCode: string) => {
+    () => {
       if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
-          url: `/api/v4/retrohunt/${curCode}/`,
+          url: `/api/v4/retrohunt/${code}/`,
           onSuccess: api_data => setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response }),
           onEnter: () => setIsReloading(true),
           onExit: () => setIsReloading(false)
@@ -249,7 +239,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [DEFAULT_RETROHUNT, currentUser.roles, retrohunt?.code]
+    [DEFAULT_RETROHUNT, code, configuration?.retrohunt?.enabled, currentUser.roles]
   );
 
   const handleNavigate = useCallback(
@@ -310,13 +300,11 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   );
 
   const reloadHits = useCallback(
-    (curCode: string, searchParam: string) => {
-      const curQuery = new SimpleSearchQuery(searchParam, DEFAULT_QUERY);
-
+    (curQuery: SimpleSearchQuery) => {
       if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
           method: 'POST',
-          url: `/api/v4/retrohunt/hits/${curCode}/`,
+          url: `/api/v4/retrohunt/hits/${code}/`,
           body: {
             ...curQuery.getParams(),
             filters: curQuery.getAll('filters', [])
@@ -324,7 +312,8 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
           onSuccess: api_data => {
             const { items, total, rows, offset } = api_data.api_response;
             if (items.length === 0 && offset !== 0 && offset >= total) {
-              handleQueryChange('offset', Math.floor(total / rows) * rows);
+              curQuery.set('offset', Math.floor(total / rows) * rows);
+              reloadHits(curQuery);
             } else {
               setHitResults(api_data.api_response);
             }
@@ -334,7 +323,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
         });
         apiCall({
           method: 'POST',
-          url: `/api/v4/retrohunt/types/${curCode}/`,
+          url: `/api/v4/retrohunt/types/${code}/`,
           body: {
             query: curQuery.get('query', DEFAULT_PARAMS?.query),
             filters: curQuery.getAll('filters', [])
@@ -352,7 +341,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser?.roles, getFilteredParams, handleQueryChange, retrohunt?.code]
+    [code, configuration?.retrohunt?.enabled, currentUser.roles]
   );
 
   const handleHitRowClick = useCallback(
@@ -360,43 +349,38 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       if (isDrawer) navigate(`/file/detail/${file.sha256}`);
       else navigate(`${location.pathname}${location.search}#${file.sha256}`);
     },
-    [isDrawer, location, navigate]
+    [isDrawer, location.pathname, location.search, navigate]
   );
 
   useEffect(() => {
     if (isDrawer) {
       const url = new URL(`${window.location.origin}/${location.hash.slice(1)}`);
       setQuery(new SimpleSearchQuery(url.search, DEFAULT_QUERY));
-    } else {
-      setQuery(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
     }
-  }, [isDrawer, location.hash, location, location.pathname, location.search]);
+  }, [isDrawer, location.hash]);
 
   useEffect(() => {
-    reloadData(code);
+    if (!isDrawer) setQuery(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
+  }, [isDrawer, location.search]);
+
+  useEffect(() => {
+    reloadData();
   }, [code, reloadData]);
 
   useEffect(() => {
-    reloadHits(code, query.toString());
-  }, [code, query, reloadHits]);
+    if (query) reloadHits(query);
+  }, [query, reloadHits]);
 
   useEffect(() => {
     if (!timer.current && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
       timer.current = true;
       setTimeout(() => {
-        reloadData(retrohunt.code);
-        reloadHits(retrohunt.code, isDrawer ? query.toString() : location.search);
+        reloadData();
+        reloadHits(query);
         timer.current = false;
       }, RELOAD_DELAY);
     }
   }, [reloadData, reloadHits, isDrawer, location.search, query, retrohunt]);
-
-  useEffect(() => {
-    if (!isDrawer && query) {
-      const search = query.getDeltaString() === '' ? '' : `?${query.getDeltaString()}`;
-      navigate(`${location.pathname}${search}${location.hash}`);
-    }
-  }, [isDrawer, location.hash, location.pathname, navigate, query]);
 
   useEffect(() => {
     if (!isDrawer && location.hash) {
@@ -509,7 +493,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
 
           <Grid item>
             <Grid container flexDirection="row" rowGap={1} columnGap={3}>
-              <Grid item sm={12} md={6} lg={8}>
+              <Grid item flex={1}>
                 <Typography variant="subtitle2">{t('details.description')}</Typography>
                 {!retrohunt ? (
                   <Skeleton style={{ height: '2.5rem' }} />
@@ -520,7 +504,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                 )}
               </Grid>
 
-              <Grid item flex={1}>
+              <Grid item sm={12} md={5}>
                 <Typography variant="subtitle2">{t('details.search')}</Typography>
                 {!retrohunt ? (
                   <Skeleton style={{ height: '2.5rem' }} />

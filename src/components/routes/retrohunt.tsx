@@ -107,7 +107,7 @@ export default function Retrohunt() {
   const { user: currentUser, indexes, configuration } = useALContext();
 
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
-  const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
+  const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [searching, setSearching] = useState<boolean>(false);
 
   const filterValue = useRef<string>('');
@@ -146,9 +146,8 @@ export default function Retrohunt() {
   );
 
   const handleReload = useCallback(
-    () => {
-      if (query && currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
-        const curQuery = new SimpleSearchQuery(query.toString(), DEFAULT_QUERY);
+    (curQuery: SimpleSearchQuery) => {
+      if (curQuery && currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
           method: 'POST',
           url: `/api/v4/retrohunt/`,
@@ -156,7 +155,8 @@ export default function Retrohunt() {
           onSuccess: api_data => {
             const { items, total, rows, offset } = api_data.api_response;
             if (items.length === 0 && offset !== 0 && offset >= total) {
-              handleQueryChange('offset', Math.floor(total / rows) * rows);
+              curQuery.set('offset', Math.floor(total / rows) * rows);
+              handleReload(curQuery);
             } else {
               setRetrohuntResults(api_data.api_response);
             }
@@ -167,7 +167,7 @@ export default function Retrohunt() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.roles, handleQueryChange, query]
+    [configuration?.retrohunt?.enabled, currentUser.roles]
   );
 
   const handleCreateRetrohunt = useCallback(
@@ -201,23 +201,18 @@ export default function Retrohunt() {
   );
 
   useEffect(() => {
-    if (query) handleReload();
+    if (query) handleReload(query);
   }, [handleReload, query]);
 
   useEffect(() => {
-    const search = query.getDeltaString() === '' ? '' : `?${query.getDeltaString()}`;
-    navigate(`${location.pathname}${search}${location.hash}`);
-  }, [location.hash, location.pathname, navigate, query]);
-
-  useEffect(() => {
     function reload() {
-      handleReload();
+      handleReload(query);
     }
     window.addEventListener('reloadRetrohunts', reload);
     return () => {
       window.removeEventListener('reloadRetrohunts', reload);
     };
-  }, [handleReload]);
+  }, [handleReload, query]);
 
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
@@ -240,11 +235,11 @@ export default function Retrohunt() {
     if (!timer.current && retrohuntResults && retrohuntResults.items.some(item => !item?.finished)) {
       timer.current = true;
       setTimeout(() => {
-        handleReload();
+        handleReload(query);
         timer.current = false;
       }, RELOAD_DELAY);
     }
-  }, [handleReload, retrohuntResults]);
+  }, [handleReload, query, retrohuntResults]);
 
   if (!configuration?.retrohunt?.enabled) return <Navigate to="/notfound" replace />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <Navigate to="/forbidden" replace />;
