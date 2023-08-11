@@ -183,7 +183,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       creator: null,
       description: '',
       errors: [],
-      expiry_ts: '2030-01-01T00:00:00.000000Z',
+      expiry_ts: null,
       finished: false,
       hits: [],
       pending_candidates: 0,
