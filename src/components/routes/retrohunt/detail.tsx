@@ -281,7 +281,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
           method: 'POST',
-          url: `/api/v4/search/file/`,
+          url: `/api/v4/retrohunt/hits/${code}/`,
           body: {
             ...curQuery.getParams(),
             filters: curQuery.getAll('filters', [])
@@ -300,7 +300,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
         });
         apiCall({
           method: 'POST',
-          url: `/api/v4/search/facet/file/type/`,
+          url: `/api/v4/retrohunt/types/${code}/`,
           body: {
             query: curQuery.get('query', DEFAULT_PARAMS?.query),
             filters: curQuery.getAll('filters', [])
