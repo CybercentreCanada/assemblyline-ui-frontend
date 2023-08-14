@@ -4,11 +4,12 @@ import CustomChip, { CustomChipProps } from './CustomChip';
 import ExternalLinks from './ExternalLookup/ExternalLinks';
 import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 
-export interface ActionableCustomChipProps extends CustomChipProps {
+export type ActionableCustomChipProps = CustomChipProps & {
   data_type?: string;
   category?: 'hash' | 'metadata' | 'tag';
   classification?: string;
-}
+  label?: string;
+};
 
 const initialMenuState = {
   mouseX: null,
@@ -20,6 +21,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
   data_type = null,
   category = null,
   classification,
+  label,
   ...otherProps
 }) => {
   const [state, setState] = React.useState(initialMenuState);
@@ -40,7 +42,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
     }
   });
 
-  const actionable = isActionable(category, data_type, otherProps.label);
+  const actionable = isActionable(category, data_type, label);
 
   // Do the menu rendering here
   return (
@@ -49,7 +51,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
         <ActionMenu
           category={category}
           type={data_type}
-          value={otherProps.label}
+          value={label}
           state={state}
           setState={setState}
           searchTagExternal={searchTagExternal}
@@ -67,6 +69,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
             />
           ) : null
         }
+        label={label}
         {...otherProps}
         onClick={actionable ? handleMenuClick : null}
         onContextMenu={actionable ? handleMenuClick : null}

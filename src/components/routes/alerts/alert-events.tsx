@@ -84,15 +84,12 @@ const WrappedAlertEventsTable = ({ alert, viewHistory, setViewHistory }) => {
                             <TableCell>{event.entity_name}</TableCell>
                           </Tooltip>
                           <TableCell>
-                            {event.priority ? <AlertPriority name={event.priority} withChip wrap={false} /> : null}
+                            {event.priority ? <AlertPriority name={event.priority} withChip /> : null}
                           </TableCell>
                           <TableCell>{event.status ? <AlertStatus name={event.status} /> : null}</TableCell>
                           <TableCell width="40%">
                             {event.labels ? (
-                              <ChipList
-                                items={event.labels.map(label => ({ label, variant: 'outlined' }))}
-                                wrap={false}
-                              />
+                              <ChipList items={event.labels.map(label => ({ label, variant: 'outlined' }))} nowrap />
                             ) : null}
                           </TableCell>
                           <TableCell>
