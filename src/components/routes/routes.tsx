@@ -45,6 +45,7 @@ const ManageSignatureSources = lazy(() => import('components/routes/manage/signa
 const ManageWorkflows = lazy(() => import('components/routes/manage/workflows'));
 const WorkflowDetail = lazy(() => import('components/routes/manage/workflow_detail'));
 const Search = lazy(() => import('components/routes/search'));
+const SearchAPI = lazy(() => import('components/routes/search/api'));
 const Settings = lazy(() => import('components/routes/settings'));
 const SubmissionDetail = lazy(() => import('components/routes/submission/detail'));
 const SubmissionReport = lazy(() => import('components/routes/submission/report'));
@@ -132,6 +133,7 @@ const WrappedRoutes = () => {
         <Route path="/manage/safelist" element={<ManageSafelist />} />
         <Route path="/manage" element={<Manage />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/search/api" element={<SearchAPI />} />
         <Route path="/search/:id" element={<Search />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/submit" element={<Submit />} />

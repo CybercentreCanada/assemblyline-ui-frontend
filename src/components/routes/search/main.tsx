@@ -266,7 +266,7 @@ function AdvancedSearch({ index: indexParam }: Props) {
                   <span>{selectedIndex}</span>
                 </>
               }
-              onClick={handleClick}
+              // onClick={handleClick}
             />
             <Popover
               id={id}
