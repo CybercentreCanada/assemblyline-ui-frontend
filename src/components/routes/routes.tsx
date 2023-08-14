@@ -41,7 +41,6 @@ import ManageSignatureSources from 'components/routes/manage/signature_sources';
 import ManageWorkflows from 'components/routes/manage/workflows';
 import WorkflowDetail from 'components/routes/manage/workflow_detail';
 import Search from 'components/routes/search';
-import Search2 from 'components/routes/search/main';
 import Settings from 'components/routes/settings';
 import SubmissionDetail from 'components/routes/submission/detail';
 import SubmissionReport from 'components/routes/submission/report';
@@ -133,7 +132,6 @@ const WrappedRoutes = () => {
         <Route path="/manage/safelist" element={<ManageSafelist />} />
         <Route path="/manage" element={<Manage />} />
         <Route path="/search" element={<Search />} />
-        <Route path="/search2" element={<Search2 />} />
         <Route path="/search/:id" element={<Search />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/submit" element={<Submit />} />
