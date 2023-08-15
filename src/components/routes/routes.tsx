@@ -46,6 +46,9 @@ const ManageWorkflows = lazy(() => import('components/routes/manage/workflows'))
 const WorkflowDetail = lazy(() => import('components/routes/manage/workflow_detail'));
 const Search = lazy(() => import('components/routes/search'));
 const SearchAPI = lazy(() => import('components/routes/search/api'));
+const SearchTable = lazy(() => import('components/routes/search/table'));
+const SearchFacet = lazy(() => import('components/routes/search/facet'));
+const SearchHistogram = lazy(() => import('components/routes/search/histogram'));
 const Settings = lazy(() => import('components/routes/settings'));
 const SubmissionDetail = lazy(() => import('components/routes/submission/detail'));
 const SubmissionReport = lazy(() => import('components/routes/submission/report'));
@@ -133,8 +136,14 @@ const WrappedRoutes = () => {
         <Route path="/manage/safelist" element={<ManageSafelist />} />
         <Route path="/manage" element={<Manage />} />
         <Route path="/search" element={<Search />} />
-        <Route path="/search/api" element={<SearchAPI />} />
         <Route path="/search/:id" element={<Search />} />
+        <Route path="/search2/api" element={<SearchAPI />} />
+        <Route path="/search2/table/:id" element={<SearchTable />} />
+        <Route path="/search2/table" element={<SearchTable />} />
+        <Route path="/search2/facet/:id/:fl" element={<SearchFacet />} />
+        <Route path="/search2/facet" element={<SearchFacet />} />
+        <Route path="/search2/histogram/:id/:fl" element={<SearchHistogram />} />
+        <Route path="/search2/histogram" element={<SearchHistogram />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/submit" element={<Submit />} />
         <Route path="/submission/detail/:id/:fid" element={<SubmissionDetail />} />

@@ -1,7 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import ApiOutlinedIcon from '@mui/icons-material/ApiOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
@@ -23,6 +25,8 @@ import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplic
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
+import TableRowsOutlinedIcon from '@mui/icons-material/TableRowsOutlined';
+import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { AppBarUserMenuElement, AppLeftNavElement, AppPreferenceConfigs } from 'commons/components/app/AppConfigs';
 import { Notification } from 'components/visual/Notification';
@@ -169,6 +173,49 @@ const useMyPreferences = () => {
               userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
               route: '/search/submission',
               nested: true
+            }
+          ]
+        }
+      },
+      {
+        type: 'group' as 'group',
+        element: {
+          id: 'search2',
+          i18nKey: 'drawer.search2',
+          userPropValidators: [
+            { prop: 'user.roles', value: 'alert_view' },
+            { prop: 'user.roles', value: 'signature_view' },
+            { prop: 'user.roles', value: 'submission_view' }
+          ],
+          icon: <SearchIcon />,
+          items: [
+            {
+              id: 'search2.api',
+              i18nKey: 'drawer.search2.api',
+              route: '/search2/api',
+              nested: true,
+              icon: <ApiOutlinedIcon />
+            },
+            {
+              id: 'search2.table',
+              i18nKey: 'drawer.search2.table',
+              route: '/search2/table',
+              nested: true,
+              icon: <TableRowsOutlinedIcon />
+            },
+            {
+              id: 'search2.facet',
+              i18nKey: 'drawer.search2.facet',
+              route: '/search2/facet',
+              nested: true,
+              icon: <BarChartOutlinedIcon />
+            },
+            {
+              id: 'search2.histogram',
+              i18nKey: 'drawer.search2.histogram',
+              route: '/search2/histogram',
+              nested: true,
+              icon: <TimelineOutlinedIcon />
             }
           ]
         }
