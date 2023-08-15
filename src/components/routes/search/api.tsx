@@ -130,6 +130,39 @@ export const SearchAPI = () => {
     return <>{propMethod}</>;
   }, []);
 
+  const onSubmit = useCallback(() => {
+    apiCall({
+      method: 'POST',
+      url: `${url}`,
+      body: JSON.parse(body),
+      onSuccess: api_data => setResponse(JSON.stringify(api_data.api_response, null, 4))
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [body, url]);
+
+  // const beforeMount = monaco => {
+  //   console.log(monaco);
+  //   // if (!monaco.languages.getLanguages().some(({ id }) => id === 'json')) {
+  //   // monaco.languages.register({ id: 'magic' });
+  //   // monaco.languages.setMonarchTokensProvider('magic', magicDef);
+  //   // monaco.languages.setLanguageConfiguration('magic', magicConfig);
+
+  //   monaco?.languages?.registerDocumentFormattingEditProvider('json', {
+  //     provideDocumentFormattingEdits(model, options) {
+  //       // var formatted = format(model.getValue(), {
+  //       //   indent: ' '.repeat(options.tabSize)
+  //       // });
+  //       console.log(model);
+  //       return [
+  //         {
+  //           range: model.getFullModelRange(),
+  //           text: model.getValue()
+  //         }
+  //       ];
+  //     }
+  //   });
+  // };
+
   return (
     <PageFullSize>
       <div style={{ paddingBottom: theme.spacing(2), textAlign: 'left', width: '100%' }}>
@@ -159,15 +192,15 @@ export const SearchAPI = () => {
           ></div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'row', paddingTop: theme.spacing(1) }}>
-          <Button variant="contained" color="success" children={'Success'} />
           <Autocomplete
             disablePortal
+            freeSolo
             options={apis ? apis.apis : []}
             sx={{ flex: 1 }}
             renderInput={params => (
               <TextField {...params} value={url} onChange={e => setURL(e.target.value)} label="Movie" />
             )}
-            getOptionLabel={option => option.path}
+            getOptionLabel={(option: API | string) => (typeof option === 'object' ? option?.path : option)}
             renderOption={(props, option: API, other: { selected: boolean; index: number; inputValue: string }) => {
               return (
                 <li {...props} key={`${option.id}-${other.index}`} style={{ ...props.style, display: 'flex', gap: 2 }}>
@@ -186,6 +219,7 @@ export const SearchAPI = () => {
               );
             }}
           />
+          <Button variant="contained" color="primary" children={'Submit'} onClick={e => onSubmit()} />
         </div>
       </PageHeader>
       <Grid item flex={1}>
@@ -199,8 +233,9 @@ export const SearchAPI = () => {
                   height={height}
                   theme={isDarkTheme ? 'vs-dark' : 'vs'}
                   loading={t('loading')}
-                  value={response}
-                  options={{ links: false }}
+                  value={body}
+                  onChange={setBody}
+                  options={{ links: false, formatOnType: true, formatOnPaste: true }}
                 />
               )}
             </AutoSizer>
