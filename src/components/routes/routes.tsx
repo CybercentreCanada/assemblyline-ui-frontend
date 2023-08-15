@@ -140,6 +140,7 @@ const WrappedRoutes = () => {
         <Route path="/search2/api" element={<SearchAPI />} />
         <Route path="/search2/table/:id" element={<SearchTable />} />
         <Route path="/search2/table" element={<SearchTable />} />
+        <Route path="/search2/facet/:id/:fc/:hs" element={<SearchFacet />} />
         <Route path="/search2/facet/:id/:fl" element={<SearchFacet />} />
         <Route path="/search2/facet/:id" element={<SearchFacet />} />
         <Route path="/search2/facet" element={<SearchFacet />} />
