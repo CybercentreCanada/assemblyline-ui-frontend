@@ -178,13 +178,43 @@ export default function useMySitemap() {
         icon: <TableRowsOutlinedIcon />
       },
       {
+        path: '/search2/table/:id',
+        title: t('drawer.search2.table'),
+        breadcrumbs: ['/search'],
+        icon: <TableRowsOutlinedIcon />
+      },
+      {
         path: '/search2/facet',
         title: t('drawer.search2.facet'),
         breadcrumbs: ['/search'],
         icon: <BarChartOutlinedIcon />
       },
       {
+        path: '/search2/facet/:id',
+        title: t('drawer.search2.facet'),
+        breadcrumbs: ['/search'],
+        icon: <BarChartOutlinedIcon />
+      },
+      {
+        path: '/search2/facet/:id/:fl',
+        title: t('drawer.search2.facet'),
+        breadcrumbs: ['/search'],
+        icon: <BarChartOutlinedIcon />
+      },
+      {
         path: '/search2/histogram',
+        title: t('drawer.search2.histogram'),
+        breadcrumbs: ['/search'],
+        icon: <TimelineOutlinedIcon />
+      },
+      {
+        path: '/search2/histogram/:id',
+        title: t('drawer.search2.histogram'),
+        breadcrumbs: ['/search'],
+        icon: <TimelineOutlinedIcon />
+      },
+      {
+        path: '/search2/histogram/:id/:fl',
         title: t('drawer.search2.histogram'),
         breadcrumbs: ['/search'],
         icon: <TimelineOutlinedIcon />

@@ -141,8 +141,10 @@ const WrappedRoutes = () => {
         <Route path="/search2/table/:id" element={<SearchTable />} />
         <Route path="/search2/table" element={<SearchTable />} />
         <Route path="/search2/facet/:id/:fl" element={<SearchFacet />} />
+        <Route path="/search2/facet/:id" element={<SearchFacet />} />
         <Route path="/search2/facet" element={<SearchFacet />} />
         <Route path="/search2/histogram/:id/:fl" element={<SearchHistogram />} />
+        <Route path="/search2/histogram/:id" element={<SearchHistogram />} />
         <Route path="/search2/histogram" element={<SearchHistogram />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/submit" element={<Submit />} />
