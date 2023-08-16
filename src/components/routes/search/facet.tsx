@@ -8,7 +8,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
-import { SearchSelector } from 'components/visual/Search2/CollectionSelector';
+import { SearchSelector } from 'components/visual/Search2/SearchSelector';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -191,7 +191,7 @@ function SearchFacet({ index: propIndex = null, field: propField = null }: Searc
     [location.hash, navigate, query]
   );
 
-  const handleFacetFieldChange = useCallback(
+  const handleFieldChange = useCallback(
     (value: any) => {
       navigate(`/search2/facet/${index}/${value}?${query ? query.toString() : ''}${location.hash}`);
     },
@@ -259,21 +259,8 @@ function SearchFacet({ index: propIndex = null, field: propField = null }: Searc
             onClear={onClear}
             onSearch={onSearch}
           />
-          <div style={{ display: 'flex', flexDirection: 'row', columnGap: theme.spacing(1) }}>
-            <SearchSelector value={index} label="Index: " options={indexOptions} onChange={handleIndexChange} />
-            <SearchSelector
-              value={facetField}
-              label="Facet field: "
-              options={facetFieldOptions}
-              onChange={handleFacetFieldChange}
-            />
-            <SearchSelector
-              value={histogramField}
-              label="Histogram field: "
-              options={HistogramFieldOptions}
-              onChange={handleHistogramFieldChange}
-            />
-          </div>
+          <SearchSelector value={index} label="Index: " options={indexOptions} onChange={handleIndexChange} />
+          <SearchSelector value={field} label="Field: " options={fieldOptions} onChange={handleFieldChange} />
         </div>
       </PageHeader>
       <div

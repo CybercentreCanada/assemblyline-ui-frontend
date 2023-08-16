@@ -45,6 +45,7 @@ const ManageSignatureSources = lazy(() => import('components/routes/manage/signa
 const ManageWorkflows = lazy(() => import('components/routes/manage/workflows'));
 const WorkflowDetail = lazy(() => import('components/routes/manage/workflow_detail'));
 const Search = lazy(() => import('components/routes/search'));
+const SearchDetail = lazy(() => import('components/routes/search/detail'));
 const SearchAPI = lazy(() => import('components/routes/search/api'));
 const SearchTable = lazy(() => import('components/routes/search/table'));
 const SearchFacet = lazy(() => import('components/routes/search/facet'));
@@ -137,6 +138,10 @@ const WrappedRoutes = () => {
         <Route path="/manage" element={<Manage />} />
         <Route path="/search" element={<Search />} />
         <Route path="/search/:id" element={<Search />} />
+        <Route path="/search2/detail/:index/:facet/:histogram" element={<SearchDetail />} />
+        <Route path="/search2/detail/:index/:facet" element={<SearchDetail />} />
+        <Route path="/search2/detail/:index" element={<SearchDetail />} />
+        <Route path="/search2/detail" element={<SearchDetail />} />
         <Route path="/search2/api" element={<SearchAPI />} />
         <Route path="/search2/table/:id" element={<SearchTable />} />
         <Route path="/search2/table" element={<SearchTable />} />

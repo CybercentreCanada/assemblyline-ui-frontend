@@ -3,23 +3,19 @@ import CustomChip from 'components/visual/CustomChip';
 import 'moment/locale/fr';
 import React, { useCallback } from 'react';
 
-export type CollectionType = 'submission' | 'file' | 'result' | 'signature' | 'alert' | 'retrohunt';
-
-const COLLECTIONS: CollectionType[] = ['submission', 'file', 'result', 'signature', 'alert', 'retrohunt'];
-
-type Props<Type> = {
-  value: Type;
+type Props<T> = {
+  value: string;
   label: string;
-  options: Type[];
-  onChange: (value: Type) => void;
+  options: T[];
+  onChange: (value: string) => void;
 };
 
-export const WrappedSearchSelector = <Type extends string>({
+export const WrappedSearchSelector = <T extends string>({
   value = null,
   label = '',
   options = [],
   onChange = null
-}: Props<Type>) => {
+}: Props<T>) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
@@ -33,7 +29,7 @@ export const WrappedSearchSelector = <Type extends string>({
   };
 
   const handleIndexClick = useCallback(
-    (key: Type) => (event: React.MouseEvent<any>) => {
+    (key: T) => (event: React.MouseEvent<any>) => {
       onChange(key);
       setAnchorEl(null);
     },
@@ -65,13 +61,14 @@ export const WrappedSearchSelector = <Type extends string>({
           vertical: 'bottom',
           horizontal: 'left'
         }}
+        style={{ maxHeight: '50vh' }}
       >
         <List
           dense
           sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
           subheader={<ListSubheader component="div" children="Indices" />}
         >
-          {options.map((option: Type, i) => (
+          {options.map((option, i) => (
             <ListItem key={`${option}-${i}`} disablePadding>
               <ListItemButton role={undefined} dense selected={option === value} onClick={handleIndexClick(option)}>
                 <ListItemText primary={option} />
