@@ -99,14 +99,16 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
             </Grid>
             <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
               {fileinfo ? (
-                (
+                fileinfo?.tlsh ? (
                   <ActionableText
                     category="hash"
                     type="tlsh"
                     value={fileinfo?.tlsh}
                     classification={fileinfo?.classification}
                   />
-                ) || <span style={{ color: theme.palette.text.disabled }}>{t('not_available')}</span>
+                ) : (
+                  <span style={{ color: theme.palette.text.disabled }}>{t('not_computable')}</span>
+                )
               ) : (
                 <Skeleton />
               )}
