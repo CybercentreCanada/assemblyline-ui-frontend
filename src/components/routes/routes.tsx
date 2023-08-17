@@ -50,6 +50,7 @@ const SearchAPI = lazy(() => import('components/routes/search/api'));
 const SearchTable = lazy(() => import('components/routes/search/table'));
 const SearchFacet = lazy(() => import('components/routes/search/facet'));
 const SearchHistogram = lazy(() => import('components/routes/search/histogram'));
+const FieldSearch = lazy(() => import('components/routes/fieldsearch'));
 const Settings = lazy(() => import('components/routes/settings'));
 const SubmissionDetail = lazy(() => import('components/routes/submission/detail'));
 const SubmissionReport = lazy(() => import('components/routes/submission/report'));
@@ -152,6 +153,9 @@ const WrappedRoutes = () => {
         <Route path="/search2/histogram/:id/:fl" element={<SearchHistogram />} />
         <Route path="/search2/histogram/:id" element={<SearchHistogram />} />
         <Route path="/search2/histogram" element={<SearchHistogram />} />
+        <Route path="/fieldsearch/:index/:field" element={<FieldSearch />} />
+        <Route path="/fieldsearch/:index" element={<FieldSearch />} />
+        <Route path="/fieldsearch" element={<FieldSearch />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/submit" element={<Submit />} />
         <Route path="/submission/detail/:id/:fid" element={<SubmissionDetail />} />
