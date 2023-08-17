@@ -6,7 +6,7 @@ import TextFieldsOutlinedIcon from '@mui/icons-material/TextFieldsOutlined';
 
 export type Index = 'submission' | 'file' | 'result' | 'signature' | 'alert' | 'retrohunt';
 
-export type FieldType = 'boolean' | 'date' | 'float' | 'integer' | 'keyword' | 'object' | 'text';
+export type FieldType = 'boolean' | 'date' | 'float' | 'integer' | 'ip' | 'keyword' | 'object' | 'text';
 
 export type Field = {
   default?: boolean;
@@ -14,6 +14,12 @@ export type Field = {
   list?: boolean;
   stored?: boolean;
   type?: FieldType;
+
+  count?: number;
+  min?: number;
+  max?: string;
+  avg?: number;
+  sum?: number;
 };
 
 export const FIELD_COLORS: Record<
@@ -23,6 +29,7 @@ export const FIELD_COLORS: Record<
   boolean: 'info',
   date: 'success',
   float: 'warning',
+  ip: 'error',
   integer: 'error',
   keyword: 'error',
   object: 'error',

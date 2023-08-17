@@ -20,6 +20,7 @@ import {
   LinkRow,
   SortableHeaderCell
 } from 'components/visual/DivTable';
+import PieChart from 'components/visual/Chart/PieChart';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import { CheckmarkSelector } from 'components/visual/Search2/CheckmarkSelector';
@@ -163,8 +164,7 @@ const DEFAULT_PARAMS = {
   start: 'now-1y',
   end: 'now',
   gap: '15d',
-  mincount: 0,
-  fl: ''
+  mincount: 0
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -189,6 +189,7 @@ function SearchDetail({
   const { index: paramIndex, facet: paramFacet, histogram: paramHistogram } = useParams<ParamProps>();
 
   const [results, setResults] = useState<Results>(null);
+  const [stats, setStats] = useState<any>(null);
   const [dataset, setDataset] = useState<{ [set: string]: number }>(null);
   const [histogram, setHistogram] = useState<any>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -357,6 +358,23 @@ function SearchDetail({
     if (query && index && facetField && currentUser.is_admin) {
       apiCall({
         method: 'POST',
+        url: `/api/v4/search/stats/${index}/`,
+        body: {
+          ...Object.fromEntries(Object.entries(query.getParams()).filter(([k, v]) => ['query'].includes(k))),
+          filters: query.getAll('filters', [])
+        },
+        onSuccess: api_data => setStats(api_data.api_response),
+        onEnter: () => setSearching(true),
+        onExit: () => setSearching(false)
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser.is_admin, facetField, index, query]);
+
+  useEffect(() => {
+    if (query && index && facetField && currentUser.is_admin) {
+      apiCall({
+        method: 'POST',
         url: `/api/v4/search/facet/${index}/${facetField}/`,
         body: {
           ...Object.fromEntries(Object.entries(query.getParams()).filter(([k, v]) => ['query'].includes(k))),
@@ -460,6 +478,7 @@ function SearchDetail({
   ) : (
     <PageFullSize margin={4}>
       <div style={{ paddingBottom: theme.spacing(2), textAlign: 'left', width: '100%' }}>
+        {/* Change title to search analysis */}
         <Typography variant="h4">{t(`title_${index || paramIndex || 'all'}`)}</Typography>
       </div>
       <PageHeader isSticky>
@@ -475,12 +494,7 @@ function SearchDetail({
           />
           <div style={{ display: 'flex', flexDirection: 'row', columnGap: theme.spacing(1) }}>
             <SearchSelector value={index} label="Index: " options={indexOptions} onChange={handleIndexChange} />
-            <FieldSelector
-              value={facetField}
-              label="Facet field: "
-              fields={facetFields}
-              onChange={handleFacetFieldChange}
-            />
+            <FieldSelector value={facetField} label="Facet field: " fields={stats} onChange={handleFacetFieldChange} />
             <FieldSelector
               value={histogramField}
               label="Histogram field: "
@@ -603,6 +617,26 @@ function SearchDetail({
               datatype={t('graph.datatype')}
               isDate
               verticalLine
+            />
+          </Grid>
+          <Grid item sm={12} md={6}>
+            <PieChart
+              dataset={dataset}
+              height={`400px`}
+              title={t('graph.name.title')}
+              datatype={t('graph.datatype')}
+              onClick={(evt, element) => {
+                console.log(element);
+                if (!searching && element.length > 0) {
+                  var ind = element[0].index;
+                  query.add('filters', `${facetField}:${Object.keys(dataset)[ind]}`);
+                  navigate(
+                    `/search2/detail/${index}/${facetField}/${histogramField}?${query ? query.getDeltaString() : ''}${
+                      location.hash
+                    }`
+                  );
+                }
+              }}
             />
           </Grid>
           <Grid item sm={12} md={12}>

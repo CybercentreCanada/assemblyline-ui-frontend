@@ -9,7 +9,8 @@ import {
   ListSubheader,
   Popover,
   TextField,
-  Theme
+  Theme,
+  useTheme
 } from '@mui/material';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import makeStyles from '@mui/styles/makeStyles';
@@ -31,6 +32,7 @@ type Props = {
 };
 
 export const WrappedFieldSelector = ({ value = null, label = '', fields = {}, onChange = null }: Props) => {
+  const theme = useTheme();
   const classes = useStyles();
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -113,31 +115,38 @@ export const WrappedFieldSelector = ({ value = null, label = '', fields = {}, on
           {React.useMemo(
             () => (
               <>
-                {Object.entries(fields)
-                  .filter(([k, v]) => k.indexOf(deferredFilter) !== -1)
-                  .map(([key, field], i) => (
-                    <ListItem key={`${key}-${i}`} disablePadding>
-                      <ListItemButton role={undefined} dense selected={key === value} onClick={handleIndexClick(key)}>
-                        <ListItemIcon>
-                          <CustomChip
-                            classes={{
-                              root: classes.chipRoot,
-                              label: classes.chipLabel
-                            }}
-                            size="small"
-                            type="rounded"
-                            variant="outlined"
-                            color={field.type in FIELDS ? FIELDS[field.type].color : 'default'}
-                            label={field.type in FIELDS ? FIELDS[field.type].icon : null}
-                          />
-                        </ListItemIcon>
-                        <ListItemText primary={key} />
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
+                {fields &&
+                  Object.entries(fields)
+                    .filter(([k, v]) => k.indexOf(deferredFilter) !== -1)
+                    .map(([key, field], i) => (
+                      <ListItem
+                        key={`${key}-${i}`}
+                        disablePadding
+                        secondaryAction={
+                          <div style={{ color: theme.palette.text.disabled }}>{`[ ${field?.count} ]`}</div>
+                        }
+                      >
+                        <ListItemButton role={undefined} dense selected={key === value} onClick={handleIndexClick(key)}>
+                          <ListItemIcon>
+                            <CustomChip
+                              classes={{
+                                root: classes.chipRoot,
+                                label: classes.chipLabel
+                              }}
+                              size="small"
+                              type="rounded"
+                              variant="outlined"
+                              color={field.type in FIELDS ? FIELDS[field.type].color : 'default'}
+                              label={field.type in FIELDS ? FIELDS[field.type].icon : null}
+                            />
+                          </ListItemIcon>
+                          <ListItemText primary={key} />
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
               </>
             ),
-            [classes.chipLabel, classes.chipRoot, deferredFilter, fields, handleIndexClick, value]
+            [classes.chipLabel, classes.chipRoot, deferredFilter, fields, handleIndexClick, theme.palette, value]
           )}
         </List>
       </Popover>
