@@ -10,43 +10,66 @@ import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation, useParams } from 'react-router-dom';
+import { Fields } from './Fields';
+import { Graph } from './Graph';
+import { DEFAULTS } from './models';
+import { Stats } from './Stats';
+import { Table } from './Table';
+import { Tabs } from './Tabs';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  tweaked_tabs: {
-    minHeight: 'unset',
-    [theme.breakpoints.up('md')]: {
-      '& [role=tab]': {
-        padding: '8px 20px',
-        fontSize: '13px',
-        minHeight: 'unset',
-        minWidth: 'unset'
-      }
-    },
-    [theme.breakpoints.down('sm')]: {
-      minHeight: 'unset',
-      '& [role=tab]': {
-        fontSize: '12px',
-        minHeight: 'unset',
-        minWidth: 'unset'
-      }
-    }
+  root: {
+    height: '100%',
+    width: '100%',
+
+    display: 'grid',
+    gridTemplateColumns: 'auto auto 1fr',
+    gridTemplateRows: 'auto auto auto auto 1fr',
+    rowGap: theme.spacing(2),
+    columnGap: theme.spacing(2),
+    gridTemplateAreas: `
+      "title title title"
+      "tabs tabs tabs"
+      "query query query"
+      "fields stats graph"
+      "fields table table"
+    `
   },
-  searchresult: {
-    paddingLeft: theme.spacing(1),
-    color: theme.palette.primary.main,
-    fontStyle: 'italic'
+  title: {
+    gridArea: 'title',
+    textAlign: 'left',
+    width: '100%'
+  },
+  tabs: {
+    gridArea: 'tabs'
+  },
+  query: {
+    gridArea: 'query'
+  },
+  fields: {
+    gridArea: 'fields'
+  },
+  stats: {
+    gridArea: 'stats'
+  },
+  graph: {
+    gridArea: 'graph',
+    minWidth: 0
+  },
+  table: {
+    gridArea: 'table'
   }
 }));
 
 type Index = 'submission' | 'file' | 'result' | 'signature' | 'alert' | 'retrohunt';
 
 type Props = {
-  index?: string;
+  index?: Index;
   field?: string;
 };
 
 type Params = {
-  index?: string;
+  index?: Index;
   field?: string;
 };
 
@@ -57,58 +80,59 @@ type Results = {
   total: number;
 };
 
-const DEFAULTS: {
-  [index in Index]: {
-    defaultField: string;
-    defaultFacetField: string;
-    defaultHistogramField: string;
-    defaultSort: string;
-    permission: string;
-  };
-} = {
-  submission: {
-    defaultField: 'classification',
-    defaultFacetField: 'classification',
-    defaultHistogramField: 'times.submitted',
-    permission: 'submission_view',
-    defaultSort: 'times.submitted desc'
-  },
-  file: {
-    defaultField: 'type',
-    defaultFacetField: 'type',
-    defaultHistogramField: 'seen.first',
-    permission: 'submission_view',
-    defaultSort: 'seen.last desc'
-  },
-  result: {
-    defaultField: 'type',
-    defaultFacetField: 'type',
-    defaultHistogramField: 'created',
-    permission: 'submission_view',
-    defaultSort: 'created desc'
-  },
-  signature: {
-    defaultField: 'type',
-    defaultFacetField: 'type',
-    defaultHistogramField: 'last_modified',
-    permission: 'signature_view',
-    defaultSort: 'last_modified desc'
-  },
-  alert: {
-    defaultField: 'type',
-    defaultFacetField: 'type',
-    defaultHistogramField: 'reporting_ts',
-    permission: 'alert_view',
-    defaultSort: 'reporting_ts desc'
-  },
-  retrohunt: {
-    defaultField: 'creator',
-    defaultFacetField: 'creator',
-    defaultHistogramField: 'created',
-    permission: 'retrohunt_view',
-    defaultSort: 'created desc'
-  }
-};
+// const DEFAULTS: Record<
+//   Index,
+//   {
+//     defaultField: string;
+//     defaultFacetField: string;
+//     defaultHistogramField: string;
+//     defaultSort: string;
+//     permission: string;
+//   }
+// > = {
+//   submission: {
+//     defaultField: 'classification',
+//     defaultFacetField: 'classification',
+//     defaultHistogramField: 'times.submitted',
+//     permission: 'submission_view',
+//     defaultSort: 'times.submitted desc'
+//   },
+//   file: {
+//     defaultField: 'type',
+//     defaultFacetField: 'type',
+//     defaultHistogramField: 'seen.first',
+//     permission: 'submission_view',
+//     defaultSort: 'seen.last desc'
+//   },
+//   result: {
+//     defaultField: 'type',
+//     defaultFacetField: 'type',
+//     defaultHistogramField: 'created',
+//     permission: 'submission_view',
+//     defaultSort: 'created desc'
+//   },
+//   signature: {
+//     defaultField: 'type',
+//     defaultFacetField: 'type',
+//     defaultHistogramField: 'last_modified',
+//     permission: 'signature_view',
+//     defaultSort: 'last_modified desc'
+//   },
+//   alert: {
+//     defaultField: 'type',
+//     defaultFacetField: 'type',
+//     defaultHistogramField: 'reporting_ts',
+//     permission: 'alert_view',
+//     defaultSort: 'reporting_ts desc'
+//   },
+//   retrohunt: {
+//     defaultField: 'creator',
+//     defaultFacetField: 'creator',
+//     defaultHistogramField: 'created',
+//     permission: 'retrohunt_view',
+//     defaultSort: 'created desc'
+//   }
+// };
 
 const START_MAP = {
   '24h': 'now-1d',
@@ -160,8 +184,8 @@ function SearchDetail({ index: propIndex = null, field: propField = null }: Prop
   const { indexes, user: currentUser, configuration, c12nDef } = useALContext();
   const { index: paramIndex, field: paramField } = useParams<Params>();
 
-  const indices = useMemo(
-    () => Object.keys(DEFAULTS).filter(key => currentUser.roles.includes(DEFAULTS[key].permission)),
+  const indices = useMemo<Index[]>(
+    () => Object.keys(DEFAULTS).filter(key => currentUser.roles.includes(DEFAULTS[key].permission)) as Index[],
     [currentUser.roles]
   );
 
@@ -171,11 +195,11 @@ function SearchDetail({ index: propIndex = null, field: propField = null }: Prop
         ? propIndex
         : paramIndex && indices.includes(paramIndex)
         ? paramIndex
-        : indices[0]) as Index,
+        : null) as Index,
     [indices, paramIndex, propIndex]
   );
 
-  const fields = useMemo(
+  const fields = useMemo<{ [k: string]: any }>(
     () =>
       index
         ? Object.fromEntries(
@@ -195,27 +219,45 @@ function SearchDetail({ index: propIndex = null, field: propField = null }: Prop
         ? propField
         : paramField && paramField in fields
         ? paramField
-        : DEFAULTS[index].defaultField,
+        : null,
     [fields, index, paramField, propField]
   );
 
   useEffect(() => {
-    if (!index && indices.length > 0)
-      navigate(`/fieldsearch/${indices[0]}/${DEFAULTS[indices[0]].defaultField}/${location.search}${location.hash}`);
+    if (!index && indices.length > 0) {
+      navigate(`/fieldsearch/${indices[0]}/${DEFAULTS[indices[0]].field}/${location.search}${location.hash}`);
+    }
   }, [index, indices, location.hash, location.search, navigate]);
 
   useEffect(() => {
-    if (!field && index)
-      navigate(`/search2/detail/${index}/${DEFAULTS[index].defaultField}/${location.search}${location.hash}`);
+    if (!field && index) {
+      navigate(`/fieldsearch/${index}/${DEFAULTS[index].field}/${location.search}${location.hash}`);
+    }
   }, [field, index, location.hash, location.search, navigate]);
 
-  return !index || !field ? (
+  return indices.length === 0 || Object.keys(fields).length === 0 || !currentUser.is_admin ? (
     <ForbiddenPage />
   ) : (
     <PageFullSize margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2), textAlign: 'left', width: '100%' }}>
-        {/* Change title to search analysis */}
-        <Typography variant="h4">{t(`title_${index || paramIndex || 'all'}`)}</Typography>
+      <div className={classes.root}>
+        <div className={classes.title}>
+          <Typography variant="h4">{t(`title_${index || paramIndex || 'all'}`)}</Typography>
+        </div>
+        <div className={classes.tabs}>
+          <Tabs />
+        </div>
+        <div className={classes.fields}>
+          <Fields />
+        </div>
+        <div className={classes.stats}>
+          <Stats />
+        </div>
+        <div className={classes.graph}>
+          <Graph />
+        </div>
+        <div className={classes.table}>
+          <Table />
+        </div>
       </div>
     </PageFullSize>
   );
