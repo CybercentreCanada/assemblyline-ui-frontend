@@ -13,7 +13,7 @@ import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 import InputDialog from './InputDialog';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
@@ -54,7 +54,6 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   const [safelistDialog, setSafelistDialog] = React.useState(false);
   const [safelistReason, setSafelistReason] = React.useState(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
-  const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const { isHighlighted, triggerHighlight } = useHighlighter();
@@ -63,15 +62,6 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   const { showSafeResults } = useSafeResults();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
-
-  const searchHeuristic = useCallback(
-    () =>
-      navigate(
-        `/search/result?query=result.sections.heuristic${signature ? '.signature' : ''}.name:${safeFieldValueURI(text)}`
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [signature, text]
-  );
 
   const handleMenuClick = useCallback(event => {
     event.preventDefault();
@@ -89,11 +79,6 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
     copy(text, 'clipID');
     handleClose();
   }, [copy, handleClose, text]);
-
-  const handleMenuSearch = useCallback(() => {
-    searchHeuristic();
-    handleClose();
-  }, [searchHeuristic, handleClose]);
 
   const handleMenuHighlight = useCallback(() => {
     handleClick();
@@ -177,7 +162,14 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
           {t('clipboard')}
         </MenuItem>
         {currentUser.roles.includes('submission_view') && (
-          <MenuItem dense onClick={handleMenuSearch}>
+          <MenuItem
+            component={Link}
+            dense
+            onClick={handleClose}
+            to={`/search/result?query=result.sections.heuristic${
+              signature ? '.signature' : ''
+            }.name:${safeFieldValueURI(text)}`}
+          >
             {SEARCH_ICON}
             {t('related')}
           </MenuItem>
