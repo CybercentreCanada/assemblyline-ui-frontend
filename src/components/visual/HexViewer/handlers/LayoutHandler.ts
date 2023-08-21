@@ -77,7 +77,7 @@ export const concatArray = (data: Array<string>, size: number): Array<string> =>
   return array;
 };
 
-export const getFoldingRowMap = (
+export const getRowFoldingMap = (
   store: Store,
   columnSize: number
 ): Map<number, { index: number; type: FoldingType }> => {
@@ -93,7 +93,7 @@ export const getFoldingRowMap = (
   map.set(0, { index: 0, type: FoldingType.SHOW });
   if (data.length === 1) return map;
 
-  while (i < data.length - 2) {
+  while (i < data.length - 1) {
     if (data[i - 1] !== data[i] && data[i] !== data[i + 1]) {
       map.set(j, { index: i, type: FoldingType.SHOW });
       j++;
