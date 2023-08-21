@@ -3,6 +3,8 @@
     color: rgba(0, 0, 0, 0.87) !important;
     page-break-after: avoid;
     page-break-before: avoid;
+    -webkit-print-color-adjust: exact; /*chrome & webkit browsers*/
+    print-color-adjust: exact; /*firefox & IE */
   }
 
   #root {
