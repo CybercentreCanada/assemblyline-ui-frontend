@@ -10,6 +10,7 @@ import Verdict from 'components/visual/Verdict';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   file_item: {
@@ -18,7 +19,8 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: theme.palette.action.hover
     },
     flexGrow: 1,
-    width: '100%'
+    width: '100%',
+    all: 'unset'
   },
   title: {
     display: 'flex',
@@ -166,14 +168,12 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
               )}
               <Box
                 className={classes.file_item}
-                component={'span'}
-                onClick={
-                  item.sha256
-                    ? () => {
-                        navigate(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
-                      }
-                    : null
-                }
+                component={item.sha256 ? Link : 'span'}
+                to={`/file/detail/${item.sha256}`}
+                onClick={e => {
+                  e.preventDefault();
+                  if (item.sha256) navigate(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
+                }}
                 style={{
                   wordBreak: 'break-word',
                   backgroundColor: isHighlighted(sha256)
