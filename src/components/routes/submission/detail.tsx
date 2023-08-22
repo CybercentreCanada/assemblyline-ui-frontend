@@ -46,10 +46,11 @@ import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
 import { setNotifyFavicon } from 'helpers/utils';
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import ForbiddenPage from '../403';
+import HeuristicDetail from '../manage/heuristic_detail';
 import AttackSection from './detail/attack';
 import ErrorSection from './detail/errors';
 import FileTreeSection from './detail/file_tree';
@@ -120,6 +121,7 @@ function WrappedSubmissionDetail() {
   const { apiCall } = useMyAPI();
   const sp4 = theme.spacing(4);
   const { showSuccessMessage } = useMySnackbar();
+  const location = useLocation();
   const navigate = useNavigate();
   const { user: currentUser, c12nDef, configuration: systemConfig } = useALContext();
   const { setHighlightMap } = useHighlighter();
@@ -802,6 +804,19 @@ function WrappedSubmissionDetail() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fid, submission]);
+
+  useEffect(() => {
+    if (!fid && location.hash) {
+      setGlobalDrawer(<HeuristicDetail heur_id={location.hash.slice(1)} />);
+    }
+  }, [fid, location.hash, setGlobalDrawer]);
+
+  useEffect(() => {
+    if (!fid && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fid, globalDrawerOpened]);
 
   useEffect(() => {
     if (loadTrigger === 0) return;
