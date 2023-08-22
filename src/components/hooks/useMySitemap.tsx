@@ -1,9 +1,7 @@
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
-import ApiOutlinedIcon from '@mui/icons-material/ApiOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined';
-import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import BlockIcon from '@mui/icons-material/Block';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
@@ -32,8 +30,6 @@ import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplic
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
-import TableRowsOutlinedIcon from '@mui/icons-material/TableRowsOutlined';
-import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WebAssetIcon from '@mui/icons-material/WebAsset';
 import { useTranslation } from 'react-i18next';
@@ -169,57 +165,6 @@ export default function useMySitemap() {
       { path: '/search/result', title: t('drawer.search.result'), breadcrumbs: ['/search'] },
       { path: '/search/signature', title: t('drawer.search.signature'), breadcrumbs: ['/search'] },
       { path: '/search/submission', title: t('drawer.search.submission'), breadcrumbs: ['/search'] },
-      { path: '/search2', title: t('drawer.search2'), isRoot: true, icon: <SearchIcon /> },
-      { path: '/search2/api', title: t('drawer.search2.api'), breadcrumbs: ['/search'], icon: <ApiOutlinedIcon /> },
-      {
-        path: '/search2/table',
-        title: t('drawer.search2.table'),
-        breadcrumbs: ['/search'],
-        icon: <TableRowsOutlinedIcon />
-      },
-      {
-        path: '/search2/table/:id',
-        title: t('drawer.search2.table'),
-        breadcrumbs: ['/search'],
-        icon: <TableRowsOutlinedIcon />
-      },
-      {
-        path: '/search2/facet',
-        title: t('drawer.search2.facet'),
-        breadcrumbs: ['/search'],
-        icon: <BarChartOutlinedIcon />
-      },
-      {
-        path: '/search2/facet/:id',
-        title: t('drawer.search2.facet'),
-        breadcrumbs: ['/search'],
-        icon: <BarChartOutlinedIcon />
-      },
-      {
-        path: '/search2/facet/:id/:fl',
-        title: t('drawer.search2.facet'),
-        breadcrumbs: ['/search'],
-        icon: <BarChartOutlinedIcon />
-      },
-      {
-        path: '/search2/histogram',
-        title: t('drawer.search2.histogram'),
-        breadcrumbs: ['/search'],
-        icon: <TimelineOutlinedIcon />
-      },
-      {
-        path: '/search2/histogram/:id',
-        title: t('drawer.search2.histogram'),
-        breadcrumbs: ['/search'],
-        icon: <TimelineOutlinedIcon />
-      },
-      {
-        path: '/search2/histogram/:id/:fl',
-        title: t('drawer.search2.histogram'),
-        breadcrumbs: ['/search'],
-        icon: <TimelineOutlinedIcon />
-      },
-
       { path: '/help', title: t('drawer.help'), isRoot: true, icon: <HelpOutlineOutlinedIcon /> },
       { path: '/help/api', title: t('drawer.help.api'), icon: <AssignmentOutlinedIcon />, breadcrumbs: ['/help'] },
       {
