@@ -5,17 +5,12 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ForbiddenPage from 'components/routes/403';
+import { DEFAULTS, Fields, Graph, Stats, Table, Tabs } from 'components/visual/FieldSearch';
 import 'moment/locale/fr';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation, useParams } from 'react-router-dom';
-import { Fields } from './Fields';
-import { Graph } from './Graph';
-import { DEFAULTS } from './models';
-import { Stats } from './Stats';
-import { Table } from './Table';
-import { Tabs } from './Tabs';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -171,7 +166,7 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
   .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
   .join('&');
 
-function SearchDetail({ index: propIndex = null, field: propField = null }: Props) {
+function FieldSearch({ index: propIndex = null, field: propField = null }: Props) {
   const { t, i18n } = useTranslation(['search']);
   const theme = useTheme();
   const classes = useStyles();
@@ -263,8 +258,8 @@ function SearchDetail({ index: propIndex = null, field: propField = null }: Prop
   );
 }
 
-SearchDetail.defaultProps = {
+FieldSearch.defaultProps = {
   index: null
 };
 
-export default SearchDetail;
+export default FieldSearch;
