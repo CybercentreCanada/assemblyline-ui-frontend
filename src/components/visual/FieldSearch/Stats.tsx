@@ -61,7 +61,7 @@ export const WrappedStats = (props: Props) => {
 
     apiCall({
       method: 'POST',
-      url: `/api/v4/search/stats/${paramIndex}/${paramField}`,
+      url: `/api/v4/search/stats/${paramIndex}/${paramField}/`,
       body: {
         ...Object.fromEntries(Object.entries(query.getParams()).filter(([k, v]) => ['query'].includes(k))),
         filters: query.getAll('filters', [])

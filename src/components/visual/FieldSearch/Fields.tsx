@@ -1,8 +1,7 @@
 import BackspaceIcon from '@mui/icons-material/Backspace';
-import CheckBoxOutlineBlankOutlinedIcon from '@mui/icons-material/CheckBoxOutlineBlankOutlined';
-import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import {
+  Checkbox,
   Divider,
   Grid,
   IconButton,
@@ -14,6 +13,7 @@ import {
   Paper,
   TextField,
   Theme,
+  Tooltip,
   useTheme
 } from '@mui/material';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -64,6 +64,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     paddingLeft: theme.spacing(0.25),
     paddingRight: theme.spacing(0.25),
     fontSize: '18px'
+  },
+  tooltip: {
+    opacity: 1
   }
 }));
 
@@ -141,9 +144,11 @@ export const WrappedFields = (props: Props) => {
       const query = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
       apiCall({
         method: 'POST',
-        url: `/api/v4/search/cardinality/${paramIndex}/`,
+        url: `/api/v4/search/doc_count/${paramIndex}/`,
         body: {
-          ...Object.fromEntries(Object.entries(query.getParams()).filter(([k, v]) => ['query'].includes(k))),
+          // ...Object.fromEntries(Object.entries(query.getParams()).filter(([k, v]) => ['query'].includes(k))),
+          query: query.get('query', '*'),
+          fl: Object.keys(indexes[paramIndex]).join(','),
           filters: query.getAll('filters', [])
         },
         onSuccess: api_data => setFieldStats(api_data.api_response),
@@ -151,7 +156,7 @@ export const WrappedFields = (props: Props) => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search, paramIndex]);
+  }, [indexes, location.search, paramIndex]);
 
   return (
     <Grid className={classes.root} component={Paper}>
@@ -194,52 +199,54 @@ export const WrappedFields = (props: Props) => {
               {fieldKeys
                 .filter(field => field.indexOf(deferredFilter) !== -1)
                 .map((field, i) => (
-                  <ListItem
-                    key={`${field}-${i}`}
-                    disablePadding
-                    secondaryAction={
-                      <IconButton edge="end" aria-label="delete" onClick={handleCheckClick(field)}>
-                        {queryFields && field in queryFields ? (
-                          <CheckBoxOutlinedIcon color="primary" />
-                        ) : (
-                          <CheckBoxOutlineBlankOutlinedIcon color="secondary" />
-                        )}
-                      </IconButton>
-                    }
+                  <Tooltip
+                    classes={{ tooltip: classes.tooltip }}
+                    title={t('notification.title')}
+                    arrow
+                    placement="right"
                   >
-                    <ListItemButton
-                      dense
-                      selected={field === currentField}
-                      disabled={['text', 'ip'].includes(indexes[paramIndex][field].type)}
-                      onClick={handleIndexClick(field)}
+                    <ListItem
+                      key={`${field}-${i}`}
+                      disablePadding
+                      secondaryAction={
+                        queryFields && (
+                          <Checkbox size="small" checked={field in queryFields} onChange={handleCheckClick(field)} />
+                        )
+                      }
                     >
-                      <ListItemIcon>
-                        <CustomChip
-                          size="small"
-                          type="rounded"
-                          variant="outlined"
-                          color={
-                            indexes[paramIndex][field].type in FIELDS
-                              ? FIELDS[indexes[paramIndex][field].type].color
-                              : 'default'
-                          }
-                          icon={
-                            indexes[paramIndex][field].type in FIELDS
-                              ? FIELDS[indexes[paramIndex][field].type].icon
-                              : null
-                          }
-                          label={`${indexes[paramIndex][field].list ? `[ ]` : ''} ${
-                            fieldStats && field in fieldStats ? fieldStats[field] : ''
-                          }`}
-                        />
-                      </ListItemIcon>
-                      <ListItemText primary={field} />
-                    </ListItemButton>
-                  </ListItem>
+                      <ListItemButton
+                        dense
+                        selected={field === currentField}
+                        disabled={['text', 'ip'].includes(indexes[paramIndex][field].type)}
+                        onClick={handleIndexClick(field)}
+                      >
+                        <ListItemIcon>
+                          <CustomChip
+                            size="small"
+                            type="rounded"
+                            variant="outlined"
+                            color={
+                              indexes[paramIndex][field].type in FIELDS
+                                ? FIELDS[indexes[paramIndex][field].type].color
+                                : 'default'
+                            }
+                            icon={
+                              indexes[paramIndex][field].type in FIELDS
+                                ? FIELDS[indexes[paramIndex][field].type].icon
+                                : null
+                            }
+                            label={`${fieldStats && field in fieldStats ? fieldStats[field] : ''}`}
+                          />
+                        </ListItemIcon>
+                        <ListItemText primary={field} style={{ paddingRight: theme.spacing(1) }} />
+                      </ListItemButton>
+                    </ListItem>
+                  </Tooltip>
                 ))}
             </>
           ),
           [
+            classes,
             currentField,
             deferredFilter,
             fieldKeys,
@@ -248,7 +255,9 @@ export const WrappedFields = (props: Props) => {
             handleIndexClick,
             indexes,
             paramIndex,
-            queryFields
+            queryFields,
+            t,
+            theme
           ]
         )}
       </List>
