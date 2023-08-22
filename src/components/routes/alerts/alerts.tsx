@@ -95,7 +95,7 @@ const Alerts: React.FC = () => {
   const classes = useStyles();
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { setGlobalDrawer } = useDrawer();
+  const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
 
   // Alerts hook.
   const {
@@ -145,7 +145,7 @@ const Alerts: React.FC = () => {
   const onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
     // Update query and url before reloading data.
     searchQuery.setQuery(filterValue);
-    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
+    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}${location.hash}`);
 
     if (inputEl) inputEl.focus();
   };
@@ -154,7 +154,7 @@ const Alerts: React.FC = () => {
   const onClearSearch = (inputEl: HTMLInputElement = null) => {
     // Reset the query.
     searchQuery.deleteQuery();
-    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
+    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}${location.hash}`);
 
     // Update the search text field reference.
     searchTextValue.current = '';
@@ -203,40 +203,10 @@ const Alerts: React.FC = () => {
           // Unfocus the simple list so the drawer does not try to refocus it when closing...
           document.getElementById(ALERT_SIMPLELIST_ID).blur();
         }
-        setGlobalDrawer(
-          <div>
-            <div
-              style={{
-                alignItems: 'start',
-                display: 'flex',
-                float: 'right',
-                height: theme.spacing(8),
-                marginTop: theme.spacing(-8),
-                marginRight: theme.spacing(-1),
-                position: 'sticky',
-                top: theme.spacing(1),
-                zIndex: 10
-              }}
-            >
-              <AlertListItemActions
-                item={item}
-                index={index}
-                currentQuery={searchQuery}
-                setDrawer={setDrawer}
-                onTakeOwnershipComplete={() => onTakeOwnershipComplete(index, item)}
-                onVerdictComplete={verdict => onVerdictComplete(index, item, verdict)}
-                type="drawer"
-              />
-              <ListNavigator id={ALERT_SIMPLELIST_ID} />
-            </div>
-            <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
-              <AlertDetails alert={item} />
-            </ListCarousel>
-          </div>
-        );
+        navigate(`${location.pathname}${location.search}#${item.alert_id}`);
       }
     },
-    [setGlobalDrawer, isLGDown, theme, searchQuery, onTakeOwnershipComplete, onVerdictComplete]
+    [isLGDown, location.pathname, location.search, navigate]
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
@@ -250,7 +220,7 @@ const Alerts: React.FC = () => {
     // Set the newly selected filters and up location url bar.
     if (query !== undefined && query !== null) searchQuery.setQuery(query);
     searchQuery.setFilters(filters);
-    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
+    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}${location.hash}`);
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -284,7 +254,7 @@ const Alerts: React.FC = () => {
   const onFavoriteSelected = (favorite: { name: string; query: string }) => {
     // Update query with selected favorite.
     searchQuery.addFq(favorite.query);
-    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
+    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}${location.hash}`);
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -343,6 +313,54 @@ const Alerts: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [onTakeOwnershipComplete, onVerdictComplete, searchQuery]
   );
+
+  useEffect(() => {
+    if (location.hash) {
+      const item = alerts.find(a => a.alert_id === location.hash.slice(1));
+      const index = alerts.findIndex(a => a.alert_id === location.hash.slice(1));
+
+      setGlobalDrawer(
+        <div>
+          <div
+            style={{
+              alignItems: 'start',
+              display: 'flex',
+              float: 'right',
+              height: theme.spacing(8),
+              marginTop: theme.spacing(-8),
+              marginRight: theme.spacing(-1),
+              position: 'sticky',
+              top: theme.spacing(1),
+              zIndex: 10
+            }}
+          >
+            {item && index >= 0 && (
+              <AlertListItemActions
+                item={item}
+                index={index}
+                currentQuery={searchQuery}
+                setDrawer={setDrawer}
+                onTakeOwnershipComplete={() => onTakeOwnershipComplete(index, item)}
+                onVerdictComplete={verdict => onVerdictComplete(index, item, verdict)}
+                type="drawer"
+              />
+            )}
+            <ListNavigator id={ALERT_SIMPLELIST_ID} />
+          </div>
+          <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
+            <AlertDetails id={location.hash.slice(1)} />
+          </ListCarousel>
+        </div>
+      );
+    }
+  }, [alerts, location.hash, onTakeOwnershipComplete, onVerdictComplete, searchQuery, setGlobalDrawer, theme]);
+
+  useEffect(() => {
+    if (alerts !== null && alerts.length > 0 && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawerOpened]);
 
   return currentUser.roles.includes('alert_view') ? (
     <PageFullWidth margin={4}>
