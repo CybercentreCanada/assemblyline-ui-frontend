@@ -1,4 +1,6 @@
-import { Button, Divider, Switch, TextField, Typography, useTheme } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import { Button, Divider, IconButton, Switch, TextField, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -6,9 +8,28 @@ import { CustomUser } from 'components/hooks/useMyUser';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useFavorites, { Favorite } from './hooks/useFavorites';
+
+const useStyles = makeStyles(theme => ({
+  label: {
+    display: 'flex',
+    alignItems: 'center',
+    columnGap: theme.spacing(1)
+  },
+  editIconButton: {
+    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.26)' : 'rgba(0, 0, 0, 0.26)',
+    padding: 'inherit',
+    height: '18.33px',
+    width: '18.33px',
+    '&:hover': {
+      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)'
+    }
+  }
+}));
+
+type Confirmation = { open: boolean; favorite: Favorite; isPublic: boolean };
 
 interface AlertsFiltersFavoritesProps {
   initValue?: string;
@@ -24,6 +45,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
   onDeleted
 }) => {
   const theme = useTheme();
+  const classes = useStyles();
   const { t } = useTranslation('favorites');
   const {
     userFavorites,
@@ -41,7 +63,8 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
   const [queryValue, setQueryValue] = useState<{ valid: boolean; value: string }>({ valid: true, value: initValue });
   const [nameValue, setNameValue] = useState<{ valid: boolean; value: string }>({ valid: true, value: '' });
   const [publicSwitch, setPublicSwitch] = useState<boolean>(false);
-  const [confirmation, setConfirmation] = useState<{ open: boolean; favorite: Favorite; isPublic: boolean }>({
+  const [addConfirmation, setAddConfirmation] = useState<boolean>(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<Confirmation>({
     open: false,
     favorite: null,
     isPublic: false
@@ -91,18 +114,31 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     }
   };
 
-  const _onDeleteClick = (favorite: Favorite, isPublic: boolean) => {
-    setConfirmation({ open: true, favorite, isPublic });
+  const handleDeleteClick = (favorite: Favorite, isPublic: boolean) => {
+    setDeleteConfirmation({ open: true, favorite, isPublic });
   };
 
-  const _onConfirmOkClick = () => {
-    const { favorite, isPublic } = confirmation;
+  const handleDeleteAccept = () => {
+    const { favorite, isPublic } = deleteConfirmation;
     _onDelete(favorite, isPublic);
-    setConfirmation({ open: false, favorite: null, isPublic: false });
+    setDeleteConfirmation({ open: false, favorite: null, isPublic: false });
   };
 
-  const _onConfirmCancelClick = () => {
-    setConfirmation({ open: false, favorite: null, isPublic: false });
+  const handleDeleteClose = () => {
+    setDeleteConfirmation({ open: false, favorite: null, isPublic: false });
+  };
+
+  const handleAddClick = () => {
+    setAddConfirmation(true);
+  };
+
+  const handleAddAccept = () => {
+    _onSave();
+    setAddConfirmation(false);
+  };
+
+  const handleAddClose = () => {
+    setAddConfirmation(false);
   };
 
   const _onSelect = (favorite: Favorite) => {
@@ -126,6 +162,20 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
   const onSwitchChange = (isPublic: boolean) => {
     setPublicSwitch(isPublic);
   };
+
+  const handleEditClick = useCallback(
+    (favorite: Favorite) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      event.stopPropagation();
+      setQueryValue({ valid: !!favorite.query, value: favorite.query });
+      setNameValue({ valid: !!favorite.name, value: favorite.name });
+      setClassification(favorite.classification);
+      validateForm(
+        { valid: !!favorite.query, value: favorite.query },
+        { valid: !!favorite.name, value: favorite.name }
+      );
+    },
+    []
+  );
 
   return (
     <div>
@@ -178,7 +228,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       </div>
 
       <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(4), textAlign: 'right' }}>
-        <Button variant="contained" color="primary" onClick={_onSave} disabled={!formValid}>
+        <Button variant="contained" color="primary" onClick={handleAddClick} disabled={!formValid}>
           {t('save')}
         </Button>
       </div>
@@ -191,10 +241,17 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           items={userFavorites.map(f => ({
             size: 'medium',
             variant: 'outlined',
-            label: f.name,
+            label: (
+              <div className={classes.label}>
+                <div>{f.name}</div>
+                <IconButton className={classes.editIconButton} onClick={handleEditClick(f)}>
+                  <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
+                </IconButton>
+              </div>
+            ),
             tooltip: f.query,
             onClick: () => _onSelect(f),
-            onDelete: () => _onDeleteClick(f, false)
+            onDelete: () => handleDeleteClick(f, false)
           }))}
         />
       </div>
@@ -207,26 +264,50 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           items={globalFavorites.map(f => ({
             size: 'medium',
             variant: 'outlined',
-            label: f.name,
+            label: (
+              <div className={classes.label}>
+                <div>{f.name}</div>
+                <IconButton className={classes.editIconButton} onClick={handleEditClick(f)}>
+                  <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
+                </IconButton>
+              </div>
+            ),
             tooltip: f.query,
             onClick: () => _onSelect(f),
-            onDelete: () => _onDeleteClick(f, true)
+            onDelete: () => handleDeleteClick(f, true)
           }))}
         />
       </div>
 
       <ConfirmationDialog
-        open={confirmation.open}
-        handleClose={_onConfirmCancelClick}
-        handleAccept={_onConfirmOkClick}
-        title={t('confirmdiag.header')}
+        open={addConfirmation}
+        handleClose={handleAddClose}
+        handleAccept={handleAddAccept}
+        title={t('confirmation.add.header')}
         cancelText={t('cancel')}
-        acceptText={t('ok')}
+        acceptText={t('confirmation.add.ok')}
         text={
           <>
-            <span style={{ display: 'block', paddingBottom: theme.spacing(1) }}>{t('confirmdiag.content')}</span>
+            <span style={{ display: 'block', paddingBottom: theme.spacing(1) }}>{t('confirmation.add.content')}</span>
+            <span style={{ display: 'block', fontWeight: 500 }}>{nameValue ? nameValue.value : null}</span>
+          </>
+        }
+      />
+
+      <ConfirmationDialog
+        open={deleteConfirmation.open}
+        handleClose={handleDeleteClose}
+        handleAccept={handleDeleteAccept}
+        title={t('confirmation.delete.header')}
+        cancelText={t('cancel')}
+        acceptText={t('confirmation.delete.ok')}
+        text={
+          <>
+            <span style={{ display: 'block', paddingBottom: theme.spacing(1) }}>
+              {t('confirmation.delete.content')}
+            </span>
             <span style={{ display: 'block', fontWeight: 500 }}>
-              {confirmation.favorite ? confirmation.favorite.name : null}
+              {deleteConfirmation.favorite ? deleteConfirmation.favorite.name : null}
             </span>
           </>
         }
