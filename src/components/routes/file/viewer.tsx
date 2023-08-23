@@ -9,7 +9,7 @@ import {
   LinearProgress,
   Paper,
   Skeleton,
-  Tab,
+  Tab as MuiTab,
   Tabs,
   Tooltip,
   Typography,
@@ -25,7 +25,7 @@ import { CustomUser } from 'components/hooks/useMyUser';
 import Empty from 'components/visual/Empty';
 import FileDownloader from 'components/visual/FileDownloader';
 import { HexViewerApp } from 'components/visual/HexViewer';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 import { useNavigate } from 'react-router';
@@ -33,10 +33,6 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
-
-type ParamProps = {
-  id: string;
-};
 
 const useStyles = makeStyles(theme => ({
   hexWrapper: {
@@ -76,6 +72,17 @@ const useStyles = makeStyles(theme => ({
     right: 0
   }
 }));
+
+export type Tab = 'ascii' | 'strings' | 'hex' | 'image';
+
+export const TAB_OPTIONS: Tab[] = ['ascii', 'strings', 'hex', 'image'];
+
+export const DEFAULT_TAB: Tab = 'ascii';
+
+type ParamProps = {
+  id: string;
+  tab: Tab;
+};
 
 const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
   const classes = useStyles();
@@ -197,7 +204,7 @@ const HexViewer = React.memo(WrappedHexViewer);
 const ImageViewer = React.memo(WrappedImageViewer);
 
 const FileViewer = () => {
-  const { id } = useParams<ParamProps>();
+  const { id, tab: paramTab } = useParams<ParamProps>();
   const { t } = useTranslation(['fileViewer']);
   const classes = useStyles();
   const theme = useTheme();
@@ -211,16 +218,22 @@ const FileViewer = () => {
   const [image, setImage] = useState(null);
   const [imageAllowed, setImageAllowed] = useState(false);
   const [type, setType] = useState('unknown');
-  const [tab, setTab] = useState(null);
   const [sha256, setSha256] = useState(null);
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const handleChangeTab = (event, newTab) => {
-    const currentTab = location.hash.substring(1, location.hash.length) || 'ascii';
-    if (currentTab !== newTab) {
-      navigate(`${location.pathname}#${newTab}`);
-    }
-  };
+  const tab = useMemo(
+    () =>
+      !paramTab || !TAB_OPTIONS.includes(paramTab) || (!imageAllowed && paramTab === 'image') ? DEFAULT_TAB : paramTab,
+    [imageAllowed, paramTab]
+  );
+
+  const handleChangeTab = useCallback(
+    (event, newTab) => {
+      if (tab !== newTab && TAB_OPTIONS.includes(newTab))
+        navigate(`/file/viewer/${id}/${newTab}/${location.search}${location.hash}`);
+    },
+    [id, location.hash, location.search, navigate, tab]
+  );
 
   useEffect(() => {
     setString(null);
@@ -232,7 +245,6 @@ const FileViewer = () => {
       url: `/api/v4/file/info/${id}/`,
       onSuccess: api_data => {
         const imgAllowed = api_data.api_response.is_section_image === true;
-        if (!imgAllowed && tab === 'image') setTab('ascii');
         setImageAllowed(imgAllowed);
         setType(api_data.api_response.type);
         setSha256(id);
@@ -240,13 +252,6 @@ const FileViewer = () => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-
-  useEffect(() => {
-    const newTab = location.hash.substring(1, location.hash.length);
-    if (newTab) setTab(newTab);
-    else if (tab === null || (!imageAllowed && tab === 'image')) setTab('ascii');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [imageAllowed, location.hash]);
 
   useEffect(() => {
     if (!sha256) return;
@@ -268,7 +273,6 @@ const FileViewer = () => {
     } else if (tab === 'hex' && hex === null) {
       apiCall({
         url: `/api/v4/file/hex/${sha256}/?bytes_only=true`,
-        // url: `/api/v4/file/hex/${sha256}/`,
         onSuccess: api_data => {
           if (error !== null) setError(null);
           setHex(api_data.api_response);
@@ -307,6 +311,12 @@ const FileViewer = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256, tab]);
+
+  useEffect(() => {
+    if (paramTab !== tab) {
+      navigate(`/file/viewer/${id}/${tab}/${location.search}${location.hash}`);
+    }
+  }, [id, location.hash, location.search, navigate, paramTab, tab]);
 
   return currentUser.roles.includes('file_detail') ? (
     <PageFullSize margin={4}>
@@ -358,10 +368,10 @@ const FileViewer = () => {
               variant="scrollable"
               scrollButtons="auto"
             >
-              <Tab label={t('ascii')} value="ascii" />
-              <Tab label={t('strings')} value="strings" />
-              <Tab label={t('hex')} value="hex" />
-              {imageAllowed ? <Tab label={t('image')} value="image" /> : <Empty />}
+              <MuiTab label={t('ascii')} value="ascii" />
+              <MuiTab label={t('strings')} value="strings" />
+              <MuiTab label={t('hex')} value="hex" />
+              {imageAllowed ? <MuiTab label={t('image')} value="image" /> : <Empty />}
             </Tabs>
           </Paper>
 
