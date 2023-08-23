@@ -1,5 +1,6 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import SortIcon from '@mui/icons-material/Sort';
 import StarIcon from '@mui/icons-material/Star';
 import { AlertTitle, Box, Drawer, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
@@ -15,6 +16,7 @@ import InformativeAlert from 'components/visual/InformativeAlert';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
+import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +28,7 @@ import ForbiddenPage from '../403';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertListItemActions, { PossibleVerdict } from './alert-list-item-actions';
+import AlertsSorts from './alert-sorts';
 import AlertsFilters from './alerts-filters';
 import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
@@ -40,7 +43,7 @@ const PAGE_SIZE = 50;
 
 export interface AlertDrawerState {
   open: boolean;
-  type: 'filter' | 'favorites' | 'actions';
+  type: 'filter' | 'favorites' | 'actions' | 'sort';
   actionData?: {
     query: SearchQuery;
     alert?: {
@@ -314,6 +317,18 @@ const Alerts: React.FC = () => {
     [onTakeOwnershipComplete, onVerdictComplete, searchQuery]
   );
 
+  const handleSortSubmit = useCallback(
+    (sort: string) => {
+      const query = new SimpleSearchQuery(location.search);
+      query.set('sort', sort);
+      navigate(`${location.pathname}?${query.toString()}${location.hash}`);
+      if (drawer.open) {
+        setDrawer({ ...drawer, open: false });
+      }
+    },
+    [drawer, location.hash, location.pathname, location.search, navigate]
+  );
+
   useEffect(() => {
     if (location.hash) {
       const item = alerts.find(a => a.alert_id === location.hash.slice(1));
@@ -385,6 +400,7 @@ const Alerts: React.FC = () => {
                   onApplyBtnClick={onApplyFilters}
                 />
               ),
+              sort: <AlertsSorts onSubmit={handleSortSubmit} />,
               favorites: (
                 <AlertsFiltersFavorites
                   initValue={searchTextValue.current}
@@ -426,6 +442,13 @@ const Alerts: React.FC = () => {
                 tooltip: t('favorites'),
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'favorites' })
+                }
+              },
+              {
+                icon: <SortIcon fontSize={isMDUp ? 'medium' : 'small'} />,
+                tooltip: t('sorts'),
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'sort' })
                 }
               },
               {
