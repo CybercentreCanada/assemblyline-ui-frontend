@@ -112,6 +112,7 @@ const WrappedRoutes = () => {
         <Route path="/crash" element={<CrashTest />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/file/detail/:id" element={<FileFullDetail />} />
+        <Route path="/file/viewer/:id/:tab" element={<FileViewer />} />
         <Route path="/file/viewer/:id" element={<FileViewer />} />
         <Route path="/help" element={<Help />} />
         <Route path="/help/api" element={<HelpApiDoc />} />
