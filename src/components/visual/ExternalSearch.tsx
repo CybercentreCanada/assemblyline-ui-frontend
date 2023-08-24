@@ -6,22 +6,22 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import React from 'react';
 
-import LaunchOutlinedIcon from '@mui/icons-material/LaunchOutlined';
 import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
-import { Box, Link, Typography, Divider, Grid, IconButton, Tooltip, useTheme } from '@mui/material';
+import { Divider, Grid, IconButton, Link, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import useExternalLookup from 'components/hooks/useExternalLookup';
-import { toTitleCase } from 'helpers/utils';
 import { useTranslation } from 'react-i18next';
 
-import { ChipList } from 'components/visual/ChipList';
-import { CustomChipProps } from 'components/visual/CustomChip';
-import { DetailedItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
-import { verdictToColor } from 'helpers/utils';
+import LaunchOutlinedIcon from '@mui/icons-material/LaunchOutlined';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import Classification from 'components/visual/Classification';
+import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
+import { DetailedItem } from 'components/routes/alerts/hooks/useAlerts';
+import { ChipList } from 'components/visual/ChipList';
+import Classification from 'components/visual/Classification';
+import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
+import { getMaxClassification } from 'helpers/classificationParser';
+import { toTitleCase, verdictToColor } from 'helpers/utils';
 
 const TARGET_RESULT_COUNT = 10;
 
@@ -87,23 +87,22 @@ type ExternalLookupProps = {
   iconStyle?: null | Object;
 };
 
-const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items, type = null }) => {
+const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState<AutoHideChipListState | null>(null);
   const [shownChips, setShownChips] = React.useState<CustomChipProps[]>([]);
 
   React.useEffect(() => {
-    const fullChipList = items.sort(detailedItemCompare).map(item => ({
+    const fullChipList = items.map(item => ({
       category: 'tag',
-      data_type: type,
-      label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
+      label: item[0].toString(),
       variant: 'outlined' as 'outlined',
-      color: verdictToColor(item.verdict)
+      tooltip: item[1].toString()
     }));
     const showExtra = items.length <= TARGET_RESULT_COUNT;
 
     setState({ showExtra, fullChipList });
-  }, [items, type]);
+  }, [items]);
 
   React.useEffect(() => {
     if (state !== null) {
@@ -167,6 +166,16 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
 
   // determine max classification of all return results
   let classification = 'TLP:C';
+  if (!!externalLookupResults) {
+    Object.values(externalLookupResults).forEach(enrichmentResults => {
+      enrichmentResults.items.forEach(enrichmentResult => {
+        console.log(`old clsf: ${classification}`);
+        classification = getMaxClassification(classification, enrichmentResult.classification, c12nDef, 'long', false);
+        console.log(`new clsf: ${classification}`);
+      });
+    });
+  }
+  console.log(`final clsf: ${classification}`);
 
   return actionable && externalLookupResults ? (
     <div>
@@ -181,6 +190,8 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
         scroll={scroll}
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
+        // maxWidth="xl"
+        // fullWidth
       >
         <DialogTitle id={titleId}>
           {c12nDef.enforce && (
@@ -190,98 +201,127 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
               </div>
             </div>
           )}
-          External Results
+          <Typography variant="h4">External Results</Typography>
         </DialogTitle>
         <DialogContent dividers={true}>
           <DialogContentText id={descriptionId} ref={descriptionElementRef} tabIndex={-1}>
-
             <div className={classes.section}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-end',
-                  justifyContent: 'space-between'
-                }}
-              >
+              <div style={{ display: 'block' }}>
                 {Object.entries(externalLookupResults).map(([source, enrichmentResults]) => (
                   <>
-                    <Typography variant="h2">{source}</Typography>
-
-                      {enrichmentResults.items.map((item, i) => (
-                        item.enrichment?.map((enrichmentResult, j) => (
-                <>
-                  {(() => {
-                    let prevGroup = null;
-                    item.enrichment?.map((enrichmentResult, j) => (
-                      <>
-                        {enrichmentResult.group !== prevGroup
-                          ? (prevGroup = enrichmentResult.group && (
-                              <>
-                                <Typography className={classes.sectionTitle}>{enrichmentResult.group}</Typography>
-                                <Divider />
-                              </>
-                            ))
-                          : null}
-
-                        <Grid container spacing={1} key={`${j}`} style={{ marginTop: theme.spacing(1) }}>
-                          <Grid
-                            item
-                            xs={3}
-                            sm={2}
-                            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                          >
-                            {enrichmentResult.name}
-                          </Grid>
-                          <Grid item xs={9} sm={10}>
-                            <div className={classes.sectionContent}>
-                              {/* <AutoHideChipList items={enrichmentResult.value} /> */}
-                            </div>
-                          </Grid>
-                        </Grid>
-                      </>
-                    ));
-                  })()}
-                </>
-              ))}
-
-
-            </div>
-
-
-
-            <Box sx={{ p: 1 }}>
-              {externalLookupResults &&
-                [...Object.keys(externalLookupResults)]?.sort().map((sourceName, i) => {
-                  return (
-                    <div key={`success_${i}`}>
-                      <Typography className={clsx(classes.title)} sx={{ display: 'inline' }}>
-                        {toTitleCase(sourceName)}
+                    <div>
+                      <Typography variant="h5" sx={{ display: 'inline' }}>
+                        {toTitleCase(source)}
                       </Typography>
+                      <Divider />
+                    </div>
 
-                      {externalLookupResults[sourceName].items.map((item, j) => {
-                        return (
+                    <div>{!!enrichmentResults.error ? enrichmentResults.error : null}</div>
+
+                    {enrichmentResults.items.map((enrichmentResult, i) => {
+                      let verdict = 'info';
+                      if (enrichmentResult.malicious === false) {
+                        verdict = 'safe';
+                      } else if (enrichmentResult.malicious === true) {
+                        verdict = 'malicious';
+                      }
+
+                      // create lookup tables
+                      // [{group: str, name: str, name_description: str, value: str, value_description}]
+                      //   -> {group: {name: [[value, desc], ...]}}
+                      //   -> {group: [name, ...]}
+                      let rLookup = {};
+                      let nLookup = {};
+                      let gOrder = [];
+                      enrichmentResult.enrichment.forEach(enrichmentItem => {
+                        //  values order
+                        if (!(enrichmentItem.group in rLookup)) {
+                          rLookup[enrichmentItem.group] = {};
+                        }
+                        if (!(enrichmentItem.name in rLookup[enrichmentItem.group])) {
+                          rLookup[enrichmentItem.group][enrichmentItem.name] = [];
+                        }
+                        rLookup[enrichmentItem.group][enrichmentItem.name].push([
+                          enrichmentItem.value,
+                          enrichmentItem.value_description
+                        ]);
+
+                        // name order
+                        if (!(enrichmentItem.group in nLookup)) {
+                          nLookup[enrichmentItem.group] = [];
+                        }
+                        if (!nLookup[enrichmentItem.group].includes(enrichmentItem.name)) {
+                          nLookup[enrichmentItem.group].push(enrichmentItem.name);
+                        }
+
+                        // group order
+                        if (!gOrder.includes(enrichmentItem.group)) {
+                          gOrder.push(enrichmentItem.group);
+                        }
+                      });
+
+                      return (
+                        <>
                           <div>
                             <Link
                               className={clsx(classes.link)}
-                              href={item.link}
+                              href={enrichmentResult.link}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              <Typography
-                                className={clsx(classes.content, classes.launch)}
-                                sx={{ display: 'inline', marginLeft: '8px' }}
-                              >
-                                {item.count} results{' '}
+                              <Typography className={clsx(classes.content, classes.launch)}>
+                                {enrichmentResult.count} results
                                 <LaunchOutlinedIcon sx={{ verticalAlign: 'middle', height: '16px' }} />
                               </Typography>
                             </Link>
+                            <Typography>{enrichmentResult.description}</Typography>
+                            <Typography>
+                              Verdict:{' '}
+                              <CustomChip
+                                type="rounded"
+                                size="tiny"
+                                variant="filled"
+                                color={verdictToColor(verdict)}
+                                label={verdict}
+                              />
+                            </Typography>
                           </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-            </Box>
+                          <div className={classes.sectionContent}></div>
+
+                          {!!gOrder &&
+                            gOrder.map((grpName, j) => {
+                              return (
+                                <>
+                                  <Typography variant="h6">{grpName}</Typography>
+                                  <div className={classes.sectionContent}></div>
+
+                                  <Grid container spacing={1} key={`${j}`} style={{ marginTop: theme.spacing(1) }}>
+                                    {!!nLookup &&
+                                      nLookup[grpName].map((keyName, k) => {
+                                        return (
+                                          <>
+                                            <Grid item xs={5} sm={5}>
+                                              <div className={classes.sectionContent}>{keyName}</div>
+                                            </Grid>
+                                            <Grid item xs={7} sm={7}>
+                                              <div className={classes.sectionContent}>
+                                                <AutoHideChipList items={rLookup[grpName][keyName]} />
+                                              </div>
+                                            </Grid>
+                                          </>
+                                        );
+                                      })}
+                                  </Grid>
+                                </>
+                              );
+                            })}
+                        </>
+                      );
+                    })}
+                  </>
+                ))}
+              </div>
+            </div>
           </DialogContentText>
         </DialogContent>
         <DialogActions>

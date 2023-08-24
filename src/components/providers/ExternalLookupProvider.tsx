@@ -36,7 +36,7 @@ type ExternalEnrichmentResult = {
   classification: string; // classification of the item searched
   confirmed: boolean; // if result is confirmed malicious
   description: string; // summary/description of the findings
-  malicious: string; // if the result is malicious or not
+  malicious: boolean; // if the result is malicious or not
   enrichment: Array<ExternalEnrichmentItem>;
 };
 
@@ -201,7 +201,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
         onSuccess: api_data => {
           let res = api_data.api_response as ExternalEnrichmentResults;
           if (Object.keys(res).length !== 0) {
-            showSuccessMessage(t('related_external.found'));
+            showSuccessMessage('search successful');
 
             setEnrichmentState(prevState => {
               return {
