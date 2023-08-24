@@ -7,11 +7,13 @@ import DialogTitle from '@mui/material/DialogTitle';
 import React from 'react';
 
 import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
-import { Divider, Grid, IconButton, Link, Tooltip, Typography, useTheme } from '@mui/material';
+import { Collapse, Divider, Grid, IconButton, Link, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import { useTranslation } from 'react-i18next';
 
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import LaunchOutlinedIcon from '@mui/icons-material/LaunchOutlined';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import clsx from 'clsx';
@@ -67,12 +69,20 @@ const useStyles = makeStyles(theme => ({
   sectionContent: {},
   sourceTitle: {
     fontWeight: 'bold'
+  },
+  collapseTitle: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    cursor: 'pointer',
+    '&:hover, &:focus': {
+      color: theme.palette.text.secondary
+    }
   }
 }));
 
 type AutoHideChipListProps = {
   items: DetailedItem[];
-  type?: string;
 };
 
 type AutoHideChipListState = {
@@ -129,6 +139,55 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
 };
 
 const AutoHideChipList = React.memo(WrappedAutoHideChipList);
+
+type ResultGroupProps = {
+  group: string;
+  names: string[];
+  valueMap: Object;
+};
+
+const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, valueMap }) => {
+  const theme = useTheme();
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(false);
+
+  return group && names ? (
+    <>
+      <Typography
+        variant="h6"
+        onClick={() => {
+          setOpen(!open);
+        }}
+        className={classes.collapseTitle}
+      >
+        <span>{toTitleCase(group)}</span>
+        {open ? <ExpandLess /> : <ExpandMore />}
+      </Typography>
+      <Divider />
+
+      <Collapse in={open} timeout="auto">
+        <Grid container spacing={1} style={{ marginTop: theme.spacing(1) }}>
+          {names.map((keyName, k) => {
+            return (
+              <React.Fragment key={k}>
+                <Grid item xs={6} sm={6}>
+                  <div className={classes.sectionContent}>{keyName}</div>
+                </Grid>
+                <Grid item xs={6} sm={6}>
+                  <div className={classes.sectionContent}>
+                    <AutoHideChipList items={valueMap[keyName]} />
+                  </div>
+                </Grid>
+              </React.Fragment>
+            );
+          })}
+        </Grid>
+      </Collapse>
+    </>
+  ) : null;
+};
+
+const ResultGroup = React.memo(WrappedResultGroup);
 
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, value, iconStyle }) => {
   const theme = useTheme();
@@ -274,7 +333,9 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
                                 <LaunchOutlinedIcon sx={{ verticalAlign: 'middle', height: '16px' }} />
                               </Typography>
                             </Link>
-                            <Typography>{enrichmentResult.description}</Typography>
+                            {enrichmentResult.description.split('. ').map(sentence => (
+                              <Typography>{sentence.replace(/\.$/, '')}.</Typography>
+                            ))}
                             <Typography>
                               Verdict:{' '}
                               <CustomChip
@@ -291,28 +352,12 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
                           {!!gOrder &&
                             gOrder.map((grpName, j) => {
                               return (
-                                <>
-                                  <Typography variant="h6">{grpName}</Typography>
-                                  <div className={classes.sectionContent}></div>
-
-                                  <Grid container spacing={1} key={`${j}`} style={{ marginTop: theme.spacing(1) }}>
-                                    {!!nLookup &&
-                                      nLookup[grpName].map((keyName, k) => {
-                                        return (
-                                          <>
-                                            <Grid item xs={5} sm={5}>
-                                              <div className={classes.sectionContent}>{keyName}</div>
-                                            </Grid>
-                                            <Grid item xs={7} sm={7}>
-                                              <div className={classes.sectionContent}>
-                                                <AutoHideChipList items={rLookup[grpName][keyName]} />
-                                              </div>
-                                            </Grid>
-                                          </>
-                                        );
-                                      })}
-                                  </Grid>
-                                </>
+                                <ResultGroup
+                                  key={j}
+                                  group={grpName}
+                                  names={nLookup[grpName]}
+                                  valueMap={rLookup[grpName]}
+                                ></ResultGroup>
                               );
                             })}
                         </>
