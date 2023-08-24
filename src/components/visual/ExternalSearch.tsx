@@ -18,6 +18,7 @@ import LaunchOutlinedIcon from '@mui/icons-material/LaunchOutlined';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
+import { ExternalEnrichmentResult } from 'components/providers/ExternalLookupProvider';
 import { DetailedItem } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
@@ -107,6 +108,7 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
       category: 'tag',
       label: item[0].toString(),
       variant: 'outlined' as 'outlined',
+      // type: 'rounded' as 'rounded',
       tooltip: item[1].toString()
     }));
     const showExtra = items.length <= TARGET_RESULT_COUNT;
@@ -189,6 +191,91 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, valueMap
 
 const ResultGroup = React.memo(WrappedResultGroup);
 
+type EnrichmentResultProps = {
+  enrichmentResult: ExternalEnrichmentResult;
+};
+
+const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ enrichmentResult }) => {
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(true);
+
+  let verdict = 'info';
+  if (enrichmentResult.malicious === false) {
+    verdict = 'safe';
+  } else if (enrichmentResult.malicious === true) {
+    verdict = 'malicious';
+  }
+
+  // create lookup tables
+  // [{group: str, name: str, name_description: str, value: str, value_description}]
+  //   -> {group: {name: [[value, desc], ...]}}
+  //   -> {group: [name, ...]}
+  let rLookup = {};
+  let nLookup = {};
+  let gOrder = [];
+  enrichmentResult.enrichment.forEach(enrichmentItem => {
+    //  values order
+    if (!(enrichmentItem.group in rLookup)) {
+      rLookup[enrichmentItem.group] = {};
+    }
+    if (!(enrichmentItem.name in rLookup[enrichmentItem.group])) {
+      rLookup[enrichmentItem.group][enrichmentItem.name] = [];
+    }
+    rLookup[enrichmentItem.group][enrichmentItem.name].push([enrichmentItem.value, enrichmentItem.value_description]);
+
+    // name order
+    if (!(enrichmentItem.group in nLookup)) {
+      nLookup[enrichmentItem.group] = [];
+    }
+    if (!nLookup[enrichmentItem.group].includes(enrichmentItem.name)) {
+      nLookup[enrichmentItem.group].push(enrichmentItem.name);
+    }
+
+    // group order
+    if (!gOrder.includes(enrichmentItem.group)) {
+      gOrder.push(enrichmentItem.group);
+    }
+  });
+
+  return enrichmentResult ? (
+    <>
+      <div>
+        <Typography
+          onClick={() => {
+            setOpen(!open);
+          }}
+          className={classes.collapseTitle}
+        >
+          <span>
+            Verdict:{' '}
+            <CustomChip type="rounded" size="tiny" variant="filled" color={verdictToColor(verdict)} label={verdict} />
+          </span>
+          {open ? <ExpandLess /> : <ExpandMore />}
+        </Typography>
+        <Link className={clsx(classes.link)} href={enrichmentResult.link} target="_blank" rel="noopener noreferrer">
+          <Typography className={clsx(classes.content, classes.launch)}>
+            {enrichmentResult.count} results
+            <LaunchOutlinedIcon sx={{ verticalAlign: 'middle', height: '16px' }} />
+          </Typography>
+        </Link>
+        <Typography>{enrichmentResult.description}</Typography>
+      </div>
+      <div className={classes.sectionContent}></div>
+
+      <Collapse in={open} timeout="auto">
+        {!!gOrder &&
+          gOrder.map((grpName, j) => {
+            return (
+              <ResultGroup key={j} group={grpName} names={nLookup[grpName]} valueMap={rLookup[grpName]}></ResultGroup>
+            );
+          })}
+      </Collapse>
+    </>
+  ) : null;
+};
+
+const EnrichmentResult = React.memo(WrappedEnrichmentResult);
+
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, value, iconStyle }) => {
   const theme = useTheme();
   const classes = useStyles();
@@ -201,6 +288,11 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
   const externalLookupResults = enrichmentState[getKey(type, value)];
   const titleId = openedDialog ? 'external-result-dialog-title' : undefined;
   const descriptionId = openedDialog ? 'external-result-dialog-description' : undefined;
+
+  // prevents click through propagation on dialog popup
+  const handleDialogClick = e => {
+    e.stopPropagation();
+  };
 
   // const handleClickOpen = event => () => {
   const handleClickOpen = () => {
@@ -246,6 +338,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
       <Dialog
         open={openedDialog}
         onClose={handleClose}
+        onClick={handleDialogClick}
         scroll={scroll}
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
@@ -261,6 +354,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
             </div>
           )}
           <Typography variant="h4">External Results</Typography>
+          <Typography>{value}</Typography>
         </DialogTitle>
         <DialogContent dividers={true}>
           <DialogContentText id={descriptionId} ref={descriptionElementRef} tabIndex={-1}>
@@ -278,90 +372,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
                     <div>{!!enrichmentResults.error ? enrichmentResults.error : null}</div>
 
                     {enrichmentResults.items.map((enrichmentResult, i) => {
-                      let verdict = 'info';
-                      if (enrichmentResult.malicious === false) {
-                        verdict = 'safe';
-                      } else if (enrichmentResult.malicious === true) {
-                        verdict = 'malicious';
-                      }
-
-                      // create lookup tables
-                      // [{group: str, name: str, name_description: str, value: str, value_description}]
-                      //   -> {group: {name: [[value, desc], ...]}}
-                      //   -> {group: [name, ...]}
-                      let rLookup = {};
-                      let nLookup = {};
-                      let gOrder = [];
-                      enrichmentResult.enrichment.forEach(enrichmentItem => {
-                        //  values order
-                        if (!(enrichmentItem.group in rLookup)) {
-                          rLookup[enrichmentItem.group] = {};
-                        }
-                        if (!(enrichmentItem.name in rLookup[enrichmentItem.group])) {
-                          rLookup[enrichmentItem.group][enrichmentItem.name] = [];
-                        }
-                        rLookup[enrichmentItem.group][enrichmentItem.name].push([
-                          enrichmentItem.value,
-                          enrichmentItem.value_description
-                        ]);
-
-                        // name order
-                        if (!(enrichmentItem.group in nLookup)) {
-                          nLookup[enrichmentItem.group] = [];
-                        }
-                        if (!nLookup[enrichmentItem.group].includes(enrichmentItem.name)) {
-                          nLookup[enrichmentItem.group].push(enrichmentItem.name);
-                        }
-
-                        // group order
-                        if (!gOrder.includes(enrichmentItem.group)) {
-                          gOrder.push(enrichmentItem.group);
-                        }
-                      });
-
-                      return (
-                        <>
-                          <div>
-                            <Link
-                              className={clsx(classes.link)}
-                              href={enrichmentResult.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <Typography className={clsx(classes.content, classes.launch)}>
-                                {enrichmentResult.count} results
-                                <LaunchOutlinedIcon sx={{ verticalAlign: 'middle', height: '16px' }} />
-                              </Typography>
-                            </Link>
-                            {enrichmentResult.description.split('. ').map(sentence => (
-                              <Typography>{sentence.replace(/\.$/, '')}.</Typography>
-                            ))}
-                            <Typography>
-                              Verdict:{' '}
-                              <CustomChip
-                                type="rounded"
-                                size="tiny"
-                                variant="filled"
-                                color={verdictToColor(verdict)}
-                                label={verdict}
-                              />
-                            </Typography>
-                          </div>
-                          <div className={classes.sectionContent}></div>
-
-                          {!!gOrder &&
-                            gOrder.map((grpName, j) => {
-                              return (
-                                <ResultGroup
-                                  key={j}
-                                  group={grpName}
-                                  names={nLookup[grpName]}
-                                  valueMap={rLookup[grpName]}
-                                ></ResultGroup>
-                              );
-                            })}
-                        </>
-                      );
+                      return <EnrichmentResult key={i} enrichmentResult={enrichmentResult}></EnrichmentResult>;
                     })}
                   </>
                 ))}

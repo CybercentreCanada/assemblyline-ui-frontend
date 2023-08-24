@@ -30,7 +30,7 @@ type ExternalEnrichmentItem = {
   classification: string;
 };
 
-type ExternalEnrichmentResult = {
+export type ExternalEnrichmentResult = {
   link: string; // link to results
   count: number; // number of hits from the search
   classification: string; // classification of the item searched
