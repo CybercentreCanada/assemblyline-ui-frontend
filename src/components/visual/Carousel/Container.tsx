@@ -1,6 +1,7 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
-import { Button, Modal, Skeleton, Theme, Typography } from '@mui/material';
+import { Button, CircularProgress, Modal, Skeleton, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import Carousel from 'commons/addons/carousel/Carousel';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -9,54 +10,7 @@ import { useLocation } from 'react-router';
 import { CarouselThumb, useCarousel } from '.';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  // root: {
-  //   width: '100%',
-  //   height: '100%',
-  //   display: 'grid'
-  // },
-  // main: {
-  //   position: 'fixed',
-  //   maxWidth: '75vw',
-  //   maxHeight: '75vw',
-  //   left: '50vw',
-  //   top: '50vh',
-  //   translate: '-50% -50%'
-  // },
-  // container: {
-  //   width: '100%',
-  //   height: '100%',
-  //   display: 'grid',
-  //   gridTemplateAreas: `"display bar"`,
-  //   gridTemplateColumns: '1fr auto'
-  // },
-  // display: {
-  //   gridArea: 'display'
-  // },
-  // bar: {
-  //   gridArea: 'bar'
-  // },
-  // test: {
-  //   maxHeight: '128px',
-  //   maxWidth: '128px',
-  //   minHeight: '128px',
-  //   minWidth: '128px',
-  //   padding: theme.spacing(0.5)
-  // },
-  // image: {
-  //   opacity: 0.2,
-  //   position: 'absolute',
-  //   top: 0,
-  //   maxWidth: '100%',
-  //   maxHeight: '100%',
-  //   objectFit: 'contain',
-  //   borderRadius: theme.spacing(0.5)
-  // },
-  // button: {
-  //   position: 'absolute',
-  //   top: 0
-  // },
-
-  imgContainer: {
+  root: {
     position: 'fixed',
     left: 'calc(50vw - 64px)',
     top: '50vh',
@@ -78,7 +32,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: 0,
     backgroundColor: theme.palette.common.black
   },
-
   navbar: {
     position: 'absolute',
     height: '100vh',
@@ -95,6 +48,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     columnGap: theme.spacing(1),
     rowGap: theme.spacing(0.5),
     margin: theme.spacing(1)
+  },
+  empty: {
+    height: '50vh',
+    width: '50vw',
+    display: 'grid',
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 }));
 
@@ -140,24 +100,44 @@ export const WrappedCarouselContainer = () => {
     <Modal open={open} onClose={onCloseImage}>
       <>
         {currentImage && (
-          <div className={classes.imgContainer}>
-            <Typography className={classes.header} variant="subtitle2">
-              <span style={{ fontWeight: 500 }}>{t('name')}</span>
-              <span style={{ fontWeight: 400 }}>{currentImage.name}</span>
-              <span style={{ fontWeight: 500 }}>{t('description')}</span>
-              <span style={{ fontWeight: 400 }}>{currentImage.description}</span>
-            </Typography>
+          <Carousel onNext={onNextImage} onPrevious={onPreviousImage}>
+            <div className={classes.root}>
+              <Typography className={classes.header} variant="subtitle2">
+                <span style={{ fontWeight: 500 }}>{t('name')}</span>
+                <span style={{ fontWeight: 400 }}>
+                  {loading ? (
+                    <Skeleton variant="rounded" height="100%" width="100%" />
+                  ) : (
+                    currentImage && currentImage.name
+                  )}
+                </span>
+                <span style={{ fontWeight: 500 }}>{t('description')}</span>
+                <span style={{ fontWeight: 400 }}>
+                  {loading ? (
+                    <Skeleton variant="rounded" height="100%" width="100%" />
+                  ) : (
+                    currentImage && currentImage.description
+                  )}
+                </span>
+              </Typography>
 
-            <Button className={classes.button} onClick={handleClick}>
               {loading ? (
-                <Skeleton variant="rounded" height="100%" width="100%" />
-              ) : data ? (
-                <img className={classes.image} src={data} alt={currentImage.name} />
+                <div className={classes.empty}>
+                  <CircularProgress />
+                </div>
               ) : (
-                <BrokenImageOutlinedIcon fontSize="large" />
+                <Button className={classes.button} onClick={handleClick}>
+                  {data ? (
+                    <img className={classes.image} src={data} alt={currentImage.name} />
+                  ) : (
+                    <div className={classes.empty}>
+                      <BrokenImageOutlinedIcon fontSize="large" />
+                    </div>
+                  )}
+                </Button>
               )}
-            </Button>
-          </div>
+            </div>
+          </Carousel>
         )}
         <div className={classes.navbar}>
           {images.map((image, i) => (
