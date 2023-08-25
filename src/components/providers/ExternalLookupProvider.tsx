@@ -4,24 +4,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type ExternalLookupResult = {
-  results: {
-    [sourceName: string]: {
-      link: string;
-      count: number;
-    };
-  };
-  errors: {
-    [sourceName: string]: string;
-  };
-  success: null | boolean;
-};
-
-type ExternalLookupResults = {
-  [tagName: string]: ExternalLookupResult;
-};
-
-type ExternalEnrichmentItem = {
+export type ExternalEnrichmentItem = {
   group: string; // type or grouping for the result
   name: string; // name key
   name_description: string; // info/help for what the name key is
@@ -54,10 +37,8 @@ export type ExternalEnrichmentState = {
 
 export type ExternalLookupContextProps = {
   isActionable: (category: string, type: string, value: string) => boolean;
-  searchTagExternal: (source: string, tagName: string, tagValue: string, classification: string) => void;
   enrichTagExternal: (source: string, tagName: string, tagValue: string, classification: string) => void;
   getKey: (tagName: string, tagValue: string) => string;
-  lookupState: ExternalLookupResults;
   enrichmentState: ExternalEnrichmentState;
 };
 
@@ -73,7 +54,6 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
-  const [lookupState, setLookupState] = React.useState<ExternalLookupResults>({});
   const [enrichmentState, setEnrichmentState] = React.useState<ExternalEnrichmentState>({});
 
   const isActionable = useCallback(
@@ -101,89 +81,6 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
   );
   const getKey = (tagName: string, tagValue: string) => `${tagName}_${tagValue}`;
 
-  const searchTagExternal = useCallback(
-    (source: string, tagName: string, tagValue: string, classification: string) => {
-      const stateKey = getKey(tagName, tagValue);
-      let url = `/api/v4/federated_lookup/search/${tagName}/${encodeURIComponent(tagValue)}/`;
-      // construct approporiate query param string
-      let qs = `classification=${encodeURIComponent(classification)}`;
-      if (!!source) {
-        qs += `&sources=${encodeURIComponent(source)}`;
-      }
-      url += `?${qs}`;
-
-      apiCall({
-        method: 'GET',
-        url: url,
-        onSuccess: api_data => {
-          if (Object.keys(api_data.api_response).length !== 0) {
-            showSuccessMessage(t('related_external.found'));
-            // cast error response into object
-            let errors = {};
-            for (let sourceName in api_data.api_error_message as Object) {
-              errors[sourceName] = api_data.api_error_message[sourceName];
-            }
-            setLookupState(prevState => {
-              return {
-                ...prevState,
-                [stateKey]: {
-                  results: {
-                    ...prevState[stateKey]?.results,
-                    ...api_data.api_response
-                  },
-                  errors: {
-                    ...prevState[stateKey]?.errors,
-                    ...errors
-                  },
-                  success: true
-                }
-              };
-            });
-          }
-        },
-        onFailure: api_data => {
-          if (Object.keys(api_data.api_error_message).length !== 0) {
-            showErrorMessage(t('related_external.error'));
-            let errors = {};
-            for (let sourceName in api_data.api_error_message as Object) {
-              errors[sourceName] = api_data.api_error_message[sourceName];
-            }
-            setLookupState(prevState => {
-              return {
-                ...prevState,
-                [stateKey]: {
-                  ...prevState[stateKey],
-                  errors: {
-                    ...prevState[stateKey]?.errors,
-                    ...errors
-                  },
-                  // take existing success from previous source search if available
-                  success: prevState[stateKey]?.success || false
-                }
-              };
-            });
-          } else {
-            showWarningMessage(t('related_external.notfound'));
-            setLookupState(prevState => {
-              return {
-                ...prevState,
-                [stateKey]: {
-                  results: {},
-                  errors: { [source]: t('related_external.notfound') },
-                  ...prevState[stateKey],
-                  // take existing success from previous source search if available
-                  success: prevState[stateKey]?.success || false
-                }
-              };
-            });
-          }
-        }
-      });
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [showErrorMessage, showSuccessMessage, showWarningMessage, t]
-  );
-
   const enrichTagExternal = useCallback(
     (source: string, tagName: string, tagValue: string, classification: string) => {
       const stateKey = getKey(tagName, tagValue);
@@ -199,9 +96,27 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
         method: 'GET',
         url: url,
         onSuccess: api_data => {
-          let res = api_data.api_response as ExternalEnrichmentResults;
+          const res = api_data.api_response as ExternalEnrichmentResults;
           if (Object.keys(res).length !== 0) {
-            showSuccessMessage('search successful');
+            let found = false;
+            let error = true;
+            for (const enrichmentResults of Object.values(res)) {
+              if (enrichmentResults.items.length > 0) {
+                showSuccessMessage(t('related_external.complete'));
+                found = true;
+                error = false;
+                break;
+              }
+              // don't show error message unless all sources report an error
+              else if (!enrichmentResults.error || enrichmentResults.error === 'Not Found') {
+                error = false;
+              }
+            }
+            if (!!error) {
+              showErrorMessage(t('related_external.error'));
+            } else if (!found) {
+              showWarningMessage(t('related_external.notfound'));
+            }
 
             setEnrichmentState(prevState => {
               return {
@@ -212,11 +127,13 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
                 }
               };
             });
+          } else {
+            showErrorMessage(t('related_external.error'));
           }
         },
         onFailure: api_data => {
           if (Object.keys(api_data.api_error_message).length !== 0) {
-            showErrorMessage(t('related_external.error'));
+            showErrorMessage(`${t('related_external.error')}: ${api_data.api_error_message}`);
           } else {
             showWarningMessage(t('related_external.notfound'));
           }
@@ -227,9 +144,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
     [showErrorMessage, showSuccessMessage, showWarningMessage, t]
   );
   return (
-    <ExternalLookupContext.Provider
-      value={{ getKey, isActionable, lookupState, searchTagExternal, enrichmentState, enrichTagExternal }}
-    >
+    <ExternalLookupContext.Provider value={{ getKey, isActionable, enrichmentState, enrichTagExternal }}>
       {children}
     </ExternalLookupContext.Provider>
   );

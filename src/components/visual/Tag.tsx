@@ -2,7 +2,6 @@ import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
-// import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import ExternalLinks from 'components/visual/ExternalSearch';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
@@ -93,7 +92,13 @@ const WrappedTag: React.FC<TagProps> = ({
             category={'tag'}
             type={type}
             value={value}
-            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
+            iconStyle={{
+              marginRight: '-3px',
+              marginLeft: '3px',
+              height: '20px',
+              verticalAlign: 'middle',
+              minWidth: '32px'
+            }}
           />
         }
       />

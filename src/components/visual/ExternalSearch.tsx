@@ -6,7 +6,8 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import React from 'react';
 
-import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
+// import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Collapse, Divider, Grid, IconButton, Link, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useExternalLookup from 'components/hooks/useExternalLookup';
@@ -35,11 +36,6 @@ const useStyles = makeStyles(theme => ({
     overflow: 'hidden',
     textDecoration: 'none'
   },
-  title: {
-    flex: 1,
-    fontWeight: 500,
-    color: theme.palette.text.primary
-  },
   content: {
     flex: 1,
     fontWeight: 400,
@@ -64,13 +60,7 @@ const useStyles = makeStyles(theme => ({
       marginBottom: theme.spacing(1)
     }
   },
-  sectionTitle: {
-    fontWeight: 'bold'
-  },
   sectionContent: {},
-  sourceTitle: {
-    fontWeight: 'bold'
-  },
   collapseTitle: {
     display: 'flex',
     alignItems: 'center',
@@ -145,10 +135,11 @@ const AutoHideChipList = React.memo(WrappedAutoHideChipList);
 type ResultGroupProps = {
   group: string;
   names: string[];
+  ndMap: Object;
   valueMap: Object;
 };
 
-const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, valueMap }) => {
+const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, valueMap }) => {
   const theme = useTheme();
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
@@ -173,7 +164,9 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, valueMap
             return (
               <React.Fragment key={k}>
                 <Grid item xs={6} sm={6}>
-                  <div className={classes.sectionContent}>{keyName}</div>
+                  <Tooltip title={ndMap[keyName]}>
+                    <div className={classes.sectionContent}>{keyName}</div>
+                  </Tooltip>
                 </Grid>
                 <Grid item xs={6} sm={6}>
                   <div className={classes.sectionContent}>
@@ -207,25 +200,30 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ enrichmentRe
   }
 
   // create lookup tables
+  // Note: we only take the order of when a source or name appears first. If they appear again later,
+  //       then it will be added to the higher order.
   // [{group: str, name: str, name_description: str, value: str, value_description}]
-  //   -> {group: {name: [[value, desc], ...]}}
-  //   -> {group: [name, ...]}
-  let rLookup = {};
+  //   vLookup -> {group: {name: [[value, desc], ...]}}
+  //   nLookup -> {group: [name, ...]}
+  //   ndLookup -> {name: desc, ...}
+  let vLookup = {};
   let nLookup = {};
+  let ndLookup = {};
   let gOrder = [];
   enrichmentResult.enrichment.forEach(enrichmentItem => {
-    //  values order
-    if (!(enrichmentItem.group in rLookup)) {
-      rLookup[enrichmentItem.group] = {};
+    //  values map
+    if (!(enrichmentItem.group in vLookup)) {
+      vLookup[enrichmentItem.group] = {};
     }
-    if (!(enrichmentItem.name in rLookup[enrichmentItem.group])) {
-      rLookup[enrichmentItem.group][enrichmentItem.name] = [];
+    if (!(enrichmentItem.name in vLookup[enrichmentItem.group])) {
+      vLookup[enrichmentItem.group][enrichmentItem.name] = [];
     }
-    rLookup[enrichmentItem.group][enrichmentItem.name].push([enrichmentItem.value, enrichmentItem.value_description]);
+    vLookup[enrichmentItem.group][enrichmentItem.name].push([enrichmentItem.value, enrichmentItem.value_description]);
 
-    // name order
+    // name maps
     if (!(enrichmentItem.group in nLookup)) {
       nLookup[enrichmentItem.group] = [];
+      ndLookup[enrichmentItem.name] = enrichmentItem.name_description;
     }
     if (!nLookup[enrichmentItem.group].includes(enrichmentItem.name)) {
       nLookup[enrichmentItem.group].push(enrichmentItem.name);
@@ -266,7 +264,13 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ enrichmentRe
         {!!gOrder &&
           gOrder.map((grpName, j) => {
             return (
-              <ResultGroup key={j} group={grpName} names={nLookup[grpName]} valueMap={rLookup[grpName]}></ResultGroup>
+              <ResultGroup
+                key={j}
+                group={grpName}
+                names={nLookup[grpName]}
+                ndMap={ndLookup}
+                valueMap={vLookup[grpName]}
+              ></ResultGroup>
             );
           })}
       </Collapse>
@@ -294,11 +298,9 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
     e.stopPropagation();
   };
 
-  // const handleClickOpen = event => () => {
   const handleClickOpen = () => {
     setOpenedDialog(true);
     setScroll('paper');
-    // event.stopPropagation();
   };
 
   const handleClose = () => {
@@ -331,8 +333,14 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
   return actionable && externalLookupResults ? (
     <div>
       {externalLookupResults !== null ? (
-        <Button onClick={handleClickOpen} style={iconStyle}>
-          <LinkOutlinedIcon />
+        <Button
+          onClick={e => {
+            e.stopPropagation();
+            handleClickOpen();
+          }}
+          style={iconStyle}
+        >
+          <InfoOutlinedIcon />
         </Button>
       ) : null}
       <Dialog
@@ -342,7 +350,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
         scroll={scroll}
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        // maxWidth="xl"
+        maxWidth="xl"
         // fullWidth
       >
         <DialogTitle id={titleId}>
@@ -374,6 +382,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
                     {enrichmentResults.items.map((enrichmentResult, i) => {
                       return <EnrichmentResult key={i} enrichmentResult={enrichmentResult}></EnrichmentResult>;
                     })}
+                    <Divider />
                   </>
                 ))}
               </div>

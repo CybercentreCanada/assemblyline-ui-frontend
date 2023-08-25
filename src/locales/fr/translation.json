@@ -118,7 +118,7 @@
   "related_external": "Rechercher dans une source externe",
   "related_external.all": "Toutes sources",
   "related_external.error": "Erreur de recherche dans les sources externes",
-  "related_external.found": "Liens trouvés dans des sources externes",
+  "related_external.complete": "Recherche terminée",
   "related_external.notfound": "Aucun lien externe trouvé",
   "router_prompt_accept": "Annuler les modifications",
   "router_prompt_cancel": "Rester à la page",

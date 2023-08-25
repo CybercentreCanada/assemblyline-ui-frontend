@@ -56,7 +56,13 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
             category={category}
             type={data_type}
             value={label}
-            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
+            iconStyle={{
+              marginRight: '-3px',
+              marginLeft: '3px',
+              height: '20px',
+              verticalAlign: 'middle',
+              minWidth: '32px'
+            }}
           />
         }
         label={label}

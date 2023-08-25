@@ -69,7 +69,13 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, clas
                 category={category}
                 type={type}
                 value={value}
-                iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'text-bottom' }}
+                iconStyle={{
+                  marginRight: '-3px',
+                  marginLeft: '3px',
+                  height: '20px',
+                  verticalAlign: 'text-bottom',
+                  minWidth: '32px'
+                }}
               />
             </MaterialLink>
           </>
