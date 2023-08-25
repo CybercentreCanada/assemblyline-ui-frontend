@@ -66,9 +66,27 @@ export const CarouselProvider2 = ({ children }: CarouselProviderProps) => {
 
   const onClearImages = useCallback(() => setImages([]), []);
 
-  const onNextImage = useCallback(() => console.log('onNextImage'), []);
+  const onNextImage = useCallback(() => {
+    const query = new SimpleSearchQuery(location.search);
+    const param = query.get('carousel', null);
+    const index = images.findIndex(i => i.name === param);
 
-  const onPreviousImage = useCallback(() => console.log('onPreviousImage'), []);
+    if (index >= 0 && index < images.length - 1) {
+      query.set(CAROUSEL_PARAM, images[index + 1].name);
+      navigate(`${location.pathname}?${query.toString()}${location.hash}`);
+    }
+  }, [images, location.hash, location.pathname, location.search, navigate]);
+
+  const onPreviousImage = useCallback(() => {
+    const query = new SimpleSearchQuery(location.search);
+    const param = query.get('carousel', null);
+    const index = images.findIndex(i => i.name === param);
+
+    if (index >= 1 && index < images.length) {
+      query.set(CAROUSEL_PARAM, images[index - 1].name);
+      navigate(`${location.pathname}?${query.toString()}${location.hash}`);
+    }
+  }, [images, location.hash, location.pathname, location.search, navigate]);
 
   useEffect(() => setOpen(!!new SimpleSearchQuery(location.search).get('carousel', null)), [location.search]);
 
