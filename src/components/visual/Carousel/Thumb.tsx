@@ -3,7 +3,9 @@ import { Button, ImageListItemBar, Skeleton, Theme, Tooltip } from '@mui/materia
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useMyAPI from 'components/hooks/useMyAPI';
-import React, { useEffect, useMemo, useState } from 'react';
+import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router';
 import { Image, useCarousel } from '.';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -46,11 +48,14 @@ type Props = {
 
 const WrappedCarouselThumb = ({ image = null, carousel = false, tooltipPlacement = 'bottom' }: Props) => {
   const classes = useStyles();
+  const location = useLocation();
   const { apiCall } = useMyAPI();
   const { onAddImage, onRemoveImage, onOpenImage } = useCarousel();
 
   const [data, setData] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const ref = useRef<HTMLButtonElement>(null);
 
   const active = useMemo<boolean>(() => false, []);
 
@@ -72,10 +77,25 @@ const WrappedCarouselThumb = ({ image = null, carousel = false, tooltipPlacement
     return () => !carousel && onRemoveImage(image);
   }, [carousel, image, onAddImage, onRemoveImage]);
 
+  useEffect(() => {
+    if (!carousel) return;
+    const query = new SimpleSearchQuery(location.search);
+    const param = query.get('carousel', null);
+
+    if (param === image.name) {
+      ref.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center'
+      });
+    }
+  }, [carousel, image.name, location.search]);
+
   return (
     <Tooltip title={image.name} placement={tooltipPlacement} disableHoverListener={carousel}>
       <Button
         className={clsx(classes.button, carousel && classes.carousel, active && classes.active)}
+        ref={ref}
         onClick={() => onOpenImage(image)}
       >
         {loading ? (
