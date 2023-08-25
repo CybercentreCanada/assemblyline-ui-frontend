@@ -1,3 +1,4 @@
+import useALContext from 'components/hooks/useALContext';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
@@ -33,6 +34,7 @@ export const CarouselContext = React.createContext<CarouselContextProps>(null);
 export const CarouselProvider2 = ({ children }: CarouselProviderProps) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user: currentUser } = useALContext();
 
   // const [images, setImages] = useState<{ [sha256: string]: Image }>({});
   const [images, setImages] = useState<Image[]>([]);
@@ -88,7 +90,10 @@ export const CarouselProvider2 = ({ children }: CarouselProviderProps) => {
     }
   }, [images, location.hash, location.pathname, location.search, navigate]);
 
-  useEffect(() => setOpen(!!new SimpleSearchQuery(location.search).get('carousel', null)), [location.search]);
+  useEffect(
+    () => setOpen(!!currentUser && !!new SimpleSearchQuery(location.search).get('carousel', null)),
+    [currentUser, location.search]
+  );
 
   return (
     <CarouselContext.Provider
