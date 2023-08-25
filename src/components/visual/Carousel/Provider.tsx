@@ -36,14 +36,13 @@ export const CarouselProvider2 = ({ children }: CarouselProviderProps) => {
   const navigate = useNavigate();
   const { user: currentUser } = useALContext();
 
-  // const [images, setImages] = useState<{ [sha256: string]: Image }>({});
   const [images, setImages] = useState<Image[]>([]);
   const [open, setOpen] = useState<boolean>(false);
 
   const onOpenImage = useCallback(
     (image: Image) => {
       const query = new SimpleSearchQuery(location.search);
-      query.set(CAROUSEL_PARAM, image.name);
+      query.set(CAROUSEL_PARAM, image.img);
       navigate(`${location.pathname}?${query.toString()}${location.hash}`);
     },
     [location.hash, location.pathname, location.search, navigate]
@@ -71,10 +70,10 @@ export const CarouselProvider2 = ({ children }: CarouselProviderProps) => {
   const onNextImage = useCallback(() => {
     const query = new SimpleSearchQuery(location.search);
     const param = query.get('carousel', null);
-    const index = images.findIndex(i => i.name === param);
+    const index = images.findIndex(i => i.img === param);
 
     if (index >= 0 && index < images.length - 1) {
-      query.set(CAROUSEL_PARAM, images[index + 1].name);
+      query.set(CAROUSEL_PARAM, images[index + 1].img);
       navigate(`${location.pathname}?${query.toString()}${location.hash}`);
     }
   }, [images, location.hash, location.pathname, location.search, navigate]);
@@ -82,10 +81,10 @@ export const CarouselProvider2 = ({ children }: CarouselProviderProps) => {
   const onPreviousImage = useCallback(() => {
     const query = new SimpleSearchQuery(location.search);
     const param = query.get('carousel', null);
-    const index = images.findIndex(i => i.name === param);
+    const index = images.findIndex(i => i.img === param);
 
     if (index >= 1 && index < images.length) {
-      query.set(CAROUSEL_PARAM, images[index - 1].name);
+      query.set(CAROUSEL_PARAM, images[index - 1].img);
       navigate(`${location.pathname}?${query.toString()}${location.hash}`);
     }
   }, [images, location.hash, location.pathname, location.search, navigate]);

@@ -82,14 +82,14 @@ const WrappedCarouselThumb = ({ image = null, carousel = false, tooltipPlacement
     const query = new SimpleSearchQuery(location.search);
     const param = query.get('carousel', null);
 
-    if (param === image.name) {
+    if (param === image.img) {
       ref.current.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest',
         inline: 'center'
       });
     }
-  }, [carousel, image.name, location.search]);
+  }, [carousel, image.img, location.search]);
 
   return (
     <Tooltip title={image.name} placement={tooltipPlacement} disableHoverListener={carousel}>

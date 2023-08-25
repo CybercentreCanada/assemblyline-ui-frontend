@@ -70,7 +70,7 @@ export const WrappedCarouselContainer = () => {
 
   const currentImage = useMemo(() => {
     const query = new SimpleSearchQuery(location.search).get('carousel', null);
-    const index = images.findIndex(i => i.name === query);
+    const index = images.findIndex(i => i.img === query);
     return index >= 0 ? images[index] : null;
   }, [images, location.search]);
 
