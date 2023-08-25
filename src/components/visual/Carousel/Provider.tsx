@@ -31,7 +31,7 @@ export type CarouselContextProps = {
 
 export const CarouselContext = React.createContext<CarouselContextProps>(null);
 
-export const CarouselProvider2 = ({ children }: CarouselProviderProps) => {
+const WrappedCarouselProvider = ({ children }: CarouselProviderProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user: currentUser } = useALContext();
@@ -113,3 +113,6 @@ export const CarouselProvider2 = ({ children }: CarouselProviderProps) => {
     </CarouselContext.Provider>
   );
 };
+
+export const CarouselProvider = React.memo(WrappedCarouselProvider);
+export default CarouselProvider;
