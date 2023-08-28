@@ -112,8 +112,8 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           {signatures && (someSigNotSafe || forceShowSig) && (
             <Grid container>
-              <TooltipGrid title={'ref.current.test.placeholder.heuristic.signature'}>
-                <span style={{ fontWeight: 500 }}>ref.current.test.placeholder.heuristic.signature</span>
+              <TooltipGrid title={'heuristic.signature'}>
+                <span style={{ fontWeight: 500 }}>heuristic.signature</span>
               </TooltipGrid>
               <Grid item xs={12} sm={9} lg={10}>
                 <AutoHideTagList
