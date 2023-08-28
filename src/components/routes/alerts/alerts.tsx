@@ -321,7 +321,7 @@ const Alerts: React.FC = () => {
     (sort: string) => {
       const query = new SimpleSearchQuery(location.search);
       query.set('sort', sort);
-      navigate(`${location.pathname}?${query.toString()}${location.hash}`);
+      navigate(`${location.pathname}?${query.toString([])}${location.hash}`);
       if (drawer.open) {
         setDrawer({ ...drawer, open: false });
       }
