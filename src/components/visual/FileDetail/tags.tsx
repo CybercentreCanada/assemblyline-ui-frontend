@@ -1,11 +1,20 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
+import {
+  Collapse,
+  Divider,
+  Grid,
+  GridProps,
+  Skeleton,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useSafeResults from 'components/hooks/useSafeResults';
 import AutoHideTagList from 'components/visual/AutoHideTagList';
-import { wbr } from 'helpers/wbr';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -19,10 +28,12 @@ const useStyles = makeStyles(theme => ({
     }
   },
   meta_key: {
-    fontWeight: 500,
-    display: 'block',
-    textIndent: `-${theme.spacing(2)}`,
-    marginLeft: theme.spacing(2)
+    overflowX: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis'
+  },
+  tooltip: {
+    margin: 'auto !important'
   }
 }));
 
@@ -37,6 +48,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const sp2 = theme.spacing(2);
   const { showSafeResults } = useSafeResults();
   const [tagUnsafeMap, setTagUnsafeMap] = React.useState({});
@@ -56,15 +68,42 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
   const someTagNotSafe = Object.values(tagUnsafeMap).some(Boolean);
   const forceShowTag = Object.keys(tagUnsafeMap).length !== 0 && (showSafeResults || force);
 
+  const TooltipGrid: React.FC<GridProps & { title?: React.ReactNode }> = ({ title = '', ...props }) => {
+    const [disabled, setDisabled] = useState<boolean>(true);
+    const ref = useRef<any>(null);
+
+    const resize = useCallback(() => {
+      ref.current && setDisabled(ref.current.scrollWidth <= ref.current.clientWidth);
+    }, []);
+
+    useEffect(() => {
+      resize();
+      window.addEventListener('resize', resize);
+      return () => {
+        window.removeEventListener('resize', resize);
+      };
+    }, [resize]);
+
+    return (
+      <Tooltip
+        title={title}
+        classes={{
+          tooltip: classes.tooltip
+        }}
+        placement={isXS ? 'bottom-start' : 'right-start'}
+        disableFocusListener={disabled}
+        disableHoverListener={disabled}
+        disableInteractive={disabled}
+        disableTouchListener={disabled}
+      >
+        <Grid ref={ref} className={classes.meta_key} item xs={12} sm={3} lg={2} {...props} />
+      </Tooltip>
+    );
+  };
+
   return (!signatures && !tags) || someTagNotSafe || forceShowTag || someSigNotSafe || forceShowSig ? (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-      <Typography
-        variant="h6"
-        onClick={() => {
-          setOpen(!open);
-        }}
-        className={classes.title}
-      >
+      <Typography variant="h6" onClick={() => setOpen(!open)} className={classes.title}>
         <span>{t('generated_tags')}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
@@ -73,15 +112,13 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           {signatures && (someSigNotSafe || forceShowSig) && (
             <Grid container>
-              <Grid item xs={12} sm={3} lg={2}>
-                <span className={classes.meta_key}>{wbr(`heuristic.signature`)}</span>
-              </Grid>
+              <TooltipGrid title={'heuristic.signature'}>
+                <span style={{ fontWeight: 500 }}>heuristic.signature</span>
+              </TooltipGrid>
               <Grid item xs={12} sm={9} lg={10}>
                 <AutoHideTagList
                   tag_type={'heuristic.signature'}
-                  items={signatures.map(item => {
-                    return { value: item[0], lvl: item[1], safelisted: item[2] };
-                  })}
+                  items={signatures.map(item => ({ value: item[0], lvl: item[1], safelisted: item[2] }))}
                   force={force}
                 />
               </Grid>
@@ -91,15 +128,18 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
             ? Object.keys(tags).map((tag_type, i) =>
                 tagUnsafeMap[tag_type] || showSafeResults || force ? (
                   <Grid container key={i}>
-                    <Grid item xs={12} sm={3} lg={2}>
-                      <span className={classes.meta_key}>{wbr(`${tag_type}`)}</span>
-                    </Grid>
+                    <TooltipGrid title={tag_type}>
+                      <span style={{ fontWeight: 500 }}>{tag_type}</span>
+                    </TooltipGrid>
                     <Grid item xs={12} sm={9} lg={10}>
                       <AutoHideTagList
                         tag_type={tag_type}
-                        items={tags[tag_type].map(item => {
-                          return { value: item[0], lvl: item[1], safelisted: item[2], classification: item[3] };
-                        })}
+                        items={tags[tag_type].map(item => ({
+                          value: item[0],
+                          lvl: item[1],
+                          safelisted: item[2],
+                          classification: item[3]
+                        }))}
                         force={force}
                       />
                     </Grid>
