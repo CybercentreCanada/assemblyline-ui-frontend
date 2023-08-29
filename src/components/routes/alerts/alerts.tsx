@@ -320,7 +320,7 @@ const Alerts: React.FC = () => {
   const handleSortSubmit = useCallback(
     (sort: string) => {
       const query = new SimpleSearchQuery(location.search);
-      query.set('sort_by', sort);
+      query.set('sort', sort);
       navigate(`${location.pathname}?${query.toString([])}${location.hash}`);
       if (drawer.open) {
         setDrawer({ ...drawer, open: false });

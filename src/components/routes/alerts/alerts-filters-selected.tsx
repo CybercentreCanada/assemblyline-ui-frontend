@@ -3,11 +3,7 @@ import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { ChipList } from 'components/visual/ChipList';
-import SearchQuery, {
-  DEFAULT_SORTBY,
-  SearchFilter,
-  SearchQueryFilters
-} from 'components/visual/SearchBar/search-query';
+import SearchQuery, { DEFAULT_SORT, SearchFilter, SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +24,7 @@ interface AlertFiltersSelectedProps {
   searchQuery: SearchQuery;
   hideQuery?: boolean;
   hideGroupBy?: boolean;
-  hideSortBy?: boolean;
+  hideSort?: boolean;
   disableActions?: boolean;
   onChange?: (filters: SearchQueryFilters, query?: string) => void;
 }
@@ -37,7 +33,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
   searchQuery,
   hideQuery = false,
   hideGroupBy = false,
-  hideSortBy = false,
+  hideSort = false,
   disableActions = false,
   onChange = () => null
 }) => {
@@ -62,14 +58,12 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
   const onSortClick = () => {
     onChange({
       ...filters,
-      sortBy: filters.sortBy.endsWith('desc')
-        ? filters.sortBy.replace('desc', 'asc')
-        : filters.sortBy.replace('asc', 'desc')
+      sort: filters.sort.endsWith('desc') ? filters.sort.replace('desc', 'asc') : filters.sort.replace('asc', 'desc')
     });
   };
 
   const onResetSortBy = () => {
-    onChange({ ...filters, sortBy: DEFAULT_SORTBY });
+    onChange({ ...filters, sort: DEFAULT_SORT });
   };
 
   const onDeleteStatus = (item: SearchFilter) => {
@@ -106,12 +100,12 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
             />
           </div>
         )}
-        {filters && filters.sortBy && !hideSortBy && (
+        {filters && filters.sort && !hideSort && (
           <div style={{ display: 'inline-block' }}>
             <ChipList
-              items={[filters.sortBy].map(v => ({
+              items={[filters.sort].map(v => ({
                 classes: {
-                  icon: clsx(classes.desc, filters.sortBy.endsWith('asc') && classes.asc)
+                  icon: clsx(classes.desc, filters.sort.endsWith('asc') && classes.asc)
                 },
                 variant: 'outlined',
                 label: `${t('sortBy')}=${t(v.substring(0, v.indexOf(' ')))}`,

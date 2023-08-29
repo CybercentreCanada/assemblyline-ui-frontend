@@ -23,7 +23,7 @@ export interface SearchFilter {
 
 export interface SearchQueryFilters {
   groupBy: string;
-  sortBy: string;
+  sort: string;
   tc: string;
   labels: SearchFilter[];
   priorities: SearchFilter[];
@@ -39,7 +39,7 @@ export interface SearchQueryParameter {
 const DEFAULT_TC = '4d';
 const DEFAULT_OFFSET = 0;
 const DEFAULT_GROUPBY = 'file.sha256';
-export const DEFAULT_SORTBY = 'reporting_ts desc';
+export const DEFAULT_SORT = 'reporting_ts desc';
 
 export default class SearchQuery {
   private params: URLSearchParams = null;
@@ -59,8 +59,8 @@ export default class SearchQuery {
       if (!this.hasGroupBy()) {
         this.setGroupBy(DEFAULT_GROUPBY);
       }
-      if (!this.hasSortBy()) {
-        this.setSortBy(DEFAULT_SORTBY);
+      if (!this.hasSort()) {
+        this.setSort(DEFAULT_SORT);
       }
     }
   }
@@ -170,21 +170,21 @@ export default class SearchQuery {
     return this.hasGroupBy() ? this.params.get('group_by') : 'file.sha256';
   }
 
-  public setSortBy(sortBy: string): SearchQuery {
-    this.params.set('sort_by', sortBy);
+  public setSort(sort: string): SearchQuery {
+    this.params.set('sort', sort);
     return this;
   }
 
-  public hasSortBy(): boolean {
-    return this.params.has('sort_by');
+  public hasSort(): boolean {
+    return this.params.has('sort');
   }
 
-  public getSortBy(): string {
-    return this.hasSortBy() ? this.params.get('sort_by') : DEFAULT_SORTBY;
+  public getSort(): string {
+    return this.hasSort() ? this.params.get('sort') : DEFAULT_SORT;
   }
 
   public setFilters(filters: SearchQueryFilters): SearchQuery {
-    this.reset(false).setTc(filters.tc).setGroupBy(filters.groupBy).setSortBy(filters.sortBy);
+    this.reset(false).setTc(filters.tc).setGroupBy(filters.groupBy).setSort(filters.sort);
     [...filters.statuses, ...filters.priorities, ...filters.labels, ...filters.queries].forEach(filter =>
       this.addFq(filter.value)
     );
@@ -206,7 +206,7 @@ export default class SearchQuery {
       .setRows(`${this.pageSize}`)
       .setTc('4d')
       .setGroupBy('file.sha256')
-      .setSortBy(DEFAULT_SORTBY)
+      .setSort(DEFAULT_SORT)
       .setTcStart('')
       .clearFq();
     if (clearQuery) this.setQuery('');
@@ -220,7 +220,7 @@ export default class SearchQuery {
     params.delete('rows');
     if (this.getTc() === DEFAULT_TC) params.delete('tc');
     if (this.getGroupBy() === DEFAULT_GROUPBY) params.delete('group_by');
-    if (this.getSortBy() === DEFAULT_SORTBY) params.delete('sort_by');
+    if (this.getSort() === DEFAULT_SORT) params.delete('sort');
     if (this.getQuery() === '') params.delete('q');
     return params.toString();
   }
@@ -268,7 +268,7 @@ export default class SearchQuery {
     return {
       tc: this.getTc(),
       groupBy: this.getGroupBy(),
-      sortBy: this.getSortBy(),
+      sort: this.getSort(),
       statuses,
       priorities,
       labels,
