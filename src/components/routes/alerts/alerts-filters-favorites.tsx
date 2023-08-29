@@ -178,11 +178,12 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
   };
 
   const handleEditClick = useCallback(
-    (favorite: Favorite) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    (favorite: Favorite, isPublic: boolean) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       event.stopPropagation();
       setQueryValue({ valid: !!favorite.query, value: favorite.query });
       setNameValue({ valid: !!favorite.name, value: favorite.name });
       setClassification(favorite.classification);
+      setPublicSwitch(isPublic);
       validateForm(
         { valid: !!favorite.query, value: favorite.query },
         { valid: !!favorite.name, value: favorite.name }
@@ -258,7 +259,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
             label: (
               <div className={classes.label}>
                 <div>{f.name}</div>
-                <IconButton className={classes.editIconButton} onClick={handleEditClick(f)}>
+                <IconButton className={classes.editIconButton} onClick={handleEditClick(f, false)}>
                   <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
                 </IconButton>
               </div>
@@ -281,7 +282,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
             label: (
               <div className={classes.label}>
                 <div>{f.name}</div>
-                <IconButton className={classes.editIconButton} onClick={handleEditClick(f)}>
+                <IconButton className={classes.editIconButton} onClick={handleEditClick(f, true)}>
                   <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
                 </IconButton>
               </div>
