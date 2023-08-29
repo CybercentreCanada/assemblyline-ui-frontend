@@ -76,7 +76,7 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(3),
     width: '600px',
     [theme.breakpoints.only('xs')]: {
-      width: '100%'
+      width: '100vw'
     }
   },
   searchresult: {
