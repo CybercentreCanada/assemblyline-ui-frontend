@@ -99,10 +99,10 @@ const WrappedAlertsSorts: React.FC<Props> = ({ onSubmit = () => null }) => {
       </div>
       <div className={classes.actions}>
         <Button variant="outlined" onClick={() => setCurrentSort(DEFAULT_SORT)}>
-          {t('sorts.reset')}
+          {t('reset')}
         </Button>
         <Button variant="contained" color="primary" onClick={() => onSubmit(currentSort)}>
-          {t('sorts.apply')}
+          {t('apply')}
         </Button>
       </div>
     </div>

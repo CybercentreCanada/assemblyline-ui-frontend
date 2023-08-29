@@ -38,6 +38,13 @@ function ensureSearchFilter(selection): SearchFilter {
 const useStyles = makeStyles(theme => ({
   option: {
     backgroundColor: theme.palette.background.default
+  },
+  actions: {
+    display: 'flex',
+    gap: theme.spacing(1),
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap',
+    marginTop: theme.spacing(1)
   }
 }));
 
@@ -217,11 +224,6 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   return (
     <div>
       <div style={{ paddingBottom: theme.spacing(2) }}>
-        <div style={{ float: 'right' }}>
-          <Button variant="contained" onClick={onClearBtnClick}>
-            {t('filters.clear')}
-          </Button>
-        </div>
         <Typography variant="h4">{t('filters')}</Typography>
       </div>
       <div style={{ marginBottom: theme.spacing(2), marginTop: theme.spacing(2) }}>
@@ -333,9 +335,12 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
           />
         </div>
       </div>
-      <div style={{ textAlign: 'right', marginTop: theme.spacing(1) }}>
+      <div className={classes.actions}>
+        <Button variant="outlined" onClick={onClearBtnClick}>
+          {t('reset')}
+        </Button>
         <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
-          {t('filters.apply')}
+          {t('apply')}
         </Button>
       </div>
     </div>

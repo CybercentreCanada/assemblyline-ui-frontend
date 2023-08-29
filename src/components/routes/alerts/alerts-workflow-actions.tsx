@@ -159,7 +159,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
           startIcon={applying ? <CircularProgress size={20} /> : null}
           disabled={applying || !formValid}
         >
-          {t('workflow.apply')}
+          {t('apply')}
         </Button>
       </div>
     </div>
