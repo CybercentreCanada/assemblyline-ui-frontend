@@ -197,6 +197,21 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('addfavorites')}</Typography>
       </div>
+      <div style={{ textAlign: 'right' }}>
+        <Button
+          onClick={() => onSwitchChange(!publicSwitch)}
+          size="small"
+          color="primary"
+          disableElevation
+          disableRipple
+        >
+          <div>{t('private')}</div>
+          <div style={{ flex: 1 }}>
+            <Switch checked={publicSwitch} onChange={event => onSwitchChange(event.target.checked)} color="primary" />
+          </div>
+          <div>{t('public')}</div>
+        </Button>
+      </div>
       {publicSwitch && c12nDef.enforce ? (
         <Classification type="picker" c12n={classification} setClassification={setClassification} />
       ) : (
@@ -225,21 +240,6 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
             fullWidth
           />
         </div>
-      </div>
-      <div style={{ textAlign: 'right' }}>
-        <Button
-          onClick={() => onSwitchChange(!publicSwitch)}
-          size="small"
-          color="primary"
-          disableElevation
-          disableRipple
-        >
-          <div>{t('private')}</div>
-          <div style={{ flex: 1 }}>
-            <Switch checked={publicSwitch} onChange={event => onSwitchChange(event.target.checked)} color="primary" />
-          </div>
-          <div>{t('public')}</div>
-        </Button>
       </div>
 
       <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(4), textAlign: 'right' }}>
