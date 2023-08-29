@@ -356,7 +356,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           <Grid container flexDirection="column" spacing={theme.spacing(2)}>
             <Grid item component="span">
               {isExistingFavorite ? t('confirmation.content.update') : t('confirmation.content.add')}
-              <b>{nameValue ? nameValue.value : 'undefined'}</b>
+              <b>{nameValue ? nameValue.value : null}</b>
               {isExistingFavorite ? t('confirmation.content.update2') : t('confirmation.content.add2')}
               {publicSwitch ? t('confirmation.content.public') : t('confirmation.content.private')}
             </Grid>
@@ -404,13 +404,13 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           <Grid container flexDirection="column" spacing={theme.spacing(2)}>
             <Grid item component="span">
               {t('confirmation.content.delete')}
-            </Grid>
-
-            <Grid item>
-              <Typography variant="subtitle2" children={t('confirmation.name')} />
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {deleteConfirmation.favorite ? deleteConfirmation.favorite.name : null}
-              </Paper>
+              <b>{deleteConfirmation.favorite ? deleteConfirmation.favorite.name : null}</b>
+              {t('confirmation.content.delete2')}
+              {deleteConfirmation
+                ? deleteConfirmation.isPublic
+                  ? t('confirmation.content.public')
+                  : t('confirmation.content.private')
+                : null}
             </Grid>
 
             <Grid item>
