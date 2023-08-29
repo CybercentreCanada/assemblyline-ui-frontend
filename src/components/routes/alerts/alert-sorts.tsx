@@ -29,6 +29,13 @@ const useStyles = makeStyles(theme => ({
   },
   asc: {
     transform: 'rotate(180deg)'
+  },
+  actions: {
+    display: 'flex',
+    gap: theme.spacing(1),
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap',
+    marginTop: theme.spacing(1)
   }
 }));
 
@@ -90,15 +97,7 @@ const WrappedAlertsSorts: React.FC<Props> = ({ onSubmit = () => null }) => {
           ))}
         </List>
       </div>
-      <div
-        style={{
-          display: 'flex',
-          gap: theme.spacing(1),
-          justifyContent: 'flex-end',
-          flexWrap: 'wrap',
-          marginTop: theme.spacing(1)
-        }}
-      >
+      <div className={classes.actions}>
         <Button variant="outlined" onClick={() => setCurrentSort(DEFAULT_SORT)}>
           {t('sorts.reset')}
         </Button>
