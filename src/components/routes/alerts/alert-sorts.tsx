@@ -55,7 +55,7 @@ const WrappedAlertsSorts: React.FC<Props> = ({ onSubmit = () => null }) => {
   const location = useLocation();
 
   const [currentSort, setCurrentSort] = useState<string>(
-    new SimpleSearchQuery(location.search).get('sort', DEFAULT_SORT)
+    new SimpleSearchQuery(location.search).get('sort_by', DEFAULT_SORT)
   );
 
   const handleSort = useCallback(
