@@ -1,4 +1,4 @@
-import { Alert, Button, CircularProgress, TextField, Typography, useTheme } from '@mui/material';
+import { Alert, Button, CircularProgress, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import SearchQuery, { SearchFilter } from 'components/visual/SearchBar/search-query';
 import React, { SyntheticEvent, useState } from 'react';
@@ -152,15 +152,17 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
         </div>
       </div>
       <div style={{ textAlign: 'right', marginTop: theme.spacing(1) }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={_onApplyBtnClick}
-          startIcon={applying ? <CircularProgress size={20} /> : null}
-          disabled={applying || !formValid}
-        >
-          {t('apply')}
-        </Button>
+        <Tooltip title={t('workflow.apply')}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={_onApplyBtnClick}
+            startIcon={applying ? <CircularProgress size={20} /> : null}
+            disabled={applying || !formValid}
+          >
+            {t('apply')}
+          </Button>
+        </Tooltip>
       </div>
     </div>
   );

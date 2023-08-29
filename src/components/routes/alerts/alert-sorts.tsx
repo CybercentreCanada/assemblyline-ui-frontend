@@ -6,6 +6,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
@@ -98,12 +99,16 @@ const WrappedAlertsSorts: React.FC<Props> = ({ onSubmit = () => null }) => {
         </List>
       </div>
       <div className={classes.actions}>
-        <Button variant="outlined" onClick={() => setCurrentSort(DEFAULT_SORT)}>
-          {t('reset')}
-        </Button>
-        <Button variant="contained" color="primary" onClick={() => onSubmit(currentSort)}>
-          {t('apply')}
-        </Button>
+        <Tooltip title={t('sorts.reset')}>
+          <Button variant="outlined" onClick={() => setCurrentSort(DEFAULT_SORT)}>
+            {t('reset')}
+          </Button>
+        </Tooltip>
+        <Tooltip title={t('sorts.apply')}>
+          <Button variant="contained" color="primary" onClick={() => onSubmit(currentSort)}>
+            {t('apply')}
+          </Button>
+        </Tooltip>
       </div>
     </div>
   );

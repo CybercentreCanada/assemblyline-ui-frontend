@@ -8,6 +8,7 @@ import {
   Paper,
   Switch,
   TextField,
+  Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
@@ -288,15 +289,17 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       </div>
 
       <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(4), textAlign: 'right' }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAddClick}
-          disabled={!formValid || loading}
-          startIcon={loading && <CircularProgress size={24} />}
-        >
-          {isExistingFavorite ? t('update.button') : t('add.button')}
-        </Button>
+        <Tooltip title={isExistingFavorite ? t('update.tooltip') : t('add.tooltip')}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddClick}
+            disabled={!formValid || loading}
+            startIcon={loading && <CircularProgress size={24} />}
+          >
+            {isExistingFavorite ? t('update.button') : t('add.button')}
+          </Button>
+        </Tooltip>
       </div>
 
       {/* Your personnal favorites  */}

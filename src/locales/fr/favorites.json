@@ -1,5 +1,6 @@
 {
   "add.button": "Ajouter",
+  "add.tooltip": "Ajouter le favori",
   "addfavorites": "Gérer les favoris",
   "cancel": "Annuler",
   "confirmation.confirm": "Êtes-vous sûr de vouloir procéder?",
@@ -30,5 +31,6 @@
   "public": "Public",
   "query": "Requête (requise)",
   "update.button": "Modifier",
+  "update.tooltip": "Modifier le favori",
   "yourfavorites": "Favoris personels"
 }

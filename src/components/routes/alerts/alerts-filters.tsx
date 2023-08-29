@@ -1,5 +1,15 @@
 /* eslint-disable no-param-reassign */
-import { Autocomplete, Button, FormControl, MenuItem, Select, TextField, Typography, useTheme } from '@mui/material';
+import {
+  Autocomplete,
+  Button,
+  FormControl,
+  MenuItem,
+  Select,
+  TextField,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import CustomChip from 'components/visual/CustomChip';
 import SearchQuery, {
@@ -336,12 +346,17 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
         </div>
       </div>
       <div className={classes.actions}>
-        <Button variant="outlined" onClick={onClearBtnClick}>
-          {t('reset')}
-        </Button>
-        <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
-          {t('apply')}
-        </Button>
+        <Tooltip title={t('filters.clear')}>
+          <Button variant="outlined" onClick={onClearBtnClick}>
+            {t('reset')}
+          </Button>
+        </Tooltip>
+
+        <Tooltip title={t('filters.apply')}>
+          <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
+            {t('apply')}
+          </Button>
+        </Tooltip>
       </div>
     </div>
   );
