@@ -245,13 +245,18 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
         >
           <div>{t('private')}</div>
           <div style={{ flex: 1 }}>
-            <Switch checked={publicSwitch} onChange={event => onSwitchChange(event.target.checked)} color="primary" />
+            <Switch
+              checked={publicSwitch}
+              onChange={event => onSwitchChange(event.target.checked)}
+              color="primary"
+              disabled={loading}
+            />
           </div>
           <div>{t('public')}</div>
         </Button>
       </div>
       {publicSwitch && c12nDef.enforce ? (
-        <Classification type="picker" c12n={classification} setClassification={setClassification} />
+        <Classification type="picker" c12n={classification} setClassification={setClassification} disabled={loading} />
       ) : (
         <div style={{ padding: theme.spacing(2.25) }} />
       )}
@@ -265,6 +270,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
             onChange={onQueryChange}
             onBlur={() => setQueryValue({ ...queryValue, valid: !!queryValue.value })}
             fullWidth
+            disabled={loading}
           />
         </div>
         <div style={{ marginTop: theme.spacing(2) }}>
@@ -276,6 +282,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
             onChange={onNameChange}
             onBlur={() => setNameValue({ ...nameValue, valid: !!nameValue.value })}
             fullWidth
+            disabled={loading}
           />
         </div>
       </div>
@@ -349,31 +356,26 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           <Grid container flexDirection="column" spacing={theme.spacing(2)}>
             <Grid item component="span">
               {isExistingFavorite ? t('confirmation.content.update') : t('confirmation.content.add')}
+              <b>{nameValue ? nameValue.value : 'undefined'}</b>
+              {isExistingFavorite ? t('confirmation.content.update2') : t('confirmation.content.add2')}
               {publicSwitch ? t('confirmation.content.public') : t('confirmation.content.private')}
-            </Grid>
-
-            <Grid item>
-              <Typography variant="subtitle2" children={t('confirmation.name')} />
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {nameValue ? nameValue.value : null}
-              </Paper>
             </Grid>
 
             {isExistingFavorite ? (
               <>
                 <Grid item>
-                  <Typography variant="subtitle2">{t('confirmation.modifiedQuery')}</Typography>
-                  <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {queryValue.value}
-                  </Paper>
-                </Grid>
-
-                <Grid item>
-                  <Typography variant="subtitle2">{t('confirmation.originalQuery')}</Typography>
+                  <Typography variant="subtitle2">{t('confirmation.from')}</Typography>
                   <Paper component="pre" variant="outlined" className={classes.preview}>
                     {publicSwitch
                       ? globalFavorites.find(f => f.name === nameValue.value)?.query
                       : userFavorites.find(f => f.name === nameValue.value)?.query}
+                  </Paper>
+                </Grid>
+
+                <Grid item>
+                  <Typography variant="subtitle2">{t('confirmation.to')}</Typography>
+                  <Paper component="pre" variant="outlined" className={classes.preview}>
+                    {queryValue.value}
                   </Paper>
                 </Grid>
               </>
