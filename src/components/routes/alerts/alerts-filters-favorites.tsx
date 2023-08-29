@@ -197,6 +197,35 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('addfavorites')}</Typography>
       </div>
+      {publicSwitch && c12nDef.enforce ? (
+        <Classification type="picker" c12n={classification} setClassification={setClassification} />
+      ) : (
+        <div style={{ padding: theme.spacing(2.25) }} />
+      )}
+      <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(2) }}>
+        <div>
+          <Typography variant="subtitle2">{t('name')}</Typography>
+          <TextField
+            error={!nameValue.valid}
+            variant="outlined"
+            value={nameValue.value}
+            onChange={onNameChange}
+            onBlur={() => setNameValue({ ...nameValue, valid: !!nameValue.value })}
+            fullWidth
+          />
+        </div>
+        <div style={{ marginTop: theme.spacing(2) }}>
+          <Typography variant="subtitle2">{t('query')}</Typography>
+          <TextField
+            error={!queryValue.valid}
+            variant="outlined"
+            value={queryValue.value}
+            onChange={onQueryChange}
+            onBlur={() => setQueryValue({ ...queryValue, valid: !!queryValue.value })}
+            fullWidth
+          />
+        </div>
+      </div>
       <div style={{ textAlign: 'right' }}>
         <Button
           onClick={() => onSwitchChange(!publicSwitch)}
@@ -211,35 +240,6 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           </div>
           <div>{t('public')}</div>
         </Button>
-      </div>
-      {publicSwitch && c12nDef.enforce ? (
-        <Classification type="picker" c12n={classification} setClassification={setClassification} />
-      ) : (
-        <div style={{ padding: theme.spacing(2.25) }} />
-      )}
-      <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(2) }}>
-        <div>
-          <Typography variant="subtitle2">{t('query')}</Typography>
-          <TextField
-            error={!queryValue.valid}
-            variant="outlined"
-            value={queryValue.value}
-            onChange={onQueryChange}
-            onBlur={() => setQueryValue({ ...queryValue, valid: !!queryValue.value })}
-            fullWidth
-          />
-        </div>
-        <div style={{ marginTop: theme.spacing(2) }}>
-          <Typography variant="subtitle2">{t('name')}</Typography>
-          <TextField
-            error={!nameValue.valid}
-            variant="outlined"
-            value={nameValue.value}
-            onChange={onNameChange}
-            onBlur={() => setNameValue({ ...nameValue, valid: !!nameValue.value })}
-            fullWidth
-          />
-        </div>
       </div>
 
       <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(4), textAlign: 'right' }}>
