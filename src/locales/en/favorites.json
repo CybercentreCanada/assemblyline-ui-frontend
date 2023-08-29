@@ -15,6 +15,6 @@
   "private": "Private",
   "public": "Public",
   "query": "Query (required)",
-  "save": "Add to favorites",
+  "save": "Save to favorites",
   "yourfavorites": "Your Favorites"
 }
