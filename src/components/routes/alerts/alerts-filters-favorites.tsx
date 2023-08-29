@@ -1,5 +1,16 @@
 import EditIcon from '@mui/icons-material/Edit';
-import { Button, Divider, Grid, IconButton, Paper, Switch, TextField, Typography, useTheme } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  Divider,
+  Grid,
+  IconButton,
+  Paper,
+  Switch,
+  TextField,
+  Typography,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
@@ -75,6 +86,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     favorite: null,
     isPublic: false
   });
+  const [loading, setLoading] = useState<boolean>(false);
 
   const isExistingFavorite = useMemo<boolean>(
     () =>
@@ -91,15 +103,31 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     setFormValid(!!_queryValue.value && !!_nameValue.value);
   };
 
+  const handleEnter = useCallback(() => {
+    setLoading(true);
+  }, []);
+
+  const handleExit = useCallback(() => {
+    setLoading(false);
+    setQueryValue({ valid: true, value: initValue });
+    setNameValue({ valid: true, value: '' });
+  }, [initValue]);
+
   const _onDelete = (favorite: Favorite, isPublic: boolean) => {
     if (isPublic) {
-      onDeleteGlobalFavorite(favorite, () => {
-        onDeleted(favorite);
-      });
+      onDeleteGlobalFavorite(
+        favorite,
+        () => onDeleted(favorite),
+        handleEnter,
+        () => setLoading(false)
+      );
     } else {
-      onDeleteUserFavorite(favorite, () => {
-        onDeleted(favorite);
-      });
+      onDeleteUserFavorite(
+        favorite,
+        () => onDeleted(favorite),
+        handleEnter,
+        () => setLoading(false)
+      );
     }
   };
 
@@ -113,15 +141,25 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       };
 
       if (publicSwitch) {
-        onAddGlobalFavorite(favorite, () => {
-          showSuccessMessage(t('added.global'));
-          onSaved(favorite);
-        });
+        onAddGlobalFavorite(
+          favorite,
+          () => {
+            showSuccessMessage(t('added.global'));
+            onSaved(favorite);
+          },
+          handleEnter,
+          handleExit
+        );
       } else {
-        onAddUserFavorite(favorite, () => {
-          showSuccessMessage(t('added.personal'));
-          onSaved(favorite);
-        });
+        onAddUserFavorite(
+          favorite,
+          () => {
+            showSuccessMessage(t('added.personal'));
+            onSaved(favorite);
+          },
+          handleEnter,
+          handleExit
+        );
       }
     } else {
       showErrorMessage(t('form.field.required'));
@@ -243,7 +281,13 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       </div>
 
       <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(4), textAlign: 'right' }}>
-        <Button variant="contained" color="primary" onClick={handleAddClick} disabled={!formValid}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAddClick}
+          disabled={!formValid || loading}
+          startIcon={loading && <CircularProgress size={24} />}
+        >
           {isExistingFavorite ? t('update.button') : t('add.button')}
         </Button>
       </div>
