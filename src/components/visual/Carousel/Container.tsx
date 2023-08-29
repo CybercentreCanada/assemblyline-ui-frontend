@@ -7,7 +7,7 @@ import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
-import { CarouselThumb, useCarousel } from '.';
+import { CarouselThumb, CAROUSEL_PARAM, useCarousel } from '.';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -69,7 +69,7 @@ export const WrappedCarouselContainer = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const currentImage = useMemo(() => {
-    const query = new SimpleSearchQuery(location.search).get('carousel', null);
+    const query = new SimpleSearchQuery(location.search).get(CAROUSEL_PARAM, null);
     const index = images.findIndex(i => i.img === query);
     return index >= 0 ? images[index] : null;
   }, [images, location.search]);

@@ -6,7 +6,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
-import { Image, useCarousel } from '.';
+import { CAROUSEL_PARAM, Image, useCarousel } from '.';
 
 const useStyles = makeStyles((theme: Theme) => ({
   button: {
@@ -80,7 +80,7 @@ const WrappedCarouselThumb = ({ image = null, carousel = false, tooltipPlacement
   useEffect(() => {
     if (!carousel) return;
     const query = new SimpleSearchQuery(location.search);
-    const param = query.get('carousel', null);
+    const param = query.get(CAROUSEL_PARAM, null);
 
     if (param === image.img) {
       ref.current.scrollIntoView({

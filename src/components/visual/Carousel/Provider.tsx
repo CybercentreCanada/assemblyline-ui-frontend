@@ -11,7 +11,7 @@ export type Image = {
   thumb: string; // sha256 of the thumb
 };
 
-const CAROUSEL_PARAM = 'carousel';
+export const CAROUSEL_PARAM = 'carousel';
 
 export interface CarouselProviderProps {
   children: React.ReactNode;
@@ -69,7 +69,7 @@ const WrappedCarouselProvider = ({ children }: CarouselProviderProps) => {
 
   const onNextImage = useCallback(() => {
     const query = new SimpleSearchQuery(location.search);
-    const param = query.get('carousel', null);
+    const param = query.get(CAROUSEL_PARAM, null);
     const index = images.findIndex(i => i.img === param);
 
     if (index >= 0 && index < images.length - 1) {
@@ -80,7 +80,7 @@ const WrappedCarouselProvider = ({ children }: CarouselProviderProps) => {
 
   const onPreviousImage = useCallback(() => {
     const query = new SimpleSearchQuery(location.search);
-    const param = query.get('carousel', null);
+    const param = query.get(CAROUSEL_PARAM, null);
     const index = images.findIndex(i => i.img === param);
 
     if (index >= 1 && index < images.length) {
@@ -90,7 +90,7 @@ const WrappedCarouselProvider = ({ children }: CarouselProviderProps) => {
   }, [images, location.hash, location.pathname, location.search, navigate]);
 
   useEffect(
-    () => setOpen(!!currentUser && !!new SimpleSearchQuery(location.search).get('carousel', null)),
+    () => setOpen(!!currentUser && !!new SimpleSearchQuery(location.search).get(CAROUSEL_PARAM, null)),
     [currentUser, location.search]
   );
 
