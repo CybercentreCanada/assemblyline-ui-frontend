@@ -257,17 +257,6 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       )}
       <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(2) }}>
         <div>
-          <Typography variant="subtitle2">{t('name')}</Typography>
-          <TextField
-            error={!nameValue.valid}
-            variant="outlined"
-            value={nameValue.value}
-            onChange={onNameChange}
-            onBlur={() => setNameValue({ ...nameValue, valid: !!nameValue.value })}
-            fullWidth
-          />
-        </div>
-        <div style={{ marginTop: theme.spacing(2) }}>
           <Typography variant="subtitle2">{t('query')}</Typography>
           <TextField
             error={!queryValue.valid}
@@ -275,6 +264,17 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
             value={queryValue.value}
             onChange={onQueryChange}
             onBlur={() => setQueryValue({ ...queryValue, valid: !!queryValue.value })}
+            fullWidth
+          />
+        </div>
+        <div style={{ marginTop: theme.spacing(2) }}>
+          <Typography variant="subtitle2">{t('name')}</Typography>
+          <TextField
+            error={!nameValue.valid}
+            variant="outlined"
+            value={nameValue.value}
+            onChange={onNameChange}
+            onBlur={() => setNameValue({ ...nameValue, valid: !!nameValue.value })}
             fullWidth
           />
         </div>
