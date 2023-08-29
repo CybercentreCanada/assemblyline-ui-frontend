@@ -1,5 +1,5 @@
 {
-  "add.button": "Add Favorite",
+  "add.button": "Add",
   "added.global": "Successfully added favorite to the global list.",
   "added.personal": "Successfully added favorite to your personal list.",
   "addfavorites": "Manage favorites",
@@ -28,6 +28,6 @@
   "private": "Private",
   "public": "Public",
   "query": "Query (required)",
-  "update.button": "Update Favorite",
+  "update.button": "Update",
   "yourfavorites": "Your Favorites"
 }
