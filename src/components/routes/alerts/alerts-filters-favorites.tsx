@@ -328,8 +328,8 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
                   <Typography variant="subtitle2">{t('confirmation.originalQuery')}</Typography>
                   <Paper component="pre" variant="outlined" className={classes.preview}>
                     {publicSwitch
-                      ? globalFavorites.find(f => f.name === nameValue.value)?.name
-                      : userFavorites.find(f => f.name === nameValue.value)?.name}
+                      ? globalFavorites.find(f => f.name === nameValue.value)?.query
+                      : userFavorites.find(f => f.name === nameValue.value)?.query}
                   </Paper>
                 </Grid>
               </>
