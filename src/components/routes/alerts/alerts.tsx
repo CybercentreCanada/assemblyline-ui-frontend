@@ -245,7 +245,7 @@ const Alerts: React.FC = () => {
 
   // Handler/callback for when clicking the 'Add' btn on the AlertsFavorite component.
   const onFavoriteAdd = (filter: { query: string; name: string }) => {
-    setDrawer({ ...drawer, open: false });
+    // setDrawer({ ...drawer, open: false });
   };
 
   // Handler/callback for when deleting a favorite on the AlertsFavorite component.

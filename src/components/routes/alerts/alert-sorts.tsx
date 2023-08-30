@@ -6,6 +6,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
@@ -29,6 +30,13 @@ const useStyles = makeStyles(theme => ({
   },
   asc: {
     transform: 'rotate(180deg)'
+  },
+  actions: {
+    display: 'flex',
+    gap: theme.spacing(1),
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap',
+    marginTop: theme.spacing(1)
   }
 }));
 
@@ -71,11 +79,6 @@ const WrappedAlertsSorts: React.FC<Props> = ({ onSubmit = () => null }) => {
   return (
     <div>
       <div style={{ paddingBottom: theme.spacing(2) }}>
-        <div style={{ float: 'right' }}>
-          <Button variant="contained" onClick={() => setCurrentSort(DEFAULT_SORT)}>
-            {t('sorts.reset')}
-          </Button>
-        </div>
         <Typography variant="h4">{t('sorts.title')}</Typography>
       </div>
       <div style={{ marginBottom: theme.spacing(2), marginTop: theme.spacing(2) }}>
@@ -95,10 +98,17 @@ const WrappedAlertsSorts: React.FC<Props> = ({ onSubmit = () => null }) => {
           ))}
         </List>
       </div>
-      <div style={{ textAlign: 'right', marginTop: theme.spacing(1) }}>
-        <Button variant="contained" color="primary" onClick={() => onSubmit(currentSort)}>
-          {t('sorts.apply')}
-        </Button>
+      <div className={classes.actions}>
+        <Tooltip title={t('sorts.reset')}>
+          <Button variant="outlined" onClick={() => setCurrentSort(DEFAULT_SORT)}>
+            {t('reset')}
+          </Button>
+        </Tooltip>
+        <Tooltip title={t('sorts.apply')}>
+          <Button variant="contained" color="primary" onClick={() => onSubmit(currentSort)}>
+            {t('apply')}
+          </Button>
+        </Tooltip>
       </div>
     </div>
   );
