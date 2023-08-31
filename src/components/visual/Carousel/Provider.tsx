@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { CarouselContainer } from '.';
 
 export type Image = {
+  id?: string; // unique id using the simple hash
   name: string;
   description: string;
   img: string; // sha256 of the image
@@ -20,9 +21,9 @@ export interface CarouselProviderProps {
 export type CarouselContextProps = {
   open?: boolean;
   images: Image[];
-  onOpenImage: (image: Image) => void;
+  onOpenImage: (id: string) => void;
   onCloseImage: () => void;
-  onAddImage: (img: Image) => void;
+  onAddImage: (img: Image, onIDChange: (id: string) => void) => void;
   onRemoveImage: (img: Image) => void;
   onClearImages: () => void;
   onNextImage?: () => void;
@@ -39,10 +40,20 @@ const WrappedCarouselProvider = ({ children }: CarouselProviderProps) => {
   const [images, setImages] = useState<Image[]>([]);
   const [open, setOpen] = useState<boolean>(false);
 
+  const simpleHash = useCallback((text: string) => {
+    let hash = 0;
+    for (var i = 0; i < text.length; i++) {
+      var char = text.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash.toString(16);
+  }, []);
+
   const onOpenImage = useCallback(
-    (image: Image) => {
+    (id: string) => {
       const query = new SimpleSearchQuery(location.search);
-      query.set(CAROUSEL_PARAM, image.img);
+      query.set(CAROUSEL_PARAM, id);
       navigate(`${location.pathname}?${query.toString()}${location.hash}`);
     },
     [location.hash, location.pathname, location.search, navigate]
@@ -55,9 +66,18 @@ const WrappedCarouselProvider = ({ children }: CarouselProviderProps) => {
   }, [location.hash, location.pathname, location.search, navigate]);
 
   const onAddImage = useCallback(
-    (img: Image) =>
-      setImages(imgs => (imgs.some(i => i.name === img.name && i.img === img.img) ? imgs : [...imgs, img])),
-    []
+    (img: Image, onIDChange: (id: string) => void) => {
+      setImages(imgs => {
+        if (imgs.some(i => i.name === img.name && i.img === img.img)) return imgs;
+        const count = imgs.filter(
+          i => i.name === img.name || i.description === img.description || i.img === img.img
+        ).length;
+        const id = simpleHash(`${JSON.stringify(img)}${count}`);
+        onIDChange(id);
+        return [...imgs, { ...img, id }];
+      });
+    },
+    [simpleHash]
   );
 
   const onRemoveImage = useCallback(
@@ -70,10 +90,10 @@ const WrappedCarouselProvider = ({ children }: CarouselProviderProps) => {
   const onNextImage = useCallback(() => {
     const query = new SimpleSearchQuery(location.search);
     const param = query.get(CAROUSEL_PARAM, null);
-    const index = images.findIndex(i => i.img === param);
+    const index = images.findIndex(i => i.id === param);
 
     if (index >= 0 && index < images.length - 1) {
-      query.set(CAROUSEL_PARAM, images[index + 1].img);
+      query.set(CAROUSEL_PARAM, images[index + 1].id);
       navigate(`${location.pathname}?${query.toString()}${location.hash}`);
     }
   }, [images, location.hash, location.pathname, location.search, navigate]);
@@ -81,10 +101,10 @@ const WrappedCarouselProvider = ({ children }: CarouselProviderProps) => {
   const onPreviousImage = useCallback(() => {
     const query = new SimpleSearchQuery(location.search);
     const param = query.get(CAROUSEL_PARAM, null);
-    const index = images.findIndex(i => i.img === param);
+    const index = images.findIndex(i => i.id === param);
 
     if (index >= 1 && index < images.length) {
-      query.set(CAROUSEL_PARAM, images[index - 1].img);
+      query.set(CAROUSEL_PARAM, images[index - 1].id);
       navigate(`${location.pathname}?${query.toString()}${location.hash}`);
     }
   }, [images, location.hash, location.pathname, location.search, navigate]);

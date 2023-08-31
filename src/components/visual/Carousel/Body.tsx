@@ -8,7 +8,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   container: {
     display: 'flex',
     flexWrap: 'nowrap',
-    overflowX: 'auto'
+    overflowX: 'auto',
+    alignItems: 'center'
   },
   wrap: {
     flexWrap: 'wrap'
