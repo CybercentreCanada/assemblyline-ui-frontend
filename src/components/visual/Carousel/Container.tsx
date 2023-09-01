@@ -2,7 +2,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import { Button, CircularProgress, IconButton, Modal, Skeleton, Theme, Typography, useTheme } from '@mui/material';
+import { Button, CircularProgress, IconButton, Modal, Skeleton, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/carousel/Carousel';
@@ -85,11 +85,14 @@ const useStyles = makeStyles((theme: Theme) => ({
       textOverflow: 'ellipsis'
     }
   },
-  content: {
+  hero: {
     display: 'grid',
     borderRadius: `0 0 ${theme.spacing(1)} ${theme.spacing(1)}`,
     padding: `0 0 ${theme.spacing(1)} 0`,
     backgroundColor: theme.palette.mode === 'dark' ? theme.palette.common.black : theme.palette.common.white
+  },
+  heroButton: {
+    padding: 0
   },
   image: {
     maxWidth: '100%',
@@ -111,23 +114,29 @@ const useStyles = makeStyles((theme: Theme) => ({
     minWidth: '50vw'
   },
   button: {
-    backgroundColor: theme.palette.background.paper
+    backgroundColor: theme.palette.background.default,
+    opacity: 1,
+    transition: theme.transitions.create('opacity', {
+      easing: theme.transitions.easing.easeInOut,
+      duration: theme.transitions.duration.shortest
+    }),
+    '&:hover': {
+      backgroundColor: theme.palette.background.default,
+      opacity: 0.5
+    }
   }
 }));
 
 export const WrappedCarouselContainer = () => {
   const { t } = useTranslation('search');
-  const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
   const { apiCall } = useMyAPI();
   const { open, images, onCloseImage, onNextImage, onPreviousImage } = useCarousel();
 
-  const [data, setData] = useState<string>('asd');
+  const [data, setData] = useState<string>(null);
   const [width, setWidth] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
-  console.log(theme.breakpoints.down('md'));
 
   const currentImage = useMemo(() => {
     const query = new SimpleSearchQuery(location.search).get(CAROUSEL_PARAM, null);
@@ -186,15 +195,17 @@ export const WrappedCarouselContainer = () => {
                 {loading && <Skeleton variant="rounded" height="100%" width="100%" />}
                 {!loading && currentImage && <span className={classes.text}>{currentImage.description}</span>}
               </Typography>
-              <Button className={classes.content} onClick={handleClick}>
-                {loading ? (
-                  <div className={classes.progress} children={<CircularProgress />} />
-                ) : !data ? (
-                  <div className={classes.progress} children={<BrokenImageOutlinedIcon fontSize="large" />} />
-                ) : (
-                  <img id="hero-image" className={classes.image} src={data} alt={currentImage.name} />
-                )}
-              </Button>
+              <div className={classes.hero}>
+                <Button className={classes.heroButton} onClick={handleClick}>
+                  {loading ? (
+                    <div className={classes.progress} children={<CircularProgress />} />
+                  ) : !data ? (
+                    <div className={classes.progress} children={<BrokenImageOutlinedIcon fontSize="large" />} />
+                  ) : (
+                    <img id="hero-image" className={classes.image} src={data} alt={currentImage.name} />
+                  )}
+                </Button>
+              </div>
             </div>
           )}
 

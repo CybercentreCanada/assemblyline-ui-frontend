@@ -12,24 +12,34 @@ const useStyles = makeStyles((theme: Theme) => ({
   button: {
     flexShrink: 0,
     padding: theme.spacing(0.5),
-    boxSizing: 'border-box'
-  },
-  image: {
-    width: '100%',
-    height: '100%',
+    boxSizing: 'border-box',
+    width: '30vw',
     maxHeight: '128px',
     maxWidth: '128px',
     objectFit: 'contain',
     borderRadius: theme.spacing(0.5)
   },
+  image: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
+    borderRadius: theme.spacing(0.5)
+  },
   carousel: {
     filter: 'brightness(0.5)',
-    [theme.breakpoints.down('md')]: {
-      maxWidth: '30vw'
+    transition: theme.transitions.create('filter', {
+      easing: theme.transitions.easing.easeInOut,
+      duration: theme.transitions.duration.shortest
+    }),
+    '&:hover': {
+      filter: `brightness(0.9)`
     }
   },
   selected: {
     filter: 'brightness(1)'
+  },
+  broken: {
+    aspectRatio: 1
   }
 }));
 
@@ -109,7 +119,12 @@ const WrappedCarouselThumb = ({ image = null, carousel = false, tooltipPlacement
   return (
     <Tooltip title={image.name} placement={tooltipPlacement}>
       <Button
-        className={clsx(classes.button, carousel && classes.carousel, selected && classes.selected)}
+        className={clsx(
+          classes.button,
+          carousel && classes.carousel,
+          !data && classes.broken,
+          selected && classes.selected
+        )}
         ref={ref}
         onClick={() => onOpenImage(image?.id || id)}
       >
