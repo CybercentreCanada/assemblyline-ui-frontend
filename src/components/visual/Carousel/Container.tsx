@@ -2,7 +2,17 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import { Button, CircularProgress, IconButton, Modal, Skeleton, Theme, Typography } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  IconButton,
+  Modal,
+  Skeleton,
+  Theme,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/carousel/Carousel';
@@ -33,7 +43,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   close: {
     gridArea: 'close',
     placeSelf: 'end',
-    margin: theme.spacing(2)
+    margin: theme.spacing(2),
+    [theme.breakpoints.down('md')]: {
+      margin: theme.spacing(1)
+    }
   },
   left: {
     gridArea: 'left',
@@ -97,7 +110,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   image: {
     maxWidth: '100%',
     objectFit: 'contain',
-    maxHeight: 'calc(100vh - 260px)'
+    maxHeight: 'calc(100vh - 260px)',
+    [theme.breakpoints.down('md')]: {
+      maxHeight: 'calc(100vh - 230px)'
+    }
   },
   progress: {
     width: '100vw',
@@ -107,7 +123,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'grid',
     placeItems: 'center',
     [theme.breakpoints.down('md')]: {
-      maxWidth: '100vw'
+      maxWidth: '100vw',
+      maxHeight: 'calc(100vh - 230px)'
     }
   },
   spacer: {
@@ -129,6 +146,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const WrappedCarouselContainer = () => {
   const { t } = useTranslation('search');
+  const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
   const { apiCall } = useMyAPI();
@@ -137,6 +155,8 @@ export const WrappedCarouselContainer = () => {
   const [data, setData] = useState<string>(null);
   const [width, setWidth] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const isDownMD = useMediaQuery(theme.breakpoints.down('md'));
 
   const currentImage = useMemo(() => {
     const query = new SimpleSearchQuery(location.search).get(CAROUSEL_PARAM, null);
@@ -218,7 +238,7 @@ export const WrappedCarouselContainer = () => {
           </div>
 
           <div className={classes.close} onClick={onCloseImage}>
-            <IconButton className={classes.button} size="large" children={<CloseIcon />} />
+            <IconButton className={classes.button} size={isDownMD ? 'small' : 'large'} children={<CloseIcon />} />
           </div>
           <div className={classes.left} onClick={onPreviousImage}>
             <IconButton className={classes.button} size="large" children={<ArrowBackIosNewIcon />} />
