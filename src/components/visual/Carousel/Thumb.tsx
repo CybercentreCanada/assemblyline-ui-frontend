@@ -1,30 +1,46 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
-import { Button, ImageListItemBar, Skeleton, Theme, Tooltip } from '@mui/material';
+import { Button, Skeleton, Theme, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CAROUSEL_PARAM, Image } from 'components/providers/CarouselProvider';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
-import { Image, useCarousel } from '.';
 
 const useStyles = makeStyles((theme: Theme) => ({
   button: {
-    minHeight: '128px',
-    minWidth: '128px',
-    padding: theme.spacing(0.5)
-  },
-  image: {
-    maxWidth: '100%',
-    maxHeight: '100%',
+    flexShrink: 0,
+    padding: theme.spacing(0.5),
+    boxSizing: 'border-box',
+    width: '30vw',
+    maxHeight: '128px',
+    maxWidth: '128px',
     objectFit: 'contain',
     borderRadius: theme.spacing(0.5)
   },
-  active: {
-    backgroundColor: theme.palette.background.paper
+  image: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
+    borderRadius: theme.spacing(0.5)
   },
   carousel: {
-    backgroundColor: theme.palette.common.black
+    filter: 'brightness(0.5)',
+    transition: theme.transitions.create('filter', {
+      easing: theme.transitions.easing.easeInOut,
+      duration: theme.transitions.duration.shortest
+    }),
+    '&:hover': {
+      filter: `brightness(0.9)`
+    }
+  },
+  selected: {
+    filter: 'brightness(1)'
+  },
+  broken: {
+    aspectRatio: 1
   }
 }));
 
@@ -46,18 +62,28 @@ type Props = {
     | 'top';
 };
 
-const WrappedCarouselThumb = ({ image = null, carousel = false, tooltipPlacement = 'bottom' }: Props) => {
+const WrappedCarouselThumb = ({ image = null, carousel = false, tooltipPlacement = 'top' }: Props) => {
   const classes = useStyles();
   const location = useLocation();
   const { apiCall } = useMyAPI();
   const { onAddImage, onRemoveImage, onOpenImage } = useCarousel();
 
   const [data, setData] = useState<string>(null);
+  const [id, setID] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   const ref = useRef<HTMLButtonElement>(null);
 
-  const active = useMemo<boolean>(() => false, []);
+  const selected = useMemo<boolean>(() => {
+    const query = new SimpleSearchQuery(location.search);
+    return query.get(CAROUSEL_PARAM, null) === image.id;
+  }, [image.id, location.search]);
+
+  const handleIDChange = useCallback((value: string) => {
+    setTimeout(() => {
+      setID(value);
+    }, 1);
+  }, []);
 
   useEffect(() => {
     if (!image) return;
@@ -73,40 +99,40 @@ const WrappedCarouselThumb = ({ image = null, carousel = false, tooltipPlacement
   }, [image]);
 
   useEffect(() => {
-    if (image && !carousel) onAddImage(image);
+    if (image && !carousel) onAddImage(image, handleIDChange);
     return () => !carousel && onRemoveImage(image);
-  }, [carousel, image, onAddImage, onRemoveImage]);
+  }, [carousel, handleIDChange, image, onAddImage, onRemoveImage]);
 
   useEffect(() => {
     if (!carousel) return;
     const query = new SimpleSearchQuery(location.search);
-    const param = query.get('carousel', null);
+    const param = query.get(CAROUSEL_PARAM, null);
 
-    if (param === image.img) {
+    if (param === image.id) {
       ref.current.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest',
         inline: 'center'
       });
     }
-  }, [carousel, image.img, location.search]);
+  }, [carousel, image.id, location.search]);
 
   return (
-    <Tooltip title={image.name} placement={tooltipPlacement} disableHoverListener={carousel}>
+    <Tooltip title={image.name} placement={tooltipPlacement}>
       <Button
-        className={clsx(classes.button, carousel && classes.carousel, active && classes.active)}
+        className={clsx(
+          classes.button,
+          carousel && classes.carousel,
+          !data && classes.broken,
+          selected && classes.selected
+        )}
         ref={ref}
-        onClick={() => onOpenImage(image)}
+        onClick={() => onOpenImage(image?.id || id)}
       >
         {loading ? (
           <Skeleton variant="rounded" height="100%" width="100%" />
         ) : data ? (
-          <>
-            <img className={classes.image} src={data} alt={image.name} />
-            {carousel && (
-              <ImageListItemBar title={image.name} subtitle={image.description} sx={{ textAlign: 'start' }} />
-            )}
-          </>
+          <img className={classes.image} src={data} alt={image.name} />
         ) : (
           <BrokenImageOutlinedIcon fontSize="large" />
         )}
