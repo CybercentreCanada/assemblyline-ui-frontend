@@ -2,11 +2,12 @@ import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import { Button, Skeleton, Theme, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CAROUSEL_PARAM, Image } from 'components/providers/CarouselProvider';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
-import { CAROUSEL_PARAM, Image, useCarousel } from '.';
 
 const useStyles = makeStyles((theme: Theme) => ({
   button: {

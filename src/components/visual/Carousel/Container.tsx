@@ -16,12 +16,14 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/carousel/Carousel';
+import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CAROUSEL_PARAM } from 'components/providers/CarouselProvider';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
-import { CarouselThumb, CAROUSEL_PARAM, useCarousel } from '.';
+import CarouselThumb from './Thumb';
 
 const useStyles = makeStyles((theme: Theme) => ({
   backdrop: {
