@@ -43,16 +43,16 @@ const useStyles = makeStyles((theme: Theme) => ({
   close: {
     gridArea: 'close',
     placeSelf: 'end',
-    margin: theme.spacing(2),
+    padding: theme.spacing(2),
     [theme.breakpoints.down('md')]: {
-      margin: theme.spacing(1)
+      padding: theme.spacing(1)
     }
   },
   left: {
     gridArea: 'left',
     display: 'grid',
     placeItems: 'center',
-    margin: theme.spacing(2),
+    padding: theme.spacing(2),
     [theme.breakpoints.down('md')]: {
       display: 'none'
     }
@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     gridArea: 'right',
     display: 'grid',
     placeItems: 'center',
-    margin: theme.spacing(2),
+    padding: theme.spacing(2),
     [theme.breakpoints.down('md')]: {
       display: 'none'
     }

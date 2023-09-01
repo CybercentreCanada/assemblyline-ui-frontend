@@ -110,8 +110,13 @@ const WrappedCarouselProvider = ({ children }: CarouselProviderProps) => {
   }, [images, location.hash, location.pathname, location.search, navigate]);
 
   useEffect(
-    () => setOpen(!!currentUser && !!new SimpleSearchQuery(location.search).get(CAROUSEL_PARAM, null)),
-    [currentUser, location.search]
+    () =>
+      setOpen(() => {
+        if (!currentUser) return false;
+        const query = new SimpleSearchQuery(location.search).get(CAROUSEL_PARAM, null);
+        return images.some(image => image.id === query);
+      }),
+    [currentUser, images, location.search]
   );
 
   return (
