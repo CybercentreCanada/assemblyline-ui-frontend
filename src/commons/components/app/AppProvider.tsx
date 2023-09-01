@@ -1,7 +1,7 @@
 import { CssBaseline, PaletteMode, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
 import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
-import { CarouselProvider } from 'components/providers/CarouselProvider';
+import CarouselProvider from 'components/providers/CarouselProvider';
 import DrawerProvider from 'components/providers/DrawerProvider';
 import HighlightProvider from 'components/providers/HighlightProvider';
 import i18n from 'i18n';
