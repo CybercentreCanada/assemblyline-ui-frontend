@@ -2,7 +2,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import { Button, CircularProgress, IconButton, Modal, Skeleton, Theme, Typography } from '@mui/material';
+import { Button, CircularProgress, IconButton, Modal, Skeleton, Theme, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/carousel/Carousel';
@@ -14,36 +14,44 @@ import { useLocation } from 'react-router';
 import { CarouselThumb, CAROUSEL_PARAM, useCarousel } from '.';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  backdrop: {},
-  root: {
+  backdrop: {
     backdropFilter: 'blur(2px)',
-    transition: 'opacity backdrop-filter 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;',
-    height: '100vh',
-    width: '100vw',
+    transition: 'backdrop-filter 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;'
+  },
+  root: {
     display: 'grid',
+    gridTemplateRows: 'auto 1fr auto',
+    gridTemplateColumns: 'auto 1fr auto',
     gridTemplateAreas: `"close close close"
                         "left main right"
-                        "nav nav nav"`,
-    gridTemplateRows: 'auto 1fr auto',
-    gridTemplateColumns: 'auto 1fr auto'
-
-    // [theme.breakpoints.only('xs')]: {
-    //   gridTemplateAreas: `"_ _ close"
-    //                       "main main main"
-    //                       "nav nav nav"`
-    // }
+                        "nav nav nav"`
   },
   main: {
-    placeSelf: 'center',
-    gridArea: 'main'
+    gridArea: 'main',
+    placeSelf: 'center'
   },
-  content: {
+  close: {
+    gridArea: 'close',
+    placeSelf: 'end',
+    margin: theme.spacing(2)
+  },
+  left: {
+    gridArea: 'left',
     display: 'grid',
-    borderRadius: theme.spacing(1),
-    paddingBottom: theme.spacing(1),
-    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.common.black : theme.palette.common.white,
-    width: 'min(100%, auto)',
-    height: 'min(100%, auto)'
+    placeItems: 'center',
+    margin: theme.spacing(2),
+    [theme.breakpoints.down('md')]: {
+      display: 'none'
+    }
+  },
+  right: {
+    gridArea: 'right',
+    display: 'grid',
+    placeItems: 'center',
+    margin: theme.spacing(2),
+    [theme.breakpoints.down('md')]: {
+      display: 'none'
+    }
   },
   navbar: {
     gridArea: 'nav',
@@ -52,51 +60,64 @@ const useStyles = makeStyles((theme: Theme) => ({
     overflowX: 'auto',
     alignItems: 'center'
   },
-  left: {
-    gridArea: 'left'
-  },
-  right: {
-    gridArea: 'right'
-  },
-  close: {
-    gridArea: 'close'
-  },
   header: {
     display: 'grid',
-
     gridTemplateColumns: 'auto 1fr',
     columnGap: theme.spacing(1),
     rowGap: theme.spacing(0.5),
-    margin: theme.spacing(1)
+    padding: theme.spacing(1),
+    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.common.black : theme.palette.common.white,
+    borderRadius: `${theme.spacing(1)} ${theme.spacing(1)} 0 0`
   },
-  button: {
-    padding: 0
+  title: {
+    fontWeight: 500
+  },
+  text: {
+    fontWeight: 400,
+    [theme.breakpoints.down('md')]: {
+      overflowX: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis'
+    },
+    '@media (max-height: 960px)': {
+      overflowX: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis'
+    }
+  },
+  content: {
+    display: 'grid',
+    borderRadius: `0 0 ${theme.spacing(1)} ${theme.spacing(1)}`,
+    padding: `0 0 ${theme.spacing(1)} 0`,
+    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.common.black : theme.palette.common.white
   },
   image: {
-    maxHeight: '100%',
     maxWidth: '100%',
-    objectFit: 'contain'
+    objectFit: 'contain',
+    maxHeight: 'calc(100vh - 260px)'
   },
   progress: {
-    width: '50vw',
-    aspectRatio: `${Math.sqrt(2)}`
+    width: '100vw',
+    maxWidth: '50vw',
+    maxHeight: 'calc(100vh - 260px)',
+    aspectRatio: `${Math.sqrt(2)}`,
+    display: 'grid',
+    placeItems: 'center',
+    [theme.breakpoints.down('md')]: {
+      maxWidth: '100vw'
+    }
   },
   spacer: {
-    minWidth: '50vw',
-    boxSizing: 'border-box',
-    flexGrow: 0
+    minWidth: '50vw'
   },
-  center: {
-    display: 'grid',
-    placeItems: 'center'
-  },
-  action: {
-    margin: theme.spacing(2)
+  button: {
+    backgroundColor: theme.palette.background.paper
   }
 }));
 
 export const WrappedCarouselContainer = () => {
   const { t } = useTranslation('search');
+  const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
   const { apiCall } = useMyAPI();
@@ -105,6 +126,8 @@ export const WrappedCarouselContainer = () => {
   const [data, setData] = useState<string>('asd');
   const [width, setWidth] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  console.log(theme.breakpoints.down('md'));
 
   const currentImage = useMemo(() => {
     const query = new SimpleSearchQuery(location.search).get(CAROUSEL_PARAM, null);
@@ -151,31 +174,27 @@ export const WrappedCarouselContainer = () => {
 
   return (
     <Carousel onNext={onNextImage} onPrevious={onPreviousImage}>
-      <Modal className={classes.root} open={open} onClose={onCloseImage}>
+      <Modal className={clsx(classes.root, classes.backdrop)} open={open} onClose={onCloseImage}>
         <>
           {currentImage && (
-            <div className={clsx(classes.center, classes.main)}>
-              <div className={classes.content} style={{ maxWidth: width }}>
-                <Typography className={classes.header} variant="subtitle2">
-                  <span style={{ fontWeight: 500 }}>{t('header.name')}</span>
-                  {loading && <Skeleton variant="rounded" height="100%" width="100%" />}
-                  {!loading && currentImage && <span style={{ fontWeight: 400 }}>{currentImage.name}</span>}
-                  <span style={{ fontWeight: 500 }}>{t('header.description')}</span>
-                  {loading && <Skeleton variant="rounded" height="100%" width="100%" />}
-                  {!loading && currentImage && <span style={{ fontWeight: 400 }}>{currentImage.description}</span>}
-                </Typography>
-              </div>
-              <div className={classes.content}>
-                <Button className={classes.button} onClick={handleClick}>
-                  {loading ? (
-                    <div className={clsx(classes.center, classes.progress)} children={<CircularProgress />} />
-                  ) : !data ? (
-                    <div className={classes.progress} children={<BrokenImageOutlinedIcon fontSize="large" />} />
-                  ) : (
-                    <img id="hero-image" className={classes.image} src={data} alt={currentImage.name} />
-                  )}
-                </Button>
-              </div>
+            <div className={classes.main}>
+              <Typography className={classes.header} variant="subtitle2" style={{ maxWidth: width }}>
+                <span className={classes.title}>{t('header.name')}</span>
+                {loading && <Skeleton variant="rounded" height="100%" width="100%" />}
+                {!loading && currentImage && <span className={classes.text}>{currentImage.name}</span>}
+                <span className={classes.title}>{t('header.description')}</span>
+                {loading && <Skeleton variant="rounded" height="100%" width="100%" />}
+                {!loading && currentImage && <span className={classes.text}>{currentImage.description}</span>}
+              </Typography>
+              <Button className={classes.content} onClick={handleClick}>
+                {loading ? (
+                  <div className={classes.progress} children={<CircularProgress />} />
+                ) : !data ? (
+                  <div className={classes.progress} children={<BrokenImageOutlinedIcon fontSize="large" />} />
+                ) : (
+                  <img id="hero-image" className={classes.image} src={data} alt={currentImage.name} />
+                )}
+              </Button>
             </div>
           )}
 
@@ -187,19 +206,15 @@ export const WrappedCarouselContainer = () => {
             <div className={classes.spacer} />
           </div>
 
-          <div className={clsx(classes.center, classes.action, classes.close)} onClick={onCloseImage}>
-            <IconButton color="primary" size="large" children={<CloseIcon />} />
+          <div className={classes.close} onClick={onCloseImage}>
+            <IconButton className={classes.button} size="large" children={<CloseIcon />} />
           </div>
-          <div className={clsx(classes.center, classes.action, classes.left)} onClick={onPreviousImage}>
-            <IconButton size="large" children={<ArrowBackIosNewIcon />} />
+          <div className={classes.left} onClick={onPreviousImage}>
+            <IconButton className={classes.button} size="large" children={<ArrowBackIosNewIcon />} />
           </div>
-          <div className={clsx(classes.center, classes.action, classes.right)} onClick={onNextImage}>
-            <IconButton size="large" children={<ArrowForwardIosIcon />} />
+          <div className={classes.right} onClick={onNextImage}>
+            <IconButton className={classes.button} size="large" children={<ArrowForwardIosIcon />} />
           </div>
-
-          {/* <Button className={clsx(classes.center, classes.close)} children={<CloseIcon />} /> */}
-          {/* <Button className={clsx(classes.center, classes.left)} children={<ArrowBackIosNewIcon />} />
-          <Button className={clsx(classes.center, classes.right)} children={<ArrowForwardIosIcon />} /> */}
         </>
       </Modal>
     </Carousel>

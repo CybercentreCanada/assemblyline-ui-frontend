@@ -23,7 +23,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderRadius: theme.spacing(0.5)
   },
   carousel: {
-    filter: 'brightness(0.5)'
+    filter: 'brightness(0.5)',
+    [theme.breakpoints.down('md')]: {
+      maxWidth: '30vw'
+    }
   },
   selected: {
     filter: 'brightness(1)'
