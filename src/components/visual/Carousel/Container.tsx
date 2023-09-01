@@ -232,7 +232,7 @@ export const WrappedCarouselContainer = () => {
           <div className={classes.navbar}>
             <div className={classes.spacer} />
             {images.map((image, i) => (
-              <CarouselThumb key={i} image={image} carousel tooltipPlacement="top" />
+              <CarouselThumb key={i} image={image} carousel />
             ))}
             <div className={classes.spacer} />
           </div>

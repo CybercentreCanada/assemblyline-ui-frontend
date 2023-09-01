@@ -61,7 +61,7 @@ type Props = {
     | 'top';
 };
 
-const WrappedCarouselThumb = ({ image = null, carousel = false, tooltipPlacement = 'bottom' }: Props) => {
+const WrappedCarouselThumb = ({ image = null, carousel = false, tooltipPlacement = 'top' }: Props) => {
   const classes = useStyles();
   const location = useLocation();
   const { apiCall } = useMyAPI();
