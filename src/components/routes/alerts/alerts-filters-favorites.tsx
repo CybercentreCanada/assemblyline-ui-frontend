@@ -1,7 +1,6 @@
 import EditIcon from '@mui/icons-material/Edit';
 import {
   Button,
-  CircularProgress,
   Divider,
   Grid,
   IconButton,
@@ -78,7 +77,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
   const [addConfirmation, setAddConfirmation] = useState<boolean>(false);
   const [updateConfirmation, setUpdateConfirmation] = useState<boolean>(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [waiting, setWaiting] = useState<boolean>(false);
 
   const isExistingFavorite = useMemo<boolean>(
     () =>
@@ -95,14 +94,12 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     setFormValid(!!_queryValue.value && !!_nameValue.value);
   };
 
-  const handleEnter = useCallback(() => {
-    setLoading(true);
-  }, []);
-
   const handleExit = useCallback(() => {
-    setLoading(false);
+    setWaiting(false);
     setQueryValue({ valid: true, value: initValue });
     setNameValue({ valid: true, value: '' });
+    setAddConfirmation(false);
+    setUpdateConfirmation(false);
   }, [initValue]);
 
   const handleDeleteFavorite = () => {
@@ -118,15 +115,21 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
         onDeleteGlobalFavorite(
           favorite,
           () => onDeleted(favorite),
-          handleEnter,
-          () => setLoading(false)
+          () => setWaiting(true),
+          () => {
+            setWaiting(false);
+            setDeleteConfirmation(false);
+          }
         );
       } else {
         onDeleteUserFavorite(
           favorite,
           () => onDeleted(favorite),
-          handleEnter,
-          () => setLoading(false)
+          () => setWaiting(true),
+          () => {
+            setWaiting(false);
+            setDeleteConfirmation(false);
+          }
         );
       }
     } else {
@@ -150,7 +153,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
             showSuccessMessage(t('added.global'));
             onSaved(favorite);
           },
-          handleEnter,
+          () => setWaiting(true),
           handleExit
         );
       } else {
@@ -160,7 +163,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
             showSuccessMessage(t('added.personal'));
             onSaved(favorite);
           },
-          handleEnter,
+          () => setWaiting(true),
           handleExit
         );
       }
@@ -221,18 +224,13 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
         >
           <div>{t('private')}</div>
           <div style={{ flex: 1 }}>
-            <Switch
-              checked={publicSwitch}
-              onChange={event => onSwitchChange(event.target.checked)}
-              color="primary"
-              disabled={loading}
-            />
+            <Switch checked={publicSwitch} onChange={event => onSwitchChange(event.target.checked)} color="primary" />
           </div>
           <div>{t('public')}</div>
         </Button>
       </div>
       {publicSwitch && c12nDef.enforce ? (
-        <Classification type="picker" c12n={classification} setClassification={setClassification} disabled={loading} />
+        <Classification type="picker" c12n={classification} setClassification={setClassification} />
       ) : (
         <div style={{ padding: theme.spacing(2.25) }} />
       )}
@@ -246,7 +244,6 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
             onChange={onQueryChange}
             onBlur={() => setQueryValue({ ...queryValue, valid: !!queryValue.value })}
             fullWidth
-            disabled={loading}
           />
         </div>
         <div style={{ marginTop: theme.spacing(2) }}>
@@ -258,7 +255,6 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
             onChange={onNameChange}
             onBlur={() => setNameValue({ ...nameValue, valid: !!nameValue.value })}
             fullWidth
-            disabled={loading}
           />
         </div>
       </div>
@@ -271,8 +267,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
                 variant="outlined"
                 color="primary"
                 onClick={() => setDeleteConfirmation(true)}
-                disabled={!formValid || loading}
-                startIcon={loading && <CircularProgress size={24} />}
+                disabled={!formValid}
               >
                 {t('delete.button')}
               </Button>
@@ -286,8 +281,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
                 variant="contained"
                 color="primary"
                 onClick={() => setUpdateConfirmation(true)}
-                disabled={!formValid || loading}
-                startIcon={loading && <CircularProgress size={24} />}
+                disabled={!formValid}
               >
                 {t('update.button')}
               </Button>
@@ -301,8 +295,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
                 variant="contained"
                 color="primary"
                 onClick={() => setAddConfirmation(true)}
-                disabled={!formValid || loading}
-                startIcon={loading && <CircularProgress size={24} />}
+                disabled={!formValid}
               >
                 {t('add.button')}
               </Button>
@@ -355,6 +348,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
 
       <ConfirmationDialog
         open={addConfirmation}
+        waiting={waiting}
         handleClose={() => setAddConfirmation(false)}
         handleAccept={() => {
           handleUpsertFavorite();
@@ -386,6 +380,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
 
       <ConfirmationDialog
         open={updateConfirmation}
+        waiting={waiting}
         handleClose={() => setUpdateConfirmation(false)}
         handleAccept={() => {
           handleUpsertFavorite();
@@ -426,6 +421,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
 
       <ConfirmationDialog
         open={deleteConfirmation}
+        waiting={waiting}
         handleClose={() => setDeleteConfirmation(false)}
         handleAccept={() => {
           handleDeleteFavorite();
