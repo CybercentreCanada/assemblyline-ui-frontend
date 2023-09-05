@@ -202,7 +202,7 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ enrichmentRe
   // create lookup tables
   // Note: we only take the order of when a source or name appears first. If they appear again later,
   //       then it will be added to the higher order.
-  // [{group: str, name: str, name_description: str, value: str, value_description}]
+  // [{group: str, name: str, name_description: str, value: str, value_description: str}]
   //   vLookup -> {group: {name: [[value, desc], ...]}}
   //   nLookup -> {group: [name, ...]}
   //   ndLookup -> {name: desc, ...}
@@ -223,10 +223,10 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ enrichmentRe
     // name maps
     if (!(enrichmentItem.group in nLookup)) {
       nLookup[enrichmentItem.group] = [];
-      ndLookup[enrichmentItem.name] = enrichmentItem.name_description;
     }
     if (!nLookup[enrichmentItem.group].includes(enrichmentItem.name)) {
       nLookup[enrichmentItem.group].push(enrichmentItem.name);
+      ndLookup[enrichmentItem.name] = enrichmentItem.name_description;
     }
 
     // group order
@@ -322,13 +322,10 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
   if (!!externalLookupResults) {
     Object.values(externalLookupResults).forEach(enrichmentResults => {
       enrichmentResults.items.forEach(enrichmentResult => {
-        console.log(`old clsf: ${classification}`);
         classification = getMaxClassification(classification, enrichmentResult.classification, c12nDef, 'long', false);
-        console.log(`new clsf: ${classification}`);
       });
     });
   }
-  console.log(`final clsf: ${classification}`);
 
   return actionable && externalLookupResults ? (
     <div>
