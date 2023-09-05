@@ -26,6 +26,8 @@
   "confirmation.ok.update": "Yes, Update it!",
   "confirmation.query": "Query",
   "confirmation.to": "To",
+  "delete.button": "Delete",
+  "delete.tooltip": "Delete the favorite",
   "form.field.required": "The Query and Name value are required.",
   "globalfavorites": "Public Favorites",
   "name": "Name (required)",
