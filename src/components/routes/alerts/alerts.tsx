@@ -1,8 +1,25 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import SortIcon from '@mui/icons-material/Sort';
 import StarIcon from '@mui/icons-material/Star';
-import { AlertTitle, Box, Drawer, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
+import {
+  AlertTitle,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Drawer,
+  Grid,
+  IconButton,
+  Paper,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import ListCarousel from 'commons/addons/lists/carousel/ListCarousel';
 import ListNavigator from 'commons/addons/lists/navigator/ListNavigator';
@@ -18,6 +35,7 @@ import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/sea
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchResultCount from 'components/visual/SearchResultCount';
+import 'moment/locale/fr';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
@@ -40,6 +58,8 @@ import usePromiseAPI from './hooks/usePromiseAPI';
 // Default size of a page to be used by the useAlert hook when fetching next load of data
 //  when scrolling has hit threshold.
 const PAGE_SIZE = 50;
+
+const LOCAL_STORAGE = 'alert.search';
 
 export interface AlertDrawerState {
   open: boolean;
@@ -89,6 +109,15 @@ const useStyles = makeStyles(theme => ({
     borderTopLeftRadius: 0,
     borderBottomLeftRadius: 0,
     marginRight: '0px !important'
+  },
+  preview: {
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr',
+    columnGap: theme.spacing(1),
+    margin: 0,
+    padding: theme.spacing(0.75, 1),
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word'
   }
 }));
 
@@ -132,6 +161,18 @@ const Alerts: React.FC = () => {
 
   // Define some references.
   const searchTextValue = useRef<string>('');
+
+  // Session states
+  const [sessionDialog, setSessionDialog] = useState<boolean>(false);
+
+  const parseSearchParams = useCallback((search: string) => {
+    let entries = [];
+    for (const entry of new URLSearchParams(search).entries()) {
+      entries.push(entry);
+    }
+    entries.sort((a, b) => `${a[0]}${a[1]}`.localeCompare(`${b[0]}${b[1]}`));
+    return entries;
+  }, []);
 
   useEffect(() => {
     if (searchQuery) {
@@ -377,6 +418,13 @@ const Alerts: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalDrawerOpened]);
 
+  useEffect(() => {
+    const search = localStorage.getItem(LOCAL_STORAGE);
+    if (search && [undefined, null, ''].includes(location.search))
+      navigate(`${location.pathname}${search}${location.hash}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return currentUser.roles.includes('alert_view') ? (
     <PageFullWidth margin={4}>
       <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
@@ -422,9 +470,62 @@ const Alerts: React.FC = () => {
         </div>
       </Drawer>
 
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Typography variant="h4">{t('alerts')}</Typography>
-      </div>
+      <Dialog open={sessionDialog} onClose={() => setSessionDialog(false)}>
+        <DialogTitle>{t('session.title')}</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(2) }}>
+          <div>{t('session.description')}</div>
+          <Grid item>
+            <Typography variant="subtitle2">{t('session.values')}</Typography>
+            <Paper component="pre" variant="outlined" className={classes.preview}>
+              {parseSearchParams(location.search)?.map(([k, v], i) => (
+                <div key={i} style={{ display: 'contents' }}>
+                  <b>{k}: </b>
+                  {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
+                </div>
+              ))}
+            </Paper>
+          </Grid>
+          <div>{localStorage.getItem(LOCAL_STORAGE) ? t('session.confirm.clear') : t('session.confirm.save')}</div>
+        </DialogContent>
+        <DialogActions>
+          {localStorage.getItem(LOCAL_STORAGE) && (
+            <Button
+              color="primary"
+              children={t('session.clear')}
+              onClick={() => {
+                localStorage.removeItem(LOCAL_STORAGE);
+                setSessionDialog(false);
+              }}
+            />
+          )}
+          <div style={{ flex: 1 }} />
+          <Button autoFocus color="secondary" children={t('session.cancel')} onClick={() => setSessionDialog(false)} />
+          <Button
+            color="primary"
+            children={t('session.save')}
+            onClick={() => {
+              localStorage.setItem(LOCAL_STORAGE, location.search);
+              setSessionDialog(false);
+            }}
+          />
+        </DialogActions>
+      </Dialog>
+
+      <Grid container alignItems="center" paddingBottom={2}>
+        <Grid item xs>
+          <Typography variant="h4">{t('alerts')}</Typography>
+        </Grid>
+
+        <Grid item xs style={{ textAlign: 'right', flex: 0 }}>
+          <Tooltip title={t('session.tooltip')}>
+            <div>
+              <IconButton onClick={() => setSessionDialog(true)} size="large">
+                <ManageSearchIcon />
+              </IconButton>
+            </div>
+          </Tooltip>
+        </Grid>
+      </Grid>
 
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
