@@ -24,6 +24,8 @@
   "confirmation.ok.update": "Oui, Modifiez le!",
   "confirmation.query": "Requête",
   "confirmation.to": "À",
+  "delete.button": "Supprimer",
+  "delete.tooltip": "Supprimer le favori",
   "form.field.required": "Les valeurs Requête et Nom sont obligatoires.",
   "globalfavorites": "Favoris publics",
   "name": "Nom (requis)",

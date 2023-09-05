@@ -25,12 +25,8 @@ import { useTranslation } from 'react-i18next';
 import useFavorites, { Favorite } from './hooks/useFavorites';
 
 const useStyles = makeStyles(theme => ({
-  label: {
-    display: 'flex',
-    alignItems: 'center',
-    columnGap: theme.spacing(1)
-  },
   editIconButton: {
+    borderRadius: '50%',
     backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.26)' : 'rgba(0, 0, 0, 0.26)',
     padding: 'inherit',
     height: '18.33px',
@@ -46,8 +42,6 @@ const useStyles = makeStyles(theme => ({
     wordBreak: 'break-word'
   }
 }));
-
-type Confirmation = { open: boolean; favorite: Favorite; isPublic: boolean };
 
 interface AlertsFiltersFavoritesProps {
   initValue?: string;
@@ -82,11 +76,8 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
   const [nameValue, setNameValue] = useState<{ valid: boolean; value: string }>({ valid: true, value: '' });
   const [publicSwitch, setPublicSwitch] = useState<boolean>(false);
   const [addConfirmation, setAddConfirmation] = useState<boolean>(false);
-  const [deleteConfirmation, setDeleteConfirmation] = useState<Confirmation>({
-    open: false,
-    favorite: null,
-    isPublic: false
-  });
+  const [updateConfirmation, setUpdateConfirmation] = useState<boolean>(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const isExistingFavorite = useMemo<boolean>(
@@ -114,25 +105,36 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     setNameValue({ valid: true, value: '' });
   }, [initValue]);
 
-  const _onDelete = (favorite: Favorite, isPublic: boolean) => {
-    if (isPublic) {
-      onDeleteGlobalFavorite(
-        favorite,
-        () => onDeleted(favorite),
-        handleEnter,
-        () => setLoading(false)
-      );
+  const handleDeleteFavorite = () => {
+    if (queryValue.value && nameValue.value) {
+      const favorite: Favorite = {
+        query: queryValue.value,
+        name: nameValue.value,
+        classification: publicSwitch && c12nDef.enforce ? classification : c12nDef.UNRESTRICTED,
+        created_by: currentUser.username
+      };
+
+      if (publicSwitch) {
+        onDeleteGlobalFavorite(
+          favorite,
+          () => onDeleted(favorite),
+          handleEnter,
+          () => setLoading(false)
+        );
+      } else {
+        onDeleteUserFavorite(
+          favorite,
+          () => onDeleted(favorite),
+          handleEnter,
+          () => setLoading(false)
+        );
+      }
     } else {
-      onDeleteUserFavorite(
-        favorite,
-        () => onDeleted(favorite),
-        handleEnter,
-        () => setLoading(false)
-      );
+      showErrorMessage(t('form.field.required'));
     }
   };
 
-  const _onSave = () => {
+  const handleUpsertFavorite = () => {
     if (queryValue.value && nameValue.value) {
       const favorite: Favorite = {
         query: queryValue.value,
@@ -165,33 +167,6 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     } else {
       showErrorMessage(t('form.field.required'));
     }
-  };
-
-  const handleDeleteClick = (favorite: Favorite, isPublic: boolean) => {
-    setDeleteConfirmation({ open: true, favorite, isPublic });
-  };
-
-  const handleDeleteAccept = () => {
-    const { favorite, isPublic } = deleteConfirmation;
-    _onDelete(favorite, isPublic);
-    setDeleteConfirmation({ open: false, favorite: null, isPublic: false });
-  };
-
-  const handleDeleteClose = () => {
-    setDeleteConfirmation({ open: false, favorite: null, isPublic: false });
-  };
-
-  const handleAddClick = () => {
-    setAddConfirmation(true);
-  };
-
-  const handleAddAccept = () => {
-    _onSave();
-    setAddConfirmation(false);
-  };
-
-  const handleAddClose = () => {
-    setAddConfirmation(false);
   };
 
   const _onSelect = (favorite: Favorite) => {
@@ -288,19 +263,53 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
         </div>
       </div>
 
-      <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(4), textAlign: 'right' }}>
-        <Tooltip title={isExistingFavorite ? t('update.tooltip') : t('add.tooltip')}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddClick}
-            disabled={!formValid || loading}
-            startIcon={loading && <CircularProgress size={24} />}
-          >
-            {isExistingFavorite ? t('update.button') : t('add.button')}
-          </Button>
-        </Tooltip>
-      </div>
+      <Grid container gap={1} justifyContent="flex-end" paddingTop={2} paddingBottom={4}>
+        {isExistingFavorite && (
+          <Tooltip title={t('delete.tooltip')}>
+            <span>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => setDeleteConfirmation(true)}
+                disabled={!formValid || loading}
+                startIcon={loading && <CircularProgress size={24} />}
+              >
+                {t('delete.button')}
+              </Button>
+            </span>
+          </Tooltip>
+        )}
+        {isExistingFavorite && (
+          <Tooltip title={t('update.tooltip')}>
+            <span>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setUpdateConfirmation(true)}
+                disabled={!formValid || loading}
+                startIcon={loading && <CircularProgress size={24} />}
+              >
+                {t('update.button')}
+              </Button>
+            </span>
+          </Tooltip>
+        )}
+        {!isExistingFavorite && (
+          <Tooltip title={t('add.tooltip')}>
+            <span>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setAddConfirmation(true)}
+                disabled={!formValid || loading}
+                startIcon={loading && <CircularProgress size={24} />}
+              >
+                {t('add.button')}
+              </Button>
+            </span>
+          </Tooltip>
+        )}
+      </Grid>
 
       {/* Your personnal favorites  */}
       <Typography variant="h6">{t('yourfavorites')}</Typography>
@@ -310,17 +319,15 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           items={userFavorites.map(f => ({
             size: 'medium',
             variant: 'outlined',
-            label: (
-              <div className={classes.label}>
-                <div>{f.name}</div>
-                <IconButton className={classes.editIconButton} onClick={handleEditClick(f, false)}>
-                  <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
-                </IconButton>
-              </div>
-            ),
+            label: <span>{f.name}</span>,
             tooltip: f.query,
+            deleteIcon: (
+              <IconButton className={classes.editIconButton}>
+                <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
+              </IconButton>
+            ),
             onClick: () => _onSelect(f),
-            onDelete: () => handleDeleteClick(f, false)
+            onDelete: handleEditClick(f, false)
           }))}
         />
       </div>
@@ -333,63 +340,44 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           items={globalFavorites.map(f => ({
             size: 'medium',
             variant: 'outlined',
-            label: (
-              <div className={classes.label}>
-                <div>{f.name}</div>
-                <IconButton className={classes.editIconButton} onClick={handleEditClick(f, true)}>
-                  <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
-                </IconButton>
-              </div>
-            ),
+            label: <span>{f.name}</span>,
             tooltip: f.query,
+            deleteIcon: (
+              <IconButton className={classes.editIconButton}>
+                <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
+              </IconButton>
+            ),
             onClick: () => _onSelect(f),
-            onDelete: () => handleDeleteClick(f, true)
+            onDelete: handleEditClick(f, true)
           }))}
         />
       </div>
 
       <ConfirmationDialog
         open={addConfirmation}
-        handleClose={handleAddClose}
-        handleAccept={handleAddAccept}
-        title={isExistingFavorite ? t('confirmation.header.update') : t('confirmation.header.add')}
+        handleClose={() => setAddConfirmation(false)}
+        handleAccept={() => {
+          handleUpsertFavorite();
+          setAddConfirmation(false);
+        }}
+        title={t('confirmation.header.add')}
         cancelText={t('cancel')}
-        acceptText={isExistingFavorite ? t('confirmation.ok.update') : t('confirmation.ok.add')}
+        acceptText={t('confirmation.ok.add')}
         text={
           <Grid container flexDirection="column" spacing={theme.spacing(2)}>
             <Grid item component="span">
-              {isExistingFavorite ? t('confirmation.content.update') : t('confirmation.content.add')}
+              {t('confirmation.content.add')}
               <b>{nameValue ? nameValue.value : null}</b>
-              {isExistingFavorite ? t('confirmation.content.update2') : t('confirmation.content.add2')}
+              {t('confirmation.content.add2')}
               {publicSwitch ? t('confirmation.content.public') : t('confirmation.content.private')}
             </Grid>
 
-            {isExistingFavorite ? (
-              <>
-                <Grid item>
-                  <Typography variant="subtitle2">{t('confirmation.from')}</Typography>
-                  <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {publicSwitch
-                      ? globalFavorites.find(f => f.name === nameValue.value)?.query
-                      : userFavorites.find(f => f.name === nameValue.value)?.query}
-                  </Paper>
-                </Grid>
-
-                <Grid item>
-                  <Typography variant="subtitle2">{t('confirmation.to')}</Typography>
-                  <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {queryValue.value}
-                  </Paper>
-                </Grid>
-              </>
-            ) : (
-              <Grid item>
-                <Typography variant="subtitle2">{t('confirmation.query')}</Typography>
-                <Paper component="pre" variant="outlined" className={classes.preview}>
-                  {queryValue.value}
-                </Paper>
-              </Grid>
-            )}
+            <Grid item>
+              <Typography variant="subtitle2">{t('confirmation.query')}</Typography>
+              <Paper component="pre" variant="outlined" className={classes.preview}>
+                {queryValue.value}
+              </Paper>
+            </Grid>
 
             <Grid item component="span" children={t('confirmation.confirm')} />
           </Grid>
@@ -397,9 +385,52 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       />
 
       <ConfirmationDialog
-        open={deleteConfirmation.open}
-        handleClose={handleDeleteClose}
-        handleAccept={handleDeleteAccept}
+        open={updateConfirmation}
+        handleClose={() => setUpdateConfirmation(false)}
+        handleAccept={() => {
+          handleUpsertFavorite();
+          setUpdateConfirmation(false);
+        }}
+        title={t('confirmation.header.update')}
+        cancelText={t('cancel')}
+        acceptText={t('confirmation.ok.update')}
+        text={
+          <Grid container flexDirection="column" spacing={theme.spacing(2)}>
+            <Grid item component="span">
+              {t('confirmation.content.update')}
+              <b>{nameValue ? nameValue.value : null}</b>
+              {t('confirmation.content.update2')}
+              {publicSwitch ? t('confirmation.content.public') : t('confirmation.content.private')}
+            </Grid>
+
+            <Grid item>
+              <Typography variant="subtitle2">{t('confirmation.from')}</Typography>
+              <Paper component="pre" variant="outlined" className={classes.preview}>
+                {publicSwitch
+                  ? globalFavorites.find(f => f.name === nameValue.value)?.query
+                  : userFavorites.find(f => f.name === nameValue.value)?.query}
+              </Paper>
+            </Grid>
+
+            <Grid item>
+              <Typography variant="subtitle2">{t('confirmation.to')}</Typography>
+              <Paper component="pre" variant="outlined" className={classes.preview}>
+                {queryValue.value}
+              </Paper>
+            </Grid>
+
+            <Grid item component="span" children={t('confirmation.confirm')} />
+          </Grid>
+        }
+      />
+
+      <ConfirmationDialog
+        open={deleteConfirmation}
+        handleClose={() => setDeleteConfirmation(false)}
+        handleAccept={() => {
+          handleDeleteFavorite();
+          setDeleteConfirmation(false);
+        }}
         title={t('confirmation.header.delete')}
         cancelText={t('cancel')}
         acceptText={t('confirmation.ok.delete')}
@@ -407,19 +438,15 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           <Grid container flexDirection="column" spacing={theme.spacing(2)}>
             <Grid item component="span">
               {t('confirmation.content.delete')}
-              <b>{deleteConfirmation.favorite ? deleteConfirmation.favorite.name : null}</b>
+              <b>{nameValue ? nameValue.value : null}</b>
               {t('confirmation.content.delete2')}
-              {deleteConfirmation
-                ? deleteConfirmation.isPublic
-                  ? t('confirmation.content.public')
-                  : t('confirmation.content.private')
-                : null}
+              {publicSwitch ? t('confirmation.content.public') : t('confirmation.content.private')}
             </Grid>
 
             <Grid item>
               <Typography variant="subtitle2">{t('confirmation.query')}</Typography>
               <Paper component="pre" variant="outlined" className={classes.preview}>
-                {deleteConfirmation.favorite ? deleteConfirmation.favorite.query : null}
+                {queryValue.value}
               </Paper>
             </Grid>
 
