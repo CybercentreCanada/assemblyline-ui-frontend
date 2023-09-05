@@ -8,7 +8,19 @@ import React from 'react';
 
 // import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Collapse, Divider, Grid, IconButton, Link, Tooltip, Typography, useTheme } from '@mui/material';
+import {
+  Box,
+  Collapse,
+  Divider,
+  Grid,
+  IconButton,
+  Link,
+  Tab,
+  Tabs,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import { useTranslation } from 'react-i18next';
@@ -72,6 +84,12 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
 type AutoHideChipListProps = {
   items: DetailedItem[];
 };
@@ -87,6 +105,33 @@ type ExternalLookupProps = {
   value: string;
   iconStyle?: null | Object;
 };
+
+function ExternalSourceTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`external-source-tabpanel-${index}`}
+      aria-labelledby={`external-source-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `external-source-tab-${index}`,
+    'aria-controls': `external-source-tabpanel-${index}`
+  };
+}
 
 const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => {
   const { t } = useTranslation();
@@ -142,7 +187,7 @@ type ResultGroupProps = {
 const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, valueMap }) => {
   const theme = useTheme();
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
 
   return group && names ? (
     <>
@@ -282,8 +327,8 @@ const EnrichmentResult = React.memo(WrappedEnrichmentResult);
 
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, value, iconStyle }) => {
   const theme = useTheme();
-  const classes = useStyles();
   const [openedDialog, setOpenedDialog] = React.useState(false);
+  const [tabState, setTabState] = React.useState(0);
   const [scroll, setScroll] = React.useState<DialogProps['scroll']>('paper');
   const { c12nDef } = useALContext();
 
@@ -292,6 +337,10 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
   const externalLookupResults = enrichmentState[getKey(type, value)];
   const titleId = openedDialog ? 'external-result-dialog-title' : undefined;
   const descriptionId = openedDialog ? 'external-result-dialog-description' : undefined;
+
+  const handleTabChange = (event: React.SyntheticEvent, newState: number) => {
+    setTabState(newState);
+  };
 
   // prevents click through propagation on dialog popup
   const handleDialogClick = e => {
@@ -327,6 +376,9 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
     });
   }
 
+  // consistant source name order
+  const sources = !!externalLookupResults ? Object.keys(externalLookupResults).sort() : null;
+
   return actionable && externalLookupResults ? (
     <div>
       {externalLookupResults !== null ? (
@@ -348,7 +400,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         maxWidth="xl"
-        // fullWidth
+        fullWidth
       >
         <DialogTitle id={titleId}>
           {c12nDef.enforce && (
@@ -363,27 +415,24 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
         </DialogTitle>
         <DialogContent dividers={true}>
           <DialogContentText id={descriptionId} ref={descriptionElementRef} tabIndex={-1}>
-            <div className={classes.section}>
-              <div style={{ display: 'block' }}>
-                {Object.entries(externalLookupResults).map(([source, enrichmentResults]) => (
-                  <>
-                    <div>
-                      <Typography variant="h5" sx={{ display: 'inline' }}>
-                        {toTitleCase(source)}
-                      </Typography>
-                      <Divider />
-                    </div>
+            <Box sx={{ width: '100%' }}>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs value={tabState} onChange={handleTabChange} aria-label="external source names">
+                  {sources.map((source, i) => (
+                    <Tab label={source} {...a11yProps(i)} />
+                  ))}
+                </Tabs>
+              </Box>
+              {sources.map((source, i) => (
+                <ExternalSourceTabPanel value={tabState} index={i}>
+                  <div>{!!externalLookupResults[source].error ? externalLookupResults[source].error : null}</div>
 
-                    <div>{!!enrichmentResults.error ? enrichmentResults.error : null}</div>
-
-                    {enrichmentResults.items.map((enrichmentResult, i) => {
-                      return <EnrichmentResult key={i} enrichmentResult={enrichmentResult}></EnrichmentResult>;
-                    })}
-                    <Divider />
-                  </>
-                ))}
-              </div>
-            </div>
+                  {externalLookupResults[source].items.map((enrichmentResult, j) => {
+                    return <EnrichmentResult key={j} enrichmentResult={enrichmentResult}></EnrichmentResult>;
+                  })}
+                </ExternalSourceTabPanel>
+              ))}
+            </Box>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
