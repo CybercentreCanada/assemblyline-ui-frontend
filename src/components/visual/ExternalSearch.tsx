@@ -1,5 +1,5 @@
 import Button from '@mui/material/Button';
-import Dialog, { DialogProps } from '@mui/material/Dialog';
+import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
@@ -17,6 +17,7 @@ import {
   Link,
   Tab,
   Tabs,
+  Theme,
   Tooltip,
   Typography,
   useTheme
@@ -88,6 +89,7 @@ interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
+  theme: Theme;
 }
 
 type AutoHideChipListProps = {
@@ -107,7 +109,7 @@ type ExternalLookupProps = {
 };
 
 function ExternalSourceTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, theme, ...other } = props;
 
   return (
     <div
@@ -118,7 +120,7 @@ function ExternalSourceTabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ marginTop: theme.spacing(0.5) }}>
           <Typography>{children}</Typography>
         </Box>
       )}
@@ -190,7 +192,7 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, v
   const [open, setOpen] = React.useState(true);
 
   return group && names ? (
-    <>
+    <Box sx={{ marginTop: theme.spacing(0.5) }}>
       <Typography
         variant="h6"
         onClick={() => {
@@ -204,16 +206,16 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, v
       <Divider />
 
       <Collapse in={open} timeout="auto">
-        <Grid container spacing={1} style={{ marginTop: theme.spacing(1) }}>
+        <Grid container spacing={1} style={{ marginTop: theme.spacing(0.5) }}>
           {names.map((keyName, k) => {
             return (
               <React.Fragment key={k}>
-                <Grid item xs={6} sm={6}>
+                <Grid item xs={4} sm={4}>
                   <Tooltip title={ndMap[keyName]}>
-                    <div className={classes.sectionContent}>{keyName}</div>
+                    <Typography style={{ flex: 1, overflowWrap: 'anywhere' }}>{keyName}</Typography>
                   </Tooltip>
                 </Grid>
-                <Grid item xs={6} sm={6}>
+                <Grid item xs={8} sm={8}>
                   <div className={classes.sectionContent}>
                     <AutoHideChipList items={valueMap[keyName]} />
                   </div>
@@ -223,7 +225,7 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, v
           })}
         </Grid>
       </Collapse>
-    </>
+    </Box>
   ) : null;
 };
 
@@ -235,6 +237,7 @@ type EnrichmentResultProps = {
 
 const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ enrichmentResult }) => {
   const classes = useStyles();
+  const theme = useTheme();
   const [open, setOpen] = React.useState(true);
 
   let verdict = 'info';
@@ -282,7 +285,7 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ enrichmentRe
 
   return enrichmentResult ? (
     <>
-      <div>
+      <div style={{ marginBottom: theme.spacing(2) }}>
         <Typography
           onClick={() => {
             setOpen(!open);
@@ -303,7 +306,6 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ enrichmentRe
         </Link>
         <Typography>{enrichmentResult.description}</Typography>
       </div>
-      <div className={classes.sectionContent}></div>
 
       <Collapse in={open} timeout="auto">
         {!!gOrder &&
@@ -319,6 +321,7 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ enrichmentRe
             );
           })}
       </Collapse>
+      <Divider />
     </>
   ) : null;
 };
@@ -327,9 +330,9 @@ const EnrichmentResult = React.memo(WrappedEnrichmentResult);
 
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, value, iconStyle }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [openedDialog, setOpenedDialog] = React.useState(false);
   const [tabState, setTabState] = React.useState(0);
-  const [scroll, setScroll] = React.useState<DialogProps['scroll']>('paper');
   const { c12nDef } = useALContext();
 
   const { enrichmentState, isActionable, getKey } = useExternalLookup();
@@ -349,12 +352,20 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
 
   const handleClickOpen = () => {
     setOpenedDialog(true);
-    setScroll('paper');
   };
 
   const handleClose = () => {
     setOpenedDialog(false);
   };
+
+  // const Transition = React.forwardRef(function Transition(
+  //   props: TransitionProps & {
+  //     children: React.ReactElement;
+  //   },
+  //   ref: React.Ref<unknown>
+  // ) {
+  //   return <Slide direction="up" ref={ref} {...props} />;
+  // });
 
   const descriptionElementRef = React.useRef<HTMLElement>(null);
   React.useEffect(() => {
@@ -396,11 +407,13 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
         open={openedDialog}
         onClose={handleClose}
         onClick={handleDialogClick}
-        scroll={scroll}
+        scroll="paper"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        maxWidth="xl"
-        fullWidth
+        fullScreen
+        // TransitionComponent={Transition}
+        // maxWidth="xl"
+        // fullWidth
       >
         <DialogTitle id={titleId}>
           {c12nDef.enforce && (
@@ -410,21 +423,23 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
               </div>
             </div>
           )}
-          <Typography variant="h4">External Results</Typography>
+          <Typography variant="h5">{t('related_external.title')}</Typography>
           <Typography>{value}</Typography>
+          {/* <Box sx={{ borderBottom: 0, borderColor: 'divider' }}> */}
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={tabState} onChange={handleTabChange} aria-label="external source names">
+              {sources.map((source, i) => (
+                <Tab label={source} {...a11yProps(i)} />
+              ))}
+            </Tabs>
+          </Box>
         </DialogTitle>
-        <DialogContent dividers={true}>
+        {/* <DialogContent dividers={true}> */}
+        <DialogContent>
           <DialogContentText id={descriptionId} ref={descriptionElementRef} tabIndex={-1}>
             <Box sx={{ width: '100%' }}>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={tabState} onChange={handleTabChange} aria-label="external source names">
-                  {sources.map((source, i) => (
-                    <Tab label={source} {...a11yProps(i)} />
-                  ))}
-                </Tabs>
-              </Box>
               {sources.map((source, i) => (
-                <ExternalSourceTabPanel value={tabState} index={i}>
+                <ExternalSourceTabPanel value={tabState} index={i} theme={theme}>
                   <div>{!!externalLookupResults[source].error ? externalLookupResults[source].error : null}</div>
 
                   {externalLookupResults[source].items.map((enrichmentResult, j) => {
@@ -435,6 +450,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
             </Box>
           </DialogContentText>
         </DialogContent>
+        <Divider />
         <DialogActions>
           <Button onClick={handleClose}>Close</Button>
         </DialogActions>

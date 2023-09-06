@@ -1,6 +1,7 @@
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { isAccessible } from 'helpers/classificationParser';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -52,7 +53,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
   const { children } = props;
   const { t } = useTranslation();
   const { apiCall } = useMyAPI();
-  const { user: currentUser, configuration: currentUserConfig } = useALContext();
+  const { user: currentUser, configuration: currentUserConfig, c12nDef } = useALContext();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
   const [enrichmentState, setEnrichmentState] = React.useState<ExternalEnrichmentState>({});
 
@@ -83,12 +84,33 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
 
   const enrichTagExternal = useCallback(
     (source: string, tagName: string, tagValue: string, classification: string) => {
+      const tagSrcMap = currentUserConfig.ui.external_source_tags;
+      if (!tagSrcMap?.hasOwnProperty(tagName)) {
+        showErrorMessage(t('related_external.invalidTagName'));
+        return;
+      }
       const stateKey = getKey(tagName, tagValue);
       let url = `/api/v4/federated_lookup/enrich/${tagName}/${encodeURIComponent(tagValue)}/`;
       // construct approporiate query param string
       let qs = `classification=${encodeURIComponent(classification)}`;
       if (!!source) {
         qs += `&sources=${encodeURIComponent(source)}`;
+      } else {
+        // only send query to sources that support the tag name and the classification
+        let s = [];
+        for (const src of currentUserConfig.ui.external_sources) {
+          if (
+            tagSrcMap[tagName].includes(src.name) &&
+            isAccessible(src.max_classification, classification, c12nDef, c12nDef.enforce)
+          ) {
+            s.push(src.name);
+          }
+        }
+        if (s.length <= 0) {
+          showWarningMessage(t('related_external.notfound'));
+          return;
+        }
+        qs += `&sources=${encodeURIComponent(s.join('|'))}`;
       }
       url += `?${qs}`;
 

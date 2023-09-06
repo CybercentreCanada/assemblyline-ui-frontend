@@ -14,7 +14,7 @@ import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { isAccessible } from 'helpers/classificationParser';
-import { safeFieldValueURI, toTitleCase } from 'helpers/utils';
+import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
@@ -285,20 +285,21 @@ const WrappedActionMenu: React.FC<TagProps> = ({
         )}
         {hasExternalQuery && (
           <div>
-            <Divider />
+            {/* <Divider />
             <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
               {t('related_external')}
-            </ListSubheader>
+            </ListSubheader> */}
 
             <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
-              {TRAVEL_EXPLORE_ICON} {t('related_external.all')}
+              {/* {TRAVEL_EXPLORE_ICON} {t('related_external.all')} */}
+              {TRAVEL_EXPLORE_ICON} {t('related_external')}
             </MenuItem>
 
-            {currentUserConfig.ui.external_source_tags?.[type]?.sort().map((source, i) => (
+            {/* {currentUserConfig.ui.external_source_tags?.[type]?.sort().map((source, i) => (
               <MenuItem dense key={`source_${i}`} onClick={() => handleMenuExternalSearch(source)}>
                 {TRAVEL_EXPLORE_ICON} {toTitleCase(source)}
               </MenuItem>
-            ))}
+            ))} */}
           </div>
         )}
         {hasExternalLinks && (
