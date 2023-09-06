@@ -295,11 +295,13 @@ export function getParts(
 }
 
 export function canSeeRequired(user_req, req) {
+  // user's require values must be a superset of given require values
+  if (req.length <= 0) return true;
   const userSet = new Set(user_req);
   const reqSet = new Set(req);
 
-  for (let elem of userSet) {
-    if (!reqSet.has(elem)) {
+  for (const elem of reqSet) {
+    if (!userSet.has(elem)) {
       return false;
     }
   }
@@ -307,15 +309,16 @@ export function canSeeRequired(user_req, req) {
 }
 
 export function canSeeGroups(user_groups, req) {
+  // user's groups must have an intersection between required groups
   if (req.length === 0) return true;
   const reqSet = new Set(req);
+  const userSet = new Set(user_groups);
 
-  for (let elem of user_groups) {
-    if (reqSet.has(elem)) {
+  for (const elem of reqSet) {
+    if (userSet.has(elem)) {
       return true;
     }
   }
-
   return false;
 }
 
