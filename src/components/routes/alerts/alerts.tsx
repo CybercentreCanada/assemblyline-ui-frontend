@@ -163,7 +163,11 @@ const Alerts: React.FC = () => {
   const searchTextValue = useRef<string>('');
 
   // Session states
-  const [sessionDialog, setSessionDialog] = useState<boolean>(false);
+  const [session, setSession] = useState<{ open: boolean; existing: string; current: string }>({
+    open: false,
+    existing: '',
+    current: ''
+  });
 
   const parseSearchParams = useCallback((search: string) => {
     let entries = [];
@@ -470,42 +474,69 @@ const Alerts: React.FC = () => {
         </div>
       </Drawer>
 
-      <Dialog open={sessionDialog} onClose={() => setSessionDialog(false)}>
+      <Dialog open={session?.open} onClose={() => setSession(s => ({ ...s, open: false }))}>
         <DialogTitle>{t('session.title')}</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(2) }}>
           <div>{t('session.description')}</div>
-          <Grid item>
-            <Typography variant="subtitle2">{t('session.values')}</Typography>
-            <Paper component="pre" variant="outlined" className={classes.preview}>
-              {parseSearchParams(location.search)?.map(([k, v], i) => (
-                <div key={i} style={{ display: 'contents' }}>
-                  <b>{k}: </b>
-                  {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
-                </div>
-              ))}
-            </Paper>
-          </Grid>
-          <div>{localStorage.getItem(LOCAL_STORAGE) ? t('session.confirm.clear') : t('session.confirm.save')}</div>
+          {session.existing && (
+            <Grid item>
+              <Typography variant="subtitle2">{t('session.existing')}</Typography>
+              <Paper component="pre" variant="outlined" className={classes.preview}>
+                {parseSearchParams(session.existing)?.map(([k, v], i) => (
+                  <div key={i} style={{ display: 'contents' }}>
+                    <b>{k}: </b>
+                    {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
+                  </div>
+                ))}
+              </Paper>
+            </Grid>
+          )}
+          {session.current && (
+            <Grid item>
+              <Typography variant="subtitle2">{t('session.current')}</Typography>
+              <Paper component="pre" variant="outlined" className={classes.preview}>
+                {parseSearchParams(session.current)?.map(([k, v], i) => (
+                  <div key={i} style={{ display: 'contents' }}>
+                    <b>{k}: </b>
+                    {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
+                  </div>
+                ))}
+              </Paper>
+            </Grid>
+          )}
+          <div>
+            {!session.current
+              ? t('session.confirm.none')
+              : session.existing
+              ? t('session.confirm.clear')
+              : t('session.confirm.save')}
+          </div>
         </DialogContent>
         <DialogActions>
-          {localStorage.getItem(LOCAL_STORAGE) && (
+          {session.existing && (
             <Button
               color="primary"
               children={t('session.clear')}
               onClick={() => {
                 localStorage.removeItem(LOCAL_STORAGE);
-                setSessionDialog(false);
+                setSession(s => ({ ...s, open: false }));
               }}
             />
           )}
           <div style={{ flex: 1 }} />
-          <Button autoFocus color="secondary" children={t('session.cancel')} onClick={() => setSessionDialog(false)} />
+          <Button
+            autoFocus
+            color="secondary"
+            children={t('session.cancel')}
+            onClick={() => setSession(s => ({ ...s, open: false }))}
+          />
           <Button
             color="primary"
+            disabled={!session.current}
             children={t('session.save')}
             onClick={() => {
               localStorage.setItem(LOCAL_STORAGE, location.search);
-              setSessionDialog(false);
+              setSession(s => ({ ...s, open: false }));
             }}
           />
         </DialogActions>
@@ -519,7 +550,12 @@ const Alerts: React.FC = () => {
         <Grid item xs style={{ textAlign: 'right', flex: 0 }}>
           <Tooltip title={t('session.tooltip')}>
             <div>
-              <IconButton onClick={() => setSessionDialog(true)} size="large">
+              <IconButton
+                size="large"
+                onClick={() =>
+                  setSession({ open: true, current: location.search, existing: localStorage.getItem(LOCAL_STORAGE) })
+                }
+              >
                 <ManageSearchIcon />
               </IconButton>
             </div>
