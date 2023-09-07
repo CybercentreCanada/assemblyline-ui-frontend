@@ -1,9 +1,9 @@
 export type FormatProp = 'long' | 'short';
 
 type LevelStylesheet = {
-  banner: string;
-  label: string;
-  text: string;
+  banner?: string;
+  label?: string;
+  text?: string;
   color?: string;
 };
 
@@ -46,6 +46,8 @@ type ClassificationSubGroup = {
 };
 
 type ClassificationYAMLDefinition = {
+  dynamic_groups: boolean;
+  dynamic_groups_type: string;
   enforce: boolean;
   groups: ClassificationGroup[];
   levels: ClassificationLevel[];
@@ -68,10 +70,12 @@ type StylesheetMap = {
 };
 
 type ParamsMap = {
-  is_required_group?: boolean;
-  solitary_display_name?: string;
-  require_group?: string;
-  limited_to_group?: string;
+  [propName: string]: {
+    is_required_group?: boolean;
+    solitary_display_name?: string;
+    require_group?: string;
+    limited_to_group?: string;
+  };
 };
 
 export type ClassificationDefinition = {
