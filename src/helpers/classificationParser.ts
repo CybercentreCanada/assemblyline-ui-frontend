@@ -313,10 +313,10 @@ export function canSeeGroups(user_groups, groups) {
   // user's groups must have an intersection between required groups
   // (ie. user must have at least one of the given groups)
   if (groups.length === 0) return true;
-  const reqSet = new Set(groups);
+  const groupSet = new Set(groups);
   const userSet = new Set(user_groups);
 
-  for (const elem of reqSet) {
+  for (const elem of groupSet) {
     if (userSet.has(elem)) {
       return true;
     }
