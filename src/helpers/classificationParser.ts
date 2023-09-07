@@ -296,6 +296,7 @@ export function getParts(
 
 export function canSeeRequired(user_req, req) {
   // user's require values must be a superset of given require values
+  // (ie. user must have all of the required values)
   if (req.length <= 0) return true;
   const userSet = new Set(user_req);
   const reqSet = new Set(req);
@@ -308,10 +309,11 @@ export function canSeeRequired(user_req, req) {
   return true;
 }
 
-export function canSeeGroups(user_groups, req) {
+export function canSeeGroups(user_groups, groups) {
   // user's groups must have an intersection between required groups
-  if (req.length === 0) return true;
-  const reqSet = new Set(req);
+  // (ie. user must have at least one of the given groups)
+  if (groups.length === 0) return true;
+  const reqSet = new Set(groups);
   const userSet = new Set(user_groups);
 
   for (const elem of reqSet) {
