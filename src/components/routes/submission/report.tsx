@@ -33,7 +33,7 @@ import ResultSection from 'components/visual/ResultCard/result_section';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
-import { bytesToSize } from 'helpers/utils';
+import { autoJoin, bytesToSize } from 'helpers/utils';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
@@ -888,7 +888,7 @@ export default function SubmissionReport() {
                               <span style={{ fontWeight: 500 }}>{meta}</span>
                             </td>
                             <td style={{ marginLeft: theme.spacing(1), width: '80%', wordBreak: 'break-word' }}>
-                              {report.metadata[meta]}
+                              {autoJoin(report.metadata[meta])}
                             </td>
                           </tr>
                         ))}
@@ -929,7 +929,7 @@ export default function SubmissionReport() {
                                 <span style={{ fontWeight: 500 }}>{meta}</span>
                               </td>
                               <td style={{ marginLeft: theme.spacing(1), width: '80%', wordBreak: 'break-word' }}>
-                                {report.metadata[meta]}
+                                {autoJoin(report.metadata[meta])}
                               </td>
                             </tr>
                           ))}

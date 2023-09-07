@@ -4,6 +4,7 @@ import { Button, Collapse, Divider, Grid, Skeleton, Typography, useTheme } from 
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import ActionableText from 'components/visual/ActionableText';
+import { autoJoin } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -90,7 +91,7 @@ const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata, classificati
                     <ActionableText
                       category="metadata"
                       type={meta}
-                      value={metadata[meta]}
+                      value={autoJoin(metadata[meta])}
                       classification={classification}
                     />
                   </Grid>
@@ -128,7 +129,7 @@ const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata, classificati
                       <ActionableText
                         category="metadata"
                         type={meta}
-                        value={metadata[meta]}
+                        value={autoJoin(metadata[meta])}
                         classification={classification}
                       />
                     </Grid>

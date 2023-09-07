@@ -34,7 +34,7 @@ import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
-import { matchSHA256, matchURL } from 'helpers/utils';
+import { autoJoin, matchSHA256, matchURL } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -569,7 +569,7 @@ const Submit: React.FC<any> = () => {
                         <span style={{ fontWeight: 500 }}>{meta}</span>
                       </Grid>
                       <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                        {submissionMetadata[meta]}
+                        {autoJoin(submissionMetadata[meta])}
                       </Grid>
                     </Grid>
                   ))}

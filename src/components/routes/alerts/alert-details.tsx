@@ -32,7 +32,7 @@ import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
-import { verdictToColor } from 'helpers/utils';
+import { autoJoin, verdictToColor } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
@@ -518,7 +518,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                           <ActionableText
                             category="metadata"
                             type={k}
-                            value={item.metadata[k]}
+                            value={autoJoin(item.metadata[k])}
                             classification={item.classification}
                           />
                         </Grid>
@@ -552,7 +552,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                 <ActionableText
                                   category="metadata"
                                   type={k}
-                                  value={item.metadata[k]}
+                                  value={autoJoin(item.metadata[k])}
                                   classification={item.classification}
                                 />
                               </Grid>
