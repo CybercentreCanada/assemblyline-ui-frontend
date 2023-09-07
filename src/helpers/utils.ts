@@ -178,3 +178,10 @@ export function matchURL(data: string) {
     /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
   return urlParseRE.exec(data);
 }
+
+export function autoJoin(data: string, seperator: string = ' | ') {
+  if (Array.isArray(data)) {
+    return data.join(seperator);
+  }
+  return data;
+}
