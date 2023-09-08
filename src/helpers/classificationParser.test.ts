@@ -2,396 +2,516 @@ import { describe, expect, it } from '@jest/globals';
 import {
   applyClassificationRules,
   ClassificationDefinition,
+  ClassificationParts,
   getMaxClassification,
   getParts,
   isAccessible,
   normalizedClassification
 } from 'helpers/classificationParser';
 
+// if you make changes to this definition, please ensure they are reflected in the assemblyline-base tests as well.
 const c12nDef: ClassificationDefinition = {
-  RESTRICTED: 'TLP:AMBER+STRICT//MAPLE//REL TO MOOSE',
-  UNRESTRICTED: 'TLP:CLEAR',
-  access_req_aliases: {},
+  RESTRICTED: 'LEVEL 2',
+  UNRESTRICTED: 'LEVEL 0',
+  access_req_aliases: { ACC: ['AC'], LEGAL: ['LE'] },
   access_req_map_lts: {
-    MAPLE: 'MPL',
-    LEAF: 'LF'
+    ACCOUNTING: 'AC',
+    'LEGAL DEPARTMENT': 'LE',
+    'NO CONTRACTORS': 'NOCON',
+    'ORIGINATOR CONTROLLED': 'ORCON'
   },
   access_req_map_stl: {
-    MPL: 'MAPLE',
-    LF: 'LEAF'
+    AC: 'ACCOUNTING',
+    LE: 'LEGAL DEPARTMENT',
+    NOCON: 'NO CONTRACTORS',
+    ORCON: 'ORIGINATOR CONTROLLED'
   },
   description: {
-    MAPLE: 'Member of the Maple Team',
-    MPL: 'Member of the Maple Team',
-    LEAF: 'Can access additional information',
-    LF: 'Can access additional information',
-    BEAVER: 'Employees of Beaver Inc',
-    MOOSE: 'Employees of Moose Org',
-    SUBGRP: 'Sub Group',
-    SG: 'Sub Group',
-    'TLP:A':
-      'Recipients may only share TLP:AMBER information with members of their own organization and with clients or customers who need to know the information to protect themselves or prevent further harm.',
-    'TLP:A+S': 'Recipients may only share TLP:AMBER+STRICT information with members of their own organization.',
-    'TLP:AMBER':
-      'Recipients may only share TLP:AMBER information with members of their own organization and with clients or customers who need to know the information to protect themselves or prevent further harm.',
-    'TLP:AMBER+STRICT':
-      'Recipients may only share TLP:AMBER+STRICT information with members of their own organization.',
-    'TLP:C': 'Subject to standard copyright rules, TLP:CLEAR information may be distributed without restriction.',
-    'TLP:CLEAR': 'Subject to standard copyright rules, TLP:CLEAR information may be distributed without restriction.',
-    'TLP:G':
-      'Recipients may share TLP:GREEN information with peers and partner organizations within their sector or community, but not via publicly accessible channels. Information in this category can be circulated widely within a particular community. TLP:GREEN information may not be released outside of the community.',
-    'TLP:GREEN':
-      'Recipients may share TLP:GREEN information with peers and partner organizations within their sector or community, but not via publicly accessible channels. Information in this category can be circulated widely within a particular community. TLP:GREEN information may not be released outside of the community.'
+    A: 'N/A',
+    AC: 'N/A',
+    ACCOUNTING: 'N/A',
+    B: 'N/A',
+    'GROUP A': 'N/A',
+    'GROUP B': 'N/A',
+    'GROUP X': 'N/A',
+    L0: 'N/A',
+    L1: 'N/A',
+    L2: 'N/A',
+    LE: 'N/A',
+    'LEGAL DEPARTMENT': 'N/A',
+    'LEVEL 0': 'N/A',
+    'LEVEL 1': 'N/A',
+    'LEVEL 2': 'N/A',
+    'NO CONTRACTORS': 'N/A',
+    NOCON: 'N/A',
+    ORCON: 'N/A',
+    'ORIGINATOR CONTROLLED': 'N/A',
+    R1: 'N/A',
+    R2: 'N/A',
+    R3: 'N/A',
+    'RESERVE ONE': 'N/A',
+    'RESERVE THREE': 'N/A',
+    'RESERVE TWO': 'N/A',
+    X: 'N/A'
   },
-  dynamic_groups: true,
-  dynamic_groups_type: 'group',
+  dynamic_groups: false,
+  dynamic_groups_type: 'email',
   enforce: true,
-  groups_aliases: {},
-  groups_auto_select: ['MOOSE'],
-  groups_auto_select_short: ['M'],
-  groups_map_lts: {
-    MOOSE: 'M',
-    BEAVER: 'B'
-  },
-  groups_map_stl: {
-    M: 'MOOSE',
-    B: 'BEAVER'
-  },
+  groups_aliases: { XX: ['X'] },
+  groups_auto_select: [],
+  groups_auto_select_short: [],
+  groups_map_lts: { 'GROUP A': 'A', 'GROUP B': 'B', 'GROUP X': 'X' },
+  groups_map_stl: { A: 'GROUP A', B: 'GROUP B', X: 'GROUP X' },
   invalid_mode: false,
-  levels_aliases: {
-    RESTRICTED: 'TLP:A+S',
-    'TLP:W': 'TLP:C',
-    'TLP:WHITE': 'TLP:C',
-    UNRESTRICTED: 'TLP:C'
-  },
-  levels_map: {
-    '100': 'TLP:C',
-    '110': 'TLP:G',
-    '120': 'TLP:A',
-    '125': 'TLP:A+S',
-    'TLP:A': '120',
-    'TLP:A+S': '125',
-    'TLP:C': '100',
-    'TLP:G': '110'
-  },
-  levels_map_lts: {
-    'TLP:AMBER': 'TLP:A',
-    'TLP:AMBER+STRICT': 'TLP:A+S',
-    'TLP:CLEAR': 'TLP:C',
-    'TLP:GREEN': 'TLP:G'
-  },
-  levels_map_stl: {
-    'TLP:A': 'TLP:AMBER',
-    'TLP:A+S': 'TLP:AMBER+STRICT',
-    'TLP:C': 'TLP:CLEAR',
-    'TLP:G': 'TLP:GREEN'
-  },
+  levels_aliases: { OPEN: 'L0' },
+  levels_map: { '1': 'L0', '15': 'L2', '5': 'L1', L0: '1', L1: '5', L2: '15' },
+  levels_map_lts: { 'LEVEL 0': 'L0', 'LEVEL 1': 'L1', 'LEVEL 2': 'L2' },
+  levels_map_stl: { L0: 'LEVEL 0', L1: 'LEVEL 1', L2: 'LEVEL 2' },
   levels_styles_map: {
-    'TLP:A': {
-      color: 'warning'
-    },
-    'TLP:A+S': {
-      color: 'warning'
-    },
-    'TLP:AMBER': {
-      color: 'warning'
-    },
-    'TLP:AMBER+STRICT': {
-      color: 'warning'
-    },
-    'TLP:C': {
-      color: 'default'
-    },
-    'TLP:CLEAR': {
-      color: 'default'
-    },
-    'TLP:G': {
-      color: 'success'
-    },
-    'TLP:GREEN': {
-      color: 'success'
-    }
+    L0: { color: 'default' },
+    L1: { color: 'default' },
+    L2: { color: 'default' },
+    'LEVEL 0': { color: 'default' },
+    'LEVEL 1': { color: 'default' },
+    'LEVEL 2': { color: 'default' }
   },
   original_definition: {
-    dynamic_groups: true,
-    dynamic_groups_type: 'group',
+    dynamic_groups: false,
+    dynamic_groups_type: 'email',
     enforce: true,
     groups: [
-      {
-        aliases: [],
-        auto_select: true,
-        description: 'Employees of MOOSE Org',
-        name: 'MOOSE',
-        short_name: 'M'
-      },
-      {
-        aliases: [],
-        auto_select: false,
-        description: 'Employees of BEAVER Inc',
-        name: 'BEAVER',
-        short_name: 'B'
-      }
+      { name: 'Group A', short_name: 'A', aliases: [], description: 'N/A' },
+      { name: 'Group B', short_name: 'B', aliases: [], description: 'N/A' },
+      { name: 'Group X', short_name: 'X', aliases: [], description: 'N/A', solitary_display_name: 'XX' }
     ],
     levels: [
-      {
-        aliases: ['UNRESTRICTED', 'TLP:W', 'TLP:WHITE'],
-        css: {
-          color: 'default'
-        },
-        description:
-          'Subject to standard copyright rules, TLP:CLEAR information may be distributed without restriction.',
-        lvl: 100,
-        name: 'TLP:CLEAR',
-        short_name: 'TLP:C'
-      },
-      {
-        aliases: [],
-        css: {
-          color: 'success'
-        },
-        description:
-          'Recipients may share TLP:GREEN information with peers and partner organizations within their sector or community, but not via publicly accessible channels. Information in this category can be circulated widely within a particular community. TLP:GREEN information may not be released outside of the community.',
-        lvl: 110,
-        name: 'TLP:GREEN',
-        short_name: 'TLP:G'
-      },
-      {
-        aliases: [],
-        css: {
-          color: 'warning'
-        },
-        description:
-          'Recipients may only share TLP:AMBER information with members of their own organization and with clients or customers who need to know the information to protect themselves or prevent further harm.',
-        lvl: 120,
-        name: 'TLP:AMBER',
-        short_name: 'TLP:A'
-      },
-      {
-        aliases: ['RESTRICTED'],
-        css: {
-          color: 'warning'
-        },
-        description: 'Recipients may only share TLP:AMBER+STRICT information with members of their own organization.',
-        lvl: 125,
-        name: 'TLP:AMBER+STRICT',
-        short_name: 'TLP:A+S'
-      }
+      { lvl: 1, name: 'Level 0', short_name: 'L0', aliases: ['Open'], description: 'N/A', css: { color: 'default' } },
+      { lvl: 5, name: 'Level 1', short_name: 'L1', aliases: [], description: 'N/A', css: { color: 'default' } },
+      { lvl: 15, name: 'Level 2', short_name: 'L2', aliases: [], description: 'N/A', css: { color: 'default' } }
     ],
     required: [
-      {
-        aliases: [],
-        description: 'Member of the Maple Team',
-        name: 'MAPLE',
-        short_name: 'MPL'
-      },
-      {
-        aliases: [],
-        description: 'Can access additional information',
-        name: 'LEAF',
-        short_name: 'LF'
-      }
+      { is_required_group: false, name: 'Legal Department', short_name: 'LE', aliases: ['Legal'], description: 'N/A' },
+      { is_required_group: false, name: 'Accounting', short_name: 'AC', aliases: ['Acc'], description: 'N/A' },
+      { is_required_group: true, name: 'Originator Controlled', short_name: 'orcon', aliases: [], description: 'N/A' },
+      { is_required_group: true, name: 'No Contractors', short_name: 'nocon', aliases: [], description: 'N/A' }
     ],
-    restricted: 'TLP:A+S//MPL//REL TO M',
+    restricted: 'L2',
     subgroups: [
-      {
-        aliases: ['SUB'],
-        description: 'Sub Group',
-        name: 'SUBGRP',
-        short_name: 'SG'
-      }
+      { name: 'Reserve One', short_name: 'R1', aliases: ['R0'], description: 'N/A' },
+      { name: 'Reserve Two', short_name: 'R2', aliases: [], description: 'N/A', require_group: 'X' },
+      { name: 'Reserve Three', short_name: 'R3', aliases: [], description: 'N/A', limited_to_group: 'X' }
     ],
-    unrestricted: 'TLP:C'
+    unrestricted: 'L0'
   },
   params_map: {
-    MAPLE: {},
-    MPL: {},
-    SUBGRP: {},
-    SG: {},
-    SUB: {},
-    MOOSE: {},
-    'TLP:A': {},
-    'TLP:A+S': {},
-    'TLP:AMBER': {},
-    'TLP:AMBER+STRICT': {},
-    'TLP:C': {},
-    'TLP:CLEAR': {},
-    'TLP:G': {},
-    'TLP:GREEN': {}
+    A: {},
+    AC: { is_required_group: false },
+    ACCOUNTING: { is_required_group: false },
+    B: {},
+    'GROUP A': {},
+    'GROUP B': {},
+    'GROUP X': { solitary_display_name: 'XX' },
+    L0: {},
+    L1: {},
+    L2: {},
+    LE: { is_required_group: false },
+    'LEGAL DEPARTMENT': { is_required_group: false },
+    'LEVEL 0': {},
+    'LEVEL 1': {},
+    'LEVEL 2': {},
+    'NO CONTRACTORS': { is_required_group: true },
+    NOCON: { is_required_group: true },
+    ORCON: { is_required_group: true },
+    'ORIGINATOR CONTROLLED': { is_required_group: true },
+    R1: {},
+    R2: { require_group: 'X' },
+    R3: { limited_to_group: 'X' },
+    'RESERVE ONE': {},
+    'RESERVE THREE': { limited_to_group: 'X' },
+    'RESERVE TWO': { require_group: 'X' },
+    X: { solitary_display_name: 'XX' }
   },
-  subgroups_aliases: {
-    SUB: ['SUBGRP']
-  },
+  subgroups_aliases: { R0: ['R1'] },
   subgroups_auto_select: [],
   subgroups_auto_select_short: [],
-  subgroups_map_lts: {
-    SUBGRP: 'SG'
-  },
-  subgroups_map_stl: {
-    SG: 'SUBGRP'
-  }
+  subgroups_map_lts: { 'RESERVE ONE': 'R1', 'RESERVE THREE': 'R3', 'RESERVE TWO': 'R2' },
+  subgroups_map_stl: { R1: 'RESERVE ONE', R2: 'RESERVE TWO', R3: 'RESERVE THREE' }
 };
 
+describe('`getParts` correctly extracts all components', () => {
+  it('Should extract the level', () => {
+    expect(getParts('L0', c12nDef, 'short', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'L0',
+      req: [],
+      groups: [],
+      subgroups: []
+    });
+    expect(getParts('L0', c12nDef, 'long', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'LEVEL 0',
+      req: [],
+      groups: [],
+      subgroups: []
+    });
+
+    expect(getParts('LEVEL 0', c12nDef, 'short', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'L0',
+      req: [],
+      groups: [],
+      subgroups: []
+    });
+    expect(getParts('LEVEL 0', c12nDef, 'long', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'LEVEL 0',
+      req: [],
+      groups: [],
+      subgroups: []
+    });
+
+    expect(getParts('L1', c12nDef, 'short', false)).toEqual({
+      lvlIdx: '5',
+      lvl: 'L1',
+      req: [],
+      groups: [],
+      subgroups: []
+    });
+    expect(getParts('L1', c12nDef, 'long', false)).toEqual({
+      lvlIdx: '5',
+      lvl: 'LEVEL 1',
+      req: [],
+      groups: [],
+      subgroups: []
+    });
+
+    expect(getParts('LEVEL 1', c12nDef, 'short', false)).toEqual({
+      lvlIdx: '5',
+      lvl: 'L1',
+      req: [],
+      groups: [],
+      subgroups: []
+    });
+    expect(getParts('LEVEL 1', c12nDef, 'long', false)).toEqual({
+      lvlIdx: '5',
+      lvl: 'LEVEL 1',
+      req: [],
+      groups: [],
+      subgroups: []
+    });
+  });
+
+  it('Should extract the group and subgroups', () => {
+    expect(getParts('L0//REL A', c12nDef, 'short', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'L0',
+      req: [],
+      groups: ['A'],
+      subgroups: []
+    });
+    expect(getParts('L0//REL A', c12nDef, 'long', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'LEVEL 0',
+      req: [],
+      groups: ['GROUP A'],
+      subgroups: []
+    });
+
+    expect(getParts('LEVEL 0//REL TO GROUP A', c12nDef, 'short', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'L0',
+      req: [],
+      groups: ['A'],
+      subgroups: []
+    });
+    expect(getParts('LEVEL 0//REL TO GROUP A', c12nDef, 'long', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'LEVEL 0',
+      req: [],
+      groups: ['GROUP A'],
+      subgroups: []
+    });
+
+    // getParts is not responsible for adding parent groups to subgroups
+    expect(getParts('LEVEL 0//R3', c12nDef, 'short', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'L0',
+      req: [],
+      groups: [],
+      subgroups: ['R3']
+    });
+    expect(getParts('LEVEL 0//REL R3', c12nDef, 'long', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'LEVEL 0',
+      req: [],
+      groups: [],
+      subgroups: ['RESERVE THREE']
+    });
+
+    expect(getParts('LEVEL 0//AC//REL A,XX/R3', c12nDef, 'short', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'L0',
+      req: ['AC'],
+      groups: ['A', 'X'],
+      subgroups: ['R3']
+    });
+    expect(getParts('LEVEL 0//AC//REL A,XX/R3', c12nDef, 'long', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'LEVEL 0',
+      req: ['ACCOUNTING'],
+      groups: ['GROUP A', 'GROUP X'],
+      subgroups: ['RESERVE THREE']
+    });
+  });
+});
+
 describe('`normalizedClassification` correctly formats', () => {
-  it('Should use short format when `short` is passed in', () => {
-    const parts = getParts('TLP:CLEAR//MAPLE', c12nDef, 'short', false);
-    const result = normalizedClassification(parts, c12nDef, 'short', false);
-    expect(result).toBe('TLP:C//MPL');
+  it('Should convert input to upper case', () => {
+    const parts = getParts('l0//accOUNTINg//rel to GROUP a', c12nDef, 'long', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//ACCOUNTING//REL TO GROUP A');
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//AC//REL A');
   });
 
-  it('Should use short format when `isMobile` is used', () => {
-    const parts = getParts('TLP:CLEAR//MAPLE', c12nDef, 'long', true);
-    const result = normalizedClassification(parts, c12nDef, 'long', true);
-    expect(result).toBe('TLP:C//MPL');
+  it('Should normalise level', () => {
+    let parts = getParts('LEVEL 0', c12nDef, 'short', false);
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0');
+    parts = getParts('LEVEL 0', c12nDef, 'long', false);
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0');
+
+    parts = getParts('LEVEL 1', c12nDef, 'short', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 1');
+    parts = getParts('LEVEL 1', c12nDef, 'long', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 1');
   });
 
-  it('Should use long format when `long` format is used and `isMobile` is `false`', () => {
-    const parts = getParts('TLP:C//MAPLE//REL B', c12nDef, 'long', false);
-    const result = normalizedClassification(parts, c12nDef, 'long', false);
-    expect(result).toBe('TLP:CLEAR//MAPLE//REL TO BEAVER');
+  it('Should always use short format when `isMobile` is used', () => {
+    const parts = getParts('L0', c12nDef, 'long', true);
+    expect(normalizedClassification(parts, c12nDef, 'short', true)).toBe('L0');
+    expect(normalizedClassification(parts, c12nDef, 'long', true)).toBe('L0');
+  });
+
+  it('Should normalise groups', () => {
+    let parts = getParts('L0//REL A, B', c12nDef, 'short', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//REL TO GROUP A, GROUP B');
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//REL A, B');
+
+    parts = getParts('L2//REL B, A', c12nDef, 'short', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 2//REL TO GROUP A, GROUP B');
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L2//REL A, B');
+
+    parts = getParts('L0//REL A', c12nDef, 'short', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//REL TO GROUP A');
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//REL A');
+  });
+
+  it('Should normalise required', () => {
+    let parts = getParts('L0//AC', c12nDef, 'short', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//ACCOUNTING');
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//AC');
+
+    parts = getParts('L2//AC/NOCON', c12nDef, 'short', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 2//ACCOUNTING/NO CONTRACTOR');
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L2//AC/NOCON');
+
+    parts = getParts('L2//NOCON/AC', c12nDef, 'short', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 2//ACCOUNTING/NO CONTRACTOR');
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L2//AC/NOCON');
   });
 
   it('Should convert aliases to real name', () => {
-    const parts = getParts('TLP:WHITE//MOOSE/SUB', c12nDef, 'long', false);
-    const result = normalizedClassification(parts, c12nDef, 'long', false);
-    expect(result).toBe('TLP:CLEAR//REL TO MOOSE/SUBGRP');
+    let parts = getParts('OPEN', c12nDef, 'long', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0');
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0');
+
+    parts = getParts('L0//LEGAL', c12nDef, 'long', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//LEGAL DEPARTMENT');
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//LE');
+  });
+
+  it('Should raise errors on invliad input?', () => {
+    let parts: ClassificationParts = { lvlIdx: 12, lvl: 'LEVEL 12', req: [], groups: [], subgroups: [] };
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('?');
+    parts = { lvlIdx: 1, lvl: 'LEVEL 0', req: ['GARBO'], groups: [], subgroups: [] };
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('?');
+    parts = { lvlIdx: 1, lvl: 'LEVEL 0', req: ['LEGAL DEPARTMENT'], groups: ['GARBO'], subgroups: [] };
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('?');
+  });
+
+  it('Should add primary group when only subgroup is specified', () => {
+    let parts: ClassificationParts = { lvlIdx: 1, lvl: 'LEVEL 0', req: [], groups: [], subgroups: ['R2'] };
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//REL TO GROUP X/RESERVE TWO');
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('L0//REL X/R2');
+  });
+
+  it('Should correctly parse groups that specify REL, REL TO, or just the group', () => {
+    let parts = getParts('L0//GROUP A', c12nDef, 'long', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//REL TO GROUP A');
+
+    parts = getParts('L0//REL TO GROUP A', c12nDef, 'long', false);
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//REL A');
+
+    parts = getParts('L0//REL GROUP A', c12nDef, 'long', false);
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//REL A');
   });
 });
 
-describe('isAccessible correctly parses classifications', () => {
-  it('Should return `true` if inputs are the same', () => {
-    const result = isAccessible('TLP:C', 'TLP:C', c12nDef, true);
-    expect(result).toBe(true);
-  });
-
+describe('`isAccessible` correctly applies access controls', () => {
   it('Should return `true` if not enforced', () => {
-    const result = isAccessible('TLP:C', 'TLP:A', c12nDef, false);
-    expect(result).toBe(true);
+    expect(isAccessible('L0', 'L1', c12nDef, false)).toBe(true);
+    expect(isAccessible('L3', 'L1', c12nDef, false)).toBe(true);
+    expect(isAccessible('', 'L1', c12nDef, false)).toBe(true);
+    expect(isAccessible(null, 'L1', c12nDef, false)).toBe(true);
+    expect(isAccessible(undefined, 'L1', c12nDef, false)).toBe(true);
   });
 
-  it('Should return `false` if user classification is lower than given classification', () => {
-    const result = isAccessible('TLP:C', 'TLP:A', c12nDef, true);
-    expect(result).toBe(false);
+  it('Should return `true` if level is falsey', () => {
+    expect(isAccessible('L1', null, c12nDef, true)).toBe(true);
+    expect(isAccessible('L2', undefined, c12nDef, true)).toBe(true);
+    expect(isAccessible('L2', '', c12nDef, true)).toBe(true);
+    expect(isAccessible(null, null, c12nDef, true)).toBe(true);
+    expect(isAccessible(undefined, null, c12nDef, true)).toBe(true);
+    expect(isAccessible('', null, c12nDef, true)).toBe(true);
   });
 
-  it('Should return `true` if user classification is higher than given classification', () => {
-    const result = isAccessible('TLP:A', 'TLP:G', c12nDef, true);
-    expect(result).toBe(true);
+  it('Should return `true` if inputs are the same', () => {
+    expect(isAccessible('L1', 'L1', c12nDef, true)).toBe(true);
+    expect(isAccessible('L1//LE', 'L1//LE', c12nDef, true)).toBe(true);
+    expect(isAccessible('L1//LE//REL A', 'L1//LE//REL A', c12nDef, true)).toBe(true);
   });
 
-  it('Should return `true` if user has all `required` values', () => {
-    let result = isAccessible('TLP:A//MAPLE', 'TLP:G//MAPLE', c12nDef, true);
-    expect(result).toBe(true);
-
-    result = isAccessible('TLP:A//MPL/LF', 'TLP:G//LEAF', c12nDef, true);
-    expect(result).toBe(true);
-
-    result = isAccessible('TLP:A//MAPLE', 'TLP:G', c12nDef, true);
-    expect(result).toBe(true);
+  it('Should return `false` if user level is lower than given level', () => {
+    expect(isAccessible('L0', 'L1', c12nDef, true)).toBe(false);
+    expect(isAccessible('L1//REL A', 'L2', c12nDef, true)).toBe(false);
+    expect(isAccessible('L0//AC', 'L1', c12nDef, true)).toBe(false);
   });
 
-  it('Should return `false` if user is missing a single `required` value', () => {
-    let result = isAccessible('TLP:A', 'TLP:G//MAPLE', c12nDef, true);
-    expect(result).toBe(false);
-
-    result = isAccessible('TLP:A//MAPLE', 'TLP:G//MAPLE/LEAF', c12nDef, true);
-    expect(result).toBe(false);
-
-    result = isAccessible('TLP:A//MAPLE', 'TLP:G//LEAF', c12nDef, true);
-    expect(result).toBe(false);
+  it('Should return `true` if user level is higher than given level', () => {
+    expect(isAccessible('L1', 'L0', c12nDef, true)).toBe(true);
   });
 
-  it('Should return `true` if user has any required group', () => {
-    const result = isAccessible('TLP:A//REL MOOSE', 'TLP:G//REL MOOSE/BEAVER', c12nDef, true);
-    expect(result).toBe(true);
+  it('Should limit access based on control system markings', () => {
+    expect(isAccessible('L2', 'L0//LE', c12nDef, true)).toBe(false);
+    expect(isAccessible('L2//LE', 'L0//LE', c12nDef, true)).toBe(true);
+
+    expect(isAccessible('L2', 'L2//LE/AC', c12nDef, true)).toBe(false);
+    expect(isAccessible('L2//LE', 'L2//LE/AC', c12nDef, true)).toBe(false);
+    expect(isAccessible('L2//AC', 'L2//AC/LE', c12nDef, true)).toBe(false);
+    expect(isAccessible('L2//LE/AC', 'L2//AC/LE', c12nDef, true)).toBe(true);
   });
 
-  it('Should return `false` if user ism issing all required groups', () => {
-    const result = isAccessible('TLP:A//MPL', 'TLP:G//REL MOOSE/BEAVER', c12nDef, true);
-    expect(result).toBe(false);
-  });
-});
-
-describe('getMaxClassification correctly identifies the maximum', () => {
-  it('Should return the higher single classification', () => {
-    let result = getMaxClassification('TLP:CLEAR', 'TLP:A', c12nDef, 'long', false);
-    expect(result).toBe('TLP:AMBER');
-
-    result = getMaxClassification('TLP:GREEN', 'TLP:C', c12nDef, 'short', false);
-    expect(result).toBe('TLP:G');
+  it('Should limit access based on dissemination markings', () => {
+    expect(isAccessible('L2', 'L2//ORCON/NOCON', c12nDef, true)).toBe(false);
+    expect(isAccessible('L2//ORCON', 'L2//ORCON/NOCON', c12nDef, true)).toBe(false);
+    expect(isAccessible('L2//NOCON', 'L2//ORCON/NOCON', c12nDef, true)).toBe(false);
+    expect(isAccessible('L2//NOCON/ORCON', 'L2//ORCON/NOCON', c12nDef, true)).toBe(true);
   });
 
-  it('Should return the higher single classification and merge a single required', () => {
-    let result = getMaxClassification('TLP:G//MAPLE', 'TLP:A', c12nDef, 'long', false);
-    expect(result).toBe('TLP:AMBER//MAPLE');
-
-    result = getMaxClassification('TLP:AMBER', 'TLP:C//LEAF', c12nDef, 'short', false);
-    expect(result).toBe('TLP:A//LF');
-  });
-
-  it('Should return the higher single classification and merge all required', () => {
-    let result = getMaxClassification('TLP:G//MAPLE', 'TLP:A//LF', c12nDef, 'long', false);
-    expect(result).toBe('TLP:AMBER//MAPLE/LEAF');
-
-    result = getMaxClassification('TLP:AMBER', 'TLP:C//LEAF/MAPLE', c12nDef, 'short', false);
-    expect(result).toBe('TLP:A//MPL/LF');
-  });
-
-  it('Should return the higher single classification and merge all groups', () => {
-    let result = getMaxClassification('TLP:G//MOOSE', 'TLP:C', c12nDef, 'long', false);
-    expect(result).toBe('TLP:GREEN//REL TO MOOSE');
-
-    result = getMaxClassification('TLP:AMBER//BEAVER', 'TLP:C//MOOSE', c12nDef, 'short', false);
-    expect(result).toBe('TLP:A//REL B/M');
-  });
-
-  it('Should return the higher single classification and merge all required and groups', () => {
-    let result = getMaxClassification('TLP:G//MAPLE//MOOSE', 'TLP:C//LEAF', c12nDef, 'long', false);
-    expect(result).toBe('TLP:GREEN//MAPLE/LEAF//REL TO MOOSE');
-
-    result = getMaxClassification('TLP:AMBER//BEAVER/MOOSE', 'TLP:C//MAPLE/LEAF', c12nDef, 'short', false);
-    expect(result).toBe('TLP:A//MPL/LF//REL B/M');
+  it('Should limit access based on releasability', () => {
+    expect(isAccessible('L2', 'L2//REL A', c12nDef, true)).toBe(false);
+    expect(isAccessible('L2/REL B', 'L2//REL A', c12nDef, true)).toBe(false);
+    expect(isAccessible('L2/REL B', 'L2//REL A, B', c12nDef, true)).toBe(true);
+    expect(isAccessible('L2/REL B', 'L2//REL B', c12nDef, true)).toBe(true);
+    expect(isAccessible('L2/REL B', 'L2', c12nDef, true)).toBe(true);
   });
 });
 
-describe('`applyClassificationRules` should correctly identify classifications passed in', () => {
-  const disabled = { groups: [], levels: [] };
+describe('`getMaxClassification` correctly identifies the maximum', () => {
+  it('Should return the higher level when only level is given', () => {
+    expect(getMaxClassification('L0', 'L0', c12nDef, 'short', false)).toBe('L0');
+    expect(getMaxClassification('L0', 'L0', c12nDef, 'long', false)).toBe('LEVEL 0');
+    expect(getMaxClassification('L0', 'L0', c12nDef, 'long', true)).toBe('L0');
 
-  it('Should return no disabled, and the single classification parts', () => {
-    const parts = getParts('TLP:CLEAR//MAPLE', c12nDef, 'long', false);
+    expect(getMaxClassification('LEVEL 0', 'L1', c12nDef, 'short', false)).toBe('L1');
+    expect(getMaxClassification('LEVEL 0', 'L1', c12nDef, 'long', false)).toBe('LEVEL 1');
+    expect(getMaxClassification('LEVEL 0', 'L1', c12nDef, 'long', true)).toBe('L1');
+
+    expect(getMaxClassification('L0', 'LEVEL 2', c12nDef, 'short', false)).toBe('L2');
+    expect(getMaxClassification('L0', 'LEVEL 2', c12nDef, 'long', false)).toBe('LEVEL 2');
+    expect(getMaxClassification('L0', 'LEVEL 2', c12nDef, 'long', true)).toBe('L2');
+
+    expect(getMaxClassification('L1', 'L0', c12nDef, 'short', false)).toBe('L1');
+    expect(getMaxClassification('L1', 'L0', c12nDef, 'long', false)).toBe('LEVEL 1');
+    expect(getMaxClassification('L1', 'L0', c12nDef, 'long', true)).toBe('L1');
+
+    expect(getMaxClassification('L1', 'L1', c12nDef, 'short', false)).toBe('L1');
+    expect(getMaxClassification('L1', 'L1', c12nDef, 'long', false)).toBe('LEVEL 1');
+    expect(getMaxClassification('L1', 'L1', c12nDef, 'long', true)).toBe('L1');
+
+    expect(getMaxClassification('L1', 'L2', c12nDef, 'short', false)).toBe('L2');
+    expect(getMaxClassification('L1', 'L2', c12nDef, 'long', false)).toBe('LEVEL 2');
+    expect(getMaxClassification('L1', 'L2', c12nDef, 'long', true)).toBe('L2');
+
+    expect(getMaxClassification('L2', 'L0', c12nDef, 'short', false)).toBe('L2');
+    expect(getMaxClassification('L2', 'L0', c12nDef, 'long', false)).toBe('LEVEL 2');
+    expect(getMaxClassification('L2', 'L0', c12nDef, 'long', true)).toBe('L2');
+
+    expect(getMaxClassification('L2', 'L1', c12nDef, 'short', false)).toBe('L2');
+    expect(getMaxClassification('L2', 'L1', c12nDef, 'long', false)).toBe('LEVEL 2');
+    expect(getMaxClassification('L2', 'L1', c12nDef, 'long', true)).toBe('L2');
+
+    expect(getMaxClassification('L2', 'L2', c12nDef, 'short', false)).toBe('L2');
+    expect(getMaxClassification('L2', 'L2', c12nDef, 'long', false)).toBe('LEVEL 2');
+    expect(getMaxClassification('L2', 'L2', c12nDef, 'long', true)).toBe('L2');
+  });
+
+  it('Should return the higher level and merge all required when valid', () => {
+    expect(getMaxClassification('L0//AC', 'L2', c12nDef, 'short', false)).toBe('L2//AC');
+    expect(getMaxClassification('L0//AC', 'LEVEL 2', c12nDef, 'long', false)).toBe('LEVEL 2//ACCOUNTING');
+    expect(getMaxClassification('LEVEL 0//AC', 'L2', c12nDef, 'long', true)).toBe('L2//AC');
+
+    expect(getMaxClassification('L0', 'L2//AC', c12nDef, 'short', false)).toBe('L2//AC');
+    expect(getMaxClassification('L0', 'LEVEL 2//AC', c12nDef, 'long', false)).toBe('LEVEL 2//ACCOUNTING');
+    expect(getMaxClassification('LEVEL 0', 'L2//AC', c12nDef, 'long', true)).toBe('L2//AC');
+
+    expect(getMaxClassification('L0//NOCON', 'L2//AC', c12nDef, 'short', false)).toBe('L2//AC/NOCON');
+    expect(getMaxClassification('L0//NOCON', 'LEVEL 2//AC', c12nDef, 'long', false)).toBe(
+      'LEVEL 2//ACCOUNTING/NO CONTRACTORS'
+    );
+    expect(getMaxClassification('LEVEL 0//NOCON', 'L2//AC', c12nDef, 'long', true)).toBe('L2//AC/NOCON');
+
+    expect(getMaxClassification('L0//NOCON', 'L2//AC/ORCON', c12nDef, 'short', false)).toBe('L2//AC/NOCON/ORCON');
+    expect(getMaxClassification('L0//NOCON', 'LEVEL 2//AC/ORCON', c12nDef, 'long', false)).toBe(
+      'LEVEL 2//ACCOUNTING/NO CONTRACTORS/ORIGINATOR CONTROLLED'
+    );
+    expect(getMaxClassification('LEVEL 0//NOCON', 'L2//AC/ORCON', c12nDef, 'long', true)).toBe('L2//AC/NOCON/ORCON');
+  });
+
+  it('Should return the higher level and merge all groups when valid', () => {
+    expect(getMaxClassification('L0//REL A, B', 'L0', c12nDef, 'short', false)).toBe('L0//REL A, B');
+    expect(getMaxClassification('L0//REL A', 'L1', c12nDef, 'long', false)).toBe('LEVEL 1//REL TO GROUP A');
+    expect(getMaxClassification('L0//REL A', 'L1', c12nDef, 'long', true)).toBe('L1//REL A');
+    expect(getMaxClassification('L0', 'L2//REL A, B', c12nDef, 'short', false)).toBe('L2//REL A, B');
+    expect(getMaxClassification('L0', 'L1//REL A', c12nDef, 'long', false)).toBe('LEVEL 1//REL TO GROUP A');
+    expect(getMaxClassification('L0//REL A, B', 'L1//REL A, B', c12nDef, 'short', false)).toBe('L1//REL A, B');
+    expect(getMaxClassification('L0//REL A, B', 'L0//REL A', c12nDef, 'long', false)).toBe('LEVEL 0//REL TO GROUP A');
+    expect(getMaxClassification('L0//REL B', 'L0//REL B, A', c12nDef, 'long', false)).toBe('LEVEL 0//REL TO GROUP B');
+  });
+
+  it('Should return the higher level and merge all groups and subgroups when valid', () => {
+    expect(getMaxClassification('L0//R1/R2', 'L0', c12nDef, 'short', false)).toBe('L0//XX/R1/R2');
+    expect(getMaxClassification('L0//R1', 'L0', c12nDef, 'long', false)).toBe('LEVEL 0//RESERVE ONE');
+    expect(getMaxClassification('L0//R1/R2', 'L1//R1/R2', c12nDef, 'short', false)).toBe('L1//XX/R1/R2');
+    expect(getMaxClassification('L0//R1/R2', 'L0//R1', c12nDef, 'long', false)).toBe('LEVEL 0//XX/RESERVE ONE');
+  });
+
+  it('Should return the higher level and merge all required, groups and subgroups when valid', () => {
+    expect(getMaxClassification('L0//R1/R2', 'L1//LE', c12nDef, 'short', false)).toBe('L1//LE//XX/R1/R2');
+    expect(getMaxClassification('L0//R1/R2', 'L1//LE', c12nDef, 'long', false)).toBe(
+      'LEVEL 1//LEGAL//XX/RESERVE 1/RESERVE 2'
+    );
+  });
+
+  it('Should raise an error? on invalid group combinations', () => {
+    expect(getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'short', false)).toBe('?');
+    expect(getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'long', false)).toBe('?');
+  });
+});
+
+describe('`applyClassificationRules` should correctly identify incorrect combinations', () => {
+  it('Should return disabled when conflicting groups are found', () => {
+    let parts = getParts('L0//GROUP A/R1', c12nDef, 'long', false);
     let result = applyClassificationRules(parts, c12nDef, 'short', false);
-    expect(result.disabled).toEqual(disabled);
-    expect(result.parts).toEqual({ groups: [], lvl: 'TLP:C', lvlIdx: '100', req: ['MPL'], subgroups: [] });
-
-    result = applyClassificationRules(parts, c12nDef, 'long', false, true);
-    expect(result.disabled).toEqual(disabled);
-    expect(result.parts).toEqual({ groups: [], lvl: 'TLP:CLEAR', lvlIdx: '100', req: ['MAPLE'], subgroups: [] });
-  });
-
-  it('Should return no disabled, and the multiple classification parts', () => {
-    const parts = getParts('TLP:AMBER//MAPLE/LEAF//MOOSE/SUBGRP/BEAVER', c12nDef, 'short', false);
-    const result = applyClassificationRules(parts, c12nDef, 'short', false);
-    expect(result.disabled).toEqual(disabled);
-    expect(result.parts).toEqual({
-      groups: ['B', 'M'],
-      lvl: 'TLP:A',
-      lvlIdx: '120',
-      req: ['LF', 'MPL'],
-      subgroups: ['SG']
-    });
-  });
-
-  it('Should return disabled, and the multiple classification parts', () => {
-    const parts = getParts('TLP:BAD//MAPLES/LEAF//MOOSE/SUBGRP/BEAVERS', c12nDef, 'short', false);
-    const result = applyClassificationRules(parts, c12nDef, 'short', false);
-    expect(result.parts).toEqual({
-      groups: ['M'],
-      lvl: 'INVALID',
-      lvlIdx: null,
-      req: ['LF'],
-      subgroups: ['SG']
-    });
-    expect(result.disabled).toEqual('');
+    expect(result.disabled).toEqual({ groups: ['R1'], levels: [] });
+    expect(result.parts).toEqual({ lvl: 'L0', lvlIdx: '1', req: [], groups: ['A'], subgroups: [] });
   });
 });
-
-//todo test more invalid
