@@ -6,7 +6,8 @@ import { ALField, CustomUser } from 'components/hooks/useMyUser';
 import SearchQuery, { SearchFilter, SearchFilterType } from 'components/visual/SearchBar/search-query';
 import { safeFieldValue, verdictRank } from 'helpers/utils';
 import { useCallback, useEffect, useReducer, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { LOCAL_STORAGE } from '../alerts';
 
 const DEFAULT_STATE = {
   loading: true,
@@ -196,6 +197,7 @@ export function detailedItemCompare(a: DetailedItem, b: DetailedItem) {
 export default function useAlerts(pageSize: number): UsingAlerts {
   const location = useLocation();
   const { apiCall } = useMyAPI();
+  const navigate = useNavigate();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { indexes: fieldIndexes } = useALContext();
   const [searchQuery, setSearchQuery] = useState<SearchQuery>(null);
@@ -205,6 +207,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const [labelFilters, setLabelFilters] = useState<SearchFilter[]>([]);
   const [valueFilters, setValueFilters] = useState<SearchFilter[]>([]);
   const [state, setState] = useReducer(alertStateReducer, DEFAULT_STATE);
+  const [search, setSearch] = useState<string>(null);
 
   // parse list of alert result: add an index field.
   const parseResult = (responseItems, offset) => {
@@ -405,8 +408,17 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   }, [searchQuery]);
 
   useEffect(() => {
-    setSearchQuery(new SearchQuery(location.pathname, location.search, pageSize));
-  }, [location.pathname, location.search, pageSize]);
+    if (search !== null) setSearchQuery(new SearchQuery(location.pathname, search, pageSize));
+  }, [location.pathname, pageSize, search]);
+
+  useEffect(() => {
+    if (location.search === '' && localStorage.getItem(LOCAL_STORAGE)) {
+      setSearch(null);
+      navigate(`${location.pathname}${localStorage.getItem(LOCAL_STORAGE)}${location.hash}`);
+    } else {
+      setSearch(location.search);
+    }
+  }, [location.hash, location.pathname, location.search, navigate]);
 
   // transform alert fields into array.
   useEffect(() => {
