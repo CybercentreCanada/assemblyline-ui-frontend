@@ -282,8 +282,10 @@ describe('`getParts` correctly extracts all components', () => {
 
 describe('`normalizedClassification` correctly formats', () => {
   it('Should convert input to upper case', () => {
-    const parts = getParts('l0//accOUNTINg//rel to GROUP a', c12nDef, 'long', false);
+    let parts = getParts('l0//accOUNTINg//rel to GROUP a', c12nDef, 'long', false);
     expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//ACCOUNTING//REL TO GROUP A');
+    // normalize mutates parts in place.
+    parts = getParts('l0//accOUNTINg//rel to GROUP a', c12nDef, 'long', false);
     expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//AC//REL A');
   });
 

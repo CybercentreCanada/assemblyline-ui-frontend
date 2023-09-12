@@ -433,7 +433,7 @@ export function normalizedClassification(
   out = getLevelText(Math.max(lvlIdx, requiredLvlIdx), c12nDef, format, isMobile);
 
   // 2. Check for all required items if they should be shown inside the groups display part
-  const reqGrp = new Set();
+  const reqGrp = new Set<string>();
   for (const r of req) {
     if (!!c12nDef.params_map[r]?.is_required_group) {
       reqGrp.add(r);
@@ -502,73 +502,33 @@ export function normalizedClassification(
     out += reqGrp.size > 0 ? '/' : '//';
     if (groups.length === 1) {
       // 6. If only one group, check if it has a solitary display name.
-    }
-  }
-
-  let tempReqT = [...req];
-  for (const r of req) {
-    if (c12nDef.params_map[r] !== undefined) {
-      if (c12nDef.params_map[r].is_required_group !== undefined) {
-        if (c12nDef.params_map[r].is_required_group) {
-          reqGrp.push(r);
-        }
-      }
-    }
-  }
-
-  for (const rg of reqGrp) {
-    tempReq.splice(tempReq.indexOf(rg), 1);
-  }
-
-  if (tempReq.length > 0) {
-    out += `//${tempReq.join('/')}`;
-  }
-  if (reqGrp.length > 0) {
-    out += `//${reqGrp.join('/')}`;
-  }
-
-  if (groups.length > 0) {
-    if (reqGrp.length > 0) {
-      out += '/';
+      const grp = groups[0];
+      const displayName = c12nDef.params_map[grp]?.solitary_display_name || grp;
+      out += displayName !== grp ? displayName : groupDelim + grp;
     } else {
-      out += '//';
-    }
-
-    if (groups.length === 1) {
-      const group = groups[0];
-      if (c12nDef.params_map[group] !== undefined) {
-        if (c12nDef.params_map[group].solitary_display_name !== undefined) {
-          out += c12nDef.params_map[group].solitary_display_name;
-        } else {
-          out += `REL TO ${group}`;
-        }
-      } else {
-        out += `REL TO ${group}`;
-      }
-    } else {
-      if (format === 'short' || isMobile) {
-        for (const alias in c12nDef.groups_aliases) {
-          if ({}.hasOwnProperty.call(c12nDef.groups_aliases, alias)) {
-            const values = c12nDef.groups_aliases[alias];
-            if (values.length > 1) {
-              if (JSON.stringify(values.sort()) === JSON.stringify(groups)) {
-                groups = [alias];
-              }
+      if (!longFormat) {
+        // 7. In short format mode, check if there is an alias that can replace multiple groups
+        for (const [alias, values] of Object.entries(c12nDef.groups_aliases)) {
+          if (values.length > 1) {
+            const sortedValues = values.sort();
+            if (sortedValues === groups) {
+              groups = [alias];
             }
           }
         }
+      } else {
+        out += groupDelim + groups.sort().join(', ');
       }
-      out += `REL TO ${groups.join(', ')}`;
     }
   }
 
-  if (subgroups.length > 0) {
-    if (groups.length > 0 || reqGrp.length > 0) {
+  if (tempSubGroups.length > 0) {
+    if (groups.length > 0 || reqGrp.size > 0) {
       out += '/';
     } else {
       out += '//';
     }
-    out += subgroups.join('/');
+    out += tempSubGroups.sort().join('/');
   }
 
   return out;
