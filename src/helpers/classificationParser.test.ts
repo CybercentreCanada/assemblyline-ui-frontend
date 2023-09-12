@@ -240,11 +240,26 @@ describe('`getParts` correctly extracts all components', () => {
       groups: [],
       subgroups: ['R3']
     });
-    expect(getParts('LEVEL 0//REL R3', c12nDef, 'long', false)).toEqual({
+    expect(getParts('LEVEL 0//R3', c12nDef, 'long', false)).toEqual({
       lvlIdx: '1',
       lvl: 'LEVEL 0',
       req: [],
       groups: [],
+      subgroups: ['RESERVE THREE']
+    });
+
+    expect(getParts('LEVEL 0//R3/REL X', c12nDef, 'short', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'L0',
+      req: [],
+      groups: ['X'],
+      subgroups: ['R3']
+    });
+    expect(getParts('LEVEL 0//R3/REL X', c12nDef, 'long', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'LEVEL 0',
+      req: [],
+      groups: ['GROUP X'],
       subgroups: ['RESERVE THREE']
     });
 
@@ -497,7 +512,7 @@ describe('`getMaxClassification` correctly identifies the maximum', () => {
   it('Should return the higher level and merge all required, groups and subgroups when valid', () => {
     expect(getMaxClassification('L0//R1/R2', 'L1//LE', c12nDef, 'short', false)).toBe('L1//LE//XX/R1/R2');
     expect(getMaxClassification('L0//R1/R2', 'L1//LE', c12nDef, 'long', false)).toBe(
-      'LEVEL 1//LEGAL//XX/RESERVE 1/RESERVE 2'
+      'LEVEL 1//LEGAL DEPARTMENT//XX/RESERVE ONE/RESERVE TWO'
     );
   });
 
