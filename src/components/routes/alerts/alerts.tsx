@@ -28,6 +28,7 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SearchBar from 'components/visual/SearchBar/search-bar';
@@ -59,7 +60,7 @@ import usePromiseAPI from './hooks/usePromiseAPI';
 //  when scrolling has hit threshold.
 const PAGE_SIZE = 50;
 
-const LOCAL_STORAGE = 'alert.search';
+export const LOCAL_STORAGE = 'alert.search';
 
 export interface AlertDrawerState {
   open: boolean;
@@ -127,6 +128,7 @@ const Alerts: React.FC = () => {
   const classes = useStyles();
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
+  const { showSuccessMessage } = useMySnackbar();
   const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
 
   // Alerts hook.
@@ -422,13 +424,6 @@ const Alerts: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalDrawerOpened]);
 
-  useEffect(() => {
-    const search = localStorage.getItem(LOCAL_STORAGE);
-    if (search && [undefined, null, ''].includes(location.search))
-      navigate(`${location.pathname}${search}${location.hash}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return currentUser.roles.includes('alert_view') ? (
     <PageFullWidth margin={4}>
       <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
@@ -478,51 +473,61 @@ const Alerts: React.FC = () => {
         <DialogTitle>{t('session.title')}</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(2) }}>
           <div>{t('session.description')}</div>
-          {session.existing && (
-            <Grid item>
-              <Typography variant="subtitle2">{t('session.existing')}</Typography>
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {parseSearchParams(session.existing)?.map(([k, v], i) => (
+
+          <Grid item>
+            <Typography variant="subtitle2">{t('session.existing')}</Typography>
+            <Paper component="pre" variant="outlined" className={classes.preview}>
+              {!session.existing ? (
+                <div>{t('none')}</div>
+              ) : (
+                parseSearchParams(session.existing)?.map(([k, v], i) => (
                   <div key={i} style={{ display: 'contents' }}>
                     <b>{k}: </b>
                     {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
                   </div>
-                ))}
-              </Paper>
-            </Grid>
-          )}
-          {session.current && (
-            <Grid item>
-              <Typography variant="subtitle2">{t('session.current')}</Typography>
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {parseSearchParams(session.current)?.map(([k, v], i) => (
+                ))
+              )}
+            </Paper>
+          </Grid>
+
+          <Grid item>
+            <Typography variant="subtitle2">{t('session.current')}</Typography>
+            <Paper component="pre" variant="outlined" className={classes.preview}>
+              {!session.current ? (
+                <div>{t('none')}</div>
+              ) : (
+                parseSearchParams(session.current)?.map(([k, v], i) => (
                   <div key={i} style={{ display: 'contents' }}>
                     <b>{k}: </b>
                     {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
                   </div>
-                ))}
-              </Paper>
-            </Grid>
-          )}
+                ))
+              )}
+            </Paper>
+          </Grid>
+
+          <div>{session.existing ? t('session.clear.confirm') : t('session.clear.none')}</div>
+
           <div>
-            {!session.current
-              ? t('session.confirm.none')
-              : session.existing
-              ? t('session.confirm.clear')
-              : t('session.confirm.save')}
+            {session.existing === session.current
+              ? t('session.save.same')
+              : session.current
+              ? t('session.save.confirm')
+              : t('session.save.none')}
           </div>
         </DialogContent>
         <DialogActions>
-          {session.existing && (
-            <Button
-              color="primary"
-              children={t('session.clear')}
-              onClick={() => {
-                localStorage.removeItem(LOCAL_STORAGE);
-                setSession(s => ({ ...s, open: false }));
-              }}
-            />
-          )}
+          <Button
+            color="primary"
+            disabled={!session.existing}
+            children={t('session.clear')}
+            onClick={() => {
+              showSuccessMessage(t('session.clear.success'));
+              localStorage.removeItem(LOCAL_STORAGE);
+              setSession(s => ({ ...s, open: false }));
+              navigate(`${location.pathname}${location.hash}`);
+            }}
+          />
           <div style={{ flex: 1 }} />
           <Button
             autoFocus
@@ -532,9 +537,10 @@ const Alerts: React.FC = () => {
           />
           <Button
             color="primary"
-            disabled={!session.current}
+            disabled={!session.current || session.current === session.existing}
             children={t('session.save')}
             onClick={() => {
+              showSuccessMessage(t('session.save.success'));
               localStorage.setItem(LOCAL_STORAGE, location.search);
               setSession(s => ({ ...s, open: false }));
             }}
