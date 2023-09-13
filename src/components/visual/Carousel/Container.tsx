@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
@@ -281,15 +280,7 @@ export const WrappedCarouselContainer = () => {
       onEnter: () => setLoading(true),
       onExit: () => setLoading(false),
       onSuccess: api_data => setData(api_data.api_response),
-      onFailure: () => setData(null),
-      onFinalize: () => {
-        const img = document.getElementById('carousel-image');
-        if (!img) return;
-        const rect = img.getBoundingClientRect();
-        if (rect.width >= window.innerWidth - 160)
-          img.style.width = `${(100 * (window.innerWidth - 160)) / window.innerWidth}vw`;
-        handleResize();
-      }
+      onFailure: () => setData(null)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentImage]);
@@ -316,8 +307,13 @@ export const WrappedCarouselContainer = () => {
   }, [data, handleKeyDown, handleResize]);
 
   useEffect(() => {
+    const img = document.getElementById('carousel-image');
+    if (!img) return;
+    const rect = img.getBoundingClientRect();
+    if (rect.width >= window.innerWidth - 160)
+      img.style.width = `${(100 * (window.innerWidth - 160)) / window.innerWidth}vw`;
     handleResize();
-  }, [loading]);
+  }, [handleResize, data]);
 
   return (
     <Carousel onNext={onNextImage} onPrevious={onPreviousImage}>
