@@ -201,7 +201,7 @@ describe('`getParts` correctly extracts all components', () => {
     });
   });
 
-  it('Should extract the group and subgroups', () => {
+  it('Should extract the group', () => {
     expect(getParts('L0//REL A', c12nDef, 'short', false)).toEqual({
       lvlIdx: '1',
       lvl: 'L0',
@@ -231,7 +231,40 @@ describe('`getParts` correctly extracts all components', () => {
       groups: ['GROUP A'],
       subgroups: []
     });
+  });
 
+  it('Should extract multiple groups', () => {
+    expect(getParts('L0//REL A, B', c12nDef, 'short', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'L0',
+      req: [],
+      groups: ['A', 'B'],
+      subgroups: []
+    });
+    expect(getParts('L0//REL B, A', c12nDef, 'long', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'LEVEL 0',
+      req: [],
+      groups: ['GROUP A', 'GROUP B'],
+      subgroups: []
+    });
+    expect(getParts('L0//REL TO GROUP A, GROUP B', c12nDef, 'short', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'L0',
+      req: [],
+      groups: ['A', 'B'],
+      subgroups: []
+    });
+    expect(getParts('L0//REL TO GROUP B, GROUP A', c12nDef, 'long', false)).toEqual({
+      lvlIdx: '1',
+      lvl: 'LEVEL 0',
+      req: [],
+      groups: ['GROUP A', 'GROUP B'],
+      subgroups: []
+    });
+  });
+
+  it('Should extract groups and subgroups', () => {
     // getParts is not responsible for adding parent groups to subgroups
     expect(getParts('LEVEL 0//R3', c12nDef, 'short', false)).toEqual({
       lvlIdx: '1',
@@ -310,41 +343,66 @@ describe('`normalizedClassification` correctly formats', () => {
   it('Should normalise groups', () => {
     let parts = getParts('L0//REL A, B', c12nDef, 'short', false);
     expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//REL TO GROUP A, GROUP B');
+    parts = getParts('L0//REL A, B', c12nDef, 'short', false);
     expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//REL A, B');
 
     parts = getParts('L2//REL B, A', c12nDef, 'short', false);
     expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 2//REL TO GROUP A, GROUP B');
+    parts = getParts('L2//REL B, A', c12nDef, 'short', false);
     expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L2//REL A, B');
 
     parts = getParts('L0//REL A', c12nDef, 'short', false);
     expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//REL TO GROUP A');
+    parts = getParts('L0//REL A', c12nDef, 'short', false);
     expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//REL A');
   });
 
   it('Should normalise required', () => {
     let parts = getParts('L0//AC', c12nDef, 'short', false);
     expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//ACCOUNTING');
+    parts = getParts('L0//AC', c12nDef, 'short', false);
     expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//AC');
 
-    parts = getParts('L2//AC/NOCON', c12nDef, 'short', false);
-    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 2//ACCOUNTING/NO CONTRACTOR');
-    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L2//AC/NOCON');
+    parts = getParts('L2//AC/LE', c12nDef, 'short', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 2//ACCOUNTING/LEGAL DEPARTMENT');
+    parts = getParts('L2//AC/LE', c12nDef, 'short', false);
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L2//AC/LE');
 
-    parts = getParts('L2//NOCON/AC', c12nDef, 'short', false);
-    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 2//ACCOUNTING/NO CONTRACTOR');
-    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L2//AC/NOCON');
+    parts = getParts('L2//LE/AC', c12nDef, 'short', false);
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 2//ACCOUNTING/LEGAL DEPARTMENT');
+    parts = getParts('L2//LE/AC', c12nDef, 'short', false);
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L2//AC/LE');
   });
 
   it('Should convert aliases to real name', () => {
     let parts = getParts('OPEN', c12nDef, 'long', false);
     expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0');
+    parts = getParts('OPEN', c12nDef, 'long', false);
     expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0');
 
     parts = getParts('L0//LEGAL', c12nDef, 'long', false);
     expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//LEGAL DEPARTMENT');
+    parts = getParts('L0//LEGAL', c12nDef, 'long', false);
     expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//LE');
   });
 
+  it('Should add primary group when only subgroup is specified', () => {
+    let parts: ClassificationParts = { lvlIdx: 1, lvl: 'LEVEL 0', req: [], groups: [], subgroups: ['R2'] };
+    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//XX/RESERVE TWO');
+    parts = { lvlIdx: 1, lvl: 'LEVEL 0', req: [], groups: [], subgroups: ['R2'] };
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//XX/R2');
+  });
+
+  it('Should correctly parse groups that specify REL, REL TO', () => {
+    let parts = getParts('L0//REL TO GROUP A', c12nDef, 'long', false);
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//REL A');
+
+    parts = getParts('L0//REL GROUP A', c12nDef, 'long', false);
+    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//REL A');
+  });
+});
+
+describe('`normalizedClassification` identifies invalid input', () => {
   it('Should raise errors on invliad input?', () => {
     let parts: ClassificationParts = { lvlIdx: 12, lvl: 'LEVEL 12', req: [], groups: [], subgroups: [] };
     expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('?');
@@ -352,23 +410,6 @@ describe('`normalizedClassification` correctly formats', () => {
     expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('?');
     parts = { lvlIdx: 1, lvl: 'LEVEL 0', req: ['LEGAL DEPARTMENT'], groups: ['GARBO'], subgroups: [] };
     expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('?');
-  });
-
-  it('Should add primary group when only subgroup is specified', () => {
-    let parts: ClassificationParts = { lvlIdx: 1, lvl: 'LEVEL 0', req: [], groups: [], subgroups: ['R2'] };
-    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//REL TO GROUP X/RESERVE TWO');
-    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('L0//REL X/R2');
-  });
-
-  it('Should correctly parse groups that specify REL, REL TO, or just the group', () => {
-    let parts = getParts('L0//GROUP A', c12nDef, 'long', false);
-    expect(normalizedClassification(parts, c12nDef, 'long', false)).toBe('LEVEL 0//REL TO GROUP A');
-
-    parts = getParts('L0//REL TO GROUP A', c12nDef, 'long', false);
-    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//REL A');
-
-    parts = getParts('L0//REL GROUP A', c12nDef, 'long', false);
-    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//REL A');
   });
 });
 
@@ -425,10 +466,10 @@ describe('`isAccessible` correctly applies access controls', () => {
 
   it('Should limit access based on releasability', () => {
     expect(isAccessible('L2', 'L2//REL A', c12nDef, true)).toBe(false);
-    expect(isAccessible('L2/REL B', 'L2//REL A', c12nDef, true)).toBe(false);
-    expect(isAccessible('L2/REL B', 'L2//REL A, B', c12nDef, true)).toBe(true);
-    expect(isAccessible('L2/REL B', 'L2//REL B', c12nDef, true)).toBe(true);
-    expect(isAccessible('L2/REL B', 'L2', c12nDef, true)).toBe(true);
+    expect(isAccessible('L2//REL B', 'L2//REL A', c12nDef, true)).toBe(false);
+    expect(isAccessible('L2//REL B', 'L2//REL A, B', c12nDef, true)).toBe(true);
+    expect(isAccessible('L2//REL B', 'L2//REL B', c12nDef, true)).toBe(true);
+    expect(isAccessible('L2//REL B', 'L2', c12nDef, true)).toBe(true);
   });
 });
 
@@ -480,17 +521,17 @@ describe('`getMaxClassification` correctly identifies the maximum', () => {
     expect(getMaxClassification('L0', 'LEVEL 2//AC', c12nDef, 'long', false)).toBe('LEVEL 2//ACCOUNTING');
     expect(getMaxClassification('LEVEL 0', 'L2//AC', c12nDef, 'long', true)).toBe('L2//AC');
 
-    expect(getMaxClassification('L0//NOCON', 'L2//AC', c12nDef, 'short', false)).toBe('L2//AC/NOCON');
+    expect(getMaxClassification('L0//NOCON', 'L2//AC', c12nDef, 'short', false)).toBe('L2//AC//NOCON');
     expect(getMaxClassification('L0//NOCON', 'LEVEL 2//AC', c12nDef, 'long', false)).toBe(
-      'LEVEL 2//ACCOUNTING/NO CONTRACTORS'
+      'LEVEL 2//ACCOUNTING//NO CONTRACTORS'
     );
-    expect(getMaxClassification('LEVEL 0//NOCON', 'L2//AC', c12nDef, 'long', true)).toBe('L2//AC/NOCON');
+    expect(getMaxClassification('LEVEL 0//NOCON', 'L2//AC', c12nDef, 'long', true)).toBe('L2//AC//NOCON');
 
-    expect(getMaxClassification('L0//NOCON', 'L2//AC/ORCON', c12nDef, 'short', false)).toBe('L2//AC/NOCON/ORCON');
+    expect(getMaxClassification('L0//NOCON', 'L2//AC/ORCON', c12nDef, 'short', false)).toBe('L2//AC//NOCON/ORCON');
     expect(getMaxClassification('L0//NOCON', 'LEVEL 2//AC/ORCON', c12nDef, 'long', false)).toBe(
-      'LEVEL 2//ACCOUNTING/NO CONTRACTORS/ORIGINATOR CONTROLLED'
+      'LEVEL 2//ACCOUNTING//NO CONTRACTORS/ORIGINATOR CONTROLLED'
     );
-    expect(getMaxClassification('LEVEL 0//NOCON', 'L2//AC/ORCON', c12nDef, 'long', true)).toBe('L2//AC/NOCON/ORCON');
+    expect(getMaxClassification('LEVEL 0//NOCON', 'L2//AC/ORCON', c12nDef, 'long', true)).toBe('L2//AC//NOCON/ORCON');
   });
 
   it('Should return the higher level and merge all groups when valid', () => {
@@ -526,7 +567,7 @@ describe('`getMaxClassification` correctly identifies the maximum', () => {
 
 describe('`applyClassificationRules` should correctly identify incorrect combinations', () => {
   it('Should return disabled when conflicting groups are found', () => {
-    let parts = getParts('L0//GROUP A/R1', c12nDef, 'long', false);
+    let parts = getParts('L0//REL GROUP A/R3', c12nDef, 'long', false);
     let result = applyClassificationRules(parts, c12nDef, 'short', false);
     expect(result.disabled).toEqual({ groups: ['R1'], levels: [] });
     expect(result.parts).toEqual({ lvl: 'L0', lvlIdx: '1', req: [], groups: ['A'], subgroups: [] });

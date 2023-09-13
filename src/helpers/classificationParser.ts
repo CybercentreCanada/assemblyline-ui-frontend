@@ -244,8 +244,12 @@ function getGroups(
     // if there is a rel marking we know we have groups
     if (gp.startsWith('REL ')) {
       const tempGroups = new Set(gp.replace('REL TO ', '').replace('REL ', '').split(','));
-      for (const tg of tempGroups) {
-        groups = groups.concat(tg.split('/'));
+      for (let tg of tempGroups) {
+        tg = tg.trim();
+        for (let tsg of tg.split('/')) {
+          tsg = tsg.trim();
+          groups.push(tsg);
+        }
       }
     } else {
       // if there is not a rel marking we either have a subgroup or a
@@ -420,8 +424,28 @@ export function normalizedClassification(
 
   const longFormat = format === 'short' || !!isMobile ? false : true;
   const groupDelim = !!longFormat ? 'REL TO ' : 'REL ';
-  const { lvlIdx, lvl, req, subgroups } = parts;
-  let { groups } = parts;
+  const { lvlIdx, lvl } = parts;
+  let { groups, subgroups, req } = parts;
+
+  // convert to correct format
+  req = req.map(r => {
+    if (!!longFormat) {
+      return c12nDef.access_req_map_stl[r] || r;
+    }
+    return c12nDef.access_req_map_lts[r] || r;
+  });
+  groups = groups.map(g => {
+    if (!!longFormat) {
+      return c12nDef.groups_map_stl[g] || g;
+    }
+    return c12nDef.groups_map_lts[g] || g;
+  });
+  subgroups = subgroups.map(g => {
+    if (!!longFormat) {
+      return c12nDef.subgroups_map_stl[g] || g;
+    }
+    return c12nDef.subgroups_map_lts[g] || g;
+  });
 
   // 1. Check for all required items if they need a specific level
   let out = lvl;
@@ -510,15 +534,13 @@ export function normalizedClassification(
         // 7. In short format mode, check if there is an alias that can replace multiple groups
         for (const [alias, values] of Object.entries(c12nDef.groups_aliases)) {
           if (values.length > 1) {
-            const sortedValues = values.sort();
-            if (sortedValues === groups) {
+            if (values.sort() === groups) {
               groups = [alias];
             }
           }
         }
-      } else {
-        out += groupDelim + groups.sort().join(', ');
       }
+      out += groupDelim + groups.sort().join(', ');
     }
   }
 
@@ -746,6 +768,7 @@ export function isAccessible(
   const userParts = getParts(user_c12n, c12nDef, 'long', false);
   const parts = getParts(c12n, c12nDef, 'long', false);
 
+  // this need to be covereted to ints!!
   if (userParts.lvlIdx >= parts.lvlIdx) {
     if (!canSeeRequired(userParts.req, parts.req)) return false;
     if (!canSeeGroups(userParts.groups, parts.groups)) return false;
