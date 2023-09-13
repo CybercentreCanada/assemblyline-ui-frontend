@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: 'absolute',
     left: 0,
     top: '80px',
-    bottom: '20vh',
+    bottom: 'min(128px, 20vw, 20vh)',
     padding: theme.spacing(2),
     display: 'grid',
     placeItems: 'center'
@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: 'absolute',
     right: 0,
     top: '80px',
-    bottom: '20vh',
+    bottom: 'min(128px, 20vw, 20vh)',
     padding: theme.spacing(2),
     display: 'grid',
     placeItems: 'center'
@@ -126,7 +126,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     cursor: 'pointer',
     backgroundColor: theme.palette.mode === 'dark' ? 'rgb(48, 48, 48)' : '#fafafa',
     width: '20vw',
-    maxHeight: 'calc(100vh - min(20vh, 128px))',
+    maxHeight: 'calc(100vh - min(128px, 20vw, 20vh))',
     aspectRatio: `${Math.sqrt(2)}`,
     borderRadius: theme.spacing(1),
     [theme.breakpoints.down('md')]: {
@@ -193,7 +193,7 @@ export const WrappedCarouselContainer = () => {
     wrapper.style.paddingLeft = rect.width >= window.innerWidth ? '80px' : 'initial';
     wrapper.style.paddingRight = rect.width >= window.innerWidth ? '80px' : 'initial';
     wrapper.style.paddingTop = rect.height >= window.innerHeight ? '80px' : 'initial';
-    wrapper.style.paddingBottom = rect.height >= window.innerHeight ? 'min(20vh, 128px)' : 'initial';
+    wrapper.style.paddingBottom = rect.height >= window.innerHeight ? 'min(128px, 20vw, 20vh)' : 'initial';
 
     if (!event) return;
 
@@ -295,11 +295,6 @@ export const WrappedCarouselContainer = () => {
   }, [currentImage]);
 
   useEffect(() => {
-    function cancelWheel(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }
     function resize() {
       handleResize();
     }
@@ -310,14 +305,10 @@ export const WrappedCarouselContainer = () => {
       handleKeyDown(e);
     }
 
-    const wrapper = document.getElementById('carousel-wrapper');
-    wrapper?.addEventListener('wheel', cancelWheel, { passive: false });
     window.addEventListener('resize', resize);
     window.addEventListener('mouseup', mouseUp);
     window.addEventListener('keydown', keydown);
-
     return () => {
-      wrapper?.removeEventListener('wheel', cancelWheel);
       window.removeEventListener('resize', resize);
       window.removeEventListener('mouseup', mouseUp);
       window.removeEventListener('keydown', keydown);
