@@ -1,9 +1,10 @@
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import { IconButton, Link, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import React from 'react';
+import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 
 export type ExtractedFiles = {
   classification: string;
@@ -48,6 +49,15 @@ const useStyles = makeStyles(theme => ({
 const WrappedExtractedFile: React.FC<ExtractedFileProps> = ({ file, download = false, sid = null }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
+  const location = useLocation();
+
+  const fileViewerPath = useMemo<string>(() => {
+    const tab = TAB_OPTIONS.find(option => location.pathname.indexOf(option) >= 0);
+    if (!location.pathname.startsWith('/file/viewer') || !tab)
+      return `/file/viewer/${file?.sha256}/${DEFAULT_TAB}/${location.search}${location.hash}`;
+    else return `/file/viewer/${file?.sha256}/${tab}/${location.search}${location.hash}`;
+  }, [file?.sha256, location.hash, location.pathname, location.search]);
+
   return (
     <div className={classes.line}>
       <div className={classes.text}>
@@ -75,7 +85,7 @@ const WrappedExtractedFile: React.FC<ExtractedFileProps> = ({ file, download = f
       </div>
       <div className={classes.button}>
         <Tooltip title={`${t('view_file')}: ${file.name}`} placement="left">
-          <IconButton component={RouterLink} to={`/file/viewer/${file.sha256}`} size="small" color="primary">
+          <IconButton component={RouterLink} to={fileViewerPath} size="small" color="primary">
             <PageviewOutlinedIcon />
           </IconButton>
         </Tooltip>
