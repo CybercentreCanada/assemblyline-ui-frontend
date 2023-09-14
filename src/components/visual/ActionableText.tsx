@@ -71,7 +71,7 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, clas
               searchTagExternal={searchTagExternal}
               classification={classification}
             />
-            <MaterialLink className={classes.link} onClick={handleMenuClick} onContextMenu={handleMenuClick}>
+            <MaterialLink className={classes.link} /*onClick={handleMenuClick}*/ onContextMenu={handleMenuClick}>
               {value}
               {lookupState && lookupState[type] ? (
                 <ExternalLinks

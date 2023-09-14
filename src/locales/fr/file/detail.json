@@ -21,6 +21,7 @@
   "mime": "MIME",
   "nothing_to_report": "Le service n'avait rien à signaler pour ce fichier.",
   "not_available": "Non disponible",
+  "not_computable": "Non calculable",
   "parents": "Parents possibles",
   "process_file": "Événements de fichier",
   "process_network": "Événements du réseau",
