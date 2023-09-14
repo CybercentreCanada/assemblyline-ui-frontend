@@ -119,6 +119,23 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(0.75, 1),
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word'
+  },
+  dialogPaper: {
+    maxWidth: '850px'
+  },
+  dialogContent: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: theme.spacing(2),
+    '@media (max-width:850px)': {
+      gridTemplateColumns: '1fr'
+    }
+  },
+  dialogDescription: {
+    gridColumn: 'span 2',
+    '@media (max-width:850px)': {
+      gridColumn: 'span 1'
+    }
   }
 }));
 
@@ -469,10 +486,14 @@ const Alerts: React.FC = () => {
         </div>
       </Drawer>
 
-      <Dialog open={session?.open} onClose={() => setSession(s => ({ ...s, open: false }))}>
+      <Dialog
+        classes={{ paper: classes.dialogPaper }}
+        open={session?.open}
+        onClose={() => setSession(s => ({ ...s, open: false }))}
+      >
         <DialogTitle>{t('session.title')}</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(2) }}>
-          <div>{t('session.description')}</div>
+        <DialogContent className={classes.dialogContent}>
+          <div className={classes.dialogDescription}>{t('session.description')}</div>
 
           <Grid item>
             <Typography variant="subtitle2">{t('session.existing')}</Typography>
