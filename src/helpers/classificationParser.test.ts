@@ -3,8 +3,10 @@ import {
   applyClassificationRules,
   ClassificationDefinition,
   ClassificationParts,
+  getLevelText,
   getMaxClassification,
   getParts,
+  InvalidClassification,
   isAccessible,
   normalizedClassification
 } from 'helpers/classificationParser';
@@ -137,6 +139,12 @@ const c12nDef: ClassificationDefinition = {
   subgroups_map_lts: { 'RESERVE ONE': 'R1', 'RESERVE THREE': 'R3', 'RESERVE TWO': 'R2' },
   subgroups_map_stl: { R1: 'RESERVE ONE', R2: 'RESERVE TWO', R3: 'RESERVE THREE' }
 };
+
+describe('`GetLevelText` identifies invalid input', () => {
+  it('Should raise errors on an invalid levelIdx', () => {
+    expect(() => getLevelText(12, c12nDef, 'short', false)).toThrow(InvalidClassification);
+  });
+});
 
 describe('`getParts` correctly extracts all components', () => {
   it('Should extract the level', () => {
@@ -295,21 +303,118 @@ describe('`getParts` correctly extracts all components', () => {
       groups: ['GROUP X'],
       subgroups: ['RESERVE THREE']
     });
+  });
+});
 
-    expect(getParts('LEVEL 0//AC//REL A,XX/R3', c12nDef, 'short', false)).toEqual({
-      lvlIdx: '1',
-      lvl: 'L0',
-      req: ['AC'],
-      groups: ['A', 'X'],
-      subgroups: ['R3']
-    });
-    expect(getParts('LEVEL 0//AC//REL A,XX/R3', c12nDef, 'long', false)).toEqual({
-      lvlIdx: '1',
-      lvl: 'LEVEL 0',
-      req: ['ACCOUNTING'],
-      groups: ['GROUP A', 'GROUP X'],
-      subgroups: ['RESERVE THREE']
-    });
+describe('`GetParts` identifies invalid input', () => {
+  it('Should raise errors on invalid input', () => {
+    expect(() => getParts('LEVEL 0//GARBO', c12nDef, 'short', false)).toThrow(InvalidClassification);
+    expect(() => getParts('LEVEL 0//LEGAL DEPARTMENT//GARBO', c12nDef, 'short', false)).toThrow(InvalidClassification);
+  });
+
+  it('Should raise errors on an invalid level text', () => {
+    expect(() => getParts('LEVEL 12', c12nDef, 'short', false)).toThrow(InvalidClassification);
+    expect(() => getParts('LEVEL 12', c12nDef, 'long', false)).toThrow(InvalidClassification);
+  });
+
+  it('Should not accept combined groups if a subgroup is limited', () => {
+    expect(() => getParts('LEVEL 0//AC//REL A,XX/R3', c12nDef, 'short', false)).toThrow(InvalidClassification);
+    expect(() => getParts('LEVEL 0//AC//REL A,XX/R3', c12nDef, 'long', false)).toThrow(InvalidClassification);
+  });
+});
+
+describe('`GetParts` identifies invalid input with dynamic_groups turned on', () => {
+  const c12nDefCopy: ClassificationDefinition = JSON.parse(JSON.stringify(c12nDef));
+  c12nDefCopy.dynamic_groups = true;
+
+  it('Should raise errors on invalid input', () => {
+    expect(() => getParts('LEVEL 0//GARBO', c12nDefCopy, 'short', false)).toThrow(InvalidClassification);
+    expect(() => getParts('LEVEL 0//LEGAL DEPARTMENT//GARBO', c12nDefCopy, 'short', false)).toThrow(
+      InvalidClassification
+    );
+  });
+
+  it('Should raise errors on an invalid level text', () => {
+    expect(() => getParts('LEVEL 12', c12nDefCopy, 'short', false)).toThrow(InvalidClassification);
+    expect(() => getParts('LEVEL 12', c12nDefCopy, 'long', false)).toThrow(InvalidClassification);
+  });
+
+  it('Should not accept combined groups if a subgroup is limited', () => {
+    expect(() => getParts('LEVEL 0//AC//REL A,XX/R3', c12nDefCopy, 'short', false)).toThrow(InvalidClassification);
+    expect(() => getParts('LEVEL 0//AC//REL A,XX/R3', c12nDefCopy, 'long', false)).toThrow(InvalidClassification);
+  });
+});
+
+describe('Multi group aliases should work', () => {
+  const c12nDefCopy: ClassificationDefinition = JSON.parse(JSON.stringify(c12nDef));
+  c12nDefCopy.groups_aliases['ALPHABET GANG'] = ['A', 'B'];
+  c12nDefCopy.original_definition.groups[0].aliases = ['ALPHABET GANG'];
+  c12nDefCopy.original_definition.groups[1].aliases = ['ALPHABET GANG'];
+
+  it('Should identify multiple groups with a single aliases', () => {
+    let parts = getParts('L0//REL A', c12nDefCopy, 'short', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'short', false)).toBe('L0//REL A');
+    parts = getParts('L0//REL A, B', c12nDefCopy, 'short', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'short', false)).toBe('L0//REL ALPHABET GANG');
+    expect(() => getParts('L0//ALPHABET GANG', c12nDefCopy, 'short', false)).toThrow(InvalidClassification);
+  });
+});
+
+describe('Auto select group should work', () => {
+  const c12nDefCopy: ClassificationDefinition = JSON.parse(JSON.stringify(c12nDef));
+  c12nDefCopy.original_definition.groups[0].auto_select = true;
+  c12nDefCopy.groups_auto_select = ['GROUP A'];
+  c12nDefCopy.groups_auto_select_short = ['A'];
+
+  it('Should auto select the group if it is missing', () => {
+    let parts = getParts('L0', c12nDefCopy, 'short', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'short', false)).toBe('L0');
+    parts = getParts('L0//REL A', c12nDefCopy, 'short', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'short', false)).toBe('L0//REL A');
+    parts = getParts('L0//REL B', c12nDefCopy, 'short', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'short', false)).toBe('L0//REL A, B');
+    parts = getParts('L0//REL A, B', c12nDefCopy, 'short', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'short', false)).toBe('L0//REL A, B');
+
+    parts = getParts('L0', c12nDefCopy, 'long', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'long', false)).toBe('LEVEL 0');
+    parts = getParts('L0//REL A', c12nDefCopy, 'long', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'long', false)).toBe('LEVEL 0//REL TO GROUP A');
+    parts = getParts('L0//REL B', c12nDefCopy, 'long', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'long', false)).toBe('LEVEL 0//REL TO GROUP A, GROUP B');
+    parts = getParts('L0//REL A, B', c12nDefCopy, 'long', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'long', false)).toBe('LEVEL 0//REL TO GROUP A, GROUP B');
+
+    expect(getMaxClassification('L1', 'L0//REL B', c12nDefCopy, 'short', false)).toBe('L1//REL A, B');
+  });
+});
+
+describe('Auto select subgroup should work', () => {
+  const c12nDefCopy: ClassificationDefinition = JSON.parse(JSON.stringify(c12nDef));
+  c12nDefCopy.original_definition.subgroups[0].auto_select = true;
+  c12nDefCopy.subgroups_auto_select = ['RESERVE ONE'];
+  c12nDefCopy.subgroups_auto_select_short = ['R1'];
+
+  it('Should auto select the subgroup if it is missing', () => {
+    let parts = getParts('L0', c12nDefCopy, 'short', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'short', false)).toBe('L0');
+    parts = getParts('L0//R0', c12nDefCopy, 'short', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'short', false)).toBe('L0//R1');
+    parts = getParts('L0//R2', c12nDefCopy, 'short', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'short', false)).toBe('L0//XX/R1/R2');
+    parts = getParts('L0//R1/R2', c12nDefCopy, 'short', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'short', false)).toBe('L0//XX/R1/R2');
+
+    parts = getParts('L0', c12nDefCopy, 'long', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'long', false)).toBe('LEVEL 0');
+    parts = getParts('L0//R1', c12nDefCopy, 'long', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'long', false)).toBe('LEVEL 0//RESERVE ONE');
+    parts = getParts('L0//R2', c12nDefCopy, 'long', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'long', false)).toBe('LEVEL 0//XX/RESERVE ONE/RESERVE TWO');
+    parts = getParts('L0//R1/R2', c12nDefCopy, 'long', false);
+    expect(normalizedClassification(parts, c12nDefCopy, 'long', false)).toBe('LEVEL 0//XX/RESERVE ONE/RESERVE TWO');
+
+    expect(getMaxClassification('L1', 'L0//R2', c12nDefCopy, 'short', false)).toBe('L1//XX/R1/R2');
   });
 });
 
@@ -399,17 +504,6 @@ describe('`normalizedClassification` correctly formats', () => {
 
     parts = getParts('L0//REL GROUP A', c12nDef, 'long', false);
     expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('L0//REL A');
-  });
-});
-
-describe('`normalizedClassification` identifies invalid input', () => {
-  it('Should raise errors on invliad input?', () => {
-    let parts: ClassificationParts = { lvlIdx: 12, lvl: 'LEVEL 12', req: [], groups: [], subgroups: [] };
-    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('?');
-    parts = { lvlIdx: 1, lvl: 'LEVEL 0', req: ['GARBO'], groups: [], subgroups: [] };
-    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('?');
-    parts = { lvlIdx: 1, lvl: 'LEVEL 0', req: ['LEGAL DEPARTMENT'], groups: ['GARBO'], subgroups: [] };
-    expect(normalizedClassification(parts, c12nDef, 'short', false)).toBe('?');
   });
 });
 
@@ -559,17 +653,29 @@ describe('`getMaxClassification` correctly identifies the maximum', () => {
     );
   });
 
-  it('Should raise an error? on invalid group combinations', () => {
-    expect(getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'short', false)).toBe('?');
-    expect(getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'long', false)).toBe('?');
+  it('Should raise an error on invalid group combinations', () => {
+    expect(() => getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'short', false)).toThrow(
+      InvalidClassification
+    );
+    expect(() => getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'long', false)).toThrow(InvalidClassification);
   });
 });
 
 describe('`applyClassificationRules` should correctly identify incorrect combinations', () => {
   it('Should return disabled when conflicting groups are found', () => {
-    let parts = getParts('L0//REL GROUP A/R3', c12nDef, 'long', false);
+    let parts = getParts('L2//XX/R3', c12nDef, 'long', false);
     let result = applyClassificationRules(parts, c12nDef, 'short', false);
-    expect(result.disabled).toEqual({ groups: ['R1'], levels: [] });
-    expect(result.parts).toEqual({ lvl: 'L0', lvlIdx: '1', req: [], groups: ['A'], subgroups: [] });
+    expect(result.disabled).toEqual({ groups: ['A', 'B'], levels: [] });
+    expect(result.parts).toEqual({ lvl: 'L2', lvlIdx: '15', req: [], groups: ['X'], subgroups: ['R3'] });
+
+    parts = getParts('L2//XX/R2', c12nDef, 'long', false);
+    result = applyClassificationRules(parts, c12nDef, 'short', false);
+    expect(result.disabled).toEqual({ groups: ['A', 'B'], levels: [] });
+    expect(result.parts).toEqual({ lvl: 'L2', lvlIdx: '15', req: [], groups: ['X'], subgroups: ['R3'] });
+
+    parts = getParts('L0//AC/REL A', c12nDef, 'long', false);
+    result = applyClassificationRules(parts, c12nDef, 'short', false);
+    expect(result.disabled).toEqual({ groups: [], levels: [] });
+    expect(result.parts).toEqual({ lvl: 'L0', lvlIdx: '1', req: ['AC'], groups: ['A'], subgroups: [] });
   });
 });

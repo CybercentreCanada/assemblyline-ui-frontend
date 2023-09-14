@@ -141,6 +141,8 @@ export const defaultDisabled: DisabledControls = {
   levels: []
 };
 
+export class InvalidClassification extends Error {}
+
 export function getLevelText(
   lvl: number,
   c12nDef: ClassificationDefinition,
@@ -153,7 +155,9 @@ export function getLevelText(
   }
 
   if (text === undefined || text == null) {
-    text = 'INVALID';
+    throw new InvalidClassification(
+      `Classification level number '${lvl}' was not found in your classification definition.`
+    );
   }
 
   if (format === 'long' && !isMobile) {
@@ -164,12 +168,6 @@ export function getLevelText(
 }
 
 function getLevelIndex(c12n: string, c12nDef: ClassificationDefinition): [number, string] {
-  // const splitIdx = c12n.indexOf('//');
-  // let c12nLvl = c12n;
-  // if (splitIdx !== -1) {
-  //   c12nLvl = c12n.slice(0, splitIdx).toLocaleUpperCase();
-  // }
-
   // assumes c12nDef is coming from the Assemblyline API and all values will be in UPPER case
   let retIndex = null;
   const [level, unused, _x] = c12n.split(/\/\/(.*)/);
@@ -181,6 +179,8 @@ function getLevelIndex(c12n: string, c12nDef: ClassificationDefinition): [number
     retIndex = c12nDef.levels_map[c12nDef.levels_map_lts[c12nLvl]];
   } else if (c12nDef.levels_aliases[c12nLvl] !== undefined) {
     retIndex = c12nDef.levels_map[c12nDef.levels_aliases[c12nLvl]];
+  } else {
+    throw new InvalidClassification(`Classification level '${level}' was not found in your classification definition.`);
   }
 
   return [retIndex, unused];
@@ -240,6 +240,9 @@ function getGroups(
   const subgroups = [];
 
   for (const grpPart of groupParts) {
+    if (!grpPart) {
+      continue;
+    }
     const gp = grpPart.toUpperCase();
     // if there is a rel marking we know we have groups
     if (gp.startsWith('REL ')) {
@@ -290,14 +293,12 @@ function getGroups(
       const grps = c12nDef.groups_aliases[g];
       if (grps.length > 1) {
         // Unclear use of alias
-        // should raise an error, but just drop for now
-        continue;
+        throw new InvalidClassification(`Unclear use of alias: ${g}`);
       }
       g1Set.add(grps[0]);
     } else {
       // Unknown component
-      // should raise an error, but just drop for now
-      continue;
+      throw new InvalidClassification(`Unknown component: ${g}`);
     }
   }
 
@@ -321,11 +322,11 @@ function getGroups(
   // Check if there are any forbidden group assignments
   for (const subgroup of g2Set) {
     const limitedToGroup = c12nDef.params_map?.[subgroup]?.limited_to_group;
-    if (limitedToGroup !== null || limitedToGroup !== undefined) {
+    if (limitedToGroup !== null && limitedToGroup !== undefined) {
       if (g1Set.size > 1 || (g1Set.size === 1 && !g1Set.has(limitedToGroup))) {
-        // subgroup {subgroup} is limited to a group {limitedToGroup}, but {', '.join(g1Set)} was found.
-        // should raise an error here
-        continue;
+        throw new InvalidClassification(
+          `Subgroup ${subgroup} is limited to group ${limitedToGroup} (found: ${Array.from(g1Set).toString()})`
+        );
       }
     }
   }
@@ -357,14 +358,18 @@ export function getParts(
 ): ClassificationParts {
   const [lvlIdx, unused] = getLevelIndex(c12n, c12nDef);
   const [req, unusedParts] = getRequired(unused, c12nDef, format, isMobile);
-  const grps = getGroups(unusedParts, c12nDef, format, isMobile);
+  const { groups, subgroups, others } = getGroups(unusedParts, c12nDef, format, isMobile);
+
+  if (others.length > 0) {
+    throw new InvalidClassification(`Unparsable classification parts: ${others.join(',')}`);
+  }
 
   return {
     lvlIdx,
     lvl: getLevelText(lvlIdx, c12nDef, format, isMobile),
     req: req,
-    groups: grps.groups,
-    subgroups: grps.subgroups
+    groups: groups,
+    subgroups: subgroups
   };
 }
 
@@ -534,7 +539,7 @@ export function normalizedClassification(
         // 7. In short format mode, check if there is an alias that can replace multiple groups
         for (const [alias, values] of Object.entries(c12nDef.groups_aliases)) {
           if (values.length > 1) {
-            if (values.sort() === groups) {
+            if (JSON.stringify(values.sort()) === JSON.stringify(groups)) {
               groups = [alias];
             }
           }
@@ -689,7 +694,10 @@ function getMaxGroups(grps1: string[], grps2: string[]): string[] {
   }
 
   if (grps1.length > 0 && grps2.length > 0 && groups.size <= 0) {
-    // should return an error
+    // NOTE: Intersection generated nothing, we will raise an InvalidClassification exception
+    throw new InvalidClassification(
+      `Could not find any intersection between the groups. ${grps1.toString()} & ${grps2.toString()}`
+    );
   }
   return Array.from(groups);
 }
@@ -751,6 +759,7 @@ export function getMaxClassification(
  * @param c12n - Classification the user wishes to see
  * @param c12nDef - ClassificationDefinition returned by the API server
  * @param enforce - `true`/`false` if access controls are enabled
+ * @param ignoreInvalid - `true`/`false` if invalid classifications should raise errors or just deny access
  *
  * @returns True is the user can see the classification
  *
@@ -759,21 +768,30 @@ export function isAccessible(
   user_c12n: string,
   c12n: string,
   c12nDef: ClassificationDefinition,
-  enforce: boolean = false
+  enforce: boolean = false,
+  ignoreInvalid: boolean = false
 ) {
   if (!!c12nDef.invalid_mode) return false;
   if (!enforce) return true;
-  if (c12n === null || c12n === undefined) return true;
+  if (!c12n) return true;
 
-  const userParts = getParts(user_c12n, c12nDef, 'long', false);
-  const parts = getParts(c12n, c12nDef, 'long', false);
+  try {
+    const userParts = getParts(user_c12n, c12nDef, 'long', false);
+    const parts = getParts(c12n, c12nDef, 'long', false);
 
-  // this need to be covereted to ints!!
-  if (userParts.lvlIdx >= parts.lvlIdx) {
-    if (!canSeeRequired(userParts.req, parts.req)) return false;
-    if (!canSeeGroups(userParts.groups, parts.groups)) return false;
-    if (!canSeeGroups(userParts.subgroups, parts.subgroups)) return false;
-    return true;
+    if (Number(userParts.lvlIdx) >= Number(parts.lvlIdx)) {
+      if (!canSeeRequired(userParts.req, parts.req)) return false;
+      if (!canSeeGroups(userParts.groups, parts.groups)) return false;
+      if (!canSeeGroups(userParts.subgroups, parts.subgroups)) return false;
+      return true;
+    }
+    return false;
+  } catch (e) {
+    if (e instanceof InvalidClassification) {
+      if (!!ignoreInvalid) {
+        return false;
+      }
+    }
+    throw e;
   }
-  return false;
 }
