@@ -11,6 +11,7 @@ import useSafeResults from 'components/hooks/useSafeResults';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Result } from '../ResultCard';
 import ResultSection, { Section } from '../ResultCard/result_section';
 
@@ -108,6 +109,8 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
   const { isHighlighted, triggerHighlight, getKey } = useHighlighter();
   const classes = useStyles();
   const theme = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { showSafeResults } = useSafeResults();
 
   const highlighted = isHighlighted(getKey('heuristic', id));
@@ -134,8 +137,9 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
         <div onClick={stopPropagating} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
           <Tooltip title={t('related')}>
             <IconButton
+              component={Link}
               size="small"
-              href={`/search/result?query=result.sections.heuristic.heur_id:${safeFieldValueURI(id)}`}
+              to={`/search/result?query=result.sections.heuristic.heur_id:${safeFieldValueURI(id)}`}
               color="inherit"
             >
               <SearchOutlinedIcon />
@@ -147,7 +151,16 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
             </IconButton>
           </Tooltip>
           <Tooltip title={t('goto_heuristic')}>
-            <IconButton size="small" href={`/manage/heuristic/${id}`} color="inherit">
+            <IconButton
+              component={Link}
+              size="small"
+              to={`/manage/heuristic/${id}`}
+              color="inherit"
+              onClick={e => {
+                e.preventDefault();
+                navigate(`${location.pathname.split('/').slice(0, 4).join('/')}#${id}`);
+              }}
+            >
               <OpenInNewOutlinedIcon />
             </IconButton>
           </Tooltip>
