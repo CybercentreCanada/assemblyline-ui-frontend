@@ -70,9 +70,9 @@ const WrappedAlertEventsTable = ({ alert, viewHistory, setViewHistory }) => {
                   {alert.events
                     .sort((a, b) => a.ts.localeCompare(b.ts) || b.ts.localeCompare(a.ts))
                     .reverse()
-                    .map(event => {
+                    .map((event, i) => {
                       return (
-                        <TableRow hover tabIndex={-1}>
+                        <TableRow key={`table-row-${i}`} hover tabIndex={-1}>
                           <Tooltip title={event.ts}>
                             <TableCell>
                               <Moment fromNow locale={i18n.language}>
