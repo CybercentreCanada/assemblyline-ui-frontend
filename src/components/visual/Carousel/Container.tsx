@@ -189,8 +189,9 @@ export const WrappedCarouselContainer = () => {
 
   const [data, setData] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [zoom, setZoom] = useState<number>(100);
   const [showAll, setShowAll] = useState<boolean>(false);
+  const [zoom, setZoom] = useState<number>(100);
+  const [actualZoom, setActualZoom] = useState<number>(100);
 
   const deferredData = useDeferredValue(data);
   const deferredZoom = useDeferredValue(zoom);
@@ -229,6 +230,7 @@ export const WrappedCarouselContainer = () => {
     const navbarHeight = `calc(min(128px, 20vw, 20vh) + ${scrollbar}px)`;
 
     img.style.width = `${(100 * width) / window.innerWidth}vw`;
+    setActualZoom(Math.floor((100 * width) / img.naturalWidth));
 
     wrapper.style.opacity = '1';
     wrapper.style.width = `min(100vw - ${2 * button}px, ${width + scrollbar}px)`;
@@ -293,6 +295,7 @@ export const WrappedCarouselContainer = () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('keydown', keydown);
       setData(null);
+      setZoom(100);
     };
   }, [handleKeyDown, handleResize]);
 
@@ -347,19 +350,21 @@ export const WrappedCarouselContainer = () => {
                   <IconButton
                     size="small"
                     sx={{ width: '30px' }}
-                    disabled={zoom < 10 || zoom > 500}
+                    disabled={actualZoom < 10 || actualZoom > 500}
                     onClick={handleZoomChange(-10)}
                     children={<RemoveOutlinedIcon fontSize="inherit" />}
                   />
                   <Typography
                     variant="subtitle2"
-                    color={zoom < 10 || zoom > 500 ? theme.palette.text.disabled : theme.palette.text.primary}
-                    children={`${zoom}%`}
+                    color={
+                      actualZoom < 10 || actualZoom > 500 ? theme.palette.text.disabled : theme.palette.text.primary
+                    }
+                    children={`${actualZoom}%`}
                   />
                   <IconButton
                     size="small"
                     sx={{ width: '30px' }}
-                    disabled={zoom < 10 || zoom > 500}
+                    disabled={actualZoom < 10 || actualZoom > 500}
                     onClick={handleZoomChange(10)}
                     children={<AddOutlinedIcon fontSize="inherit" />}
                   />
