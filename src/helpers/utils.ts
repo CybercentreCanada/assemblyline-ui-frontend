@@ -1,13 +1,32 @@
 import { PossibleColors } from 'components/visual/CustomChip';
 
+/**
+ *
+ * Given a string, converts to Title Case by splitting on `_` and whitespace
+ *
+ * @param s - string to conver to title case
+ *
+ * @returns title cased string
+ *
+ */
 export function toTitleCase(s: string) {
   return s
     .replace(/_/g, ' ')
     .split(' ')
+    .filter(x => typeof x === 'string' && x.length > 0)
     .map(w => w[0].toUpperCase() + w.substring(1).toLowerCase())
     .join(' ');
 }
 
+/**
+ *
+ * Extract the `filename` parameter out of the `Content-Disposition` HTTP response header
+ *
+ * @param disposition - `Content-Disposition` header
+ *
+ * @returns filename contents
+ *
+ */
 export function getFileName(disposition: string): string {
   const utf8FilenameRegex = /filename\*=UTF-8''([\w%\-.]+)(?:; ?|$)/i;
   const asciiFilenameRegex = /^filename=(["']?)(.*?[^\\])\1(?:; ?|$)/i;
@@ -30,6 +49,15 @@ export function getFileName(disposition: string): string {
   return fileName;
 }
 
+/**
+ *
+ * Convert a given bytes to human readable form
+ *
+ * @param bytes - total bytes to convert
+ *
+ * @returns Human readable string
+ *
+ */
 export function bytesToSize(bytes: number | null) {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   if (bytes === 0 || bytes === null) return '0 B';
