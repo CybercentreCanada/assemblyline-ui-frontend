@@ -262,8 +262,8 @@ export const WrappedCarouselContainer = () => {
 
   const handleZoomChange = useCallback(
     (value: number) => (event: any) => {
-      zoomRef.current = Math.min(Math.max(zoomRef.current + value, 10), 500);
-      setZoom(zoomRef.current);
+      zoomRef.current = Math.min(Math.max(value, 10), 500);
+      setZoom(value);
     },
     []
   );
@@ -351,7 +351,7 @@ export const WrappedCarouselContainer = () => {
                     size="small"
                     sx={{ width: '30px' }}
                     disabled={actualZoom < 10 || actualZoom > 500}
-                    onClick={handleZoomChange(-10)}
+                    onClick={handleZoomChange(actualZoom - 10)}
                     children={<RemoveOutlinedIcon fontSize="inherit" />}
                   />
                   <Typography
@@ -365,7 +365,7 @@ export const WrappedCarouselContainer = () => {
                     size="small"
                     sx={{ width: '30px' }}
                     disabled={actualZoom < 10 || actualZoom > 500}
-                    onClick={handleZoomChange(10)}
+                    onClick={handleZoomChange(actualZoom + 10)}
                     children={<AddOutlinedIcon fontSize="inherit" />}
                   />
                 </div>
