@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     backdropFilter: 'blur(2px)',
     transition: 'backdrop-filter 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;'
   },
-
   close: {
     position: 'fixed',
     right: 0,
@@ -168,10 +167,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   thumb: {
     backgroundColor: 'rgb(48, 48, 48) !important'
-  },
-  avatar: {
-    color: `${theme.palette.primary.main} !important`,
-    backgroundColor: `inherit !important`
   },
   checkbox: {
     padding: '5px',
