@@ -143,7 +143,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const [metaOpen, setMetaOpen] = React.useState(false);
   const [viewHistory, setViewHistory] = React.useState(false);
   const [hasEvents, setHasEvents] = React.useState(false);
-  const upMD = useMediaQuery(theme.breakpoints.up('md'));
+  const upSM = useMediaQuery(theme.breakpoints.up('sm'));
   // eslint-disable-next-line
   const { t } = useTranslation(['alerts']);
 
@@ -384,8 +384,9 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
             className={classes.sectionContent}
             style={{
               display: 'flex',
-              alignItems: upMD ? 'start' : 'center',
-              flexDirection: upMD ? 'row' : 'column'
+              alignItems: upSM ? 'start' : 'center',
+              flexDirection: upSM ? 'row' : 'column',
+              rowGap: theme.spacing(2)
             }}
           >
             <Grid container>

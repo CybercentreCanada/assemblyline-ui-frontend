@@ -32,7 +32,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
-  const upMD = useMediaQuery(theme.breakpoints.up('md'));
+  const upSM = useMediaQuery(theme.breakpoints.up('sm'));
 
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -53,8 +53,9 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
             paddingBottom: sp2,
             paddingTop: sp2,
             display: 'flex',
-            alignItems: upMD ? 'start' : 'center',
-            flexDirection: upMD ? 'row' : 'column'
+            alignItems: upSM ? 'start' : 'center',
+            flexDirection: upSM ? 'row' : 'column',
+            rowGap: sp2
           }}
         >
           <Grid container>

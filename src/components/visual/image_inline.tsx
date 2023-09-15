@@ -10,10 +10,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexWrap: 'wrap'
   },
   imageBox: {
+    height: theme.spacing(16),
+    width: theme.spacing(16),
     display: 'flex',
-    height: theme.spacing(17),
-    width: theme.spacing(17),
-    justifyContent: 'center'
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   imageItem: {
     display: 'inherit',
@@ -29,16 +30,18 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   image: {
     borderRadius: theme.spacing(0.5),
-    minWidth: theme.spacing(16),
+    minWidth: theme.spacing(4),
+    minHeight: theme.spacing(4),
     maxHeight: theme.spacing(16),
     maxWidth: theme.spacing(16),
     objectFit: 'contain'
   },
   imageBoxSM: {
+    height: theme.spacing(12),
+    width: theme.spacing(12),
     display: 'flex',
-    height: theme.spacing(13),
-    width: theme.spacing(13),
-    justifyContent: 'center'
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   imageItemSM: {
     display: 'inherit',
@@ -54,7 +57,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   imageSM: {
     borderRadius: theme.spacing(0.5),
-    minWidth: theme.spacing(12),
+    minWidth: theme.spacing(3),
+    minHeight: theme.spacing(3),
     maxHeight: theme.spacing(12),
     maxWidth: theme.spacing(12),
     objectFit: 'contain'
@@ -154,13 +158,15 @@ const WrappedImageItem = ({ alt, src, index, handleOpenCarousel, small = false, 
   };
 
   return (
-    <div className={small ? classes.imageBoxSM : classes.imageBox}>
+    <div>
       {image ? (
         <Tooltip title={alt}>
           <Button className={small ? classes.imageItemSM : classes.imageItem} onClick={handleImageClick}>
-            <Badge badgeContent={count} color="primary">
-              <img src={image} alt={alt} className={small ? classes.imageSM : classes.image} />
-            </Badge>
+            <div className={small ? classes.imageBoxSM : classes.imageBox}>
+              <Badge badgeContent={count} color="primary">
+                <img src={image} alt={alt} className={small ? classes.imageSM : classes.image} />
+              </Badge>
+            </div>
           </Button>
         </Tooltip>
       ) : (
