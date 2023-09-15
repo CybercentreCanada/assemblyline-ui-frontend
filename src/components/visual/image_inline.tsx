@@ -1,5 +1,5 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
-import { Button, CircularProgress, Theme, Tooltip } from '@mui/material';
+import { Badge, Button, CircularProgress, Theme, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -107,6 +107,7 @@ const WrappedImageInline = ({ data, printable = false, small = false }) => {
         index={0}
         handleOpenCarousel={OpenCarouselDialog}
         small={small}
+        count={data.length}
       />
     </div>
   ) : null;
@@ -120,9 +121,10 @@ type ImageItemProps = {
   index: number;
   handleOpenCarousel: (index: number) => void;
   small?: boolean;
+  count?: number;
 };
 
-const WrappedImageItem = ({ alt, src, index, handleOpenCarousel, small = false }: ImageItemProps) => {
+const WrappedImageItem = ({ alt, src, index, handleOpenCarousel, small = false, count = null }: ImageItemProps) => {
   const [image, setImage] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const classes = useStyles();
@@ -153,7 +155,9 @@ const WrappedImageItem = ({ alt, src, index, handleOpenCarousel, small = false }
       {image ? (
         <Tooltip title={alt}>
           <Button className={small ? classes.imageItemSM : classes.imageItem} onClick={handleImageClick}>
-            <img src={image} alt={alt} className={small ? classes.imageSM : classes.image} />
+            <Badge badgeContent={count} color="primary">
+              <img src={image} alt={alt} className={small ? classes.imageSM : classes.image} />
+            </Badge>
           </Button>
         </Tooltip>
       ) : (
