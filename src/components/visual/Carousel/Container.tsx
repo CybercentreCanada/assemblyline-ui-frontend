@@ -200,7 +200,6 @@ export const WrappedCarouselContainer = () => {
   const isSmallRef = useRef<boolean>(false);
   const showAllRef = useRef<boolean>(false);
 
-  zoomRef.current = zoom;
   showAllRef.current = showAll;
 
   const isSmall = useMediaQuery(
