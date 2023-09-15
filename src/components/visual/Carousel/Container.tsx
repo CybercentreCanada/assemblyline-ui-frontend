@@ -295,6 +295,7 @@ export const WrappedCarouselContainer = () => {
       window.removeEventListener('keydown', keydown);
       setData(null);
       setZoom(100);
+      zoomRef.current = 100;
     };
   }, [handleKeyDown, handleResize]);
 
