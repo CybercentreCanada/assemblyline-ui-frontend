@@ -13,6 +13,7 @@ import {
   Skeleton,
   Tooltip,
   Typography,
+  useMediaQuery,
   useTheme
 } from '@mui/material';
 import Alert from '@mui/material/Alert';
@@ -30,6 +31,7 @@ import ActionableText from 'components/visual/ActionableText';
 import { ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
+import { ImageInline } from 'components/visual/image_inline';
 import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
 import { verdictToColor } from 'helpers/utils';
@@ -141,8 +143,9 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const [metaOpen, setMetaOpen] = React.useState(false);
   const [viewHistory, setViewHistory] = React.useState(false);
   const [hasEvents, setHasEvents] = React.useState(false);
+  const upMD = useMediaQuery(theme.breakpoints.up('md'));
   // eslint-disable-next-line
-  const { t, i18n } = useTranslation(['alerts']);
+  const { t } = useTranslation(['alerts']);
 
   useEffect(() => {
     const alertId = id || paramId;
@@ -377,7 +380,14 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
         <div className={classes.section}>
           <Typography className={classes.sectionTitle}>{t('file_info')}</Typography>
           <Divider />
-          <div className={classes.sectionContent}>
+          <div
+            className={classes.sectionContent}
+            style={{
+              display: 'flex',
+              alignItems: upMD ? 'start' : 'center',
+              flexDirection: upMD ? 'row' : 'column'
+            }}
+          >
             <Grid container>
               <Grid
                 item
@@ -462,6 +472,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                 )}
               </Grid>
             </Grid>
+            {item && item.file.screenshots && <ImageInline data={item.file.screenshots} small />}
           </div>
         </div>
 
