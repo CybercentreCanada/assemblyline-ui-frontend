@@ -32,19 +32,39 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxHeight: theme.spacing(24),
     maxWidth: theme.spacing(24),
     objectFit: 'contain'
+  },
+  imageBoxSM: {
+    display: 'flex',
+    height: theme.spacing(17),
+    width: theme.spacing(17)
+  },
+  imageItemSM: {
+    display: 'inherit',
+    padding: theme.spacing(0.5),
+    textDecoration: 'none'
+  },
+  imageLoadingSM: {
+    borderRadius: theme.spacing(0.5),
+    display: 'grid',
+    minHeight: theme.spacing(16),
+    minWidth: theme.spacing(16),
+    placeItems: 'center'
+  },
+  imageSM: {
+    borderRadius: theme.spacing(0.5),
+    maxHeight: theme.spacing(16),
+    maxWidth: theme.spacing(16),
+    objectFit: 'contain'
   }
 }));
 
-const WrappedImageInline = ({ body, printable = false }) => {
-  const classes = useStyles();
-  const { openCarousel } = useCarousel();
-
+const WrappedImageInlineBody = ({ body, printable = false, small = false }) => {
   const [data, setData] = useState<
     Array<{
       name: string;
       description: string;
-      imgSrc: string;
-      thumbSrc: string;
+      img: string;
+      thumb: string;
     }>
   >([]);
 
@@ -55,8 +75,8 @@ const WrappedImageInline = ({ body, printable = false }) => {
           return {
             name: element.img.name,
             description: element.img.description,
-            imgSrc: element.img.sha256,
-            thumbSrc: element.thumb.sha256
+            img: element.img.sha256,
+            thumb: element.thumb.sha256
           };
         })
       );
@@ -66,15 +86,28 @@ const WrappedImageInline = ({ body, printable = false }) => {
     };
   }, [body]);
 
+  return body && Array.isArray(body) ? <ImageInline data={data} printable={printable} small={small} /> : null;
+};
+
+export const ImageInlineBody = React.memo(WrappedImageInlineBody);
+
+const WrappedImageInline = ({ data, printable = false, small = false }) => {
+  const classes = useStyles();
+  const { openCarousel } = useCarousel();
+
   const OpenCarouselDialog = (index: number) => {
     openCarousel(index, data);
   };
 
-  return body && Array.isArray(body) ? (
+  return data && data.length > 0 ? (
     <div className={printable ? classes.printable : null}>
-      {data && data.length > 0 ? (
-        <ImageItem src={data[0].thumbSrc} alt={data[0].name} index={0} handleOpenCarousel={OpenCarouselDialog} />
-      ) : null}
+      <ImageItem
+        src={data[0].thumb}
+        alt={data[0].name}
+        index={0}
+        handleOpenCarousel={OpenCarouselDialog}
+        small={small}
+      />
     </div>
   ) : null;
 };
@@ -86,9 +119,10 @@ type ImageItemProps = {
   src: string;
   index: number;
   handleOpenCarousel: (index: number) => void;
+  small?: boolean;
 };
 
-const ImageItem = ({ alt, src, index, handleOpenCarousel }: ImageItemProps) => {
+const WrappedImageItem = ({ alt, src, index, handleOpenCarousel, small = false }: ImageItemProps) => {
   const [image, setImage] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const classes = useStyles();
@@ -115,17 +149,21 @@ const ImageItem = ({ alt, src, index, handleOpenCarousel }: ImageItemProps) => {
   };
 
   return (
-    <div className={classes.imageBox}>
+    <div className={small ? classes.imageBoxSM : classes.imageBox}>
       {image ? (
         <Tooltip title={alt}>
-          <Button className={classes.imageItem} onClick={handleImageClick}>
-            <img src={image} alt={alt} className={classes.image} />
+          <Button className={small ? classes.imageItemSM : classes.imageItem} onClick={handleImageClick}>
+            <img src={image} alt={alt} className={small ? classes.imageSM : classes.image} />
           </Button>
         </Tooltip>
       ) : (
         <Tooltip title={alt}>
-          <Button className={classes.imageItem} onClick={handleImageClick} color="secondary">
-            <div className={classes.imageLoading}>
+          <Button
+            className={small ? classes.imageItemSM : classes.imageItem}
+            onClick={handleImageClick}
+            color="secondary"
+          >
+            <div className={small ? classes.imageLoadingSM : classes.imageLoading}>
               {loading ? <CircularProgress /> : <BrokenImageOutlinedIcon fontSize="large" />}
             </div>
           </Button>
@@ -134,3 +172,5 @@ const ImageItem = ({ alt, src, index, handleOpenCarousel }: ImageItemProps) => {
     </div>
   );
 };
+
+export const ImageItem = React.memo(WrappedImageItem);

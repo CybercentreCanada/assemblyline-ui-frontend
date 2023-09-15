@@ -6,8 +6,8 @@ import { bytesToSize } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ActionableText from '../ActionableText';
+import { ImageInlineBody } from '../image_inline';
 import { GraphBody } from '../ResultCard/graph_body';
-import { ImageInline } from './image_inline';
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -181,7 +181,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
             {promotedSections
               ? promotedSections
                   .filter(section => section.promote_to === 'SCREENSHOT')
-                  .map((section, idx) => <ImageInline key={idx} body={section.body} />)
+                  .map((section, idx) => <ImageInlineBody key={idx} body={section.body} />)
               : null}
           </div>
         </div>

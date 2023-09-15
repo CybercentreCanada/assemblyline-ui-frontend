@@ -189,8 +189,8 @@ export type CarouselContextProps = {
   images: Array<{
     name: string;
     description: string;
-    imgSrc: string;
-    thumbSrc: string;
+    img: string;
+    thumb: string;
   }>;
   setCarousel: (value: boolean) => void;
   openCarousel: (
@@ -198,8 +198,8 @@ export type CarouselContextProps = {
     imgs: Array<{
       name: string;
       description: string;
-      imgSrc: string;
-      thumbSrc: string;
+      img: string;
+      thumb: string;
     }>
   ) => void;
   closeCarousel: () => void;
@@ -208,8 +208,8 @@ export type CarouselContextProps = {
     images: Array<{
       name: string;
       description: string;
-      imgSrc: string;
-      thumbSrc: string;
+      img: string;
+      thumb: string;
     }>
   ) => void;
 };
@@ -229,8 +229,8 @@ function CarouselProvider(props: CarouselProviderProps) {
     Array<{
       name: string;
       description: string;
-      imgSrc: string;
-      thumbSrc: string;
+      img: string;
+      thumb: string;
     }>
   >([]);
   const carouselItemsRef = useRef<HTMLDivElement[] | null[]>([]);
@@ -323,7 +323,7 @@ function CarouselProvider(props: CarouselProviderProps) {
                       {images[index].name}
                     </Typography>
                   </div>
-                  <Image alt={images[index].name} src={images[index].imgSrc} />
+                  <Image alt={images[index].name} src={images[index].img} />
                   <div className={classes.textContainer} style={{ paddingTop: '4px' }}>
                     <Typography className={classes.text} variant="body2">
                       {images[index].description}
@@ -337,7 +337,7 @@ function CarouselProvider(props: CarouselProviderProps) {
                           <Image
                             key={'thumb-' + i}
                             alt={element.name}
-                            src={element.thumbSrc}
+                            src={element.thumb}
                             isThumb
                             thumbSelected={index === i}
                             onClick={() => {
