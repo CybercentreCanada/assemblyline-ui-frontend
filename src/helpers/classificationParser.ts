@@ -228,12 +228,13 @@ function getGroups(
   groupParts: string[],
   c12nDef: ClassificationDefinition,
   format: FormatProp,
-  isMobile: boolean
+  isMobile: boolean,
+  autoSelect: boolean = false
 ): ClassificationGroups {
   // Note: this function assumes c12nDef is coming from the Assemblyline API and all values will be in UPPER case
   // and that this function is called AFTER getLevelIndex and getRequired functions with the used values passed in.
-  const g1Set = new Set<string>();
-  const g2Set = new Set<string>();
+  let g1Set = new Set<string>();
+  let g2Set = new Set<string>();
   let others = new Set<string>();
 
   let groups = [];
@@ -331,7 +332,13 @@ function getGroups(
     }
   }
 
-  // should add auto select handling here...
+  // Do auto select
+  if (!!autoSelect && !!g1Set) {
+    g1Set = new Set([...g1Set, ...c12nDef.groups_auto_select_short]);
+  }
+  if (!!autoSelect && !!g2Set) {
+    g2Set = new Set([...g2Set, ...c12nDef.subgroups_auto_select_short]);
+  }
 
   // swap to long format if required
   if (format === 'long' && !isMobile) {
@@ -581,6 +588,18 @@ export const defaultClassificationValidator: ClassificationValidator = {
   parts: defaultParts
 };
 
+/**
+ * Applies the Level, Require and Group rules and returns valid and invalid options based on the given input
+ *
+ * @param parts - `ClassificationParts` object containing the parsed classification components
+ * @param c12nDef - ClassificationDefinition returned by the API server
+ * @param format - return results in `long` or `short` format
+ * @param isMobile - `true`/`false` if the results should be returned for display on a mobile device
+ * @param userClassification - `true`/`false` if to apply `auto select` based on the user
+ *
+ * @returns The most restrictive classification that we could create out of the two
+ *
+ */
 export function applyClassificationRules(
   parts: ClassificationParts,
   c12nDef: ClassificationDefinition,
@@ -588,6 +607,7 @@ export function applyClassificationRules(
   isMobile: boolean,
   userClassification: boolean = false
 ): ClassificationValidator {
+  const longFormat = format === 'short' || !!isMobile ? false : true;
   const requireLvl = {};
   const limitedToGroup = {};
   const requireGroup = {};
@@ -632,19 +652,29 @@ export function applyClassificationRules(
             }
           }
           if (value in requireGroup) {
-            if (!retParts.groups.includes(requireGroup[value])) {
-              retParts.groups.push(requireGroup[value]);
+            const valueLong = c12nDef.groups_map_stl[requireGroup[value]] || requireGroup[value];
+            const valueShort = c12nDef.groups_map_lts[requireGroup[value]] || requireGroup[value];
+            if (!retParts.groups.includes(valueLong) && !retParts.groups.includes(valueShort)) {
+              retParts.groups.push(valueShort);
               for (const group of c12nDef.groups_auto_select) {
-                if (!retParts.groups.includes(group)) retParts.groups.push(group);
+                const gLong = c12nDef.groups_map_stl[group] || group;
+                const gShort = c12nDef.groups_map_lts[group] || group;
+                if (!retParts.groups.includes(gShort) && !retParts.groups.includes(gLong)) {
+                  retParts.groups.push(group);
+                }
               }
             }
           }
           if (value in limitedToGroup) {
-            for (const g in c12nDef.groups_map_stl) {
-              if (g !== limitedToGroup[value]) {
-                disabledList.groups.push(g);
-                if (retParts.groups.includes(g)) {
-                  retParts.groups.splice(retParts.groups.indexOf(g), 1);
+            for (const gShort in c12nDef.groups_map_stl) {
+              const lgShort = c12nDef.groups_map_lts[limitedToGroup[value]] || limitedToGroup[value];
+              if (gShort !== lgShort) {
+                const gLong = c12nDef.groups_map_stl[gShort];
+                disabledList.groups.push(gShort);
+                if (retParts.groups.includes(gShort)) {
+                  retParts.groups.splice(retParts.groups.indexOf(gShort), 1);
+                } else if (retParts.groups.includes(gLong)) {
+                  retParts.groups.splice(retParts.groups.indexOf(gLong), 1);
                 }
               }
             }
@@ -655,17 +685,57 @@ export function applyClassificationRules(
         }
         if (triggerAutoSelect) {
           for (const group of c12nDef.groups_auto_select) {
-            if (!retParts.groups.includes(group)) retParts.groups.push(group);
+            const gLong = c12nDef.groups_map_stl[group] || group;
+            const gShort = c12nDef.groups_map_lts[group] || group;
+            if (!retParts.groups.includes(gLong) && !retParts.groups.includes(gShort)) {
+              retParts.groups.push(group);
+            }
           }
         }
       }
     }
   }
 
-  // Sort all lists
-  retParts.req = retParts.req.sort();
-  retParts.groups = retParts.groups.sort();
-  retParts.subgroups = retParts.subgroups.sort();
+  // Sort all lists and format all returns
+  retParts.req = retParts.req.sort().map(r => {
+    if (!!longFormat) {
+      return c12nDef.access_req_map_stl[r] || r;
+    }
+    return c12nDef.access_req_map_lts[r] || r;
+  });
+
+  retParts.groups = retParts.groups.sort().map(g => {
+    if (!!longFormat) {
+      return c12nDef.groups_map_stl[g] || g;
+    }
+    return c12nDef.groups_map_lts[g] || g;
+  });
+
+  retParts.subgroups = retParts.subgroups.sort().map(sg => {
+    if (!!longFormat) {
+      return c12nDef.subgroups_map_stl[sg] || sg;
+    }
+    return c12nDef.subgroups_map_lts[sg] || sg;
+  });
+
+  disabledList.groups = disabledList.groups.sort().map(g => {
+    if (!!longFormat) {
+      return c12nDef.groups_map_stl[g] || g;
+    }
+    return c12nDef.groups_map_lts[g] || g;
+  });
+  disabledList.levels = disabledList.levels.sort().map(l => {
+    if (!!longFormat) {
+      return c12nDef.levels_map_stl[l] || l;
+    }
+    return c12nDef.levels_map_lts[l] || l;
+  });
+
+  if (!!longFormat) {
+    retParts.lvl = c12nDef.levels_map_stl[retParts.lvl] || retParts.lvl;
+  } else {
+    retParts.lvl = c12nDef.levels_map_lts[retParts.lvl] || retParts.lvl;
+  }
 
   return {
     disabled: disabledList,

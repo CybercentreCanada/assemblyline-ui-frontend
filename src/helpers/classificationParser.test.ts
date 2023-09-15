@@ -662,20 +662,81 @@ describe('`getMaxClassification` correctly identifies the maximum', () => {
 });
 
 describe('`applyClassificationRules` should correctly identify incorrect combinations', () => {
-  it('Should return disabled when conflicting groups are found', () => {
-    let parts = getParts('L2//XX/R3', c12nDef, 'long', false);
+  it('Should find disabled groups', () => {
+    let parts = getParts('L2//XX/R2', c12nDef, 'short', false);
     let result = applyClassificationRules(parts, c12nDef, 'short', false);
-    expect(result.disabled).toEqual({ groups: ['A', 'B'], levels: [] });
-    expect(result.parts).toEqual({ lvl: 'L2', lvlIdx: '15', req: [], groups: ['X'], subgroups: ['R3'] });
+    expect(result.disabled).toEqual({ groups: [], levels: [] });
+    expect(result.parts).toEqual({ lvl: 'L2', lvlIdx: '15', req: [], groups: ['X'], subgroups: ['R2'] });
 
     parts = getParts('L2//XX/R2', c12nDef, 'long', false);
     result = applyClassificationRules(parts, c12nDef, 'short', false);
-    expect(result.disabled).toEqual({ groups: ['A', 'B'], levels: [] });
-    expect(result.parts).toEqual({ lvl: 'L2', lvlIdx: '15', req: [], groups: ['X'], subgroups: ['R3'] });
+    expect(result.disabled).toEqual({ groups: [], levels: [] });
+    expect(result.parts).toEqual({ lvl: 'L2', lvlIdx: '15', req: [], groups: ['X'], subgroups: ['R2'] });
 
-    parts = getParts('L0//AC/REL A', c12nDef, 'long', false);
+    parts = getParts('L2//R2', c12nDef, 'short', false);
     result = applyClassificationRules(parts, c12nDef, 'short', false);
     expect(result.disabled).toEqual({ groups: [], levels: [] });
-    expect(result.parts).toEqual({ lvl: 'L0', lvlIdx: '1', req: ['AC'], groups: ['A'], subgroups: [] });
+    expect(result.parts).toEqual({ lvl: 'L2', lvlIdx: '15', req: [], groups: ['X'], subgroups: ['R2'] });
+
+    parts = getParts('L2//XX/R3', c12nDef, 'long', false);
+    result = applyClassificationRules(parts, c12nDef, 'long', false);
+    expect(result.disabled).toEqual({ groups: ['GROUP A', 'GROUP B'], levels: [] });
+    expect(result.parts).toEqual({
+      lvl: 'LEVEL 2',
+      lvlIdx: '15',
+      req: [],
+      groups: ['GROUP X'],
+      subgroups: ['RESERVE THREE']
+    });
+
+    parts = getParts('L0//AC/REL A', c12nDef, 'short', false);
+    result = applyClassificationRules(parts, c12nDef, 'long', false);
+    expect(result.disabled).toEqual({ groups: [], levels: [] });
+    expect(result.parts).toEqual({
+      lvl: 'LEVEL 0',
+      lvlIdx: '1',
+      req: ['ACCOUNTING'],
+      groups: ['GROUP A'],
+      subgroups: []
+    });
+  });
+
+  it('Should find disabled levels', () => {
+    const c12nDefCopy: ClassificationDefinition = JSON.parse(JSON.stringify(c12nDef));
+    c12nDefCopy.original_definition.required[0].require_lvl = 5;
+    c12nDefCopy.params_map['LEGAL DEPARTMENT'].require_lvl = 5;
+    c12nDefCopy.params_map.LE.require_lvl = 5;
+
+    let parts = getParts('L2//LE', c12nDefCopy, 'short', false);
+    let result = applyClassificationRules(parts, c12nDefCopy, 'short', false);
+    expect(result.disabled).toEqual({ groups: [], levels: ['L0'] });
+    expect(result.parts).toEqual({ lvl: 'L2', lvlIdx: '15', req: ['LE'], groups: [], subgroups: [] });
+
+    parts = getParts('L2//LE', c12nDefCopy, 'long', false);
+    result = applyClassificationRules(parts, c12nDefCopy, 'short', false);
+    expect(result.disabled).toEqual({ groups: [], levels: ['L0'] });
+    expect(result.parts).toEqual({ lvl: 'L2', lvlIdx: '15', req: ['LE'], groups: [], subgroups: [] });
+
+    parts = getParts('L2//LE', c12nDefCopy, 'long', false);
+    result = applyClassificationRules(parts, c12nDefCopy, 'long', false);
+    expect(result.disabled).toEqual({ groups: [], levels: ['LEVEL 0'] });
+    expect(result.parts).toEqual({
+      lvl: 'LEVEL 2',
+      lvlIdx: '15',
+      req: ['LEGAL DEPARTMENT'],
+      groups: [],
+      subgroups: []
+    });
+
+    parts = getParts('L2//LE', c12nDefCopy, 'short', false);
+    result = applyClassificationRules(parts, c12nDefCopy, 'long', false);
+    expect(result.disabled).toEqual({ groups: [], levels: ['LEVEL 0'] });
+    expect(result.parts).toEqual({
+      lvl: 'LEVEL 2',
+      lvlIdx: '15',
+      req: ['LEGAL DEPARTMENT'],
+      groups: [],
+      subgroups: []
+    });
   });
 });
