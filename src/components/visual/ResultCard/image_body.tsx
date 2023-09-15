@@ -3,7 +3,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { Image } from 'components/providers/CarouselProvider';
 import { CarouselThumb } from 'components/visual/Carousel/Thumb';
-import React, { useMemo } from 'react';
+import React, { useId, useMemo } from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -37,6 +37,7 @@ type Props = {
 
 const WrappedImageBody = ({ body, printable = false }: Props) => {
   const classes = useStyles();
+  const group = useId();
 
   const images = useMemo<Image[]>(
     () =>
@@ -48,14 +49,14 @@ const WrappedImageBody = ({ body, printable = false }: Props) => {
             thumb: item.thumb.sha256
           }))
         : [],
-    [body]
+    [body, group]
   );
 
   return (
     images && (
       <div className={clsx(classes.container, printable && classes.wrap)}>
         {images.map((image, index) => (
-          <CarouselThumb key={`${image.img}-${index}`} image={image} />
+          <CarouselThumb key={`${image.img}-${index}`} image={image} group={group} />
         ))}
       </div>
     )
