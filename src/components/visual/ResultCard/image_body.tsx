@@ -62,7 +62,6 @@ const WrappedImageBody = ({ body, printable = false }) => {
           alt={element.img.name}
           index={index}
           handleOpenCarousel={OpenCarouselDialog}
-          small
         />
       ))}
     </div>

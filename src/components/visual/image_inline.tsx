@@ -11,8 +11,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   imageBox: {
     display: 'flex',
-    height: theme.spacing(26),
-    width: theme.spacing(26)
+    height: theme.spacing(17),
+    width: theme.spacing(17),
+    justifyContent: 'center'
   },
   imageItem: {
     display: 'inherit',
@@ -22,21 +23,22 @@ const useStyles = makeStyles((theme: Theme) => ({
   imageLoading: {
     borderRadius: theme.spacing(0.5),
     display: 'grid',
-    minHeight: theme.spacing(24),
-    minWidth: theme.spacing(24),
+    minHeight: theme.spacing(16),
+    minWidth: theme.spacing(16),
     placeItems: 'center'
   },
   image: {
     borderRadius: theme.spacing(0.5),
-    minWidth: theme.spacing(24),
-    maxHeight: theme.spacing(24),
-    maxWidth: theme.spacing(24),
+    minWidth: theme.spacing(16),
+    maxHeight: theme.spacing(16),
+    maxWidth: theme.spacing(16),
     objectFit: 'contain'
   },
   imageBoxSM: {
     display: 'flex',
-    height: theme.spacing(17),
-    width: theme.spacing(17)
+    height: theme.spacing(13),
+    width: theme.spacing(13),
+    justifyContent: 'center'
   },
   imageItemSM: {
     display: 'inherit',
@@ -46,14 +48,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   imageLoadingSM: {
     borderRadius: theme.spacing(0.5),
     display: 'grid',
-    minHeight: theme.spacing(16),
-    minWidth: theme.spacing(16),
+    minHeight: theme.spacing(12),
+    minWidth: theme.spacing(12),
     placeItems: 'center'
   },
   imageSM: {
     borderRadius: theme.spacing(0.5),
-    maxHeight: theme.spacing(16),
-    maxWidth: theme.spacing(16),
+    minWidth: theme.spacing(12),
+    maxHeight: theme.spacing(12),
+    maxWidth: theme.spacing(12),
     objectFit: 'contain'
   }
 }));
