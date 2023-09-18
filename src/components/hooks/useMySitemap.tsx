@@ -73,7 +73,7 @@ export default function useMySitemap() {
         isRoot: true
       },
       {
-        path: '/file/viewer/:id',
+        path: '/file/viewer/:id/:tab',
         title: t('breadcrumb.file.viewer'),
         icon: <PageviewOutlinedIcon />,
         isRoot: true
