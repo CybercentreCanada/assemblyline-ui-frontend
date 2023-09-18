@@ -191,32 +191,34 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
             <Grid item xs>
               <Typography variant="h4">{t('detail.title')}</Typography>
             </Grid>
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-              {item ? (
-                <>
-                  <Tooltip title={t(hasEvents ? 'history' : 'history.none')}>
-                    <IconButton
-                      disableRipple={!hasEvents}
-                      style={{
-                        color: hasEvents ? theme.palette.action.active : theme.palette.action.disabled
-                      }}
-                      size="large"
-                      onClick={() => {
-                        if (hasEvents) {
-                          setViewHistory(true);
-                        }
-                      }}
-                    >
-                      <WorkHistoryOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <AlertEventsTable alert={item} viewHistory={viewHistory} setViewHistory={setViewHistory} />
-                </>
-              ) : (
-                <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              )}
-            </Grid>
-            {currentUser.roles.includes('submission_view') && (
+            {!id && (
+              <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+                {item ? (
+                  <>
+                    <Tooltip title={t(hasEvents ? 'history' : 'history.none')}>
+                      <IconButton
+                        disableRipple={!hasEvents}
+                        style={{
+                          color: hasEvents ? theme.palette.action.active : theme.palette.action.disabled
+                        }}
+                        size="large"
+                        onClick={() => {
+                          if (hasEvents) {
+                            setViewHistory(true);
+                          }
+                        }}
+                      >
+                        <WorkHistoryOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <AlertEventsTable alert={item} viewHistory={viewHistory} setViewHistory={setViewHistory} />
+                  </>
+                ) : (
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                )}
+              </Grid>
+            )}
+            {!id && currentUser.roles.includes('submission_view') && (
               <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
                 {item ? (
                   <Tooltip title={t('submission')}>
