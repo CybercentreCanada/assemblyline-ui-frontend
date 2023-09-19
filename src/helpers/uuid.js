@@ -1,5 +1,12 @@
 /* eslint-disable no-bitwise */
 
+/**
+ *
+ * Generates a valid UUID string
+ *
+ * @returns The UUID
+ *
+ */
 export default function generateUUID() {
   let d = new Date().getTime();
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {

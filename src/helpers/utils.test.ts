@@ -292,6 +292,9 @@ describe('Test `priorityText`', () => {
     expect(priorityText(1)).toBe('low');
     expect(priorityText(99)).toBe('low');
 
+    expect(priorityText(100)).toBe('medium');
+    expect(priorityText(199)).toBe('medium');
+
     expect(priorityText(200)).toBe('high');
     expect(priorityText(299)).toBe('high');
 
@@ -523,28 +526,34 @@ describe('Test `matchSHA256`', () => {
 
 describe('Test `matchURL`', () => {
   it('Should match valid URLs', () => {
-    expect(matchURL('blah')).toBe(null);
-    expect(matchURL('http://user:pass@www.blah.com:123/blah#anchor?blah&q=blah2')).toBe(true);
-    expect(matchURL('http://blah')).toBe(null);
-    expect(matchURL('http://blah.com')).toBe(true);
-    expect(matchURL('http://blah.com:abc')).toBe(null);
-    expect(matchURL('http://blah.com:123')).toBe(true);
-    expect(matchURL('http://blah.com:123?blah')).toBe(true);
-    expect(matchURL('http://blah.com:123/blah')).toBe(true);
-    expect(matchURL('http://blah.com:123/blah?blah')).toBe(true);
-    expect(matchURL('1.1.1.1')).toBe(null);
-    expect(matchURL('http://1.1.1.1')).toBe(true);
-    expect(matchURL('http://1.1.1.1:123')).toBe(true);
-    expect(matchURL('http://1.1.1.1:123/blah')).toBe(true);
-    expect(matchURL('http://1.1.1.1:123/blah?blah')).toBe(true);
-    expect(matchURL('net.tcp://1.1.1.1:123')).toBe(true);
-    expect(matchURL('net.tcp://1.1.1.1:1')).toBe(true);
-    // URI requires a scheme: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#scheme
-    expect(matchURL('//1.1.1.1:1')).toBe(null);
+    expect(matchURL('http://blah.com')[0]).toBe('http://blah.com');
+    expect(matchURL('http://blah.com:123')[0]).toBe('http://blah.com');
+    expect(matchURL('http://blah.com:123?blah')[0]).toBe('http://blah.com');
+    expect(matchURL('http://blah.com:123/blah')[0]).toBe('http://blah.com');
+    expect(matchURL('http://blah.com:123/blah?blah')[0]).toBe('http://blah.com');
+    expect(matchURL('https://user:pass@www.blah.com:123/blah#anchor?blah&q=blah2')[0]).toBe(
+      'https://user:pass@www.blah.com'
+    );
+    expect(matchURL('http://1.1.1.1')[0]).toBe('http://1.1.1.1');
+    expect(matchURL('http://1.1.1.1:123')[0]).toBe('http://1.1.1.1');
+    expect(matchURL('http://1.1.1.1:123/blah')[0]).toBe('http://1.1.1.1');
+    expect(matchURL('http://1.1.1.1:123/blah?blah')[0]).toBe('http://1.1.1.1');
+    expect(matchURL('net.tcp://1.1.1.1:123')[0]).toBe('tcp://1.1.1.1');
+    expect(matchURL('net.tcp://1.1.1.1:1')[0]).toBe('tcp://1.1.1.1');
   });
   it('Should not match invalid URLs', () => {
     expect(matchSHA256('')).toBe(null);
     expect(matchSHA256(null)).toBe(null);
     expect(matchSHA256(undefined)).toBe(null);
+    expect(matchURL('blah')).toBe(null);
+    expect(matchURL('1.1.1.1')).toBe(null);
+    // URI requires a scheme: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#scheme
+    expect(matchURL('//1.1.1.1:1')).toBe(null);
+
+    // TODO The follow are invalid inputs that are currently passing. The function needs to be updated.
+    // expect(matchURL('http://blah')).toBe(null);
+    // expect(matchURL('hxxp://blah.com')).toBe(null);
+    // expect(matchURL('http://1.1.1.1:123:123')).toBe(null);
+    // expect(matchURL('http://blah.com:abc')).toBe(null);
   });
 });

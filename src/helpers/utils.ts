@@ -337,14 +337,15 @@ export function matchSHA256(data: string) {
 
 /**
  *
- * Matches on valid URL and returns it. Returns `null` on invalid URLs.
+ * Matches on valid URL and returns the result array. Returns `null` on invalid URLs.
+ * Note: Path and Query params are validated but not captured.
  *
- * @param data - data to parse
+ * @param data - string to parse
  *
- * @returns  valid url as a string, or null
+ * @returns Matching RegEx Result Array or NULL
  *
  */
-export function matchURL(data: string) {
+export function matchURL(data: string): RegExpExecArray | null {
   const urlParseRE =
     /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
   return urlParseRE.exec(data);
