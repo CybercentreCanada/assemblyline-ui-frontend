@@ -6,7 +6,7 @@ import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CAROUSEL_PARAM, Image } from 'components/providers/CarouselProvider';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -15,13 +15,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(0.5),
     boxSizing: 'border-box',
     width: 'min(128px, 20vw, 20vh)',
-    height: 'min(128px, 20vw, 20vh)',
+    maxHeight: 'min(128px, 20vw, 20vh)',
     objectFit: 'contain',
     borderRadius: theme.spacing(0.5)
   },
   image: {
-    maxWidth: '100%',
-    maxHeight: '100%',
+    width: '100%',
+    height: '100%',
     objectFit: 'contain',
     borderRadius: theme.spacing(0.5)
   },
@@ -48,7 +48,6 @@ type Props = {
     button?: string;
   };
   image?: Image;
-  group?: string;
   carousel?: boolean;
   tooltipPlacement?:
     | 'bottom-end'
@@ -68,7 +67,6 @@ type Props = {
 const WrappedCarouselThumb = ({
   classes: classesProps = null,
   image = null,
-  group: groupProps = null,
   carousel = false,
   tooltipPlacement = 'top'
 }: Props) => {
@@ -81,7 +79,6 @@ const WrappedCarouselThumb = ({
   const [id, setID] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const group = useId();
   const ref = useRef<HTMLButtonElement>(null);
 
   const selected = useMemo<boolean>(() => {
@@ -109,9 +106,9 @@ const WrappedCarouselThumb = ({
   }, [image]);
 
   useEffect(() => {
-    if (image && !carousel) onAddImage({ ...image, group: groupProps || group }, handleIDChange);
+    if (image && !carousel) onAddImage(image, handleIDChange);
     return () => !carousel && onRemoveImage(image);
-  }, [carousel, group, groupProps, handleIDChange, image, onAddImage, onRemoveImage]);
+  }, [carousel, handleIDChange, image, onAddImage, onRemoveImage]);
 
   useEffect(() => {
     if (!carousel) return;

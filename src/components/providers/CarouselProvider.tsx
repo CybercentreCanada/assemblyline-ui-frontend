@@ -6,7 +6,6 @@ import { useLocation, useNavigate } from 'react-router';
 
 export type Image = {
   id?: string; // unique id using the simple hash
-  group?: string; // grouping for the image navigation
   name: string;
   description: string;
   img: string; // sha256 of the image
@@ -27,8 +26,8 @@ export type CarouselContextProps = {
   onAddImage: (img: Image, onIDChange: (id: string) => void) => void;
   onRemoveImage: (img: Image) => void;
   onClearImages: () => void;
-  onNextImage?: (inGroup?: boolean) => void;
-  onPreviousImage?: (inGroup?: boolean) => void;
+  onNextImage?: () => void;
+  onPreviousImage?: () => void;
 };
 
 export const CarouselContext = React.createContext<CarouselContextProps>(null);
@@ -88,34 +87,27 @@ const WrappedCarouselProvider = ({ children }: CarouselProviderProps) => {
 
   const onClearImages = useCallback(() => setImages([]), []);
 
-  const onNextImage = useCallback(
-    (inGroup: boolean = true) => {
-      const query = new SimpleSearchQuery(location.search);
-      const param = query.get(CAROUSEL_PARAM, null);
-      const index = images.findIndex(i => i.id === param);
+  const onNextImage = useCallback(() => {
+    const query = new SimpleSearchQuery(location.search);
+    const param = query.get(CAROUSEL_PARAM, null);
+    const index = images.findIndex(i => i.id === param);
 
-      if (index < 0 || index >= images.length - 1 || (inGroup && images[index].group !== images[index + 1].group))
-        return;
-
+    if (index >= 0 && index < images.length - 1) {
       query.set(CAROUSEL_PARAM, images[index + 1].id);
       navigate(`${location.pathname}?${query.toString()}${location.hash}`);
-    },
-    [images, location.hash, location.pathname, location.search, navigate]
-  );
+    }
+  }, [images, location.hash, location.pathname, location.search, navigate]);
 
-  const onPreviousImage = useCallback(
-    (inGroup: boolean = true) => {
-      const query = new SimpleSearchQuery(location.search);
-      const param = query.get(CAROUSEL_PARAM, null);
-      const index = images.findIndex(i => i.id === param);
+  const onPreviousImage = useCallback(() => {
+    const query = new SimpleSearchQuery(location.search);
+    const param = query.get(CAROUSEL_PARAM, null);
+    const index = images.findIndex(i => i.id === param);
 
-      if (index < 1 || index >= images.length || (inGroup && images[index].group !== images[index - 1].group)) return;
-
+    if (index >= 1 && index < images.length) {
       query.set(CAROUSEL_PARAM, images[index - 1].id);
       navigate(`${location.pathname}?${query.toString()}${location.hash}`);
-    },
-    [images, location.hash, location.pathname, location.search, navigate]
-  );
+    }
+  }, [images, location.hash, location.pathname, location.search, navigate]);
 
   useEffect(
     () =>
