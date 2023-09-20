@@ -1,168 +1,76 @@
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
-import CloseIcon from '@mui/icons-material/Close';
-import {
-  Button,
-  CircularProgress,
-  IconButton,
-  Modal,
-  Skeleton,
-  Theme,
-  Typography,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
+import { Button, CircularProgress, Modal, Skeleton, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import Carousel from 'commons/addons/carousel/Carousel';
-import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CAROUSEL_PARAM } from 'components/providers/CarouselProvider';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
-import CarouselThumb from './Thumb';
+import { CarouselThumb, useCarousel } from '.';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  backdrop: {
-    backdropFilter: 'blur(2px)',
-    transition: 'backdrop-filter 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;'
-  },
   root: {
-    display: 'grid',
-    gridTemplateRows: 'auto 1fr auto',
-    gridTemplateColumns: 'auto 1fr auto',
-    gridTemplateAreas: `"close close close"
-                        "left main right"
-                        "nav nav nav"`
+    position: 'fixed',
+    left: 'calc(50vw - 64px)',
+    top: '50vh',
+    translate: '-50% -50%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignContent: 'flex-start',
+    borderRadius: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+
+    backgroundColor: theme.palette.common.black
   },
-  main: {
-    gridArea: 'main',
-    placeSelf: 'center'
+  button: {
+    padding: 0
   },
-  close: {
-    gridArea: 'close',
-    placeSelf: 'end',
-    padding: theme.spacing(2),
-    [theme.breakpoints.down('md')]: {
-      padding: theme.spacing(1)
-    }
-  },
-  left: {
-    gridArea: 'left',
-    display: 'grid',
-    placeItems: 'center',
-    padding: theme.spacing(2),
-    [theme.breakpoints.down('md')]: {
-      display: 'none'
-    }
-  },
-  right: {
-    gridArea: 'right',
-    display: 'grid',
-    placeItems: 'center',
-    padding: theme.spacing(2),
-    [theme.breakpoints.down('md')]: {
-      display: 'none'
-    }
+  image: {
+    maxHeight: '80vh',
+    maxWidth: '50vw',
+    padding: 0,
+    backgroundColor: theme.palette.common.black
   },
   navbar: {
-    gridArea: 'nav',
+    position: 'absolute',
+    height: '100vh',
+    width: '150px',
+    right: 0,
     display: 'flex',
+    flexDirection: 'column',
     flexWrap: 'nowrap',
-    overflowX: 'auto',
-    alignItems: 'center'
+    overflowY: 'auto'
   },
   header: {
     display: 'grid',
     gridTemplateColumns: 'auto 1fr',
     columnGap: theme.spacing(1),
     rowGap: theme.spacing(0.5),
-    padding: theme.spacing(1),
-    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.common.black : theme.palette.common.white,
-    borderRadius: `${theme.spacing(1)} ${theme.spacing(1)} 0 0`
+    margin: theme.spacing(1)
   },
-  title: {
-    fontWeight: 500
-  },
-  text: {
-    fontWeight: 400,
-    [theme.breakpoints.down('md')]: {
-      overflowX: 'hidden',
-      whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis'
-    },
-    '@media (max-height: 960px)': {
-      overflowX: 'hidden',
-      whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis'
-    }
-  },
-  hero: {
+  empty: {
+    height: '50vh',
+    width: '50vw',
     display: 'grid',
-    borderRadius: `0 0 ${theme.spacing(1)} ${theme.spacing(1)}`,
-    padding: `0 0 ${theme.spacing(1)} 0`,
-    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.common.black : theme.palette.common.white
-  },
-  heroButton: {
-    padding: 0
-  },
-  image: {
-    maxWidth: '100%',
-    objectFit: 'contain',
-    maxHeight: 'calc(100vh - 260px)',
-    [theme.breakpoints.down('md')]: {
-      maxHeight: 'calc(100vh - 230px)'
-    }
-  },
-  progress: {
-    width: '100vw',
-    maxWidth: '50vw',
-    maxHeight: 'calc(100vh - 260px)',
-    aspectRatio: `${Math.sqrt(2)}`,
-    display: 'grid',
-    placeItems: 'center',
-    [theme.breakpoints.down('md')]: {
-      maxWidth: '100vw',
-      maxHeight: 'calc(100vh - 230px)'
-    }
-  },
-  spacer: {
-    minWidth: '50vw'
-  },
-  button: {
-    backgroundColor: theme.palette.background.default,
-    opacity: 1,
-    transition: theme.transitions.create('opacity', {
-      easing: theme.transitions.easing.easeInOut,
-      duration: theme.transitions.duration.shortest
-    }),
-    '&:hover': {
-      backgroundColor: theme.palette.background.default,
-      opacity: 0.5
-    }
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 }));
 
 export const WrappedCarouselContainer = () => {
-  const { t } = useTranslation('search');
-  const theme = useTheme();
+  const { t } = useTranslation();
   const classes = useStyles();
   const location = useLocation();
   const { apiCall } = useMyAPI();
   const { open, images, onCloseImage, onNextImage, onPreviousImage } = useCarousel();
 
   const [data, setData] = useState<string>(null);
-  const [width, setWidth] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const isDownMD = useMediaQuery(theme.breakpoints.down('md'));
-
   const currentImage = useMemo(() => {
-    const query = new SimpleSearchQuery(location.search).get(CAROUSEL_PARAM, null);
-    const index = images.findIndex(i => i.id === query);
+    const query = new SimpleSearchQuery(location.search).get('carousel', null);
+    const index = images.findIndex(i => i.img === query);
     return index >= 0 ? images[index] : null;
   }, [images, location.search]);
 
@@ -174,21 +82,6 @@ export const WrappedCarouselContainer = () => {
     },
     [onNextImage, onPreviousImage]
   );
-
-  useEffect(() => {
-    setTimeout(() => {
-      const w = document.getElementById('hero-image')?.getBoundingClientRect().width;
-      setWidth(w > 0 ? w : 'auto');
-    }, 1);
-  }, [data]);
-
-  useEffect(() => {
-    function resize() {
-      setWidth(document.getElementById('hero-image')?.getBoundingClientRect().width);
-    }
-    window.addEventListener('resize', resize);
-    return () => window.removeEventListener('resize', resize);
-  }, []);
 
   useEffect(() => {
     if (!currentImage) return;
@@ -204,53 +97,55 @@ export const WrappedCarouselContainer = () => {
   }, [currentImage]);
 
   return (
-    <Carousel onNext={onNextImage} onPrevious={onPreviousImage}>
-      <Modal className={clsx(classes.root, classes.backdrop)} open={open} onClose={onCloseImage}>
-        <>
-          {currentImage && (
-            <div className={classes.main}>
-              <Typography className={classes.header} variant="subtitle2" style={{ maxWidth: width }}>
-                <span className={classes.title}>{t('header.name')}</span>
-                {loading && <Skeleton variant="rounded" height="100%" width="100%" />}
-                {!loading && currentImage && <span className={classes.text}>{currentImage.name}</span>}
-                <span className={classes.title}>{t('header.description')}</span>
-                {loading && <Skeleton variant="rounded" height="100%" width="100%" />}
-                {!loading && currentImage && <span className={classes.text}>{currentImage.description}</span>}
-              </Typography>
-              <div className={classes.hero}>
-                <Button className={classes.heroButton} onClick={handleClick}>
+    <Modal open={open} onClose={onCloseImage}>
+      <>
+        {currentImage && (
+          <Carousel onNext={onNextImage} onPrevious={onPreviousImage}>
+            <div className={classes.root}>
+              <Typography className={classes.header} variant="subtitle2">
+                <span style={{ fontWeight: 500 }}>{t('name')}</span>
+                <span style={{ fontWeight: 400 }}>
                   {loading ? (
-                    <div className={classes.progress} children={<CircularProgress />} />
-                  ) : !data ? (
-                    <div className={classes.progress} children={<BrokenImageOutlinedIcon fontSize="large" />} />
+                    <Skeleton variant="rounded" height="100%" width="100%" />
                   ) : (
-                    <img id="hero-image" className={classes.image} src={data} alt={currentImage.name} />
+                    currentImage && currentImage.name
+                  )}
+                </span>
+                <span style={{ fontWeight: 500 }}>{t('description')}</span>
+                <span style={{ fontWeight: 400 }}>
+                  {loading ? (
+                    <Skeleton variant="rounded" height="100%" width="100%" />
+                  ) : (
+                    currentImage && currentImage.description
+                  )}
+                </span>
+              </Typography>
+
+              {loading ? (
+                <div className={classes.empty}>
+                  <CircularProgress />
+                </div>
+              ) : (
+                <Button className={classes.button} onClick={handleClick}>
+                  {data ? (
+                    <img className={classes.image} src={data} alt={currentImage.name} />
+                  ) : (
+                    <div className={classes.empty}>
+                      <BrokenImageOutlinedIcon fontSize="large" />
+                    </div>
                   )}
                 </Button>
-              </div>
+              )}
             </div>
-          )}
-
-          <div className={classes.navbar}>
-            <div className={classes.spacer} />
-            {images.map((image, i) => (
-              <CarouselThumb key={i} image={image} carousel />
-            ))}
-            <div className={classes.spacer} />
-          </div>
-
-          <div className={classes.close} onClick={onCloseImage}>
-            <IconButton className={classes.button} size={isDownMD ? 'small' : 'large'} children={<CloseIcon />} />
-          </div>
-          <div className={classes.left} onClick={onPreviousImage}>
-            <IconButton className={classes.button} size="large" children={<ArrowBackIosNewIcon />} />
-          </div>
-          <div className={classes.right} onClick={onNextImage}>
-            <IconButton className={classes.button} size="large" children={<ArrowForwardIosIcon />} />
-          </div>
-        </>
-      </Modal>
-    </Carousel>
+          </Carousel>
+        )}
+        <div className={classes.navbar}>
+          {images.map((image, i) => (
+            <CarouselThumb key={i} image={image} carousel tooltipPlacement="left" />
+          ))}
+        </div>
+      </>
+    </Modal>
   );
 };
 

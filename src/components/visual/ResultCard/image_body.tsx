@@ -1,66 +1,149 @@
-import { Theme } from '@mui/material';
+import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
+import { Button, CircularProgress, Theme, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { Image } from 'components/providers/CarouselProvider';
-import { CarouselThumb } from 'components/visual/Carousel/Thumb';
-import React, { useMemo } from 'react';
+import useCarousel from 'components/hooks/useCarousel';
+import useMyAPI from 'components/hooks/useMyAPI';
+import { default as React, useEffect, useState } from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  container: {
+  imageList: {
     display: 'flex',
     flexWrap: 'nowrap',
+    marginRight: theme.spacing(2),
     overflowX: 'auto',
-    alignItems: 'center'
+    paddingBottom: theme.spacing(0.5),
+    paddingTop: theme.spacing(0.5)
   },
-  wrap: {
+  printable: {
     flexWrap: 'wrap'
+  },
+  imageBox: {
+    display: 'flex',
+    height: theme.spacing(17),
+    width: theme.spacing(17)
+  },
+  imageItem: {
+    display: 'inherit',
+    padding: theme.spacing(0.5),
+    textDecoration: 'none'
+  },
+  imageLoading: {
+    borderRadius: theme.spacing(0.5),
+    display: 'grid',
+    minHeight: theme.spacing(16),
+    minWidth: theme.spacing(16),
+    placeItems: 'center'
+  },
+  image: {
+    borderRadius: theme.spacing(0.5),
+    maxHeight: theme.spacing(16),
+    maxWidth: theme.spacing(16),
+    objectFit: 'contain'
   }
 }));
 
-type Body = Array<{
-  img: {
-    description: string;
-    name: string;
-    sha256: string;
-  };
-  thumb: {
-    description: string;
-    name: string;
-    sha256: string;
-  };
-}>;
-
-type Props = {
-  body: Body;
-  printable?: boolean;
-};
-
-const WrappedImageBody = ({ body, printable = false }: Props) => {
+const WrappedImageBody = ({ body, printable = false }) => {
   const classes = useStyles();
+  const { openCarousel } = useCarousel();
+  const [data, setData] = useState<
+    Array<{
+      name: string;
+      description: string;
+      imgSrc: string;
+      thumbSrc: string;
+    }>
+  >([]);
 
-  const images = useMemo<Image[]>(
-    () =>
-      body && Array.isArray(body)
-        ? body.map(item => ({
-            name: item.img.name,
-            description: item.img.description,
-            img: item.img.sha256,
-            thumb: item.thumb.sha256
-          }))
-        : [],
-    [body]
-  );
+  useEffect(() => {
+    if (body != null) {
+      setData(
+        body.map(element => {
+          return {
+            name: element.img.name,
+            description: element.img.description,
+            imgSrc: element.img.sha256,
+            thumbSrc: element.thumb.sha256
+          };
+        })
+      );
+    }
+    return () => {
+      setData([]);
+    };
+  }, [body]);
 
-  return (
-    images && (
-      <div className={clsx(classes.container, printable && classes.wrap)}>
-        {images.map((image, index) => (
-          <CarouselThumb key={`${image.img}-${index}`} image={image} />
-        ))}
-      </div>
-    )
-  );
+  const OpenCarouselDialog = (index: number) => {
+    openCarousel(index, data);
+  };
+
+  return body && Array.isArray(body) ? (
+    <div className={clsx(printable ? classes.printable : null, classes.imageList)}>
+      {body.map((element, index) => (
+        <ImageItem
+          key={index}
+          src={element.thumb.sha256}
+          alt={element.img.name}
+          index={index}
+          handleOpenCarousel={OpenCarouselDialog}
+        />
+      ))}
+    </div>
+  ) : null;
 };
 
 export const ImageBody = React.memo(WrappedImageBody);
-export default ImageBody;
+
+type ImageItemProps = {
+  alt: string;
+  src: string;
+  index: number;
+  handleOpenCarousel: (index: number) => void;
+};
+
+const ImageItem = ({ alt, src, index, handleOpenCarousel }: ImageItemProps) => {
+  const [image, setImage] = useState<string>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const classes = useStyles();
+  const { apiCall } = useMyAPI();
+
+  useEffect(() => {
+    apiCall({
+      url: `/api/v4/file/image/${src}/`,
+      allowCache: true,
+      onSuccess: api_data => {
+        setLoading(false);
+        setImage(api_data.api_response);
+      },
+      onFailure: api_data => {
+        setLoading(false);
+        setImage(null);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [alt, src]);
+
+  const handleImageClick = () => {
+    handleOpenCarousel(index);
+  };
+
+  return (
+    <div className={classes.imageBox}>
+      {image ? (
+        <Tooltip title={alt}>
+          <Button className={classes.imageItem} onClick={handleImageClick}>
+            <img src={image} alt={alt} className={classes.image} />
+          </Button>
+        </Tooltip>
+      ) : (
+        <Tooltip title={alt}>
+          <Button className={classes.imageItem} onClick={handleImageClick} color="secondary">
+            <div className={classes.imageLoading}>
+              {loading ? <CircularProgress /> : <BrokenImageOutlinedIcon fontSize="large" />}
+            </div>
+          </Button>
+        </Tooltip>
+      )}
+    </div>
+  );
+};
