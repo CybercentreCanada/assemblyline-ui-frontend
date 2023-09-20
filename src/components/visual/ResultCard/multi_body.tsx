@@ -3,7 +3,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { GraphBody } from './graph_body';
-import { ImageBody } from './image_body';
+
 import { JSONBody } from './json_body';
 import { KVBody } from './kv_body';
 import { MemDumpBody } from './memdump_body';
@@ -12,6 +12,7 @@ import { ProcessTreeBody } from './process_tree_body';
 import { TblBody } from './table_body';
 import { TextBody } from './text_body';
 import { URLBody } from './url_body';
+import { ImageBody } from '../Carousel';
 
 const useStyles = makeStyles(theme => ({
   divider: {
