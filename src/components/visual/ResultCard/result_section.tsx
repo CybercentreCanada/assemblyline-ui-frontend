@@ -109,6 +109,7 @@ export type Section = {
     classification: string;
   }[];
   title_text: string;
+  promote_to: string;
 };
 
 type ResultSectionProps = {

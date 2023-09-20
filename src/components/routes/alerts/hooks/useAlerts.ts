@@ -16,6 +16,13 @@ const DEFAULT_STATE = {
   alerts: []
 };
 
+export interface Screenshots {
+  name: string;
+  description: string;
+  img: string;
+  thumb: string;
+}
+
 export interface AlertFile {
   md5: string;
   name: string;
@@ -23,6 +30,7 @@ export interface AlertFile {
   sha256: string;
   size: number;
   type: string;
+  screenshots: Screenshots[];
 }
 
 export interface AlertUpdateItem {
