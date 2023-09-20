@@ -14,8 +14,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexShrink: 0,
     padding: theme.spacing(0.5),
     boxSizing: 'border-box',
-    width: 'min(128px, 20vw, 20vh)',
-    maxHeight: 'min(128px, 20vw, 20vh)',
+    width: '30vw',
+    maxHeight: '128px',
+    maxWidth: '128px',
     objectFit: 'contain',
     borderRadius: theme.spacing(0.5)
   },
@@ -44,9 +45,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type Props = {
-  classes?: {
-    button?: string;
-  };
   image?: Image;
   carousel?: boolean;
   tooltipPlacement?:
@@ -64,12 +62,7 @@ type Props = {
     | 'top';
 };
 
-const WrappedCarouselThumb = ({
-  classes: classesProps = null,
-  image = null,
-  carousel = false,
-  tooltipPlacement = 'top'
-}: Props) => {
+const WrappedCarouselThumb = ({ image = null, carousel = false, tooltipPlacement = 'top' }: Props) => {
   const classes = useStyles();
   const location = useLocation();
   const { apiCall } = useMyAPI();
@@ -131,8 +124,7 @@ const WrappedCarouselThumb = ({
           classes.button,
           carousel && classes.carousel,
           !data && classes.broken,
-          selected && classes.selected,
-          classesProps?.button
+          selected && classes.selected
         )}
         ref={ref}
         onClick={() => onOpenImage(image?.id || id)}
