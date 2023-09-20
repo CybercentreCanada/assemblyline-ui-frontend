@@ -1,9 +1,9 @@
 import { CssBaseline, PaletteMode, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
 import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
+import CarouselProvider from 'components/providers/CarouselProvider';
 import DrawerProvider from 'components/providers/DrawerProvider';
 import HighlightProvider from 'components/providers/HighlightProvider';
-import { CarouselProvider } from 'components/visual/Carousel';
 import i18n from 'i18n';
 import { createContext, ReactNode, useCallback, useMemo } from 'react';
 import useThemeBuilder from '../utils/hooks/useThemeBuilder';
