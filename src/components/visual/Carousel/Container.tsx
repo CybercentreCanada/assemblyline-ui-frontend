@@ -19,7 +19,7 @@ import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CAROUSEL_PARAM } from 'components/providers/CarouselProvider';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import React, { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import CarouselThumb from './Thumb';
@@ -163,8 +163,6 @@ export const WrappedCarouselContainer = () => {
 
   const [data, setData] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
-  const deferredData = useDeferredValue(data);
 
   const isSmall = useMediaQuery(
     `@media (max-width: ${theme.breakpoints.values.md}px) or (max-height: ${theme.breakpoints.values.sm}px)`
@@ -315,7 +313,7 @@ export const WrappedCarouselContainer = () => {
     if (rect.width >= window.innerWidth - 160)
       img.style.width = `${(100 * (window.innerWidth - 160)) / window.innerWidth}vw`;
     handleResize();
-  }, [handleResize, deferredData]);
+  }, [handleResize, data]);
 
   return (
     <Carousel onNext={onNextImage} onPrevious={onPreviousImage}>
