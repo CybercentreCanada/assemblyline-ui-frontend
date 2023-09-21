@@ -34,7 +34,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     minHeight: theme.spacing(4),
     maxHeight: theme.spacing(16),
     maxWidth: theme.spacing(16),
-    objectFit: 'contain'
+    objectFit: 'contain',
+    boxShadow: theme.shadows[3],
+    transition: theme.transitions.create('transform'),
+    '&:hover': {
+      transform: 'scale(1.05)'
+    }
   },
   imageBoxSM: {
     height: theme.spacing(12),
@@ -61,7 +66,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     minHeight: theme.spacing(3),
     maxHeight: theme.spacing(12),
     maxWidth: theme.spacing(12),
-    objectFit: 'contain'
+    objectFit: 'contain',
+    boxShadow: theme.shadows[3],
+    transition: theme.transitions.create('transform'),
+    '&:hover': {
+      transform: 'scale(1.05)'
+    }
   }
 }));
 
