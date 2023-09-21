@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 const useStyles = makeStyles((theme: Theme) => ({
   svgItem: {
     borderRadius: theme.spacing(0.625),
-    boxShadow: theme.shadows[3],
+    boxShadow: theme.shadows[2],
     marginRight: theme.spacing(1.5)
   }
 }));

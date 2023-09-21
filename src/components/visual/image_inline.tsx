@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxHeight: theme.spacing(12),
     maxWidth: theme.spacing(12),
     objectFit: 'contain',
-    boxShadow: theme.shadows[3],
+    boxShadow: theme.shadows[2],
     transition: theme.transitions.create('transform'),
     '&:hover': {
       transform: 'scale(1.05)'
