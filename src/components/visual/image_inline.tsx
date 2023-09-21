@@ -163,7 +163,7 @@ const WrappedImageItem = ({ alt, src, index, handleOpenCarousel, small = false, 
         <Tooltip title={alt}>
           <Button className={small ? classes.imageItemSM : classes.imageItem} onClick={handleImageClick}>
             <div className={small ? classes.imageBoxSM : classes.imageBox}>
-              <Badge badgeContent={count} color="primary">
+              <Badge badgeContent={count > 1 ? count : 0} color="primary">
                 <img src={image} alt={alt} className={small ? classes.imageSM : classes.image} />
               </Badge>
             </div>
