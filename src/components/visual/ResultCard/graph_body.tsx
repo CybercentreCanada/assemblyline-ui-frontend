@@ -6,8 +6,7 @@ import React, { useState } from 'react';
 const useStyles = makeStyles((theme: Theme) => ({
   svgItem: {
     borderRadius: theme.spacing(0.625),
-    boxShadow: theme.shadows[2],
-    marginRight: theme.spacing(1.5)
+    boxShadow: theme.shadows[2]
   }
 }));
 
@@ -37,26 +36,29 @@ const WrappedGraphBody = ({ body }) => {
           ))}
         </svg>
         <div style={{ display: 'flex' }}>
-          <svg width="30" height="15" className={classes.svgItem}>
-            <rect x={0} width="100%" height="100%" fill={colorRange[0]} />
+          <svg width="90" height="18" className={classes.svgItem}>
+            <defs>
+              <linearGradient id="Gradient">
+                <stop style={{ stopColor: colorRange[0] }} offset="10%" />
+                <stop style={{ stopColor: colorRange[1] }} offset="90%" />
+              </linearGradient>
+            </defs>
+            <rect x={0} width="100%" height="100%" fill="url(#Gradient)" />
             <text
-              x="50%"
+              x={5}
               y="50%"
               dominantBaseline="central"
-              textAnchor="middle"
+              textAnchor="start"
               fill={theme.palette.getContrastText(colorRange[0])}
               fontWeight={500}
             >
               {body.data.domain[0]}
             </text>
-          </svg>
-          <svg width="30" height="15" className={classes.svgItem}>
-            <rect x={0} width="100%" height="100%" fill={colorRange[1]} />
             <text
-              x="50%"
+              x={85}
               y="50%"
               dominantBaseline="central"
-              textAnchor="middle"
+              textAnchor="end"
               fill={theme.palette.getContrastText(colorRange[1])}
             >
               {body.data.domain[1]}
