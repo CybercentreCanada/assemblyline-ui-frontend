@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const WrappedGraphBody = ({ body }) => {
   const theme = useTheme();
-  const [currentValue, setCurrentValue] = useState(0);
+  const [currentValue, setCurrentValue] = useState(null);
 
   const classes = useStyles();
   if (body.type === 'colormap') {
