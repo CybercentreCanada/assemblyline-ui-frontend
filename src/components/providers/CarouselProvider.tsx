@@ -57,6 +57,7 @@ const useStyles = makeStyles(theme => ({
     minHeight: theme.spacing(12),
     minWidth: theme.spacing(12),
     maxWidth: '100vw',
+    imageRendering: 'pixelated',
     maxHeight: `calc(95vh - 2*${theme.spacing(3)} - 2*${theme.spacing(2)})`,
     '@media (min-height:500px)': {
       maxHeight: `calc(95vh - ${MDSize} - 2*${theme.spacing(3)} - 2*${theme.spacing(2)})`
@@ -123,6 +124,7 @@ const useStyles = makeStyles(theme => ({
   },
   thumb: {
     display: 'flex',
+    imageRendering: 'pixelated',
     '@media (min-height:500px)': {
       maxHeight: MDSize
     },
