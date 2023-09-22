@@ -143,10 +143,10 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
   React.useEffect(() => {
     const fullChipList = items.map(item => ({
       category: 'tag',
-      label: item[0].toString(),
+      label: item[0] !== null && item[0] !== undefined ? item[0].toString() : '',
       variant: 'outlined' as 'outlined',
       // type: 'rounded' as 'rounded',
-      tooltip: item[1].toString()
+      tooltip: item[1] !== null && item[1] !== undefined ? item[1].toString() : ''
     }));
     const showExtra = items.length <= TARGET_RESULT_COUNT;
 
