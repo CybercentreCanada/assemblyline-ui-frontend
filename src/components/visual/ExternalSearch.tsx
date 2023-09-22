@@ -378,7 +378,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
   }, [openedDialog]);
 
   // determine max classification of all return results
-  let classification = 'TLP:C';
+  let classification = c12nDef.UNRESTRICTED;
   if (!!externalLookupResults) {
     Object.values(externalLookupResults).forEach(enrichmentResults => {
       enrichmentResults.items.forEach(enrichmentResult => {
