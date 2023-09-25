@@ -214,6 +214,7 @@ function WrappedClassification({
   return (
     c12nDef &&
     c12nDef.enforce &&
+    !!validated.parts &&
     (c12n ? (
       <>
         {type === 'text' ? (
