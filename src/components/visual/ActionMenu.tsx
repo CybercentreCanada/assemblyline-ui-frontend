@@ -9,11 +9,12 @@ import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem } from '@m
 import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
+import useExternalLookup from 'components/hooks/useExternalLookup';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { isAccessible } from 'helpers/classificationParser';
-import { safeFieldValueURI, toTitleCase } from 'helpers/utils';
+import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
@@ -65,7 +66,6 @@ type TagProps = {
   classification?: string | null;
   state: Coordinates;
   setState: (Coordinates) => void;
-  searchTagExternal: (source: any, type: any, value: any, classification: any) => void;
   highlight_key?: string;
 };
 
@@ -88,7 +88,6 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   classification = null,
   state,
   setState,
-  searchTagExternal,
   highlight_key = null
 }) => {
   const { t } = useTranslation();
@@ -105,6 +104,8 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { showSuccessMessage } = useMySnackbar();
   const { triggerHighlight } = useHighlighter();
   const { apiCall } = useMyAPI();
+
+  const { enrichTagExternal } = useExternalLookup();
 
   const handleClose = useCallback(() => {
     setState(initialMenuState);
@@ -137,10 +138,10 @@ const WrappedActionMenu: React.FC<TagProps> = ({
 
   const handleMenuExternalSearch = useCallback(
     source => {
-      searchTagExternal(source, type, value, classification);
+      enrichTagExternal(source, type, value, classification);
       handleClose();
     },
-    [searchTagExternal, handleClose, type, value, classification]
+    [enrichTagExternal, handleClose, type, value, classification]
   );
 
   const handleHighLight = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
@@ -284,20 +285,9 @@ const WrappedActionMenu: React.FC<TagProps> = ({
         )}
         {hasExternalQuery && (
           <div>
-            <Divider />
-            <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
-              {t('related_external')}
-            </ListSubheader>
-
             <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
-              {TRAVEL_EXPLORE_ICON} {t('related_external.all')}
+              {TRAVEL_EXPLORE_ICON} {t('related_external')}
             </MenuItem>
-
-            {currentUserConfig.ui.external_source_tags?.[type]?.sort().map((source, i) => (
-              <MenuItem dense key={`source_${i}`} onClick={() => handleMenuExternalSearch(source)}>
-                {TRAVEL_EXPLORE_ICON} {toTitleCase(source)}
-              </MenuItem>
-            ))}
           </div>
         )}
         {hasExternalLinks && (

@@ -1,8 +1,8 @@
+import useExternalLookup from 'components/hooks/useExternalLookup';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
 import CustomChip, { CustomChipProps } from './CustomChip';
-import ExternalLinks from './ExternalLookup/ExternalLinks';
-import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
+import ExternalLinks from './ExternalSearch';
 
 export type ActionableCustomChipProps = CustomChipProps & {
   data_type?: string;
@@ -34,14 +34,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
     });
   }, []);
 
-  const { lookupState, isActionable, searchTagExternal } = useSearchTagExternal({
-    [data_type]: {
-      results: {},
-      errors: {},
-      success: null
-    }
-  });
-
+  const { isActionable } = useExternalLookup();
   const actionable = isActionable(category, data_type, label);
 
   // Do the menu rendering here
@@ -54,20 +47,23 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
           value={label}
           state={state}
           setState={setState}
-          searchTagExternal={searchTagExternal}
           classification={classification}
         />
       )}
       <CustomChip
         icon={
-          actionable && lookupState && lookupState[data_type] ? (
-            <ExternalLinks
-              success={lookupState[data_type].success}
-              results={lookupState[data_type].results}
-              errors={lookupState[data_type].errors}
-              iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
-            />
-          ) : null
+          <ExternalLinks
+            category={category}
+            type={data_type}
+            value={label}
+            iconStyle={{
+              marginRight: '-3px',
+              marginLeft: '3px',
+              height: '20px',
+              verticalAlign: 'middle',
+              minWidth: '32px'
+            }}
+          />
         }
         label={label}
         {...otherProps}
