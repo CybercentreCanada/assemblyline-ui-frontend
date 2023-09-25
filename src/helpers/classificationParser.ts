@@ -298,14 +298,8 @@ export function canSeeRequired(user_req, req) {
   const userSet = new Set(user_req);
   const reqSet = new Set(req);
 
-  // for (let elem of userSet) {
-  //   if (!reqSet.has(elem)) {
-  //     return false;
-  //   }
-  // }
-  // return true;
-  for (const elem of reqSet) {
-    if (!userSet.has(elem)) {
+  for (let elem of userSet) {
+    if (!reqSet.has(elem)) {
       return false;
     }
   }
@@ -315,21 +309,13 @@ export function canSeeRequired(user_req, req) {
 export function canSeeGroups(user_groups, req) {
   if (req.length === 0) return true;
   const reqSet = new Set(req);
-  const userSet = new Set(user_groups);
 
-  // for (let elem of user_groups) {
-  //   if (reqSet.has(elem)) {
-  //     return true;
-  //   }
-  // }
-
-  // return false;
-
-  for (const elem of reqSet) {
-    if (userSet.has(elem)) {
+  for (let elem of user_groups) {
+    if (reqSet.has(elem)) {
       return true;
     }
   }
+
   return false;
 }
 
@@ -585,15 +571,9 @@ export function isAccessible(
   const { groups, subgroups } = getGroups(c12n, c12nDef, 'long', false);
 
   if (getLevelIndex(user_c12n, c12nDef) >= getLevelIndex(c12n, c12nDef)) {
-    if (!canSeeRequired(userReq, req)) {
-      return false;
-    }
-    if (!canSeeGroups(userGroups, groups)) {
-      return false;
-    }
-    if (!canSeeGroups(userSubgroups, subgroups)) {
-      return false;
-    }
+    if (!canSeeRequired(userReq, req)) return false;
+    if (!canSeeGroups(userGroups, groups)) return false;
+    if (!canSeeGroups(userSubgroups, subgroups)) return false;
     return true;
   }
 
