@@ -155,9 +155,10 @@ export function getLevelText(
   }
 
   if (text === undefined || text == null) {
-    throw new InvalidClassification(
-      `Classification level number '${lvl}' was not found in your classification definition.`
-    );
+    // throw new InvalidClassification(
+    //   `Classification level number '${lvl}' was not found in your classification definition.`
+    // );
+    text = 'INVALID';
   }
 
   if (format === 'long' && !isMobile) {
@@ -180,7 +181,8 @@ function getLevelIndex(c12n: string, c12nDef: ClassificationDefinition): [number
   } else if (c12nDef.levels_aliases[c12nLvl] !== undefined) {
     retIndex = c12nDef.levels_map[c12nDef.levels_aliases[c12nLvl]];
   } else {
-    throw new InvalidClassification(`Classification level '${level}' was not found in your classification definition.`);
+    // throw new InvalidClassification(`Classification level '${level}' was not found in your classification definition.`);
+    retIndex = 0;
   }
 
   return [retIndex, unused];
@@ -292,14 +294,16 @@ function getGroups(
       // Check that this alias is actually a solitary name, don't
       // let other aliases leak outside the REL marking
       const grps = c12nDef.groups_aliases[g];
-      if (grps.length > 1) {
-        // Unclear use of alias
-        throw new InvalidClassification(`Unclear use of alias: ${g}`);
-      }
+      // if (grps.length > 1) {
+      // Unclear use of alias
+      // throw new InvalidClassification(`Unclear use of alias: ${g}`);
+      // }
+      // just default to first
       g1Set.add(grps[0]);
     } else {
       // Unknown component
-      throw new InvalidClassification(`Unknown component: ${g}`);
+      // throw new InvalidClassification(`Unknown component: ${g}`);
+      g1Set.add(g);
     }
   }
 
@@ -321,16 +325,16 @@ function getGroups(
   }
 
   // Check if there are any forbidden group assignments
-  for (const subgroup of g2Set) {
-    const limitedToGroup = c12nDef.params_map?.[subgroup]?.limited_to_group;
-    if (limitedToGroup !== null && limitedToGroup !== undefined) {
-      if (g1Set.size > 1 || (g1Set.size === 1 && !g1Set.has(limitedToGroup))) {
-        throw new InvalidClassification(
-          `Subgroup ${subgroup} is limited to group ${limitedToGroup} (found: ${Array.from(g1Set).toString()})`
-        );
-      }
-    }
-  }
+  // for (const subgroup of g2Set) {
+  //   const limitedToGroup = c12nDef.params_map?.[subgroup]?.limited_to_group;
+  //   if (limitedToGroup !== null && limitedToGroup !== undefined) {
+  //     if (g1Set.size > 1 || (g1Set.size === 1 && !g1Set.has(limitedToGroup))) {
+  //       throw new InvalidClassification(
+  //         `Subgroup ${subgroup} is limited to group ${limitedToGroup} (found: ${Array.from(g1Set).toString()})`
+  //       );
+  //     }
+  //   }
+  // }
 
   // Do auto select
   if (!!autoSelect && !!g1Set) {
@@ -367,9 +371,9 @@ export function getParts(
   const [req, unusedParts] = getRequired(unused, c12nDef, format, isMobile);
   const { groups, subgroups, others } = getGroups(unusedParts, c12nDef, format, isMobile);
 
-  if (others.length > 0) {
-    throw new InvalidClassification(`Unparsable classification parts: ${others.join(',')}`);
-  }
+  // if (others.length > 0) {
+  //   throw new InvalidClassification(`Unparsable classification parts: ${others.join(',')}`);
+  // }
 
   return {
     lvlIdx,
@@ -763,12 +767,12 @@ function getMaxGroups(grps1: string[], grps2: string[]): string[] {
     groups = new Set([...grps1, ...grps2]);
   }
 
-  if (grps1.length > 0 && grps2.length > 0 && groups.size <= 0) {
-    // NOTE: Intersection generated nothing, we will raise an InvalidClassification exception
-    throw new InvalidClassification(
-      `Could not find any intersection between the groups. ${grps1.toString()} & ${grps2.toString()}`
-    );
-  }
+  // if (grps1.length > 0 && grps2.length > 0 && groups.size <= 0) {
+  //   // NOTE: Intersection generated nothing, we will raise an InvalidClassification exception
+  //   throw new InvalidClassification(
+  //     `Could not find any intersection between the groups. ${grps1.toString()} & ${grps2.toString()}`
+  //   );
+  // }
   return Array.from(groups);
 }
 
