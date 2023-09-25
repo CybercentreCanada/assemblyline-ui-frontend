@@ -285,21 +285,9 @@ const WrappedActionMenu: React.FC<TagProps> = ({
         )}
         {hasExternalQuery && (
           <div>
-            {/* <Divider />
-            <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
-              {t('related_external')}
-            </ListSubheader> */}
-
             <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
-              {/* {TRAVEL_EXPLORE_ICON} {t('related_external.all')} */}
               {TRAVEL_EXPLORE_ICON} {t('related_external')}
             </MenuItem>
-
-            {/* {currentUserConfig.ui.external_source_tags?.[type]?.sort().map((source, i) => (
-              <MenuItem dense key={`source_${i}`} onClick={() => handleMenuExternalSearch(source)}>
-                {TRAVEL_EXPLORE_ICON} {toTitleCase(source)}
-              </MenuItem>
-            ))} */}
           </div>
         )}
         {hasExternalLinks && (
