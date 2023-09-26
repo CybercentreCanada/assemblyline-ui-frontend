@@ -102,3 +102,12 @@ Simply use the `npm start script` to launch the frontend.
 ### Once dependencies and frontend started
 
 Access the dev frontend at the following link: `https://<YOUR_IP>.nip.io`
+
+## Testing
+
+Testing is done through the `jest` framework.
+
+To run the tests, simply use the `npm test` command. (Development dependencies should already have been installed
+previously via the `yarn install` command).
+
+NOTE: the test command will only run tests related to changed files based on git.
