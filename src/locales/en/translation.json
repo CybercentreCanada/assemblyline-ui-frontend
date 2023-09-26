@@ -117,7 +117,7 @@
   "related": "Find related results",
   "related_external": "Find in external sources",
   "related_external.all": "All sources",
-  "related_external.complete": "Search completed",
+  "related_external.complete": "Exteranl search completed",
   "related_external.error": "Error searching in external sources",
   "related_external.invalidTagName": "Not searchable in any external sources",
   "related_external.notfound": "No external links found",
