@@ -166,7 +166,9 @@ export function getLevelText(
   if (text === undefined || text == null) {
     //ERROR: `Classification level number '${lvl}' was not found in your classification definition.`
     /* eslint-disable no-console */
-    console.error(`Classification level number '${lvl}' was not found in your classification definition.`);
+    console.error(
+      `[classificationParser] Classification level number '${lvl}' was not found in your classification definition.`
+    );
     /* eslint-enable no-console */
     return 'INVALID';
   }
@@ -194,7 +196,9 @@ function getLevelIndex(c12n: string, c12nDef: ClassificationDefinition): [number
     // ERROR: `Classification level '${level}' was not found in your classification definition.`
     retIndex = -1;
     /* eslint-disable no-console */
-    console.error(`Classification level '${level}' was not found in your classification definition.`);
+    console.error(
+      `[classificationParser] Classification level '${level}' was not found in your classification definition.`
+    );
     /* eslint-enable no-console */
   }
 
@@ -310,7 +314,7 @@ function getGroups(
       if (grps.length > 1) {
         // ERROR: Unclear use of alias ${g}
         /* eslint-disable no-console */
-        console.error(`Unclear use of alias ${g}`);
+        console.error(`[classificationParser] Unclear use of alias ${g}`);
         /* eslint-enable no-console */
         // just default to first below
       }
@@ -320,7 +324,7 @@ function getGroups(
       // just add it as is to the list
       g1Set.add(g);
       /* eslint-disable no-console */
-      console.error(`Unknown component ${g}`);
+      console.error(`[classificationParser] Unknown component ${g}`);
       /* eslint-enable no-console */
     }
   }
@@ -351,7 +355,9 @@ function getGroups(
         // just log the error and leave it
         /* eslint-disable no-console */
         console.error(
-          `Subgroup ${subgroup} is limited to group ${limitedToGroup} (found: ${Array.from(g1Set).toString()})`
+          `[classificationParser] Subgroup ${subgroup} is limited to group ${limitedToGroup} (found: ${Array.from(
+            g1Set
+          ).toString()})`
         );
         /* eslint-enable no-console */
       }
@@ -397,7 +403,7 @@ export function getParts(
     // ERROR: `Unparsable classification parts: ${others.join(',')}`)
     // just log the error and leave it
     /* eslint-disable no-console */
-    console.error(`Unparsable classification parts: ${others.join(',')}`);
+    console.error(`[classificationParser] Unparsable classification parts: ${others.join(',')}`);
     /* eslint-enable no-console */
   }
 
@@ -797,7 +803,9 @@ function getMaxGroups(grps1: string[], grps2: string[]): string[] {
     // ERROR: Intersection generated nothing, we will just combine all groups which will result in an invalid combination
     groups = new Set([...grps1, ...grps2]);
     /* eslint-disable no-console */
-    console.error(`Could not find any intersection between the groups. ${grps1.toString()} & ${grps2.toString()}`);
+    console.error(
+      `[classificationParser] Could not find any intersection between the groups. ${grps1.toString()} & ${grps2.toString()}`
+    );
     /* eslint-enable no-console */
   }
   return Array.from(groups);
