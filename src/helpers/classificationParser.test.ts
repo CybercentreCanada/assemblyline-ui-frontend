@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 import {
   applyClassificationRules,
   ClassificationDefinition,
@@ -6,7 +6,6 @@ import {
   getLevelText,
   getMaxClassification,
   getParts,
-  InvalidClassification,
   isAccessible,
   normalizedClassification
 } from 'helpers/classificationParser';
@@ -142,7 +141,9 @@ const c12nDef: ClassificationDefinition = {
 
 describe('`GetLevelText` identifies invalid input', () => {
   it('Should raise errors on an invalid levelIdx', () => {
-    expect(() => getLevelText(12, c12nDef, 'short', false)).toThrow(InvalidClassification);
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    expect(getLevelText(12, c12nDef, 'short', false)).toBe('INVALID');
+    console.error.mockRestore();
   });
 });
 
@@ -307,19 +308,63 @@ describe('`getParts` correctly extracts all components', () => {
 });
 
 describe('`GetParts` identifies invalid input', () => {
-  it('Should raise errors on invalid input', () => {
-    expect(() => getParts('LEVEL 0//GARBO', c12nDef, 'short', false)).toThrow(InvalidClassification);
-    expect(() => getParts('LEVEL 0//LEGAL DEPARTMENT//GARBO', c12nDef, 'short', false)).toThrow(InvalidClassification);
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  it('Should raise errors on an invalid level text', () => {
-    expect(() => getParts('LEVEL 12', c12nDef, 'short', false)).toThrow(InvalidClassification);
-    expect(() => getParts('LEVEL 12', c12nDef, 'long', false)).toThrow(InvalidClassification);
+  afterEach(() => {
+    console.error.mockRestore();
   });
 
-  it('Should not accept combined groups if a subgroup is limited', () => {
-    expect(() => getParts('LEVEL 0//AC//REL A,XX/R3', c12nDef, 'short', false)).toThrow(InvalidClassification);
-    expect(() => getParts('LEVEL 0//AC//REL A,XX/R3', c12nDef, 'long', false)).toThrow(InvalidClassification);
+  it('Should still add unknown groups', () => {
+    expect(getParts('LEVEL 0//GARBO', c12nDef, 'short', false)).toEqual({
+      groups: ['GARBO'],
+      lvl: 'L0',
+      lvlIdx: '1',
+      req: [],
+      subgroups: []
+    });
+    expect(getParts('LEVEL 0//LEGAL DEPARTMENT//GARBO', c12nDef, 'short', false)).toEqual({
+      groups: ['GARBO'],
+      lvl: 'L0',
+      lvlIdx: '1',
+      req: ['LE'],
+      subgroups: []
+    });
+  });
+
+  it('Should return -1 for invalid level text', () => {
+    expect(getParts('LEVEL 12', c12nDef, 'short', false)).toEqual({
+      groups: [],
+      lvl: 'INVALID',
+      lvlIdx: -1,
+      req: [],
+      subgroups: []
+    });
+    expect(getParts('LEVEL 12', c12nDef, 'long', false)).toEqual({
+      groups: [],
+      lvl: 'INVALID',
+      lvlIdx: -1,
+      req: [],
+      subgroups: []
+    });
+  });
+
+  it('Should still combined groups if a subgroup is limited', () => {
+    expect(getParts('LEVEL 0//AC//REL A,XX/R3', c12nDef, 'short', false)).toEqual({
+      groups: ['A', 'X'],
+      lvl: 'L0',
+      lvlIdx: '1',
+      req: ['AC'],
+      subgroups: ['R3']
+    });
+    expect(getParts('LEVEL 0//AC//REL A,XX/R3', c12nDef, 'long', false)).toEqual({
+      groups: ['GROUP A', 'GROUP X'],
+      lvl: 'LEVEL 0',
+      lvlIdx: '1',
+      req: ['ACCOUNTING'],
+      subgroups: ['RESERVE THREE']
+    });
   });
 });
 
@@ -327,21 +372,63 @@ describe('`GetParts` identifies invalid input with dynamic_groups turned on', ()
   const c12nDefCopy: ClassificationDefinition = JSON.parse(JSON.stringify(c12nDef));
   c12nDefCopy.dynamic_groups = true;
 
-  it('Should raise errors on invalid input', () => {
-    expect(() => getParts('LEVEL 0//GARBO', c12nDefCopy, 'short', false)).toThrow(InvalidClassification);
-    expect(() => getParts('LEVEL 0//LEGAL DEPARTMENT//GARBO', c12nDefCopy, 'short', false)).toThrow(
-      InvalidClassification
-    );
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  it('Should raise errors on an invalid level text', () => {
-    expect(() => getParts('LEVEL 12', c12nDefCopy, 'short', false)).toThrow(InvalidClassification);
-    expect(() => getParts('LEVEL 12', c12nDefCopy, 'long', false)).toThrow(InvalidClassification);
+  afterEach(() => {
+    console.error.mockRestore();
   });
 
-  it('Should not accept combined groups if a subgroup is limited', () => {
-    expect(() => getParts('LEVEL 0//AC//REL A,XX/R3', c12nDefCopy, 'short', false)).toThrow(InvalidClassification);
-    expect(() => getParts('LEVEL 0//AC//REL A,XX/R3', c12nDefCopy, 'long', false)).toThrow(InvalidClassification);
+  it('Should still add unknown groups', () => {
+    expect(getParts('LEVEL 0//GARBO', c12nDefCopy, 'short', false)).toEqual({
+      groups: ['GARBO'],
+      lvl: 'L0',
+      lvlIdx: '1',
+      req: [],
+      subgroups: []
+    });
+    expect(getParts('LEVEL 0//LEGAL DEPARTMENT//GARBO', c12nDefCopy, 'short', false)).toEqual({
+      groups: ['GARBO'],
+      lvl: 'L0',
+      lvlIdx: '1',
+      req: ['LE'],
+      subgroups: []
+    });
+  });
+
+  it('Should return -1 for invalid level text', () => {
+    expect(getParts('LEVEL 12', c12nDefCopy, 'short', false)).toEqual({
+      groups: [],
+      lvl: 'INVALID',
+      lvlIdx: -1,
+      req: [],
+      subgroups: []
+    });
+    expect(getParts('LEVEL 12', c12nDefCopy, 'long', false)).toEqual({
+      groups: [],
+      lvl: 'INVALID',
+      lvlIdx: -1,
+      req: [],
+      subgroups: []
+    });
+  });
+
+  it('Should still combined groups if a subgroup is limited', () => {
+    expect(getParts('LEVEL 0//AC//REL A,XX/R3', c12nDefCopy, 'short', false)).toEqual({
+      groups: ['A', 'X'],
+      lvl: 'L0',
+      lvlIdx: '1',
+      req: ['AC'],
+      subgroups: ['R3']
+    });
+    expect(getParts('LEVEL 0//AC//REL A,XX/R3', c12nDefCopy, 'long', false)).toEqual({
+      groups: ['GROUP A', 'GROUP X'],
+      lvl: 'LEVEL 0',
+      lvlIdx: '1',
+      req: ['ACCOUNTING'],
+      subgroups: ['RESERVE THREE']
+    });
   });
 });
 
@@ -356,7 +443,18 @@ describe('Multi group aliases should work', () => {
     expect(normalizedClassification(parts, c12nDefCopy, 'short', false)).toBe('L0//REL A');
     parts = getParts('L0//REL A, B', c12nDefCopy, 'short', false);
     expect(normalizedClassification(parts, c12nDefCopy, 'short', false)).toBe('L0//REL ALPHABET GANG');
-    expect(() => getParts('L0//ALPHABET GANG', c12nDefCopy, 'short', false)).toThrow(InvalidClassification);
+  });
+
+  it('Should default to the first group in the case of unclear aliases', () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    expect(getParts('L0//ALPHABET GANG', c12nDefCopy, 'short', false)).toEqual({
+      groups: ['A'],
+      lvl: 'L0',
+      lvlIdx: '1',
+      req: [],
+      subgroups: []
+    });
+    console.error.mockRestore();
   });
 });
 
@@ -653,11 +751,13 @@ describe('`getMaxClassification` correctly identifies the maximum', () => {
     );
   });
 
-  it('Should raise an error on invalid group combinations', () => {
-    expect(() => getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'short', false)).toThrow(
-      InvalidClassification
+  it('Should return all combined groups on invalid group combinations', () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    expect(getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'short', false)).toBe('L0//REL A, B');
+    expect(getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'long', false)).toBe(
+      'LEVEL 0//REL TO GROUP A, GROUP B'
     );
-    expect(() => getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'long', false)).toThrow(InvalidClassification);
+    console.error.mockRestore();
   });
 });
 
