@@ -4,24 +4,12 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
 
 // import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import {
-  Box,
-  Collapse,
-  Divider,
-  Grid,
-  IconButton,
-  Link,
-  Tab,
-  Tabs,
-  Theme,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@mui/material';
+import { Box, Collapse, Divider, Grid, IconButton, Link, Tab, Tabs, Theme, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import { useTranslation } from 'react-i18next';
@@ -65,10 +53,8 @@ const useStyles = makeStyles(theme => ({
     }
   },
   dialogPaper: {
-    // height: '100% - 64px',
-    // width: '100% - 64px',
-    minHeight: '90vh',
-    maxHeight: '90vh'
+    minHeight: '95vh',
+    maxHeight: '95vh'
   },
   sectionContent: {},
   collapseTitle: {
@@ -142,8 +128,9 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
     const fullChipList = items.map(item => ({
       category: 'tag',
       label: item[0] !== null && item[0] !== undefined ? item[0].toString() : '',
-      variant: 'outlined' as 'outlined',
-      // type: 'rounded' as 'rounded',
+      // variant: 'outlined' as 'outlined',
+      variant: 'filled' as 'filled',
+      type: 'rounded' as 'rounded',
       tooltip: item[1] !== null && item[1] !== undefined ? item[1].toString() : ''
     }));
     const showExtra = items.length <= TARGET_RESULT_COUNT;
@@ -214,7 +201,6 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, v
                   </Tooltip>
                 </Grid>
                 <Grid item xs={8} sm={8}>
-                  {/* <div className={classes.sectionContent}> */}
                   <div>
                     <AutoHideChipList items={valueMap[keyName]} />
                   </div>
@@ -371,9 +357,16 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
   }, [openedDialog]);
 
   // determine max classification of all return results
+  // create tooltip text to highlight which sources have results
   let classification = c12nDef.UNRESTRICTED;
+  let tip = `${t('related_external.title')}:`;
   if (!!externalLookupResults) {
-    Object.values(externalLookupResults).forEach(enrichmentResults => {
+    Object.entries(externalLookupResults).forEach(([src, enrichmentResults]) => {
+      if (!!enrichmentResults.error) {
+        tip += `\n${toTitleCase(src)}: ${t('related_external.error')}`;
+      } else {
+        tip += `\n${toTitleCase(src)}: ${enrichmentResults.items.length} ${t('related_external.title')}`;
+      }
       enrichmentResults.items.forEach(enrichmentResult => {
         classification = getMaxClassification(classification, enrichmentResult.classification, c12nDef, 'long', false);
       });
@@ -393,7 +386,9 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
           }}
           style={iconStyle}
         >
-          <InfoOutlinedIcon />
+          <Tooltip title={<div style={{ whiteSpace: 'pre-line' }}>{tip}</div>}>
+            <InfoOutlinedIcon />
+          </Tooltip>
         </Button>
       ) : null}
       <Dialog
@@ -403,58 +398,69 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
         scroll="paper"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className={classes.dialogPaper}
+        classes={{ paper: classes.dialogPaper }}
         fullWidth={true}
-        // maxWidth={false}
         maxWidth="xl"
-        // fullScreen
+        // maxWidth={false}
       >
-        <div>
-          <IconButton
-            aria-label="close"
-            style={{ float: 'right', padding: theme.spacing(2) }}
-            onClick={handleClose}
-            size="large"
-          >
-            <CloseOutlinedIcon />
-          </IconButton>
-
-          <DialogTitle id={titleId}>
-            {c12nDef.enforce && (
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
-                <div style={{ flex: 1 }}>
-                  <Classification c12n={classification} type="outlined" />
-                </div>
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          size="large"
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: theme.palette.text.primary
+          }}
+        >
+          <CloseOutlinedIcon />
+        </IconButton>
+        <DialogTitle id={titleId} sx={{ m: 0, p: 2 }}>
+          {c12nDef.enforce && (
+            <div
+              style={{
+                display: 'block',
+                alignItems: 'center',
+                marginBottom: theme.spacing(2),
+                paddingLeft: theme.spacing(6),
+                paddingRight: theme.spacing(6)
+              }}
+            >
+              <div style={{ flex: 1 }}>
+                <Classification c12n={classification} type="outlined" />
               </div>
-            )}
-            <Typography variant="h4">{t('related_external.title')}</Typography>
-            <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-              {value}
-            </Typography>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs value={tabState} onChange={handleTabChange} aria-label="external source names">
-                {sources.map((source, i) => (
-                  <Tab label={source} {...a11yProps(i)} />
-                ))}
-              </Tabs>
-            </Box>
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id={descriptionId} ref={descriptionElementRef} tabIndex={-1}>
-              <Box sx={{ width: '100%' }}>
-                {sources.map((source, i) => (
-                  <ExternalSourceTabPanel value={tabState} index={i} theme={theme}>
-                    <div>{!!externalLookupResults[source].error ? externalLookupResults[source].error : null}</div>
+            </div>
+          )}
 
-                    {externalLookupResults[source].items.map((enrichmentResult, j) => {
-                      return <EnrichmentResult key={j} enrichmentResult={enrichmentResult} num={j}></EnrichmentResult>;
-                    })}
-                  </ExternalSourceTabPanel>
-                ))}
-              </Box>
-            </DialogContentText>
-          </DialogContent>
-        </div>
+          <Typography variant="h4">{t('related_external.title')}</Typography>
+          <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
+            {value}
+          </Typography>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={tabState} onChange={handleTabChange} aria-label="external source names">
+              {sources.map((source, i) => (
+                <Tab label={source} {...a11yProps(i)} />
+              ))}
+            </Tabs>
+          </Box>
+        </DialogTitle>
+
+        <DialogContent>
+          <DialogContentText id={descriptionId} ref={descriptionElementRef} tabIndex={-1}>
+            <Box sx={{ width: '100%' }}>
+              {sources.map((source, i) => (
+                <ExternalSourceTabPanel value={tabState} index={i} theme={theme}>
+                  <div>{!!externalLookupResults[source].error ? externalLookupResults[source].error : null}</div>
+
+                  {externalLookupResults[source].items.map((enrichmentResult, j) => {
+                    return <EnrichmentResult key={j} enrichmentResult={enrichmentResult} num={j}></EnrichmentResult>;
+                  })}
+                </ExternalSourceTabPanel>
+              ))}
+            </Box>
+          </DialogContentText>
+        </DialogContent>
       </Dialog>
     </div>
   ) : null;
