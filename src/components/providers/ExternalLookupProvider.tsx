@@ -1,7 +1,6 @@
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { isAccessible } from 'helpers/classificationParser';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -53,7 +52,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
   const { children } = props;
   const { t } = useTranslation();
   const { apiCall } = useMyAPI();
-  const { user: currentUser, configuration: currentUserConfig, c12nDef } = useALContext();
+  const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
   const [enrichmentState, setEnrichmentState] = React.useState<ExternalEnrichmentState>({});
 
@@ -100,8 +99,9 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
         let s = [];
         for (const src of currentUserConfig.ui.external_sources) {
           if (
-            tagSrcMap[tagName].includes(src.name) &&
-            isAccessible(src.max_classification, classification, c12nDef, c12nDef.enforce)
+            tagSrcMap[tagName].includes(src.name)
+            // let search proxy handle classifications so we can easily report the error back
+            // && isAccessible(src.max_classification, classification, c12nDef, c12nDef.enforce)
           ) {
             s.push(src.name);
           }
@@ -139,19 +139,19 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
             } else if (!found) {
               showWarningMessage(t('related_external.notfound'));
             }
-
-            setEnrichmentState(prevState => {
-              return {
-                ...prevState,
-                [stateKey]: {
-                  ...prevState[stateKey],
-                  ...res
-                }
-              };
-            });
           } else {
             showErrorMessage(t('related_external.error'));
           }
+          // always update the results to display errors and not found.
+          setEnrichmentState(prevState => {
+            return {
+              ...prevState,
+              [stateKey]: {
+                ...prevState[stateKey],
+                ...res
+              }
+            };
+          });
         },
         onFailure: api_data => {
           if (Object.keys(api_data.api_error_message).length !== 0) {
@@ -159,6 +159,16 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
           } else {
             showWarningMessage(t('related_external.notfound'));
           }
+          const res = api_data.api_response as ExternalEnrichmentResults;
+          setEnrichmentState(prevState => {
+            return {
+              ...prevState,
+              [stateKey]: {
+                ...prevState[stateKey],
+                ...res
+              }
+            };
+          });
         }
       });
     },

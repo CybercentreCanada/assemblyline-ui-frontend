@@ -122,7 +122,7 @@
   "related": "Trouver des résultats liés",
   "related_external": "Rechercher dans des sources externes",
   "related_external.all": "Toutes sources",
-  "related_external.complete": "Recherche terminée",
+  "related_external.complete": "Recherche externe terminée",
   "related_external.error": "Erreur de recherche dans les sources externes",
   "related_external.invalidTagName": "Non consultable dans aucune source externe",
   "related_external.notfound": "Aucun lien externe trouvé",

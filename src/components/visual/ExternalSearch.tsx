@@ -1,27 +1,15 @@
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
 
 // import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import {
-  Box,
-  Collapse,
-  Divider,
-  Grid,
-  IconButton,
-  Link,
-  Tab,
-  Tabs,
-  Theme,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@mui/material';
+import { Box, Collapse, Divider, Grid, IconButton, Link, Tab, Tabs, Theme, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import { useTranslation } from 'react-i18next';
@@ -47,18 +35,15 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     flex: 1,
     overflow: 'hidden',
-    textDecoration: 'none'
+    textDecoration: 'none',
+    // fontWeight: 400,
+    color: theme.palette.primary.main
   },
   content: {
     flex: 1,
-    fontWeight: 400,
-    color: theme.palette.primary.main
-  },
-  error: {
-    flex: 1,
-    fontWeight: 400,
+    // fontWeight: 400,
     color: theme.palette.text.primary,
-    fontSize: 'small'
+    overflowWrap: 'anywhere'
   },
   launch: {
     color: theme.palette.primary.main,
@@ -67,11 +52,9 @@ const useStyles = makeStyles(theme => ({
       color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
     }
   },
-  section: {
-    marginBottom: theme.spacing(2),
-    '& > hr': {
-      marginBottom: theme.spacing(1)
-    }
+  dialogPaper: {
+    minHeight: '95vh',
+    maxHeight: '95vh'
   },
   sectionContent: {},
   collapseTitle: {
@@ -81,7 +64,8 @@ const useStyles = makeStyles(theme => ({
     cursor: 'pointer',
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
-    }
+    },
+    color: theme.palette.text.primary
   }
 }));
 
@@ -144,8 +128,9 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
     const fullChipList = items.map(item => ({
       category: 'tag',
       label: item[0] !== null && item[0] !== undefined ? item[0].toString() : '',
-      variant: 'outlined' as 'outlined',
-      // type: 'rounded' as 'rounded',
+      // variant: 'outlined' as 'outlined',
+      variant: 'filled' as 'filled',
+      type: 'rounded' as 'rounded',
       tooltip: item[1] !== null && item[1] !== undefined ? item[1].toString() : ''
     }));
     const showExtra = items.length <= TARGET_RESULT_COUNT;
@@ -212,11 +197,11 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, v
               <React.Fragment key={k}>
                 <Grid item xs={4} sm={4}>
                   <Tooltip title={ndMap[keyName]}>
-                    <Typography style={{ flex: 1, overflowWrap: 'anywhere' }}>{keyName}</Typography>
+                    <Typography className={clsx(classes.content)}>{keyName}</Typography>
                   </Tooltip>
                 </Grid>
                 <Grid item xs={8} sm={8}>
-                  <div className={classes.sectionContent}>
+                  <div>
                     <AutoHideChipList items={valueMap[keyName]} />
                   </div>
                 </Grid>
@@ -233,9 +218,10 @@ const ResultGroup = React.memo(WrappedResultGroup);
 
 type EnrichmentResultProps = {
   enrichmentResult: ExternalEnrichmentResult;
+  num: number;
 };
 
-const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ enrichmentResult }) => {
+const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichmentResult }) => {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
@@ -292,19 +278,20 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ enrichmentRe
           }}
           className={classes.collapseTitle}
         >
+          Result {num + 1}:{open ? <ExpandLess /> : <ExpandMore />}
+        </Typography>
+        <Typography>
           <span>
-            Verdict:{' '}
             <CustomChip type="rounded" size="tiny" variant="filled" color={verdictToColor(verdict)} label={verdict} />
           </span>
-          {open ? <ExpandLess /> : <ExpandMore />}
         </Typography>
         <Link className={clsx(classes.link)} href={enrichmentResult.link} target="_blank" rel="noopener noreferrer">
-          <Typography className={clsx(classes.content, classes.launch)}>
+          <Typography className={clsx(classes.launch)}>
             {enrichmentResult.count} results
             <LaunchOutlinedIcon sx={{ verticalAlign: 'middle', height: '16px' }} />
           </Typography>
         </Link>
-        <Typography>{enrichmentResult.description}</Typography>
+        <Typography className={clsx(classes.content)}>{enrichmentResult.description}</Typography>
       </div>
 
       <Collapse in={open} timeout="auto">
@@ -330,6 +317,7 @@ const EnrichmentResult = React.memo(WrappedEnrichmentResult);
 
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, value, iconStyle }) => {
   const theme = useTheme();
+  const classes = useStyles();
   const { t } = useTranslation();
   const [openedDialog, setOpenedDialog] = React.useState(false);
   const [tabState, setTabState] = React.useState(0);
@@ -358,15 +346,6 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
     setOpenedDialog(false);
   };
 
-  // const Transition = React.forwardRef(function Transition(
-  //   props: TransitionProps & {
-  //     children: React.ReactElement;
-  //   },
-  //   ref: React.Ref<unknown>
-  // ) {
-  //   return <Slide direction="up" ref={ref} {...props} />;
-  // });
-
   const descriptionElementRef = React.useRef<HTMLElement>(null);
   React.useEffect(() => {
     if (openedDialog) {
@@ -378,9 +357,16 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
   }, [openedDialog]);
 
   // determine max classification of all return results
+  // create tooltip text to highlight which sources have results
   let classification = c12nDef.UNRESTRICTED;
+  let tip = `${t('related_external.title')}:`;
   if (!!externalLookupResults) {
-    Object.values(externalLookupResults).forEach(enrichmentResults => {
+    Object.entries(externalLookupResults).forEach(([src, enrichmentResults]) => {
+      if (!!enrichmentResults.error) {
+        tip += `\n${toTitleCase(src)}: ${t('related_external.error')}`;
+      } else {
+        tip += `\n${toTitleCase(src)}: ${enrichmentResults.items.length} ${t('related_external.title')}`;
+      }
       enrichmentResults.items.forEach(enrichmentResult => {
         classification = getMaxClassification(classification, enrichmentResult.classification, c12nDef, 'long', false);
       });
@@ -400,7 +386,9 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
           }}
           style={iconStyle}
         >
-          <InfoOutlinedIcon />
+          <Tooltip title={<div style={{ whiteSpace: 'pre-line' }}>{tip}</div>}>
+            <InfoOutlinedIcon />
+          </Tooltip>
         </Button>
       ) : null}
       <Dialog
@@ -410,22 +398,45 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
         scroll="paper"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        fullScreen
-        // TransitionComponent={Transition}
-        // maxWidth="xl"
-        // fullWidth
+        classes={{ paper: classes.dialogPaper }}
+        fullWidth={true}
+        maxWidth="xl"
+        // maxWidth={false}
       >
-        <DialogTitle id={titleId}>
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          size="large"
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: theme.palette.text.primary
+          }}
+        >
+          <CloseOutlinedIcon />
+        </IconButton>
+        <DialogTitle id={titleId} sx={{ m: 0, p: 2 }}>
           {c12nDef.enforce && (
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
+            <div
+              style={{
+                display: 'block',
+                alignItems: 'center',
+                marginBottom: theme.spacing(2),
+                paddingLeft: theme.spacing(6),
+                paddingRight: theme.spacing(6)
+              }}
+            >
               <div style={{ flex: 1 }}>
                 <Classification c12n={classification} type="outlined" />
               </div>
             </div>
           )}
-          <Typography variant="h5">{t('related_external.title')}</Typography>
-          <Typography>{value}</Typography>
-          {/* <Box sx={{ borderBottom: 0, borderColor: 'divider' }}> */}
+
+          <Typography variant="h4">{t('related_external.title')}</Typography>
+          <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
+            {value}
+          </Typography>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={tabState} onChange={handleTabChange} aria-label="external source names">
               {sources.map((source, i) => (
@@ -434,7 +445,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
             </Tabs>
           </Box>
         </DialogTitle>
-        {/* <DialogContent dividers={true}> */}
+
         <DialogContent>
           <DialogContentText id={descriptionId} ref={descriptionElementRef} tabIndex={-1}>
             <Box sx={{ width: '100%' }}>
@@ -443,17 +454,13 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
                   <div>{!!externalLookupResults[source].error ? externalLookupResults[source].error : null}</div>
 
                   {externalLookupResults[source].items.map((enrichmentResult, j) => {
-                    return <EnrichmentResult key={j} enrichmentResult={enrichmentResult}></EnrichmentResult>;
+                    return <EnrichmentResult key={j} enrichmentResult={enrichmentResult} num={j}></EnrichmentResult>;
                   })}
                 </ExternalSourceTabPanel>
               ))}
             </Box>
           </DialogContentText>
         </DialogContent>
-        <Divider />
-        <DialogActions>
-          <Button onClick={handleClose}>Close</Button>
-        </DialogActions>
       </Dialog>
     </div>
   ) : null;
