@@ -26,8 +26,9 @@ export type ExternalEnrichmentResult = {
 export type ExternalEnrichmentResults = {
   [sourceName: string]: {
     // Data source of query
-    error: null | string; // error message returned by data source
-    items: Array<ExternalEnrichmentResult>;
+    error?: null | string; // error message returned by data source
+    items?: Array<ExternalEnrichmentResult>;
+    inProgress?: null | boolean;
   };
 };
 
@@ -89,10 +90,12 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
         return;
       }
       const stateKey = getKey(tagName, tagValue);
+      const pendingStates = {};
       let url = `/api/v4/federated_lookup/enrich/${tagName}/${encodeURIComponent(tagValue)}/`;
       // construct approporiate query param string
       let qs = `classification=${encodeURIComponent(classification)}`;
       if (!!source) {
+        pendingStates[source] = { inProgress: false, error: '', items: [] };
         qs += `&sources=${encodeURIComponent(source)}`;
       } else {
         // only send query to sources that support the tag name and the classification
@@ -104,6 +107,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
             // && isAccessible(src.max_classification, classification, c12nDef, c12nDef.enforce)
           ) {
             s.push(src.name);
+            pendingStates[src.name] = { inProgress: false, error: '', items: [] };
           }
         }
         if (s.length <= 0) {
@@ -113,6 +117,16 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
         qs += `&sources=${encodeURIComponent(s.join('|'))}`;
       }
       url += `?${qs}`;
+
+      setEnrichmentState(prevState => {
+        return {
+          ...prevState,
+          [stateKey]: {
+            ...prevState[stateKey],
+            ...pendingStates
+          }
+        };
+      });
 
       apiCall({
         method: 'GET',
@@ -143,12 +157,15 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
             showErrorMessage(t('related_external.error'));
           }
           // always update the results to display errors and not found.
+          Object.keys(pendingStates).forEach(src => {
+            pendingStates[src].inProgress = false;
+          });
           setEnrichmentState(prevState => {
             return {
               ...prevState,
               [stateKey]: {
                 ...prevState[stateKey],
-                ...res
+                ...{ ...pendingStates, ...res }
               }
             };
           });
@@ -159,7 +176,11 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
           } else {
             showWarningMessage(t('related_external.notfound'));
           }
-          const res = api_data.api_response as ExternalEnrichmentResults;
+          // ensure inProgress state is unset
+          Object.keys(pendingStates).forEach(src => {
+            pendingStates[src].inProgess = false;
+          });
+          const res = { ...pendingStates, ...(api_data.api_response as ExternalEnrichmentResults) };
           setEnrichmentState(prevState => {
             return {
               ...prevState,

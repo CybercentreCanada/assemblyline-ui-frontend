@@ -15,7 +15,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { isAccessible } from 'helpers/classificationParser';
 import { safeFieldValueURI, toTitleCase } from 'helpers/utils';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
@@ -105,7 +105,9 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { triggerHighlight } = useHighlighter();
   const { apiCall } = useMyAPI();
 
-  const { enrichTagExternal } = useExternalLookup();
+  const { enrichTagExternal, enrichmentState, getKey } = useExternalLookup();
+  const externalLookupResults = enrichmentState[getKey(type, value)];
+  const [allInProgress, setAllInProgress] = React.useState(false);
 
   const handleClose = useCallback(() => {
     setState(initialMenuState);
@@ -194,6 +196,18 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const hasExternalLinks =
     !!currentUserConfig.ui.external_links?.hasOwnProperty(category) &&
     !!currentUserConfig.ui.external_links[category].hasOwnProperty(type);
+
+  useEffect(() => {
+    if (!!externalLookupResults) {
+      let inProgress = true;
+      Object.values(externalLookupResults).forEach(results => {
+        if (!results.inProgress) {
+          inProgress = false;
+        }
+      });
+      setAllInProgress(inProgress);
+    }
+  }, [externalLookupResults]);
 
   return hasExternalLinks || hasExternalQuery || category === 'tag' ? (
     <>
@@ -289,12 +303,17 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
               {t('related_external')}
             </ListSubheader>
-            <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
+            <MenuItem dense onClick={() => handleMenuExternalSearch(null)} disabled={allInProgress}>
               {TRAVEL_EXPLORE_ICON} {t('related_external.all')}
             </MenuItem>
 
             {currentUserConfig.ui.external_source_tags?.[type]?.sort().map((source, i) => (
-              <MenuItem dense key={`source_${i}`} onClick={() => handleMenuExternalSearch(source)}>
+              <MenuItem
+                dense
+                key={`source_${i}`}
+                onClick={() => handleMenuExternalSearch(source)}
+                disabled={!!enrichmentState?.[source]?.inProgress}
+              >
                 {TRAVEL_EXPLORE_ICON} {toTitleCase(source)}
               </MenuItem>
             ))}
