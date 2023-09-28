@@ -4,7 +4,7 @@ import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
-import { CircularProgress, IconButton, Modal, Paper, Skeleton, Tooltip } from '@mui/material';
+import { alpha, CircularProgress, IconButton, Modal, Skeleton, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/carousel/Carousel';
@@ -32,7 +32,6 @@ const useStyles = makeStyles(theme => {
   return {
     backdrop: {
       outline: 'none',
-      // backgroundColor: 'transparent',
       backdropFilter: 'blur(2px)',
       transition: 'backdrop-filter 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;',
       zIndex: 1350,
@@ -62,6 +61,9 @@ const useStyles = makeStyles(theme => {
       padding: theme.spacing(1),
       columnGap: theme.spacing(1),
       minWidth: '10vw',
+      opacity: 1,
+      backgroundColor: alpha(theme.palette.background.paper, 0.5),
+      transition: theme.transitions.create(['all'], options),
       '&:hover>div': {
         whiteSpace: 'wrap !important'
       },
@@ -73,6 +75,9 @@ const useStyles = makeStyles(theme => {
         overflowX: 'hidden',
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis'
+      },
+      [`&.${ZOOM_CLASS}`]: {
+        opacity: 0
       }
     },
     buttonWrapper: {
@@ -81,15 +86,15 @@ const useStyles = makeStyles(theme => {
       backgroundColor: 'rgba(0,0,0,0)',
       transition: theme.transitions.create('background-color', options),
       '&:hover>button': {
-        backgroundColor: augmentedPaper
+        backgroundColor: alpha(augmentedPaper, 0.5)
       },
       '&:hover>div>button': {
-        backgroundColor: augmentedPaper
+        backgroundColor: alpha(augmentedPaper, 0.5)
       }
     },
     button: {
       color: theme.palette.text.primary,
-      backgroundColor: theme.palette.background.paper
+      backgroundColor: alpha(theme.palette.background.paper, 0.5)
     },
     navButton: {
       position: 'absolute',
@@ -100,9 +105,9 @@ const useStyles = makeStyles(theme => {
       height: '48px',
       width: '48px',
       color: theme.palette.text.primary,
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: alpha(theme.palette.background.paper, 0.5),
       '&:hover': {
-        backgroundColor: augmentedPaper
+        backgroundColor: alpha(augmentedPaper, 0.5)
       }
     },
     navbarContainer: {
@@ -181,6 +186,10 @@ const useStyles = makeStyles(theme => {
       maxHeight: `calc(100vh - 64px - ${navbarHeight})`,
       imageRendering: 'pixelated',
       transition: theme.transitions.create(['all'], options),
+      userSelect: 'none',
+      pointerEvents: 'none',
+      '-moz-user-select': 'none',
+      '-webkit-user-select': 'none',
       [`&.${ZOOM_CLASS}`]: {
         minHeight: 'max(256px, 200%)',
         minWidth: 'max(256px, 200%)',
@@ -360,6 +369,7 @@ const WrappedCarouselContainer = ({
                     src={imgData}
                     alt={currentImage?.name}
                     draggable={false}
+                    unselectable="on"
                   />
                 ) : (
                   <div
@@ -392,18 +402,18 @@ const WrappedCarouselContainer = ({
               </div>
             </div>
 
-            <div id="carousel-menu" className={clsx(classes.menu)}>
+            <div id="carousel-menu" className={classes.menu}>
               <div className={classes.buttonWrapper} onClick={handleClose}>
                 <Tooltip title={t('close')}>
                   <IconButton className={classes.button} size="large" children={<CloseIcon />} />
                 </Tooltip>
               </div>
-              <Paper className={classes.info}>
+              <div className={clsx(classes.info, zoomClass)}>
                 <div>{t('name')}</div>
                 <div>{currentImage ? currentImage?.name : loading && <Skeleton variant="rounded" />}</div>
                 <div>{t('description')}</div>
                 <div>{currentImage ? currentImage?.description : loading && <Skeleton variant="rounded" />}</div>
-              </Paper>
+              </div>
               <div className={classes.buttonWrapper} onClick={() => imgData && setIsZooming(z => !z)}>
                 <Tooltip title={t('zoom')}>
                   <div>
@@ -422,10 +432,10 @@ const WrappedCarouselContainer = ({
               id="carousel-navbar"
               ref={navbarRef}
               className={clsx(classes.navbarContainer, zoomClass)}
-              onPointerDown={handleNavbarDown}
-              onPointerLeave={handleNavbarStop}
-              onPointerUp={handleNavbarStop}
-              onPointerMove={handleNavbarMove}
+              onMouseDown={handleNavbarDown}
+              onMouseLeave={handleNavbarStop}
+              onMouseUp={handleNavbarStop}
+              onMouseMove={handleNavbarMove}
             >
               <div className={clsx(classes.navbar)}>
                 {images.map((image, i) => (
