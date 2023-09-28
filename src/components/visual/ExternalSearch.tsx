@@ -433,8 +433,8 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
           size="large"
           sx={{
             position: 'absolute',
-            right: theme.spacing(2),
-            top: theme.spacing(2),
+            right: theme.spacing(1),
+            top: theme.spacing(1),
             color: theme.palette.text.primary
           }}
         >
