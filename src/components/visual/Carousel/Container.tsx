@@ -4,7 +4,7 @@ import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
-import { Button, CircularProgress, IconButton, Modal, Paper, Skeleton, Tooltip } from '@mui/material';
+import { CircularProgress, IconButton, Modal, Paper, Skeleton, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/carousel/Carousel';
@@ -75,7 +75,6 @@ const useStyles = makeStyles(theme => {
         textOverflow: 'ellipsis'
       }
     },
-
     buttonWrapper: {
       cursor: 'pointer',
       padding: theme.spacing(1),
@@ -97,30 +96,14 @@ const useStyles = makeStyles(theme => {
       top: '50%',
       bottom: '50%',
       display: 'none',
-      cursor: 'pointer'
-    },
-    navPrev: {
-      left: 0,
-      borderRadius: `0 ${theme.spacing(0.5)} ${theme.spacing(0.5)} 0`,
-      transition: theme.transitions.create(['all'], options),
-      [`&.${ZOOM_CLASS}`]: {
-        left: '-64px'
-      }
-    },
-    navNext: {
-      right: 0,
-      borderRadius: `${theme.spacing(0.5)} 0 0 ${theme.spacing(0.5)}`,
-      transition: theme.transitions.create(['all'], options),
-      [`&.${ZOOM_CLASS}`]: {
-        right: '-64px'
-      }
-    },
-    navIcon: {
+      cursor: 'pointer',
+      height: '48px',
+      width: '48px',
       color: theme.palette.text.primary,
-      backgroundColor: augmentedPaper
-    },
-    navActive: {
-      display: 'flex'
+      backgroundColor: theme.palette.background.paper,
+      '&:hover': {
+        backgroundColor: augmentedPaper
+      }
     },
     navbarContainer: {
       position: 'absolute',
@@ -147,7 +130,6 @@ const useStyles = makeStyles(theme => {
       gap: theme.spacing(1),
       padding: theme.spacing(1)
     },
-
     imageContainer: {
       position: 'absolute',
       width: '100%',
@@ -171,13 +153,13 @@ const useStyles = makeStyles(theme => {
     },
     imageWrapper: {
       position: 'absolute',
-      display: 'grid',
+      display: 'flex',
+      justifyContent: 'center',
       [`&.${ZOOM_CLASS}`]: {
-        position: 'initial',
-        display: 'unset'
+        position: 'initial'
       }
     },
-    containerOverlayItem: {
+    containerNavOverlay: {
       height: '100%',
       width: '25%',
       cursor: 'pointer',
@@ -185,6 +167,9 @@ const useStyles = makeStyles(theme => {
       zIndex: '1',
       [`&.${ZOOM_CLASS}`]: {
         width: '0%'
+      },
+      '&:hover>div': {
+        display: 'flex'
       }
     },
     image: {
@@ -197,8 +182,8 @@ const useStyles = makeStyles(theme => {
       imageRendering: 'pixelated',
       transition: theme.transitions.create(['all'], options),
       [`&.${ZOOM_CLASS}`]: {
-        minHeight: '100vh',
-        minWidth: '100vw',
+        minHeight: 'max(256px, 200%)',
+        minWidth: 'max(256px, 200%)',
         maxHeight: 'none',
         maxWidth: 'none',
         marginTop: '64px'
@@ -252,8 +237,6 @@ const WrappedCarouselContainer = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [isZooming, setIsZooming] = useState<boolean>(false);
 
-  const prevRef = useRef<HTMLButtonElement>(null);
-  const nextRef = useRef<HTMLButtonElement>(null);
   const navbarRef = useRef<HTMLDivElement>(null);
   const navbarScroll = useRef<{ isDown: boolean; isDragging: boolean; scrollLeft: Number; startX: number }>({
     isDown: false,
@@ -306,26 +289,6 @@ const WrappedCarouselContainer = ({
     navbarScroll.current.isDragging = Math.abs(walkX) > 20;
   }, []);
 
-  const handleImagePointerEnter = useCallback(
-    (type: 'prev' | 'next') => (event: React.PointerEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-      type === 'prev'
-        ? prevRef.current?.classList.add(classes.navActive)
-        : nextRef.current?.classList.add(classes.navActive);
-    },
-    [classes.navActive]
-  );
-
-  const handleImagePointerLeave = useCallback(
-    (type: 'prev' | 'next') => (event: React.PointerEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-      type === 'prev'
-        ? prevRef.current?.classList.remove(classes.navActive)
-        : nextRef.current?.classList.remove(classes.navActive);
-    },
-    [classes.navActive]
-  );
-
   const handleZoomClick = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
     setIsZooming(z => !z);
@@ -371,15 +334,22 @@ const WrappedCarouselContainer = ({
         <Modal className={classes.backdrop} open={open} onClose={handleClose}>
           <div id="carousel" className={classes.root}>
             <div className={clsx(classes.imageContainer, zoomClass)} onClick={!isZooming ? handleClose : null}>
-              <Tooltip title={t('prev')} followCursor={true} placement="top">
-                <div
-                  className={clsx(classes.containerOverlayItem, zoomClass)}
-                  onPointerEnter={handleImagePointerEnter('prev')}
-                  onPointerLeave={handleImagePointerLeave('prev')}
-                  onClick={handleImageChange(-1)}
-                  style={{ left: '0' }}
-                />
-              </Tooltip>
+              <div
+                className={clsx(classes.containerNavOverlay, zoomClass)}
+                onClick={handleImageChange(-1)}
+                style={{ left: 0 }}
+              >
+                <Tooltip title={t('prev')} placement="top">
+                  <IconButton
+                    className={clsx(classes.navButton, zoomClass)}
+                    component="div"
+                    size="large"
+                    children={<ChevronLeftOutlinedIcon />}
+                    onClick={handleImageChange(1)}
+                    style={{ left: '8px' }}
+                  />
+                </Tooltip>
+              </div>
               <div
                 className={clsx(classes.imageWrapper, zoomClass)}
                 onClick={event => event.stopPropagation()}
@@ -405,15 +375,22 @@ const WrappedCarouselContainer = ({
                   </div>
                 )}
               </div>
-              <Tooltip title={t('next')} followCursor={true} placement="top">
-                <div
-                  className={clsx(classes.containerOverlayItem, zoomClass)}
-                  onPointerEnter={handleImagePointerEnter('next')}
-                  onPointerLeave={handleImagePointerLeave('next')}
-                  onClick={handleImageChange(1)}
-                  style={{ right: '0' }}
-                />
-              </Tooltip>
+              <div
+                className={clsx(classes.containerNavOverlay, zoomClass)}
+                onClick={handleImageChange(1)}
+                style={{ right: '0' }}
+              >
+                <Tooltip title={t('next')} placement="top">
+                  <IconButton
+                    className={clsx(classes.navButton, zoomClass)}
+                    component="div"
+                    size="large"
+                    children={<ChevronRightOutlinedIcon />}
+                    onClick={handleImageChange(1)}
+                    style={{ right: '8px' }}
+                  />
+                </Tooltip>
+              </div>
             </div>
 
             <div id="carousel-menu" className={clsx(classes.menu)}>
@@ -441,40 +418,6 @@ const WrappedCarouselContainer = ({
                 </Tooltip>
               </div>
             </div>
-
-            <Button
-              className={clsx(classes.navButton, classes.navPrev, zoomClass)}
-              ref={prevRef}
-              size="large"
-              onClick={handleImageChange(-1)}
-            >
-              <IconButton
-                className={classes.navIcon}
-                component="div"
-                size="large"
-                disableFocusRipple
-                disableRipple
-                disableTouchRipple
-                children={<ChevronLeftOutlinedIcon />}
-              />
-            </Button>
-
-            <Button
-              className={clsx(classes.navButton, classes.navNext, zoomClass)}
-              ref={nextRef}
-              size="large"
-              onClick={handleImageChange(1)}
-            >
-              <IconButton
-                className={classes.navIcon}
-                component="div"
-                size="large"
-                disableFocusRipple
-                disableRipple
-                disableTouchRipple
-                children={<ChevronRightOutlinedIcon />}
-              />
-            </Button>
 
             <div
               id="carousel-navbar"
