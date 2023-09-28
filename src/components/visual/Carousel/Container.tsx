@@ -4,7 +4,7 @@ import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
-import { alpha, Button, CircularProgress, IconButton, Modal, Paper, Skeleton, Tooltip } from '@mui/material';
+import { Button, CircularProgress, IconButton, Modal, Paper, Skeleton, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/carousel/Carousel';
@@ -31,14 +31,19 @@ const useStyles = makeStyles(theme => {
 
   return {
     backdrop: {
+      outline: 'none',
       // backgroundColor: 'transparent',
       backdropFilter: 'blur(2px)',
       transition: 'backdrop-filter 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;',
-      zIndex: 1350
+      zIndex: 1350,
+      '&:focus-visible': {
+        outline: 'none'
+      }
     },
     root: {
       height: '100%',
-      width: '100%'
+      width: '100%',
+      outline: 'none'
     },
     menu: {
       position: 'absolute',
@@ -84,24 +89,15 @@ const useStyles = makeStyles(theme => {
       }
     },
     button: {
-      color: theme.palette.text.secondary,
+      color: theme.palette.text.primary,
       backgroundColor: theme.palette.background.paper
     },
     navButton: {
       position: 'absolute',
-      top: '64px',
-      bottom: navbarHeight,
-      display: 'grid',
-      placeItems: 'center',
-      cursor: 'pointer',
-      padding: theme.spacing(1),
-      backgroundColor: 'rgba(0,0,0,0)',
-      '&:hover': {
-        backgroundColor: alpha(augmentedPaper, 0.1)
-      },
-      '&:hover>div': {
-        backgroundColor: augmentedPaper
-      }
+      top: '50%',
+      bottom: '50%',
+      display: 'none',
+      cursor: 'pointer'
     },
     navPrev: {
       left: 0,
@@ -120,14 +116,11 @@ const useStyles = makeStyles(theme => {
       }
     },
     navIcon: {
-      color: theme.palette.text.secondary,
-      backgroundColor: theme.palette.background.paper
+      color: theme.palette.text.primary,
+      backgroundColor: augmentedPaper
     },
     navActive: {
-      backgroundColor: alpha(augmentedPaper, 0.1),
-      '&>div': {
-        backgroundColor: augmentedPaper
-      }
+      display: 'flex'
     },
     navbarContainer: {
       position: 'absolute',
@@ -192,8 +185,11 @@ const useStyles = makeStyles(theme => {
       justifyContent: 'space-between'
     },
     imageOverlayItem: {
-      width: '20%',
+      height: '100%',
+      width: '25%',
       cursor: 'pointer',
+      position: 'absolute',
+      zIndex: '1',
       [`&.${ZOOM_CLASS}`]: {
         width: '0%'
       }
@@ -391,21 +387,18 @@ const WrappedCarouselContainer = ({
         <Modal className={classes.backdrop} open={open} onClose={handleClose}>
           <div id="carousel" className={classes.root}>
             <div className={clsx(classes.imageContainer, zoomClass)} onClick={handleClose}>
+              <Tooltip title={t('prev')} followCursor={true} placement="top">
+                <div
+                  className={clsx(classes.imageOverlayItem, zoomClass)}
+                  onPointerEnter={handleImagePointerEnter('prev')}
+                  onPointerLeave={handleImagePointerLeave('prev')}
+                  onClick={handleImageChange(-1)}
+                  style={{ left: '0' }}
+                />
+              </Tooltip>
               <div className={clsx(classes.imageWrapper, zoomClass)}>
                 <div className={clsx(classes.imageOverlay, zoomClass)} onClick={e => e.stopPropagation()}>
-                  <div
-                    className={clsx(classes.imageOverlayItem, zoomClass)}
-                    onPointerEnter={handleImagePointerEnter('prev')}
-                    onPointerLeave={handleImagePointerLeave('prev')}
-                    onClick={handleImageChange(-1)}
-                  />
                   <div style={{ width: '100%' }} onClick={handleZoomClick} />
-                  <div
-                    className={clsx(classes.imageOverlayItem, zoomClass)}
-                    onPointerEnter={handleImagePointerEnter('next')}
-                    onPointerLeave={handleImagePointerLeave('next')}
-                    onClick={handleImageChange(1)}
-                  />
                 </div>
 
                 {imgData ? (
@@ -428,6 +421,15 @@ const WrappedCarouselContainer = ({
                   </div>
                 )}
               </div>
+              <Tooltip title={t('next')} followCursor={true} placement="top">
+                <div
+                  className={clsx(classes.imageOverlayItem, zoomClass)}
+                  onPointerEnter={handleImagePointerEnter('next')}
+                  onPointerLeave={handleImagePointerLeave('next')}
+                  onClick={handleImageChange(1)}
+                  style={{ right: '0' }}
+                />
+              </Tooltip>
             </div>
 
             <div id="carousel-menu" className={clsx(classes.menu)}>
@@ -462,17 +464,15 @@ const WrappedCarouselContainer = ({
               size="large"
               onClick={handleImageChange(-1)}
             >
-              <Tooltip title={t('prev')}>
-                <IconButton
-                  className={classes.navIcon}
-                  component="div"
-                  size="large"
-                  disableFocusRipple
-                  disableRipple
-                  disableTouchRipple
-                  children={<ChevronLeftOutlinedIcon />}
-                />
-              </Tooltip>
+              <IconButton
+                className={classes.navIcon}
+                component="div"
+                size="large"
+                disableFocusRipple
+                disableRipple
+                disableTouchRipple
+                children={<ChevronLeftOutlinedIcon />}
+              />
             </Button>
 
             <Button
@@ -481,17 +481,15 @@ const WrappedCarouselContainer = ({
               size="large"
               onClick={handleImageChange(1)}
             >
-              <Tooltip title={t('next')}>
-                <IconButton
-                  className={classes.navIcon}
-                  component="div"
-                  size="large"
-                  disableFocusRipple
-                  disableRipple
-                  disableTouchRipple
-                  children={<ChevronRightOutlinedIcon />}
-                />
-              </Tooltip>
+              <IconButton
+                className={classes.navIcon}
+                component="div"
+                size="large"
+                disableFocusRipple
+                disableRipple
+                disableTouchRipple
+                children={<ChevronRightOutlinedIcon />}
+              />
             </Button>
 
             <div
