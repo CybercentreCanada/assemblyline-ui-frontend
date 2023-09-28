@@ -6,7 +6,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
 
 const useStyles = makeStyles(theme => {
-  const augmentedPaper = theme.palette.augmentColor({ color: { main: theme.palette.background.paper } });
+  const augmentedPaper = theme.palette.augmentColor({ color: { main: theme.palette.background.default } });
 
   return {
     button: {
@@ -20,9 +20,11 @@ const useStyles = makeStyles(theme => {
       }
     },
     img: {
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover',
+      minWidth: '50%',
+      minHeight: '50%',
+      maxWidth: '100%',
+      maxHeight: '100%',
+      objectFit: 'contain',
       imageRendering: 'pixelated',
       filter: `brightness(50%)`,
       transition: theme.transitions.create('filter', {
