@@ -27,10 +27,6 @@ const useStyles = makeStyles(theme => {
       objectFit: 'contain',
       imageRendering: 'pixelated',
       filter: `brightness(50%)`,
-      userSelect: 'none',
-      pointerEvents: 'none',
-      '-moz-user-select': 'none',
-      '-webkit-user-select': 'none',
       transition: theme.transitions.create('filter', {
         easing: theme.transitions.easing.easeInOut,
         duration: theme.transitions.duration.short
@@ -84,7 +80,7 @@ const WrappedCarouselItem = ({ alt, src, selected, onClick }: Props) => {
     <Tooltip title={alt} placement="top">
       <Button className={clsx('carousel-thumb', classes.button, selected && classes.selected)} onMouseUp={onClick}>
         {data ? (
-          <img className={classes.img} src={data} alt={alt} draggable={false} unselectable="on" />
+          <img className={classes.img} src={data} alt={alt} draggable={false} />
         ) : loading ? (
           <CircularProgress color="primary" />
         ) : (

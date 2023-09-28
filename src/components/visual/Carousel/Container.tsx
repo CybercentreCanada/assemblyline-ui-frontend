@@ -186,10 +186,6 @@ const useStyles = makeStyles(theme => {
       maxHeight: `calc(100vh - 64px - ${navbarHeight})`,
       imageRendering: 'pixelated',
       transition: theme.transitions.create(['all'], options),
-      userSelect: 'none',
-      pointerEvents: 'none',
-      '-moz-user-select': 'none',
-      '-webkit-user-select': 'none',
       [`&.${ZOOM_CLASS}`]: {
         minHeight: 'max(256px, 200%)',
         minWidth: 'max(256px, 200%)',
@@ -369,7 +365,6 @@ const WrappedCarouselContainer = ({
                     src={imgData}
                     alt={currentImage?.name}
                     draggable={false}
-                    unselectable="on"
                   />
                 ) : (
                   <div
