@@ -6,39 +6,43 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  button: {
-    height: '100%',
-    aspectRatio: '1 / 1',
-    backgroundColor: theme.palette.background.paper,
-    padding: 0,
-    overflow: 'hidden',
-    '&:hover': {
-      backgroundColor: theme.palette.background.paper
+const useStyles = makeStyles(theme => {
+  const augmentedPaper = theme.palette.augmentColor({ color: { main: theme.palette.background.paper } });
+
+  return {
+    button: {
+      height: '100%',
+      aspectRatio: '1 / 1',
+      backgroundColor: theme.palette.mode === 'dark' ? augmentedPaper.main : augmentedPaper.dark,
+      padding: 0,
+      overflow: 'hidden',
+      '&:hover': {
+        backgroundColor: theme.palette.mode === 'dark' ? augmentedPaper.light : augmentedPaper.main
+      }
+    },
+    img: {
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
+      imageRendering: 'pixelated',
+      filter: `brightness(50%)`,
+      transition: theme.transitions.create('filter', {
+        easing: theme.transitions.easing.easeInOut,
+        duration: theme.transitions.duration.short
+      }),
+      '&:hover': {
+        filter: `brightness(90%)`
+      }
+    },
+    selected: {
+      border: `2px solid ${theme.palette.primary.main}`,
+      backgroundColor: theme.palette.mode === 'dark' ? augmentedPaper.light : augmentedPaper.main,
+      '&>img': {
+        filter: `brightness(100%)`
+      }
     }
-  },
-  img: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    imageRendering: 'pixelated',
-    borderRadius: theme.spacing(0.5),
-    filter: `brightness(50%)`,
-    transition: theme.transitions.create('filter', {
-      easing: theme.transitions.easing.easeInOut,
-      duration: theme.transitions.duration.short
-    }),
-    '&:hover': {
-      filter: `brightness(90%)`
-    }
-  },
-  selected: {
-    border: `2px solid ${theme.palette.primary.main}`,
-    '&>img': {
-      filter: `brightness(100%)`
-    }
-  }
-}));
+  };
+});
 
 type Props = {
   alt: string;

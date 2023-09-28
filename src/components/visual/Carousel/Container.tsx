@@ -3,6 +3,7 @@ import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import { alpha, Button, CircularProgress, IconButton, Modal, Paper, Skeleton, Tooltip, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
@@ -11,6 +12,8 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CarouselItem from './Item';
+
+const ZOOM_CLASS = 'zooming';
 
 const useStyles = makeStyles(theme => {
   const navbarHeight = 'min(128px, 30vw, 30vh)';
@@ -75,6 +78,9 @@ const useStyles = makeStyles(theme => {
       transition: theme.transitions.create('background-color', options),
       '&:hover>button': {
         backgroundColor: augmentedPaper
+      },
+      '&:hover>div>button': {
+        backgroundColor: augmentedPaper
       }
     },
     button: {
@@ -90,7 +96,6 @@ const useStyles = makeStyles(theme => {
       cursor: 'pointer',
       padding: theme.spacing(1),
       backgroundColor: 'rgba(0,0,0,0)',
-      transition: theme.transitions.create('background-color', options),
       '&:hover': {
         backgroundColor: alpha(augmentedPaper, 0.1)
       },
@@ -100,11 +105,19 @@ const useStyles = makeStyles(theme => {
     },
     navPrev: {
       left: 0,
-      borderRadius: `0 ${theme.spacing(0.5)} ${theme.spacing(0.5)} 0`
+      borderRadius: `0 ${theme.spacing(0.5)} ${theme.spacing(0.5)} 0`,
+      transition: theme.transitions.create(['all'], options),
+      [`&.${ZOOM_CLASS}`]: {
+        left: '-64px'
+      }
     },
     navNext: {
       right: 0,
-      borderRadius: `${theme.spacing(0.5)} 0 0 ${theme.spacing(0.5)}`
+      borderRadius: `${theme.spacing(0.5)} 0 0 ${theme.spacing(0.5)}`,
+      transition: theme.transitions.create(['all'], options),
+      [`&.${ZOOM_CLASS}`]: {
+        right: '-64px'
+      }
     },
     navIcon: {
       color: theme.palette.text.secondary,
@@ -126,6 +139,10 @@ const useStyles = makeStyles(theme => {
       '-ms-overflow-style': 'none', // Internet Explorer 10+
       '&::-webkit-scrollbar': {
         display: 'none' // Safari and Chrome
+      },
+      transition: theme.transitions.create(['all'], options),
+      [`&.${ZOOM_CLASS}`]: {
+        bottom: `calc(0px - ${navbarHeight})`
       }
     },
     navbar: {
@@ -144,11 +161,28 @@ const useStyles = makeStyles(theme => {
       top: '64px',
       bottom: navbarHeight,
       display: 'grid',
-      placeItems: 'center'
+      placeItems: 'center',
+      overflow: 'scroll',
+      scrollbarWidth: 'none', // Firefox
+      '-ms-overflow-style': 'none', // Internet Explorer 10+
+      '&::-webkit-scrollbar': {
+        display: 'none' // Safari and Chrome
+      },
+      transition: theme.transitions.create(['all'], options),
+      [`&.${ZOOM_CLASS}`]: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0
+      }
     },
     imageWrapper: {
       position: 'absolute',
-      display: 'grid'
+      display: 'grid',
+      [`&.${ZOOM_CLASS}`]: {
+        position: 'initial',
+        display: 'unset'
+      }
     },
     imageOverlay: {
       position: 'absolute',
@@ -159,14 +193,27 @@ const useStyles = makeStyles(theme => {
     },
     imageOverlayItem: {
       width: '20%',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      [`&.${ZOOM_CLASS}`]: {
+        width: '0%'
+      }
     },
     image: {
+      height: 'auto',
+      width: 'auto',
       minHeight: navbarHeight,
       minWidth: navbarHeight,
       maxWidth: '100vw',
       maxHeight: `calc(100vh - 64px - ${navbarHeight})`,
-      imageRendering: 'pixelated'
+      imageRendering: 'pixelated',
+      transition: theme.transitions.create(['all'], options),
+      [`&.${ZOOM_CLASS}`]: {
+        minHeight: '100vh',
+        minWidth: '100vw',
+        maxHeight: 'none',
+        maxWidth: 'none',
+        marginTop: '64px'
+      }
     },
     loadingContainer: {
       height: `calc(2 * ${navbarHeight})`,
@@ -221,6 +268,7 @@ const WrappedCarouselContainer = ({
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
   const navbarRef = useRef<HTMLDivElement>(null);
+  const zoomTimer = useRef<number>(null);
   const navbarScroll = useRef<{ isDown: boolean; isDragging: boolean; scrollLeft: Number; startX: number }>({
     isDown: false,
     isDragging: false,
@@ -230,16 +278,26 @@ const WrappedCarouselContainer = ({
 
   const currentImage = useMemo<Image>(() => images && images[index], [images, index]);
 
+  const zoomClass = useMemo<string | null>(() => isZooming && ZOOM_CLASS, [isZooming]);
+
   // const isSmall = useMediaQuery(
   //   `@media (max-width: ${theme.breakpoints.values.md}px) or (max-height: ${theme.breakpoints.values.sm}px)`
   // );
+
+  const handleClose = useCallback(
+    (event: any = null) => {
+      setIsZooming(false);
+      onClose();
+    },
+    [onClose]
+  );
 
   const handleImageChange = useCallback(
     (value: number) =>
       (event: any = null) => {
         event?.stopPropagation();
         if (!images && images.length <= 1) return;
-        setIndex(i => (i + value) % images.length);
+        setIndex(i => (i + value + images.length) % images.length);
       },
     [images, setIndex]
   );
@@ -286,6 +344,13 @@ const WrappedCarouselContainer = ({
     [classes.navActive]
   );
 
+  const handleZoomClick = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    event.stopPropagation();
+    const now = Date.now();
+    if (now - zoomTimer.current < 200) setIsZooming(z => !z);
+    zoomTimer.current = now;
+  }, []);
+
   useEffect(() => {
     if (!currentImage) return;
     apiCall({
@@ -323,45 +388,32 @@ const WrappedCarouselContainer = ({
     images &&
     images.length > 0 && (
       <Carousel onPrevious={handleImageChange(-1)} onNext={handleImageChange(1)}>
-        <Modal className={classes.backdrop} open={open} onClose={onClose}>
+        <Modal className={classes.backdrop} open={open} onClose={handleClose}>
           <div id="carousel" className={classes.root}>
-            <div className={classes.imageContainer} onClick={onClose}>
-              <div className={classes.imageWrapper}>
-                <div className={classes.imageOverlay} onClick={e => e.stopPropagation()}>
+            <div className={clsx(classes.imageContainer, zoomClass)} onClick={handleClose}>
+              <div className={clsx(classes.imageWrapper, zoomClass)}>
+                <div className={clsx(classes.imageOverlay, zoomClass)} onClick={e => e.stopPropagation()}>
                   <div
-                    className={classes.imageOverlayItem}
+                    className={clsx(classes.imageOverlayItem, zoomClass)}
                     onPointerEnter={handleImagePointerEnter('prev')}
                     onPointerLeave={handleImagePointerLeave('prev')}
                     onClick={handleImageChange(-1)}
                   />
+                  <div style={{ width: '100%' }} onClick={handleZoomClick} />
                   <div
-                    className={classes.imageOverlayItem}
+                    className={clsx(classes.imageOverlayItem, zoomClass)}
                     onPointerEnter={handleImagePointerEnter('next')}
                     onPointerLeave={handleImagePointerLeave('next')}
                     onClick={handleImageChange(1)}
                   />
                 </div>
+
                 {imgData ? (
                   <img
-                    className={clsx(true && classes.image)}
+                    className={clsx(classes.image, zoomClass)}
                     src={imgData}
                     alt={currentImage?.name}
                     draggable={false}
-                    // onMouseMove={handleImageMouseMove}
-                    // onMouseLeave={handleImageMouseLeave}
-                    // onClick={handleImageClick}
-                    // style={
-                    //   {
-                    //     // minWidth: '256px',
-                    //     // width: `${zoom}%`
-                    //     // minWidth: `max(${zoom}%, 256px)`,
-                    //     // minWidth: `256px`,
-                    //     // maxWidth: `max(${zoom}vw, 256px)`
-                    //     // transform: `scale(${Math.max(zoom / 100, 1)})`
-                    //     // transform: `scale(${zoom / 100})`
-                    //     // transform: `translate(-${zoom}%, -${zoom}%) scale(${zoom / 100})`
-                    //   }
-                    // }
                   />
                 ) : (
                   <div
@@ -379,7 +431,7 @@ const WrappedCarouselContainer = ({
             </div>
 
             <div id="carousel-menu" className={clsx(classes.menu)}>
-              <div className={classes.buttonWrapper} onClick={onClose}>
+              <div className={classes.buttonWrapper} onClick={handleClose}>
                 <Tooltip title={t('close')}>
                   <IconButton className={classes.button} size="large" children={<CloseIcon />} />
                 </Tooltip>
@@ -390,15 +442,22 @@ const WrappedCarouselContainer = ({
                 <div>{t('description')}</div>
                 <div>{currentImage ? currentImage?.description : loading && <Skeleton variant="rounded" />}</div>
               </Paper>
-              <div className={classes.buttonWrapper}>
+              <div className={classes.buttonWrapper} onClick={() => imgData && setIsZooming(z => !z)}>
                 <Tooltip title={t('zoom')}>
-                  <IconButton className={classes.button} size="large" children={<ZoomInIcon />} />
+                  <div>
+                    <IconButton
+                      className={classes.button}
+                      size="large"
+                      disabled={!imgData}
+                      children={isZooming ? <ZoomOutIcon /> : <ZoomInIcon />}
+                    />
+                  </div>
                 </Tooltip>
               </div>
             </div>
 
             <Button
-              className={clsx(classes.navButton, classes.navPrev)}
+              className={clsx(classes.navButton, classes.navPrev, zoomClass)}
               ref={prevRef}
               size="large"
               onClick={handleImageChange(-1)}
@@ -417,7 +476,7 @@ const WrappedCarouselContainer = ({
             </Button>
 
             <Button
-              className={clsx(classes.navButton, classes.navNext)}
+              className={clsx(classes.navButton, classes.navNext, zoomClass)}
               ref={nextRef}
               size="large"
               onClick={handleImageChange(1)}
@@ -438,7 +497,7 @@ const WrappedCarouselContainer = ({
             <div
               id="carousel-navbar"
               ref={navbarRef}
-              className={clsx(classes.navbarContainer)}
+              className={clsx(classes.navbarContainer, zoomClass)}
               onPointerDown={handleNavbarDown}
               onPointerLeave={handleNavbarStop}
               onPointerUp={handleNavbarStop}
