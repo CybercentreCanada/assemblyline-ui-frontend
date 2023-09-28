@@ -4,7 +4,6 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => {
   const augmentedPaper = theme.palette.augmentColor({ color: { main: theme.palette.background.paper } });
@@ -52,7 +51,7 @@ type Props = {
 };
 
 const WrappedCarouselItem = ({ alt, src, selected, onClick }: Props) => {
-  const { t } = useTranslation(['carousel']);
+  // const { t } = useTranslation(['carousel']);
   const classes = useStyles();
   const { apiCall } = useMyAPI();
 

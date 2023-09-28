@@ -4,7 +4,7 @@ import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
-import { alpha, Button, CircularProgress, IconButton, Modal, Paper, Skeleton, Tooltip, useTheme } from '@mui/material';
+import { alpha, Button, CircularProgress, IconButton, Modal, Paper, Skeleton, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/carousel/Carousel';
@@ -255,7 +255,7 @@ const WrappedCarouselContainer = ({
   onClose = () => null
 }: CarouselContainerProps) => {
   const { t } = useTranslation('carousel');
-  const theme = useTheme();
+  // const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
 
@@ -263,7 +263,7 @@ const WrappedCarouselContainer = ({
   const [imgData, setImgData] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isZooming, setIsZooming] = useState<boolean>(false);
-  const [zoom, setZoom] = useState<number>(100);
+  // const [zoom, setZoom] = useState<number>(100);
 
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
