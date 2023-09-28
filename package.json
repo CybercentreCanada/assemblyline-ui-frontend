@@ -76,6 +76,7 @@
     "start": "WDS_SOCKET_PORT=443 HTTPS=true BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --coverage",
+    "ci": "CI=true react-scripts test --coverage --coverageReporters=cobertura",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
