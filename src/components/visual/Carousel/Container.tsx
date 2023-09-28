@@ -185,8 +185,7 @@ const useStyles = makeStyles(theme => {
         minHeight: 'max(256px, 200%)',
         minWidth: 'max(256px, 200%)',
         maxHeight: 'none',
-        maxWidth: 'none',
-        marginTop: '64px'
+        maxWidth: 'none'
       }
     },
     loadingContainer: {
