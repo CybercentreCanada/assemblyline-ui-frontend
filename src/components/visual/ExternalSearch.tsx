@@ -7,7 +7,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
 
-// import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, Collapse, Divider, Grid, IconButton, Link, Tab, Tabs, Theme, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
@@ -22,7 +21,7 @@ import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import { ExternalEnrichmentResult } from 'components/providers/ExternalLookupProvider';
 import { DetailedItem } from 'components/routes/alerts/hooks/useAlerts';
-import { ChipList } from 'components/visual/ChipList';
+import { ChipList, ChipSkeletonInline } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
 import { getMaxClassification } from 'helpers/classificationParser';
@@ -36,12 +35,10 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     overflow: 'hidden',
     textDecoration: 'none',
-    // fontWeight: 400,
     color: theme.palette.primary.main
   },
   content: {
     flex: 1,
-    // fontWeight: 400,
     color: theme.palette.text.primary,
     overflowWrap: 'anywhere'
   },
@@ -128,7 +125,6 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
     const fullChipList = items.map(item => ({
       category: 'tag',
       label: item[0] !== null && item[0] !== undefined ? item[0].toString() : '',
-      // variant: 'outlined' as 'outlined',
       variant: 'filled' as 'filled',
       type: 'rounded' as 'rounded',
       tooltip: item[1] !== null && item[1] !== undefined ? item[1].toString() : ''
@@ -222,6 +218,7 @@ type EnrichmentResultProps = {
 };
 
 const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichmentResult }) => {
+  const { t } = useTranslation();
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
@@ -278,7 +275,7 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
           }}
           className={classes.collapseTitle}
         >
-          Result {num + 1}:{open ? <ExpandLess /> : <ExpandMore />}
+          {toTitleCase(t('result'))} {num + 1}:{open ? <ExpandLess /> : <ExpandMore />}
         </Typography>
         <Typography>
           <span>
@@ -287,7 +284,7 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
         </Typography>
         <Link className={clsx(classes.link)} href={enrichmentResult.link} target="_blank" rel="noopener noreferrer">
           <Typography className={clsx(classes.launch)}>
-            {enrichmentResult.count} results
+            {enrichmentResult.count} {t('results')}
             <LaunchOutlinedIcon sx={{ verticalAlign: 'middle', height: '16px' }} />
           </Typography>
         </Link>
@@ -326,9 +323,12 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
   const { enrichmentState, isActionable, getKey } = useExternalLookup();
   const actionable = isActionable(category, type, value);
   const externalLookupResults = enrichmentState[getKey(type, value)];
+  const [inProgress, setInProgress] = React.useState(false);
   const titleId = openedDialog ? 'external-result-dialog-title' : undefined;
   const descriptionId = openedDialog ? 'external-result-dialog-description' : undefined;
 
+  const [resultClassification, setResultClassification] = React.useState(c12nDef.UNRESTRICTED);
+  const [resultTT, setResultTT] = React.useState('');
   const handleTabChange = (event: React.SyntheticEvent, newState: number) => {
     setTabState(newState);
   };
@@ -346,6 +346,18 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
     setOpenedDialog(false);
   };
 
+  React.useEffect(() => {
+    if (!!externalLookupResults) {
+      let someInProgress = false;
+      Object.values(externalLookupResults).forEach(results => {
+        if (!!results.inProgress) {
+          someInProgress = true;
+        }
+      });
+      setInProgress(someInProgress);
+    }
+  }, [externalLookupResults]);
+
   const descriptionElementRef = React.useRef<HTMLElement>(null);
   React.useEffect(() => {
     if (openedDialog) {
@@ -358,27 +370,39 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
 
   // determine max classification of all return results
   // create tooltip text to highlight which sources have results
-  let classification = c12nDef.UNRESTRICTED;
-  let tip = `${t('related_external.title')}:`;
-  if (!!externalLookupResults) {
-    Object.entries(externalLookupResults).forEach(([src, enrichmentResults]) => {
-      if (!!enrichmentResults.error) {
-        tip += `\n${toTitleCase(src)}: ${t('related_external.error')}`;
-      } else {
-        tip += `\n${toTitleCase(src)}: ${enrichmentResults.items.length} ${t('related_external.title')}`;
-      }
-      enrichmentResults.items.forEach(enrichmentResult => {
-        classification = getMaxClassification(classification, enrichmentResult.classification, c12nDef, 'long', false);
+  React.useEffect(() => {
+    let classification = resultClassification;
+    let tip = `${t('related_external.title')}:`;
+    if (!!externalLookupResults) {
+      Object.entries(externalLookupResults).forEach(([src, enrichmentResults]) => {
+        if (!!enrichmentResults.error) {
+          tip += `\n${toTitleCase(src)}: ${toTitleCase(t('error'))}`;
+        } else {
+          tip += `\n${toTitleCase(src)}: ${enrichmentResults.items.length} ${t('results')}`;
+        }
+        enrichmentResults.items.forEach(enrichmentResult => {
+          classification = getMaxClassification(
+            classification,
+            enrichmentResult.classification,
+            c12nDef,
+            'long',
+            false
+          );
+        });
       });
-    });
-  }
+    }
+    setResultClassification(classification);
+    setResultTT(tip);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [externalLookupResults, c12nDef]);
 
   // consistant source name order
   const sources = !!externalLookupResults ? Object.keys(externalLookupResults).sort() : null;
 
   return actionable && externalLookupResults ? (
     <div>
-      {externalLookupResults !== null ? (
+      {!!inProgress ? <ChipSkeletonInline /> : null}
+      {!!externalLookupResults && !inProgress ? (
         <Button
           onClick={e => {
             e.stopPropagation();
@@ -386,7 +410,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
           }}
           style={iconStyle}
         >
-          <Tooltip title={<div style={{ whiteSpace: 'pre-line' }}>{tip}</div>}>
+          <Tooltip title={<div style={{ whiteSpace: 'pre-line' }}>{resultTT}</div>}>
             <InfoOutlinedIcon />
           </Tooltip>
         </Button>
@@ -409,8 +433,8 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
           size="large"
           sx={{
             position: 'absolute',
-            right: 8,
-            top: 8,
+            right: theme.spacing(1),
+            top: theme.spacing(1),
             color: theme.palette.text.primary
           }}
         >
@@ -427,9 +451,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
                 paddingRight: theme.spacing(6)
               }}
             >
-              <div style={{ flex: 1 }}>
-                <Classification c12n={classification} type="outlined" />
-              </div>
+              <Classification c12n={resultClassification} size="tiny" />
             </div>
           )}
 
@@ -440,7 +462,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={tabState} onChange={handleTabChange} aria-label="external source names">
               {sources.map((source, i) => (
-                <Tab label={source} {...a11yProps(i)} />
+                <Tab key={i} label={source} {...a11yProps(i)} />
               ))}
             </Tabs>
           </Box>
@@ -450,7 +472,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
           <DialogContentText id={descriptionId} ref={descriptionElementRef} tabIndex={-1}>
             <Box sx={{ width: '100%' }}>
               {sources.map((source, i) => (
-                <ExternalSourceTabPanel value={tabState} index={i} theme={theme}>
+                <ExternalSourceTabPanel key={i} value={tabState} index={i} theme={theme}>
                   <div>{!!externalLookupResults[source].error ? externalLookupResults[source].error : null}</div>
 
                   {externalLookupResults[source].items.map((enrichmentResult, j) => {
