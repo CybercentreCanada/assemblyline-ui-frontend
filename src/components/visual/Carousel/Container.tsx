@@ -177,14 +177,7 @@ const useStyles = makeStyles(theme => {
         display: 'unset'
       }
     },
-    imageOverlay: {
-      position: 'absolute',
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      justifyContent: 'space-between'
-    },
-    imageOverlayItem: {
+    containerOverlayItem: {
       height: '100%',
       width: '25%',
       cursor: 'pointer',
@@ -251,7 +244,6 @@ const WrappedCarouselContainer = ({
   onClose = () => null
 }: CarouselContainerProps) => {
   const { t } = useTranslation('carousel');
-  // const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
 
@@ -259,12 +251,10 @@ const WrappedCarouselContainer = ({
   const [imgData, setImgData] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isZooming, setIsZooming] = useState<boolean>(false);
-  // const [zoom, setZoom] = useState<number>(100);
 
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
   const navbarRef = useRef<HTMLDivElement>(null);
-  const zoomTimer = useRef<number>(null);
   const navbarScroll = useRef<{ isDown: boolean; isDragging: boolean; scrollLeft: Number; startX: number }>({
     isDown: false,
     isDragging: false,
@@ -275,10 +265,6 @@ const WrappedCarouselContainer = ({
   const currentImage = useMemo<Image>(() => images && images[index], [images, index]);
 
   const zoomClass = useMemo<string | null>(() => isZooming && ZOOM_CLASS, [isZooming]);
-
-  // const isSmall = useMediaQuery(
-  //   `@media (max-width: ${theme.breakpoints.values.md}px) or (max-height: ${theme.breakpoints.values.sm}px)`
-  // );
 
   const handleClose = useCallback(
     (event: any = null) => {
@@ -342,9 +328,7 @@ const WrappedCarouselContainer = ({
 
   const handleZoomClick = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
-    const now = Date.now();
-    if (now - zoomTimer.current < 200) setIsZooming(z => !z);
-    zoomTimer.current = now;
+    setIsZooming(z => !z);
   }, []);
 
   useEffect(() => {
@@ -386,21 +370,21 @@ const WrappedCarouselContainer = ({
       <Carousel onPrevious={handleImageChange(-1)} onNext={handleImageChange(1)}>
         <Modal className={classes.backdrop} open={open} onClose={handleClose}>
           <div id="carousel" className={classes.root}>
-            <div className={clsx(classes.imageContainer, zoomClass)} onClick={handleClose}>
+            <div className={clsx(classes.imageContainer, zoomClass)} onClick={!isZooming ? handleClose : null}>
               <Tooltip title={t('prev')} followCursor={true} placement="top">
                 <div
-                  className={clsx(classes.imageOverlayItem, zoomClass)}
+                  className={clsx(classes.containerOverlayItem, zoomClass)}
                   onPointerEnter={handleImagePointerEnter('prev')}
                   onPointerLeave={handleImagePointerLeave('prev')}
                   onClick={handleImageChange(-1)}
                   style={{ left: '0' }}
                 />
               </Tooltip>
-              <div className={clsx(classes.imageWrapper, zoomClass)}>
-                <div className={clsx(classes.imageOverlay, zoomClass)} onClick={e => e.stopPropagation()}>
-                  <div style={{ width: '100%' }} onClick={handleZoomClick} />
-                </div>
-
+              <div
+                className={clsx(classes.imageWrapper, zoomClass)}
+                onClick={event => event.stopPropagation()}
+                onDoubleClick={handleZoomClick}
+              >
                 {imgData ? (
                   <img
                     className={clsx(classes.image, zoomClass)}
@@ -423,7 +407,7 @@ const WrappedCarouselContainer = ({
               </div>
               <Tooltip title={t('next')} followCursor={true} placement="top">
                 <div
-                  className={clsx(classes.imageOverlayItem, zoomClass)}
+                  className={clsx(classes.containerOverlayItem, zoomClass)}
                   onPointerEnter={handleImagePointerEnter('next')}
                   onPointerLeave={handleImagePointerLeave('next')}
                   onClick={handleImageChange(1)}
