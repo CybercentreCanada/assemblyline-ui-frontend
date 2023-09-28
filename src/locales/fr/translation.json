@@ -122,6 +122,8 @@
   "related_external.invalidTagName": "Non consultable dans aucune source externe",
   "related_external.notfound": "Aucun lien externe trouvé",
   "related_external.title": "Résultats de recherche externes",
+  "result": "résultat",
+  "results": "résultats",
   "router_prompt_accept": "Annuler les modifications",
   "router_prompt_cancel": "Rester à la page",
   "router_prompt_text": "Vous avez des modifications non enregistrées, êtes-vous sûr de vouloir quitter?",

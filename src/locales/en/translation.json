@@ -122,6 +122,8 @@
   "related_external.invalidTagName": "Not searchable in any external sources",
   "related_external.notfound": "No external links found",
   "related_external.title": "External search results",
+  "result": "result",
+  "results": "results",
   "router_prompt_accept": "Discard changes",
   "router_prompt_cancel": "Stay on page",
   "router_prompt_text": "You have unsaved changes, are you sure you want to leave?",
