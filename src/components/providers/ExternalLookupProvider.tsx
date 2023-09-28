@@ -86,7 +86,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
     (source: string, tagName: string, tagValue: string, classification: string) => {
       const tagSrcMap = currentUserConfig.ui.external_source_tags;
       if (!tagSrcMap?.hasOwnProperty(tagName)) {
-        showErrorMessage(t('related_external.invalidTagName'));
+        showErrorMessage(t('related_external.error.invalidTagName'));
         return;
       }
       const stateKey = getKey(tagName, tagValue);
@@ -95,19 +95,20 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
       // construct approporiate query param string
       let qs = `classification=${encodeURIComponent(classification)}`;
       if (!!source) {
-        pendingStates[source] = { inProgress: false, error: '', items: [] };
+        pendingStates[source] = { inProgress: true, error: '', items: [] };
         qs += `&sources=${encodeURIComponent(source)}`;
       } else {
         // only send query to sources that support the tag name and the classification
         let s = [];
         for (const src of currentUserConfig.ui.external_sources) {
-          if (
-            tagSrcMap[tagName].includes(src.name)
-            // let search proxy handle classifications so we can easily report the error back
-            // && isAccessible(src.max_classification, classification, c12nDef, c12nDef.enforce)
-          ) {
+          if (tagSrcMap[tagName].includes(src.name)) {
+            // uncomment when classification updates are merged in
+            // if (!isAccessible(src.max_classification, classification, c12nDef, c12nDef.enforce)) {
+            //   pendingStates[src.name] = { inProgress: false, error: t('related_external.error.maxClassification'), items: [] };
+            // } else {
             s.push(src.name);
-            pendingStates[src.name] = { inProgress: false, error: '', items: [] };
+            pendingStates[src.name] = { inProgress: true, error: '', items: [] };
+            // }
           }
         }
         if (s.length <= 0) {

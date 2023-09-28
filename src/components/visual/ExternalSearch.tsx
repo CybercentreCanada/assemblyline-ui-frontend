@@ -373,10 +373,10 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
   React.useEffect(() => {
     let classification = resultClassification;
     let tip = `${t('related_external.title')}:`;
-    if (externalLookupResults?.items !== undefined) {
+    if (!!externalLookupResults) {
       Object.entries(externalLookupResults).forEach(([src, enrichmentResults]) => {
         if (!!enrichmentResults.error) {
-          tip += `\n${toTitleCase(src)}: ${t('related_external.error')}`;
+          tip += `\n${toTitleCase(src)}: ${toTitleCase(t('error'))}`;
         } else {
           tip += `\n${toTitleCase(src)}: ${enrichmentResults.items.length} ${t('results')}`;
         }
