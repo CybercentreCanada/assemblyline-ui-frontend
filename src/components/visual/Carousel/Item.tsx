@@ -8,6 +8,11 @@ import React, { useEffect, useState } from 'react';
 const useStyles = makeStyles(theme => {
   const augmentedPaper = theme.palette.augmentColor({ color: { main: theme.palette.background.default } });
 
+  const options = {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.shortest
+  };
+
   return {
     button: {
       height: '100%',
@@ -27,10 +32,7 @@ const useStyles = makeStyles(theme => {
       objectFit: 'contain',
       imageRendering: 'pixelated',
       filter: `brightness(50%)`,
-      transition: theme.transitions.create('filter', {
-        easing: theme.transitions.easing.easeInOut,
-        duration: theme.transitions.duration.short
-      }),
+      transition: theme.transitions.create('filter', options),
       '&:hover': {
         filter: `brightness(90%)`
       }
@@ -49,7 +51,7 @@ type Props = {
   alt: string;
   src: string;
   selected?: boolean;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLElement>;
 };
 
 const WrappedCarouselItem = ({ alt, src, selected, onClick }: Props) => {

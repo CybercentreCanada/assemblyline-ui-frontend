@@ -116,6 +116,7 @@ const useStyles = makeStyles(theme => {
       width: '100%',
       height: navbarHeight,
       overflow: 'scroll',
+      userSelect: 'none',
       scrollbarWidth: 'none', // Firefox
       '-ms-overflow-style': 'none', // Internet Explorer 10+
       '&::-webkit-scrollbar': {
@@ -143,6 +144,7 @@ const useStyles = makeStyles(theme => {
       display: 'grid',
       placeItems: 'center',
       overflow: 'scroll',
+      userSelect: 'none',
       scrollbarWidth: 'none', // Firefox
       '-ms-overflow-style': 'none', // Internet Explorer 10+
       '&::-webkit-scrollbar': {
@@ -217,6 +219,15 @@ export type Image = {
   thumb: string;
 };
 
+type Dragging = {
+  isDown: boolean;
+  isDragging: boolean;
+  scrollLeft?: Number;
+  scrollTop?: Number;
+  startX?: number;
+  startY?: number;
+};
+
 type CarouselContainerProps = {
   images: Image[];
   open: boolean;
@@ -242,11 +253,15 @@ const WrappedCarouselContainer = ({
   const [isZooming, setIsZooming] = useState<boolean>(false);
 
   const navbarRef = useRef<HTMLDivElement>(null);
-  const navbarScroll = useRef<{ isDown: boolean; isDragging: boolean; scrollLeft: Number; startX: number }>({
+  const navbarScroll = useRef<Dragging>({ isDown: false, isDragging: false, scrollLeft: 0, startX: 0 });
+  const imageRef = useRef<HTMLDivElement>(null);
+  const imageScroll = useRef<Dragging>({
     isDown: false,
     isDragging: false,
     scrollLeft: 0,
-    startX: 0
+    scrollTop: 0,
+    startX: 0,
+    startY: 0
   });
 
   const currentImage = useMemo<Image>(() => images && images[index], [images, index]);
