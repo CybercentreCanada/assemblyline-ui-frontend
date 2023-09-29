@@ -2,8 +2,8 @@
   "close": "Close (Esc)",
   "description": "Description",
   "name": "Name",
-  "next": "Next Image (→ ou ↓)",
+  "next": "Next Image (→ or ↓)",
   "not_found": "The API is preventing us from displaying this image.",
-  "prev": "Previous Image (← ou ↑)",
+  "prev": "Previous Image (← or ↑)",
   "zoom": "Zoom (double click)"
 }

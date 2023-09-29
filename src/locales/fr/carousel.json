@@ -2,8 +2,8 @@
   "close": "Fermer (Esc)",
   "description": "Description",
   "name": "Nom",
-  "next": "Image suivante (→ or ↓)",
+  "next": "Image suivante (→ ou ↓)",
   "not_found": "L'API nous empêche d'afficher cette image.",
-  "prev": "Image Précédente Image (← or ↑)",
+  "prev": "Image Précédente Image (← ou ↑)",
   "zoom": "Zoom (double clic)"
 }
