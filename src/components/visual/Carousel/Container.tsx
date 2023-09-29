@@ -358,6 +358,11 @@ const WrappedCarouselContainer = ({
     };
   }, []);
 
+  const handleImageWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    setZoom(z => Math.min(Math.max(z + event.deltaY / 10, 10), 500));
+  }, []);
+
   const handleImageMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!imageDrag.current.isDown || event.button !== 0) return;
     event.preventDefault();
@@ -457,10 +462,11 @@ const WrappedCarouselContainer = ({
               ref={containerRef}
               className={clsx(classes.imageContainer, zoomClass)}
               onClick={!isZooming ? handleClose : null}
-              onMouseDown={handleImageDown}
-              onMouseUp={handleImageStop}
-              onMouseLeave={handleImageStop}
-              onMouseMove={handleImageMove}
+              onMouseDown={isZooming ? handleImageDown : null}
+              onMouseUp={isZooming ? handleImageStop : null}
+              onMouseLeave={isZooming ? handleImageStop : null}
+              onMouseMove={isZooming ? handleImageMove : null}
+              onWheel={isZooming ? handleImageWheel : null}
             >
               <div
                 className={clsx(classes.containerNavOverlay, zoomClass)}
