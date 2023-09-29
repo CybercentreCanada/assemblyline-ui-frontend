@@ -20,7 +20,7 @@ const MIN_IMAGE_SIZE_REM = 4;
 const useStyles = makeStyles(theme => {
   const navbarHeight = 'min(128px, 30vw, 30vh)';
   const imageSize = `min(${MIN_IMAGE_SIZE_REM}rem, 30vw, 30vh)`;
-  const backgroundColor = alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.5 : 0.7);
+  const backgroundColor = alpha(theme.palette.background.paper, 0.7);
 
   const options = {
     easing: theme.transitions.easing.easeInOut,

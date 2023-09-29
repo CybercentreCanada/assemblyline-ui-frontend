@@ -17,11 +17,11 @@ const useStyles = makeStyles(theme => {
     button: {
       height: '100%',
       aspectRatio: '1 / 1',
-      backgroundColor: alpha(theme.palette.mode === 'dark' ? augmentedPaper.main : augmentedPaper.dark, 0.5),
+      backgroundColor: alpha(theme.palette.mode === 'dark' ? augmentedPaper.main : augmentedPaper.dark, 0.7),
       padding: 0,
       overflow: 'hidden',
       '&:hover': {
-        backgroundColor: alpha(theme.palette.mode === 'dark' ? augmentedPaper.light : augmentedPaper.main, 0.5)
+        backgroundColor: alpha(theme.palette.mode === 'dark' ? augmentedPaper.light : augmentedPaper.main, 0.7)
       }
     },
     img: {
