@@ -497,14 +497,8 @@ const WrappedCarouselContainer = ({
                             imgRef.current.naturalHeight > 128
                               ? `calc(${zoom / 100} * ${imgRef.current.naturalHeight}px)`
                               : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`,
-                          minWidth:
-                            imgRef.current.naturalWidth > 128
-                              ? `calc(${zoom / 100} * ${imgRef.current.naturalWidth}px)`
-                              : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`,
-                          minHeight:
-                            imgRef.current.naturalHeight > 128
-                              ? `calc(${zoom / 100} * ${imgRef.current.naturalHeight}px)`
-                              : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`
+                          minWidth: 0,
+                          minHeight: 0
                         }
                       : {}
                   }
