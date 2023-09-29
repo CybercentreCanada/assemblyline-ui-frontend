@@ -296,7 +296,15 @@ const WrappedCarouselContainer = ({
     [images, isZooming, setIndex]
   );
 
-  const handleImageDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleImageWheel = useCallback(
+    (event: React.WheelEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+      handleImageChange(event.deltaY > 0 ? 1 : -1)(event);
+    },
+    [handleImageChange]
+  );
+
+  const handleZoomDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
     if (event.button !== 0) return;
     dragTimer.current = new Date().valueOf();
@@ -309,7 +317,7 @@ const WrappedCarouselContainer = ({
     };
   }, []);
 
-  const handleImageStop = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleZoomStop = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     // Ignore if we are not currently dragging
     if (!imageDrag.current.isDown) return;
 
@@ -352,12 +360,12 @@ const WrappedCarouselContainer = ({
     };
   }, []);
 
-  const handleImageWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
+  const handleZoomWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
     event.stopPropagation();
     setZoom(z => Math.min(Math.max(z - event.deltaY / 10, 10), 500));
   }, []);
 
-  const handleImageMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleZoomMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!imageDrag.current.isDown || event.button !== 0) return;
     event.preventDefault();
 
@@ -456,11 +464,11 @@ const WrappedCarouselContainer = ({
               ref={containerRef}
               className={clsx(classes.imageContainer, zoomClass)}
               onClick={!isZooming ? handleClose : null}
-              onMouseDown={isZooming ? handleImageDown : null}
-              onMouseUp={isZooming ? handleImageStop : null}
-              onMouseLeave={isZooming ? handleImageStop : null}
-              onMouseMove={isZooming ? handleImageMove : null}
-              onWheel={isZooming ? handleImageWheel : null}
+              onMouseDown={isZooming ? handleZoomDown : null}
+              onMouseUp={isZooming ? handleZoomStop : null}
+              onMouseLeave={isZooming ? handleZoomStop : null}
+              onMouseMove={isZooming ? handleZoomMove : null}
+              onWheel={isZooming ? handleZoomWheel : handleImageWheel}
             >
               <div
                 className={clsx(classes.containerNavOverlay, zoomClass)}
