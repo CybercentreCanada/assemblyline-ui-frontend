@@ -214,13 +214,7 @@ const useStyles = makeStyles(theme => {
       flexDirection: 'row',
       flexWrap: 'nowrap',
       alignItems: 'center',
-      gap: theme.spacing(1),
-      '@media (max-width: 440px)': {
-        flexWrap: 'wrap',
-        '&>span': {
-          display: 'none'
-        }
-      }
+      gap: theme.spacing(1)
     },
     zoomSlider: {
       '& .MuiSlider-thumb': {
@@ -283,11 +277,12 @@ const WrappedCarouselContainer = ({
     startX: 0,
     startY: 0
   });
+
   const zoomTimer = useRef<number>(null);
+  const zoomClass = useMemo<string | null>(() => isZooming && ZOOM_CLASS, [isZooming]);
 
   const currentImage = useMemo<Image>(() => images && images[index], [images, index]);
-
-  const zoomClass = useMemo<string | null>(() => isZooming && ZOOM_CLASS, [isZooming]);
+  const dragTimer = useRef<number>(null);
 
   const handleClose = useCallback(
     (event: any = null) => {
@@ -310,6 +305,7 @@ const WrappedCarouselContainer = ({
   const handleImageDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
     if (event.button !== 0) return;
+    dragTimer.current = new Date().valueOf();
     imageDrag.current = {
       isDown: true,
       startX: event.pageX - containerRef.current.offsetLeft,
@@ -320,8 +316,39 @@ const WrappedCarouselContainer = ({
   }, []);
 
   const handleImageStop = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    // Ignore if we are not currently dragging
+    if (!imageDrag.current.isDown) return;
+
     event.stopPropagation();
     if (event.button !== 0) return;
+
+    // Calculate dragging speed
+    const timeDiff = (new Date() as any) - dragTimer.current;
+    let speedY = ((containerRef.current.scrollTop - imageDrag.current.scrollTop.valueOf()) / timeDiff) * 15;
+    let speedX = ((containerRef.current.scrollLeft - imageDrag.current.scrollLeft.valueOf()) / timeDiff) * 15;
+    let speedYAbsolute = Math.abs(speedY);
+    let speedXAbsolute = Math.abs(speedX);
+
+    // Request delayed drawing of the scroll
+    const draw = () => {
+      if (speedYAbsolute > 0) {
+        if (speedY > 0) {
+          containerRef.current.scrollTop += speedYAbsolute--;
+        } else {
+          containerRef.current.scrollTop -= speedYAbsolute--;
+        }
+      }
+      if (speedXAbsolute > 0) {
+        if (speedX > 0) {
+          containerRef.current.scrollLeft += speedXAbsolute--;
+        } else {
+          containerRef.current.scrollLeft -= speedXAbsolute--;
+        }
+      }
+      requestAnimationFrame(draw);
+    };
+    draw();
+
     imageDrag.current = {
       isDown: false,
       scrollLeft: 0,
@@ -432,6 +459,7 @@ const WrappedCarouselContainer = ({
               onClick={!isZooming ? handleClose : null}
               onMouseDown={handleImageDown}
               onMouseUp={handleImageStop}
+              onMouseLeave={handleImageStop}
               onMouseMove={handleImageMove}
             >
               <div
