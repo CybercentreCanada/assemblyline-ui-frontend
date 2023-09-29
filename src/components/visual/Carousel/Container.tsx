@@ -54,13 +54,12 @@ const useStyles = makeStyles(theme => {
       alignItems: 'start',
       justifyItems: 'center'
     },
-    menuInfo: {
+    menuPane: {
       display: 'grid',
       placeItems: 'center',
       borderRadius: '0px 0px 4px 4px',
       padding: theme.spacing(1),
       backgroundColor: alpha(theme.palette.background.paper, 0.5),
-      height: '64px',
       minWidth: '10vw',
       [`&.${ZOOM_CLASS}`]: {
         minWidth: 'auto',
@@ -282,6 +281,7 @@ const WrappedCarouselContainer = ({
     startX: 0,
     startY: 0
   });
+  const zoomTimer = useRef<number>(null);
 
   const currentImage = useMemo<Image>(() => images && images[index], [images, index]);
 
@@ -366,12 +366,23 @@ const WrappedCarouselContainer = ({
     navbarScroll.current.isDragging = Math.abs(walkX) > 20;
   }, []);
 
+  const handleZoomChange = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    event.stopPropagation();
+    event.preventDefault();
+    setIsZooming(z => !z);
+    setZoom(100);
+  }, []);
+
   const handleZoomClick = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
     event.preventDefault();
-    console.log('handleZoomClick');
-    setIsZooming(z => !z);
-    setZoom(100);
+    if (event.button !== 0) return;
+    const now = Date.now();
+    if (now - zoomTimer.current < 200) {
+      setIsZooming(z => !z);
+      setZoom(100);
+    }
+    zoomTimer.current = now;
   }, []);
 
   useEffect(() => {
@@ -453,12 +464,7 @@ const WrappedCarouselContainer = ({
                         }
                       : {}
                   }
-                  onDoubleClick={handleZoomClick}
-                  
-                  onClick={e => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
+                  onClick={handleZoomClick}
                 />
               ) : (
                 <div className={classes.loadingContainer} style={thumbData && { backgroundImage: `url(${thumbData})` }}>
@@ -495,7 +501,7 @@ const WrappedCarouselContainer = ({
                 </Tooltip>
               </div>
 
-              <div className={clsx(classes.menuInfo, zoomClass)}>
+              <div className={clsx(classes.menuPane, zoomClass)}>
                 {isZooming ? (
                   <div className={classes.zoom}>
                     <div style={{ textAlign: 'end', minWidth: '35px' }}>{`${zoom}%`}</div>
@@ -529,7 +535,7 @@ const WrappedCarouselContainer = ({
                 )}
               </div>
 
-              <div className={classes.buttonWrapper} onClick={imgData && handleZoomClick}>
+              <div className={classes.buttonWrapper} onClick={imgData && handleZoomChange}>
                 <Tooltip title={t('zoom')}>
                   <div>
                     <IconButton
