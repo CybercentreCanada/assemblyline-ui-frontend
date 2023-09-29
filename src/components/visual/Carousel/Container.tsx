@@ -16,10 +16,11 @@ import { useTranslation } from 'react-i18next';
 import CarouselItem from './Item';
 
 const ZOOM_CLASS = 'zooming';
+const MIN_IMAGE_SIZE_REM = 4;
 
 const useStyles = makeStyles(theme => {
   const navbarHeight = 'min(128px, 30vw, 30vh)';
-  const imageSize = 'min(4rem, 30vw, 30vh)';
+  const imageSize = `min(${MIN_IMAGE_SIZE_REM}rem, 30vw, 30vh)`;
 
   // const isSmall = `@media (max-width: ${theme.breakpoints.values.md}px) or (max-height: ${theme.breakpoints.values.sm}px)`;
 
@@ -460,8 +461,22 @@ const WrappedCarouselContainer = ({
                   style={
                     isZooming
                       ? {
-                          width: `calc(${zoom / 100} * ${imgRef.current.naturalWidth}px)`,
-                          height: `calc(${zoom / 100} * ${imgRef.current.naturalHeight}px)`
+                          width:
+                            imgRef.current.naturalWidth > 128
+                              ? `calc(${zoom / 100} * ${imgRef.current.naturalWidth}px)`
+                              : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`,
+                          height:
+                            imgRef.current.naturalHeight > 128
+                              ? `calc(${zoom / 100} * ${imgRef.current.naturalHeight}px)`
+                              : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`,
+                          minWidth:
+                            imgRef.current.naturalWidth > 128
+                              ? `calc(${zoom / 100} * ${imgRef.current.naturalWidth}px)`
+                              : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`,
+                          minHeight:
+                            imgRef.current.naturalHeight > 128
+                              ? `calc(${zoom / 100} * ${imgRef.current.naturalHeight}px)`
+                              : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`
                         }
                       : {}
                   }
