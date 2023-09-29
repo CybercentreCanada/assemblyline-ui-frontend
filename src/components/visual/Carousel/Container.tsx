@@ -296,14 +296,6 @@ const WrappedCarouselContainer = ({
     [images, isZooming, setIndex]
   );
 
-  const handleImageWheel = useCallback(
-    (event: React.WheelEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-      handleImageChange(event.deltaY > 0 ? 1 : -1)(event);
-    },
-    [handleImageChange]
-  );
-
   const handleZoomDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
     if (event.button !== 0) return;
@@ -457,7 +449,10 @@ const WrappedCarouselContainer = ({
   return (
     images &&
     images.length > 0 && (
-      <Carousel onPrevious={handleImageChange(-1)} onNext={handleImageChange(1)}>
+      <Carousel
+        onPrevious={!isZooming ? handleImageChange(-1) : null}
+        onNext={!isZooming ? handleImageChange(1) : null}
+      >
         <Modal className={classes.backdrop} open={open} onClose={handleClose}>
           <div id="carousel" className={classes.root}>
             <div
@@ -468,7 +463,7 @@ const WrappedCarouselContainer = ({
               onMouseUp={isZooming ? handleZoomStop : null}
               onMouseLeave={isZooming ? handleZoomStop : null}
               onMouseMove={isZooming ? handleZoomMove : null}
-              onWheel={isZooming ? handleZoomWheel : handleImageWheel}
+              onWheel={isZooming ? handleZoomWheel : null}
             >
               <div
                 className={clsx(classes.containerNavOverlay, zoomClass)}
@@ -510,7 +505,7 @@ const WrappedCarouselContainer = ({
                         }
                       : {}
                   }
-                  onClick={handleZoomClick}
+                  onClick={imgData ? handleZoomClick : null}
                 />
               ) : (
                 <div className={classes.loadingContainer} style={thumbData && { backgroundImage: `url(${thumbData})` }}>
