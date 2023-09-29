@@ -19,6 +19,7 @@ const ZOOM_CLASS = 'zooming';
 
 const useStyles = makeStyles(theme => {
   const navbarHeight = 'min(128px, 30vw, 30vh)';
+  const imageSize = 'min(4rem, 30vw, 30vh)';
 
   // const isSmall = `@media (max-width: ${theme.breakpoints.values.md}px) or (max-height: ${theme.breakpoints.values.sm}px)`;
 
@@ -181,8 +182,8 @@ const useStyles = makeStyles(theme => {
     image: {
       height: 'auto',
       width: 'auto',
-      minHeight: navbarHeight,
-      minWidth: navbarHeight,
+      minHeight: imageSize,
+      minWidth: imageSize,
       maxWidth: '100vw',
       maxHeight: `calc(100vh - 64px - ${navbarHeight})`,
       imageRendering: 'pixelated',
