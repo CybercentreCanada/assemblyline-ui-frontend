@@ -1,4 +1,4 @@
-import { ZoomOut } from '@mui/icons-material';
+import { ZoomIn, ZoomOut } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
@@ -20,12 +20,7 @@ const MIN_IMAGE_SIZE_REM = 4;
 const useStyles = makeStyles(theme => {
   const navbarHeight = 'min(128px, 30vw, 30vh)';
   const imageSize = `min(${MIN_IMAGE_SIZE_REM}rem, 30vw, 30vh)`;
-
-  // const isSmall = `@media (max-width: ${theme.breakpoints.values.md}px) or (max-height: ${theme.breakpoints.values.sm}px)`;
-
-  const augmentedPaper = theme.palette.augmentColor({ color: { main: theme.palette.background.paper } })[
-    theme.palette.mode === 'dark' ? 'light' : 'dark'
-  ];
+  const backgroundColor = alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.5 : 0.7);
 
   const options = {
     easing: theme.transitions.easing.easeInOut,
@@ -60,7 +55,7 @@ const useStyles = makeStyles(theme => {
       placeItems: 'center',
       borderRadius: '0px 0px 4px 4px',
       padding: theme.spacing(1),
-      backgroundColor: alpha(theme.palette.background.paper, 0.5),
+      backgroundColor: backgroundColor,
       minWidth: '10vw',
       transition: theme.transitions.create(['all'], options),
       [`&.${ZOOM_CLASS}`]: {
@@ -88,28 +83,21 @@ const useStyles = makeStyles(theme => {
       }
     },
     buttonWrapper: {
-      padding: theme.spacing(1)
+      margin: theme.spacing(1),
+      borderRadius: theme.spacing(3),
+      backgroundColor: backgroundColor
     },
-    button: {
-      color: theme.palette.text.primary,
-      backgroundColor: alpha(theme.palette.background.paper, 0.5),
-      '&:hover': {
-        backgroundColor: alpha(augmentedPaper, 0.5)
-      }
-    },
-    navButton: {
+    navButtonWrapper: {
+      margin: theme.spacing(1),
+      borderRadius: theme.spacing(3),
+      backgroundColor: backgroundColor,
       position: 'absolute',
       top: '50%',
       bottom: '50%',
       display: 'none',
       cursor: 'pointer',
       height: '48px',
-      width: '48px',
-      color: theme.palette.text.primary,
-      backgroundColor: alpha(theme.palette.background.paper, 0.5),
-      '&:hover': {
-        backgroundColor: alpha(augmentedPaper, 0.5)
-      }
+      width: '48px'
     },
     navbarContainer: {
       position: 'absolute',
@@ -192,7 +180,7 @@ const useStyles = makeStyles(theme => {
       display: 'grid',
       placeItems: 'center',
       borderRadius: theme.spacing(0.5),
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: backgroundColor,
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
       backgroundSize: 'cover',
@@ -201,7 +189,7 @@ const useStyles = makeStyles(theme => {
       overflow: 'hidden'
     },
     zoom: {
-      backgroundColor: alpha(theme.palette.background.paper, 0.5),
+      backgroundColor: backgroundColor,
       borderRadius: theme.spacing(3),
       position: 'fixed',
       top: theme.spacing(1),
@@ -479,16 +467,16 @@ const WrappedCarouselContainer = ({
                 onClick={handleImageChange(-1)}
                 style={{ left: 0 }}
               >
-                <Tooltip title={t('prev')} placement="right">
-                  <IconButton
-                    className={clsx(classes.navButton, zoomClass)}
-                    component="div"
-                    size="large"
-                    children={<ChevronLeftOutlinedIcon />}
-                    onClick={handleImageChange(1)}
-                    style={{ left: '8px' }}
-                  />
-                </Tooltip>
+                <div className={classes.navButtonWrapper}>
+                  <Tooltip title={t('prev')} placement="right">
+                    <IconButton
+                      component="div"
+                      size="large"
+                      children={<ChevronLeftOutlinedIcon />}
+                      onClick={handleImageChange(1)}
+                    />
+                  </Tooltip>
+                </div>
               </div>
 
               {imgData ? (
@@ -531,23 +519,23 @@ const WrappedCarouselContainer = ({
                 onClick={handleImageChange(1)}
                 style={{ right: '0' }}
               >
-                <Tooltip title={t('next')} placement="left">
-                  <IconButton
-                    className={clsx(classes.navButton, zoomClass)}
-                    component="div"
-                    size="large"
-                    children={<ChevronRightOutlinedIcon />}
-                    onClick={handleImageChange(1)}
-                    style={{ right: '8px' }}
-                  />
-                </Tooltip>
+                <div className={classes.navButtonWrapper} style={{ right: 0 }}>
+                  <Tooltip title={t('next')} placement="left">
+                    <IconButton
+                      component="div"
+                      size="large"
+                      children={<ChevronRightOutlinedIcon />}
+                      onClick={handleImageChange(1)}
+                    />
+                  </Tooltip>
+                </div>
               </div>
             </div>
 
             <div id="carousel-menu" className={classes.menu}>
               <div className={classes.buttonWrapper}>
                 <Tooltip title={t('close')} placement="right">
-                  <IconButton onClick={handleClose} className={classes.button} size="large" children={<CloseIcon />} />
+                  <IconButton onClick={handleClose} size="large" children={<CloseIcon />} />
                 </Tooltip>
               </div>
 
@@ -558,7 +546,7 @@ const WrappedCarouselContainer = ({
                       onClick={imgData ? handleZoomChange : null}
                       size="large"
                       disabled={!imgData}
-                      children={<ZoomOut />}
+                      children={isZooming ? <ZoomOut /> : <ZoomIn />}
                     />
                   </div>
                 </Tooltip>
