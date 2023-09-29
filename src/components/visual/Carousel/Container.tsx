@@ -360,7 +360,7 @@ const WrappedCarouselContainer = ({
 
   const handleImageWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
     event.stopPropagation();
-    setZoom(z => Math.min(Math.max(z + event.deltaY / 10, 10), 500));
+    setZoom(z => Math.min(Math.max(z - event.deltaY / 10, 10), 500));
   }, []);
 
   const handleImageMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
