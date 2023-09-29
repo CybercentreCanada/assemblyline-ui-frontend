@@ -1,5 +1,5 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
-import { Button, CircularProgress, Tooltip } from '@mui/material';
+import { alpha, Button, CircularProgress, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -17,11 +17,11 @@ const useStyles = makeStyles(theme => {
     button: {
       height: '100%',
       aspectRatio: '1 / 1',
-      backgroundColor: theme.palette.mode === 'dark' ? augmentedPaper.main : augmentedPaper.dark,
+      backgroundColor: alpha(theme.palette.mode === 'dark' ? augmentedPaper.main : augmentedPaper.dark, 0.5),
       padding: 0,
       overflow: 'hidden',
       '&:hover': {
-        backgroundColor: theme.palette.mode === 'dark' ? augmentedPaper.light : augmentedPaper.main
+        backgroundColor: alpha(theme.palette.mode === 'dark' ? augmentedPaper.light : augmentedPaper.main, 0.5)
       }
     },
     img: {
@@ -39,7 +39,7 @@ const useStyles = makeStyles(theme => {
     },
     selected: {
       border: `2px solid ${theme.palette.primary.main}`,
-      backgroundColor: theme.palette.mode === 'dark' ? augmentedPaper.light : augmentedPaper.main,
+      backgroundColor: alpha(theme.palette.mode === 'dark' ? augmentedPaper.light : augmentedPaper.main, 0.5),
       '&>img': {
         filter: `brightness(100%)`
       }
