@@ -1,11 +1,10 @@
+import { ZoomOut } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveIcon from '@mui/icons-material/Remove';
-import ZoomInIcon from '@mui/icons-material/ZoomIn';
-import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import { alpha, CircularProgress, IconButton, Modal, Skeleton, Slider, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
@@ -63,10 +62,9 @@ const useStyles = makeStyles(theme => {
       padding: theme.spacing(1),
       backgroundColor: alpha(theme.palette.background.paper, 0.5),
       minWidth: '10vw',
+      transition: theme.transitions.create(['all'], options),
       [`&.${ZOOM_CLASS}`]: {
-        minWidth: 'auto',
-        maxWidth: '350px',
-        width: '100%'
+        marginTop: '-64px'
       }
     },
     info: {
@@ -90,20 +88,14 @@ const useStyles = makeStyles(theme => {
       }
     },
     buttonWrapper: {
-      cursor: 'pointer',
-      padding: theme.spacing(1),
-      backgroundColor: 'rgba(0,0,0,0)',
-      transition: theme.transitions.create('background-color', options),
-      '&:hover>button': {
-        backgroundColor: alpha(augmentedPaper, 0.5)
-      },
-      '&:hover>div>button': {
-        backgroundColor: alpha(augmentedPaper, 0.5)
-      }
+      padding: theme.spacing(1)
     },
     button: {
       color: theme.palette.text.primary,
-      backgroundColor: alpha(theme.palette.background.paper, 0.5)
+      backgroundColor: alpha(theme.palette.background.paper, 0.5),
+      '&:hover': {
+        backgroundColor: alpha(augmentedPaper, 0.5)
+      }
     },
     navButton: {
       position: 'absolute',
@@ -209,12 +201,26 @@ const useStyles = makeStyles(theme => {
       overflow: 'hidden'
     },
     zoom: {
-      width: '100%',
+      backgroundColor: alpha(theme.palette.background.paper, 0.5),
+      borderRadius: theme.spacing(3),
+      position: 'fixed',
+      top: theme.spacing(1),
+      right: theme.spacing(1)
+    },
+    zoomAttributes: {
       display: 'flex',
-      flexDirection: 'row',
+      flexDirection: 'column',
       flexWrap: 'nowrap',
       alignItems: 'center',
-      gap: theme.spacing(1)
+      gap: theme.spacing(1),
+      height: 0,
+      opacity: 0,
+      transition: theme.transitions.create(['all'], options),
+      [`&.${ZOOM_CLASS}`]: {
+        paddingBottom: theme.spacing(1),
+        height: '200px',
+        opacity: 1
+      }
     },
     zoomSlider: {
       '& .MuiSlider-thumb': {
@@ -400,7 +406,7 @@ const WrappedCarouselContainer = ({
     navbarScroll.current.isDragging = Math.abs(walkX) > 20;
   }, []);
 
-  const handleZoomChange = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleZoomChange = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
     event.preventDefault();
     setIsZooming(z => !z);
@@ -473,7 +479,7 @@ const WrappedCarouselContainer = ({
                 onClick={handleImageChange(-1)}
                 style={{ left: 0 }}
               >
-                <Tooltip title={t('prev')} placement="top">
+                <Tooltip title={t('prev')} placement="right">
                   <IconButton
                     className={clsx(classes.navButton, zoomClass)}
                     component="div"
@@ -525,7 +531,7 @@ const WrappedCarouselContainer = ({
                 onClick={handleImageChange(1)}
                 style={{ right: '0' }}
               >
-                <Tooltip title={t('next')} placement="top">
+                <Tooltip title={t('next')} placement="left">
                   <IconButton
                     className={clsx(classes.navButton, zoomClass)}
                     component="div"
@@ -539,57 +545,55 @@ const WrappedCarouselContainer = ({
             </div>
 
             <div id="carousel-menu" className={classes.menu}>
-              <div className={classes.buttonWrapper} onClick={handleClose}>
-                <Tooltip title={t('close')}>
-                  <IconButton className={classes.button} size="large" children={<CloseIcon />} />
+              <div className={classes.buttonWrapper}>
+                <Tooltip title={t('close')} placement="right">
+                  <IconButton onClick={handleClose} className={classes.button} size="large" children={<CloseIcon />} />
                 </Tooltip>
+              </div>
+
+              <div className={clsx(classes.zoom, zoomClass)}>
+                <Tooltip title={t('zoom')} placement="left">
+                  <div>
+                    <IconButton
+                      onClick={imgData ? handleZoomChange : null}
+                      size="large"
+                      disabled={!imgData}
+                      children={<ZoomOut />}
+                    />
+                  </div>
+                </Tooltip>
+                <div className={clsx(classes.zoomAttributes, zoomClass)}>
+                  <div style={{ textAlign: 'end', minWidth: '35px' }}>{`${zoom}%`}</div>
+                  <IconButton
+                    size="small"
+                    onClick={() => setZoom(z => Math.min(500, z + 10))}
+                    children={<AddIcon fontSize="small" />}
+                  />
+                  <Slider
+                    className={classes.zoomSlider}
+                    value={zoom}
+                    step={10}
+                    min={10}
+                    max={500}
+                    size="small"
+                    onChange={(event, newValue) => setZoom(newValue as number)}
+                    orientation="vertical"
+                  />
+                  <IconButton
+                    size="small"
+                    onClick={() => setZoom(z => Math.max(10, z - 10))}
+                    children={<RemoveIcon fontSize="small" />}
+                  />
+                </div>
               </div>
 
               <div className={clsx(classes.menuPane, zoomClass)}>
-                {isZooming ? (
-                  <div className={classes.zoom}>
-                    <div style={{ textAlign: 'end', minWidth: '35px' }}>{`${zoom}%`}</div>
-                    <IconButton
-                      size="small"
-                      onClick={() => setZoom(z => Math.max(10, z - 10))}
-                      children={<RemoveIcon fontSize="small" />}
-                    />
-                    <Slider
-                      className={classes.zoomSlider}
-                      value={zoom}
-                      step={10}
-                      min={10}
-                      max={500}
-                      size="small"
-                      onChange={(event, newValue) => setZoom(newValue as number)}
-                    />
-                    <IconButton
-                      size="small"
-                      onClick={() => setZoom(z => Math.min(500, z + 10))}
-                      children={<AddIcon fontSize="small" />}
-                    />
-                  </div>
-                ) : (
-                  <div className={classes.info}>
-                    <div>{t('name')}</div>
-                    <div>{currentImage ? currentImage?.name : loading && <Skeleton variant="rounded" />}</div>
-                    <div>{t('description')}</div>
-                    <div>{currentImage ? currentImage?.description : loading && <Skeleton variant="rounded" />}</div>
-                  </div>
-                )}
-              </div>
-
-              <div className={classes.buttonWrapper} onClick={imgData && handleZoomChange}>
-                <Tooltip title={t('zoom')}>
-                  <div>
-                    <IconButton
-                      className={classes.button}
-                      size="large"
-                      disabled={!imgData}
-                      children={isZooming ? <ZoomOutIcon /> : <ZoomInIcon />}
-                    />
-                  </div>
-                </Tooltip>
+                <div className={classes.info}>
+                  <div>{t('name')}</div>
+                  <div>{currentImage ? currentImage?.name : loading && <Skeleton variant="rounded" />}</div>
+                  <div>{t('description')}</div>
+                  <div>{currentImage ? currentImage?.description : loading && <Skeleton variant="rounded" />}</div>
+                </div>
               </div>
             </div>
 
