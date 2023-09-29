@@ -1,10 +1,12 @@
+import AddIcon from '@mui/icons-material/Add';
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import RemoveIcon from '@mui/icons-material/Remove';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
-import { alpha, CircularProgress, IconButton, Modal, Skeleton, Tooltip } from '@mui/material';
+import { alpha, CircularProgress, IconButton, Modal, Skeleton, Slider, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/carousel/Carousel';
@@ -52,17 +54,26 @@ const useStyles = makeStyles(theme => {
       alignItems: 'start',
       justifyItems: 'center'
     },
-    info: {
+    menuInfo: {
+      display: 'grid',
+      placeItems: 'center',
       borderRadius: '0px 0px 4px 4px',
+      padding: theme.spacing(1),
+      backgroundColor: alpha(theme.palette.background.paper, 0.5),
+      height: '64px',
+      minWidth: '10vw',
+      [`&.${ZOOM_CLASS}`]: {
+        minWidth: 'auto',
+        maxWidth: '350px',
+        width: '100%'
+      }
+    },
+    info: {
       display: 'grid',
       alignContent: 'end',
       alignItems: 'stretch',
       gridTemplateColumns: 'auto 1fr',
-      padding: theme.spacing(1),
       columnGap: theme.spacing(1),
-      minWidth: '10vw',
-      opacity: 1,
-      backgroundColor: alpha(theme.palette.background.paper, 0.5),
       transition: theme.transitions.create(['all'], options),
       '&:hover>div': {
         whiteSpace: 'wrap !important'
@@ -75,9 +86,6 @@ const useStyles = makeStyles(theme => {
         overflowX: 'hidden',
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis'
-      },
-      [`&.${ZOOM_CLASS}`]: {
-        opacity: 0
       }
     },
     buttonWrapper: {
@@ -158,14 +166,6 @@ const useStyles = makeStyles(theme => {
         right: 0
       }
     },
-    imageWrapper: {
-      position: 'absolute',
-      display: 'flex',
-      justifyContent: 'center',
-      [`&.${ZOOM_CLASS}`]: {
-        position: 'initial'
-      }
-    },
     containerNavOverlay: {
       height: '100%',
       width: '25%',
@@ -189,8 +189,6 @@ const useStyles = makeStyles(theme => {
       imageRendering: 'pixelated',
       transition: theme.transitions.create(['all'], options),
       [`&.${ZOOM_CLASS}`]: {
-        minHeight: 'max(256px, 200%)',
-        minWidth: 'max(256px, 200%)',
         maxHeight: 'none',
         maxWidth: 'none'
       }
@@ -208,6 +206,25 @@ const useStyles = makeStyles(theme => {
       backgroundBlendMode: 'soft-light',
       imageRendering: 'unset',
       overflow: 'hidden'
+    },
+    zoom: {
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      alignItems: 'center',
+      gap: theme.spacing(1),
+      '@media (max-width: 440px)': {
+        flexWrap: 'wrap',
+        '&>span': {
+          display: 'none'
+        }
+      }
+    },
+    zoomSlider: {
+      '& .MuiSlider-thumb': {
+        boxShadow: 'none'
+      }
     }
   };
 });
@@ -221,7 +238,7 @@ export type Image = {
 
 type Dragging = {
   isDown: boolean;
-  isDragging: boolean;
+  isDragging?: boolean;
   scrollLeft?: Number;
   scrollTop?: Number;
   startX?: number;
@@ -251,11 +268,13 @@ const WrappedCarouselContainer = ({
   const [imgData, setImgData] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isZooming, setIsZooming] = useState<boolean>(false);
+  const [zoom, setZoom] = useState<number>(100);
 
   const navbarRef = useRef<HTMLDivElement>(null);
   const navbarScroll = useRef<Dragging>({ isDown: false, isDragging: false, scrollLeft: 0, startX: 0 });
-  const imageRef = useRef<HTMLDivElement>(null);
-  const imageScroll = useRef<Dragging>({
+  const containerRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const imageDrag = useRef<Dragging>({
     isDown: false,
     isDragging: false,
     scrollLeft: 0,
@@ -280,13 +299,51 @@ const WrappedCarouselContainer = ({
     (value: number) =>
       (event: any = null) => {
         event?.stopPropagation();
-        if (!images && images.length <= 1) return;
+        if (!images && images.length <= 1 && isZooming) return;
         setIndex(i => (i + value + images.length) % images.length);
       },
-    [images, setIndex]
+    [images, isZooming, setIndex]
   );
 
+  const handleImageDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    event.stopPropagation();
+    if (event.button !== 0) return;
+    imageDrag.current = {
+      isDown: true,
+      startX: event.pageX - containerRef.current.offsetLeft,
+      startY: event.pageY - containerRef.current.offsetTop,
+      scrollLeft: containerRef.current.scrollLeft,
+      scrollTop: containerRef.current.scrollTop
+    };
+  }, []);
+
+  const handleImageStop = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    event.stopPropagation();
+    if (event.button !== 0) return;
+    imageDrag.current = {
+      isDown: false,
+      scrollLeft: 0,
+      scrollTop: 0,
+      startX: 0,
+      startY: 0
+    };
+  }, []);
+
+  const handleImageMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!imageDrag.current.isDown || event.button !== 0) return;
+    event.preventDefault();
+
+    const x = event.pageX - containerRef.current.offsetLeft;
+    const walkX = x - imageDrag.current.startX;
+    containerRef.current.scrollLeft = imageDrag.current.scrollLeft.valueOf() - walkX;
+
+    const y = event.pageY - containerRef.current.offsetTop;
+    const walkY = y - imageDrag.current.startY;
+    containerRef.current.scrollTop = imageDrag.current.scrollTop.valueOf() - walkY;
+  }, []);
+
   const handleNavbarDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (event.button !== 0) return;
     navbarScroll.current = {
       isDown: true,
       isDragging: false,
@@ -296,11 +353,12 @@ const WrappedCarouselContainer = ({
   }, []);
 
   const handleNavbarStop = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (event.button !== 0) return;
     navbarScroll.current = { isDown: false, isDragging: false, scrollLeft: 0, startX: 0 };
   }, []);
 
   const handleNavbarMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (!navbarScroll.current.isDown) return;
+    if (!navbarScroll.current.isDown || event.button !== 0) return;
     event.preventDefault();
     const x = event.pageX - navbarRef.current.offsetLeft;
     const walkX = x - navbarScroll.current.startX;
@@ -310,7 +368,10 @@ const WrappedCarouselContainer = ({
 
   const handleZoomClick = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
+    event.preventDefault();
+    console.log('handleZoomClick');
     setIsZooming(z => !z);
+    setZoom(100);
   }, []);
 
   useEffect(() => {
@@ -352,7 +413,14 @@ const WrappedCarouselContainer = ({
       <Carousel onPrevious={handleImageChange(-1)} onNext={handleImageChange(1)}>
         <Modal className={classes.backdrop} open={open} onClose={handleClose}>
           <div id="carousel" className={classes.root}>
-            <div className={clsx(classes.imageContainer, zoomClass)} onClick={!isZooming ? handleClose : null}>
+            <div
+              ref={containerRef}
+              className={clsx(classes.imageContainer, zoomClass)}
+              onClick={!isZooming ? handleClose : null}
+              onMouseDown={handleImageDown}
+              onMouseUp={handleImageStop}
+              onMouseMove={handleImageMove}
+            >
               <div
                 className={clsx(classes.containerNavOverlay, zoomClass)}
                 onClick={handleImageChange(-1)}
@@ -369,31 +437,39 @@ const WrappedCarouselContainer = ({
                   />
                 </Tooltip>
               </div>
-              <div
-                className={clsx(classes.imageWrapper, zoomClass)}
-                onClick={event => event.stopPropagation()}
-                onDoubleClick={handleZoomClick}
-              >
-                {imgData ? (
-                  <img
-                    className={clsx(classes.image, zoomClass)}
-                    src={imgData}
-                    alt={currentImage?.name}
-                    draggable={false}
-                  />
-                ) : (
-                  <div
-                    className={classes.loadingContainer}
-                    style={thumbData && { backgroundImage: `url(${thumbData})` }}
-                  >
-                    {loading ? (
-                      <CircularProgress color="primary" />
-                    ) : (
-                      <BrokenImageOutlinedIcon color="primary" fontSize="large" />
-                    )}
-                  </div>
-                )}
-              </div>
+
+              {imgData ? (
+                <img
+                  ref={imgRef}
+                  className={clsx(classes.image, zoomClass)}
+                  src={imgData}
+                  alt={currentImage?.name}
+                  draggable={false}
+                  style={
+                    isZooming
+                      ? {
+                          width: `calc(${zoom / 100} * ${imgRef.current.naturalWidth}px)`,
+                          height: `calc(${zoom / 100} * ${imgRef.current.naturalHeight}px)`
+                        }
+                      : {}
+                  }
+                  onDoubleClick={handleZoomClick}
+                  
+                  onClick={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                />
+              ) : (
+                <div className={classes.loadingContainer} style={thumbData && { backgroundImage: `url(${thumbData})` }}>
+                  {loading ? (
+                    <CircularProgress color="primary" />
+                  ) : (
+                    <BrokenImageOutlinedIcon color="primary" fontSize="large" />
+                  )}
+                </div>
+              )}
+
               <div
                 className={clsx(classes.containerNavOverlay, zoomClass)}
                 onClick={handleImageChange(1)}
@@ -418,13 +494,42 @@ const WrappedCarouselContainer = ({
                   <IconButton className={classes.button} size="large" children={<CloseIcon />} />
                 </Tooltip>
               </div>
-              <div className={clsx(classes.info, zoomClass)}>
-                <div>{t('name')}</div>
-                <div>{currentImage ? currentImage?.name : loading && <Skeleton variant="rounded" />}</div>
-                <div>{t('description')}</div>
-                <div>{currentImage ? currentImage?.description : loading && <Skeleton variant="rounded" />}</div>
+
+              <div className={clsx(classes.menuInfo, zoomClass)}>
+                {isZooming ? (
+                  <div className={classes.zoom}>
+                    <div style={{ textAlign: 'end', minWidth: '35px' }}>{`${zoom}%`}</div>
+                    <IconButton
+                      size="small"
+                      onClick={() => setZoom(z => Math.max(10, z - 10))}
+                      children={<RemoveIcon fontSize="small" />}
+                    />
+                    <Slider
+                      className={classes.zoomSlider}
+                      value={zoom}
+                      step={10}
+                      min={10}
+                      max={500}
+                      size="small"
+                      onChange={(event, newValue) => setZoom(newValue as number)}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => setZoom(z => Math.min(500, z + 10))}
+                      children={<AddIcon fontSize="small" />}
+                    />
+                  </div>
+                ) : (
+                  <div className={classes.info}>
+                    <div>{t('name')}</div>
+                    <div>{currentImage ? currentImage?.name : loading && <Skeleton variant="rounded" />}</div>
+                    <div>{t('description')}</div>
+                    <div>{currentImage ? currentImage?.description : loading && <Skeleton variant="rounded" />}</div>
+                  </div>
+                )}
               </div>
-              <div className={classes.buttonWrapper} onClick={() => imgData && setIsZooming(z => !z)}>
+
+              <div className={classes.buttonWrapper} onClick={imgData && handleZoomClick}>
                 <Tooltip title={t('zoom')}>
                   <div>
                     <IconButton
