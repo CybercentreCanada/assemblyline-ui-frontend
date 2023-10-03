@@ -21,6 +21,7 @@ type IndexDefinitionMap = {
   file: IndexDefinition;
   heuristic: IndexDefinition;
   result: IndexDefinition;
+  retrohunt: IndexDefinition;
   safelist: IndexDefinition;
   signature: IndexDefinition;
   submission: IndexDefinition;
@@ -71,6 +72,11 @@ export type ConfigurationDefinition = {
     archive: {
       enabled: boolean;
     };
+  };
+  retrohunt: {
+    enabled: boolean;
+    dtl: number;
+    max_dtl: number;
   };
   submission: {
     dtl: number;
