@@ -1,11 +1,13 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
+import { Collapse, Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { bytesToSize } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ActionableText from '../ActionableText';
+import { ImageInlineBody } from '../image_inline';
+import { GraphBody } from '../ResultCard/graph_body';
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -21,14 +23,16 @@ const useStyles = makeStyles(theme => ({
 
 type IdentificationSectionProps = {
   fileinfo: any;
+  promotedSections?: any[];
 };
 
-const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo }) => {
+const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo, promotedSections = [] }) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
+  const upSM = useMediaQuery(theme.breakpoints.up('sm'));
 
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -44,7 +48,16 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">
-        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+        <div
+          style={{
+            paddingBottom: sp2,
+            paddingTop: sp2,
+            display: 'flex',
+            alignItems: upSM ? 'start' : 'center',
+            flexDirection: upSM ? 'row' : 'column',
+            rowGap: sp2
+          }}
+        >
           <Grid container>
             <Grid item xs={4} sm={3} lg={2}>
               <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>MD5</span>
@@ -155,7 +168,23 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
             <Grid item xs={8} sm={9} lg={10}>
               {fileinfo ? fileinfo.entropy : <Skeleton />}
             </Grid>
+            <Grid item xs={0} sm={3} lg={2} />
+            <Grid item xs={12} sm={9} lg={10}>
+              {promotedSections
+                ? promotedSections
+                    .filter(section => section.promote_to === 'ENTROPY')
+                    .map((section, idx) => <GraphBody key={idx} body={section.body} />)
+                : null}
+            </Grid>
           </Grid>
+
+          <div>
+            {promotedSections
+              ? promotedSections
+                  .filter(section => section.promote_to === 'SCREENSHOT')
+                  .map((section, idx) => <ImageInlineBody key={idx} body={section.body} />)
+              : null}
+          </div>
         </div>
       </Collapse>
     </div>

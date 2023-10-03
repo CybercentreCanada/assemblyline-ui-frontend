@@ -128,6 +128,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const navigate = useNavigate();
   const { showSuccessMessage } = useMySnackbar();
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
+  const [promotedSections, setPromotedSections] = useState([]);
   const popoverOpen = Boolean(resubmitAnchor);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
@@ -259,6 +260,18 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
     }
     // eslint-disable-next-line
   }, [sha256, sid]);
+
+  useEffect(() => {
+    if (file === null) {
+      setPromotedSections(null);
+    } else {
+      setPromotedSections(
+        file.results
+          .map(serviceResult => serviceResult.result.sections.filter(section => section.promote_to !== null))
+          .flat()
+      );
+    }
+  }, [file]);
 
   return currentUser.roles.includes('submission_view') ? (
     <div id="fileDetailTop" style={{ textAlign: 'left' }}>
@@ -394,7 +407,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         </Grid>
       </div>
       <div style={{ paddingBottom: sp2 }}>
-        <IdentificationSection fileinfo={file ? file.file_info : null} />
+        <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
         <FrequencySection fileinfo={file ? file.file_info : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
         <ChildrenSection childrens={file ? file.childrens : null} />
