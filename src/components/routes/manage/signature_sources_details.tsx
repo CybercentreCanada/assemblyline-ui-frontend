@@ -38,7 +38,7 @@ const WrappedSourceDetail = ({
 }) => {
   const { t, i18n } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
-  const { c12nDef } = useALContext();
+  const { c12nDef, settings } = useALContext();
   const [tempHeader, setTempHeader] = useState({ ...DEFAULT_HEADER });
   const classes = useStyles();
 
@@ -148,7 +148,14 @@ const WrappedSourceDetail = ({
               }}
             />
           </div>
-          <TextField size="small" value={source.uri} fullWidth variant="outlined" onChange={handleURIChange} />
+          <TextField
+            size="small"
+            value={source.uri}
+            fullWidth
+            variant="outlined"
+            type={settings?.demo ? 'password' : 'text'}
+            onChange={handleURIChange}
+          />
         </Grid>
         <Grid item xs={12} sm={3}>
           <div className={classes.label}>{t('git_branch')}</div>
@@ -255,6 +262,7 @@ const WrappedSourceDetail = ({
               value={source.password}
               fullWidth
               variant="outlined"
+              type={settings?.demo ? 'password' : 'text'}
               onChange={handlePasswordChange}
             />
           </div>
@@ -280,6 +288,7 @@ const WrappedSourceDetail = ({
             fullWidth
             variant="outlined"
             InputProps={{ style: { fontFamily: 'monospace' } }}
+            type={settings?.demo ? 'password' : 'text'}
             onChange={handlePrivateKeyChange}
           />
         </Grid>
@@ -298,6 +307,7 @@ const WrappedSourceDetail = ({
                   value={header.value}
                   fullWidth
                   variant="outlined"
+                  type={settings?.demo ? 'password' : 'text'}
                   onChange={event => handleHeaderValueChange(event, id)}
                 />
               </Grid>
@@ -337,6 +347,7 @@ const WrappedSourceDetail = ({
                 fullWidth
                 placeholder={t('headers.value')}
                 variant="outlined"
+                type={settings?.demo ? 'password' : 'text'}
                 onChange={handleTempHeaderValue}
               />
             </Grid>
@@ -381,6 +392,7 @@ const WrappedSourceDetail = ({
             placeholder={t('proxy.placeholder')}
             fullWidth
             variant="outlined"
+            type={settings?.demo ? 'password' : 'text'}
             onChange={handleProxyChange}
           />
         </Grid>
@@ -405,6 +417,7 @@ const WrappedSourceDetail = ({
             fullWidth
             variant="outlined"
             InputProps={{ style: { fontFamily: 'monospace' } }}
+            type={settings?.demo ? 'password' : 'text'}
             onChange={handleCAChange}
           />
         </Grid>

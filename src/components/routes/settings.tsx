@@ -195,6 +195,13 @@ function Settings() {
     }
   }
 
+  function toggleDemoView() {
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, demo: !settings.demo });
+    }
+  }
+
   function handleViewChange(event) {
     if (settings) {
       setModified(true);
@@ -656,6 +663,21 @@ function Settings() {
                 ) : (
                   <Skeleton />
                 )}
+              </TableCell>
+            </ClickRow>
+            <ClickRow enabled={editable} onClick={toggleDemoView}>
+              <TableCell colSpan={2} width="100%">
+                <Typography variant="body1">{t('interface.demo')}</Typography>
+                <Typography variant="caption">{t('interface.demo_desc')}</Typography>
+              </TableCell>
+              <TableCell align="right">
+                <Switch
+                  checked={settings ? settings.demo : false}
+                  disabled={settings === null || !editable}
+                  onChange={() => toggleDemoView()}
+                  color="secondary"
+                  name="demo"
+                />
               </TableCell>
             </ClickRow>
           </TableBody>

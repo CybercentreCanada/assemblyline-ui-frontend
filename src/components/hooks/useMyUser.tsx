@@ -31,6 +31,7 @@ type IndexDefinitionMap = {
 type SettingsDefinition = {
   classification: string;
   deep_scan: boolean;
+  demo: boolean;
   description: string;
   download_encoding: string;
   expand_min_score: number;
