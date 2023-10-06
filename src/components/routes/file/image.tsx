@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 const MIN = 100;
 const MAX = 900;
 const ZOOM_CLASS = 'zooming';
+const PIXELATED_CLASS = 'pixelated';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -24,10 +25,14 @@ const useStyles = makeStyles(theme => ({
     minWidth: `128px`,
     objectFit: 'contain',
     cursor: 'pointer',
+    imageRendering: 'auto',
     [`&.${ZOOM_CLASS}`]: {
       objectFit: 'initial',
       maxHeight: 'none',
       maxWidth: 'none'
+    },
+    [`&.${PIXELATED_CLASS}`]: {
+      imageRendering: 'pixelated'
     }
   },
   zoom: {
@@ -40,7 +45,8 @@ const useStyles = makeStyles(theme => ({
     rowGap: theme.spacing(1),
     height: '250px',
     width: '50px',
-    padding: `${theme.spacing(2)} 0`
+    padding: `${theme.spacing(2)} 0`,
+    opacity: 0
   },
   zoomSlider: {
     '& .MuiSlider-thumb': {
@@ -51,17 +57,17 @@ const useStyles = makeStyles(theme => ({
 
 type Data = {
   isDown: boolean;
-  zoom?: number;
+  prevZoom?: number;
+  curZoom?: number;
+  distance?: number;
   startX?: number;
   startY?: number;
-  x?: number;
-  y?: number;
-};
-
-type ResizeProps = {
-  zoomValue?: number;
-  pageX?: number;
-  pageY?: number;
+  prevX?: number;
+  prevY?: number;
+  curX?: number;
+  curY?: number;
+  imgX?: number;
+  imgY?: number;
 };
 
 type ImageViewerProps = {
@@ -72,140 +78,104 @@ type ImageViewerProps = {
 const WrappedImageViewer = React.forwardRef(({ src = null, alt = null }: ImageViewerProps, ref) => {
   const classes = useStyles();
 
-  const [zoom, setZoom] = useState<number>(100);
+  const [zoom, setZoom] = useState<number>(MIN);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [isZooming, setIsZooming] = useState<boolean>(false);
+  const [isPixelated, setIsPixelated] = useState<boolean>(false);
 
-  const zoomRef = useRef<number>(null);
-  const dragTimer = useRef<number>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const dragTimer = useRef<number>(null);
   const animationID = useRef<number>();
-  const transformData = useRef<any>({
-    x: 0,
-    y: 0
-  });
   const data = useRef<Data>({
     isDown: false,
-    zoom: 0,
+    prevZoom: 0,
+    curZoom: 0,
+    distance: 0,
     startX: 0,
     startY: 0,
-    x: 0,
-    y: 0
+    prevX: 0,
+    prevY: 0,
+    curX: 0,
+    curY: 0,
+    imgX: 0,
+    imgY: 0
   });
 
-  const handleMouseResize = useCallback(
-    ({ zoomValue = MIN, pageX = 0, pageY = 0 }: ResizeProps) => {
-      if (!isLoaded || !containerRef.current || !imgRef.current) return;
-
-      const { top, left, width: w } = containerRef.current.getBoundingClientRect();
-      menuRef.current.style.top = `${top}px`;
-      menuRef.current.style.left = `${left + w - 50}px`;
-
-      // Calculate new width and height based on zoom value
-      const aspectRatio = imgRef.current.naturalHeight / imgRef.current.naturalWidth;
-      let width, height;
-
-      // tall image
-      if (aspectRatio > 1) {
-        height =
-          (zoomValue / 100) * Math.max(128, Math.min(imgRef.current.naturalHeight, containerRef.current.clientHeight));
-        width = height / aspectRatio;
-      }
-      // wide image
-      else {
-        width =
-          (zoomValue / 100) * Math.max(128, Math.min(imgRef.current.naturalWidth, containerRef.current.clientWidth));
-        height = width * aspectRatio;
-      }
-
-      // const maxWidth = Math.max(128, Math.min(containerRef.current.clientWidth, imgRef.current.naturalWidth));
-      // const maxHeight = Math.max(128, Math.min(containerRef.current.clientHeight, imgRef.current.naturalHeight));
-
-      console.log(transformData.current.x, transformData.current.y);
-
-      if (zoomValue <= MIN) {
-        setIsZooming(false);
-        setZoom(MIN);
-        imgRef.current.style.width = `auto`;
-        imgRef.current.style.height = `auto`;
-        imgRef.current.style.transform = `none`;
-        return;
-      } else {
-        setIsZooming(true);
-        setZoom(zoomValue);
-        imgRef.current.style.width = `${width}px`;
-        imgRef.current.style.height = `${height}px`;
-      }
-
-      // Calculate horizontal scroll
-      const thresholdX = width - containerRef.current.clientWidth;
-      if (thresholdX > 0) {
-        const x = transformData.current.x + pageX - data.current.x;
-        data.current.x = pageX;
-        transformData.current.x = Math.min(0, Math.max(-thresholdX, x));
-      } else {
-        transformData.current.x = 0;
-      }
-
-      // Calculate vertical scroll
-      const thresholdY = height - containerRef.current.clientHeight;
-      if (thresholdY > 0) {
-        const y = transformData.current.y + pageY - data.current.y;
-        data.current.y = pageY;
-        transformData.current.y = Math.min(0, Math.max(-thresholdY, y));
-      } else {
-        transformData.current.y = 0;
-      }
-
-      imgRef.current.style.transform = `translate(${transformData.current.x}px, ${transformData.current.y}px)`;
-    },
-    [isLoaded]
-  );
-
-  const handleWheel = useCallback(
-    (event: React.WheelEvent<HTMLDivElement>, z: number) => {
-      event.stopPropagation();
-      if (!isLoaded) return;
-      handleMouseResize({ zoomValue: Math.max(MIN, Math.min(MAX, z - Math.floor(event.deltaY / 10))) });
-    },
-    [handleMouseResize, isLoaded]
-  );
-
-  const handleMouseDown = useCallback(
-    (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      if (!isLoaded || event.button !== 0) return;
-      dragTimer.current = new Date().valueOf();
-      data.current = {
-        isDown: true,
-        startX: event.pageX,
-        startY: event.pageY,
-        x: event.pageX,
-        y: event.pageY
-      };
-      if (animationID.current) cancelAnimationFrame(animationID.current);
-    },
-    [isLoaded]
-  );
-
-  const handleMouseMove = useCallback(
-    (event: React.MouseEvent<HTMLDivElement, MouseEvent>, z: number) => {
-      if (!isLoaded || !data.current.isDown) return;
-      handleMouseResize({ zoomValue: z, pageX: event.pageX, pageY: event.pageY });
-    },
-    [handleMouseResize, isLoaded]
-  );
-
-  const handleMouseUp = useCallback(() => {
-    data.current.isDown = false;
-
+  const resize = useCallback(() => {
     if (!containerRef.current || !imgRef.current) return;
 
+    const { naturalWidth, naturalHeight } = imgRef.current;
+    const { clientHeight: ctnHeight, clientWidth: ctnWidth } = containerRef.current;
+    const { curZoom, prevZoom, imgX, curX, prevX, imgY, curY, prevY } = data.current;
+
+    // Reposition the menu element
+    const { top, left, width: curWidth } = containerRef.current.getBoundingClientRect();
+    menuRef.current.style.top = `${top}px`;
+    menuRef.current.style.left = `${left + curWidth - 50}px`;
+    menuRef.current.style.opacity = `1`;
+
+    // Calculate new width and height based on zoom value
+    const aspectRatio = naturalHeight / naturalWidth;
+    let width, height;
+
+    // tall image
+    if (aspectRatio > 1) {
+      height = (curZoom / 100) * Math.max(128, Math.min(naturalHeight, ctnHeight));
+      width = height / aspectRatio;
+    }
+    // wide image
+    else {
+      width = (curZoom / 100) * Math.max(128, Math.min(naturalWidth, ctnWidth));
+      height = width * aspectRatio;
+    }
+
+    if (curZoom <= MIN) {
+      setIsZooming(false);
+      setZoom(MIN);
+      data.current.curZoom = MIN;
+      imgRef.current.style.width = `auto`;
+      imgRef.current.style.height = `auto`;
+      imgRef.current.style.maxWidth = null;
+      imgRef.current.style.maxHeight = null;
+    } else {
+      setIsZooming(true);
+      setZoom(curZoom);
+      imgRef.current.style.width = `${width}px`;
+      imgRef.current.style.height = `${height}px`;
+      imgRef.current.style.maxWidth = `none`;
+      imgRef.current.style.maxHeight = `none`;
+    }
+
+    // Calculate horizontal scroll
+    const thresholdX = width - ctnWidth;
+    if (thresholdX <= 0) {
+      data.current = { ...data.current, imgX: 0, curX: 0, prevX: 0 };
+    } else {
+      data.current.imgX = Math.min(0, Math.max(-thresholdX, (imgX + curX - prevX) * (curZoom / prevZoom)));
+      data.current.prevX = curX;
+    }
+
+    // Calculate vertical scroll
+    const thresholdY = height - ctnHeight;
+    if (thresholdY <= 0) {
+      data.current = { ...data.current, imgY: 0, curY: 0, prevY: 0 };
+    } else {
+      data.current.imgY = Math.min(0, Math.max(-thresholdY, (imgY + curY - prevY) * (curZoom / prevZoom)));
+      data.current.prevY = curY;
+    }
+
+    data.current.prevZoom = data.current.curZoom;
+    imgRef.current.style.transform = `translate(${data.current.imgX}px, ${data.current.imgY}px)`;
+  }, []);
+
+  const animate = useCallback(() => {
     // Calculate dragging speed
     const timeDiff = (new Date() as any) - dragTimer.current;
-    let speedY = ((data.current.y - data.current.startY) / timeDiff) * 15;
-    let speedX = ((data.current.x - data.current.startX) / timeDiff) * 15;
+    const { curX, curY, startX, startY } = data.current;
+    let speedY = ((curY - startY) / timeDiff) * 15;
+    let speedX = ((curX - startX) / timeDiff) * 15;
     let speedYAbsolute = Math.abs(speedY);
     let speedXAbsolute = Math.abs(speedX);
 
@@ -216,125 +186,170 @@ const WrappedImageViewer = React.forwardRef(({ src = null, alt = null }: ImageVi
       const thresholdY = imgRef.current.clientHeight - containerRef.current.clientHeight;
       if (speedYAbsolute > 0 && thresholdY > 0) {
         if (speedY > 0) {
-          transformData.current.y = Math.min(0, Math.max(-thresholdY, transformData.current.y + speedYAbsolute--));
+          data.current.imgY = Math.min(0, Math.max(-thresholdY, data.current.imgY + speedYAbsolute--));
         } else {
-          transformData.current.y = Math.min(0, Math.max(-thresholdY, transformData.current.y - speedYAbsolute--));
+          data.current.imgY = Math.min(0, Math.max(-thresholdY, data.current.imgY - speedYAbsolute--));
         }
       }
-
       const thresholdX = imgRef.current.clientWidth - containerRef.current.clientWidth;
       if (speedXAbsolute > 0 && thresholdX > 0) {
         if (speedX > 0) {
-          transformData.current.x = Math.min(0, Math.max(-thresholdX, transformData.current.x + speedXAbsolute--));
+          data.current.imgX = Math.min(0, Math.max(-thresholdX, data.current.imgX + speedXAbsolute--));
         } else {
-          transformData.current.x = Math.min(0, Math.max(-thresholdX, transformData.current.x - speedXAbsolute--));
+          data.current.imgX = Math.min(0, Math.max(-thresholdX, data.current.imgX - speedXAbsolute--));
         }
       }
 
-      if (imgRef.current.style.width !== 'auto')
-        imgRef.current.style.transform = `translate(${transformData.current.x}px, ${transformData.current.y}px)`;
+      // Resize the elements
+      resize();
 
+      // Cancel the animation if there are no more speeds
       if (speedXAbsolute <= 0 && speedYAbsolute <= 0) cancelAnimationFrame(animationID.current);
       else animationID.current = requestAnimationFrame(draw);
     };
     draw();
+  }, [resize]);
+
+  const calculate = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+    // Find the middle point of all points
+    let midX = 0;
+    let midY = 0;
+    for (let i = 0; i < event.touches.length; i++) {
+      midX += event.touches.item(i).pageX;
+      midY += event.touches.item(i).pageY;
+    }
+    midX /= event.touches.length;
+    midY /= event.touches.length;
+
+    // Find the distance between all points and the middle point
+    let dist = 0;
+    for (let i = 0; i < event.touches.length; i++) {
+      dist += Math.sqrt(
+        Math.pow(event.touches.item(i).pageX - midX, 2) + Math.pow(event.touches.item(i).pageY - midY, 2)
+      );
+    }
+
+    dist /= event.touches.length;
+
+    return { x: midX, y: midY, distance: dist };
   }, []);
 
-  const handleResize = useCallback(() => {
-    if (!containerRef.current) return;
-    const { top, left, width: w } = containerRef.current.getBoundingClientRect();
-    menuRef.current.style.top = `${top}px`;
-    menuRef.current.style.left = `${left + w - 50}px`;
-
-    // Calculate new width and height based on zoom value
-    const aspectRatio = imgRef.current.naturalHeight / imgRef.current.naturalWidth;
-    const width = imgRef.current.clientWidth;
-    const height = imgRef.current.clientWidth * aspectRatio;
-
-    const maxWidth = Math.max(128, Math.min(containerRef.current.clientWidth, imgRef.current.naturalWidth));
-    const maxHeight = Math.max(128, Math.min(containerRef.current.clientHeight, imgRef.current.naturalHeight));
-
-    const newZoom = Math.floor((100 * width) / maxWidth);
-
-    if (newZoom <= MIN) {
-      setIsZooming(false);
-      setZoom(MIN);
-      imgRef.current.style.width = `auto`;
-      imgRef.current.style.height = `auto`;
-    } else if (width / maxWidth >= 5 || height / maxHeight >= 5) {
-      setIsZooming(true);
-      setZoom(MAX);
-      imgRef.current.style.width = `${5 * Math.min(maxWidth, maxHeight / aspectRatio)}px`;
-      imgRef.current.style.height = `${5 * Math.min(maxHeight, maxWidth * aspectRatio)}px`;
+  const handleLoad = useCallback((event: any) => {
+    setIsLoaded(true);
+    if (event.target?.naturalWidth <= 128 || event.target?.naturalHeight <= 128) {
+      setIsPixelated(true);
     } else {
-      setIsZooming(true);
-      setZoom(newZoom);
-      imgRef.current.style.width = `${width}px`;
-      imgRef.current.style.height = `${height}px`;
+      setIsPixelated(false);
     }
   }, []);
 
-  const handleTouchStart = useCallback(
-    (event: React.TouchEvent<HTMLDivElement>) => {
+  const handleZoomChange = useCallback(
+    (value: number, delta: number) => {
       if (!isLoaded) return;
+      if (animationID.current) cancelAnimationFrame(animationID.current);
+      if (value) data.current.curZoom = value;
+      if (delta) data.current.curZoom += delta;
+      data.current.curZoom = Math.max(MIN, Math.min(MAX, Math.floor(data.current.curZoom)));
+      resize();
+    },
+    [isLoaded, resize]
+  );
 
-      if (event.touches.length === 1) {
-        dragTimer.current = new Date().valueOf();
-        data.current = {
-          ...data.current,
-          isDown: true,
-          startX: event.touches[0].pageX,
-          startY: event.touches[0].pageY,
-          x: event.touches[0].pageX,
-          y: event.touches[0].pageY
-        };
-      }
+  const handleWheel = useCallback(
+    (event: React.WheelEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+      if (!isLoaded) return;
+      data.current.curZoom = Math.max(MIN, Math.min(MAX, data.current.curZoom - Math.floor(event.deltaY / 10)));
+      resize();
+    },
+    [isLoaded, resize]
+  );
 
-      if (event.touches.length === 2) {
-        const newZoom = Math.sqrt(
-          Math.pow(event.touches[1].pageX - event.touches[0].pageX, 2) +
-            Math.pow(event.touches[1].pageY - event.touches[0].pageY, 2)
-        );
-        data.current = { ...data.current, zoom: newZoom };
-      }
+  const handleMouseDown = useCallback(
+    (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      if (!isLoaded || event.button !== 0) return;
+      dragTimer.current = new Date().valueOf();
+      data.current = {
+        ...data.current,
+        isDown: true,
+        startX: event.pageX,
+        startY: event.pageY,
+        curX: event.pageX,
+        curY: event.pageY,
+        prevX: event.pageX,
+        prevY: event.pageY
+      };
+      if (animationID.current) cancelAnimationFrame(animationID.current);
     },
     [isLoaded]
   );
 
-  const handleTouchMove = useCallback(
-    (event: React.TouchEvent<HTMLDivElement>, z: number) => {
-      if (!isLoaded) return;
-      if (event.touches.length === 1) {
-        handleMouseResize({ zoomValue: z, pageX: event.touches[0].pageX, pageY: event.touches[0].pageY });
-      } else if (event.touches.length === 2) {
-        const newZoom = Math.sqrt(
-          Math.pow(event.touches[1].pageX - event.touches[0].pageX, 2) +
-            Math.pow(event.touches[1].pageY - event.touches[0].pageY, 2)
-        );
-        handleMouseResize({
-          zoomValue: (z * newZoom) / data.current.zoom,
-          pageX: event.touches[0].pageX,
-          pageY: event.touches[0].pageY
-        });
-        data.current = {
-          ...data.current,
-          zoom: newZoom
-        };
-      }
+  const handleMouseMove = useCallback(
+    (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      if (!isLoaded || !data.current.isDown) return;
+      data.current = { ...data.current, curX: event.pageX, curY: event.pageY };
+      resize();
     },
-    [handleMouseResize, isLoaded]
+    [isLoaded, resize]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    data.current.isDown = false;
+    if (!containerRef.current || !imgRef.current) return;
+    animate();
+  }, [animate]);
+
+  const handleTouchStart = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      if (!isLoaded) return;
+      const { x, y, distance } = calculate(event);
+      dragTimer.current = new Date().valueOf();
+      data.current = {
+        ...data.current,
+        distance: distance,
+        isDown: true,
+        startX: x,
+        startY: y,
+        curX: x,
+        curY: y,
+        prevX: x,
+        prevY: y
+      };
+      if (animationID.current) cancelAnimationFrame(animationID.current);
+    },
+    [calculate, isLoaded]
+  );
+
+  const handleTouchMove = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      if (!isLoaded || !data.current.isDown) return;
+      const { x, y, distance } = calculate(event);
+
+      if (distance > 0 && data.current.distance > 0) {
+        let z = (data.current.curZoom * distance) / data.current.distance;
+        z = Math.max(MIN, Math.min(MAX, Math.floor(z)));
+        data.current = { ...data.current, curZoom: Math.max(MIN, Math.min(MAX, Math.floor(z))), distance: distance };
+      }
+
+      data.current = { ...data.current, curX: x, curY: y };
+      resize();
+    },
+    [calculate, isLoaded, resize]
   );
 
   useEffect(() => {
     if (!isLoaded) return;
 
-    handleResize();
+    function handleResize() {
+      resize();
+    }
 
     function touchstart(event) {
       event.preventDefault();
     }
 
     const element = containerRef.current;
+    handleResize();
 
     window.addEventListener('mouseup', handleMouseUp);
     window.addEventListener('resize', handleResize);
@@ -346,7 +361,7 @@ const WrappedImageViewer = React.forwardRef(({ src = null, alt = null }: ImageVi
       element.removeEventListener('touchstart', touchstart);
       window.removeEventListener('touchend', handleMouseUp);
     };
-  }, [handleMouseUp, handleResize, isLoaded]);
+  }, [handleMouseUp, isLoaded, resize]);
 
   return (
     src && (
@@ -354,36 +369,24 @@ const WrappedImageViewer = React.forwardRef(({ src = null, alt = null }: ImageVi
         <div
           ref={containerRef}
           className={classes.root}
-          onWheel={e => handleWheel(e, zoom)}
-          onMouseDown={e => handleMouseDown(e)}
-          onMouseMove={e => handleMouseMove(e, zoom)}
-          onTouchStart={e => handleTouchStart(e)}
-          onTouchMove={e => handleTouchMove(e, zoom)}
+          onWheel={handleWheel}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
         >
           <img
             ref={imgRef}
-            className={clsx(classes.image, isZooming && ZOOM_CLASS)}
+            className={clsx(classes.image, isZooming && ZOOM_CLASS, isPixelated && PIXELATED_CLASS)}
             src={src}
             alt={alt}
             draggable={false}
-            style={
-              isZooming
-                ? {
-                    maxHeight: 'none',
-                    maxWidth: 'none'
-                  }
-                : {}
-            }
-            onLoad={() => setIsLoaded(true)}
+            onLoad={handleLoad}
           />
         </div>
         <div ref={menuRef} className={classes.zoom}>
           <div style={{ textAlign: 'end', minWidth: '35px' }}>{`${Math.floor(zoom)}%`}</div>
-          <IconButton
-            size="small"
-            children={<AddIcon fontSize="small" />}
-            onClick={() => handleMouseResize({ zoomValue: Math.min(MAX, zoom + 10) })}
-          />
+          <IconButton size="small" children={<AddIcon fontSize="small" />} onClick={() => handleZoomChange(null, 10)} />
           <Slider
             className={classes.zoomSlider}
             value={zoom}
@@ -392,12 +395,12 @@ const WrappedImageViewer = React.forwardRef(({ src = null, alt = null }: ImageVi
             max={MAX}
             size="small"
             orientation="vertical"
-            onChange={(event, newValue) => handleMouseResize({ zoomValue: Math.floor(newValue as number) })}
+            onChange={(event, newValue) => handleZoomChange(newValue as number, null)}
           />
           <IconButton
             size="small"
             children={<RemoveIcon fontSize="small" />}
-            onClick={() => handleMouseResize({ zoomValue: Math.max(100, zoom - 10) })}
+            onClick={() => handleZoomChange(null, -10)}
           />
         </div>
       </>
