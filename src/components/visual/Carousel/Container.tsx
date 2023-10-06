@@ -167,7 +167,6 @@ const useStyles = makeStyles(theme => {
       minWidth: imageSize,
       maxWidth: '100vw',
       maxHeight: `calc(100vh - 64px - ${navbarHeight})`,
-      imageRendering: 'pixelated',
       transition: theme.transitions.create(['all'], options),
       [`&.${ZOOM_CLASS}`]: {
         maxHeight: 'none',
@@ -272,6 +271,8 @@ const WrappedCarouselContainer = ({
     startY: 0
   });
 
+  const [imageRendering, setImageRendering] = useState<'auto' | 'pixelated'>('auto' as 'auto');
+
   const zoomTimer = useRef<number>(null);
   const zoomClass = useMemo<string | null>(() => isZooming && ZOOM_CLASS, [isZooming]);
 
@@ -354,7 +355,7 @@ const WrappedCarouselContainer = ({
 
   const handleZoomWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
     event.stopPropagation();
-    setZoom(z => Math.min(Math.max(z - event.deltaY / 10, 10), 500));
+    setZoom(z => Math.round(Math.min(Math.max(z - event.deltaY / 10, 10), 500)));
   }, []);
 
   const handleZoomMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -438,13 +439,16 @@ const WrappedCarouselContainer = ({
   }, [currentImage]);
 
   useEffect(() => {
-    const thumbs = document.getElementById('carousel')?.querySelectorAll('.carousel-thumb');
-    if (!thumbs || index < 0 || index >= thumbs?.length) return;
-    thumbs[index]?.scrollIntoView({
-      inline: 'center',
-      behavior: 'smooth'
-    });
-  }, [imgData, index]);
+    var i = new Image();
+    i.onload = function () {
+      if (i.width <= 128 || i.height <= 128) {
+        setImageRendering('pixelated');
+      } else {
+        setImageRendering('auto');
+      }
+    };
+    i.src = imgData;
+  }, [imgData]);
 
   return (
     images &&
@@ -501,9 +505,12 @@ const WrappedCarouselContainer = ({
                               ? `calc(${zoom / 100} * ${imgRef.current.naturalHeight}px)`
                               : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`,
                           minWidth: 0,
-                          minHeight: 0
+                          minHeight: 0,
+                          imageRendering: imageRendering
                         }
-                      : {}
+                      : {
+                          imageRendering: imageRendering
+                        }
                   }
                   onClick={imgData ? handleZoomClick : null}
                 />
