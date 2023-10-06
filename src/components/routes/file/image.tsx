@@ -49,6 +49,9 @@ const useStyles = makeStyles(theme => ({
     padding: `${theme.spacing(2)} 0`,
     [theme.breakpoints.down('md')]: {
       right: `calc(50px - ${theme.spacing(3)})`
+    },
+    '@media (max-height: 600px)': {
+      display: 'none'
     }
   },
   zoomSlider: {
