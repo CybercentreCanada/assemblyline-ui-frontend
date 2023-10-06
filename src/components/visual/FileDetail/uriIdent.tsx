@@ -23,7 +23,55 @@ type URIIdentificationSectionProps = {
   promotedSections?: any[];
 };
 
-const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> = ({ fileinfo, promotedSections = [] }) => {
+const parseValue = value => {
+  if (value instanceof Array) {
+    return value.join(' | ');
+  } else if (value === true) {
+    return 'true';
+  } else if (value === false) {
+    return 'false';
+  } else if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+  return value;
+};
+
+const KVItem = ({ name, value }) => (
+  <>
+    <Grid item xs={4} sm={3} lg={2}>
+      <span style={{ fontWeight: 500, marginRight: '4px', display: 'flex', textTransform: 'capitalize' }}>{name}</span>
+    </Grid>
+    <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+      {parseValue(value)}
+    </Grid>
+  </>
+);
+
+const WrappedOrderedKVExtra = ({ body }) => (
+  <>
+    {Object.keys(body).map(id => {
+      const item = body[id];
+      return <KVItem key={id} name={item[0]} value={item[1]} />;
+    })}
+  </>
+);
+
+const OrderedKVExtra = React.memo(WrappedOrderedKVExtra);
+
+const WrappedKVExtra = ({ body }) => (
+  <>
+    {Object.keys(body).map((key, id) => {
+      return <KVItem key={id} name={key} value={body[key]} />;
+    })}
+  </>
+);
+
+const KVExtra = React.memo(WrappedKVExtra);
+
+const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> = ({
+  fileinfo,
+  promotedSections = []
+}) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -63,66 +111,7 @@ const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> =
               {fileinfo?.uri_info ? fileinfo.uri_info.scheme : <Skeleton />}
             </Grid>
 
-            <Grid item xs={4} sm={3} lg={2}>
-              <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Netloc</span>
-            </Grid>
-            <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-              {fileinfo?.uri_info ? fileinfo.uri_info.netloc : <Skeleton />}
-            </Grid>
-
-            {fileinfo?.uri_info?.path ?
-              <>
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Path</span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  {fileinfo.uri_info.path}
-                </Grid>
-              </>
-              :
-              <></>
-            }
-
-            {fileinfo?.uri_info?.params ?
-              <>
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Params</span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  {fileinfo.uri_info.params}
-                </Grid>
-              </>
-              :
-              <></>
-            }
-
-            {fileinfo?.uri_info?.query ?
-              <>
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Query</span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  {fileinfo.uri_info.query}
-                </Grid>
-              </>
-              :
-              <></>
-            }
-
-            {fileinfo?.uri_info?.fragment ?
-              <>
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Fragment</span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  {fileinfo.uri_info.fragment}
-                </Grid>
-              </>
-              :
-              <></>
-            }
-
-            {fileinfo?.uri_info?.username ?
+            {fileinfo?.uri_info?.username && (
               <>
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Username</span>
@@ -131,11 +120,9 @@ const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> =
                   {fileinfo.uri_info.username}
                 </Grid>
               </>
-              :
-              <></>
-            }
+            )}
 
-            {fileinfo?.uri_info?.password ?
+            {fileinfo?.uri_info?.password && (
               <>
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Password</span>
@@ -144,24 +131,16 @@ const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> =
                   {fileinfo.uri_info.password}
                 </Grid>
               </>
-              :
-              <></>
-            }
+            )}
 
-            {fileinfo?.uri_info?.hostname ?
-              <>
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Hostname</span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  {fileinfo.uri_info.hostname}
-                </Grid>
-              </>
-              :
-              <></>
-            }
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Hostname</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              {fileinfo.uri_info.hostname}
+            </Grid>
 
-            {fileinfo?.uri_info?.port ?
+            {fileinfo?.uri_info?.port && (
               <>
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Port</span>
@@ -170,15 +149,70 @@ const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> =
                   {fileinfo.uri_info.port}
                 </Grid>
               </>
-              :
-              <></>
-            }
+            )}
+
+            {fileinfo?.uri_info?.path && (
+              <>
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Path</span>
+                </Grid>
+                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                  {fileinfo.uri_info.path}
+                </Grid>
+              </>
+            )}
+
+            {fileinfo?.uri_info?.params && (
+              <>
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Params</span>
+                </Grid>
+                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                  {fileinfo.uri_info.params}
+                </Grid>
+              </>
+            )}
+
+            {fileinfo?.uri_info?.query && (
+              <>
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Query</span>
+                </Grid>
+                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                  {fileinfo.uri_info.query}
+                </Grid>
+              </>
+            )}
+
+            {fileinfo?.uri_info?.fragment && (
+              <>
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>Fragment</span>
+                </Grid>
+                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                  {fileinfo.uri_info.fragment}
+                </Grid>
+              </>
+            )}
+
+            {promotedSections
+              ? promotedSections
+                  .filter(section => section.promote_to === 'URI_PARAMS')
+                  .map((section, idx) =>
+                    section.body_format === 'KEY_VALUE' ? (
+                      <KVExtra key={idx} body={section.body} />
+                    ) : (
+                      <OrderedKVExtra key={idx} body={section.body} />
+                    )
+                  )
+              : null}
           </Grid>
+
           <div>
             {promotedSections
               ? promotedSections
-                .filter(section => section.promote_to === 'SCREENSHOT')
-                .map((section, idx) => <ImageInlineBody key={idx} body={section.body} />)
+                  .filter(section => section.promote_to === 'SCREENSHOT')
+                  .map((section, idx) => <ImageInlineBody key={idx} body={section.body} />)
               : null}
           </div>
         </div>
