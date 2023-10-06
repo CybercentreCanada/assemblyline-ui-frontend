@@ -36,7 +36,8 @@ const useStyles = makeStyles(theme => ({
     }
   },
   zoom: {
-    position: 'fixed',
+    position: 'absolute',
+    right: `calc(50px - ${theme.spacing(1)})`,
     backgroundColor: alpha(theme.palette.background.paper, 0.7),
     borderRadius: theme.spacing(3),
     display: 'flex',
@@ -46,7 +47,12 @@ const useStyles = makeStyles(theme => ({
     height: '250px',
     width: '50px',
     padding: `${theme.spacing(2)} 0`,
-    opacity: 0
+    [theme.breakpoints.down('md')]: {
+      right: `calc(50px - ${theme.spacing(3)})`
+    },
+    '@media (max-height: 600px)': {
+      display: 'none'
+    }
   },
   zoomSlider: {
     '& .MuiSlider-thumb': {
@@ -85,7 +91,6 @@ const WrappedImageViewer = React.forwardRef(({ src = null, alt = null }: ImageVi
 
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
   const dragTimer = useRef<number>(null);
   const animationID = useRef<number>();
   const data = useRef<Data>({
@@ -106,19 +111,13 @@ const WrappedImageViewer = React.forwardRef(({ src = null, alt = null }: ImageVi
   const resize = useCallback(() => {
     if (!containerRef.current || !imgRef.current) return;
 
+    const { curZoom, prevZoom, imgX, curX, prevX, imgY, curY, prevY } = data.current;
     const { naturalWidth, naturalHeight } = imgRef.current;
     const { clientHeight: ctnHeight, clientWidth: ctnWidth } = containerRef.current;
-    const { curZoom, prevZoom, imgX, curX, prevX, imgY, curY, prevY } = data.current;
-
-    // Reposition the menu element
-    const { top, left, width: curWidth } = containerRef.current.getBoundingClientRect();
-    menuRef.current.style.top = `${top}px`;
-    menuRef.current.style.left = `${left + curWidth - 50}px`;
-    menuRef.current.style.opacity = `1`;
 
     // Calculate new width and height based on zoom value
     const aspectRatio = naturalHeight / naturalWidth;
-    let width, height;
+    let width: number, height: number;
 
     // tall image
     if (aspectRatio > 1) {
@@ -384,7 +383,7 @@ const WrappedImageViewer = React.forwardRef(({ src = null, alt = null }: ImageVi
             onLoad={handleLoad}
           />
         </div>
-        <div ref={menuRef} className={classes.zoom}>
+        <div className={classes.zoom}>
           <div style={{ textAlign: 'end', minWidth: '35px' }}>{`${Math.floor(zoom)}%`}</div>
           <IconButton size="small" children={<AddIcon fontSize="small" />} onClick={() => handleZoomChange(null, 10)} />
           <Slider
