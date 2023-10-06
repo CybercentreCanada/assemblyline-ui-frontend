@@ -439,6 +439,15 @@ const WrappedCarouselContainer = ({
   }, [currentImage]);
 
   useEffect(() => {
+    const thumbs = document.getElementById('carousel')?.querySelectorAll('.carousel-thumb');
+    if (!thumbs || index < 0 || index >= thumbs?.length) return;
+    thumbs[index]?.scrollIntoView({
+      inline: 'center',
+      behavior: 'smooth'
+    });
+  }, [imgData, index]);
+
+  useEffect(() => {
     var i = new Image();
     i.onload = function () {
       if (i.width <= 128 || i.height <= 128) {
