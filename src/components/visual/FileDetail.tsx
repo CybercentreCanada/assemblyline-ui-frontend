@@ -49,6 +49,20 @@ import TagSection from './FileDetail/tags';
 import FileDownloader from './FileDownloader';
 import InputDialog from './InputDialog';
 
+type URIInfo = {
+  uri: string;
+  scheme: string;
+  netloc: string;
+  path: string;
+  params: string;
+  query: string;
+  fragment: string;
+  username: string;
+  password: string;
+  hostname: string;
+  port: number;
+}
+
 type FileInfo = {
   archive_ts: string;
   ascii: string;
@@ -70,6 +84,7 @@ type FileInfo = {
   ssdeep: string;
   tlsh: string;
   type: string;
+  uri_info: URIInfo;
 };
 
 type File = {
@@ -301,7 +316,14 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
               {file?.file_info?.type.startsWith("uri/") ? t('uri_title') : t('title')}
             </Typography>
             <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-              {file ? fileName : <Skeleton style={{ width: '10rem' }} />}
+              {file?.file_info?.type.startsWith("uri/") && file?.file_info?.uri_info?.uri ?
+                file?.file_info?.uri_info?.uri
+                :
+                file ?
+                  fileName
+                  :
+                  <Skeleton style={{ width: '10rem' }} />
+              }
             </Typography>
           </Grid>
           <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
