@@ -2,7 +2,6 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
@@ -100,11 +99,7 @@ function ExternalSourceTabPanel(props: TabPanelProps) {
       aria-labelledby={`external-source-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ marginTop: theme.spacing(0.5) }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box sx={{ marginTop: theme.spacing(0.5) }}>{children}</Box>}
     </div>
   );
 }
@@ -270,18 +265,21 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
     <>
       <div style={{ marginBottom: theme.spacing(2) }}>
         <Typography
+          variant="h5"
+          align="center"
           onClick={() => {
             setOpen(!open);
           }}
           className={classes.collapseTitle}
         >
-          {toTitleCase(t('result'))} {num + 1}:{open ? <ExpandLess /> : <ExpandMore />}
-        </Typography>
-        <Typography>
           <span>
-            <CustomChip type="rounded" size="tiny" variant="filled" color={verdictToColor(verdict)} label={verdict} />
+            {toTitleCase(t('result'))} #{num + 1}
           </span>
+          {open ? <ExpandLess /> : <ExpandMore />}
         </Typography>
+        <span>
+          <CustomChip type="rounded" size="tiny" variant="filled" color={verdictToColor(verdict)} label={verdict} />
+        </span>
         <Link className={clsx(classes.link)} href={enrichmentResult.link} target="_blank" rel="noopener noreferrer">
           <Typography className={clsx(classes.launch)}>
             {enrichmentResult.count} {t('results')}
@@ -334,7 +332,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
   };
 
   // prevents click through propagation on dialog popup
-  const handleDialogClick = e => {
+  const nullifyDialogClick = e => {
     e.stopPropagation();
   };
 
@@ -400,7 +398,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
   const sources = !!externalLookupResults ? Object.keys(externalLookupResults).sort() : null;
 
   return actionable && externalLookupResults ? (
-    <div>
+    <div onContextMenu={nullifyDialogClick} onClick={nullifyDialogClick}>
       {!!inProgress ? <ChipSkeletonInline /> : null}
       {!!externalLookupResults && !inProgress ? (
         <Button
@@ -418,7 +416,6 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
       <Dialog
         open={openedDialog}
         onClose={handleClose}
-        onClick={handleDialogClick}
         scroll="paper"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
@@ -455,7 +452,9 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
             </div>
           )}
 
-          <Typography variant="h4">{t('related_external.title')}</Typography>
+          <Typography variant="h4" component={'div'}>
+            {t('related_external.title')}
+          </Typography>
           <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
             {value}
           </Typography>
@@ -469,19 +468,17 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
         </DialogTitle>
 
         <DialogContent>
-          <DialogContentText id={descriptionId} ref={descriptionElementRef} tabIndex={-1}>
-            <Box sx={{ width: '100%' }}>
-              {sources.map((source, i) => (
-                <ExternalSourceTabPanel key={i} value={tabState} index={i} theme={theme}>
-                  <div>{!!externalLookupResults[source].error ? externalLookupResults[source].error : null}</div>
+          <Box sx={{ width: '100%' }}>
+            {sources.map((source, i) => (
+              <ExternalSourceTabPanel key={i} value={tabState} index={i} theme={theme}>
+                <div>{!!externalLookupResults[source].error ? externalLookupResults[source].error : null}</div>
 
-                  {externalLookupResults[source].items.map((enrichmentResult, j) => {
-                    return <EnrichmentResult key={j} enrichmentResult={enrichmentResult} num={j}></EnrichmentResult>;
-                  })}
-                </ExternalSourceTabPanel>
-              ))}
-            </Box>
-          </DialogContentText>
+                {externalLookupResults[source].items.map((enrichmentResult, j) => {
+                  return <EnrichmentResult key={j} enrichmentResult={enrichmentResult} num={j}></EnrichmentResult>;
+                })}
+              </ExternalSourceTabPanel>
+            ))}
+          </Box>
         </DialogContent>
       </Dialog>
     </div>
