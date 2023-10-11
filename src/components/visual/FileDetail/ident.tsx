@@ -2,10 +2,12 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useALContext from 'components/hooks/useALContext';
 import { bytesToSize } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ActionableText from '../ActionableText';
+import Classification from '../Classification';
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -27,6 +29,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
+  const { c12nDef } = useALContext();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
 
@@ -46,6 +49,25 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
       <Collapse in={open} timeout="auto">
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           <Grid container>
+            {c12nDef.enforce && (
+              <>
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span
+                    style={{
+                      fontWeight: 500,
+                      marginRight: theme.spacing(0.5),
+                      display: 'flex'
+                    }}
+                  >
+                    {t('file_classification')}
+                  </span>
+                </Grid>
+                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                  <Classification type="text" format="long" c12n={fileinfo ? fileinfo.classification : null} />
+                </Grid>
+              </>
+            )}
+
             <Grid item xs={4} sm={3} lg={2}>
               <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>MD5</span>
             </Grid>
