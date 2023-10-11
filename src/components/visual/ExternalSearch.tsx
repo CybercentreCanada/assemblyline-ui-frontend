@@ -7,7 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Box, Collapse, Divider, Grid, IconButton, Link, Tab, Tabs, Theme, Typography, useTheme } from '@mui/material';
+import { Box, Collapse, Divider, Grid, IconButton, Tab, Tabs, Theme, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +16,6 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import LaunchOutlinedIcon from '@mui/icons-material/LaunchOutlined';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import { ExternalEnrichmentResult } from 'components/providers/ExternalLookupProvider';
 import { DetailedItem } from 'components/routes/alerts/hooks/useAlerts';
@@ -30,24 +29,14 @@ const TARGET_RESULT_COUNT = 10;
 
 const useStyles = makeStyles(theme => ({
   link: {
-    width: '100%',
-    flex: 1,
-    overflow: 'hidden',
     textDecoration: 'none',
-    color: theme.palette.primary.main
-  },
-  content: {
-    flex: 1,
-    color: theme.palette.text.primary,
-    overflowWrap: 'anywhere'
-  },
-  launch: {
     color: theme.palette.primary.main,
     transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
     '&:hover': {
       color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
     }
   },
+  launch: {},
   dialogPaper: {
     minHeight: '95vh',
     maxHeight: '95vh'
@@ -120,8 +109,8 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
     const fullChipList = items.map(item => ({
       category: 'tag',
       label: item[0] !== null && item[0] !== undefined ? item[0].toString() : '',
-      variant: 'filled' as 'filled',
-      type: 'rounded' as 'rounded',
+      variant: 'outlined' as 'outlined',
+      // type: 'rounded' as 'rounded',
       tooltip: item[1] !== null && item[1] !== undefined ? item[1].toString() : ''
     }));
     const showExtra = items.length <= TARGET_RESULT_COUNT;
@@ -168,7 +157,7 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, v
   const [open, setOpen] = React.useState(true);
 
   return group && names ? (
-    <Box sx={{ marginTop: theme.spacing(0.5) }}>
+    <Box sx={{ marginBottom: theme.spacing(2) }}>
       <Typography
         variant="h6"
         onClick={() => {
@@ -188,7 +177,7 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, v
               <React.Fragment key={k}>
                 <Grid item xs={4} sm={4}>
                   <Tooltip title={ndMap[keyName]}>
-                    <Typography className={clsx(classes.content)}>{keyName}</Typography>
+                    <Typography>{keyName}</Typography>
                   </Tooltip>
                 </Grid>
                 <Grid item xs={8} sm={8}>
@@ -264,7 +253,7 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
 
   return enrichmentResult ? (
     <>
-      <div>
+      <div style={{ marginBottom: theme.spacing(2) }}>
         {count > 1 && (
           <Typography
             variant="h5"
@@ -279,16 +268,17 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
             {open ? <ExpandLess /> : <ExpandMore />}
           </Typography>
         )}
-        <span>
-          <CustomChip type="rounded" size="tiny" variant="filled" color={verdictToColor(verdict)} label={verdict} />
-        </span>
-        <Link className={clsx(classes.link)} href={enrichmentResult.link} target="_blank" rel="noopener noreferrer">
-          <Typography className={clsx(classes.launch)}>
-            {enrichmentResult.count} {t('results')}
-            <LaunchOutlinedIcon sx={{ verticalAlign: 'middle', height: '16px' }} />
-          </Typography>
-        </Link>
-        <Typography className={clsx(classes.content)}>{enrichmentResult.description}</Typography>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <CustomChip type="rounded" size="small" variant="filled" color={verdictToColor(verdict)} label={verdict} />
+          <Tooltip title={t('goto_external')}>
+            <IconButton href={enrichmentResult.link} target="_blank" rel="noopener noreferrer">
+              <LaunchOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
+        <Typography variant="subtitle1" gutterBottom>
+          {enrichmentResult.description}
+        </Typography>
       </div>
 
       <Collapse in={open} timeout="auto">
@@ -301,7 +291,7 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
                 names={nLookup[grpName]}
                 ndMap={ndLookup}
                 valueMap={vLookup[grpName]}
-              ></ResultGroup>
+              />
             );
           })}
       </Collapse>
