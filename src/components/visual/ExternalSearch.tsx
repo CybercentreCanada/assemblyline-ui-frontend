@@ -210,9 +210,10 @@ const ResultGroup = React.memo(WrappedResultGroup);
 type EnrichmentResultProps = {
   enrichmentResult: ExternalEnrichmentResult;
   num: number;
+  count: number;
 };
 
-const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichmentResult }) => {
+const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichmentResult, count }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   const theme = useTheme();
@@ -263,20 +264,21 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
 
   return enrichmentResult ? (
     <>
-      <div style={{ marginBottom: theme.spacing(2) }}>
-        <Typography
-          variant="h5"
-          align="center"
-          onClick={() => {
-            setOpen(!open);
-          }}
-          className={classes.collapseTitle}
-        >
-          <span>
-            {toTitleCase(t('result'))} #{num + 1}
-          </span>
-          {open ? <ExpandLess /> : <ExpandMore />}
-        </Typography>
+      <div>
+        {count < 1 && (
+          <Typography
+            variant="h5"
+            onClick={() => {
+              setOpen(!open);
+            }}
+            className={classes.collapseTitle}
+          >
+            <span style={{ flex: 1, textAlign: 'center' }}>
+              {toTitleCase(t('result'))} #{num + 1}
+            </span>
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </Typography>
+        )}
         <span>
           <CustomChip type="rounded" size="tiny" variant="filled" color={verdictToColor(verdict)} label={verdict} />
         </span>
@@ -303,7 +305,16 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
             );
           })}
       </Collapse>
-      <Divider />
+      {count < 1 && (
+        <Divider
+          style={{
+            marginBottom: theme.spacing(2),
+            marginTop: theme.spacing(2),
+            marginLeft: theme.spacing(4),
+            marginRight: theme.spacing(4)
+          }}
+        />
+      )}
     </>
   ) : null;
 };
@@ -474,7 +485,14 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
                 <div>{!!externalLookupResults[source].error ? externalLookupResults[source].error : null}</div>
 
                 {externalLookupResults[source].items.map((enrichmentResult, j) => {
-                  return <EnrichmentResult key={j} enrichmentResult={enrichmentResult} num={j}></EnrichmentResult>;
+                  return (
+                    <EnrichmentResult
+                      key={j}
+                      enrichmentResult={enrichmentResult}
+                      num={j}
+                      count={externalLookupResults[source].items.length}
+                    ></EnrichmentResult>
+                  );
                 })}
               </ExternalSourceTabPanel>
             ))}
