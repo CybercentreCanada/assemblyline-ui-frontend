@@ -3,11 +3,11 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
+import Classification from 'components/visual/Classification';
 import { bytesToSize } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ActionableText from '../ActionableText';
-import Classification from '../Classification';
 
 const useStyles = makeStyles(theme => ({
   title: {
