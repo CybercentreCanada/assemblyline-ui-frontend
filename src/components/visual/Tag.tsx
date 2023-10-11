@@ -6,7 +6,7 @@ import ExternalLinks from 'components/visual/ExternalSearch';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
 
-const STYLE = { height: 'auto', minHeight: '20px' };
+const STYLE = { height: 'auto', minHeight: '22px' };
 const initialMenuState = {
   mouseX: null,
   mouseY: null
@@ -87,20 +87,7 @@ const WrappedTag: React.FC<TagProps> = ({
         onClick={highlight_key ? handleClick : null}
         fullWidth={fullWidth}
         onContextMenu={handleMenuClick}
-        icon={
-          <ExternalLinks
-            category={'tag'}
-            type={type}
-            value={value}
-            iconStyle={{
-              marginRight: '-3px',
-              marginLeft: '3px',
-              height: '20px',
-              verticalAlign: 'middle',
-              minWidth: '32px'
-            }}
-          />
-        }
+        icon={<ExternalLinks category={'tag'} type={type} value={value} />}
       />
     </>
   );

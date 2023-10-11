@@ -88,6 +88,7 @@
   "fullscreen.off": "Close fullscreen mode",
   "fullscreen.on": "Show in fullscreen mode",
   "goto_heuristic": "Go to heuristic",
+  "goto_external": "Go to external results",
   "goto_signature": "Go to signature",
   "highlight": "Toggle highlight",
   "loading": "Loading",

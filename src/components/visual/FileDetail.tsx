@@ -94,6 +94,7 @@ type File = {
   attack_matrix: {
     [category: string]: string[][];
   };
+  classification: string;
   childrens: {
     name: string;
     sha256: string;
@@ -306,7 +307,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
       />
       {c12nDef.enforce && (
         <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
-          <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
+          <Classification size="tiny" c12n={file ? file.classification : null} />
         </div>
       )}
       <div style={{ paddingBottom: sp4 }}>

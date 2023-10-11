@@ -298,7 +298,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           </MenuItem>
         )}
         {hasExternalQuery && (
-          <>
+          <div>
             <Divider />
             <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
               {t('related_external')}
@@ -317,7 +317,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
                 {TRAVEL_EXPLORE_ICON} {toTitleCase(source)}
               </MenuItem>
             ))}
-          </>
+          </div>
         )}
         {hasExternalLinks && (
           <div>

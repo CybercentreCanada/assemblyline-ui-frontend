@@ -88,6 +88,7 @@
   "fullscreen.off": "Fermer le mode plein écran",
   "fullscreen.on": "Afficher en mode plein écran",
   "goto_heuristic": "Aller à l'heuristique",
+  "goto_external": "Aller aux resultats externes",
   "goto_signature": "Aller à la signature",
   "highlight": "Activer la surbrillance",
   "loading": "Chargement",
