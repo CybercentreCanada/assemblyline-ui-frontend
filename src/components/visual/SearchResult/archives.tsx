@@ -136,29 +136,30 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                     <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
                       {['attribution', 'technique', 'info'].map(
                         (category, j) =>
-                          file.label_categories &&
-                          category in file.label_categories &&
-                          file.label_categories[category].map((label, k) => (
-                            <CustomChip
-                              key={`${j}-${k}`}
-                              wrap
-                              variant="outlined"
-                              size="tiny"
-                              type="rounded"
-                              color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
-                              label={label}
-                              style={{ height: 'auto', minHeight: '20px' }}
-                              onClick={
-                                !onLabelClick
-                                  ? null
-                                  : event => {
-                                      event.preventDefault();
-                                      event.stopPropagation();
-                                      onLabelClick(event, label);
-                                    }
-                              }
-                            />
-                          ))
+                          Array.isArray(file?.label_categories[category]) &&
+                          file?.label_categories[category]
+                            ?.sort((a, b) => a.localeCompare(b))
+                            .map((label, k) => (
+                              <CustomChip
+                                key={`${j}-${k}`}
+                                wrap
+                                variant="outlined"
+                                size="tiny"
+                                type="rounded"
+                                color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                                label={label}
+                                style={{ height: 'auto', minHeight: '20px' }}
+                                onClick={
+                                  !onLabelClick
+                                    ? null
+                                    : event => {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                        onLabelClick(event, label);
+                                      }
+                                }
+                              />
+                            ))
                       )}
                     </div>
                   }

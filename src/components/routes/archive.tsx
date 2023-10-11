@@ -91,8 +91,8 @@ export default function MalwareArchive() {
   const [fileResults, setFileResults] = useState<FileResults>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [histogram, setHistogram] = useState(null);
-  const [types, setTypes] = useState<{ [k: string]: number }>(null);
-  const [labels, setLabels] = useState<{ [k: string]: number }>(null);
+  const [types, setTypes] = useState<Record<string, number>>(null);
+  const [labels, setLabels] = useState<Record<string, number>>(null);
   const [pageSize] = useState<number>(PAGE_SIZE);
   const [searching, setSearching] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<string[]>();
@@ -139,6 +139,69 @@ export default function MalwareArchive() {
     [location.hash, location.pathname, navigate, query, searching]
   );
 
+  const handleReload = useCallback(
+    q => {
+      if (q && currentUser.roles.includes('archive_view')) {
+        const curQuery = new SimpleSearchQuery(q.toString(), `rows=${pageSize}&offset=0`);
+        curQuery.set('rows', pageSize);
+        curQuery.set('offset', 0);
+        curQuery.set('archive_only', true);
+        const tc = curQuery.pop('tc') || DEFAULT_TC;
+        if (tc !== '1y') {
+          curQuery.add('filters', TC_MAP[tc]);
+        }
+
+        setSearching(true);
+        apiCall({
+          url: `/api/v4/search/file/?${curQuery.toString()}`,
+          onSuccess: api_data => {
+            setFileResults(api_data.api_response);
+          },
+          onFailure: api_data => {
+            showErrorMessage(api_data.api_error_message);
+          },
+          onFinalize: () => {
+            setSearching(false);
+          }
+        });
+        apiCall({
+          url: `/api/v4/search/histogram/file/seen.last/?start=${START_MAP[tc]}&end=now&gap=${
+            GAP_MAP[tc]
+          }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+          onSuccess: api_data => {
+            setHistogram(api_data.api_response);
+          }
+        });
+        apiCall({
+          url: `/api/v4/search/facet/file/labels/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+          onSuccess: api_data => {
+            let newLabels: { [k: string]: number } = api_data.api_response;
+            newLabels = Object.fromEntries(
+              Object.keys(newLabels)
+                .sort((a, b) => newLabels[b] - newLabels[a])
+                .map(k => [k, newLabels[k]])
+            );
+            setLabels(newLabels);
+          }
+        });
+        apiCall({
+          url: `/api/v4/search/facet/file/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+          onSuccess: api_data => {
+            let newTypes: { [k: string]: number } = api_data.api_response;
+            newTypes = Object.fromEntries(
+              Object.keys(newTypes)
+                .sort((a, b) => newTypes[b] - newTypes[a])
+                .map(k => [k, newTypes[k]])
+            );
+            setTypes(newTypes);
+          }
+        });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   useEffect(() => {
     setSearching(true);
     const newSearchQuery = new SimpleSearchQuery(
@@ -180,64 +243,19 @@ export default function MalwareArchive() {
   }, []);
 
   useEffect(() => {
-    if (query && currentUser.roles.includes('archive_view')) {
-      const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0`);
-      curQuery.set('rows', pageSize);
-      curQuery.set('offset', 0);
-      curQuery.set('archive_only', true);
-      const tc = curQuery.pop('tc') || DEFAULT_TC;
-      if (tc !== '1y') {
-        curQuery.add('filters', TC_MAP[tc]);
-      }
+    handleReload(query);
+  }, [handleReload, query]);
 
-      setSearching(true);
-      apiCall({
-        url: `/api/v4/search/file/?${curQuery.toString()}`,
-        onSuccess: api_data => {
-          setFileResults(api_data.api_response);
-        },
-        onFailure: api_data => {
-          showErrorMessage(api_data.api_error_message);
-        },
-        onFinalize: () => {
-          setSearching(false);
-        }
-      });
-      apiCall({
-        url: `/api/v4/search/histogram/file/seen.last/?start=${START_MAP[tc]}&end=now&gap=${
-          GAP_MAP[tc]
-        }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-        onSuccess: api_data => {
-          setHistogram(api_data.api_response);
-        }
-      });
-      apiCall({
-        url: `/api/v4/search/facet/file/labels/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-        onSuccess: api_data => {
-          let newLabels: { [k: string]: number } = api_data.api_response;
-          newLabels = Object.fromEntries(
-            Object.keys(newLabels)
-              .sort((a, b) => newLabels[b] - newLabels[a])
-              .map(k => [k, newLabels[k]])
-          );
-          setLabels(newLabels);
-        }
-      });
-      apiCall({
-        url: `/api/v4/search/facet/file/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-        onSuccess: api_data => {
-          let newTypes: { [k: string]: number } = api_data.api_response;
-          newTypes = Object.fromEntries(
-            Object.keys(newTypes)
-              .sort((a, b) => newTypes[b] - newTypes[a])
-              .map(k => [k, newTypes[k]])
-          );
-          setTypes(newTypes);
-        }
-      });
+  useEffect(() => {
+    function reload() {
+      handleReload(query);
     }
-    // eslint-disable-next-line
-  }, [query]);
+
+    window.addEventListener('reloadArchive', reload);
+    return () => {
+      window.removeEventListener('reloadArchive', reload);
+    };
+  }, [handleReload, query]);
 
   if (!configuration?.datastore?.archive?.enabled) return <Navigate to="/notfound" replace />;
   else if (!currentUser.roles.includes('archive_view')) return <Navigate to="/forbidden" replace />;
