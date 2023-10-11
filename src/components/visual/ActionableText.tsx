@@ -19,7 +19,9 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: theme.spacing(0.5),
     borderRadius: theme.spacing(0.5),
     textDecoration: 'none',
+    minHeight: '22px',
     color: 'inherit',
+    alignItems: 'center',
     display: 'flex',
     cursor: 'pointer',
     '&:hover': {
@@ -64,19 +66,8 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, clas
               classification={classification}
             />
             <MaterialLink className={classes.link} onClick={handleMenuClick} onContextMenu={handleMenuClick}>
-              {value}
-              <ExternalLinks
-                category={category}
-                type={type}
-                value={value}
-                iconStyle={{
-                  marginRight: '-3px',
-                  marginLeft: '3px',
-                  height: '20px',
-                  verticalAlign: 'text-bottom',
-                  minWidth: '32px'
-                }}
-              />
+              <div style={{ marginTop: '2px' }}>{value}</div>
+              <ExternalLinks category={category} type={type} value={value} />
             </MaterialLink>
           </>
         ) : (

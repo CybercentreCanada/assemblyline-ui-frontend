@@ -22,6 +22,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
   category = null,
   classification,
   label,
+  variant = 'outlined',
   ...otherProps
 }) => {
   const [state, setState] = React.useState(initialMenuState);
@@ -51,21 +52,9 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
         />
       )}
       <CustomChip
-        icon={
-          <ExternalLinks
-            category={category}
-            type={data_type}
-            value={label}
-            iconStyle={{
-              marginRight: '-3px',
-              marginLeft: '3px',
-              height: '20px',
-              verticalAlign: 'middle',
-              minWidth: '32px'
-            }}
-          />
-        }
+        icon={<ExternalLinks category={category} type={data_type} value={label} round={variant === 'outlined'} />}
         label={label}
+        variant={variant}
         {...otherProps}
         onClick={actionable ? handleMenuClick : null}
         onContextMenu={actionable ? handleMenuClick : null}

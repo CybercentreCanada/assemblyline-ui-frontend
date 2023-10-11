@@ -1,25 +1,37 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
 
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Box, Collapse, Divider, Grid, IconButton, Tab, Tabs, Theme, Typography, useTheme } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Collapse,
+  Divider,
+  Grid,
+  IconButton,
+  Tab,
+  Tabs,
+  Theme,
+  Typography,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import { useTranslation } from 'react-i18next';
 
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LaunchOutlinedIcon from '@mui/icons-material/LaunchOutlined';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import useALContext from 'components/hooks/useALContext';
 import { ExternalEnrichmentResult } from 'components/providers/ExternalLookupProvider';
 import { DetailedItem } from 'components/routes/alerts/hooks/useAlerts';
-import { ChipList, ChipSkeletonInline } from 'components/visual/ChipList';
+import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
 import { getMaxClassification } from 'helpers/classificationParser';
@@ -74,7 +86,7 @@ type ExternalLookupProps = {
   category: string;
   type: string;
   value: string;
-  iconStyle?: null | Object;
+  round?: boolean;
 };
 
 function ExternalSourceTabPanel(props: TabPanelProps) {
@@ -311,7 +323,7 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
 
 const EnrichmentResult = React.memo(WrappedEnrichmentResult);
 
-const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, value, iconStyle }) => {
+const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, value, round }) => {
   const theme = useTheme();
   const classes = useStyles();
   const { t } = useTranslation();
@@ -400,17 +412,23 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
 
   return actionable && externalLookupResults ? (
     <div onContextMenu={nullifyDialogClick} onClick={nullifyDialogClick}>
-      {!!inProgress ? <ChipSkeletonInline /> : null}
+      {!!inProgress ? (
+        <div style={{ display: 'flex', minWidth: '38px', justifyContent: 'center' }}>
+          <CircularProgress variant="indeterminate" style={{ height: '18px', width: '18px' }} />
+        </div>
+      ) : null}
       {!!externalLookupResults && !inProgress ? (
         <Button
+          size="large"
+          color="inherit"
           onClick={e => {
             e.stopPropagation();
             handleClickOpen();
           }}
-          style={iconStyle}
+          style={{ minWidth: '32px', padding: '2px 10px', borderRadius: round ? '16px 4px 4px 16px' : '4px' }}
         >
           <Tooltip title={<div style={{ whiteSpace: 'pre-line' }}>{resultTT}</div>}>
-            <InfoOutlinedIcon />
+            <InfoOutlinedIcon style={{ width: '18px', height: '18px' }} />
           </Tooltip>
         </Button>
       ) : null}
@@ -423,7 +441,6 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
         classes={{ paper: classes.dialogPaper }}
         fullWidth={true}
         maxWidth="xl"
-        // maxWidth={false}
       >
         <IconButton
           aria-label="close"
