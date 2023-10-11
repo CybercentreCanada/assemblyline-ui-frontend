@@ -139,6 +139,7 @@ function DrawerProvider(props: DrawerProviderProps) {
           [children, classes.appContent]
         )}
         <Drawer
+          id="drawerContainer"
           open={globalDrawerOpened}
           className={classes.appRightDrawer}
           style={{

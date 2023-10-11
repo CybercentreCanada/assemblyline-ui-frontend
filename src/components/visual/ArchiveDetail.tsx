@@ -16,20 +16,20 @@ import {
   ListItemText,
   Popover,
   Skeleton,
+  Tab as MuiTab,
+  Tabs as MuiTabs,
   Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
@@ -122,6 +122,10 @@ type ArchiveDetailProps = {
   force?: boolean;
 };
 
+const TABS = { identification: null, discovery: null, analysis: null };
+
+type Tab = keyof typeof TABS;
+
 const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
   sha256,
   sid = null,
@@ -130,24 +134,33 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
   force = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
+  const theme = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const { user: currentUser, c12nDef } = useALContext();
+  const { showSuccessMessage } = useMySnackbar();
+
   const [file, setFile] = useState<File | null>(null);
+  const [resubmitAnchor, setResubmitAnchor] = useState<HTMLElement>(null);
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
   const [safelistReason, setSafelistReason] = useState<string>('');
-  const [waitingDialog, setWaitingDialog] = useState(false);
-  const { apiCall } = useMyAPI();
-  const { c12nDef } = useALContext();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const theme = useTheme();
-  const navigate = useNavigate();
-  const { showSuccessMessage } = useMySnackbar();
-  const [resubmitAnchor, setResubmitAnchor] = useState(null);
+  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
+  const [tab, setTab] = useState<Tab>('identification');
+
+  const params = new URLSearchParams(location.search);
+  const fileName = file ? params.get('name') || sha256 : null;
   const popoverOpen = Boolean(resubmitAnchor);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
 
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const fileName = file ? params.get('name') || sha256 : null;
+  const ref = useRef<HTMLDivElement>(null);
+
+  const inDrawer = useMemo<boolean>(
+    () => document.getElementById('drawerContainer').contains(ref.current),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ref?.current]
+  );
 
   const elementInViewport = element => {
     const bounding = element.getBoundingClientRect();
@@ -199,6 +212,10 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
     setSafelistDialog(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256]);
+
+  const handleTabChange = useCallback((event: React.SyntheticEvent<Element, Event>, value: any) => {
+    setTab(value);
+  }, []);
 
   const addToSafelist = useCallback(() => {
     const data = {
@@ -267,7 +284,7 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
   }, [sha256, sid]);
 
   return currentUser.roles.includes('submission_view') ? (
-    <div id="fileDetailTop" style={{ textAlign: 'left' }}>
+    <div id="fileDetailTop" ref={ref} style={{ textAlign: 'left' }}>
       <InputDialog
         open={safelistDialog}
         handleClose={() => setSafelistDialog(false)}
@@ -400,23 +417,44 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
         </Grid>
       </div>
       <div style={{ paddingBottom: sp2 }}>
-        <IdentificationSection fileinfo={file ? file.file_info : null} isArchive />
-        <FrequencySection fileinfo={file ? file.file_info : null} />
-        <MetadataSection metadata={file ? file.metadata : null} />
-        <ChildrenSection childrens={file ? file.childrens : null} />
-        <ParentSection parents={file ? file.parents : null} />
-        <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
-        <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
-        <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
-        <ResultSection
-          results={file ? file.results : null}
-          sid={sid}
-          alternates={file ? file.alternates : null}
-          force={force}
-        />
-        <EmptySection emptys={file ? file.emptys : null} sid={sid} />
-        <ErrorSection errors={file ? file.errors : null} />
-        <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
+        <MuiTabs
+          value={tab}
+          onChange={handleTabChange}
+          sx={{ backgroundColor: inDrawer ? theme.palette.background.default : theme.palette.background.paper }}
+        >
+          {Object.keys(TABS).map((title, i) => (
+            <MuiTab key={`${i}`} label={t(title)} value={title} />
+          ))}
+        </MuiTabs>
+
+        {tab === 'identification' && (
+          <>
+            <IdentificationSection fileinfo={file ? file.file_info : null} isArchive />
+            <FrequencySection fileinfo={file ? file.file_info : null} />
+            <MetadataSection metadata={file ? file.metadata : null} />
+            <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
+          </>
+        )}
+
+        {tab === 'discovery' && <></>}
+
+        {tab === 'analysis' && (
+          <>
+            <ChildrenSection childrens={file ? file.childrens : null} />
+            <ParentSection parents={file ? file.parents : null} />
+            <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
+            <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
+            <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
+            <ResultSection
+              results={file ? file.results : null}
+              sid={sid}
+              alternates={file ? file.alternates : null}
+              force={force}
+            />
+            <EmptySection emptys={file ? file.emptys : null} sid={sid} />
+            <ErrorSection errors={file ? file.errors : null} />
+          </>
+        )}
       </div>
     </div>
   ) : (
