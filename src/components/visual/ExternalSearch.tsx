@@ -283,7 +283,7 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <CustomChip type="rounded" size="small" variant="filled" color={verdictToColor(verdict)} label={verdict} />
           <Tooltip title={t('goto_external')}>
-            <IconButton href={enrichmentResult.link} target="_blank" rel="noopener noreferrer">
+            <IconButton size="large" href={enrichmentResult.link} target="_blank" rel="noopener noreferrer">
               <LaunchOutlinedIcon />
             </IconButton>
           </Tooltip>
