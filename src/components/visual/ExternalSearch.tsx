@@ -265,7 +265,7 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
   return enrichmentResult ? (
     <>
       <div>
-        {count < 1 && (
+        {count > 1 && (
           <Typography
             variant="h5"
             onClick={() => {
@@ -305,7 +305,7 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
             );
           })}
       </Collapse>
-      {count < 1 && (
+      {count > 1 && (
         <Divider
           style={{
             marginBottom: theme.spacing(2),
