@@ -387,7 +387,8 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
     if (!!externalLookupResults) {
       Object.entries(externalLookupResults).forEach(([src, enrichmentResults]) => {
         if (!!enrichmentResults.error) {
-          tip += `\n${toTitleCase(src)}: ${toTitleCase(t('error'))}`;
+          const err = enrichmentResults.error === 'Not Found' ? t('notfound') : t('error');
+          tip += `\n${toTitleCase(src)}: ${toTitleCase(err)}`;
         } else {
           tip += `\n${toTitleCase(src)}: ${enrichmentResults.items.length} ${t('results')}`;
         }
