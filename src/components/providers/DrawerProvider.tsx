@@ -139,7 +139,6 @@ function DrawerProvider(props: DrawerProviderProps) {
           [children, classes.appContent]
         )}
         <Drawer
-          id="drawerContainer"
           open={globalDrawerOpened}
           className={classes.appRightDrawer}
           style={{
@@ -168,6 +167,7 @@ function DrawerProvider(props: DrawerProviderProps) {
                   </IconButton>
                 </div>
                 <div
+                  id="drawerContent"
                   style={{
                     paddingLeft: theme.spacing(2),
                     paddingRight: theme.spacing(2)

@@ -34,6 +34,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 import CommentSection from './ArchiveDetail/comments';
+import { DiscoverSection } from './ArchiveDetail/discover';
 import IdentificationSection from './ArchiveDetail/ident';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
@@ -48,7 +49,7 @@ import TagSection from './FileDetail/tags';
 import FileDownloader from './FileDownloader';
 import InputDialog from './InputDialog';
 
-type FileInfo = {
+export type FileInfo = {
   archive_ts: string;
   ascii: string;
   classification: string;
@@ -84,7 +85,7 @@ type FileInfo = {
   type: string;
 };
 
-type File = {
+export type File = {
   alternates: {
     [serviceName: string]: AlternateResult[];
   };
@@ -122,7 +123,7 @@ type ArchiveDetailProps = {
   force?: boolean;
 };
 
-const TABS = { identification: null, discovery: null, analysis: null };
+const TABS = { details: null, discover: null, detection: null, community: null };
 
 type Tab = keyof typeof TABS;
 
@@ -146,7 +147,7 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
   const [safelistReason, setSafelistReason] = useState<string>('');
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
-  const [tab, setTab] = useState<Tab>('identification');
+  const [tab, setTab] = useState<Tab>('details');
 
   const params = new URLSearchParams(location.search);
   const fileName = file ? params.get('name') || sha256 : null;
@@ -157,7 +158,7 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
   const ref = useRef<HTMLDivElement>(null);
 
   const inDrawer = useMemo<boolean>(
-    () => document.getElementById('drawerContainer').contains(ref.current),
+    () => document.getElementById('drawerContent')?.contains(ref.current),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [ref?.current]
   );
@@ -420,28 +421,32 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
         <MuiTabs
           value={tab}
           onChange={handleTabChange}
+
           sx={{ backgroundColor: inDrawer ? theme.palette.background.default : theme.palette.background.paper }}
         >
           {Object.keys(TABS).map((title, i) => (
-            <MuiTab key={`${i}`} label={t(title)} value={title} />
+            <MuiTab key={`${i}`} label={t(title)} value={title}  />
           ))}
         </MuiTabs>
 
-        {tab === 'identification' && (
+        {tab === 'details' && (
           <>
             <IdentificationSection fileinfo={file ? file.file_info : null} isArchive />
             <FrequencySection fileinfo={file ? file.file_info : null} />
             <MetadataSection metadata={file ? file.metadata : null} />
-            <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
           </>
         )}
 
-        {tab === 'discovery' && <></>}
-
-        {tab === 'analysis' && (
+        {tab === 'discover' && (
           <>
             <ChildrenSection childrens={file ? file.childrens : null} />
             <ParentSection parents={file ? file.parents : null} />
+            <DiscoverSection file={file} />
+          </>
+        )}
+
+        {tab === 'detection' && (
+          <>
             <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
             <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
             <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
@@ -453,6 +458,12 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
             />
             <EmptySection emptys={file ? file.emptys : null} sid={sid} />
             <ErrorSection errors={file ? file.errors : null} />
+          </>
+        )}
+
+        {tab === 'community' && (
+          <>
+            <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
           </>
         )}
       </div>
