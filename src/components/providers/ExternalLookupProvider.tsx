@@ -91,7 +91,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
       }
       const stateKey = getKey(tagName, tagValue);
       const pendingStates = {};
-      let url = `/api/v4/federated_lookup/enrich/${tagName}/${encodeURIComponent(tagValue)}/`;
+      let url = `/api/v4/federated_lookup/enrich/${tagName}/${encodeURIComponent(encodeURIComponent(tagValue))}/`;
       // construct approporiate query param string
       let qs = `classification=${encodeURIComponent(classification)}`;
       if (!!source) {
