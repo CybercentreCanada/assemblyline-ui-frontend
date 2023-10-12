@@ -387,7 +387,8 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
     if (!!externalLookupResults) {
       Object.entries(externalLookupResults).forEach(([src, enrichmentResults]) => {
         if (!!enrichmentResults.error) {
-          tip += `\n${toTitleCase(src)}: ${toTitleCase(t('error'))}`;
+          const err = enrichmentResults.error === 'Not Found' ? t('notfound') : t('error');
+          tip += `\n${toTitleCase(src)}: ${toTitleCase(err)}`;
         } else {
           tip += `\n${toTitleCase(src)}: ${enrichmentResults.items.length} ${t('results')}`;
         }
@@ -414,7 +415,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
     <div onContextMenu={nullifyDialogClick} onClick={nullifyDialogClick}>
       {!!inProgress ? (
         <div style={{ display: 'flex', minWidth: '38px', justifyContent: 'center' }}>
-          <CircularProgress variant="indeterminate" style={{ height: '18px', width: '18px' }} />
+          <CircularProgress variant="indeterminate" style={{ height: '18px', width: '18px' }} color="inherit" />
         </div>
       ) : null}
       {!!externalLookupResults && !inProgress ? (
