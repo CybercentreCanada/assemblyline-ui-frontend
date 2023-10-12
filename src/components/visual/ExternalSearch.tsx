@@ -415,7 +415,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
     <div onContextMenu={nullifyDialogClick} onClick={nullifyDialogClick}>
       {!!inProgress ? (
         <div style={{ display: 'flex', minWidth: '38px', justifyContent: 'center' }}>
-          <CircularProgress variant="indeterminate" style={{ height: '18px', width: '18px' }} />
+          <CircularProgress variant="indeterminate" style={{ height: '18px', width: '18px' }} color="inherit" />
         </div>
       ) : null}
       {!!externalLookupResults && !inProgress ? (
