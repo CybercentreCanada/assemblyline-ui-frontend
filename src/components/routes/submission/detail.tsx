@@ -1031,9 +1031,13 @@ function WrappedSubmissionDetail() {
                         />
                       )}
                       {systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger') && (
-                        <Tooltip title={t(submission.archived ? 'archived' : 'archive')}>
+                        <Tooltip title={t(submission.archived || submission.from_archive ? 'archived' : 'archive')}>
                           <div>
-                            <IconButton onClick={archive} disabled={submission.archived} size="large">
+                            <IconButton
+                              onClick={archive}
+                              disabled={submission.archived || submission.from_archive}
+                              size="large"
+                            >
                               <ArchiveOutlinedIcon />
                             </IconButton>
                           </div>
