@@ -1,40 +1,14 @@
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
-import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
-import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
-import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
-import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
-import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import {
-  Grid,
-  IconButton,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Popover,
-  Skeleton,
-  Tab as MuiTab,
-  Tabs as MuiTabs,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@mui/material';
+import { Tab as MuiTab, Tabs as MuiTabs, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
 import ForbiddenPage from 'components/routes/403';
-import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link, useLocation } from 'react-router-dom';
 import CommentSection from './ArchiveDetail/comments';
 import { DiscoverSection } from './ArchiveDetail/discover';
+import Header from './ArchiveDetail/header';
 import IdentificationSection from './ArchiveDetail/ident';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
@@ -46,8 +20,6 @@ import MetadataSection from './FileDetail/metadata';
 import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
 import TagSection from './FileDetail/tags';
-import FileDownloader from './FileDownloader';
-import InputDialog from './InputDialog';
 
 export type FileInfo = {
   archive_ts: string;
@@ -123,7 +95,7 @@ type ArchiveDetailProps = {
   force?: boolean;
 };
 
-const TABS = { details: null, discover: null, detection: null, community: null };
+const TABS = { details: null, detection: null, relations: null, community: null };
 
 type Tab = keyof typeof TABS;
 
@@ -136,24 +108,13 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
   const { apiCall } = useMyAPI();
-  const { user: currentUser, c12nDef } = useALContext();
-  const { showSuccessMessage } = useMySnackbar();
+  const { user: currentUser } = useALContext();
 
   const [file, setFile] = useState<File | null>(null);
-  const [resubmitAnchor, setResubmitAnchor] = useState<HTMLElement>(null);
-  const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
-  const [safelistReason, setSafelistReason] = useState<string>('');
-  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [tab, setTab] = useState<Tab>('details');
 
-  const params = new URLSearchParams(location.search);
-  const fileName = file ? params.get('name') || sha256 : null;
-  const popoverOpen = Boolean(resubmitAnchor);
   const sp2 = theme.spacing(2);
-  const sp4 = theme.spacing(4);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -195,69 +156,9 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
     return newData;
   };
 
-  const resubmit = useCallback(() => {
-    apiCall({
-      url: `/api/v4/submit/dynamic/${sha256}/${sid ? `?copy_sid=${sid}` : ''}`,
-      onSuccess: api_data => {
-        showSuccessMessage(t('resubmit.success'));
-        setTimeout(() => {
-          navigate(`/submission/detail/${api_data.api_response.sid}`);
-        }, 500);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256]);
-
-  const prepareSafelist = useCallback(() => {
-    setSafelistReason('');
-    setSafelistDialog(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256]);
-
   const handleTabChange = useCallback((event: React.SyntheticEvent<Element, Event>, value: any) => {
     setTab(value);
   }, []);
-
-  const addToSafelist = useCallback(() => {
-    const data = {
-      hashes: {
-        md5: file.file_info.md5,
-        sha1: file.file_info.sha1,
-        sha256: file.file_info.sha256
-      },
-      file: {
-        name: [],
-        size: file.file_info.size,
-        type: file.file_info.type
-      },
-      sources: [
-        {
-          classification: file.file_info.classification,
-          name: currentUser.username,
-          reason: [safelistReason],
-          type: 'user'
-        }
-      ],
-      type: 'file'
-    };
-
-    if (fileName !== sha256) {
-      data.file.name.push(fileName);
-    }
-
-    apiCall({
-      url: `/api/v4/safelist/`,
-      method: 'PUT',
-      body: data,
-      onSuccess: _ => {
-        setSafelistDialog(false);
-        showSuccessMessage(t('safelist.success'));
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256, safelistReason, file]);
 
   useEffect(() => {
     setFile(null);
@@ -286,146 +187,22 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
 
   return currentUser.roles.includes('submission_view') ? (
     <div id="fileDetailTop" ref={ref} style={{ textAlign: 'left' }}>
-      <InputDialog
-        open={safelistDialog}
-        handleClose={() => setSafelistDialog(false)}
-        handleAccept={addToSafelist}
-        handleInputChange={event => setSafelistReason(event.target.value)}
-        inputValue={safelistReason}
-        title={t('safelist.title')}
-        cancelText={t('safelist.cancelText')}
-        acceptText={t('safelist.acceptText')}
-        inputLabel={t('safelist.input')}
-        text={t('safelist.text')}
-        waiting={waitingDialog}
+      <Header
+        sha256={sha256}
+        file={file}
+        sid={sid}
+        liveResultKeys={liveResultKeys}
+        liveErrors={liveErrors}
+        force={force}
       />
-      {c12nDef.enforce && (
-        <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
-          <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
-        </div>
-      )}
-      <div style={{ paddingBottom: sp4 }}>
-        <Grid container alignItems="center">
-          <Grid item xs>
-            <Typography variant="h4">{t('title')}</Typography>
-            <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-              {file ? fileName : <Skeleton style={{ width: '10rem' }} />}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
-            {file ? (
-              <>
-                <Tooltip title={t('related')}>
-                  <IconButton
-                    component={Link}
-                    to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`}
-                    size="large"
-                  >
-                    <ViewCarouselOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-                {currentUser.roles.includes('file_download') && (
-                  <FileDownloader
-                    icon={<GetAppOutlinedIcon />}
-                    link={`/api/v4/file/download/${file.file_info.sha256}/?${
-                      fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
-                    }${sid ? `sid=${sid}&` : ''}`}
-                    tooltip={t('download')}
-                  />
-                )}
-                {currentUser.roles.includes('file_detail') && (
-                  <Tooltip title={t('file_viewer')}>
-                    <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`} size="large">
-                      <PageviewOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {currentUser.roles.includes('submission_create') && (
-                  <>
-                    <Tooltip title={t('resubmit')}>
-                      <IconButton onClick={event => setResubmitAnchor(event.currentTarget)} size="large">
-                        <ReplayOutlinedIcon />
-                        {popoverOpen ? (
-                          <ExpandLessIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
-                        ) : (
-                          <ExpandMoreIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
-                        )}
-                      </IconButton>
-                    </Tooltip>
-                    <Popover
-                      open={popoverOpen}
-                      anchorEl={resubmitAnchor}
-                      onClose={() => setResubmitAnchor(null)}
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right'
-                      }}
-                      transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right'
-                      }}
-                    >
-                      <List disablePadding>
-                        <ListItem
-                          button
-                          component={Link}
-                          to="/submit"
-                          state={{
-                            hash: file.file_info.sha256,
-                            tabContext: '1',
-                            c12n: file.file_info.classification
-                          }}
-                          dense
-                          onClick={() => setResubmitAnchor(null)}
-                        >
-                          <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                            <TuneOutlinedIcon />
-                          </ListItemIcon>
-                          <ListItemText primary={t('resubmit.modify')} />
-                        </ListItem>
-                        <ListItem button dense onClick={resubmit}>
-                          <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                            <OndemandVideoOutlinedIcon />
-                          </ListItemIcon>
-                          <ListItemText primary={t('resubmit.dynamic')} />
-                        </ListItem>
-                      </List>
-                    </Popover>
-                  </>
-                )}
-                {currentUser.roles.includes('safelist_manage') && (
-                  <Tooltip title={t('safelist')}>
-                    <IconButton onClick={prepareSafelist} size="large">
-                      <PlaylistAddCheckIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </>
-            ) : (
-              <div style={{ display: 'inline-flex' }}>
-                {[...Array(5)].map((_, i) => (
-                  <Skeleton
-                    key={i}
-                    variant="circular"
-                    height="2.5rem"
-                    width="2.5rem"
-                    style={{ margin: theme.spacing(0.5) }}
-                  />
-                ))}
-              </div>
-            )}
-          </Grid>
-        </Grid>
-      </div>
       <div style={{ paddingBottom: sp2 }}>
         <MuiTabs
           value={tab}
           onChange={handleTabChange}
-
           sx={{ backgroundColor: inDrawer ? theme.palette.background.default : theme.palette.background.paper }}
         >
           {Object.keys(TABS).map((title, i) => (
-            <MuiTab key={`${i}`} label={t(title)} value={title}  />
+            <MuiTab key={`${i}`} label={t(title)} value={title} />
           ))}
         </MuiTabs>
 
@@ -434,14 +211,6 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
             <IdentificationSection fileinfo={file ? file.file_info : null} isArchive />
             <FrequencySection fileinfo={file ? file.file_info : null} />
             <MetadataSection metadata={file ? file.metadata : null} />
-          </>
-        )}
-
-        {tab === 'discover' && (
-          <>
-            <ChildrenSection childrens={file ? file.childrens : null} />
-            <ParentSection parents={file ? file.parents : null} />
-            <DiscoverSection file={file} />
           </>
         )}
 
@@ -458,6 +227,14 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
             />
             <EmptySection emptys={file ? file.emptys : null} sid={sid} />
             <ErrorSection errors={file ? file.errors : null} />
+          </>
+        )}
+
+        {tab === 'relations' && (
+          <>
+            <ChildrenSection childrens={file ? file.childrens : null} />
+            <ParentSection parents={file ? file.parents : null} />
+            <DiscoverSection file={file} />
           </>
         )}
 
