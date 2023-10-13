@@ -146,6 +146,7 @@ export default function MalwareArchive() {
         curQuery.set('rows', pageSize);
         curQuery.set('offset', 0);
         curQuery.set('archive_only', true);
+        curQuery.add('filters', 'is_supplementary:false');
         const tc = curQuery.pop('tc') || DEFAULT_TC;
         if (tc !== '1y') {
           curQuery.add('filters', TC_MAP[tc]);
