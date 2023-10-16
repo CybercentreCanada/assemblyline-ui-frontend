@@ -458,8 +458,9 @@ const WrappedHeader: React.FC<Props> = ({
             {file &&
               Object.entries(file?.tags)
                 .filter(([k, v]) => k.includes('attribution'))
-                .map(([tag_type, items]: [string, any[]]) => (
+                .map(([tag_type, items]: [string, any[]], i) => (
                   <AutoHideTagList
+                    key={i}
                     tag_type={tag_type}
                     items={items.map(item => ({
                       value: item[0],
