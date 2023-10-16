@@ -166,6 +166,7 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comm
         <CommentCard isAdding onAddComment={handleAddComment} />
         {useMemo(
           () =>
+            authors &&
             comments &&
             comments.length !== 0 &&
             comments.map((comment, i) => (
