@@ -63,6 +63,7 @@ export type DrawerContextProps = {
   globalDrawer: React.ReactElement<any>;
   globalDrawerOpened: boolean;
 };
+
 export interface DrawerProviderProps {
   children: React.ReactNode;
 }
@@ -95,6 +96,7 @@ function DrawerProvider(props: DrawerProviderProps) {
     },
     [drawerClosePrompt]
   );
+
   useEffect(() => {
     function proceedWithDrawerChange(event: CustomEvent) {
       setNextDrawer(null);
@@ -181,4 +183,5 @@ function DrawerProvider(props: DrawerProviderProps) {
     </DrawerContext.Provider>
   );
 }
+
 export default DrawerProvider;
