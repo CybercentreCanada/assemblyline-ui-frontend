@@ -796,10 +796,13 @@ function WrappedSubmissionDetail() {
             liveResultKeys={liveResultKeys}
             liveErrors={curFileLiveErrors}
             force={submission && submission.max_score < 0}
-          />
+          />,
+          { hasMaximize: true }
         );
       } else {
-        setGlobalDrawer(<FileDetail sha256={fid} sid={id} force={submission && submission.max_score < 0} />);
+        setGlobalDrawer(<FileDetail sha256={fid} sid={id} force={submission && submission.max_score < 0} />, {
+          hasMaximize: true
+        });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

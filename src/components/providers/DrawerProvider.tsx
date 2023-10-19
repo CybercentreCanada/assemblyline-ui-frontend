@@ -193,7 +193,7 @@ function DrawerProvider({ children }: DrawerProviderProps) {
               <>
                 <div id="drawerTop" className={classes.drawerTop}>
                   <IconButton size="large" onClick={closeGlobalDrawer} children={<CloseOutlinedIcon />} />
-                  {isXL && typeof isMaximized === 'boolean' && (
+                  {isXL && isMaximized !== null && (
                     <Tooltip title={isMaximized ? t('drawer.minimize') : t('drawer.maximize')}>
                       <IconButton size="large" onClick={() => setIsMaximized(v => !v)}>
                         <DoubleArrowOutlinedIcon
