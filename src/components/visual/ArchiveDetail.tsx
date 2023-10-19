@@ -9,13 +9,13 @@ import { useTranslation } from 'react-i18next';
 import CommentSection from './ArchiveDetail/comments';
 import { DiscoverSection } from './ArchiveDetail/discover';
 import Header from './ArchiveDetail/header';
-import IdentificationSection from './ArchiveDetail/ident';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
 import Detection from './FileDetail/detection';
 import EmptySection from './FileDetail/emptys';
 import ErrorSection from './FileDetail/errors';
 import FrequencySection from './FileDetail/frequency';
+import IdentificationSection from './FileDetail/ident';
 import MetadataSection from './FileDetail/metadata';
 import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
@@ -95,7 +95,16 @@ type ArchiveDetailProps = {
   force?: boolean;
 };
 
-const TABS = { details: null, detection: null, relations: null, community: null };
+const TABS = {
+  details: null,
+  detection: null,
+  tags: null,
+  relations: null,
+  ascii: null,
+  strings: null,
+  hex: null,
+  community: null
+};
 
 type Tab = keyof typeof TABS;
 
@@ -185,6 +194,12 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
     // eslint-disable-next-line
   }, [sha256, sid]);
 
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
   return currentUser.roles.includes('submission_view') ? (
     <div id="fileDetailTop" ref={ref} style={{ textAlign: 'left' }}>
       <Header
@@ -198,17 +213,20 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
       <div style={{ paddingBottom: sp2 }}>
         <MuiTabs
           value={tab}
+          variant="scrollable"
+          scrollButtons="auto"
           onChange={handleTabChange}
-          sx={{ backgroundColor: inDrawer ? theme.palette.background.default : theme.palette.background.paper }}
+          sx={{ backgroundColor: theme.palette.background.default }}
+          // sx={{ backgroundColor: inDrawer ? theme.palette.background.default : theme.palette.background.paper }}
         >
           {Object.keys(TABS).map((title, i) => (
-            <MuiTab key={`${i}`} label={t(title)} value={title} />
+            <MuiTab key={`${i}`} label={t(title)} value={title} sx={{ minWidth: '120px' }} />
           ))}
         </MuiTabs>
 
         {tab === 'details' && (
           <>
-            <IdentificationSection fileinfo={file ? file.file_info : null} isArchive />
+            <IdentificationSection fileinfo={file ? file.file_info : null} />
             <FrequencySection fileinfo={file ? file.file_info : null} />
             <MetadataSection metadata={file ? file.metadata : null} />
           </>
@@ -218,7 +236,6 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
           <>
             <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
             <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
-            <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
             <ResultSection
               results={file ? file.results : null}
               sid={sid}
@@ -230,7 +247,37 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
           </>
         )}
 
+        {tab === 'tags' && (
+          <>
+            <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
+          </>
+        )}
+
         {tab === 'relations' && (
+          <>
+            <ChildrenSection childrens={file ? file.childrens : null} />
+            <ParentSection parents={file ? file.parents : null} />
+            <DiscoverSection file={file} />
+          </>
+        )}
+
+        {tab === 'ascii' && (
+          <>
+            <ChildrenSection childrens={file ? file.childrens : null} />
+            <ParentSection parents={file ? file.parents : null} />
+            <DiscoverSection file={file} />
+          </>
+        )}
+
+        {tab === 'strings' && (
+          <>
+            <ChildrenSection childrens={file ? file.childrens : null} />
+            <ParentSection parents={file ? file.parents : null} />
+            <DiscoverSection file={file} />
+          </>
+        )}
+
+        {tab === 'hex' && (
           <>
             <ChildrenSection childrens={file ? file.childrens : null} />
             <ParentSection parents={file ? file.parents : null} />
