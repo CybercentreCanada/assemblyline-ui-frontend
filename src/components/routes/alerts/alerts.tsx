@@ -429,7 +429,8 @@ const Alerts: React.FC = () => {
           <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
             <AlertDetails id={location.hash.slice(1)} />
           </ListCarousel>
-        </div>
+        </div>,
+        { hasMaximize: true }
       );
     }
   }, [alerts, location.hash, onTakeOwnershipComplete, onVerdictComplete, searchQuery, setGlobalDrawer, theme]);
