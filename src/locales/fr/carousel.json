@@ -5,5 +5,6 @@
   "next": "Image suivante (→ ou ↓)",
   "not_found": "L'API nous empêche d'afficher cette image.",
   "prev": "Image Précédente Image (← ou ↑)",
+  "view_file": "Afficher l'image dans la visionneuse de fichiers",
   "zoom": "Zoom (double clic)"
 }
