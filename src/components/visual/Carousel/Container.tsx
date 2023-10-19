@@ -13,7 +13,7 @@ import Carousel from 'commons/addons/carousel/Carousel';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import CarouselItem from './Item';
 
 const ZOOM_CLASS = 'zooming';
@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => {
       maxWidth: 'calc(100% - 128px)',
       display: 'grid',
       gridTemplateColumns: '1fr auto',
-      alignItems: 'start',
+      alignItems: 'center',
       borderRadius: '0px 0px 4px 4px',
       padding: theme.spacing(1),
       backgroundColor: backgroundColor,
@@ -258,7 +258,6 @@ const WrappedCarouselContainer = ({
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const location = useLocation();
-  const navigate = useNavigate();
 
   const [thumbData, setThumbData] = useState<string>(null);
   const [imgData, setImgData] = useState<string>(null);
@@ -592,16 +591,15 @@ const WrappedCarouselContainer = ({
                   <div>{t('description')}</div>
                   <div>{currentImage ? currentImage?.description : loading && <Skeleton variant="rounded" />}</div>
                 </div>
-                <Tooltip title={`${t('view_file')}: ${currentImage.img}`} placement="bottom">
+                <Tooltip title={t('view_file')} placement="bottom">
                   <IconButton
                     component={Link}
                     to={`/file/viewer/${currentImage.img}/image/${location.search}${location.hash}`}
-                    color="primary"
-                    size="small"
+                    color="inherit"
+                    // size="small"
+                    style={{ marginLeft: '8px' }}
                     onClick={e => {
-                      e.preventDefault();
                       handleClose();
-                      navigate(`/file/viewer/${currentImage.img}/image/${location.search}${location.hash}`);
                     }}
                   >
                     <PageviewOutlinedIcon />
