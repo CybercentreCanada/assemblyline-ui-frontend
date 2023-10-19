@@ -457,7 +457,7 @@ const ServiceGeneral = ({
                     endAdornment: <InputAdornment position="end">↑</InputAdornment>
                   }}
                   onChange={handleLicenceChange}
-                  value={service.licence_count > 1 ? service.licence_count : ''}
+                  value={service.licence_count > 0 ? service.licence_count : ''}
                   placeholder={t('limit.none')}
                   error={instancesError}
                 />
@@ -490,7 +490,7 @@ const ServiceGeneral = ({
               placeholder={t('limit.none')}
               InputProps={{ inputProps: { min: 0 } }}
               onChange={handleMaxQueueSizeChange}
-              value={service.max_queue_length > 0 ? service.licence_count : ''}
+              value={service.max_queue_length > 0 ? service.max_queue_length : ''}
             />
           ) : (
             <Skeleton style={{ height: '2.5rem' }} />

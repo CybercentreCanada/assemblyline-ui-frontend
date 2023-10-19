@@ -64,24 +64,11 @@ export const handleLayoutColumnResize2 = (store: Store, width: number) => {
   else return columns;
 };
 
-export const concatArray = (data: Array<string>, size: number): Array<string> => {
-  let array = [];
-  let text = '';
-  for (let i = 0; i < data.length; i++) {
-    if (i % size === size - 1) {
-      array.push(text);
-      text = '';
-    } else text = text + data[i];
-  }
-  if (text.length !== 0) array.push(text);
-  return array;
-};
-
-export const getFoldingRowMap = (
+export const getRowFoldingMap = (
   store: Store,
   columnSize: number
 ): Map<number, { index: number; type: FoldingType }> => {
-  const data = concatArray(store.hex.data.split(' '), columnSize);
+  let data = store.hex.data.replaceAll(' ', '').match(new RegExp(`.{1,${2 * columnSize}}`, 'g'));
   let map: Map<number, { index: number; type: FoldingType }> = new Map();
 
   let i: number = 1; // data
@@ -93,7 +80,7 @@ export const getFoldingRowMap = (
   map.set(0, { index: 0, type: FoldingType.SHOW });
   if (data.length === 1) return map;
 
-  while (i < data.length - 2) {
+  while (i < data.length - 1) {
     if (data[i - 1] !== data[i] && data[i] !== data[i + 1]) {
       map.set(j, { index: i, type: FoldingType.SHOW });
       j++;

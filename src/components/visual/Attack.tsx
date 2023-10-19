@@ -12,7 +12,7 @@ import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -44,7 +44,6 @@ const WrappedAttack: React.FC<AttackProps> = ({
 }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
-  const navigate = useNavigate();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
@@ -52,12 +51,6 @@ const WrappedAttack: React.FC<AttackProps> = ({
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
-
-  const searchAttack = useCallback(
-    () => navigate(`/search/result?query=result.sections.heuristic.attack.pattern:${safeFieldValueURI(text)}`),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [text]
-  );
 
   const maliciousness = lvl || scoreToVerdict(score);
   const color: PossibleColors = {
@@ -85,11 +78,6 @@ const WrappedAttack: React.FC<AttackProps> = ({
     handleClose();
   }, [copy, handleClose, text]);
 
-  const handleMenuSearch = useCallback(() => {
-    searchAttack();
-    handleClose();
-  }, [searchAttack, handleClose]);
-
   const handleMenuHighlight = useCallback(() => {
     handleClick();
     handleClose();
@@ -110,7 +98,12 @@ const WrappedAttack: React.FC<AttackProps> = ({
           {t('clipboard')}
         </MenuItem>
         {currentUser.roles.includes('submission_view') && (
-          <MenuItem dense onClick={handleMenuSearch}>
+          <MenuItem
+            component={Link}
+            dense
+            onClick={handleClose}
+            to={`/search/result?query=result.sections.heuristic.attack.pattern:${safeFieldValueURI(text)}`}
+          >
             {SEARCH_ICON}
             {t('related')}
           </MenuItem>

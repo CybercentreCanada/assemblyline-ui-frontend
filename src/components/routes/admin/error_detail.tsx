@@ -12,14 +12,15 @@ import PageCenter from 'commons/components/pages/PageCenter';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import FileDownloader from 'components/visual/FileDownloader';
 import 'moment/locale/fr';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import Moment from 'react-moment';
 import { Navigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 
 export type Error = {
   created: string;
@@ -64,6 +65,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
   const { copy } = useClipboard();
   const [error, setError] = useState<Error>(null);
   const { apiCall } = useMyAPI();
+  const location = useLocation();
   const { key, type, source, name } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
@@ -78,6 +80,13 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
     'MAX FILES REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
     UNKNOWN: <ReportProblemOutlinedIcon style={{ color: theme.palette.action.active }} />
   };
+
+  const fileViewerPath = useMemo<string>(() => {
+    const tab = TAB_OPTIONS.find(option => location.pathname.indexOf(option) >= 0);
+    if (!location.pathname.startsWith('/file/viewer') || !tab)
+      return `/file/viewer/${error?.sha256}/${DEFAULT_TAB}/${location.search}${location.hash}`;
+    else return `/file/viewer/${error?.sha256}/${tab}/${location.search}${location.hash}`;
+  }, [error?.sha256, location.hash, location.pathname, location.search]);
 
   useEffect(() => {
     if ((error_key || key) && currentUser.is_admin) {
@@ -192,7 +201,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
                   tooltip={t('download')}
                 />
                 <Tooltip title={t('file_viewer')}>
-                  <IconButton component={Link} to={`/file/viewer/${error.sha256}`} size="large">
+                  <IconButton component={Link} to={fileViewerPath} size="large">
                     <PageviewOutlinedIcon />
                   </IconButton>
                 </Tooltip>

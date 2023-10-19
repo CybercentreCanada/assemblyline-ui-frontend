@@ -26,10 +26,11 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
+import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
@@ -127,6 +128,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const navigate = useNavigate();
   const { showSuccessMessage } = useMySnackbar();
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
+  const [promotedSections, setPromotedSections] = useState([]);
   const popoverOpen = Boolean(resubmitAnchor);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
@@ -134,6 +136,13 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const fileName = file ? params.get('name') || sha256 : null;
+
+  const fileViewerPath = useMemo<string>(() => {
+    const tab = TAB_OPTIONS.find(option => location.pathname.indexOf(option) >= 0);
+    if (!location.pathname.startsWith('/file/viewer') || !tab)
+      return `/file/viewer/${file?.file_info?.sha256}/${DEFAULT_TAB}/${location.search}${location.hash}`;
+    else return `/file/viewer/${file?.file_info?.sha256}/${tab}/${location.search}${location.hash}`;
+  }, [file?.file_info?.sha256, location.hash, location.pathname, location.search]);
 
   const elementInViewport = element => {
     const bounding = element.getBoundingClientRect();
@@ -252,6 +261,18 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
     // eslint-disable-next-line
   }, [sha256, sid]);
 
+  useEffect(() => {
+    if (file === null) {
+      setPromotedSections(null);
+    } else {
+      setPromotedSections(
+        file.results
+          .map(serviceResult => serviceResult.result.sections.filter(section => section.promote_to !== null))
+          .flat()
+      );
+    }
+  }, [file]);
+
   return currentUser.roles.includes('submission_view') ? (
     <div id="fileDetailTop" style={{ textAlign: 'left' }}>
       <InputDialog
@@ -303,7 +324,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                 )}
                 {currentUser.roles.includes('file_detail') && (
                   <Tooltip title={t('file_viewer')}>
-                    <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`} size="large">
+                    <IconButton component={Link} to={fileViewerPath} size="large">
                       <PageviewOutlinedIcon />
                     </IconButton>
                   </Tooltip>
@@ -386,7 +407,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         </Grid>
       </div>
       <div style={{ paddingBottom: sp2 }}>
-        <IdentificationSection fileinfo={file ? file.file_info : null} />
+        <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
         <FrequencySection fileinfo={file ? file.file_info : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
         <ChildrenSection childrens={file ? file.childrens : null} />

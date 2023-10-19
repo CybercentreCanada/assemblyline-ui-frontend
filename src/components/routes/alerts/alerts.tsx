@@ -1,7 +1,25 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import SortIcon from '@mui/icons-material/Sort';
 import StarIcon from '@mui/icons-material/Star';
-import { AlertTitle, Box, Drawer, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
+import {
+  AlertTitle,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Drawer,
+  Grid,
+  IconButton,
+  Paper,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import ListCarousel from 'commons/addons/lists/carousel/ListCarousel';
 import ListNavigator from 'commons/addons/lists/navigator/ListNavigator';
@@ -10,12 +28,15 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
+import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchResultCount from 'components/visual/SearchResultCount';
+import 'moment/locale/fr';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
@@ -26,6 +47,7 @@ import ForbiddenPage from '../403';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertListItemActions, { PossibleVerdict } from './alert-list-item-actions';
+import AlertsSorts from './alert-sorts';
 import AlertsFilters from './alerts-filters';
 import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
@@ -38,9 +60,11 @@ import usePromiseAPI from './hooks/usePromiseAPI';
 //  when scrolling has hit threshold.
 const PAGE_SIZE = 50;
 
+export const LOCAL_STORAGE = 'alert.search';
+
 export interface AlertDrawerState {
   open: boolean;
-  type: 'filter' | 'favorites' | 'actions';
+  type: 'filter' | 'favorites' | 'actions' | 'sort';
   actionData?: {
     query: SearchQuery;
     alert?: {
@@ -73,7 +97,7 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(3),
     width: '600px',
     [theme.breakpoints.only('xs')]: {
-      width: '100%'
+      width: '100vw'
     }
   },
   searchresult: {
@@ -86,6 +110,32 @@ const useStyles = makeStyles(theme => ({
     borderTopLeftRadius: 0,
     borderBottomLeftRadius: 0,
     marginRight: '0px !important'
+  },
+  preview: {
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr',
+    columnGap: theme.spacing(1),
+    margin: 0,
+    padding: theme.spacing(0.75, 1),
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word'
+  },
+  dialogPaper: {
+    maxWidth: '850px'
+  },
+  dialogContent: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: theme.spacing(2),
+    '@media (max-width:850px)': {
+      gridTemplateColumns: '1fr'
+    }
+  },
+  dialogDescription: {
+    gridColumn: 'span 2',
+    '@media (max-width:850px)': {
+      gridColumn: 'span 1'
+    }
   }
 }));
 
@@ -95,7 +145,8 @@ const Alerts: React.FC = () => {
   const classes = useStyles();
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { setGlobalDrawer } = useDrawer();
+  const { showSuccessMessage } = useMySnackbar();
+  const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
 
   // Alerts hook.
   const {
@@ -130,6 +181,22 @@ const Alerts: React.FC = () => {
   // Define some references.
   const searchTextValue = useRef<string>('');
 
+  // Session states
+  const [session, setSession] = useState<{ open: boolean; existing: string; current: string }>({
+    open: false,
+    existing: '',
+    current: ''
+  });
+
+  const parseSearchParams = useCallback((search: string) => {
+    let entries = [];
+    for (const entry of new URLSearchParams(search).entries()) {
+      entries.push(entry);
+    }
+    entries.sort((a, b) => `${a[0]}${a[1]}`.localeCompare(`${b[0]}${b[1]}`));
+    return entries;
+  }, []);
+
   useEffect(() => {
     if (searchQuery) {
       setScrollReset(true);
@@ -145,7 +212,7 @@ const Alerts: React.FC = () => {
   const onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
     // Update query and url before reloading data.
     searchQuery.setQuery(filterValue);
-    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
+    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}${location.hash}`);
 
     if (inputEl) inputEl.focus();
   };
@@ -154,7 +221,7 @@ const Alerts: React.FC = () => {
   const onClearSearch = (inputEl: HTMLInputElement = null) => {
     // Reset the query.
     searchQuery.deleteQuery();
-    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
+    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}${location.hash}`);
 
     // Update the search text field reference.
     searchTextValue.current = '';
@@ -203,40 +270,10 @@ const Alerts: React.FC = () => {
           // Unfocus the simple list so the drawer does not try to refocus it when closing...
           document.getElementById(ALERT_SIMPLELIST_ID).blur();
         }
-        setGlobalDrawer(
-          <div>
-            <div
-              style={{
-                alignItems: 'start',
-                display: 'flex',
-                float: 'right',
-                height: theme.spacing(8),
-                marginTop: theme.spacing(-8),
-                marginRight: theme.spacing(-1),
-                position: 'sticky',
-                top: theme.spacing(1),
-                zIndex: 10
-              }}
-            >
-              <AlertListItemActions
-                item={item}
-                index={index}
-                currentQuery={searchQuery}
-                setDrawer={setDrawer}
-                onTakeOwnershipComplete={() => onTakeOwnershipComplete(index, item)}
-                onVerdictComplete={verdict => onVerdictComplete(index, item, verdict)}
-                type="drawer"
-              />
-              <ListNavigator id={ALERT_SIMPLELIST_ID} />
-            </div>
-            <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
-              <AlertDetails alert={item} />
-            </ListCarousel>
-          </div>
-        );
+        navigate(`${location.pathname}${location.search}#${item.alert_id}`);
       }
     },
-    [setGlobalDrawer, isLGDown, theme, searchQuery, onTakeOwnershipComplete, onVerdictComplete]
+    [isLGDown, location.pathname, location.search, navigate]
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
@@ -250,7 +287,7 @@ const Alerts: React.FC = () => {
     // Set the newly selected filters and up location url bar.
     if (query !== undefined && query !== null) searchQuery.setQuery(query);
     searchQuery.setFilters(filters);
-    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
+    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}${location.hash}`);
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -272,7 +309,7 @@ const Alerts: React.FC = () => {
 
   // Handler/callback for when clicking the 'Add' btn on the AlertsFavorite component.
   const onFavoriteAdd = (filter: { query: string; name: string }) => {
-    setDrawer({ ...drawer, open: false });
+    // setDrawer({ ...drawer, open: false });
   };
 
   // Handler/callback for when deleting a favorite on the AlertsFavorite component.
@@ -284,7 +321,7 @@ const Alerts: React.FC = () => {
   const onFavoriteSelected = (favorite: { name: string; query: string }) => {
     // Update query with selected favorite.
     searchQuery.addFq(favorite.query);
-    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
+    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}${location.hash}`);
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -344,6 +381,66 @@ const Alerts: React.FC = () => {
     [onTakeOwnershipComplete, onVerdictComplete, searchQuery]
   );
 
+  const handleSortSubmit = useCallback(
+    (sort: string) => {
+      const query = new SimpleSearchQuery(location.search);
+      query.set('sort', sort);
+      navigate(`${location.pathname}?${query.toString([])}${location.hash}`);
+      if (drawer.open) {
+        setDrawer({ ...drawer, open: false });
+      }
+    },
+    [drawer, location.hash, location.pathname, location.search, navigate]
+  );
+
+  useEffect(() => {
+    if (location.hash) {
+      const item = alerts.find(a => a.alert_id === location.hash.slice(1));
+      const index = alerts.findIndex(a => a.alert_id === location.hash.slice(1));
+
+      setGlobalDrawer(
+        <div>
+          <div
+            style={{
+              alignItems: 'start',
+              display: 'flex',
+              float: 'right',
+              height: theme.spacing(8),
+              marginTop: theme.spacing(-8),
+              marginRight: theme.spacing(-1),
+              position: 'sticky',
+              top: theme.spacing(1),
+              zIndex: 10
+            }}
+          >
+            {item && index >= 0 && (
+              <AlertListItemActions
+                item={item}
+                index={index}
+                currentQuery={searchQuery}
+                setDrawer={setDrawer}
+                onTakeOwnershipComplete={() => onTakeOwnershipComplete(index, item)}
+                onVerdictComplete={verdict => onVerdictComplete(index, item, verdict)}
+                type="drawer"
+              />
+            )}
+            <ListNavigator id={ALERT_SIMPLELIST_ID} />
+          </div>
+          <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
+            <AlertDetails id={location.hash.slice(1)} />
+          </ListCarousel>
+        </div>
+      );
+    }
+  }, [alerts, location.hash, onTakeOwnershipComplete, onVerdictComplete, searchQuery, setGlobalDrawer, theme]);
+
+  useEffect(() => {
+    if (alerts !== null && alerts.length > 0 && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawerOpened]);
+
   return currentUser.roles.includes('alert_view') ? (
     <PageFullWidth margin={4}>
       <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
@@ -367,6 +464,7 @@ const Alerts: React.FC = () => {
                   onApplyBtnClick={onApplyFilters}
                 />
               ),
+              sort: <AlertsSorts onSubmit={handleSortSubmit} />,
               favorites: (
                 <AlertsFiltersFavorites
                   initValue={searchTextValue.current}
@@ -388,9 +486,109 @@ const Alerts: React.FC = () => {
         </div>
       </Drawer>
 
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Typography variant="h4">{t('alerts')}</Typography>
-      </div>
+      <Dialog
+        classes={{ paper: classes.dialogPaper }}
+        open={session?.open}
+        onClose={() => setSession(s => ({ ...s, open: false }))}
+      >
+        <DialogTitle>{t('session.title')}</DialogTitle>
+        <DialogContent className={classes.dialogContent}>
+          <div className={classes.dialogDescription}>{t('session.description')}</div>
+
+          <Grid item>
+            <Typography variant="subtitle2">{t('session.existing')}</Typography>
+            <Paper component="pre" variant="outlined" className={classes.preview}>
+              {!session.existing ? (
+                <div>{t('none')}</div>
+              ) : (
+                parseSearchParams(session.existing)?.map(([k, v], i) => (
+                  <div key={i} style={{ display: 'contents' }}>
+                    <b>{k}: </b>
+                    {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
+                  </div>
+                ))
+              )}
+            </Paper>
+          </Grid>
+
+          <Grid item>
+            <Typography variant="subtitle2">{t('session.current')}</Typography>
+            <Paper component="pre" variant="outlined" className={classes.preview}>
+              {!session.current ? (
+                <div>{t('none')}</div>
+              ) : (
+                parseSearchParams(session.current)?.map(([k, v], i) => (
+                  <div key={i} style={{ display: 'contents' }}>
+                    <b>{k}: </b>
+                    {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
+                  </div>
+                ))
+              )}
+            </Paper>
+          </Grid>
+
+          <div>{session.existing ? t('session.clear.confirm') : t('session.clear.none')}</div>
+
+          <div>
+            {session.existing === session.current
+              ? t('session.save.same')
+              : session.current
+              ? t('session.save.confirm')
+              : t('session.save.none')}
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color="primary"
+            disabled={!session.existing}
+            children={t('session.clear')}
+            onClick={() => {
+              showSuccessMessage(t('session.clear.success'));
+              localStorage.removeItem(LOCAL_STORAGE);
+              setSession(s => ({ ...s, open: false }));
+              navigate(`${location.pathname}${location.hash}`);
+            }}
+          />
+          <div style={{ flex: 1 }} />
+          <Button
+            autoFocus
+            color="secondary"
+            children={t('session.cancel')}
+            onClick={() => setSession(s => ({ ...s, open: false }))}
+          />
+          <Button
+            color="primary"
+            disabled={!session.current || session.current === session.existing}
+            children={t('session.save')}
+            onClick={() => {
+              showSuccessMessage(t('session.save.success'));
+              localStorage.setItem(LOCAL_STORAGE, location.search);
+              setSession(s => ({ ...s, open: false }));
+            }}
+          />
+        </DialogActions>
+      </Dialog>
+
+      <Grid container alignItems="center" paddingBottom={2}>
+        <Grid item xs>
+          <Typography variant="h4">{t('alerts')}</Typography>
+        </Grid>
+
+        <Grid item xs style={{ textAlign: 'right', flex: 0 }}>
+          <Tooltip title={t('session.tooltip')}>
+            <div>
+              <IconButton
+                size="large"
+                onClick={() =>
+                  setSession({ open: true, current: location.search, existing: localStorage.getItem(LOCAL_STORAGE) })
+                }
+              >
+                <ManageSearchIcon />
+              </IconButton>
+            </div>
+          </Tooltip>
+        </Grid>
+      </Grid>
 
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
@@ -408,6 +606,13 @@ const Alerts: React.FC = () => {
                 tooltip: t('favorites'),
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'favorites' })
+                }
+              },
+              {
+                icon: <SortIcon fontSize={isMDUp ? 'medium' : 'small'} />,
+                tooltip: t('sorts'),
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'sort' })
                 }
               },
               {
