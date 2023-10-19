@@ -489,7 +489,7 @@ const WrappedCarouselContainer = ({
                       component="div"
                       size="large"
                       children={<ChevronLeftOutlinedIcon />}
-                      onClick={handleImageChange(1)}
+                      onClick={handleImageChange(-1)}
                     />
                   </Tooltip>
                 </div>
