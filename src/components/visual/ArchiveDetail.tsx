@@ -1,4 +1,5 @@
 import { Tab as MuiTab, Tabs as MuiTabs, useTheme } from '@mui/material';
+import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import ForbiddenPage from 'components/routes/403';
@@ -9,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import CommentSection from './ArchiveDetail/comments';
 import { DiscoverSection } from './ArchiveDetail/discover';
 import Header from './ArchiveDetail/header';
+import HexSection from './ArchiveDetail/viewer/hex';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
 import Detection from './FileDetail/detection';
@@ -201,7 +203,7 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
   };
 
   return currentUser.roles.includes('submission_view') ? (
-    <div id="fileDetailTop" ref={ref} style={{ textAlign: 'left' }}>
+    <PageFullSize id="fileDetailTop" ref={ref} styles={{ paper: { textAlign: 'left' } }}>
       <Header
         sha256={sha256}
         file={file}
@@ -210,88 +212,73 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
         liveErrors={liveErrors}
         force={force}
       />
-      <div style={{ paddingBottom: sp2 }}>
-        <MuiTabs
-          value={tab}
-          variant="scrollable"
-          scrollButtons="auto"
-          onChange={handleTabChange}
-          sx={{ backgroundColor: theme.palette.background.default }}
-          // sx={{ backgroundColor: inDrawer ? theme.palette.background.default : theme.palette.background.paper }}
-        >
-          {Object.keys(TABS).map((title, i) => (
-            <MuiTab key={`${i}`} label={t(title)} value={title} sx={{ minWidth: '120px' }} />
-          ))}
-        </MuiTabs>
 
-        {tab === 'details' && (
-          <>
-            <IdentificationSection fileinfo={file ? file.file_info : null} />
-            <FrequencySection fileinfo={file ? file.file_info : null} />
-            <MetadataSection metadata={file ? file.metadata : null} />
-          </>
-        )}
+      <MuiTabs
+        value={tab}
+        variant="scrollable"
+        scrollButtons="auto"
+        onChange={handleTabChange}
+        sx={{ backgroundColor: theme.palette.background.default }}
+        // sx={{ backgroundColor: inDrawer ? theme.palette.background.default : theme.palette.background.paper }}
+      >
+        {Object.keys(TABS).map((title, i) => (
+          <MuiTab key={`${i}`} label={t(title)} value={title} sx={{ minWidth: '120px' }} />
+        ))}
+      </MuiTabs>
 
-        {tab === 'detection' && (
-          <>
-            <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
-            <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
-            <ResultSection
-              results={file ? file.results : null}
-              sid={sid}
-              alternates={file ? file.alternates : null}
-              force={force}
-            />
-            <EmptySection emptys={file ? file.emptys : null} sid={sid} />
-            <ErrorSection errors={file ? file.errors : null} />
-          </>
-        )}
+      {tab === 'details' && (
+        <>
+          <IdentificationSection fileinfo={file ? file.file_info : null} />
+          <FrequencySection fileinfo={file ? file.file_info : null} />
+          <MetadataSection metadata={file ? file.metadata : null} />
+        </>
+      )}
 
-        {tab === 'tags' && (
-          <>
-            <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
-          </>
-        )}
+      {tab === 'detection' && (
+        <>
+          <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
+          <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
+          <ResultSection
+            results={file ? file.results : null}
+            sid={sid}
+            alternates={file ? file.alternates : null}
+            force={force}
+          />
+          <EmptySection emptys={file ? file.emptys : null} sid={sid} />
+          <ErrorSection errors={file ? file.errors : null} />
+        </>
+      )}
 
-        {tab === 'relations' && (
-          <>
-            <ChildrenSection childrens={file ? file.childrens : null} />
-            <ParentSection parents={file ? file.parents : null} />
-            <DiscoverSection file={file} />
-          </>
-        )}
+      {tab === 'tags' && (
+        <>
+          <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
+        </>
+      )}
 
-        {tab === 'ascii' && (
-          <>
-            <ChildrenSection childrens={file ? file.childrens : null} />
-            <ParentSection parents={file ? file.parents : null} />
-            <DiscoverSection file={file} />
-          </>
-        )}
+      {tab === 'relations' && (
+        <>
+          <ChildrenSection childrens={file ? file.childrens : null} />
+          <ParentSection parents={file ? file.parents : null} />
+          <DiscoverSection file={file} />
+        </>
+      )}
 
-        {tab === 'strings' && (
-          <>
-            <ChildrenSection childrens={file ? file.childrens : null} />
-            <ParentSection parents={file ? file.parents : null} />
-            <DiscoverSection file={file} />
-          </>
-        )}
+      {tab === 'ascii' && <>ascii</>}
 
-        {tab === 'hex' && (
-          <>
-            <ChildrenSection childrens={file ? file.childrens : null} />
-            <ParentSection parents={file ? file.parents : null} />
-            <DiscoverSection file={file} />
-          </>
-        )}
+      {tab === 'strings' && <>strings</>}
 
-        {tab === 'community' && (
-          <>
-            <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
-          </>
-        )}
-      </div>
-    </div>
+      {tab === 'hex' && (
+        <>
+          <HexSection sha256={sha256} />
+        </>
+      )}
+
+      {tab === 'community' && (
+        <>
+          <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
+        </>
+      )}
+    </PageFullSize>
   ) : (
     <ForbiddenPage />
   );
