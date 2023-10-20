@@ -1,4 +1,12 @@
 {
+  "attribution.title": "Attributions",
+  "attribution.actor": "Actors",
+  "attribution.campaign": "Campaigns",
+  "attribution.category": "Categories",
+  "attribution.exploit": "Exploits",
+  "attribution.family": "Families",
+  "attribution.implant": "Implants",
+  "attribution.network": "Networks",
   "chart.title": "Number of times seen in the past 30 days",
   "delete.acceptText": "Yes, remove it!",
   "delete.cancelText": "Cancel",

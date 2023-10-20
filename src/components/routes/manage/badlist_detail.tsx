@@ -22,10 +22,21 @@ export type Badlist = {
   added: string;
   classification: string;
   enabled: boolean;
+  attribution: {
+    actor: string[];
+    campaign: string[];
+    category: string[];
+    exploit: string[];
+    implant: string[];
+    family: string[];
+    network: string[];
+  };
   hashes: {
     md5: string;
     sha1: string;
     sha256: string;
+    ssdeep: string;
+    tlsh: string;
   };
   file: {
     name: string[];
@@ -217,16 +228,14 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                           style={{ color: theme.palette.action.active }}
                           to={
                             badlist.type === 'file'
-                              ? `/search/result/?query=result.sections.heuristic.signature.name:"BADLIST_${
-                                  badlist_id || id
-                                }"`
-                              : badlist.type === 'signature'
-                              ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValueURI(
-                                  badlist.signature.name
+                              ? `/search/?query=sha256:${badlist.hashes.sha256 || badlist_id || id} OR results:${
+                                  badlist.hashes.sha256 || badlist_id || id
+                                }* OR errors:${badlist.hashes.sha256 || badlist_id || id}* OR file.sha256:${
+                                  badlist.hashes.sha256 || badlist_id || id
+                                }`
+                              : `/search/result/?query=result.sections.tags.${badlist.tag.type}:${safeFieldValueURI(
+                                  badlist.tag.value
                                 )}`
-                              : `/search/result/?query=result.sections.badlisted_tags.${
-                                  badlist.tag.type
-                                }:${safeFieldValueURI(badlist.tag.value)}`
                           }
                           size="large"
                         >
@@ -343,6 +352,38 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                   <Skeleton />
                 )}
               </Grid>
+              <Grid item xs={4} sm={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>SSDeep</span>
+              </Grid>
+              <Grid
+                item
+                xs={8}
+                sm={9}
+                lg={10}
+                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+              >
+                {badlist ? (
+                  badlist.hashes.ssdeep || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
+                ) : (
+                  <Skeleton />
+                )}
+              </Grid>
+              <Grid item xs={4} sm={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>TLSH</span>
+              </Grid>
+              <Grid
+                item
+                xs={8}
+                sm={9}
+                lg={10}
+                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+              >
+                {badlist ? (
+                  badlist.hashes.tlsh || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
+                ) : (
+                  <Skeleton />
+                )}
+              </Grid>
             </Grid>
           </Grid>
           {badlist && badlist.file && (
@@ -379,20 +420,6 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
               </Grid>
             </Grid>
           )}
-          {badlist && badlist.signature && (
-            <Grid item xs={12}>
-              <Typography variant="h6">{t('signature.title')}</Typography>
-              <Divider />
-              <Grid container>
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>{t('signature.name')}</span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10}>
-                  {badlist.signature.name}
-                </Grid>
-              </Grid>
-            </Grid>
-          )}
           {badlist && badlist.tag && (
             <Grid item xs={12}>
               <Typography variant="h6">{t('tag.title')}</Typography>
@@ -410,6 +437,26 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                 <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
                   {badlist.tag.value}
                 </Grid>
+              </Grid>
+            </Grid>
+          )}
+          {badlist && badlist.attribution && (
+            <Grid item xs={12}>
+              <Typography variant="h6">{t('attribution.title')}</Typography>
+              <Divider />
+              <Grid container>
+                {Object.keys(badlist.attribution).map(k => (
+                  <>
+                    <Grid item xs={4} sm={3} lg={2}>
+                      <span style={{ fontWeight: 500 }}>{t(`attribution.${k}`)}</span>
+                    </Grid>
+                    <Grid item xs={8} sm={9} lg={10}>
+                      {badlist.attribution[k].map(x => (
+                        <CustomChip label={x} size="small" variant="outlined" />
+                      ))}
+                    </Grid>
+                  </>
+                ))}
               </Grid>
             </Grid>
           )}
