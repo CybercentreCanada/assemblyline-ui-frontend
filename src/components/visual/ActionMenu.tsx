@@ -167,6 +167,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
       },
       sources: [
         {
+          classification: classification,
           name: currentUser.username,
           reason: [safelistReason],
           type: 'user'
@@ -202,6 +203,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
       },
       sources: [
         {
+          classification: classification,
           name: currentUser.username,
           reason: [badlistReason],
           type: 'user'
