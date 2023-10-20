@@ -3,13 +3,14 @@ import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import ForbiddenPage from 'components/routes/403';
+import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Banner from './ArchiveDetail/banner';
 import CommentSection from './ArchiveDetail/comments';
 import { DiscoverSection } from './ArchiveDetail/discover';
-import Header from './ArchiveDetail/header';
 import HexSection from './ArchiveDetail/viewer/hex';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
@@ -120,12 +121,10 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser, c12nDef } = useALContext();
 
   const [file, setFile] = useState<File | null>(null);
   const [tab, setTab] = useState<Tab>('details');
-
-  const sp2 = theme.spacing(2);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -196,22 +195,15 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
     // eslint-disable-next-line
   }, [sha256, sid]);
 
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
-
   return currentUser.roles.includes('submission_view') ? (
     <PageFullSize id="fileDetailTop" ref={ref} styles={{ paper: { textAlign: 'left' } }}>
-      <Header
-        sha256={sha256}
-        file={file}
-        sid={sid}
-        liveResultKeys={liveResultKeys}
-        liveErrors={liveErrors}
-        force={force}
-      />
+      {c12nDef.enforce && (
+        <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
+          <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
+        </div>
+      )}
+
+      <Banner sha256={sha256} file={file} sid={sid} force={force} />
 
       <MuiTabs
         value={tab}
