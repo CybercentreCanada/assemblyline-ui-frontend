@@ -109,8 +109,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     borderRadius: theme.spacing(1),
     padding: theme.spacing(1),
-    overflowX: 'hidden',
-    marginBottom: theme.spacing(2)
+    overflowX: 'hidden'
   },
   container: {
     width: '100%',
