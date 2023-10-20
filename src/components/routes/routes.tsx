@@ -39,6 +39,8 @@ const ManageHeuristics = lazy(() => import('components/routes/manage/heuristics'
 const HeuristicDetail = lazy(() => import('components/routes/manage/heuristic_detail'));
 const ManageSafelist = lazy(() => import('components/routes/manage/safelist'));
 const SafelistDetail = lazy(() => import('components/routes/manage/safelist_detail'));
+const ManageBadlist = lazy(() => import('components/routes/manage/badlist'));
+const BadlistDetail = lazy(() => import('components/routes/manage/badlist_detail'));
 const ManageSignatures = lazy(() => import('components/routes/manage/signatures'));
 const SignatureDetail = lazy(() => import('components/routes/manage/signature_detail'));
 const ManageSignatureSources = lazy(() => import('components/routes/manage/signature_sources'));
@@ -133,6 +135,8 @@ const WrappedRoutes = () => {
         <Route path="/manage/workflows" element={<ManageWorkflows />} />
         <Route path="/manage/safelist/:id" element={<SafelistDetail />} />
         <Route path="/manage/safelist" element={<ManageSafelist />} />
+        <Route path="/manage/badlist/:id" element={<BadlistDetail />} />
+        <Route path="/manage/badlist" element={<ManageBadlist />} />
         <Route path="/manage" element={<Manage />} />
         <Route path="/retrohunt" element={<RetroHunt />} />
         <Route path="/retrohunt/:code" element={<RetroHuntDetail />} />

@@ -83,6 +83,8 @@ export default function ApiDoc() {
     self_manage: 'info',
     safelist_view: 'default',
     safelist_manage: 'info',
+    badlist_view: 'default',
+    badlist_manage: 'info',
     workflow_view: 'default',
     workflow_manage: 'info',
     apikey_access: 'default',

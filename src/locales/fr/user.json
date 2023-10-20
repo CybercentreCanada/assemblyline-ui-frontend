@@ -81,6 +81,8 @@
   "role.retrohunt_view": "Visionnement de Retrohunt",
   "role.safelist_manage": "Gestion de la Liste sure",
   "role.safelist_view": "Visionnement de la Liste sure",
+  "role.badlist_manage": "Gestion de la Liste mauvaise",
+  "role.badlist_view": "Visionnement de la Liste mauvaise",
   "role.self_manage": "Gestion de l'Utilisateur en cours",
   "role.signature_download": "Téléchargement de Signatures",
   "role.signature_import": "Ajout de Signatures",

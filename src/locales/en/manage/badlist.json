@@ -1,0 +1,12 @@
+{
+  "filter": "Filter badlisted hashes...",
+  "filtered": "hash matching filter",
+  "filtereds": "hashes matching filter",
+  "searching": "Searching...",
+  "title": "Badlist",
+  "total": "hash in badlist",
+  "totals": "hashes in badlist",
+  "user": "Hashes added by users",
+  "disabled": "Disabled hashes",
+  "tag": "Tag based hashes"
+}
