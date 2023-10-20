@@ -250,7 +250,9 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
       hashes: {
         md5: file.file_info.md5,
         sha1: file.file_info.sha1,
-        sha256: file.file_info.sha256
+        sha256: file.file_info.sha256,
+        ssdeep: file.file_info.ssdeep,
+        tlsh: file.file_info.tlsh
       },
       file: {
         name: [],
