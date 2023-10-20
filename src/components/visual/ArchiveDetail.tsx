@@ -11,7 +11,10 @@ import { useTranslation } from 'react-i18next';
 import Banner from './ArchiveDetail/banner';
 import CommentSection from './ArchiveDetail/comments';
 import { DiscoverSection } from './ArchiveDetail/discover';
+import ArchiveLabels from './ArchiveDetail/labels';
+import ASCIISection from './ArchiveDetail/viewer/ascii';
 import HexSection from './ArchiveDetail/viewer/hex';
+import StringsSection from './ArchiveDetail/viewer/strings';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
 import Detection from './FileDetail/detection';
@@ -210,7 +213,7 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
         variant="scrollable"
         scrollButtons="auto"
         onChange={handleTabChange}
-        sx={{ backgroundColor: theme.palette.background.default }}
+        sx={{ backgroundColor: theme.palette.background.default, margin: `${theme.spacing(2)} 0` }}
         // sx={{ backgroundColor: inDrawer ? theme.palette.background.default : theme.palette.background.paper }}
       >
         {Object.keys(TABS).map((title, i) => (
@@ -255,9 +258,17 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
         </>
       )}
 
-      {tab === 'ascii' && <>ascii</>}
+      {tab === 'ascii' && (
+        <>
+          <ASCIISection sha256={sha256} type={file?.file_info?.type} />
+        </>
+      )}
 
-      {tab === 'strings' && <>strings</>}
+      {tab === 'strings' && (
+        <>
+          <StringsSection sha256={sha256} type={file?.file_info?.type} />
+        </>
+      )}
 
       {tab === 'hex' && (
         <>
@@ -267,6 +278,7 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
 
       {tab === 'community' && (
         <>
+          <ArchiveLabels sha256={sha256} labels={file?.file_info?.label_categories} />
           <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
         </>
       )}
