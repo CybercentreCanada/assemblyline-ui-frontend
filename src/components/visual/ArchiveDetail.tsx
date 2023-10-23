@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import Banner from './ArchiveDetail/banner';
 import CommentSection from './ArchiveDetail/comments';
 import { DiscoverSection } from './ArchiveDetail/discover';
-import ArchiveLabels from './ArchiveDetail/labels';
+import LabelSection from './ArchiveDetail/labels';
 import ASCIISection from './ArchiveDetail/viewer/ascii';
 import HexSection from './ArchiveDetail/viewer/hex';
 import StringsSection from './ArchiveDetail/viewer/strings';
@@ -276,12 +276,17 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
         </>
       )}
 
-      {tab === 'community' && (
-        <>
-          <ArchiveLabels sha256={sha256} labels={file?.file_info?.label_categories} />
+      {/* {tab === 'community' && (
+        <div style={{ display: 'contents' }}>
+          <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} />
           <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
-        </>
-      )}
+        </div>
+      )} */}
+
+      <div style={{ display: tab === 'community' ? 'contents' : 'none' }}>
+        <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} />
+        <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
+      </div>
     </PageFullSize>
   ) : (
     <ForbiddenPage />

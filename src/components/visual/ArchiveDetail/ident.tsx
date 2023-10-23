@@ -6,7 +6,6 @@ import { bytesToSize } from 'helpers/utils';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ActionableText from '../ActionableText';
-import ArchiveLabels from './labels';
 
 const useStyles = makeStyles(theme => ({
   sp2: {
@@ -151,8 +150,6 @@ const WrappedIdentificationSection: React.FC<Props> = ({ fileinfo, isArchive = f
             <Row title={t('mime')}>{fileinfo ? fileinfo.mime : <Skeleton />}</Row>
             <Row title={t('magic')}>{fileinfo ? fileinfo.magic : <Skeleton />}</Row>
             <Row title={t('entropy')}>{fileinfo ? fileinfo.entropy : <Skeleton />}</Row>
-
-            <ArchiveLabels sha256={fileinfo?.sha256} labels={fileinfo?.label_categories} xs={4} sm={3} lg={2} />
           </Grid>
         </div>
       </Collapse>

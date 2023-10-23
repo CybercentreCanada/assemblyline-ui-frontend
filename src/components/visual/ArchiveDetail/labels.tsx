@@ -1,27 +1,52 @@
-import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
-import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
-import { Autocomplete, Collapse, Grid, GridSize, IconButton, Skeleton, TextField } from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import {
+  Button,
+  Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Grid,
+  IconButton,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import CustomChip from 'components/visual/CustomChip';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ChipList } from '../ChipList';
 
 const useStyles = makeStyles(theme => ({
+  container: {
+    paddingBottom: theme.spacing(2),
+    paddingTop: theme.spacing(2)
+  },
   title: {
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    cursor: 'pointer',
+    '&:hover, &:focus': {
+      color: theme.palette.text.secondary
+    }
   },
-  label: {
-    fontWeight: 500,
-    marginRight: theme.spacing(0.5)
-  },
-  content: {
-    display: 'flex',
-    gap: theme.spacing(1),
-    flexWrap: 'wrap'
+  preview: {
+    margin: 0,
+    padding: theme.spacing(0.75, 1),
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word'
   }
 }));
 
@@ -42,43 +67,82 @@ const LABELS: Record<
 
 type Labels = Partial<Record<keyof typeof DEFAULT_LABELS, string[]>>;
 
+type NewLabel = Record<'value' | 'category', string>;
+
 type Props = {
   sha256: string;
   labels: Labels;
-  xs?: boolean | GridSize;
-  sm?: boolean | GridSize;
-  md?: boolean | GridSize;
-  lg?: boolean | GridSize;
-  xl?: boolean | GridSize;
 };
 
-const WrappedArchiveLabels: React.FC<Props> = ({ sha256 = null, labels: propLabels = null, xs, sm, md, lg, xl }) => {
+const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabels = null }) => {
   const { t } = useTranslation(['fileDetail']);
+  const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
   const [labels, setLabels] = useState<Labels>(null);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [newLabel, setNewLabel] = useState<NewLabel>({ value: '', category: '' });
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  const [addDialog, setAddDialog] = useState<boolean>(false);
+  const [saveConfirmation, setSaveConfirmation] = useState<boolean>(false);
+  const [waiting, setWaiting] = useState<boolean>(false);
 
   const prevLabels = useRef<Labels>(null);
 
   const sortedLabels = useMemo<Labels>(() => {
     if (!labels || typeof labels !== 'object') return DEFAULT_LABELS;
     return Object.fromEntries(
-      Object.keys(DEFAULT_LABELS).map(category => [
-        category,
-        Array.isArray(labels[category]) ? labels[category].sort((a, b) => a.localeCompare(b)) : []
+      Object.keys(DEFAULT_LABELS).map(cat => [
+        cat,
+        Array.isArray(labels[cat]) ? labels[cat].sort((a, b) => a.localeCompare(b)) : []
       ])
     );
   }, [labels]);
 
-  const handleEditingLabels = useCallback((data: Labels) => {
-    setIsEditing(true);
-    prevLabels.current = data;
+  const hasDifferentLabels = useMemo<boolean>(
+    () =>
+      !labels
+        ? false
+        : Object.keys(prevLabels.current).some(
+            cat =>
+              labels[cat].filter(l => !prevLabels.current[cat].includes(l)).length > 0 ||
+              prevLabels.current[cat].filter(l => !labels[cat].includes(l)).length > 0
+          ),
+    [labels]
+  );
+
+  const handleDeleteLabel = useCallback((category: keyof typeof DEFAULT_LABELS, label: string) => {
+    setLabels(lbs => ({ ...lbs, [category]: lbs[category].filter(l => l !== label) }));
   }, []);
 
-  const handleSaveLabels = useCallback(
+  const handleAddDialogOpen = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setAddDialog(true);
+  }, []);
+
+  const handleCloseAddDialog = useCallback(() => {
+    setAddDialog(false);
+    setNewLabel({ value: '', category: '' });
+  }, []);
+
+  const handleAddLabel = useCallback(({ value, category }: NewLabel) => {
+    setAddDialog(false);
+    setNewLabel({ value: '', category: '' });
+    setLabels(lbs => ({ ...lbs, [category]: [...lbs[category], value] }));
+  }, []);
+
+  const handleNewLabelChange = useCallback(
+    (key: keyof NewLabel) => event => setNewLabel(l => ({ ...l, [key]: event.target.value })),
+    []
+  );
+
+  const handleRevertLabels = useCallback(() => {
+    setLabels(prevLabels.current);
+  }, []);
+
+  const handleAcceptConfirmation = useCallback(
     (data: Labels) => {
       if (!sha256) return;
       apiCall({
@@ -86,128 +150,189 @@ const WrappedArchiveLabels: React.FC<Props> = ({ sha256 = null, labels: propLabe
         url: `/api/v4/file/label/${sha256}/`,
         body: { ...data },
         onSuccess: api_data => {
+          setLabels(data);
+          prevLabels.current = data;
           showSuccessMessage(t('labels.success'));
-          setLabels(api_data.api_response?.response?.label_categories);
           setTimeout(() => window.dispatchEvent(new CustomEvent('reloadArchive')), 1000);
         },
         onFailure: api_data => showErrorMessage(api_data.api_response),
-        onExit: () => setIsEditing(false)
+        onEnter: () => setWaiting(true),
+        onExit: () => {
+          setWaiting(false);
+          setSaveConfirmation(false);
+        }
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [sha256, showErrorMessage, showSuccessMessage, t]
   );
 
-  const handleCancelLabels = useCallback(() => {
-    setLabels(prevLabels.current);
-    setIsEditing(false);
-  }, []);
+  const LabelItem: React.FC<{ category: string; prev: string[]; next: string[] }> = useCallback(
+    ({ category = '', prev = [], next = [] }) => {
+      const added = next.filter(l => !prev.includes(l));
+      const removed = prev.filter(l => !next.includes(l));
+
+      return (
+        added.concat(removed).length > 0 && (
+          <Grid item>
+            <Typography variant="subtitle2" children={t(category)} />
+            <Paper component="pre" variant="outlined" className={classes.preview}>
+              <ChipList
+                items={removed.map((value, i) => ({
+                  key: i,
+                  color: 'error',
+                  label: value,
+                  size: 'small',
+                  variant: 'outlined'
+                }))}
+              />
+              <ChipList
+                items={added.map((value, i) => ({
+                  key: i,
+                  color: 'success',
+                  label: value,
+                  size: 'small',
+                  variant: 'outlined'
+                }))}
+              />
+            </Paper>
+          </Grid>
+        )
+      );
+    },
+    [classes.preview, t]
+  );
 
   useEffect(() => {
-    if (propLabels) {
-      setIsEditing(false);
-      setLabels(propLabels);
-    }
-  }, [propLabels, sha256]);
+    setLabels(propLabels);
+    prevLabels.current = propLabels;
+  }, [propLabels]);
 
   return (
-    <>
-      <Grid item xs={xs} sm={sm} md={md} lg={lg} xl={xl}>
-        <div className={classes.title}>
-          <span className={classes.label}>{t('labels')}</span>
-          {!isEditing && (
-            <IconButton
-              children={<CreateOutlinedIcon fontSize="small" />}
-              size="small"
-              onClick={() => handleEditingLabels(sortedLabels)}
-            />
-          )}
-          {isEditing && (
-            <IconButton
-              children={<SaveOutlinedIcon fontSize="small" />}
-              size="small"
-              onClick={() => handleSaveLabels(sortedLabels)}
-            />
-          )}
-          {isEditing && (
-            <IconButton
-              children={<ClearOutlinedIcon fontSize="small" />}
-              size="small"
-              onClick={() => handleCancelLabels()}
-            />
-          )}
+    <div className={classes.container}>
+      <Dialog open={addDialog} onClose={handleCloseAddDialog}>
+        <DialogTitle>{t('label.add.header')}</DialogTitle>
+        <DialogContent>
+          <Grid container flexDirection="column" spacing={2}>
+            <Grid item children={t('label.add.content')} />
+            <Grid item>
+              <Typography variant="subtitle2" children={t('label')} />
+              <TextField
+                value={newLabel.value}
+                variant="outlined"
+                fullWidth
+                autoFocus
+                onChange={handleNewLabelChange('value')}
+              />
+            </Grid>
+            <Grid item>
+              <Typography variant="subtitle2" children={t('category')} />
+              <Select value={newLabel.category} fullWidth onChange={handleNewLabelChange('category')}>
+                <MenuItem value={'attribution'} children={t('attribution')} />
+                <MenuItem value={'info'} children={t('info')} />
+                <MenuItem value={'technique'} children={t('technique')} />
+              </Select>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button color="secondary" children={t('cancel')} onClick={handleCloseAddDialog} />
+          <Button
+            color="primary"
+            autoFocus
+            disabled={
+              [null, undefined, ''].includes(newLabel?.value) || [null, undefined, ''].includes(newLabel?.category)
+            }
+            children={t('label.add.ok')}
+            onClick={() => handleAddLabel(newLabel)}
+          />
+        </DialogActions>
+      </Dialog>
+
+      <ConfirmationDialog
+        open={saveConfirmation}
+        waiting={waiting}
+        title={t('label.save.header')}
+        acceptText={t('label.save.ok')}
+        cancelText={t('cancel')}
+        handleAccept={() => handleAcceptConfirmation(sortedLabels)}
+        handleClose={() => setSaveConfirmation(false)}
+        handleCancel={() => setSaveConfirmation(false)}
+        text={
+          <Grid container flexDirection="column" spacing={theme.spacing(2)}>
+            <Grid item component="span" children={t('label.save.content')} />
+            {labels &&
+              Object.keys(DEFAULT_LABELS).map(category => (
+                <LabelItem category={category} prev={prevLabels.current[category]} next={labels[category]} />
+              ))}
+            <Grid item>
+              <Typography variant="subtitle2">{t('category')}</Typography>
+            </Grid>
+            <Grid item component="span" children={t('label.save.confirm')} />
+          </Grid>
+        }
+      />
+      <Typography className={classes.title} variant="h6" onClick={() => setIsCollapsed(c => !c)}>
+        <span>{t('labels')}</span>
+        <div style={{ flex: 1 }} />
+        <Tooltip title={t('add')}>
+          <IconButton
+            size="large"
+            style={{
+              color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+            }}
+            onClick={handleAddDialogOpen}
+          >
+            <AddCircleOutlineIcon />
+          </IconButton>
+        </Tooltip>
+        {!isCollapsed ? <ExpandLess /> : <ExpandMore />}
+      </Typography>
+      <Divider />
+      <Collapse in={!isCollapsed} timeout="auto">
+        <div style={{ padding: `${theme.spacing(2)} 0` }}>
+          {Object.entries(sortedLabels).map(([cat, values], i) => (
+            <Grid container key={i}>
+              <Grid item xs={12} sm={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t(cat)}</span>
+              </Grid>
+              <Grid item xs={12} sm={9} lg={10}>
+                <ChipList
+                  items={values.map((value, j) => ({
+                    key: i,
+                    color: cat in LABELS ? LABELS[cat].color : 'primary',
+                    label: value,
+                    size: 'small',
+                    variant: 'outlined',
+                    onDelete: () => handleDeleteLabel(cat as keyof typeof DEFAULT_LABELS, value)
+                  }))}
+                />
+              </Grid>
+            </Grid>
+          ))}
         </div>
-      </Grid>
-      <Grid
-        item
-        xs={typeof xs === 'number' ? 12 - xs : xs}
-        sm={typeof sm === 'number' ? 12 - sm : sm}
-        md={typeof md === 'number' ? 12 - md : md}
-        lg={typeof lg === 'number' ? 12 - lg : lg}
-        xl={typeof xl === 'number' ? 12 - xl : xl}
-      >
-        {!sha256 ? (
-          <Skeleton />
-        ) : (
-          <>
-            <Collapse in={!isEditing} timeout="auto">
-              <div className={classes.content}>
-                {sortedLabels &&
-                  Object.keys(sortedLabels)?.map(category =>
-                    sortedLabels[category]?.map((label, i) => (
-                      <CustomChip
-                        key={i}
-                        wrap
-                        variant="outlined"
-                        size="tiny"
-                        type="rounded"
-                        color={category in LABELS ? LABELS[category].color : 'primary'}
-                        label={label}
-                        style={{ height: 'auto', minHeight: '20px' }}
-                      />
-                    ))
-                  )}
-              </div>
-            </Collapse>
-            <Collapse in={isEditing} timeout="auto">
-              <div className={classes.content}>
-                {sortedLabels &&
-                  Object.keys(sortedLabels)?.map(category => (
-                    <Autocomplete
-                      key={category}
-                      options={[]}
-                      multiple
-                      fullWidth
-                      freeSolo
-                      value={sortedLabels[category]}
-                      onChange={(e, newValue) => setLabels(l => ({ ...l, [category]: newValue }))}
-                      renderInput={p => <TextField {...p} variant="standard" />}
-                      renderTags={(value: readonly string[], getTagProps) =>
-                        value.map((option: string, index: number) => (
-                          <CustomChip
-                            key={`${category}-${index}`}
-                            component="div"
-                            wrap
-                            variant="outlined"
-                            size="small"
-                            type="rounded"
-                            color={category in LABELS ? LABELS[category].color : 'primary'}
-                            label={option}
-                            style={{ height: 'auto', minHeight: '20px' }}
-                            {...getTagProps({ index })}
-                          />
-                        ))
-                      }
-                    />
-                  ))}
-              </div>
-            </Collapse>
-          </>
+        {hasDifferentLabels && (
+          <Grid container gap={1} justifyContent="flex-end">
+            <Tooltip title={t('label.discard.tooltip')}>
+              <span>
+                <Button variant="outlined" color="primary" onClick={handleRevertLabels}>
+                  {t('label.discard.button')}
+                </Button>
+              </span>
+            </Tooltip>
+            <Tooltip title={t('label.save.tooltip')}>
+              <span>
+                <Button variant="contained" color="primary" onClick={() => setSaveConfirmation(true)}>
+                  {t('label.save.button')}
+                </Button>
+              </span>
+            </Tooltip>
+          </Grid>
         )}
-      </Grid>
-    </>
+      </Collapse>
+    </div>
   );
 };
 
-const ArchiveLabels = React.memo(WrappedArchiveLabels);
-export default ArchiveLabels;
+const LabelSection = React.memo(WrappedLabelSection);
+export default LabelSection;
