@@ -221,67 +221,46 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
         ))}
       </MuiTabs>
 
-      {tab === 'details' && (
-        <>
-          <IdentificationSection fileinfo={file ? file.file_info : null} />
-          <FrequencySection fileinfo={file ? file.file_info : null} />
-          <MetadataSection metadata={file ? file.metadata : null} />
-        </>
-      )}
+      <div style={{ display: tab === 'details' ? 'contents' : 'none' }}>
+        <IdentificationSection fileinfo={file ? file.file_info : null} />
+        <FrequencySection fileinfo={file ? file.file_info : null} />
+        <MetadataSection metadata={file ? file.metadata : null} />
+      </div>
 
-      {tab === 'detection' && (
-        <>
-          <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
-          <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
-          <ResultSection
-            results={file ? file.results : null}
-            sid={sid}
-            alternates={file ? file.alternates : null}
-            force={force}
-          />
-          <EmptySection emptys={file ? file.emptys : null} sid={sid} />
-          <ErrorSection errors={file ? file.errors : null} />
-        </>
-      )}
+      <div style={{ display: tab === 'detection' ? 'contents' : 'none' }}>
+        <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
+        <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
+        <ResultSection
+          results={file ? file.results : null}
+          sid={sid}
+          alternates={file ? file.alternates : null}
+          force={force}
+        />
+        <EmptySection emptys={file ? file.emptys : null} sid={sid} />
+        <ErrorSection errors={file ? file.errors : null} />
+      </div>
 
-      {tab === 'tags' && (
-        <>
-          <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
-        </>
-      )}
+      <div style={{ display: tab === 'tags' ? 'contents' : 'none' }}>
+        <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
+      </div>
 
-      {tab === 'relations' && (
-        <>
-          <ChildrenSection childrens={file ? file.childrens : null} />
-          <ParentSection parents={file ? file.parents : null} />
-          <DiscoverSection file={file} />
-        </>
-      )}
+      <div style={{ display: tab === 'relations' ? 'contents' : 'none' }}>
+        <ChildrenSection childrens={file ? file.childrens : null} />
+        <ParentSection parents={file ? file.parents : null} />
+        <DiscoverSection file={file} />
+      </div>
 
-      {tab === 'ascii' && (
-        <>
-          <ASCIISection sha256={sha256} type={file?.file_info?.type} />
-        </>
-      )}
+      <div style={{ display: tab === 'ascii' ? 'contents' : 'none' }}>
+        <ASCIISection sha256={sha256} type={file?.file_info?.type} load={tab === 'ascii'} />
+      </div>
 
-      {tab === 'strings' && (
-        <>
-          <StringsSection sha256={sha256} type={file?.file_info?.type} />
-        </>
-      )}
+      <div style={{ display: tab === 'strings' ? 'contents' : 'none' }}>
+        <StringsSection sha256={sha256} type={file?.file_info?.type} load={tab === 'ascii'} />
+      </div>
 
-      {tab === 'hex' && (
-        <>
-          <HexSection sha256={sha256} />
-        </>
-      )}
-
-      {/* {tab === 'community' && (
-        <div style={{ display: 'contents' }}>
-          <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} />
-          <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
-        </div>
-      )} */}
+      <div style={{ display: tab === 'hex' ? 'contents' : 'none' }}>
+        <HexSection sha256={sha256} load={tab === 'ascii'} />
+      </div>
 
       <div style={{ display: tab === 'community' ? 'contents' : 'none' }}>
         <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} />

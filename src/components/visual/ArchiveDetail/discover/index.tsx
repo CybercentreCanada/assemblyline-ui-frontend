@@ -46,7 +46,7 @@ const WrappedDiscoverSection: React.FC<SectionProps> = ({ file }) => {
 
   const [open, setOpen] = useState<boolean>(true);
 
-  return (
+  return file ? (
     <div className={classes.sp2}>
       <Typography className={classes.title} variant="h6" onClick={() => setOpen(!open)}>
         <span>{t('discover')}</span>
@@ -59,7 +59,7 @@ const WrappedDiscoverSection: React.FC<SectionProps> = ({ file }) => {
         </div>
       </Collapse>
     </div>
-  );
+  ) : null;
 };
 
 export const DiscoverSection = React.memo(WrappedDiscoverSection);

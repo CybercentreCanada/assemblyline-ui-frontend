@@ -22,18 +22,19 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   sha256: string;
+  load?: boolean;
 };
 
-const WrappedHexSection: React.FC<Props> = ({ sha256 }) => {
+const WrappedHexSection: React.FC<Props> = ({ sha256, load = true }) => {
   const classes = useStyles();
   const { apiCall } = useMyAPI();
-
-  const [data, setData] = useState<string>(null);
-  const [error, setError] = useState(null);
   const { user: currentUser } = useAppUser<CustomUser>();
 
+  const [data, setData] = useState<string>(null);
+  const [error, setError] = useState<string>(null);
+
   useEffect(() => {
-    if (!sha256 || data) return;
+    if (!sha256 || data || !load) return;
     apiCall({
       url: `/api/v4/file/hex/${sha256}/?bytes_only=true`,
       allowCache: true,
@@ -42,7 +43,7 @@ const WrappedHexSection: React.FC<Props> = ({ sha256 }) => {
       onEnter: () => setError(null)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256]);
+  }, [data, load, sha256]);
 
   return !currentUser.roles.includes('file_detail') ? (
     <ForbiddenPage />

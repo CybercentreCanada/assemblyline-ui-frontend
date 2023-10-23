@@ -28,9 +28,10 @@ const useStyles = makeStyles(theme => ({
 type Props = {
   sha256: string;
   type?: string;
+  load?: boolean;
 };
 
-const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null }) => {
+const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null, load = true }) => {
   const { apiCall } = useMyAPI();
   const classes = useStyles();
   const { i18n } = useTranslation();
@@ -93,7 +94,7 @@ const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null 
   };
 
   useEffect(() => {
-    if (!sha256) return;
+    if (!sha256 || data || !load) return;
     apiCall({
       url: `/api/v4/file/strings/${sha256}/`,
       allowCache: true,
@@ -102,7 +103,7 @@ const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null 
       onEnter: () => setError(null)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256]);
+  }, [data, load, sha256]);
 
   return !currentUser.roles.includes('file_detail') ? (
     <ForbiddenPage />
