@@ -262,8 +262,8 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
           <Grid container flexDirection="column" spacing={theme.spacing(2)}>
             <Grid item component="span" children={t('label.save.content')} />
             {labels &&
-              Object.keys(DEFAULT_LABELS).map(category => (
-                <LabelItem category={category} prev={prevLabels.current[category]} next={labels[category]} />
+              Object.keys(DEFAULT_LABELS).map((category, i) => (
+                <LabelItem key={i} category={category} prev={prevLabels.current[category]} next={labels[category]} />
               ))}
             <Grid item>
               <Typography variant="subtitle2">{t('category')}</Typography>
@@ -292,14 +292,14 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
       <Collapse in={!isCollapsed} timeout="auto">
         <div style={{ padding: `${theme.spacing(2)} 0` }}>
           {Object.entries(sortedLabels).map(([cat, values], i) => (
-            <Grid container key={i}>
+            <Grid key={i} container>
               <Grid item xs={12} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t(cat)}</span>
               </Grid>
               <Grid item xs={12} sm={9} lg={10}>
                 <ChipList
                   items={values.map((value, j) => ({
-                    key: i,
+                    key: `${i}-${j}`,
                     color: cat in LABELS ? LABELS[cat].color : 'primary',
                     label: value,
                     size: 'small',
