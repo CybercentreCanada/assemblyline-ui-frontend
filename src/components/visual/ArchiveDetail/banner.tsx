@@ -471,12 +471,12 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
 
         <div className={classes.content}>
           <div>
-            {!verdicts ? (
+            {!file ? (
               <>
                 <Skeleton />
                 <Skeleton />
               </>
-            ) : verdicts.malicious > 0 ? (
+            ) : verdicts && ['malicious', 'highly_suspicious', 'suspicious'].includes(currentVerdict) ? (
               <>
                 <div className={clsx(classes.color, VERDICTS.malicious.className)}>
                   {`${verdicts.malicious} ${t(`file.result${verdicts.malicious > 1 ? 's' : ''}.malicious`)}`}
