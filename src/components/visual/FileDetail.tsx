@@ -41,11 +41,11 @@ import EmptySection from './FileDetail/emptys';
 import ErrorSection from './FileDetail/errors';
 import FrequencySection from './FileDetail/frequency';
 import IdentificationSection from './FileDetail/ident';
-import URIIdentificationSection from './FileDetail/uriIdent';
 import MetadataSection from './FileDetail/metadata';
 import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
 import TagSection from './FileDetail/tags';
+import URIIdentificationSection from './FileDetail/uriIdent';
 import FileDownloader from './FileDownloader';
 import InputDialog from './InputDialog';
 
@@ -61,7 +61,7 @@ type URIInfo = {
   password: string;
   hostname: string;
   port: number;
-}
+};
 
 type FileInfo = {
   archive_ts: string;
@@ -313,17 +313,16 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         <Grid container alignItems="center">
           <Grid item xs>
             <Typography variant="h4">
-              {file?.file_info?.type.startsWith("uri/") ? t('uri_title') : t('title')}
+              {file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
             </Typography>
             <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-              {file?.file_info?.type.startsWith("uri/") && file?.file_info?.uri_info?.uri ?
+              {file?.file_info?.type.startsWith('uri/') && file?.file_info?.uri_info?.uri ? (
                 file?.file_info?.uri_info?.uri
-                :
-                file ?
-                  fileName
-                  :
-                  <Skeleton style={{ width: '10rem' }} />
-              }
+              ) : file ? (
+                fileName
+              ) : (
+                <Skeleton style={{ width: '10rem' }} />
+              )}
             </Typography>
           </Grid>
           <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
@@ -341,8 +340,9 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                 {currentUser.roles.includes('file_download') && (
                   <FileDownloader
                     icon={<GetAppOutlinedIcon />}
-                    link={`/api/v4/file/download/${file.file_info.sha256}/?${fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
-                      }${sid ? `sid=${sid}&` : ''}`}
+                    link={`/api/v4/file/download/${file.file_info.sha256}/?${
+                      fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                    }${sid ? `sid=${sid}&` : ''}`}
                     tooltip={t('download')}
                   />
                 )}
@@ -431,28 +431,26 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         </Grid>
       </div>
       <div style={{ paddingBottom: sp2 }}>
-        <>
-          {file?.file_info?.type.startsWith("uri/") ?
-            <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
-            :
-            <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
-          }
-          <FrequencySection fileinfo={file ? file.file_info : null} />
-          <MetadataSection metadata={file ? file.metadata : null} />
-          <ChildrenSection childrens={file ? file.childrens : null} />
-          <ParentSection parents={file ? file.parents : null} />
-          <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
-          <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
-          <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
-          <ResultSection
-            results={file ? file.results : null}
-            sid={sid}
-            alternates={file ? file.alternates : null}
-            force={force}
-          />
-          <EmptySection emptys={file ? file.emptys : null} sid={sid} />
-          <ErrorSection errors={file ? file.errors : null} />
-        </>
+        {file?.file_info?.type.startsWith('uri/') ? (
+          <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+        ) : (
+          <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+        )}
+        <FrequencySection fileinfo={file ? file.file_info : null} />
+        <MetadataSection metadata={file ? file.metadata : null} />
+        <ChildrenSection childrens={file ? file.childrens : null} />
+        <ParentSection parents={file ? file.parents : null} />
+        <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
+        <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
+        <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
+        <ResultSection
+          results={file ? file.results : null}
+          sid={sid}
+          alternates={file ? file.alternates : null}
+          force={force}
+        />
+        <EmptySection emptys={file ? file.emptys : null} sid={sid} />
+        <ErrorSection errors={file ? file.errors : null} />
       </div>
     </div>
   ) : (
