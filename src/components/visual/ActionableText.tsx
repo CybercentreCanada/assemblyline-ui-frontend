@@ -1,9 +1,9 @@
 import { Link as MaterialLink, Skeleton } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import useExternalLookup from 'components/hooks/useExternalLookup';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
-import ExternalLinks from './ExternalLookup/ExternalLinks';
-import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
+import ExternalLinks from './ExternalSearch';
 
 const initialMenuState = {
   mouseX: null,
@@ -19,7 +19,9 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: theme.spacing(0.5),
     borderRadius: theme.spacing(0.5),
     textDecoration: 'none',
+    minHeight: '22px',
     color: 'inherit',
+    alignItems: 'center',
     display: 'flex',
     cursor: 'pointer',
     '&:hover': {
@@ -47,14 +49,7 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, clas
     });
   }, []);
 
-  const { lookupState, isActionable, searchTagExternal } = useSearchTagExternal({
-    [type]: {
-      results: {},
-      errors: {},
-      success: null
-    }
-  });
-
+  const { isActionable } = useExternalLookup();
   const actionable = isActionable(category, type, value);
 
   return (
@@ -68,19 +63,11 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, clas
               value={value}
               state={state}
               setState={setState}
-              searchTagExternal={searchTagExternal}
               classification={classification}
             />
             <MaterialLink className={classes.link} onClick={handleMenuClick} onContextMenu={handleMenuClick}>
-              {value}
-              {lookupState && lookupState[type] ? (
-                <ExternalLinks
-                  success={lookupState[type].success}
-                  results={lookupState[type].results}
-                  errors={lookupState[type].errors}
-                  iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'text-bottom' }}
-                />
-              ) : null}
+              <div style={{ marginTop: '2px' }}>{value}</div>
+              <ExternalLinks category={category} type={type} value={value} />
             </MaterialLink>
           </>
         ) : (

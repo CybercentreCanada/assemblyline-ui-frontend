@@ -61,6 +61,11 @@ export type ExternalLink = {
   url: string;
 };
 
+export type ExternalSource = {
+  max_classification: string;
+  name: string;
+};
+
 export type ConfigurationDefinition = {
   auth: {
     allow_2fa: boolean;
@@ -115,7 +120,7 @@ export type ConfigurationDefinition = {
       hash: { [key: string]: ExternalLink[] };
       metadata: { [key: string]: ExternalLink[] };
     };
-    external_sources: string[];
+    external_sources: ExternalSource[];
     external_source_tags: {
       [tag_name: string]: string[];
     };
