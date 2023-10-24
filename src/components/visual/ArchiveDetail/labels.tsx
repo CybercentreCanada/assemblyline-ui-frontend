@@ -260,15 +260,12 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
         handleCancel={() => setSaveConfirmation(false)}
         text={
           <Grid container flexDirection="column" spacing={theme.spacing(2)}>
-            <Grid item component="span" children={t('label.save.content')} />
+            <Grid item children={t('label.save.content')} />
             {labels &&
               Object.keys(DEFAULT_LABELS).map((category, i) => (
                 <LabelItem key={i} category={category} prev={prevLabels.current[category]} next={labels[category]} />
               ))}
-            <Grid item>
-              <Typography variant="subtitle2">{t('category')}</Typography>
-            </Grid>
-            <Grid item component="span" children={t('label.save.confirm')} />
+            <Grid item children={t('label.save.confirm')} />
           </Grid>
         }
       />
