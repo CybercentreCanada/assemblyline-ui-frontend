@@ -247,7 +247,7 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
       <div style={{ display: tab === 'relations' ? 'contents' : 'none' }}>
         <ChildrenSection childrens={file ? file.childrens : null} />
         <ParentSection parents={file ? file.parents : null} />
-        <DiscoverSection file={file} />
+        <DiscoverSection file={file ? file : null} />
       </div>
 
       <div style={{ display: tab === 'ascii' ? 'contents' : 'none' }}>
