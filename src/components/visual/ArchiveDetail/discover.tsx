@@ -72,6 +72,15 @@ const WrappedDiscoverSection: React.FC<SectionProps> = ({ file }) => {
   const [data, setData] = useState<Discover>(null);
   const [open, setOpen] = useState<boolean>(true);
 
+  const nbOfValues = useMemo<number | null>(
+    () =>
+      data &&
+      Object.keys(DEFAULT_DISCOVER)
+        .map(k => (Object.entries(data[k]) ? Object.entries(data[k]).length : 0))
+        .reduce((a, v) => a + v),
+    [data]
+  );
+
   const discover = useMemo<Record<keyof typeof DEFAULT_DISCOVER, { value: string; to: string }>>(() => {
     let base = {
       tlsh: { value: '', to: '' },
@@ -95,7 +104,7 @@ const WrappedDiscoverSection: React.FC<SectionProps> = ({ file }) => {
     base = {
       ...base,
       vector: {
-        value: ssdeep[1],
+        value: vector,
         to: `/search/file?query=result.sections.tags.vector:${safeFieldValueURI(vector)}`
       }
     };
@@ -114,7 +123,7 @@ const WrappedDiscoverSection: React.FC<SectionProps> = ({ file }) => {
     // eslint-disable-next-line
   }, [file]);
 
-  return data ? (
+  return data && nbOfValues > 0 ? (
     <div className={classes.sp2}>
       <Typography className={classes.title} variant="h6" onClick={() => setOpen(!open)}>
         <span>{t('discover')}</span>
@@ -125,7 +134,7 @@ const WrappedDiscoverSection: React.FC<SectionProps> = ({ file }) => {
         <Grid container paddingBottom={2} paddingTop={2} flexDirection={'column'} gap={2}>
           {Object.keys(DEFAULT_DISCOVER).map(
             (k, i) =>
-              Object.entries(data[k]).length >= 0 && (
+              Object.entries(data[k]).length > 0 && (
                 <Grid key={i} container flexDirection="column">
                   <Grid item fontWeight={500}>
                     <Link className={classes.clickable} to={discover[k].to} replace style={{ wordBreak: 'break-word' }}>
