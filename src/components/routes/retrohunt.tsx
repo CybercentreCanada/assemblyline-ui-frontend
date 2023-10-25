@@ -179,7 +179,7 @@ export default function Retrohunt() {
 
   const handleOpenCreatePage = useCallback(() => {
     if (currentUser.roles.includes('retrohunt_run') && configuration?.retrohunt?.enabled) {
-      setGlobalDrawer(<RetrohuntCreate isDrawer onCreateRetrohunt={handleCreateRetrohunt} />);
+      setGlobalDrawer(<RetrohuntCreate isDrawer onCreateRetrohunt={handleCreateRetrohunt} />, { hasMaximize: true });
       navigate(`${location.pathname}?${query.getDeltaString()}`);
     }
   }, [
@@ -227,7 +227,7 @@ export default function Retrohunt() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<RetrohuntDetail code={location.hash.substr(1)} isDrawer />);
+      setGlobalDrawer(<RetrohuntDetail code={location.hash.substr(1)} isDrawer />, { hasMaximize: true });
     }
   }, [location.hash, setGlobalDrawer]);
 

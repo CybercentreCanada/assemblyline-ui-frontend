@@ -4,6 +4,7 @@ import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { alpha, CircularProgress, IconButton, Modal, Skeleton, Slider, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
@@ -12,6 +13,7 @@ import Carousel from 'commons/addons/carousel/Carousel';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link, useLocation } from 'react-router-dom';
 import CarouselItem from './Item';
 
 const ZOOM_CLASS = 'zooming';
@@ -51,8 +53,11 @@ const useStyles = makeStyles(theme => {
       justifyItems: 'center'
     },
     menuPane: {
+      position: 'absolute',
+      maxWidth: 'calc(100% - 128px)',
       display: 'grid',
-      placeItems: 'center',
+      gridTemplateColumns: '1fr auto',
+      alignItems: 'center',
       borderRadius: '0px 0px 4px 4px',
       padding: theme.spacing(1),
       backgroundColor: backgroundColor,
@@ -251,6 +256,7 @@ const WrappedCarouselContainer = ({
   const { t } = useTranslation('carousel');
   const classes = useStyles();
   const { apiCall } = useMyAPI();
+  const location = useLocation();
 
   const [thumbData, setThumbData] = useState<string>(null);
   const [imgData, setImgData] = useState<string>(null);
@@ -489,7 +495,7 @@ const WrappedCarouselContainer = ({
                       component="div"
                       size="large"
                       children={<ChevronLeftOutlinedIcon />}
-                      onClick={handleImageChange(1)}
+                      onClick={handleImageChange(-1)}
                     />
                   </Tooltip>
                 </div>
@@ -583,7 +589,7 @@ const WrappedCarouselContainer = ({
                     min={10}
                     max={500}
                     size="small"
-                    onChange={(event, newValue) => setZoom(newValue as number)}
+                    onChange={(event, newValue) => setZoom(Math.floor(newValue as number))}
                     orientation="vertical"
                   />
                   <IconButton
@@ -601,6 +607,20 @@ const WrappedCarouselContainer = ({
                   <div>{t('description')}</div>
                   <div>{currentImage ? currentImage?.description : loading && <Skeleton variant="rounded" />}</div>
                 </div>
+                <Tooltip title={t('view_file')} placement="bottom">
+                  <IconButton
+                    component={Link}
+                    to={`/file/viewer/${currentImage.img}/image/${location.search}${location.hash}`}
+                    color="inherit"
+                    // size="small"
+                    style={{ marginLeft: '8px' }}
+                    onClick={e => {
+                      handleClose();
+                    }}
+                  >
+                    <PageviewOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
               </div>
             </div>
 

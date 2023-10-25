@@ -34,6 +34,7 @@
   "file.results.suspicious": "services ont trouvé ce fichier suspect",
   "file.safe": "Fichier Sans Danger",
   "file.suspicious": "Fichier Suspect",
+  "file_classification": "Classification du fichier",
   "file_viewer": "Visionneuse de fichiers",
   "frequency": "Fréquence des fichiers",
   "generated_tags": "Tags générés",

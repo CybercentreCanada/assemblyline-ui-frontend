@@ -22,6 +22,7 @@ import PageFullSize from 'commons/components/pages/PageFullSize';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { ImageViewer } from 'components/routes/file/image';
 import Empty from 'components/visual/Empty';
 import FileDownloader from 'components/visual/FileDownloader';
 import { HexViewerApp } from 'components/visual/HexViewer';
@@ -187,11 +188,13 @@ const WrappedHexViewer = ({ hex, error }) => {
   );
 };
 
-const WrappedImageViewer = ({ image, error }) => {
+const WrappedImageContainer = ({ name, image = null, error }) => {
   const classes = useStyles();
 
   return image ? (
-    <img className={classes.img} alt={''} src={image} />
+    <div className={classes.hexWrapper} style={{ height: 0 }}>
+      <ImageViewer src={image} alt={name} />
+    </div>
   ) : error ? (
     <Alert severity="error">{error}</Alert>
   ) : (
@@ -201,7 +204,7 @@ const WrappedImageViewer = ({ image, error }) => {
 
 const MonacoViewer = React.memo(WrappedMonacoViewer);
 const HexViewer = React.memo(WrappedHexViewer);
-const ImageViewer = React.memo(WrappedImageViewer);
+const ImageContainer = React.memo(WrappedImageContainer);
 
 const FileViewer = () => {
   const { id, tab: paramTab } = useParams<ParamProps>();
@@ -223,14 +226,16 @@ const FileViewer = () => {
 
   const tab = useMemo(
     () =>
-      !paramTab || !TAB_OPTIONS.includes(paramTab) || (!imageAllowed && paramTab === 'image') ? DEFAULT_TAB : paramTab,
-    [imageAllowed, paramTab]
+      sha256 && (!paramTab || !TAB_OPTIONS.includes(paramTab) || (!imageAllowed && paramTab === 'image'))
+        ? DEFAULT_TAB
+        : paramTab,
+    [imageAllowed, paramTab, sha256]
   );
 
   const handleChangeTab = useCallback(
     (event, newTab) => {
       if (tab !== newTab && TAB_OPTIONS.includes(newTab))
-        navigate(`/file/viewer/${id}/${newTab}/${location.search}${location.hash}`);
+        navigate(`/file/viewer/${id}/${newTab}/${location.search}${location.hash}`, { replace: true });
     },
     [id, location.hash, location.search, navigate, tab]
   );
@@ -392,7 +397,7 @@ const FileViewer = () => {
           )}
           {tab === 'image' && (
             <div className={classes.tab}>
-              <ImageViewer image={image} error={error} />{' '}
+              <ImageContainer name={sha256} image={image} error={error} />
             </div>
           )}
         </div>

@@ -1,9 +1,12 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import { Badge, Button, CircularProgress, Theme, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import clsx from 'clsx';
 import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { Image } from 'components/visual/Carousel/Container';
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) => ({
   printable: {
@@ -69,29 +72,54 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const WrappedImageInlineBody = ({ body, printable = false, small = false }) => {
-  const [data, setData] = useState<
-    Array<{
-      name: string;
-      description: string;
-      img: string;
-      thumb: string;
-    }>
-  >([]);
+export type ImageBodyData = Array<{
+  img: {
+    name: string;
+    description: string;
+    sha256: string;
+  };
+  thumb: {
+    name: string;
+    description: string;
+    sha256: string;
+  };
+}>;
+
+type ImageInlineBodyProps = {
+  body: ImageBodyData;
+  printable?: boolean;
+  small?: boolean;
+};
+
+type ImageInlineProps = {
+  data: Image[];
+  printable?: boolean;
+  small?: boolean;
+};
+
+type ImageItemProps = {
+  src: string;
+  alt: string;
+  index: number;
+  to?: string;
+  count?: number;
+  small?: boolean;
+  onImageClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, index: number) => void;
+};
+
+const WrappedImageInlineBody = ({ body, printable = false, small = false }: ImageInlineBodyProps) => {
+  const [data, setData] = useState<Image[]>([]);
 
   useEffect(() => {
-    if (body != null) {
-      setData(
-        body.map(element => {
-          return {
-            name: element.img.name,
-            description: element.img.description,
-            img: element.img.sha256,
-            thumb: element.thumb.sha256
-          };
-        })
-      );
-    }
+    if (body === null || !Array.isArray(body)) return;
+    setData(
+      body.map(element => ({
+        name: element?.img?.name,
+        description: element?.img?.description,
+        img: element?.img?.sha256,
+        thumb: element?.thumb?.sha256
+      }))
+    );
     return () => {
       setData([]);
     };
@@ -100,42 +128,34 @@ const WrappedImageInlineBody = ({ body, printable = false, small = false }) => {
   return body && Array.isArray(body) ? <ImageInline data={data} printable={printable} small={small} /> : null;
 };
 
-export const ImageInlineBody = React.memo(WrappedImageInlineBody);
-
-const WrappedImageInline = ({ data, printable = false, small = false }) => {
+const WrappedImageInline = ({ data, printable = false, small = false }: ImageInlineProps) => {
   const classes = useStyles();
   const { openCarousel } = useCarousel();
 
-  const OpenCarouselDialog = (index: number) => {
-    openCarousel(index, data);
-  };
-
   return data && data.length > 0 ? (
-    <div className={printable ? classes.printable : null}>
+    <div className={clsx(printable && classes.printable)}>
       <ImageItem
         src={data[0].thumb}
         alt={data[0].name}
         index={0}
-        handleOpenCarousel={OpenCarouselDialog}
-        small={small}
+        to={data[0].img}
         count={data.length}
+        small={small}
+        onImageClick={(e, index) => openCarousel(index, data)}
       />
     </div>
   ) : null;
 };
 
-export const ImageInline = React.memo(WrappedImageInline);
-
-type ImageItemProps = {
-  alt: string;
-  src: string;
-  index: number;
-  handleOpenCarousel: (index: number) => void;
-  small?: boolean;
-  count?: number;
-};
-
-const WrappedImageItem = ({ alt, src, index, handleOpenCarousel, small = false, count = null }: ImageItemProps) => {
+const WrappedImageItem = ({
+  src,
+  alt,
+  index,
+  to = null,
+  count = 0,
+  small = false,
+  onImageClick = () => null
+}: ImageItemProps) => {
   const [image, setImage] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const classes = useStyles();
@@ -145,49 +165,44 @@ const WrappedImageItem = ({ alt, src, index, handleOpenCarousel, small = false, 
     apiCall({
       url: `/api/v4/file/image/${src}/`,
       allowCache: true,
-      onSuccess: api_data => {
-        setLoading(false);
-        setImage(api_data.api_response);
-      },
-      onFailure: api_data => {
-        setLoading(false);
-        setImage(null);
-      }
+      onSuccess: api_data => setImage(api_data.api_response),
+      onFailure: api_data => setImage(null),
+      onEnter: () => setLoading(false),
+      onExit: () => setLoading(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alt, src]);
 
-  const handleImageClick = () => {
-    handleOpenCarousel(index);
-  };
-
   return (
     <div>
-      {image ? (
-        <Tooltip title={alt}>
-          <Button className={small ? classes.imageItemSM : classes.imageItem} onClick={handleImageClick}>
-            <div className={small ? classes.imageBoxSM : classes.imageBox}>
+      <Tooltip title={alt}>
+        <Button
+          className={clsx(classes.imageItem, small && classes.imageItemSM)}
+          component={Link}
+          to={`/file/viewer/${to}/image/`}
+          color="secondary"
+          onClick={event => {
+            event.preventDefault();
+            onImageClick(event, index);
+          }}
+        >
+          <div className={clsx(classes.imageLoading, small && classes.imageLoadingSM)}>
+            {image ? (
               <Badge badgeContent={count > 1 ? count : 0} color="primary">
-                <img src={image} alt={alt} className={small ? classes.imageSM : classes.image} />
+                <img className={clsx(classes.image, small && classes.imageSM)} src={image} alt={alt} />
               </Badge>
-            </div>
-          </Button>
-        </Tooltip>
-      ) : (
-        <Tooltip title={alt}>
-          <Button
-            className={small ? classes.imageItemSM : classes.imageItem}
-            onClick={handleImageClick}
-            color="secondary"
-          >
-            <div className={small ? classes.imageLoadingSM : classes.imageLoading}>
-              {loading ? <CircularProgress /> : <BrokenImageOutlinedIcon fontSize="large" />}
-            </div>
-          </Button>
-        </Tooltip>
-      )}
+            ) : loading ? (
+              <CircularProgress />
+            ) : (
+              <BrokenImageOutlinedIcon fontSize="large" />
+            )}
+          </div>
+        </Button>
+      </Tooltip>
     </div>
   );
 };
 
+export const ImageInlineBody = React.memo(WrappedImageInlineBody);
+export const ImageInline = React.memo(WrappedImageInline);
 export const ImageItem = React.memo(WrappedImageItem);

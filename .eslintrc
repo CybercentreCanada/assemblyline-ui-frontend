@@ -35,7 +35,12 @@
       }
     ],
     "arrow-parens": ["error", "as-needed"],
-    "import/no-extraneous-dependencies": ["error", { "packageDir": "./" }],
+    "import/no-extraneous-dependencies": [
+      "error", {
+        "devDependencies": true,
+        "packageDir": "./"
+      }
+    ],
     "import/imports-first": ["error", "absolute-first"],
     "import/newline-after-import": "error",
     "import/no-cycle": "off",
