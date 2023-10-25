@@ -1,8 +1,7 @@
 import { useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import React from 'react';
+import React, { LegacyRef } from 'react';
 
-// TODO: Add to commons and fixed to be used in the new format
 const useStyles = makeStyles(theme => ({
   page: {
     display: 'flex',
@@ -14,21 +13,40 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type PageFullSizeProps = {
+  id?: string;
+  ref?: LegacyRef<HTMLDivElement>;
   children: React.ReactNode;
   margin?: number;
   mb?: number;
   ml?: number;
   mr?: number;
   mt?: number;
+  styles?: {
+    root?: React.CSSProperties;
+    paper?: React.CSSProperties;
+  };
 };
 
-const PageFullSize: React.FC<PageFullSizeProps> = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 2 }) => {
+const PageFullSize: React.FC<PageFullSizeProps> = ({
+  id,
+  ref,
+  children,
+  margin = null,
+  mb = 2,
+  ml = 2,
+  mr = 2,
+  mt = 2,
+  styles = {
+    root: null,
+    paper: null
+  }
+}) => {
   const classes = useStyles();
   const theme = useTheme();
   const divider = useMediaQuery(theme.breakpoints.up('md')) ? 1 : 2;
 
   return (
-    <div className={classes.page}>
+    <div className={classes.page} ref={ref} style={{ ...styles.root }}>
       <div
         style={{
           marginBottom: theme.spacing(margin / divider || mb / divider),
@@ -39,7 +57,8 @@ const PageFullSize: React.FC<PageFullSizeProps> = ({ children, margin = null, mb
           display: 'flex',
           flexDirection: 'column',
           flexGrow: 1,
-          minHeight: 0
+          minHeight: 0,
+          ...styles.paper
         }}
       >
         {children}

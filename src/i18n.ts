@@ -11,6 +11,7 @@ import adminSiteMapEN from 'locales/en/admin/site_map.json';
 import adminTagSafelistEN from 'locales/en/admin/tag_safelist.json';
 import adminUsersEN from 'locales/en/admin/users.json';
 import alertsEN from 'locales/en/alerts.json';
+import archiveEN from 'locales/en/archive.json';
 import authorizeEN from 'locales/en/authorize.json';
 import carouselEN from 'locales/en/carousel.json';
 import dashboardEN from 'locales/en/dashboard.json';
@@ -59,6 +60,7 @@ import adminSiteMapFR from 'locales/fr/admin/site_map.json';
 import adminTagSafelistFR from 'locales/fr/admin/tag_safelist.json';
 import adminUsersFR from 'locales/fr/admin/users.json';
 import alertsFR from 'locales/fr/alerts.json';
+import archiveFR from 'locales/fr/archive.json';
 import authorizeFR from 'locales/fr/authorize.json';
 import carouselFR from 'locales/fr/carousel.json';
 import dashboardFR from 'locales/fr/dashboard.json';
@@ -108,6 +110,7 @@ const resources = {
     adminSiteMap: adminSiteMapEN,
     adminTagSafelist: adminTagSafelistEN,
     adminUsers: adminUsersEN,
+    archive: archiveEN,
     authorize: authorizeEN,
     carousel: carouselEN,
     dashboard: dashboardEN,
@@ -158,6 +161,7 @@ const resources = {
     adminSiteMap: adminSiteMapFR,
     adminTagSafelist: adminTagSafelistFR,
     adminUsers: adminUsersFR,
+    archive: archiveFR,
     authorize: authorizeFR,
     carousel: carouselFR,
     dashboard: dashboardFR,
