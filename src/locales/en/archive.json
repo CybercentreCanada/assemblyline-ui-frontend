@@ -30,6 +30,8 @@
   "no_results_desc": "The query that you ran did not return any results.",
   "related": "Related submissions",
   "searching": "Searching...",
+  "supplementary.exclude": "Exclude supplementary files",
+  "supplementary.include": "Include supplementary files",
   "tc.1m": "Last month",
   "tc.1y": "Last year",
   "tc.24h": "Last 24 hours",

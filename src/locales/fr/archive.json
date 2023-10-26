@@ -30,6 +30,8 @@
   "no_results_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat.",
   "related": "Soumissions connexes",
   "searching": "Recherche en cours...",
+  "supplementary.exclude": "Exclure les fichiers supplémentaires",
+  "supplementary.include": "Inclure les fichiers supplémentaires",
   "tc.1m": "Le mois dernier",
   "tc.1y": "La dernière année",
   "tc.24h": "Dernières 24 heures",

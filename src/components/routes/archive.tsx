@@ -1,4 +1,6 @@
-import { Grid, MenuItem, Select, Typography, useTheme } from '@mui/material';
+import FileOpenIcon from '@mui/icons-material/FileOpen';
+import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
+import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -81,6 +83,7 @@ export default function MalwareArchive() {
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
@@ -140,13 +143,16 @@ export default function MalwareArchive() {
   );
 
   const handleReload = useCallback(
-    q => {
+    (q: SimpleSearchQuery) => {
       if (q && currentUser.roles.includes('archive_view')) {
         const curQuery = new SimpleSearchQuery(q.toString(), `rows=${pageSize}&offset=0`);
         curQuery.set('rows', pageSize);
         curQuery.set('offset', 0);
         curQuery.set('archive_only', true);
-        curQuery.add('filters', 'is_supplementary:false');
+
+        const supp = curQuery.pop('supplementary') || false;
+        curQuery.add('filters', supp ? 'is_supplementary:*' : 'is_supplementary:false');
+
         const tc = curQuery.pop('tc') || DEFAULT_TC;
         if (tc !== '1y') {
           curQuery.add('filters', TC_MAP[tc]);
@@ -299,6 +305,29 @@ export default function MalwareArchive() {
               onValueChange={onFilterValueChange}
               onClear={onClear}
               onSearch={onSearch}
+              buttons={[
+                query?.has('supplementary')
+                  ? {
+                      icon: <FileOpenIcon fontSize={downSM ? 'small' : 'medium'} />,
+                      tooltip: t('supplementary.exclude'),
+                      props: {
+                        onClick: () => {
+                          query.delete('supplementary');
+                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                        }
+                      }
+                    }
+                  : {
+                      icon: <FileOpenOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                      tooltip: t('supplementary.include'),
+                      props: {
+                        onClick: () => {
+                          query.set('supplementary', true);
+                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                        }
+                      }
+                    }
+              ]}
             >
               {fileResults !== null && (
                 <div className={classes.searchresult}>
