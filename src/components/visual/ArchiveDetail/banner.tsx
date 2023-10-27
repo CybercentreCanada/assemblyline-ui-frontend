@@ -108,8 +108,7 @@ const useStyles = makeStyles(theme => ({
     gridTemplateColumns: 'auto 1fr',
     alignItems: 'center',
     borderRadius: theme.spacing(1),
-    padding: theme.spacing(1),
-    overflowX: 'hidden'
+    padding: theme.spacing(1)
   },
   container: {
     width: '100%',
