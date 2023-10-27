@@ -27,7 +27,7 @@ import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { File } from 'components/visual/ArchiveDetail';
+import { File } from 'components/routes/archive/detail';
 import CustomChip from 'components/visual/CustomChip';
 import { bytesToSize } from 'helpers/utils';
 import React, { useCallback, useMemo, useState } from 'react';
