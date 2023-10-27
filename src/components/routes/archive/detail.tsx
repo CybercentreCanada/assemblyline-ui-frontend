@@ -205,20 +205,29 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
         <Banner sha256={sha256} file={file} sid={null} force={force} />
 
-        <MuiTabs
-          value={tab}
-          variant="scrollable"
-          scrollButtons="auto"
-          onChange={handleTabChange}
-          sx={{
-            backgroundColor: inDrawer ? theme.palette.background.default : theme.palette.background.paper,
-            margin: `${theme.spacing(2)} 0`
+        <div
+          style={{
+            position: 'sticky',
+            top: '64px',
+            zIndex: 1,
+            backgroundColor: inDrawer ? theme.palette.background.paper : theme.palette.background.default
           }}
         >
-          {Object.keys(TABS).map((title, i) => (
-            <MuiTab key={`${i}`} label={t(title)} value={title} sx={{ minWidth: '120px' }} />
-          ))}
-        </MuiTabs>
+          <MuiTabs
+            value={tab}
+            variant="scrollable"
+            scrollButtons="auto"
+            onChange={handleTabChange}
+            sx={{
+              backgroundColor: inDrawer ? theme.palette.background.default : theme.palette.background.paper,
+              margin: `${theme.spacing(2)} 0`
+            }}
+          >
+            {Object.keys(TABS).map((title, i) => (
+              <MuiTab key={`${i}`} label={t(title)} value={title} sx={{ minWidth: '120px' }} />
+            ))}
+          </MuiTabs>
+        </div>
 
         <div style={{ display: tab === 'details' ? 'contents' : 'none' }}>
           <IdentificationSection fileinfo={file ? file.file_info : null} />
