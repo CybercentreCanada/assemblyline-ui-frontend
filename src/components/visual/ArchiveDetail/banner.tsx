@@ -207,7 +207,7 @@ const LABELS: Record<
 type Labels = Partial<Record<keyof typeof DEFAULT_LABELS, string[]>>;
 
 const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid = null, force = false }) => {
-  const { t } = useTranslation(['fileDetail']);
+  const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();

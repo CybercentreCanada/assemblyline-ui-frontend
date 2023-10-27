@@ -58,7 +58,7 @@ type SectionProps = {
 };
 
 const WrappedDiscoverSection: React.FC<SectionProps> = ({ file }) => {
-  const { t } = useTranslation(['fileDetail']);
+  const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
 

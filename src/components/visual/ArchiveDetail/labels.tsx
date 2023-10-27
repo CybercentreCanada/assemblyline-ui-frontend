@@ -75,7 +75,7 @@ type Props = {
 };
 
 const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabels = null }) => {
-  const { t } = useTranslation(['fileDetail']);
+  const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
