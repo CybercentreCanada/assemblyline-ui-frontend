@@ -23,7 +23,7 @@ const AdminUsers = lazy(() => import('components/routes/admin/users'));
 const AlertDetails = lazy(() => import('components/routes/alerts/alert-details'));
 const Alerts = lazy(() => import('components/routes/alerts/alerts'));
 const AppRegistration = lazy(() => import('components/routes/authorize'));
-const ArchiveFullDetail = lazy(() => import('components/routes/archive/detail'));
+const ArchiveDetail = lazy(() => import('components/routes/archive/detail'));
 const CrashTest = lazy(() => import('components/routes/crash'));
 const Dashboard = lazy(() => import('components/routes/dashboard'));
 const FileFullDetail = lazy(() => import('components/routes/file/detail'));
@@ -113,7 +113,8 @@ const WrappedRoutes = () => {
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/users/:id" element={<User />} />
         <Route path="/archive" element={<MalwareArchive />} />
-        <Route path="/archive/:id" element={<ArchiveFullDetail />} />
+        <Route path="/archive/:id" element={<ArchiveDetail />} />
+        <Route path="/archive/:id/:tab" element={<ArchiveDetail />} />
         <Route path="/authorize" element={<AppRegistration />} />
         <Route path="/crash" element={<CrashTest />} />
         <Route path="/dashboard" element={<Dashboard />} />
