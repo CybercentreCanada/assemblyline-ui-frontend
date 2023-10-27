@@ -4,7 +4,7 @@ import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { File } from 'components/visual/ArchiveDetail';
+import { File } from 'components/routes/archive/detail';
 import { safeFieldValueURI } from 'helpers/utils';
 import 'moment/locale/fr';
 import React, { useEffect, useMemo, useState } from 'react';
