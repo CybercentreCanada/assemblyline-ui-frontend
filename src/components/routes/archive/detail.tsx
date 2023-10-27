@@ -8,9 +8,6 @@ import Banner from 'components/visual/ArchiveDetail/banner';
 import CommentSection from 'components/visual/ArchiveDetail/comments';
 import { DiscoverSection } from 'components/visual/ArchiveDetail/discover';
 import LabelSection from 'components/visual/ArchiveDetail/labels';
-import ASCIISection from 'components/visual/ArchiveDetail/viewer/ascii';
-import HexSection from 'components/visual/ArchiveDetail/viewer/hex';
-import StringsSection from 'components/visual/ArchiveDetail/viewer/strings';
 import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import AttackSection from 'components/visual/FileDetail/attacks';
@@ -24,6 +21,9 @@ import MetadataSection from 'components/visual/FileDetail/metadata';
 import ParentSection from 'components/visual/FileDetail/parents';
 import ResultSection from 'components/visual/FileDetail/results';
 import TagSection from 'components/visual/FileDetail/tags';
+import ASCIISection from 'components/visual/FileViewer/ascii';
+import HexSection from 'components/visual/FileViewer/hex';
+import StringsSection from 'components/visual/FileViewer/strings';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -263,11 +263,11 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
         </div>
 
         <div style={{ display: tab === 'strings' ? 'contents' : 'none' }}>
-          <StringsSection sha256={sha256} type={file?.file_info?.type} load={tab === 'ascii'} />
+          <StringsSection sha256={sha256} type={file?.file_info?.type} load={tab === 'strings'} />
         </div>
 
         <div style={{ display: tab === 'hex' ? 'contents' : 'none' }}>
-          <HexSection sha256={sha256} load={tab === 'ascii'} />
+          <HexSection sha256={sha256} load={tab === 'hex'} />
         </div>
 
         <div style={{ display: tab === 'community' ? 'contents' : 'none' }}>
@@ -278,6 +278,6 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
     );
 };
 
-const ArchiveDetail = React.memo(WrappedArchiveDetail);
+export const ArchiveDetail = React.memo(WrappedArchiveDetail);
 
 export default ArchiveDetail;

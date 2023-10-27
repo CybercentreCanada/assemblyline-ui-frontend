@@ -12,9 +12,6 @@ import Banner from './ArchiveDetail/banner';
 import CommentSection from './ArchiveDetail/comments';
 import { DiscoverSection } from './ArchiveDetail/discover';
 import LabelSection from './ArchiveDetail/labels';
-import ASCIISection from './ArchiveDetail/viewer/ascii';
-import HexSection from './ArchiveDetail/viewer/hex';
-import StringsSection from './ArchiveDetail/viewer/strings';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
 import Detection from './FileDetail/detection';
@@ -26,6 +23,9 @@ import MetadataSection from './FileDetail/metadata';
 import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
 import TagSection from './FileDetail/tags';
+import ASCIISection from './FileViewer/ascii';
+import HexSection from './FileViewer/hex';
+import StringsSection from './FileViewer/strings';
 
 export type FileInfo = {
   archive_ts: string;
@@ -137,7 +137,7 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
     [ref?.current]
   );
 
-  const elementInViewport = element => {
+  const elementInViewport = useCallback((element: HTMLElement) => {
     const bounding = element.getBoundingClientRect();
     const myElementHeight = element.offsetHeight;
     const myElementWidth = element.offsetWidth;
@@ -151,23 +151,29 @@ const WrappedArchiveDetail: React.FC<ArchiveDetailProps> = ({
       return true;
     }
     return false;
-  };
+  }, []);
 
-  const scrollToTop = scrollToItem => {
-    const element = document.getElementById(scrollToItem);
-    if (element && !elementInViewport(element)) {
-      element.scrollIntoView();
-    }
-  };
+  const scrollToTop = useCallback(
+    (scrollToItemID: string) => {
+      const element = document.getElementById(scrollToItemID);
+      if (element && !elementInViewport(element)) {
+        element.scrollIntoView();
+      }
+    },
+    [elementInViewport]
+  );
 
-  const patchFileDetails = (data: File) => {
-    const newData = { ...data };
-    newData.results.sort((a, b) => (a.response.service_name > b.response.service_name ? 1 : -1));
-    newData.emptys = data.results.filter(result => emptyResult(result));
-    newData.results = data.results.filter(result => !emptyResult(result));
-    newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
-    return newData;
-  };
+  const patchFileDetails = useCallback(
+    (data: File) => {
+      const newData = { ...data };
+      newData.results.sort((a, b) => (a.response.service_name > b.response.service_name ? 1 : -1));
+      newData.emptys = data.results.filter(result => emptyResult(result));
+      newData.results = data.results.filter(result => !emptyResult(result));
+      newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
+      return newData;
+    },
+    [liveErrors]
+  );
 
   const handleTabChange = useCallback((event: React.SyntheticEvent<Element, Event>, value: any) => {
     setTab(value);

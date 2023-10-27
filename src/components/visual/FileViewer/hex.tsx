@@ -38,29 +38,25 @@ const WrappedHexSection: React.FC<Props> = ({ sha256, load = true }) => {
     apiCall({
       url: `/api/v4/file/hex/${sha256}/?bytes_only=true`,
       allowCache: true,
+      onEnter: () => {
+        setData(null);
+        setError(null);
+      },
       onSuccess: api_data => setData(api_data.api_response),
-      onFailure: api_data => setError(api_data.api_error_message),
-      onEnter: () => setError(null)
+      onFailure: api_data => setError(api_data.api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, load, sha256]);
 
-  useEffect(() => {
-    setData(null);
-    setError(null);
-  }, [sha256]);
-
-  return !currentUser.roles.includes('file_detail') ? (
-    <ForbiddenPage />
-  ) : data ? (
-    <div className={classes.wrapper}>
-      <HexViewerApp data={data} />
-    </div>
-  ) : error ? (
-    <Alert severity="error">{error}</Alert>
-  ) : (
-    <LinearProgress />
-  );
+  if (!currentUser.roles.includes('file_detail')) return <ForbiddenPage />;
+  else if (error) return <Alert severity="error">{error}</Alert>;
+  else if (!data) return <LinearProgress />;
+  else
+    return (
+      <div className={classes.wrapper}>
+        <HexViewerApp data={data} />
+      </div>
+    );
 };
 
 export const HexSection = React.memo(WrappedHexSection);
