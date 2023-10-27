@@ -207,7 +207,7 @@ const LABELS: Record<
 type Labels = Partial<Record<keyof typeof DEFAULT_LABELS, string[]>>;
 
 const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid = null, force = false }) => {
-  const { t } = useTranslation(['archive']);
+  const { t } = useTranslation(['fileDetail', 'archive']);
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
@@ -455,7 +455,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
           <div style={{ flex: 1 }} />
           <Typography
             className={clsx(classes.text, classes.color, VERDICTS[currentVerdict].className)}
-            children={t(`file.${file ? currentVerdict : 'none'}`)}
+            children={t(`file.${file ? currentVerdict : 'none'}`, { ns: 'archive' })}
             variant="h4"
           />
         </div>
@@ -478,16 +478,25 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
             ) : verdicts && ['malicious', 'highly_suspicious', 'suspicious'].includes(currentVerdict) ? (
               <>
                 <div className={clsx(classes.color, VERDICTS.malicious.className)}>
-                  {`${verdicts.malicious} ${t(`file.result${verdicts.malicious > 1 ? 's' : ''}.malicious`)}`}
+                  {`${verdicts.malicious} ${t(`file.result${verdicts.malicious > 1 ? 's' : ''}.malicious`, {
+                    ns: 'archive'
+                  })}`}
                 </div>
                 <div className={clsx(classes.color, VERDICTS.suspicious.className)}>
                   {`${verdicts.suspicious + verdicts.highly_suspicious} ${t(
-                    `file.result${verdicts.suspicious + verdicts.highly_suspicious > 1 ? 's' : ''}.suspicious`
+                    `file.result${verdicts.suspicious + verdicts.highly_suspicious > 1 ? 's' : ''}.suspicious`,
+                    {
+                      ns: 'archive'
+                    }
                   )}`}
                 </div>
               </>
             ) : (
-              <div className={clsx(classes.color, VERDICTS.safe.className)}>{t('file.result.info')}</div>
+              <div className={clsx(classes.color, VERDICTS.safe.className)}>
+                {t('file.result.info', {
+                  ns: 'archive'
+                })}
+              </div>
             )}
           </div>
           <div>{t('type')}</div>
