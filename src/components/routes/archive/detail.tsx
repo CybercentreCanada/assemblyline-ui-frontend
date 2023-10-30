@@ -125,7 +125,7 @@ type Props = {
 };
 
 const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = false }) => {
-  const { t } = useTranslation(['fileDetail']);
+  const { t } = useTranslation(['fileDetail', 'archive']);
   const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -253,8 +253,12 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
         </div>
 
         <div style={{ display: tab === 'relations' ? 'contents' : 'none' }}>
-          <ChildrenSection childrens={file ? file.childrens : null} />
-          <ParentSection parents={file ? file.parents : null} />
+          <ChildrenSection
+            childrens={file ? file.childrens : null}
+            title={t('childrens', { ns: 'archive' })}
+            show={true}
+          />
+          <ParentSection parents={file ? file.parents : null} title={t('parents', { ns: 'archive' })} show={true} />
           <DiscoverSection file={file ? file : null} />
         </div>
 
