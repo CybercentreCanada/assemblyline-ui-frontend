@@ -1,6 +1,6 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { AlertTitle, Collapse, Divider, Typography, useTheme } from '@mui/material';
+import { AlertTitle, Collapse, Divider, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import 'moment/locale/fr';
 import React from 'react';
@@ -31,11 +31,17 @@ const useStyles = makeStyles(theme => ({
 
 type ParentSectionProps = {
   parents: any;
-  title?: string;
+  loading?: boolean;
   show?: boolean;
+  title?: string;
 };
 
-const WrappedParentSection: React.FC<ParentSectionProps> = ({ parents, title = null, show = false }) => {
+const WrappedParentSection: React.FC<ParentSectionProps> = ({
+  parents,
+  loading = false,
+  show = false,
+  title = null
+}) => {
   const { t } = useTranslation(['fileDetail', 'archive']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -51,7 +57,16 @@ const WrappedParentSection: React.FC<ParentSectionProps> = ({ parents, title = n
       <Divider />
       <Collapse in={open} timeout="auto">
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-          {parents && parents.length !== 0 ? (
+          {loading ? (
+            <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
+          ) : !parents || parents.length === 0 ? (
+            <div style={{ width: '100%' }}>
+              <InformativeAlert>
+                <AlertTitle>{t('no_parents_title', { ns: 'archive' })}</AlertTitle>
+                {t('no_parents_desc', { ns: 'archive' })}
+              </InformativeAlert>
+            </div>
+          ) : (
             parents?.map((resultKey, i) => {
               const [parentSHA256, service] = resultKey.split('.', 2);
               return (
@@ -66,13 +81,6 @@ const WrappedParentSection: React.FC<ParentSectionProps> = ({ parents, title = n
                 </Link>
               );
             })
-          ) : (
-            <div style={{ width: '100%' }}>
-              <InformativeAlert>
-                <AlertTitle>{t('no_parents_title', { ns: 'archive' })}</AlertTitle>
-                {t('no_parents_desc', { ns: 'archive' })}
-              </InformativeAlert>
-            </div>
           )}
         </div>
       </Collapse>

@@ -1,6 +1,6 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { AlertTitle, Collapse, Divider, Typography, useTheme } from '@mui/material';
+import { AlertTitle, Collapse, Divider, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import 'moment/locale/fr';
 import React from 'react';
@@ -31,11 +31,17 @@ const useStyles = makeStyles(theme => ({
 
 type ChildrenSectionProps = {
   childrens: any;
-  title?: string;
+  loading?: boolean;
   show?: boolean;
+  title?: string;
 };
 
-const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({ childrens, title = null, show = false }) => {
+const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({
+  childrens,
+  loading = false,
+  show = false,
+  title = null
+}) => {
   const { t } = useTranslation(['fileDetail', 'archive']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -51,7 +57,16 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({ childrens, tit
       <Divider />
       <Collapse in={open} timeout="auto">
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-          {childrens && childrens.length !== 0 ? (
+          {loading ? (
+            <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
+          ) : !childrens || childrens.length === 0 ? (
+            <div style={{ width: '100%' }}>
+              <InformativeAlert>
+                <AlertTitle>{t('no_children_title', { ns: 'archive' })}</AlertTitle>
+                {t('no_children_desc', { ns: 'archive' })}
+              </InformativeAlert>
+            </div>
+          ) : (
             childrens?.map((fileItem, i) => (
               <Link
                 key={i}
@@ -63,13 +78,6 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({ childrens, tit
                 <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{` :: ${fileItem.sha256}`}</span>
               </Link>
             ))
-          ) : (
-            <div style={{ width: '100%' }}>
-              <InformativeAlert>
-                <AlertTitle>{t('no_children_title', { ns: 'archive' })}</AlertTitle>
-                {t('no_children_desc', { ns: 'archive' })}
-              </InformativeAlert>
-            </div>
           )}
         </div>
       </Collapse>

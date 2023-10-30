@@ -134,6 +134,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   const [file, setFile] = useState<File | null>(null);
   const [stateTab, setStateTab] = useState<Tab>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const inDrawer = useMemo<boolean>(() => (propSha256 ? true : paramSha256 ? false : null), [paramSha256, propSha256]);
   const sha256 = useMemo<string>(() => paramSha256 || propSha256, [paramSha256, propSha256]);
@@ -163,9 +164,13 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
     if (!sha256) return;
     apiCall({
       url: `/api/v4/file/result/${sha256}/`,
-      onEnter: () => setFile(null),
+      onEnter: () => {
+        setFile(null);
+        setLoading(true);
+      },
       onSuccess: api_data => setFile(patchFileDetails(api_data.api_response)),
-      onFailure: api_data => showErrorMessage(api_data.api_response)
+      onFailure: api_data => showErrorMessage(api_data.api_response),
+      onFinalize: () => setLoading(false)
     });
     // eslint-disable-next-line
   }, [patchFileDetails, sha256]);
@@ -254,9 +259,15 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             childrens={file ? file.childrens : null}
             title={t('childrens', { ns: 'archive' })}
             show={true}
+            loading={loading}
           />
-          <ParentSection parents={file ? file.parents : null} title={t('parents', { ns: 'archive' })} show={true} />
-          <SimilarSection file={file ? file : null} />
+          <ParentSection
+            parents={file ? file.parents : null}
+            title={t('parents', { ns: 'archive' })}
+            show={true}
+            loading={loading}
+          />
+          <SimilarSection file={file ? file : null} show={true} />
         </div>
 
         <div style={{ display: tab === 'ascii' ? 'contents' : 'none' }}>
