@@ -1,6 +1,6 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
+import { AlertTitle, Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -10,6 +10,7 @@ import 'moment/locale/fr';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import InformativeAlert from '../InformativeAlert';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -55,9 +56,12 @@ type Similar = Record<keyof typeof DEFAULT_SIMILAR, Record<string, { sha256: str
 
 type SectionProps = {
   file: File;
+  loading?: boolean;
+  show?: boolean;
+  title?: string;
 };
 
-const WrappedSimilarSection: React.FC<SectionProps> = ({ file }) => {
+const WrappedSimilarSection: React.FC<SectionProps> = ({ file, loading = false, show = false, title = null }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
@@ -123,45 +127,61 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({ file }) => {
     // eslint-disable-next-line
   }, [file]);
 
-  return data && nbOfValues > 0 ? (
+  return show || (data && nbOfValues > 0) ? (
     <div className={classes.sp2}>
       <Typography className={classes.title} variant="h6" onClick={() => setOpen(!open)}>
-        <span>{t('discover')}</span>
+        <span>{title ?? t('similar')}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">
         <Grid container paddingBottom={2} paddingTop={2} flexDirection={'column'} gap={2}>
-          {Object.keys(DEFAULT_SIMILAR).map(
-            (k, i) =>
-              Object.entries(data[k]).length > 0 && (
-                <Grid key={i} container flexDirection="column">
-                  <Grid item fontWeight={500}>
-                    <Link className={classes.clickable} to={discover[k].to} replace style={{ wordBreak: 'break-word' }}>
-                      <span>{t(DEFAULT_SIMILAR[k].label)}</span>
-                      <span
-                        style={{ fontSize: '80%', color: theme.palette.text.secondary }}
-                      >{` :: ${discover[k].value}`}</span>
-                    </Link>
+          {loading ? (
+            <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
+          ) : !data || nbOfValues === 0 ? (
+            <div style={{ width: '100%' }}>
+              <InformativeAlert>
+                <AlertTitle>{t('no_similar_title')}</AlertTitle>
+                {t('no_similar_desc')}
+              </InformativeAlert>
+            </div>
+          ) : (
+            Object.keys(DEFAULT_SIMILAR).map(
+              (k, i) =>
+                Object.entries(data[k]).length > 0 && (
+                  <Grid key={i} container flexDirection="column">
+                    <Grid item fontWeight={500}>
+                      <Link
+                        className={classes.clickable}
+                        to={discover[k].to}
+                        replace
+                        style={{ wordBreak: 'break-word' }}
+                      >
+                        <span>{t(DEFAULT_SIMILAR[k].label)}</span>
+                        <span
+                          style={{ fontSize: '80%', color: theme.palette.text.secondary }}
+                        >{` :: ${discover[k].value}`}</span>
+                      </Link>
+                    </Grid>
+                    {k in data &&
+                      Object.entries(data[k]).map(([sha256, values]: [string, { sha256: string; type: string }], j) => (
+                        <Grid key={`${i}-${j}`} item marginLeft={2}>
+                          <Link
+                            className={classes.clickable}
+                            to={`/file/detail/${sha256}`}
+                            style={{ wordBreak: 'break-word' }}
+                            replace
+                          >
+                            <span>{sha256}</span>
+                            <span
+                              style={{ fontSize: '80%', color: theme.palette.text.secondary }}
+                            >{` :: ${values?.type}`}</span>
+                          </Link>
+                        </Grid>
+                      ))}
                   </Grid>
-                  {k in data &&
-                    Object.entries(data[k]).map(([sha256, values]: [string, { sha256: string; type: string }], j) => (
-                      <Grid key={`${i}-${j}`} item marginLeft={2}>
-                        <Link
-                          className={classes.clickable}
-                          to={`/file/detail/${sha256}`}
-                          style={{ wordBreak: 'break-word' }}
-                          replace
-                        >
-                          <span>{sha256}</span>
-                          <span
-                            style={{ fontSize: '80%', color: theme.palette.text.secondary }}
-                          >{` :: ${values?.type}`}</span>
-                        </Link>
-                      </Grid>
-                    ))}
-                </Grid>
-              )
+                )
+            )
           )}
         </Grid>
       </Collapse>
