@@ -3,17 +3,21 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import {
   Button,
+  CircularProgress,
   Collapse,
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   Divider,
+  FormControlLabel,
+  FormLabel,
   Grid,
   IconButton,
-  MenuItem,
   Paper,
-  Select,
+  Radio,
+  RadioGroup,
   TextField,
   Tooltip,
   Typography,
@@ -22,11 +26,10 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import { ChipList } from 'components/visual/ChipList';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChipList } from '../ChipList';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -82,13 +85,13 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
   const [labels, setLabels] = useState<Labels>(null);
-  const [newLabel, setNewLabel] = useState<NewLabel>({ value: '', category: '' });
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
-  const [addDialog, setAddDialog] = useState<boolean>(false);
-  const [saveConfirmation, setSaveConfirmation] = useState<boolean>(false);
+  const [newLabel, setNewLabel] = useState<NewLabel>({ value: '', category: '' });
+  const [confirmation, setConfirmation] = useState<{ open: boolean; type: 'add' | 'delete' }>({
+    open: false,
+    type: 'add'
+  });
   const [waiting, setWaiting] = useState<boolean>(false);
-
-  const prevLabels = useRef<Labels>(null);
 
   const sortedLabels = useMemo<Labels>(() => {
     if (!labels || typeof labels !== 'object') return DEFAULT_LABELS;
@@ -100,66 +103,46 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
     );
   }, [labels]);
 
-  const hasDifferentLabels = useMemo<boolean>(
-    () =>
-      !labels
-        ? false
-        : Object.keys(prevLabels.current).some(
-            cat =>
-              labels[cat].filter(l => !prevLabels.current[cat].includes(l)).length > 0 ||
-              prevLabels.current[cat].filter(l => !labels[cat].includes(l)).length > 0
-          ),
-    [labels]
-  );
-
-  const handleDeleteLabel = useCallback((category: keyof typeof DEFAULT_LABELS, label: string) => {
-    setLabels(lbs => ({ ...lbs, [category]: lbs[category].filter(l => l !== label) }));
+  const handleCloseConfirmation = useCallback(() => {
+    setConfirmation(c => ({ ...c, open: false }));
   }, []);
 
-  const handleAddDialogOpen = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleAddConfirmation = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
     event.stopPropagation();
-    setAddDialog(true);
-  }, []);
-
-  const handleCloseAddDialog = useCallback(() => {
-    setAddDialog(false);
+    setConfirmation({ open: true, type: 'add' });
     setNewLabel({ value: '', category: '' });
   }, []);
 
-  const handleAddLabel = useCallback(({ value, category }: NewLabel) => {
-    setAddDialog(false);
-    setNewLabel({ value: '', category: '' });
-    setLabels(lbs => ({ ...lbs, [category]: [...lbs[category], value] }));
+  const handleDeleteConfirmation = useCallback((category: keyof typeof DEFAULT_LABELS, label: string) => {
+    setConfirmation({ open: true, type: 'delete' });
+    setNewLabel({ value: label, category: category });
   }, []);
 
-  const handleNewLabelChange = useCallback(
+  const handleEditingLabelChange = useCallback(
     (key: keyof NewLabel) => event => setNewLabel(l => ({ ...l, [key]: event.target.value })),
     []
   );
 
-  const handleRevertLabels = useCallback(() => {
-    setLabels(prevLabels.current);
-  }, []);
-
-  const handleAcceptConfirmation = useCallback(
-    (data: Labels) => {
+  const handleAddLabel = useCallback(
+    ({ value, category }: NewLabel) => {
       if (!sha256) return;
       apiCall({
-        method: 'POST',
+        method: 'PUT',
         url: `/api/v4/file/label/${sha256}/`,
-        body: { ...data },
-        onSuccess: api_data => {
-          setLabels(data);
-          prevLabels.current = data;
-          showSuccessMessage(t('labels.success'));
+        body: { [category]: [value] },
+        onSuccess: ({ api_response }) => {
+          const data = api_response?.label_categories ?? {};
+          setLabels(l => Object.fromEntries(Object.keys(LABELS).map(k => [k, [...(k in data ? data[k] : [])]])));
+          showSuccessMessage(t('label.add.success'));
           setTimeout(() => window.dispatchEvent(new CustomEvent('reloadArchive')), 1000);
         },
         onFailure: api_data => showErrorMessage(api_data.api_response),
         onEnter: () => setWaiting(true),
         onExit: () => {
           setWaiting(false);
-          setSaveConfirmation(false);
+          setConfirmation({ open: false, type: 'add' });
+          setNewLabel({ value: '', category: '' });
         }
       });
     },
@@ -167,118 +150,131 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
     [sha256, showErrorMessage, showSuccessMessage, t]
   );
 
-  const LabelItem: React.FC<{ category: string; prev: string[]; next: string[] }> = useCallback(
-    ({ category = '', prev = [], next = [] }) => {
-      const added = next.filter(l => !prev.includes(l));
-      const removed = prev.filter(l => !next.includes(l));
-
-      return (
-        added.concat(removed).length > 0 && (
-          <Grid item>
-            <Typography variant="subtitle2" children={t(category)} />
-            <Paper component="pre" variant="outlined" className={classes.preview}>
-              <ChipList
-                items={removed.map((value, i) => ({
-                  key: i,
-                  color: 'error',
-                  label: value,
-                  size: 'small',
-                  variant: 'outlined'
-                }))}
-              />
-              <ChipList
-                items={added.map((value, i) => ({
-                  key: i,
-                  color: 'success',
-                  label: value,
-                  size: 'small',
-                  variant: 'outlined'
-                }))}
-              />
-            </Paper>
-          </Grid>
-        )
-      );
+  const handleDeleteLabel = useCallback(
+    ({ value, category }: NewLabel) => {
+      if (!sha256) return;
+      apiCall({
+        method: 'DELETE',
+        url: `/api/v4/file/label/${sha256}/`,
+        body: { [category]: [value] },
+        onSuccess: ({ api_response }) => {
+          const data = api_response?.label_categories ?? {};
+          setLabels(l => Object.fromEntries(Object.keys(LABELS).map(k => [k, [...(k in data ? data[k] : [])]])));
+          showSuccessMessage(t('label.delete.success'));
+          setTimeout(() => window.dispatchEvent(new CustomEvent('reloadArchive')), 1000);
+        },
+        onFailure: api_data => showErrorMessage(api_data.api_response),
+        onEnter: () => setWaiting(true),
+        onExit: () => {
+          setWaiting(false);
+          setConfirmation({ open: false, type: 'delete' });
+          setNewLabel({ value: '', category: '' });
+        }
+      });
     },
-    [classes.preview, t]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sha256, showErrorMessage, showSuccessMessage, t]
   );
 
   useEffect(() => {
     setLabels(propLabels);
-    prevLabels.current = propLabels;
   }, [propLabels]);
 
   return (
     <div className={classes.container}>
-      <Dialog open={addDialog} onClose={handleCloseAddDialog}>
-        <DialogTitle>{t('label.add.header')}</DialogTitle>
+      <Dialog open={confirmation.open} onClose={handleCloseConfirmation}>
+        <DialogTitle>{t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.header`)}</DialogTitle>
         <DialogContent>
-          <Grid container flexDirection="column" spacing={2}>
-            <Grid item children={t('label.add.content')} />
-            <Grid item>
-              <Typography variant="subtitle2" children={t('label')} />
-              <TextField
-                value={newLabel.value}
-                variant="outlined"
-                fullWidth
-                autoFocus
-                onChange={handleNewLabelChange('value')}
-              />
+          <DialogContentText component="div">
+            <Grid container flexDirection="column" spacing={2}>
+              <Grid item children={t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.content`)} />
+
+              {confirmation.type === 'add' && (
+                <>
+                  <Grid item>
+                    <FormLabel>{t('category')}</FormLabel>
+                    <RadioGroup
+                      value={newLabel.category}
+                      defaultValue="attribution"
+                      row
+                      onChange={handleEditingLabelChange('category')}
+                      sx={{ justifyContent: 'space-around' }}
+                    >
+                      <FormControlLabel value="attribution" label={t('attribution')} control={<Radio size="small" />} />
+                      <FormControlLabel value="technique" label={t('technique')} control={<Radio size="small" />} />
+                      <FormControlLabel value="info" label={t('info')} control={<Radio size="small" />} />
+                    </RadioGroup>
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      value={newLabel.value}
+                      autoFocus
+                      fullWidth
+                      label={t('label')}
+                      size="small"
+                      variant="outlined"
+                      onChange={handleEditingLabelChange('value')}
+                    />
+                  </Grid>
+                </>
+              )}
+
+              {confirmation.type === 'delete' && (
+                <Grid item>
+                  <Typography variant="subtitle2" children={t(newLabel.category)} />
+                  <Paper component="pre" variant="outlined" className={classes.preview}>
+                    {newLabel.value}
+                  </Paper>
+                </Grid>
+              )}
+
+              {newLabel?.category in LABELS && ![null, undefined, ''].includes(newLabel?.value) && (
+                <Grid item children={t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.confirm`)} />
+              )}
             </Grid>
-            <Grid item>
-              <Typography variant="subtitle2" children={t('category')} />
-              <Select value={newLabel.category} fullWidth onChange={handleNewLabelChange('category')}>
-                <MenuItem value={'attribution'} children={t('attribution')} />
-                <MenuItem value={'info'} children={t('info')} />
-                <MenuItem value={'technique'} children={t('technique')} />
-              </Select>
-            </Grid>
-          </Grid>
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button color="secondary" children={t('cancel')} onClick={handleCloseAddDialog} />
+          <Button color="secondary" children={t('cancel')} onClick={handleCloseConfirmation} />
           <Button
             color="primary"
             autoFocus
             disabled={
-              [null, undefined, ''].includes(newLabel?.value) || [null, undefined, ''].includes(newLabel?.category)
+              [null, undefined, ''].includes(newLabel?.value) ||
+              [null, undefined, ''].includes(newLabel?.category) ||
+              waiting
             }
-            children={t('label.add.ok')}
-            onClick={() => handleAddLabel(newLabel)}
+            children={
+              <>
+                {t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.ok`)}
+                {waiting && (
+                  <CircularProgress
+                    size={24}
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      marginTop: -12,
+                      marginLeft: -12
+                    }}
+                  />
+                )}
+              </>
+            }
+            onClick={confirmation.type === 'add' ? () => handleAddLabel(newLabel) : () => handleDeleteLabel(newLabel)}
           />
         </DialogActions>
       </Dialog>
-
-      <ConfirmationDialog
-        open={saveConfirmation}
-        waiting={waiting}
-        title={t('label.save.header')}
-        acceptText={t('label.save.ok')}
-        cancelText={t('cancel')}
-        handleAccept={() => handleAcceptConfirmation(sortedLabels)}
-        handleClose={() => setSaveConfirmation(false)}
-        handleCancel={() => setSaveConfirmation(false)}
-        text={
-          <Grid container flexDirection="column" spacing={theme.spacing(2)}>
-            <Grid item children={t('label.save.content')} />
-            {labels &&
-              Object.keys(DEFAULT_LABELS).map((category, i) => (
-                <LabelItem key={i} category={category} prev={prevLabels.current[category]} next={labels[category]} />
-              ))}
-            <Grid item children={t('label.save.confirm')} />
-          </Grid>
-        }
-      />
       <Typography className={classes.title} variant="h6" onClick={() => setIsCollapsed(c => !c)}>
         <span>{t('labels')}</span>
         <div style={{ flex: 1 }} />
-        <Tooltip title={t('add')}>
+        <Tooltip title={t('label.add.tooltip')}>
           <IconButton
             size="large"
             style={{
               color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
             }}
-            onClick={handleAddDialogOpen}
+            onClick={handleAddConfirmation}
           >
             <AddCircleOutlineIcon />
           </IconButton>
@@ -301,31 +297,13 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                     label: value,
                     size: 'small',
                     variant: 'outlined',
-                    onDelete: () => handleDeleteLabel(cat as keyof typeof DEFAULT_LABELS, value)
+                    onDelete: () => handleDeleteConfirmation(cat as keyof typeof DEFAULT_LABELS, value)
                   }))}
                 />
               </Grid>
             </Grid>
           ))}
         </div>
-        {hasDifferentLabels && (
-          <Grid container gap={1} justifyContent="flex-end">
-            <Tooltip title={t('label.discard.tooltip')}>
-              <span>
-                <Button variant="outlined" color="primary" onClick={handleRevertLabels}>
-                  {t('label.discard.button')}
-                </Button>
-              </span>
-            </Tooltip>
-            <Tooltip title={t('label.save.tooltip')}>
-              <span>
-                <Button variant="contained" color="primary" onClick={() => setSaveConfirmation(true)}>
-                  {t('label.save.button')}
-                </Button>
-              </span>
-            </Tooltip>
-          </Grid>
-        )}
       </Collapse>
     </div>
   );
