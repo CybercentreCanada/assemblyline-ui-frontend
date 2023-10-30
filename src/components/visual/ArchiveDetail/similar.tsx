@@ -44,20 +44,20 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const DEFAULT_DISCOVER = {
+const DEFAULT_SIMILAR = {
   tlsh: { label: 'TLSH' },
   ssdeep1: { label: 'SSDEEP' },
   ssdeep2: { label: 'SSDEEP' },
   vector: { label: 'Vector' }
 };
 
-type Discover = Record<keyof typeof DEFAULT_DISCOVER, Record<string, { sha256: string; type: string }>>;
+type Similar = Record<keyof typeof DEFAULT_SIMILAR, Record<string, { sha256: string; type: string }>>;
 
 type SectionProps = {
   file: File;
 };
 
-const WrappedDiscoverSection: React.FC<SectionProps> = ({ file }) => {
+const WrappedSimilarSection: React.FC<SectionProps> = ({ file }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
@@ -69,19 +69,19 @@ const WrappedDiscoverSection: React.FC<SectionProps> = ({ file }) => {
   const { showErrorMessage } = useMySnackbar();
   // const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
 
-  const [data, setData] = useState<Discover>(null);
+  const [data, setData] = useState<Similar>(null);
   const [open, setOpen] = useState<boolean>(true);
 
   const nbOfValues = useMemo<number | null>(
     () =>
       data &&
-      Object.keys(DEFAULT_DISCOVER)
+      Object.keys(DEFAULT_SIMILAR)
         .map(k => (Object.entries(data[k]) ? Object.entries(data[k]).length : 0))
         .reduce((a, v) => a + v),
     [data]
   );
 
-  const discover = useMemo<Record<keyof typeof DEFAULT_DISCOVER, { value: string; to: string }>>(() => {
+  const discover = useMemo<Record<keyof typeof DEFAULT_SIMILAR, { value: string; to: string }>>(() => {
     let base = {
       tlsh: { value: '', to: '' },
       ssdeep1: { value: '', to: '' },
@@ -132,13 +132,13 @@ const WrappedDiscoverSection: React.FC<SectionProps> = ({ file }) => {
       <Divider />
       <Collapse in={open} timeout="auto">
         <Grid container paddingBottom={2} paddingTop={2} flexDirection={'column'} gap={2}>
-          {Object.keys(DEFAULT_DISCOVER).map(
+          {Object.keys(DEFAULT_SIMILAR).map(
             (k, i) =>
               Object.entries(data[k]).length > 0 && (
                 <Grid key={i} container flexDirection="column">
                   <Grid item fontWeight={500}>
                     <Link className={classes.clickable} to={discover[k].to} replace style={{ wordBreak: 'break-word' }}>
-                      <span>{t(DEFAULT_DISCOVER[k].label)}</span>
+                      <span>{t(DEFAULT_SIMILAR[k].label)}</span>
                       <span
                         style={{ fontSize: '80%', color: theme.palette.text.secondary }}
                       >{` :: ${discover[k].value}`}</span>
@@ -169,5 +169,5 @@ const WrappedDiscoverSection: React.FC<SectionProps> = ({ file }) => {
   ) : null;
 };
 
-export const DiscoverSection = React.memo(WrappedDiscoverSection);
-export default DiscoverSection;
+export const SimilarSection = React.memo(WrappedSimilarSection);
+export default SimilarSection;

@@ -4,10 +4,7 @@ import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import Banner from 'components/visual/ArchiveDetail/banner';
-import CommentSection from 'components/visual/ArchiveDetail/comments';
-import { DiscoverSection } from 'components/visual/ArchiveDetail/discover';
-import LabelSection from 'components/visual/ArchiveDetail/labels';
+import { ArchiveBanner, CommentSection, LabelSection, SimilarSection } from 'components/visual/ArchiveDetail';
 import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import AttackSection from 'components/visual/FileDetail/attacks';
@@ -203,7 +200,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
           </div>
         )}
 
-        <Banner sha256={sha256} file={file} sid={null} force={force} />
+        <ArchiveBanner sha256={sha256} file={file} sid={null} force={force} />
 
         <div
           style={{
@@ -259,7 +256,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             show={true}
           />
           <ParentSection parents={file ? file.parents : null} title={t('parents', { ns: 'archive' })} show={true} />
-          <DiscoverSection file={file ? file : null} />
+          <SimilarSection file={file ? file : null} />
         </div>
 
         <div style={{ display: tab === 'ascii' ? 'contents' : 'none' }}>

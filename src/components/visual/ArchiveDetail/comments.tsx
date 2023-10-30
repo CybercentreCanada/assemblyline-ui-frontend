@@ -187,5 +187,5 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comm
   );
 };
 
-const CommentSection = React.memo(WrappedCommentSection);
+export const CommentSection = React.memo(WrappedCommentSection);
 export default CommentSection;

@@ -309,5 +309,5 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
   );
 };
 
-const LabelSection = React.memo(WrappedLabelSection);
+export const LabelSection = React.memo(WrappedLabelSection);
 export default LabelSection;

@@ -529,5 +529,5 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   );
 };
 
-const ArchiveBanner = React.memo(WrappedArchiveBanner);
+export const ArchiveBanner = React.memo(WrappedArchiveBanner);
 export default ArchiveBanner;
