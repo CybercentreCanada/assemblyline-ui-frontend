@@ -1,3 +1,5 @@
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import CompareIcon from '@mui/icons-material/Compare';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -7,21 +9,34 @@ import {
   Divider,
   Grid,
   IconButton,
+  Menu,
+  MenuItem,
   Skeleton,
   Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { File } from 'components/routes/archive/detail';
+import { File, Tab } from 'components/routes/archive/detail';
+import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { safeFieldValueURI } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, useLocation } from 'react-router-dom';
+import { DIFF_QUERY } from '../FileViewer';
 import InformativeAlert from '../InformativeAlert';
+
+const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
+const COMPARE_ICON = <CompareIcon style={{ marginRight: '16px' }} />;
+const INITIAL_MENU = {
+  mouseX: null,
+  mouseY: null
+};
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -94,25 +109,42 @@ const DEFAULT_SIMILAR = {
   vector: { label: 'Vector' }
 };
 
-type Similar = Record<keyof typeof DEFAULT_SIMILAR, Record<string, { sha256: string; type: string }>>;
+type Result = {
+  sha256: string;
+  type: string;
+};
+
+type Similar = Record<keyof typeof DEFAULT_SIMILAR, Record<string, Result>>;
 
 type SectionProps = {
   file: File;
   show?: boolean;
   title?: string;
   visible?: boolean;
+  onTabChange?: (event: any, value: Tab) => void;
 };
 
-const WrappedSimilarSection: React.FC<SectionProps> = ({ file, show = false, title = null, visible = true }) => {
+const WrappedSimilarSection: React.FC<SectionProps> = ({
+  file,
+  show = false,
+  title = null,
+  visible = true,
+  onTabChange = () => null
+}) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
+  const location = useLocation();
+  const navigate = useNavigate();
 
+  const { copy } = useClipboard();
   const { apiCall } = useMyAPI();
   const { showErrorMessage } = useMySnackbar();
 
   const [data, setData] = useState<Similar>(null);
   const [open, setOpen] = useState<boolean>(true);
+  const [menu, setMenu] = useState<{ mouseX: number; mouseY: number }>(INITIAL_MENU);
+  const [selectedResult, setSelectedResult] = useState<Result>(null);
 
   const nbOfValues = useMemo<number | null>(
     () =>
@@ -154,6 +186,38 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({ file, show = false, tit
     return base;
   }, [file]);
 
+  const handleClose = useCallback(() => {
+    setMenu(INITIAL_MENU);
+  }, []);
+
+  const handleMenuCopy = useCallback(
+    (value: Result) => () => {
+      copy(value?.sha256, 'sha256');
+      handleClose();
+    },
+    [copy, handleClose]
+  );
+
+  const handleCompareClick = useCallback(
+    (value: Result) => () => {
+      const query = new SimpleSearchQuery(location.search, null);
+      query.add(DIFF_QUERY, value?.sha256);
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+      onTabChange(null, 'ascii');
+      handleClose();
+    },
+    [handleClose, location.hash, location.pathname, location.search, navigate, onTabChange]
+  );
+
+  const handleFileClick = useCallback((event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, value: Result) => {
+    event.preventDefault();
+    setSelectedResult(value);
+    setMenu({
+      mouseX: event.clientX - 2,
+      mouseY: event.clientY - 4
+    });
+  }, []);
+
   useEffect(() => {
     if (!file || !visible) return;
     apiCall({
@@ -176,8 +240,9 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({ file, show = false, tit
     value: string;
     size: number;
     to: string;
-    files: Record<string, { sha256: string; type: string }>;
-  }> = ({ label = null, value = null, size = 0, to = null, files = {} }) => {
+    files: Record<string, Result>;
+    onContextMenu?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, value: Result) => void;
+  }> = ({ label = null, value = null, size = 0, to = null, files = {}, onContextMenu = () => null }) => {
     const [expand, setExpand] = useState<boolean>(true);
 
     return (
@@ -192,7 +257,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({ file, show = false, tit
           <Tooltip title={t('search')}>
             <span style={{ margin: `0 ${theme.spacing(0.5)}` }}>
               <IconButton component={Link} size="small" to={to} onClick={e => e.stopPropagation()}>
-                <SearchOutlinedIcon />
+                <SearchOutlinedIcon fontSize="small" />
               </IconButton>
             </span>
           </Tooltip>
@@ -207,9 +272,10 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({ file, show = false, tit
                 to={`/file/detail/${sha256}`}
                 style={{ wordBreak: 'break-word' }}
                 replace
+                onContextMenu={event => onContextMenu(event, values)}
               >
-                <span style={{ color: theme.palette.text.primary }}>{values?.type}</span>
-                <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{` :: ${sha256}`}</span>
+                <span style={{ color: theme.palette.text.primary }}>{values?.type}</span>&nbsp;
+                <small>{` :: ${sha256}`}</small>
               </Link>
             ))}
           </div>
@@ -247,10 +313,28 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({ file, show = false, tit
                     size={Object.keys(data[k]).length}
                     to={similar[k].to}
                     files={data[k]}
+                    onContextMenu={handleFileClick}
                   />
                 )
             )
           )}
+          <Menu
+            open={menu.mouseY !== null}
+            onClose={handleClose}
+            anchorReference="anchorPosition"
+            anchorPosition={
+              menu.mouseY !== null && menu.mouseX !== null ? { top: menu.mouseY, left: menu.mouseX } : undefined
+            }
+          >
+            <MenuItem dense onClick={handleMenuCopy(selectedResult)}>
+              {CLIPBOARD_ICON}
+              {t('clipboard')}
+            </MenuItem>
+            <MenuItem dense onClick={handleCompareClick(selectedResult)}>
+              {COMPARE_ICON}
+              {t('compare')}
+            </MenuItem>
+          </Menu>
         </Grid>
       </Collapse>
     </div>

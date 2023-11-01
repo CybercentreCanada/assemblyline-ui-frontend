@@ -106,7 +106,7 @@ const TABS = {
   community: null
 };
 
-type Tab = keyof typeof TABS;
+export type Tab = keyof typeof TABS;
 
 const DEFAULT_TAB: Tab = 'details';
 
@@ -134,7 +134,6 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   const [file, setFile] = useState<File | null>(null);
   const [stateTab, setStateTab] = useState<Tab>(null);
-  const [loading, setLoading] = useState<boolean>(false);
 
   const inDrawer = useMemo<boolean>(() => (propSha256 ? true : paramSha256 ? false : null), [paramSha256, propSha256]);
   const sha256 = useMemo<string>(() => paramSha256 || propSha256, [paramSha256, propSha256]);
@@ -144,7 +143,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
   );
 
   const handleTabChange = useCallback(
-    (event: React.SyntheticEvent<Element, Event>, value: any) => {
+    (event: React.SyntheticEvent<Element, Event>, value: Tab) => {
       if (!inDrawer) navigate(`/archive/${sha256}/${value}${location.search}${location.hash}`);
       else setStateTab(value);
     },
@@ -164,13 +163,9 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
     if (!sha256) return;
     apiCall({
       url: `/api/v4/file/result/${sha256}/`,
-      onEnter: () => {
-        setFile(null);
-        setLoading(true);
-      },
+      onEnter: () => setFile(null),
       onSuccess: api_data => setFile(patchFileDetails(api_data.api_response)),
-      onFailure: api_data => showErrorMessage(api_data.api_response),
-      onFinalize: () => setLoading(false)
+      onFailure: api_data => showErrorMessage(api_data.api_response)
     });
     // eslint-disable-next-line
   }, [patchFileDetails, sha256]);
@@ -178,7 +173,6 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
   useEffect(() => {
     return () => {
       setFile(null);
-      setLoading(true);
     };
   }, [sha256]);
 
@@ -268,7 +262,12 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             show={true}
           />
           <ParentSection parents={file ? file.parents : null} title={t('parents', { ns: 'archive' })} show={true} />
-          <SimilarSection file={file ? file : null} show={true} visible={tab === 'relations'} />
+          <SimilarSection
+            file={file ? file : null}
+            show={true}
+            visible={tab === 'relations'}
+            onTabChange={handleTabChange}
+          />
         </div>
 
         <div style={{ display: tab === 'ascii' ? 'contents' : 'none' }}>

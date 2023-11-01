@@ -8,7 +8,7 @@ import { useLocation } from 'react-router';
 import MonacoEditor, { LANGUAGE_SELECTOR } from '../MonacoEditor';
 import SimpleSearchQuery from '../SearchBar/simple-search-query';
 
-const DIFF_QUERY = 'diff';
+export const DIFF_QUERY = 'diff';
 
 type Props = {
   sha256: string;
