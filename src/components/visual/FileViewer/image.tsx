@@ -91,10 +91,10 @@ type Data = {
 type Props = {
   sha256: string;
   name?: string;
-  load?: boolean;
+  visible?: boolean;
 };
 
-const WrappedImageSection = ({ name = null, sha256 = null, load = true }: Props) => {
+const WrappedImageSection = ({ name = null, sha256 = null, visible = true }: Props) => {
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -356,7 +356,7 @@ const WrappedImageSection = ({ name = null, sha256 = null, load = true }: Props)
   );
 
   useEffect(() => {
-    if (!sha256 || !load) return;
+    if (!sha256 || !visible) return;
     apiCall({
       allowCache: true,
       url: `/api/v4/file/image/${sha256}/`,
@@ -368,7 +368,7 @@ const WrappedImageSection = ({ name = null, sha256 = null, load = true }: Props)
       onFailure: api_data => setError(api_data.api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [load, sha256]);
+  }, [sha256, visible]);
 
   useEffect(() => {
     if (!isLoaded) return;

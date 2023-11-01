@@ -176,6 +176,13 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
   }, [patchFileDetails, sha256]);
 
   useEffect(() => {
+    return () => {
+      setFile(null);
+      setLoading(true);
+    };
+  }, [sha256]);
+
+  useEffect(() => {
     if (!inDrawer && paramTab !== tab) navigate(`/archive/${sha256}/${tab}${location.search}${location.hash}`);
     else if (inDrawer && stateTab !== tab) setStateTab(tab);
   }, [inDrawer, location.hash, location.search, navigate, paramTab, sha256, stateTab, tab]);
@@ -259,27 +266,21 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             childrens={file ? file.childrens : null}
             title={t('childrens', { ns: 'archive' })}
             show={true}
-            loading={loading}
           />
-          <ParentSection
-            parents={file ? file.parents : null}
-            title={t('parents', { ns: 'archive' })}
-            show={true}
-            loading={loading}
-          />
-          <SimilarSection file={file ? file : null} show={true} loading={loading} />
+          <ParentSection parents={file ? file.parents : null} title={t('parents', { ns: 'archive' })} show={true} />
+          <SimilarSection file={file ? file : null} show={true} visible={tab === 'relations'} />
         </div>
 
         <div style={{ display: tab === 'ascii' ? 'contents' : 'none' }}>
-          <ASCIISection sha256={sha256} type={file?.file_info?.type} load={tab === 'ascii'} />
+          <ASCIISection sha256={sha256} type={file?.file_info?.type} visible={tab === 'ascii'} />
         </div>
 
         <div style={{ display: tab === 'strings' ? 'contents' : 'none' }}>
-          <StringsSection sha256={sha256} type={file?.file_info?.type} load={tab === 'strings'} />
+          <StringsSection sha256={sha256} type={file?.file_info?.type} visible={tab === 'strings'} />
         </div>
 
         <div style={{ display: tab === 'hex' ? 'contents' : 'none' }}>
-          <HexSection sha256={sha256} load={tab === 'hex'} />
+          <HexSection sha256={sha256} visible={tab === 'hex'} />
         </div>
 
         <div style={{ display: tab === 'community' ? 'contents' : 'none' }}>

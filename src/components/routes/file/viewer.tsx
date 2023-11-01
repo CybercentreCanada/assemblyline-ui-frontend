@@ -156,22 +156,22 @@ const WrappedFileViewer: React.FC<Props> = () => {
 
           {tab === 'ascii' && (
             <div className={classes.tab} style={{ display: tab === 'ascii' ? 'contents' : 'none' }}>
-              <ASCIISection sha256={sha256} type={type} load={tab === 'ascii'} />
+              <ASCIISection sha256={sha256} type={type} visible={tab === 'ascii'} />
             </div>
           )}
           {tab === 'strings' && (
             <div className={classes.tab} style={{ display: tab === 'strings' ? 'contents' : 'none' }}>
-              <StringsSection sha256={sha256} type={type} load={tab === 'strings'} />
+              <StringsSection sha256={sha256} type={type} visible={tab === 'strings'} />
             </div>
           )}
           {tab === 'hex' && (
             <div className={classes.tab} style={{ display: tab === 'hex' ? 'contents' : 'none' }}>
-              <HexSection sha256={sha256} load={tab === 'hex'} />
+              <HexSection sha256={sha256} visible={tab === 'hex'} />
             </div>
           )}
           {tab === 'image' && (
             <div className={classes.tab} style={{ display: tab === 'image' ? 'contents' : 'none' }}>
-              <ImageSection sha256={sha256} name={sha256} load={tab === 'image'} />
+              <ImageSection sha256={sha256} name={sha256} visible={tab === 'image'} />
             </div>
           )}
         </div>

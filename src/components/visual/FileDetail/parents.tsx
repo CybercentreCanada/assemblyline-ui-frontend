@@ -31,17 +31,11 @@ const useStyles = makeStyles(theme => ({
 
 type ParentSectionProps = {
   parents: any;
-  loading?: boolean;
   show?: boolean;
   title?: string;
 };
 
-const WrappedParentSection: React.FC<ParentSectionProps> = ({
-  parents,
-  loading = false,
-  show = false,
-  title = null
-}) => {
+const WrappedParentSection: React.FC<ParentSectionProps> = ({ parents, show = false, title = null }) => {
   const { t } = useTranslation(['fileDetail', 'archive']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -57,9 +51,9 @@ const WrappedParentSection: React.FC<ParentSectionProps> = ({
       <Divider />
       <Collapse in={open} timeout="auto">
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-          {loading ? (
+          {!parents ? (
             <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-          ) : !parents || parents.length === 0 ? (
+          ) : parents.length === 0 ? (
             <div style={{ width: '100%' }}>
               <InformativeAlert>
                 <AlertTitle>{t('no_parents_title', { ns: 'archive' })}</AlertTitle>

@@ -98,12 +98,12 @@ type Similar = Record<keyof typeof DEFAULT_SIMILAR, Record<string, { sha256: str
 
 type SectionProps = {
   file: File;
-  loading?: boolean;
   show?: boolean;
   title?: string;
+  visible?: boolean;
 };
 
-const WrappedSimilarSection: React.FC<SectionProps> = ({ file, loading = false, show = false, title = null }) => {
+const WrappedSimilarSection: React.FC<SectionProps> = ({ file, show = false, title = null, visible = true }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
@@ -155,15 +155,20 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({ file, loading = false, 
   }, [file]);
 
   useEffect(() => {
-    if (!file) return;
+    if (!file || !visible) return;
     apiCall({
       method: 'GET',
       url: `/api/v4/archive/details/${file?.file_info?.sha256}/`,
       onSuccess: api_data => setData(api_data.api_response),
       onFailure: api_data => showErrorMessage(api_data.api_error_message)
     });
-    return () => setData(null);
     // eslint-disable-next-line
+  }, [file, visible]);
+
+  useEffect(() => {
+    return () => {
+      setData(null);
+    };
   }, [file]);
 
   const Card: React.FC<{
@@ -222,9 +227,9 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({ file, loading = false, 
       <Divider />
       <Collapse in={open} timeout="auto">
         <Grid container paddingBottom={2} paddingTop={2} flexDirection={'column'} gap={2}>
-          {loading ? (
+          {!data ? (
             <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-          ) : !data || nbOfValues === 0 ? (
+          ) : nbOfValues === 0 ? (
             <div style={{ width: '100%' }}>
               <InformativeAlert>
                 <AlertTitle>{t('no_similar_title')}</AlertTitle>

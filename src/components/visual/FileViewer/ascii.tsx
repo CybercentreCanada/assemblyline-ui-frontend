@@ -13,10 +13,10 @@ const DIFF_QUERY = 'diff';
 type Props = {
   sha256: string;
   type?: string;
-  load?: boolean;
+  visible?: boolean;
 };
 
-const WrappedASCIISection: React.FC<Props> = ({ sha256, type: propType = null, load = true }) => {
+const WrappedASCIISection: React.FC<Props> = ({ sha256, type: propType = null, visible = true }) => {
   const location = useLocation();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -32,7 +32,7 @@ const WrappedASCIISection: React.FC<Props> = ({ sha256, type: propType = null, l
   }, [location.search]);
 
   useEffect(() => {
-    if (!sha256 || data || !load) return;
+    if (!sha256 || data || !visible) return;
     apiCall({
       url: `/api/v4/file/ascii/${sha256}/`,
       allowCache: true,
@@ -44,10 +44,10 @@ const WrappedASCIISection: React.FC<Props> = ({ sha256, type: propType = null, l
       onFailure: api_data => setError(api_data.api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, load, sha256]);
+  }, [data, sha256, visible]);
 
   useEffect(() => {
-    if (!diffSha256 || !load) return;
+    if (!diffSha256 || !visible) return;
     apiCall({
       url: `/api/v4/file/ascii/${diffSha256}/`,
       allowCache: true,
@@ -56,7 +56,7 @@ const WrappedASCIISection: React.FC<Props> = ({ sha256, type: propType = null, l
       onFailure: api_data => setError(api_data.api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, load, sha256]);
+  }, [data, sha256, visible]);
 
   if (!currentUser.roles.includes('file_detail')) return <ForbiddenPage />;
   else if (error) return <Alert severity="error">{error}</Alert>;
