@@ -270,20 +270,22 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
         <span>{t('labels')}</span>
         <div style={{ flex: 1 }} />
         <Tooltip title={t('label.add.tooltip')}>
-          <IconButton
-            disabled={!labels}
-            size="large"
-            style={{
-              color: !labels
-                ? theme.palette.text.disabled
-                : theme.palette.mode === 'dark'
-                ? theme.palette.success.light
-                : theme.palette.success.dark
-            }}
-            onClick={handleAddConfirmation}
-          >
-            <AddCircleOutlineIcon />
-          </IconButton>
+          <span>
+            <IconButton
+              disabled={!labels}
+              size="large"
+              style={{
+                color: !labels
+                  ? theme.palette.text.disabled
+                  : theme.palette.mode === 'dark'
+                  ? theme.palette.success.light
+                  : theme.palette.success.dark
+              }}
+              onClick={handleAddConfirmation}
+            >
+              <AddCircleOutlineIcon />
+            </IconButton>
+          </span>
         </Tooltip>
         {!isCollapsed ? <ExpandLess /> : <ExpandMore />}
       </Typography>
