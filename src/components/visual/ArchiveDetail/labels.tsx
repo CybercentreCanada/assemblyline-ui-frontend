@@ -296,7 +296,20 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                 <span style={{ fontWeight: 500 }}>{t(cat)}</span>
               </Grid>
               <Grid item xs={12} sm={9} lg={10}>
-                {labels && cat in labels ? (
+                {!labels || !(cat in labels) ? (
+                  <Skeleton />
+                ) : sortedLabels[cat].length === 0 ? (
+                  <ChipList
+                    items={[
+                      {
+                        label: t('none'),
+                        size: 'small',
+                        variant: 'outlined',
+                        style: { color: theme.palette.text.disabled }
+                      }
+                    ]}
+                  />
+                ) : (
                   <ChipList
                     items={sortedLabels[cat].map((value, j) => ({
                       key: `${i}-${j}`,
@@ -307,32 +320,10 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                       onDelete: () => handleDeleteConfirmation(cat as keyof typeof DEFAULT_LABELS, value)
                     }))}
                   />
-                ) : (
-                  <Skeleton />
                 )}
               </Grid>
             </Grid>
           ))}
-
-          {/* {Object.entries(sortedLabels).map(([cat, values], i) => (
-            <Grid key={i} container>
-              <Grid item xs={12} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t(cat)}</span>
-              </Grid>
-              <Grid item xs={12} sm={9} lg={10}>
-                <ChipList
-                  items={values.map((value, j) => ({
-                    key: `${i}-${j}`,
-                    color: cat in LABELS ? LABELS[cat].color : 'primary',
-                    label: value,
-                    size: 'small',
-                    variant: 'outlined',
-                    onDelete: () => handleDeleteConfirmation(cat as keyof typeof DEFAULT_LABELS, value)
-                  }))}
-                />
-              </Grid>
-            </Grid>
-          ))} */}
         </div>
       </Collapse>
     </div>
