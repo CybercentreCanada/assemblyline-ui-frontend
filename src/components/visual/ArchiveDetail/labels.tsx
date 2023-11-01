@@ -18,6 +18,7 @@ import {
   Paper,
   Radio,
   RadioGroup,
+  Skeleton,
   TextField,
   Tooltip,
   Typography,
@@ -270,9 +271,14 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
         <div style={{ flex: 1 }} />
         <Tooltip title={t('label.add.tooltip')}>
           <IconButton
+            disabled={!labels}
             size="large"
             style={{
-              color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+              color: !labels
+                ? theme.palette.text.disabled
+                : theme.palette.mode === 'dark'
+                ? theme.palette.success.light
+                : theme.palette.success.dark
             }}
             onClick={handleAddConfirmation}
           >
@@ -284,7 +290,31 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
       <Divider />
       <Collapse in={!isCollapsed} timeout="auto">
         <div style={{ padding: `${theme.spacing(2)} 0` }}>
-          {Object.entries(sortedLabels).map(([cat, values], i) => (
+          {Object.keys(LABELS).map((cat, i) => (
+            <Grid key={i} container>
+              <Grid item xs={12} sm={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t(cat)}</span>
+              </Grid>
+              <Grid item xs={12} sm={9} lg={10}>
+                {labels && cat in labels ? (
+                  <ChipList
+                    items={sortedLabels[cat].map((value, j) => ({
+                      key: `${i}-${j}`,
+                      color: cat in LABELS ? LABELS[cat].color : 'primary',
+                      label: value,
+                      size: 'small',
+                      variant: 'outlined',
+                      onDelete: () => handleDeleteConfirmation(cat as keyof typeof DEFAULT_LABELS, value)
+                    }))}
+                  />
+                ) : (
+                  <Skeleton />
+                )}
+              </Grid>
+            </Grid>
+          ))}
+
+          {/* {Object.entries(sortedLabels).map(([cat, values], i) => (
             <Grid key={i} container>
               <Grid item xs={12} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t(cat)}</span>
@@ -302,7 +332,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                 />
               </Grid>
             </Grid>
-          ))}
+          ))} */}
         </div>
       </Collapse>
     </div>
