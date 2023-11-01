@@ -267,7 +267,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             show={true}
             loading={loading}
           />
-          <SimilarSection file={file ? file : null} show={true} />
+          <SimilarSection file={file ? file : null} show={true} loading={loading} />
         </div>
 
         <div style={{ display: tab === 'ascii' ? 'contents' : 'none' }}>
