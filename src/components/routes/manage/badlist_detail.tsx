@@ -444,20 +444,20 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
             <Grid item xs={12}>
               <Typography variant="h6">{t('attribution.title')}</Typography>
               <Divider />
-              <Grid container>
-                {Object.keys(badlist.attribution).map(k => (
-                  <>
+              {Object.keys(badlist.attribution)
+                .filter(k => badlist.attribution[k] !== null)
+                .map((k, kid) => (
+                  <Grid key={kid} container>
                     <Grid item xs={4} sm={3} lg={2}>
                       <span style={{ fontWeight: 500 }}>{t(`attribution.${k}`)}</span>
                     </Grid>
                     <Grid item xs={8} sm={9} lg={10}>
-                      {badlist.attribution[k].map(x => (
-                        <CustomChip label={x} size="small" variant="outlined" />
+                      {badlist.attribution[k].map((x, i) => (
+                        <CustomChip key={i} label={x} size="small" variant="outlined" />
                       ))}
                     </Grid>
-                  </>
+                  </Grid>
                 ))}
-              </Grid>
             </Grid>
           )}
           <Grid item xs={12}>
