@@ -2,6 +2,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import {
+  Autocomplete,
   Button,
   CircularProgress,
   Collapse,
@@ -31,6 +32,8 @@ import { ChipList } from 'components/visual/ChipList';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import CustomChip from '../CustomChip';
+import { useDebounce } from '../HexViewer';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -51,6 +54,19 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(0.75, 1),
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word'
+  },
+  searchTextFieldOptionsInner: {
+    backgroundColor: theme.palette.background.default
+  },
+  searchTextFieldItem: {
+    padding: theme.spacing(1),
+    '&:hover': {
+      cursor: 'pointer',
+      backgroundColor: theme.palette.action.hover
+    },
+    '&[data-searchtextfieldoption-selected="true"]': {
+      backgroundColor: theme.palette.action.selected
+    }
   }
 }));
 
@@ -73,6 +89,12 @@ type Labels = Partial<Record<keyof typeof DEFAULT_LABELS, string[]>>;
 
 type NewLabel = Record<'value' | 'category', string>;
 
+type Option = {
+  category: keyof typeof DEFAULT_LABELS;
+  label: string;
+  total: number;
+};
+
 type Props = {
   sha256: string;
   labels: Labels;
@@ -92,6 +114,8 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
     open: false,
     type: 'add'
   });
+  const [suggestions, setSuggestions] = useState<Option[]>([]);
+  const [selectedOption, setSelectedOption] = useState<Option>(null);
   const [waiting, setWaiting] = useState<boolean>(false);
 
   const sortedLabels = useMemo<Labels>(() => {
@@ -123,6 +147,24 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
   const handleEditingLabelChange = useCallback(
     (key: keyof NewLabel) => event => setNewLabel(l => ({ ...l, [key]: event.target.value })),
     []
+  );
+
+  const handleLabelSuggestions = useCallback(
+    ({ value, category }: NewLabel) => {
+      if (!sha256) return;
+      apiCall({
+        method: 'POST',
+        url: `/api/v4/file/label/`,
+        body: {
+          input: value,
+          count: 10
+        },
+        onSuccess: ({ api_response }) => setSuggestions(api_response),
+        onFailure: api_data => showErrorMessage(api_data.api_response)
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sha256, showErrorMessage, showSuccessMessage, t]
   );
 
   const handleAddLabel = useCallback(
@@ -181,6 +223,11 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
     setLabels(propLabels);
   }, [propLabels]);
 
+  useDebounce(() => confirmation.open && confirmation.type === 'add' && handleLabelSuggestions(newLabel), 500, [
+    confirmation,
+    newLabel
+  ]);
+
   return (
     <div className={classes.container}>
       <Dialog open={confirmation.open} onClose={handleCloseConfirmation}>
@@ -207,14 +254,65 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                     </RadioGroup>
                   </Grid>
                   <Grid item>
-                    <TextField
-                      value={newLabel.value}
-                      autoFocus
-                      fullWidth
-                      label={t('label')}
-                      size="small"
-                      variant="outlined"
-                      onChange={handleEditingLabelChange('value')}
+                    <Autocomplete
+                      classes={{
+                        listbox: classes.searchTextFieldOptionsInner,
+                        option: classes.searchTextFieldItem
+                      }}
+                      value={selectedOption}
+                      onChange={(event: any, newValue: Option | null) => {
+                        setSelectedOption(newValue);
+                        setNewLabel(l =>
+                          [null, undefined].includes(newValue)
+                            ? { ...l, value: '' }
+                            : typeof newValue === 'string'
+                            ? { ...l, value: newValue }
+                            : { category: newValue?.category, value: newValue?.label }
+                        );
+                      }}
+                      inputValue={newLabel?.value}
+                      onInputChange={(event, newInputValue) => {
+                        setNewLabel(l =>
+                          [null, undefined, ''].includes(newInputValue) ? l : { ...l, value: newInputValue }
+                        );
+                      }}
+                      options={suggestions}
+                      freeSolo
+                      getOptionLabel={(option: any) =>
+                        [null, undefined, ''].includes(option?.label) ? '' : option?.label
+                      }
+                      renderOption={(props, option) => (
+                        <Grid component="li" container {...props} key={JSON.stringify(option)}>
+                          <Grid item md={3}>
+                            <CustomChip
+                              size="small"
+                              label={t(option?.category)}
+                              color={option?.category in LABELS ? LABELS[option?.category].color : 'primary'}
+                              variant="outlined"
+                            />
+                          </Grid>
+                          <Grid item md={8}>
+                            {option?.label}
+                          </Grid>
+                          <Grid item md={1}>
+                            <CustomChip size="small" label={option?.total} />
+                          </Grid>
+                        </Grid>
+                      )}
+                      renderInput={params => (
+                        <TextField
+                          {...params}
+                          autoFocus
+                          fullWidth
+                          label={t('label')}
+                          size="small"
+                          variant="outlined"
+                          inputProps={{
+                            ...params.inputProps,
+                            autoComplete: 'search'
+                          }}
+                        />
+                      )}
                     />
                   </Grid>
                 </>
