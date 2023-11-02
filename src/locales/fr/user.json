@@ -73,6 +73,7 @@
   "role.external_query": "Requête externe",
   "role.file_detail": "Détail de Fichiers",
   "role.file_download": "Téléchargement de Fichiers",
+  "role.file_purge": "Purger un fichier",
   "role.heuristic_view": "Visionnement d'Heuristiques",
   "role.obo_access": "Accès au nom de",
   "role.replay_system": "Gestion des Rediffusions",
