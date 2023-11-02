@@ -25,6 +25,7 @@
   "fields.idx_heuristic": "Index heuristique",
   "fields.idx_result": "Index des résultats",
   "fields.idx_safelist": "Index de liste sûre",
+  "fields.idx_badlist": "Index de liste mauvaise",
   "fields.idx_signature": "Index de signature",
   "fields.idx_submission": "Index de soumission",
   "fields.idx_user": "Index des utilisateurs",

@@ -18,6 +18,7 @@ type IndexDefinition = {
 
 type IndexDefinitionMap = {
   alert: IndexDefinition;
+  badlist: IndexDefinition;
   file: IndexDefinition;
   heuristic: IndexDefinition;
   result: IndexDefinition;
