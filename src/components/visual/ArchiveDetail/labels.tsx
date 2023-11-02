@@ -1,4 +1,3 @@
-// import/no-extraneous-dependencies
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
