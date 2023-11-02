@@ -247,6 +247,15 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
 
   const addToBadlist = useCallback(() => {
     const data = {
+      attribution: {
+        actor: (file.tags['attribution.actor'] || []).map(item => item[0]),
+        campaign: (file.tags['attribution.campaign'] || []).map(item => item[0]),
+        category: (file.tags['attribution.category'] || []).map(item => item[0]),
+        exploit: (file.tags['attribution.exploit'] || []).map(item => item[0]),
+        implant: (file.tags['attribution.implant'] || []).map(item => item[0]),
+        family: (file.tags['attribution.family'] || []).map(item => item[0]),
+        network: (file.tags['attribution.network'] || []).map(item => item[0])
+      },
       hashes: {
         md5: file.file_info.md5,
         sha1: file.file_info.sha1,
