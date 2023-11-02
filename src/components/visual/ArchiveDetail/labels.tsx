@@ -1,3 +1,4 @@
+// import/no-extraneous-dependencies
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -26,6 +27,8 @@ import {
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import match from 'autosuggest-highlight/match';
+import parse from 'autosuggest-highlight/parse';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { ChipList } from 'components/visual/ChipList';
@@ -272,33 +275,43 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                       }}
                       inputValue={newLabel?.value}
                       onInputChange={(event, newInputValue) => {
+                        if (event?.type !== 'change') return;
                         setNewLabel(l =>
-                          [null, undefined, ''].includes(newInputValue) ? l : { ...l, value: newInputValue }
+                          [null, undefined].includes(newInputValue) ? l : { ...l, value: newInputValue }
                         );
                       }}
                       options={suggestions}
                       freeSolo
+                      disableClearable
                       getOptionLabel={(option: any) =>
                         [null, undefined, ''].includes(option?.label) ? '' : option?.label
                       }
-                      renderOption={(props, option) => (
-                        <Grid component="li" container {...props} key={JSON.stringify(option)}>
-                          <Grid item md={3}>
-                            <CustomChip
-                              size="small"
-                              label={t(option?.category)}
-                              color={option?.category in LABELS ? LABELS[option?.category].color : 'primary'}
-                              variant="outlined"
-                            />
+                      renderOption={(props, option) => {
+                        const matches = match(option?.label, newLabel?.value, { insideWords: true });
+                        const parts = parse(option?.label, matches);
+                        return (
+                          <Grid component="li" container {...props} key={JSON.stringify(option)}>
+                            <Grid item md={3}>
+                              <CustomChip
+                                size="small"
+                                label={t(option?.category)}
+                                color={option?.category in LABELS ? LABELS[option?.category].color : 'primary'}
+                                variant="outlined"
+                              />
+                            </Grid>
+                            <Grid item md={8}>
+                              {parts.map((part, index) => (
+                                <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                                  {part.text}
+                                </span>
+                              ))}
+                            </Grid>
+                            <Grid item md={1}>
+                              <CustomChip size="small" label={option?.total} />
+                            </Grid>
                           </Grid>
-                          <Grid item md={8}>
-                            {option?.label}
-                          </Grid>
-                          <Grid item md={1}>
-                            <CustomChip size="small" label={option?.total} />
-                          </Grid>
-                        </Grid>
-                      )}
+                        );
+                      }}
                       renderInput={params => (
                         <TextField
                           {...params}
