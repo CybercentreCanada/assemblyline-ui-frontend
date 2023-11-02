@@ -14,6 +14,7 @@
   "comment.shortcut.submit": "Submit (Ctrl|Alt + Enter)",
   "comments": "Comments",
   "compare": "Compare in the file viewer",
+  "compare.clear": "Clear file compare",
   "debug_info": "Debug Information:",
   "detail": "File analysis details",
   "download": "Download file",

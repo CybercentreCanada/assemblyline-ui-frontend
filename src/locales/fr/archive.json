@@ -14,6 +14,7 @@
   "comment.shortcut.submit": "Soumettre (Ctrl|Alt + Entrer)",
   "comments": "Commentaires",
   "compare": "Comparer dans la visionneuse de fichiers",
+  "compare.clear": "Effacer la comparaison des fichiers",
   "debug_info": "Informations de débogage:",
   "detail": "Détails de l'analyse du fichier",
   "download": "Télécharger le fichier",

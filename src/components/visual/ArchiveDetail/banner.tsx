@@ -1,4 +1,5 @@
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import CompareIcon from '@mui/icons-material/Compare';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
@@ -36,7 +37,9 @@ import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 import FileDownloader from '../FileDownloader';
+import { DIFF_QUERY } from '../FileViewer';
 import InputDialog from '../InputDialog';
+import SimpleSearchQuery from '../SearchBar/simple-search-query';
 
 const VERDICTS = {
   malicious: {
@@ -273,6 +276,12 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
     [classes.color, classes.icon]
   );
 
+  const handleClearCompare = useCallback(() => {
+    const query = new SimpleSearchQuery(location.search);
+    query.delete(DIFF_QUERY);
+    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+  }, [location.hash, location.pathname, location.search, navigate]);
+
   const resubmit = useCallback(() => {
     apiCall({
       url: `/api/v4/submit/dynamic/${sha256}/${sid ? `?copy_sid=${sid}` : ''}`,
@@ -434,6 +443,13 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                   <Tooltip title={t('safelist')}>
                     <IconButton onClick={prepareSafelist} size="large">
                       <PlaylistAddCheckIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {new SimpleSearchQuery(location.search).has(DIFF_QUERY) && (
+                  <Tooltip title={t('compare.clear', { ns: 'archive' })}>
+                    <IconButton onClick={handleClearCompare} size="large">
+                      <CompareIcon />
                     </IconButton>
                   </Tooltip>
                 )}
