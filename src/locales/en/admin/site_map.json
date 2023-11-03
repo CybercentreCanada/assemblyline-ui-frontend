@@ -20,6 +20,7 @@
   "role.external_query": "External Query",
   "role.file_detail": "File Detail",
   "role.file_download": "File Download",
+  "role.file_purge": "File Purge",
   "role.heuristic_view": "Heuristic View",
   "role.obo_access": "On Behalf Of Access",
   "role.replay_system": "Replay System",
