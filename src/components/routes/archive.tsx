@@ -1,4 +1,6 @@
-import { Grid, MenuItem, Select, Typography, useTheme } from '@mui/material';
+import FileOpenIcon from '@mui/icons-material/FileOpen';
+import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
+import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -7,7 +9,7 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import ArchiveDetail from 'components/visual/ArchiveDetail';
+import ArchiveDetail from 'components/routes/archive/detail';
 import { ChipList } from 'components/visual/ChipList';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
@@ -24,8 +26,6 @@ import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 
-const PAGE_SIZE = 25;
-
 const useStyles = makeStyles(theme => ({
   searchresult: {
     fontStyle: 'italic',
@@ -41,6 +41,11 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.down('xl')]: {
       width: '100%'
     }
+  },
+  tableWrapper: {
+    paddingTop: theme.spacing(2),
+    paddingLeft: theme.spacing(0.5),
+    paddingRight: theme.spacing(0.5)
   }
 }));
 
@@ -50,6 +55,8 @@ type FileResults = {
   rows: number;
   total: number;
 };
+
+const PAGE_SIZE = 25;
 
 const DEFAULT_TC = '1m';
 
@@ -76,11 +83,25 @@ const GAP_MAP = {
   '1y': '15d'
 };
 
+const DEFAULT_PARAMS: object = {
+  query: '*',
+  offset: 0,
+  rows: PAGE_SIZE,
+  archive_only: true,
+  is_supplementary: false,
+  tc: DEFAULT_TC
+};
+
+const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
+  .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
+  .join('&');
+
 export default function MalwareArchive() {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
@@ -90,16 +111,16 @@ export default function MalwareArchive() {
 
   const [fileResults, setFileResults] = useState<FileResults>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
+  const [parsedQuery, setParsedQuery] = useState<SimpleSearchQuery>(null);
   const [histogram, setHistogram] = useState(null);
   const [types, setTypes] = useState<Record<string, number>>(null);
   const [labels, setLabels] = useState<Record<string, number>>(null);
-  const [pageSize] = useState<number>(PAGE_SIZE);
   const [searching, setSearching] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<string[]>();
 
   const filterValue = useRef<string>('');
 
-  const onClear = useCallback(() => {
+  const handleClear = useCallback(() => {
     if (query.getAll('filters').length !== 0) {
       query.delete('query');
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
@@ -108,28 +129,28 @@ export default function MalwareArchive() {
     }
   }, [location.hash, location.pathname, navigate, query]);
 
-  const onSearch = useCallback(() => {
+  const handleSearch = useCallback(() => {
     if (query.get('query') === filterValue.current) return;
     if (filterValue.current !== '') {
       query.set('query', filterValue.current);
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
     } else {
-      onClear();
+      handleClear();
     }
-  }, [query, navigate, location.pathname, location.hash, onClear]);
+  }, [query, navigate, location.pathname, location.hash, handleClear]);
 
-  const onFilterValueChange = useCallback((inputValue: string) => {
+  const handleFilterValueChange = useCallback((inputValue: string) => {
     filterValue.current = inputValue;
   }, []);
 
-  const setFileID = useCallback(
+  const handleFileChange = useCallback(
     (file_id: string) => {
       navigate(`${location.pathname}${location.search ? location.search : ''}#${file_id}`);
     },
     [location.pathname, location.search, navigate]
   );
 
-  const onLabelClick = useCallback(
+  const handleLabelClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => {
       if (!searching) {
         query.add('filters', `labels:${safeFieldValue(label)}`);
@@ -140,62 +161,50 @@ export default function MalwareArchive() {
   );
 
   const handleReload = useCallback(
-    q => {
+    (q: SimpleSearchQuery) => {
       if (q && currentUser.roles.includes('archive_view')) {
-        const curQuery = new SimpleSearchQuery(q.toString(), `rows=${pageSize}&offset=0`);
-        curQuery.set('rows', pageSize);
-        curQuery.set('offset', 0);
-        curQuery.set('archive_only', true);
-        curQuery.add('filters', 'is_supplementary:false');
-        const tc = curQuery.pop('tc') || DEFAULT_TC;
+        const tc = q.pop('tc') || DEFAULT_TC;
         if (tc !== '1y') {
-          curQuery.add('filters', TC_MAP[tc]);
+          q.add('filters', TC_MAP[tc]);
         }
 
-        setSearching(true);
         apiCall({
-          url: `/api/v4/search/file/?${curQuery.toString()}`,
-          onSuccess: api_data => {
-            setFileResults(api_data.api_response);
-          },
-          onFailure: api_data => {
-            showErrorMessage(api_data.api_error_message);
-          },
-          onFinalize: () => {
-            setSearching(false);
-          }
+          url: `/api/v4/search/file/?${q.toString()}`,
+          onSuccess: api_data => setFileResults(api_data.api_response),
+          onFailure: api_data => showErrorMessage(api_data.api_error_message),
+          onEnter: () => setSearching(true),
+          onFinalize: () => setSearching(false)
         });
+
         apiCall({
           url: `/api/v4/search/histogram/file/seen.last/?start=${START_MAP[tc]}&end=now&gap=${
             GAP_MAP[tc]
-          }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-          onSuccess: api_data => {
-            setHistogram(api_data.api_response);
-          }
+          }&mincount=0&${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+          onSuccess: api_data => setHistogram(api_data.api_response)
         });
+
         apiCall({
-          url: `/api/v4/search/facet/file/labels/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-          onSuccess: api_data => {
-            let newLabels: { [k: string]: number } = api_data.api_response;
-            newLabels = Object.fromEntries(
-              Object.keys(newLabels)
-                .sort((a, b) => newLabels[b] - newLabels[a])
-                .map(k => [k, newLabels[k]])
-            );
-            setLabels(newLabels);
-          }
+          url: `/api/v4/search/facet/file/labels/?${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+          onSuccess: ({ api_response }: { api_response: Record<string, number> }) =>
+            setLabels(
+              Object.fromEntries(
+                Object.keys(api_response)
+                  .sort((a, b) => api_response[b] - api_response[a])
+                  .map(k => [k, api_response[k]])
+              )
+            )
         });
+
         apiCall({
-          url: `/api/v4/search/facet/file/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-          onSuccess: api_data => {
-            let newTypes: { [k: string]: number } = api_data.api_response;
-            newTypes = Object.fromEntries(
-              Object.keys(newTypes)
-                .sort((a, b) => newTypes[b] - newTypes[a])
-                .map(k => [k, newTypes[k]])
-            );
-            setTypes(newTypes);
-          }
+          url: `/api/v4/search/facet/file/type/?${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+          onSuccess: ({ api_response }: { api_response: Record<string, number> }) =>
+            setTypes(
+              Object.fromEntries(
+                Object.keys(api_response)
+                  .sort((a, b) => api_response[b] - api_response[a])
+                  .map(k => [k, api_response[k]])
+              )
+            )
         });
       }
     },
@@ -205,14 +214,29 @@ export default function MalwareArchive() {
 
   useEffect(() => {
     setSearching(true);
-    const newSearchQuery = new SimpleSearchQuery(
-      location.search,
-      `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}&archive_only=true`
-    );
+    const newSearchQuery = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
     filterValue.current = newSearchQuery.get('query');
     newSearchQuery.set('query', filterValue.current || '*');
     setQuery(newSearchQuery);
-  }, [location.pathname, location.search, pageSize]);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    if (!query) return;
+    const curQuery = new SimpleSearchQuery(query.toString(), DEFAULT_QUERY);
+    curQuery.set('rows', PAGE_SIZE);
+    curQuery.set('offset', 0);
+    curQuery.set('archive_only', true);
+
+    const supp = curQuery.pop('supplementary') || false;
+    curQuery.add('filters', supp ? 'is_supplementary:*' : 'is_supplementary:false');
+
+    const tc = curQuery.pop('tc') || DEFAULT_TC;
+    if (tc !== '1y') {
+      curQuery.add('filters', TC_MAP[tc]);
+    }
+
+    setParsedQuery(new SimpleSearchQuery(curQuery.toString()));
+  }, [query]);
 
   useEffect(() => {
     if (fileResults !== null && !globalDrawerOpened && location.hash) {
@@ -244,19 +268,19 @@ export default function MalwareArchive() {
   }, []);
 
   useEffect(() => {
-    handleReload(query);
-  }, [handleReload, query]);
+    handleReload(parsedQuery);
+  }, [handleReload, parsedQuery]);
 
   useEffect(() => {
     function reload() {
-      handleReload(query);
+      handleReload(parsedQuery);
     }
 
     window.addEventListener('reloadArchive', reload);
     return () => {
       window.removeEventListener('reloadArchive', reload);
     };
-  }, [handleReload, query]);
+  }, [handleReload, parsedQuery]);
 
   if (!configuration?.datastore?.archive?.enabled) return <Navigate to="/notfound" replace />;
   else if (!currentUser.roles.includes('archive_view')) return <Navigate to="/forbidden" replace />;
@@ -296,9 +320,32 @@ export default function MalwareArchive() {
               placeholder={t('filter')}
               searching={searching}
               suggestions={suggestions}
-              onValueChange={onFilterValueChange}
-              onClear={onClear}
-              onSearch={onSearch}
+              onValueChange={handleFilterValueChange}
+              onClear={handleClear}
+              onSearch={handleSearch}
+              buttons={[
+                query?.has('supplementary')
+                  ? {
+                      icon: <FileOpenIcon fontSize={downSM ? 'small' : 'medium'} />,
+                      tooltip: t('supplementary.exclude'),
+                      props: {
+                        onClick: () => {
+                          query.delete('supplementary');
+                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                        }
+                      }
+                    }
+                  : {
+                      icon: <FileOpenOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                      tooltip: t('supplementary.include'),
+                      props: {
+                        onClick: () => {
+                          query.set('supplementary', true);
+                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                        }
+                      }
+                    }
+              ]}
             >
               {fileResults !== null && (
                 <div className={classes.searchresult}>
@@ -318,11 +365,12 @@ export default function MalwareArchive() {
                   )}
 
                   <SearchPager
+                    index="file"
+                    method="GET"
+                    pageSize={PAGE_SIZE}
+                    query={parsedQuery}
                     total={fileResults.total}
                     setResults={setFileResults}
-                    pageSize={pageSize}
-                    index="file"
-                    query={query}
                     setSearching={setSearching}
                   />
                 </div>
@@ -411,16 +459,10 @@ export default function MalwareArchive() {
           </Grid>
         )}
 
-        <div
-          style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}
-        >
-          <ArchivesTable fileResults={fileResults} setFileID={setFileID} onLabelClick={onLabelClick} />
+        <div className={classes.tableWrapper}>
+          <ArchivesTable fileResults={fileResults} setFileID={handleFileChange} onLabelClick={handleLabelClick} />
+          {/* <ArchivesTable2 fileResults={fileResults} handleFileChange={handleFileChange} handleLabelClick={handleLabelClick} /> */}
         </div>
-        {/* <div
-          style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}
-        >
-          <ArchivesTable2 fileResults={fileResults} setFileID={setFileID} onLabelClick={onLabelClick} />
-        </div> */}
       </PageFullWidth>
     );
 }

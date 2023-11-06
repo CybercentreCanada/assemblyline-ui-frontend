@@ -149,7 +149,7 @@ const WrappedCommentCard: React.FC<Props> = ({
   onEditComment = () => null,
   onDeleteComment = () => null
 }) => {
-  const { t, i18n } = useTranslation(['fileDetail']);
+  const { t, i18n } = useTranslation(['archive']);
   const classes = useStyles();
   const { user: currentUser } = useALContext();
 

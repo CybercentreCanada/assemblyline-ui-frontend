@@ -1,4 +1,5 @@
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import CompareIcon from '@mui/icons-material/Compare';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
@@ -27,7 +28,7 @@ import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { File } from 'components/visual/ArchiveDetail';
+import { File } from 'components/routes/archive/detail';
 import CustomChip from 'components/visual/CustomChip';
 import { bytesToSize } from 'helpers/utils';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -36,7 +37,9 @@ import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 import FileDownloader from '../FileDownloader';
+import { DIFF_QUERY } from '../FileViewer';
 import InputDialog from '../InputDialog';
+import SimpleSearchQuery from '../SearchBar/simple-search-query';
 
 const VERDICTS = {
   malicious: {
@@ -108,8 +111,7 @@ const useStyles = makeStyles(theme => ({
     gridTemplateColumns: 'auto 1fr',
     alignItems: 'center',
     borderRadius: theme.spacing(1),
-    padding: theme.spacing(1),
-    overflowX: 'hidden'
+    padding: theme.spacing(1)
   },
   container: {
     width: '100%',
@@ -208,7 +210,7 @@ const LABELS: Record<
 type Labels = Partial<Record<keyof typeof DEFAULT_LABELS, string[]>>;
 
 const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid = null, force = false }) => {
-  const { t } = useTranslation(['fileDetail']);
+  const { t } = useTranslation(['fileDetail', 'archive']);
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
@@ -273,6 +275,12 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
     },
     [classes.color, classes.icon]
   );
+
+  const handleClearCompare = useCallback(() => {
+    const query = new SimpleSearchQuery(location.search);
+    query.delete(DIFF_QUERY);
+    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+  }, [location.hash, location.pathname, location.search, navigate]);
 
   const resubmit = useCallback(() => {
     apiCall({
@@ -438,6 +446,13 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                     </IconButton>
                   </Tooltip>
                 )}
+                {new SimpleSearchQuery(location.search).has(DIFF_QUERY) && (
+                  <Tooltip title={t('compare.clear', { ns: 'archive' })}>
+                    <IconButton onClick={handleClearCompare} size="large">
+                      <CompareIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </>
             ) : (
               <div style={{ display: 'inline-flex' }}>
@@ -456,7 +471,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
           <div style={{ flex: 1 }} />
           <Typography
             className={clsx(classes.text, classes.color, VERDICTS[currentVerdict].className)}
-            children={t(`file.${file ? currentVerdict : 'none'}`)}
+            children={t(`file.${file ? currentVerdict : 'none'}`, { ns: 'archive' })}
             variant="h4"
           />
         </div>
@@ -479,16 +494,25 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
             ) : verdicts && ['malicious', 'highly_suspicious', 'suspicious'].includes(currentVerdict) ? (
               <>
                 <div className={clsx(classes.color, VERDICTS.malicious.className)}>
-                  {`${verdicts.malicious} ${t(`file.result${verdicts.malicious > 1 ? 's' : ''}.malicious`)}`}
+                  {`${verdicts.malicious} ${t(`file.result${verdicts.malicious > 1 ? 's' : ''}.malicious`, {
+                    ns: 'archive'
+                  })}`}
                 </div>
                 <div className={clsx(classes.color, VERDICTS.suspicious.className)}>
                   {`${verdicts.suspicious + verdicts.highly_suspicious} ${t(
-                    `file.result${verdicts.suspicious + verdicts.highly_suspicious > 1 ? 's' : ''}.suspicious`
+                    `file.result${verdicts.suspicious + verdicts.highly_suspicious > 1 ? 's' : ''}.suspicious`,
+                    {
+                      ns: 'archive'
+                    }
                   )}`}
                 </div>
               </>
             ) : (
-              <div className={clsx(classes.color, VERDICTS.safe.className)}>{t('file.result.info')}</div>
+              <div className={clsx(classes.color, VERDICTS.safe.className)}>
+                {t('file.result.info', {
+                  ns: 'archive'
+                })}
+              </div>
             )}
           </div>
           <div>{t('type')}</div>
@@ -521,5 +545,5 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   );
 };
 
-const ArchiveBanner = React.memo(WrappedArchiveBanner);
+export const ArchiveBanner = React.memo(WrappedArchiveBanner);
 export default ArchiveBanner;

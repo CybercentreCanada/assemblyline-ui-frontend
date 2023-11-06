@@ -1,9 +1,13 @@
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { alpha, IconButton, Slider } from '@mui/material';
+import { Alert, alpha, IconButton, LinearProgress, Slider } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
+import ForbiddenPage from 'components/routes/403';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const MIN = 100;
 const MAX = 900;
@@ -11,6 +15,14 @@ const ZOOM_CLASS = 'zooming';
 const PIXELATED_CLASS = 'pixelated';
 
 const useStyles = makeStyles(theme => ({
+  wrapper: {
+    backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FAFAFA',
+    border: `1px solid ${theme.palette.divider}`,
+    padding: theme.spacing(1),
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column'
+  },
   root: {
     height: '100%',
     width: '100%',
@@ -76,14 +88,19 @@ type Data = {
   imgY?: number;
 };
 
-type ImageViewerProps = {
-  src: string;
-  alt: string;
+type Props = {
+  sha256: string;
+  name?: string;
+  visible?: boolean;
 };
 
-const WrappedImageViewer = React.forwardRef(({ src = null, alt = null }: ImageViewerProps, ref) => {
+const WrappedImageSection = ({ name = null, sha256 = null, visible = true }: Props) => {
   const classes = useStyles();
+  const { apiCall } = useMyAPI();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
+  const [src, setSrc] = useState<string>(null);
+  const [error, setError] = useState<string>(null);
   const [zoom, setZoom] = useState<number>(MIN);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [isZooming, setIsZooming] = useState<boolean>(false);
@@ -107,6 +124,8 @@ const WrappedImageViewer = React.forwardRef(({ src = null, alt = null }: ImageVi
     imgX: 0,
     imgY: 0
   });
+
+  const alt = useMemo<string>(() => name, [name]);
 
   const resize = useCallback(() => {
     if (!containerRef.current || !imgRef.current) return;
@@ -337,6 +356,21 @@ const WrappedImageViewer = React.forwardRef(({ src = null, alt = null }: ImageVi
   );
 
   useEffect(() => {
+    if (!sha256 || !visible) return;
+    apiCall({
+      allowCache: true,
+      url: `/api/v4/file/image/${sha256}/`,
+      onEnter: () => {
+        setError(null);
+        setSrc(null);
+      },
+      onSuccess: api_data => setSrc(api_data.api_response),
+      onFailure: api_data => setError(api_data.api_error_message)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256, visible]);
+
+  useEffect(() => {
     if (!isLoaded) return;
 
     function handleResize() {
@@ -362,49 +396,58 @@ const WrappedImageViewer = React.forwardRef(({ src = null, alt = null }: ImageVi
     };
   }, [handleMouseUp, isLoaded, resize]);
 
-  return (
-    src && (
-      <>
-        <div
-          ref={containerRef}
-          className={classes.root}
-          onWheel={handleWheel}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-        >
-          <img
-            ref={imgRef}
-            className={clsx(classes.image, isZooming && ZOOM_CLASS, isPixelated && PIXELATED_CLASS)}
-            src={src}
-            alt={alt}
-            draggable={false}
-            onLoad={handleLoad}
-          />
+  if (!currentUser.roles.includes('file_detail')) return <ForbiddenPage />;
+  else if (error) return <Alert severity="error">{error}</Alert>;
+  else if (!data) return <LinearProgress />;
+  else
+    return (
+      src && (
+        <div className={classes.wrapper}>
+          <div
+            ref={containerRef}
+            className={classes.root}
+            onWheel={handleWheel}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+          >
+            <img
+              ref={imgRef}
+              className={clsx(classes.image, isZooming && ZOOM_CLASS, isPixelated && PIXELATED_CLASS)}
+              src={src}
+              alt={alt}
+              draggable={false}
+              onLoad={handleLoad}
+            />
+          </div>
+          <div className={classes.zoom}>
+            <div style={{ textAlign: 'end', minWidth: '35px' }}>{`${Math.floor(zoom)}%`}</div>
+            <IconButton
+              size="small"
+              children={<AddIcon fontSize="small" />}
+              onClick={() => handleZoomChange(null, 10)}
+            />
+            <Slider
+              className={classes.zoomSlider}
+              value={zoom}
+              step={10}
+              min={MIN}
+              max={MAX}
+              size="small"
+              orientation="vertical"
+              onChange={(event, newValue) => handleZoomChange(newValue as number, null)}
+            />
+            <IconButton
+              size="small"
+              children={<RemoveIcon fontSize="small" />}
+              onClick={() => handleZoomChange(null, -10)}
+            />
+          </div>
         </div>
-        <div className={classes.zoom}>
-          <div style={{ textAlign: 'end', minWidth: '35px' }}>{`${Math.floor(zoom)}%`}</div>
-          <IconButton size="small" children={<AddIcon fontSize="small" />} onClick={() => handleZoomChange(null, 10)} />
-          <Slider
-            className={classes.zoomSlider}
-            value={zoom}
-            step={10}
-            min={MIN}
-            max={MAX}
-            size="small"
-            orientation="vertical"
-            onChange={(event, newValue) => handleZoomChange(newValue as number, null)}
-          />
-          <IconButton
-            size="small"
-            children={<RemoveIcon fontSize="small" />}
-            onClick={() => handleZoomChange(null, -10)}
-          />
-        </div>
-      </>
-    )
-  );
-});
+      )
+    );
+};
 
-export const ImageViewer = React.memo(WrappedImageViewer);
+export const ImageSection = React.memo(WrappedImageSection);
+export default ImageSection;

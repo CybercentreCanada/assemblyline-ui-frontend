@@ -53,6 +53,7 @@ type Language =
   | 'less'
   | 'lexon'
   | 'liquid'
+  | 'lisp'
   | 'lua'
   | 'm3'
   | 'markdown'
@@ -101,6 +102,44 @@ type Language =
   | 'yaml'
   | 'yara';
 
+export const LANGUAGE_SELECTOR: Record<string, Language> = {
+  'text/json': 'json',
+  'text/jsons': 'json',
+  'code/vbe': 'vb',
+  'code/vbs': 'vb',
+  'code/wsf': 'xml',
+  'code/batch': 'bat',
+  'code/ps1': 'powershell',
+  'text/ini': 'ini',
+  'text/autorun': 'ini',
+  'code/java': 'java',
+  'code/python': 'python',
+  'code/php': 'php',
+  'code/shell': 'shell',
+  'code/xml': 'xml',
+  'code/yaml': 'yaml',
+  'code/javascript': 'javascript',
+  'code/jscript': 'javascript',
+  'code/typescript': 'typescript',
+  'code/xfa': 'xml',
+  'code/html': 'html',
+  'code/hta': 'html',
+  'code/html/component': 'html',
+  'code/csharp': 'csharp',
+  'code/jsp': 'java',
+  'code/c': 'cpp',
+  'code/h': 'cpp',
+  'code/clickonce': 'xml',
+  'code/css': 'css',
+  'code/markdown': 'markdown',
+  'code/sql': 'sql',
+  'code/go': 'go',
+  'code/ruby': 'ruby',
+  'code/perl': 'perl',
+  'code/rust': 'rust',
+  'code/lisp': 'lisp'
+};
+
 // Supported Options
 interface Options {
   readOnly?: boolean;
@@ -111,7 +150,6 @@ interface Options {
 type EditorProps = {
   diff?: boolean;
   value?: string;
-  test: unknown;
   language?: Language;
   options?: Options;
   onChange?: (value: string) => void;
@@ -195,10 +233,10 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
                 width={width}
                 height={height}
                 theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                original={original}
-                modified={modified}
+                original={language === 'json' && options?.beautify ? beautifyJSON(original) : original}
+                modified={language === 'json' && options?.beautify ? beautifyJSON(modified) : modified}
                 loading={t('loading')}
-                options={{ links: false, renderSideBySide: false, readOnly: true }}
+                options={{ links: false, renderSideBySide: false, readOnly: true, ...options }}
               />
             ) : (
               <Editor
@@ -207,7 +245,7 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
                 height={height}
                 theme={isDarkTheme ? 'vs-dark' : 'vs'}
                 loading={t('loading')}
-                value={language === 'json' && options.beautify ? beautifyJSON(value) : value}
+                value={language === 'json' && options?.beautify ? beautifyJSON(value) : value}
                 onChange={v => onChange(v)}
                 beforeMount={beforeMount}
                 onMount={onMount}

@@ -22,10 +22,10 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   sha256: string;
-  load?: boolean;
+  visible?: boolean;
 };
 
-const WrappedHexSection: React.FC<Props> = ({ sha256, load = true }) => {
+const WrappedHexSection: React.FC<Props> = ({ sha256, visible = true }) => {
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -34,33 +34,29 @@ const WrappedHexSection: React.FC<Props> = ({ sha256, load = true }) => {
   const [error, setError] = useState<string>(null);
 
   useEffect(() => {
-    if (!sha256 || data || !load) return;
+    if (!sha256 || data || !visible) return;
     apiCall({
       url: `/api/v4/file/hex/${sha256}/?bytes_only=true`,
       allowCache: true,
+      onEnter: () => {
+        setData(null);
+        setError(null);
+      },
       onSuccess: api_data => setData(api_data.api_response),
-      onFailure: api_data => setError(api_data.api_error_message),
-      onEnter: () => setError(null)
+      onFailure: api_data => setError(api_data.api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, load, sha256]);
+  }, [data, sha256, visible]);
 
-  useEffect(() => {
-    setData(null);
-    setError(null);
-  }, [sha256]);
-
-  return !currentUser.roles.includes('file_detail') ? (
-    <ForbiddenPage />
-  ) : data ? (
-    <div className={classes.wrapper}>
-      <HexViewerApp data={data} />
-    </div>
-  ) : error ? (
-    <Alert severity="error">{error}</Alert>
-  ) : (
-    <LinearProgress />
-  );
+  if (!currentUser.roles.includes('file_detail')) return <ForbiddenPage />;
+  else if (error) return <Alert severity="error">{error}</Alert>;
+  else if (!data) return <LinearProgress />;
+  else
+    return (
+      <div className={classes.wrapper}>
+        <HexViewerApp data={data} />
+      </div>
+    );
 };
 
 export const HexSection = React.memo(WrappedHexSection);

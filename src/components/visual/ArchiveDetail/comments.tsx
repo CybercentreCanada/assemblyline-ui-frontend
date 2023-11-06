@@ -34,7 +34,7 @@ type Props = {
 const SOCKETIO_NAMESPACE = '/file_comments';
 
 const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comments }) => {
-  const { t } = useTranslation(['fileDetail']);
+  const { t } = useTranslation(['archive']);
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useALContext();
@@ -187,5 +187,5 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comm
   );
 };
 
-const CommentSection = React.memo(WrappedCommentSection);
+export const CommentSection = React.memo(WrappedCommentSection);
 export default CommentSection;
