@@ -30,6 +30,7 @@
   "options.submission.ttl": "Days to live",
   "options.submission.ttl.forever": "0: Forever",
   "options.submission.ttl.max": "Maximum",
+  "options.submission.url_submission_auto_service_selection": "The following services are recommended for URL scanning:",
   "submit.file.failure": "The file you are trying to start did not upload properly, try again...",
   "submit.file.upload_fail": "The file failed to upload, try again...",
   "submit.hash.error": "Not a valid sha256 hash",

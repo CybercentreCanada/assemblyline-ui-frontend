@@ -135,17 +135,9 @@ const Submit: React.FC<any> = () => {
 
   const validateServiceSelection = cbType => {
     let showPopup = false;
-    let currentSettings = settings;
-    const url = matchURL(urlHash);
-
-    if (url && configuration.ui.allow_url_submissions) {
-      currentSettings = settingsWithForcedServiceSelection(
-        configuration.ui.url_submission_auto_service_selection || []
-      );
-    }
 
     // Check if we need the popup, and if we do
-    currentSettings.services.forEach(cat => {
+    settings.services.forEach(cat => {
       cat.services.forEach(srv => {
         if (srv.selected && srv.is_external) {
           showPopup = true;
@@ -265,22 +257,20 @@ const Submit: React.FC<any> = () => {
     return selected;
   };
 
-  const settingsWithForcedServiceSelection = service_names => {
+  const toggleServiceSelection = service_name => {
     if (settings) {
       const newServices = settings.services;
       for (const cat of newServices) {
         for (const srv of cat.services) {
-          if (service_names.includes(srv.name)) {
-            srv.selected = true;
+          if (srv.name === service_name) {
+            srv.selected = !srv.selected;
             break;
           }
         }
         cat.selected = cat.services.every(e => e.selected);
         break;
       }
-      const retVal = { ...settings, services: newServices };
-      setSettings(retVal);
-      return retVal;
+      setSettings({ ...settings, services: newServices });
     }
   };
 
@@ -549,6 +539,35 @@ const Submit: React.FC<any> = () => {
                 </>
               )}
             </div>
+            {matchURL(urlHash) &&
+              configuration.ui.url_submission_auto_service_selection &&
+              configuration.ui.url_submission_auto_service_selection.length > 0 && (
+                <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
+                  <Typography variant="subtitle1">
+                    {t('options.submission.url_submission_auto_service_selection')}
+                  </Typography>
+                  {configuration.ui.url_submission_auto_service_selection.map((service, i) => (
+                    <div key={i}>
+                      <FormControlLabel
+                        control={
+                          settings ? (
+                            <Checkbox
+                              size="small"
+                              checked={isSelected(service)}
+                              name="label"
+                              onChange={event => toggleServiceSelection(service)}
+                            />
+                          ) : (
+                            <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
+                          )
+                        }
+                        label={<Typography variant="body2">{service}</Typography>}
+                        className={settings ? classes.item : null}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             {matchSHA256(urlHash) &&
               configuration.submission.sha256_sources &&
               configuration.submission.sha256_sources.length > 0 && (
