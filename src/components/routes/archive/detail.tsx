@@ -144,7 +144,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   const handleTabChange = useCallback(
     (event: React.SyntheticEvent<Element, Event>, value: Tab) => {
-      if (!inDrawer) navigate(`/archive/${sha256}/${value}${location.search}${location.hash}`);
+      if (!inDrawer) navigate(`/archive/${sha256}/${value}${location.search}${location.hash}`, { replace: true });
       else setStateTab(value);
     },
     [inDrawer, location.hash, location.search, navigate, sha256]
@@ -177,8 +177,11 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
   }, [sha256]);
 
   useEffect(() => {
-    if (!inDrawer && paramTab !== tab) navigate(`/archive/${sha256}/${tab}${location.search}${location.hash}`);
-    else if (inDrawer && stateTab !== tab) setStateTab(tab);
+    if (!inDrawer && paramTab !== tab) {
+      navigate(`/archive/${sha256}/${tab}${location.search}${location.hash}`, { replace: true });
+    } else if (inDrawer && stateTab !== tab) {
+      setStateTab(tab);
+    }
   }, [inDrawer, location.hash, location.search, navigate, paramTab, sha256, stateTab, tab]);
 
   const Layout: React.FC<{ children: React.ReactNode }> = useCallback(
@@ -266,6 +269,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             file={file ? file : null}
             show={true}
             visible={tab === 'relations'}
+            drawer={inDrawer}
             onTabChange={handleTabChange}
           />
         </div>

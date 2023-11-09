@@ -119,6 +119,12 @@ export default function useMySitemap() {
         icon: <DescriptionOutlinedIcon />,
         isRoot: true
       },
+      {
+        path: '/archive/:id/:tab',
+        title: t('breadcrumb.archive.detail'),
+        icon: <DescriptionOutlinedIcon />,
+        isRoot: true
+      },
       { path: '/dashboard', title: t('drawer.dashboard'), isRoot: true, icon: <DashboardOutlinedIcon /> },
       { path: '/manage', title: t('drawer.manage'), isRoot: true, icon: <BuildOutlinedIcon /> },
       {
