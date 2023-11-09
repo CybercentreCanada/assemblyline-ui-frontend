@@ -93,8 +93,8 @@ type NewLabel = Record<'value' | 'category', string>;
 
 type Option = {
   category: keyof typeof DEFAULT_LABELS;
+  count: number;
   label: string;
-  total: number;
 };
 
 type Props = {
@@ -158,8 +158,10 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
         method: 'POST',
         url: `/api/v4/file/label/`,
         body: {
-          input: value,
-          count: 10
+          include: value,
+          mincount: 1,
+          size: 10,
+          use_archive: true
         },
         onSuccess: ({ api_response }) => setSuggestions(api_response),
         onFailure: api_data => showErrorMessage(api_data.api_response)
@@ -306,7 +308,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                               ))}
                             </Grid>
                             <Grid item md={1}>
-                              <CustomChip size="small" label={option?.total} />
+                              <CustomChip size="small" label={option?.count} />
                             </Grid>
                           </Grid>
                         );
