@@ -131,6 +131,7 @@ export type ConfigurationDefinition = {
     tos: boolean;
     tos_lockout: boolean;
     tos_lockout_notify: boolean;
+    url_submission_auto_service_selection: string[];
   };
   user: {
     api_priv_map: {

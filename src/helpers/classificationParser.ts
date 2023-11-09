@@ -183,6 +183,7 @@ export function getLevelText(
 function getLevelIndex(c12n: string, c12nDef: ClassificationDefinition): [number, string] {
   // assumes c12nDef is coming from the Assemblyline API and all values will be in UPPER case
   let retIndex = null;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [level, unused, _x] = c12n.split(/\/\/(.*)/);
   const c12nLvl = level.toUpperCase();
 
