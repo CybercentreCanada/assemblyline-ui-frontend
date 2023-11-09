@@ -135,9 +135,17 @@ const Submit: React.FC<any> = () => {
 
   const validateServiceSelection = cbType => {
     let showPopup = false;
+    let currentSettings = settings;
+    const url = matchURL(urlHash);
+
+    if (url && configuration.ui.allow_url_submissions) {
+      currentSettings = settingsWithForcedServiceSelection(
+        configuration.ui.url_submission_auto_service_selection || []
+      );
+    }
 
     // Check if we need the popup, and if we do
-    settings.services.forEach(cat => {
+    currentSettings.services.forEach(cat => {
       cat.services.forEach(srv => {
         if (srv.selected && srv.is_external) {
           showPopup = true;
@@ -257,6 +265,25 @@ const Submit: React.FC<any> = () => {
     return selected;
   };
 
+  const settingsWithForcedServiceSelection = service_names => {
+    if (settings) {
+      const newServices = settings.services;
+      for (const cat of newServices) {
+        for (const srv of cat.services) {
+          if (service_names.includes(srv.name)) {
+            srv.selected = true;
+            break;
+          }
+        }
+        cat.selected = cat.services.every(e => e.selected);
+        break;
+      }
+      const retVal = { ...settings, services: newServices };
+      setSettings(retVal);
+      return retVal;
+    }
+  };
+
   const anySelected = () => {
     const serviceList = settings.service_spec.map(srv => srv.name);
     return serviceList.some(isSelected);
@@ -337,7 +364,6 @@ const Submit: React.FC<any> = () => {
     } else {
       data = {
         ui_params: settings,
-        name: url[15] === undefined || url[15] === '' ? 'file' : url[15],
         url: urlHash,
         metadata: submissionMetadata
       };
