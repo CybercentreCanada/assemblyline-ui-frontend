@@ -30,7 +30,7 @@
   "options.submission.ttl": "Jours à vivre",
   "options.submission.ttl.forever": "0: pour toujours",
   "options.submission.ttl.max": "Maximum",
-  "options.submission.url_submission_auto_service_selection": "Les services suivants sont recommandés pour l'analyse d'URL:",
+  "options.submission.url_submission_auto_service_selection": "Les services suivants ont été sélectionnés automatiquement pour de meilleurs résultats d'analyse d'URL:",
   "submit.file.failure": "Le fichier que vous essayez de démarrer n'a pas été téléversé correctement, réessayez ...",
   "submit.file.upload_fail": "Échec du téléversement du fichier, réessayez ...",
   "submit.progress": "% téléversé ...",
