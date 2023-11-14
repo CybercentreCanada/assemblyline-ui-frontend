@@ -335,7 +335,7 @@ function Search({ index }: SearchProps) {
                 ) : (
                   <Empty />
                 )}
-                {currentUser.roles.includes(permissionMap.retrohunt) ? (
+                {currentUser.roles.includes(permissionMap.retrohunt) && configuration.retrohunt.enabled ? (
                   <Tab
                     label={`${t('retrohunt')} (${
                       retrohuntResults ? searchResultsDisplay(retrohuntResults.total) : '...'
