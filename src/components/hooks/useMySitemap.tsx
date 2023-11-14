@@ -198,6 +198,7 @@ export default function useMySitemap() {
       { path: '/search/alert', title: t('drawer.search.alert'), breadcrumbs: ['/search'] },
       { path: '/search/file', title: t('drawer.search.file'), breadcrumbs: ['/search'] },
       { path: '/search/result', title: t('drawer.search.result'), breadcrumbs: ['/search'] },
+      { path: '/search/retrohunt', title: t('drawer.search.retrohunt'), breadcrumbs: ['/search'] },
       { path: '/search/signature', title: t('drawer.search.signature'), breadcrumbs: ['/search'] },
       { path: '/search/submission', title: t('drawer.search.submission'), breadcrumbs: ['/search'] },
       { path: '/help', title: t('drawer.help'), isRoot: true, icon: <HelpOutlineOutlinedIcon /> },
