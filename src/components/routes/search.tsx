@@ -202,7 +202,11 @@ function Search({ index }: SearchProps) {
         }
         for (const searchIndex of searchList) {
           // Do no perform search if user has no rights
-          if (!currentUser.roles.includes(permissionMap[searchIndex])) continue;
+          if (
+            !currentUser.roles.includes(permissionMap[searchIndex]) ||
+            (searchIndex === 'retrohunt' && !configuration.retrohunt.enabled)
+          )
+            continue;
 
           apiCall({
             method: 'POST',
