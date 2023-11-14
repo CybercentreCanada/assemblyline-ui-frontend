@@ -25,6 +25,7 @@ const Toc: ContentWithTOCItemDef[] = [
       { id: 'fields.idx_file' },
       { id: 'fields.idx_heuristic' },
       { id: 'fields.idx_result' },
+      { id: 'fields.idx_retrohunt' },
       { id: 'fields.idx_safelist' },
       { id: 'fields.idx_signature' },
       { id: 'fields.idx_submission' },
