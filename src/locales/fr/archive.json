@@ -6,12 +6,23 @@
   "childrens": "Enfants",
   "clipboard": "Copier dans le presse-papier",
   "comment": "Commenter",
-  "comment.placeholder.add": "Ajouter un commentaire...",
-  "comment.placeholder.edit": "Modifier un commentaire...",
-  "comment.popper.delete": "Supprimer le commentaire",
-  "comment.popper.edit": "Modifier le commentaire",
-  "comment.shortcut.cancel": "Annuler (Échap)",
-  "comment.shortcut.submit": "Soumettre (Ctrl|Alt + Entrer)",
+  "comment.confirmation.action.add": "Oui, ajoutez-le !",
+  "comment.confirmation.action.delete": "Oui, supprimez-le !",
+  "comment.confirmation.action.edit": "Oui, modifiez-le !",
+  "comment.confirmation.confirm": "Êtes-vous sûr de vouloir continuer ?",
+  "comment.confirmation.content.add": "Vous êtes sur le point d'ajouter un nouveau commentaire à ce fichier. Entrez son contenu.",
+  "comment.confirmation.content.delete": "Vous êtes sur le point de supprimer le commentaire suivant de ce fichier.",
+  "comment.confirmation.content.edit": "Vous êtes sur le point de modifier ce commentaire sur ce fichier. Entrez son contenu.",
+  "comment.confirmation.title.add": "Ajouter un nouveau commentaire",
+  "comment.confirmation.title.delete": "Supprimer un commentaire",
+  "comment.confirmation.title.edit": "Modifier un commentaire",
+  "comment.content": "Contenu",
+  "comment.snackbar.add": "Commentaire ajouté avec succès.",
+  "comment.snackbar.delete": "Commentaire supprimé avec succès.",
+  "comment.snackbar.edit": "Commentaire modifié avec succès.",
+  "comment.tooltip.add": "Ajouter un nouveau commentaire",
+  "comment.tooltip.delete": "Supprimer ce commentaire",
+  "comment.tooltip.edit": "Modifier ce commentaire",
   "comments": "Commentaires",
   "compare": "Comparer dans la visionneuse de fichiers",
   "compare.clear": "Effacer la comparaison des fichiers",
@@ -103,29 +114,5 @@
   "type.SERVICE BUSY": "SERVICE OCCUPÉ",
   "type.SERVICE DOWN": "SERVICE EN PANNE",
   "type.TASK PRE-EMPTED": "TÂCHE PRÉEMPTÉE",
-  "type.UNKNOWN": "INCONNUE",
-
-  "comment.content": "Contenu",
-
-  "comment.tooltip.add": "Ajouter un nouveau commentaire",
-  "comment.tooltip.edit": "Modifier ce commentaire",
-  "comment.tooltip.delete": "Supprimer ce commentaire",
-
-  "comment.confirmation.title.add": "Ajouter un nouveau commentaire",
-  "comment.confirmation.title.edit": "Modifier un commentaire",
-  "comment.confirmation.title.delete": "Supprimer un commentaire",
-
-  "comment.confirmation.content.add": "Vous êtes sur le point d'ajouter un nouveau commentaire à ce fichier. Entrez son contenu.",
-  "comment.confirmation.content.edit": "Vous êtes sur le point de modifier ce commentaire sur ce fichier. Entrez son contenu.",
-  "comment.confirmation.content.delete": "Vous êtes sur le point de supprimer le commentaire suivant de ce fichier.",
-
-  "comment.confirmation.confirm": "Êtes-vous sûr de vouloir continuer ?",
-
-  "comment.confirmation.action.add": "Oui, ajoutez-le !",
-  "comment.confirmation.action.edit": "Oui, modifiez-le !",
-  "comment.confirmation.action.delete": "Oui, supprimez-le !",
-
-  "comment.snackbar.add": "Commentaire ajouté avec succès.",
-  "comment.snackbar.edit": "Commentaire modifié avec succès.",
-  "comment.snackbar.delete": "Commentaire supprimé avec succès."
+  "type.UNKNOWN": "INCONNUE"
 }

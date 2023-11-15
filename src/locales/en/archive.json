@@ -6,12 +6,23 @@
   "childrens": "Children",
   "clipboard": "Copy to clipboard",
   "comment": "Comment",
-  "comment.placeholder.add": "Add a comment...",
-  "comment.placeholder.edit": "Edit the comment...",
-  "comment.popper.delete": "Delete Comment",
-  "comment.popper.edit": "Edit comment",
-  "comment.shortcut.cancel": "Cancel (Escape)",
-  "comment.shortcut.submit": "Submit (Ctrl|Alt + Enter)",
+  "comment.confirmation.action.add": "Yes, add it!",
+  "comment.confirmation.action.delete": "Yes, remove it!",
+  "comment.confirmation.action.edit": "Yes, modify it!",
+  "comment.confirmation.confirm": "Are you sure you want to proceed?",
+  "comment.confirmation.content.add": "You are about to add a new comment to this file. Enter its content.",
+  "comment.confirmation.content.delete": "You are about to delete this following comment from this file.",
+  "comment.confirmation.content.edit": "You are about to modify this comment on this file. Enter its content.",
+  "comment.confirmation.title.add": "Add a new comment",
+  "comment.confirmation.title.delete": "Remove a comment",
+  "comment.confirmation.title.edit": "Modify a comment",
+  "comment.content": "Content",
+  "comment.snackbar.add": "Comment successfully added.",
+  "comment.snackbar.delete": "Comment successfully removed.",
+  "comment.snackbar.edit": "Comment successfully modified.",
+  "comment.tooltip.add": "Add a new comment",
+  "comment.tooltip.delete": "Remove this comment",
+  "comment.tooltip.edit": "Modify this comment",
   "comments": "Comments",
   "compare": "Compare in the file viewer",
   "compare.clear": "Clear file compare",
@@ -103,29 +114,5 @@
   "type.SERVICE BUSY": "SERVICE BUSY",
   "type.SERVICE DOWN": "SERVICE DOWN",
   "type.TASK PRE-EMPTED": "TASK PRE-EMPTED",
-  "type.UNKNOWN": "UNKNOWN",
-
-  "comment.content": "Content",
-
-  "comment.tooltip.add": "Add a new comment",
-  "comment.tooltip.edit": "Modify this comment",
-  "comment.tooltip.delete": "Remove this comment",
-
-  "comment.confirmation.title.add": "Add a new comment",
-  "comment.confirmation.title.edit": "Modify a comment",
-  "comment.confirmation.title.delete": "Remove a comment",
-
-  "comment.confirmation.content.add": "You are about to add a new comment to this file. Enter its content.",
-  "comment.confirmation.content.edit": "You are about to modify this comment on this file. Enter its content.",
-  "comment.confirmation.content.delete": "You are about to delete this following comment from this file.",
-
-  "comment.confirmation.confirm": "Are you sure you want to proceed?",
-
-  "comment.confirmation.action.add": "Yes, add it!",
-  "comment.confirmation.action.edit": "Yes, modify it!",
-  "comment.confirmation.action.delete": "Yes, remove it!",
-
-  "comment.snackbar.add": "Comment successfully added.",
-  "comment.snackbar.edit": "Comment successfully modified.",
-  "comment.snackbar.delete": "Comment successfully removed."
+  "type.UNKNOWN": "UNKNOWN"
 }
