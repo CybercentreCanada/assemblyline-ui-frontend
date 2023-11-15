@@ -19,6 +19,7 @@ import MetadataSection from 'components/visual/FileDetail/metadata';
 import ParentSection from 'components/visual/FileDetail/parents';
 import ResultSection from 'components/visual/FileDetail/results';
 import TagSection from 'components/visual/FileDetail/tags';
+import URIIdentificationSection from 'components/visual/FileDetail/uriIdent';
 import ASCIISection from 'components/visual/FileViewer/ascii';
 import HexSection from 'components/visual/FileViewer/hex';
 import StringsSection from 'components/visual/FileViewer/strings';
@@ -130,6 +131,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   const [file, setFile] = useState<File | null>(null);
   const [stateTab, setStateTab] = useState<Tab>(null);
+  const [promotedSections, setPromotedSections] = useState([]);
 
   const inDrawer = useMemo<boolean>(() => (propSha256 ? true : paramSha256 ? false : null), [paramSha256, propSha256]);
   const sha256 = useMemo<string>(() => paramSha256 || propSha256, [paramSha256, propSha256]);
@@ -192,6 +194,18 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
     [inDrawer]
   );
 
+  useEffect(() => {
+    if (file === null) {
+      setPromotedSections(null);
+    } else {
+      setPromotedSections(
+        file.results
+          .map(serviceResult => serviceResult.result.sections.filter(section => section.promote_to !== null))
+          .flat()
+      );
+    }
+  }, [file]);
+
   if (!configuration?.datastore?.archive?.enabled)
     return inDrawer ? <NotFoundPage /> : <Navigate to="/notfound" replace />;
   else if (!currentUser.roles.includes('archive_view'))
@@ -232,8 +246,12 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
         </div>
 
         <div style={{ display: tab === 'details' ? 'contents' : 'none' }}>
-          <IdentificationSection fileinfo={file ? file.file_info : null} />
-          <FrequencySection fileinfo={file ? file.file_info : null} />
+          {file?.file_info?.type.startsWith('uri/') ? (
+            <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+          ) : (
+            <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+          )}
+          <FrequencySection seen={file ? file.file_info?.seen : null} />
           <MetadataSection metadata={file ? file.metadata : null} />
         </div>
 
