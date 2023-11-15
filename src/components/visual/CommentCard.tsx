@@ -10,7 +10,6 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
-  Paper,
   Popper,
   Stack,
   Tooltip,
@@ -43,7 +42,9 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     gap: theme.spacing(1),
-    padding: `${theme.spacing(1)} ${theme.spacing(1.75)}`
+    padding: `${theme.spacing(1)} ${theme.spacing(1.75)}`,
+    borderRadius: '6px',
+    backgroundColor: '#0000001A'
   },
   header: {
     display: 'flex',
@@ -54,9 +55,7 @@ const useStyles = makeStyles(theme => ({
   date: {
     color: theme.palette.text.secondary
   },
-  authorText: {
-    borderColor: theme.palette.primary.main
-  },
+  authorText: {},
   actions: {
     display: 'flex',
     alignItems: 'center',
@@ -101,10 +100,10 @@ const useStyles = makeStyles(theme => ({
 export const REACTIONS = {
   thumbs_up: '👍',
   thumbs_down: '👎',
-  heart: '🧡',
-  smiley: '😀',
-  surprise: '🎉',
-  party: '🚀'
+  love: '🧡',
+  smile: '😀',
+  surprised: '😲',
+  party: '🎉'
 };
 
 export type Reaction = {
@@ -258,10 +257,9 @@ const WrappedCommentCard: React.FC<Props> = ({
         )}
       </div>
 
-      <Paper
+      <div
         className={clsx(classes.content, currentAuthor?.email === currentUser?.email && classes.authorText)}
         ref={contentRef}
-        variant="outlined"
         onMouseEnter={handlePopoverOpen}
         onMouseLeave={handlePopoverClose}
       >
@@ -350,10 +348,9 @@ const WrappedCommentCard: React.FC<Props> = ({
                   </Tooltip>
                 ))}
 
-                <Divider className={classes.divider} />
-
                 {isCurrentUser && (
                   <>
+                    <Divider className={classes.divider} />
                     <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.tooltip.edit')}>
                       <Button
                         className={classes.action}
@@ -380,7 +377,7 @@ const WrappedCommentCard: React.FC<Props> = ({
             </Fade>
           )}
         </Popper>
-      </Paper>
+      </div>
     </div>
   );
 };
