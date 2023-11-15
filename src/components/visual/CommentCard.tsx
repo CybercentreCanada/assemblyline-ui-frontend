@@ -2,12 +2,16 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import {
   Button,
-  ButtonGroup,
-  CircularProgress,
+  Chip,
+  Divider,
   Fade,
-  Paper,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
   Popper,
-  TextField,
+  Stack,
   Tooltip,
   Typography
 } from '@mui/material';
@@ -15,7 +19,8 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { AppUserAvatar } from 'commons/components/topnav/UserProfile';
 import useALContext from 'components/hooks/useALContext';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import 'moment/locale/fr';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 
@@ -33,20 +38,13 @@ const useStyles = makeStyles(theme => ({
     alignSelf: 'start',
     minWidth: '40px'
   },
-  container: {
-    flex: 1,
-    display: 'grid',
-    gridTemplateAreas: `"input input input" ". cancel button"`,
-    gridTemplateColumns: '1fr auto auto',
-    gridTemplateRows: 'auto auto',
-    gap: theme.spacing(1)
-  },
-
   content: {
     display: 'flex',
     flexDirection: 'column',
-    gap: theme.spacing(0.5),
-    padding: `${theme.spacing(1)} ${theme.spacing(1.75)}`
+    gap: theme.spacing(1),
+    padding: `${theme.spacing(1)} ${theme.spacing(1.75)}`,
+    borderRadius: '6px',
+    backgroundColor: '#0000001A'
   },
   header: {
     display: 'flex',
@@ -54,41 +52,71 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     gap: theme.spacing(1.5)
   },
-  textfield: {
-    gridArea: 'input',
-    margin: 0
+  date: {
+    color: theme.palette.text.secondary
   },
-  cancel: { gridArea: 'cancel' },
-  add: { gridArea: 'button' },
-  edit: { gridArea: 'button' },
-  name: { gridArea: 'name', fontWeight: 500 },
-  date: { gridArea: 'date', color: theme.palette.text.secondary },
-  text: { gridArea: 'text' },
-  authorText: { borderColor: theme.palette.primary.main },
-  hide: { display: 'none' },
-  actions: { backgroundColor: theme.palette.background.paper },
+  authorText: {},
+  actions: {
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: theme.palette.background.default,
+    borderRadius: '4px'
+  },
   action: {
     padding: `${theme.spacing(0.25)} ${theme.spacing(0.5)}`,
-    minWidth: 'auto !important'
+    minWidth: 'auto !important',
+    height: `32px`
+  },
+  divider: {
+    width: '1px',
+    height: '25px',
+    backgroundColor: theme.palette.text.primary
   },
   tooltip: {
     backgroundColor: theme.palette.grey[700],
     marginTop: `${theme.spacing(1)} !important`
   },
-  progress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
+  reactionTooltip: {
+    padding: 0
+  },
+  reactionList: {
+    borderRadius: '4px',
+    backgroundColor: theme.palette.background.default
+  },
+  reactionSubHeader: {
+    borderRadius: '4px',
+    backgroundColor: theme.palette.background.default,
+    lineHeight: '36px'
+  },
+  chipContainer: {
+    display: 'flex',
+    gap: theme.spacing(1)
+  },
+  actionIcon: {
+    fontSize: 'medium'
   }
 }));
 
+export const REACTIONS = {
+  thumbs_up: '👍',
+  thumbs_down: '👎',
+  love: '🧡',
+  smile: '😀',
+  surprised: '😲',
+  party: '🎉'
+};
+
+export type Reaction = {
+  uname: string;
+  icon: keyof typeof REACTIONS;
+};
+
 export type Comment = {
   cid?: string;
-  uname?: string;
-  text?: string;
   date?: string;
+  text?: string;
+  uname?: string;
+  reactions?: Reaction[];
 };
 
 export type Author = {
@@ -98,30 +126,36 @@ export type Author = {
   email?: string;
 };
 
+export type Comments = Comment[];
+
+export type Authors = Record<string, Author>;
+
 export const DEFAULT_COMMENT: Comment = {
   cid: null,
-  uname: null,
+  date: null,
   text: '',
-  date: null
+  uname: null,
+  reactions: []
 };
 
-export const DEFAULT_AUTHOR: Author = { uname: null, name: null, avatar: null, email: null };
-
-export type CommentProp = {
-  comment: Comment;
-  successCallback?: (comment: Comment) => void;
-  finalizeCallback?: () => void;
+export const DEFAULT_AUTHOR: Author = {
+  uname: null,
+  name: null,
+  avatar: null,
+  email: null
 };
 
 type Props = {
   currentComment?: Comment;
   previousComment?: Comment;
+  authors?: Authors;
   currentAuthor?: Author;
-  previousAuthor?: Author;
-  isAdding?: boolean;
-  onAddComment?: ({ comment, successCallback = () => null, finalizeCallback = () => null }: CommentProp) => void;
-  onEditComment?: ({ comment, successCallback = () => null, finalizeCallback = () => null }: CommentProp) => void;
-  onDeleteComment?: ({ comment, successCallback = () => null, finalizeCallback = () => null }: CommentProp) => void;
+  onEditClick?: (comment: Comment) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onDeleteClick?: (comment: Comment) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onReactionClick?: (
+    comment: Comment,
+    reaction: string
+  ) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 
 const CALENDAR_STRINGS = {
@@ -142,34 +176,35 @@ const CALENDAR_STRINGS = {
 const WrappedCommentCard: React.FC<Props> = ({
   currentComment = DEFAULT_COMMENT,
   previousComment = null,
+  authors = null,
   currentAuthor = DEFAULT_AUTHOR,
-  previousAuthor = DEFAULT_AUTHOR,
-  isAdding = false,
-  onAddComment = () => null,
-  onEditComment = () => null,
-  onDeleteComment = () => null
+  onEditClick = () => null,
+  onDeleteClick = () => null,
+  onReactionClick = () => null
 }) => {
   const { t, i18n } = useTranslation(['archive']);
   const classes = useStyles();
   const { user: currentUser } = useALContext();
 
-  const [comment, setComment] = useState<Comment>(currentComment);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
-  const inputRef = useRef(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const actionsOpen = Boolean(anchorEl);
 
-  const username = useMemo<string>(
+  const reactions = useMemo<Record<keyof typeof REACTIONS, string[]> | object>(
     () =>
-      (currentAuthor?.name || currentUser?.name || '')
-        .split(' ')
-        .filter(w => w !== '')
-        .splice(0, 2)
-        .map(n => (n ? n[0].toUpperCase() : ''))
-        .join(''),
-    [currentAuthor?.name, currentUser?.name]
+      !('reactions' in currentComment)
+        ? {}
+        : (Object.fromEntries(
+            Object.keys(REACTIONS).map(reaction => [
+              reaction,
+              currentComment?.reactions
+                ?.filter((v, i, a) => v?.icon === reaction)
+                .map(r => r?.uname)
+                .filter((v, i, a) => a.findIndex(e => e === v) === i)
+                .sort((n1, n2) => n1.localeCompare(n2))
+            ])
+          ) as Record<keyof typeof REACTIONS, string[]>),
+    [currentComment]
   );
 
   const isCurrentUser = useMemo<boolean>(
@@ -183,8 +218,8 @@ const WrappedCommentCard: React.FC<Props> = ({
   );
 
   const isSameAuthor = useMemo<boolean>(
-    () => currentAuthor?.name === previousAuthor?.name,
-    [currentAuthor?.name, previousAuthor?.name]
+    () => currentComment?.uname === previousComment?.uname,
+    [currentComment?.uname, previousComment?.uname]
   );
 
   const isNarrowTimeSpan = useMemo<boolean>(
@@ -192,224 +227,157 @@ const WrappedCommentCard: React.FC<Props> = ({
     [currentComment?.date, previousComment?.date]
   );
 
-  const handleTextChange = useCallback(
-    (loading: boolean) => (e: React.ChangeEvent<any>) => {
-      if (!loading) setComment(c => ({ ...c, text: e.target.value }));
-    },
+  const getAvatar = useCallback(
+    (name: string) =>
+      (name || '')
+        .split(' ')
+        .filter(w => w !== '')
+        .splice(0, 2)
+        .map(n => (n ? n[0].toUpperCase() : ''))
+        .join(''),
     []
-  );
-
-  const handleTextFocus = useCallback((e: React.FocusEvent<any, Element>) => {
-    setIsEditing(true);
-    e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length);
-  }, []);
-
-  const handleCancelClick = useCallback(
-    (c: Comment) => () => {
-      setComment(c);
-      setIsEditing(false);
-    },
-    []
-  );
-
-  const handleAddClick = useCallback(
-    (c: Comment) => () => {
-      setIsLoading(true);
-      const successCallback = () => {
-        setComment(DEFAULT_COMMENT);
-        setIsEditing(false);
-        inputRef.current.blur();
-      };
-      const finalizeCallback = () => setIsLoading(false);
-      onAddComment({ comment: c, successCallback, finalizeCallback });
-    },
-    [onAddComment]
-  );
-
-  const handleEditClick = useCallback(
-    (c: Comment) => () => {
-      setIsLoading(true);
-      const successCallback = (newComment: Comment) => {
-        setComment(newComment);
-        setIsEditing(false);
-        setIsLoading(false);
-        inputRef.current.blur();
-      };
-      const finalizeCallback = () => setIsLoading(false);
-      onEditComment({ comment: c, successCallback, finalizeCallback });
-    },
-    [onEditComment]
   );
 
   const handlePopoverOpen = useCallback(() => setAnchorEl(contentRef.current), []);
 
   const handlePopoverClose = useCallback(() => setAnchorEl(null), []);
 
-  const handleEditAction = useCallback(
-    () => () => {
-      setIsEditing(true);
-      setAnchorEl(null);
-      setTimeout(() => {
-        inputRef.current.focus();
-      }, 0);
-    },
-    []
-  );
-
-  const handleDeleteAction = useCallback(
-    (c: Comment) => () => {
-      setIsLoading(true);
-      const finalizeCallback = () => setIsLoading(false);
-      onDeleteComment({ comment: c, finalizeCallback });
-    },
-    [onDeleteComment]
-  );
-
-  const handleTextKeyDown = useCallback(
-    (c: Comment, loading: boolean) => (e: React.KeyboardEvent<any>) => {
-      if (loading) return;
-      e.stopPropagation();
-
-      if (e.code === 'Escape') {
-        setComment(c);
-        setIsEditing(false);
-        inputRef.current.blur();
-      } else if (e.code === 'Enter' && (e.altKey || e.ctrlKey)) {
-        if (isAdding) handleAddClick(c)();
-        else handleEditClick(c)();
-      }
-    },
-    [handleAddClick, handleEditClick, isAdding]
-  );
-
-  useEffect(() => setComment(currentComment), [currentComment]);
-
   return (
-    <div className={clsx(classes.comment, (isAdding || !isSameAuthor || !isNarrowTimeSpan) && classes.diffComment)}>
+    <div className={clsx(classes.comment, (!isSameAuthor || !isNarrowTimeSpan) && classes.diffComment)}>
       <div className={classes.icon}>
-        {isAdding || !isSameAuthor ? (
+        {!isSameAuthor ? (
           <AppUserAvatar
-            children={username}
-            alt={isAdding ? currentUser.name : currentAuthor.name}
-            url={isAdding ? currentUser.avatar : currentAuthor.avatar}
-            email={isAdding ? currentUser.email : currentAuthor.email}
+            children={getAvatar(currentAuthor?.name)}
+            alt={currentAuthor?.name}
+            url={currentAuthor?.avatar}
+            email={currentAuthor?.email}
           />
         ) : (
           <div />
         )}
       </div>
 
-      <div className={clsx(classes.container, !isAdding && !isEditing && classes.hide)}>
-        <TextField
-          className={classes.textfield}
-          value={comment?.text}
-          inputRef={inputRef}
-          type="text"
-          placeholder={isAdding ? t('comment.placeholder.add') : t('comment.placeholder.edit')}
-          multiline
-          maxRows={3}
-          fullWidth
-          size="small"
-          margin="dense"
-          onChange={handleTextChange(isLoading)}
-          onFocus={handleTextFocus}
-          onKeyDown={handleTextKeyDown(comment, isLoading)}
-        />
-        {isEditing && (
-          <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.shortcut.cancel')}>
-            <Button
-              className={classes.cancel}
-              variant="outlined"
-              size="small"
-              disabled={isLoading}
-              onClick={handleCancelClick(currentComment)}
-            >
-              {t('cancel')}
-              {isLoading && <CircularProgress className={classes.progress} size={24} />}
-            </Button>
-          </Tooltip>
+      <div
+        className={clsx(classes.content, currentAuthor?.email === currentUser?.email && classes.authorText)}
+        ref={contentRef}
+        onMouseEnter={handlePopoverOpen}
+        onMouseLeave={handlePopoverClose}
+      >
+        {(!isSameAuthor || !isNarrowTimeSpan) && (
+          <div className={classes.header}>
+            {!isSameAuthor && (
+              <Typography variant="body1" fontWeight={500}>
+                {currentAuthor?.name}
+              </Typography>
+            )}
+            {(!isSameAuthor || !isNarrowTimeSpan) && (
+              <Typography className={classes.date} variant="body2">
+                <Moment calendar={calendar} locale={i18n.language} children={currentComment?.date} />
+              </Typography>
+            )}
+          </div>
         )}
-        {isAdding && isEditing && (
-          <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.shortcut.submit')}>
-            <Button
-              className={classes.add}
-              variant="contained"
-              size="small"
-              disabled={isLoading}
-              onClick={handleAddClick(comment)}
-            >
-              {t('comment')}
-              {isLoading && <CircularProgress className={classes.progress} size={24} />}
-            </Button>
-          </Tooltip>
-        )}
-        {!isAdding && isEditing && (
-          <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.shortcut.submit')}>
-            <Button
-              className={classes.edit}
-              variant="contained"
-              size="small"
-              disabled={isLoading}
-              onClick={handleEditClick(comment)}
-            >
-              {t('update')}
-              {isLoading && <CircularProgress className={classes.progress} size={24} />}
-            </Button>
-          </Tooltip>
-        )}
-      </div>
 
-      {!isAdding && !isEditing && (
-        <Paper
-          className={clsx(classes.content, currentAuthor?.email === currentUser?.email && classes.authorText)}
-          ref={contentRef}
-          variant="outlined"
-          onMouseEnter={handlePopoverOpen}
-          onMouseLeave={handlePopoverClose}
-        >
-          {(!isSameAuthor || !isNarrowTimeSpan) && (
-            <div className={classes.header}>
-              {!isSameAuthor && (
-                <Typography className={classes.name} variant="body1">
-                  {currentAuthor?.name}
-                </Typography>
-              )}
-              {(!isSameAuthor || !isNarrowTimeSpan) && (
-                <Typography className={classes.date} variant="body2">
-                  <Moment calendar={calendar} locale={i18n.language} children={comment?.date} />
-                </Typography>
-              )}
-            </div>
+        <Typography variant="body2">{currentComment?.text}</Typography>
+
+        <div className={classes.chipContainer}>
+          {Object.entries(reactions).map(
+            ([reaction, names], i) =>
+              names?.length > 0 && (
+                <Tooltip
+                  key={i}
+                  classes={{ tooltip: classes.reactionTooltip }}
+                  title={
+                    <List
+                      className={classes.reactionList}
+                      dense={true}
+                      subheader={
+                        <ListSubheader className={classes.reactionSubHeader}>{t(`reaction.${reaction}`)}</ListSubheader>
+                      }
+                    >
+                      {names.map((name: string, j: number) => (
+                        <ListItem key={`${i}-${j}`}>
+                          <ListItemIcon>
+                            {name in authors && (
+                              <AppUserAvatar
+                                children={getAvatar(authors[name]?.name)}
+                                alt={authors[name]?.name}
+                                url={authors[name]?.avatar}
+                                email={authors[name]?.email}
+                                sx={{ width: 30, height: 30 }}
+                              />
+                            )}
+                          </ListItemIcon>
+                          <ListItemText primary={authors[name]?.name} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  }
+                >
+                  <Chip
+                    label={
+                      <>
+                        <span style={{ fontSize: 'medium' }}>{REACTIONS[reaction]}</span>
+                        <span>{names.length}</span>
+                      </>
+                    }
+                    size="small"
+                    variant="outlined"
+                    color={names.includes(currentUser?.username) ? 'primary' : 'default'}
+                    onClick={onReactionClick(currentComment, reaction)}
+                  />
+                </Tooltip>
+              )
           )}
+        </div>
 
-          <Typography className={classes.text} variant="body2">
-            {comment?.text}
-          </Typography>
+        <Popper open={actionsOpen} anchorEl={anchorEl} placement="top-end" transition disablePortal>
+          {({ TransitionProps }) => (
+            <Fade {...TransitionProps} timeout={350}>
+              <Stack className={classes.actions} direction="row">
+                {Object.entries(REACTIONS).map(([icon, emoji]: [keyof typeof REACTIONS, string], i) => (
+                  <Tooltip key={i} classes={{ tooltip: classes.tooltip }} title={t(`reaction.${icon}`)}>
+                    <Button
+                      className={classes.action}
+                      size="small"
+                      color="inherit"
+                      onClick={onReactionClick(currentComment, icon)}
+                    >
+                      <span className={classes.actionIcon}>{emoji}</span>
+                    </Button>
+                  </Tooltip>
+                ))}
 
-          {isCurrentUser && (
-            <Popper open={actionsOpen} anchorEl={anchorEl} placement="top-end" transition disablePortal>
-              {({ TransitionProps }) => (
-                <Fade {...TransitionProps} timeout={350}>
-                  <ButtonGroup className={classes.actions} variant="outlined" color="inherit">
-                    <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.popper.edit')}>
-                      <Button className={classes.action} size="small" onClick={handleEditAction()}>
+                {isCurrentUser && (
+                  <>
+                    <Divider className={classes.divider} />
+                    <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.tooltip.edit')}>
+                      <Button
+                        className={classes.action}
+                        size="small"
+                        color="inherit"
+                        onClick={onEditClick(currentComment)}
+                      >
                         <CreateOutlinedIcon />
-                        {isLoading && <CircularProgress className={classes.progress} size={24} />}
                       </Button>
                     </Tooltip>
-                    <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.popper.delete')}>
-                      <Button className={classes.action} size="small" onClick={handleDeleteAction(comment)}>
+                    <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.tooltip.delete')}>
+                      <Button
+                        className={classes.action}
+                        size="small"
+                        color="inherit"
+                        onClick={onDeleteClick(currentComment)}
+                      >
                         <ClearOutlinedIcon />
-                        {isLoading && <CircularProgress className={classes.progress} size={24} />}
                       </Button>
                     </Tooltip>
-                  </ButtonGroup>
-                </Fade>
-              )}
-            </Popper>
+                  </>
+                )}
+              </Stack>
+            </Fade>
           )}
-        </Paper>
-      )}
+        </Popper>
+      </div>
     </div>
   );
 };

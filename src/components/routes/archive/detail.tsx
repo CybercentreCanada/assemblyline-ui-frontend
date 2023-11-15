@@ -6,6 +6,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { ArchiveBanner, CommentSection, LabelSection, SimilarSection } from 'components/visual/ArchiveDetail';
 import Classification from 'components/visual/Classification';
+import { Comments } from 'components/visual/CommentCard';
 import { Error } from 'components/visual/ErrorCard';
 import AttackSection from 'components/visual/FileDetail/attacks';
 import ChildrenSection from 'components/visual/FileDetail/childrens';
@@ -33,12 +34,7 @@ export type FileInfo = {
   archive_ts: string;
   ascii: string;
   classification: string;
-  comments: {
-    cid: string;
-    uname: string;
-    date: string;
-    text: string;
-  }[];
+  comments: Comments;
   entropy: number;
   expiry_ts: string | null;
   hex: string;
@@ -144,7 +140,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   const handleTabChange = useCallback(
     (event: React.SyntheticEvent<Element, Event>, value: Tab) => {
-      if (!inDrawer) navigate(`/archive/${sha256}/${value}${location.search}${location.hash}`);
+      if (!inDrawer) navigate(`/archive/${sha256}/${value}${location.search}${location.hash}`, { replace: true });
       else setStateTab(value);
     },
     [inDrawer, location.hash, location.search, navigate, sha256]
@@ -177,8 +173,11 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
   }, [sha256]);
 
   useEffect(() => {
-    if (!inDrawer && paramTab !== tab) navigate(`/archive/${sha256}/${tab}${location.search}${location.hash}`);
-    else if (inDrawer && stateTab !== tab) setStateTab(tab);
+    if (!inDrawer && paramTab !== tab) {
+      navigate(`/archive/${sha256}/${tab}${location.search}${location.hash}`, { replace: true });
+    } else if (inDrawer && stateTab !== tab) {
+      setStateTab(tab);
+    }
   }, [inDrawer, location.hash, location.search, navigate, paramTab, sha256, stateTab, tab]);
 
   const Layout: React.FC<{ children: React.ReactNode }> = useCallback(
@@ -266,6 +265,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             file={file ? file : null}
             show={true}
             visible={tab === 'relations'}
+            drawer={inDrawer}
             onTabChange={handleTabChange}
           />
         </div>
@@ -284,7 +284,12 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
         <div style={{ display: tab === 'community' ? 'contents' : 'none' }}>
           <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} />
-          <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
+          <CommentSection
+            sha256={file?.file_info?.sha256}
+            comments={file ? file?.file_info?.comments : null}
+            visible={tab === 'community'}
+            drawer={inDrawer}
+          />
         </div>
       </Layout>
     );

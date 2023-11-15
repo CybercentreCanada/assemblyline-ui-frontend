@@ -1,10 +1,30 @@
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, Divider, Typography } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  Grid,
+  IconButton,
+  Paper,
+  TextField,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { Author, Comment, CommentProp } from 'components/visual/CommentCard';
+import useMySnackbar from 'components/hooks/useMySnackbar';
+import { Authors, Comment, Comments, DEFAULT_COMMENT } from 'components/visual/CommentCard';
+import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { io } from 'socket.io-client';
@@ -23,94 +43,198 @@ const useStyles = makeStyles(theme => ({
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
     }
+  },
+  dialog: {
+    minWidth: '50vw'
+  },
+  preview: {
+    margin: 0,
+    padding: theme.spacing(0.75, 1),
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word'
   }
 }));
 
+type Confirmation = {
+  open: boolean;
+  type: 'add' | 'edit' | 'delete';
+};
+
 type Props = {
   sha256: string;
-  comments: Comment[];
+  comments: Comments;
+  visible?: boolean; // is visible on screen
+  drawer?: boolean; // inside the drawer
 };
 
 const SOCKETIO_NAMESPACE = '/file_comments';
 
-const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comments }) => {
+const WrappedCommentSection: React.FC<Props> = ({
+  sha256 = null,
+  comments: commentsProps = [],
+  visible = true,
+  drawer = false
+}) => {
   const { t } = useTranslation(['archive']);
+  const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useALContext();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
-  const [comments, setComments] = useState<Comment[]>(_comments);
-  const [authors, setAuthors] = useState<{ [uname: string]: Author }>(null);
+  const [comments, setComments] = useState<Comments>(commentsProps);
+  const [authors, setAuthors] = useState<Authors>(null);
+  const [currentComment, setCurrentComment] = useState<Comment>(DEFAULT_COMMENT);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  const [confirmation, setConfirmation] = useState<Confirmation>({ open: false, type: 'add' });
+  const [waiting, setWaiting] = useState<boolean>(false);
+
   const socket = useRef(null);
 
-  const handleRefreshComments = useCallback((file_sha256: string) => {
-    if (!file_sha256) return;
-    apiCall({
-      method: 'GET',
-      url: `/api/v4/file/comment/${file_sha256}/`,
-      onSuccess: api_data => {
-        setAuthors(a => ({ ...a, ...api_data.api_response.authors }));
-        setComments(
-          api_data.api_response.comments.sort((a: Comment, b: Comment) => Date.parse(b.date) - Date.parse(a.date))
-        );
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const sortedComments = useMemo<Comment[]>(
+    () => (!comments ? [] : comments.sort((c1, c2) => c2?.date.localeCompare(c1?.date))),
+    [comments]
+  );
+
+  const handleAddConfirmation = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setConfirmation({ open: true, type: 'add' });
+    setCurrentComment(DEFAULT_COMMENT);
   }, []);
 
+  const handleEditConfirmation = useCallback(
+    (comment: Comment) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setConfirmation({ open: true, type: 'edit' });
+      setCurrentComment(comment);
+    },
+    []
+  );
+
+  const handleDeleteConfirmation = useCallback(
+    (comment: Comment) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setConfirmation({ open: true, type: 'delete' });
+      setCurrentComment(comment);
+    },
+    []
+  );
+
+  const handleCloseConfirmation = useCallback(() => {
+    setConfirmation(c => ({ ...c, open: false }));
+  }, []);
+
+  const handleRefreshComments = useCallback(() => {
+    if (!sha256 || !visible) return;
+    apiCall({
+      method: 'GET',
+      url: `/api/v4/archive/comment/${sha256}/`,
+      onSuccess: ({ api_response }) => {
+        setAuthors(a => ({ ...a, ...api_response.authors }));
+        setComments(c =>
+          [...api_response.comments, ...(c ? c : [])].filter((v, i, a) => a.findIndex(e => e?.cid === v?.cid) === i)
+        );
+      },
+      onFailure: ({ api_error_message }) => showErrorMessage(api_error_message)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256, visible]);
+
   const handleAddComment = useCallback(
-    ({ comment, successCallback, finalizeCallback }: CommentProp) => {
+    (comment: Comment) => () => {
+      if (!sha256 || !visible) return;
       apiCall({
         method: 'PUT',
-        url: `/api/v4/file/comment/${sha256}/`,
-        body: { text: comment?.text },
-        onSuccess: api_data => {
-          setComments(cs => [api_data.api_response, ...cs]);
-          successCallback(null);
-          socket.current.emit('comments_change', { sha256: sha256 });
+        url: `/api/v4/archive/comment/${sha256}/`,
+        body: comment,
+        onSuccess: ({ api_response }) => {
+          setComments(c => [api_response, ...(c ? c : [])]);
+          showSuccessMessage(t('comment.snackbar.add'));
         },
-        onFinalize: finalizeCallback
+        onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
+        onEnter: () => setWaiting(true),
+        onExit: () => {
+          setWaiting(false);
+          setConfirmation(c => ({ ...c, open: false }));
+        }
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sha256]
+    [sha256, visible]
   );
 
   const handleEditComment = useCallback(
-    ({ comment, successCallback, finalizeCallback }: CommentProp) => {
-      if (!sha256) return;
+    (comment: Comment) => () => {
+      if (!sha256 || !visible) return;
       apiCall({
         method: 'POST',
-        url: `/api/v4/file/comment/${sha256}/${comment?.cid}/`,
-        body: { text: comment?.text },
+        url: `/api/v4/archive/comment/${sha256}/${comment?.cid}/`,
+        body: comment,
         onSuccess: () => {
-          successCallback(comment);
-          socket.current.emit('comments_change', { sha256: sha256 });
+          setComments(c => c.map(v => (v?.cid === comment?.cid ? comment : v)));
+          showSuccessMessage(t('comment.snackbar.edit'));
         },
-        onFinalize: finalizeCallback
+        onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
+        onEnter: () => setWaiting(true),
+        onExit: () => {
+          setWaiting(false);
+          setConfirmation(c => ({ ...c, open: false }));
+        }
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sha256]
+    [sha256, visible]
   );
 
   const handleDeleteComment = useCallback(
-    ({ comment, finalizeCallback }: CommentProp) => {
-      if (!comment?.cid || !sha256) return;
+    (comment: Comment) => () => {
+      if (!sha256 || !visible) return;
       apiCall({
         method: 'DELETE',
-        url: `/api/v4/file/comment/${sha256}/${comment?.cid}/`,
-        onSuccess: () => {
-          setComments(cs => cs.filter(c => c?.cid !== comment?.cid));
-          socket.current.emit('comments_change', { sha256: sha256 });
+        url: `/api/v4/archive/comment/${sha256}/${comment?.cid}/`,
+        body: comment,
+        onSuccess: ({ api_response }) => {
+          setComments(c => c.filter(v => v?.cid !== comment?.cid));
+          showSuccessMessage(t('comment.snackbar.delete'));
         },
-        onFinalize: finalizeCallback
+        onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
+        onEnter: () => setWaiting(true),
+        onExit: () => {
+          setWaiting(false);
+          setConfirmation(c => ({ ...c, open: false }));
+        }
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sha256]
+    [sha256, visible]
   );
+
+  const handleReactionClick = useCallback(
+    (comment: Comment, reaction: string) => () => {
+      if (!sha256 || !visible) return;
+      apiCall({
+        method: 'PUT',
+        url: `/api/v4/archive/reaction/${sha256}/${comment?.cid}/${reaction}/`,
+        body: comment,
+        onSuccess: ({ api_response }) => {
+          setComments(c =>
+            c.map(v => {
+              if (v?.cid === comment?.cid) v.reactions = api_response;
+              return v;
+            })
+          );
+        },
+        onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
+        onEnter: () => setWaiting(true),
+        onExit: () => setWaiting(false)
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sha256, visible]
+  );
+
+  const handleTextChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    setCurrentComment(c => ({ ...c, text: event.target.value }));
+  }, []);
 
   useEffect(() => {
     setAuthors(a => ({
@@ -125,11 +249,11 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comm
   }, [currentUser]);
 
   useEffect(() => {
-    if (sha256) handleRefreshComments(sha256);
+    if (sha256) handleRefreshComments();
   }, [handleRefreshComments, sha256]);
 
   useEffect(() => {
-    if (!sha256) return;
+    if (!sha256 || !visible) return;
 
     socket.current = io(SOCKETIO_NAMESPACE);
 
@@ -147,42 +271,136 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comm
     socket.current.on('refresh_comments', () => {
       // eslint-disable-next-line no-console
       console.debug('Socket-IO :: Someone made a new comment');
-      handleRefreshComments(sha256);
+      handleRefreshComments();
     });
 
     return () => {
       socket.current.disconnect();
     };
-  }, [handleRefreshComments, sha256]);
+  }, [handleRefreshComments, sha256, visible]);
 
   return (
     <div className={classes.container}>
       <Typography className={classes.title} variant="h6" onClick={() => setIsCollapsed(c => !c)}>
         <span>{t('comments')}</span>
+        <div style={{ flex: 1 }} />
+        <Tooltip title={t('comment.tooltip.add')}>
+          <span>
+            <IconButton
+              disabled={!comments}
+              size="large"
+              style={{
+                color: !comments
+                  ? theme.palette.text.disabled
+                  : theme.palette.mode === 'dark'
+                  ? theme.palette.success.light
+                  : theme.palette.success.dark
+              }}
+              onClick={handleAddConfirmation}
+            >
+              <AddCircleOutlineIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
         {!isCollapsed ? <ExpandLess /> : <ExpandMore />}
       </Typography>
       <Divider />
       <Collapse in={!isCollapsed} timeout="auto">
-        <CommentCard isAdding onAddComment={handleAddComment} />
-        {useMemo(
-          () =>
-            authors &&
-            comments &&
-            comments.length !== 0 &&
-            comments.map((comment, i) => (
-              <CommentCard
-                key={`${comment?.cid}`}
-                currentComment={comment}
-                previousComment={i > 0 ? comments[i - 1] : null}
-                currentAuthor={comment?.uname in authors ? authors[comment?.uname] : undefined}
-                previousAuthor={i > 0 && comment?.uname in authors ? authors[comments[i - 1]?.uname] : undefined}
-                onEditComment={handleEditComment}
-                onDeleteComment={handleDeleteComment}
-              />
-            )),
-          [authors, comments, handleDeleteComment, handleEditComment]
-        )}
+        {authors &&
+          sortedComments &&
+          sortedComments.map((comment, i) => (
+            <CommentCard
+              key={`${comment?.cid}`}
+              currentComment={comment}
+              previousComment={i > 0 ? sortedComments[i - 1] : null}
+              currentAuthor={comment?.uname in authors ? authors[comment?.uname] : undefined}
+              authors={authors}
+              onEditClick={handleEditConfirmation}
+              onDeleteClick={handleDeleteConfirmation}
+              onReactionClick={handleReactionClick}
+            />
+          ))}
       </Collapse>
+      <Dialog classes={{ paper: classes.dialog }} open={confirmation.open} onClose={handleCloseConfirmation}>
+        <DialogTitle>
+          {confirmation.type === 'add' && t('comment.confirmation.title.add')}
+          {confirmation.type === 'edit' && t('comment.confirmation.title.edit')}
+          {confirmation.type === 'delete' && t('comment.confirmation.title.delete')}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText component="div">
+            <Grid container flexDirection="column" spacing={2}>
+              <Grid item>
+                {confirmation.type === 'add' && t('comment.confirmation.content.add')}
+                {confirmation.type === 'edit' && t('comment.confirmation.content.edit')}
+                {confirmation.type === 'delete' && t('comment.confirmation.content.delete')}
+              </Grid>
+              {['add', 'edit'].includes(confirmation.type) && (
+                <Grid item>
+                  <TextField
+                    value={currentComment?.text}
+                    disabled={waiting}
+                    label={t('comment.content')}
+                    margin="dense"
+                    size="small"
+                    type="text"
+                    minRows={3}
+                    autoFocus
+                    fullWidth
+                    multiline
+                    onChange={handleTextChange}
+                  />
+                </Grid>
+              )}
+              {confirmation.type === 'delete' && (
+                <Grid item>
+                  <Typography variant="subtitle2" children={t('comment.content')} />
+                  <Paper component="pre" variant="outlined" className={classes.preview}>
+                    {currentComment?.text}
+                  </Paper>
+                </Grid>
+              )}
+              <Grid item>{t('comment.confirmation.confirm')}</Grid>
+            </Grid>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button color="secondary" children={t('cancel')} onClick={handleCloseConfirmation} />
+          <Button
+            color="primary"
+            autoFocus
+            disabled={[null, undefined, ''].includes(currentComment?.text) || waiting}
+            children={
+              <>
+                {confirmation.type === 'add' && t('comment.confirmation.action.add')}
+                {confirmation.type === 'edit' && t('comment.confirmation.action.edit')}
+                {confirmation.type === 'delete' && t('comment.confirmation.action.delete')}
+                {waiting && (
+                  <CircularProgress
+                    size={24}
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      marginTop: -12,
+                      marginLeft: -12
+                    }}
+                  />
+                )}
+              </>
+            }
+            onClick={
+              confirmation.type === 'add'
+                ? handleAddComment(currentComment)
+                : confirmation.type === 'edit'
+                ? handleEditComment(currentComment)
+                : confirmation.type === 'delete'
+                ? handleDeleteComment(currentComment)
+                : null
+            }
+          />
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
