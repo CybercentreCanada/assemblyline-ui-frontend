@@ -63,11 +63,18 @@ type Confirmation = {
 type Props = {
   sha256: string;
   comments: Comments;
+  visible?: boolean; // is visible on screen
+  drawer?: boolean; // inside the drawer
 };
 
 const SOCKETIO_NAMESPACE = '/file_comments';
 
-const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: commentsProps = [] }) => {
+const WrappedCommentSection: React.FC<Props> = ({
+  sha256 = null,
+  comments: commentsProps = [],
+  visible = true,
+  drawer = false
+}) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
@@ -117,7 +124,7 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
   }, []);
 
   const handleRefreshComments = useCallback(() => {
-    if (!sha256) return;
+    if (!sha256 || !visible) return;
     apiCall({
       method: 'GET',
       url: `/api/v4/archive/comment/${sha256}/`,
@@ -130,11 +137,11 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
       onFailure: ({ api_error_message }) => showErrorMessage(api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256]);
+  }, [sha256, visible]);
 
   const handleAddComment = useCallback(
     (comment: Comment) => () => {
-      if (!sha256) return;
+      if (!sha256 || !visible) return;
       apiCall({
         method: 'PUT',
         url: `/api/v4/archive/comment/${sha256}/`,
@@ -152,12 +159,12 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sha256]
+    [sha256, visible]
   );
 
   const handleEditComment = useCallback(
     (comment: Comment) => () => {
-      if (!sha256) return;
+      if (!sha256 || !visible) return;
       apiCall({
         method: 'POST',
         url: `/api/v4/archive/comment/${sha256}/${comment?.cid}/`,
@@ -175,12 +182,12 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sha256]
+    [sha256, visible]
   );
 
   const handleDeleteComment = useCallback(
     (comment: Comment) => () => {
-      if (!sha256) return;
+      if (!sha256 || !visible) return;
       apiCall({
         method: 'DELETE',
         url: `/api/v4/archive/comment/${sha256}/${comment?.cid}/`,
@@ -198,12 +205,12 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sha256]
+    [sha256, visible]
   );
 
   const handleReactionClick = useCallback(
     (comment: Comment, reaction: string) => () => {
-      if (!sha256) return;
+      if (!sha256 || !visible) return;
       apiCall({
         method: 'PUT',
         url: `/api/v4/archive/reaction/${sha256}/${comment?.cid}/${reaction}/`,
@@ -215,7 +222,6 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
               return v;
             })
           );
-          // setComments(c => ({ ...c, [comment?.cid]: { ...comment, reactions: api_response } }));
         },
         onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
         onEnter: () => setWaiting(true),
@@ -223,28 +229,11 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sha256]
+    [sha256, visible]
   );
 
   const handleTextChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setCurrentComment(c => ({ ...c, text: event.target.value }));
-  }, []);
-
-  const handleTextFocus = useCallback((event: React.FocusEvent<HTMLTextAreaElement | HTMLInputElement, Element>) => {
-    event.currentTarget.setSelectionRange(event.currentTarget.value.length, event.currentTarget.value.length);
-  }, []);
-
-  const handleTextKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
-    // if (loading) return;
-    // e.stopPropagation();
-    // if (e.code === 'Escape') {
-    //   setComment(c);
-    //   setIsEditing(false);
-    //   inputRef.current.blur();
-    // } else if (e.code === 'Enter' && (e.altKey || e.ctrlKey)) {
-    //   if (isAdding) handleAddClick(c)();
-    //   else handleEditClick(c)();
-    // }
   }, []);
 
   useEffect(() => {
@@ -264,7 +253,7 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
   }, [handleRefreshComments, sha256]);
 
   useEffect(() => {
-    if (!sha256) return;
+    if (!sha256 || !visible) return;
 
     socket.current = io(SOCKETIO_NAMESPACE);
 
@@ -288,7 +277,7 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
     return () => {
       socket.current.disconnect();
     };
-  }, [handleRefreshComments, sha256]);
+  }, [handleRefreshComments, sha256, visible]);
 
   return (
     <div className={classes.container}>
@@ -349,16 +338,16 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
               {['add', 'edit'].includes(confirmation.type) && (
                 <Grid item>
                   <TextField
-                    autoFocus
+                    value={currentComment?.text}
                     disabled={waiting}
-                    fullWidth
                     label={t('comment.content')}
                     margin="dense"
-                    minRows={3}
-                    multiline
                     size="small"
                     type="text"
-                    value={currentComment?.text}
+                    minRows={3}
+                    autoFocus
+                    fullWidth
+                    multiline
                     onChange={handleTextChange}
                   />
                 </Grid>

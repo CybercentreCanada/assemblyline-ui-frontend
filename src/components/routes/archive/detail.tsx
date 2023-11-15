@@ -284,7 +284,12 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
         <div style={{ display: tab === 'community' ? 'contents' : 'none' }}>
           <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} />
-          <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
+          <CommentSection
+            sha256={file?.file_info?.sha256}
+            comments={file ? file?.file_info?.comments : null}
+            visible={tab === 'community'}
+            drawer={inDrawer}
+          />
         </div>
       </Layout>
     );
