@@ -1,7 +1,7 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
-import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Menu, MenuItem } from '@mui/material';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
@@ -19,7 +19,7 @@ import InputDialog from './InputDialog';
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
-const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
+const SAFELIST_ICON = <VerifiedUserOutlinedIcon style={{ marginRight: '16px' }} />;
 const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />;
 const initialMenuState = {
   mouseX: null,

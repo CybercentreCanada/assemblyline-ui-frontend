@@ -1,5 +1,5 @@
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import BugReportIcon from '@mui/icons-material/BugReport';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import { useMediaQuery, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
@@ -140,7 +140,7 @@ export default function Submissions() {
                 }
               },
               {
-                icon: <BugReportIcon fontSize={upMD ? 'medium' : 'small'} />,
+                icon: <BugReportOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('malicious_submissions'),
                 props: {
                   onClick: () => {

@@ -26,6 +26,8 @@
   "role.retrohunt_view": "Visionnement de Rétrohunt",
   "role.safelist_manage": "Gestion de la Liste sure",
   "role.safelist_view": "Visionnement de la Liste sure",
+  "role.badlist_manage": "Gestion de la Liste mauvaise",
+  "role.badlist_view": "Visionnement de la Liste mauvaise",
   "role.search": "Recherche",
   "role.self_manage": "Gestion de l'Utilisateur en cours",
   "role.signature_download": "Téléchargement de Signatures",
