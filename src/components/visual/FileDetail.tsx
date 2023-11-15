@@ -437,7 +437,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         ) : (
           <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
         )}
-        <FrequencySection fileinfo={file ? file.file_info : null} />
+        <FrequencySection seen={file ? file.file_info?.seen : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
         <ChildrenSection childrens={file ? file.childrens : null} />
         <ParentSection parents={file ? file.parents : null} />
