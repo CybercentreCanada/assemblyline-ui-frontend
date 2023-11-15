@@ -36,7 +36,7 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
 import { matchSHA256, matchURL } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -108,6 +108,7 @@ const Submit: React.FC<any> = () => {
   const [urlHash, setUrlHash] = useState(state ? state.hash : '');
   const [submissionMetadata, setSubmissionMetadata] = useState(state ? state.metadata : undefined);
   const [urlHashHasError, setUrlHashHasError] = useState(false);
+  const [urlAutoselection, setUrlAutoselection] = useState(false);
   const [value, setValue] = useState(state ? state.tabContext : '0');
   const classification = useState(state ? state.c12n : null)[0];
   const banner = useAppBanner();
@@ -257,6 +258,22 @@ const Submit: React.FC<any> = () => {
     return selected;
   };
 
+  const toggleServiceSelection = service_name => {
+    if (settings) {
+      const newServices = settings.services;
+      for (const cat of newServices) {
+        for (const srv of cat.services) {
+          if (srv.name === service_name) {
+            srv.selected = !srv.selected;
+            break;
+          }
+        }
+        cat.selected = cat.services.every(e => e.selected);
+      }
+      setSettings({ ...settings, services: newServices });
+    }
+  };
+
   const anySelected = () => {
     const serviceList = settings.service_spec.map(srv => srv.name);
     return serviceList.some(isSelected);
@@ -337,7 +354,6 @@ const Submit: React.FC<any> = () => {
     } else {
       data = {
         ui_params: settings,
-        name: url[15] === undefined || url[15] === '' ? 'file' : url[15],
         url: urlHash,
         metadata: submissionMetadata
       };
@@ -362,6 +378,22 @@ const Submit: React.FC<any> = () => {
       }
     });
   }
+
+  useEffect(() => {
+    if (!urlAutoselection && matchURL(urlHash)) {
+      const newServices = settings.services;
+      for (const cat of newServices) {
+        for (const srv of cat.services) {
+          if (configuration.ui.url_submission_auto_service_selection.includes(srv.name)) {
+            srv.selected = true;
+          }
+        }
+        cat.selected = cat.services.every(e => e.selected);
+      }
+      setSettings({ ...settings, services: newServices });
+      setUrlAutoselection(true);
+    }
+  }, [settings, urlHash, urlAutoselection, configuration.ui.url_submission_auto_service_selection]);
 
   useEffectOnce(() => {
     // Setup Flow
@@ -523,6 +555,35 @@ const Submit: React.FC<any> = () => {
                 </>
               )}
             </div>
+            {matchURL(urlHash) &&
+              configuration.ui.url_submission_auto_service_selection &&
+              configuration.ui.url_submission_auto_service_selection.length > 0 && (
+                <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
+                  <Typography variant="subtitle1">
+                    {t('options.submission.url_submission_auto_service_selection')}
+                  </Typography>
+                  {configuration.ui.url_submission_auto_service_selection.map((service, i) => (
+                    <div key={i}>
+                      <FormControlLabel
+                        control={
+                          settings ? (
+                            <Checkbox
+                              size="small"
+                              checked={isSelected(service)}
+                              name="label"
+                              onChange={event => toggleServiceSelection(service)}
+                            />
+                          ) : (
+                            <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
+                          )
+                        }
+                        label={<Typography variant="body2">{service}</Typography>}
+                        className={settings ? classes.item : null}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             {matchSHA256(urlHash) &&
               configuration.submission.sha256_sources &&
               configuration.submission.sha256_sources.length > 0 && (

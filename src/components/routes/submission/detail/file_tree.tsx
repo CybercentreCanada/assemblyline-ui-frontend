@@ -136,7 +136,7 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
         return !isVisible(tree[sha256], defaultForceShown, isHighlighted, showSafeResults) ||
           (item.score < 0 && !showSafeResults && !force) ? null : (
           <div key={i}>
-            <div style={{ display: 'flex', width: '100%' }}>
+            <div style={{ display: 'flex', width: '100%', alignItems: 'flex-start' }}>
               {item.children &&
               Object.values(item.children).some(c => !isVisible(c, forcedShown, isHighlighted, showSafeResults)) ? (
                 <Tooltip title={t('tree_more')}>
@@ -183,11 +183,18 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
                     : null
                 }}
               >
-                <span>
-                  <Verdict score={item.score} mono short />
-                  {`:: ${item.name.join(' | ')} `}
-                  <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
-                </span>
+                <div style={{ display: 'flex' }}>
+                  <span style={{ whiteSpace: 'nowrap', paddingRight: '4px' }}>
+                    <Verdict score={item.score} mono short />
+                    <span>::</span>
+                  </span>
+                  <span style={{ alignSelf: 'center', paddingTop: '2px' }}>
+                    <span style={{ paddingRight: '4px', unicodeBidi: 'isolate-override' }}>
+                      {item.name.join(' | ')}
+                    </span>
+                    <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
+                  </span>
+                </div>
               </Box>
             </div>
             <div style={{ marginLeft: theme.spacing(3) }}>

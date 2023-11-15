@@ -45,8 +45,23 @@ import MetadataSection from './FileDetail/metadata';
 import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
 import TagSection from './FileDetail/tags';
+import URIIdentificationSection from './FileDetail/uriIdent';
 import FileDownloader from './FileDownloader';
 import InputDialog from './InputDialog';
+
+type URIInfo = {
+  uri: string;
+  scheme: string;
+  netloc: string;
+  path: string;
+  params: string;
+  query: string;
+  fragment: string;
+  username: string;
+  password: string;
+  hostname: string;
+  port: number;
+};
 
 type FileInfo = {
   archive_ts: string;
@@ -69,6 +84,7 @@ type FileInfo = {
   ssdeep: string;
   tlsh: string;
   type: string;
+  uri_info: URIInfo;
 };
 
 type File = {
@@ -297,9 +313,17 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
       <div style={{ paddingBottom: sp4 }}>
         <Grid container alignItems="center">
           <Grid item xs>
-            <Typography variant="h4">{t('title')}</Typography>
+            <Typography variant="h4">
+              {file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
+            </Typography>
             <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-              {file ? fileName : <Skeleton style={{ width: '10rem' }} />}
+              {file?.file_info?.type.startsWith('uri/') && file?.file_info?.uri_info?.uri ? (
+                file?.file_info?.uri_info?.uri
+              ) : file ? (
+                fileName
+              ) : (
+                <Skeleton style={{ width: '10rem' }} />
+              )}
             </Typography>
           </Grid>
           <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
@@ -408,7 +432,11 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         </Grid>
       </div>
       <div style={{ paddingBottom: sp2 }}>
-        <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+        {file?.file_info?.type.startsWith('uri/') ? (
+          <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+        ) : (
+          <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+        )}
         <FrequencySection fileinfo={file ? file.file_info : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
         <ChildrenSection childrens={file ? file.childrens : null} />
