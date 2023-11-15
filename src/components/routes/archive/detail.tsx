@@ -6,6 +6,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { ArchiveBanner, CommentSection, LabelSection, SimilarSection } from 'components/visual/ArchiveDetail';
 import Classification from 'components/visual/Classification';
+import { Comments } from 'components/visual/CommentCard';
 import { Error } from 'components/visual/ErrorCard';
 import AttackSection from 'components/visual/FileDetail/attacks';
 import ChildrenSection from 'components/visual/FileDetail/childrens';
@@ -33,12 +34,7 @@ export type FileInfo = {
   archive_ts: string;
   ascii: string;
   classification: string;
-  comments: {
-    cid: string;
-    uname: string;
-    date: string;
-    text: string;
-  }[];
+  comments: Comments;
   entropy: number;
   expiry_ts: string | null;
   hex: string;
