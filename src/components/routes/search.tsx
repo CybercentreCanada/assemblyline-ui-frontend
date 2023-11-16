@@ -99,6 +99,9 @@ function Search({ index }: SearchProps) {
   const [alertResults, setAlertResults] = useState<SearchResults>(null);
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
 
+  // Current index
+  const currentIndex = index || id;
+
   const stateMap = {
     submission: setSubmissionResults,
     file: setFileResults,
@@ -191,7 +194,7 @@ function Search({ index }: SearchProps) {
       queryValue.current = query.get('query', '');
       if (query.get('query')) {
         const searchList = [];
-        if (!(index || id)) {
+        if (!currentIndex) {
           searchList.push(...Object.keys(stateMap));
         } else {
           searchList.push(tab);
@@ -199,7 +202,11 @@ function Search({ index }: SearchProps) {
         }
         for (const searchIndex of searchList) {
           // Do no perform search if user has no rights
-          if (!currentUser.roles.includes(permissionMap[searchIndex])) continue;
+          if (
+            !currentUser.roles.includes(permissionMap[searchIndex]) ||
+            (searchIndex === 'retrohunt' && !configuration.retrohunt.enabled)
+          )
+            continue;
 
           apiCall({
             method: 'POST',
@@ -216,7 +223,7 @@ function Search({ index }: SearchProps) {
               }
             },
             onFinalize: () => {
-              if (index || id) {
+              if (currentIndex) {
                 setSearching(false);
               }
             }
@@ -231,8 +238,9 @@ function Search({ index }: SearchProps) {
 
   const SpecialTab = ({ children, ...otherProps }) => children;
 
-  return ((index || id) && !currentUser.roles.includes(permissionMap[index || id])) ||
-    (!(index || id) && Object.values(permissionMap).every(val => !currentUser.roles.includes(val))) ? (
+  return (currentIndex && !currentUser.roles.includes(permissionMap[index || id])) ||
+    (!currentIndex && Object.values(permissionMap).every(val => !currentUser.roles.includes(val))) ||
+    (currentIndex === 'retrohunt' && !configuration.retrohunt.enabled) ? (
     <ForbiddenPage />
   ) : (
     <PageFullWidth margin={4}>
@@ -280,7 +288,7 @@ function Search({ index }: SearchProps) {
             }
           />
 
-          {!(index || id) && query && query.get('query') && (
+          {!currentIndex && query && query.get('query') && (
             <Paper square style={{ marginBottom: theme.spacing(0.5) }}>
               <Tabs
                 className={classes.tweaked_tabs}
@@ -335,7 +343,7 @@ function Search({ index }: SearchProps) {
                 ) : (
                   <Empty />
                 )}
-                {currentUser.roles.includes(permissionMap.retrohunt) ? (
+                {currentUser.roles.includes(permissionMap.retrohunt) && configuration.retrohunt.enabled ? (
                   <Tab
                     label={`${t('retrohunt')} (${
                       retrohuntResults ? searchResultsDisplay(retrohuntResults.total) : '...'
@@ -369,7 +377,7 @@ function Search({ index }: SearchProps) {
               justifyContent: 'flex-end'
             }}
           >
-            {resMap[tab] && resMap[tab].total !== 0 && (index || id) && (
+            {resMap[tab] && resMap[tab].total !== 0 && currentIndex && (
               <div className={classes.searchresult}>
                 <SearchResultCount count={resMap[tab].total} />
                 {t(resMap[tab].total === 1 ? 'matching_result' : 'matching_results')}
@@ -392,22 +400,22 @@ function Search({ index }: SearchProps) {
       </PageHeader>
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         {tab === 'alert' && query && query.get('query') && (
-          <AlertsTable alertResults={alertResults} allowSort={!!(index || id)} />
+          <AlertsTable alertResults={alertResults} allowSort={!!currentIndex} />
         )}
         {tab === 'file' && query && query.get('query') && (
-          <FilesTable fileResults={fileResults} allowSort={!!(index || id)} />
+          <FilesTable fileResults={fileResults} allowSort={!!currentIndex} />
         )}
         {tab === 'result' && query && query.get('query') && (
-          <ResultsTable resultResults={resultResults} allowSort={!!(index || id)} />
+          <ResultsTable resultResults={resultResults} allowSort={!!currentIndex} />
         )}
         {tab === 'retrohunt' && query && query.get('query') && (
-          <RetrohuntTable retrohuntResults={retrohuntResults} allowSort={!!(index || id)} />
+          <RetrohuntTable retrohuntResults={retrohuntResults} allowSort={!!currentIndex} />
         )}
         {tab === 'signature' && query && query.get('query') && (
-          <SignaturesTable signatureResults={signatureResults} allowSort={!!(index || id)} />
+          <SignaturesTable signatureResults={signatureResults} allowSort={!!currentIndex} />
         )}
         {tab === 'submission' && query && query.get('query') && (
-          <SubmissionsTable submissionResults={submissionResults} allowSort={!!(index || id)} />
+          <SubmissionsTable submissionResults={submissionResults} allowSort={!!currentIndex} />
         )}
       </div>
     </PageFullWidth>
