@@ -380,7 +380,7 @@ const Submit: React.FC<any> = () => {
   }
 
   useEffect(() => {
-    if (!urlAutoselection && matchURL(urlHash)) {
+    if (settings && !urlAutoselection && matchURL(urlHash)) {
       const newServices = settings.services;
       for (const cat of newServices) {
         for (const srv of cat.services) {
