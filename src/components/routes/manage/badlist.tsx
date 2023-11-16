@@ -1,7 +1,8 @@
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { alpha, useMediaQuery, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
@@ -16,7 +17,7 @@ import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
-import SafelistTable from 'components/visual/SearchResult/safelist';
+import BadlistTable from 'components/visual/SearchResult/badlist';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -24,7 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import ForbiddenPage from '../403';
-import SafelistDetail from './safelist_detail';
+import BadlistDetail from './badlist_detail';
 
 const PAGE_SIZE = 25;
 
@@ -52,13 +53,13 @@ type SearchResults = {
   total: number;
 };
 
-export default function Safelist() {
-  const { t } = useTranslation(['manageSafelist']);
+export default function Badlist() {
+  const { t } = useTranslation(['manageBadlist']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const [safelistResults, setSafelistResults] = useState<SearchResults>(null);
+  const [badlistResults, setBadlistResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const navigate = useNavigate();
@@ -68,8 +69,8 @@ export default function Safelist() {
   const classes = useStyles();
   const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [suggestions] = useState(
-    indexes.safelist
-      ? [...Object.keys(indexes.safelist).filter(name => indexes.safelist[name].indexed), ...DEFAULT_SUGGESTION]
+    indexes.badlist
+      ? [...Object.keys(indexes.badlist).filter(name => indexes.badlist[name].indexed), ...DEFAULT_SUGGESTION]
       : [...DEFAULT_SUGGESTION]
   );
   const filterValue = useRef<string>('');
@@ -79,7 +80,7 @@ export default function Safelist() {
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
-    if (safelistResults !== null && !globalDrawerOpened && location.hash) {
+    if (badlistResults !== null && !globalDrawerOpened && location.hash) {
       navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,7 +88,7 @@ export default function Safelist() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<SafelistDetail safelist_id={location.hash.substr(1)} close={closeGlobalDrawer} />);
+      setGlobalDrawer(<BadlistDetail badlist_id={location.hash.substr(1)} close={closeGlobalDrawer} />);
     } else {
       closeGlobalDrawer();
     }
@@ -95,7 +96,7 @@ export default function Safelist() {
   }, [location.hash]);
 
   useEffect(() => {
-    if (query && currentUser.roles.includes('safelist_view')) {
+    if (query && currentUser.roles.includes('badlist_view')) {
       reload(0);
     }
 
@@ -104,23 +105,23 @@ export default function Safelist() {
 
   useEffect(() => {
     function handleReload() {
-      reload(safelistResults ? safelistResults.offset : 0);
+      reload(badlistResults ? badlistResults.offset : 0);
     }
 
-    window.addEventListener('reloadSafelist', handleReload);
+    window.addEventListener('reloadBadlist', handleReload);
 
     return () => {
-      window.removeEventListener('reloadSafelist', handleReload);
+      window.removeEventListener('reloadBadlist', handleReload);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, safelistResults]);
+  }, [query, badlistResults]);
 
   const reload = offset => {
     query.set('rows', PAGE_SIZE);
     query.set('offset', offset);
     apiCall({
       method: 'POST',
-      url: '/api/v4/search/safelist/',
+      url: '/api/v4/search/badlist/',
       body: query.getParams(),
       onSuccess: api_data => {
         if (
@@ -130,7 +131,7 @@ export default function Safelist() {
         ) {
           reload(Math.max(0, api_data.api_response.offset - api_data.api_response.rows));
         } else {
-          setSafelistResults(api_data.api_response);
+          setBadlistResults(api_data.api_response);
         }
       },
       onEnter: () => setSearching(true),
@@ -164,7 +165,7 @@ export default function Safelist() {
     filterValue.current = inputValue;
   };
 
-  const setSafelistID = useCallback(
+  const setBadlistID = useCallback(
     (wf_id: string) => {
       navigate(`${location.pathname}${location.search ? location.search : ''}#${wf_id}`);
     },
@@ -172,18 +173,18 @@ export default function Safelist() {
     [location.search]
   );
 
-  return currentUser.roles.includes('safelist_view') ? (
+  return currentUser.roles.includes('badlist_view') ? (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('title')}</Typography>
-        <VerifiedUserOutlinedIcon
+        <BugReportOutlinedIcon
           style={{
             width: upMD ? theme.spacing(27.5) : theme.spacing(18.5),
             height: upMD ? theme.spacing(19.5) : theme.spacing(16),
             position: 'fixed',
             right: 0,
             zIndex: -1,
-            color: alpha(theme.palette.success.light, 0.3),
+            color: alpha(theme.palette.error.light, 0.3),
             marginTop: upMD ? theme.spacing(-9) : theme.spacing(-7)
           }}
         />
@@ -232,28 +233,28 @@ export default function Safelist() {
               }
             ]}
           >
-            {safelistResults !== null && (
+            {badlistResults !== null && (
               <div className={classes.searchresult}>
-                {safelistResults.total !== 0 && (
+                {badlistResults.total !== 0 && (
                   <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                     {searching ? (
                       <span>{t('searching')}</span>
                     ) : (
                       <span>
-                        <SearchResultCount count={safelistResults.total} />
+                        <SearchResultCount count={badlistResults.total} />
                         {query.get('query')
-                          ? t(`filtered${safelistResults.total === 1 ? '' : 's'}`)
-                          : t(`total${safelistResults.total === 1 ? '' : 's'}`)}
+                          ? t(`filtered${badlistResults.total === 1 ? '' : 's'}`)
+                          : t(`total${badlistResults.total === 1 ? '' : 's'}`)}
                       </span>
                     )}
                   </Typography>
                 )}
 
                 <SearchPager
-                  total={safelistResults.total}
-                  setResults={setSafelistResults}
+                  total={badlistResults.total}
+                  setResults={setBadlistResults}
                   pageSize={pageSize}
-                  index="safelist"
+                  index="badlist"
                   query={query}
                   setSearching={setSearching}
                 />
@@ -264,7 +265,7 @@ export default function Safelist() {
       </PageHeader>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <SafelistTable safelistResults={safelistResults} setSafelistID={setSafelistID} />
+        <BadlistTable badlistResults={badlistResults} setBadlistID={setBadlistID} />
       </div>
     </PageFullWidth>
   ) : (

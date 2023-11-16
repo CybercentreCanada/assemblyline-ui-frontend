@@ -59,6 +59,7 @@
   "no_results_desc": "The query that you ran did not return any results.",
   "no_results_title": "No results found!",
   "no_retrohunt_title": "No retrohunt jobs found!",
+  "no_badlist_title": "No badlisted hash found!",
   "no_safelist_title": "No safelisted hash found!",
   "no_services_available_desc": "There are no new services available to be added.",
   "no_services_available_title": "No services found!",
