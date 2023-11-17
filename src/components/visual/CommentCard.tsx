@@ -20,7 +20,7 @@ import clsx from 'clsx';
 import { AppUserAvatar } from 'commons/components/topnav/UserProfile';
 import useALContext from 'components/hooks/useALContext';
 import 'moment/locale/fr';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 
@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => ({
       justifyContent: 'flex-end'
     },
     [`&.${REACTIONS_CLASS}`]: {
-      marginBottom: theme.spacing(2.5)
+      margin: `${theme.spacing(1.5)} 0px`
     }
   },
   icon: {
@@ -55,7 +55,6 @@ const useStyles = makeStyles(theme => ({
   },
 
   container: {
-    position: 'relative',
     maxWidth: '85%',
     display: 'flex',
     flexDirection: 'column',
@@ -148,10 +147,6 @@ const useStyles = makeStyles(theme => ({
     lineHeight: '36px'
   },
   reactionContainer: {
-    width: '100%',
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
     display: 'flex',
     gap: theme.spacing(1),
     padding: `0px ${theme.spacing(1)}`,
@@ -160,7 +155,8 @@ const useStyles = makeStyles(theme => ({
       justifyContent: 'flex-end'
     },
     [`&.${REACTIONS_CLASS}`]: {
-      transform: `translateY(${theme.spacing(2)})`
+      margin: `-${theme.spacing(1)} 0px`
+      // transform: `translateY(${theme.spacing(2)})`
     }
   },
   reactionChip: {
@@ -265,9 +261,6 @@ const WrappedCommentCard: React.FC<Props> = ({
   const classes = useStyles();
   const { user: currentUser } = useALContext();
 
-  const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-
   const reactions = useMemo<Record<keyof typeof REACTIONS, string[]> | object>(
     () =>
       !currentComment || !('reactions' in currentComment)
@@ -283,6 +276,15 @@ const WrappedCommentCard: React.FC<Props> = ({
             ])
           ) as Record<keyof typeof REACTIONS, string[]>),
     [currentComment]
+  );
+
+  const hasReactions = useMemo<boolean>(
+    () =>
+      !!reactions &&
+      Object.entries(reactions)
+        .map(([_, v]) => (Array.isArray(v) ? v?.length : 0))
+        .reduce((p, c) => p + c, 0) > 0,
+    [reactions]
   );
 
   const isCurrentUser = useMemo<boolean>(
@@ -340,7 +342,7 @@ const WrappedCommentCard: React.FC<Props> = ({
         classes.root,
         isCurrentUser && CURRENT_USER_CLASS,
         samePreviousAuthor && previousNarrowTimeSpan && PREVIOUS_CLASS,
-        currentComment?.reactions?.length > 0 && REACTIONS_CLASS
+        hasReactions && REACTIONS_CLASS
       )}
     >
       {!currentComment ? (
@@ -418,11 +420,8 @@ const WrappedCommentCard: React.FC<Props> = ({
                 isCurrentUser && CURRENT_USER_CLASS,
                 previousNarrowTimeSpan && samePreviousAuthor && PREVIOUS_CLASS,
                 nextNarrowTimeSpan && sameNextAuthor && NEXT_CLASS,
-                currentComment?.reactions?.length > 0 && REACTIONS_CLASS
+                hasReactions && REACTIONS_CLASS
               )}
-              ref={contentRef}
-              onMouseEnter={() => setAnchorEl(contentRef.current)}
-              onMouseLeave={() => setAnchorEl(null)}
             >
               <Typography variant="body2" children={currentComment?.text} />
             </div>
@@ -433,7 +432,7 @@ const WrappedCommentCard: React.FC<Props> = ({
           className={clsx(
             classes.reactionContainer,
             isCurrentUser && CURRENT_USER_CLASS,
-            currentComment?.reactions?.length > 0 && REACTIONS_CLASS
+            hasReactions && REACTIONS_CLASS
           )}
         >
           {Object.entries(reactions).map(

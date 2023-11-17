@@ -88,7 +88,6 @@ const WrappedCommentSection: React.FC<Props> = ({
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [confirmation, setConfirmation] = useState<Confirmation>({ open: false, type: 'add' });
   const [waiting, setWaiting] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
 
   const socket = useRef(null);
 
@@ -133,9 +132,7 @@ const WrappedCommentSection: React.FC<Props> = ({
         setAuthors(a => ({ ...a, ...api_response.authors }));
         setComments([...api_response.comments]);
       },
-      onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
-      onEnter: () => setLoading(true),
-      onExit: () => setLoading(false)
+      onFailure: ({ api_error_message }) => showErrorMessage(api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256, visible]);
@@ -251,10 +248,7 @@ const WrappedCommentSection: React.FC<Props> = ({
 
   useEffect(() => {
     if (sha256) handleRefreshComments();
-    return () => {
-      setLoading(true);
-      setComments(null);
-    };
+    return () => setComments(null);
   }, [handleRefreshComments, sha256]);
 
   useEffect(() => {
@@ -311,7 +305,7 @@ const WrappedCommentSection: React.FC<Props> = ({
       </Typography>
       <Divider />
       <Collapse in={!isCollapsed} timeout="auto">
-        {loading
+        {!comments
           ? Array.from({ length: 3 }).map((_, i) => <CommentCard key={i} />)
           : authors &&
             sortedComments &&
