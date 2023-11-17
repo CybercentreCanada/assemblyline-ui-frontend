@@ -4,16 +4,16 @@ import {
   Button,
   Chip,
   Divider,
-  Fade,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   ListSubheader,
-  Popper,
+  Skeleton,
   Stack,
   Tooltip,
-  Typography
+  Typography,
+  useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
@@ -24,34 +24,104 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 
+const PREVIOUS_CLASS = 'previous';
+const NEXT_CLASS = 'next';
+const CURRENT_USER_CLASS = 'current_user';
+const LOADING_CLASS = 'loading';
+const REACTIONS_CLASS = 'reactions';
+
 const useStyles = makeStyles(theme => ({
-  comment: {
+  root: {
     display: 'flex',
     alignItems: 'flex-start',
+    justifyContent: 'flex-start',
     gap: theme.spacing(1),
-    margin: `${theme.spacing(0.5)} 0 0 0`
-  },
-  diffComment: {
-    margin: `${theme.spacing(2)} 0 0 0`
+    marginTop: theme.spacing(1.5),
+    [`&.${PREVIOUS_CLASS}`]: {
+      marginTop: theme.spacing(0.5)
+    },
+    [`&.${CURRENT_USER_CLASS}`]: {
+      justifyContent: 'flex-end'
+    },
+    [`&.${REACTIONS_CLASS}`]: {
+      marginBottom: theme.spacing(2.5)
+    }
   },
   icon: {
     alignSelf: 'start',
-    minWidth: '40px'
+    minWidth: '40px',
+    minHeight: '40px',
+    marginTop: '20px'
   },
-  content: {
+
+  container: {
+    position: 'relative',
+    maxWidth: '85%',
     display: 'flex',
     flexDirection: 'column',
-    gap: theme.spacing(1),
-    padding: `${theme.spacing(1)} ${theme.spacing(1.75)}`,
-    borderRadius: '6px',
-    backgroundColor: '#0000001A'
+    [`&.${LOADING_CLASS}`]: {
+      flex: 1
+    }
   },
   header: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing(1.5)
+    justifyContent: 'flex-start',
+    gap: theme.spacing(2.5),
+    marginLeft: theme.spacing(1),
+    height: '20px',
+    [`&.${CURRENT_USER_CLASS}`]: {
+      justifyContent: 'flex-end'
+    }
   },
+  content: {
+    minHeight: '40px',
+    padding: `${theme.spacing(1)} ${theme.spacing(1.75)}`,
+    borderRadius: theme.spacing(1),
+    color: theme.palette.common.white,
+    boxShadow: theme.shadows[2],
+    [`&:not(.${CURRENT_USER_CLASS})`]: {
+      backgroundColor: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 500],
+      [`&.${PREVIOUS_CLASS}`]: {
+        borderTopLeftRadius: '0px'
+      },
+      [`&.${NEXT_CLASS}`]: {
+        borderBottomLeftRadius: '0px'
+      }
+    },
+    [`&.${CURRENT_USER_CLASS}`]: {
+      backgroundColor: theme.palette.primary.main,
+      [`&.${PREVIOUS_CLASS}`]: {
+        borderTopRightRadius: '0px'
+      },
+      [`&.${NEXT_CLASS}`]: {
+        borderBottomRightRadius: '0px'
+      }
+    },
+    [`&.${REACTIONS_CLASS}`]: {
+      paddingBottom: theme.spacing(2)
+    }
+  },
+  commentTooltip: {
+    margin: `${theme.spacing(0.5)} !important`,
+    padding: '0px !important'
+  },
+
+  // content: {
+  //   display: 'flex',
+  //   flexDirection: 'column',
+  //   gap: theme.spacing(1),
+  //   padding: `${theme.spacing(1)} ${theme.spacing(1.75)}`,
+  //   borderRadius: '6px',
+  //   // backgroundColor: theme.palette.grey[400],
+  //   // color: 'black'
+  //   backgroundColor: alpha(theme.palette.common.black, 0.15)
+  //   // backgroundColor: '#0000001A',
+  //   // backgroundColor: 'rgba(0, 0, 0, 0.15)'
+  //   // boxShadow: theme.shadows[2],
+  //   // border: `1px solid ${theme.palette.divider}`
+  // },
   date: {
     color: theme.palette.text.secondary
   },
@@ -60,7 +130,9 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     backgroundColor: theme.palette.background.default,
-    borderRadius: '4px'
+    borderRadius: '4px',
+    boxShadow: theme.shadows[10],
+    border: '1px solid black'
   },
   action: {
     padding: `${theme.spacing(0.25)} ${theme.spacing(0.5)}`,
@@ -73,29 +145,64 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.text.primary
   },
   tooltip: {
-    backgroundColor: theme.palette.grey[700],
-    marginTop: `${theme.spacing(1)} !important`
+    backgroundColor: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 500],
+    margin: `${theme.spacing(0.5)} !important`
   },
   reactionTooltip: {
     padding: 0
   },
   reactionList: {
     borderRadius: '4px',
-    backgroundColor: theme.palette.background.default
+    backgroundColor: theme.palette.background.default,
+    boxShadow: theme.shadows[2]
   },
   reactionSubHeader: {
     borderRadius: '4px',
     backgroundColor: theme.palette.background.default,
     lineHeight: '36px'
   },
-  chipContainer: {
+  reactionContainer: {
+    width: '100%',
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
     display: 'flex',
-    gap: theme.spacing(1)
+    gap: theme.spacing(1),
+    padding: `0px ${theme.spacing(1)}`,
+    justifyContent: 'flex-start',
+    [`&.${CURRENT_USER_CLASS}`]: {
+      justifyContent: 'flex-end'
+    },
+    [`&.${REACTIONS_CLASS}`]: {
+      transform: `translateY(${theme.spacing(2)})`
+    }
+  },
+  reactionChip: {
+    backgroundColor: theme.palette.background.default,
+    borderRadius: '14px'
   },
   actionIcon: {
     fontSize: 'medium'
+  },
+  justifyEnd: {
+    justifyContent: 'flex-end'
   }
 }));
+
+const CALENDAR_STRINGS = {
+  fr: {
+    sameDay: 'H[h]mm',
+    lastDay: '[Hier] H[h]mm',
+    lastWeek: 'dddd H[h]mm ',
+    sameElse: 'Do MMMM YYYY H[h]mm'
+  },
+  en: {
+    sameDay: 'h:mm a',
+    lastDay: '[Yesterday] h:mm a',
+    lastWeek: 'dddd h:mm a',
+    sameElse: 'MMMM D YYYY, h:mm a'
+  }
+};
 
 export const REACTIONS = {
   thumbs_up: '👍',
@@ -148,8 +255,8 @@ export const DEFAULT_AUTHOR: Author = {
 type Props = {
   currentComment?: Comment;
   previousComment?: Comment;
+  nextComment?: Comment;
   authors?: Authors;
-  currentAuthor?: Author;
   onEditClick?: (comment: Comment) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDeleteClick?: (comment: Comment) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onReactionClick?: (
@@ -158,31 +265,17 @@ type Props = {
   ) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 
-const CALENDAR_STRINGS = {
-  fr: {
-    sameDay: 'H[h]mm',
-    lastDay: '[Hier] H[h]mm',
-    lastWeek: 'dddd H[h]mm ',
-    sameElse: 'Do MMMM YYYY H[h]mm'
-  },
-  en: {
-    sameDay: 'h:mm a',
-    lastDay: '[Yesterday] h:mm a',
-    lastWeek: 'dddd h:mm a',
-    sameElse: 'MMMM D YYYY, h:mm a'
-  }
-};
-
 const WrappedCommentCard: React.FC<Props> = ({
-  currentComment = DEFAULT_COMMENT,
+  currentComment = null,
   previousComment = null,
+  nextComment = null,
   authors = null,
-  currentAuthor = DEFAULT_AUTHOR,
   onEditClick = () => null,
   onDeleteClick = () => null,
   onReactionClick = () => null
 }) => {
   const { t, i18n } = useTranslation(['archive']);
+  const theme = useTheme();
   const classes = useStyles();
   const { user: currentUser } = useALContext();
 
@@ -192,7 +285,7 @@ const WrappedCommentCard: React.FC<Props> = ({
 
   const reactions = useMemo<Record<keyof typeof REACTIONS, string[]> | object>(
     () =>
-      !('reactions' in currentComment)
+      !currentComment || !('reactions' in currentComment)
         ? {}
         : (Object.fromEntries(
             Object.keys(REACTIONS).map(reaction => [
@@ -208,8 +301,8 @@ const WrappedCommentCard: React.FC<Props> = ({
   );
 
   const isCurrentUser = useMemo<boolean>(
-    () => currentUser?.username === currentAuthor?.uname,
-    [currentAuthor, currentUser]
+    () => currentUser?.username === currentComment?.uname,
+    [currentComment, currentUser]
   );
 
   const calendar = useMemo<(typeof CALENDAR_STRINGS)['en']>(
@@ -217,70 +310,157 @@ const WrappedCommentCard: React.FC<Props> = ({
     [i18n.language]
   );
 
-  const isSameAuthor = useMemo<boolean>(
+  const samePreviousAuthor = useMemo<boolean>(
     () => currentComment?.uname === previousComment?.uname,
     [currentComment?.uname, previousComment?.uname]
   );
 
-  const isNarrowTimeSpan = useMemo<boolean>(
+  const sameNextAuthor = useMemo<boolean>(
+    () => currentComment?.uname === nextComment?.uname,
+    [currentComment?.uname, nextComment?.uname]
+  );
+
+  const previousNarrowTimeSpan = useMemo<boolean>(
     () => Date.parse(previousComment?.date) - Date.parse(currentComment?.date) < 5 * 60 * 1000,
     [currentComment?.date, previousComment?.date]
   );
 
-  const getAvatar = useCallback(
-    (name: string) =>
-      (name || '')
-        .split(' ')
-        .filter(w => w !== '')
-        .splice(0, 2)
-        .map(n => (n ? n[0].toUpperCase() : ''))
-        .join(''),
-    []
+  const nextNarrowTimeSpan = useMemo<boolean>(
+    () => Date.parse(currentComment?.date) - Date.parse(nextComment?.date) < 5 * 60 * 1000,
+    [currentComment?.date, nextComment?.date]
   );
 
-  const handlePopoverOpen = useCallback(() => setAnchorEl(contentRef.current), []);
-
-  const handlePopoverClose = useCallback(() => setAnchorEl(null), []);
+  const AvatarIcon: React.FC<{ comment?: Comment }> = useCallback(
+    ({ comment = null }) =>
+      comment &&
+      comment?.uname in authors && (
+        <AppUserAvatar
+          children={authors[comment?.uname]?.name
+            .split(' ')
+            .filter(w => w !== '')
+            .splice(0, 2)
+            .map(n => (n ? n[0].toUpperCase() : ''))
+            .join('')}
+          alt={authors[comment?.uname]?.name}
+          url={authors[comment?.uname]?.avatar}
+          email={authors[comment?.uname]?.email}
+        />
+      ),
+    [authors]
+  );
 
   return (
-    <div className={clsx(classes.comment, (!isSameAuthor || !isNarrowTimeSpan) && classes.diffComment)}>
-      <div className={classes.icon}>
-        {!isSameAuthor ? (
-          <AppUserAvatar
-            children={getAvatar(currentAuthor?.name)}
-            alt={currentAuthor?.name}
-            url={currentAuthor?.avatar}
-            email={currentAuthor?.email}
-          />
+    <div
+      className={clsx(
+        classes.root,
+        isCurrentUser && CURRENT_USER_CLASS,
+        samePreviousAuthor && previousNarrowTimeSpan && PREVIOUS_CLASS,
+        currentComment?.reactions?.length > 0 && REACTIONS_CLASS
+      )}
+    >
+      {!currentComment ? (
+        <Skeleton className={classes.icon} variant="circular" />
+      ) : (
+        !isCurrentUser && (
+          <div className={classes.icon}>{!samePreviousAuthor ? <AvatarIcon comment={currentComment} /> : <div />}</div>
+        )
+      )}
+
+      <div className={clsx(classes.container, !currentComment && LOADING_CLASS)}>
+        {!currentComment ? (
+          <Typography variant="caption" children={<Skeleton style={{ width: '50%' }} />} />
         ) : (
-          <div />
-        )}
-      </div>
-
-      <div
-        className={clsx(classes.content, currentAuthor?.email === currentUser?.email && classes.authorText)}
-        ref={contentRef}
-        onMouseEnter={handlePopoverOpen}
-        onMouseLeave={handlePopoverClose}
-      >
-        {(!isSameAuthor || !isNarrowTimeSpan) && (
-          <div className={classes.header}>
-            {!isSameAuthor && (
-              <Typography variant="body1" fontWeight={500}>
-                {currentAuthor?.name}
-              </Typography>
-            )}
-            {(!isSameAuthor || !isNarrowTimeSpan) && (
-              <Typography className={classes.date} variant="body2">
-                <Moment calendar={calendar} locale={i18n.language} children={currentComment?.date} />
-              </Typography>
-            )}
-          </div>
+          (!samePreviousAuthor || !previousNarrowTimeSpan) && (
+            <div className={clsx(classes.header, isCurrentUser && CURRENT_USER_CLASS)}>
+              {!isCurrentUser && !samePreviousAuthor && (
+                <Typography
+                  color={theme.palette.text.secondary}
+                  variant="caption"
+                  children={authors[currentComment?.uname]?.name}
+                />
+              )}
+              {(!samePreviousAuthor || !previousNarrowTimeSpan) && (
+                <Typography className={classes.date} variant="caption">
+                  <Moment calendar={calendar} locale={i18n.language} children={currentComment?.date} />
+                </Typography>
+              )}
+            </div>
+          )
         )}
 
-        <Typography variant="body2">{currentComment?.text}</Typography>
+        {!currentComment ? (
+          <Skeleton style={{ minHeight: '40px', padding: `${theme.spacing(1)} ${theme.spacing(1.75)}` }} />
+        ) : (
+          <Tooltip
+            classes={{ tooltip: classes.commentTooltip }}
+            placement="top-end"
+            title={
+              <Stack className={classes.actions} direction="row">
+                {Object.entries(REACTIONS).map(([icon, emoji]: [keyof typeof REACTIONS, string], i) => (
+                  <Tooltip key={i} classes={{ tooltip: classes.tooltip }} placement="top" title={t(`reaction.${icon}`)}>
+                    <Button
+                      className={classes.action}
+                      size="small"
+                      color="inherit"
+                      onClick={onReactionClick(currentComment, icon)}
+                    >
+                      <span className={classes.actionIcon}>{emoji}</span>
+                    </Button>
+                  </Tooltip>
+                ))}
 
-        <div className={classes.chipContainer}>
+                {isCurrentUser && (
+                  <>
+                    <Divider className={classes.divider} />
+                    <Tooltip classes={{ tooltip: classes.tooltip }} placement="top" title={t('comment.tooltip.edit')}>
+                      <Button
+                        className={classes.action}
+                        size="small"
+                        color="inherit"
+                        onClick={onEditClick(currentComment)}
+                      >
+                        <CreateOutlinedIcon />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip classes={{ tooltip: classes.tooltip }} placement="top" title={t('comment.tooltip.delete')}>
+                      <Button
+                        className={classes.action}
+                        size="small"
+                        color="inherit"
+                        onClick={onDeleteClick(currentComment)}
+                      >
+                        <ClearOutlinedIcon />
+                      </Button>
+                    </Tooltip>
+                  </>
+                )}
+              </Stack>
+            }
+          >
+            <div
+              className={clsx(
+                classes.content,
+                isCurrentUser && CURRENT_USER_CLASS,
+                previousNarrowTimeSpan && samePreviousAuthor && PREVIOUS_CLASS,
+                nextNarrowTimeSpan && sameNextAuthor && NEXT_CLASS,
+                currentComment?.reactions?.length > 0 && REACTIONS_CLASS
+              )}
+              ref={contentRef}
+              onMouseEnter={() => setAnchorEl(contentRef.current)}
+              onMouseLeave={() => setAnchorEl(null)}
+            >
+              <Typography variant="body2" children={currentComment?.text} />
+            </div>
+          </Tooltip>
+        )}
+
+        <div
+          className={clsx(
+            classes.reactionContainer,
+            isCurrentUser && CURRENT_USER_CLASS,
+            currentComment?.reactions?.length > 0 && REACTIONS_CLASS
+          )}
+        >
           {Object.entries(reactions).map(
             ([reaction, names], i) =>
               names?.length > 0 && (
@@ -300,7 +480,12 @@ const WrappedCommentCard: React.FC<Props> = ({
                           <ListItemIcon>
                             {name in authors && (
                               <AppUserAvatar
-                                children={getAvatar(authors[name]?.name)}
+                                children={authors[name]?.name
+                                  .split(' ')
+                                  .filter(w => w !== '')
+                                  .splice(0, 2)
+                                  .map(n => (n ? n[0].toUpperCase() : ''))
+                                  .join('')}
                                 alt={authors[name]?.name}
                                 url={authors[name]?.avatar}
                                 email={authors[name]?.email}
@@ -314,24 +499,26 @@ const WrappedCommentCard: React.FC<Props> = ({
                     </List>
                   }
                 >
-                  <Chip
-                    label={
-                      <>
-                        <span style={{ fontSize: 'medium' }}>{REACTIONS[reaction]}</span>
-                        <span>{names.length}</span>
-                      </>
-                    }
-                    size="small"
-                    variant="outlined"
-                    color={names.includes(currentUser?.username) ? 'primary' : 'default'}
-                    onClick={onReactionClick(currentComment, reaction)}
-                  />
+                  <div className={classes.reactionChip}>
+                    <Chip
+                      label={
+                        <>
+                          <span style={{ fontSize: 'medium' }}>{REACTIONS[reaction]}</span>
+                          <span>{names.length}</span>
+                        </>
+                      }
+                      size="small"
+                      variant="outlined"
+                      color={names.includes(currentUser?.username) ? 'primary' : 'default'}
+                      onClick={onReactionClick(currentComment, reaction)}
+                    />
+                  </div>
                 </Tooltip>
               )
           )}
         </div>
 
-        <Popper open={actionsOpen} anchorEl={anchorEl} placement="top-end" transition disablePortal>
+        {/* <Popper open={actionsOpen} anchorEl={anchorEl} placement="top-end" transition disablePortal>
           {({ TransitionProps }) => (
             <Fade {...TransitionProps} timeout={350}>
               <Stack className={classes.actions} direction="row">
@@ -376,10 +563,149 @@ const WrappedCommentCard: React.FC<Props> = ({
               </Stack>
             </Fade>
           )}
-        </Popper>
+        </Popper> */}
       </div>
     </div>
   );
+
+  // return (
+  //   <div className={clsx(classes.root, (!samePreviousAuthor || !previousNarrowTimeSpan) && classes.diffComment)}>
+  //     <div className={classes.icon}>
+  //       {!samePreviousAuthor ? (
+  //         <AppUserAvatar
+  //           children={getAvatar(authors[currentComment?.uname]?.name)}
+  //           alt={authors[currentComment?.uname]?.name}
+  //           url={authors[currentComment?.uname]?.avatar}
+  //           email={authors[currentComment?.uname]?.email}
+  //         />
+  //       ) : (
+  //         <div />
+  //       )}
+  //     </div>
+
+  //     <div
+  //       className={clsx(classes.content, isCurrentUser && classes.authorText)}
+  //       ref={contentRef}
+  //       onMouseEnter={() => setAnchorEl(contentRef.current)}
+  //       onMouseLeave={() => setAnchorEl(null)}
+  //     >
+  //       {(!samePreviousAuthor || !previousNarrowTimeSpan) && (
+  //         <div className={classes.header}>
+  //           {!samePreviousAuthor && (
+  //             <Typography variant="body1" fontWeight={500}>
+  //               {authors[currentComment?.uname]?.name}
+  //             </Typography>
+  //           )}
+  //           {(!samePreviousAuthor || !previousNarrowTimeSpan) && (
+  //             <Typography className={classes.date} variant="body2">
+  //               <Moment calendar={calendar} locale={i18n.language} children={currentComment?.date} />
+  //             </Typography>
+  //           )}
+  //         </div>
+  //       )}
+
+  //       <Typography variant="body2">{currentComment?.text}</Typography>
+
+  //       <div className={classes.chipContainer}>
+  //         {Object.entries(reactions).map(
+  //           ([reaction, names], i) =>
+  //             names?.length > 0 && (
+  //               <Tooltip
+  //                 key={i}
+  //                 classes={{ tooltip: classes.reactionTooltip }}
+  //                 title={
+  //                   <List
+  //                     className={classes.reactionList}
+  //                     dense={true}
+  //                     subheader={
+  //                       <ListSubheader className={classes.reactionSubHeader}>{t(`reaction.${reaction}`)}</ListSubheader>
+  //                     }
+  //                   >
+  //                     {names.map((name: string, j: number) => (
+  //                       <ListItem key={`${i}-${j}`}>
+  //                         <ListItemIcon>
+  //                           {name in authors && (
+  //                             <AppUserAvatar
+  //                               children={getAvatar(authors[name]?.name)}
+  //                               alt={authors[name]?.name}
+  //                               url={authors[name]?.avatar}
+  //                               email={authors[name]?.email}
+  //                               sx={{ width: 30, height: 30 }}
+  //                             />
+  //                           )}
+  //                         </ListItemIcon>
+  //                         <ListItemText primary={authors[name]?.name} />
+  //                       </ListItem>
+  //                     ))}
+  //                   </List>
+  //                 }
+  //               >
+  //                 <Chip
+  //                   label={
+  //                     <>
+  //                       <span style={{ fontSize: 'medium' }}>{REACTIONS[reaction]}</span>
+  //                       <span>{names.length}</span>
+  //                     </>
+  //                   }
+  //                   size="small"
+  //                   variant="outlined"
+  //                   color={names.includes(currentUser?.username) ? 'primary' : 'default'}
+  //                   onClick={onReactionClick(currentComment, reaction)}
+  //                 />
+  //               </Tooltip>
+  //             )
+  //         )}
+  //       </div>
+
+  //       <Popper open={actionsOpen} anchorEl={anchorEl} placement="top-end" transition disablePortal>
+  //         {({ TransitionProps }) => (
+  //           <Fade {...TransitionProps} timeout={350}>
+  //             <Stack className={classes.actions} direction="row">
+  //               {Object.entries(REACTIONS).map(([icon, emoji]: [keyof typeof REACTIONS, string], i) => (
+  //                 <Tooltip key={i} classes={{ tooltip: classes.tooltip }} title={t(`reaction.${icon}`)}>
+  //                   <Button
+  //                     className={classes.action}
+  //                     size="small"
+  //                     color="inherit"
+  //                     onClick={onReactionClick(currentComment, icon)}
+  //                   >
+  //                     <span className={classes.actionIcon}>{emoji}</span>
+  //                   </Button>
+  //                 </Tooltip>
+  //               ))}
+
+  //               {isCurrentUser && (
+  //                 <>
+  //                   <Divider className={classes.divider} />
+  //                   <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.tooltip.edit')}>
+  //                     <Button
+  //                       className={classes.action}
+  //                       size="small"
+  //                       color="inherit"
+  //                       onClick={onEditClick(currentComment)}
+  //                     >
+  //                       <CreateOutlinedIcon />
+  //                     </Button>
+  //                   </Tooltip>
+  //                   <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.tooltip.delete')}>
+  //                     <Button
+  //                       className={classes.action}
+  //                       size="small"
+  //                       color="inherit"
+  //                       onClick={onDeleteClick(currentComment)}
+  //                     >
+  //                       <ClearOutlinedIcon />
+  //                     </Button>
+  //                   </Tooltip>
+  //                 </>
+  //               )}
+  //             </Stack>
+  //           </Fade>
+  //         )}
+  //       </Popper>
+  //     </div>
+  //   </div>
+  // );
 };
 
 export const CommentCard = React.memo(WrappedCommentCard);

@@ -88,6 +88,7 @@ const WrappedCommentSection: React.FC<Props> = ({
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [confirmation, setConfirmation] = useState<Confirmation>({ open: false, type: 'add' });
   const [waiting, setWaiting] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const socket = useRef(null);
 
@@ -130,11 +131,11 @@ const WrappedCommentSection: React.FC<Props> = ({
       url: `/api/v4/archive/comment/${sha256}/`,
       onSuccess: ({ api_response }) => {
         setAuthors(a => ({ ...a, ...api_response.authors }));
-        setComments(c =>
-          [...api_response.comments, ...(c ? c : [])].filter((v, i, a) => a.findIndex(e => e?.cid === v?.cid) === i)
-        );
+        setComments([...api_response.comments]);
       },
-      onFailure: ({ api_error_message }) => showErrorMessage(api_error_message)
+      onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
+      onEnter: () => setLoading(true),
+      onExit: () => setLoading(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256, visible]);
@@ -250,6 +251,10 @@ const WrappedCommentSection: React.FC<Props> = ({
 
   useEffect(() => {
     if (sha256) handleRefreshComments();
+    return () => {
+      setLoading(true);
+      setComments(null);
+    };
   }, [handleRefreshComments, sha256]);
 
   useEffect(() => {
@@ -306,20 +311,22 @@ const WrappedCommentSection: React.FC<Props> = ({
       </Typography>
       <Divider />
       <Collapse in={!isCollapsed} timeout="auto">
-        {authors &&
-          sortedComments &&
-          sortedComments.map((comment, i) => (
-            <CommentCard
-              key={`${comment?.cid}`}
-              currentComment={comment}
-              previousComment={i > 0 ? sortedComments[i - 1] : null}
-              currentAuthor={comment?.uname in authors ? authors[comment?.uname] : undefined}
-              authors={authors}
-              onEditClick={handleEditConfirmation}
-              onDeleteClick={handleDeleteConfirmation}
-              onReactionClick={handleReactionClick}
-            />
-          ))}
+        {loading
+          ? Array.from({ length: 3 }).map((_, i) => <CommentCard key={i} />)
+          : authors &&
+            sortedComments &&
+            sortedComments.map((comment, i) => (
+              <CommentCard
+                key={i}
+                currentComment={comment}
+                previousComment={i > 0 && sortedComments[i - 1]}
+                nextComment={i < sortedComments.length - 1 && sortedComments[i + 1]}
+                authors={authors}
+                onEditClick={handleEditConfirmation}
+                onDeleteClick={handleDeleteConfirmation}
+                onReactionClick={handleReactionClick}
+              />
+            ))}
       </Collapse>
       <Dialog classes={{ paper: classes.dialog }} open={confirmation.open} onClose={handleCloseConfirmation}>
         <DialogTitle>
