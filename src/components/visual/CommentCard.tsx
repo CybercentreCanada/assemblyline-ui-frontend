@@ -107,21 +107,6 @@ const useStyles = makeStyles(theme => ({
     margin: `${theme.spacing(0.5)} !important`,
     padding: '0px !important'
   },
-
-  // content: {
-  //   display: 'flex',
-  //   flexDirection: 'column',
-  //   gap: theme.spacing(1),
-  //   padding: `${theme.spacing(1)} ${theme.spacing(1.75)}`,
-  //   borderRadius: '6px',
-  //   // backgroundColor: theme.palette.grey[400],
-  //   // color: 'black'
-  //   backgroundColor: alpha(theme.palette.common.black, 0.15)
-  //   // backgroundColor: '#0000001A',
-  //   // backgroundColor: 'rgba(0, 0, 0, 0.15)'
-  //   // boxShadow: theme.shadows[2],
-  //   // border: `1px solid ${theme.palette.divider}`
-  // },
   date: {
     color: theme.palette.text.secondary
   },
@@ -131,13 +116,14 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     backgroundColor: theme.palette.background.default,
     borderRadius: '4px',
-    boxShadow: theme.shadows[10],
-    border: '1px solid black'
+    boxShadow: theme.shadows[4]
+    // border: '1px solid black'
   },
   action: {
     padding: `${theme.spacing(0.25)} ${theme.spacing(0.5)}`,
     minWidth: 'auto !important',
-    height: `32px`
+    height: `32px`,
+    color: theme.palette.text.primary
   },
   divider: {
     width: '1px',
@@ -154,7 +140,7 @@ const useStyles = makeStyles(theme => ({
   reactionList: {
     borderRadius: '4px',
     backgroundColor: theme.palette.background.default,
-    boxShadow: theme.shadows[2]
+    boxShadow: theme.shadows[4]
   },
   reactionSubHeader: {
     borderRadius: '4px',
@@ -281,7 +267,6 @@ const WrappedCommentCard: React.FC<Props> = ({
 
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const actionsOpen = Boolean(anchorEl);
 
   const reactions = useMemo<Record<keyof typeof REACTIONS, string[]> | object>(
     () =>
@@ -413,22 +398,12 @@ const WrappedCommentCard: React.FC<Props> = ({
                   <>
                     <Divider className={classes.divider} />
                     <Tooltip classes={{ tooltip: classes.tooltip }} placement="top" title={t('comment.tooltip.edit')}>
-                      <Button
-                        className={classes.action}
-                        size="small"
-                        color="inherit"
-                        onClick={onEditClick(currentComment)}
-                      >
+                      <Button className={classes.action} size="small" onClick={onEditClick(currentComment)}>
                         <CreateOutlinedIcon />
                       </Button>
                     </Tooltip>
                     <Tooltip classes={{ tooltip: classes.tooltip }} placement="top" title={t('comment.tooltip.delete')}>
-                      <Button
-                        className={classes.action}
-                        size="small"
-                        color="inherit"
-                        onClick={onDeleteClick(currentComment)}
-                      >
+                      <Button className={classes.action} size="small" onClick={onDeleteClick(currentComment)}>
                         <ClearOutlinedIcon />
                       </Button>
                     </Tooltip>
@@ -493,7 +468,7 @@ const WrappedCommentCard: React.FC<Props> = ({
                               />
                             )}
                           </ListItemIcon>
-                          <ListItemText primary={authors[name]?.name} />
+                          <ListItemText primary={authors[name]?.name} sx={{ color: theme.palette.text.primary }} />
                         </ListItem>
                       ))}
                     </List>
@@ -517,195 +492,9 @@ const WrappedCommentCard: React.FC<Props> = ({
               )
           )}
         </div>
-
-        {/* <Popper open={actionsOpen} anchorEl={anchorEl} placement="top-end" transition disablePortal>
-          {({ TransitionProps }) => (
-            <Fade {...TransitionProps} timeout={350}>
-              <Stack className={classes.actions} direction="row">
-                {Object.entries(REACTIONS).map(([icon, emoji]: [keyof typeof REACTIONS, string], i) => (
-                  <Tooltip key={i} classes={{ tooltip: classes.tooltip }} title={t(`reaction.${icon}`)}>
-                    <Button
-                      className={classes.action}
-                      size="small"
-                      color="inherit"
-                      onClick={onReactionClick(currentComment, icon)}
-                    >
-                      <span className={classes.actionIcon}>{emoji}</span>
-                    </Button>
-                  </Tooltip>
-                ))}
-
-                {isCurrentUser && (
-                  <>
-                    <Divider className={classes.divider} />
-                    <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.tooltip.edit')}>
-                      <Button
-                        className={classes.action}
-                        size="small"
-                        color="inherit"
-                        onClick={onEditClick(currentComment)}
-                      >
-                        <CreateOutlinedIcon />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.tooltip.delete')}>
-                      <Button
-                        className={classes.action}
-                        size="small"
-                        color="inherit"
-                        onClick={onDeleteClick(currentComment)}
-                      >
-                        <ClearOutlinedIcon />
-                      </Button>
-                    </Tooltip>
-                  </>
-                )}
-              </Stack>
-            </Fade>
-          )}
-        </Popper> */}
       </div>
     </div>
   );
-
-  // return (
-  //   <div className={clsx(classes.root, (!samePreviousAuthor || !previousNarrowTimeSpan) && classes.diffComment)}>
-  //     <div className={classes.icon}>
-  //       {!samePreviousAuthor ? (
-  //         <AppUserAvatar
-  //           children={getAvatar(authors[currentComment?.uname]?.name)}
-  //           alt={authors[currentComment?.uname]?.name}
-  //           url={authors[currentComment?.uname]?.avatar}
-  //           email={authors[currentComment?.uname]?.email}
-  //         />
-  //       ) : (
-  //         <div />
-  //       )}
-  //     </div>
-
-  //     <div
-  //       className={clsx(classes.content, isCurrentUser && classes.authorText)}
-  //       ref={contentRef}
-  //       onMouseEnter={() => setAnchorEl(contentRef.current)}
-  //       onMouseLeave={() => setAnchorEl(null)}
-  //     >
-  //       {(!samePreviousAuthor || !previousNarrowTimeSpan) && (
-  //         <div className={classes.header}>
-  //           {!samePreviousAuthor && (
-  //             <Typography variant="body1" fontWeight={500}>
-  //               {authors[currentComment?.uname]?.name}
-  //             </Typography>
-  //           )}
-  //           {(!samePreviousAuthor || !previousNarrowTimeSpan) && (
-  //             <Typography className={classes.date} variant="body2">
-  //               <Moment calendar={calendar} locale={i18n.language} children={currentComment?.date} />
-  //             </Typography>
-  //           )}
-  //         </div>
-  //       )}
-
-  //       <Typography variant="body2">{currentComment?.text}</Typography>
-
-  //       <div className={classes.chipContainer}>
-  //         {Object.entries(reactions).map(
-  //           ([reaction, names], i) =>
-  //             names?.length > 0 && (
-  //               <Tooltip
-  //                 key={i}
-  //                 classes={{ tooltip: classes.reactionTooltip }}
-  //                 title={
-  //                   <List
-  //                     className={classes.reactionList}
-  //                     dense={true}
-  //                     subheader={
-  //                       <ListSubheader className={classes.reactionSubHeader}>{t(`reaction.${reaction}`)}</ListSubheader>
-  //                     }
-  //                   >
-  //                     {names.map((name: string, j: number) => (
-  //                       <ListItem key={`${i}-${j}`}>
-  //                         <ListItemIcon>
-  //                           {name in authors && (
-  //                             <AppUserAvatar
-  //                               children={getAvatar(authors[name]?.name)}
-  //                               alt={authors[name]?.name}
-  //                               url={authors[name]?.avatar}
-  //                               email={authors[name]?.email}
-  //                               sx={{ width: 30, height: 30 }}
-  //                             />
-  //                           )}
-  //                         </ListItemIcon>
-  //                         <ListItemText primary={authors[name]?.name} />
-  //                       </ListItem>
-  //                     ))}
-  //                   </List>
-  //                 }
-  //               >
-  //                 <Chip
-  //                   label={
-  //                     <>
-  //                       <span style={{ fontSize: 'medium' }}>{REACTIONS[reaction]}</span>
-  //                       <span>{names.length}</span>
-  //                     </>
-  //                   }
-  //                   size="small"
-  //                   variant="outlined"
-  //                   color={names.includes(currentUser?.username) ? 'primary' : 'default'}
-  //                   onClick={onReactionClick(currentComment, reaction)}
-  //                 />
-  //               </Tooltip>
-  //             )
-  //         )}
-  //       </div>
-
-  //       <Popper open={actionsOpen} anchorEl={anchorEl} placement="top-end" transition disablePortal>
-  //         {({ TransitionProps }) => (
-  //           <Fade {...TransitionProps} timeout={350}>
-  //             <Stack className={classes.actions} direction="row">
-  //               {Object.entries(REACTIONS).map(([icon, emoji]: [keyof typeof REACTIONS, string], i) => (
-  //                 <Tooltip key={i} classes={{ tooltip: classes.tooltip }} title={t(`reaction.${icon}`)}>
-  //                   <Button
-  //                     className={classes.action}
-  //                     size="small"
-  //                     color="inherit"
-  //                     onClick={onReactionClick(currentComment, icon)}
-  //                   >
-  //                     <span className={classes.actionIcon}>{emoji}</span>
-  //                   </Button>
-  //                 </Tooltip>
-  //               ))}
-
-  //               {isCurrentUser && (
-  //                 <>
-  //                   <Divider className={classes.divider} />
-  //                   <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.tooltip.edit')}>
-  //                     <Button
-  //                       className={classes.action}
-  //                       size="small"
-  //                       color="inherit"
-  //                       onClick={onEditClick(currentComment)}
-  //                     >
-  //                       <CreateOutlinedIcon />
-  //                     </Button>
-  //                   </Tooltip>
-  //                   <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.tooltip.delete')}>
-  //                     <Button
-  //                       className={classes.action}
-  //                       size="small"
-  //                       color="inherit"
-  //                       onClick={onDeleteClick(currentComment)}
-  //                     >
-  //                       <ClearOutlinedIcon />
-  //                     </Button>
-  //                   </Tooltip>
-  //                 </>
-  //               )}
-  //             </Stack>
-  //           </Fade>
-  //         )}
-  //       </Popper>
-  //     </div>
-  //   </div>
-  // );
 };
 
 export const CommentCard = React.memo(WrappedCommentCard);
