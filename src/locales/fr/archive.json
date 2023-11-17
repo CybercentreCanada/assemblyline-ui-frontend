@@ -36,7 +36,6 @@
   "file.highly_suspicious": "Fichier Hautement Suspect",
   "file.info": "Fichier Informatif",
   "file.malicious": "Fichier Malveillant",
-  "file.none": "Fichier",
   "file.result.info": "Aucun service n'a trouvé ce fichier malveillant",
   "file.result.malicious": "service a trouvé ce fichier malveillant",
   "file.result.suspicious": "service a trouvé ce fichier suspect",
@@ -123,5 +122,15 @@
   "type.SERVICE BUSY": "SERVICE OCCUPÉ",
   "type.SERVICE DOWN": "SERVICE EN PANNE",
   "type.TASK PRE-EMPTED": "TÂCHE PRÉEMPTÉE",
-  "type.UNKNOWN": "INCONNUE"
+  "type.UNKNOWN": "INCONNUE",
+  "uri.highly_suspicious": "URI Hautement Suspect",
+  "uri.info": "URI Informatif",
+  "uri.malicious": "URI Malveillant",
+  "uri.result.info": "Aucun service n'a trouvé ce URI malveillant",
+  "uri.result.malicious": "service a trouvé ce URI malveillant",
+  "uri.result.suspicious": "service a trouvé ce URI suspect",
+  "uri.results.malicious": "services ont trouvé ce URI malveillant",
+  "uri.results.suspicious": "services ont trouvé ce URI suspect",
+  "uri.safe": "URI Sans Danger",
+  "uri.suspicious": "URI Suspect"
 }
