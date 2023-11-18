@@ -60,6 +60,9 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     [`&.${LOADING_CLASS}`]: {
       flex: 1
+    },
+    [theme.breakpoints.down('md')]: {
+      maxWidth: '75%'
     }
   },
   header: {
