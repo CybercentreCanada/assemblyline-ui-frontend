@@ -48,6 +48,10 @@ const WrappedHexSection: React.FC<Props> = ({ sha256, visible = true }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, sha256, visible]);
 
+  useEffect(() => {
+    return () => setData(null);
+  }, [sha256]);
+
   if (!currentUser.roles.includes('file_detail')) return <ForbiddenPage />;
   else if (error) return <Alert severity="error">{error}</Alert>;
   else if (!data) return <LinearProgress />;

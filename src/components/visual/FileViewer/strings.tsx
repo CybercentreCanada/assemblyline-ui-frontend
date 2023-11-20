@@ -58,6 +58,13 @@ const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, sha256, visible]);
 
+  useEffect(() => {
+    return () => {
+      setData(null);
+      setDiffData(null);
+    };
+  }, [sha256]);
+
   if (!currentUser.roles.includes('file_detail')) return <ForbiddenPage />;
   else if (error) return <Alert severity="error">{error}</Alert>;
   else if (!data) return <LinearProgress />;
