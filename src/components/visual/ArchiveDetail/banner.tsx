@@ -228,6 +228,8 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   const fileName = file ? params.get('name') || sha256 : null;
   const popoverOpen = Boolean(resubmitAnchor);
 
+  const isURI = useMemo<boolean>(() => file?.file_info?.type.startsWith('uri/'), [file?.file_info?.type]);
+
   const { verdicts, currentVerdict } = useMemo<{
     verdicts: Record<keyof typeof VERDICTS, number>;
     currentVerdict: keyof typeof VERDICTS;
@@ -364,7 +366,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
       )}
 
       <div className={classes.container}>
-        <div className={classes.row} style={{ flexDirection: 'row-reverse' }}>
+        <div className={classes.row}>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             {file ? (
               <>
@@ -468,11 +470,17 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               </div>
             )}
           </div>
-          <div style={{ flex: 1 }} />
           <Typography
             className={clsx(classes.text, classes.color, VERDICTS[currentVerdict].className)}
-            children={t(`file.${file ? currentVerdict : 'none'}`, { ns: 'archive' })}
+            children={
+              !file ? (
+                <Skeleton style={{ width: '100%' }} />
+              ) : (
+                t(`${isURI ? 'uri' : 'file'}.${file ? currentVerdict : 'none'}`, { ns: 'archive' })
+              )
+            }
             variant="h4"
+            style={{ flex: 1 }}
           />
         </div>
         <div>
@@ -480,7 +488,15 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
             className={classes.text}
             gridColumn="span 2"
             variant="body1"
-            children={file ? file?.file_info?.sha256 : <Skeleton style={{ width: '50%' }} />}
+            children={
+              !file ? (
+                <Skeleton style={{ width: '50%' }} />
+              ) : isURI ? (
+                file?.file_info?.uri_info?.uri
+              ) : (
+                file?.file_info?.sha256
+              )
+            }
           />
         </div>
 
@@ -494,13 +510,18 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
             ) : verdicts && ['malicious', 'highly_suspicious', 'suspicious'].includes(currentVerdict) ? (
               <>
                 <div className={clsx(classes.color, VERDICTS.malicious.className)}>
-                  {`${verdicts.malicious} ${t(`file.result${verdicts.malicious > 1 ? 's' : ''}.malicious`, {
-                    ns: 'archive'
-                  })}`}
+                  {`${verdicts.malicious} ${t(
+                    `${isURI ? 'uri' : 'file'}.result${verdicts.malicious > 1 ? 's' : ''}.malicious`,
+                    {
+                      ns: 'archive'
+                    }
+                  )}`}
                 </div>
                 <div className={clsx(classes.color, VERDICTS.suspicious.className)}>
                   {`${verdicts.suspicious + verdicts.highly_suspicious} ${t(
-                    `file.result${verdicts.suspicious + verdicts.highly_suspicious > 1 ? 's' : ''}.suspicious`,
+                    `${isURI ? 'uri' : 'file'}.result${
+                      verdicts.suspicious + verdicts.highly_suspicious > 1 ? 's' : ''
+                    }.suspicious`,
                     {
                       ns: 'archive'
                     }
@@ -509,7 +530,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               </>
             ) : (
               <div className={clsx(classes.color, VERDICTS.safe.className)}>
-                {t('file.result.info', {
+                {t(`${isURI ? 'uri' : 'file'}.result.info`, {
                   ns: 'archive'
                 })}
               </div>
@@ -517,8 +538,12 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
           </div>
           <div>{t('type')}</div>
           <div>{file ? `${file?.file_info?.type}` : <Skeleton />}</div>
-          <div>{t('size')}</div>
-          <div>{file ? `${bytesToSize(file?.file_info?.size)}` : <Skeleton />}</div>
+          {!isURI && (
+            <>
+              <div>{t('size')}</div>
+              <div>{file ? `${bytesToSize(file?.file_info?.size)}` : <Skeleton />}</div>
+            </>
+          )}
           <div>{t('seen.last')}</div>
           <div>{file ? <Moment fromNow>{file?.file_info?.seen?.last}</Moment> : <Skeleton />}</div>
         </div>

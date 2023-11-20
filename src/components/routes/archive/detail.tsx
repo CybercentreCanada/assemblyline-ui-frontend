@@ -60,6 +60,19 @@ export type FileInfo = {
   ssdeep: string;
   tlsh: string;
   type: string;
+  uri_info?: {
+    fragment?: string;
+    hostname: string;
+    netloc: string;
+    params?: string;
+    password?: string;
+    path?: string;
+    port: number;
+    query?: string;
+    scheme: string;
+    uri: string;
+    username?: string;
+  };
 };
 
 export type File = {

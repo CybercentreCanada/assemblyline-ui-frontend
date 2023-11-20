@@ -1,9 +1,11 @@
+import FileOpenIcon from '@mui/icons-material/FileOpen';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import { AlertTitle, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { Comments } from 'components/visual/CommentCard';
 import CustomChip from 'components/visual/CustomChip';
 import {
   DivTable,
@@ -14,22 +16,25 @@ import {
   LinkRow,
   SortableHeaderCell
 } from 'components/visual/DivTable';
+import FileDownloader from 'components/visual/FileDownloader';
+import InformativeAlert from 'components/visual/InformativeAlert';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
-import FileDownloader from '../FileDownloader';
-import InformativeAlert from '../InformativeAlert';
 
 export type ArchivedFileResult = {
   archive_ts: string;
   ascii: string;
   classification: string;
+  comments: Comments;
   entropy: number;
   expiry_ts: string | null;
   hex: string;
   id: string;
+  is_section_image: boolean;
+  is_supplementary: boolean;
   labels: string[];
   label_categories?: {
     info: string[];
@@ -62,6 +67,7 @@ type SearchResults = {
 type ArchivesTableProps = {
   fileResults: SearchResults;
   allowSort?: boolean;
+  hasSupplementary?: boolean;
   setFileID?: (id: string) => void;
   onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
 };
@@ -75,6 +81,7 @@ const LABELS_COLOR_MAP = {
 const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
   fileResults,
   allowSort = true,
+  hasSupplementary = false,
   setFileID = null,
   onLabelClick = null
 }) => {
@@ -88,11 +95,18 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
         <DivTable>
           <DivTableHead>
             <DivTableRow>
+              {hasSupplementary && (
+                <SortableHeaderCell
+                  children={t('header.is_supplementary')}
+                  sortField="is_supplementary"
+                  allowSort={allowSort}
+                />
+              )}
               <SortableHeaderCell children={t('header.seen.last')} sortField="seen.last" allowSort={allowSort} />
               <SortableHeaderCell children={t('header.sha256')} sortField="sha256" allowSort={allowSort} />
               <SortableHeaderCell children={t('header.type')} sortField="type" allowSort={allowSort} />
               <DivTableCell children={t('header.labels')} />
-              <DivTableCell children={null} style={{ textAlign: 'center' }} />
+              <DivTableCell children={t('header.actions')} style={{ textAlign: 'center' }} />
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
@@ -110,11 +124,22 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                 hover
                 style={{ textDecoration: 'none' }}
               >
+                {hasSupplementary && (
+                  <DivTableCell style={{ textAlign: 'center' }}>
+                    {file?.is_supplementary && (
+                      <Tooltip title={t('tooltip.is_supplementary')}>
+                        <span>
+                          <FileOpenIcon fontSize={theme.breakpoints.down('md') ? 'small' : 'medium'} />
+                        </span>
+                      </Tooltip>
+                    )}
+                  </DivTableCell>
+                )}
                 <DivTableCell>
                   <Tooltip title={file.seen.last}>
-                    <>
+                    <span>
                       <Moment fromNow locale={i18n.language} children={file.seen.last} />
-                    </>
+                    </span>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>
@@ -173,15 +198,19 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                   }}
                 >
                   {currentUser.roles.includes('file_download') && 'sha256' in file && (
-                    <FileDownloader
-                      icon={<GetAppOutlinedIcon fontSize="small" />}
-                      link={`/api/v4/file/download/${file.sha256}/?`}
-                      size="small"
-                      onClick={e => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                      }}
-                    />
+                    <Tooltip title={t('tooltip.download')}>
+                      <span>
+                        <FileDownloader
+                          icon={<GetAppOutlinedIcon fontSize="small" />}
+                          link={`/api/v4/file/download/${file.sha256}/?`}
+                          size="small"
+                          onClick={e => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                          }}
+                        />
+                      </span>
+                    </Tooltip>
                   )}
                 </DivTableCell>
               </LinkRow>
