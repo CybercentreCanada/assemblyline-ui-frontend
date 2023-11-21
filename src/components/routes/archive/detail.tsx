@@ -158,15 +158,13 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   const tab = useMemo<Tab>(() => {
     const currentTab = inDrawer ? stateTab : paramTab;
-    if (!file) return currentTab;
-    else if (currentTab === 'image' && file?.file_info?.is_section_image === true) return currentTab;
-    else if (
+    return !file ||
+      (currentTab === 'image' && file?.file_info?.is_section_image === true) ||
       Object.keys(TABS)
         .filter(v => v !== 'image')
         .includes(currentTab)
-    )
-      return currentTab;
-    else return DEFAULT_TAB;
+      ? currentTab
+      : DEFAULT_TAB;
   }, [file, inDrawer, paramTab, stateTab]);
 
   const handleTabChange = useCallback(
@@ -259,7 +257,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
           }}
         >
           <MuiTabs
-            value={tab}
+            value={tab || 'details'}
             variant="scrollable"
             scrollButtons="auto"
             onChange={handleTabChange}
