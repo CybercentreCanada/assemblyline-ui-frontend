@@ -155,10 +155,19 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   const inDrawer = useMemo<boolean>(() => (propSha256 ? true : paramSha256 ? false : null), [paramSha256, propSha256]);
   const sha256 = useMemo<string>(() => paramSha256 || propSha256, [paramSha256, propSha256]);
-  const tab = useMemo<Tab>(
-    () => (Object.keys(TABS).includes(inDrawer ? stateTab : paramTab) ? (inDrawer ? stateTab : paramTab) : DEFAULT_TAB),
-    [inDrawer, paramTab, stateTab]
-  );
+
+  const tab = useMemo<Tab>(() => {
+    const currentTab = inDrawer ? stateTab : paramTab;
+    if (!file) return currentTab;
+    else if (currentTab === 'image' && file?.file_info?.is_section_image === true) return currentTab;
+    else if (
+      Object.keys(TABS)
+        .filter(v => v !== 'image')
+        .includes(currentTab)
+    )
+      return currentTab;
+    else return DEFAULT_TAB;
+  }, [file, inDrawer, paramTab, stateTab]);
 
   const handleTabChange = useCallback(
     (event: React.SyntheticEvent<Element, Event>, value: Tab) => {
