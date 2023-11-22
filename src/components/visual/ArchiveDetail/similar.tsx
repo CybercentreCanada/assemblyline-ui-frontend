@@ -10,12 +10,7 @@ import {
   Grid,
   IconButton,
   Skeleton,
-  Table,
-  TableBody,
-  TableCell,
   TableContainer,
-  TableHead,
-  TableRow,
   Tooltip,
   Typography,
   useTheme
@@ -24,6 +19,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { File, Tab } from 'components/routes/archive/detail';
+import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { safeFieldValueURI } from 'helpers/utils';
 import 'moment/locale/fr';
@@ -279,25 +275,25 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                       </div>
                     </div>
                     <TableContainer className={classes.tablecontainer}>
-                      <Table classes={{ root: classes.table }} size="small">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell classes={{ root: classes.headcell }} children={t('header.archived')} />
-                            <TableCell classes={{ root: classes.headcell }} children={t('header.seen.last')} />
-                            <TableCell classes={{ root: classes.headcell }} children={t('header.sha256')} />
-                            <TableCell classes={{ root: classes.headcell }} children={t('header.type')} />
-                            <TableCell classes={{ root: classes.headcell }} children={t('header.actions')} />
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
+                      <DivTable classes={{ root: classes.table }} size="small">
+                        <DivTableHead>
+                          <DivTableRow>
+                            <DivTableCell classes={{ root: classes.headcell }} children={t('header.archived')} />
+                            <DivTableCell classes={{ root: classes.headcell }} children={t('header.seen.last')} />
+                            <DivTableCell classes={{ root: classes.headcell }} children={t('header.sha256')} />
+                            <DivTableCell classes={{ root: classes.headcell }} children={t('header.type')} />
+                            <DivTableCell classes={{ root: classes.headcell }} children={t('header.actions')} />
+                          </DivTableRow>
+                        </DivTableHead>
+                        <DivTableBody>
                           {data[k].items.map((item, j) => (
-                            <TableRow
+                            <LinkRow
                               key={`${i}-${j}`}
                               classes={{ root: classes.tablerow }}
                               component={Link}
                               to={item?.from_archive ? `/archive/${item?.sha256}` : `/file/detail/${item?.sha256}`}
                             >
-                              <TableCell classes={{ root: classes.bodycell }}>
+                              <DivTableCell classes={{ root: classes.bodycell }}>
                                 {item?.from_archive && (
                                   <Tooltip title={t('file.from_archive')} placement="right">
                                     <span>
@@ -307,31 +303,31 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                                     </span>
                                   </Tooltip>
                                 )}
-                              </TableCell>
+                              </DivTableCell>
 
-                              <TableCell classes={{ root: classes.bodycell }}>
+                              <DivTableCell classes={{ root: classes.bodycell }}>
                                 <Tooltip title={item.seen.last}>
                                   <span>
                                     <Moment fromNow locale={i18n.language} children={item.seen.last} />
                                   </span>
                                 </Tooltip>
-                              </TableCell>
+                              </DivTableCell>
 
-                              <TableCell classes={{ root: classes.bodycell }}>{item?.sha256}</TableCell>
+                              <DivTableCell classes={{ root: classes.bodycell }}>{item?.sha256}</DivTableCell>
 
-                              <TableCell classes={{ root: classes.bodycell }}>{item?.type}</TableCell>
+                              <DivTableCell classes={{ root: classes.bodycell }}>{item?.type}</DivTableCell>
 
-                              <TableCell classes={{ root: classes.bodycell }}>
+                              <DivTableCell classes={{ root: classes.bodycell }}>
                                 <Tooltip title={t('compare')} placement="left">
                                   <IconButton size="small" onClick={handleCompareClick(item)}>
                                     <CompareIcon fontSize="small" />
                                   </IconButton>
                                 </Tooltip>
-                              </TableCell>
-                            </TableRow>
+                              </DivTableCell>
+                            </LinkRow>
                           ))}
-                        </TableBody>
-                      </Table>
+                        </DivTableBody>
+                      </DivTable>
                     </TableContainer>
                   </div>
                 )
