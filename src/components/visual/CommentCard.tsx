@@ -130,6 +130,7 @@ const useStyles = makeStyles(theme => ({
   divider: {
     width: '1px',
     height: '25px',
+    margin: `0 ${theme.spacing(0.5)}`,
     backgroundColor: theme.palette.text.primary
   },
   tooltip: {
@@ -382,6 +383,7 @@ const WrappedCommentCard: React.FC<Props> = ({
           <Skeleton style={{ minHeight: '40px', padding: `${theme.spacing(1)} ${theme.spacing(1.75)}` }} />
         ) : (
           <Tooltip
+            open={true}
             classes={{ tooltip: classes.commentTooltip }}
             placement="top-end"
             title={
