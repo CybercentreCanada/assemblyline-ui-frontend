@@ -1,3 +1,5 @@
+import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import { Divider, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
@@ -68,22 +70,71 @@ type ParamProps = {
 type BadlistDetailProps = {
   badlist_id?: string;
   close?: () => void;
+  mode?: 'read' | 'write';
 };
 
-const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
+const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps) => {
   const { t, i18n } = useTranslation(['manageBadlistDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [badlist, setBadlist] = useState<Badlist>(null);
-  const [histogram, setHistogram] = useState<any>(null);
-  const [deleteDialog, setDeleteDialog] = useState(false);
-  const [waitingDialog, setWaitingDialog] = useState(false);
-  const [enableDialog, setEnableDialog] = useState(false);
-  const [disableDialog, setDisableDialog] = useState(false);
+  const [originalBadlist, setOriginalBadlist] = useState<Badlist>(null);
+  const [histogram, setHistogram] = useState<Record<string, number>>(null);
+  const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
+  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
+  const [enableDialog, setEnableDialog] = useState<boolean>(false);
+  const [disableDialog, setDisableDialog] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<'read' | 'write'>(mode);
+  const [modified, setModified] = useState<boolean>(false);
   const { user: currentUser, c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const navigate = useNavigate();
+
+  const DEFAULT_BADLIST: Badlist = {
+    added: '',
+    classification: c12nDef.UNRESTRICTED,
+    enabled: false,
+    attribution: {
+      actor: [],
+      campaign: [],
+      category: [],
+      exploit: [],
+      implant: [],
+      family: [],
+      network: []
+    },
+    hashes: {
+      md5: '',
+      sha1: '',
+      sha256: '',
+      ssdeep: '',
+      tlsh: ''
+    },
+    file: {
+      name: [],
+      size: 0,
+      type: ''
+    },
+    id: '',
+    sources: [
+      {
+        classification: '',
+        name: '',
+        reason: [],
+        type: ''
+      }
+    ],
+    signature: {
+      name: ''
+    },
+    tag: {
+      type: '',
+      value: ''
+    },
+    type: '',
+    updated: ''
+  };
 
   useEffect(() => {
     if ((badlist_id || id) && currentUser.roles.includes('badlist_view')) {
@@ -91,8 +142,13 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
         url: `/api/v4/badlist/${badlist_id || id}/`,
         onSuccess: api_data => {
           setBadlist(api_data.api_response);
+          setOriginalBadlist(api_data.api_response);
         }
       });
+      setViewMode('read');
+    } else {
+      setViewMode('write');
+      setBadlist({ ...DEFAULT_BADLIST });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [badlist_id, id]);
@@ -243,6 +299,45 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                         </IconButton>
                       </Tooltip>
                     )}
+                    {(badlist_id || id) &&
+                      currentUser.roles.includes('badlist_manage') &&
+                      (badlist ? (
+                        <Tooltip title={t(viewMode === 'read' ? 'edit' : 'cancel')}>
+                          <IconButton
+                            style={{
+                              color:
+                                viewMode === 'read'
+                                  ? theme.palette.mode === 'dark'
+                                    ? theme.palette.info.light
+                                    : theme.palette.info.dark
+                                  : theme.palette.mode === 'dark'
+                                  ? theme.palette.error.light
+                                  : theme.palette.error.dark
+                            }}
+                            onClick={() => {
+                              if (viewMode === 'read') {
+                                // Switch to write mode
+                                setViewMode('write');
+                              } else {
+                                // Reset the state of the badlist, cancel changes
+                                setViewMode('read');
+                                setBadlist(originalBadlist);
+                                setModified(false);
+                              }
+                            }}
+                            size="large"
+                          >
+                            {viewMode === 'read' ? <EditOutlinedIcon /> : <EditOffOutlinedIcon />}
+                          </IconButton>
+                        </Tooltip>
+                      ) : (
+                        <Skeleton
+                          variant="circular"
+                          height="2.5rem"
+                          width="2.5rem"
+                          style={{ margin: theme.spacing(0.5) }}
+                        />
+                      ))}
                     {currentUser.roles.includes('badlist_manage') && (
                       <Tooltip title={t('remove')}>
                         <IconButton

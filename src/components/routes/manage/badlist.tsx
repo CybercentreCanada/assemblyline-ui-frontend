@@ -1,9 +1,9 @@
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
-
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import { alpha, useMediaQuery, useTheme } from '@mui/material';
+import { alpha, Grid, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -88,7 +88,13 @@ export default function Badlist() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<BadlistDetail badlist_id={location.hash.substr(1)} close={closeGlobalDrawer} />);
+      setGlobalDrawer(
+        <BadlistDetail
+          badlist_id={location.hash === '#new' ? null : location.hash.slice(1)}
+          close={closeGlobalDrawer}
+          mode={location.hash === '#new' ? 'write' : 'read'}
+        />
+      );
     } else {
       closeGlobalDrawer();
     }
@@ -176,7 +182,26 @@ export default function Badlist() {
   return currentUser.roles.includes('badlist_view') ? (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Typography variant="h4">{t('title')}</Typography>
+        <Grid container alignItems="center">
+          <Grid item xs>
+            <Typography variant="h4">{t('title')}</Typography>
+          </Grid>
+          {currentUser.roles.includes('badlist_manage') && (
+            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+              <Tooltip title={t('add_workflow')}>
+                <IconButton
+                  style={{
+                    color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                  }}
+                  onClick={() => navigate(`${location.pathname}${location.search ? location.search : ''}#new`)}
+                  size="large"
+                >
+                  <AddCircleOutlineOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          )}
+        </Grid>
         <BugReportOutlinedIcon
           style={{
             width: upMD ? theme.spacing(27.5) : theme.spacing(18.5),
