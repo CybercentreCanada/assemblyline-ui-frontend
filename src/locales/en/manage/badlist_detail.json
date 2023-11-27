@@ -41,6 +41,7 @@
   "tag.value": "Value",
   "timing": "Timing information",
   "timing.added": "Date Added",
+  "timing.expiry_ts": "Expiration date",
   "timing.updated": "Last updated",
   "title": "Badlisted hash details",
   "title.file": "Badlisted file details",

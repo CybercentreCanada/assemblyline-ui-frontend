@@ -35,6 +35,7 @@ export type Safelist = {
   added: string;
   classification: string;
   enabled: boolean;
+  expiry_ts?: string;
   hashes: {
     md5: string;
     sha1: string;
@@ -570,6 +571,22 @@ const SafelistDetail = ({ safelist_id, close, mode = 'read' }: SafelistDetailPro
                   <Skeleton />
                 )}
               </Grid>
+              {safelist && 'expiry_ts' in safelist && (
+                <>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('timing.expiry_ts')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10}>
+                    <div>
+                      <Moment format="YYYY-MM-DD">{safelist?.expiry_ts}</Moment>&nbsp; (
+                      <Moment fromNow locale={i18n.language}>
+                        {safelist?.expiry_ts}
+                      </Moment>
+                      )
+                    </div>
+                  </Grid>
+                </>
+              )}
             </Grid>
           </Grid>
           {currentUser.roles.includes('submission_view') && (
