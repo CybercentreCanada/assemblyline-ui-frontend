@@ -1,8 +1,8 @@
-import Paper from '@mui/material/Paper';
-import TableContainer from '@mui/material/TableContainer';
 import ClearIcon from '@mui/icons-material/Clear';
 import DoneIcon from '@mui/icons-material/Done';
 import { AlertTitle, Skeleton } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import {
@@ -69,7 +69,7 @@ const WrappedUsersTable: React.FC<UsersTableProps> = ({ userResults }) => {
                 <DivTableCell>{user.groups && user.groups.join(' | ')}</DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                    <Classification type="text" size="tiny" c12n={user.classification} format="short" />
+                    <Classification type="text" size="tiny" c12n={user.classification} format="short" isUser />
                   </DivTableCell>
                 )}
                 <DivTableCell>
