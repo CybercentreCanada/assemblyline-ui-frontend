@@ -366,7 +366,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                         // Switch to write mode
                         setViewMode('write');
 
-                        // Remove meta properties of workflow so it's treated as a new workflow
+                        // Keep properties of workflow that are important
                         var keptProperties = {
                           classification: workflow.classification,
                           enabled: workflow.enabled,
@@ -375,6 +375,8 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                           query: workflow.query,
                           status: workflow.status
                         };
+
+                        // Apply important properties on top of default workflow template
                         setWorkflow({ ...DEFAULT_WORKFLOW, ...keptProperties });
                         setWorkflowID(null);
                         setModified(false);
