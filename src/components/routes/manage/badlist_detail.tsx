@@ -1,6 +1,8 @@
 import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import { Divider, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
@@ -91,6 +93,8 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const navigate = useNavigate();
+
+  const readOnly = viewMode === 'read';
 
   const DEFAULT_BADLIST: Badlist = {
     added: '',
@@ -227,6 +231,10 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
     });
   };
 
+  const setClassification = classification => {
+    setBadlist({ ...badlist, classification });
+  };
+
   return currentUser.roles.includes('badlist_view') ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">
       <ConfirmationDialog
@@ -262,7 +270,12 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
 
       {c12nDef.enforce && (
         <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Classification type="outlined" c12n={badlist ? badlist.classification : null} />
+          <Classification
+            type={readOnly ? 'outlined' : 'picker'}
+            c12n={badlist ? badlist.classification : null}
+            setClassification={setClassification}
+            format="long"
+          />
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
@@ -277,91 +290,98 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
             <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
               {badlist ? (
                 <>
-                  <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
-                    {currentUser.roles.includes('submission_view') && (
-                      <Tooltip title={t('usage')}>
-                        <IconButton
-                          component={Link}
-                          style={{ color: theme.palette.action.active }}
-                          to={
-                            badlist.type === 'file'
-                              ? `/search/?query=sha256:${badlist.hashes.sha256 || badlist_id || id} OR results:${
-                                  badlist.hashes.sha256 || badlist_id || id
-                                }* OR errors:${badlist.hashes.sha256 || badlist_id || id}* OR file.sha256:${
-                                  badlist.hashes.sha256 || badlist_id || id
-                                }`
-                              : `/search/result/?query=result.sections.tags.${badlist.tag.type}:${safeFieldValueURI(
-                                  badlist.tag.value
-                                )}`
-                          }
-                          size="large"
-                        >
-                          <YoutubeSearchedForIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {(badlist_id || id) &&
-                      currentUser.roles.includes('badlist_manage') &&
-                      (badlist ? (
-                        <Tooltip title={t(viewMode === 'read' ? 'edit' : 'cancel')}>
+                  {(badlist_id || id) && (
+                    <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
+                      {currentUser.roles.includes('submission_view') && (
+                        <Tooltip title={t('usage')}>
                           <IconButton
+                            component={Link}
+                            disabled={!readOnly}
                             style={{
-                              color:
-                                viewMode === 'read'
-                                  ? theme.palette.mode === 'dark'
-                                    ? theme.palette.info.light
-                                    : theme.palette.info.dark
+                              color: readOnly ? theme.palette.action.active : theme.palette.action.disabled
+                            }}
+                            to={
+                              badlist.type === 'file'
+                                ? `/search/?query=sha256:${badlist.hashes.sha256 || badlist_id || id} OR results:${
+                                    badlist.hashes.sha256 || badlist_id || id
+                                  }* OR errors:${badlist.hashes.sha256 || badlist_id || id}* OR file.sha256:${
+                                    badlist.hashes.sha256 || badlist_id || id
+                                  }`
+                                : `/search/result/?query=result.sections.tags.${badlist.tag.type}:${safeFieldValueURI(
+                                    badlist.tag.value
+                                  )}`
+                            }
+                            size="large"
+                          >
+                            <YoutubeSearchedForIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      {currentUser.roles.includes('badlist_manage') && (
+                        <Tooltip title={badlist.enabled ? t('enabled') : t('disabled')}>
+                          <IconButton
+                            onClick={badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
+                            size="large"
+                            disabled={!readOnly}
+                          >
+                            {badlist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      {currentUser.roles.includes('badlist_manage') &&
+                        (badlist ? (
+                          <Tooltip title={t(readOnly ? 'edit' : 'cancel')}>
+                            <IconButton
+                              style={{
+                                color: readOnly
+                                  ? theme.palette.primary.main
                                   : theme.palette.mode === 'dark'
                                   ? theme.palette.error.light
                                   : theme.palette.error.dark
+                              }}
+                              onClick={() => {
+                                if (readOnly) {
+                                  // Switch to write mode
+                                  setViewMode('write');
+                                } else {
+                                  // Reset the state of the badlist, cancel changes
+                                  setViewMode('read');
+                                  setBadlist(originalBadlist);
+                                  setModified(false);
+                                }
+                              }}
+                              size="large"
+                            >
+                              {readOnly ? <EditOutlinedIcon /> : <EditOffOutlinedIcon />}
+                            </IconButton>
+                          </Tooltip>
+                        ) : (
+                          <Skeleton
+                            variant="circular"
+                            height="2.5rem"
+                            width="2.5rem"
+                            style={{ margin: theme.spacing(0.5) }}
+                          />
+                        ))}
+                      {currentUser.roles.includes('badlist_manage') && (
+                        <Tooltip title={t('remove')}>
+                          <IconButton
+                            disabled={!readOnly}
+                            style={{
+                              color: readOnly
+                                ? theme.palette.mode === 'dark'
+                                  ? theme.palette.error.light
+                                  : theme.palette.error.dark
+                                : theme.palette.action.disabled
                             }}
-                            onClick={() => {
-                              if (viewMode === 'read') {
-                                // Switch to write mode
-                                setViewMode('write');
-                              } else {
-                                // Reset the state of the badlist, cancel changes
-                                setViewMode('read');
-                                setBadlist(originalBadlist);
-                                setModified(false);
-                              }
-                            }}
+                            onClick={() => setDeleteDialog(true)}
                             size="large"
                           >
-                            {viewMode === 'read' ? <EditOutlinedIcon /> : <EditOffOutlinedIcon />}
+                            <RemoveCircleOutlineOutlinedIcon />
                           </IconButton>
                         </Tooltip>
-                      ) : (
-                        <Skeleton
-                          variant="circular"
-                          height="2.5rem"
-                          width="2.5rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
-                      ))}
-                    {currentUser.roles.includes('badlist_manage') && (
-                      <Tooltip title={t('remove')}>
-                        <IconButton
-                          style={{
-                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                          }}
-                          onClick={() => setDeleteDialog(true)}
-                          size="large"
-                        >
-                          <RemoveCircleOutlineOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </div>
-                  {currentUser.roles.includes('badlist_manage') && (
-                    <CustomChip
-                      type="rounded"
-                      size="small"
-                      style={{ width: '6rem' }}
-                      color={badlist.enabled ? 'primary' : 'default'}
-                      onClick={badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
-                      label={badlist.enabled ? t('enabled') : t('disabled')}
-                    />
+                      )}
+                    </div>
                   )}
                 </>
               ) : (
