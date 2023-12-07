@@ -1,9 +1,8 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
-import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import { alpha, Grid, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
+import { Grid, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -202,17 +201,6 @@ export default function Badlist() {
             </Grid>
           )}
         </Grid>
-        <BugReportOutlinedIcon
-          style={{
-            width: upMD ? theme.spacing(27.5) : theme.spacing(18.5),
-            height: upMD ? theme.spacing(19.5) : theme.spacing(16),
-            position: 'fixed',
-            right: 0,
-            zIndex: -1,
-            color: alpha(theme.palette.error.light, 0.3),
-            marginTop: upMD ? theme.spacing(-9) : theme.spacing(-7)
-          }}
-        />
       </div>
 
       <PageHeader isSticky>
