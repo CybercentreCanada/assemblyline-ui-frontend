@@ -118,8 +118,8 @@ function WrappedClassification({
         });
       }
     }
-    // eslint-disable-next-line
-  }, [c12n, currentUser, isMobile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [c12n, currentUser, isMobile, type]);
 
   function toggleGroups(grp) {
     const newGrp = validated.parts.groups;
