@@ -393,23 +393,29 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
                       width="2.5rem"
                       style={{ margin: theme.spacing(0.5) }}
                     />
-                    <Skeleton
-                      variant="circular"
-                      height="2.5rem"
-                      width="2.5rem"
-                      style={{ margin: theme.spacing(0.5) }}
-                    />
+                    {currentUser.roles.includes('badlist_manage') && (
+                      <>
+                        <Skeleton
+                          variant="circular"
+                          height="2.5rem"
+                          width="2.5rem"
+                          style={{ margin: theme.spacing(0.5) }}
+                        />
+                        <Skeleton
+                          variant="circular"
+                          height="2.5rem"
+                          width="2.5rem"
+                          style={{ margin: theme.spacing(0.5) }}
+                        />
+                        <Skeleton
+                          variant="circular"
+                          height="2.5rem"
+                          width="2.5rem"
+                          style={{ margin: theme.spacing(0.5) }}
+                        />
+                      </>
+                    )}
                   </div>
-                  <Skeleton
-                    variant="rectangular"
-                    height="2rem"
-                    width="6rem"
-                    style={{
-                      marginBottom: theme.spacing(1),
-                      marginTop: theme.spacing(1),
-                      borderRadius: theme.spacing(1)
-                    }}
-                  />
                 </>
               )}
             </Grid>
