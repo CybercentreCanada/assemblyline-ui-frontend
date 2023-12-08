@@ -149,13 +149,15 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
           setWorkflow({
             ...api_data.api_response,
             status: api_data.api_response.status || '',
-            priority: api_data.api_response.priority || ''
+            priority: api_data.api_response.priority || '',
+            enabled: api_data.api_response.enabled === undefined ? true : api_data.api_response.enabled
           });
           setOriginalWorkflow({
             ...api_data.api_response,
             status: api_data.api_response.status || '',
             priority: api_data.api_response.priority || '',
-            labels: api_data.api_response.labels || []
+            labels: api_data.api_response.labels || [],
+            enabled: api_data.api_response.enabled === undefined ? true : api_data.api_response.enabled
           });
 
           apiCall({

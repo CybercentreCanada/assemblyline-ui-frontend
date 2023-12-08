@@ -1,3 +1,5 @@
+import ClearIcon from '@mui/icons-material/Clear';
+import DoneIcon from '@mui/icons-material/Done';
 import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
@@ -24,6 +26,7 @@ export type WorkflowResult = {
   creation_date: string;
   creator: string;
   edited_by: string;
+  enabled: boolean;
   hit_count: string;
   id: string;
   last_edit: string;
@@ -66,6 +69,7 @@ const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults, se
               {c12nDef.enforce && (
                 <SortableHeaderCell sortField="classification">{t('header.classification')}</SortableHeaderCell>
               )}
+              <SortableHeaderCell sortField="enabled">{t('header.enabled')}</SortableHeaderCell>
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
@@ -103,6 +107,14 @@ const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults, se
                     <Classification type="text" size="tiny" c12n={workflow.classification} format="short" />
                   </DivTableCell>
                 )}
+                <DivTableCell>
+                  {workflow && (workflow.enabled || workflow.enabled === undefined) ? (
+                    // By default, workflows were always enabled
+                    <DoneIcon color="primary" />
+                  ) : (
+                    <ClearIcon color="error" />
+                  )}
+                </DivTableCell>
               </LinkRow>
             ))}
           </DivTableBody>
