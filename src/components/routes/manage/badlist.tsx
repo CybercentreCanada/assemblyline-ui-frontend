@@ -87,13 +87,11 @@ export default function Badlist() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(
-        <BadlistDetail
-          badlist_id={location.hash === '#new' ? null : location.hash.slice(1)}
-          close={closeGlobalDrawer}
-          mode={location.hash === '#new' ? 'write' : 'read'}
-        />
-      );
+      if (location.hash === '#new') {
+        console.log('todo');
+      } else {
+        setGlobalDrawer(<BadlistDetail badlist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
+      }
     } else {
       closeGlobalDrawer();
     }

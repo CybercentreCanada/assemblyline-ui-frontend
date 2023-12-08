@@ -1,5 +1,3 @@
-import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
@@ -73,90 +71,39 @@ type ParamProps = {
 type BadlistDetailProps = {
   badlist_id?: string;
   close?: () => void;
-  mode?: 'read' | 'write';
 };
 
-const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps) => {
+const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
   const { t, i18n } = useTranslation(['manageBadlistDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [badlist, setBadlist] = useState<Badlist>(null);
-  const [originalBadlist, setOriginalBadlist] = useState<Badlist>(null);
   const [histogram, setHistogram] = useState<Record<string, number>>(null);
   const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [enableDialog, setEnableDialog] = useState<boolean>(false);
   const [disableDialog, setDisableDialog] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<'read' | 'write'>(mode);
-  const [modified, setModified] = useState<boolean>(false);
+  const [removeAttributionDialog, setRemoveAttributionDialog] = useState(null);
   const { user: currentUser, c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const navigate = useNavigate();
 
-  const readOnly = viewMode === 'read';
-
-  const DEFAULT_BADLIST: Badlist = {
-    added: '',
-    classification: c12nDef.UNRESTRICTED,
-    enabled: false,
-    attribution: {
-      actor: [],
-      campaign: [],
-      category: [],
-      exploit: [],
-      implant: [],
-      family: [],
-      network: []
-    },
-    hashes: {
-      md5: '',
-      sha1: '',
-      sha256: '',
-      ssdeep: '',
-      tlsh: ''
-    },
-    file: {
-      name: [],
-      size: 0,
-      type: ''
-    },
-    id: '',
-    sources: [
-      {
-        classification: '',
-        name: '',
-        reason: [],
-        type: ''
-      }
-    ],
-    signature: {
-      name: ''
-    },
-    tag: {
-      type: '',
-      value: ''
-    },
-    type: '',
-    updated: ''
-  };
-
   useEffect(() => {
     if ((badlist_id || id) && currentUser.roles.includes('badlist_view')) {
-      apiCall({
-        url: `/api/v4/badlist/${badlist_id || id}/`,
-        onSuccess: api_data => {
-          setBadlist(api_data.api_response);
-          setOriginalBadlist(api_data.api_response);
-        }
-      });
-      setViewMode('read');
-    } else {
-      setViewMode('write');
-      setBadlist({ ...DEFAULT_BADLIST });
+      reload();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [badlist_id, id]);
+
+  const reload = () => {
+    apiCall({
+      url: `/api/v4/badlist/${badlist_id || id}/`,
+      onSuccess: api_data => {
+        setBadlist(api_data.api_response);
+      }
+    });
+  };
 
   useEffect(() => {
     if (badlist && currentUser.roles.includes('submission_view')) {
@@ -231,8 +178,23 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
     });
   };
 
-  const setClassification = classification => {
-    setBadlist({ ...badlist, classification });
+  const deleteAttribution = () => {
+    apiCall({
+      url: `/api/v4/badlist/attribution/${badlist_id || id}/${removeAttributionDialog.type}/${
+        removeAttributionDialog.value
+      }/`,
+      method: 'DELETE',
+      onSuccess: () => {
+        setRemoveAttributionDialog(null);
+        showSuccessMessage(t('remove.attribution.success'));
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('reloadBadlist'));
+          reload();
+        }, 1000);
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
+    });
   };
 
   return currentUser.roles.includes('badlist_view') ? (
@@ -267,15 +229,20 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
         text={t('disable.text')}
         waiting={waitingDialog}
       />
+      <ConfirmationDialog
+        open={removeAttributionDialog !== null}
+        handleClose={() => setRemoveAttributionDialog(null)}
+        handleAccept={deleteAttribution}
+        title={t('remove.attribution.title')}
+        cancelText={t('remove.attribution.cancelText')}
+        acceptText={t('remove.attribution.acceptText')}
+        text={t('remove.attribution.text')}
+        waiting={waitingDialog}
+      />
 
       {c12nDef.enforce && (
         <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Classification
-            type={readOnly ? 'outlined' : 'picker'}
-            c12n={badlist ? badlist.classification : null}
-            setClassification={setClassification}
-            format="long"
-          />
+          <Classification type="outlined" c12n={badlist ? badlist.classification : null} format="long" />
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
@@ -296,9 +263,8 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
                         <Tooltip title={t('usage')}>
                           <IconButton
                             component={Link}
-                            disabled={!readOnly}
                             style={{
-                              color: readOnly ? theme.palette.action.active : theme.palette.action.disabled
+                              color: theme.palette.action.active
                             }}
                             to={
                               badlist.type === 'file'
@@ -322,57 +288,18 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
                           <IconButton
                             onClick={badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
                             size="large"
-                            disabled={!readOnly}
                           >
                             {badlist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
                           </IconButton>
                         </Tooltip>
                       )}
-                      {currentUser.roles.includes('badlist_manage') &&
-                        (badlist ? (
-                          <Tooltip title={t(readOnly ? 'edit' : 'cancel')}>
-                            <IconButton
-                              style={{
-                                color: readOnly
-                                  ? theme.palette.primary.main
-                                  : theme.palette.mode === 'dark'
-                                  ? theme.palette.error.light
-                                  : theme.palette.error.dark
-                              }}
-                              onClick={() => {
-                                if (readOnly) {
-                                  // Switch to write mode
-                                  setViewMode('write');
-                                } else {
-                                  // Reset the state of the badlist, cancel changes
-                                  setViewMode('read');
-                                  setBadlist(originalBadlist);
-                                  setModified(false);
-                                }
-                              }}
-                              size="large"
-                            >
-                              {readOnly ? <EditOutlinedIcon /> : <EditOffOutlinedIcon />}
-                            </IconButton>
-                          </Tooltip>
-                        ) : (
-                          <Skeleton
-                            variant="circular"
-                            height="2.5rem"
-                            width="2.5rem"
-                            style={{ margin: theme.spacing(0.5) }}
-                          />
-                        ))}
+
                       {currentUser.roles.includes('badlist_manage') && (
                         <Tooltip title={t('remove')}>
                           <IconButton
-                            disabled={!readOnly}
                             style={{
-                              color: readOnly
-                                ? theme.palette.mode === 'dark'
-                                  ? theme.palette.error.light
-                                  : theme.palette.error.dark
-                                : theme.palette.action.disabled
+                              color:
+                                theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                             }}
                             onClick={() => setDeleteDialog(true)}
                             size="large"
@@ -407,12 +334,6 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
                           width="2.5rem"
                           style={{ margin: theme.spacing(0.5) }}
                         />
-                        <Skeleton
-                          variant="circular"
-                          height="2.5rem"
-                          width="2.5rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
                       </>
                     )}
                   </div>
@@ -426,80 +347,50 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
             <Typography variant="h6">{t('hashes')}</Typography>
             <Divider />
             <Grid container>
-              <Grid item xs={4} sm={3} lg={2}>
+              <Grid item xs={4} sm={3}>
                 <span style={{ fontWeight: 500 }}>MD5</span>
               </Grid>
-              <Grid
-                item
-                xs={8}
-                sm={9}
-                lg={10}
-                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-              >
+              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {badlist ? (
                   badlist.hashes.md5 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3} lg={2}>
+              <Grid item xs={4} sm={3}>
                 <span style={{ fontWeight: 500 }}>SHA1</span>
               </Grid>
-              <Grid
-                item
-                xs={8}
-                sm={9}
-                lg={10}
-                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-              >
+              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {badlist ? (
                   badlist.hashes.sha1 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3} lg={2}>
+              <Grid item xs={4} sm={3}>
                 <span style={{ fontWeight: 500 }}>SHA256</span>
               </Grid>
-              <Grid
-                item
-                xs={8}
-                sm={9}
-                lg={10}
-                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-              >
+              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {badlist ? (
                   badlist.hashes.sha256 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3} lg={2}>
+              <Grid item xs={4} sm={3}>
                 <span style={{ fontWeight: 500 }}>SSDeep</span>
               </Grid>
-              <Grid
-                item
-                xs={8}
-                sm={9}
-                lg={10}
-                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-              >
+              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {badlist ? (
                   badlist.hashes.ssdeep || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3} lg={2}>
+              <Grid item xs={4} sm={3}>
                 <span style={{ fontWeight: 500 }}>TLSH</span>
               </Grid>
-              <Grid
-                item
-                xs={8}
-                sm={9}
-                lg={10}
-                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-              >
+              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {badlist ? (
                   badlist.hashes.tlsh || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
@@ -513,16 +404,16 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
               <Typography variant="h6">{t('file.title')}</Typography>
               <Divider />
               <Grid container>
-                <Grid item xs={4} sm={3} lg={2}>
+                <Grid item xs={4} sm={3}>
                   <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10}>
+                <Grid item xs={8} sm={9}>
                   {badlist ? badlist.file.name.map((name, i) => <div key={i}>{name}</div>) : <Skeleton />}
                 </Grid>
-                <Grid item xs={4} sm={3} lg={2}>
+                <Grid item xs={4} sm={3}>
                   <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10}>
+                <Grid item xs={8} sm={9}>
                   {badlist.file.size ? (
                     <span>
                       {badlist.file.size}
@@ -533,10 +424,10 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
                   )}
                 </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
+                <Grid item xs={4} sm={3}>
                   <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                <Grid item xs={8} sm={9} style={{ wordBreak: 'break-word' }}>
                   {badlist.file.type || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>}
                 </Grid>
               </Grid>
@@ -547,57 +438,71 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
               <Typography variant="h6">{t('tag.title')}</Typography>
               <Divider />
               <Grid container>
-                <Grid item xs={4} sm={3} lg={2}>
+                <Grid item xs={4} sm={3}>
                   <span style={{ fontWeight: 500 }}>{t('tag.type')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10}>
+                <Grid item xs={8} sm={9}>
                   {badlist.tag.type}
                 </Grid>
-                <Grid item xs={4} sm={3} lg={2}>
+                <Grid item xs={4} sm={3}>
                   <span style={{ fontWeight: 500 }}>{t('tag.value')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                <Grid item xs={8} sm={9} style={{ wordBreak: 'break-word' }}>
                   {badlist.tag.value}
                 </Grid>
               </Grid>
             </Grid>
           )}
-          {badlist && badlist.attribution && (
-            <Grid item xs={12}>
-              <Typography variant="h6">{t('attribution.title')}</Typography>
-              <Divider />
-              {Object.keys(badlist.attribution)
-                .filter(k => badlist.attribution[k] !== null)
+          <Grid item xs={12}>
+            <Typography variant="h6">{t('attribution.title')}</Typography>
+            <Divider />
+            {badlist &&
+              Object.keys(badlist.attribution)
+                .filter(k => badlist.attribution[k] && badlist.attribution[k].length !== 0)
                 .map((k, kid) => (
-                  <Grid key={kid} container>
-                    <Grid item xs={4} sm={3} lg={2}>
+                  <Grid key={kid} container spacing={2}>
+                    <Grid item xs={4} sm={3}>
                       <span style={{ fontWeight: 500 }}>{t(`attribution.${k}`)}</span>
                     </Grid>
-                    <Grid item xs={8} sm={9} lg={10}>
+                    <Grid item xs={8} sm={9}>
                       {badlist.attribution[k].map((x, i) => (
-                        <CustomChip key={i} label={x} size="small" variant="outlined" />
+                        <CustomChip
+                          key={i}
+                          label={x}
+                          size="small"
+                          variant="outlined"
+                          onDelete={
+                            currentUser.roles.includes('badlist_manage')
+                              ? () => setRemoveAttributionDialog({ type: k, value: x })
+                              : null
+                          }
+                        />
                       ))}
                     </Grid>
                   </Grid>
                 ))}
-            </Grid>
-          )}
+          </Grid>
           <Grid item xs={12}>
             <Typography variant="h6">{t('sources')}</Typography>
             <Divider />
             {badlist ? (
-              badlist.sources.map(src => (
-                <Grid key={src.name} container spacing={1}>
-                  <Grid item xs={4} sm={3} lg={2}>
+              badlist.sources.map((src, src_id) => (
+                <Grid key={src_id} container>
+                  <Grid item xs={12} sm={3}>
                     <span style={{ fontWeight: 500 }}>
                       {src.name} ({t(src.type)})
                     </span>
                   </Grid>
-                  <Grid item xs={8} sm={9} lg={10}>
+                  <Grid item xs={12} sm={c12nDef.enforce ? 7 : 9}>
                     {src.reason.map((reason, i) => (
                       <div key={i}>{reason}</div>
                     ))}
                   </Grid>
+                  {c12nDef.enforce && (
+                    <Grid item xs={12} sm={2}>
+                      <Classification fullWidth size="small" format="short" c12n={src.classification} type="outlined" />
+                    </Grid>
+                  )}
                 </Grid>
               ))
             ) : (
@@ -608,10 +513,10 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
             <Typography variant="h6">{t('timing')}</Typography>
             <Divider />
             <Grid container>
-              <Grid item xs={4} sm={3} lg={2}>
+              <Grid item xs={4} sm={3}>
                 <span style={{ fontWeight: 500 }}>{t('timing.added')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
+              <Grid item xs={8} sm={9}>
                 {badlist ? (
                   <div>
                     <Moment format="YYYY-MM-DD">{badlist.added}</Moment>&nbsp; (
@@ -624,10 +529,10 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3} lg={2}>
+              <Grid item xs={4} sm={3}>
                 <span style={{ fontWeight: 500 }}>{t('timing.updated')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
+              <Grid item xs={8} sm={9}>
                 {badlist ? (
                   <div>
                     <Moment format="YYYY-MM-DD">{badlist.updated}</Moment>&nbsp; (
@@ -642,10 +547,10 @@ const BadlistDetail = ({ badlist_id, close, mode = 'read' }: BadlistDetailProps)
               </Grid>
               {badlist && 'expiry_ts' in badlist && (
                 <>
-                  <Grid item xs={4} sm={3} lg={2}>
+                  <Grid item xs={4} sm={3}>
                     <span style={{ fontWeight: 500 }}>{t('timing.expiry_ts')}</span>
                   </Grid>
-                  <Grid item xs={8} sm={9} lg={10}>
+                  <Grid item xs={8} sm={9}>
                     <div>
                       <Moment format="YYYY-MM-DD">{badlist?.expiry_ts}</Moment>&nbsp; (
                       <Moment fromNow locale={i18n.language}>
