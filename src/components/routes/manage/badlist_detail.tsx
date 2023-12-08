@@ -10,6 +10,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
+import DatePicker from 'components/visual/DatePicker';
 import Histogram from 'components/visual/Histogram';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import 'moment/locale/fr';
@@ -510,7 +511,19 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
             )}
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="h6">{t('timing')}</Typography>
+            <Grid container alignItems={'end'}>
+              <Grid item xs={11}>
+                <Typography variant="h6">{t('timing')}</Typography>
+              </Grid>
+              <Grid item xs={1} style={{ textAlign: 'right' }}>
+                <DatePicker
+                  date={badlist.expiry_ts}
+                  setDate={date => setBadlist({ ...badlist, expiry_ts: date })}
+                  tooltip={t('expiry.change')}
+                />
+              </Grid>
+            </Grid>
+
             <Divider />
             <Grid container>
               <Grid item xs={4} sm={3}>
@@ -545,22 +558,22 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                   <Skeleton />
                 )}
               </Grid>
-              {badlist && 'expiry_ts' in badlist && (
-                <>
-                  <Grid item xs={4} sm={3}>
-                    <span style={{ fontWeight: 500 }}>{t('timing.expiry_ts')}</span>
-                  </Grid>
-                  <Grid item xs={8} sm={9}>
-                    <div>
-                      <Moment format="YYYY-MM-DD">{badlist?.expiry_ts}</Moment>&nbsp; (
-                      <Moment fromNow locale={i18n.language}>
-                        {badlist?.expiry_ts}
-                      </Moment>
-                      )
-                    </div>
-                  </Grid>
-                </>
-              )}
+              <Grid item xs={4} sm={3}>
+                <span style={{ fontWeight: 500 }}>{t('timing.expiry_ts')}</span>
+              </Grid>
+              <Grid item xs={7} sm={8}>
+                {badlist ? (
+                  <div>
+                    <Moment format="YYYY-MM-DD">{badlist.expiry_ts}</Moment>&nbsp; (
+                    <Moment fromNow locale={i18n.language}>
+                      {badlist.expiry_ts}
+                    </Moment>
+                    )
+                  </div>
+                ) : (
+                  <Skeleton />
+                )}
+              </Grid>
             </Grid>
           </Grid>
           {currentUser.roles.includes('submission_view') && (

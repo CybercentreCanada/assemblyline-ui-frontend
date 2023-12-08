@@ -10,9 +10,10 @@ import { useTranslation } from 'react-i18next';
 interface DatePickerProps {
   date: string;
   setDate: (date: string) => void;
+  tooltip?: string;
 }
 
-function WrappedDatePicker({ date, setDate }: DatePickerProps) {
+function WrappedDatePicker({ date, setDate, tooltip = null }: DatePickerProps) {
   const [tempDate, setTempDate] = React.useState(null);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -26,7 +27,7 @@ function WrappedDatePicker({ date, setDate }: DatePickerProps) {
   // Build chip based on computed values
   return (
     <LocalizationProvider dateAdapter={AdapterMoment}>
-      <Tooltip title={t('date.open')}>
+      <Tooltip title={tooltip ? tooltip : t('date.open')}>
         <IconButton onClick={handleOpen}>
           <EventIcon />
         </IconButton>
