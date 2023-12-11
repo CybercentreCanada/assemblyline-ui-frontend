@@ -1,8 +1,10 @@
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Divider, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Divider, Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -12,6 +14,7 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
 import Histogram from 'components/visual/Histogram';
+import InputDialog from 'components/visual/InputDialog';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
@@ -65,6 +68,9 @@ export type Badlist = {
   updated: string;
 };
 
+const DEFAULT_TEMP_ATTRIBUTION = { type: 'actor', value: '' };
+const ATTRIBUTION_TYPES = ['actor', 'campaign', 'category', 'exploit', 'implant', 'family', 'network'];
+
 type ParamProps = {
   id: string;
 };
@@ -83,8 +89,10 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
   const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [enableDialog, setEnableDialog] = useState<boolean>(false);
+  const [addAttributionDialog, setAddAttributionDialog] = useState<boolean>(false);
   const [disableDialog, setDisableDialog] = useState<boolean>(false);
   const [removeAttributionDialog, setRemoveAttributionDialog] = useState(null);
+  const [addAttributionData, setAddAttributionData] = useState({ ...DEFAULT_TEMP_ATTRIBUTION });
   const { user: currentUser, c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
@@ -214,6 +222,24 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
     });
   };
 
+  const addAttribution = () => {
+    apiCall({
+      url: `/api/v4/badlist/attribution/${badlist_id || id}/${addAttributionData.type}/${addAttributionData.value}/`,
+      method: 'PUT',
+      onSuccess: () => {
+        setAddAttributionDialog(false);
+        showSuccessMessage(t('add.attribution.success'));
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('reloadBadlist'));
+          setAddAttributionData({ ...DEFAULT_TEMP_ATTRIBUTION });
+          reload();
+        }, 1000);
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
+    });
+  };
+
   return currentUser.roles.includes('badlist_view') ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">
       <ConfirmationDialog
@@ -255,6 +281,36 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
         acceptText={t('remove.attribution.acceptText')}
         text={t('remove.attribution.text')}
         waiting={waitingDialog}
+      />
+      <InputDialog
+        open={addAttributionDialog}
+        handleClose={() => setAddAttributionDialog(false)}
+        handleAccept={addAttribution}
+        title={t('add.attribution.title')}
+        cancelText={t('add.attribution.cancelText')}
+        acceptText={t('add.attribution.acceptText')}
+        text={t('add.attribution.text')}
+        waiting={waitingDialog}
+        handleInputChange={event => setAddAttributionData({ ...addAttributionData, value: event.target.value })}
+        inputValue={addAttributionData.value}
+        extra={
+          <>
+            <FormControl size="small" fullWidth>
+              <Select
+                value={addAttributionData.type}
+                variant="outlined"
+                onChange={event => setAddAttributionData({ ...addAttributionData, type: event.target.value })}
+                fullWidth
+              >
+                {ATTRIBUTION_TYPES.map((item, i) => (
+                  <MenuItem key={i} value={item}>
+                    {t(`attribution.${item}`)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </>
+        }
       />
 
       {c12nDef.enforce && (
@@ -466,8 +522,39 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
             </Grid>
           )}
           <Grid item xs={12}>
-            <Typography variant="h6">{t('attribution.title')}</Typography>
+            <Grid container alignItems={'end'}>
+              <Grid item xs={11}>
+                <Typography variant="h6">{t('attribution.title')}</Typography>
+              </Grid>
+              <Grid item xs={1} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                {currentUser.roles.includes('badlist_manage') &&
+                  (badlist ? (
+                    <Tooltip title={t('add.attribution')}>
+                      <IconButton
+                        style={{
+                          color:
+                            theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                        }}
+                        onClick={() => setAddAttributionDialog(true)}
+                      >
+                        <AddCircleOutlineIcon />
+                      </IconButton>
+                    </Tooltip>
+                  ) : (
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
+                  ))}
+              </Grid>
+            </Grid>
             <Divider />
+            {badlist &&
+              Object.keys(badlist.attribution).every(
+                k => !badlist.attribution[k] || badlist.attribution[k].length === 0
+              ) && <span style={{ color: theme.palette.action.disabled }}>{t('attribution.empty')}</span>}
             {badlist &&
               Object.keys(badlist.attribution)
                 .filter(k => badlist.attribution[k] && badlist.attribution[k].length !== 0)
@@ -527,16 +614,22 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                 <Typography variant="h6">{t('timing')}</Typography>
               </Grid>
               <Grid item xs={1} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                {badlist ? (
-                  <DatePicker
-                    date={badlist.expiry_ts}
-                    setDate={handleExpiryDateChange}
-                    tooltip={t('expiry.change')}
-                    defaultDateOffset={1}
-                  />
-                ) : (
-                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                )}
+                {currentUser.roles.includes('badlist_manage') &&
+                  (badlist ? (
+                    <DatePicker
+                      date={badlist.expiry_ts}
+                      setDate={handleExpiryDateChange}
+                      tooltip={t('expiry.change')}
+                      defaultDateOffset={1}
+                    />
+                  ) : (
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
+                  ))}
               </Grid>
             </Grid>
             <Divider />

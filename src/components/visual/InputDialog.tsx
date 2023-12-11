@@ -21,6 +21,7 @@ export type InputDialogProps = {
   handleInputChange: (event?: any) => void;
   inputValue: string;
   inputLabel?: string;
+  extra?: React.ReactNode;
 };
 
 const InputDialog = ({
@@ -34,7 +35,8 @@ const InputDialog = ({
   inputValue,
   inputLabel = null,
   waiting = false,
-  text = null
+  text = null,
+  extra = null
 }: InputDialogProps) => (
   <Dialog
     open={open}
@@ -48,6 +50,7 @@ const InputDialog = ({
         <DialogContentText id="alert-dialog-description">{text}</DialogContentText>
       </DialogContent>
     )}
+    {extra && <DialogContent>{extra}</DialogContent>}
     <DialogContent>
       <TextField
         autoFocus
