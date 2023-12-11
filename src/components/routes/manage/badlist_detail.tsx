@@ -578,13 +578,17 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
               </Grid>
               <Grid item xs={8} sm={9}>
                 {badlist ? (
-                  <div>
-                    <Moment format="YYYY-MM-DD">{badlist.expiry_ts}</Moment>&nbsp; (
-                    <Moment fromNow locale={i18n.language}>
-                      {badlist.expiry_ts}
-                    </Moment>
-                    )
-                  </div>
+                  badlist.expiry_ts ? (
+                    <div>
+                      <Moment format="YYYY-MM-DD">{badlist.expiry_ts}</Moment>&nbsp; (
+                      <Moment fromNow locale={i18n.language}>
+                        {badlist.expiry_ts}
+                      </Moment>
+                      )
+                    </div>
+                  ) : (
+                    <span style={{ color: theme.palette.action.disabled }}>{t('expiry.forever')}</span>
+                  )
                 ) : (
                   <Skeleton />
                 )}

@@ -27,6 +27,7 @@
   "enabled": "Désactiver",
   "expiry.change": "Modifier la date d'expiration",
   "expiry.clear.success": "La date d'expiration a été effacée avec succès, cet élément de la liste mauvaise restera pour toujours.",
+  "expiry.forever": "N'expire pas",
   "expiry.update.success": "La date d'expiration a été mise à jour avec succès pour cet élément de la liste mauvaise.",
   "external": "externe",
   "file.name": "Noms possibles",
