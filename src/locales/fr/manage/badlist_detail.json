@@ -1,6 +1,8 @@
 {
   "add.attribution": "Ajouter une attribution",
-  "add.attribution.title": "Ajouter une attribution ?",
+  "add.attribution.categorylabel": "Catégorie",
+  "add.attribution.inputlabel": "Étiquette",
+  "add.attribution.title": "Ajout d'attribution",
   "add.attribution.cancelText": "Annuler",
   "add.attribution.acceptText": "Sauvegarder",
   "add.attribution.text": "Quelle étiquette d'attribution souhaitez-vous ajouter à cet article et dans quelle catégorie ?",
