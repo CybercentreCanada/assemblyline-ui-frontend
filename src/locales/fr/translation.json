@@ -38,6 +38,7 @@
   "clipboard": "Copier dans le presse-papiers",
   "clipboard.failure": "n'a pas pu être copié dans le presse-papiers.",
   "clipboard.success": "a été copié dans le presse-papiers.",
+  "date.cancel": "Annuler",
   "date.clear": "Retirer",
   "date.open": "Changer la date",
   "date.title": "Sélectionnez la date souhaitée :",

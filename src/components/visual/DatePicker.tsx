@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, IconButton, TextField, Tooltip } from '@mui/material';
+import { Button, Dialog, DialogActions, IconButton, TextField, Tooltip, useTheme } from '@mui/material';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
 import EventIcon from '@mui/icons-material/Event';
@@ -28,6 +28,7 @@ function WrappedDatePicker({
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const theme = useTheme();
   const { t } = useTranslation();
 
   useEffectOnce(() => {
@@ -73,9 +74,9 @@ function WrappedDatePicker({
               renderInput={params => <TextField {...params} />}
               minDate={tomorrow}
             />
-
-            <DialogActions>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
               <Button
+                style={{ margin: theme.spacing(1) }}
                 onClick={() => {
                   setDate(null);
                   handleClose();
@@ -84,18 +85,28 @@ function WrappedDatePicker({
               >
                 {t('date.clear')}
               </Button>
-              <Button
-                onClick={() => {
-                  setDate(tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null);
-                  handleClose();
-                }}
-                color="primary"
-                autoFocus
-                disabled={tempDate === null}
-              >
-                {t('date.select')}
-              </Button>
-            </DialogActions>
+              <DialogActions>
+                <Button
+                  onClick={() => {
+                    handleClose();
+                  }}
+                  color="secondary"
+                >
+                  {t('date.cancel')}
+                </Button>
+                <Button
+                  onClick={() => {
+                    setDate(tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null);
+                    handleClose();
+                  }}
+                  color="primary"
+                  autoFocus
+                  disabled={tempDate === null}
+                >
+                  {t('date.select')}
+                </Button>
+              </DialogActions>
+            </div>
           </Dialog>
         </>
       ) : (
