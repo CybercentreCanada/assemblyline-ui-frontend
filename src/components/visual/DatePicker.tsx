@@ -3,6 +3,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
 import EventIcon from '@mui/icons-material/Event';
 import { DatePicker as MuiDatePicker, LocalizationProvider, StaticDatePicker } from '@mui/x-date-pickers';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import moment from 'moment';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,22 +13,40 @@ interface DatePickerProps {
   setDate: (date: string) => void;
   tooltip?: string;
   type?: 'button' | 'input';
+  defaultDateOffset?: number | null;
 }
 
-function WrappedDatePicker({ date, setDate, tooltip = null, type = 'button' }: DatePickerProps) {
+function WrappedDatePicker({
+  date,
+  setDate,
+  tooltip = null,
+  type = 'button',
+  defaultDateOffset = null
+}: DatePickerProps) {
   const [tempDate, setTempDate] = React.useState(null);
+  const [tomorrow, setTomorrow] = React.useState(null);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const { t } = useTranslation();
 
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
+  useEffectOnce(() => {
+    const temp = new Date();
+    temp.setDate(temp.getDate() + 1);
+    temp.setHours(0, 0, 0, 0);
+    setTomorrow(moment(temp));
+  });
 
   useEffect(() => {
-    setTempDate(moment(date));
-  }, [date]);
+    if (date === null && defaultDateOffset) {
+      const defaultDate = new Date();
+      defaultDate.setDate(defaultDate.getDate() + defaultDateOffset);
+      defaultDate.setHours(0, 0, 0, 0);
+      setTempDate(moment(defaultDate));
+    } else {
+      setTempDate(moment(date));
+    }
+  }, [date, defaultDateOffset]);
 
   // Build chip based on computed values
   return (
@@ -52,7 +71,7 @@ function WrappedDatePicker({ date, setDate, tooltip = null, type = 'button' }: D
                 setTempDate(newValue);
               }}
               renderInput={params => <TextField {...params} />}
-              minDate={moment(tomorrow)}
+              minDate={tomorrow}
             />
 
             <DialogActions>
@@ -96,7 +115,7 @@ function WrappedDatePicker({ date, setDate, tooltip = null, type = 'button' }: D
               InputProps={{ ...InputProps }}
             />
           )}
-          minDate={moment(tomorrow)}
+          minDate={tomorrow}
         />
       )}
     </LocalizationProvider>

@@ -528,7 +528,12 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
               </Grid>
               <Grid item xs={1} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                 {badlist ? (
-                  <DatePicker date={badlist.expiry_ts} setDate={handleExpiryDateChange} tooltip={t('expiry.change')} />
+                  <DatePicker
+                    date={badlist.expiry_ts}
+                    setDate={handleExpiryDateChange}
+                    tooltip={t('expiry.change')}
+                    defaultDateOffset={1}
+                  />
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
                 )}
