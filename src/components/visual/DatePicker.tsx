@@ -47,9 +47,9 @@ function WrappedDatePicker({ date, setDate, tooltip = null, type = 'button' }: D
           >
             <StaticDatePicker
               displayStaticWrapperAs="desktop"
-              value={moment(tempDate)}
+              value={tempDate}
               onChange={newValue => {
-                setTempDate(newValue.format('YYYY-MM-DDThh:mm:ss.SSSSSSZ'));
+                setTempDate(newValue);
               }}
               renderInput={params => <TextField {...params} />}
               minDate={moment(tomorrow)}
@@ -67,7 +67,7 @@ function WrappedDatePicker({ date, setDate, tooltip = null, type = 'button' }: D
               </Button>
               <Button
                 onClick={() => {
-                  setDate(tempDate);
+                  setDate(tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null);
                   handleClose();
                 }}
                 color="primary"
