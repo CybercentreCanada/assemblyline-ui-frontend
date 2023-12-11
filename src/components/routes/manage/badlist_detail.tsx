@@ -3,8 +3,7 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Divider, Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import FormControl from '@mui/material/FormControl';
+import { Divider, Grid, IconButton, MenuItem, Skeleton, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -293,22 +292,25 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
         waiting={waitingDialog}
         handleInputChange={event => setAddAttributionData({ ...addAttributionData, value: event.target.value })}
         inputValue={addAttributionData.value}
+        inputLabel={t('add.attribution.inputlabel')}
+        outLabel
         extra={
           <>
-            <FormControl size="small" fullWidth>
-              <Select
-                value={addAttributionData.type}
-                variant="outlined"
-                onChange={event => setAddAttributionData({ ...addAttributionData, type: event.target.value })}
-                fullWidth
-              >
-                {ATTRIBUTION_TYPES.map((item, i) => (
-                  <MenuItem key={i} value={item}>
-                    {t(`attribution.${item}`)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <Typography variant="overline">{t('add.attribution.categorylabel')}</Typography>
+            <TextField
+              size="small"
+              value={addAttributionData.type}
+              variant="outlined"
+              onChange={event => setAddAttributionData({ ...addAttributionData, type: event.target.value })}
+              fullWidth
+              select
+            >
+              {ATTRIBUTION_TYPES.map((item, i) => (
+                <MenuItem key={i} value={item}>
+                  {t(`attribution.${item}`)}
+                </MenuItem>
+              ))}
+            </TextField>
           </>
         }
       />

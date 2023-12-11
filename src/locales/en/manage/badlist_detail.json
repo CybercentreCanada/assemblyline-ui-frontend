@@ -1,5 +1,7 @@
 {
   "add.attribution": "Add an attribution",
+  "add.attribution.categorylabel": "Category",
+  "add.attribution.inputlabel": "Label",
   "add.attribution.title": "Add Attribution?",
   "add.attribution.cancelText": "Cancel",
   "add.attribution.acceptText": "Save",
