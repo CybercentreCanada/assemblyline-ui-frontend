@@ -179,6 +179,22 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
     });
   };
 
+  const handleExpiryDateChange = date => {
+    apiCall({
+      body: date,
+      url: `/api/v4/badlist/expiry/${badlist_id || id}/`,
+      method: date ? 'PUT' : 'DELETE',
+      onSuccess: () => {
+        setDisableDialog(false);
+        showSuccessMessage(t(date ? 'expiry.update.success' : 'expiry.clear.success'));
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadBadlist')), 1000);
+        setBadlist({ ...badlist, expiry_ts: date });
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
+    });
+  };
+
   const deleteAttribution = () => {
     apiCall({
       url: `/api/v4/badlist/attribution/${badlist_id || id}/${removeAttributionDialog.type}/${
@@ -315,24 +331,19 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
               ) : (
                 <>
                   <div style={{ display: 'flex' }}>
-                    <Skeleton
-                      variant="circular"
-                      height="2.5rem"
-                      width="2.5rem"
-                      style={{ margin: theme.spacing(0.5) }}
-                    />
+                    <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
                     {currentUser.roles.includes('badlist_manage') && (
                       <>
                         <Skeleton
                           variant="circular"
-                          height="2.5rem"
-                          width="2.5rem"
+                          height="3rem"
+                          width="3rem"
                           style={{ margin: theme.spacing(0.5) }}
                         />
                         <Skeleton
                           variant="circular"
-                          height="2.5rem"
-                          width="2.5rem"
+                          height="3rem"
+                          width="3rem"
                           style={{ margin: theme.spacing(0.5) }}
                         />
                       </>
@@ -515,15 +526,14 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
               <Grid item xs={11}>
                 <Typography variant="h6">{t('timing')}</Typography>
               </Grid>
-              <Grid item xs={1} style={{ textAlign: 'right' }}>
-                <DatePicker
-                  date={badlist.expiry_ts}
-                  setDate={date => setBadlist({ ...badlist, expiry_ts: date })}
-                  tooltip={t('expiry.change')}
-                />
+              <Grid item xs={1} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                {badlist ? (
+                  <DatePicker date={badlist.expiry_ts} setDate={handleExpiryDateChange} tooltip={t('expiry.change')} />
+                ) : (
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                )}
               </Grid>
             </Grid>
-
             <Divider />
             <Grid container>
               <Grid item xs={4} sm={3}>
@@ -561,7 +571,7 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
               <Grid item xs={4} sm={3}>
                 <span style={{ fontWeight: 500 }}>{t('timing.expiry_ts')}</span>
               </Grid>
-              <Grid item xs={7} sm={8}>
+              <Grid item xs={8} sm={9}>
                 {badlist ? (
                   <div>
                     <Moment format="YYYY-MM-DD">{badlist.expiry_ts}</Moment>&nbsp; (
