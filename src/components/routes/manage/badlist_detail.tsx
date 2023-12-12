@@ -1,3 +1,4 @@
+import { ClearOutlined } from '@mui/icons-material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
@@ -91,6 +92,7 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
   const [addAttributionDialog, setAddAttributionDialog] = useState<boolean>(false);
   const [disableDialog, setDisableDialog] = useState<boolean>(false);
   const [removeAttributionDialog, setRemoveAttributionDialog] = useState(null);
+  const [removeSourceData, setRemoveSourceData] = useState(null);
   const [addAttributionData, setAddAttributionData] = useState({ ...DEFAULT_TEMP_ATTRIBUTION });
   const { user: currentUser, c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
@@ -202,6 +204,42 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
     });
   };
 
+  const handleClassificationChange = (classification, source, type) => {
+    apiCall({
+      body: classification,
+      url: `/api/v4/badlist/classification/${badlist_id || id}/${source}/${type}/`,
+      method: 'PUT',
+      onSuccess: () => {
+        showSuccessMessage(t('classification.update.success'));
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('reloadBadlist'));
+          reload();
+        }, 1000);
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
+    });
+  };
+
+  const deleteSource = () => {
+    apiCall({
+      url: `/api/v4/badlist/source/${badlist_id || id}/${removeSourceData.name}/${removeSourceData.type}/`,
+      method: 'DELETE',
+      onSuccess: () => {
+        showSuccessMessage(t('remove.source.success'));
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('reloadBadlist'));
+          reload();
+        }, 1000);
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => {
+        setWaitingDialog(false);
+        setRemoveSourceData(null);
+      }
+    });
+  };
+
   const deleteAttribution = () => {
     apiCall({
       url: `/api/v4/badlist/attribution/${badlist_id || id}/${removeAttributionDialog.type}/${
@@ -279,6 +317,16 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
         cancelText={t('remove.attribution.cancelText')}
         acceptText={t('remove.attribution.acceptText')}
         text={t('remove.attribution.text')}
+        waiting={waitingDialog}
+      />
+      <ConfirmationDialog
+        open={removeSourceData !== null}
+        handleClose={() => setRemoveSourceData(null)}
+        handleAccept={deleteSource}
+        title={t('remove.source.title')}
+        cancelText={t('remove.source.cancelText')}
+        acceptText={t('remove.source.acceptText')}
+        text={t('remove.source.text')}
         waiting={waitingDialog}
       />
       <InputDialog
@@ -591,7 +639,17 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                 <Grid key={src_id} container>
                   <Grid item xs={12} sm={3}>
                     <span style={{ fontWeight: 500 }}>
-                      {src.name} ({t(src.type)})
+                      {src.name} ({t(src.type)}){' '}
+                      {(currentUser.is_admin || currentUser.username === src.name) && (
+                        <Tooltip title={t('remove.source.tooltip')}>
+                          <IconButton
+                            size="small"
+                            onClick={() => setRemoveSourceData({ name: src.name, type: src.type })}
+                          >
+                            <ClearOutlined style={{ fontSize: theme.spacing(2) }} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     </span>
                   </Grid>
                   <Grid item xs={12} sm={c12nDef.enforce ? 7 : 9}>
@@ -601,7 +659,18 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                   </Grid>
                   {c12nDef.enforce && (
                     <Grid item xs={12} sm={2}>
-                      <Classification fullWidth size="small" format="short" c12n={src.classification} type="outlined" />
+                      <Classification
+                        fullWidth
+                        size="small"
+                        format="short"
+                        c12n={src.classification}
+                        type={currentUser.is_admin || currentUser.username === src.name ? 'picker' : 'outlined'}
+                        setClassification={
+                          currentUser.is_admin || currentUser.username === src.name
+                            ? classification => handleClassificationChange(classification, src.name, src.type)
+                            : null
+                        }
+                      />
                     </Grid>
                   )}
                 </Grid>
