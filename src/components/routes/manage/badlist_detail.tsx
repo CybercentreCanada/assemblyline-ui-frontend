@@ -602,10 +602,12 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
             </Grid>
             <Divider />
             {badlist &&
-              Object.keys(badlist.attribution).every(
-                k => !badlist.attribution[k] || badlist.attribution[k].length === 0
-              ) && <span style={{ color: theme.palette.action.disabled }}>{t('attribution.empty')}</span>}
+              (!badlist.attribution ||
+                Object.keys(badlist.attribution).every(
+                  k => !badlist.attribution[k] || badlist.attribution[k].length === 0
+                )) && <span style={{ color: theme.palette.action.disabled }}>{t('attribution.empty')}</span>}
             {badlist &&
+              badlist.attribution &&
               Object.keys(badlist.attribution)
                 .filter(k => badlist.attribution[k] && badlist.attribution[k].length !== 0)
                 .map((k, kid) => (
@@ -640,7 +642,7 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                   <Grid item xs={12} sm={3}>
                     <span style={{ fontWeight: 500 }}>
                       {src.name} ({t(src.type)}){' '}
-                      {(currentUser.is_admin || currentUser.username === src.name) && (
+                      {(currentUser.is_admin || currentUser.username === src.name) && badlist.sources.length !== 1 && (
                         <Tooltip title={t('remove.source.tooltip')}>
                           <IconButton
                             size="small"
