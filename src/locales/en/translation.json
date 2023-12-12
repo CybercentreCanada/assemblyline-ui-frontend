@@ -81,6 +81,7 @@
   "drawer.submit": "Submit",
   "error": "error",
   "error.button": "Try again",
+  "error.chunk": "Reloading the application to fix a loading error...",
   "error.description": "This is the error we've got:",
   "error.hideStack": "Hide Stack",
   "error.showStack": "Show Stack",
