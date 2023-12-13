@@ -1,9 +1,6 @@
-import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import { Divider, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -20,16 +17,6 @@ import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
-
-const useStyles = makeStyles(theme => ({
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
 
 export type Safelist = {
   added: string;
@@ -71,60 +58,22 @@ type ParamProps = {
 type SafelistDetailProps = {
   safelist_id?: string;
   close?: () => void;
-  mode?: 'read' | 'write';
 };
 
-const SafelistDetail = ({ safelist_id, close, mode = 'read' }: SafelistDetailProps) => {
+const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   const { t, i18n } = useTranslation(['manageSafelistDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [safelist, setSafelist] = useState<Safelist>(null);
-  const [originalSafelist, setOriginalSafelist] = useState<Safelist>(null);
-  const [histogram, setHistogram] = useState<Record<string, number>>(null);
-  const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
-  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
-  const [enableDialog, setEnableDialog] = useState<boolean>(false);
-  const [disableDialog, setDisableDialog] = useState<boolean>(false);
-  const [modified, setModified] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<'read' | 'write'>(mode);
+  const [histogram, setHistogram] = useState<any>(null);
+  const [deleteDialog, setDeleteDialog] = useState(false);
+  const [waitingDialog, setWaitingDialog] = useState(false);
+  const [enableDialog, setEnableDialog] = useState(false);
+  const [disableDialog, setDisableDialog] = useState(false);
   const { user: currentUser, c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const navigate = useNavigate();
-
-  const DEFAULT_SAFELIST: Safelist = {
-    added: '',
-    classification: c12nDef.UNRESTRICTED,
-    enabled: false,
-    hashes: {
-      md5: '',
-      sha1: '',
-      sha256: ''
-    },
-    file: {
-      name: [],
-      size: 0,
-      type: ''
-    },
-    id: '',
-    sources: [
-      {
-        classification: c12nDef.UNRESTRICTED,
-        name: '',
-        reason: [],
-        type: ''
-      }
-    ],
-    signature: {
-      name: ''
-    },
-    tag: {
-      type: '',
-      value: ''
-    },
-    type: '',
-    updated: ''
-  };
 
   useEffect(() => {
     if ((safelist_id || id) && currentUser.roles.includes('safelist_view')) {
@@ -132,13 +81,8 @@ const SafelistDetail = ({ safelist_id, close, mode = 'read' }: SafelistDetailPro
         url: `/api/v4/safelist/${safelist_id || id}/`,
         onSuccess: api_data => {
           setSafelist(api_data.api_response);
-          setOriginalSafelist(api_data.api_response);
         }
       });
-      setViewMode('read');
-    } else {
-      setViewMode('write');
-      setSafelist({ ...DEFAULT_SAFELIST });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safelist_id, id]);
@@ -292,47 +236,6 @@ const SafelistDetail = ({ safelist_id, close, mode = 'read' }: SafelistDetailPro
                           <YoutubeSearchedForIcon />
                         </IconButton>
                       </Tooltip>
-                    )}
-                    {(safelist_id || id) && currentUser.roles.includes('safelist_manage') && (
-                      <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
-                        {safelist ? (
-                          <Tooltip title={t(viewMode === 'read' ? 'edit' : 'cancel')}>
-                            <IconButton
-                              style={{
-                                color:
-                                  viewMode === 'read'
-                                    ? theme.palette.mode === 'dark'
-                                      ? theme.palette.info.light
-                                      : theme.palette.info.dark
-                                    : theme.palette.mode === 'dark'
-                                    ? theme.palette.error.light
-                                    : theme.palette.error.dark
-                              }}
-                              onClick={() => {
-                                if (viewMode === 'read') {
-                                  // Switch to write mode
-                                  setViewMode('write');
-                                } else {
-                                  // Reset the state of the safelist, cancel changes
-                                  setViewMode('read');
-                                  setSafelist(originalSafelist);
-                                  setModified(false);
-                                }
-                              }}
-                              size="large"
-                            >
-                              {viewMode === 'read' ? <EditOutlinedIcon /> : <EditOffOutlinedIcon />}
-                            </IconButton>
-                          </Tooltip>
-                        ) : (
-                          <Skeleton
-                            variant="circular"
-                            height="2.5rem"
-                            width="2.5rem"
-                            style={{ margin: theme.spacing(0.5) }}
-                          />
-                        )}
-                      </Grid>
                     )}
                     {currentUser.roles.includes('safelist_manage') && (
                       <Tooltip title={t('remove')}>
