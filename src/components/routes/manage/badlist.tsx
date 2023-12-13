@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import ForbiddenPage from '../403';
+import BadlistNew from './badlist_add';
 import BadlistDetail from './badlist_detail';
 
 const PAGE_SIZE = 25;
@@ -88,7 +89,7 @@ export default function Badlist() {
   useEffect(() => {
     if (location.hash) {
       if (location.hash === '#new') {
-        console.log('todo');
+        setGlobalDrawer(<BadlistNew close={closeGlobalDrawer} />);
       } else {
         setGlobalDrawer(<BadlistDetail badlist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
       }
