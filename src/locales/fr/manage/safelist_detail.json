@@ -33,6 +33,7 @@
   "tag.value": "Valeur",
   "timing": "Informations sur le temps",
   "timing.added": "Date d'ajout",
+  "timing.expiry_ts": "Date d'expiration",
   "timing.updated": "Dernière mise à jour",
   "title": "Détails de hachage en liste sûre",
   "title.file": "Détails de fichier en liste sûre",

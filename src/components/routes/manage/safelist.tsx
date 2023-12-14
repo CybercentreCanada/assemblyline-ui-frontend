@@ -87,7 +87,7 @@ export default function Safelist() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<SafelistDetail safelist_id={location.hash.substr(1)} close={closeGlobalDrawer} />);
+      setGlobalDrawer(<SafelistDetail safelist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
     } else {
       closeGlobalDrawer();
     }
