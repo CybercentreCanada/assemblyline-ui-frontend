@@ -237,14 +237,40 @@ const BadlistNew = () => {
     setReady(true);
   }, [badlist, possibleTags]);
 
+  const cleanBadlist = () => {
+    const data = { ...badlist };
+    if (data.type === 'tag') {
+      delete data.hashes;
+      delete data.file;
+    } else if (data.type === 'file') {
+      delete data.tag;
+      if (data.file.name[0] === '') {
+        data.file.name = [];
+      }
+      if (data.file.type === '') {
+        data.file.type = null;
+      }
+      for (const k in data.hashes) {
+        if (data.hashes[k] === '') {
+          data.hashes[k] = null;
+        }
+      }
+    }
+    return data;
+  };
+
   const saveBadlist = () => {
     apiCall({
       url: `/api/v4/badlist/`,
       method: 'POST',
-      body: badlist,
-      onSuccess: () => {
+      body: cleanBadlist(),
+      onSuccess: resp => {
+        setModified(false);
         showSuccessMessage(t('add.success'));
-        setTimeout(() => navigate('/manage/badlist'), 1000);
+        setTimeout(() => {
+          navigate(`/manage/badlist#${resp.api_response.hash}`);
+          window.dispatchEvent(new CustomEvent('reloadBadlist'));
+        }, 1000);
       },
       onEnter: () => setWaiting(true),
       onExit: () => setWaiting(false)
@@ -394,7 +420,7 @@ const BadlistNew = () => {
                     <Grid key={idx} xs={12} md={6}>
                       <FormLabel>{hash.toUpperCase()}</FormLabel>
                       <TextField
-                        error={badlist?.hashes[hash] && !badlist?.hashes[hash].match(HASH_MAP[hash])}
+                        error={!!(badlist?.hashes[hash] && !badlist?.hashes[hash].match(HASH_MAP[hash]))}
                         value={badlist?.hashes[hash]}
                         onChange={event =>
                           setBadlist({ ...badlist, hashes: { ...badlist.hashes, [hash]: event.target.value } })
