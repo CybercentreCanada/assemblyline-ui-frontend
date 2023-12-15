@@ -113,7 +113,7 @@ export type Signature = [string, string, boolean]; // [name, h_type, safelisted]
 export type Tag = [string, string, boolean, string]; // [value, h_type, safelisted, classification]
 
 type Result = {
-  tag_type: string;
+  type: string;
   value: string;
   h_type: string;
   safelisted: boolean;
@@ -178,19 +178,30 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   }, []);
 
   useEffect(() => {
-    setResults(
-      tags &&
-        Object.entries(tags).flatMap(([tagType, items]) =>
+    const signatureResults = !signatures
+      ? []
+      : signatures.map(item => ({
+          type: 'heuristic.signature',
+          value: item[0],
+          h_type: item[1],
+          safelisted: item[2],
+          classification: ''
+        }));
+
+    const tagResults = !tags
+      ? []
+      : Object.entries(tags).flatMap(([tagType, items]) =>
           items.map(item => ({
-            tag_type: tagType,
+            type: tagType,
             value: item[0],
             h_type: item[1],
             safelisted: item[2],
             classification: item[3]
           }))
-        )
-    );
-  }, [tags]);
+        );
+
+    setResults([...signatureResults, ...tagResults]);
+  }, [signatures, tags]);
 
   return (!signatures && !tags) || someTagNotSafe || forceShowTag || someSigNotSafe || forceShowSig ? (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -208,8 +219,8 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                   <GridTableHeader
                     allowSort
                     sortField="tag_type"
-                    onSort={() => onResultsSort('tag_type', 'ASC')}
-                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'blue' }}
+                    onSort={() => onResultsSort('type', 'ASC')}
+                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'rgb(64, 64, 64)' }}
                   >
                     {t('type')}
                   </GridTableHeader>
@@ -217,7 +228,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                     allowSort
                     sortField="h_type"
                     onSort={() => onResultsSort('h_type', 'ASC')}
-                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'blue' }}
+                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'rgb(64, 64, 64)' }}
                   >
                     {t('verdict')}
                   </GridTableHeader>
@@ -225,7 +236,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                     allowSort
                     sortField="value"
                     onSort={() => onResultsSort('value', 'ASC')}
-                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'blue' }}
+                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'rgb(64, 64, 64)' }}
                   >
                     {t('value')}
                   </GridTableHeader>
@@ -233,30 +244,28 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                     allowSort
                     sortField="classification"
                     onSort={() => onResultsSort('classification', 'ASC')}
-                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'blue' }}
+                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'rgb(64, 64, 64)' }}
                   >
                     {t('classification')}
                   </GridTableHeader>
                   <GridTableHeader
-                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'blue' }}
+                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'rgb(64, 64, 64)' }}
                   />
                 </GridTableRow>
               </GridTableHead>
               <GridTableBody>
-                {results
-                  .filter((r, i) => i < 5)
-                  .map(({ tag_type, value, h_type, safelisted, classification }, i) => (
-                    <Row
-                      key={`${tag_type}-${value}-${h_type}-${safelisted}-${classification}`}
-                      tag_type={tag_type}
-                      value={value}
-                      h_type={h_type}
-                      safelisted={safelisted}
-                      classification={classification}
-                      sha256={sha256}
-                      force={force}
-                    />
-                  ))}
+                {results.map(({ type, value, h_type, safelisted, classification }, i) => (
+                  <Row
+                    key={`${type}-${value}-${h_type}-${safelisted}-${classification}`}
+                    tag_type={type}
+                    value={value}
+                    h_type={h_type}
+                    safelisted={safelisted}
+                    classification={classification}
+                    sha256={sha256}
+                    force={force}
+                  />
+                ))}
               </GridTableBody>
             </GridTable>
           )}
