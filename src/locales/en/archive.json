@@ -4,6 +4,7 @@
   "canceled": "Show cancelled tasks",
   "category": "Category",
   "childrens": "Children",
+  "classification": "Classification",
   "clipboard": "Copy to clipboard",
   "comment": "Comment",
   "comment.confirmation.action.add": "Yes, add it!",
@@ -104,6 +105,7 @@
   "similar": "Similar",
   "supplementary.exclude": "Exclude supplementary files",
   "supplementary.include": "Include supplementary files",
+  "tags": "Tags",
   "tc.1m": "Last month",
   "tc.1y": "Last year",
   "tc.24h": "Last 24 hours",
@@ -115,6 +117,7 @@
   "tooltip.is_supplementary": "This file is supplementary",
   "total": "archived file",
   "totals": "archived files",
+  "type": "Type",
   "type.EXCEPTION": "EXCEPTION",
   "type.MAX DEPTH REACHED": "MAX DEPTH REACHED",
   "type.MAX FILES REACHED": "MAX FILES REACHED",
@@ -132,5 +135,7 @@
   "uri.results.malicious": "services found this URI malicious",
   "uri.results.suspicious": "services found this URI suspicious",
   "uri.safe": "Safe URI",
-  "uri.suspicious": "Suspicious URI"
+  "uri.suspicious": "Suspicious URI",
+  "value": "Value",
+  "verdict": "Verdict"
 }

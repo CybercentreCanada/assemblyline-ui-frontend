@@ -9,7 +9,9 @@ import {
   ArchivedTagSection,
   CommentSection,
   LabelSection,
-  SimilarSection
+  Signature,
+  SimilarSection,
+  Tag
 } from 'components/visual/ArchiveDetail';
 import Classification from 'components/visual/Classification';
 import { Comments } from 'components/visual/CommentCard';
@@ -105,10 +107,8 @@ export type File = {
   };
   parents: string[];
   results: Result[];
-  signatures: string[][];
-  tags: {
-    [type: string]: string[][];
-  };
+  signatures: Signature[];
+  tags: Record<string, Tag[]>;
 };
 
 const TABS = {
@@ -304,7 +304,13 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
         </div>
 
         <div style={{ display: tab === 'tags' ? 'contents' : 'none' }}>
-          <ArchivedTagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
+          <ArchivedTagSection
+            sha256={sha256}
+            signatures={file ? file.signatures : null}
+            tags={file ? file.tags : null}
+            force={force}
+            drawer={inDrawer}
+          />
         </div>
 
         <div style={{ display: tab === 'relations' ? 'contents' : 'none' }}>

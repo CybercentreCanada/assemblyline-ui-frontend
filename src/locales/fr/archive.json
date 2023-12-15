@@ -4,6 +4,7 @@
   "canceled": "Afficher les tâches annulées",
   "category": "Catégorie",
   "childrens": "Enfants",
+  "classification": "Classification",
   "clipboard": "Copier dans le presse-papier",
   "comment": "Commenter",
   "comment.confirmation.action.add": "Oui, ajoutez-le !",
@@ -104,6 +105,7 @@
   "similar": "Similaires",
   "supplementary.exclude": "Exclure les fichiers supplémentaires",
   "supplementary.include": "Inclure les fichiers supplémentaires",
+  "tags": "Tags",
   "tc.1m": "Le mois dernier",
   "tc.1y": "La dernière année",
   "tc.24h": "Dernières 24 heures",
@@ -115,6 +117,7 @@
   "tooltip.is_supplementary": "Ce fichier est supplémentaire",
   "total": "fichier archivé",
   "totals": "fichiers archivés",
+  "type": "Type",
   "type.EXCEPTION": "EXCEPTION",
   "type.MAX DEPTH REACHED": "PROFONDEUR MAXIMALE ATTEINTE",
   "type.MAX FILES REACHED": "MAXIMUM DE FICHIERS ATTEINT",
@@ -132,5 +135,7 @@
   "uri.results.malicious": "services ont trouvé ce URI malveillant",
   "uri.results.suspicious": "services ont trouvé ce URI suspect",
   "uri.safe": "URI Sans Danger",
-  "uri.suspicious": "URI Suspect"
+  "uri.suspicious": "URI Suspect",
+  "value": "Valeur",
+  "verdict": "Verdict"
 }
