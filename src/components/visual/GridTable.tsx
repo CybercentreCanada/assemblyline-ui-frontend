@@ -25,7 +25,7 @@ interface StyledPaperProps extends PaperProps {
 }
 
 export const StyledPaper = styled(Paper, {
-  shouldForwardProp: prop => prop !== 'default'
+  shouldForwardProp: prop => prop !== 'original'
 })<StyledPaperProps>(({ theme, original }) => ({
   ...(original && {
     backgroundColor: theme.palette.background.default
