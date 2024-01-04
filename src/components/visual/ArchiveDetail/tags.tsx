@@ -2,20 +2,13 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Collapse, Divider, Paper, TableContainer, Typography, useTheme } from '@mui/material';
+import { Collapse, Divider, TableContainer, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
-import ResultsTable, { ResultResult } from 'components/visual/SearchResult/results';
-import Verdict from 'components/visual/Verdict';
-import { safeFieldValue } from 'helpers/utils';
-import 'moment/locale/fr';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
-import ActionMenu from '../ActionMenu';
-import Classification from '../Classification';
+import ActionMenu from 'components/visual/ActionMenu';
+import Classification from 'components/visual/Classification';
 import {
   GridLinkRow,
   GridTable,
@@ -23,9 +16,17 @@ import {
   GridTableCell,
   GridTableHead,
   GridTableRow,
-  SortableGridHeaderCell
-} from '../GridTable';
-import SimpleSearchQuery from '../SearchBar/simple-search-query';
+  SortableGridHeaderCell,
+  StyledPaper
+} from 'components/visual/GridTable';
+import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
+import ResultsTable, { ResultResult } from 'components/visual/SearchResult/results';
+import Verdict from 'components/visual/Verdict';
+import { safeFieldValue } from 'helpers/utils';
+import 'moment/locale/fr';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -225,15 +226,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
       <Collapse in={open} timeout="auto">
         <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
           {results && (
-            <TableContainer
-              component={props =>
-                drawer ? (
-                  <Paper sx={{ backgroundColor: theme.palette.background.default }} {...props} />
-                ) : (
-                  <Paper {...props} />
-                )
-              }
-            >
+            <TableContainer component={props => <StyledPaper {...props} original={drawer} />}>
               <GridTable columns={5} size="small">
                 <GridTableHead>
                   <GridTableRow>
@@ -394,13 +387,7 @@ const WrappedRow: React.FC<RowProps> = ({
           <Collapse in={open} timeout="auto">
             <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}>
               <ResultsTable
-                component={props =>
-                  drawer ? (
-                    <Paper {...props} />
-                  ) : (
-                    <Paper sx={{ backgroundColor: theme.palette.background.default }} {...props} />
-                  )
-                }
+                component={props => <StyledPaper {...props} original={!drawer} />}
                 resultResults={resultResults}
                 allowSort={false}
               />

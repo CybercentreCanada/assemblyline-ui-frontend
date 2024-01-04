@@ -20,6 +20,9 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { File, Tab } from 'components/routes/archive/detail';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
+import { DIFF_QUERY } from 'components/visual/FileViewer';
+import { StyledPaper } from 'components/visual/GridTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { safeFieldValueURI } from 'helpers/utils';
 import 'moment/locale/fr';
@@ -28,14 +31,12 @@ import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
-import { DIFF_QUERY } from '../FileViewer';
-import InformativeAlert from '../InformativeAlert';
 
 const useStyles = makeStyles(theme => ({
   container: {
-    backgroundColor: theme.palette.background.default,
-    border: `solid 1px ${theme.palette.divider}`,
-    borderRadius: '4px',
+    // backgroundColor: theme.palette.background.default,
+    // border: `solid 1px ${theme.palette.divider}`,
+    // borderRadius: '4px',
     width: '100%',
     paddingLeft: theme.spacing(1),
     paddingTop: theme.spacing(1),
@@ -65,7 +66,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: 'inherit',
     lineHeight: 'inherit',
     padding: '6px 16px',
-    backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
+    // backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
     '@media print': {
       color: 'black',
       backgroundColor: '#DDD !important'
@@ -249,7 +250,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
               (k, i) =>
                 k in data &&
                 data[k].total > 0 && (
-                  <div key={i} className={classes.container}>
+                  <StyledPaper key={i} className={classes.container} original={drawer}>
                     <div className={classes.caption}>
                       <div>
                         <b>{t(DEFAULT_SIMILAR[k].label)}</b>&nbsp;
@@ -274,7 +275,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                         </small>
                       </div>
                     </div>
-                    <TableContainer className={classes.tablecontainer}>
+                    <TableContainer component={props => <StyledPaper {...props} original={!drawer} />}>
                       <DivTable classes={{ root: classes.table }} size="small">
                         <DivTableHead>
                           <DivTableRow>
@@ -329,7 +330,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                         </DivTableBody>
                       </DivTable>
                     </TableContainer>
-                  </div>
+                  </StyledPaper>
                 )
             )
           )}

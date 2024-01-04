@@ -1,4 +1,6 @@
 import {
+  Paper,
+  PaperProps,
   styled,
   Table,
   TableBody,
@@ -18,13 +20,27 @@ import React from 'react';
 import { To, useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 
+interface StyledPaperProps extends PaperProps {
+  original?: boolean;
+}
+
+export const StyledPaper = styled(Paper, {
+  shouldForwardProp: prop => prop !== 'default'
+})<StyledPaperProps>(({ theme, original }) => ({
+  ...(original && {
+    backgroundColor: theme.palette.background.default
+  })
+}));
+
 interface GridTableProps extends TableProps {
-  component?: never;
+  component?: React.ElementType<any>;
   columns?: number;
 }
 
 export const GridTable = styled(
-  ({ size = 'small', ...other }: GridTableProps) => <Table size={size} {...other} component="div" />,
+  ({ component = 'div', size = 'small', ...other }: GridTableProps) => (
+    <Table size={size} {...other} component={component} />
+  ),
   {
     shouldForwardProp: prop => prop !== 'columns'
   }
@@ -36,17 +52,48 @@ export const GridTable = styled(
   overflowX: 'auto'
 }));
 
-export const GridTableHead = styled(props => <TableHead {...props} component="div" />)<TableHeadProps>(() => ({
+interface GridTableHeadProps extends TableHeadProps {
+  component?: React.ElementType<any>;
+}
+
+export const GridTableHead = styled(({ component = 'div', ...other }: GridTableHeadProps) => (
+  <TableHead component={component} {...other} />
+))<GridTableHeadProps>(() => ({
   display: 'contents'
 }));
 
-export const GridTableBody = styled(props => <TableBody {...props} component="div" />)<TableBodyProps>(() => ({
-  display: 'contents'
+interface GridTableBodyProps extends TableBodyProps {
+  component?: React.ElementType<any>;
+  alternating?: boolean;
+}
+
+export const GridTableBody = styled(
+  ({ component = 'div', ...other }: GridTableBodyProps) => <TableBody component={component} {...other} />,
+  {
+    shouldForwardProp: prop => prop !== 'alternating'
+  }
+)<GridTableBodyProps>(({ theme, alternating = false }) => ({
+  display: 'contents',
+  '&>*:last-child>*': {
+    borderBottom: 'none'
+  },
+  ...(alternating && {
+    '&>*:nth-of-type(odd)>*': {
+      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 3%)' : 'rgba(0, 0, 0, 3%)'
+    }
+  })
 }));
 
-export const GridTableRow = styled(props => <TableRow {...props} component="div" />, {
-  shouldForwardProp: prop => prop !== 'hover' && prop !== 'selected'
-})<TableRowProps>(({ theme, hover = false, selected = false }) => ({
+interface GridTableRowProps extends TableRowProps {
+  component?: React.ElementType<any>;
+}
+
+export const GridTableRow = styled(
+  ({ component = 'div', ...other }: GridTableRowProps) => <TableRow component={component} {...other} />,
+  {
+    shouldForwardProp: prop => prop !== 'hover' && prop !== 'selected'
+  }
+)<GridTableRowProps>(({ theme, hover = false, selected = false }) => ({
   display: 'contents',
   ...(hover && {
     '&:hover>div': {
@@ -60,7 +107,7 @@ export const GridTableRow = styled(props => <TableRow {...props} component="div"
   })
 }));
 
-interface GridLinkRowProps extends TableRowProps {
+interface GridLinkRowProps extends GridTableRowProps {
   component?: never;
   to: To;
 }
@@ -75,13 +122,12 @@ export const GridLinkRow = styled(({ to, ...other }: GridLinkRowProps) => (
 interface GridTableCellProps extends TableCellProps {
   breakable?: boolean;
   center?: boolean;
-  component?: never;
   hidden?: boolean;
 }
 
 export const GridTableCell = styled(
-  ({ children, ...other }: GridTableCellProps) => (
-    <TableCell {...other} component="div">
+  ({ children, component = 'div', ...other }: GridTableCellProps) => (
+    <TableCell {...other} component={component}>
       <div>{children}</div>
     </TableCell>
   ),
