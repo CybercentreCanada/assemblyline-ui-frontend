@@ -44,24 +44,10 @@ export const GridTableBody = styled(props => <TableBody {...props} component="di
   display: 'contents'
 }));
 
-export const GridTableRow = styled(props => <TableRow {...props} component="div" />)<TableRowProps>(() => ({
-  display: 'contents'
-}));
-
-interface GridLinkRowProps extends TableRowProps {
-  component?: never;
-  to: To;
-}
-
-export const GridLinkRow = styled(
-  ({ to, ...other }: GridLinkRowProps) => <TableRow {...(other as any)} component={Link} to={to} />,
-  {
-    shouldForwardProp: prop => prop !== 'hover' && prop !== 'selected'
-  }
-)<GridLinkRowProps>(({ theme, hover = false, selected = false }) => ({
+export const GridTableRow = styled(props => <TableRow {...props} component="div" />, {
+  shouldForwardProp: prop => prop !== 'hover' && prop !== 'selected'
+})<TableRowProps>(({ theme, hover = false, selected = false }) => ({
   display: 'contents',
-  cursor: 'pointer',
-  textDecoration: 'none',
   ...(hover && {
     '&:hover>div': {
       backgroundColor: theme.palette.action.hover
@@ -72,6 +58,18 @@ export const GridLinkRow = styled(
       backgroundColor: theme.palette.mode === 'dark' ? 'rgba(124, 147, 185, 0.16)' : 'rgba(11, 101, 161, 0.08)'
     }
   })
+}));
+
+interface GridLinkRowProps extends TableRowProps {
+  component?: never;
+  to: To;
+}
+
+export const GridLinkRow = styled(({ to, ...other }: GridLinkRowProps) => (
+  <GridTableRow {...(other as any)} component={Link} to={to} />
+))<GridLinkRowProps>(() => ({
+  cursor: 'pointer',
+  textDecoration: 'none'
 }));
 
 interface GridTableCellProps extends TableCellProps {
