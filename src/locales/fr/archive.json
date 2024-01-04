@@ -89,6 +89,8 @@
   "no_results_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat.",
   "no_similar_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat.",
   "no_similar_title": "Aucun fichier similaire trouvé !",
+  "no_tag_desc": "Ce fichier ne contient aucun tag ni signature.",
+  "no_tag_title": "Aucun tag trouvé !",
   "none": "Aucun",
   "parents": "Parents",
   "reaction.love": "Aime",

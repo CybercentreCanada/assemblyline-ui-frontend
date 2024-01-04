@@ -2,8 +2,9 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Collapse, Divider, TableContainer, Typography, useTheme } from '@mui/material';
+import { AlertTitle, Collapse, Divider, Skeleton, TableContainer, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
@@ -19,6 +20,7 @@ import {
   SortableGridHeaderCell,
   StyledPaper
 } from 'components/visual/GridTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import ResultsTable, { ResultResult } from 'components/visual/SearchResult/results';
 import Verdict from 'components/visual/Verdict';
@@ -148,6 +150,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
+  const { c12nDef } = useALContext();
   const { showSafeResults } = useSafeResults();
 
   const [results, setResults] = useState<Result[]>(null);
@@ -225,9 +228,18 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
       <Divider />
       <Collapse in={open} timeout="auto">
         <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
-          {results && (
+          {!results ? (
+            <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
+          ) : results?.length === 0 ? (
+            <div style={{ width: '100%' }}>
+              <InformativeAlert>
+                <AlertTitle>{t('no_tag_title')}</AlertTitle>
+                {t('no_tag_desc')}
+              </InformativeAlert>
+            </div>
+          ) : (
             <TableContainer component={props => <StyledPaper {...props} original={drawer} />}>
-              <GridTable columns={5} size="small">
+              <GridTable columns={c12nDef.enforce ? 5 : 4} size="small">
                 <GridTableHead>
                   <GridTableRow>
                     <SortableGridHeaderCell
@@ -251,13 +263,15 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                       sortField="value"
                       onSort={onSortResults}
                     />
-                    <SortableGridHeaderCell
-                      allowSort
-                      children={t('classification')}
-                      query={query}
-                      sortField="classification"
-                      onSort={onSortResults}
-                    />
+                    {c12nDef.enforce && (
+                      <SortableGridHeaderCell
+                        allowSort
+                        children={t('classification')}
+                        query={query}
+                        sortField="classification"
+                        onSort={onSortResults}
+                      />
+                    )}
                     <GridTableCell />
                   </GridTableRow>
                 </GridTableHead>
@@ -315,6 +329,7 @@ const WrappedRow: React.FC<RowProps> = ({
   const location = useLocation();
 
   const { apiCall } = useMyAPI();
+  const { c12nDef } = useALContext();
   const { showErrorMessage } = useMySnackbar();
 
   const [resultResults, setResultResults] = useState<{
@@ -376,7 +391,17 @@ const WrappedRow: React.FC<RowProps> = ({
         <GridTableCell children={tag_type} />
         <GridTableCell children={<Verdict verdict={h_type as any} fullWidth />} />
         <GridTableCell breakable children={value} />
-        <GridTableCell children={<Classification type="text" size="tiny" c12n={classification} format="short" />} />
+        {c12nDef.enforce && (
+          <GridTableCell
+            children={
+              classification !== '' ? (
+                <Classification type="text" size="tiny" c12n={classification} format="short" />
+              ) : (
+                ''
+              )
+            }
+          />
+        )}
         <GridTableCell sx={{ textAlign: 'right' }}>
           {open ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
         </GridTableCell>
