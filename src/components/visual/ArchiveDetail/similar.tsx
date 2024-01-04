@@ -249,6 +249,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                           {data[k].items.map((item, j) => (
                             <GridLinkRow
                               key={`${i}-${j}`}
+                              hover
                               to={item?.from_archive ? `/archive/${item?.sha256}` : `/file/detail/${item?.sha256}`}
                             >
                               <GridTableCell>
