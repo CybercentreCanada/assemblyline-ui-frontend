@@ -4,7 +4,15 @@ import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { ArchiveBanner, CommentSection, LabelSection, SimilarSection } from 'components/visual/ArchiveDetail';
+import {
+  ArchiveBanner,
+  ArchivedTagSection,
+  CommentSection,
+  LabelSection,
+  Signature,
+  SimilarSection,
+  Tag
+} from 'components/visual/ArchiveDetail';
 import Classification from 'components/visual/Classification';
 import { Comments } from 'components/visual/CommentCard';
 import { Error } from 'components/visual/ErrorCard';
@@ -18,11 +26,8 @@ import IdentificationSection from 'components/visual/FileDetail/ident';
 import MetadataSection from 'components/visual/FileDetail/metadata';
 import ParentSection from 'components/visual/FileDetail/parents';
 import ResultSection from 'components/visual/FileDetail/results';
-import TagSection from 'components/visual/FileDetail/tags';
 import URIIdentificationSection from 'components/visual/FileDetail/uriIdent';
-import ASCIISection from 'components/visual/FileViewer/ascii';
-import HexSection from 'components/visual/FileViewer/hex';
-import StringsSection from 'components/visual/FileViewer/strings';
+import { ASCIISection, HexSection, ImageSection, StringsSection } from 'components/visual/FileViewer';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,7 +43,10 @@ export type FileInfo = {
   comments: Comments;
   entropy: number;
   expiry_ts: string | null;
+  from_archive: boolean;
   hex: string;
+  is_section_image: boolean;
+  is_supplementary: boolean;
   labels: string[];
   label_categories?: {
     info: string[];
@@ -99,10 +107,8 @@ export type File = {
   };
   parents: string[];
   results: Result[];
-  signatures: string[][];
-  tags: {
-    [type: string]: string[][];
-  };
+  signatures: Signature[];
+  tags: Record<string, Tag[]>;
 };
 
 const TABS = {
@@ -113,6 +119,7 @@ const TABS = {
   ascii: null,
   strings: null,
   hex: null,
+  image: null,
   community: null
 };
 
@@ -148,10 +155,17 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   const inDrawer = useMemo<boolean>(() => (propSha256 ? true : paramSha256 ? false : null), [paramSha256, propSha256]);
   const sha256 = useMemo<string>(() => paramSha256 || propSha256, [paramSha256, propSha256]);
-  const tab = useMemo<Tab>(
-    () => (Object.keys(TABS).includes(inDrawer ? stateTab : paramTab) ? (inDrawer ? stateTab : paramTab) : DEFAULT_TAB),
-    [inDrawer, paramTab, stateTab]
-  );
+
+  const tab = useMemo<Tab>(() => {
+    const currentTab = inDrawer ? stateTab : paramTab;
+    return !file ||
+      (currentTab === 'image' && file?.file_info?.is_section_image === true) ||
+      Object.keys(TABS)
+        .filter(v => v !== 'image')
+        .includes(currentTab)
+      ? currentTab
+      : DEFAULT_TAB;
+  }, [file, inDrawer, paramTab, stateTab]);
 
   const handleTabChange = useCallback(
     (event: React.SyntheticEvent<Element, Event>, value: Tab) => {
@@ -198,7 +212,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
   const Layout: React.FC<{ children: React.ReactNode }> = useCallback(
     ({ children }) =>
       inDrawer ? (
-        <PageFullSize styles={{ paper: { textAlign: 'left' } }}>{children}</PageFullSize>
+        <PageFullSize styles={{ paper: { textAlign: 'left', minHeight: null } }}>{children}</PageFullSize>
       ) : (
         <PageCenter width="100%" height="100%" textAlign="left">
           <PageFullSize>{children}</PageFullSize>
@@ -237,13 +251,13 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
         <div
           style={{
             position: 'sticky',
-            top: '64px',
-            zIndex: 1,
+            top: '63px',
+            zIndex: 1000,
             backgroundColor: inDrawer ? theme.palette.background.paper : theme.palette.background.default
           }}
         >
           <MuiTabs
-            value={tab}
+            value={tab || 'details'}
             variant="scrollable"
             scrollButtons="auto"
             onChange={handleTabChange}
@@ -252,9 +266,17 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
               margin: `${theme.spacing(2)} 0`
             }}
           >
-            {Object.keys(TABS).map((title, i) => (
-              <MuiTab key={`${i}`} label={t(title)} value={title} sx={{ minWidth: '120px' }} />
-            ))}
+            <MuiTab label={t('details')} value={'details'} sx={{ minWidth: '120px' }} />
+            <MuiTab label={t('detection')} value={'detection'} sx={{ minWidth: '120px' }} />
+            <MuiTab label={t('tags')} value={'tags'} sx={{ minWidth: '120px' }} />
+            <MuiTab label={t('relations')} value={'relations'} sx={{ minWidth: '120px' }} />
+            <MuiTab label={t('ascii')} value={'ascii'} sx={{ minWidth: '120px' }} />
+            <MuiTab label={t('strings')} value={'strings'} sx={{ minWidth: '120px' }} />
+            <MuiTab label={t('hex')} value={'hex'} sx={{ minWidth: '120px' }} />
+            {file?.file_info?.is_section_image !== false && (
+              <MuiTab label={t('image')} value={'image'} sx={{ minWidth: '120px' }} />
+            )}
+            <MuiTab label={t('community')} value={'community'} sx={{ minWidth: '120px' }} />
           </MuiTabs>
         </div>
 
@@ -282,7 +304,13 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
         </div>
 
         <div style={{ display: tab === 'tags' ? 'contents' : 'none' }}>
-          <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
+          <ArchivedTagSection
+            sha256={sha256}
+            signatures={file ? file.signatures : null}
+            tags={file ? file.tags : null}
+            force={force}
+            drawer={inDrawer}
+          />
         </div>
 
         <div style={{ display: tab === 'relations' ? 'contents' : 'none' }}>
@@ -312,6 +340,12 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
         <div style={{ display: tab === 'hex' ? 'contents' : 'none' }}>
           <HexSection sha256={sha256} visible={tab === 'hex'} />
         </div>
+
+        {file?.file_info?.is_section_image && (
+          <div style={{ display: tab === 'image' ? 'contents' : 'none' }}>
+            <ImageSection sha256={sha256} name={sha256} visible={tab === 'image'} />
+          </div>
+        )}
 
         <div style={{ display: tab === 'community' ? 'contents' : 'none' }}>
           <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} />

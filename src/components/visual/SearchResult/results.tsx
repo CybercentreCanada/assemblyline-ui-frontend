@@ -44,17 +44,18 @@ type SearchResults = {
 
 type ResultsTableProps = {
   resultResults: SearchResults;
+  component?: any;
   allowSort?: boolean;
 };
 
-const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allowSort = true }) => {
+const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, component = Paper, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
   const theme = useTheme();
 
   return resultResults ? (
     resultResults.total !== 0 ? (
-      <TableContainer component={Paper}>
+      <TableContainer component={component}>
         <DivTable>
           <DivTableHead>
             <DivTableRow>

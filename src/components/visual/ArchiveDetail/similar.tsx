@@ -10,12 +10,7 @@ import {
   Grid,
   IconButton,
   Skeleton,
-  Table,
-  TableBody,
-  TableCell,
   TableContainer,
-  TableHead,
-  TableRow,
   Tooltip,
   Typography,
   useTheme
@@ -24,6 +19,17 @@ import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { File, Tab } from 'components/routes/archive/detail';
+import { DIFF_QUERY } from 'components/visual/FileViewer';
+import {
+  GridLinkRow,
+  GridTable,
+  GridTableBody,
+  GridTableCell,
+  GridTableHead,
+  GridTableRow,
+  StyledPaper
+} from 'components/visual/GridTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { safeFieldValueURI } from 'helpers/utils';
 import 'moment/locale/fr';
@@ -32,18 +38,11 @@ import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
-import { DIFF_QUERY } from '../FileViewer';
-import InformativeAlert from '../InformativeAlert';
 
 const useStyles = makeStyles(theme => ({
   container: {
-    backgroundColor: theme.palette.background.default,
-    border: `solid 1px ${theme.palette.divider}`,
-    borderRadius: '4px',
     width: '100%',
-    paddingLeft: theme.spacing(1),
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(1)
+    padding: theme.spacing(1)
   },
   caption: {
     display: 'grid',
@@ -55,49 +54,6 @@ const useStyles = makeStyles(theme => ({
       overflow: 'hidden',
       textOverflow: 'ellipsis'
     }
-  },
-  tablecontainer: {
-    fontSize: '90%',
-    maxWidth: '100%'
-  },
-  table: {
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  },
-  headcell: {
-    fontSize: 'inherit',
-    lineHeight: 'inherit',
-    padding: '6px 16px',
-    backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
-    '@media print': {
-      color: 'black',
-      backgroundColor: '#DDD !important'
-    }
-  },
-  tablerow: {
-    textDecoration: 'none',
-    '&:nth-of-type(odd)': {
-      '@media print': {
-        backgroundColor: '#EEE !important'
-      },
-      backgroundColor: theme.palette.mode === 'dark' ? '#ffffff08' : '#00000008'
-    },
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover
-    }
-  },
-  bodycell: {
-    '@media print': {
-      color: 'black'
-    },
-    fontSize: 'inherit',
-    lineHeight: 'inherit',
-    padding: `0px ${theme.spacing(2)}`
-  },
-  sp2: {
-    paddingBottom: theme.spacing(2),
-    paddingTop: theme.spacing(2)
   },
   title: {
     display: 'flex',
@@ -231,14 +187,14 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
   }, [file]);
 
   return show || (data && nbOfValues > 0) ? (
-    <div className={classes.sp2}>
+    <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
       <Typography className={classes.title} variant="h6" onClick={() => setOpen(!open)}>
         <span>{title ?? t('similar')}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">
-        <Grid container paddingBottom={2} paddingTop={2} flexDirection={'column'} gap={2}>
+        <Grid container paddingBottom={2} paddingTop={2} flexDirection="column" gap={2}>
           {!data ? (
             <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
           ) : nbOfValues === 0 ? (
@@ -253,7 +209,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
               (k, i) =>
                 k in data &&
                 data[k].total > 0 && (
-                  <div key={i} className={classes.container}>
+                  <StyledPaper key={i} className={classes.container} original={drawer}>
                     <div className={classes.caption}>
                       <div>
                         <b>{t(DEFAULT_SIMILAR[k].label)}</b>&nbsp;
@@ -278,26 +234,24 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                         </small>
                       </div>
                     </div>
-                    <TableContainer className={classes.tablecontainer}>
-                      <Table classes={{ root: classes.table }} size="small">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell classes={{ root: classes.headcell }} children={t('header.archived')} />
-                            <TableCell classes={{ root: classes.headcell }} children={t('header.seen.last')} />
-                            <TableCell classes={{ root: classes.headcell }} children={t('header.sha256')} />
-                            <TableCell classes={{ root: classes.headcell }} children={t('header.type')} />
-                            <TableCell classes={{ root: classes.headcell }} children={t('header.actions')} />
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
+                    <TableContainer component={props => <StyledPaper {...props} original={!drawer} />}>
+                      <GridTable columns={5} size="small">
+                        <GridTableHead>
+                          <GridTableRow>
+                            <GridTableCell children={t('header.archived')} />
+                            <GridTableCell children={t('header.seen.last')} />
+                            <GridTableCell children={t('header.sha256')} />
+                            <GridTableCell children={t('header.type')} />
+                            <GridTableCell children={t('header.actions')} />
+                          </GridTableRow>
+                        </GridTableHead>
+                        <GridTableBody>
                           {data[k].items.map((item, j) => (
-                            <TableRow
+                            <GridLinkRow
                               key={`${i}-${j}`}
-                              classes={{ root: classes.tablerow }}
-                              component={Link}
                               to={item?.from_archive ? `/archive/${item?.sha256}` : `/file/detail/${item?.sha256}`}
                             >
-                              <TableCell classes={{ root: classes.bodycell }}>
+                              <GridTableCell>
                                 {item?.from_archive && (
                                   <Tooltip title={t('file.from_archive')} placement="right">
                                     <span>
@@ -307,33 +261,33 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                                     </span>
                                   </Tooltip>
                                 )}
-                              </TableCell>
+                              </GridTableCell>
 
-                              <TableCell classes={{ root: classes.bodycell }}>
+                              <GridTableCell>
                                 <Tooltip title={item.seen.last}>
                                   <span>
                                     <Moment fromNow locale={i18n.language} children={item.seen.last} />
                                   </span>
                                 </Tooltip>
-                              </TableCell>
+                              </GridTableCell>
 
-                              <TableCell classes={{ root: classes.bodycell }}>{item?.sha256}</TableCell>
+                              <GridTableCell>{item?.sha256}</GridTableCell>
 
-                              <TableCell classes={{ root: classes.bodycell }}>{item?.type}</TableCell>
+                              <GridTableCell>{item?.type}</GridTableCell>
 
-                              <TableCell classes={{ root: classes.bodycell }}>
+                              <GridTableCell>
                                 <Tooltip title={t('compare')} placement="left">
                                   <IconButton size="small" onClick={handleCompareClick(item)}>
                                     <CompareIcon fontSize="small" />
                                   </IconButton>
                                 </Tooltip>
-                              </TableCell>
-                            </TableRow>
+                              </GridTableCell>
+                            </GridLinkRow>
                           ))}
-                        </TableBody>
-                      </Table>
+                        </GridTableBody>
+                      </GridTable>
                     </TableContainer>
-                  </div>
+                  </StyledPaper>
                 )
             )
           )}

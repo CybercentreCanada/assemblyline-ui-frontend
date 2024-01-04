@@ -55,17 +55,17 @@ const WrappedFileViewer: React.FC<Props> = () => {
   const navigate = useNavigate();
 
   const { apiCall } = useMyAPI();
-  const { id, tab: paramTab } = useParams<ParamProps>();
+  const { id: sha256, tab: paramTab } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [type, setType] = useState<string>('unknown');
-  const [imageAllowed, setImageAllowed] = useState<boolean>(false);
+  const [imageAllowed, setImageAllowed] = useState<boolean>(null);
 
-  const sha256 = useMemo<string>(() => id, [id]);
-
-  const tab = useMemo(
+  const tab = useMemo<Tab>(
     () =>
-      sha256 && (!paramTab || !TAB_OPTIONS.includes(paramTab) || (!imageAllowed && paramTab === 'image'))
+      sha256 &&
+      imageAllowed !== null &&
+      (!paramTab || !TAB_OPTIONS.includes(paramTab) || (!imageAllowed && paramTab === 'image'))
         ? DEFAULT_TAB
         : paramTab,
     [imageAllowed, paramTab, sha256]
@@ -89,7 +89,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser?.roles, id]);
+  }, [currentUser?.roles, sha256]);
 
   useEffect(() => {
     if (paramTab !== tab) {
@@ -97,13 +97,20 @@ const WrappedFileViewer: React.FC<Props> = () => {
     }
   }, [location?.hash, location?.search, navigate, paramTab, sha256, tab]);
 
+  useEffect(() => {
+    return () => {
+      setType('unknown');
+      setImageAllowed(null);
+    };
+  }, [sha256]);
+
   return currentUser.roles.includes('file_detail') ? (
     <PageFullSize margin={4}>
       <Grid container alignItems="center">
         <Grid item xs>
           <Typography variant="h4">{t('title')}</Typography>
           <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-            {id}
+            {sha256}
           </Typography>
         </Grid>
         <Grid item xs={12} sm={12} md={4} style={{ textAlign: 'right', flexGrow: 0 }}>
@@ -150,7 +157,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
               <MuiTab label={t('ascii')} value="ascii" />
               <MuiTab label={t('strings')} value="strings" />
               <MuiTab label={t('hex')} value="hex" />
-              {imageAllowed ? <MuiTab label={t('image')} value="image" /> : <Empty />}
+              {imageAllowed !== false ? <MuiTab label={t('image')} value="image" /> : <Empty />}
             </Tabs>
           </Paper>
 

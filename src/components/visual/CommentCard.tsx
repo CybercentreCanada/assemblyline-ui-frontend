@@ -130,6 +130,7 @@ const useStyles = makeStyles(theme => ({
   divider: {
     width: '1px',
     height: '25px',
+    margin: `0 ${theme.spacing(0.5)}`,
     backgroundColor: theme.palette.text.primary
   },
   tooltip: {

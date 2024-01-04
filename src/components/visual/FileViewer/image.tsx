@@ -21,7 +21,8 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(1),
     flexGrow: 1,
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    height: '1px'
   },
   root: {
     height: '100%',

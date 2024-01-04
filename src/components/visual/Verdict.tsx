@@ -5,7 +5,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type VerdictProps = {
-  score: number;
+  verdict?: 'info' | 'safe' | 'suspicious' | 'highly_suspicious' | 'malicious';
+  score?: number;
   short?: boolean;
   variant?: 'outlined' | 'filled';
   size?: 'tiny' | 'small' | 'medium';
@@ -16,7 +17,8 @@ type VerdictProps = {
 };
 
 const WrappedVerdict: React.FC<VerdictProps> = ({
-  score,
+  verdict = null,
+  score = null,
   type = 'rounded',
   variant = 'filled',
   size = 'tiny',
@@ -62,10 +64,10 @@ const WrappedVerdict: React.FC<VerdictProps> = ({
     }
   };
 
-  const { text, color, shortText, textColor } = VERDICT_SCORE_MAP[scoreToVerdict(score)];
+  const { text, color, shortText, textColor } = VERDICT_SCORE_MAP[verdict || scoreToVerdict(score)];
 
   return (
-    <Tooltip title={`${text} [Score: ${score}]`}>
+    <Tooltip title={`${text} [Score: ${score}]`} disableHoverListener={!score}>
       <span>
         {type === 'text' ? (
           <span style={{ fontWeight: 500, color: textColor }}>{text}</span>
