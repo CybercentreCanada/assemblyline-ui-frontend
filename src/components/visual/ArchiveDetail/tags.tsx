@@ -279,6 +279,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                       classification={classification}
                       sha256={sha256}
                       force={force}
+                      drawer={drawer}
                     />
                   ))}
                 </GridTableBody>
@@ -299,6 +300,7 @@ type RowProps = {
   classification: string;
   sha256: string;
   force: boolean;
+  drawer?: boolean;
 };
 
 const initialMenuState = {
@@ -306,7 +308,16 @@ const initialMenuState = {
   mouseY: null
 };
 
-const WrappedRow: React.FC<RowProps> = ({ tag_type, value, h_type, safelisted, classification, sha256, force }) => {
+const WrappedRow: React.FC<RowProps> = ({
+  tag_type,
+  value,
+  h_type,
+  safelisted,
+  classification,
+  sha256,
+  force,
+  drawer
+}) => {
   const theme = useTheme();
   const location = useLocation();
 
@@ -382,7 +393,17 @@ const WrappedRow: React.FC<RowProps> = ({ tag_type, value, h_type, safelisted, c
         <GridTableCell sx={{ gridColumn: 'span 5', padding: 0 }}>
           <Collapse in={open} timeout="auto">
             <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}>
-              <ResultsTable component={other => <Paper {...other} />} resultResults={resultResults} allowSort={false} />
+              <ResultsTable
+                component={props =>
+                  drawer ? (
+                    <Paper {...props} />
+                  ) : (
+                    <Paper sx={{ backgroundColor: theme.palette.background.default }} {...props} />
+                  )
+                }
+                resultResults={resultResults}
+                allowSort={false}
+              />
             </div>
           </Collapse>
         </GridTableCell>
