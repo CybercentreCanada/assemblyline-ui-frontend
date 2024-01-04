@@ -2,7 +2,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Collapse, Divider, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Collapse, Divider, Paper, TableContainer, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -11,12 +11,21 @@ import ResultsTable, { ResultResult } from 'components/visual/SearchResult/resul
 import Verdict from 'components/visual/Verdict';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import ActionMenu from '../ActionMenu';
 import Classification from '../Classification';
-import { GridTable, GridTableBody, GridTableCell, GridTableHead, GridTableHeader, GridTableRow } from '../GridTable';
+import {
+  GridLinkRow2,
+  GridTable2,
+  GridTableBody2,
+  GridTableCell2,
+  GridTableHead2,
+  GridTableRow2,
+  SortableGridHeaderCell2
+} from '../GridTable';
+import SimpleSearchQuery from '../SearchBar/simple-search-query';
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -113,7 +122,7 @@ export type Signature = [string, string, boolean]; // [name, h_type, safelisted]
 export type Tag = [string, string, boolean, string]; // [value, h_type, safelisted, classification]
 
 type Result = {
-  type: string;
+  tag_type: string;
   value: string;
   h_type: string;
   safelisted: boolean;
@@ -145,9 +154,10 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   const [results, setResults] = useState<Result[]>(null);
   const [tagUnsafeMap, setTagUnsafeMap] = useState<any>({});
   const [open, setOpen] = useState<boolean>(true);
+  const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(''));
 
-  const sortRef = useRef<keyof Result>(null);
-  const dirRef = useRef<'ASC' | 'DESC'>(null);
+  // const sortRef = useRef<keyof Result>(null);
+  // const dirRef = useRef<'ASC' | 'DESC'>(null);
 
   useEffect(() => {
     if (tags) {
@@ -164,24 +174,43 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   const someTagNotSafe = Object.values(tagUnsafeMap).some(Boolean);
   const forceShowTag = Object.keys(tagUnsafeMap).length !== 0 && (showSafeResults || force);
 
-  const onResultsSort = useCallback((key: keyof Result, defaultDir: 'ASC' | 'DESC' = 'ASC') => {
-    dirRef.current = sortRef.current !== key ? defaultDir : dirRef.current === 'DESC' ? 'ASC' : 'DESC';
-    sortRef.current = key;
+  // const onResultsSort = useCallback((key: keyof Result, defaultDir: 'ASC' | 'DESC' = 'ASC') => {
+  //   dirRef.current = sortRef.current !== key ? defaultDir : dirRef.current === 'DESC' ? 'ASC' : 'DESC';
+  //   sortRef.current = key;
 
-    setResults(r => [
-      ...r.sort((a, b) =>
-        dirRef.current === 'ASC'
-          ? (a[key] as any).localeCompare(b[key] as any)
-          : (b[key] as any).localeCompare(a[key] as any)
-      )
-    ]);
+  //   setResults(r => [
+  //     ...r.sort((a, b) =>
+  //       dirRef.current === 'ASC'
+  //         ? (a[key] as any).localeCompare(b[key] as any)
+  //         : (b[key] as any).localeCompare(a[key] as any)
+  //     )
+  //   ]);
+  // }, []);
+
+  const onSortResults = useCallback((event: any, { field }: { field: string }) => {
+    // dirRef.current = sortRef.current !== key ? defaultDir : dirRef.current === 'DESC' ? 'ASC' : 'DESC';
+    // sortRef.current = key;
+
+    // setResults(r => [
+    //   ...r.sort((a, b) =>
+    //     dirRef.current === 'ASC'
+    //       ? (a[key] as any).localeCompare(b[key] as any)
+    //       : (b[key] as any).localeCompare(a[key] as any)
+    //   )
+    // ]);
+
+    setQuery(prev => {
+      const q = new SimpleSearchQuery(prev.toString(), '');
+      q.set('sort', field);
+      return q;
+    });
   }, []);
 
   useEffect(() => {
     const signatureResults = !signatures
       ? []
       : signatures.map(item => ({
-          type: 'heuristic.signature',
+          tag_type: 'heuristic.signature',
           value: item[0],
           h_type: item[1],
           safelisted: item[2],
@@ -192,7 +221,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
       ? []
       : Object.entries(tags).flatMap(([tagType, items]) =>
           items.map(item => ({
-            type: tagType,
+            tag_type: tagType,
             value: item[0],
             h_type: item[1],
             safelisted: item[2],
@@ -200,8 +229,20 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
           }))
         );
 
-    setResults([...signatureResults, ...tagResults]);
-  }, [signatures, tags]);
+    const sort = new SimpleSearchQuery(query.toString(), null).get('sort', 'tag_type asc');
+    const dir = sort && sort.indexOf('asc') !== -1 ? 'asc' : 'desc';
+    const field = sort.replace(' asc', '').replace(' desc', '') as keyof Result;
+
+    setResults(
+      [...signatureResults, ...tagResults].sort((a, b) =>
+        !(field in a)
+          ? 0
+          : dir === 'asc'
+          ? (a[field] as any).localeCompare(b[field] as any)
+          : (b[field] as any).localeCompare(a[field] as any)
+      )
+    );
+  }, [query, signatures, tags]);
 
   return (!signatures && !tags) || someTagNotSafe || forceShowTag || someSigNotSafe || forceShowSig ? (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -213,61 +254,65 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
       <Collapse in={open} timeout="auto">
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           {results && (
-            <GridTable nbOfColumns={5} sx={{ backgroundColor: theme.palette.background.default }}>
-              <GridTableHead>
-                <GridTableRow>
-                  <GridTableHeader
-                    allowSort
-                    sortField="tag_type"
-                    onSort={() => onResultsSort('type', 'ASC')}
-                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'rgb(64, 64, 64)' }}
-                  >
-                    {t('type')}
-                  </GridTableHeader>
-                  <GridTableHeader
-                    allowSort
-                    sortField="h_type"
-                    onSort={() => onResultsSort('h_type', 'ASC')}
-                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'rgb(64, 64, 64)' }}
-                  >
-                    {t('verdict')}
-                  </GridTableHeader>
-                  <GridTableHeader
-                    allowSort
-                    sortField="value"
-                    onSort={() => onResultsSort('value', 'ASC')}
-                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'rgb(64, 64, 64)' }}
-                  >
-                    {t('value')}
-                  </GridTableHeader>
-                  <GridTableHeader
-                    allowSort
-                    sortField="classification"
-                    onSort={() => onResultsSort('classification', 'ASC')}
-                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'rgb(64, 64, 64)' }}
-                  >
-                    {t('classification')}
-                  </GridTableHeader>
-                  <GridTableHeader
-                    style={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgb(46, 46, 46)' : 'rgb(64, 64, 64)' }}
-                  />
-                </GridTableRow>
-              </GridTableHead>
-              <GridTableBody>
-                {results.map(({ type, value, h_type, safelisted, classification }, i) => (
-                  <Row
-                    key={`${type}-${value}-${h_type}-${safelisted}-${classification}`}
-                    tag_type={type}
-                    value={value}
-                    h_type={h_type}
-                    safelisted={safelisted}
-                    classification={classification}
-                    sha256={sha256}
-                    force={force}
-                  />
-                ))}
-              </GridTableBody>
-            </GridTable>
+            <TableContainer
+              component={props =>
+                drawer ? (
+                  <Paper sx={{ backgroundColor: theme.palette.background.default }} {...props} />
+                ) : (
+                  <Paper {...props} />
+                )
+              }
+            >
+              <GridTable2 columns={5} size="small">
+                <GridTableHead2>
+                  <GridTableRow2>
+                    <SortableGridHeaderCell2
+                      allowSort
+                      children={t('type')}
+                      query={query}
+                      sortField="tag_type"
+                      onSort={onSortResults}
+                    />
+                    <SortableGridHeaderCell2
+                      allowSort
+                      children={t('verdict')}
+                      query={query}
+                      sortField="h_type"
+                      onSort={onSortResults}
+                    />
+                    <SortableGridHeaderCell2
+                      allowSort
+                      children={t('value')}
+                      query={query}
+                      sortField="value"
+                      onSort={onSortResults}
+                    />
+                    <SortableGridHeaderCell2
+                      allowSort
+                      children={t('classification')}
+                      query={query}
+                      sortField="classification"
+                      onSort={onSortResults}
+                    />
+                    <GridTableCell2 />
+                  </GridTableRow2>
+                </GridTableHead2>
+                <GridTableBody2>
+                  {results.map(({ tag_type, value, h_type, safelisted, classification }, i) => (
+                    <Row
+                      key={`${tag_type}-${value}-${h_type}-${safelisted}-${classification}`}
+                      tag_type={tag_type}
+                      value={value}
+                      h_type={h_type}
+                      safelisted={safelisted}
+                      classification={classification}
+                      sha256={sha256}
+                      force={force}
+                    />
+                  ))}
+                </GridTableBody2>
+              </GridTable2>
+            </TableContainer>
           )}
         </div>
       </Collapse>
@@ -347,31 +392,30 @@ const WrappedRow: React.FC<RowProps> = ({ tag_type, value, h_type, safelisted, c
         setState={setState}
         classification={classification}
       />
-      <GridTableRow
-        link
+      <GridLinkRow2
         hover
         to={`/search/result?query=result.sections.tags.${tag_type}:%22WARZONE%22#${location.hash}`}
         onClick={handleRowClick}
         onContextMenu={handleMenuClick}
       >
-        <GridTableCell children={tag_type} />
-        <GridTableCell children={<Verdict verdict={h_type as any} fullWidth />} />
-        <GridTableCell wrap sx={{ wordWrap: 'break-word' }} children={value} />
-        <GridTableCell children={<Classification type="text" size="tiny" c12n={classification} format="short" />} />
-        <GridTableCell sx={{ textAlign: 'right' }}>
-          {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-        </GridTableCell>
-      </GridTableRow>
+        <GridTableCell2 children={tag_type} />
+        <GridTableCell2 children={<Verdict verdict={h_type as any} fullWidth />} />
+        <GridTableCell2 breakable children={value} />
+        <GridTableCell2 children={<Classification type="text" size="tiny" c12n={classification} format="short" />} />
+        <GridTableCell2 sx={{ textAlign: 'right' }}>
+          {open ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+        </GridTableCell2>
+      </GridLinkRow2>
 
-      <GridTableRow>
-        <GridTableCell sx={{ gridColumn: 'span 5', padding: 0 }}>
+      <GridTableRow2>
+        <GridTableCell2 sx={{ gridColumn: 'span 5', padding: 0 }}>
           <Collapse in={open} timeout="auto">
             <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}>
-              <ResultsTable resultResults={resultResults} allowSort={false} />
+              <ResultsTable component={other => <Paper {...other} />} resultResults={resultResults} allowSort={false} />
             </div>
           </Collapse>
-        </GridTableCell>
-      </GridTableRow>
+        </GridTableCell2>
+      </GridTableRow2>
     </>
   );
 };
