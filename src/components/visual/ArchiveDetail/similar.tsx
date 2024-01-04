@@ -19,9 +19,16 @@ import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { File, Tab } from 'components/routes/archive/detail';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
 import { DIFF_QUERY } from 'components/visual/FileViewer';
-import { StyledPaper } from 'components/visual/GridTable';
+import {
+  GridLinkRow,
+  GridTable,
+  GridTableBody,
+  GridTableCell,
+  GridTableHead,
+  GridTableRow,
+  StyledPaper
+} from 'components/visual/GridTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { safeFieldValueURI } from 'helpers/utils';
@@ -34,13 +41,8 @@ import { Link, useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   container: {
-    // backgroundColor: theme.palette.background.default,
-    // border: `solid 1px ${theme.palette.divider}`,
-    // borderRadius: '4px',
     width: '100%',
-    paddingLeft: theme.spacing(1),
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(1)
+    padding: theme.spacing(1)
   },
   caption: {
     display: 'grid',
@@ -52,49 +54,6 @@ const useStyles = makeStyles(theme => ({
       overflow: 'hidden',
       textOverflow: 'ellipsis'
     }
-  },
-  tablecontainer: {
-    fontSize: '90%',
-    maxWidth: '100%'
-  },
-  table: {
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  },
-  headcell: {
-    fontSize: 'inherit',
-    lineHeight: 'inherit',
-    padding: '6px 16px',
-    // backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
-    '@media print': {
-      color: 'black',
-      backgroundColor: '#DDD !important'
-    }
-  },
-  tablerow: {
-    textDecoration: 'none',
-    '&:nth-of-type(odd)': {
-      '@media print': {
-        backgroundColor: '#EEE !important'
-      },
-      backgroundColor: theme.palette.mode === 'dark' ? '#ffffff08' : '#00000008'
-    },
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover
-    }
-  },
-  bodycell: {
-    '@media print': {
-      color: 'black'
-    },
-    fontSize: 'inherit',
-    lineHeight: 'inherit',
-    padding: `0px ${theme.spacing(2)}`
-  },
-  sp2: {
-    paddingBottom: theme.spacing(2),
-    paddingTop: theme.spacing(2)
   },
   title: {
     display: 'flex',
@@ -228,14 +187,14 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
   }, [file]);
 
   return show || (data && nbOfValues > 0) ? (
-    <div className={classes.sp2}>
+    <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
       <Typography className={classes.title} variant="h6" onClick={() => setOpen(!open)}>
         <span>{title ?? t('similar')}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">
-        <Grid container paddingBottom={2} paddingTop={2} flexDirection={'column'} gap={2}>
+        <Grid container paddingBottom={2} paddingTop={2} flexDirection="column" gap={2}>
           {!data ? (
             <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
           ) : nbOfValues === 0 ? (
@@ -276,25 +235,23 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                       </div>
                     </div>
                     <TableContainer component={props => <StyledPaper {...props} original={!drawer} />}>
-                      <DivTable classes={{ root: classes.table }} size="small">
-                        <DivTableHead>
-                          <DivTableRow>
-                            <DivTableCell classes={{ root: classes.headcell }} children={t('header.archived')} />
-                            <DivTableCell classes={{ root: classes.headcell }} children={t('header.seen.last')} />
-                            <DivTableCell classes={{ root: classes.headcell }} children={t('header.sha256')} />
-                            <DivTableCell classes={{ root: classes.headcell }} children={t('header.type')} />
-                            <DivTableCell classes={{ root: classes.headcell }} children={t('header.actions')} />
-                          </DivTableRow>
-                        </DivTableHead>
-                        <DivTableBody>
+                      <GridTable columns={5} size="small">
+                        <GridTableHead>
+                          <GridTableRow>
+                            <GridTableCell children={t('header.archived')} />
+                            <GridTableCell children={t('header.seen.last')} />
+                            <GridTableCell children={t('header.sha256')} />
+                            <GridTableCell children={t('header.type')} />
+                            <GridTableCell children={t('header.actions')} />
+                          </GridTableRow>
+                        </GridTableHead>
+                        <GridTableBody>
                           {data[k].items.map((item, j) => (
-                            <LinkRow
+                            <GridLinkRow
                               key={`${i}-${j}`}
-                              classes={{ root: classes.tablerow }}
-                              component={Link}
                               to={item?.from_archive ? `/archive/${item?.sha256}` : `/file/detail/${item?.sha256}`}
                             >
-                              <DivTableCell classes={{ root: classes.bodycell }}>
+                              <GridTableCell>
                                 {item?.from_archive && (
                                   <Tooltip title={t('file.from_archive')} placement="right">
                                     <span>
@@ -304,31 +261,31 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                                     </span>
                                   </Tooltip>
                                 )}
-                              </DivTableCell>
+                              </GridTableCell>
 
-                              <DivTableCell classes={{ root: classes.bodycell }}>
+                              <GridTableCell>
                                 <Tooltip title={item.seen.last}>
                                   <span>
                                     <Moment fromNow locale={i18n.language} children={item.seen.last} />
                                   </span>
                                 </Tooltip>
-                              </DivTableCell>
+                              </GridTableCell>
 
-                              <DivTableCell classes={{ root: classes.bodycell }}>{item?.sha256}</DivTableCell>
+                              <GridTableCell>{item?.sha256}</GridTableCell>
 
-                              <DivTableCell classes={{ root: classes.bodycell }}>{item?.type}</DivTableCell>
+                              <GridTableCell>{item?.type}</GridTableCell>
 
-                              <DivTableCell classes={{ root: classes.bodycell }}>
+                              <GridTableCell>
                                 <Tooltip title={t('compare')} placement="left">
                                   <IconButton size="small" onClick={handleCompareClick(item)}>
                                     <CompareIcon fontSize="small" />
                                   </IconButton>
                                 </Tooltip>
-                              </DivTableCell>
-                            </LinkRow>
+                              </GridTableCell>
+                            </GridLinkRow>
                           ))}
-                        </DivTableBody>
-                      </DivTable>
+                        </GridTableBody>
+                      </GridTable>
                     </TableContainer>
                   </StyledPaper>
                 )
