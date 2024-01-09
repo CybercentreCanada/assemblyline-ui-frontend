@@ -9,6 +9,7 @@ import PageFullSize from 'commons/components/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
+import Content from 'components/visual/Content';
 import Empty from 'components/visual/Empty';
 import FileDownloader from 'components/visual/FileDownloader';
 import { ASCIISection, HexSection, ImageSection, StringsSection } from 'components/visual/FileViewer';
@@ -46,25 +47,6 @@ type ParamProps = {
 };
 
 type Props = {};
-
-type TabSectionProps = {
-  children?: React.ReactNode;
-  name?: string;
-  visible?: boolean;
-};
-
-const TabSection: React.FC<TabSectionProps> = React.memo(({ children, name = '', visible = false }) => {
-  const classes = useStyles();
-  const [render, setRender] = useState<boolean>(false);
-  useEffect(() => {
-    if (visible === true) setRender(true);
-  }, [visible]);
-  return (
-    <div className={classes.tab} style={{ display: visible ? 'contents' : 'none' }}>
-      {render && children}
-    </div>
-  );
-});
 
 const WrappedFileViewer: React.FC<Props> = () => {
   const { t } = useTranslation(['fileViewer']);
@@ -180,21 +162,29 @@ const WrappedFileViewer: React.FC<Props> = () => {
             </Tabs>
           </Paper>
 
-          <TabSection visible={tab === 'ascii'} name="ascii">
-            <ASCIISection sha256={sha256} type={type} />
-          </TabSection>
+          <Content visible={tab === 'ascii'} name="ascii">
+            <div className={classes.tab}>
+              <ASCIISection sha256={sha256} type={type} />
+            </div>
+          </Content>
 
-          <TabSection visible={tab === 'strings'} name="strings">
-            <StringsSection sha256={sha256} type={type} />
-          </TabSection>
+          <Content visible={tab === 'strings'} name="strings">
+            <div className={classes.tab}>
+              <StringsSection sha256={sha256} type={type} />
+            </div>
+          </Content>
 
-          <TabSection visible={tab === 'hex'} name="hex">
-            <HexSection sha256={sha256} />
-          </TabSection>
+          <Content visible={tab === 'hex'} name="hex">
+            <div className={classes.tab}>
+              <HexSection sha256={sha256} />
+            </div>
+          </Content>
 
-          <TabSection visible={tab === 'image' && imageAllowed} name="image">
-            <ImageSection sha256={sha256} name={sha256} />
-          </TabSection>
+          <Content visible={tab === 'image' && imageAllowed} name="image">
+            <div className={classes.tab}>
+              <ImageSection sha256={sha256} name={sha256} />
+            </div>
+          </Content>
         </div>
       ) : (
         <Skeleton
