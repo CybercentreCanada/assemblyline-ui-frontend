@@ -91,7 +91,6 @@ type SectionProps = {
   file: File;
   show?: boolean;
   title?: string;
-  visible?: boolean;
   drawer?: boolean;
   onTabChange?: (event: any, value: Tab) => void;
 };
@@ -100,7 +99,6 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
   file,
   show = false,
   title = null,
-  visible = true,
   drawer = false,
   onTabChange = () => null
 }) => {
@@ -170,7 +168,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
   );
 
   useEffect(() => {
-    if (!file || !visible || data) return;
+    if (!file || data) return;
     apiCall({
       method: 'GET',
       url: `/api/v4/archive/details/${file?.file_info?.sha256}/`,
@@ -178,7 +176,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
       onFailure: api_data => showErrorMessage(api_data.api_error_message)
     });
     // eslint-disable-next-line
-  }, [file, visible]);
+  }, [file]);
 
   useEffect(() => {
     return () => {

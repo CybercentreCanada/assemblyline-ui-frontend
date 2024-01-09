@@ -63,18 +63,12 @@ type Confirmation = {
 type Props = {
   sha256: string;
   comments: Comments;
-  visible?: boolean; // is visible on screen
   drawer?: boolean; // inside the drawer
 };
 
 const SOCKETIO_NAMESPACE = '/file_comments';
 
-const WrappedCommentSection: React.FC<Props> = ({
-  sha256 = null,
-  comments: commentsProps = [],
-  visible = true,
-  drawer = false
-}) => {
+const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: commentsProps = [], drawer = false }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
@@ -124,7 +118,7 @@ const WrappedCommentSection: React.FC<Props> = ({
   }, []);
 
   const handleRefreshComments = useCallback(() => {
-    if (!sha256 || !visible) return;
+    if (!sha256) return;
     apiCall({
       method: 'GET',
       url: `/api/v4/archive/comment/${sha256}/`,
@@ -135,11 +129,11 @@ const WrappedCommentSection: React.FC<Props> = ({
       onFailure: ({ api_error_message }) => showErrorMessage(api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256, visible]);
+  }, [sha256]);
 
   const handleAddComment = useCallback(
     (comment: Comment) => () => {
-      if (!sha256 || !visible) return;
+      if (!sha256) return;
       apiCall({
         method: 'PUT',
         url: `/api/v4/archive/comment/${sha256}/`,
@@ -157,12 +151,12 @@ const WrappedCommentSection: React.FC<Props> = ({
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sha256, visible]
+    [sha256]
   );
 
   const handleEditComment = useCallback(
     (comment: Comment) => () => {
-      if (!sha256 || !visible) return;
+      if (!sha256) return;
       apiCall({
         method: 'POST',
         url: `/api/v4/archive/comment/${sha256}/${comment?.cid}/`,
@@ -180,12 +174,12 @@ const WrappedCommentSection: React.FC<Props> = ({
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sha256, visible]
+    [sha256]
   );
 
   const handleDeleteComment = useCallback(
     (comment: Comment) => () => {
-      if (!sha256 || !visible) return;
+      if (!sha256) return;
       apiCall({
         method: 'DELETE',
         url: `/api/v4/archive/comment/${sha256}/${comment?.cid}/`,
@@ -203,12 +197,12 @@ const WrappedCommentSection: React.FC<Props> = ({
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sha256, visible]
+    [sha256]
   );
 
   const handleReactionClick = useCallback(
     (comment: Comment, reaction: string) => () => {
-      if (!sha256 || !visible) return;
+      if (!sha256) return;
       apiCall({
         method: 'PUT',
         url: `/api/v4/archive/reaction/${sha256}/${comment?.cid}/${reaction}/`,
@@ -227,7 +221,7 @@ const WrappedCommentSection: React.FC<Props> = ({
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sha256, visible]
+    [sha256]
   );
 
   const handleTextChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -252,7 +246,7 @@ const WrappedCommentSection: React.FC<Props> = ({
   }, [handleRefreshComments, sha256]);
 
   useEffect(() => {
-    if (!sha256 || !visible) return;
+    if (!sha256) return;
 
     socket.current = io(SOCKETIO_NAMESPACE);
 
@@ -276,7 +270,7 @@ const WrappedCommentSection: React.FC<Props> = ({
     return () => {
       socket.current.disconnect();
     };
-  }, [handleRefreshComments, sha256, visible]);
+  }, [handleRefreshComments, sha256]);
 
   return (
     <div className={classes.container}>

@@ -322,8 +322,8 @@ const WrappedRow: React.FC<RowProps> = ({
   safelisted,
   classification,
   sha256,
-  force,
-  drawer
+  force = false,
+  drawer = false
 }) => {
   const theme = useTheme();
   const location = useLocation();
@@ -339,6 +339,7 @@ const WrappedRow: React.FC<RowProps> = ({
     total: number;
   }>(null);
   const [open, setOpen] = useState<boolean>(false);
+  const [render, setRender] = useState<boolean>(false);
   const [state, setState] = useState(initialMenuState);
 
   useEffect(() => {
@@ -409,14 +410,16 @@ const WrappedRow: React.FC<RowProps> = ({
 
       <GridTableRow>
         <GridTableCell sx={{ gridColumn: 'span 5', padding: 0 }}>
-          <Collapse in={open} timeout="auto">
-            <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}>
-              <ResultsTable
-                component={props => <StyledPaper {...props} original={!drawer} />}
-                resultResults={resultResults}
-                allowSort={false}
-              />
-            </div>
+          <Collapse in={open} timeout="auto" onEnter={() => setRender(true)}>
+            {render && (
+              <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}>
+                <ResultsTable
+                  component={props => <StyledPaper {...props} original={!drawer} />}
+                  resultResults={resultResults}
+                  allowSort={false}
+                />
+              </div>
+            )}
           </Collapse>
         </GridTableCell>
       </GridTableRow>

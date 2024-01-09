@@ -138,6 +138,20 @@ type Props = {
   force?: boolean;
 };
 
+type TabSectionProps = {
+  children?: React.ReactNode;
+  name?: string;
+  visible?: boolean;
+};
+
+const TabSection: React.FC<TabSectionProps> = React.memo(({ children, name = '', visible = false }) => {
+  const [render, setRender] = useState<boolean>(false);
+  useEffect(() => {
+    if (visible === true) setRender(true);
+  }, [visible]);
+  return <div style={{ display: visible ? 'contents' : 'none' }}>{render && children}</div>;
+});
+
 const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = false }) => {
   const { t } = useTranslation(['fileDetail', 'archive']);
   const theme = useTheme();
@@ -280,7 +294,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
           </MuiTabs>
         </div>
 
-        <div style={{ display: tab === 'details' ? 'contents' : 'none' }}>
+        <TabSection visible={tab === 'details'} name="details">
           {file?.file_info?.type.startsWith('uri/') ? (
             <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
           ) : (
@@ -288,9 +302,9 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
           )}
           <FrequencySection seen={file ? file.file_info?.seen : null} />
           <MetadataSection metadata={file ? file.metadata : null} />
-        </div>
+        </TabSection>
 
-        <div style={{ display: tab === 'detection' ? 'contents' : 'none' }}>
+        <TabSection visible={tab === 'detection'} name="detection">
           <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
           <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
           <ResultSection
@@ -301,9 +315,9 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
           />
           <EmptySection emptys={file ? file.emptys : null} sid={null} />
           <ErrorSection errors={file ? file.errors : null} />
-        </div>
+        </TabSection>
 
-        <div style={{ display: tab === 'tags' ? 'contents' : 'none' }}>
+        <TabSection visible={tab === 'tags'} name="tags">
           <ArchivedTagSection
             sha256={sha256}
             signatures={file ? file.signatures : null}
@@ -311,51 +325,42 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             force={force}
             drawer={inDrawer}
           />
-        </div>
+        </TabSection>
 
-        <div style={{ display: tab === 'relations' ? 'contents' : 'none' }}>
+        <TabSection visible={tab === 'relations'} name="relations">
           <ChildrenSection
             childrens={file ? file.childrens : null}
             title={t('childrens', { ns: 'archive' })}
             show={true}
           />
           <ParentSection parents={file ? file.parents : null} title={t('parents', { ns: 'archive' })} show={true} />
-          <SimilarSection
-            file={file ? file : null}
-            show={true}
-            visible={tab === 'relations'}
-            drawer={inDrawer}
-            onTabChange={handleTabChange}
-          />
-        </div>
+          <SimilarSection file={file ? file : null} show={true} drawer={inDrawer} onTabChange={handleTabChange} />
+        </TabSection>
 
-        <div style={{ display: tab === 'ascii' ? 'contents' : 'none' }}>
-          <ASCIISection sha256={sha256} type={file?.file_info?.type} visible={tab === 'ascii'} />
-        </div>
+        <TabSection visible={tab === 'ascii'} name="ascii">
+          <ASCIISection sha256={sha256} type={file?.file_info?.type} />
+        </TabSection>
 
-        <div style={{ display: tab === 'strings' ? 'contents' : 'none' }}>
-          <StringsSection sha256={sha256} type={file?.file_info?.type} visible={tab === 'strings'} />
-        </div>
+        <TabSection visible={tab === 'strings'} name="strings">
+          <StringsSection sha256={sha256} type={file?.file_info?.type} />
+        </TabSection>
 
-        <div style={{ display: tab === 'hex' ? 'contents' : 'none' }}>
-          <HexSection sha256={sha256} visible={tab === 'hex'} />
-        </div>
+        <TabSection visible={tab === 'hex'} name="hex">
+          <HexSection sha256={sha256} />
+        </TabSection>
 
-        {file?.file_info?.is_section_image && (
-          <div style={{ display: tab === 'image' ? 'contents' : 'none' }}>
-            <ImageSection sha256={sha256} name={sha256} visible={tab === 'image'} />
-          </div>
-        )}
+        <TabSection visible={tab === 'image' && file?.file_info?.is_section_image} name="image">
+          <ImageSection sha256={sha256} name={sha256} />
+        </TabSection>
 
-        <div style={{ display: tab === 'community' ? 'contents' : 'none' }}>
+        <TabSection visible={tab === 'community'} name="community">
           <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} />
           <CommentSection
             sha256={file?.file_info?.sha256}
             comments={file ? file?.file_info?.comments : null}
-            visible={tab === 'community'}
             drawer={inDrawer}
           />
-        </div>
+        </TabSection>
       </Layout>
     );
 };
