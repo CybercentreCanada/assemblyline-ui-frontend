@@ -1,0 +1,23 @@
+{
+  "add.success": "L'élément de la liste sûre a été ajouté avec succès au système.",
+  "details": "Détails de l'élément",
+  "expiry.title": "Date d'expiration",
+  "file": "Fichier",
+  "file.hashes": "Hachages de fichiers (Au moins un des MD5, SHA1 ou SHA256 est requis) *",
+  "file.prop": "Propriétés du fichier (facultatif)",
+  "file.name": "Nom",
+  "file.size": "Taille",
+  "file.type": "Type",
+  "information": "Information",
+  "information.tag": "Informations sur la balise",
+  "information.signature": "Informations sur la signature",
+  "information.file": "Informations sur le fichier",
+  "reason.title": "Quelle est la raison pour laquelle cela a été ajouté à la liste sûre?",
+  "signature": "Signature",
+  "signature.name.title": "Nom de la signature",
+  "tag": "Balise",
+  "tag.type.title": "Type de balise",
+  "tag.value.title": "Valeur de la balise",
+  "title": "Nouvel élément de la liste sûre",
+  "type.title": "Sélectionnez le type d'élément à ajouter"
+}
