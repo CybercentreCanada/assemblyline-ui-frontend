@@ -641,7 +641,7 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                 <Grid key={src_id} container>
                   <Grid item xs={12} sm={3}>
                     <span style={{ fontWeight: 500 }}>
-                      {src.name} ({t(src.type)}){' '}
+                      {src.name} ({t(src.type)})
                       {(currentUser.is_admin || currentUser.username === src.name) && badlist.sources.length !== 1 && (
                         <Tooltip title={t('remove.source.tooltip')}>
                           <IconButton
