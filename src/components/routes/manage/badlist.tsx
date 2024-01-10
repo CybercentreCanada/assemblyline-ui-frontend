@@ -186,7 +186,7 @@ export default function Badlist() {
           </Grid>
           {currentUser.roles.includes('badlist_manage') && (
             <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-              <Tooltip title={t('add_workflow')}>
+              <Tooltip title={t('add_badlist')}>
                 <IconButton
                   style={{
                     color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
