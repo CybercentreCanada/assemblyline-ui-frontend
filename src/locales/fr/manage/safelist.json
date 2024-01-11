@@ -1,4 +1,5 @@
 {
+  "add_safelist": "Ajouter un item à la liste sûre",
   "filter": "Filtrer les hachages de la liste sûre...",
   "filtered": "hachage correspondant au filtre",
   "filtereds": "hachages correspondant au filtre",

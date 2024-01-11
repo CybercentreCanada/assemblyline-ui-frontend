@@ -33,6 +33,7 @@ import manageBadlistDetailEN from 'locales/en/manage/badlist_detail.json';
 import manageHeuristicsEN from 'locales/en/manage/heuristics.json';
 import manageHeuristicDetailEN from 'locales/en/manage/heuristic_detail.json';
 import manageSafelistEN from 'locales/en/manage/safelist.json';
+import manageSafelistAddEN from 'locales/en/manage/safelist_add.json';
 import manageSafelistDetailEN from 'locales/en/manage/safelist_detail.json';
 import manageSignaturesEN from 'locales/en/manage/signatures.json';
 import manageSignatureDetailEN from 'locales/en/manage/signature_detail.json';
@@ -85,6 +86,7 @@ import manageBadlistDetailFR from 'locales/fr/manage/badlist_detail.json';
 import manageHeuristicsFR from 'locales/fr/manage/heuristics.json';
 import manageHeuristicDetailFR from 'locales/fr/manage/heuristic_detail.json';
 import manageSafelistFR from 'locales/fr/manage/safelist.json';
+import manageSafelistAddFR from 'locales/fr/manage/safelist_add.json';
 import manageSafelistDetailFR from 'locales/fr/manage/safelist_detail.json';
 import manageSignaturesFR from 'locales/fr/manage/signatures.json';
 import manageSignatureDetailFR from 'locales/fr/manage/signature_detail.json';
@@ -140,6 +142,7 @@ const resources = {
     manageSignatureSources: manageSignatureSourcesEN,
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
+    manageSafelistAdd: manageSafelistAddEN,
     manageSafelistDetail: manageSafelistDetailEN,
     manageSafelist: manageSafelistEN,
     manageBadlistAdd: manageBadlistAddEN,
@@ -194,6 +197,7 @@ const resources = {
     manageSignatureSources: manageSignatureSourcesFR,
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
+    manageSafelistAdd: manageSafelistAddFR,
     manageSafelistDetail: manageSafelistDetailFR,
     manageSafelist: manageSafelistFR,
     manageBadlistAdd: manageBadlistAddFR,
