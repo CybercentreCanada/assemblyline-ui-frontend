@@ -105,6 +105,8 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const [badlistDialog, setBadlistDialog] = React.useState(false);
   const [badlistReason, setBadlistReason] = React.useState(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
+  const [badlisted, setBadlisted] = React.useState(null);
+  const [safelisted, setSafelisted] = React.useState(null);
   const { showSuccessMessage } = useMySnackbar();
   const { triggerHighlight } = useHighlighter();
   const { apiCall } = useMyAPI();
@@ -112,6 +114,33 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { enrichTagExternal, enrichmentState, getKey } = useExternalLookup();
   const externalLookupResults = enrichmentState[getKey(type, value)];
   const [allInProgress, setAllInProgress] = React.useState(false);
+
+  useEffect(() => {
+    if (state.mouseY !== null) {
+      if (category === 'tag' && currentUser.roles.includes('safelist_manage')) {
+        apiCall({
+          url: `/api/v4/safelist/${type}/${value}/`,
+          method: 'GET',
+          onSuccess: resp => {
+            setSafelisted(resp.api_response);
+          },
+          onFailure: () => setSafelisted(null)
+        });
+      }
+      if (category === 'tag' && currentUser.roles.includes('badlist_manage')) {
+        apiCall({
+          url: `/api/v4/badlist/${type}/${value}/`,
+          method: 'GET',
+          onSuccess: resp => {
+            setBadlisted(resp.api_response);
+          },
+          onFailure: () => setSafelisted(null)
+        });
+      }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   const handleClose = useCallback(() => {
     setState(initialMenuState);
@@ -333,13 +362,13 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           </MenuItem>
         )}
         {category === 'tag' && currentUser.roles.includes('badlist_manage') && (
-          <MenuItem dense onClick={handleMenuBadlist}>
+          <MenuItem dense onClick={handleMenuBadlist} disabled={badlisted !== null}>
             {BADLIST_ICON}
             {t('badlist')}
           </MenuItem>
         )}
         {category === 'tag' && currentUser.roles.includes('safelist_manage') && (
-          <MenuItem dense onClick={handleMenuSafelist}>
+          <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted !== null}>
             {SAFELIST_ICON}
             {t('safelist')}
           </MenuItem>
