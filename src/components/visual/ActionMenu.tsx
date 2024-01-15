@@ -119,7 +119,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
     if (state.mouseY !== null) {
       if (category === 'tag' && currentUser.roles.includes('safelist_manage')) {
         apiCall({
-          url: `/api/v4/safelist/${type}/${value}/`,
+          url: `/api/v4/safelist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
           method: 'GET',
           onSuccess: resp => {
             setSafelisted(resp.api_response);
@@ -129,12 +129,12 @@ const WrappedActionMenu: React.FC<TagProps> = ({
       }
       if (category === 'tag' && currentUser.roles.includes('badlist_manage')) {
         apiCall({
-          url: `/api/v4/badlist/${type}/${value}/`,
+          url: `/api/v4/badlist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
           method: 'GET',
           onSuccess: resp => {
             setBadlisted(resp.api_response);
           },
-          onFailure: () => setSafelisted(null)
+          onFailure: () => setBadlisted(null)
         });
       }
     }

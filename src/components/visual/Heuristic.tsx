@@ -67,7 +67,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   useEffect(() => {
     if (state.mouseY !== null && currentUser.roles.includes('safelist_manage')) {
       apiCall({
-        url: `/api/v4/safelist/signature/${text}/`,
+        url: `/api/v4/safelist/signature/${encodeURIComponent(encodeURIComponent(text))}/`,
         method: 'GET',
         onSuccess: resp => {
           setSafelisted(resp.api_response);
