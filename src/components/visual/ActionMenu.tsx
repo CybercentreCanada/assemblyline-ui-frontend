@@ -6,7 +6,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem } from '@mui/material';
+import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
@@ -362,16 +362,34 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           </MenuItem>
         )}
         {category === 'tag' && currentUser.roles.includes('badlist_manage') && (
-          <MenuItem dense onClick={handleMenuBadlist} disabled={badlisted !== null}>
-            {BADLIST_ICON}
-            {t('badlist')}
-          </MenuItem>
+          <Tooltip
+            title={t(
+              badlisted !== null ? badlisted.sources.map(s => `${s.name}: ${s.reason.join(', ')}`).join(' | ') : ''
+            )}
+            placement="right"
+          >
+            <div>
+              <MenuItem dense onClick={handleMenuBadlist} disabled={badlisted !== null}>
+                {BADLIST_ICON}
+                {t(`${badlisted !== null ? 'already_' : ''}badlist`)}
+              </MenuItem>
+            </div>
+          </Tooltip>
         )}
         {category === 'tag' && currentUser.roles.includes('safelist_manage') && (
-          <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted !== null}>
-            {SAFELIST_ICON}
-            {t('safelist')}
-          </MenuItem>
+          <Tooltip
+            title={t(
+              safelisted !== null ? safelisted.sources.map(s => `${s.name}: ${s.reason.join(', ')}`).join(' | ') : ''
+            )}
+            placement="right"
+          >
+            <div>
+              <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted !== null}>
+                {SAFELIST_ICON}
+                {t(`${safelisted !== null ? 'already_' : ''}safelist`)}
+              </MenuItem>
+            </div>
+          </Tooltip>
         )}
         {category === 'tag' && type.endsWith('.uri') && (
           <MenuItem

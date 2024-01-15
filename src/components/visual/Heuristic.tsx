@@ -2,7 +2,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { Menu, MenuItem } from '@mui/material';
+import { Menu, MenuItem, Tooltip } from '@mui/material';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -195,10 +195,19 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
           {t('highlight')}
         </MenuItem>
         {signature && currentUser.roles.includes('safelist_manage') && (
-          <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted}>
-            {SAFELIST_ICON}
-            {t('safelist')}
-          </MenuItem>
+          <Tooltip
+            title={t(
+              safelisted !== null ? safelisted.sources.map(s => `${s.name}: ${s.reason.join(', ')}`).join(' | ') : ''
+            )}
+            placement="right"
+          >
+            <div>
+              <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted}>
+                {SAFELIST_ICON}
+                {t(`${safelisted !== null ? 'already_' : ''}safelist`)}
+              </MenuItem>
+            </div>
+          </Tooltip>
         )}
       </Menu>
       <CustomChip
