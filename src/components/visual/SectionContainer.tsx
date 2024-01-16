@@ -7,18 +7,19 @@ import 'moment/locale/fr';
 import React, { useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
+  container: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    color: 'inherit',
+    gap: theme.spacing(1)
+  },
   clickable: {
     textDecoration: 'none',
     cursor: 'pointer',
     '&:hover>span, &:focus>span': {
       color: theme.palette.text.secondary
     }
-  },
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    color: 'inherit'
   },
   spacer: {
     paddingBottom: theme.spacing(2),
@@ -58,16 +59,12 @@ const WrappedSectionContainer: React.FC<SectionContainerProps> = ({
 
   return (
     <div className={classes.spacer}>
-      <Typography
-        className={clsx(classes.title, !nocollapse && classes.clickable)}
-        variant="h6"
-        onClick={() => (nocollapse ? null : setOpen(o => !o))}
-      >
-        <span>{title}</span>
-        <span style={{ flex: 1 }} />
+      <div className={clsx(classes.container, !nocollapse && classes.clickable)}>
+        <Typography variant="h6" children={title} onClick={() => (nocollapse ? null : setOpen(o => !o))} />
+        <div style={{ flex: 1 }} />
         {slots?.end}
-        <span className={classes.center}>{nocollapse ? null : open ? <ExpandLess /> : <ExpandMore />}</span>
-      </Typography>
+        <div className={classes.center}>{nocollapse ? null : open ? <ExpandLess /> : <ExpandMore />}</div>
+      </div>
       <Divider />
       <Collapse in={open} timeout="auto" onEnter={() => setRender(true)}>
         <div className={classes.spacer} {...slotProps?.wrapper}>
