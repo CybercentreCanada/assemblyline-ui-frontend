@@ -153,6 +153,7 @@
   "safelist.text": "Are you sure you want the current tag to be added to the safelist?",
   "safelist.title": "Safelist",
   "badlist": "Add to badlist",
+  "bad_safe_found": "Found in the following sources",
   "already_badlist": "Already in the badlist",
   "badlist.acceptText": "Yes, add it!",
   "badlist.cancelText": "Cancel",

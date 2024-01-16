@@ -15,6 +15,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import InputDialog from './InputDialog';
+import SafeBadItem from './SafeBadItem';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -195,12 +196,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
           {t('highlight')}
         </MenuItem>
         {signature && currentUser.roles.includes('safelist_manage') && (
-          <Tooltip
-            title={t(
-              safelisted !== null ? safelisted.sources.map(s => `${s.name}: ${s.reason.join(', ')}`).join(' | ') : ''
-            )}
-            placement="right"
-          >
+          <Tooltip title={safelisted ? <SafeBadItem item={safelisted} /> : ''} placement="right" arrow>
             <div>
               <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted}>
                 {SAFELIST_ICON}

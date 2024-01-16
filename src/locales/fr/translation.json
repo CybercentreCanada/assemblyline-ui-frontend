@@ -153,6 +153,7 @@
   "safelist.text": "Voulez-vous vraiment que cette balise soit ajouté à la liste sûre?",
   "safelist.title": "Liste sûre",
   "badlist": "Ajouter à la liste mauvaise",
+  "bad_safe_found": "Trouvé dans les sources suivantes",
   "already_badlist": "Déja dans la liste mauvaise",
   "badlist.acceptText": "Oui, ajoutez-la !",
   "badlist.cancelText": "Annuler",

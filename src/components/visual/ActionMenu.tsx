@@ -22,6 +22,7 @@ import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import ClassificationMismatchDialog from './ClassificationMismatchDialog';
 import InputDialog from './InputDialog';
+import SafeBadItem from './SafeBadItem';
 
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -362,12 +363,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           </MenuItem>
         )}
         {category === 'tag' && currentUser.roles.includes('badlist_manage') && (
-          <Tooltip
-            title={t(
-              badlisted !== null ? badlisted.sources.map(s => `${s.name}: ${s.reason.join(', ')}`).join(' | ') : ''
-            )}
-            placement="right"
-          >
+          <Tooltip title={badlisted ? <SafeBadItem item={badlisted} /> : ''} placement="right" arrow>
             <div>
               <MenuItem dense onClick={handleMenuBadlist} disabled={badlisted !== null}>
                 {BADLIST_ICON}
@@ -377,12 +373,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           </Tooltip>
         )}
         {category === 'tag' && currentUser.roles.includes('safelist_manage') && (
-          <Tooltip
-            title={t(
-              safelisted !== null ? safelisted.sources.map(s => `${s.name}: ${s.reason.join(', ')}`).join(' | ') : ''
-            )}
-            placement="right"
-          >
+          <Tooltip title={safelisted ? <SafeBadItem item={safelisted} /> : ''} placement="right" arrow>
             <div>
               <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted !== null}>
                 {SAFELIST_ICON}
