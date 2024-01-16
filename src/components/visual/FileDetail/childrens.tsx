@@ -82,7 +82,7 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({
               <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{` :: ${fileItem.sha256}`}</span>
             </Link>
           ))}
-          {!showExtra && (
+          {!showExtra && childrens.length > 10 && (
             <Tooltip title={tDefault('more')}>
               <IconButton size="small" onClick={() => setShowExtra(true)} style={{ padding: 0 }}>
                 <MoreHorizOutlinedIcon />
