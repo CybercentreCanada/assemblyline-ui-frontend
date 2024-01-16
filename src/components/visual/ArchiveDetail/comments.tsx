@@ -1,16 +1,12 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import {
   Button,
   CircularProgress,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Divider,
   Grid,
   IconButton,
   Paper,
@@ -23,27 +19,14 @@ import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { Authors, Comment, Comments, DEFAULT_COMMENT } from 'components/visual/CommentCard';
+import CommentCard, { Authors, Comment, Comments, DEFAULT_COMMENT } from 'components/visual/CommentCard';
+import SectionContainer from 'components/visual/SectionContainer';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { io } from 'socket.io-client';
-import CommentCard from '../CommentCard';
 
 const useStyles = makeStyles(theme => ({
-  container: {
-    paddingBottom: theme.spacing(2),
-    paddingTop: theme.spacing(2)
-  },
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  },
   dialog: {
     minWidth: '50vw'
   },
@@ -64,11 +47,17 @@ type Props = {
   sha256: string;
   comments: Comments;
   drawer?: boolean; // inside the drawer
+  nocollapse?: boolean;
 };
 
 const SOCKETIO_NAMESPACE = '/file_comments';
 
-const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: commentsProps = [], drawer = false }) => {
+const WrappedCommentSection: React.FC<Props> = ({
+  sha256 = null,
+  comments: commentsProps = [],
+  drawer = false,
+  nocollapse = false
+}) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
@@ -79,7 +68,6 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
   const [comments, setComments] = useState<Comments>(commentsProps);
   const [authors, setAuthors] = useState<Authors>(null);
   const [currentComment, setCurrentComment] = useState<Comment>(DEFAULT_COMMENT);
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [confirmation, setConfirmation] = useState<Confirmation>({ open: false, type: 'add' });
   const [waiting, setWaiting] = useState<boolean>(false);
 
@@ -273,49 +261,48 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
   }, [handleRefreshComments, sha256]);
 
   return (
-    <div className={classes.container}>
-      <Typography className={classes.title} variant="h6" onClick={() => setIsCollapsed(c => !c)}>
-        <span>{t('comments')}</span>
-        <div style={{ flex: 1 }} />
-        <Tooltip title={t('comment.tooltip.add')}>
-          <span>
-            <IconButton
-              disabled={!comments}
-              size="large"
-              style={{
-                color: !comments
-                  ? theme.palette.text.disabled
-                  : theme.palette.mode === 'dark'
-                  ? theme.palette.success.light
-                  : theme.palette.success.dark
-              }}
-              onClick={handleAddConfirmation}
-            >
-              <AddCircleOutlineIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-        {!isCollapsed ? <ExpandLess /> : <ExpandMore />}
-      </Typography>
-      <Divider />
-      <Collapse in={!isCollapsed} timeout="auto">
-        {!comments
-          ? Array.from({ length: 3 }).map((_, i) => <CommentCard key={i} />)
-          : authors &&
-            sortedComments &&
-            sortedComments.map((comment, i) => (
-              <CommentCard
-                key={i}
-                currentComment={comment}
-                previousComment={i > 0 && sortedComments[i - 1]}
-                nextComment={i < sortedComments.length - 1 && sortedComments[i + 1]}
-                authors={authors}
-                onEditClick={handleEditConfirmation}
-                onDeleteClick={handleDeleteConfirmation}
-                onReactionClick={handleReactionClick}
-              />
-            ))}
-      </Collapse>
+    <SectionContainer
+      title={t('comments')}
+      nocollapse={nocollapse}
+      slots={{
+        end: (
+          <Tooltip title={t('comment.tooltip.add')}>
+            <span>
+              <IconButton
+                disabled={!comments}
+                size="large"
+                style={{
+                  color: !comments
+                    ? theme.palette.text.disabled
+                    : theme.palette.mode === 'dark'
+                    ? theme.palette.success.light
+                    : theme.palette.success.dark
+                }}
+                onClick={handleAddConfirmation}
+              >
+                <AddCircleOutlineIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+        )
+      }}
+    >
+      {!comments
+        ? Array.from({ length: 3 }).map((_, i) => <CommentCard key={i} />)
+        : authors &&
+          sortedComments &&
+          sortedComments.map((comment, i) => (
+            <CommentCard
+              key={i}
+              currentComment={comment}
+              previousComment={i > 0 && sortedComments[i - 1]}
+              nextComment={i < sortedComments.length - 1 && sortedComments[i + 1]}
+              authors={authors}
+              onEditClick={handleEditConfirmation}
+              onDeleteClick={handleDeleteConfirmation}
+              onReactionClick={handleReactionClick}
+            />
+          ))}
       <Dialog classes={{ paper: classes.dialog }} open={confirmation.open} onClose={handleCloseConfirmation}>
         <DialogTitle>
           {confirmation.type === 'add' && t('comment.confirmation.title.add')}
@@ -396,7 +383,7 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: comme
           />
         </DialogActions>
       </Dialog>
-    </div>
+    </SectionContainer>
   );
 };
 

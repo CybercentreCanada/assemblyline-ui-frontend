@@ -2,18 +2,17 @@ import { loader } from '@monaco-editor/react';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { Grid, IconButton, Paper, Skeleton, Tab as MuiTab, Tabs, Tooltip, Typography, useTheme } from '@mui/material';
+import { Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
-import Content from 'components/visual/Content';
-import Empty from 'components/visual/Empty';
 import FileDownloader from 'components/visual/FileDownloader';
 import { ASCIISection, HexSection, ImageSection, StringsSection } from 'components/visual/FileViewer';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { TabContainer } from 'components/visual/TabContainer';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useLocation, useParams } from 'react-router-dom';
@@ -62,24 +61,6 @@ const WrappedFileViewer: React.FC<Props> = () => {
   const [type, setType] = useState<string>('unknown');
   const [imageAllowed, setImageAllowed] = useState<boolean>(null);
 
-  const tab = useMemo<Tab>(
-    () =>
-      sha256 &&
-      imageAllowed !== null &&
-      (!paramTab || !TAB_OPTIONS.includes(paramTab) || (!imageAllowed && paramTab === 'image'))
-        ? DEFAULT_TAB
-        : paramTab,
-    [imageAllowed, paramTab, sha256]
-  );
-
-  const handleChangeTab = useCallback(
-    (event, newTab) => {
-      if (tab !== newTab && TAB_OPTIONS.includes(newTab))
-        navigate(`/file/viewer/${sha256}/${newTab}/${location.search}${location.hash}`, { replace: true });
-    },
-    [location?.hash, location?.search, navigate, sha256, tab]
-  );
-
   useEffect(() => {
     if (!sha256 || !currentUser.roles.includes('file_detail')) return;
     apiCall({
@@ -91,12 +72,6 @@ const WrappedFileViewer: React.FC<Props> = () => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.roles, sha256]);
-
-  useEffect(() => {
-    if (paramTab !== tab) {
-      navigate(`/file/viewer/${sha256}/${tab}/${location.search}${location.hash}`);
-    }
-  }, [location?.hash, location?.search, navigate, paramTab, sha256, tab]);
 
   useEffect(() => {
     return () => {
@@ -144,54 +119,59 @@ const WrappedFileViewer: React.FC<Props> = () => {
           </div>
         </Grid>
       </Grid>
-      {sha256 && tab !== null ? (
-        <div className={classes.main}>
-          <Paper square style={{ marginTop: theme.spacing(2), marginBottom: theme.spacing(1) }}>
-            <Tabs
-              value={tab}
-              onChange={handleChangeTab}
-              indicatorColor="primary"
-              textColor="primary"
-              variant="scrollable"
-              scrollButtons="auto"
-            >
-              <MuiTab label={t('ascii')} value="ascii" />
-              <MuiTab label={t('strings')} value="strings" />
-              <MuiTab label={t('hex')} value="hex" />
-              {imageAllowed !== false ? <MuiTab label={t('image')} value="image" /> : <Empty />}
-            </Tabs>
-          </Paper>
-
-          <Content visible={tab === 'ascii'} name="ascii">
-            <div className={classes.tab}>
-              <ASCIISection sha256={sha256} type={type} />
-            </div>
-          </Content>
-
-          <Content visible={tab === 'strings'} name="strings">
-            <div className={classes.tab}>
-              <StringsSection sha256={sha256} type={type} />
-            </div>
-          </Content>
-
-          <Content visible={tab === 'hex'} name="hex">
-            <div className={classes.tab}>
-              <HexSection sha256={sha256} />
-            </div>
-          </Content>
-
-          <Content visible={tab === 'image' && imageAllowed} name="image">
-            <div className={classes.tab}>
-              <ImageSection sha256={sha256} name={sha256} />
-            </div>
-          </Content>
-        </div>
-      ) : (
+      {!sha256 ? (
         <Skeleton
           variant="rectangular"
           height={theme.spacing(6)}
           style={{ marginTop: theme.spacing(2), marginBottom: theme.spacing(2) }}
         />
+      ) : (
+        <div className={classes.main}>
+          <TabContainer
+            value={paramTab}
+            defaultTab={DEFAULT_TAB}
+            paper
+            selectionFollowsFocus
+            onChange={(_event, value) =>
+              navigate(`/file/viewer/${sha256}/${value}/${location.search}${location.hash}`, { replace: true })
+            }
+            tabs={{
+              ascii: {
+                label: t('ascii'),
+                content: (
+                  <div className={classes.tab}>
+                    <ASCIISection sha256={sha256} type={type} />
+                  </div>
+                )
+              },
+              strings: {
+                label: t('strings'),
+                content: (
+                  <div className={classes.tab}>
+                    <StringsSection sha256={sha256} type={type} />
+                  </div>
+                )
+              },
+              hex: {
+                label: t('hex'),
+                content: (
+                  <div className={classes.tab}>
+                    <HexSection sha256={sha256} />
+                  </div>
+                )
+              },
+              image: {
+                label: t('image'),
+                disabled: !imageAllowed,
+                content: (
+                  <div className={classes.tab}>
+                    <ImageSection sha256={sha256} name={sha256} />
+                  </div>
+                )
+              }
+            }}
+          />
+        </div>
       )}
     </PageFullSize>
   ) : (

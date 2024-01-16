@@ -1,12 +1,12 @@
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import { AlertTitle, Collapse, Divider, Skeleton, Typography, useTheme } from '@mui/material';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import { AlertTitle, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import SectionContainer from 'components/visual/SectionContainer';
 import 'moment/locale/fr';
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import InformativeAlert from '../InformativeAlert';
 
 const useStyles = makeStyles(theme => ({
   clickable: {
@@ -17,15 +17,6 @@ const useStyles = makeStyles(theme => ({
     '&:hover, &:focus': {
       backgroundColor: theme.palette.action.hover
     }
-  },
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
   }
 }));
 
@@ -33,49 +24,74 @@ type ChildrenSectionProps = {
   childrens: any;
   show?: boolean;
   title?: string;
+  nocollapse?: boolean;
 };
 
-const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({ childrens, show = false, title = null }) => {
+const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({
+  childrens,
+  show = false,
+  title = null,
+  nocollapse = false
+}) => {
+  const { t: tDefault } = useTranslation();
   const { t } = useTranslation(['fileDetail', 'archive']);
-  const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
-  const sp2 = theme.spacing(2);
+
+  const [showExtra, setShowExtra] = useState<boolean>(false);
+
+  const filteredChildren = useMemo(
+    () => (!childrens || childrens.length === 0 || showExtra ? childrens : childrens.filter((fileItem, i) => i < 10)),
+    [childrens, showExtra]
+  );
 
   return show || (childrens && childrens.length !== 0) ? (
-    <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-      <Typography variant="h6" onClick={() => setOpen(!open)} className={classes.title}>
-        <span>{title ?? t('childrens')}</span>
-        {open ? <ExpandLess /> : <ExpandMore />}
-      </Typography>
-      <Divider />
-      <Collapse in={open} timeout="auto">
-        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-          {!childrens ? (
-            <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-          ) : childrens.length === 0 ? (
-            <div style={{ width: '100%' }}>
-              <InformativeAlert>
-                <AlertTitle>{t('no_children_title', { ns: 'archive' })}</AlertTitle>
-                {t('no_children_desc', { ns: 'archive' })}
-              </InformativeAlert>
-            </div>
-          ) : (
-            childrens?.map((fileItem, i) => (
-              <Link
-                key={i}
-                className={classes.clickable}
-                to={`/file/detail/${fileItem.sha256}?name=${encodeURI(fileItem.name)}`}
-                style={{ wordBreak: 'break-word' }}
-              >
-                <span>{fileItem.name}</span>
-                <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{` :: ${fileItem.sha256}`}</span>
-              </Link>
-            ))
-          )}
+    <SectionContainer
+      title={title ?? t('childrens')}
+      nocollapse={nocollapse}
+      slots={{
+        end: childrens && childrens?.length > 0 && (
+          <Typography
+            color="secondary"
+            variant="subtitle1"
+            children={`${childrens?.length} ${t('childrens', { ns: 'fileDetail' })}`}
+            sx={{ fontStyle: 'italic' }}
+          />
+        )
+      }}
+    >
+      {!childrens ? (
+        <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
+      ) : childrens.length === 0 ? (
+        <div style={{ width: '100%' }}>
+          <InformativeAlert>
+            <AlertTitle>{t('no_children_title', { ns: 'archive' })}</AlertTitle>
+            {t('no_children_desc', { ns: 'archive' })}
+          </InformativeAlert>
         </div>
-      </Collapse>
-    </div>
+      ) : (
+        <>
+          {filteredChildren?.map((fileItem, i) => (
+            <Link
+              key={i}
+              className={classes.clickable}
+              to={`/file/detail/${fileItem.sha256}?name=${encodeURI(fileItem.name)}`}
+              style={{ wordBreak: 'break-word' }}
+            >
+              <span>{fileItem.name}</span>
+              <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{` :: ${fileItem.sha256}`}</span>
+            </Link>
+          ))}
+          {!showExtra && (
+            <Tooltip title={tDefault('more')}>
+              <IconButton size="small" onClick={() => setShowExtra(true)} style={{ padding: 0 }}>
+                <MoreHorizOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        </>
+      )}
+    </SectionContainer>
   ) : null;
 };
 
