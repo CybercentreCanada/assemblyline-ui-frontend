@@ -22,10 +22,9 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   sha256: string;
-  visible?: boolean;
 };
 
-const WrappedHexSection: React.FC<Props> = ({ sha256, visible = true }) => {
+const WrappedHexSection: React.FC<Props> = ({ sha256 }) => {
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -34,7 +33,7 @@ const WrappedHexSection: React.FC<Props> = ({ sha256, visible = true }) => {
   const [error, setError] = useState<string>(null);
 
   useEffect(() => {
-    if (!sha256 || data || !visible) return;
+    if (!sha256 || data) return;
     apiCall({
       url: `/api/v4/file/hex/${sha256}/?bytes_only=true`,
       allowCache: true,
@@ -46,7 +45,7 @@ const WrappedHexSection: React.FC<Props> = ({ sha256, visible = true }) => {
       onFailure: api_data => setError(api_data.api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, sha256, visible]);
+  }, [data, sha256]);
 
   useEffect(() => {
     return () => setData(null);

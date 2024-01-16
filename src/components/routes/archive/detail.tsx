@@ -1,4 +1,4 @@
-import { Tab as MuiTab, Tabs as MuiTabs, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
@@ -29,6 +29,7 @@ import ResultSection from 'components/visual/FileDetail/results';
 import URIIdentificationSection from 'components/visual/FileDetail/uriIdent';
 import { ASCIISection, HexSection, ImageSection, StringsSection } from 'components/visual/FileViewer';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
+import { TabContainer } from 'components/visual/TabContainer';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
@@ -111,25 +112,9 @@ export type File = {
   tags: Record<string, Tag[]>;
 };
 
-const TABS = {
-  details: null,
-  detection: null,
-  tags: null,
-  relations: null,
-  ascii: null,
-  strings: null,
-  hex: null,
-  image: null,
-  community: null
-};
-
-export type Tab = keyof typeof TABS;
-
-const DEFAULT_TAB: Tab = 'details';
-
 type Params = {
   id?: string;
-  tab?: Tab;
+  tab?: string;
 };
 
 type Props = {
@@ -150,30 +135,10 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
   const { user: currentUser, c12nDef, configuration } = useALContext();
 
   const [file, setFile] = useState<File | null>(null);
-  const [stateTab, setStateTab] = useState<Tab>(null);
   const [promotedSections, setPromotedSections] = useState([]);
 
   const inDrawer = useMemo<boolean>(() => (propSha256 ? true : paramSha256 ? false : null), [paramSha256, propSha256]);
   const sha256 = useMemo<string>(() => paramSha256 || propSha256, [paramSha256, propSha256]);
-
-  const tab = useMemo<Tab>(() => {
-    const currentTab = inDrawer ? stateTab : paramTab;
-    return !file ||
-      (currentTab === 'image' && file?.file_info?.is_section_image === true) ||
-      Object.keys(TABS)
-        .filter(v => v !== 'image')
-        .includes(currentTab)
-      ? currentTab
-      : DEFAULT_TAB;
-  }, [file, inDrawer, paramTab, stateTab]);
-
-  const handleTabChange = useCallback(
-    (event: React.SyntheticEvent<Element, Event>, value: Tab) => {
-      if (!inDrawer) navigate(`/archive/${sha256}/${value}${location.search}${location.hash}`, { replace: true });
-      else setStateTab(value);
-    },
-    [inDrawer, location.hash, location.search, navigate, sha256]
-  );
 
   const patchFileDetails = useCallback((data: File) => {
     const newData = { ...data };
@@ -200,14 +165,6 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
       setFile(null);
     };
   }, [sha256]);
-
-  useEffect(() => {
-    if (!inDrawer && paramTab !== tab) {
-      navigate(`/archive/${sha256}/${tab}${location.search}${location.hash}`, { replace: true });
-    } else if (inDrawer && stateTab !== tab) {
-      setStateTab(tab);
-    }
-  }, [inDrawer, location.hash, location.search, navigate, paramTab, sha256, stateTab, tab]);
 
   const Layout: React.FC<{ children: React.ReactNode }> = useCallback(
     ({ children }) =>
@@ -241,121 +198,131 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
     return (
       <Layout>
         {c12nDef.enforce && (
-          <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
+          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(0) }}>
             <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
           </div>
         )}
 
         <ArchiveBanner sha256={sha256} file={file} sid={null} force={force} />
 
-        <div
-          style={{
-            position: 'sticky',
-            top: '63px',
-            zIndex: 1000,
-            backgroundColor: inDrawer ? theme.palette.background.paper : theme.palette.background.default
+        <TabContainer
+          value={inDrawer ? null : paramTab}
+          paper={!inDrawer}
+          defaultTab="details"
+          selectionFollowsFocus
+          sx={{ position: 'sticky', top: '63px' }}
+          onChange={
+            inDrawer
+              ? null
+              : (_event, value) =>
+                  navigate(`/archive/${sha256}/${value}${location.search}${location.hash}`, { replace: true })
+          }
+          tabs={{
+            details: {
+              label: t('details'),
+              content: (
+                <>
+                  {file?.file_info?.type.startsWith('uri/') ? (
+                    <URIIdentificationSection
+                      fileinfo={file ? file.file_info : null}
+                      promotedSections={promotedSections}
+                      nocollapse
+                    />
+                  ) : (
+                    <IdentificationSection
+                      fileinfo={file ? file.file_info : null}
+                      promotedSections={promotedSections}
+                      nocollapse
+                    />
+                  )}
+                  <FrequencySection seen={file ? file.file_info?.seen : null} nocollapse />
+                  <MetadataSection metadata={file ? file.metadata : null} nocollapse />
+                </>
+              )
+            },
+            detection: {
+              label: t('detection'),
+              content: (
+                <>
+                  <Detection
+                    results={file ? file.results : null}
+                    heuristics={file ? file.heuristics : null}
+                    force={force}
+                    nocollapse
+                  />
+                  <AttackSection attacks={file ? file.attack_matrix : null} force={force} nocollapse />
+                  <ResultSection
+                    results={file ? file.results : null}
+                    sid={null}
+                    alternates={file ? file.alternates : null}
+                    force={force}
+                    nocollapse
+                  />
+                  <EmptySection emptys={file ? file.emptys : null} sid={null} nocollapse />
+                  <ErrorSection errors={file ? file.errors : null} nocollapse />
+                </>
+              )
+            },
+            tags: {
+              label: t('tags'),
+              content: (
+                <ArchivedTagSection
+                  sha256={sha256}
+                  signatures={file ? file.signatures : null}
+                  tags={file ? file.tags : null}
+                  force={force}
+                  drawer={inDrawer}
+                  nocollapse
+                />
+              )
+            },
+            relations: {
+              label: t('relations'),
+              content: (
+                <>
+                  <ChildrenSection
+                    childrens={file ? file.childrens : null}
+                    title={t('childrens', { ns: 'archive' })}
+                    show
+                    nocollapse
+                  />
+                  <ParentSection
+                    parents={file ? file.parents : null}
+                    title={t('parents', { ns: 'archive' })}
+                    show
+                    nocollapse
+                  />
+                  <SimilarSection file={file ? file : null} drawer={inDrawer} show nocollapse />
+                </>
+              )
+            },
+            ascii: {
+              label: t('ascii'),
+              content: <ASCIISection sha256={sha256} type={file?.file_info?.type} />
+            },
+            strings: { label: t('strings'), content: <StringsSection sha256={sha256} type={file?.file_info?.type} /> },
+            hex: { label: t('hex'), content: <HexSection sha256={sha256} /> },
+            image: {
+              label: t('image'),
+              disabled: !file?.file_info?.is_section_image,
+              content: <ImageSection sha256={sha256} name={sha256} />
+            },
+            community: {
+              label: t('community'),
+              content: (
+                <>
+                  <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} nocollapse />
+                  <CommentSection
+                    sha256={file?.file_info?.sha256}
+                    comments={file ? file?.file_info?.comments : null}
+                    drawer={inDrawer}
+                    nocollapse
+                  />
+                </>
+              )
+            }
           }}
-        >
-          <MuiTabs
-            value={tab || 'details'}
-            variant="scrollable"
-            scrollButtons="auto"
-            onChange={handleTabChange}
-            sx={{
-              backgroundColor: inDrawer ? theme.palette.background.default : theme.palette.background.paper,
-              margin: `${theme.spacing(2)} 0`
-            }}
-          >
-            <MuiTab label={t('details')} value={'details'} sx={{ minWidth: '120px' }} />
-            <MuiTab label={t('detection')} value={'detection'} sx={{ minWidth: '120px' }} />
-            <MuiTab label={t('tags')} value={'tags'} sx={{ minWidth: '120px' }} />
-            <MuiTab label={t('relations')} value={'relations'} sx={{ minWidth: '120px' }} />
-            <MuiTab label={t('ascii')} value={'ascii'} sx={{ minWidth: '120px' }} />
-            <MuiTab label={t('strings')} value={'strings'} sx={{ minWidth: '120px' }} />
-            <MuiTab label={t('hex')} value={'hex'} sx={{ minWidth: '120px' }} />
-            {file?.file_info?.is_section_image !== false && (
-              <MuiTab label={t('image')} value={'image'} sx={{ minWidth: '120px' }} />
-            )}
-            <MuiTab label={t('community')} value={'community'} sx={{ minWidth: '120px' }} />
-          </MuiTabs>
-        </div>
-
-        <div style={{ display: tab === 'details' ? 'contents' : 'none' }}>
-          {file?.file_info?.type.startsWith('uri/') ? (
-            <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
-          ) : (
-            <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
-          )}
-          <FrequencySection seen={file ? file.file_info?.seen : null} />
-          <MetadataSection metadata={file ? file.metadata : null} />
-        </div>
-
-        <div style={{ display: tab === 'detection' ? 'contents' : 'none' }}>
-          <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
-          <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
-          <ResultSection
-            results={file ? file.results : null}
-            sid={null}
-            alternates={file ? file.alternates : null}
-            force={force}
-          />
-          <EmptySection emptys={file ? file.emptys : null} sid={null} />
-          <ErrorSection errors={file ? file.errors : null} />
-        </div>
-
-        <div style={{ display: tab === 'tags' ? 'contents' : 'none' }}>
-          <ArchivedTagSection
-            sha256={sha256}
-            signatures={file ? file.signatures : null}
-            tags={file ? file.tags : null}
-            force={force}
-            drawer={inDrawer}
-          />
-        </div>
-
-        <div style={{ display: tab === 'relations' ? 'contents' : 'none' }}>
-          <ChildrenSection
-            childrens={file ? file.childrens : null}
-            title={t('childrens', { ns: 'archive' })}
-            show={true}
-          />
-          <ParentSection parents={file ? file.parents : null} title={t('parents', { ns: 'archive' })} show={true} />
-          <SimilarSection
-            file={file ? file : null}
-            show={true}
-            visible={tab === 'relations'}
-            drawer={inDrawer}
-            onTabChange={handleTabChange}
-          />
-        </div>
-
-        <div style={{ display: tab === 'ascii' ? 'contents' : 'none' }}>
-          <ASCIISection sha256={sha256} type={file?.file_info?.type} visible={tab === 'ascii'} />
-        </div>
-
-        <div style={{ display: tab === 'strings' ? 'contents' : 'none' }}>
-          <StringsSection sha256={sha256} type={file?.file_info?.type} visible={tab === 'strings'} />
-        </div>
-
-        <div style={{ display: tab === 'hex' ? 'contents' : 'none' }}>
-          <HexSection sha256={sha256} visible={tab === 'hex'} />
-        </div>
-
-        {file?.file_info?.is_section_image && (
-          <div style={{ display: tab === 'image' ? 'contents' : 'none' }}>
-            <ImageSection sha256={sha256} name={sha256} visible={tab === 'image'} />
-          </div>
-        )}
-
-        <div style={{ display: tab === 'community' ? 'contents' : 'none' }}>
-          <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} />
-          <CommentSection
-            sha256={file?.file_info?.sha256}
-            comments={file ? file?.file_info?.comments : null}
-            visible={tab === 'community'}
-            drawer={inDrawer}
-          />
-        </div>
+        />
       </Layout>
     );
 };

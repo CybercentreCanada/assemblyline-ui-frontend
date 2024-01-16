@@ -1,17 +1,13 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import {
   Autocomplete,
   Button,
   CircularProgress,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Divider,
   FormControlLabel,
   FormLabel,
   Grid,
@@ -31,26 +27,14 @@ import parse from 'autosuggest-highlight/parse';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { ChipList } from 'components/visual/ChipList';
+import CustomChip from 'components/visual/CustomChip';
+import { useDebounce } from 'components/visual/HexViewer';
+import SectionContainer from 'components/visual/SectionContainer';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import CustomChip from '../CustomChip';
-import { useDebounce } from '../HexViewer';
 
 const useStyles = makeStyles(theme => ({
-  container: {
-    paddingBottom: theme.spacing(2),
-    paddingTop: theme.spacing(2)
-  },
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  },
   preview: {
     margin: 0,
     padding: theme.spacing(0.75, 1),
@@ -100,9 +84,10 @@ type Option = {
 type Props = {
   sha256: string;
   labels: Labels;
+  nocollapse?: boolean;
 };
 
-const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabels = null }) => {
+const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabels = null, nocollapse = false }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
@@ -110,7 +95,6 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
   const [labels, setLabels] = useState<Labels>(null);
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [newLabel, setNewLabel] = useState<NewLabel>({ value: '', category: '' });
   const [confirmation, setConfirmation] = useState<{ open: boolean; type: 'add' | 'delete' }>({
     open: false,
@@ -233,7 +217,32 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
   ]);
 
   return (
-    <div className={classes.container}>
+    <SectionContainer
+      title={t('labels')}
+      nocollapse={nocollapse}
+      slots={{
+        end: (
+          <Tooltip title={t('label.add.tooltip')}>
+            <span>
+              <IconButton
+                disabled={!labels}
+                size="large"
+                style={{
+                  color: !labels
+                    ? theme.palette.text.disabled
+                    : theme.palette.mode === 'dark'
+                    ? theme.palette.success.light
+                    : theme.palette.success.dark
+                }}
+                onClick={handleAddConfirmation}
+              >
+                <AddCircleOutlineIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+        )
+      }}
+    >
       <Dialog open={confirmation.open} onClose={handleCloseConfirmation}>
         <DialogTitle>{t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.header`)}</DialogTitle>
         <DialogContent>
@@ -378,69 +387,42 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
           />
         </DialogActions>
       </Dialog>
-      <Typography className={classes.title} variant="h6" onClick={() => setIsCollapsed(c => !c)}>
-        <span>{t('labels')}</span>
-        <div style={{ flex: 1 }} />
-        <Tooltip title={t('label.add.tooltip')}>
-          <span>
-            <IconButton
-              disabled={!labels}
-              size="large"
-              style={{
-                color: !labels
-                  ? theme.palette.text.disabled
-                  : theme.palette.mode === 'dark'
-                  ? theme.palette.success.light
-                  : theme.palette.success.dark
-              }}
-              onClick={handleAddConfirmation}
-            >
-              <AddCircleOutlineIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-        {!isCollapsed ? <ExpandLess /> : <ExpandMore />}
-      </Typography>
-      <Divider />
-      <Collapse in={!isCollapsed} timeout="auto">
-        <div style={{ padding: `${theme.spacing(2)} 0` }}>
-          {Object.keys(LABELS).map((cat, i) => (
-            <Grid key={i} container>
-              <Grid item xs={12} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t(cat)}</span>
-              </Grid>
-              <Grid item xs={12} sm={9} lg={10}>
-                {!labels || !(cat in labels) ? (
-                  <Skeleton />
-                ) : sortedLabels[cat].length === 0 ? (
-                  <ChipList
-                    items={[
-                      {
-                        label: t('none'),
-                        size: 'small',
-                        variant: 'outlined',
-                        style: { color: theme.palette.text.disabled }
-                      }
-                    ]}
-                  />
-                ) : (
-                  <ChipList
-                    items={sortedLabels[cat].map((value, j) => ({
-                      key: `${i}-${j}`,
-                      color: cat in LABELS ? LABELS[cat].color : 'primary',
-                      label: value,
-                      size: 'small',
-                      variant: 'outlined',
-                      onDelete: () => handleDeleteConfirmation(cat as keyof typeof DEFAULT_LABELS, value)
-                    }))}
-                  />
-                )}
-              </Grid>
-            </Grid>
-          ))}
-        </div>
-      </Collapse>
-    </div>
+
+      {Object.keys(LABELS).map((cat, i) => (
+        <Grid key={i} container>
+          <Grid item xs={12} sm={3} lg={2}>
+            <span style={{ fontWeight: 500 }}>{t(cat)}</span>
+          </Grid>
+          <Grid item xs={12} sm={9} lg={10}>
+            {!labels || !(cat in labels) ? (
+              <Skeleton />
+            ) : sortedLabels[cat].length === 0 ? (
+              <ChipList
+                items={[
+                  {
+                    label: t('none'),
+                    size: 'small',
+                    variant: 'outlined',
+                    style: { color: theme.palette.text.disabled }
+                  }
+                ]}
+              />
+            ) : (
+              <ChipList
+                items={sortedLabels[cat].map((value, j) => ({
+                  key: `${i}-${j}`,
+                  color: cat in LABELS ? LABELS[cat].color : 'primary',
+                  label: value,
+                  size: 'small',
+                  variant: 'outlined',
+                  onDelete: () => handleDeleteConfirmation(cat as keyof typeof DEFAULT_LABELS, value)
+                }))}
+              />
+            )}
+          </Grid>
+        </Grid>
+      ))}
+    </SectionContainer>
   );
 };
 

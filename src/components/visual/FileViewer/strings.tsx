@@ -13,10 +13,9 @@ const DIFF_QUERY = 'diff';
 type Props = {
   sha256: string;
   type?: string;
-  visible?: boolean;
 };
 
-const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null, visible = true }) => {
+const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null }) => {
   const location = useLocation();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -32,7 +31,7 @@ const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null,
   }, [location.search]);
 
   useEffect(() => {
-    if (!sha256 || data || !visible) return;
+    if (!sha256 || data) return;
     apiCall({
       url: `/api/v4/file/strings/${sha256}/`,
       allowCache: true,
@@ -44,10 +43,10 @@ const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null,
       onFailure: api_data => setError(api_data.api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, sha256, visible]);
+  }, [data, sha256]);
 
   useEffect(() => {
-    if (!diffSha256 || !visible) return;
+    if (!diffSha256) return;
     apiCall({
       url: `/api/v4/file/strings/${diffSha256}/`,
       allowCache: true,
@@ -56,7 +55,7 @@ const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null,
       onFailure: api_data => setError(api_data.api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, sha256, visible]);
+  }, [data, sha256]);
 
   useEffect(() => {
     return () => {
