@@ -6,7 +6,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem } from '@mui/material';
+import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
@@ -22,6 +22,7 @@ import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import ClassificationMismatchDialog from './ClassificationMismatchDialog';
 import InputDialog from './InputDialog';
+import SafeBadItem from './SafeBadItem';
 
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -105,6 +106,8 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const [badlistDialog, setBadlistDialog] = React.useState(false);
   const [badlistReason, setBadlistReason] = React.useState(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
+  const [badlisted, setBadlisted] = React.useState(null);
+  const [safelisted, setSafelisted] = React.useState(null);
   const { showSuccessMessage } = useMySnackbar();
   const { triggerHighlight } = useHighlighter();
   const { apiCall } = useMyAPI();
@@ -112,6 +115,33 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { enrichTagExternal, enrichmentState, getKey } = useExternalLookup();
   const externalLookupResults = enrichmentState[getKey(type, value)];
   const [allInProgress, setAllInProgress] = React.useState(false);
+
+  useEffect(() => {
+    if (state.mouseY !== null) {
+      if (category === 'tag' && currentUser.roles.includes('safelist_manage')) {
+        apiCall({
+          url: `/api/v4/safelist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
+          method: 'GET',
+          onSuccess: resp => {
+            setSafelisted(resp.api_response);
+          },
+          onFailure: () => setSafelisted(null)
+        });
+      }
+      if (category === 'tag' && currentUser.roles.includes('badlist_manage')) {
+        apiCall({
+          url: `/api/v4/badlist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
+          method: 'GET',
+          onSuccess: resp => {
+            setBadlisted(resp.api_response);
+          },
+          onFailure: () => setBadlisted(null)
+        });
+      }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   const handleClose = useCallback(() => {
     setState(initialMenuState);
@@ -333,16 +363,24 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           </MenuItem>
         )}
         {category === 'tag' && currentUser.roles.includes('badlist_manage') && (
-          <MenuItem dense onClick={handleMenuBadlist}>
-            {BADLIST_ICON}
-            {t('badlist')}
-          </MenuItem>
+          <Tooltip title={badlisted ? <SafeBadItem item={badlisted} /> : ''} placement="right" arrow>
+            <div>
+              <MenuItem dense onClick={handleMenuBadlist} disabled={badlisted !== null}>
+                {BADLIST_ICON}
+                {t(`${badlisted !== null ? 'already_' : ''}badlist`)}
+              </MenuItem>
+            </div>
+          </Tooltip>
         )}
         {category === 'tag' && currentUser.roles.includes('safelist_manage') && (
-          <MenuItem dense onClick={handleMenuSafelist}>
-            {SAFELIST_ICON}
-            {t('safelist')}
-          </MenuItem>
+          <Tooltip title={safelisted ? <SafeBadItem item={safelisted} /> : ''} placement="right" arrow>
+            <div>
+              <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted !== null}>
+                {SAFELIST_ICON}
+                {t(`${safelisted !== null ? 'already_' : ''}safelist`)}
+              </MenuItem>
+            </div>
+          </Tooltip>
         )}
         {category === 'tag' && type.endsWith('.uri') && (
           <MenuItem
