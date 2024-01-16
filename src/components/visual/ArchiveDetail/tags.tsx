@@ -137,7 +137,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   const { showSafeResults } = useSafeResults();
 
   const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(''));
-  const [pageSize, setPageSize] = useState<number>(50);
+  const [pageSize, setPageSize] = useState<number>(100);
 
   const results = useMemo<Result[]>(() => {
     const signatureResults = !signatures
@@ -229,12 +229,12 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
       q.set('sort', field);
       return q;
     });
-    setPageSize(50);
+    setPageSize(100);
   }, []);
 
   const handleSortClear = useCallback((event: any) => {
     setQuery(new SimpleSearchQuery('', ''));
-    setPageSize(50);
+    setPageSize(100);
   }, []);
 
   return (
@@ -329,7 +329,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
               </GridTableBody>
             </GridTable>
           </TableContainer>
-          <EndOfPage endOfPage={pageSize >= results?.length} onLoading={() => setPageSize(v => v + 50)} />
+          <EndOfPage endOfPage={pageSize >= results?.length} onLoading={() => setPageSize(v => v + 100)} />
         </>
       )}
     </SectionContainer>
