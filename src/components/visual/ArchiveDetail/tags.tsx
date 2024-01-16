@@ -232,7 +232,9 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
     setPageSize(100);
   }, []);
 
-  const handleSortClear = useCallback((event: any) => {
+  const handleSortClear = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
+    event.stopPropagation();
     setQuery(new SimpleSearchQuery('', ''));
     setPageSize(100);
   }, []);

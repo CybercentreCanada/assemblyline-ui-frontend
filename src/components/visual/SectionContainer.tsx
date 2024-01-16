@@ -59,8 +59,11 @@ const WrappedSectionContainer: React.FC<SectionContainerProps> = ({
 
   return (
     <div className={classes.spacer}>
-      <div className={clsx(classes.container, !nocollapse && classes.clickable)}>
-        <Typography variant="h6" children={title} onClick={() => (nocollapse ? null : setOpen(o => !o))} />
+      <div
+        className={clsx(classes.container, !nocollapse && classes.clickable)}
+        onClick={() => (nocollapse ? null : setOpen(o => !o))}
+      >
+        <Typography variant="h6" children={title} />
         <div style={{ flex: 1 }} />
         {slots?.end}
         <div className={classes.center}>{nocollapse ? null : open ? <ExpandLess /> : <ExpandMore />}</div>
