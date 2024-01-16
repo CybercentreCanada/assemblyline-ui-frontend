@@ -1,4 +1,5 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -8,6 +9,7 @@ import {
   AlertTitle,
   CircularProgress,
   Collapse,
+  IconButton,
   Menu,
   MenuItem,
   Skeleton,
@@ -170,15 +172,16 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   }, [sha256, signatures, tags]);
 
   const sortedResults = useMemo<Result[]>(() => {
-    if (!results || query.toString() === '') return results;
+    const resultsCopy = JSON.parse(JSON.stringify(results));
+    if (!resultsCopy || query.toString() === '') return resultsCopy;
 
     const sort = new SimpleSearchQuery(query.toString(), null).get('sort', 'tag_type asc');
     const dir = sort && sort.indexOf('asc') !== -1 ? 'asc' : 'desc';
     const field = sort.replace(' asc', '').replace(' desc', '') as keyof Result;
 
-    if (!field || !(field in results[0])) return results;
+    if (!field || !(field in resultsCopy[0])) return resultsCopy;
     else if (field === 'h_type')
-      return results.sort((a, b) =>
+      return resultsCopy.sort((a, b) =>
         dir === 'asc'
           ? (a?.h_type in VERDICT_MAP ? VERDICT_MAP[a.h_type] : 0) -
             (b?.h_type in VERDICT_MAP ? VERDICT_MAP[b.h_type] : 0)
@@ -186,7 +189,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
             (a?.h_type in VERDICT_MAP ? VERDICT_MAP[a.h_type] : 0)
       );
     else
-      return results.sort((a, b) =>
+      return resultsCopy.sort((a, b) =>
         dir === 'asc'
           ? (a[field] as any).localeCompare(b[field] as any)
           : (b[field] as any).localeCompare(a[field] as any)
@@ -229,18 +232,32 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
     setPageSize(50);
   }, []);
 
+  const handleSortClear = useCallback((event: any) => {
+    setQuery(new SimpleSearchQuery('', ''));
+    setPageSize(50);
+  }, []);
+
   return (
     <SectionContainer
       title={t('tags')}
       nocollapse={nocollapse}
       slots={{
         end: sortedResults && sortedResults?.length > 0 && (
-          <Typography
-            color="secondary"
-            variant="subtitle1"
-            children={`${sortedResults?.length} ${t('tags', { ns: 'fileDetail' })}`}
-            sx={{ fontStyle: 'italic' }}
-          />
+          <>
+            <Typography
+              color="secondary"
+              variant="subtitle1"
+              children={`${sortedResults?.length} ${t('tags', { ns: 'fileDetail' })}`}
+              sx={{ fontStyle: 'italic' }}
+            />
+            <Tooltip title={t('tags.tooltip.clear')}>
+              <span>
+                <IconButton color="inherit" size="large" onClick={handleSortClear}>
+                  <CancelOutlinedIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </>
         )
       }}
     >
