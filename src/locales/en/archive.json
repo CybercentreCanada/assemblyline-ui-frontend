@@ -108,6 +108,7 @@
   "supplementary.exclude": "Exclude supplementary files",
   "supplementary.include": "Include supplementary files",
   "tags": "Tags",
+  "tags.tooltip.clear": "Clear tags sorting",
   "tc.1m": "Last month",
   "tc.1y": "Last year",
   "tc.24h": "Last 24 hours",

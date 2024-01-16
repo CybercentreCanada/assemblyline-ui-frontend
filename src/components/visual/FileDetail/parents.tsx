@@ -85,7 +85,7 @@ const WrappedParentSection: React.FC<ParentSectionProps> = ({
               </Link>
             );
           })}
-          {!showExtra && (
+          {!showExtra && parents.length > 10 && (
             <Tooltip title={tDefault('more')}>
               <IconButton size="small" onClick={() => setShowExtra(true)} style={{ padding: 0 }}>
                 <MoreHorizOutlinedIcon />

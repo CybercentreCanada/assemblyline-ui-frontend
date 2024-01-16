@@ -95,18 +95,12 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
         <DivTable>
           <DivTableHead>
             <DivTableRow>
-              {hasSupplementary && (
-                <SortableHeaderCell
-                  children={t('header.is_supplementary')}
-                  sortField="is_supplementary"
-                  allowSort={allowSort}
-                />
-              )}
+              {hasSupplementary && <DivTableCell />}
               <SortableHeaderCell children={t('header.seen.last')} sortField="seen.last" allowSort={allowSort} />
               <SortableHeaderCell children={t('header.sha256')} sortField="sha256" allowSort={allowSort} />
               <SortableHeaderCell children={t('header.type')} sortField="type" allowSort={allowSort} />
-              <DivTableCell children={t('header.labels')} />
-              <DivTableCell children={t('header.actions')} style={{ textAlign: 'center' }} />
+              <SortableHeaderCell children={t('header.labels')} sortField="labels" allowSort={allowSort} />
+              <DivTableCell />
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
