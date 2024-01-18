@@ -555,7 +555,7 @@ const WrappedRow: React.FC<RowProps> = ({
           sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-end', '&>div': { padding: '0px 5px' } } }}
         >
           {error && error !== '' ? (
-            <Tooltip title={t(error)}>
+            <Tooltip title={t(error)} placement="left">
               <div>
                 <InfoOutlinedIcon />
               </div>
@@ -563,13 +563,13 @@ const WrappedRow: React.FC<RowProps> = ({
           ) : loading ? (
             <CircularProgress color="inherit" style={{ height: '20px', width: '20px' }} />
           ) : open ? (
-            <Tooltip title={t('tags.less')}>
+            <Tooltip title={t('tags.less')} placement="left">
               <div>
                 <KeyboardArrowUpIcon fontSize="small" />
               </div>
             </Tooltip>
           ) : (
-            <Tooltip title={t('tags.more')}>
+            <Tooltip title={t('tags.more')} placement="left">
               <div>
                 <KeyboardArrowDownIcon fontSize="small" />
               </div>
