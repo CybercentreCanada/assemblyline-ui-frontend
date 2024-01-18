@@ -43,7 +43,7 @@ import SectionContainer from 'components/visual/SectionContainer';
 import Verdict from 'components/visual/Verdict';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { FC, RefObject, useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -76,54 +76,6 @@ const VERDICT_MAP = {
   safe: 0
 };
 
-function useOnScreen(ref: RefObject<Element>, rootMargin = '0px') {
-  // State and setter for storing whether element is visible
-  const [isIntersecting, setIntersecting] = useState(false);
-  useEffect(() => {
-    const observerRef = ref.current;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // Update our state when observer callback fires
-        setIntersecting(entry.isIntersecting);
-      },
-      {
-        rootMargin
-      }
-    );
-    if (observerRef) {
-      observer.observe(observerRef);
-    }
-    return () => {
-      if (observerRef) {
-        observer.unobserve(observerRef);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty array ensures that effect is only run on mount and unmount
-  return isIntersecting;
-}
-
-export const EndOfPage: FC<{ endOfPage?: boolean; onLoading?: () => void }> = ({
-  endOfPage = true,
-  onLoading = () => null
-}) => {
-  const ref = useRef();
-  const onScreen = useOnScreen(ref);
-  const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    if (onScreen) startTransition(() => null);
-  }, [onScreen]);
-
-  useEffect(() => {
-    return () => {
-      if (isPending) onLoading();
-    };
-  }, [isPending, onLoading]);
-
-  return endOfPage ? null : <div ref={ref} style={{ display: 'flex', justifyContent: 'center' }} />;
-};
-
 const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   sha256,
   signatures,
@@ -137,7 +89,6 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   const { showSafeResults } = useSafeResults();
 
   const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(''));
-  const [pageSize, setPageSize] = useState<number>(100);
 
   const results = useMemo<Result[]>(() => {
     const signatureResults = !signatures
@@ -241,14 +192,12 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
       q.set('sort', field);
       return q;
     });
-    setPageSize(100);
   }, []);
 
   const handleSortClear = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
     event.stopPropagation();
     setQuery(new SimpleSearchQuery('', ''));
-    setPageSize(100);
   }, []);
 
   return (
@@ -328,7 +277,6 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
               </GridTableBody>
             </GridTable>
           </TableContainer>
-          <EndOfPage endOfPage={pageSize >= results?.length} onLoading={() => setPageSize(v => v + 100)} />
         </>
       )}
     </SectionContainer>
