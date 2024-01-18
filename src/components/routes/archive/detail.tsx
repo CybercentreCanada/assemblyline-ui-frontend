@@ -210,7 +210,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
           paper={!inDrawer}
           defaultTab="details"
           selectionFollowsFocus
-          sx={{ position: 'sticky', top: '63px' }}
+          stickyTop={63}
           onChange={
             inDrawer
               ? null
