@@ -353,7 +353,7 @@ const WrappedRow: React.FC<RowProps> = ({
   force = false,
   drawer = false
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['archive']);
   const theme = useTheme();
 
   const { apiCall } = useMyAPI();
@@ -394,7 +394,7 @@ const WrappedRow: React.FC<RowProps> = ({
       },
       onSuccess: api_data => {
         if (api_data.api_response?.total > 0) setResultResults(api_data.api_response);
-        else setError('no results');
+        else setError('no_results_title');
       },
       onFailure: api_data => {
         setError(api_data.api_error_message);
@@ -547,7 +547,7 @@ const WrappedRow: React.FC<RowProps> = ({
         )}
         <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'center' } }}>
           {error && error !== '' ? (
-            <Tooltip title={error}>
+            <Tooltip title={t(error)}>
               <div>
                 <InfoOutlinedIcon />
               </div>

@@ -87,6 +87,7 @@
   "no_parents_desc": "The query that you ran did not return any results.",
   "no_parents_title": "No parent files found!",
   "no_results_desc": "The query that you ran did not return any results.",
+  "no_results_title": "No results found!",
   "no_similar_desc": "The query that you ran did not return any results.",
   "no_similar_title": "No similar files found!",
   "no_tag_desc": "This file doesn't have any tags or signatures.",

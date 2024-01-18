@@ -87,6 +87,7 @@
   "no_parents_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat.",
   "no_parents_title": "Aucun fichier parent trouvé !",
   "no_results_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat.",
+  "no_results_title": "Aucun résultat trouvé !",
   "no_similar_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat.",
   "no_similar_title": "Aucun fichier similaire trouvé !",
   "no_tag_desc": "Ce fichier ne contient aucun tag ni signature.",
