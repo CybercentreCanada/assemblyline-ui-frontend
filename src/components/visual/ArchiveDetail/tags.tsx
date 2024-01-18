@@ -46,6 +46,7 @@ import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 export type Signature = [string, string, boolean]; // [name, h_type, safelisted]
 
@@ -206,10 +207,13 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
     setQuery(new SimpleSearchQuery('', ''));
   }, []);
 
+  const theme = useTheme();
+
   return (
     <SectionContainer
       title={t('tags')}
       nocollapse={nocollapse}
+      variant="flex"
       slots={{
         end: sortedResults && sortedResults?.length > 0 && (
           <Typography
@@ -232,57 +236,77 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
         </div>
       ) : (
         <>
-          <TableContainer component={StyledPaper} original={drawer}>
-            <GridTable columns={c12nDef.enforce ? 5 : 4} size="small">
-              <GridTableHead>
-                <GridTableRow>
-                  <SortableGridHeaderCell
-                    allowSort
-                    children={t('type')}
-                    query={query}
-                    sortField="tag_type"
-                    onSort={handleSort}
-                  />
-                  <SortableGridHeaderCell
-                    allowSort
-                    children={t('verdict')}
-                    query={query}
-                    sortField="h_type"
-                    inverted
-                    onSort={handleSort}
-                  />
-                  <SortableGridHeaderCell
-                    allowSort
-                    children={t('value')}
-                    query={query}
-                    sortField="value"
-                    onSort={handleSort}
-                  />
-                  {c12nDef.enforce && (
-                    <SortableGridHeaderCell
-                      allowSort
-                      children={t('classification')}
-                      query={query}
-                      sortField="classification"
-                      onSort={handleSort}
-                    />
-                  )}
-                  <GridTableCell sx={{ justifyItems: 'flex-end' }}>
-                    <Tooltip title={t('tags.tooltip.clear')}>
-                      <IconButton color="inherit" size="small" onClick={handleSortClear}>
-                        <CancelOutlinedIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </GridTableCell>
-                </GridTableRow>
-              </GridTableHead>
-              <GridTableBody>
-                {groupedResults.map((items, i) => (
-                  <GroupedRow key={i} results={items} sha256={sha256} force={force} drawer={drawer} />
-                ))}
-              </GridTableBody>
-            </GridTable>
-          </TableContainer>
+          <div
+            style={{
+              flexGrow: 1,
+              border: `1px solid ${theme.palette.divider}`,
+              position: 'relative'
+            }}
+          >
+            <div style={{ display: 'flex', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+              <AutoSizer style={{ display: 'flex', height: '100%', width: '100%' }}>
+                {({ width, height }) => (
+                  <TableContainer component={StyledPaper} original={drawer} style={{ overflowX: 'hidden' }}>
+                    <GridTable
+                      columns={c12nDef.enforce ? 5 : 4}
+                      stickyHeader
+                      paper={!drawer}
+                      size="small"
+                      style={{ height: height, width: width }}
+                    >
+                      <GridTableHead>
+                        <GridTableRow>
+                          <SortableGridHeaderCell
+                            allowSort
+                            children={t('type')}
+                            query={query}
+                            sortField="tag_type"
+                            onSort={handleSort}
+                          />
+                          <SortableGridHeaderCell
+                            allowSort
+                            children={t('verdict')}
+                            query={query}
+                            sortField="h_type"
+                            inverted
+                            onSort={handleSort}
+                          />
+                          <SortableGridHeaderCell
+                            allowSort
+                            children={t('value')}
+                            query={query}
+                            sortField="value"
+                            onSort={handleSort}
+                          />
+                          {c12nDef.enforce && (
+                            <SortableGridHeaderCell
+                              allowSort
+                              children={t('classification')}
+                              query={query}
+                              sortField="classification"
+                              onSort={handleSort}
+                            />
+                          )}
+                          <GridTableCell variant="head" sx={{ justifyItems: 'flex-end' }}>
+                            <Tooltip title={t('tags.tooltip.clear')}>
+                              <IconButton color="inherit" size="small" onClick={handleSortClear}>
+                                <CancelOutlinedIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </GridTableCell>
+                        </GridTableRow>
+                      </GridTableHead>
+                      <GridTableBody>
+                        {groupedResults.map((items, i) => (
+                          <GroupedRow key={i} results={items} sha256={sha256} force={force} drawer={drawer} />
+                        ))}
+                      </GridTableBody>
+                    </GridTable>
+                  </TableContainer>
+                )}
+              </AutoSizer>
+            </div>
+          </div>
         </>
       )}
     </SectionContainer>

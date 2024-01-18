@@ -43,22 +43,26 @@ export const StyledPaper: FC<StyledPaperProps> = memo(
 interface GridTableProps extends TableProps {
   component?: React.ElementType<any>;
   columns?: number;
+  paper?: boolean;
 }
 
 export const GridTable: FC<GridTableProps> = memo(
   styled(
-    ({ component = 'div', size = 'small', ...other }: GridTableProps) => (
+    ({ component = 'div', size = 'small', paper = false, ...other }: GridTableProps) => (
       <Table size={size} {...other} component={component} />
     ),
     {
-      shouldForwardProp: prop => prop !== 'columns'
+      shouldForwardProp: prop => prop !== 'columns' && prop !== 'paper'
     }
-  )<GridTableProps>(({ columns }) => ({
+  )<GridTableProps>(({ theme, columns, paper = false }) => ({
     display: 'grid',
     gridTemplateColumns: `repeat(${columns}, auto)`,
     gridAutoFlow: 'row',
     alignItems: 'stretch',
-    overflowX: 'auto'
+    overflowX: 'auto',
+    '& .MuiTableCell-head': {
+      backgroundColor: `color-mix(in srgb, black 5%, ${theme.palette.background[paper ? 'paper' : 'default']})`
+    }
   }))
 );
 
@@ -175,7 +179,6 @@ export const GridTableCell: FC<GridTableCellProps> = memo(
       })
     },
     '&.MuiTableCell-head': {
-      backgroundColor: 'rgba(0, 0, 0, 5%)',
       whiteSpace: 'nowrap'
     }
   }))

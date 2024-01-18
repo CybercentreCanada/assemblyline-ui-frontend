@@ -28,6 +28,11 @@ const useStyles = makeStyles(theme => ({
   center: {
     display: 'grid',
     placeItems: 'center'
+  },
+  flex: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1
   }
 }));
 
@@ -36,6 +41,7 @@ type SectionContainerProps = {
   title?: string;
   nocollapse?: boolean;
   closed?: boolean;
+  variant?: 'default' | 'flex';
   slots?: {
     end?: React.ReactNode;
   };
@@ -49,6 +55,7 @@ const WrappedSectionContainer: React.FC<SectionContainerProps> = ({
   nocollapse = false,
   closed = false,
   title = null,
+  variant = 'default',
   slots = { end: null },
   slotProps = { wrapper: null }
 }) => {
@@ -58,7 +65,7 @@ const WrappedSectionContainer: React.FC<SectionContainerProps> = ({
   const [render, setRender] = useState<boolean>(!closed);
 
   return (
-    <div className={classes.spacer}>
+    <div className={clsx(classes.spacer, variant === 'flex' && classes.flex)}>
       <div
         className={clsx(classes.container, !nocollapse && classes.clickable)}
         onClick={() => (nocollapse ? null : setOpen(o => !o))}
@@ -66,11 +73,22 @@ const WrappedSectionContainer: React.FC<SectionContainerProps> = ({
         <Typography variant="h6" children={title} />
         <div style={{ flex: 1 }} />
         {slots?.end}
-        <div className={classes.center}>{nocollapse ? null : open ? <ExpandLess /> : <ExpandMore />}</div>
+        <div className={clsx(classes.center)}>{nocollapse ? null : open ? <ExpandLess /> : <ExpandMore />}</div>
       </div>
       <Divider />
-      <Collapse in={open} timeout="auto" onEnter={() => setRender(true)}>
-        <div className={classes.spacer} {...slotProps?.wrapper}>
+      <Collapse
+        in={open}
+        timeout="auto"
+        onEnter={() => setRender(true)}
+        sx={{
+          ...(variant === 'flex' && {
+            '&.MuiCollapse-root': { display: 'flex', flexDirection: 'column', flex: 1 },
+            '& .MuiCollapse-wrapper': { display: 'flex', flexDirection: 'column', flex: 1 },
+            '& .MuiCollapse-wrapperInner': { display: 'flex', flexDirection: 'column', flex: 1 }
+          })
+        }}
+      >
+        <div className={clsx(classes.spacer, variant === 'flex' && classes.flex)} {...slotProps?.wrapper}>
           {render && children}
         </div>
       </Collapse>
