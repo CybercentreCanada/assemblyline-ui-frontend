@@ -196,6 +196,18 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
       );
   }, [query, results]);
 
+  const groupedResults = useMemo<Array<Result[]>>(() => {
+    const sort = new SimpleSearchQuery(query.toString(), null).get('sort', 'tag_type asc');
+    const field = sort.replace(' asc', '').replace(' desc', '') as keyof Result;
+
+    return sortedResults.reduce((acc, curr) => {
+      const node = acc.find(item => item.find(subItem => subItem[field] === curr[field]));
+      if (node) node.push(curr);
+      else acc.push([curr]);
+      return acc;
+    }, []);
+  }, [query, sortedResults]);
+
   const tagUnsafeMap = useMemo(() => {
     if (!tags) return null;
     const newTagUnsafeMap = {};
@@ -245,21 +257,12 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
       nocollapse={nocollapse}
       slots={{
         end: sortedResults && sortedResults?.length > 0 && (
-          <>
-            <Typography
-              color="secondary"
-              variant="subtitle1"
-              children={`${sortedResults?.length} ${t('tags', { ns: 'fileDetail' })}`}
-              sx={{ fontStyle: 'italic' }}
-            />
-            <Tooltip title={t('tags.tooltip.clear')}>
-              <span>
-                <IconButton color="inherit" size="large" onClick={handleSortClear}>
-                  <CancelOutlinedIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
-          </>
+          <Typography
+            color="secondary"
+            variant="subtitle1"
+            children={`${sortedResults?.length} ${t('tags', { ns: 'fileDetail' })}`}
+            sx={{ fontStyle: 'italic' }}
+          />
         )
       }}
     >
@@ -309,25 +312,19 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                       onSort={handleSort}
                     />
                   )}
-                  <GridTableCell />
+                  <GridTableCell>
+                    <Tooltip title={t('tags.tooltip.clear')}>
+                      <IconButton color="inherit" size="small" onClick={handleSortClear}>
+                        <CancelOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </GridTableCell>
                 </GridTableRow>
               </GridTableHead>
               <GridTableBody>
-                {sortedResults
-                  .filter((_result, i) => i < pageSize)
-                  .map(({ tag_type, value, h_type, safelisted, classification }) => (
-                    <Row
-                      key={`${tag_type}-${value}-${h_type}-${safelisted}-${classification}`}
-                      tag_type={tag_type}
-                      value={value}
-                      h_type={h_type}
-                      safelisted={safelisted}
-                      classification={classification}
-                      sha256={sha256}
-                      force={force}
-                      drawer={drawer}
-                    />
-                  ))}
+                {groupedResults.map((items, i) => (
+                  <GroupedRow key={i} results={items} sha256={sha256} force={force} drawer={drawer} />
+                ))}
               </GridTableBody>
             </GridTable>
           </TableContainer>
@@ -337,6 +334,50 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
     </SectionContainer>
   );
 };
+
+type GroupedRowProps = {
+  drawer?: boolean;
+  force?: boolean;
+  results: Result[];
+  sha256: string;
+};
+
+const WrappedGroupedRow = ({ drawer = true, force = false, results = [], sha256 }: GroupedRowProps) => {
+  const { t } = useTranslation(['archive']);
+
+  const [showMore, setShowMore] = useState<boolean>(false);
+
+  return (
+    <>
+      {results &&
+        results?.length > 0 &&
+        (showMore ? results : results.filter((r, i) => i < 10)).map(
+          ({ tag_type, value, h_type, safelisted, classification }) => (
+            <Row
+              key={`${tag_type}-${value}-${h_type}-${safelisted}-${classification}`}
+              tag_type={tag_type}
+              value={value}
+              h_type={h_type}
+              safelisted={safelisted}
+              classification={classification}
+              sha256={sha256}
+              force={force}
+              drawer={drawer}
+            />
+          )
+        )}
+      {!showMore && results?.length > 10 && (
+        <GridTableRow hover sx={{ cursor: 'pointer', textDecoration: 'none' }} onClick={() => setShowMore(true)}>
+          <GridTableCell sx={{ gridColumn: 'span 5', '&.MuiTableCell-root>div': { justifyItems: 'center' } }}>{`+ ${
+            results?.length - 10
+          } ${results?.length - 10 <= 1 ? t('row') : t('rows')}`}</GridTableCell>
+        </GridTableRow>
+      )}
+    </>
+  );
+};
+
+const GroupedRow = React.memo(WrappedGroupedRow);
 
 type RowProps = {
   tag_type: string;
@@ -556,7 +597,7 @@ const WrappedRow: React.FC<RowProps> = ({
             }
           />
         )}
-        <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-end' } }}>
+        <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'center' } }}>
           {error && error !== '' ? (
             <Tooltip title={error}>
               <div>
