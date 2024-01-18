@@ -111,6 +111,8 @@
   "supplementary.exclude": "Exclure les fichiers supplémentaires",
   "supplementary.include": "Inclure les fichiers supplémentaires",
   "tags": "Tags",
+  "tags.less": "Masquer les résultats partageant ce tag",
+  "tags.more": "Afficher les résultats partageant ce tag",
   "tags.tooltip.clear": "Effacer le tri des tags",
   "tc.1m": "Le mois dernier",
   "tc.1y": "La dernière année",

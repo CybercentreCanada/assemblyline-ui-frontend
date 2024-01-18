@@ -555,9 +555,17 @@ const WrappedRow: React.FC<RowProps> = ({
           ) : loading ? (
             <CircularProgress color="inherit" style={{ height: '20px', width: '20px' }} />
           ) : open ? (
-            <KeyboardArrowUpIcon fontSize="small" />
+            <Tooltip title={t('tags.less')}>
+              <div>
+                <KeyboardArrowUpIcon fontSize="small" />
+              </div>
+            </Tooltip>
           ) : (
-            <KeyboardArrowDownIcon fontSize="small" />
+            <Tooltip title={t('tags.more')}>
+              <div>
+                <KeyboardArrowDownIcon fontSize="small" />
+              </div>
+            </Tooltip>
           )}
         </GridTableCell>
       </GridLinkRow>
