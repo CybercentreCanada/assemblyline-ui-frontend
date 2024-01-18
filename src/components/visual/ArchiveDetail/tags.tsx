@@ -123,16 +123,15 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   }, [sha256, signatures, tags]);
 
   const sortedResults = useMemo<Result[]>(() => {
-    const resultsCopy = JSON.parse(JSON.stringify(results));
-    if (!resultsCopy || query.toString() === '') return resultsCopy;
+    if (!results || query.toString() === '') return results;
 
     const sort = new SimpleSearchQuery(query.toString(), null).get('sort', 'tag_type asc');
     const dir = sort && sort.indexOf('asc') !== -1 ? 'asc' : 'desc';
     const field = sort.replace(' asc', '').replace(' desc', '') as keyof Result;
 
-    if (!field || !(field in resultsCopy[0])) return resultsCopy;
+    if (!field || !(field in results[0])) return results;
     else if (field === 'h_type')
-      return resultsCopy.sort((a, b) =>
+      return results.toSorted((a, b) =>
         dir === 'asc'
           ? (a?.h_type in VERDICT_MAP ? VERDICT_MAP[a.h_type] : 0) -
             (b?.h_type in VERDICT_MAP ? VERDICT_MAP[b.h_type] : 0)
@@ -140,7 +139,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
             (a?.h_type in VERDICT_MAP ? VERDICT_MAP[a.h_type] : 0)
       );
     else
-      return resultsCopy.sort((a, b) =>
+      return results.toSorted((a, b) =>
         dir === 'asc'
           ? (a[field] as any).localeCompare(b[field] as any)
           : (b[field] as any).localeCompare(a[field] as any)
