@@ -261,10 +261,10 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                       onSort={handleSort}
                     />
                   )}
-                  <GridTableCell>
+                  <GridTableCell sx={{ justifyItems: 'flex-end' }}>
                     <Tooltip title={t('tags.tooltip.clear')}>
                       <IconButton color="inherit" size="small" onClick={handleSortClear}>
-                        <CancelOutlinedIcon />
+                        <CancelOutlinedIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                   </GridTableCell>
@@ -545,7 +545,9 @@ const WrappedRow: React.FC<RowProps> = ({
             }
           />
         )}
-        <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'center' } }}>
+        <GridTableCell
+          sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-end', '&>div': { padding: '0px 5px' } } }}
+        >
           {error && error !== '' ? (
             <Tooltip title={t(error)}>
               <div>
