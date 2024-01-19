@@ -124,15 +124,18 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   }, [sha256, signatures, tags]);
 
   const sortedResults = useMemo<Result[]>(() => {
-    if (!results || query.toString() === '') return results;
+    if (!results) return null;
+
+    const newResults = JSON.parse(JSON.stringify(results));
+    if (query.toString() === '') return newResults;
 
     const sort = new SimpleSearchQuery(query.toString(), null).get('sort', 'tag_type asc');
     const dir = sort && sort.indexOf('asc') !== -1 ? 'asc' : 'desc';
     const field = sort.replace(' asc', '').replace(' desc', '') as keyof Result;
 
-    if (!field || !(field in results[0])) return results;
+    if (!field || !(field in newResults[0])) return newResults;
     else if (field === 'h_type')
-      return results.toSorted((a, b) =>
+      return newResults.toSorted((a, b) =>
         dir === 'asc'
           ? (a?.h_type in VERDICT_MAP ? VERDICT_MAP[a.h_type] : 0) -
             (b?.h_type in VERDICT_MAP ? VERDICT_MAP[b.h_type] : 0)
@@ -140,7 +143,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
             (a?.h_type in VERDICT_MAP ? VERDICT_MAP[a.h_type] : 0)
       );
     else
-      return results.toSorted((a, b) =>
+      return newResults.toSorted((a, b) =>
         dir === 'asc'
           ? (a[field] as any).localeCompare(b[field] as any)
           : (b[field] as any).localeCompare(a[field] as any)
@@ -209,6 +212,8 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
 
   const theme = useTheme();
 
+  // TODO: add input filter on the headers to filter that specific column.
+
   return (
     <SectionContainer
       title={t('tags')}
@@ -263,6 +268,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                             sortField="tag_type"
                             onSort={handleSort}
                           />
+
                           <SortableGridHeaderCell
                             allowSort
                             children={t('verdict')}
@@ -294,6 +300,13 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                               </IconButton>
                             </Tooltip>
                           </GridTableCell>
+                        </GridTableRow>
+                        <GridTableRow>
+                          <GridTableCell children={'asdfasdf'} />
+                          <GridTableCell children={'asdfasdf'} />
+                          <GridTableCell children={'asdfasdf'} />
+                          <GridTableCell children={'asdfasdf'} />
+                          <GridTableCell children={'asdfasdf'} />
                         </GridTableRow>
                       </GridTableHead>
                       <GridTableBody>
