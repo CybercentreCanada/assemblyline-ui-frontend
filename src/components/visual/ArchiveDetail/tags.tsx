@@ -1,4 +1,5 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import CancelIcon from '@mui/icons-material/Cancel';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -10,8 +11,10 @@ import {
   CircularProgress,
   Collapse,
   IconButton,
+  InputAdornment,
   Menu,
   MenuItem,
+  OutlinedInput,
   Skeleton,
   TableContainer,
   Tooltip,
@@ -43,7 +46,7 @@ import SectionContainer from 'components/visual/SectionContainer';
 import Verdict from 'components/visual/Verdict';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -85,6 +88,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   drawer = true,
   nocollapse = false
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation(['archive']);
   const { c12nDef } = useALContext();
   const { showSafeResults } = useSafeResults();
@@ -123,17 +127,28 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256, signatures, tags]);
 
-  const sortedResults = useMemo<Result[]>(() => {
+  const filteredResults = useMemo<Result[]>(() => {
     if (!results) return null;
 
     const newResults = JSON.parse(JSON.stringify(results));
+    if (query.toString() === '') return newResults;
+
+    return newResults.filter((result: Result) =>
+      Object.entries(result).every(([key, value]) => value.toString().match(query.get(key, '')))
+    );
+  }, [query, results]);
+
+  const sortedResults = useMemo<Result[]>(() => {
+    if (!filteredResults) return null;
+
+    const newResults = JSON.parse(JSON.stringify(filteredResults));
     if (query.toString() === '') return newResults;
 
     const sort = new SimpleSearchQuery(query.toString(), null).get('sort', 'tag_type asc');
     const dir = sort && sort.indexOf('asc') !== -1 ? 'asc' : 'desc';
     const field = sort.replace(' asc', '').replace(' desc', '') as keyof Result;
 
-    if (!field || !(field in newResults[0])) return newResults;
+    if (!field || newResults?.length === 0 || !(field in newResults[0])) return newResults;
     else if (field === 'h_type')
       return newResults.toSorted((a, b) =>
         dir === 'asc'
@@ -148,7 +163,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
           ? (a[field] as any).localeCompare(b[field] as any)
           : (b[field] as any).localeCompare(a[field] as any)
       );
-  }, [query, results]);
+  }, [filteredResults, query]);
 
   const groupedResults = useMemo<Array<Result[]>>(
     () =>
@@ -210,9 +225,14 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
     setQuery(new SimpleSearchQuery('', ''));
   }, []);
 
-  const theme = useTheme();
-
-  // TODO: add input filter on the headers to filter that specific column.
+  const handleFilter = useCallback((key: string, value: string) => {
+    setQuery(q => {
+      const newQuery = new SimpleSearchQuery(q.toString(), '');
+      if (value === '') newQuery.delete(key);
+      else newQuery.set(key, value);
+      return newQuery;
+    });
+  }, []);
 
   return (
     <SectionContainer
@@ -230,9 +250,9 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
         )
       }}
     >
-      {!sortedResults ? (
+      {!results ? (
         <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-      ) : sortedResults?.length === 0 ? (
+      ) : results?.length === 0 ? (
         <div style={{ width: '100%' }}>
           <InformativeAlert>
             <AlertTitle>{t('no_tag_title')}</AlertTitle>
@@ -257,7 +277,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                       stickyHeader
                       paper={!drawer}
                       size="small"
-                      style={{ height: height, width: width }}
+                      style={{ maxHeight: height, width: width }}
                     >
                       <GridTableHead>
                         <GridTableRow>
@@ -268,7 +288,6 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                             sortField="tag_type"
                             onSort={handleSort}
                           />
-
                           <SortableGridHeaderCell
                             allowSort
                             children={t('verdict')}
@@ -302,11 +321,11 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                           </GridTableCell>
                         </GridTableRow>
                         <GridTableRow>
-                          <GridTableCell children={'asdfasdf'} />
-                          <GridTableCell children={'asdfasdf'} />
-                          <GridTableCell children={'asdfasdf'} />
-                          <GridTableCell children={'asdfasdf'} />
-                          <GridTableCell children={'asdfasdf'} />
+                          <FilterCell onChange={value => handleFilter('tag_type', value)} />
+                          <FilterCell onChange={value => handleFilter('verdict', value)} />
+                          <FilterCell onChange={value => handleFilter('value', value)} />
+                          <FilterCell onChange={value => handleFilter('classification', value)} />
+                          <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }} />
                         </GridTableRow>
                       </GridTableHead>
                       <GridTableBody>
@@ -635,6 +654,48 @@ const WrappedRow: React.FC<RowProps> = ({
 };
 
 const Row = React.memo(WrappedRow);
+
+type FilterFieldProps = {
+  onChange: (value: string) => void;
+};
+
+const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => null }: FilterFieldProps) => {
+  const [value, setValue] = useState<string>('');
+  const [, startTransition] = useTransition();
+
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+      setValue(event.target.value);
+      startTransition(() => onChange(event.target.value));
+    },
+    [onChange]
+  );
+
+  const handleClear = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setValue('');
+      startTransition(() => onChange(''));
+    },
+    [onChange]
+  );
+
+  return (
+    <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }}>
+      <OutlinedInput
+        value={value}
+        size="small"
+        onChange={handleChange}
+        endAdornment={
+          <InputAdornment position="end">
+            <IconButton edge="end" onClick={event => handleClear(event)}>
+              <CancelIcon color="secondary" />
+            </IconButton>
+          </InputAdornment>
+        }
+      />
+    </GridTableCell>
+  );
+});
 
 export const ArchivedTagSection = React.memo(WrappedArchivedTagSection);
 export default ArchivedTagSection;
