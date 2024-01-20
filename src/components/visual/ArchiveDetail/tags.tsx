@@ -15,6 +15,8 @@ import {
   Menu,
   MenuItem,
   OutlinedInput,
+  Select,
+  SelectChangeEvent,
   Skeleton,
   TableContainer,
   Tooltip,
@@ -134,7 +136,13 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
     if (query.toString() === '') return newResults;
 
     return newResults.filter((result: Result) =>
-      Object.entries(result).every(([key, value]) => value.toString().match(query.get(key, '')))
+      Object.entries(result).every(([key, value]) => {
+        if (key === 'h_type') {
+          return query.get(key, '') === '' ? true : query.get(key, '').split(',').includes(value.toString());
+        } else {
+          return !!value.toString().match(query.get(key, ''));
+        }
+      })
     );
   }, [query, results]);
 
@@ -322,7 +330,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                         </GridTableRow>
                         <GridTableRow>
                           <FilterCell onChange={value => handleFilter('tag_type', value)} />
-                          <FilterCell onChange={value => handleFilter('verdict', value)} />
+                          <SelectCell onChange={value => handleFilter('h_type', value)} />
                           <FilterCell onChange={value => handleFilter('value', value)} />
                           <FilterCell onChange={value => handleFilter('classification', value)} />
                           <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }} />
@@ -693,6 +701,43 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
           </InputAdornment>
         }
       />
+    </GridTableCell>
+  );
+});
+
+const SelectCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => null }: FilterFieldProps) => {
+  const [value, setValue] = useState<string[]>([]);
+  const [, startTransition] = useTransition();
+
+  const handleChange = useCallback(
+    (event: SelectChangeEvent<string[]>) => {
+      const newValue = typeof event.target.value === 'string' ? event.target.value.split(',') : event.target.value;
+      setValue(newValue);
+      startTransition(() => onChange(newValue.join(',')));
+    },
+    [onChange]
+  );
+
+  return (
+    <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }}>
+      <Select
+        value={value}
+        multiple
+        size="small"
+        sx={{ width: '125px' }}
+        onChange={event => handleChange(event)}
+        input={<OutlinedInput />}
+      >
+        {['malicious', 'highly_suspicious', 'suspicious', 'info', 'safe'].map(name => (
+          <MenuItem
+            key={name}
+            value={name}
+            sx={{ '&>span': { width: '100%', cursor: 'pointer' }, '& .MuiChip-root': { cursor: 'pointer' } }}
+          >
+            <Verdict verdict={name as any} fullWidth />
+          </MenuItem>
+        ))}
+      </Select>
     </GridTableCell>
   );
 });
