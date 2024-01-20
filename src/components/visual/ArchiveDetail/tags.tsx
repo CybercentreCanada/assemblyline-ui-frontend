@@ -1,6 +1,6 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -327,7 +327,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                           <GridTableCell variant="head" sx={{ justifyItems: 'flex-end' }}>
                             <Tooltip title={t('tags.tooltip.clear')}>
                               <IconButton color="inherit" size="small" onClick={handleSortClear}>
-                                <CancelOutlinedIcon fontSize="small" />
+                                <CloseOutlinedIcon fontSize="small" />
                               </IconButton>
                             </Tooltip>
                           </GridTableCell>
