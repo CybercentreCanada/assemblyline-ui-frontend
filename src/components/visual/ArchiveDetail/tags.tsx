@@ -285,7 +285,11 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                       stickyHeader
                       paper={!drawer}
                       size="small"
-                      style={{ maxHeight: height, width: width }}
+                      style={{
+                        gridTemplateColumns: c12nDef.enforce ? `auto 125px auto auto auto` : `auto 125px auto auto`,
+                        maxHeight: height,
+                        width: width
+                      }}
                     >
                       <GridTableHead>
                         <GridTableRow>
@@ -723,8 +727,9 @@ const SelectCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
       <Select
         value={value}
         multiple
+        fullWidth
         size="small"
-        sx={{ width: '125px' }}
+        sx={{ maxWidth: '109px' }}
         onChange={event => handleChange(event)}
         input={<OutlinedInput />}
       >
