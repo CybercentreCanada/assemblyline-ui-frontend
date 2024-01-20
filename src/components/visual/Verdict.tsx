@@ -14,6 +14,7 @@ type VerdictProps = {
   mono?: boolean;
   fullWidth?: boolean;
   wrap?: boolean;
+  pointer?: boolean;
 };
 
 const WrappedVerdict: React.FC<VerdictProps> = ({
@@ -25,7 +26,8 @@ const WrappedVerdict: React.FC<VerdictProps> = ({
   short = false,
   mono = false,
   fullWidth = false,
-  wrap = false
+  wrap = false,
+  pointer = false
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -81,6 +83,7 @@ const WrappedVerdict: React.FC<VerdictProps> = ({
             mono={mono}
             fullWidth={fullWidth}
             wrap={wrap}
+            sx={{ ...(pointer && { cursor: 'pointer' }) }}
           />
         )}
       </span>

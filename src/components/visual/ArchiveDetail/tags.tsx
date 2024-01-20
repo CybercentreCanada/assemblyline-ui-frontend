@@ -606,7 +606,7 @@ const WrappedRow: React.FC<RowProps> = ({
         onContextMenu={handleMenuClick}
       >
         <GridTableCell children={tag_type} />
-        <GridTableCell children={<Verdict verdict={h_type as any} fullWidth />} />
+        <GridTableCell children={<Verdict verdict={h_type as any} fullWidth pointer />} />
         <GridTableCell breakable children={value} />
         {c12nDef.enforce && (
           <GridTableCell
@@ -731,15 +731,10 @@ const SelectCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
         size="small"
         sx={{ maxWidth: '109px' }}
         onChange={event => handleChange(event)}
-        input={<OutlinedInput />}
       >
         {['malicious', 'highly_suspicious', 'suspicious', 'info', 'safe'].map(name => (
-          <MenuItem
-            key={name}
-            value={name}
-            sx={{ '&>span': { width: '100%', cursor: 'pointer' }, '& .MuiChip-root': { cursor: 'pointer' } }}
-          >
-            <Verdict verdict={name as any} fullWidth />
+          <MenuItem key={name} value={name} sx={{ '&>span': { width: '100%' } }}>
+            <Verdict verdict={name as any} fullWidth pointer />
           </MenuItem>
         ))}
       </Select>
