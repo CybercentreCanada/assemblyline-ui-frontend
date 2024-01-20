@@ -460,12 +460,7 @@ export default function MalwareArchive() {
         )}
 
         <div className={classes.tableWrapper}>
-          <ArchivesTable
-            fileResults={fileResults}
-            hasSupplementary={query?.has('supplementary')}
-            setFileID={handleFileChange}
-            onLabelClick={handleLabelClick}
-          />
+          <ArchivesTable fileResults={fileResults} setFileID={handleFileChange} onLabelClick={handleLabelClick} />
         </div>
       </PageFullWidth>
     );

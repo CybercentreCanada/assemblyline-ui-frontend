@@ -12,6 +12,7 @@ interface Props<T extends TabElements> extends TabsProps {
   paper?: boolean;
   value?: keyof T;
   tabs: T;
+  stickyTop?: null | number;
 }
 
 type TabContextProps = {
@@ -34,6 +35,7 @@ const WrappedTabContainer = <T extends TabElements>({
   sx = {},
   value: valueProp = null,
   tabs = null,
+  stickyTop = null,
   onChange: onChangeProp = null,
   ...props
 }: Props<T>): ReactElement<Props<T>> => {
@@ -68,28 +70,45 @@ const WrappedTabContainer = <T extends TabElements>({
 
   return (
     <TabContext.Provider value={{ onTabChange }}>
-      <Tabs
-        value={tab}
-        indicatorColor="primary"
-        textColor="primary"
-        variant="scrollable"
-        scrollButtons="auto"
-        onChange={handleChange(tab)}
-        sx={{
-          backgroundColor: theme.palette.background.default,
-          margin: `${theme.spacing(2)} 0`,
+      <div
+        style={{
+          backgroundColor: theme.palette.background.paper,
           zIndex: 1000,
           ...(paper && {
-            backgroundColor: theme.palette.background.paper
+            backgroundColor: theme.palette.background.default
           }),
-          ...sx
+          ...(!!stickyTop && {
+            position: 'sticky',
+            top: `${stickyTop}px`,
+            marginLeft: '-4px',
+            marginRight: '-4px',
+            paddingLeft: '4px',
+            paddingRight: '4px'
+          })
         }}
-        {...props}
       >
-        {Object.entries(tabs).map(([value, { label = '', disabled = false }], i) =>
-          disabled ? null : <Tab key={i} label={label} value={value} sx={{ minWidth: '120px' }} />
-        )}
-      </Tabs>
+        <Tabs
+          value={tab}
+          indicatorColor="primary"
+          textColor="primary"
+          variant="scrollable"
+          scrollButtons="auto"
+          onChange={handleChange(tab)}
+          sx={{
+            backgroundColor: theme.palette.background.default,
+            margin: `${theme.spacing(2)} 0`,
+            ...(paper && {
+              backgroundColor: theme.palette.background.paper
+            }),
+            ...sx
+          }}
+          {...props}
+        >
+          {Object.entries(tabs).map(([value, { label = '', disabled = false }], i) =>
+            disabled ? null : <Tab key={i} label={label} value={value} sx={{ minWidth: '120px' }} />
+          )}
+        </Tabs>
+      </div>
 
       {Object.entries(tabs).map(([value, { label = '', disabled = false, content = null }], i) =>
         disabled ? null : <TabContent key={i} open={tab === value} children={content} />

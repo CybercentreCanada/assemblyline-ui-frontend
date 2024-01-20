@@ -19,7 +19,7 @@ import {
 import FileDownloader from 'components/visual/FileDownloader';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import 'moment/locale/fr';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
@@ -67,7 +67,6 @@ type SearchResults = {
 type ArchivesTableProps = {
   fileResults: SearchResults;
   allowSort?: boolean;
-  hasSupplementary?: boolean;
   setFileID?: (id: string) => void;
   onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
 };
@@ -81,13 +80,17 @@ const LABELS_COLOR_MAP = {
 const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
   fileResults,
   allowSort = true,
-  hasSupplementary = false,
   setFileID = null,
   onLabelClick = null
 }) => {
   const { t, i18n } = useTranslation(['archive']);
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
+
+  const hasSupplementary = useMemo<boolean>(
+    () => fileResults && fileResults?.total > 0 && fileResults?.items.some(item => item.is_supplementary),
+    [fileResults]
+  );
 
   return fileResults ? (
     fileResults.total !== 0 ? (

@@ -1,4 +1,5 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import CancelIcon from '@mui/icons-material/Cancel';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -10,8 +11,12 @@ import {
   CircularProgress,
   Collapse,
   IconButton,
+  InputAdornment,
   Menu,
   MenuItem,
+  OutlinedInput,
+  Select,
+  SelectChangeEvent,
   Skeleton,
   TableContainer,
   Tooltip,
@@ -43,9 +48,10 @@ import SectionContainer from 'components/visual/SectionContainer';
 import Verdict from 'components/visual/Verdict';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { FC, RefObject, useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 export type Signature = [string, string, boolean]; // [name, h_type, safelisted]
 
@@ -76,54 +82,6 @@ const VERDICT_MAP = {
   safe: 0
 };
 
-function useOnScreen(ref: RefObject<Element>, rootMargin = '0px') {
-  // State and setter for storing whether element is visible
-  const [isIntersecting, setIntersecting] = useState(false);
-  useEffect(() => {
-    const observerRef = ref.current;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // Update our state when observer callback fires
-        setIntersecting(entry.isIntersecting);
-      },
-      {
-        rootMargin
-      }
-    );
-    if (observerRef) {
-      observer.observe(observerRef);
-    }
-    return () => {
-      if (observerRef) {
-        observer.unobserve(observerRef);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty array ensures that effect is only run on mount and unmount
-  return isIntersecting;
-}
-
-export const EndOfPage: FC<{ endOfPage?: boolean; onLoading?: () => void }> = ({
-  endOfPage = true,
-  onLoading = () => null
-}) => {
-  const ref = useRef();
-  const onScreen = useOnScreen(ref);
-  const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    if (onScreen) startTransition(() => null);
-  }, [onScreen]);
-
-  useEffect(() => {
-    return () => {
-      if (isPending) onLoading();
-    };
-  }, [isPending, onLoading]);
-
-  return endOfPage ? null : <div ref={ref} style={{ display: 'flex', justifyContent: 'center' }} />;
-};
-
 const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   sha256,
   signatures,
@@ -132,12 +90,12 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   drawer = true,
   nocollapse = false
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation(['archive']);
   const { c12nDef } = useALContext();
   const { showSafeResults } = useSafeResults();
 
   const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(''));
-  const [pageSize, setPageSize] = useState<number>(100);
 
   const results = useMemo<Result[]>(() => {
     const signatureResults = !signatures
@@ -171,17 +129,36 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256, signatures, tags]);
 
+  const filteredResults = useMemo<Result[]>(() => {
+    if (!results) return null;
+
+    const newResults = JSON.parse(JSON.stringify(results));
+    if (query.toString() === '') return newResults;
+
+    return newResults.filter((result: Result) =>
+      Object.entries(result).every(([key, value]) => {
+        if (key === 'h_type') {
+          return query.get(key, '') === '' ? true : query.get(key, '').split(',').includes(value.toString());
+        } else {
+          return !!value.toString().match(query.get(key, ''));
+        }
+      })
+    );
+  }, [query, results]);
+
   const sortedResults = useMemo<Result[]>(() => {
-    const resultsCopy = JSON.parse(JSON.stringify(results));
-    if (!resultsCopy || query.toString() === '') return resultsCopy;
+    if (!filteredResults) return null;
+
+    const newResults = JSON.parse(JSON.stringify(filteredResults));
+    if (query.toString() === '') return newResults;
 
     const sort = new SimpleSearchQuery(query.toString(), null).get('sort', 'tag_type asc');
     const dir = sort && sort.indexOf('asc') !== -1 ? 'asc' : 'desc';
     const field = sort.replace(' asc', '').replace(' desc', '') as keyof Result;
 
-    if (!field || !(field in resultsCopy[0])) return resultsCopy;
+    if (!field || newResults?.length === 0 || !(field in newResults[0])) return newResults;
     else if (field === 'h_type')
-      return resultsCopy.sort((a, b) =>
+      return newResults.toSorted((a, b) =>
         dir === 'asc'
           ? (a?.h_type in VERDICT_MAP ? VERDICT_MAP[a.h_type] : 0) -
             (b?.h_type in VERDICT_MAP ? VERDICT_MAP[b.h_type] : 0)
@@ -189,12 +166,31 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
             (a?.h_type in VERDICT_MAP ? VERDICT_MAP[a.h_type] : 0)
       );
     else
-      return resultsCopy.sort((a, b) =>
+      return newResults.toSorted((a, b) =>
         dir === 'asc'
           ? (a[field] as any).localeCompare(b[field] as any)
           : (b[field] as any).localeCompare(a[field] as any)
       );
-  }, [query, results]);
+  }, [filteredResults, query]);
+
+  const groupedResults = useMemo<Array<Result[]>>(
+    () =>
+      sortedResults.reduce((prev: Array<Result[]>, curr: Result, i: number, array: Result[]) => {
+        // const node = prev.find(item => item.find((subItem, subI) => subItem?.tag_type === curr?.tag_type));
+        const node =
+          Array.isArray(prev) &&
+          prev?.length > 0 &&
+          prev[prev.length - 1].find(subItem => subItem?.tag_type === curr?.tag_type)
+            ? prev[prev.length - 1]
+            : null;
+
+        if (node) node.push(curr);
+        else prev.push([curr]);
+
+        return prev;
+      }, []),
+    [sortedResults]
+  );
 
   const tagUnsafeMap = useMemo(() => {
     if (!tags) return null;
@@ -229,43 +225,42 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
       q.set('sort', field);
       return q;
     });
-    setPageSize(100);
   }, []);
 
   const handleSortClear = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
     event.stopPropagation();
     setQuery(new SimpleSearchQuery('', ''));
-    setPageSize(100);
+  }, []);
+
+  const handleFilter = useCallback((key: string, value: string) => {
+    setQuery(q => {
+      const newQuery = new SimpleSearchQuery(q.toString(), '');
+      if (value === '') newQuery.delete(key);
+      else newQuery.set(key, value);
+      return newQuery;
+    });
   }, []);
 
   return (
     <SectionContainer
       title={t('tags')}
       nocollapse={nocollapse}
+      variant="flex"
       slots={{
         end: sortedResults && sortedResults?.length > 0 && (
-          <>
-            <Typography
-              color="secondary"
-              variant="subtitle1"
-              children={`${sortedResults?.length} ${t('tags', { ns: 'fileDetail' })}`}
-              sx={{ fontStyle: 'italic' }}
-            />
-            <Tooltip title={t('tags.tooltip.clear')}>
-              <span>
-                <IconButton color="inherit" size="large" onClick={handleSortClear}>
-                  <CancelOutlinedIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
-          </>
+          <Typography
+            color="secondary"
+            variant="subtitle1"
+            children={`${sortedResults?.length} ${t('tags', { ns: 'fileDetail' })}`}
+            sx={{ fontStyle: 'italic' }}
+          />
         )
       }}
     >
-      {!sortedResults ? (
+      {!results ? (
         <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-      ) : sortedResults?.length === 0 ? (
+      ) : results?.length === 0 ? (
         <div style={{ width: '100%' }}>
           <InformativeAlert>
             <AlertTitle>{t('no_tag_title')}</AlertTitle>
@@ -274,69 +269,133 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
         </div>
       ) : (
         <>
-          <TableContainer component={StyledPaper} original={drawer}>
-            <GridTable columns={c12nDef.enforce ? 5 : 4} size="small">
-              <GridTableHead>
-                <GridTableRow>
-                  <SortableGridHeaderCell
-                    allowSort
-                    children={t('type')}
-                    query={query}
-                    sortField="tag_type"
-                    onSort={handleSort}
-                  />
-                  <SortableGridHeaderCell
-                    allowSort
-                    children={t('verdict')}
-                    query={query}
-                    sortField="h_type"
-                    inverted
-                    onSort={handleSort}
-                  />
-                  <SortableGridHeaderCell
-                    allowSort
-                    children={t('value')}
-                    query={query}
-                    sortField="value"
-                    onSort={handleSort}
-                  />
-                  {c12nDef.enforce && (
-                    <SortableGridHeaderCell
-                      allowSort
-                      children={t('classification')}
-                      query={query}
-                      sortField="classification"
-                      onSort={handleSort}
-                    />
-                  )}
-                  <GridTableCell />
-                </GridTableRow>
-              </GridTableHead>
-              <GridTableBody>
-                {sortedResults
-                  .filter((_result, i) => i < pageSize)
-                  .map(({ tag_type, value, h_type, safelisted, classification }) => (
-                    <Row
-                      key={`${tag_type}-${value}-${h_type}-${safelisted}-${classification}`}
-                      tag_type={tag_type}
-                      value={value}
-                      h_type={h_type}
-                      safelisted={safelisted}
-                      classification={classification}
-                      sha256={sha256}
-                      force={force}
-                      drawer={drawer}
-                    />
-                  ))}
-              </GridTableBody>
-            </GridTable>
-          </TableContainer>
-          <EndOfPage endOfPage={pageSize >= results?.length} onLoading={() => setPageSize(v => v + 100)} />
+          <div
+            style={{
+              flexGrow: 1,
+              border: `1px solid ${theme.palette.divider}`,
+              position: 'relative'
+            }}
+          >
+            <div style={{ display: 'flex', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+              <AutoSizer style={{ display: 'flex', height: '100%', width: '100%' }}>
+                {({ width, height }) => (
+                  <TableContainer component={StyledPaper} original={drawer} style={{ overflowX: 'hidden' }}>
+                    <GridTable
+                      columns={c12nDef.enforce ? 5 : 4}
+                      stickyHeader
+                      paper={!drawer}
+                      size="small"
+                      style={{ maxHeight: height, width: width }}
+                    >
+                      <GridTableHead>
+                        <GridTableRow>
+                          <SortableGridHeaderCell
+                            allowSort
+                            children={t('type')}
+                            query={query}
+                            sortField="tag_type"
+                            onSort={handleSort}
+                          />
+                          <SortableGridHeaderCell
+                            allowSort
+                            children={t('verdict')}
+                            query={query}
+                            sortField="h_type"
+                            inverted
+                            onSort={handleSort}
+                          />
+                          <SortableGridHeaderCell
+                            allowSort
+                            children={t('value')}
+                            query={query}
+                            sortField="value"
+                            onSort={handleSort}
+                          />
+                          {c12nDef.enforce && (
+                            <SortableGridHeaderCell
+                              allowSort
+                              children={t('classification')}
+                              query={query}
+                              sortField="classification"
+                              onSort={handleSort}
+                            />
+                          )}
+                          <GridTableCell variant="head" sx={{ justifyItems: 'flex-end' }}>
+                            <Tooltip title={t('tags.tooltip.clear')}>
+                              <IconButton color="inherit" size="small" onClick={handleSortClear}>
+                                <CancelOutlinedIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </GridTableCell>
+                        </GridTableRow>
+                        <GridTableRow>
+                          <FilterCell onChange={value => handleFilter('tag_type', value)} />
+                          <SelectCell onChange={value => handleFilter('h_type', value)} />
+                          <FilterCell onChange={value => handleFilter('value', value)} />
+                          <FilterCell onChange={value => handleFilter('classification', value)} />
+                          <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }} />
+                        </GridTableRow>
+                      </GridTableHead>
+                      <GridTableBody>
+                        {groupedResults.map((items, i) => (
+                          <GroupedRow key={i} results={items} sha256={sha256} force={force} drawer={drawer} />
+                        ))}
+                      </GridTableBody>
+                    </GridTable>
+                  </TableContainer>
+                )}
+              </AutoSizer>
+            </div>
+          </div>
         </>
       )}
     </SectionContainer>
   );
 };
+
+type GroupedRowProps = {
+  drawer?: boolean;
+  force?: boolean;
+  results: Result[];
+  sha256: string;
+};
+
+const WrappedGroupedRow = ({ drawer = true, force = false, results = [], sha256 }: GroupedRowProps) => {
+  const { t } = useTranslation(['archive']);
+
+  const [showMore, setShowMore] = useState<boolean>(false);
+
+  return (
+    <>
+      {results &&
+        results?.length > 0 &&
+        (showMore ? results : results.filter((r, i) => i < 10)).map(
+          ({ tag_type, value, h_type, safelisted, classification }) => (
+            <Row
+              key={`${tag_type}-${value}-${h_type}-${safelisted}-${classification}`}
+              tag_type={tag_type}
+              value={value}
+              h_type={h_type}
+              safelisted={safelisted}
+              classification={classification}
+              sha256={sha256}
+              force={force}
+              drawer={drawer}
+            />
+          )
+        )}
+      {!showMore && results?.length > 10 && (
+        <GridTableRow hover sx={{ cursor: 'pointer', textDecoration: 'none' }} onClick={() => setShowMore(true)}>
+          <GridTableCell sx={{ gridColumn: 'span 5', '&.MuiTableCell-root>div': { justifyItems: 'center' } }}>{`+ ${
+            results?.length - 10
+          } ${results?.length - 10 <= 1 ? t('row') : t('rows')}`}</GridTableCell>
+        </GridTableRow>
+      )}
+    </>
+  );
+};
+
+const GroupedRow = React.memo(WrappedGroupedRow);
 
 type RowProps = {
   tag_type: string;
@@ -364,7 +423,7 @@ const WrappedRow: React.FC<RowProps> = ({
   force = false,
   drawer = false
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['archive']);
   const theme = useTheme();
 
   const { apiCall } = useMyAPI();
@@ -405,7 +464,7 @@ const WrappedRow: React.FC<RowProps> = ({
       },
       onSuccess: api_data => {
         if (api_data.api_response?.total > 0) setResultResults(api_data.api_response);
-        else setError('no results');
+        else setError('no_results_title');
       },
       onFailure: api_data => {
         setError(api_data.api_error_message);
@@ -556,9 +615,11 @@ const WrappedRow: React.FC<RowProps> = ({
             }
           />
         )}
-        <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-end' } }}>
+        <GridTableCell
+          sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-end', '&>div': { padding: '0px 5px' } } }}
+        >
           {error && error !== '' ? (
-            <Tooltip title={error}>
+            <Tooltip title={t(error)} placement="left">
               <div>
                 <InfoOutlinedIcon />
               </div>
@@ -566,9 +627,17 @@ const WrappedRow: React.FC<RowProps> = ({
           ) : loading ? (
             <CircularProgress color="inherit" style={{ height: '20px', width: '20px' }} />
           ) : open ? (
-            <KeyboardArrowUpIcon fontSize="small" />
+            <Tooltip title={t('tags.less')} placement="left">
+              <div>
+                <KeyboardArrowUpIcon fontSize="small" />
+              </div>
+            </Tooltip>
           ) : (
-            <KeyboardArrowDownIcon fontSize="small" />
+            <Tooltip title={t('tags.more')} placement="left">
+              <div>
+                <KeyboardArrowDownIcon fontSize="small" />
+              </div>
+            </Tooltip>
           )}
         </GridTableCell>
       </GridLinkRow>
@@ -593,6 +662,85 @@ const WrappedRow: React.FC<RowProps> = ({
 };
 
 const Row = React.memo(WrappedRow);
+
+type FilterFieldProps = {
+  onChange: (value: string) => void;
+};
+
+const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => null }: FilterFieldProps) => {
+  const [value, setValue] = useState<string>('');
+  const [, startTransition] = useTransition();
+
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+      setValue(event.target.value);
+      startTransition(() => onChange(event.target.value));
+    },
+    [onChange]
+  );
+
+  const handleClear = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setValue('');
+      startTransition(() => onChange(''));
+    },
+    [onChange]
+  );
+
+  return (
+    <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }}>
+      <OutlinedInput
+        value={value}
+        size="small"
+        onChange={handleChange}
+        endAdornment={
+          <InputAdornment position="end">
+            <IconButton edge="end" onClick={event => handleClear(event)}>
+              <CancelIcon color="secondary" />
+            </IconButton>
+          </InputAdornment>
+        }
+      />
+    </GridTableCell>
+  );
+});
+
+const SelectCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => null }: FilterFieldProps) => {
+  const [value, setValue] = useState<string[]>([]);
+  const [, startTransition] = useTransition();
+
+  const handleChange = useCallback(
+    (event: SelectChangeEvent<string[]>) => {
+      const newValue = typeof event.target.value === 'string' ? event.target.value.split(',') : event.target.value;
+      setValue(newValue);
+      startTransition(() => onChange(newValue.join(',')));
+    },
+    [onChange]
+  );
+
+  return (
+    <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }}>
+      <Select
+        value={value}
+        multiple
+        size="small"
+        sx={{ width: '125px' }}
+        onChange={event => handleChange(event)}
+        input={<OutlinedInput />}
+      >
+        {['malicious', 'highly_suspicious', 'suspicious', 'info', 'safe'].map(name => (
+          <MenuItem
+            key={name}
+            value={name}
+            sx={{ '&>span': { width: '100%', cursor: 'pointer' }, '& .MuiChip-root': { cursor: 'pointer' } }}
+          >
+            <Verdict verdict={name as any} fullWidth />
+          </MenuItem>
+        ))}
+      </Select>
+    </GridTableCell>
+  );
+});
 
 export const ArchivedTagSection = React.memo(WrappedArchivedTagSection);
 export default ArchivedTagSection;

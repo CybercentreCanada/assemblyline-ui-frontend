@@ -220,15 +220,15 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                     </small>
                   </div>
                 </div>
-                <TableContainer component={props => <StyledPaper {...props} original={!drawer} />}>
+                <TableContainer component={StyledPaper} original={!drawer}>
                   <GridTable columns={5} size="small">
                     <GridTableHead>
                       <GridTableRow>
-                        <GridTableCell children={t('header.archived')} />
+                        {data[k].items.some(item => item?.from_archive) && <GridTableCell />}
                         <GridTableCell children={t('header.seen.last')} />
                         <GridTableCell children={t('header.sha256')} />
                         <GridTableCell children={t('header.type')} />
-                        <GridTableCell children={t('header.actions')} />
+                        <GridTableCell />
                       </GridTableRow>
                     </GridTableHead>
                     <GridTableBody alternating>
@@ -238,17 +238,19 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                           hover
                           to={item?.from_archive ? `/archive/${item?.sha256}` : `/file/detail/${item?.sha256}`}
                         >
-                          <GridTableCell>
-                            {item?.from_archive && (
-                              <Tooltip title={t('file.from_archive')} placement="right">
-                                <span>
-                                  <IconButton size="small" disabled>
-                                    <ArchiveIcon fontSize="small" style={{ color: theme.palette.text.primary }} />
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
-                            )}
-                          </GridTableCell>
+                          {data[k].items.some(_item => _item?.from_archive) && (
+                            <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-start' } }}>
+                              {item?.from_archive && (
+                                <Tooltip title={t('file.from_archive')} placement="right">
+                                  <span>
+                                    <IconButton size="small" disabled>
+                                      <ArchiveIcon fontSize="small" style={{ color: theme.palette.text.primary }} />
+                                    </IconButton>
+                                  </span>
+                                </Tooltip>
+                              )}
+                            </GridTableCell>
+                          )}
 
                           <GridTableCell>
                             <Tooltip title={item.seen.last}>
@@ -262,7 +264,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
 
                           <GridTableCell>{item?.type}</GridTableCell>
 
-                          <GridTableCell>
+                          <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-end' } }}>
                             <Tooltip title={t('compare')} placement="left">
                               <IconButton size="small" onClick={handleCompareClick(item)}>
                                 <CompareIcon fontSize="small" />
