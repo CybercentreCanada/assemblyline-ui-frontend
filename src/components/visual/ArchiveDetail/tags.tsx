@@ -286,7 +286,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                       paper={!drawer}
                       size="small"
                       style={{
-                        gridTemplateColumns: c12nDef.enforce ? `auto 125px auto auto auto` : `auto 125px auto auto`,
+                        gridTemplateColumns: c12nDef.enforce ? `auto 125px auto auto 50px` : `auto 125px auto 50px`,
                         maxHeight: height,
                         width: width
                       }}
