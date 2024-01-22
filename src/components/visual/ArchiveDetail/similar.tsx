@@ -194,90 +194,94 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
         Object.keys(DEFAULT_SIMILAR).map(
           (k, i) =>
             k in data &&
-            data[k].total > 0 && (
-              <StyledPaper key={i} className={classes.container} original={drawer}>
-                <div className={classes.caption}>
-                  <div>
-                    <b>{t(DEFAULT_SIMILAR[k].label)}</b>&nbsp;
-                    <small className={classes.muted}>{` :: ${similar[k].value}}`}</small>
-                  </div>
-                  <div style={{ gridRow: 'span 2' }}>
-                    <Tooltip title={t('search.tooltip')} placement="left">
-                      <IconButton
-                        component={Link}
-                        size="small"
-                        to={`${similar[k].to}#${file?.file_info?.sha256}`}
-                        onClick={e => e.stopPropagation()}
-                        style={{ margin: `0 ${theme.spacing(0.5)}` }}
-                      >
-                        <SearchOutlinedIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </div>
-                  <div>
-                    <small style={{ color: theme.palette.primary.main }}>
-                      {data[k].total}&nbsp;{t(`result${data[k].total === 1 ? '' : 's'}`)}
-                    </small>
-                  </div>
-                </div>
-                <TableContainer component={StyledPaper} original={!drawer}>
-                  <GridTable columns={5} size="small">
-                    <GridTableHead>
-                      <GridTableRow>
-                        {data[k].items.some(item => item?.from_archive) && <GridTableCell />}
-                        <GridTableCell children={t('header.seen.last')} />
-                        <GridTableCell children={t('header.sha256')} />
-                        <GridTableCell children={t('header.type')} />
-                        <GridTableCell />
-                      </GridTableRow>
-                    </GridTableHead>
-                    <GridTableBody alternating>
-                      {data[k].items.map((item, j) => (
-                        <GridLinkRow
-                          key={`${i}-${j}`}
-                          hover
-                          to={item?.from_archive ? `/archive/${item?.sha256}` : `/file/detail/${item?.sha256}`}
+            data[k].total > 0 &&
+            (() => {
+              const hasArchived = data[k].items.some(item => item?.from_archive);
+              return (
+                <StyledPaper key={i} className={classes.container} original={drawer}>
+                  <div className={classes.caption}>
+                    <div>
+                      <b>{t(DEFAULT_SIMILAR[k].label)}</b>&nbsp;
+                      <small className={classes.muted}>{` :: ${similar[k].value}}`}</small>
+                    </div>
+                    <div style={{ gridRow: 'span 2' }}>
+                      <Tooltip title={t('search.tooltip')} placement="left">
+                        <IconButton
+                          component={Link}
+                          size="small"
+                          to={`${similar[k].to}#${file?.file_info?.sha256}`}
+                          onClick={e => e.stopPropagation()}
+                          style={{ margin: `0 ${theme.spacing(0.5)}` }}
                         >
-                          {data[k].items.some(_item => _item?.from_archive) && (
-                            <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-start' } }}>
-                              {item?.from_archive && (
-                                <Tooltip title={t('file.from_archive')} placement="right">
-                                  <span>
-                                    <IconButton size="small" disabled>
-                                      <ArchiveIcon fontSize="small" style={{ color: theme.palette.text.primary }} />
-                                    </IconButton>
-                                  </span>
-                                </Tooltip>
-                              )}
+                          <SearchOutlinedIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                    <div>
+                      <small style={{ color: theme.palette.primary.main }}>
+                        {data[k].total}&nbsp;{t(`result${data[k].total === 1 ? '' : 's'}`)}
+                      </small>
+                    </div>
+                  </div>
+                  <TableContainer component={StyledPaper} original={!drawer}>
+                    <GridTable columns={hasArchived ? 5 : 4} size="small" paper={drawer}>
+                      <GridTableHead>
+                        <GridTableRow>
+                          {hasArchived && <GridTableCell />}
+                          <GridTableCell children={t('header.seen.last')} />
+                          <GridTableCell children={t('header.sha256')} />
+                          <GridTableCell children={t('header.type')} />
+                          <GridTableCell />
+                        </GridTableRow>
+                      </GridTableHead>
+                      <GridTableBody alternating>
+                        {data[k].items.map((item, j) => (
+                          <GridLinkRow
+                            key={`${i}-${j}`}
+                            hover
+                            to={item?.from_archive ? `/archive/${item?.sha256}` : `/file/detail/${item?.sha256}`}
+                          >
+                            {hasArchived && (
+                              <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-start' } }}>
+                                {item?.from_archive && (
+                                  <Tooltip title={t('file.from_archive')} placement="right">
+                                    <span>
+                                      <IconButton size="small" disabled>
+                                        <ArchiveIcon fontSize="small" style={{ color: theme.palette.text.primary }} />
+                                      </IconButton>
+                                    </span>
+                                  </Tooltip>
+                                )}
+                              </GridTableCell>
+                            )}
+
+                            <GridTableCell>
+                              <Tooltip title={item.seen.last}>
+                                <span>
+                                  <Moment fromNow locale={i18n.language} children={item.seen.last} />
+                                </span>
+                              </Tooltip>
                             </GridTableCell>
-                          )}
 
-                          <GridTableCell>
-                            <Tooltip title={item.seen.last}>
-                              <span>
-                                <Moment fromNow locale={i18n.language} children={item.seen.last} />
-                              </span>
-                            </Tooltip>
-                          </GridTableCell>
+                            <GridTableCell>{item?.sha256}</GridTableCell>
 
-                          <GridTableCell>{item?.sha256}</GridTableCell>
+                            <GridTableCell>{item?.type}</GridTableCell>
 
-                          <GridTableCell>{item?.type}</GridTableCell>
-
-                          <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-end' } }}>
-                            <Tooltip title={t('compare')} placement="left">
-                              <IconButton size="small" onClick={handleCompareClick(item)}>
-                                <CompareIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </GridTableCell>
-                        </GridLinkRow>
-                      ))}
-                    </GridTableBody>
-                  </GridTable>
-                </TableContainer>
-              </StyledPaper>
-            )
+                            <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-end' } }}>
+                              <Tooltip title={t('compare')} placement="left">
+                                <IconButton size="small" onClick={handleCompareClick(item)}>
+                                  <CompareIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </GridTableCell>
+                          </GridLinkRow>
+                        ))}
+                      </GridTableBody>
+                    </GridTable>
+                  </TableContainer>
+                </StyledPaper>
+              );
+            })()
         )
       )}
     </SectionContainer>

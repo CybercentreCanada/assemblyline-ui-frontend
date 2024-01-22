@@ -33,10 +33,8 @@ export const StyledPaper: FC<StyledPaperProps> = memo(
     {
       shouldForwardProp: prop => prop !== 'original'
     }
-  )<StyledPaperProps>(({ theme, original }) => ({
-    ...(original && {
-      backgroundColor: theme.palette.background.default
-    })
+  )<StyledPaperProps>(({ theme, original = false }) => ({
+    backgroundColor: theme.palette.background[original ? 'default' : 'paper']
   }))
 );
 
@@ -60,7 +58,7 @@ export const GridTable: FC<GridTableProps> = memo(
     gridAutoFlow: 'row',
     alignItems: 'stretch',
     overflowX: 'auto',
-    '& .MuiTableCell-head': {
+    '&>*>*>*.MuiTableCell-head': {
       backgroundColor: `color-mix(in srgb, black 5%, ${theme.palette.background[paper ? 'paper' : 'default']})`
     }
   }))
@@ -157,11 +155,6 @@ export const GridTableCell: FC<GridTableCellProps> = memo(
       alignItems: 'center',
       paddingRight: theme.spacing(1),
       paddingLeft: theme.spacing(1),
-      '&>div': {
-        display: 'grid',
-        alignItems: 'center',
-        justifyItems: 'stretch'
-      },
       ...(center && {
         justifyContent: 'center'
       }),
