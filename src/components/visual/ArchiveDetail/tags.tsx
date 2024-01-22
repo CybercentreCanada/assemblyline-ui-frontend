@@ -1,6 +1,6 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -285,7 +285,13 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                       stickyHeader
                       paper={!drawer}
                       size="small"
-                      style={{ maxHeight: height, width: width }}
+                      style={{
+                        gridTemplateColumns: c12nDef.enforce
+                          ? `minmax(auto, 1fr) 125px minmax(auto, 3fr) minmax(auto, 1fr) min-content`
+                          : `minmax(auto, 1fr) 125px minmax(auto, 3fr) min-content`,
+                        maxHeight: height,
+                        width: width
+                      }}
                     >
                       <GridTableHead>
                         <GridTableRow>
@@ -323,7 +329,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                           <GridTableCell variant="head" sx={{ justifyItems: 'flex-end' }}>
                             <Tooltip title={t('tags.tooltip.clear')}>
                               <IconButton color="inherit" size="small" onClick={handleSortClear}>
-                                <CancelOutlinedIcon fontSize="small" />
+                                <CloseOutlinedIcon fontSize="small" />
                               </IconButton>
                             </Tooltip>
                           </GridTableCell>
@@ -602,7 +608,7 @@ const WrappedRow: React.FC<RowProps> = ({
         onContextMenu={handleMenuClick}
       >
         <GridTableCell children={tag_type} />
-        <GridTableCell children={<Verdict verdict={h_type as any} fullWidth />} />
+        <GridTableCell children={<Verdict verdict={h_type as any} fullWidth pointer />} />
         <GridTableCell breakable children={value} />
         {c12nDef.enforce && (
           <GridTableCell
@@ -679,6 +685,16 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
     [onChange]
   );
 
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+      if (event?.code === 'Escape') {
+        setValue('');
+        startTransition(() => onChange(''));
+      }
+    },
+    [onChange]
+  );
+
   const handleClear = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       setValue('');
@@ -693,6 +709,7 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
         value={value}
         size="small"
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
         endAdornment={
           <InputAdornment position="end">
             <IconButton edge="end" onClick={event => handleClear(event)}>
@@ -700,6 +717,22 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
             </IconButton>
           </InputAdornment>
         }
+        sx={{
+          '& button': {
+            visibility: 'hidden'
+          },
+          '&:hover button': {
+            visibility: 'visible'
+          },
+          '&.Mui-focused button': {
+            visibility: 'visible'
+          },
+          ...(value.length > 0 && {
+            '& button': {
+              visibility: 'visible'
+            }
+          })
+        }}
       />
     </GridTableCell>
   );
@@ -723,18 +756,14 @@ const SelectCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
       <Select
         value={value}
         multiple
+        fullWidth
         size="small"
-        sx={{ width: '125px' }}
+        sx={{ maxWidth: '109px' }}
         onChange={event => handleChange(event)}
-        input={<OutlinedInput />}
       >
         {['malicious', 'highly_suspicious', 'suspicious', 'info', 'safe'].map(name => (
-          <MenuItem
-            key={name}
-            value={name}
-            sx={{ '&>span': { width: '100%', cursor: 'pointer' }, '& .MuiChip-root': { cursor: 'pointer' } }}
-          >
-            <Verdict verdict={name as any} fullWidth />
+          <MenuItem key={name} value={name} sx={{ '&>span': { width: '100%' } }}>
+            <Verdict verdict={name as any} fullWidth pointer />
           </MenuItem>
         ))}
       </Select>
