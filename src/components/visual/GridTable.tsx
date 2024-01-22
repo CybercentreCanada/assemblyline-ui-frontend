@@ -22,7 +22,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 interface StyledPaperProps extends PaperProps {
   component?: any;
-  original?: boolean;
+  paper?: boolean;
 }
 
 export const StyledPaper: FC<StyledPaperProps> = memo(
@@ -31,10 +31,10 @@ export const StyledPaper: FC<StyledPaperProps> = memo(
       <Paper component={component} {...other} ref={ref} />
     )),
     {
-      shouldForwardProp: prop => prop !== 'original'
+      shouldForwardProp: prop => prop !== 'paper'
     }
-  )<StyledPaperProps>(({ theme, original = false }) => ({
-    backgroundColor: theme.palette.background[original ? 'default' : 'paper']
+  )<StyledPaperProps>(({ theme, paper = false }) => ({
+    backgroundColor: theme.palette.background[paper ? 'paper' : 'default']
   }))
 );
 

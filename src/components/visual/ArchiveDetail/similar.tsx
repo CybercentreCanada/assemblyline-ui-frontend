@@ -198,7 +198,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
             (() => {
               const hasArchived = data[k].items.some(item => item?.from_archive);
               return (
-                <StyledPaper key={i} className={classes.container} original={drawer}>
+                <StyledPaper key={i} className={classes.container} paper={!drawer}>
                   <div className={classes.caption}>
                     <div>
                       <b>{t(DEFAULT_SIMILAR[k].label)}</b>&nbsp;
@@ -223,7 +223,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                       </small>
                     </div>
                   </div>
-                  <TableContainer component={StyledPaper} original={!drawer}>
+                  <TableContainer component={StyledPaper} paper={drawer}>
                     <GridTable columns={hasArchived ? 5 : 4} size="small" paper={drawer}>
                       <GridTableHead>
                         <GridTableRow>

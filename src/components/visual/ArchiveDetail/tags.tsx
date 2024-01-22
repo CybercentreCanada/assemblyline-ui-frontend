@@ -138,13 +138,13 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
     if (query.toString() === '') return newResults;
 
     return newResults.filter((result: Result) =>
-      Object.entries(result).every(([key, value]) => {
-        if (key === 'h_type') {
-          return query.get(key, '') === '' ? true : query.get(key, '').split(',').includes(value.toString());
-        } else {
-          return !!value.toString().match(query.get(key, ''));
-        }
-      })
+      Object.entries(result).every(([key, value]) =>
+        key !== 'h_type'
+          ? !!value.toString().match(query.get(key, ''))
+          : query.get(key, '') === ''
+          ? true
+          : query.get(key, '').split(',').includes(value.toString())
+      )
     );
   }, [query, results]);
 
@@ -178,7 +178,6 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   const groupedResults = useMemo<Array<Result[]>>(
     () =>
       sortedResults.reduce((prev: Array<Result[]>, curr: Result, i: number, array: Result[]) => {
-        // const node = prev.find(item => item.find((subItem, subI) => subItem?.tag_type === curr?.tag_type));
         const node =
           Array.isArray(prev) &&
           prev?.length > 0 &&
@@ -281,18 +280,17 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
             <div style={{ display: 'flex', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
               <AutoSizer style={{ display: 'flex', height: '100%', width: '100%' }}>
                 {({ width, height }) => (
-                  <TableContainer component={StyledPaper} original={drawer} style={{ overflowX: 'hidden' }}>
+                  <TableContainer component={StyledPaper} paper={!drawer} style={{ overflowX: 'hidden' }}>
                     <GridTable
-                      columns={c12nDef.enforce ? 5 : 4}
                       stickyHeader
                       paper={!drawer}
                       size="small"
                       style={{
+                        maxHeight: height,
+                        width: width,
                         gridTemplateColumns: c12nDef.enforce
                           ? `minmax(auto, 1fr) 125px minmax(auto, 3fr) minmax(auto, 1fr) min-content`
-                          : `minmax(auto, 1fr) 125px minmax(auto, 3fr) min-content`,
-                        maxHeight: height,
-                        width: width
+                          : `minmax(auto, 1fr) 125px minmax(auto, 3fr) min-content`
                       }}
                     >
                       <GridTableHead>
@@ -702,7 +700,7 @@ const WrappedRow: React.FC<RowProps> = ({
             {render && (
               <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}>
                 <ResultsTable
-                  component={props => <StyledPaper {...props} original={!drawer} />}
+                  component={props => <StyledPaper {...props} paper={drawer} />}
                   resultResults={resultResults}
                   allowSort={false}
                 />
