@@ -706,6 +706,22 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
             </IconButton>
           </InputAdornment>
         }
+        sx={{
+          '& button': {
+            visibility: 'hidden'
+          },
+          '&:hover button': {
+            visibility: 'visible'
+          },
+          '&.Mui-focused button': {
+            visibility: 'visible'
+          },
+          ...(value.length > 0 && {
+            '& button': {
+              visibility: 'visible'
+            }
+          })
+        }}
       />
     </GridTableCell>
   );
