@@ -280,7 +280,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
             <div style={{ display: 'flex', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
               <AutoSizer style={{ display: 'flex', height: '100%', width: '100%' }}>
                 {({ width, height }) => (
-                  <TableContainer component={StyledPaper} paper={!drawer} style={{ overflowX: 'hidden' }}>
+                  <TableContainer component={StyledPaper} paper={!drawer} style={{ overflow: 'hidden' }}>
                     <GridTable
                       stickyHeader
                       paper={!drawer}
@@ -339,7 +339,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                           <SelectCell onChange={value => handleFilter('h_type', value)} />
                           <FilterCell onChange={value => handleFilter('value', value)} />
                           <FilterCell onChange={value => handleFilter('classification', value)} />
-                          <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }} />
+                          <GridTableCell variant="head" sx={{ position: 'sticky', top: '42.9px' }} />
                         </GridTableRow>
                       </GridTableHead>
                       <GridTableBody>
@@ -750,7 +750,7 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
   );
 
   return (
-    <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }}>
+    <GridTableCell variant="head" sx={{ position: 'sticky', top: '42.9px' }}>
       <OutlinedInput
         value={value}
         size="small"
@@ -799,7 +799,7 @@ const SelectCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
   );
 
   return (
-    <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }}>
+    <GridTableCell variant="head" sx={{ position: 'sticky', top: '42.9px' }}>
       <Select
         value={value}
         multiple
