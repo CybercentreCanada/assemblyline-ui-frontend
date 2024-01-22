@@ -685,6 +685,16 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
     [onChange]
   );
 
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+      if (event?.code === 'Escape') {
+        setValue('');
+        startTransition(() => onChange(''));
+      }
+    },
+    [onChange]
+  );
+
   const handleClear = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       setValue('');
@@ -699,6 +709,7 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
         value={value}
         size="small"
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
         endAdornment={
           <InputAdornment position="end">
             <IconButton edge="end" onClick={event => handleClear(event)}>
