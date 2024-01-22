@@ -23,6 +23,8 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import match from 'autosuggest-highlight/match';
+import parse from 'autosuggest-highlight/parse';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -136,13 +138,13 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
     if (query.toString() === '') return newResults;
 
     return newResults.filter((result: Result) =>
-      Object.entries(result).every(([key, value]) => {
-        if (key === 'h_type') {
-          return query.get(key, '') === '' ? true : query.get(key, '').split(',').includes(value.toString());
-        } else {
-          return !!value.toString().match(query.get(key, ''));
-        }
-      })
+      Object.entries(result).every(([key, value]) =>
+        key !== 'h_type'
+          ? !!value.toString().match(query.get(key, ''))
+          : query.get(key, '') === ''
+          ? true
+          : query.get(key, '').split(',').includes(value.toString())
+      )
     );
   }, [query, results]);
 
@@ -176,7 +178,6 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   const groupedResults = useMemo<Array<Result[]>>(
     () =>
       sortedResults.reduce((prev: Array<Result[]>, curr: Result, i: number, array: Result[]) => {
-        // const node = prev.find(item => item.find((subItem, subI) => subItem?.tag_type === curr?.tag_type));
         const node =
           Array.isArray(prev) &&
           prev?.length > 0 &&
@@ -279,18 +280,17 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
             <div style={{ display: 'flex', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
               <AutoSizer style={{ display: 'flex', height: '100%', width: '100%' }}>
                 {({ width, height }) => (
-                  <TableContainer component={StyledPaper} original={drawer} style={{ overflowX: 'hidden' }}>
+                  <TableContainer component={StyledPaper} paper={!drawer} style={{ overflowX: 'hidden' }}>
                     <GridTable
-                      columns={c12nDef.enforce ? 5 : 4}
                       stickyHeader
                       paper={!drawer}
                       size="small"
                       style={{
+                        maxHeight: height,
+                        width: width,
                         gridTemplateColumns: c12nDef.enforce
                           ? `minmax(auto, 1fr) 125px minmax(auto, 3fr) minmax(auto, 1fr) min-content`
-                          : `minmax(auto, 1fr) 125px minmax(auto, 3fr) min-content`,
-                        maxHeight: height,
-                        width: width
+                          : `minmax(auto, 1fr) 125px minmax(auto, 3fr) min-content`
                       }}
                     >
                       <GridTableHead>
@@ -344,7 +344,14 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                       </GridTableHead>
                       <GridTableBody>
                         {groupedResults.map((items, i) => (
-                          <GroupedRow key={i} results={items} sha256={sha256} force={force} drawer={drawer} />
+                          <GroupedRow
+                            key={i}
+                            results={items}
+                            sha256={sha256}
+                            force={force}
+                            drawer={drawer}
+                            query={query}
+                          />
                         ))}
                       </GridTableBody>
                     </GridTable>
@@ -364,9 +371,16 @@ type GroupedRowProps = {
   force?: boolean;
   results: Result[];
   sha256: string;
+  query?: SimpleSearchQuery;
 };
 
-const WrappedGroupedRow = ({ drawer = true, force = false, results = [], sha256 }: GroupedRowProps) => {
+const WrappedGroupedRow = ({
+  drawer = true,
+  force = false,
+  results = [],
+  sha256,
+  query = new SimpleSearchQuery('')
+}: GroupedRowProps) => {
   const { t } = useTranslation(['archive']);
 
   const [showMore, setShowMore] = useState<boolean>(false);
@@ -387,14 +401,15 @@ const WrappedGroupedRow = ({ drawer = true, force = false, results = [], sha256 
               sha256={sha256}
               force={force}
               drawer={drawer}
+              query={query}
             />
           )
         )}
       {!showMore && results?.length > 10 && (
         <GridTableRow hover sx={{ cursor: 'pointer', textDecoration: 'none' }} onClick={() => setShowMore(true)}>
-          <GridTableCell sx={{ gridColumn: 'span 5', '&.MuiTableCell-root>div': { justifyItems: 'center' } }}>{`+ ${
-            results?.length - 10
-          } ${results?.length - 10 <= 1 ? t('row') : t('rows')}`}</GridTableCell>
+          <GridTableCell center sx={{ gridColumn: 'span 5' }}>{`+ ${results?.length - 10} ${
+            results?.length - 10 <= 1 ? t('row') : t('rows')
+          }`}</GridTableCell>
         </GridTableRow>
       )}
     </>
@@ -412,6 +427,7 @@ type RowProps = {
   sha256: string;
   force: boolean;
   drawer?: boolean;
+  query?: SimpleSearchQuery;
 };
 
 const initialMenuState = {
@@ -427,7 +443,8 @@ const WrappedRow: React.FC<RowProps> = ({
   classification,
   sha256,
   force = false,
-  drawer = false
+  drawer = false,
+  query = new SimpleSearchQuery('')
 }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
@@ -607,9 +624,38 @@ const WrappedRow: React.FC<RowProps> = ({
         onClick={handleRowClick}
         onContextMenu={handleMenuClick}
       >
-        <GridTableCell children={tag_type} />
+        <GridTableCell
+          children={(() => {
+            const matches = match(tag_type, query?.get('tag_type', ''), { insideWords: true });
+            const parts = parse(tag_type, matches);
+            return (
+              <>
+                {parts.map((part, index) => (
+                  <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                    {part.text}
+                  </span>
+                ))}
+              </>
+            );
+          })()}
+        />
         <GridTableCell children={<Verdict verdict={h_type as any} fullWidth pointer />} />
-        <GridTableCell breakable children={value} />
+        <GridTableCell
+          breakable
+          children={(() => {
+            const matches = match(value, query?.get('value', ''), { insideWords: true });
+            const parts = parse(value, matches);
+            return (
+              <>
+                {parts.map((part, index) => (
+                  <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                    {part.text}
+                  </span>
+                ))}
+              </>
+            );
+          })()}
+        />
         {c12nDef.enforce && (
           <GridTableCell
             children={
@@ -654,7 +700,7 @@ const WrappedRow: React.FC<RowProps> = ({
             {render && (
               <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}>
                 <ResultsTable
-                  component={props => <StyledPaper {...props} original={!drawer} />}
+                  component={props => <StyledPaper {...props} paper={drawer} />}
                   resultResults={resultResults}
                   allowSort={false}
                 />
@@ -708,6 +754,7 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
       <OutlinedInput
         value={value}
         size="small"
+        fullWidth
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         endAdornment={
