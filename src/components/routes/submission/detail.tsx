@@ -637,6 +637,7 @@ function WrappedSubmissionDetail() {
           }
         });
         apiCall({
+          allowCache: true,
           url: `/api/v4/submission/ai/${id}/`,
           onSuccess: ai_summary => {
             setAISummary(ai_summary.api_response);

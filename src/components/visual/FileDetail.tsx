@@ -344,6 +344,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   useEffect(() => {
     if (sha256) {
       apiCall({
+        allowCache: true,
         url: `/api/v4/file/ai/${sha256}/`,
         onSuccess: ai_summary => {
           setAISummary(ai_summary.api_response);
