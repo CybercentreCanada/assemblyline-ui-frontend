@@ -246,7 +246,7 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({
 
   return (heuristics && Object.keys(heuristics).length === 0) ||
     (heuristics && maxScore < SCORE_SHOW_THRESHOLD && !showSafeResults && !force) ? null : (
-    <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+    <div style={{ paddingTop: sp2 }}>
       <Typography
         variant="h6"
         onClick={() => {

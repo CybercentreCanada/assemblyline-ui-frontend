@@ -51,6 +51,7 @@ import { Link, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import ForbiddenPage from '../403';
 import HeuristicDetail from '../manage/heuristic_detail';
+import AISummarySection from './detail/ai_summary';
 import AttackSection from './detail/attack';
 import ErrorSection from './detail/errors';
 import FileTreeSection from './detail/file_tree';
@@ -99,6 +100,7 @@ function WrappedSubmissionDetail() {
   const [submission, setSubmission] = useState(null);
   const [summary, setSummary] = useState(null);
   const [tree, setTree] = useState(null);
+  const [aiSummary, setAISummary] = useState(null);
   const [filtered, setFiltered] = useState(false);
   const [partial, setPartial] = useState(false);
   const [watchQueue, setWatchQueue] = useState(null);
@@ -632,6 +634,12 @@ function WrappedSubmissionDetail() {
             if (tree_data.api_response.partial) {
               setPartial(true);
             }
+          }
+        });
+        apiCall({
+          url: `/api/v4/submission/ai/${id}/`,
+          onSuccess: ai_summary => {
+            setAISummary(ai_summary.api_response);
           }
         });
       } else {
@@ -1256,6 +1264,7 @@ function WrappedSubmissionDetail() {
           metadata={submission ? submission.metadata : null}
           classification={submission ? submission.classification : null}
         />
+        <AISummarySection summary={aiSummary} />
         <Detection
           section_map={summary ? summary.heuristic_sections : null}
           heuristics={summary ? summary.heuristics : null}

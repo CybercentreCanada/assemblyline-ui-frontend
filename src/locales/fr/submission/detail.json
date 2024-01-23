@@ -1,4 +1,5 @@
 {
+  "ai_summary": "Résumé généré par l'IA",
   "archive": "Copiez la soumission dans l'archive des logiciels malveillants",
   "archive.success": "La soumission a été mise en file d'attente avec succès pour l'archivage",
   "archive.success.resubmit": "La soumission a été soumise à nouveau pour répondre aux exigences de service minimales pour l'archivage et sera automatiquement archivée une fois terminée.",

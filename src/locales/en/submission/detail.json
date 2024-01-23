@@ -1,4 +1,5 @@
 {
+  "ai_summary": "AI Generated Summary",
   "archive": "Copy the submission into the malware archive",
   "archive.success": "Submission was successfully queued for archiving",
   "archive.success.resubmit": "Submission was resubmitted to meet the minimum service requirements for archiving and will be automatically archived one completed.",
