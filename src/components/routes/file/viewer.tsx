@@ -71,12 +71,27 @@ const useStyles = makeStyles(theme => ({
     bottom: 0,
     left: 0,
     right: 0
+  },
+  ai: {
+    '@media print': {
+      backgroundColor: '#00000005',
+      border: '1px solid #DDD',
+      color: '#888'
+    },
+    backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: '4px',
+    color: theme.palette.text.secondary,
+    margin: '0.25rem 0',
+    padding: '16px 8px',
+    textAlign: 'left',
+    whiteSpace: 'pre-wrap'
   }
 }));
 
-export type Tab = 'ascii' | 'strings' | 'hex' | 'image';
+export type Tab = 'ascii' | 'ai' | 'strings' | 'hex' | 'image';
 
-export const TAB_OPTIONS: Tab[] = ['ascii', 'strings', 'hex', 'image'];
+export const TAB_OPTIONS: Tab[] = ['ascii', 'ai', 'strings', 'hex', 'image'];
 
 export const DEFAULT_TAB: Tab = 'ascii';
 
@@ -219,7 +234,9 @@ const FileViewer = () => {
   const [ascii, setAscii] = useState(null);
   const [error, setError] = useState(null);
   const [image, setImage] = useState(null);
+  const [aiSummary, setAISummary] = useState(null);
   const [imageAllowed, setImageAllowed] = useState(false);
+  const [aiAllowed, setAIAllowed] = useState(false);
   const [type, setType] = useState('unknown');
   const [sha256, setSha256] = useState(null);
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -252,6 +269,11 @@ const FileViewer = () => {
         const imgAllowed = api_data.api_response.is_section_image === true;
         setImageAllowed(imgAllowed);
         setType(api_data.api_response.type);
+        if (api_data.api_response.type.indexOf('code/') === 0) {
+          setAIAllowed(true);
+        } else {
+          setAIAllowed(false);
+        }
         setSha256(id);
       }
     });
@@ -273,6 +295,19 @@ const FileViewer = () => {
         onFailure: api_data => {
           setError(api_data.api_error_message);
           if (string !== null) setAscii(null);
+        }
+      });
+    } else if (tab === 'ai' && aiSummary === null) {
+      apiCall({
+        allowCache: true,
+        url: `/api/v4/file/code_summary/${sha256}/`,
+        onSuccess: api_data => {
+          if (error !== null) setError(null);
+          setAISummary(api_data.api_response);
+        },
+        onFailure: api_data => {
+          setError(api_data.api_error_message);
+          if (string !== null) setAISummary(null);
         }
       });
     } else if (tab === 'hex' && hex === null) {
@@ -374,6 +409,7 @@ const FileViewer = () => {
               scrollButtons="auto"
             >
               <MuiTab label={t('ascii')} value="ascii" />
+              {aiAllowed ? <MuiTab label={t('code_summary')} value="ai" /> : <Empty />}
               <MuiTab label={t('strings')} value="strings" />
               <MuiTab label={t('hex')} value="hex" />
               {imageAllowed ? <MuiTab label={t('image')} value="image" /> : <Empty />}
@@ -383,6 +419,17 @@ const FileViewer = () => {
           {tab === 'ascii' && (
             <div className={classes.tab}>
               <MonacoViewer data={ascii} type={type} error={error} beautify />
+            </div>
+          )}
+          {tab === 'ai' && (
+            <div className={classes.tab}>
+              {aiSummary !== null && aiSummary !== undefined ? (
+                <pre className={classes.ai}>{aiSummary}</pre>
+              ) : error ? (
+                <Alert severity="error">{error}</Alert>
+              ) : (
+                <LinearProgress />
+              )}
             </div>
           )}
           {tab === 'strings' && (
