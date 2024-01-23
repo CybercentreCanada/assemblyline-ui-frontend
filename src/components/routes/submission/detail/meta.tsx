@@ -46,7 +46,7 @@ const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata, classificati
   const [metaOpen, setMetaOpen] = React.useState(false);
 
   return !metadata || Object.keys(metadata).length !== 0 ? (
-    <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
+    <div style={{ paddingTop: theme.spacing(2) }}>
       <div
         style={{
           display: 'flex',

@@ -53,7 +53,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, force =
   const forceShowTag = Object.keys(tagUnsafeMap).length !== 0 && (showSafeResults || force);
 
   return someTagNotSafe || forceShowTag ? (
-    <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+    <div style={{ paddingTop: sp2 }}>
       <Typography variant="h6" onClick={() => setOpen(!open)} className={classes.title}>
         <span>{t(tag_group)}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
