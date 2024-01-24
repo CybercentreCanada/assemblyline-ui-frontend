@@ -4,6 +4,7 @@ import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CgSmartphoneChip, CgSmartphoneRam } from 'react-icons/cg';
+import { SiLinux, SiWindows } from 'react-icons/si';
 import { Container, Volume } from '../service_detail';
 import ContainerDialog from './container_dialog';
 
@@ -38,6 +39,11 @@ type ContainerCardProps = {
   name?: string;
   volumes?: { [name: string]: Volume };
   onChange: (newContainer: Container, name?: string, newVolumes?: { [name: string]: Volume }) => void;
+};
+
+const OS_ICONS = {
+  linux: <SiLinux size={24} style={{ verticalAlign: 'middle' }} />,
+  windows: <SiWindows size={24} style={{ verticalAlign: 'middle' }} />
 };
 
 const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: ContainerCardProps) => {
@@ -86,15 +92,24 @@ const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: 
               </div>
             </Tooltip>
             <Tooltip title={t('container.card.ram')}>
-              <div style={{ display: 'inline-block' }}>
+              <div style={{ display: 'inline-block', paddingRight: theme.spacing(4) }}>
                 <CgSmartphoneRam size={24} style={{ verticalAlign: 'middle' }} />
                 <span style={{ paddingLeft: theme.spacing(1), verticalAlign: 'middle' }}>{container.ram_mb}</span>
               </div>
             </Tooltip>
+            {container.operating_system ? (
+              <Tooltip title={t('container.card.os')}>
+                <div style={{ display: 'inline-block', paddingRight: theme.spacing(4) }}>
+                  {OS_ICONS[container.operating_system]}
+                </div>
+              </Tooltip>
+            ) : null}
           </Grid>
           {container.service_account && (
             <>
-              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('container.card.service_account')}:`}</Grid>
+              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t(
+                'container.card.service_account'
+              )}:`}</Grid>
               <Grid item xs={7} sm={8} md={10} className={classes.mono}>
                 {container.service_account}
               </Grid>

@@ -14,6 +14,7 @@
   "container.card.env": "Environment variables",
   "container.card.internet": "Internet access",
   "container.card.no": "no",
+  "container.card.os": "Operating System",
   "container.card.ram": "Max amount of memory allocated",
   "container.card.service_account": "Service account",
   "container.card.volumes": "Persistent volumes",

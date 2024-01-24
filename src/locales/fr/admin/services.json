@@ -14,6 +14,7 @@
   "container.card.env": "Variables d'environnement",
   "container.card.internet": "Accès Internet",
   "container.card.no": "non",
+  "container.card.os": "Système opérateur",
   "container.card.ram": "Quantité maximale de mémoire allouée",
   "container.card.service_account": "Compte de service",
   "container.card.volumes": "Volumes persistants",
