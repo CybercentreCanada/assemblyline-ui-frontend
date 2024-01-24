@@ -6,7 +6,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  TextField
+  TextField,
+  Typography
 } from '@mui/material';
 
 export type InputDialogProps = {
@@ -21,6 +22,8 @@ export type InputDialogProps = {
   handleInputChange: (event?: any) => void;
   inputValue: string;
   inputLabel?: string;
+  extra?: React.ReactNode;
+  outLabel?: boolean;
 };
 
 const InputDialog = ({
@@ -34,7 +37,9 @@ const InputDialog = ({
   inputValue,
   inputLabel = null,
   waiting = false,
-  text = null
+  text = null,
+  extra = null,
+  outLabel = false
 }: InputDialogProps) => (
   <Dialog
     open={open}
@@ -44,14 +49,16 @@ const InputDialog = ({
   >
     <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
     {text && (
-      <DialogContent>
+      <DialogContent sx={{ padding: '10px 24px 10px 24px' }}>
         <DialogContentText id="alert-dialog-description">{text}</DialogContentText>
       </DialogContent>
     )}
-    <DialogContent>
+    {extra && <DialogContent sx={{ padding: '10px 24px 10px 24px' }}>{extra}</DialogContent>}
+    <DialogContent sx={{ padding: '10px 24px 20px 24px' }}>
+      {outLabel && inputLabel && <Typography variant="overline">{inputLabel}</Typography>}
       <TextField
         autoFocus
-        label={inputLabel}
+        label={outLabel ? null : inputLabel}
         size="small"
         variant="outlined"
         fullWidth

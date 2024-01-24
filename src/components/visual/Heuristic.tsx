@@ -2,7 +2,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { Menu, MenuItem } from '@mui/material';
+import { Menu, MenuItem, Tooltip } from '@mui/material';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -11,10 +11,11 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { safeFieldValueURI } from 'helpers/utils';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import InputDialog from './InputDialog';
+import SafeBadItem from './SafeBadItem';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -54,6 +55,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   const [safelistDialog, setSafelistDialog] = React.useState(false);
   const [safelistReason, setSafelistReason] = React.useState(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
+  const [safelisted, setSafelisted] = React.useState(null);
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const { isHighlighted, triggerHighlight } = useHighlighter();
@@ -62,6 +64,21 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   const { showSafeResults } = useSafeResults();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
+
+  useEffect(() => {
+    if (state.mouseY !== null && currentUser.roles.includes('safelist_manage')) {
+      apiCall({
+        url: `/api/v4/safelist/signature/${encodeURIComponent(encodeURIComponent(text))}/`,
+        method: 'GET',
+        onSuccess: resp => {
+          setSafelisted(resp.api_response);
+        },
+        onFailure: () => setSafelisted(null)
+      });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   const handleMenuClick = useCallback(event => {
     event.preventDefault();
@@ -179,10 +196,14 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
           {t('highlight')}
         </MenuItem>
         {signature && currentUser.roles.includes('safelist_manage') && (
-          <MenuItem dense onClick={handleMenuSafelist}>
-            {SAFELIST_ICON}
-            {t('safelist')}
-          </MenuItem>
+          <Tooltip title={safelisted ? <SafeBadItem item={safelisted} /> : ''} placement="right" arrow>
+            <div>
+              <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted}>
+                {SAFELIST_ICON}
+                {t(`${safelisted !== null ? 'already_' : ''}safelist`)}
+              </MenuItem>
+            </div>
+          </Tooltip>
         )}
       </Menu>
       <CustomChip

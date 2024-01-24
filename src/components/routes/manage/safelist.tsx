@@ -1,8 +1,8 @@
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { alpha, useMediaQuery, useTheme } from '@mui/material';
+import { Grid, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import ForbiddenPage from '../403';
+import SafelistNew from './safelist_add';
 import SafelistDetail from './safelist_detail';
 
 const PAGE_SIZE = 25;
@@ -87,7 +88,11 @@ export default function Safelist() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<SafelistDetail safelist_id={location.hash.substr(1)} close={closeGlobalDrawer} />);
+      if (location.hash === '#new') {
+        setGlobalDrawer(<SafelistNew close={closeGlobalDrawer} />);
+      } else {
+        setGlobalDrawer(<SafelistDetail safelist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
+      }
     } else {
       closeGlobalDrawer();
     }
@@ -175,18 +180,26 @@ export default function Safelist() {
   return currentUser.roles.includes('safelist_view') ? (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Typography variant="h4">{t('title')}</Typography>
-        <VerifiedUserOutlinedIcon
-          style={{
-            width: upMD ? theme.spacing(27.5) : theme.spacing(18.5),
-            height: upMD ? theme.spacing(19.5) : theme.spacing(16),
-            position: 'fixed',
-            right: 0,
-            zIndex: -1,
-            color: alpha(theme.palette.success.light, 0.3),
-            marginTop: upMD ? theme.spacing(-9) : theme.spacing(-7)
-          }}
-        />
+        <Grid container alignItems="center">
+          <Grid item xs>
+            <Typography variant="h4">{t('title')}</Typography>
+          </Grid>
+          {currentUser.roles.includes('safelist_manage') && (
+            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+              <Tooltip title={t('add_safelist')}>
+                <IconButton
+                  style={{
+                    color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                  }}
+                  onClick={() => navigate(`${location.pathname}${location.search ? location.search : ''}#new`)}
+                  size="large"
+                >
+                  <AddCircleOutlineOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          )}
+        </Grid>
       </div>
 
       <PageHeader isSticky>

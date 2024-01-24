@@ -1,5 +1,5 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Button, Collapse, Paper, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Button, Collapse, LinearProgress, Paper, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import PageCenter from 'commons/components/pages/PageCenter';
@@ -174,7 +174,27 @@ export const ErrorFallback: React.FC<FallbackProps> = ({ error, resetErrorBounda
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const [expanded, setExpanded] = React.useState(false);
 
-  return (
+  React.useEffect(() => {
+    if (error.name === 'ChunkLoadError') {
+      setTimeout(() => window.location.reload(), 5000);
+    }
+  }, [error]);
+
+  return error.name === 'ChunkLoadError' ? (
+    <div
+      role="alert"
+      style={{
+        textAlign: 'center',
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)'
+      }}
+    >
+      <Typography children={t('error.chunk')} variant="body1" gutterBottom />
+      <LinearProgress />
+    </div>
+  ) : (
     <div role="alert">
       <PageCenter margin={4}>
         <div className={classes.bugContainer}>
