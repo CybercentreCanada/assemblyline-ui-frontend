@@ -4,6 +4,8 @@ import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import {
   Alert,
+  Button,
+  CircularProgress,
   Grid,
   IconButton,
   LinearProgress,
@@ -13,6 +15,7 @@ import {
   Tabs,
   Tooltip,
   Typography,
+  useMediaQuery,
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
@@ -23,12 +26,14 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { ImageViewer } from 'components/routes/file/image';
+import AIMarkdown from 'components/visual/AiMarkdown';
 import Empty from 'components/visual/Empty';
 import FileDownloader from 'components/visual/FileDownloader';
 import { HexViewerApp } from 'components/visual/HexViewer';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
+
 import { useNavigate } from 'react-router';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -73,19 +78,16 @@ const useStyles = makeStyles(theme => ({
     right: 0
   },
   code: {
-    '@media print': {
-      backgroundColor: '#00000005',
-      border: '1px solid #DDD',
-      color: '#888'
-    },
-    backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
+    backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FFF',
     border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    color: theme.palette.text.secondary,
-    margin: '0.25rem 0',
+    color: theme.palette.mode === 'dark' ? theme.palette.text.secondary : theme.palette.text.primary,
     padding: '16px 8px',
     textAlign: 'left',
-    whiteSpace: 'pre-wrap'
+    whiteSpace: 'pre-wrap',
+    overflowY: 'auto',
+    height: '100%',
+    maxHeight: '100%',
+    whiteSpaceCollapse: 'collapse'
   }
 }));
 
@@ -233,13 +235,16 @@ const FileViewer = () => {
   const [hex, setHex] = useState(null);
   const [ascii, setAscii] = useState(null);
   const [error, setError] = useState(null);
+  const [codeError, setCodeError] = useState(null);
   const [image, setImage] = useState(null);
   const [codeSummary, setCodeSummary] = useState(null);
   const [imageAllowed, setImageAllowed] = useState(false);
   const [codeAllowed, setCodeAllowed] = useState(false);
+  const [analysing, setAnalysing] = useState(false);
   const [type, setType] = useState('unknown');
   const [sha256, setSha256] = useState(null);
   const { user: currentUser } = useAppUser<CustomUser>();
+  const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const tab = useMemo(
     () =>
@@ -256,6 +261,23 @@ const FileViewer = () => {
     },
     [id, location.hash, location.search, navigate, tab]
   );
+
+  const getCodeSummary = useCallback(() => {
+    apiCall({
+      url: `/api/v4/file/code_summary/${sha256}/`,
+      onSuccess: api_data => {
+        if (codeError !== null) setCodeError(null);
+        setCodeSummary(api_data.api_response);
+      },
+      onFailure: api_data => {
+        setCodeError(api_data.api_error_message);
+        if (codeSummary !== null) setCodeSummary(null);
+      },
+      onEnter: () => setAnalysing(true),
+      onExit: () => setAnalysing(false)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [codeSummary, codeError, sha256]);
 
   useEffect(() => {
     setString(null);
@@ -298,18 +320,7 @@ const FileViewer = () => {
         }
       });
     } else if (tab === 'code' && codeSummary === null) {
-      apiCall({
-        allowCache: true,
-        url: `/api/v4/file/code_summary/${sha256}/`,
-        onSuccess: api_data => {
-          if (error !== null) setError(null);
-          setCodeSummary(api_data.api_response);
-        },
-        onFailure: api_data => {
-          setError(api_data.api_error_message);
-          if (string !== null) setCodeSummary(null);
-        }
-      });
+      getCodeSummary();
     } else if (tab === 'hex' && hex === null) {
       apiCall({
         url: `/api/v4/file/hex/${sha256}/?bytes_only=true`,
@@ -409,7 +420,7 @@ const FileViewer = () => {
               scrollButtons="auto"
             >
               <MuiTab label={t('ascii')} value="ascii" />
-              {codeAllowed ? <MuiTab label={t('code_summary')} value="code" /> : <Empty />}
+              {codeAllowed && !isMdUp ? <MuiTab label={t('code_summary')} value="code" /> : <Empty />}
               <MuiTab label={t('strings')} value="strings" />
               <MuiTab label={t('hex')} value="hex" />
               {imageAllowed ? <MuiTab label={t('image')} value="image" /> : <Empty />}
@@ -418,15 +429,46 @@ const FileViewer = () => {
 
           {tab === 'ascii' && (
             <div className={classes.tab}>
-              <MonacoViewer data={ascii} type={type} error={error} beautify />
+              <Grid container style={{ flexGrow: 1 }}>
+                <Grid xs={12} md={codeAllowed && isMdUp ? 8 : 12} style={{ display: 'flex' }}>
+                  <MonacoViewer data={ascii} type={type} error={error} beautify />
+                </Grid>
+                {codeAllowed && isMdUp && (
+                  <Grid xs={12} md={4}>
+                    <div className={classes.code}>
+                      <Button onClick={() => getCodeSummary()} variant="outlined" fullWidth color="inherit">
+                        {t('analyse_code')}
+                      </Button>
+                      {analysing ? (
+                        <div
+                          style={{
+                            textAlign: 'center',
+                            position: 'relative',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)'
+                          }}
+                        >
+                          <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_code')}</div>
+                          <CircularProgress variant="indeterminate" />
+                        </div>
+                      ) : codeError ? (
+                        <Alert severity="error">{codeError}</Alert>
+                      ) : (
+                        <AIMarkdown markdown={codeSummary} />
+                      )}
+                    </div>
+                  </Grid>
+                )}
+              </Grid>
             </div>
           )}
-          {tab === 'code' && (
+          {tab === 'code' && !isMdUp && (
             <div className={classes.tab}>
               {codeSummary !== null && codeSummary !== undefined ? (
-                <pre className={classes.code}>{codeSummary}</pre>
-              ) : error ? (
-                <Alert severity="error">{error}</Alert>
+                <AIMarkdown markdown={codeSummary} />
+              ) : codeError ? (
+                <Alert severity="error">{codeError}</Alert>
               ) : (
                 <LinearProgress />
               )}
