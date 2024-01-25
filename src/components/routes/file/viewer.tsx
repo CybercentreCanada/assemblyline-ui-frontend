@@ -266,6 +266,7 @@ const FileViewer = () => {
 
   const getCodeSummary = useCallback(() => {
     apiCall({
+      allowCache: true,
       url: `/api/v4/file/code_summary/${sha256}/`,
       onSuccess: api_data => {
         if (codeError !== null) setCodeError(null);
