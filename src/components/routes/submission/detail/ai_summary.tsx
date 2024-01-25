@@ -2,6 +2,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import AIMarkdown from 'components/visual/AiMarkdown';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -58,7 +59,7 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({ summary }) =
       <div style={{ paddingTop: theme.spacing(2) }}>
         {summary ? (
           <Collapse in={!open} timeout="auto">
-            <pre className={classes.alert}>{summary}</pre>
+            <AIMarkdown markdown={summary} />
           </Collapse>
         ) : (
           <Skeleton variant="rectangular" style={{ height: '12rem', borderRadius: '4px' }} />
