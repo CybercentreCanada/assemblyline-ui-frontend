@@ -144,7 +144,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const [badlistReason, setBadlistReason] = useState<string>('');
   const [waitingDialog, setWaitingDialog] = useState(false);
   const { apiCall } = useMyAPI();
-  const { c12nDef } = useALContext();
+  const { c12nDef, configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const theme = useTheme();
   const navigate = useNavigate();
@@ -342,7 +342,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   }, [sha256, sid]);
 
   useEffect(() => {
-    if (sha256) {
+    if (configuration.ui.ai.enabled && sha256) {
       apiCall({
         allowCache: true,
         url: `/api/v4/file/ai/${sha256}/`,
@@ -352,7 +352,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
       });
     }
     // eslint-disable-next-line
-  }, [sha256]);
+  }, [sha256, configuration]);
 
   useEffect(() => {
     if (file === null) {
@@ -535,7 +535,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         )}
         <FrequencySection seen={file ? file.file_info?.seen : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
-        <AISummarySection summary={aiSummary} />
+        {configuration.ui.ai.enabled && <AISummarySection summary={aiSummary} />}
         <ChildrenSection childrens={file ? file.childrens : null} />
         <ParentSection parents={file ? file.parents : null} />
         <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />

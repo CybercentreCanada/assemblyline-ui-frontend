@@ -101,6 +101,9 @@ export type ConfigurationDefinition = {
     version: string;
   };
   ui: {
+    ai: {
+      enabled: boolean;
+    };
     alerting_meta: {
       important: string[];
       subject: string[];

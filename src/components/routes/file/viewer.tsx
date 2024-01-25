@@ -23,6 +23,7 @@ import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { ImageViewer } from 'components/routes/file/image';
@@ -33,7 +34,6 @@ import { HexViewerApp } from 'components/visual/HexViewer';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
-
 import { useNavigate } from 'react-router';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -244,6 +244,8 @@ const FileViewer = () => {
   const [type, setType] = useState('unknown');
   const [sha256, setSha256] = useState(null);
   const { user: currentUser } = useAppUser<CustomUser>();
+  const { configuration } = useALContext();
+
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const tab = useMemo(
@@ -292,7 +294,7 @@ const FileViewer = () => {
         setImageAllowed(imgAllowed);
         setType(api_data.api_response.type);
         if (api_data.api_response.type.indexOf('code/') === 0) {
-          setCodeAllowed(true);
+          setCodeAllowed(configuration.ui.ai.enabled);
         } else {
           setCodeAllowed(false);
         }
@@ -453,7 +455,9 @@ const FileViewer = () => {
                           <CircularProgress variant="indeterminate" />
                         </div>
                       ) : codeError ? (
-                        <Alert severity="error">{codeError}</Alert>
+                        <Alert severity="error" style={{ marginTop: theme.spacing(2) }}>
+                          {codeError}
+                        </Alert>
                       ) : (
                         <AIMarkdown markdown={codeSummary} />
                       )}

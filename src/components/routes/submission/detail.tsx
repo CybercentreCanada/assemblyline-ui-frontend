@@ -636,13 +636,15 @@ function WrappedSubmissionDetail() {
             }
           }
         });
-        apiCall({
-          allowCache: true,
-          url: `/api/v4/submission/ai/${id}/`,
-          onSuccess: ai_summary => {
-            setAISummary(ai_summary.api_response);
-          }
-        });
+        if (systemConfig.ui.ai.enabled) {
+          apiCall({
+            allowCache: true,
+            url: `/api/v4/submission/ai/${id}/`,
+            onSuccess: ai_summary => {
+              setAISummary(ai_summary.api_response);
+            }
+          });
+        }
       } else {
         if (!socket) {
           // eslint-disable-next-line no-console
@@ -664,7 +666,7 @@ function WrappedSubmissionDetail() {
       setBaseFiles(submission.files.map(f => f.sha256));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [submission]);
+  }, [submission, systemConfig]);
 
   useEffect(() => {
     if (liveStatus === 'processing') {
@@ -1265,7 +1267,7 @@ function WrappedSubmissionDetail() {
           metadata={submission ? submission.metadata : null}
           classification={submission ? submission.classification : null}
         />
-        <AISummarySection summary={aiSummary} />
+        {systemConfig.ui.ai.enabled && <AISummarySection summary={aiSummary} />}
         <Detection
           section_map={summary ? summary.heuristic_sections : null}
           heuristics={summary ? summary.heuristics : null}
