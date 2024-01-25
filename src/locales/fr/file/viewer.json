@@ -1,4 +1,6 @@
 {
+  "analyse_code": "Analyser le code",
+  "analysing_code": "Demander aux robots de donner un sens à ce code...",
   "code_summary": "Résumé du code",
   "detail": "Détails de l'analyse du fichier",
   "download": "Télécharger le fichier",
