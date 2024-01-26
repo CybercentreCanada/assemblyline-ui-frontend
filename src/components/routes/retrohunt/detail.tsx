@@ -176,6 +176,12 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
 
   const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
+      indices: null,
+      created_time: null,
+      started_time: null,
+      completed_time: null,
+      key: null,
+
       archive_only: false,
       classification: c12nDef.UNRESTRICTED,
       code: null,
