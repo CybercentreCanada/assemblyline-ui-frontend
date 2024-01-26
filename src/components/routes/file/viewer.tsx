@@ -87,7 +87,8 @@ const useStyles = makeStyles(theme => ({
     overflowY: 'auto',
     height: '100%',
     maxHeight: '100%',
-    whiteSpaceCollapse: 'collapse'
+    whiteSpaceCollapse: 'collapse',
+    borderLeftWidth: '0px'
   }
 }));
 
@@ -433,11 +434,11 @@ const FileViewer = () => {
           {tab === 'ascii' && (
             <div className={classes.tab}>
               <Grid container style={{ flexGrow: 1 }}>
-                <Grid xs={12} md={codeAllowed && isMdUp ? 8 : 12} style={{ display: 'flex' }}>
+                <Grid item xs={12} md={codeAllowed && isMdUp ? 8 : 12} style={{ display: 'flex' }}>
                   <MonacoViewer data={ascii} type={type} error={error} beautify />
                 </Grid>
                 {codeAllowed && isMdUp && (
-                  <Grid xs={12} md={4}>
+                  <Grid item xs={12} md={4}>
                     <div className={classes.code}>
                       <Button onClick={() => getCodeSummary()} variant="outlined" fullWidth color="inherit">
                         {t('analyse_code')}
