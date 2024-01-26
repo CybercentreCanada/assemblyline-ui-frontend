@@ -137,7 +137,6 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
-  const [aiSummary, setAISummary] = useState(null);
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
   const [safelistReason, setSafelistReason] = useState<string>('');
   const [badlistDialog, setBadlistDialog] = useState<boolean>(false);
@@ -342,19 +341,6 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   }, [sha256, sid]);
 
   useEffect(() => {
-    if (configuration.ui.ai.enabled && sha256) {
-      apiCall({
-        allowCache: true,
-        url: `/api/v4/file/ai/${sha256}/`,
-        onSuccess: ai_summary => {
-          setAISummary(ai_summary.api_response);
-        }
-      });
-    }
-    // eslint-disable-next-line
-  }, [sha256, configuration]);
-
-  useEffect(() => {
     if (file === null) {
       setPromotedSections(null);
     } else {
@@ -535,7 +521,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         )}
         <FrequencySection seen={file ? file.file_info?.seen : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
-        {configuration.ui.ai.enabled && <AISummarySection summary={aiSummary} />}
+        {configuration.ui.ai.enabled && <AISummarySection type="file" id={file ? file.file_info.sha256 : null} />}
         <ChildrenSection childrens={file ? file.childrens : null} />
         <ParentSection parents={file ? file.parents : null} />
         <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />

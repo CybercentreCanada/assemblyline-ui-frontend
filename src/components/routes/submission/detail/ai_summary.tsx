@@ -1,9 +1,11 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, Divider, Skeleton, Typography, useTheme } from '@mui/material';
+import { Alert, Collapse, Divider, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useALContext from 'components/hooks/useALContext';
+import useMyAPI from 'components/hooks/useMyAPI';
 import AIMarkdown from 'components/visual/AiMarkdown';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -28,14 +30,37 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type AISummarySectionProps = {
-  summary: string;
+  type: 'submission' | 'file';
+  id: string;
 };
 
-const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({ summary }) => {
+const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({ type, id }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
+  const { configuration } = useALContext();
+  const { apiCall } = useMyAPI();
+  const [summary, setSummary] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (configuration.ui.ai.enabled && id) {
+      apiCall({
+        allowCache: true,
+        url: `/api/v4/${type}/ai/${id}/`,
+        onSuccess: api_data => {
+          if (error !== null) setError(null);
+          setSummary(api_data.api_response);
+        },
+        onFailure: api_data => {
+          setError(api_data.api_error_message);
+          if (summary !== null) setSummary(null);
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [configuration, id, type]);
 
   return (
     <div style={{ paddingTop: theme.spacing(2) }}>
@@ -51,16 +76,18 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({ summary }) =
       </Typography>
       <Divider />
       <div style={{ paddingTop: theme.spacing(2) }}>
-        {summary ? (
-          <Collapse in={!open} timeout="auto">
+        <Collapse in={!open} timeout="auto">
+          {summary ? (
             <div className={classes.container}>
               <AIMarkdown markdown={summary} />
               <div className={classes.watermark}>{t('powered_by_ai')}</div>
             </div>
-          </Collapse>
-        ) : (
-          <Skeleton variant="rectangular" style={{ height: '12rem', borderRadius: '4px' }} />
-        )}
+          ) : error ? (
+            <Alert severity="error">{error}</Alert>
+          ) : (
+            <Skeleton variant="rectangular" style={{ height: '12rem', borderRadius: '4px' }} />
+          )}
+        </Collapse>
       </div>
     </div>
   );

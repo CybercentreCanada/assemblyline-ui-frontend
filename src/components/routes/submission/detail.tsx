@@ -100,7 +100,6 @@ function WrappedSubmissionDetail() {
   const [submission, setSubmission] = useState(null);
   const [summary, setSummary] = useState(null);
   const [tree, setTree] = useState(null);
-  const [aiSummary, setAISummary] = useState(null);
   const [filtered, setFiltered] = useState(false);
   const [partial, setPartial] = useState(false);
   const [watchQueue, setWatchQueue] = useState(null);
@@ -636,15 +635,6 @@ function WrappedSubmissionDetail() {
             }
           }
         });
-        if (systemConfig.ui.ai.enabled) {
-          apiCall({
-            allowCache: true,
-            url: `/api/v4/submission/ai/${id}/`,
-            onSuccess: ai_summary => {
-              setAISummary(ai_summary.api_response);
-            }
-          });
-        }
       } else {
         if (!socket) {
           // eslint-disable-next-line no-console
@@ -1267,7 +1257,12 @@ function WrappedSubmissionDetail() {
           metadata={submission ? submission.metadata : null}
           classification={submission ? submission.classification : null}
         />
-        {systemConfig.ui.ai.enabled && <AISummarySection summary={aiSummary} />}
+        {systemConfig.ui.ai.enabled && (
+          <AISummarySection
+            type={'submission' as 'submission'}
+            id={submission && submission.state === 'completed' ? submission.sid : null}
+          />
+        )}
         <Detection
           section_map={summary ? summary.heuristic_sections : null}
           heuristics={summary ? summary.heuristics : null}
