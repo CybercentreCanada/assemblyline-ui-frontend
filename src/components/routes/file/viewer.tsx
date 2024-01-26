@@ -78,6 +78,8 @@ const useStyles = makeStyles(theme => ({
     right: 0
   },
   code: {
+    display: 'flex',
+    flexDirection: 'column',
     backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FFF',
     border: `1px solid ${theme.palette.divider}`,
     color: theme.palette.mode === 'dark' ? theme.palette.text.secondary : theme.palette.text.primary,
@@ -89,6 +91,18 @@ const useStyles = makeStyles(theme => ({
     maxHeight: '100%',
     whiteSpaceCollapse: 'collapse',
     borderLeftWidth: '0px'
+  },
+  spinner: {
+    textAlign: 'center',
+    position: 'relative',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)'
+  },
+  watermark: {
+    textAlign: 'right',
+    color: theme.palette.text.disabled,
+    fontSize: 'smaller'
   }
 }));
 
@@ -443,26 +457,21 @@ const FileViewer = () => {
                       <Button onClick={() => getCodeSummary()} variant="outlined" fullWidth color="inherit">
                         {t('analyse_code')}
                       </Button>
-                      {analysing ? (
-                        <div
-                          style={{
-                            textAlign: 'center',
-                            position: 'relative',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)'
-                          }}
-                        >
-                          <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_code')}</div>
-                          <CircularProgress variant="indeterminate" />
-                        </div>
-                      ) : codeError ? (
-                        <Alert severity="error" style={{ marginTop: theme.spacing(2) }}>
-                          {codeError}
-                        </Alert>
-                      ) : (
-                        <AIMarkdown markdown={codeSummary} />
-                      )}
+                      <div style={{ flexGrow: 1 }}>
+                        {analysing ? (
+                          <div className={classes.spinner}>
+                            <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_code')}</div>
+                            <CircularProgress variant="indeterminate" />
+                          </div>
+                        ) : codeError ? (
+                          <Alert severity="error" style={{ marginTop: theme.spacing(2) }}>
+                            {codeError}
+                          </Alert>
+                        ) : (
+                          <AIMarkdown markdown={codeSummary} />
+                        )}
+                      </div>
+                      <div className={classes.watermark}>{t('powered_by_ai')}</div>
                     </div>
                   </Grid>
                 )}

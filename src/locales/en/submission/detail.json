@@ -1,5 +1,5 @@
 {
-  "ai_summary": "AI Generated Summary",
+  "ai_summary": "Executive Summary",
   "archive": "Copy the submission into the malware archive",
   "archive.success": "Submission was successfully queued for archiving",
   "archive.success.resubmit": "Submission was resubmitted to meet the minimum service requirements for archiving and will be automatically archived one completed.",
@@ -52,6 +52,7 @@
   "params.services.selected": "Selected services",
   "params.services.service_spec": "Service parameters",
   "params.submitter": "Submitted By",
+  "powered_by_ai": "Powered by AI",
   "processing": "Submission is processing, receiving results live...",
   "psid": "Extended scan of",
   "queued": "Submission is waiting to be pick up by dispatcher for processing...",

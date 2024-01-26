@@ -16,20 +16,14 @@ const useStyles = makeStyles(theme => ({
       color: theme.palette.text.secondary
     }
   },
-  alert: {
-    '@media print': {
-      backgroundColor: '#00000005',
-      border: '1px solid #DDD',
-      color: '#888'
-    },
-    backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    color: theme.palette.text.secondary,
-    margin: '0.25rem 0',
-    padding: '16px 8px',
-    textAlign: 'left',
-    whiteSpace: 'pre-wrap'
+  container: {
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  watermark: {
+    textAlign: 'right',
+    color: theme.palette.text.disabled,
+    fontSize: 'smaller'
   }
 }));
 
@@ -59,7 +53,10 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({ summary }) =
       <div style={{ paddingTop: theme.spacing(2) }}>
         {summary ? (
           <Collapse in={!open} timeout="auto">
-            <AIMarkdown markdown={summary} />
+            <div className={classes.container}>
+              <AIMarkdown markdown={summary} />
+              <div className={classes.watermark}>{t('powered_by_ai')}</div>
+            </div>
           </Collapse>
         ) : (
           <Skeleton variant="rectangular" style={{ height: '12rem', borderRadius: '4px' }} />
