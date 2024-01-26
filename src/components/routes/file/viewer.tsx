@@ -487,6 +487,9 @@ const FileViewer = () => {
               ) : (
                 <LinearProgress />
               )}
+              <div className={classes.watermark} style={{ paddingBottom: theme.spacing(1) }}>
+                {t('powered_by_ai')}
+              </div>
             </div>
           )}
           {tab === 'strings' && (
