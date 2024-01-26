@@ -1,6 +1,8 @@
-import { Feed } from 'components/models/notification';
+import useALContext from 'components/hooks/useALContext';
+import useMyAPI from 'components/hooks/useMyAPI';
+import { Feed, FeedItem, FeedSchema, FeedURLsSchema } from 'components/models/notification';
+import { Service, ServicesSchema } from 'components/models/service';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { z } from 'zod';
 
 /**
  * JSON Feed Version 1.1
@@ -228,79 +230,160 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
   return { fetchJSONFeeds, fetchJSONNotifications };
 };
 
-export const useNotificationFeed2 = (urlsProp: string[] = []) => {
-  const [feed, setFeed] = useState<Feed>(null);
+type Props = {
+  urls: string[];
+  lastTimeOpen: Date;
+};
+
+export const useNotificationFeed2 = ({
+  urls = [],
+  lastTimeOpen = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)
+}: Props) => {
+  const { apiCall } = useMyAPI();
+  const { user: currentUser, configuration } = useALContext();
+
+  const [feeds, setFeeds] = useState<Feed[]>(null);
+  const [services, setServices] = useState<Service[]>(null);
+
+  const isAdmin = useMemo<boolean>(() => currentUser && currentUser?.is_admin, [currentUser]);
+  const systemVersion = useMemo<string>(() => configuration && configuration?.system?.version, [configuration]);
+  const systemType = useMemo<'dev' | 'prod' | null>(
+    () =>
+      !systemVersion
+        ? null
+        : /(\d){1,}\.(\d){1,}\.(\d){1,}\.(d|D)ev(\d){1,}/g.test(systemVersion)
+        ? 'dev'
+        : /(\d){1,}\.(\d){1,}\.(\d){1,}\.(\d){1,}/g.test(systemVersion)
+        ? 'prod'
+        : null,
+    [systemVersion]
+  );
 
   const fetchFeed = useCallback(
     (url: string) =>
-      new Promise(async (resolve, reject) => {
-        return url;
-        // const response: Response = (await fetch(url, { method: 'GET' }).catch(err =>
-        //   // eslint-disable-next-line no-console
-        //   console.error(`Notification Area: error caused by URL "${err}`)
-        // )) as Response;
-
-        // if (!response) {
-        //   resolve({ ...DEFAULT_JSON_FEED });
-        //   return;
-        // }
-
-        // const textResponse: string = await response.text();
-        // const jsonFeed = JSON.parse(textResponse);
-        // resolve(parseJSONFeed(jsonFeed));
-        // return;
+      new Promise<Feed>(async (resolve, reject) => {
+        try {
+          const response = await fetch(url, { method: 'GET' });
+          const text = await response.text();
+          const json = await JSON.parse(text);
+          const feed = await FeedSchema.parse(json);
+          resolve(feed);
+        } catch (err) {
+          reject(err);
+        }
       }),
     []
   );
 
   const fetchAllFeeds = useCallback(
-    (urls: string[] = []) =>
-      new Promise(async (resolve, reject) => {
-        const urlSchema = z.string().url();
-        // let values = null;
-
-        // const test = ['www.google.com'];
-
-        // try {
-        //   values = urlSchema.parse([...urls, 'asd']);
-        // } catch (err) {
-        //   if (err instanceof z.ZodError) {
-        //     err.errors.map(error => console.log(`Error while parsing the URLs`));
-        //     console.log(err.errors);
-        //   }
-        // }
-
-        // console.log(values);
-
-        const values = ['asd']
-          .map(url => {
-            try {
-              return urlSchema.parse(url);
-            } catch (err) {
-              console.log(err);
-              if (err instanceof z.ZodError) {
-                console.log(`error while parsing url: "${url}". ${err.errors}`);
-              }
-              return null;
-            }
-          })
-          .filter(url => url);
-
-        if (values.length === 0) reject('There are no feed URLS to fetch from');
-
-        const feeds: JSONFeed[] = (await Promise.all(urls.map(url => fetchFeed(url))).catch(err =>
-          reject(err)
-        )) as JSONFeed[];
-        resolve(feeds);
+    (feedURLs: string[] = []) =>
+      new Promise<Feed[]>(async (resolve, reject) => {
+        try {
+          const parsedURLs = await FeedURLsSchema.parse(feedURLs);
+          const f = await Promise.all(parsedURLs.map(url => fetchFeed(url)));
+          resolve(f);
+        } catch (err) {
+          reject(err);
+        }
       }),
+    [fetchFeed]
+  );
+
+  const areArraysEquals = useCallback(
+    (a: any, b: any): boolean =>
+      Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((val, index) => val === b[index]),
     []
   );
 
-  useEffect(() => {
-    fetchAllFeeds(urlsProp)
-      .then(f => setFeed(f))
-      .catch(e => console.error(e));
-  }, [fetchAllFeeds, urlsProp]);
+  const areArrayHigher = useCallback((a: any, b: any): boolean => {
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+    let i = 0;
+    while (i < a.length) {
+      if (a[i] > b[i]) return true;
+      else if (a[i] < b[i]) return false;
+      else i++;
+    }
+    return false;
+  }, []);
 
-  return feed;
+  const getVersionValues = useCallback(
+    (value: string): Array<number> =>
+      value
+        ?.match(/(\d){1,}\.(\d){1,}\.(\d){1,}\..*/g)
+        ?.at(0)
+        ?.replaceAll(/[^0-9.]/g, '')
+        ?.split('.')
+        ?.map(v => parseInt(v)),
+    []
+  );
+
+  const isNewSystemVersion = useCallback(
+    (item: FeedItem): null | 'newer' | 'current' | 'older' => {
+      const notVer = item.url;
+      if (!((/(d|D)ev/g.test(notVer) && systemType === 'dev') || (/(s|S)table/g.test(notVer) && systemType === 'prod')))
+        return null;
+
+      const notValues: Array<number> = getVersionValues(notVer);
+      const sysValues: Array<number> = getVersionValues(systemVersion);
+
+      if (areArraysEquals(notValues, sysValues)) return 'current';
+      else if (areArrayHigher(notValues, sysValues)) return 'newer';
+      else return 'older';
+    },
+    [areArrayHigher, areArraysEquals, getVersionValues, systemType, systemVersion]
+  );
+
+  const isNewService = useCallback(
+    (item: FeedItem): null | boolean => {
+      if (!/(s|S)ervice/g.test(item.title)) return null;
+      const title = item?.title?.toLowerCase().slice(0, -16);
+      return services.some(s => title === s?.name?.toLowerCase());
+    },
+    [services]
+  );
+
+  useEffect(() => {
+    apiCall({
+      url: '/api/v4/service/all/',
+      onSuccess: ({ api_response }) => setServices(ServicesSchema.parse(api_response))
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    fetchAllFeeds(urls)
+      .then(data => setFeeds(data))
+      .catch(e => console.error(e));
+  }, [fetchAllFeeds, urls]);
+
+  const notifications = useMemo<FeedItem[]>(
+    () =>
+      services &&
+      feeds &&
+      feeds
+        .filter(f => f)
+        .flatMap(f => f.items)
+        .filter(n => {
+          if (n.date_published < new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)) return false;
+          else if (!isAdmin && isNewService(n) === false) return false;
+          else if (!isAdmin && isNewSystemVersion(n) === 'newer') return false;
+          else return true;
+        })
+        .sort((a, b) => b.date_published.getTime() - a.date_published.getTime())
+        .map(n => ({
+          ...n,
+          _isNew: n.date_published > lastTimeOpen,
+          tags: []
+            .concat(isNewService(n) ? ['new'] : [])
+            .concat(isAdmin && isNewService(n) === false ? ['new'] : [])
+            .concat(isAdmin && isNewSystemVersion(n) === 'newer' ? ['new'] : [])
+            .concat(isAdmin && isNewSystemVersion(n) === 'current' ? ['current'] : [])
+            .concat(n.tags)
+        })),
+    [feeds, isAdmin, isNewService, isNewSystemVersion, lastTimeOpen, services]
+  );
+
+  console.log(notifications && notifications?.map(n => n.tags));
+
+  return notifications;
 };

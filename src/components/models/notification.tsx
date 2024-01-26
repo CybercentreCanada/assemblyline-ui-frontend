@@ -6,6 +6,8 @@ import { zTime } from './utils/helpers';
  * https://www.jsonfeed.org/
  */
 
+export const FeedTagSchema = z.enum(['new', 'current', 'dev', 'service', 'blog']).default(null).catch(null);
+
 export const decodeHTML = (html: string) => {
   if (!html) return '';
   var txt = document.createElement('textarea');
@@ -50,7 +52,7 @@ export const FeedItemSchema = z.object({
   date_published: zTime,
   date_modified: zTime,
   authors: z.array(FeedAuthorSchema).default([]).catch([]),
-  tags: z.enum(['new', 'current', 'dev', 'service', 'blog']).default(null).catch(null),
+  tags: z.array(FeedTagSchema).default([]).catch([]),
   language: z.string().default('en').catch('en'),
   attachments: z.array(FeedAttachmentSchema).default([]).catch([]),
   _isNew: z.boolean().default(false).catch(false)
@@ -73,8 +75,19 @@ export const FeedSchema = z.object({
   items: z.array(FeedItemSchema).default([]).catch([])
 });
 
+export const FeedURLSchema = z.string().url().default(null).catch(null);
+
+export const FeedURLsSchema = z
+  .array(FeedURLSchema)
+  .transform(arr => arr.filter(value => value))
+  .default([])
+  .catch([]);
+
+export type FeedTag = z.infer<typeof FeedTagSchema>;
 export type FeedHub = z.infer<typeof FeedHubSchema>;
 export type FeedAttachment = z.infer<typeof FeedAttachmentSchema>;
 export type FeedAuthor = z.infer<typeof FeedAuthorSchema>;
 export type FeedItem = z.infer<typeof FeedItemSchema>;
 export type Feed = z.infer<typeof FeedSchema>;
+export type FeedURL = z.infer<typeof FeedURLSchema>;
+export type FeedURLs = z.infer<typeof FeedURLsSchema>;
