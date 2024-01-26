@@ -42,6 +42,7 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({ type, id }) 
   const { configuration } = useALContext();
   const { apiCall } = useMyAPI();
   const [summary, setSummary] = useState(null);
+  const [truncated, setTruncated] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -51,11 +52,15 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({ type, id }) 
         url: `/api/v4/${type}/ai/${id}/`,
         onSuccess: api_data => {
           if (error !== null) setError(null);
-          setSummary(api_data.api_response);
+          setSummary(api_data.api_response.content);
+          setTruncated(api_data.api_response.truncated);
         },
         onFailure: api_data => {
           setError(api_data.api_error_message);
-          if (summary !== null) setSummary(null);
+          if (summary !== null) {
+            setSummary(null);
+            setTruncated(false);
+          }
         }
       });
     }
@@ -79,7 +84,7 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({ type, id }) 
         <Collapse in={!open} timeout="auto">
           {summary ? (
             <div className={classes.container}>
-              <AIMarkdown markdown={summary} />
+              <AIMarkdown markdown={summary} truncated={truncated} />
               <div className={classes.watermark}>{t('powered_by_ai')}</div>
             </div>
           ) : error ? (

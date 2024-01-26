@@ -253,6 +253,7 @@ const FileViewer = () => {
   const [codeError, setCodeError] = useState(null);
   const [image, setImage] = useState(null);
   const [codeSummary, setCodeSummary] = useState(null);
+  const [codeTruncated, setCodeTruncated] = useState(false);
   const [imageAllowed, setImageAllowed] = useState(false);
   const [codeAllowed, setCodeAllowed] = useState(false);
   const [analysing, setAnalysing] = useState(false);
@@ -285,11 +286,15 @@ const FileViewer = () => {
       url: `/api/v4/file/code_summary/${sha256}/`,
       onSuccess: api_data => {
         if (codeError !== null) setCodeError(null);
-        setCodeSummary(api_data.api_response);
+        setCodeSummary(api_data.api_response.content);
+        setCodeTruncated(api_data.api_response.truncated);
       },
       onFailure: api_data => {
         setCodeError(api_data.api_error_message);
-        if (codeSummary !== null) setCodeSummary(null);
+        if (codeSummary !== null) {
+          setCodeSummary(null);
+          setCodeTruncated(false);
+        }
       },
       onEnter: () => setAnalysing(true),
       onExit: () => setAnalysing(false)
@@ -468,7 +473,7 @@ const FileViewer = () => {
                             {codeError}
                           </Alert>
                         ) : (
-                          <AIMarkdown markdown={codeSummary} />
+                          <AIMarkdown markdown={codeSummary} truncated={codeTruncated} />
                         )}
                       </div>
                       <div className={classes.watermark}>{t('powered_by_ai')}</div>
@@ -481,7 +486,7 @@ const FileViewer = () => {
           {tab === 'code' && !isMdUp && (
             <div className={classes.tab}>
               {codeSummary !== null && codeSummary !== undefined ? (
-                <AIMarkdown markdown={codeSummary} />
+                <AIMarkdown markdown={codeSummary} truncated={codeTruncated} />
               ) : codeError ? (
                 <Alert severity="error">{codeError}</Alert>
               ) : (
