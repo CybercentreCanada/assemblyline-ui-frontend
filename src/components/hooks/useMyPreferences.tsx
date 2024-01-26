@@ -427,6 +427,7 @@ const useMyPreferences = () => {
     (): AppPreferenceConfigs => ({
       allowBreadcrumbs: true,
       allowShowSafeResults: true,
+      allowHybribReports: true,
       allowQuickSearch: true,
       allowReset: false,
       appName: 'Assemblyline',

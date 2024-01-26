@@ -25,6 +25,7 @@ export const AppDefaultsPreferencesConfigs: AppPreferenceConfigs = {
   allowThemeSelection: true,
   allowTranslate: true,
   allowShowSafeResults: true,
+  allowHybribReports: true,
   avatarD: 'mp'
 };
 

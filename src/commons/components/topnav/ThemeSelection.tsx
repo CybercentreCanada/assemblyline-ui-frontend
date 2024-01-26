@@ -15,6 +15,7 @@ import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
 import useAppLanguage from 'commons/components/app/hooks/useAppLanguage';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useAppQuickSearch from 'commons/components/app/hooks/useAppQuickSearch';
+import useHybridReports from 'components/hooks/useHybridReports';
 import useSafeResults from 'components/hooks/useSafeResults';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +38,7 @@ const ThemeSelection = () => {
   const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
 
   const { showSafeResults, toggleShowSafeResults } = useSafeResults();
+  const { showHybridReports, toggleShowHybridReports } = useHybridReports();
 
   const clearStorage = () => {
     localStorage.clear();
@@ -129,6 +131,15 @@ const ThemeSelection = () => {
               <ListItemText>{t('personalization.showsaferesults')}</ListItemText>
               <ListItemSecondaryAction>
                 <Switch edge="end" checked={showSafeResults} onClick={toggleShowSafeResults} />
+              </ListItemSecondaryAction>
+            </ListItem>
+          )}
+
+          {configs.preferences.allowHybribReports && (
+            <ListItem button onClick={toggleShowHybridReports}>
+              <ListItemText>{t('personalization.showhybridreports')}</ListItemText>
+              <ListItemSecondaryAction>
+                <Switch edge="end" checked={showHybridReports} onClick={toggleShowHybridReports} />
               </ListItemSecondaryAction>
             </ListItem>
           )}

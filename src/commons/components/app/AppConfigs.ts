@@ -34,6 +34,7 @@ export type AppPreferenceConfigs = {
   defaultAutoHideAppbar?: boolean; // Should the top bar autohide (applies only to "side" layout)
   defaultShowBreadcrumbs?: boolean; // Indicate whether breadcrumbs should be shown by default.
   allowShowSafeResults?: boolean; // Indicate whether Show Safe Results should be shown by default.
+  allowHybribReports?: boolean; // Use AI Hybrid report or standard reports
   topnav?: AppTopNavConfigs; // top nav appbar specific configurations.
   leftnav?: AppLeftNavConfigs; // left nav drawer specific configurations.
   avatarD?: GravatarD; // The gravatar api uses this parameter to generate a themed image unique to an email address.
