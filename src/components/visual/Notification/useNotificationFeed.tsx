@@ -1,4 +1,6 @@
-import { useCallback, useMemo } from 'react';
+import { Feed } from 'components/models/notification';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { z } from 'zod';
 
 /**
  * JSON Feed Version 1.1
@@ -224,4 +226,81 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
   );
 
   return { fetchJSONFeeds, fetchJSONNotifications };
+};
+
+export const useNotificationFeed2 = (urlsProp: string[] = []) => {
+  const [feed, setFeed] = useState<Feed>(null);
+
+  const fetchFeed = useCallback(
+    (url: string) =>
+      new Promise(async (resolve, reject) => {
+        return url;
+        // const response: Response = (await fetch(url, { method: 'GET' }).catch(err =>
+        //   // eslint-disable-next-line no-console
+        //   console.error(`Notification Area: error caused by URL "${err}`)
+        // )) as Response;
+
+        // if (!response) {
+        //   resolve({ ...DEFAULT_JSON_FEED });
+        //   return;
+        // }
+
+        // const textResponse: string = await response.text();
+        // const jsonFeed = JSON.parse(textResponse);
+        // resolve(parseJSONFeed(jsonFeed));
+        // return;
+      }),
+    []
+  );
+
+  const fetchAllFeeds = useCallback(
+    (urls: string[] = []) =>
+      new Promise(async (resolve, reject) => {
+        const urlSchema = z.string().url();
+        // let values = null;
+
+        // const test = ['www.google.com'];
+
+        // try {
+        //   values = urlSchema.parse([...urls, 'asd']);
+        // } catch (err) {
+        //   if (err instanceof z.ZodError) {
+        //     err.errors.map(error => console.log(`Error while parsing the URLs`));
+        //     console.log(err.errors);
+        //   }
+        // }
+
+        // console.log(values);
+
+        const values = ['asd']
+          .map(url => {
+            try {
+              return urlSchema.parse(url);
+            } catch (err) {
+              console.log(err);
+              if (err instanceof z.ZodError) {
+                console.log(`error while parsing url: "${url}". ${err.errors}`);
+              }
+              return null;
+            }
+          })
+          .filter(url => url);
+
+        if (values.length === 0) reject('There are no feed URLS to fetch from');
+
+        const feeds: JSONFeed[] = (await Promise.all(urls.map(url => fetchFeed(url))).catch(err =>
+          reject(err)
+        )) as JSONFeed[];
+        resolve(feeds);
+      }),
+    []
+  );
+
+  useEffect(() => {
+    fetchAllFeeds(urlsProp)
+      .then(f => setFeed(f))
+      .catch(e => console.error(e));
+  }, [fetchAllFeeds, urlsProp]);
+
+  return feed;
 };
