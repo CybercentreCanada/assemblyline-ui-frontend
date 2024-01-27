@@ -1,12 +1,12 @@
 import { Divider, Link, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import { FeedAuthor, FeedItem } from 'components/models/notification';
 import * as DOMPurify from 'dompurify';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
 import Moment from 'react-moment';
-import { JSONFeedAuthor, JSONFeedItem } from '.';
 import CustomChip from '../CustomChip';
 
 const useStyles = makeStyles(theme => ({
@@ -117,7 +117,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
-  notification?: JSONFeedItem;
+  notification?: FeedItem;
   hideDivider?: boolean;
 };
 
@@ -125,7 +125,7 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
   const classes = useStyles();
   const { i18n } = useTranslation('notification');
 
-  const Author = React.memo(({ author, index, last }: { author: JSONFeedAuthor; index: number; last: number }) => (
+  const Author = React.memo(({ author, index, last }: { author: FeedAuthor; index: number; last: number }) => (
     <>
       {author?.url && author?.url !== '' ? (
         <Link
