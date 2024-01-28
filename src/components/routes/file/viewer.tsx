@@ -90,7 +90,8 @@ const useStyles = makeStyles(theme => ({
     height: '100%',
     maxHeight: '100%',
     whiteSpaceCollapse: 'collapse',
-    borderLeftWidth: '0px'
+    borderLeftWidth: '0px',
+    wordBreak: 'break-word'
   },
   spinner: {
     textAlign: 'center',
