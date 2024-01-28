@@ -25,9 +25,11 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
+import useHybridReports from 'components/hooks/useHybridReports';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
+import useSafeResults from 'components/hooks/useSafeResults';
 import Classification from 'components/visual/Classification';
 import ResultSection from 'components/visual/ResultCard/result_section';
 import TextVerdict from 'components/visual/TextVerdict';
@@ -40,6 +42,7 @@ import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
+import AISummarySection from './detail/ai_summary';
 
 type ParamProps = {
   id: string;
@@ -341,26 +344,29 @@ function TagTable({ group, items }) {
   const theme = useTheme();
   const orderedItems = {};
   const classes = useStyles();
+  const { showSafeResults } = useSafeResults();
 
   Object.keys(items).map(tagType =>
-    Object.keys(items[tagType]).map(tagValue => {
-      const key = `${items[tagType][tagValue].h_type}_${tagType}`;
-      if (!Object.hasOwnProperty.call(orderedItems, key)) {
-        orderedItems[key] = { verdict: items[tagType][tagValue].h_type, type: tagType, values: [] };
-      }
-      orderedItems[key].values.push(tagValue);
-      return null;
-    })
+    Object.keys(items[tagType])
+      .filter(tagValue => items[tagType][tagValue].h_type !== 'info' || showSafeResults)
+      .map(tagValue => {
+        const key = `${items[tagType][tagValue].h_type}_${tagType}`;
+        if (!Object.hasOwnProperty.call(orderedItems, key)) {
+          orderedItems[key] = { verdict: items[tagType][tagValue].h_type, type: tagType, values: [] };
+        }
+        orderedItems[key].values.push(tagValue);
+        return null;
+      })
   );
 
-  return (
+  return Object.keys(orderedItems).length !== 0 ? (
     <div className={classes.section}>
       <div className={classes.section_title}>
         <Typography variant="h6">{t(`tag.${group}`)}</Typography>
         <Divider className={classes.divider} />
       </div>
       <div className={classes.section_content}>
-        <Grid container spacing={1}>
+        <Grid container spacing={0.5}>
           {Object.keys(orderedItems).map((k, idx) => (
             <Grid
               key={idx}
@@ -383,7 +389,7 @@ function TagTable({ group, items }) {
                     key={vidx}
                     style={{
                       minWidth: '18rem',
-                      marginBottom: theme.spacing(1.25),
+                      marginBottom: theme.spacing(0.5),
                       wordBreak: 'break-word'
                     }}
                   >
@@ -396,22 +402,25 @@ function TagTable({ group, items }) {
         </Grid>
       </div>
     </div>
-  );
+  ) : null;
 }
 
 function AttackMatrixBlock({ attack, items }) {
   const classes = useStyles();
+  const { showSafeResults } = useSafeResults();
   return (
     <div className={classes.attack_bloc}>
       <span className={classes.attack_title}>{attack.replace(/-/g, ' ')}</span>
-      {Object.keys(items).map((cat, idx) =>
-        items[cat].h_type === 'safe' ? null : (
-          <div key={idx}>
-            <TextVerdict verdict={items[cat].h_type} mono />
-            <span style={{ verticalAlign: 'middle' }}>{cat}</span>
-          </div>
-        )
-      )}
+      {Object.keys(items)
+        .filter((cat, idx) => items[cat].h_type !== 'info' || showSafeResults)
+        .map((cat, idx) =>
+          items[cat].h_type === 'safe' ? null : (
+            <div key={idx}>
+              <TextVerdict verdict={items[cat].h_type} mono />
+              <span style={{ verticalAlign: 'middle' }}>{cat}</span>
+            </div>
+          )
+        )}
     </div>
   );
 }
@@ -437,6 +446,8 @@ function AttackMatrixSkel() {
 function HeuristicsList({ verdict, items, sections, name_map, force = false }) {
   const classes = useStyles();
   const theme = useTheme();
+  const { configuration } = useALContext();
+  const { showSafeResults } = useSafeResults();
   const classMap = {
     malicious: classes.malicious_heur,
     suspicious: classes.suspicious_heur,
@@ -460,6 +471,9 @@ function HeuristicsList({ verdict, items, sections, name_map, force = false }) {
                 return (
                   sections[heur_id] &&
                   sections[heur_id]
+                    .filter(
+                      sec => sec.heuristic?.score >= configuration.submission.verdicts.suspicious || showSafeResults
+                    )
                     .sort((a, b) => (a.title_text >= b.title_text ? 1 : -1))
                     .map((sec, secidx) => {
                       return (
@@ -579,6 +593,8 @@ export default function SubmissionReport() {
   const classes = useStyles();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
   const [metaOpen, setMetaOpen] = useState(false);
+  const { showSafeResults } = useSafeResults();
+  const { showHybridReports } = useHybridReports();
 
   useEffectOnce(() => {
     if (currentUser.roles.includes('submission_view')) {
@@ -743,181 +759,177 @@ export default function SubmissionReport() {
                 </>
               )}
 
-              {(!report || report.file_info) &&
-                report?.file_info?.type.startsWith('uri/') ?
-                (
-                  <>
-                    <Grid item xs={12}>
-                      <div style={{ height: theme.spacing(2) }} />
-                    </Grid>
+              {(!report || report.file_info) && report?.file_info?.type.startsWith('uri/') ? (
+                <>
+                  <Grid item xs={12}>
+                    <div style={{ height: theme.spacing(2) }} />
+                  </Grid>
 
-                    <Grid item xs={4} sm={3} lg={2}>
-                      <span style={{ fontWeight: 500 }}>{t('file.scheme')}</span>
-                    </Grid>
-                    <Grid item xs={8} sm={9} lg={10}>
-                      {report.file_info?.uri_info ? report.file_info.uri_info.scheme : <Skeleton />}
-                    </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.scheme')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10}>
+                    {report.file_info?.uri_info ? report.file_info.uri_info.scheme : <Skeleton />}
+                  </Grid>
 
-                    {report.file_info?.uri_info?.username && (
-                      <>
-                        <Grid item xs={4} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{t('file.username')}</span>
-                        </Grid>
-                        <Grid item xs={8} sm={9} lg={10}>
-                          {report.file_info.uri_info.username}
-                        </Grid>
-                      </>
-                    )}
+                  {report.file_info?.uri_info?.username && (
+                    <>
+                      <Grid item xs={4} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{t('file.username')}</span>
+                      </Grid>
+                      <Grid item xs={8} sm={9} lg={10}>
+                        {report.file_info.uri_info.username}
+                      </Grid>
+                    </>
+                  )}
 
-                    {report.file_info?.uri_info?.password && (
-                      <>
-                        <Grid item xs={4} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{t('file.password')}</span>
-                        </Grid>
-                        <Grid item xs={8} sm={9} lg={10}>
-                          {report.file_info.uri_info.password}
-                        </Grid>
-                      </>
-                    )}
+                  {report.file_info?.uri_info?.password && (
+                    <>
+                      <Grid item xs={4} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{t('file.password')}</span>
+                      </Grid>
+                      <Grid item xs={8} sm={9} lg={10}>
+                        {report.file_info.uri_info.password}
+                      </Grid>
+                    </>
+                  )}
 
-                    <Grid item xs={4} sm={3} lg={2}>
-                      <span style={{ fontWeight: 500 }}>{t('file.hostname')}</span>
-                    </Grid>
-                    <Grid item xs={8} sm={9} lg={10}>
-                      {report.file_info.uri_info.hostname}
-                    </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.hostname')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10}>
+                    {report.file_info.uri_info.hostname}
+                  </Grid>
 
-                    {report.file_info?.uri_info?.port && (
-                      <>
-                        <Grid item xs={4} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{t('file.port')}</span>
-                        </Grid>
-                        <Grid item xs={8} sm={9} lg={10}>
-                          {report.file_info.uri_info.port}
-                        </Grid>
-                      </>
-                    )}
+                  {report.file_info?.uri_info?.port && (
+                    <>
+                      <Grid item xs={4} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{t('file.port')}</span>
+                      </Grid>
+                      <Grid item xs={8} sm={9} lg={10}>
+                        {report.file_info.uri_info.port}
+                      </Grid>
+                    </>
+                  )}
 
-                    {report.file_info?.uri_info?.path && (
-                      <>
-                        <Grid item xs={4} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{t('file.path')}</span>
-                        </Grid>
-                        <Grid item xs={8} sm={9} lg={10}>
-                          {report.file_info.uri_info.path}
-                        </Grid>
-                      </>
-                    )}
+                  {report.file_info?.uri_info?.path && (
+                    <>
+                      <Grid item xs={4} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{t('file.path')}</span>
+                      </Grid>
+                      <Grid item xs={8} sm={9} lg={10}>
+                        {report.file_info.uri_info.path}
+                      </Grid>
+                    </>
+                  )}
 
-                    {report.file_info?.uri_info?.params && (
-                      <>
-                        <Grid item xs={4} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{t('file.params')}</span>
-                        </Grid>
-                        <Grid item xs={8} sm={9} lg={10}>
-                          {report.file_info.uri_info.params}
-                        </Grid>
-                      </>
-                    )}
+                  {report.file_info?.uri_info?.params && (
+                    <>
+                      <Grid item xs={4} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{t('file.params')}</span>
+                      </Grid>
+                      <Grid item xs={8} sm={9} lg={10}>
+                        {report.file_info.uri_info.params}
+                      </Grid>
+                    </>
+                  )}
 
-                    {report.file_info?.uri_info?.query && (
-                      <>
-                        <Grid item xs={4} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{t('file.query')}</span>
-                        </Grid>
-                        <Grid item xs={8} sm={9} lg={10}>
-                          {report.file_info.uri_info.query}
-                        </Grid>
-                      </>
-                    )}
+                  {report.file_info?.uri_info?.query && (
+                    <>
+                      <Grid item xs={4} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{t('file.query')}</span>
+                      </Grid>
+                      <Grid item xs={8} sm={9} lg={10}>
+                        {report.file_info.uri_info.query}
+                      </Grid>
+                    </>
+                  )}
 
-                    {report.file_info?.uri_info?.fragment && (
-                      <>
-                        <Grid item xs={4} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{t('file.fragment')}</span>
-                        </Grid>
-                        <Grid item xs={8} sm={9} lg={10}>
-                          {report.file_info.uri_info.fragment}
-                        </Grid>
-                      </>
-                    )}
-                  </>
-                )
-                :
-                (
-                  <>
-                    <Grid item xs={12}>
-                      <div style={{ height: theme.spacing(2) }} />
-                    </Grid>
+                  {report.file_info?.uri_info?.fragment && (
+                    <>
+                      <Grid item xs={4} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{t('file.fragment')}</span>
+                      </Grid>
+                      <Grid item xs={8} sm={9} lg={10}>
+                        {report.file_info.uri_info.fragment}
+                      </Grid>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Grid item xs={12}>
+                    <div style={{ height: theme.spacing(2) }} />
+                  </Grid>
 
-                    <Grid item xs={4} sm={3} lg={2}>
-                      <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
-                    </Grid>
-                    <Grid item xs={8} sm={9} lg={10}>
-                      {report ? report.file_info.type : <Skeleton />}
-                    </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10}>
+                    {report ? report.file_info.type : <Skeleton />}
+                  </Grid>
 
-                    <Grid item xs={4} sm={3} lg={2}>
-                      <span style={{ fontWeight: 500 }}>{t('file.mime')}</span>
-                    </Grid>
-                    <Grid item xs={8} sm={9} lg={10}>
-                      {report ? report.file_info.mime : <Skeleton />}
-                    </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.mime')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10}>
+                    {report ? report.file_info.mime : <Skeleton />}
+                  </Grid>
 
-                    <Grid item xs={4} sm={3} lg={2}>
-                      <span style={{ fontWeight: 500 }}>{t('file.magic')}</span>
-                    </Grid>
-                    <Grid item xs={8} sm={9} lg={10}>
-                      {report ? report.file_info.magic : <Skeleton />}
-                    </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.magic')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10}>
+                    {report ? report.file_info.magic : <Skeleton />}
+                  </Grid>
 
-                    <Grid item xs={4} sm={3} lg={2}>
-                      <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
-                    </Grid>
-                    <Grid item xs={8} sm={9} lg={10}>
-                      {report ? report.file_info.size : <Skeleton />}
-                    </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10}>
+                    {report ? report.file_info.size : <Skeleton />}
+                  </Grid>
 
-                    <Grid item xs={4} sm={3} lg={2}>
-                      <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
-                    </Grid>
-                    <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                      {report ? report.file_info.md5 : <Skeleton />}
-                    </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                    {report ? report.file_info.md5 : <Skeleton />}
+                  </Grid>
 
-                    <Grid item xs={4} sm={3} lg={2}>
-                      <span style={{ fontWeight: 500 }}>{t('file.sha1')}</span>
-                    </Grid>
-                    <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                      {report ? report.file_info.sha1 : <Skeleton />}
-                    </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.sha1')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                    {report ? report.file_info.sha1 : <Skeleton />}
+                  </Grid>
 
-                    <Grid item xs={4} sm={3} lg={2}>
-                      <span style={{ fontWeight: 500 }}>{t('file.sha256')}</span>
-                    </Grid>
-                    <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                      {report ? report.file_info.sha256 : <Skeleton />}
-                    </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.sha256')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                    {report ? report.file_info.sha256 : <Skeleton />}
+                  </Grid>
 
-                    <Grid item xs={4} sm={3} lg={2}>
-                      <span style={{ fontWeight: 500 }}>{t('file.ssdeep')}</span>
-                    </Grid>
-                    <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                      {report ? report.file_info.ssdeep : <Skeleton />}
-                    </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.ssdeep')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                    {report ? report.file_info.ssdeep : <Skeleton />}
+                  </Grid>
 
-                    {report && report.file_info.tlsh && (
-                      <>
-                        <Grid item xs={4} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{t('file.tlsh')}</span>
-                        </Grid>
-                        <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                          {report.file_info.tlsh}
-                        </Grid>
-                      </>
-                    )}
-                  </>
-                )}
+                  {report && report.file_info.tlsh && (
+                    <>
+                      <Grid item xs={4} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{t('file.tlsh')}</span>
+                      </Grid>
+                      <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                        {report.file_info.tlsh}
+                      </Grid>
+                    </>
+                  )}
+                </>
+              )}
             </Grid>
           </div>
         </div>
@@ -1042,11 +1054,16 @@ export default function SubmissionReport() {
           </div>
         )}
 
-        {(!report ||
-          Object.keys(report.heuristics.malicious).length !== 0 ||
-          Object.keys(report.heuristics.suspicious).length !== 0 ||
-          Object.keys(report.heuristics.info).length !== 0 ||
-          (report.max_score < 0 && report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
+        {showHybridReports && (
+          <AISummarySection type={'submission' as 'submission'} id={report ? report.sid : null} hideTitle detailed />
+        )}
+
+        {!showHybridReports &&
+          (!report ||
+            Object.keys(report.heuristics.malicious).length !== 0 ||
+            Object.keys(report.heuristics.suspicious).length !== 0 ||
+            (showSafeResults && Object.keys(report.heuristics.info).length !== 0) ||
+            (report.max_score < 0 && report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
             <>
               <div className={classes.section_title}>
                 <Typography variant="h6">{t('heuristics')}</Typography>
@@ -1054,15 +1071,17 @@ export default function SubmissionReport() {
               </div>
               {report ? (
                 <>
-                  {report.max_score < 0 && report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0 && (
-                    <HeuristicsList
-                      verdict="safe"
-                      items={report.heuristics.safe}
-                      sections={report.heuristic_sections}
-                      name_map={report.heuristic_name_map}
-                      force
-                    />
-                  )}
+                  {report.max_score < 0 &&
+                    report.heuristics.safe &&
+                    Object.keys(report.heuristics.safe).length !== 0 && (
+                      <HeuristicsList
+                        verdict="safe"
+                        items={report.heuristics.safe}
+                        sections={report.heuristic_sections}
+                        name_map={report.heuristic_name_map}
+                        force
+                      />
+                    )}
                   {Object.keys(report.heuristics.malicious).length !== 0 && (
                     <HeuristicsList
                       verdict="malicious"
@@ -1079,7 +1098,7 @@ export default function SubmissionReport() {
                       name_map={report.heuristic_name_map}
                     />
                   )}
-                  {Object.keys(report.heuristics.info).length !== 0 && (
+                  {showSafeResults && Object.keys(report.heuristics.info).length !== 0 && (
                     <HeuristicsList
                       verdict="info"
                       items={report.heuristics.info}
@@ -1094,7 +1113,7 @@ export default function SubmissionReport() {
             </>
           )}
 
-        {(!report || Object.keys(report.attack_matrix).length !== 0) && (
+        {!showHybridReports && (!report || Object.keys(report.attack_matrix).length !== 0) && (
           <div className={classes.section}>
             <div className={classes.section_title}>
               <Typography variant="h6">{t('attack')}</Typography>
@@ -1109,8 +1128,8 @@ export default function SubmissionReport() {
             >
               {report
                 ? Object.keys(report.attack_matrix).map((att, i) => (
-                  <AttackMatrixBlock key={i} attack={att} items={report.attack_matrix[att]} />
-                ))
+                    <AttackMatrixBlock key={i} attack={att} items={report.attack_matrix[att]} />
+                  ))
                 : [...Array(5)].map((_, i) => <AttackMatrixSkel key={i} />)}
             </div>
           </div>

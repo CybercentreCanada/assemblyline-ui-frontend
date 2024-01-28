@@ -32,9 +32,16 @@ const useStyles = makeStyles(theme => ({
 type AISummarySectionProps = {
   type: 'submission' | 'file';
   id: string;
+  hideTitle?: boolean;
+  detailed?: boolean;
 };
 
-const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({ type, id }) => {
+const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
+  type,
+  id,
+  hideTitle = false,
+  detailed = false
+}) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const classes = useStyles();
@@ -49,7 +56,7 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({ type, id }) 
     if (configuration.ui.ai.enabled && id) {
       apiCall({
         allowCache: true,
-        url: `/api/v4/${type}/ai/${id}/`,
+        url: `/api/v4/${type}/ai/${id}/${detailed ? '?detailed' : ''}`,
         onSuccess: api_data => {
           if (error !== null) setError(null);
           setSummary(api_data.api_response.content);
@@ -68,19 +75,23 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({ type, id }) 
   }, [configuration, id, type]);
 
   return (
-    <div style={{ paddingTop: theme.spacing(2) }}>
-      <Typography
-        variant="h6"
-        onClick={() => {
-          setOpen(!open);
-        }}
-        className={classes.title}
-      >
-        <span>{t('ai_summary')}</span>
-        {open ? <ExpandLess /> : <ExpandMore />}
-      </Typography>
-      <Divider />
-      <div style={{ paddingTop: theme.spacing(2) }}>
+    <div style={{ paddingTop: !hideTitle ? theme.spacing(2) : null }}>
+      {!hideTitle && (
+        <>
+          <Typography
+            variant="h6"
+            onClick={() => {
+              setOpen(!open);
+            }}
+            className={classes.title}
+          >
+            <span>{t('ai_summary')}</span>
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </Typography>
+          <Divider />
+        </>
+      )}
+      <div style={{ paddingTop: !hideTitle ? theme.spacing(2) : null }}>
         <Collapse in={!open} timeout="auto">
           {summary ? (
             <div className={classes.container}>
