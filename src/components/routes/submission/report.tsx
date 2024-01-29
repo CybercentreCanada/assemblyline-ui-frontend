@@ -220,14 +220,16 @@ export default function SubmissionReport() {
                         </IconButton>
                       </NoPrintTooltip>
                     )}
-                    <NoPrintTooltip
-                      title={t(useAIReport ? 'use_not_ai' : 'use_ai')}
-                      PopperProps={{ disablePortal: true }}
-                    >
-                      <IconButton onClick={() => setUseAIReport(!useAIReport)} size="large">
-                        {useAIReport ? <AssistantIcon /> : <AssistantOutlinedIcon />}
-                      </IconButton>
-                    </NoPrintTooltip>
+                    {configuration.ui.ai.enabled && (
+                      <NoPrintTooltip
+                        title={t(useAIReport ? 'use_not_ai' : 'use_ai')}
+                        PopperProps={{ disablePortal: true }}
+                      >
+                        <IconButton onClick={() => setUseAIReport(!useAIReport)} size="large">
+                          {useAIReport ? <AssistantIcon /> : <AssistantOutlinedIcon />}
+                        </IconButton>
+                      </NoPrintTooltip>
+                    )}
                     <NoPrintTooltip title={t('print')} PopperProps={{ disablePortal: true }}>
                       <IconButton onClick={() => window.print()} size="large">
                         <PrintOutlinedIcon />
@@ -247,12 +249,14 @@ export default function SubmissionReport() {
                       width="2.5rem"
                       style={{ margin: theme.spacing(0.5) }}
                     />
-                    <Skeleton
-                      variant="circular"
-                      height="2.5rem"
-                      width="2.5rem"
-                      style={{ margin: theme.spacing(0.5) }}
-                    />
+                    {configuration.ui.ai.enabled && (
+                      <Skeleton
+                        variant="circular"
+                        height="2.5rem"
+                        width="2.5rem"
+                        style={{ margin: theme.spacing(0.5) }}
+                      />
+                    )}
                     <Skeleton
                       variant="circular"
                       height="2.5rem"
