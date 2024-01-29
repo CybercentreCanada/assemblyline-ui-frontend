@@ -509,47 +509,59 @@ function HeuristicsListSkel() {
   );
 }
 
-function FileTree({ tree, important_files }) {
+function FileTree({ tree, important_files, showInfoContent = false }) {
   const classes = useStyles();
+  const { configuration } = useALContext();
 
   return tree && important_files ? (
     <div>
-      {Object.keys(tree).map((f, i) =>
-        important_files.indexOf(f) !== -1 ? (
-          tree[f].score < 0 ? null : (
-            <div key={i} style={{ pageBreakInside: 'avoid' }}>
-              <table style={{ borderSpacing: 0 }}>
-                <tbody>
-                  <tr>
-                    <td style={{ verticalAlign: 'top' }}>
-                      <Verdict score={tree[f].score} short mono />
-                    </td>
-                    <td>
-                      <b style={{ fontSize: '110%', wordBreak: 'break-word' }}>{tree[f].name.join(' | ')}</b>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td />
-                    <td>
-                      <div className={classes.file_details}>
-                        {`${tree[f].sha256} - ${tree[f].type} - `}
-                        <b>{tree[f].size}</b>
-                        <span style={{ fontWeight: 300 }}> ({bytesToSize(tree[f].size)})</span>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td />
-                    <td>
-                      <FileTree tree={tree[f].children} important_files={important_files} />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )
-        ) : null
-      )}
+      {Object.keys(tree)
+        .filter(
+          f =>
+            showInfoContent ||
+            tree[f].score >= configuration.submission.verdicts.suspicious ||
+            Object.keys(tree[f].children).length > 0
+        )
+        .map((f, i) =>
+          important_files.indexOf(f) !== -1 ? (
+            tree[f].score < 0 ? null : (
+              <div key={i} style={{ pageBreakInside: 'avoid' }}>
+                <table style={{ borderSpacing: 0 }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ verticalAlign: 'top' }}>
+                        <Verdict score={tree[f].score} short mono />
+                      </td>
+                      <td>
+                        <b style={{ fontSize: '110%', wordBreak: 'break-word' }}>{tree[f].name.join(' | ')}</b>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td />
+                      <td>
+                        <div className={classes.file_details}>
+                          {`${tree[f].sha256} - ${tree[f].type} - `}
+                          <b>{tree[f].size}</b>
+                          <span style={{ fontWeight: 300 }}> ({bytesToSize(tree[f].size)})</span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td />
+                      <td>
+                        <FileTree
+                          tree={tree[f].children}
+                          important_files={important_files}
+                          showInfoContent={showInfoContent}
+                        />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )
+          ) : null
+        )}
     </div>
   ) : null;
 }
@@ -1190,6 +1202,7 @@ export default function SubmissionReport() {
                 <FileTree
                   tree={report?.file_tree[report?.files[0]?.sha256]?.children}
                   important_files={report?.important_files}
+                  showInfoContent={showInfoContent}
                 />
               ) : (
                 <FileTreeSkel />
