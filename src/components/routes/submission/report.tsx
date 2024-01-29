@@ -38,7 +38,7 @@ import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
 import { bytesToSize } from 'helpers/utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
@@ -628,6 +628,12 @@ export default function SubmissionReport() {
       });
     }
   });
+
+  useEffect(() => {
+    if (useAIReport) {
+      setShowInfoContent(false);
+    }
+  }, [useAIReport]);
 
   return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
