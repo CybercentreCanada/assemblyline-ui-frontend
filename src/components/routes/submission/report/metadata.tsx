@@ -52,7 +52,14 @@ function WrappedMetadata({ report }) {
 
   return (
     (!report || Object.keys(report.metadata).length !== 0) && (
-      <div className={classes.section}>
+      <div
+        className={
+          Object.keys(report.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
+            .length === 0
+            ? 'no-print'
+            : classes.section
+        }
+      >
         <div className={classes.section_title}>
           <div
             style={{
