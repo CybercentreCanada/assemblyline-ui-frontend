@@ -50,6 +50,8 @@
   "tag.table.type": "Type",
   "tag.table.value": "Valeur",
   "title": "Rapport de Soumission",
+  "use_ai": "Utiliser le rapport généré par l'IA",
+  "use_not_ai": "Arrêtez d'utiliser le rapport généré par l'IA",
   "user.verdict": "Verdict des Utilisateurs",
   "warning": "Avertissement",
   "warning.partial": "Certaines informations sur ce rapport sont manquantes dans le système. Par conséquent, vous ne voyez qu'un rapport partiel.",

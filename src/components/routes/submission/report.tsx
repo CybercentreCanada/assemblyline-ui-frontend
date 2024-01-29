@@ -1,3 +1,5 @@
+import AssistantIcon from '@mui/icons-material/Assistant';
+import AssistantOutlinedIcon from '@mui/icons-material/AssistantOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import InfoIcon from '@mui/icons-material/Info';
@@ -27,7 +29,6 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
-import useHybridReports from 'components/hooks/useHybridReports';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -592,7 +593,7 @@ export default function SubmissionReport() {
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
   const [metaOpen, setMetaOpen] = useState(false);
   const [showInfoContent, setShowInfoContent] = useState(false);
-  const { showHybridReports } = useHybridReports();
+  const [useAIReport, setUseAIReport] = useState(false);
 
   useEffectOnce(() => {
     if (currentUser.roles.includes('submission_view')) {
@@ -645,7 +646,7 @@ export default function SubmissionReport() {
               <div style={{ textAlign: 'right' }}>
                 {report ? (
                   <>
-                    {!showHybridReports && (
+                    {!useAIReport && (
                       <NoPrintTooltip
                         title={t(showInfoContent ? 'hide_info' : 'show_info')}
                         PopperProps={{ disablePortal: true }}
@@ -655,6 +656,14 @@ export default function SubmissionReport() {
                         </IconButton>
                       </NoPrintTooltip>
                     )}
+                    <NoPrintTooltip
+                      title={t(useAIReport ? 'use_not_ai' : 'use_ai')}
+                      PopperProps={{ disablePortal: true }}
+                    >
+                      <IconButton onClick={() => setUseAIReport(!useAIReport)} size="large">
+                        {useAIReport ? <AssistantIcon /> : <AssistantOutlinedIcon />}
+                      </IconButton>
+                    </NoPrintTooltip>
                     <NoPrintTooltip title={t('print')} PopperProps={{ disablePortal: true }}>
                       <IconButton onClick={() => window.print()} size="large">
                         <PrintOutlinedIcon />
@@ -668,6 +677,12 @@ export default function SubmissionReport() {
                   </>
                 ) : (
                   <div style={{ display: 'inline-flex' }}>
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
                     <Skeleton
                       variant="circular"
                       height="2.5rem"
@@ -1068,11 +1083,11 @@ export default function SubmissionReport() {
           </div>
         )}
 
-        {showHybridReports && (
+        {useAIReport && (
           <AISummarySection type={'submission' as 'submission'} id={report ? report.sid : null} hideTitle detailed />
         )}
 
-        {!showHybridReports &&
+        {!useAIReport &&
           (!report ||
             Object.keys(report.heuristics.malicious).length !== 0 ||
             Object.keys(report.heuristics.suspicious).length !== 0 ||
@@ -1131,7 +1146,7 @@ export default function SubmissionReport() {
             </>
           )}
 
-        {!showHybridReports && (!report || Object.keys(report.attack_matrix).length !== 0) && (
+        {!useAIReport && (!report || Object.keys(report.attack_matrix).length !== 0) && (
           <div className={classes.section}>
             <div className={classes.section_title}>
               <Typography variant="h6">{t('attack')}</Typography>
