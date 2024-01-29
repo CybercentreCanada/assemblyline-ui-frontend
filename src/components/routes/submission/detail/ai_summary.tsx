@@ -91,7 +91,7 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
           <Divider />
         </>
       )}
-      <div style={{ paddingTop: !hideTitle ? theme.spacing(2) : null }}>
+      <div style={{ paddingTop: !hideTitle ? theme.spacing(2) : null, pageBreakInside: 'avoid' }}>
         <Collapse in={!open} timeout="auto">
           {summary ? (
             <div className={classes.container}>
