@@ -37,8 +37,8 @@ import ResultSection from 'components/visual/ResultCard/result_section';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
-import { bytesToSize } from 'helpers/utils';
-import { useEffect, useState } from 'react';
+import { bytesToSize, filterObject } from 'helpers/utils';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
@@ -341,23 +341,21 @@ function AttributionBanner({ report }) {
   );
 }
 
-function TagTable({ group, items, showInfoContent = false }) {
+function TagTable({ group, items }) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
   const orderedItems = {};
   const classes = useStyles();
 
   Object.keys(items).map(tagType =>
-    Object.keys(items[tagType])
-      .filter(tagValue => items[tagType][tagValue].h_type !== 'info' || showInfoContent)
-      .map(tagValue => {
-        const key = `${items[tagType][tagValue].h_type}_${tagType}`;
-        if (!Object.hasOwnProperty.call(orderedItems, key)) {
-          orderedItems[key] = { verdict: items[tagType][tagValue].h_type, type: tagType, values: [] };
-        }
-        orderedItems[key].values.push(tagValue);
-        return null;
-      })
+    Object.keys(items[tagType]).map(tagValue => {
+      const key = `${items[tagType][tagValue].h_type}_${tagType}`;
+      if (!Object.hasOwnProperty.call(orderedItems, key)) {
+        orderedItems[key] = { verdict: items[tagType][tagValue].h_type, type: tagType, values: [] };
+      }
+      orderedItems[key].values.push(tagValue);
+      return null;
+    })
   );
 
   return Object.keys(orderedItems).length !== 0 ? (
@@ -406,21 +404,19 @@ function TagTable({ group, items, showInfoContent = false }) {
   ) : null;
 }
 
-function AttackMatrixBlock({ attack, items, showInfoContent = false }) {
+function AttackMatrixBlock({ attack, items }) {
   const classes = useStyles();
   return (
     <div className={classes.attack_bloc}>
       <span className={classes.attack_title}>{attack.replace(/-/g, ' ')}</span>
-      {Object.keys(items)
-        .filter((cat, idx) => items[cat].h_type !== 'info' || showInfoContent)
-        .map((cat, idx) =>
-          items[cat].h_type === 'safe' ? null : (
-            <div key={idx}>
-              <TextVerdict verdict={items[cat].h_type} mono />
-              <span style={{ verticalAlign: 'middle' }}>{cat}</span>
-            </div>
-          )
-        )}
+      {Object.keys(items).map((cat, idx) =>
+        items[cat].h_type === 'safe' ? null : (
+          <div key={idx}>
+            <TextVerdict verdict={items[cat].h_type} mono />
+            <span style={{ verticalAlign: 'middle' }}>{cat}</span>
+          </div>
+        )
+      )}
     </div>
   );
 }
@@ -443,10 +439,9 @@ function AttackMatrixSkel() {
   );
 }
 
-function HeuristicsList({ verdict, items, sections, name_map, force = false, showInfoContent = false }) {
+function HeuristicsList({ verdict, items, sections, name_map, force = false }) {
   const classes = useStyles();
   const theme = useTheme();
-  const { configuration } = useALContext();
   const classMap = {
     malicious: classes.malicious_heur,
     suspicious: classes.suspicious_heur,
@@ -470,9 +465,6 @@ function HeuristicsList({ verdict, items, sections, name_map, force = false, sho
                 return (
                   sections[heur_id] &&
                   sections[heur_id]
-                    .filter(
-                      sec => sec.heuristic?.score >= configuration.submission.verdicts.suspicious || showInfoContent
-                    )
                     .sort((a, b) => (a.title_text >= b.title_text ? 1 : -1))
                     .map((sec, secidx) => {
                       return (
@@ -509,59 +501,47 @@ function HeuristicsListSkel() {
   );
 }
 
-function FileTree({ tree, important_files, showInfoContent = false }) {
+function FileTree({ tree, important_files }) {
   const classes = useStyles();
-  const { configuration } = useALContext();
 
   return tree && important_files ? (
     <div>
-      {Object.keys(tree)
-        .filter(
-          f =>
-            showInfoContent ||
-            tree[f].score >= configuration.submission.verdicts.suspicious ||
-            Object.keys(tree[f].children).length > 0
-        )
-        .map((f, i) =>
-          important_files.indexOf(f) !== -1 ? (
-            tree[f].score < 0 ? null : (
-              <div key={i} style={{ pageBreakInside: 'avoid' }}>
-                <table style={{ borderSpacing: 0 }}>
-                  <tbody>
-                    <tr>
-                      <td style={{ verticalAlign: 'top' }}>
-                        <Verdict score={tree[f].score} short mono />
-                      </td>
-                      <td>
-                        <b style={{ fontSize: '110%', wordBreak: 'break-word' }}>{tree[f].name.join(' | ')}</b>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td />
-                      <td>
-                        <div className={classes.file_details}>
-                          {`${tree[f].sha256} - ${tree[f].type} - `}
-                          <b>{tree[f].size}</b>
-                          <span style={{ fontWeight: 300 }}> ({bytesToSize(tree[f].size)})</span>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td />
-                      <td>
-                        <FileTree
-                          tree={tree[f].children}
-                          important_files={important_files}
-                          showInfoContent={showInfoContent}
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            )
-          ) : null
-        )}
+      {Object.keys(tree).map((f, i) =>
+        important_files.indexOf(f) !== -1 ? (
+          tree[f].score < 0 ? null : (
+            <div key={i} style={{ pageBreakInside: 'avoid' }}>
+              <table style={{ borderSpacing: 0 }}>
+                <tbody>
+                  <tr>
+                    <td style={{ verticalAlign: 'top' }}>
+                      <Verdict score={tree[f].score} short mono />
+                    </td>
+                    <td>
+                      <b style={{ fontSize: '110%', wordBreak: 'break-word' }}>{tree[f].name.join(' | ')}</b>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td />
+                    <td>
+                      <div className={classes.file_details}>
+                        {`${tree[f].sha256} - ${tree[f].type} - `}
+                        <b>{tree[f].size}</b>
+                        <span style={{ fontWeight: 300 }}> ({bytesToSize(tree[f].size)})</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td />
+                    <td>
+                      <FileTree tree={tree[f].children} important_files={important_files} />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )
+        ) : null
+      )}
     </div>
   ) : null;
 }
@@ -599,6 +579,7 @@ export default function SubmissionReport() {
   const navigate = useNavigate();
   const theme = useTheme();
   const [report, setReport] = useState(null);
+  const [originalReport, setOriginalReport] = useState(null);
   const { apiCall } = useMyAPI();
   const sp4 = theme.spacing(4);
   const classes = useStyles();
@@ -607,12 +588,88 @@ export default function SubmissionReport() {
   const [showInfoContent, setShowInfoContent] = useState(false);
   const [useAIReport, setUseAIReport] = useState(false);
 
+  const cleanupReport = useCallback(() => {
+    const recursiveFileTreeCleanup = (tree, impFiles) => {
+      for (const key of Object.keys(tree)) {
+        const data = tree[key];
+        // Cleanup children
+        recursiveFileTreeCleanup(data.children, impFiles);
+
+        // Check if current key needs cleaning
+        if (
+          data.score < configuration.submission.verdicts.suspicious &&
+          data.score >= configuration.submission.verdicts.info &&
+          Object.keys(data.children).length === 0
+        ) {
+          const idx = impFiles.indexOf(key);
+          if (idx !== -1) {
+            impFiles.splice(idx, 1);
+          }
+        }
+      }
+
+      return impFiles;
+    };
+
+    if (originalReport && !showInfoContent) {
+      // Cleanup attack matrix
+      const tempMatrix = { ...originalReport.attack_matrix };
+      for (const cat in tempMatrix) {
+        tempMatrix[cat] = filterObject(tempMatrix[cat], value => value.h_type !== 'info');
+        if (Object.keys(tempMatrix[cat]).length === 0) {
+          delete tempMatrix[cat];
+        }
+      }
+
+      // Cleanup heuristics
+      const tempHeur = { ...originalReport.heuristics, info: {} };
+      const tempHeurSec = { ...originalReport.heuristic_sections };
+      for (const key in tempHeurSec) {
+        tempHeurSec[key] = [
+          ...tempHeurSec[key].filter(
+            heur =>
+              heur.heuristic.score >= configuration.submission.verdicts.suspicious ||
+              heur.heuristic.score < configuration.submission.verdicts.info
+          )
+        ];
+      }
+
+      // Cleanup important files
+      const tempImpFiles = recursiveFileTreeCleanup(originalReport.file_tree, [...originalReport.important_files]);
+
+      // Cleanup tags
+      const tempTags = { ...originalReport.tags };
+      for (const cat in tempTags) {
+        for (const type in tempTags[cat]) {
+          tempTags[cat][type] = filterObject(tempTags[cat][type], value => value.h_type !== 'info');
+          if (Object.keys(tempTags[cat][type]).length === 0) {
+            delete tempTags[cat][type];
+          }
+        }
+        if (Object.keys(tempTags[cat]).length === 0) {
+          delete tempTags[cat];
+        }
+      }
+
+      setReport({
+        ...originalReport,
+        attack_matrix: tempMatrix,
+        heuristics: tempHeur,
+        heuristic_sections: tempHeurSec,
+        important_files: tempImpFiles,
+        tags: tempTags
+      });
+    } else {
+      setReport(originalReport);
+    }
+  }, [originalReport, showInfoContent, configuration]);
+
   useEffectOnce(() => {
     if (currentUser.roles.includes('submission_view')) {
       apiCall({
         url: `/api/v4/submission/report/${id}/`,
         onSuccess: api_data => {
-          setReport(api_data.api_response);
+          setOriginalReport(api_data.api_response);
         },
         onFailure: api_data => {
           if (api_data.api_status_code === 425) {
@@ -628,6 +685,12 @@ export default function SubmissionReport() {
       });
     }
   });
+
+  useEffect(() => {
+    if (originalReport) {
+      cleanupReport();
+    }
+  }, [cleanupReport, originalReport, showInfoContent]);
 
   useEffect(() => {
     if (useAIReport) {
@@ -1109,7 +1172,7 @@ export default function SubmissionReport() {
           (!report ||
             Object.keys(report.heuristics.malicious).length !== 0 ||
             Object.keys(report.heuristics.suspicious).length !== 0 ||
-            (showInfoContent && Object.keys(report.heuristics.info).length !== 0) ||
+            Object.keys(report.heuristics.info).length !== 0 ||
             (report.max_score < 0 && report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
             <>
               <div className={classes.section_title}>
@@ -1127,7 +1190,6 @@ export default function SubmissionReport() {
                         sections={report.heuristic_sections}
                         name_map={report.heuristic_name_map}
                         force
-                        showInfoContent={showInfoContent}
                       />
                     )}
                   {Object.keys(report.heuristics.malicious).length !== 0 && (
@@ -1136,7 +1198,6 @@ export default function SubmissionReport() {
                       items={report.heuristics.malicious}
                       sections={report.heuristic_sections}
                       name_map={report.heuristic_name_map}
-                      showInfoContent={showInfoContent}
                     />
                   )}
                   {Object.keys(report.heuristics.suspicious).length !== 0 && (
@@ -1145,16 +1206,14 @@ export default function SubmissionReport() {
                       items={report.heuristics.suspicious}
                       sections={report.heuristic_sections}
                       name_map={report.heuristic_name_map}
-                      showInfoContent={showInfoContent}
                     />
                   )}
-                  {showInfoContent && Object.keys(report.heuristics.info).length !== 0 && (
+                  {Object.keys(report.heuristics.info).length !== 0 && (
                     <HeuristicsList
                       verdict="info"
                       items={report.heuristics.info}
                       sections={report.heuristic_sections}
                       name_map={report.heuristic_name_map}
-                      showInfoContent={showInfoContent}
                     />
                   )}
                 </>
@@ -1179,12 +1238,7 @@ export default function SubmissionReport() {
             >
               {report
                 ? Object.keys(report.attack_matrix).map((att, i) => (
-                    <AttackMatrixBlock
-                      key={i}
-                      attack={att}
-                      items={report.attack_matrix[att]}
-                      showInfoContent={showInfoContent}
-                    />
+                    <AttackMatrixBlock key={i} attack={att} items={report.attack_matrix[att]} />
                   ))
                 : [...Array(5)].map((_, i) => <AttackMatrixSkel key={i} />)}
             </div>
@@ -1194,7 +1248,7 @@ export default function SubmissionReport() {
         {report &&
           Object.keys(report.tags).length !== 0 &&
           Object.keys(report.tags).map((tagGroup, groupIdx) => (
-            <TagTable key={groupIdx} group={tagGroup} items={report.tags[tagGroup]} showInfoContent={showInfoContent} />
+            <TagTable key={groupIdx} group={tagGroup} items={report.tags[tagGroup]} />
           ))}
 
         {(!report || report.important_files.length !== 0) && (
@@ -1208,7 +1262,6 @@ export default function SubmissionReport() {
                 <FileTree
                   tree={report?.file_tree[report?.files[0]?.sha256]?.children}
                   important_files={report?.important_files}
-                  showInfoContent={showInfoContent}
                 />
               ) : (
                 <FileTreeSkel />
