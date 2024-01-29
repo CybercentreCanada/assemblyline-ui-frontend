@@ -83,7 +83,9 @@ export const FileInfoSchema = z.object({
   ssdeep: z.string().default('').catch('').describe('SSDEEP hash of the file'),
   tlsh: z.string().default('').catch('').describe('TLSH hash of the file'),
   type: z.string().default('').catch('').describe('Type of file as identified by Assemblyline'),
-  uri_info: URIInfoSchema.default(null).describe('"URI structure to speed up specialty file searching"')
+  uri_info: URIInfoSchema.default(getDefaults(URIInfoSchema)).describe(
+    '"URI structure to speed up specialty file searching"'
+  )
 });
 
 export const FileInfoResultsSchema = makeResultSchema(FileInfoSchema).describe('asdasd');
