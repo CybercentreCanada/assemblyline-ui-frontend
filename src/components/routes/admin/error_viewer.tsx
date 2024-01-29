@@ -219,12 +219,6 @@ export default function ErrorViewer() {
     [location.search]
   );
 
-  console.log(
-    '  File "/var/lib/assemblyline/.local/lib/python3.9/site-packages/assemblyline_v4_service/common/base.py", line 171, in handle_task\n    self.execute(request)\n  File "/opt/al_service/batchdeobfuscator.py", line 53, in execute\n    bat_filename, extracted_files = deobfuscator.analyze(tf.name, self.working_directory)\n  File "/var/lib/assemblyline/.local/lib/python3.9/site-packages/batch_deobfuscator/batch_interpreter.py", line 1017, in analyze\n    self.analyze_logical_line(logical_line, working_directory, f, extracted_files)\n  File "/var/lib/assemblyline/.local/lib/python3.9/site-packages/batch_deobfuscator/batch_interpreter.py", line 973, in analyze_logical_line\n    self.interpret_command(normalized_comm)\n  File "/var/lib/assemblyline/.local/lib/python3.9/site-packages/batch_deobfuscator/batch_interpreter.py", line 767, in interpret_command\n    self.interpret_net(normalized_comm)\n  File "/var/lib/assemblyline/.local/lib/python3.9/site-packages/batch_deobfuscator/batch_interpreter.py", line 648, in interpret_net\n    info = {"devicename": split_cmd[2], "server": split_cmd[3]}\nIndexError: list index out of range'
-      .length,
-    '  File "/var/lib/assemblyline/.local/lib/python3.9/site-packages/assemblyline_v4_service/common/base.py", line 171, in handle_task\n    self.execute(request)\n  File "/opt/al_service/batchdeobfuscator.py", line 53, in execute\n    bat_filename, extracted_files = deobfuscator.analyze(tf.name, self.working_directory)\n  File "/var/lib/assemblyline/.local/lib/python3.9/site-packages/batch_deobfuscator/batch_interpreter.py", line 1017, in analyze\n    self.analyze_logical_line(logical_line, working_directory, f, extracted_files)\n  File "/var/lib/assemblyline/.local/lib/python3.9/site-packages/batch_deobfuscator/batch_interpreter.py", line 973, in analyze_logical_line\n    self.interpret_command(normalized_comm)\n  File "/var/lib/assemblyline/.local/lib/python3.9/site-packages/batch_deobfuscator/batch_interpreter.py", line 767, in interpret_command\n    self.interpret_net(normalized_comm)\n  File "/var/lib/assemblyline/.local/lib/python3.9/site-packages/batch_deobfuscator/batch_interpreter.py", line 648, in interpret_net\n    info = {"devicename": split_cmd[2], "server": split_cmd[3]}\nIndexError: list index out of range'
-  );
-
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
       <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
