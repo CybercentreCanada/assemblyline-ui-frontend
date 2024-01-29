@@ -1,5 +1,7 @@
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import InfoIcon from '@mui/icons-material/Info';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
@@ -29,7 +31,6 @@ import useHybridReports from 'components/hooks/useHybridReports';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
-import useSafeResults from 'components/hooks/useSafeResults';
 import Classification from 'components/visual/Classification';
 import ResultSection from 'components/visual/ResultCard/result_section';
 import TextVerdict from 'components/visual/TextVerdict';
@@ -339,16 +340,15 @@ function AttributionBanner({ report }) {
   );
 }
 
-function TagTable({ group, items }) {
+function TagTable({ group, items, showInfoContent = false }) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
   const orderedItems = {};
   const classes = useStyles();
-  const { showSafeResults } = useSafeResults();
 
   Object.keys(items).map(tagType =>
     Object.keys(items[tagType])
-      .filter(tagValue => items[tagType][tagValue].h_type !== 'info' || showSafeResults)
+      .filter(tagValue => items[tagType][tagValue].h_type !== 'info' || showInfoContent)
       .map(tagValue => {
         const key = `${items[tagType][tagValue].h_type}_${tagType}`;
         if (!Object.hasOwnProperty.call(orderedItems, key)) {
@@ -405,14 +405,13 @@ function TagTable({ group, items }) {
   ) : null;
 }
 
-function AttackMatrixBlock({ attack, items }) {
+function AttackMatrixBlock({ attack, items, showInfoContent = false }) {
   const classes = useStyles();
-  const { showSafeResults } = useSafeResults();
   return (
     <div className={classes.attack_bloc}>
       <span className={classes.attack_title}>{attack.replace(/-/g, ' ')}</span>
       {Object.keys(items)
-        .filter((cat, idx) => items[cat].h_type !== 'info' || showSafeResults)
+        .filter((cat, idx) => items[cat].h_type !== 'info' || showInfoContent)
         .map((cat, idx) =>
           items[cat].h_type === 'safe' ? null : (
             <div key={idx}>
@@ -443,11 +442,10 @@ function AttackMatrixSkel() {
   );
 }
 
-function HeuristicsList({ verdict, items, sections, name_map, force = false }) {
+function HeuristicsList({ verdict, items, sections, name_map, force = false, showInfoContent = false }) {
   const classes = useStyles();
   const theme = useTheme();
   const { configuration } = useALContext();
-  const { showSafeResults } = useSafeResults();
   const classMap = {
     malicious: classes.malicious_heur,
     suspicious: classes.suspicious_heur,
@@ -472,7 +470,7 @@ function HeuristicsList({ verdict, items, sections, name_map, force = false }) {
                   sections[heur_id] &&
                   sections[heur_id]
                     .filter(
-                      sec => sec.heuristic?.score >= configuration.submission.verdicts.suspicious || showSafeResults
+                      sec => sec.heuristic?.score >= configuration.submission.verdicts.suspicious || showInfoContent
                     )
                     .sort((a, b) => (a.title_text >= b.title_text ? 1 : -1))
                     .map((sec, secidx) => {
@@ -593,7 +591,7 @@ export default function SubmissionReport() {
   const classes = useStyles();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
   const [metaOpen, setMetaOpen] = useState(false);
-  const { showSafeResults } = useSafeResults();
+  const [showInfoContent, setShowInfoContent] = useState(false);
   const { showHybridReports } = useHybridReports();
 
   useEffectOnce(() => {
@@ -647,6 +645,16 @@ export default function SubmissionReport() {
               <div style={{ textAlign: 'right' }}>
                 {report ? (
                   <>
+                    {!showHybridReports && (
+                      <NoPrintTooltip
+                        title={t(showInfoContent ? 'hide_info' : 'show_info')}
+                        PopperProps={{ disablePortal: true }}
+                      >
+                        <IconButton onClick={() => setShowInfoContent(!showInfoContent)} size="large">
+                          {showInfoContent ? <InfoIcon /> : <InfoOutlinedIcon />}
+                        </IconButton>
+                      </NoPrintTooltip>
+                    )}
                     <NoPrintTooltip title={t('print')} PopperProps={{ disablePortal: true }}>
                       <IconButton onClick={() => window.print()} size="large">
                         <PrintOutlinedIcon />
@@ -660,6 +668,12 @@ export default function SubmissionReport() {
                   </>
                 ) : (
                   <div style={{ display: 'inline-flex' }}>
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
                     <Skeleton
                       variant="circular"
                       height="2.5rem"
@@ -1062,7 +1076,7 @@ export default function SubmissionReport() {
           (!report ||
             Object.keys(report.heuristics.malicious).length !== 0 ||
             Object.keys(report.heuristics.suspicious).length !== 0 ||
-            (showSafeResults && Object.keys(report.heuristics.info).length !== 0) ||
+            (showInfoContent && Object.keys(report.heuristics.info).length !== 0) ||
             (report.max_score < 0 && report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
             <>
               <div className={classes.section_title}>
@@ -1080,6 +1094,7 @@ export default function SubmissionReport() {
                         sections={report.heuristic_sections}
                         name_map={report.heuristic_name_map}
                         force
+                        showInfoContent={showInfoContent}
                       />
                     )}
                   {Object.keys(report.heuristics.malicious).length !== 0 && (
@@ -1088,6 +1103,7 @@ export default function SubmissionReport() {
                       items={report.heuristics.malicious}
                       sections={report.heuristic_sections}
                       name_map={report.heuristic_name_map}
+                      showInfoContent={showInfoContent}
                     />
                   )}
                   {Object.keys(report.heuristics.suspicious).length !== 0 && (
@@ -1096,14 +1112,16 @@ export default function SubmissionReport() {
                       items={report.heuristics.suspicious}
                       sections={report.heuristic_sections}
                       name_map={report.heuristic_name_map}
+                      showInfoContent={showInfoContent}
                     />
                   )}
-                  {showSafeResults && Object.keys(report.heuristics.info).length !== 0 && (
+                  {showInfoContent && Object.keys(report.heuristics.info).length !== 0 && (
                     <HeuristicsList
                       verdict="info"
                       items={report.heuristics.info}
                       sections={report.heuristic_sections}
                       name_map={report.heuristic_name_map}
+                      showInfoContent={showInfoContent}
                     />
                   )}
                 </>
@@ -1128,7 +1146,12 @@ export default function SubmissionReport() {
             >
               {report
                 ? Object.keys(report.attack_matrix).map((att, i) => (
-                    <AttackMatrixBlock key={i} attack={att} items={report.attack_matrix[att]} />
+                    <AttackMatrixBlock
+                      key={i}
+                      attack={att}
+                      items={report.attack_matrix[att]}
+                      showInfoContent={showInfoContent}
+                    />
                   ))
                 : [...Array(5)].map((_, i) => <AttackMatrixSkel key={i} />)}
             </div>
@@ -1138,7 +1161,7 @@ export default function SubmissionReport() {
         {report &&
           Object.keys(report.tags).length !== 0 &&
           Object.keys(report.tags).map((tagGroup, groupIdx) => (
-            <TagTable key={groupIdx} group={tagGroup} items={report.tags[tagGroup]} />
+            <TagTable key={groupIdx} group={tagGroup} items={report.tags[tagGroup]} showInfoContent={showInfoContent} />
           ))}
 
         {(!report || report.important_files.length !== 0) && (
