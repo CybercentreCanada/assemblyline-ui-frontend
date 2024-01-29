@@ -49,7 +49,7 @@ type ErrorsTableProps = {
   allowSort?: boolean;
 };
 
-const MAX_MESSAGE_SIZE = 100;
+const MAX_MESSAGE_SIZE = 2500;
 
 const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, setErrorKey = null, allowSort = true }) => {
   const { t, i18n } = useTranslation(['adminErrorViewer']);
@@ -108,13 +108,13 @@ const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, setError
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>{error.response.service_name}</DivTableCell>
-                <DivTableCell>
+                <DivTableCell style={{ wordBreak: 'break-word' }}>
                   {error.response.message.length > MAX_MESSAGE_SIZE ? (
                     <>
                       <span>{error.response.message.slice(0, MAX_MESSAGE_SIZE)}... </span>
-                      <span>{`(${bytesToSize(new Blob([error.response.message.slice(MAX_MESSAGE_SIZE)]).size)} ${t(
-                        'more'
-                      )})`}</span>
+                      <span style={{ color: theme.palette.secondary.main }}>{`(${bytesToSize(
+                        new Blob([error.response.message.slice(MAX_MESSAGE_SIZE)]).size
+                      )} ${t('more')})`}</span>
                     </>
                   ) : (
                     <span>{error.response.message}</span>
