@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
@@ -720,6 +721,8 @@ type FilterFieldProps = {
 };
 
 const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => null }: FilterFieldProps) => {
+  const theme = useTheme();
+
   const [value, setValue] = useState<string>('');
   const [, startTransition] = useTransition();
 
@@ -765,8 +768,13 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
           </InputAdornment>
         }
         sx={{
+          '& .MuiOutlinedInput-input': {
+            paddingTop: theme.spacing(0.5),
+            paddingBottom: theme.spacing(0.5)
+          },
           '& button': {
-            visibility: 'hidden'
+            visibility: 'hidden',
+            padding: theme.spacing(0.5)
           },
           '&:hover button': {
             visibility: 'visible'
@@ -786,6 +794,8 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
 });
 
 const SelectCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => null }: FilterFieldProps) => {
+  const theme = useTheme();
+
   const [value, setValue] = useState<string[]>([]);
   const [, startTransition] = useTransition();
 
@@ -805,8 +815,14 @@ const SelectCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
         multiple
         fullWidth
         size="small"
-        sx={{ maxWidth: '109px' }}
         onChange={event => handleChange(event)}
+        sx={{
+          maxWidth: '109px',
+          '& .MuiOutlinedInput-input': {
+            paddingTop: theme.spacing(0.5),
+            paddingBottom: theme.spacing(0.5)
+          }
+        }}
       >
         {['malicious', 'highly_suspicious', 'suspicious', 'info', 'safe'].map(name => (
           <MenuItem key={name} value={name} sx={{ '&>span': { width: '100%' } }}>
