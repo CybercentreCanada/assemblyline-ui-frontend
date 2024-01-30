@@ -1,6 +1,6 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Alert, Collapse, Divider, Skeleton, Typography, useTheme } from '@mui/material';
+import { Alert, Collapse, Divider, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -25,7 +25,8 @@ const useStyles = makeStyles(theme => ({
   watermark: {
     textAlign: 'right',
     color: theme.palette.text.disabled,
-    fontSize: 'smaller'
+    fontSize: 'smaller',
+    cursor: 'pointer'
   }
 }));
 
@@ -96,7 +97,9 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
           {summary ? (
             <div className={classes.container}>
               <AIMarkdown markdown={summary} truncated={truncated} />
-              <div className={classes.watermark}>{t('powered_by_ai')}</div>
+              <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
+                <div className={classes.watermark}>{t('powered_by_ai')}</div>
+              </Tooltip>
             </div>
           ) : error ? (
             <Alert severity="error">{error}</Alert>
