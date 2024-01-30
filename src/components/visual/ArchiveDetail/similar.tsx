@@ -224,7 +224,16 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                     </div>
                   </div>
                   <TableContainer component={StyledPaper} paper={drawer}>
-                    <GridTable columns={hasArchived ? 5 : 4} size="small" paper={drawer}>
+                    <GridTable
+                      columns={hasArchived ? 5 : 4}
+                      size="small"
+                      paper={drawer}
+                      style={{
+                        gridTemplateColumns: hasArchived
+                          ? `min-content minmax(auto, 1fr) minmax(auto, 3fr) minmax(auto, 1fr) min-content`
+                          : `minmax(auto, 1fr) minmax(auto, 3fr) minmax(auto, 1fr) min-content`
+                      }}
+                    >
                       <GridTableHead>
                         <GridTableRow>
                           {hasArchived && <GridTableCell />}

@@ -280,7 +280,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
             <div style={{ display: 'flex', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
               <AutoSizer style={{ display: 'flex', height: '100%', width: '100%' }}>
                 {({ width, height }) => (
-                  <TableContainer component={StyledPaper} paper={!drawer} style={{ overflowX: 'hidden' }}>
+                  <TableContainer component={StyledPaper} paper={!drawer} style={{ overflow: 'hidden' }}>
                     <GridTable
                       stickyHeader
                       paper={!drawer}
@@ -339,7 +339,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                           <SelectCell onChange={value => handleFilter('h_type', value)} />
                           <FilterCell onChange={value => handleFilter('value', value)} />
                           <FilterCell onChange={value => handleFilter('classification', value)} />
-                          <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }} />
+                          <GridTableCell variant="head" sx={{ position: 'sticky', top: '42.9px' }} />
                         </GridTableRow>
                       </GridTableHead>
                       <GridTableBody>
@@ -720,6 +720,8 @@ type FilterFieldProps = {
 };
 
 const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => null }: FilterFieldProps) => {
+  const theme = useTheme();
+
   const [value, setValue] = useState<string>('');
   const [, startTransition] = useTransition();
 
@@ -750,7 +752,7 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
   );
 
   return (
-    <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }}>
+    <GridTableCell variant="head" sx={{ position: 'sticky', top: '42.9px' }}>
       <OutlinedInput
         value={value}
         size="small"
@@ -765,8 +767,13 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
           </InputAdornment>
         }
         sx={{
+          '& .MuiOutlinedInput-input': {
+            paddingTop: theme.spacing(0.5),
+            paddingBottom: theme.spacing(0.5)
+          },
           '& button': {
-            visibility: 'hidden'
+            visibility: 'hidden',
+            padding: theme.spacing(0.5)
           },
           '&:hover button': {
             visibility: 'visible'
@@ -786,6 +793,8 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
 });
 
 const SelectCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => null }: FilterFieldProps) => {
+  const theme = useTheme();
+
   const [value, setValue] = useState<string[]>([]);
   const [, startTransition] = useTransition();
 
@@ -799,14 +808,20 @@ const SelectCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
   );
 
   return (
-    <GridTableCell variant="head" sx={{ position: 'sticky', top: '43px' }}>
+    <GridTableCell variant="head" sx={{ position: 'sticky', top: '42.9px' }}>
       <Select
         value={value}
         multiple
         fullWidth
         size="small"
-        sx={{ maxWidth: '109px' }}
         onChange={event => handleChange(event)}
+        sx={{
+          maxWidth: '109px',
+          '& .MuiOutlinedInput-input': {
+            paddingTop: theme.spacing(0.5),
+            paddingBottom: theme.spacing(0.5)
+          }
+        }}
       >
         {['malicious', 'highly_suspicious', 'suspicious', 'info', 'safe'].map(name => (
           <MenuItem key={name} value={name} sx={{ '&>span': { width: '100%' } }}>
