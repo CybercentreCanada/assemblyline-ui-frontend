@@ -1,3 +1,5 @@
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import {
   Box,
   Button,
@@ -9,11 +11,9 @@ import {
   Paper,
   Popper,
   Typography,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -188,7 +188,13 @@ const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates 
 
   return displayedResult.result.score < 0 && !showSafeResults && !force ? null : (
     <div className={classes.card} style={{ marginBottom: sp2 }}>
-      <Popper open={popper} anchorEl={anchorEl} placement="bottom-end" transition>
+      <Popper
+        open={popper}
+        anchorEl={anchorEl}
+        placement="bottom-end"
+        transition
+        sx={{ zIndex: theme.zIndex.drawer + 1 }}
+      >
         {({ TransitionProps }) => (
           <Fade {...TransitionProps}>
             <Paper>
