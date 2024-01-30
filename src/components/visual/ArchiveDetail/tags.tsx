@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
