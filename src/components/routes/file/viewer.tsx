@@ -87,11 +87,14 @@ const useStyles = makeStyles(theme => ({
     textAlign: 'left',
     whiteSpace: 'pre-wrap',
     overflowY: 'auto',
-    height: '100%',
-    maxHeight: '100%',
     whiteSpaceCollapse: 'collapse',
     borderLeftWidth: '0px',
-    wordBreak: 'break-word'
+    wordBreak: 'break-word',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 0,
+    left: 0
   },
   spinner: {
     textAlign: 'center',
@@ -103,7 +106,8 @@ const useStyles = makeStyles(theme => ({
   watermark: {
     textAlign: 'right',
     color: theme.palette.text.disabled,
-    fontSize: 'smaller'
+    fontSize: 'smaller',
+    cursor: 'pointer'
   }
 }));
 
@@ -459,25 +463,35 @@ const FileViewer = () => {
                 </Grid>
                 {codeAllowed && isMdUp && (
                   <Grid item xs={12} md={4}>
-                    <div className={classes.code}>
-                      <Button onClick={() => getCodeSummary()} variant="outlined" fullWidth color="inherit">
-                        {t('analyse_code')}
-                      </Button>
-                      <div style={{ flexGrow: 1 }}>
-                        {analysing ? (
+                    <div style={{ position: 'relative', height: '100%' }}>
+                      <div className={classes.code}>
+                        {!analysing && !codeSummary && !codeError && (
                           <div className={classes.spinner}>
-                            <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_code')}</div>
-                            <CircularProgress variant="indeterminate" />
+                            <Button onClick={() => getCodeSummary()} variant="outlined" color="inherit">
+                              {t('analyse_code')}
+                            </Button>
                           </div>
-                        ) : codeError ? (
-                          <Alert severity="error" style={{ marginTop: theme.spacing(2) }}>
-                            {codeError}
-                          </Alert>
-                        ) : (
-                          <AIMarkdown markdown={codeSummary} truncated={codeTruncated} />
+                        )}
+                        <div style={{ flexGrow: 1, marginTop: !analysing && !codeError ? theme.spacing(-4) : null }}>
+                          {analysing ? (
+                            <div className={classes.spinner}>
+                              <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_code')}</div>
+                              <CircularProgress variant="indeterminate" />
+                            </div>
+                          ) : codeError ? (
+                            <Alert severity="error" style={{ marginTop: theme.spacing(2) }}>
+                              {codeError}
+                            </Alert>
+                          ) : (
+                            <AIMarkdown markdown={codeSummary} truncated={codeTruncated} />
+                          )}
+                        </div>
+                        {codeSummary && (
+                          <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
+                            <div className={classes.watermark}>{t('powered_by_ai')}</div>
+                          </Tooltip>
                         )}
                       </div>
-                      <div className={classes.watermark}>{t('powered_by_ai')}</div>
                     </div>
                   </Grid>
                 )}
@@ -485,16 +499,33 @@ const FileViewer = () => {
             </div>
           )}
           {tab === 'code' && !isMdUp && (
-            <div className={classes.tab}>
-              {codeSummary !== null && codeSummary !== undefined ? (
-                <AIMarkdown markdown={codeSummary} truncated={codeTruncated} />
-              ) : codeError ? (
-                <Alert severity="error">{codeError}</Alert>
-              ) : (
-                <LinearProgress />
-              )}
-              <div className={classes.watermark} style={{ paddingBottom: theme.spacing(1) }}>
-                {t('powered_by_ai')}
+            <div style={{ position: 'relative', overflowY: 'auto', height: '100%' }}>
+              <div
+                className={classes.tab}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  padding: theme.spacing(1),
+                  marginTop: !codeError ? theme.spacing(-4) : null
+                }}
+              >
+                {codeSummary !== null && codeSummary !== undefined ? (
+                  <AIMarkdown markdown={codeSummary} truncated={codeTruncated} />
+                ) : codeError ? (
+                  <Alert severity="error">{codeError}</Alert>
+                ) : (
+                  <LinearProgress />
+                )}
+                {codeSummary && (
+                  <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
+                    <div className={classes.watermark} style={{ paddingBottom: theme.spacing(1) }}>
+                      {t('powered_by_ai')}
+                    </div>
+                  </Tooltip>
+                )}
               </div>
             </div>
           )}
