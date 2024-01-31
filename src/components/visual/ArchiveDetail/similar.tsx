@@ -177,7 +177,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
             (() => {
               const hasArchived = data[k].items.some(item => item?.from_archive);
               return (
-                <StyledPaper key={i} className={classes.container} paper={!drawer}>
+                <StyledPaper key={i} className={classes.container} paper={!drawer} variant="outlined">
                   <div className={classes.caption}>
                     <div>
                       <b>{t(DEFAULT_SIMILAR[k].label)}</b>&nbsp;
@@ -202,7 +202,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                       </small>
                     </div>
                   </div>
-                  <TableContainer component={StyledPaper} paper={drawer}>
+                  <TableContainer component={StyledPaper} variant="outlined">
                     <GridTable
                       columns={hasArchived ? 5 : 4}
                       size="small"
@@ -221,7 +221,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                           <GridTableCell children={t('header.type')} />
                         </GridTableRow>
                       </GridTableHead>
-                      <GridTableBody alternating>
+                      <GridTableBody>
                         {data[k].items.map((item, j) => (
                           <GridLinkRow
                             key={`${i}-${j}`}

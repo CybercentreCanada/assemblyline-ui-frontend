@@ -281,7 +281,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
             <div style={{ display: 'flex', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
               <AutoSizer style={{ display: 'flex', height: '100%', width: '100%' }}>
                 {({ width, height }) => (
-                  <TableContainer component={StyledPaper} paper={!drawer} style={{ overflow: 'hidden' }}>
+                  <TableContainer component={StyledPaper} style={{ overflow: 'hidden' }}>
                     <GridTable
                       stickyHeader
                       paper={!drawer}
