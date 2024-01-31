@@ -274,7 +274,8 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
             style={{
               flexGrow: 1,
               border: `1px solid ${theme.palette.divider}`,
-              position: 'relative'
+              position: 'relative',
+              borderRadius: theme.spacing(0.5)
             }}
           >
             <div style={{ display: 'flex', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
