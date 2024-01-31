@@ -88,6 +88,8 @@
   "message": "Message d'erreur:",
   "no_children_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat.",
   "no_children_title": "Aucun fichier enfant trouvé !",
+  "no_detection_desc": "Le fichier actuellement sélectionné n'a généré aucun résultat.",
+  "no_detection_title": "Aucune détection trouvée !",
   "no_errors_title": "Aucun fichier archivé trouvé !",
   "no_parents_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat.",
   "no_parents_title": "Aucun fichier parent trouvé !",

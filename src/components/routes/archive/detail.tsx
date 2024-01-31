@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/material';
+import { AlertTitle, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
@@ -28,6 +28,7 @@ import ParentSection from 'components/visual/FileDetail/parents';
 import ResultSection from 'components/visual/FileDetail/results';
 import URIIdentificationSection from 'components/visual/FileDetail/uriIdent';
 import { ASCIISection, HexSection, ImageSection, StringsSection } from 'components/visual/FileViewer';
+import InformativeAlert from 'components/visual/InformativeAlert';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
 import { TabContainer } from 'components/visual/TabContainer';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -242,26 +243,39 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             },
             detection: {
               label: t('detection'),
-              content: (
-                <>
-                  <Detection
-                    results={file ? file.results : null}
-                    heuristics={file ? file.heuristics : null}
-                    force={force}
-                    nocollapse
-                  />
-                  <AttackSection attacks={file ? file.attack_matrix : null} force={force} nocollapse />
-                  <ResultSection
-                    results={file ? file.results : null}
-                    sid={null}
-                    alternates={file ? file.alternates : null}
-                    force={force}
-                    nocollapse
-                  />
-                  <EmptySection emptys={file ? file.emptys : null} sid={null} nocollapse />
-                  <ErrorSection errors={file ? file.errors : null} nocollapse />
-                </>
-              )
+              content:
+                file &&
+                file.results.length === 0 &&
+                Object.keys(file.heuristics).length === 0 &&
+                Object.keys(file.attack_matrix).length === 0 &&
+                file.emptys.length === 0 &&
+                file.errors.length === 0 ? (
+                  <div style={{ width: '100%' }}>
+                    <InformativeAlert>
+                      <AlertTitle>{t('no_detection_title', { ns: 'archive' })}</AlertTitle>
+                      {t('no_detection_desc', { ns: 'archive' })}
+                    </InformativeAlert>
+                  </div>
+                ) : (
+                  <>
+                    <Detection
+                      results={file ? file.results : null}
+                      heuristics={file ? file.heuristics : null}
+                      force={force}
+                      nocollapse
+                    />
+                    <AttackSection attacks={file ? file.attack_matrix : null} force={force} nocollapse />
+                    <ResultSection
+                      results={file ? file.results : null}
+                      sid={null}
+                      alternates={file ? file.alternates : null}
+                      force={force}
+                      nocollapse
+                    />
+                    <EmptySection emptys={file ? file.emptys : null} sid={null} nocollapse />
+                    <ErrorSection errors={file ? file.errors : null} nocollapse />
+                  </>
+                )
             },
             tags: {
               label: t('tags'),

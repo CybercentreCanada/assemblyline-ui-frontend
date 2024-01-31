@@ -88,6 +88,8 @@
   "message": "Error message:",
   "no_children_desc": "The query that you ran did not return any results.",
   "no_children_title": "No child files found!",
+  "no_detection_desc": "The currently selected file did not generate any results.",
+  "no_detection_title": "No detection found!",
   "no_errors_title": "No archived files found!",
   "no_parents_desc": "The query that you ran did not return any results.",
   "no_parents_title": "No parent files found!",
