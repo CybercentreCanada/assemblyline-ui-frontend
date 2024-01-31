@@ -317,7 +317,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                               ))}
                             </Grid>
                             <Grid item md={1}>
-                              <CustomChip size="small" label={option?.count} />
+                              <CustomChip size="small" label={option?.total} />
                             </Grid>
                           </Grid>
                         );
