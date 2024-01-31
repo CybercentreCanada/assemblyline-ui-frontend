@@ -14,7 +14,6 @@ const StyledTableCell = withStyles((theme: Theme) =>
       paddingLeft: theme.spacing(1)
     },
     head: {
-      // backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
       backgroundColor: 'rgba(0, 0, 0, 5%)',
       whiteSpace: 'nowrap'
     }
@@ -31,7 +30,6 @@ const BreakableTableCell = withStyles((theme: Theme) =>
       }
     },
     head: {
-      // backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
       backgroundColor: 'rgba(0, 0, 0, 5%)',
       whiteSpace: 'nowrap'
     }
