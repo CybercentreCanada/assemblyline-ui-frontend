@@ -32,6 +32,7 @@
   "debug_info": "Informations de débogage:",
   "detail": "Détails de l'analyse du fichier",
   "details": "Détails",
+  "detection": "Détection",
   "download": "Télécharger le fichier",
   "exception": "Afficher les exceptions non gérées",
   "fail.FAIL_NONRECOVERABLE": "Échec non récupérable",

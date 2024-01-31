@@ -32,6 +32,7 @@
   "debug_info": "Debug Information:",
   "detail": "File analysis details",
   "details": "Details",
+  "detection": "Detection",
   "download": "Download file",
   "exception": "Show unhandled exceptions",
   "fail.FAIL_NONRECOVERABLE": "Non-recoverable failure",

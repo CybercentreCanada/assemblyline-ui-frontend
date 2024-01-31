@@ -124,7 +124,7 @@ type Props = {
 };
 
 const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = false }) => {
-  const { t } = useTranslation(['fileDetail', 'archive']);
+  const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
