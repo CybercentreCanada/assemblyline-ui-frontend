@@ -1,12 +1,10 @@
 import ArchiveIcon from '@mui/icons-material/Archive';
-import CompareIcon from '@mui/icons-material/Compare';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { AlertTitle, IconButton, Skeleton, TableContainer, Tooltip, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { File } from 'components/routes/archive/detail';
-import { DIFF_QUERY } from 'components/visual/FileViewer';
 import {
   GridLinkRow,
   GridTable,
@@ -17,16 +15,13 @@ import {
   StyledPaper
 } from 'components/visual/GridTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SectionContainer from 'components/visual/SectionContainer';
-import { useTab } from 'components/visual/TabContainer';
 import { safeFieldValueURI } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { useNavigate } from 'react-router';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -88,9 +83,6 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
   const { t, i18n } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { onTabChange } = useTab();
 
   const { apiCall } = useMyAPI();
   const { showErrorMessage } = useMySnackbar();
@@ -136,19 +128,6 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
 
     return base;
   }, [file]);
-
-  const handleCompareClick = useCallback(
-    (value: Item) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      const query = new SimpleSearchQuery(location.search, null);
-      query.add(DIFF_QUERY, value?.sha256);
-      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-      onTabChange('ascii');
-    },
-    [location.hash, location.pathname, location.search, navigate, onTabChange]
-  );
 
   useEffect(() => {
     if (!file || data) return;
@@ -230,8 +209,8 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                       paper={drawer}
                       style={{
                         gridTemplateColumns: hasArchived
-                          ? `min-content minmax(auto, 1fr) minmax(auto, 3fr) minmax(auto, 1fr) min-content`
-                          : `minmax(auto, 1fr) minmax(auto, 3fr) minmax(auto, 1fr) min-content`
+                          ? `min-content minmax(auto, 1fr) minmax(auto, 3fr) minmax(auto, 1fr)`
+                          : `minmax(auto, 1fr) minmax(auto, 3fr) minmax(auto, 1fr)`
                       }}
                     >
                       <GridTableHead>
@@ -240,7 +219,6 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                           <GridTableCell children={t('header.seen.last')} />
                           <GridTableCell children={t('header.sha256')} />
                           <GridTableCell children={t('header.type')} />
-                          <GridTableCell />
                         </GridTableRow>
                       </GridTableHead>
                       <GridTableBody alternating>
@@ -275,14 +253,6 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                             <GridTableCell>{item?.sha256}</GridTableCell>
 
                             <GridTableCell>{item?.type}</GridTableCell>
-
-                            <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-end' } }}>
-                              <Tooltip title={t('compare')} placement="left">
-                                <IconButton size="small" onClick={handleCompareClick(item)}>
-                                  <CompareIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </GridTableCell>
                           </GridLinkRow>
                         ))}
                       </GridTableBody>

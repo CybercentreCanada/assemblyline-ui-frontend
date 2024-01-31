@@ -152,7 +152,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
   useEffect(() => {
     if (!sha256) return;
     apiCall({
-      url: `/api/v4/file/result/${sha256}/`,
+      url: `/api/v4/file/result/${sha256}/?archive_only=true`,
       onEnter: () => setFile(null),
       onSuccess: api_data => setFile(patchFileDetails(api_data.api_response)),
       onFailure: api_data => showErrorMessage(api_data.api_response)
