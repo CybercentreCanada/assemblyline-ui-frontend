@@ -773,8 +773,7 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
             paddingBottom: theme.spacing(0.5)
           },
           '& button': {
-            visibility: 'hidden',
-            padding: theme.spacing(0.5)
+            visibility: 'hidden'
           },
           '&:hover button': {
             visibility: 'visible'
