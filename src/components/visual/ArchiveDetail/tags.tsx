@@ -763,7 +763,7 @@ const FilterCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
         endAdornment={
           <InputAdornment position="end">
             <IconButton edge="end" onClick={event => handleClear(event)}>
-              <CancelIcon color="secondary" />
+              <CancelIcon color="inherit" style={{ width: '0.75em', height: '0.75em' }} />
             </IconButton>
           </InputAdornment>
         }
