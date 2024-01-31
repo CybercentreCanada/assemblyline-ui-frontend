@@ -1,11 +1,12 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
-import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
-import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem } from '@mui/material';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
+import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
@@ -21,11 +22,13 @@ import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import ClassificationMismatchDialog from './ClassificationMismatchDialog';
 import InputDialog from './InputDialog';
+import SafeBadItem from './SafeBadItem';
 
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
 const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />;
-const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
+const BADLIST_ICON = <BugReportOutlinedIcon style={{ marginRight: '16px' }} />;
+const SAFELIST_ICON = <VerifiedUserOutlinedIcon style={{ marginRight: '16px' }} />;
 const SUBMIT_ICON = <PublishOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -100,7 +103,11 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const [currentLinkClassification, setCurrentLinkClassification] = React.useState('');
   const [safelistDialog, setSafelistDialog] = React.useState(false);
   const [safelistReason, setSafelistReason] = React.useState(null);
+  const [badlistDialog, setBadlistDialog] = React.useState(false);
+  const [badlistReason, setBadlistReason] = React.useState(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
+  const [badlisted, setBadlisted] = React.useState(null);
+  const [safelisted, setSafelisted] = React.useState(null);
   const { showSuccessMessage } = useMySnackbar();
   const { triggerHighlight } = useHighlighter();
   const { apiCall } = useMyAPI();
@@ -108,6 +115,33 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { enrichTagExternal, enrichmentState, getKey } = useExternalLookup();
   const externalLookupResults = enrichmentState[getKey(type, value)];
   const [allInProgress, setAllInProgress] = React.useState(false);
+
+  useEffect(() => {
+    if (state.mouseY !== null) {
+      if (category === 'tag' && currentUser.roles.includes('safelist_manage')) {
+        apiCall({
+          url: `/api/v4/safelist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
+          method: 'GET',
+          onSuccess: resp => {
+            setSafelisted(resp.api_response);
+          },
+          onFailure: () => setSafelisted(null)
+        });
+      }
+      if (category === 'tag' && currentUser.roles.includes('badlist_manage')) {
+        apiCall({
+          url: `/api/v4/badlist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
+          method: 'GET',
+          onSuccess: resp => {
+            setBadlisted(resp.api_response);
+          },
+          onFailure: () => setBadlisted(null)
+        });
+      }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   const handleClose = useCallback(() => {
     setState(initialMenuState);
@@ -120,7 +154,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   }, [currentEvent]);
 
   const checkClassification = useCallback(
-    (event: MouseEvent, link_classification, allow_bypass) => {
+    (event, link_classification, allow_bypass) => {
       if (!isAccessible(link_classification, classification, c12nDef, c12nDef.enforce)) {
         event.preventDefault();
         setCurrentEvent(event);
@@ -166,6 +200,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
       },
       sources: [
         {
+          classification: classification,
           name: currentUser.username,
           reason: [safelistReason],
           type: 'user'
@@ -187,6 +222,42 @@ const WrappedActionMenu: React.FC<TagProps> = ({
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safelistReason, t, type, value]);
+
+  const handleMenuBadlist = useCallback(() => {
+    setBadlistDialog(true);
+    handleClose();
+  }, [setBadlistDialog, handleClose]);
+
+  const addToBadlist = useCallback(() => {
+    const data = {
+      tag: {
+        type,
+        value
+      },
+      sources: [
+        {
+          classification: classification,
+          name: currentUser.username,
+          reason: [badlistReason],
+          type: 'user'
+        }
+      ],
+      type: 'tag'
+    };
+
+    apiCall({
+      url: `/api/v4/badlist/`,
+      method: 'PUT',
+      body: data,
+      onSuccess: _ => {
+        setBadlistDialog(false);
+        showSuccessMessage(t('badlist.success'));
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [badlistReason, t, type, value]);
 
   const hasExternalQuery =
     !!currentUser.roles.includes('external_query') &&
@@ -219,19 +290,34 @@ const WrappedActionMenu: React.FC<TagProps> = ({
         targetClassification={currentLinkClassification}
       />
       {category === 'tag' && (
-        <InputDialog
-          open={safelistDialog}
-          handleClose={() => setSafelistDialog(false)}
-          handleAccept={addToSafelist}
-          handleInputChange={event => setSafelistReason(event.target.value)}
-          inputValue={safelistReason}
-          title={t('safelist.title')}
-          cancelText={t('safelist.cancelText')}
-          acceptText={t('safelist.acceptText')}
-          inputLabel={t('safelist.input')}
-          text={t('safelist.text')}
-          waiting={waitingDialog}
-        />
+        <>
+          <InputDialog
+            open={safelistDialog}
+            handleClose={() => setSafelistDialog(false)}
+            handleAccept={addToSafelist}
+            handleInputChange={event => setSafelistReason(event.target.value)}
+            inputValue={safelistReason}
+            title={t('safelist.title')}
+            cancelText={t('safelist.cancelText')}
+            acceptText={t('safelist.acceptText')}
+            inputLabel={t('safelist.input')}
+            text={t('safelist.text')}
+            waiting={waitingDialog}
+          />
+          <InputDialog
+            open={badlistDialog}
+            handleClose={() => setBadlistDialog(false)}
+            handleAccept={addToBadlist}
+            handleInputChange={event => setBadlistReason(event.target.value)}
+            inputValue={badlistReason}
+            title={t('badlist.title')}
+            cancelText={t('badlist.cancelText')}
+            acceptText={t('badlist.acceptText')}
+            inputLabel={t('badlist.input')}
+            text={t('badlist.text')}
+            waiting={waitingDialog}
+          />
+        </>
       )}
       <Menu
         open={state.mouseY !== null}
@@ -276,11 +362,25 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             {t('highlight')}
           </MenuItem>
         )}
+        {category === 'tag' && currentUser.roles.includes('badlist_manage') && (
+          <Tooltip title={badlisted ? <SafeBadItem item={badlisted} /> : ''} placement="right" arrow>
+            <div>
+              <MenuItem dense onClick={handleMenuBadlist} disabled={badlisted !== null}>
+                {BADLIST_ICON}
+                {t(`${badlisted !== null ? 'already_' : ''}badlist`)}
+              </MenuItem>
+            </div>
+          </Tooltip>
+        )}
         {category === 'tag' && currentUser.roles.includes('safelist_manage') && (
-          <MenuItem dense onClick={handleMenuSafelist}>
-            {SAFELIST_ICON}
-            {t('safelist')}
-          </MenuItem>
+          <Tooltip title={safelisted ? <SafeBadItem item={safelisted} /> : ''} placement="right" arrow>
+            <div>
+              <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted !== null}>
+                {SAFELIST_ICON}
+                {t(`${safelisted !== null ? 'already_' : ''}safelist`)}
+              </MenuItem>
+            </div>
+          </Tooltip>
         )}
         {category === 'tag' && type.endsWith('.uri') && (
           <MenuItem

@@ -4,6 +4,7 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined';
 import BlockIcon from '@mui/icons-material/Block';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOutlined';
@@ -23,7 +24,6 @@ import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
-import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined';
@@ -32,6 +32,7 @@ import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplic
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WebAssetIcon from '@mui/icons-material/WebAsset';
 import { useTranslation } from 'react-i18next';
@@ -184,13 +185,26 @@ export default function useMySitemap() {
       {
         path: '/manage/safelist',
         title: t('drawer.manage.safelist'),
-        icon: <PlaylistAddCheckIcon />,
+        icon: <VerifiedUserOutlinedIcon />,
+        breadcrumbs: ['/manage']
+      },
+      {
+        path: '/manage/badlist/:id',
+        title: t('breadcrumb.badlist.detail'),
+        icon: <ListOutlinedIcon />,
+        breadcrumbs: ['/manage', '/manage/badlist']
+      },
+      {
+        path: '/manage/badlist',
+        title: t('drawer.manage.badlist'),
+        icon: <BugReportOutlinedIcon />,
         breadcrumbs: ['/manage']
       },
       { path: '/search', title: t('drawer.search'), isRoot: true, icon: <SearchIcon /> },
       { path: '/search/alert', title: t('drawer.search.alert'), breadcrumbs: ['/search'] },
       { path: '/search/file', title: t('drawer.search.file'), breadcrumbs: ['/search'] },
       { path: '/search/result', title: t('drawer.search.result'), breadcrumbs: ['/search'] },
+      { path: '/search/retrohunt', title: t('drawer.search.retrohunt'), breadcrumbs: ['/search'] },
       { path: '/search/signature', title: t('drawer.search.signature'), breadcrumbs: ['/search'] },
       { path: '/search/submission', title: t('drawer.search.submission'), breadcrumbs: ['/search'] },
       { path: '/help', title: t('drawer.help'), isRoot: true, icon: <HelpOutlineOutlinedIcon /> },
@@ -264,7 +278,7 @@ export default function useMySitemap() {
       {
         path: '/admin/tag_safelist',
         title: t('adminmenu.tag_safelist'),
-        icon: <PlaylistAddCheckIcon />,
+        icon: <VerifiedUserOutlinedIcon />,
         breadcrumbs: ['/admin']
       },
       {

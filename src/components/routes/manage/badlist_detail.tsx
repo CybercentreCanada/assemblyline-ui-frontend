@@ -1,17 +1,20 @@
 import { ClearOutlined } from '@mui/icons-material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Divider, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Divider, Grid, IconButton, MenuItem, Skeleton, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
 import Histogram from 'components/visual/Histogram';
+import InputDialog from 'components/visual/InputDialog';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
@@ -21,15 +24,26 @@ import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
-export type Safelist = {
+export type Badlist = {
   added: string;
   classification: string;
   enabled: boolean;
   expiry_ts?: string;
+  attribution: {
+    actor: string[];
+    campaign: string[];
+    category: string[];
+    exploit: string[];
+    implant: string[];
+    family: string[];
+    network: string[];
+  };
   hashes: {
     md5: string;
     sha1: string;
     sha256: string;
+    ssdeep: string;
+    tlsh: string;
   };
   file: {
     name: string[];
@@ -54,59 +68,63 @@ export type Safelist = {
   updated: string;
 };
 
+const DEFAULT_TEMP_ATTRIBUTION = { type: 'actor', value: '' };
+const ATTRIBUTION_TYPES = ['actor', 'campaign', 'category', 'exploit', 'implant', 'family', 'network'];
+
 type ParamProps = {
   id: string;
 };
 
-type SafelistDetailProps = {
-  safelist_id?: string;
+type BadlistDetailProps = {
+  badlist_id?: string;
   close?: () => void;
 };
 
-const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
-  const { t, i18n } = useTranslation(['manageSafelistDetail']);
+const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
+  const { t, i18n } = useTranslation(['manageBadlistDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
-  const [safelist, setSafelist] = useState<Safelist>(null);
-  const [histogram, setHistogram] = useState<any>(null);
-  const [deleteDialog, setDeleteDialog] = useState(false);
-  const [waitingDialog, setWaitingDialog] = useState(false);
-  const [enableDialog, setEnableDialog] = useState(false);
-  const [disableDialog, setDisableDialog] = useState(false);
+  const [badlist, setBadlist] = useState<Badlist>(null);
+  const [histogram, setHistogram] = useState<Record<string, number>>(null);
+  const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
+  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
+  const [enableDialog, setEnableDialog] = useState<boolean>(false);
+  const [addAttributionDialog, setAddAttributionDialog] = useState<boolean>(false);
+  const [disableDialog, setDisableDialog] = useState<boolean>(false);
+  const [removeAttributionDialog, setRemoveAttributionDialog] = useState(null);
   const [removeSourceData, setRemoveSourceData] = useState(null);
+  const [addAttributionData, setAddAttributionData] = useState({ ...DEFAULT_TEMP_ATTRIBUTION });
   const { user: currentUser, c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if ((safelist_id || id) && currentUser.roles.includes('safelist_view')) {
+    if ((badlist_id || id) && currentUser.roles.includes('badlist_view')) {
       reload();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safelist_id, id]);
+  }, [badlist_id, id]);
 
   const reload = () => {
     apiCall({
-      url: `/api/v4/safelist/${safelist_id || id}/`,
+      url: `/api/v4/badlist/${badlist_id || id}/`,
       onSuccess: api_data => {
-        setSafelist(api_data.api_response);
+        setBadlist(api_data.api_response);
       }
     });
   };
 
   useEffect(() => {
-    if (safelist && currentUser.roles.includes('submission_view')) {
+    if (badlist && currentUser.roles.includes('submission_view')) {
       apiCall({
         method: 'POST',
         url: '/api/v4/search/histogram/result/created/',
         body: {
           query:
-            safelist.type === 'file'
-              ? `result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`
-              : safelist.type === 'signature'
-              ? `result.sections.heuristic.signature.name:${safeFieldValue(safelist.signature.name)}`
-              : `result.sections.safelisted_tags.${safelist.tag.type}:${safeFieldValue(safelist.tag.value)}`,
+            badlist.type === 'file'
+              ? `result.sections.heuristic.signature.name:"BADLIST_${badlist_id || id}"`
+              : `result.sections.tags.${badlist.tag.type}:${safeFieldValue(badlist.tag.value)}`,
           mincount: 0,
           start: 'now-30d/d',
           end: 'now+1d/d-1s',
@@ -118,19 +136,19 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safelist]);
+  }, [badlist]);
 
-  const removeSafelist = () => {
+  const removeBadlist = () => {
     apiCall({
-      url: `/api/v4/safelist/${safelist_id || id}/`,
+      url: `/api/v4/badlist/${badlist_id || id}/`,
       method: 'DELETE',
       onSuccess: () => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
         if (id) {
-          setTimeout(() => navigate('/manage/safelist'), 1000);
+          setTimeout(() => navigate('/manage/badlist'), 1000);
         }
-        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadBadlist')), 1000);
         close();
       },
       onEnter: () => setWaitingDialog(true),
@@ -141,13 +159,13 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   const enableHash = () => {
     apiCall({
       body: true,
-      url: `/api/v4/safelist/enable/${safelist_id || id}/`,
+      url: `/api/v4/badlist/enable/${badlist_id || id}/`,
       method: 'PUT',
       onSuccess: () => {
         setEnableDialog(false);
         showSuccessMessage(t('enable.success'));
-        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
-        setSafelist({ ...safelist, enabled: true });
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadBadlist')), 1000);
+        setBadlist({ ...badlist, enabled: true });
       },
       onEnter: () => setWaitingDialog(true),
       onExit: () => setWaitingDialog(false)
@@ -157,13 +175,13 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   const disableHash = () => {
     apiCall({
       body: false,
-      url: `/api/v4/safelist/enable/${safelist_id || id}/`,
+      url: `/api/v4/badlist/enable/${badlist_id || id}/`,
       method: 'PUT',
       onSuccess: () => {
         setDisableDialog(false);
         showSuccessMessage(t('disable.success'));
-        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
-        setSafelist({ ...safelist, enabled: false });
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadBadlist')), 1000);
+        setBadlist({ ...badlist, enabled: false });
       },
       onEnter: () => setWaitingDialog(true),
       onExit: () => setWaitingDialog(false)
@@ -173,13 +191,13 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   const handleExpiryDateChange = date => {
     apiCall({
       body: date,
-      url: `/api/v4/safelist/expiry/${safelist_id || id}/`,
+      url: `/api/v4/badlist/expiry/${badlist_id || id}/`,
       method: date ? 'PUT' : 'DELETE',
       onSuccess: () => {
         setDisableDialog(false);
         showSuccessMessage(t(date ? 'expiry.update.success' : 'expiry.clear.success'));
-        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
-        setSafelist({ ...safelist, expiry_ts: date });
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadBadlist')), 1000);
+        setBadlist({ ...badlist, expiry_ts: date });
       },
       onEnter: () => setWaitingDialog(true),
       onExit: () => setWaitingDialog(false)
@@ -189,12 +207,12 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   const handleClassificationChange = (classification, source, type) => {
     apiCall({
       body: classification,
-      url: `/api/v4/safelist/classification/${safelist_id || id}/${source}/${type}/`,
+      url: `/api/v4/badlist/classification/${badlist_id || id}/${source}/${type}/`,
       method: 'PUT',
       onSuccess: () => {
         showSuccessMessage(t('classification.update.success'));
         setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('reloadSafelist'));
+          window.dispatchEvent(new CustomEvent('reloadBadlist'));
           reload();
         }, 1000);
       },
@@ -205,12 +223,12 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
 
   const deleteSource = () => {
     apiCall({
-      url: `/api/v4/safelist/source/${safelist_id || id}/${removeSourceData.name}/${removeSourceData.type}/`,
+      url: `/api/v4/badlist/source/${badlist_id || id}/${removeSourceData.name}/${removeSourceData.type}/`,
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('remove.source.success'));
         setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('reloadSafelist'));
+          window.dispatchEvent(new CustomEvent('reloadBadlist'));
           reload();
         }, 1000);
       },
@@ -222,12 +240,49 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
     });
   };
 
-  return currentUser.roles.includes('safelist_view') ? (
+  const deleteAttribution = () => {
+    apiCall({
+      url: `/api/v4/badlist/attribution/${badlist_id || id}/${removeAttributionDialog.type}/${
+        removeAttributionDialog.value
+      }/`,
+      method: 'DELETE',
+      onSuccess: () => {
+        setRemoveAttributionDialog(null);
+        showSuccessMessage(t('remove.attribution.success'));
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('reloadBadlist'));
+          reload();
+        }, 1000);
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
+    });
+  };
+
+  const addAttribution = () => {
+    apiCall({
+      url: `/api/v4/badlist/attribution/${badlist_id || id}/${addAttributionData.type}/${addAttributionData.value}/`,
+      method: 'PUT',
+      onSuccess: () => {
+        setAddAttributionDialog(false);
+        showSuccessMessage(t('add.attribution.success'));
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('reloadBadlist'));
+          setAddAttributionData({ ...DEFAULT_TEMP_ATTRIBUTION });
+          reload();
+        }, 1000);
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
+    });
+  };
+
+  return currentUser.roles.includes('badlist_view') ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
-        handleAccept={removeSafelist}
+        handleAccept={removeBadlist}
         title={t('delete.title')}
         cancelText={t('delete.cancelText')}
         acceptText={t('delete.acceptText')}
@@ -255,6 +310,16 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         waiting={waitingDialog}
       />
       <ConfirmationDialog
+        open={removeAttributionDialog !== null}
+        handleClose={() => setRemoveAttributionDialog(null)}
+        handleAccept={deleteAttribution}
+        title={t('remove.attribution.title')}
+        cancelText={t('remove.attribution.cancelText')}
+        acceptText={t('remove.attribution.acceptText')}
+        text={t('remove.attribution.text')}
+        waiting={waitingDialog}
+      />
+      <ConfirmationDialog
         open={removeSourceData !== null}
         handleClose={() => setRemoveSourceData(null)}
         handleAccept={deleteSource}
@@ -264,43 +329,76 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         text={t('remove.source.text')}
         waiting={waitingDialog}
       />
+      <InputDialog
+        open={addAttributionDialog}
+        handleClose={() => setAddAttributionDialog(false)}
+        handleAccept={addAttribution}
+        title={t('add.attribution.title')}
+        cancelText={t('add.attribution.cancelText')}
+        acceptText={t('add.attribution.acceptText')}
+        text={t('add.attribution.text')}
+        waiting={waitingDialog}
+        handleInputChange={event => setAddAttributionData({ ...addAttributionData, value: event.target.value })}
+        inputValue={addAttributionData.value}
+        inputLabel={t('add.attribution.inputlabel')}
+        outLabel
+        extra={
+          <>
+            <Typography variant="overline">{t('add.attribution.categorylabel')}</Typography>
+            <TextField
+              size="small"
+              value={addAttributionData.type}
+              variant="outlined"
+              onChange={event => setAddAttributionData({ ...addAttributionData, type: event.target.value })}
+              fullWidth
+              select
+            >
+              {ATTRIBUTION_TYPES.map((item, i) => (
+                <MenuItem key={i} value={item}>
+                  {t(`attribution.${item}`)}
+                </MenuItem>
+              ))}
+            </TextField>
+          </>
+        }
+      />
 
       {c12nDef.enforce && (
         <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Classification type="outlined" c12n={safelist ? safelist.classification : null} format="long" />
+          <Classification type="outlined" c12n={badlist ? badlist.classification : null} format="long" />
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: theme.spacing(4) }}>
           <Grid container alignItems="center" spacing={1}>
             <Grid item xs>
-              <Typography variant="h4">{safelist ? t(`title.${safelist.type}`) : t('title')}</Typography>
+              <Typography variant="h4">{badlist ? t(`title.${badlist.type}`) : t('title')}</Typography>
               <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-                {safelist ? safelist_id || id : <Skeleton style={{ width: '10rem' }} />}
+                {badlist ? badlist_id || id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
             <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
-              {safelist ? (
+              {badlist ? (
                 <>
-                  {(safelist_id || id) && (
+                  {(badlist_id || id) && (
                     <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
                       {currentUser.roles.includes('submission_view') && (
                         <Tooltip title={t('usage')}>
                           <IconButton
                             component={Link}
-                            style={{ color: theme.palette.action.active }}
+                            style={{
+                              color: theme.palette.action.active
+                            }}
                             to={
-                              safelist.type === 'file'
-                                ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${
-                                    safelist_id || id
-                                  }"`
-                                : safelist.type === 'signature'
-                                ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValueURI(
-                                    safelist.signature.name
+                              badlist.type === 'file'
+                                ? `/search/?query=sha256:${badlist.hashes.sha256 || badlist_id || id} OR results:${
+                                    badlist.hashes.sha256 || badlist_id || id
+                                  }* OR errors:${badlist.hashes.sha256 || badlist_id || id}* OR file.sha256:${
+                                    badlist.hashes.sha256 || badlist_id || id
+                                  }`
+                                : `/search/result/?query=result.sections.tags.${badlist.tag.type}:${safeFieldValueURI(
+                                    badlist.tag.value
                                   )}`
-                                : `/search/result/?query=result.sections.safelisted_tags.${
-                                    safelist.tag.type
-                                  }:${safeFieldValueURI(safelist.tag.value)}`
                             }
                             size="large"
                           >
@@ -308,18 +406,18 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                           </IconButton>
                         </Tooltip>
                       )}
-                      {currentUser.roles.includes('safelist_manage') && (
-                        <Tooltip title={safelist.enabled ? t('enabled') : t('disabled')}>
+                      {currentUser.roles.includes('badlist_manage') && (
+                        <Tooltip title={badlist.enabled ? t('enabled') : t('disabled')}>
                           <IconButton
-                            onClick={safelist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
+                            onClick={badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
                             size="large"
                           >
-                            {safelist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+                            {badlist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
                           </IconButton>
                         </Tooltip>
                       )}
 
-                      {currentUser.roles.includes('safelist_manage') && (
+                      {currentUser.roles.includes('badlist_manage') && (
                         <Tooltip title={t('remove')}>
                           <IconButton
                             style={{
@@ -340,7 +438,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 <>
                   <div style={{ display: 'flex' }}>
                     <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
-                    {currentUser.roles.includes('safelist_manage') && (
+                    {currentUser.roles.includes('badlist_manage') && (
                       <>
                         <Skeleton
                           variant="circular"
@@ -363,7 +461,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
           </Grid>
         </div>
         <Grid container spacing={3}>
-          <Grid item xs={12} style={{ display: safelist && safelist.type === 'file' ? 'initial' : 'none' }}>
+          <Grid item xs={12} style={{ display: badlist && badlist.type === 'file' ? 'initial' : 'none' }}>
             <Typography variant="h6">{t('hashes')}</Typography>
             <Divider />
             <Grid container>
@@ -371,8 +469,8 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 <span style={{ fontWeight: 500 }}>MD5</span>
               </Grid>
               <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                {safelist ? (
-                  safelist.hashes.md5 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
+                {badlist ? (
+                  badlist.hashes.md5 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
@@ -381,8 +479,8 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 <span style={{ fontWeight: 500 }}>SHA1</span>
               </Grid>
               <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                {safelist ? (
-                  safelist.hashes.sha1 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
+                {badlist ? (
+                  badlist.hashes.sha1 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
@@ -391,15 +489,35 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 <span style={{ fontWeight: 500 }}>SHA256</span>
               </Grid>
               <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                {safelist ? (
-                  safelist.hashes.sha256 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
+                {badlist ? (
+                  badlist.hashes.sha256 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
+                ) : (
+                  <Skeleton />
+                )}
+              </Grid>
+              <Grid item xs={4} sm={3}>
+                <span style={{ fontWeight: 500 }}>SSDeep</span>
+              </Grid>
+              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                {badlist ? (
+                  badlist.hashes.ssdeep || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
+                ) : (
+                  <Skeleton />
+                )}
+              </Grid>
+              <Grid item xs={4} sm={3}>
+                <span style={{ fontWeight: 500 }}>TLSH</span>
+              </Grid>
+              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                {badlist ? (
+                  badlist.hashes.tlsh || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
             </Grid>
           </Grid>
-          {safelist && safelist.file && (
+          {badlist && badlist.file && (
             <Grid item xs={12}>
               <Typography variant="h6">{t('file.title')}</Typography>
               <Divider />
@@ -408,16 +526,16 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                   <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
                 </Grid>
                 <Grid item xs={8} sm={9}>
-                  {safelist ? safelist.file.name.map((name, i) => <div key={i}>{name}</div>) : <Skeleton />}
+                  {badlist ? badlist.file.name.map((name, i) => <div key={i}>{name}</div>) : <Skeleton />}
                 </Grid>
                 <Grid item xs={4} sm={3}>
                   <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
                 </Grid>
                 <Grid item xs={8} sm={9}>
-                  {safelist.file.size ? (
+                  {badlist.file.size ? (
                     <span>
-                      {safelist.file.size}
-                      <span style={{ fontWeight: 300 }}> ({bytesToSize(safelist.file.size)})</span>
+                      {badlist.file.size}
+                      <span style={{ fontWeight: 300 }}> ({bytesToSize(badlist.file.size)})</span>
                     </span>
                   ) : (
                     <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
@@ -428,26 +546,12 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                   <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
                 </Grid>
                 <Grid item xs={8} sm={9} style={{ wordBreak: 'break-word' }}>
-                  {safelist.file.type || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>}
+                  {badlist.file.type || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>}
                 </Grid>
               </Grid>
             </Grid>
           )}
-          {safelist && safelist.signature && (
-            <Grid item xs={12}>
-              <Typography variant="h6">{t('signature.title')}</Typography>
-              <Divider />
-              <Grid container>
-                <Grid item xs={4} sm={3}>
-                  <span style={{ fontWeight: 500 }}>{t('signature.name')}</span>
-                </Grid>
-                <Grid item xs={8} sm={9}>
-                  {safelist.signature.name}
-                </Grid>
-              </Grid>
-            </Grid>
-          )}
-          {safelist && safelist.tag && (
+          {badlist && badlist.tag && (
             <Grid item xs={12}>
               <Typography variant="h6">{t('tag.title')}</Typography>
               <Divider />
@@ -456,27 +560,89 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                   <span style={{ fontWeight: 500 }}>{t('tag.type')}</span>
                 </Grid>
                 <Grid item xs={8} sm={9}>
-                  {safelist.tag.type}
+                  {badlist.tag.type}
                 </Grid>
                 <Grid item xs={4} sm={3}>
                   <span style={{ fontWeight: 500 }}>{t('tag.value')}</span>
                 </Grid>
                 <Grid item xs={8} sm={9} style={{ wordBreak: 'break-word' }}>
-                  {safelist.tag.value}
+                  {badlist.tag.value}
                 </Grid>
               </Grid>
             </Grid>
           )}
           <Grid item xs={12}>
+            <Grid container alignItems={'end'}>
+              <Grid item xs={11}>
+                <Typography variant="h6">{t('attribution.title')}</Typography>
+              </Grid>
+              <Grid item xs={1} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                {currentUser.roles.includes('badlist_manage') &&
+                  (badlist ? (
+                    <Tooltip title={t('add.attribution')}>
+                      <IconButton
+                        style={{
+                          color:
+                            theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                        }}
+                        onClick={() => setAddAttributionDialog(true)}
+                      >
+                        <AddCircleOutlineIcon />
+                      </IconButton>
+                    </Tooltip>
+                  ) : (
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
+                  ))}
+              </Grid>
+            </Grid>
+            <Divider />
+            {badlist &&
+              (!badlist.attribution ||
+                Object.keys(badlist.attribution).every(
+                  k => !badlist.attribution[k] || badlist.attribution[k].length === 0
+                )) && <span style={{ color: theme.palette.action.disabled }}>{t('attribution.empty')}</span>}
+            {badlist &&
+              badlist.attribution &&
+              Object.keys(badlist.attribution)
+                .filter(k => badlist.attribution[k] && badlist.attribution[k].length !== 0)
+                .map((k, kid) => (
+                  <Grid key={kid} container spacing={2}>
+                    <Grid item xs={4} sm={3}>
+                      <span style={{ fontWeight: 500 }}>{t(`attribution.${k}`)}</span>
+                    </Grid>
+                    <Grid item xs={8} sm={9}>
+                      {badlist.attribution[k].map((x, i) => (
+                        <CustomChip
+                          key={i}
+                          label={x}
+                          size="small"
+                          variant="outlined"
+                          onDelete={
+                            currentUser.roles.includes('badlist_manage')
+                              ? () => setRemoveAttributionDialog({ type: k, value: x })
+                              : null
+                          }
+                        />
+                      ))}
+                    </Grid>
+                  </Grid>
+                ))}
+          </Grid>
+          <Grid item xs={12}>
             <Typography variant="h6">{t('sources')}</Typography>
             <Divider />
-            {safelist ? (
-              safelist.sources.map((src, src_id) => (
+            {badlist ? (
+              badlist.sources.map((src, src_id) => (
                 <Grid key={src_id} container>
                   <Grid item xs={12} sm={3}>
                     <span style={{ fontWeight: 500 }}>
                       {src.name} ({t(src.type)})
-                      {(currentUser.is_admin || currentUser.username === src.name) && safelist.sources.length !== 1 && (
+                      {(currentUser.is_admin || currentUser.username === src.name) && badlist.sources.length !== 1 && (
                         <Tooltip title={t('remove.source.tooltip')}>
                           <IconButton
                             size="small"
@@ -521,10 +687,10 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 <Typography variant="h6">{t('timing')}</Typography>
               </Grid>
               <Grid item xs={1} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                {currentUser.roles.includes('safelist_manage') &&
-                  (safelist ? (
+                {currentUser.roles.includes('badlist_manage') &&
+                  (badlist ? (
                     <DatePicker
-                      date={safelist.expiry_ts}
+                      date={badlist.expiry_ts}
                       setDate={handleExpiryDateChange}
                       tooltip={t('expiry.change')}
                       defaultDateOffset={1}
@@ -545,11 +711,11 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 <span style={{ fontWeight: 500 }}>{t('timing.added')}</span>
               </Grid>
               <Grid item xs={8} sm={9}>
-                {safelist ? (
+                {badlist ? (
                   <div>
-                    <Moment format="YYYY-MM-DD">{safelist.added}</Moment>&nbsp; (
+                    <Moment format="YYYY-MM-DD">{badlist.added}</Moment>&nbsp; (
                     <Moment fromNow locale={i18n.language}>
-                      {safelist.added}
+                      {badlist.added}
                     </Moment>
                     )
                   </div>
@@ -561,11 +727,11 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 <span style={{ fontWeight: 500 }}>{t('timing.updated')}</span>
               </Grid>
               <Grid item xs={8} sm={9}>
-                {safelist ? (
+                {badlist ? (
                   <div>
-                    <Moment format="YYYY-MM-DD">{safelist.updated}</Moment>&nbsp; (
+                    <Moment format="YYYY-MM-DD">{badlist.updated}</Moment>&nbsp; (
                     <Moment fromNow locale={i18n.language}>
-                      {safelist.updated}
+                      {badlist.updated}
                     </Moment>
                     )
                   </div>
@@ -577,12 +743,12 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 <span style={{ fontWeight: 500 }}>{t('timing.expiry_ts')}</span>
               </Grid>
               <Grid item xs={8} sm={9}>
-                {safelist ? (
-                  safelist.expiry_ts ? (
+                {badlist ? (
+                  badlist.expiry_ts ? (
                     <div>
-                      <Moment format="YYYY-MM-DD">{safelist.expiry_ts}</Moment>&nbsp; (
+                      <Moment format="YYYY-MM-DD">{badlist.expiry_ts}</Moment>&nbsp; (
                       <Moment fromNow locale={i18n.language}>
-                        {safelist.expiry_ts}
+                        {badlist.expiry_ts}
                       </Moment>
                       )
                     </div>
@@ -602,7 +768,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 height="300px"
                 isDate
                 title={t('chart.title')}
-                datatype={safelist_id || id}
+                datatype={badlist_id || id}
                 verticalLine
               />
             </Grid>
@@ -615,9 +781,9 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   );
 };
 
-SafelistDetail.defaultProps = {
-  safelist_id: null,
+BadlistDetail.defaultProps = {
+  badlist_id: null,
   close: () => {}
 };
 
-export default SafelistDetail;
+export default BadlistDetail;
