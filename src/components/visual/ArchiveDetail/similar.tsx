@@ -221,7 +221,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                           <GridTableCell children={t('header.type')} />
                         </GridTableRow>
                       </GridTableHead>
-                      <GridTableBody>
+                      <GridTableBody alternating>
                         {data[k].items.map((item, j) => (
                           <GridLinkRow
                             key={`${i}-${j}`}
