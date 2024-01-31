@@ -27,9 +27,21 @@ interface StyledPaperProps extends PaperProps {
 
 export const StyledPaper: FC<StyledPaperProps> = memo(
   styled(
-    forwardRef(({ component, ...other }: StyledPaperProps, ref) => <Paper component={component} {...other} ref={ref} />)
-  )<StyledPaperProps>(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF08' : '#00000008'
+    forwardRef(({ component, ...other }: StyledPaperProps, ref) => (
+      <Paper component={component} {...other} ref={ref} />
+    )),
+    {
+      shouldForwardProp: prop => prop !== 'paper'
+    }
+  )<StyledPaperProps>(({ theme, paper = false }) => ({
+    // backgroundColor: theme.palette.mode === 'dark' ? '#0000001A' : '#FFFFFF1A',
+    backgroundColor: paper
+      ? theme.palette.mode === 'dark'
+        ? '#00000006'
+        : '#FFFFFF06'
+      : theme.palette.mode === 'dark'
+      ? '#FFFFFF06'
+      : '#00000006'
   }))
 );
 
@@ -56,11 +68,11 @@ export const GridTable: FC<GridTableProps> = memo(
     '&>*>*>*.MuiTableCell-head': {
       backgroundColor: paper
         ? theme.palette.mode === 'dark'
-          ? '#00000025'
-          : '#0000000F'
+          ? '#393939'
+          : '#EEEEEE'
         : theme.palette.mode === 'dark'
-        ? '#FFFFFF08'
-        : '#0000000F'
+        ? '#484848'
+        : '#F3F3F3'
     }
   }))
 );
@@ -92,7 +104,7 @@ export const GridTableBody: FC<GridTableBodyProps> = memo(
     },
     ...(alternating && {
       '&>*:nth-of-type(even)>*': {
-        backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF0A' : '#00000005'
+        backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF0A' : '#00000008'
       }
     })
   }))
@@ -114,7 +126,7 @@ export const GridTableRow: FC<GridTableRowProps> = memo(
     }),
     ...(selected && {
       '&>div': {
-        backgroundColor: theme.palette.mode
+        backgroundColor: theme.palette.action.selected
       }
     })
   }))
