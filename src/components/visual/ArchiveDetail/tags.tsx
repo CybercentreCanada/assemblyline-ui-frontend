@@ -696,15 +696,17 @@ const WrappedRow: React.FC<RowProps> = ({
       </GridLinkRow>
 
       <GridTableRow>
-        <GridTableCell sx={{ gridColumn: 'span 5', padding: 0 }}>
+        <GridTableCell
+          sx={{
+            gridColumn: 'span 5',
+            padding: 0,
+            backgroundColor: theme.palette.mode === 'dark' ? '#2f2f2f' : '#E2E2E2'
+          }}
+        >
           <Collapse in={open && resultResults?.total > 0} timeout="auto" onEnter={() => setRender(true)}>
             {render && (
               <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}>
-                <ResultsTable
-                  component={props => <StyledPaper {...props} paper={drawer} />}
-                  resultResults={resultResults}
-                  allowSort={false}
-                />
+                <ResultsTable resultResults={resultResults} allowSort={false} />
               </div>
             )}
           </Collapse>
