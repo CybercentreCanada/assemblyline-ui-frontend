@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column'
   },
   watermark: {
-    textAlign: 'right',
+    float: 'right',
     color: theme.palette.text.disabled,
     fontSize: 'smaller',
     cursor: 'pointer'
@@ -97,9 +97,11 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
           {summary ? (
             <div className={classes.container}>
               <AIMarkdown markdown={summary} truncated={truncated} />
-              <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
-                <div className={classes.watermark}>{t('powered_by_ai')}</div>
-              </Tooltip>
+              <div>
+                <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
+                  <div className={classes.watermark}>{t('powered_by_ai')}</div>
+                </Tooltip>
+              </div>
             </div>
           ) : error ? (
             <Alert severity="error">{error}</Alert>
