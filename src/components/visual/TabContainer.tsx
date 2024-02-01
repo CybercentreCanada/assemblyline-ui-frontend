@@ -96,6 +96,7 @@ const WrappedTabContainer = <T extends TabElements>({
           onChange={handleChange(tab)}
           sx={{
             backgroundColor: theme.palette.background.default,
+            border: `1px solid ${theme.palette.divider}`,
             margin: `${theme.spacing(2)} 0`,
             ...(paper && {
               backgroundColor: theme.palette.background.paper

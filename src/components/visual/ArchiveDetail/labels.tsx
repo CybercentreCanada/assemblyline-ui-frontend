@@ -397,16 +397,9 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
             {!labels || !(cat in labels) ? (
               <Skeleton />
             ) : sortedLabels[cat].length === 0 ? (
-              <ChipList
-                items={[
-                  {
-                    label: t('none'),
-                    size: 'small',
-                    variant: 'outlined',
-                    style: { color: theme.palette.text.disabled }
-                  }
-                ]}
-              />
+              <Typography variant="caption" color={theme.palette.text.disabled}>
+                {t('none')}
+              </Typography>
             ) : (
               <ChipList
                 items={sortedLabels[cat].map((value, j) => ({

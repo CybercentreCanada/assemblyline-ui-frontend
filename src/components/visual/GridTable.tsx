@@ -34,7 +34,14 @@ export const StyledPaper: FC<StyledPaperProps> = memo(
       shouldForwardProp: prop => prop !== 'paper'
     }
   )<StyledPaperProps>(({ theme, paper = false }) => ({
-    backgroundColor: theme.palette.background[paper ? 'paper' : 'default']
+    // backgroundColor: theme.palette.mode === 'dark' ? '#0000001A' : '#FFFFFF1A',
+    backgroundColor: paper
+      ? theme.palette.mode === 'dark'
+        ? '#00000010'
+        : '#FFFFFF06'
+      : theme.palette.mode === 'dark'
+      ? '#FFFFFF10'
+      : '#00000006'
   }))
 );
 
@@ -58,8 +65,21 @@ export const GridTable: FC<GridTableProps> = memo(
     gridAutoFlow: 'row',
     alignItems: 'stretch',
     overflowX: 'auto',
+    backgroundColor: paper
+      ? theme.palette.mode === 'dark'
+        ? theme.palette.background.default
+        : theme.palette.background.paper
+      : theme.palette.mode === 'dark'
+      ? theme.palette.background.paper
+      : theme.palette.background.default,
     '&>*>*>*.MuiTableCell-head': {
-      backgroundColor: `color-mix(in srgb, black 5%, ${theme.palette.background[paper ? 'paper' : 'default']})`
+      backgroundColor: paper
+        ? theme.palette.mode === 'dark'
+          ? '#383838'
+          : '#F6F6F6'
+        : theme.palette.mode === 'dark'
+        ? '#494949'
+        : '#F3F3F3'
     }
   }))
 );
@@ -90,8 +110,8 @@ export const GridTableBody: FC<GridTableBodyProps> = memo(
       borderBottom: 'none'
     },
     ...(alternating && {
-      '&>*:nth-of-type(odd)>*': {
-        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 3%)' : 'rgba(0, 0, 0, 3%)'
+      '&>*:nth-of-type(even)>*': {
+        backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF0A' : '#00000008'
       }
     })
   }))
@@ -113,7 +133,7 @@ export const GridTableRow: FC<GridTableRowProps> = memo(
     }),
     ...(selected && {
       '&>div': {
-        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(124, 147, 185, 0.16)' : 'rgba(11, 101, 161, 0.08)'
+        backgroundColor: theme.palette.action.selected
       }
     })
   }))
