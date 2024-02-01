@@ -170,7 +170,9 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
   const Layout: React.FC<{ children: React.ReactNode }> = useCallback(
     ({ children }) =>
       inDrawer ? (
-        <PageFullSize styles={{ paper: { textAlign: 'left', minHeight: null } }}>{children}</PageFullSize>
+        <PageFullSize mt={0} styles={{ paper: { textAlign: 'left', minHeight: null } }}>
+          {children}
+        </PageFullSize>
       ) : (
         <PageCenter width="100%" height="100%" textAlign="left">
           <PageFullSize>{children}</PageFullSize>
