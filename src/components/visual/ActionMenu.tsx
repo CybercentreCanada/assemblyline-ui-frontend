@@ -313,7 +313,11 @@ const WrappedActionMenu: React.FC<TagProps> = ({
     }
   }, [externalLookupResults]);
 
-  return hasExternalLinks || hasExternalQuery || category === 'tag' || category === 'signature' ? (
+  return hasExternalLinks ||
+    hasExternalQuery ||
+    category === 'heuristic' ||
+    category === 'signature' ||
+    category === 'tag' ? (
     <>
       <ClassificationMismatchDialog
         open={confirmationDialog}
