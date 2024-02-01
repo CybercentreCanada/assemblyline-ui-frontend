@@ -36,8 +36,8 @@
   }
 
   @page {
-    size: auto;
-    margin: 0.5in;
+    size: 1020px 1320px;
+    margin: 0.4in;
   }
 
   .no-print,

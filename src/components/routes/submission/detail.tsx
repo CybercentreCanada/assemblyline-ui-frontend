@@ -51,6 +51,7 @@ import { Link, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import ForbiddenPage from '../403';
 import HeuristicDetail from '../manage/heuristic_detail';
+import AISummarySection from './detail/ai_summary';
 import AttackSection from './detail/attack';
 import ErrorSection from './detail/errors';
 import FileTreeSection from './detail/file_tree';
@@ -655,7 +656,7 @@ function WrappedSubmissionDetail() {
       setBaseFiles(submission.files.map(f => f.sha256));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [submission]);
+  }, [submission, systemConfig]);
 
   useEffect(() => {
     if (liveStatus === 'processing') {
@@ -1260,6 +1261,12 @@ function WrappedSubmissionDetail() {
           metadata={submission ? submission.metadata : null}
           classification={submission ? submission.classification : null}
         />
+        {systemConfig.ui.ai.enabled && (
+          <AISummarySection
+            type={'submission' as 'submission'}
+            id={submission && submission.state === 'completed' ? submission.sid : null}
+          />
+        )}
         <Detection
           section_map={summary ? summary.heuristic_sections : null}
           heuristics={summary ? summary.heuristics : null}

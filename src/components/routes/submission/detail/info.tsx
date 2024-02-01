@@ -33,7 +33,7 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
   const classes = useStyles();
   const sp2 = theme.spacing(2);
   return (
-    <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+    <div style={{ paddingTop: sp2 }}>
       <Typography
         variant="h6"
         onClick={() => {

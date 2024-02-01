@@ -8,6 +8,7 @@
   "adminmenu.sitemap": "Site Map",
   "adminmenu.tag_safelist": "System Safelist",
   "adminmenu.users": "Users",
+  "ai_truncated": "The AI output was truncated because it was too long.",
   "api.invalid": "Invalid data returned by API server",
   "api.unreachable": "API server unreachable, we will auto-reconnect once the server is back online...",
   "app.language": "Language",
