@@ -118,8 +118,8 @@ function WrappedClassification({
         });
       }
     }
-    // eslint-disable-next-line
-  }, [c12n, currentUser, isMobile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [c12n, currentUser, isMobile, type]);
 
   function toggleGroups(grp) {
     const newGrp = validated.parts.groups;
@@ -214,8 +214,7 @@ function WrappedClassification({
   return (
     c12nDef &&
     c12nDef.enforce &&
-    !!validated?.parts?.lvl &&
-    (c12n ? (
+    (!!validated?.parts?.lvl && c12n ? (
       <>
         {type === 'text' ? (
           <span className={classes[computeColor()]}>
