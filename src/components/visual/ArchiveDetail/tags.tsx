@@ -1,18 +1,14 @@
-import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import {
   AlertTitle,
   CircularProgress,
   Collapse,
   IconButton,
   InputAdornment,
-  Menu,
   MenuItem,
   OutlinedInput,
   Select,
@@ -25,7 +21,6 @@ import {
 } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -42,7 +37,6 @@ import {
   SortableGridHeaderCell
 } from 'components/visual/GridTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
-import InputDialog from 'components/visual/InputDialog';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import ResultsTable, { ResultResult } from 'components/visual/SearchResult/results';
 import SectionContainer from 'components/visual/SectionContainer';
@@ -51,7 +45,6 @@ import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
 export type Signature = [string, string, boolean]; // [name, h_type, safelisted]
@@ -452,13 +445,9 @@ const WrappedRow: React.FC<RowProps> = ({
 }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
-
   const { apiCall } = useMyAPI();
   const { c12nDef } = useALContext();
   const { showErrorMessage } = useMySnackbar();
-  const { showSuccessMessage } = useMySnackbar();
-  const { copy } = useClipboard();
-  const { user: currentUser } = useALContext();
 
   const [resultResults, setResultResults] = useState<{
     items: ResultResult[];
@@ -471,9 +460,6 @@ const WrappedRow: React.FC<RowProps> = ({
   const [render, setRender] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [state, setState] = useState(initialMenuState);
-  const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
-  const [safelistReason, setSafelistReason] = useState<string>(null);
-  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
 
   useEffect(() => {
     if (!sha256 || !tag_type || !value || !open || !!resultResults) return;
@@ -503,35 +489,6 @@ const WrappedRow: React.FC<RowProps> = ({
     // eslint-disable-next-line
   }, [open, resultResults, sha256, tag_type, value]);
 
-  const addToSafelist = useCallback(() => {
-    const data = {
-      signature: {
-        name: value
-      },
-      sources: [
-        {
-          name: currentUser.username,
-          reason: [safelistReason],
-          type: 'user'
-        }
-      ],
-      type: 'signature'
-    };
-
-    apiCall({
-      url: `/api/v4/safelist/`,
-      method: 'PUT',
-      body: data,
-      onSuccess: _ => {
-        setSafelistDialog(false);
-        showSuccessMessage(t('safelist.success'));
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safelistReason, t, value]);
-
   const handleRowClick = useCallback((event: React.MouseEvent<any>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -546,78 +503,16 @@ const WrappedRow: React.FC<RowProps> = ({
     });
   }, []);
 
-  const handleClose = useCallback(() => {
-    setState(initialMenuState);
-  }, []);
-
-  const handleMenuCopy = useCallback(() => {
-    copy(value, 'clipID');
-    handleClose();
-  }, [copy, handleClose, value]);
-
-  const handleMenuSafelist = useCallback(() => {
-    setSafelistDialog(true);
-    handleClose();
-  }, [setSafelistDialog, handleClose]);
-
   return (
     <>
-      {tag_type === 'heuristic.signature' ? (
-        <>
-          <InputDialog
-            open={safelistDialog}
-            handleClose={() => setSafelistDialog(false)}
-            handleAccept={addToSafelist}
-            handleInputChange={event => setSafelistReason(event.target.value)}
-            inputValue={safelistReason}
-            title={t('safelist.title')}
-            cancelText={t('safelist.cancelText')}
-            acceptText={t('safelist.acceptText')}
-            inputLabel={t('safelist.input')}
-            text={t('safelist.text')}
-            waiting={waitingDialog}
-          />
-          <Menu
-            open={state.mouseY !== null}
-            onClose={handleClose}
-            anchorReference="anchorPosition"
-            anchorPosition={
-              state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
-            }
-          >
-            <MenuItem dense onClick={handleMenuCopy}>
-              <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />
-              {t('clipboard')}
-            </MenuItem>
-            {currentUser.roles.includes('submission_view') && (
-              <MenuItem
-                component={Link}
-                dense
-                onClick={handleClose}
-                to={`/search/result?query=result.sections.${tag_type}.name:${safeFieldValue(value)}`}
-              >
-                <SearchOutlinedIcon style={{ marginRight: '16px' }} />
-                {t('related')}
-              </MenuItem>
-            )}
-            {currentUser.roles.includes('safelist_manage') && (
-              <MenuItem dense onClick={handleMenuSafelist}>
-                <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />
-                {t('safelist')}
-              </MenuItem>
-            )}
-          </Menu>
-        </>
-      ) : (
-        <ActionMenu
-          category={'tag'}
-          type={tag_type}
-          value={value}
-          state={state}
-          setState={setState}
-          classification={classification}
-        />
-      )}
+      <ActionMenu
+        category={tag_type === 'heuristic.signature' ? 'signature' : 'tag'}
+        type={tag_type === 'heuristic.signature' ? '' : tag_type}
+        value={value}
+        state={state}
+        setState={setState}
+        classification={classification}
+      />
       <GridLinkRow
         hover
         to={
