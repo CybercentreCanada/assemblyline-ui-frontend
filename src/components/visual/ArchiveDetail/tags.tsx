@@ -293,8 +293,8 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                         maxHeight: height,
                         width: width,
                         gridTemplateColumns: c12nDef.enforce
-                          ? `minmax(auto, 1fr) 125px minmax(auto, 3fr) minmax(auto, 1fr) min-content`
-                          : `minmax(auto, 1fr) 125px minmax(auto, 3fr) min-content`
+                          ? `minmax(auto, 1fr) 140px minmax(auto, 3fr) minmax(auto, 1fr) min-content`
+                          : `minmax(auto, 1fr) 140px minmax(auto, 3fr) min-content`
                       }}
                     >
                       <GridTableHead>
@@ -821,8 +821,9 @@ const SelectCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
         fullWidth
         size="small"
         onChange={event => handleChange(event)}
+        renderValue={values => values.map(v => <Verdict short verdict={v as any} />)}
         sx={{
-          maxWidth: '109px',
+          maxWidth: '140px',
           '& .MuiOutlinedInput-input': {
             paddingTop: theme.spacing(0.5),
             paddingBottom: theme.spacing(0.5)
