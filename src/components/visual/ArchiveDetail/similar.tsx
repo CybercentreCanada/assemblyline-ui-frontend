@@ -202,7 +202,13 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
                       </small>
                     </div>
                   </div>
-                  <TableContainer component={StyledPaper} variant="outlined">
+                  <TableContainer
+                    style={{
+                      overflow: 'hidden',
+                      border: `1px solid ${theme.palette.divider}`,
+                      borderRadius: theme.spacing(0.5)
+                    }}
+                  >
                     <GridTable
                       columns={hasArchived ? 5 : 4}
                       size="small"
