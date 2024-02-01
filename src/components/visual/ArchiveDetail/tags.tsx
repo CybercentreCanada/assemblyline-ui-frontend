@@ -39,8 +39,7 @@ import {
   GridTableCell,
   GridTableHead,
   GridTableRow,
-  SortableGridHeaderCell,
-  StyledPaper
+  SortableGridHeaderCell
 } from 'components/visual/GridTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import InputDialog from 'components/visual/InputDialog';
@@ -273,18 +272,22 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
           <div
             style={{
               flexGrow: 1,
-              border: `1px solid ${theme.palette.divider}`,
-              position: 'relative',
-              borderRadius: theme.spacing(0.5)
+              position: 'relative'
             }}
           >
             <div style={{ display: 'flex', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
               <AutoSizer style={{ display: 'flex', height: '100%', width: '100%' }}>
                 {({ width, height }) => (
-                  <TableContainer component={StyledPaper} style={{ overflow: 'hidden' }}>
+                  <TableContainer
+                    style={{
+                      overflow: 'hidden',
+                      border: `1px solid ${theme.palette.divider}`,
+                      borderRadius: theme.spacing(0.5)
+                    }}
+                  >
                     <GridTable
                       stickyHeader
-                      paper={!drawer}
+                      paper={drawer}
                       size="small"
                       style={{
                         maxHeight: height,
@@ -674,7 +677,7 @@ const WrappedRow: React.FC<RowProps> = ({
           {error && error !== '' ? (
             <Tooltip title={t(error)} placement="left">
               <div>
-                <InfoOutlinedIcon />
+                <InfoOutlinedIcon fontSize="small" />
               </div>
             </Tooltip>
           ) : loading ? (
@@ -700,7 +703,8 @@ const WrappedRow: React.FC<RowProps> = ({
           sx={{
             gridColumn: 'span 5',
             padding: 0,
-            backgroundColor: theme.palette.mode === 'dark' ? '#2f2f2f' : '#E2E2E2'
+            backgroundColor: theme.palette.mode === 'dark' ? '#2f2f2f' : '#E2E2E2',
+            borderBottom: open && resultResults?.total > 0 ? `1px solid ${theme.palette.divider}` : 'none'
           }}
         >
           <Collapse in={open && resultResults?.total > 0} timeout="auto" onEnter={() => setRender(true)}>
