@@ -72,6 +72,7 @@ const useStyles = makeStyles(theme => ({
     zIndex: 5
   },
   drawerContent: {
+    height: '100%',
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2)
   },

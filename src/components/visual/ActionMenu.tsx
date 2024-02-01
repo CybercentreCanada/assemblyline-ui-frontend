@@ -63,7 +63,7 @@ type Coordinates = {
 };
 
 type TagProps = {
-  category: 'hash' | 'metadata' | 'tag';
+  category: 'heuristic' | 'signature' | 'hash' | 'metadata' | 'tag';
   type: string;
   value: string;
   classification?: string | null;
@@ -73,12 +73,16 @@ type TagProps = {
 };
 
 const categoryPrefix = {
+  heuristic: 'result.sections.heuristic.name',
+  signature: 'result.sections.heuristic.signature.name',
   metadata: 'metadata.',
   tag: 'result.sections.tags.',
   hash: ''
 };
 
 const categoryIndex = {
+  heuristic: '/result',
+  signature: '/result',
   metadata: '',
   tag: '/result',
   hash: ''
@@ -118,15 +122,27 @@ const WrappedActionMenu: React.FC<TagProps> = ({
 
   useEffect(() => {
     if (state.mouseY !== null) {
-      if (category === 'tag' && currentUser.roles.includes('safelist_manage')) {
-        apiCall({
-          url: `/api/v4/safelist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
-          method: 'GET',
-          onSuccess: resp => {
-            setSafelisted(resp.api_response);
-          },
-          onFailure: () => setSafelisted(null)
-        });
+      if (currentUser.roles.includes('safelist_manage')) {
+        if (category === 'tag') {
+          apiCall({
+            url: `/api/v4/safelist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
+            method: 'GET',
+            onSuccess: resp => {
+              setSafelisted(resp.api_response);
+            },
+            onFailure: () => setSafelisted(null)
+          });
+        }
+        if (category === 'signature') {
+          apiCall({
+            url: `/api/v4/safelist/signature/${encodeURIComponent(encodeURIComponent(value))}/`,
+            method: 'GET',
+            onSuccess: resp => {
+              setSafelisted(resp.api_response);
+            },
+            onFailure: () => setSafelisted(null)
+          });
+        }
       }
       if (category === 'tag' && currentUser.roles.includes('badlist_manage')) {
         apiCall({
@@ -193,21 +209,38 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   }, [setSafelistDialog, handleClose]);
 
   const addToSafelist = useCallback(() => {
-    const data = {
-      tag: {
-        type,
-        value
-      },
-      sources: [
-        {
-          classification: classification,
-          name: currentUser.username,
-          reason: [safelistReason],
-          type: 'user'
-        }
-      ],
-      type: 'tag'
-    };
+    let data = null;
+    if (category === 'signature') {
+      data = {
+        signature: {
+          name: value
+        },
+        sources: [
+          {
+            name: currentUser.username,
+            reason: [safelistReason],
+            type: 'user'
+          }
+        ],
+        type: 'signature'
+      };
+    } else {
+      data = {
+        tag: {
+          type,
+          value
+        },
+        sources: [
+          {
+            classification: classification,
+            name: currentUser.username,
+            reason: [safelistReason],
+            type: 'user'
+          }
+        ],
+        type: 'tag'
+      };
+    }
 
     apiCall({
       url: `/api/v4/safelist/`,
@@ -280,7 +313,11 @@ const WrappedActionMenu: React.FC<TagProps> = ({
     }
   }, [externalLookupResults]);
 
-  return hasExternalLinks || hasExternalQuery || category === 'tag' ? (
+  return hasExternalLinks ||
+    hasExternalQuery ||
+    category === 'heuristic' ||
+    category === 'signature' ||
+    category === 'tag' ? (
     <>
       <ClassificationMismatchDialog
         open={confirmationDialog}
@@ -289,35 +326,35 @@ const WrappedActionMenu: React.FC<TagProps> = ({
         dataClassification={classification}
         targetClassification={currentLinkClassification}
       />
+      {(category === 'tag' || category === 'signature') && (
+        <InputDialog
+          open={safelistDialog}
+          handleClose={() => setSafelistDialog(false)}
+          handleAccept={addToSafelist}
+          handleInputChange={event => setSafelistReason(event.target.value)}
+          inputValue={safelistReason}
+          title={t('safelist.title')}
+          cancelText={t('safelist.cancelText')}
+          acceptText={t('safelist.acceptText')}
+          inputLabel={t('safelist.input')}
+          text={t('safelist.text')}
+          waiting={waitingDialog}
+        />
+      )}
       {category === 'tag' && (
-        <>
-          <InputDialog
-            open={safelistDialog}
-            handleClose={() => setSafelistDialog(false)}
-            handleAccept={addToSafelist}
-            handleInputChange={event => setSafelistReason(event.target.value)}
-            inputValue={safelistReason}
-            title={t('safelist.title')}
-            cancelText={t('safelist.cancelText')}
-            acceptText={t('safelist.acceptText')}
-            inputLabel={t('safelist.input')}
-            text={t('safelist.text')}
-            waiting={waitingDialog}
-          />
-          <InputDialog
-            open={badlistDialog}
-            handleClose={() => setBadlistDialog(false)}
-            handleAccept={addToBadlist}
-            handleInputChange={event => setBadlistReason(event.target.value)}
-            inputValue={badlistReason}
-            title={t('badlist.title')}
-            cancelText={t('badlist.cancelText')}
-            acceptText={t('badlist.acceptText')}
-            inputLabel={t('badlist.input')}
-            text={t('badlist.text')}
-            waiting={waitingDialog}
-          />
-        </>
+        <InputDialog
+          open={badlistDialog}
+          handleClose={() => setBadlistDialog(false)}
+          handleAccept={addToBadlist}
+          handleInputChange={event => setBadlistReason(event.target.value)}
+          inputValue={badlistReason}
+          title={t('badlist.title')}
+          cancelText={t('badlist.cancelText')}
+          acceptText={t('badlist.acceptText')}
+          inputLabel={t('badlist.input')}
+          text={t('badlist.text')}
+          waiting={waitingDialog}
+        />
       )}
       <Menu
         open={state.mouseY !== null}
@@ -351,6 +388,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             to={`/search${categoryIndex[category]}?query=${categoryPrefix[category]}${type}:${safeFieldValueURI(
               value
             )}`}
+            onClick={handleClose}
           >
             {SEARCH_ICON}
             {t('related')}
@@ -372,7 +410,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             </div>
           </Tooltip>
         )}
-        {category === 'tag' && currentUser.roles.includes('safelist_manage') && (
+        {(category === 'tag' || category === 'signature') && currentUser.roles.includes('safelist_manage') && (
           <Tooltip title={safelisted ? <SafeBadItem item={safelisted} /> : ''} placement="right" arrow>
             <div>
               <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted !== null}>

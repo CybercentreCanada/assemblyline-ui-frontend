@@ -1,55 +1,22 @@
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, Divider, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import ErrorCard from 'components/visual/ErrorCard';
+import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import ErrorCard from '../ErrorCard';
-
-const useStyles = makeStyles(theme => ({
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  }
-}));
 
 type ErrorSectionProps = {
   errors: any;
+  nocollapse?: boolean;
 };
 
-const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ errors }) => {
+const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ errors, nocollapse = false }) => {
   const { t } = useTranslation(['fileDetail']);
-  const [open, setOpen] = React.useState(true);
-  const theme = useTheme();
-  const classes = useStyles();
-  const sp2 = theme.spacing(2);
 
   return errors && errors.length !== 0 ? (
-    <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-      <Typography
-        variant="h6"
-        onClick={() => {
-          setOpen(!open);
-        }}
-        className={classes.title}
-      >
-        <span>{t('errors')}</span>
-        {open ? <ExpandLess /> : <ExpandMore />}
-      </Typography>
-      <Divider />
-      <Collapse in={open} timeout="auto">
-        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-          {errors.map((error, i) => (
-            <ErrorCard key={i} error={error} />
-          ))}
-        </div>
-      </Collapse>
-    </div>
+    <SectionContainer title={t('errors')} nocollapse={nocollapse}>
+      {errors.map((error, i) => (
+        <ErrorCard key={i} error={error} />
+      ))}
+    </SectionContainer>
   ) : null;
 };
 
