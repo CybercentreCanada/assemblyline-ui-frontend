@@ -1,4 +1,4 @@
-import { AlertTitle, useTheme } from '@mui/material';
+import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
@@ -28,6 +28,7 @@ import ParentSection from 'components/visual/FileDetail/parents';
 import ResultSection from 'components/visual/FileDetail/results';
 import URIIdentificationSection from 'components/visual/FileDetail/uriIdent';
 import { ASCIISection, HexSection, ImageSection, StringsSection } from 'components/visual/FileViewer';
+import CodeSection from 'components/visual/FileViewer/code_summary';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
 import { TabContainer } from 'components/visual/TabContainer';
@@ -37,6 +38,7 @@ import { Navigate, useNavigate } from 'react-router';
 import { useLocation, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import NotFoundPage from '../404';
+import AISummarySection from '../submission/detail/ai_summary';
 
 export type FileInfo = {
   archive_ts: string;
@@ -137,6 +139,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   const [file, setFile] = useState<File | null>(null);
   const [promotedSections, setPromotedSections] = useState([]);
+  const [codeAllowed, setCodeAllowed] = useState(false);
 
   const inDrawer = useMemo<boolean>(() => (propSha256 ? true : paramSha256 ? false : null), [paramSha256, propSha256]);
   const sha256 = useMemo<string>(() => paramSha256 || propSha256, [paramSha256, propSha256]);
@@ -150,12 +153,22 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
     return newData;
   }, []);
 
+  const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
+
   useEffect(() => {
     if (!sha256) return;
     apiCall({
       url: `/api/v4/file/result/${sha256}/?archive_only=true`,
       onEnter: () => setFile(null),
-      onSuccess: api_data => setFile(patchFileDetails(api_data.api_response)),
+      onSuccess: api_data => {
+        setFile(patchFileDetails(api_data.api_response));
+
+        if (api_data.api_response.file_info.type.indexOf('code/') === 0) {
+          setCodeAllowed(configuration.ui.ai.enabled);
+        } else {
+          setCodeAllowed(false);
+        }
+      },
       onFailure: api_data => showErrorMessage(api_data.api_response)
     });
     // eslint-disable-next-line
@@ -259,7 +272,10 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
                     </InformativeAlert>
                   </div>
                 ) : (
-                  <>
+                  <div style={{ paddingBottom: theme.spacing(2) }}>
+                    {configuration.ui.ai.enabled && (
+                      <AISummarySection type="file" id={file ? file.file_info.sha256 : null} />
+                    )}
                     <Detection
                       results={file ? file.results : null}
                       heuristics={file ? file.heuristics : null}
@@ -276,7 +292,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
                     />
                     <EmptySection emptys={file ? file.emptys : null} sid={null} nocollapse />
                     <ErrorSection errors={file ? file.errors : null} nocollapse />
-                  </>
+                  </div>
                 )
             },
             tags: {
@@ -314,7 +330,13 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             },
             ascii: {
               label: t('ascii'),
-              content: <ASCIISection sha256={sha256} type={file?.file_info?.type} />
+              content: <ASCIISection sha256={sha256} type={file?.file_info?.type} codeAllowed={codeAllowed} />
+            },
+
+            code: {
+              label: t('code'),
+              content: <CodeSection sha256={sha256} />,
+              disabled: isMdUp || !codeAllowed
             },
             strings: { label: t('strings'), content: <StringsSection sha256={sha256} type={file?.file_info?.type} /> },
             hex: { label: t('hex'), content: <HexSection sha256={sha256} /> },
