@@ -37,10 +37,10 @@ export const StyledPaper: FC<StyledPaperProps> = memo(
     // backgroundColor: theme.palette.mode === 'dark' ? '#0000001A' : '#FFFFFF1A',
     backgroundColor: paper
       ? theme.palette.mode === 'dark'
-        ? '#00000006'
+        ? '#00000010'
         : '#FFFFFF06'
       : theme.palette.mode === 'dark'
-      ? '#FFFFFF06'
+      ? '#FFFFFF10'
       : '#00000006'
   }))
 );
@@ -65,13 +65,20 @@ export const GridTable: FC<GridTableProps> = memo(
     gridAutoFlow: 'row',
     alignItems: 'stretch',
     overflowX: 'auto',
+    backgroundColor: paper
+      ? theme.palette.mode === 'dark'
+        ? theme.palette.background.default
+        : theme.palette.background.paper
+      : theme.palette.mode === 'dark'
+      ? theme.palette.background.paper
+      : theme.palette.background.default,
     '&>*>*>*.MuiTableCell-head': {
       backgroundColor: paper
         ? theme.palette.mode === 'dark'
-          ? '#393939'
-          : '#EEEEEE'
+          ? '#383838'
+          : '#F6F6F6'
         : theme.palette.mode === 'dark'
-        ? '#484848'
+        ? '#494949'
         : '#F3F3F3'
     }
   }))
