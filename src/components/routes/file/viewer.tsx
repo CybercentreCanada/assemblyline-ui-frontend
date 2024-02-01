@@ -2,15 +2,17 @@ import { loader } from '@monaco-editor/react';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Grid, IconButton, Skeleton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
 import FileDownloader from 'components/visual/FileDownloader';
 import { ASCIISection, HexSection, ImageSection, StringsSection } from 'components/visual/FileViewer';
+import CodeSection from 'components/visual/FileViewer/code_summary';
 import { TabContainer } from 'components/visual/TabContainer';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -57,6 +59,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
   const { apiCall } = useMyAPI();
   const { id: sha256, tab: paramTab } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
+  const [codeAllowed, setCodeAllowed] = useState(false);
   const { configuration } = useALContext();
 
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -71,6 +74,11 @@ const WrappedFileViewer: React.FC<Props> = () => {
       onSuccess: api_data => {
         setType(api_data.api_response.type);
         setImageAllowed(api_data.api_response.is_section_image === true);
+        if (api_data.api_response.type.indexOf('code/') === 0) {
+          setCodeAllowed(configuration.ui.ai.enabled);
+        } else {
+          setCodeAllowed(false);
+        }
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -143,9 +151,18 @@ const WrappedFileViewer: React.FC<Props> = () => {
                 label: t('ascii'),
                 content: (
                   <div className={classes.tab}>
-                    <ASCIISection sha256={sha256} type={type} />
+                    <ASCIISection sha256={sha256} type={type} codeAllowed={codeAllowed} />
                   </div>
                 )
+              },
+              code: {
+                label: t('code'),
+                content: (
+                  <div className={classes.tab}>
+                    <CodeSection sha256={sha256} />
+                  </div>
+                ),
+                disabled: isMdUp || !codeAllowed
               },
               strings: {
                 label: t('strings'),
