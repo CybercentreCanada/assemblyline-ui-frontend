@@ -198,7 +198,11 @@ const WrappedLabelCell = ({ label_categories = null, onLabelClick = null }: Labe
     () =>
       label_categories &&
       ['attribution', 'technique', 'info'].flatMap(
-        category => category in label_categories && label_categories[category].map(label => ({ category, label }))
+        category =>
+          category in label_categories &&
+          label_categories[category]
+            .sort((a: string, b: string) => a.valueOf().localeCompare(b.valueOf()))
+            .map(label => ({ category, label }))
       ),
     [label_categories]
   );
