@@ -4,7 +4,9 @@ import { AlertTitle, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
+import useALContext from 'components/hooks/useALContext';
 import { CustomUser } from 'components/hooks/useMyUser';
+import Classification from 'components/visual/Classification';
 import { Comments } from 'components/visual/CommentCard';
 import CustomChip from 'components/visual/CustomChip';
 import {
@@ -86,6 +88,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
   const { t, i18n } = useTranslation(['archive']);
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
+  const { c12nDef } = useALContext();
 
   const hasSupplementary = useMemo<boolean>(
     () => fileResults && fileResults?.total > 0 && fileResults?.items.some(item => item.is_supplementary),
@@ -103,6 +106,11 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
               <SortableHeaderCell children={t('header.sha256')} sortField="sha256" allowSort={allowSort} />
               <SortableHeaderCell children={t('header.type')} sortField="type" allowSort={allowSort} />
               <SortableHeaderCell children={t('header.labels')} sortField="labels" allowSort={allowSort} />
+              {c12nDef.enforce && (
+                <SortableHeaderCell sortField="classification" allowSort={allowSort}>
+                  {t('header.classification')}
+                </SortableHeaderCell>
+              )}
               <DivTableCell />
             </DivTableRow>
           </DivTableHead>
@@ -186,6 +194,11 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                     </div>
                   }
                 />
+                {c12nDef.enforce && (
+                  <DivTableCell>
+                    <Classification type="text" size="tiny" c12n={file.classification} format="short" />
+                  </DivTableCell>
+                )}
                 <DivTableCell
                   style={{
                     padding: 'unset',

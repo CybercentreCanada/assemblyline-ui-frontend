@@ -65,6 +65,7 @@
   "graph.type.title": "Archived File Type Distribution",
   "header.actions": "Actions",
   "header.archived": "Archived",
+  "header.classification": "Classification",
   "header.download": "Download",
   "header.is_supplementary": "Supplementary",
   "header.labels": "Labels",

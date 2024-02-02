@@ -65,6 +65,7 @@
   "graph.type.title": "Répartition des types des fichiers archivés",
   "header.actions": "Actions",
   "header.archived": "Archivé",
+  "header.classification": "Classification",
   "header.download": "Télécharger",
   "header.is_supplementary": "Supplémentaire",
   "header.labels": "Étiquettes",
