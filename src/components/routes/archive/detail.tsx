@@ -53,10 +53,9 @@ export type FileInfo = {
   is_supplementary: boolean;
   labels: string[];
   label_categories?: {
+    attribution: string[];
+    technique: string[];
     info: string[];
-    safe: string[];
-    suspicious: string[];
-    malicious: string[];
   };
   magic: string;
   md5: string;

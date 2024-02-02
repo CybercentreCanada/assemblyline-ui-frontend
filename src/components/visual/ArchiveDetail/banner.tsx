@@ -11,6 +11,7 @@ import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import {
+  Collapse,
   IconButton,
   List,
   ListItem,
@@ -30,6 +31,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import { File } from 'components/routes/archive/detail';
 import CustomChip from 'components/visual/CustomChip';
 import { bytesToSize } from 'helpers/utils';
+import 'moment/locale/fr';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
@@ -120,7 +122,7 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     display: 'flex',
     flexDirection: 'row-reverse',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'flex-end',
     flexWrap: 'wrap'
   },
@@ -140,7 +142,7 @@ const useStyles = makeStyles(theme => ({
   header: {},
   content: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, auto)',
+    gridTemplateColumns: '3fr repeat(3, 1fr)',
     gridTemplateRows: 'repeat(2, auto)',
     gridAutoFlow: 'column',
     columnGap: theme.spacing(1),
@@ -204,8 +206,6 @@ const LABELS: Record<
   info: { color: 'default' }
 };
 
-type Labels = Partial<Record<keyof typeof DEFAULT_LABELS, string[]>>;
-
 const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid = null, force = false }) => {
   const { t } = useTranslation(['fileDetail', 'archive']);
   const theme = useTheme();
@@ -220,6 +220,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
   const [safelistReason, setSafelistReason] = useState<string>('');
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
+  const [showMoreLabels, setShowMoreLabels] = useState<boolean>(false);
 
   const params = new URLSearchParams(location.search);
   const fileName = file ? params.get('name') || sha256 : null;
@@ -246,18 +247,18 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
     return values;
   }, [file, scoreToVerdict]);
 
-  const sortedLabels = useMemo<Labels>(() => {
-    if (!file?.file_info?.label_categories || typeof file?.file_info?.label_categories !== 'object')
-      return DEFAULT_LABELS;
-    return Object.fromEntries(
-      Object.keys(DEFAULT_LABELS).map(category => [
-        category,
-        Array.isArray(file?.file_info?.label_categories[category])
-          ? file?.file_info?.label_categories[category].sort((a, b) => a.localeCompare(b))
-          : []
-      ])
-    );
-  }, [file?.file_info?.label_categories]);
+  const labels = useMemo<Array<{ category: string; label: string }>>(
+    () =>
+      file?.file_info?.label_categories &&
+      ['attribution', 'technique', 'info'].flatMap(
+        category =>
+          category in file?.file_info?.label_categories &&
+          file?.file_info?.label_categories[category]
+            .sort((a: string, b: string) => a.valueOf().localeCompare(b.valueOf()))
+            .map(label => ({ category, label }))
+      ),
+    [file?.file_info?.label_categories]
+  );
 
   const Icon = useCallback<React.FC<{ variant: keyof typeof VERDICTS }>>(
     ({ variant }) => {
@@ -358,7 +359,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
 
       <div className={classes.container}>
         <div className={classes.row}>
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
             {file ? (
               <>
                 <Tooltip title={t('related')}>
@@ -454,34 +455,33 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               </div>
             )}
           </div>
-          <Typography
-            className={clsx(classes.text, classes.color, VERDICTS[currentVerdict].className)}
-            children={
-              !file ? (
-                <Skeleton style={{ width: '100%' }} />
-              ) : (
-                t(`${isURI ? 'uri' : 'file'}.${file ? currentVerdict : 'none'}`, { ns: 'archive' })
-              )
-            }
-            variant="h4"
-            style={{ flex: 1 }}
-          />
-        </div>
-        <div>
-          <Typography
-            className={classes.text}
-            gridColumn="span 2"
-            variant="body1"
-            children={
-              !file ? (
-                <Skeleton style={{ width: '50%' }} />
-              ) : isURI ? (
-                file?.file_info?.uri_info?.uri
-              ) : (
-                file?.file_info?.sha256
-              )
-            }
-          />
+          <div style={{ flex: 1 }}>
+            <Typography
+              className={clsx(classes.text, classes.color, VERDICTS[currentVerdict].className)}
+              children={
+                !file ? (
+                  <Skeleton style={{ width: '100%' }} />
+                ) : (
+                  t(`${isURI ? 'uri' : 'file'}.${file ? currentVerdict : 'none'}`, { ns: 'archive' })
+                )
+              }
+              variant="h4"
+              style={{ flex: 1, whiteSpace: 'nowrap', marginRight: theme.spacing(2) }}
+            />
+            <Typography
+              className={classes.text}
+              variant="body2"
+              children={
+                !file ? (
+                  <Skeleton style={{ width: '50%' }} />
+                ) : isURI ? (
+                  file?.file_info?.uri_info?.uri
+                ) : (
+                  file?.file_info?.sha256
+                )
+              }
+            />
+          </div>
         </div>
 
         <div className={classes.content}>
@@ -532,12 +532,19 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
           <div>{file ? <Moment fromNow>{file?.file_info?.seen?.last}</Moment> : <Skeleton />}</div>
         </div>
 
-        <div>
-          {sortedLabels &&
-            Object.keys(sortedLabels)?.map(category =>
-              sortedLabels[category]?.map((label, i) => (
+        {labels?.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(1), flexWrap: 'wrap' }}>
+            <div>
+              <Tooltip title={showMoreLabels ? t('show_more', { ns: 'archive' }) : t('show_less', { ns: 'archive' })}>
+                <IconButton size="large" onClick={() => setShowMoreLabels(v => !v)} style={{ padding: 0 }}>
+                  {showMoreLabels ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                </IconButton>
+              </Tooltip>
+            </div>
+            <Collapse in={!showMoreLabels} timeout="auto" style={{ flex: 1 }} collapsedSize={25}>
+              {labels.map(({ category, label }, j) => (
                 <CustomChip
-                  key={i}
+                  key={`${j}`}
                   wrap
                   variant="outlined"
                   size="tiny"
@@ -546,9 +553,10 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                   label={label}
                   style={{ height: 'auto', minHeight: '20px' }}
                 />
-              ))
-            )}
-        </div>
+              ))}
+            </Collapse>
+          </div>
+        )}
       </div>
     </div>
   );
