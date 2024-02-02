@@ -122,7 +122,7 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     display: 'flex',
     flexDirection: 'row-reverse',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'flex-end',
     flexWrap: 'wrap'
   },
@@ -359,7 +359,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
 
       <div className={classes.container}>
         <div className={classes.row}>
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
             {file ? (
               <>
                 <Tooltip title={t('related')}>
@@ -455,34 +455,33 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               </div>
             )}
           </div>
-          <Typography
-            className={clsx(classes.text, classes.color, VERDICTS[currentVerdict].className)}
-            children={
-              !file ? (
-                <Skeleton style={{ width: '100%' }} />
-              ) : (
-                t(`${isURI ? 'uri' : 'file'}.${file ? currentVerdict : 'none'}`, { ns: 'archive' })
-              )
-            }
-            variant="h4"
-            style={{ flex: 1 }}
-          />
-        </div>
-        <div>
-          <Typography
-            className={classes.text}
-            gridColumn="span 2"
-            variant="body1"
-            children={
-              !file ? (
-                <Skeleton style={{ width: '50%' }} />
-              ) : isURI ? (
-                file?.file_info?.uri_info?.uri
-              ) : (
-                file?.file_info?.sha256
-              )
-            }
-          />
+          <div style={{ flex: 1 }}>
+            <Typography
+              className={clsx(classes.text, classes.color, VERDICTS[currentVerdict].className)}
+              children={
+                !file ? (
+                  <Skeleton style={{ width: '100%' }} />
+                ) : (
+                  t(`${isURI ? 'uri' : 'file'}.${file ? currentVerdict : 'none'}`, { ns: 'archive' })
+                )
+              }
+              variant="h4"
+              style={{ flex: 1, whiteSpace: 'nowrap', marginRight: theme.spacing(2) }}
+            />
+            <Typography
+              className={classes.text}
+              variant="body2"
+              children={
+                !file ? (
+                  <Skeleton style={{ width: '50%' }} />
+                ) : isURI ? (
+                  file?.file_info?.uri_info?.uri
+                ) : (
+                  file?.file_info?.sha256
+                )
+              }
+            />
+          </div>
         </div>
 
         <div className={classes.content}>
