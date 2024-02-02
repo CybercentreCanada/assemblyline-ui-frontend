@@ -48,9 +48,15 @@ type Props = {
   sha256: string;
   type?: string;
   codeAllowed?: boolean;
+  archiveOnly?: boolean;
 };
 
-const WrappedASCIISection: React.FC<Props> = ({ sha256, type: propType = null, codeAllowed = false }) => {
+const WrappedASCIISection: React.FC<Props> = ({
+  sha256,
+  type: propType = null,
+  codeAllowed = false,
+  archiveOnly = false
+}) => {
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { t } = useTranslation(['fileViewer']);
@@ -70,6 +76,13 @@ const WrappedASCIISection: React.FC<Props> = ({ sha256, type: propType = null, c
 
   const getCodeSummary = useCallback(
     noCache => {
+      const params = [];
+      if (noCache) {
+        params.push('no_cache');
+      }
+      if (archiveOnly) {
+        params.push('archive_only');
+      }
       apiCall({
         allowCache: !noCache,
         url: `/api/v4/file/code_summary/${sha256}/${noCache ? '?no_cache' : ''}`,

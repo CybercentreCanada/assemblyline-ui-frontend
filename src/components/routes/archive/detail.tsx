@@ -274,7 +274,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
                 ) : (
                   <div style={{ paddingBottom: theme.spacing(2) }}>
                     {configuration.ui.ai.enabled && (
-                      <AISummarySection type="file" id={file ? file.file_info.sha256 : null} noCollapse />
+                      <AISummarySection type="file" id={file ? file.file_info.sha256 : null} noCollapse archiveOnly />
                     )}
                     <Detection
                       results={file ? file.results : null}
@@ -330,12 +330,14 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             },
             ascii: {
               label: t('ascii'),
-              content: <ASCIISection sha256={sha256} type={file?.file_info?.type} codeAllowed={codeAllowed} />
+              content: (
+                <ASCIISection sha256={sha256} type={file?.file_info?.type} codeAllowed={codeAllowed} archiveOnly />
+              )
             },
 
             code: {
               label: t('code'),
-              content: <CodeSection sha256={sha256} />,
+              content: <CodeSection sha256={sha256} archiveOnly />,
               disabled: isMdUp || !codeAllowed
             },
             strings: { label: t('strings'), content: <StringsSection sha256={sha256} type={file?.file_info?.type} /> },

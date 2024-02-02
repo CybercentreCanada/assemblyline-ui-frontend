@@ -43,6 +43,7 @@ type AISummarySectionProps = {
   noTitle?: boolean;
   noCollapse?: boolean;
   detailed?: boolean;
+  archiveOnly?: boolean;
 };
 
 const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
@@ -50,7 +51,8 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
   id,
   noTitle = false,
   noCollapse = false,
-  detailed = false
+  detailed = false,
+  archiveOnly = false
 }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
@@ -71,6 +73,9 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
       }
       if (noCache) {
         params.push('no_cache');
+      }
+      if (archiveOnly) {
+        params.push('archive_only');
       }
       apiCall({
         allowCache: !noCache,
@@ -98,13 +103,15 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
   useEffect(() => {
     if (configuration.ui.ai.enabled && id) {
       getReportSummary(false);
-    } else {
+    }
+
+    return () => {
       setError(null);
       setSummary(null);
       setTruncated(false);
-    }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration, id, type]);
+  }, [id]);
 
   return (
     <div style={{ paddingTop: !noTitle ? theme.spacing(2) : null }}>
@@ -141,11 +148,13 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
               <AIMarkdown markdown={summary} truncated={truncated} />
             </div>
           ) : error ? (
-            <Alert severity="error">{error}</Alert>
+            <Alert severity="error" style={{ marginBottom: theme.spacing(2) }}>
+              {error}
+            </Alert>
           ) : (
             <Skeleton variant="rectangular" style={{ height: '12rem', borderRadius: '4px' }} />
           )}
-          {!analysing && (
+          {(summary || error) && (
             <div>
               <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
                 <div className={classes.watermark} onClick={() => getReportSummary(true)}>
