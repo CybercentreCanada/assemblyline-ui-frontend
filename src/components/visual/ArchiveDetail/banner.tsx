@@ -1,6 +1,6 @@
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
-import { default as ExpandLess, default as ExpandLessIcon } from '@mui/icons-material/ExpandLess';
-import { default as ExpandMore, default as ExpandMoreIcon } from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import MoodBadIcon from '@mui/icons-material/MoodBad';
@@ -206,8 +206,6 @@ const LABELS: Record<
   info: { color: 'default' }
 };
 
-type Labels = Partial<Record<keyof typeof DEFAULT_LABELS, string[]>>;
-
 const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid = null, force = false }) => {
   const { t } = useTranslation(['fileDetail', 'archive']);
   const theme = useTheme();
@@ -222,7 +220,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
   const [safelistReason, setSafelistReason] = useState<string>('');
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
-  const [showMoreLabels, setShowMoreLabels] = useState<boolean>(true);
+  const [showMoreLabels, setShowMoreLabels] = useState<boolean>(false);
 
   const params = new URLSearchParams(location.search);
   const fileName = file ? params.get('name') || sha256 : null;
@@ -540,7 +538,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
             <div>
               <Tooltip title={showMoreLabels ? t('show_more', { ns: 'archive' }) : t('show_less', { ns: 'archive' })}>
                 <IconButton size="large" onClick={() => setShowMoreLabels(v => !v)} style={{ padding: 0 }}>
-                  {showMoreLabels ? <ExpandMore /> : <ExpandLess />}
+                  {showMoreLabels ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                 </IconButton>
               </Tooltip>
             </div>
