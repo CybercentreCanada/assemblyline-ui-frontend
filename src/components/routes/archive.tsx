@@ -9,7 +9,7 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import ArchiveDetail from 'components/routes/archive/detail';
+import ArchiveDetail, { FileInfo } from 'components/routes/archive/detail';
 import { ChipList } from 'components/visual/ChipList';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
@@ -17,7 +17,7 @@ import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
-import ArchivesTable, { ArchivedFileResult } from 'components/visual/SearchResult/archives';
+import ArchivesTable from 'components/visual/SearchResult/archives';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
@@ -50,7 +50,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type FileResults = {
-  items: ArchivedFileResult[];
+  items: FileInfo[];
   offset: number;
   rows: number;
   total: number;

@@ -1,13 +1,14 @@
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import { AlertTitle, Skeleton, Tooltip, useTheme } from '@mui/material';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { FileInfo } from 'components/routes/archive/detail';
 import Classification from 'components/visual/Classification';
-import { Comments } from 'components/visual/CommentCard';
 import CustomChip from 'components/visual/CustomChip';
 import {
   DivTable,
@@ -21,59 +22,13 @@ import {
 import FileDownloader from 'components/visual/FileDownloader';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import 'moment/locale/fr';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 
-export type ArchivedFileResult = {
-  archive_ts: string;
-  ascii: string;
-  classification: string;
-  comments: Comments;
-  entropy: number;
-  expiry_ts: string | null;
-  hex: string;
-  id: string;
-  is_section_image: boolean;
-  is_supplementary: boolean;
-  labels: string[];
-  label_categories?: {
-    info: string[];
-    safe: string[];
-    suspicious: string[];
-    malicious: string[];
-  };
-  magic: string;
-  md5: string;
-  mime: string;
-  seen: {
-    count: number;
-    first: string;
-    last: string;
-  };
-  sha1: string;
-  sha256: string;
-  size: number;
-  ssdeep: string;
-  type: string;
-  uri_info?: {
-    fragment?: string;
-    hostname: string;
-    netloc: string;
-    params?: string;
-    password?: string;
-    path?: string;
-    port: number;
-    query?: string;
-    scheme: string;
-    uri: string;
-    username?: string;
-  };
-};
-
 type SearchResults = {
-  items: ArchivedFileResult[];
+  items: FileInfo[];
   rows: number;
   offset: number;
   total: number;
@@ -135,13 +90,13 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
           <DivTableBody>
             {fileResults.items.map((file, i) => (
               <LinkRow
-                key={`${file.id}-${i}`}
+                key={`${file.sha256}-${i}`}
                 component={Link}
-                to={`/archive/${file.id}`}
+                to={`/archive/${file.sha256}`}
                 onClick={event => {
                   if (setFileID) {
                     event.preventDefault();
-                    setFileID(file.id);
+                    setFileID(file.sha256);
                   }
                 }}
                 hover
@@ -180,37 +135,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                 </DivTableCell>
                 <DivTableCell children={'type' in file ? file.type : null} />
                 <DivTableCell
-                  children={
-                    <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
-                      {['attribution', 'technique', 'info'].map(
-                        (category, j) =>
-                          Array.isArray(file?.label_categories[category]) &&
-                          file?.label_categories[category]
-                            ?.sort((a, b) => a.localeCompare(b))
-                            .map((label, k) => (
-                              <CustomChip
-                                key={`${j}-${k}`}
-                                wrap
-                                variant="outlined"
-                                size="tiny"
-                                type="rounded"
-                                color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
-                                label={label}
-                                style={{ height: 'auto', minHeight: '20px' }}
-                                onClick={
-                                  !onLabelClick
-                                    ? null
-                                    : event => {
-                                        event.preventDefault();
-                                        event.stopPropagation();
-                                        onLabelClick(event, label);
-                                      }
-                                }
-                              />
-                            ))
-                      )}
-                    </div>
-                  }
+                  children={<LabelCell label_categories={file?.label_categories} onLabelClick={onLabelClick} />}
                 />
                 {c12nDef.enforce && (
                   <DivTableCell>
@@ -258,6 +183,80 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
     <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
   );
 };
+
+type LabelCellProps = {
+  label_categories?: FileInfo['label_categories'];
+  onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
+};
+
+const WrappedLabelCell = ({ label_categories = null, onLabelClick = null }: LabelCellProps) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const [showMore, setShowMore] = useState<boolean>(false);
+
+  const labels = useMemo(
+    () =>
+      label_categories &&
+      Object.entries(label_categories).flatMap(
+        ([category, categoryLabels], j) =>
+          ['attribution', 'technique', 'info'].includes(category) &&
+          categoryLabels.map((label, k) => ({
+            category,
+            label
+          }))
+      ),
+    [label_categories]
+  );
+
+  return (
+    <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
+      {labels?.length > 0 && (
+        <>
+          {labels
+            .filter((_, j) => (showMore ? true : j < 5))
+            .map(({ category, label }, j) => (
+              <CustomChip
+                key={`${j}`}
+                wrap
+                variant="outlined"
+                size="tiny"
+                type="rounded"
+                color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                label={label}
+                style={{ height: 'auto', minHeight: '20px' }}
+                onClick={
+                  !onLabelClick
+                    ? null
+                    : event => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        onLabelClick(event, label);
+                      }
+                }
+              />
+            ))}
+          {!showMore && labels?.length > 5 && (
+            <Tooltip title={t('more')}>
+              <IconButton
+                size="small"
+                onClick={event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setShowMore(true);
+                }}
+                style={{ padding: 0 }}
+              >
+                <MoreHorizOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+const LabelCell = React.memo(WrappedLabelCell);
 
 const ArchivesTable = React.memo(WrappedArchivesTable);
 export default ArchivesTable;
