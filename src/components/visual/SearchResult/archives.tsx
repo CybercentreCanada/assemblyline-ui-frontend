@@ -71,12 +71,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
             <DivTableRow>
               {hasSupplementary && <DivTableCell />}
               <SortableHeaderCell children={t('header.seen.last')} sortField="seen.last" allowSort={allowSort} />
-              <SortableHeaderCell
-                children={t('header.identification')}
-                sortField="uri_info.uri"
-                allowSort={allowSort}
-                inverted
-              />
+              <SortableHeaderCell children={t('header.sha256')} sortField="sha256" allowSort={allowSort} inverted />
               <SortableHeaderCell children={t('header.type')} sortField="type" allowSort={allowSort} inverted />
               <SortableHeaderCell children={t('header.labels')} sortField="labels" allowSort={allowSort} inverted />
               {c12nDef.enforce && (
@@ -121,17 +116,28 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>
-                  {!('sha256' in file) ? null : (
+                  {file?.type?.startsWith('uri/') && (
                     <div
-                      children={file?.type?.startsWith('uri/') ? file?.uri_info?.uri : file.sha256}
                       style={{
+                        wordBreak: 'break-word'
                         // width: upLG ? '100%' : '10vw',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis'
                       }}
-                    />
+                    >
+                      {file?.uri_info?.uri}
+                    </div>
                   )}
+                  <div
+                    style={{
+                      wordBreak: 'break-word',
+                      // width: upLG ? '100%' : '10vw',
+                      ...(file?.type?.startsWith('uri/') && {
+                        fontSize: 'x-small',
+                        color: theme.palette.text.disabled
+                      })
+                    }}
+                  >
+                    {file.sha256}
+                  </div>
                 </DivTableCell>
                 <DivTableCell children={'type' in file ? file.type : null} />
                 <DivTableCell

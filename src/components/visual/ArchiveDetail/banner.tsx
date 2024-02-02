@@ -121,9 +121,7 @@ const useStyles = makeStyles(theme => ({
   row: {
     width: '100%',
     display: 'flex',
-    flexDirection: 'row-reverse',
     alignItems: 'flex-start',
-    justifyContent: 'flex-end',
     flexWrap: 'wrap'
   },
   icon: {
@@ -142,10 +140,10 @@ const useStyles = makeStyles(theme => ({
   header: {},
   content: {
     display: 'grid',
-    gridTemplateColumns: '3fr repeat(3, 1fr)',
+    gridTemplateColumns: '3fr repeat(3, auto)',
     gridTemplateRows: 'repeat(2, auto)',
     gridAutoFlow: 'column',
-    columnGap: theme.spacing(1),
+    columnGap: theme.spacing(4),
     margin: `${theme.spacing(1)} 0`,
     '&:hover>div': {
       wordBreak: 'break-word',
@@ -359,6 +357,33 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
 
       <div className={classes.container}>
         <div className={classes.row}>
+          <div style={{ flex: 1 }}>
+            <Typography
+              className={clsx(classes.text, classes.color, VERDICTS[currentVerdict].className)}
+              children={
+                !file ? (
+                  <Skeleton style={{ width: '100%' }} />
+                ) : (
+                  t(`${isURI ? 'uri' : 'file'}.${file ? currentVerdict : 'none'}`, { ns: 'archive' })
+                )
+              }
+              variant="h4"
+              style={{ flex: 1, whiteSpace: 'nowrap', marginRight: theme.spacing(2) }}
+            />
+            <Typography
+              className={classes.text}
+              variant="body2"
+              children={
+                !file ? (
+                  <Skeleton style={{ width: '50%' }} />
+                ) : isURI ? (
+                  file?.file_info?.uri_info?.uri
+                ) : (
+                  file?.file_info?.sha256
+                )
+              }
+            />
+          </div>
           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
             {file ? (
               <>
@@ -455,33 +480,6 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               </div>
             )}
           </div>
-          <div style={{ flex: 1 }}>
-            <Typography
-              className={clsx(classes.text, classes.color, VERDICTS[currentVerdict].className)}
-              children={
-                !file ? (
-                  <Skeleton style={{ width: '100%' }} />
-                ) : (
-                  t(`${isURI ? 'uri' : 'file'}.${file ? currentVerdict : 'none'}`, { ns: 'archive' })
-                )
-              }
-              variant="h4"
-              style={{ flex: 1, whiteSpace: 'nowrap', marginRight: theme.spacing(2) }}
-            />
-            <Typography
-              className={classes.text}
-              variant="body2"
-              children={
-                !file ? (
-                  <Skeleton style={{ width: '50%' }} />
-                ) : isURI ? (
-                  file?.file_info?.uri_info?.uri
-                ) : (
-                  file?.file_info?.sha256
-                )
-              }
-            />
-          </div>
         </div>
 
         <div className={classes.content}>
@@ -541,7 +539,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                 </IconButton>
               </Tooltip>
             </div>
-            <Collapse in={!showMoreLabels} timeout="auto" style={{ flex: 1 }} collapsedSize={25}>
+            <Collapse in={!showMoreLabels} timeout="auto" style={{ flex: 1 }} collapsedSize={27}>
               {labels.map(({ category, label }, j) => (
                 <CustomChip
                   key={`${j}`}

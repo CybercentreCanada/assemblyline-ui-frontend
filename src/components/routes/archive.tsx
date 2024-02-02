@@ -295,7 +295,7 @@ export default function MalwareArchive() {
               <Typography variant="h4">{t('title')}</Typography>
               <Tooltip title={t('beta.description')}>
                 <div>
-                  <Chip color="primary" variant="outlined" label={t('beta.title')} />
+                  <Chip color="primary" size="small" variant="outlined" label={t('beta.title')} />
                 </div>
               </Tooltip>
             </div>
