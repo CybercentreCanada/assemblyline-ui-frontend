@@ -105,12 +105,12 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
   );
 
   const reloadErrors = useCallback(
-    (curCode: string, searchParam: string) => {
+    (curKey: string, searchParam: string) => {
       if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         const curQuery = new SimpleSearchQuery(searchParam, DEFAULT_QUERY);
         apiCall({
           method: 'POST',
-          url: `/api/v4/retrohunt/errors/${curCode}/`,
+          url: `/api/v4/retrohunt/errors/${curKey}/`,
           body: curQuery.getParams(),
           onSuccess: api_data => setErrorResults(api_data.api_response),
           onEnter: () => setIsReloading(true),
@@ -131,14 +131,14 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
   }, []);
 
   useEffect(() => {
-    if (open && retrohunt && 'code' in retrohunt) reloadErrors(retrohunt.code, query.getDeltaString());
+    if (open && retrohunt && 'key' in retrohunt) reloadErrors(retrohunt.key, query.getDeltaString());
   }, [open, query, reloadErrors, retrohunt]);
 
   useEffect(() => {
     if (!timer.current && open && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
       timer.current = true;
       setTimeout(() => {
-        reloadErrors(retrohunt.code, query.toString());
+        reloadErrors(retrohunt.key, query.toString());
         timer.current = false;
       }, RELOAD_DELAY);
     }

@@ -147,8 +147,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                     <Classification type="text" size="tiny" c12n={retrohunt.classification} format="short" />
                   </DivTableCell>
                 )}
-                {/* <DivTableCell>{retrohunt.total_hits}</DivTableCell> */}
-                <DivTableCell>{null}</DivTableCell>
+                <DivTableCell>{retrohunt?.total_hits}</DivTableCell>
                 <DivTableCell>
                   <RetrohuntStatus result={retrohunt} />
                 </DivTableCell>

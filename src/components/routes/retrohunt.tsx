@@ -47,7 +47,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export type RetrohuntIndex = 'hot' | 'archive' | 'hot_and_archive';
+export type RetrohuntIndex = null | 'hot' | 'archive' | 'hot_and_archive';
 
 export type RetrohuntPhase = null | 'filtering' | 'yara' | 'finished';
 
@@ -83,6 +83,9 @@ export type RetrohuntResult = {
   finished: boolean;
   truncated: boolean;
 
+  total_hits?: number;
+  total_errors?: number;
+
   // to remove
   [key: string]: any;
 };
@@ -103,8 +106,7 @@ const RELOAD_DELAY = 5000;
 const DEFAULT_PARAMS: object = {
   query: '*',
   offset: 0,
-  rows: PAGE_SIZE,
-  fl: 'archive_only,classification,code,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated'
+  rows: PAGE_SIZE
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -241,7 +243,7 @@ export default function RetrohuntPage() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<RetrohuntDetail code={location.hash.substr(1)} isDrawer />);
+      setGlobalDrawer(<RetrohuntDetail id={location.hash.substr(1)} isDrawer />);
     }
   }, [location.hash, setGlobalDrawer]);
 
