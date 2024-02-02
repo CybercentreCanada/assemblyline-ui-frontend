@@ -521,7 +521,9 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         )}
         <FrequencySection seen={file ? file.file_info?.seen : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
-        {configuration.ui.ai.enabled && <AISummarySection type="file" id={file ? file.file_info.sha256 : null} />}
+        {configuration.ui.ai.enabled && !liveErrors && !liveResultKeys && (
+          <AISummarySection type="file" id={file ? file.file_info.sha256 : null} />
+        )}
         <ChildrenSection childrens={file ? file.childrens : null} />
         <ParentSection parents={file ? file.parents : null} />
         <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
