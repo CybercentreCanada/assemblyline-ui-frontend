@@ -1,6 +1,8 @@
 {
   "ascii": "ASCII",
   "attribution": "Attribution",
+  "beta.description": "Malware Archive is a work-in-progress feature that may change change over time.",
+  "beta.title": "beta",
   "cancel": "Cancel",
   "canceled": "Show cancelled tasks",
   "category": "Category",

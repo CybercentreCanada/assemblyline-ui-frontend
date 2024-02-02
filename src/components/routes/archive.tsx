@@ -1,6 +1,6 @@
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
-import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Chip, Grid, MenuItem, Select, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -289,7 +289,14 @@ export default function MalwareArchive() {
       <PageFullWidth margin={4}>
         <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
           <Grid item xs={12} sm={7} md={9} xl={10}>
-            <Typography variant="h4">{t('title')}</Typography>
+            <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
+              <Typography variant="h4">{t('title')}</Typography>
+              <Tooltip title={t('beta.description')}>
+                <div>
+                  <Chip color="primary" variant="outlined" label={t('beta.title')} />
+                </div>
+              </Tooltip>
+            </div>
           </Grid>
           <Grid item xs={12} sm={5} md={3} xl={2}>
             <FormControl size="small" fullWidth>
