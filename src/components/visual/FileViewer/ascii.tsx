@@ -68,27 +68,30 @@ const WrappedASCIISection: React.FC<Props> = ({ sha256, type: propType = null, c
 
   const type = useMemo<string>(() => (propType && propType in LANGUAGE_SELECTOR ? propType : 'unknown'), [propType]);
 
-  const getCodeSummary = useCallback(() => {
-    apiCall({
-      allowCache: true,
-      url: `/api/v4/file/code_summary/${sha256}/`,
-      onSuccess: api_data => {
-        if (codeError !== null) setCodeError(null);
-        setCodeSummary(api_data.api_response.content);
-        setCodeTruncated(api_data.api_response.truncated);
-      },
-      onFailure: api_data => {
-        setCodeError(api_data.api_error_message);
-        if (codeSummary !== null) {
-          setCodeSummary(null);
-          setCodeTruncated(false);
-        }
-      },
-      onEnter: () => setAnalysing(true),
-      onExit: () => setAnalysing(false)
-    });
+  const getCodeSummary = useCallback(
+    noCache => {
+      apiCall({
+        allowCache: !noCache,
+        url: `/api/v4/file/code_summary/${sha256}/${noCache ? '?no_cache' : ''}`,
+        onSuccess: api_data => {
+          if (codeError !== null) setCodeError(null);
+          setCodeSummary(api_data.api_response.content);
+          setCodeTruncated(api_data.api_response.truncated);
+        },
+        onFailure: api_data => {
+          setCodeError(api_data.api_error_message);
+          if (codeSummary !== null) {
+            setCodeSummary(null);
+            setCodeTruncated(false);
+          }
+        },
+        onEnter: () => setAnalysing(true),
+        onExit: () => setAnalysing(false)
+      });
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [codeSummary, codeError, sha256]);
+    [codeSummary, codeError, sha256]
+  );
 
   useEffect(() => {
     if (!sha256 || data) return;
@@ -134,7 +137,7 @@ const WrappedASCIISection: React.FC<Props> = ({ sha256, type: propType = null, c
               <div className={classes.code}>
                 {!analysing && !codeSummary && !codeError && (
                   <div className={classes.spinner}>
-                    <Button onClick={() => getCodeSummary()} variant="outlined" color="inherit">
+                    <Button onClick={() => getCodeSummary(false)} variant="outlined" color="inherit">
                       {t('analyse_code')}
                     </Button>
                   </div>
@@ -153,10 +156,12 @@ const WrappedASCIISection: React.FC<Props> = ({ sha256, type: propType = null, c
                     <AIMarkdown markdown={codeSummary} truncated={codeTruncated} />
                   )}
                 </div>
-                {codeSummary && (
+                {!analysing && (codeSummary || codeError) && (
                   <div>
                     <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
-                      <div className={classes.watermark}>{t('powered_by_ai')}</div>
+                      <div className={classes.watermark} onClick={() => getCodeSummary(true)}>
+                        {t('powered_by_ai')}
+                      </div>
                     </Tooltip>
                   </div>
                 )}

@@ -1,11 +1,11 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Alert, Collapse, Divider, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Alert, CircularProgress, Collapse, Divider, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import AIMarkdown from 'components/visual/AiMarkdown';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -21,6 +21,13 @@ const useStyles = makeStyles(theme => ({
   container: {
     display: 'flex',
     flexDirection: 'column'
+  },
+  spinner: {
+    textAlign: 'center',
+    position: 'relative',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)'
   },
   watermark: {
     float: 'right',
@@ -51,15 +58,23 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
   const [open, setOpen] = React.useState(true);
   const { configuration } = useALContext();
   const { apiCall } = useMyAPI();
+  const [analysing, setAnalysing] = useState(false);
   const [summary, setSummary] = useState(null);
   const [truncated, setTruncated] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (configuration.ui.ai.enabled && id) {
+  const getReportSummary = useCallback(
+    noCache => {
+      const params = [];
+      if (detailed) {
+        params.push('detailed');
+      }
+      if (noCache) {
+        params.push('no_cache');
+      }
       apiCall({
-        allowCache: true,
-        url: `/api/v4/${type}/ai/${id}/${detailed ? '?detailed' : ''}`,
+        allowCache: !noCache,
+        url: `/api/v4/${type}/ai/${id}/${params ? `?${params.join('&')}` : ''}`,
         onSuccess: api_data => {
           if (error !== null) setError(null);
           setSummary(api_data.api_response.content);
@@ -71,8 +86,18 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
             setSummary(null);
             setTruncated(false);
           }
-        }
+        },
+        onEnter: () => setAnalysing(true),
+        onExit: () => setAnalysing(false)
       });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [summary, error, id]
+  );
+
+  useEffect(() => {
+    if (configuration.ui.ai.enabled && id) {
+      getReportSummary(false);
     } else {
       setError(null);
       setSummary(null);
@@ -104,19 +129,30 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
       )}
       <div style={{ paddingTop: !noTitle ? theme.spacing(2) : null, pageBreakInside: 'avoid' }}>
         <Collapse in={open} timeout="auto">
-          {summary ? (
+          {analysing || (!summary && !error) ? (
+            <div style={{ height: '12rem', borderRadius: '4px' }}>
+              <div className={classes.spinner}>
+                <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_report')}</div>
+                <CircularProgress variant="indeterminate" />
+              </div>
+            </div>
+          ) : summary ? (
             <div className={classes.container}>
               <AIMarkdown markdown={summary} truncated={truncated} />
-              <div>
-                <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
-                  <div className={classes.watermark}>{t('powered_by_ai')}</div>
-                </Tooltip>
-              </div>
             </div>
           ) : error ? (
             <Alert severity="error">{error}</Alert>
           ) : (
             <Skeleton variant="rectangular" style={{ height: '12rem', borderRadius: '4px' }} />
+          )}
+          {!analysing && (
+            <div>
+              <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
+                <div className={classes.watermark} onClick={() => getReportSummary(true)}>
+                  {t('powered_by_ai')}
+                </div>
+              </Tooltip>
+            </div>
           )}
         </Collapse>
       </div>
