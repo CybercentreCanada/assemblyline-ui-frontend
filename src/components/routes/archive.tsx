@@ -338,7 +338,7 @@ export default function MalwareArchive() {
                   tooltip: t('filter.attributed'),
                   props: {
                     onClick: () => {
-                      query.set('filters', 'label_categories.attribution:*');
+                      query.add('filters', 'label_categories.attribution:*');
                       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                     }
                   }
@@ -348,7 +348,7 @@ export default function MalwareArchive() {
                   tooltip: t('filter.labelled'),
                   props: {
                     onClick: () => {
-                      query.set('filters', 'labels:*');
+                      query.add('filters', 'labels:*');
                       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                     }
                   }
