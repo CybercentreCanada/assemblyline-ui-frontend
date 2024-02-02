@@ -33,20 +33,22 @@ const useStyles = makeStyles(theme => ({
 type AISummarySectionProps = {
   type: 'submission' | 'file';
   id: string;
-  hideTitle?: boolean;
+  noTitle?: boolean;
+  noCollapse?: boolean;
   detailed?: boolean;
 };
 
 const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
   type,
   id,
-  hideTitle = false,
+  noTitle = false,
+  noCollapse = false,
   detailed = false
 }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const { configuration } = useALContext();
   const { apiCall } = useMyAPI();
   const [summary, setSummary] = useState(null);
@@ -76,24 +78,28 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
   }, [configuration, id, type]);
 
   return (
-    <div style={{ paddingTop: !hideTitle ? theme.spacing(2) : null }}>
-      {!hideTitle && (
+    <div style={{ paddingTop: !noTitle ? theme.spacing(2) : null }}>
+      {!noTitle && (
         <>
           <Typography
             variant="h6"
-            onClick={() => {
-              setOpen(!open);
-            }}
-            className={classes.title}
+            onClick={
+              noCollapse
+                ? null
+                : () => {
+                    setOpen(!open);
+                  }
+            }
+            className={noCollapse ? null : classes.title}
           >
             <span>{t('ai_summary')}</span>
-            {open ? <ExpandLess /> : <ExpandMore />}
+            {noCollapse ? null : open ? <ExpandLess /> : <ExpandMore />}
           </Typography>
           <Divider />
         </>
       )}
-      <div style={{ paddingTop: !hideTitle ? theme.spacing(2) : null, pageBreakInside: 'avoid' }}>
-        <Collapse in={!open} timeout="auto">
+      <div style={{ paddingTop: !noTitle ? theme.spacing(2) : null, pageBreakInside: 'avoid' }}>
+        <Collapse in={open} timeout="auto">
           {summary ? (
             <div className={classes.container}>
               <AIMarkdown markdown={summary} truncated={truncated} />

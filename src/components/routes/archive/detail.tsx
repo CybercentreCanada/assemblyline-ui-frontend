@@ -274,7 +274,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
                 ) : (
                   <div style={{ paddingBottom: theme.spacing(2) }}>
                     {configuration.ui.ai.enabled && (
-                      <AISummarySection type="file" id={file ? file.file_info.sha256 : null} />
+                      <AISummarySection type="file" id={file ? file.file_info.sha256 : null} noCollapse />
                     )}
                     <Detection
                       results={file ? file.results : null}
