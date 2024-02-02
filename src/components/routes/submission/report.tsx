@@ -294,7 +294,7 @@ export default function SubmissionReport() {
         )}
         <Metadata report={report} />
         {useAIReport && (
-          <AISummarySection type={'submission' as 'submission'} id={report ? report.sid : null} hideTitle detailed />
+          <AISummarySection type={'submission' as 'submission'} id={report ? report.sid : null} noTitle detailed />
         )}
         {!useAIReport && <Heuristics report={report} />}
         {!useAIReport && <Attack report={report} />}
