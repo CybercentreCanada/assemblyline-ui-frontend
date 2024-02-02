@@ -249,7 +249,7 @@ export default function MalwareArchive() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<ArchiveDetail sha256={location.hash.substr(1)} />);
+      setGlobalDrawer(<ArchiveDetail sha256={location.hash.substr(1)} />, { hasMaximize: true });
     } else {
       closeGlobalDrawer();
     }
