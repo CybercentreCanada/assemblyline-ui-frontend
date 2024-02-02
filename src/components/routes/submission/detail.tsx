@@ -1261,11 +1261,8 @@ function WrappedSubmissionDetail() {
           metadata={submission ? submission.metadata : null}
           classification={submission ? submission.classification : null}
         />
-        {systemConfig.ui.ai.enabled && (
-          <AISummarySection
-            type={'submission' as 'submission'}
-            id={submission && submission.state === 'completed' ? submission.sid : null}
-          />
+        {systemConfig.ui.ai.enabled && submission && submission.state === 'completed' && (
+          <AISummarySection type={'submission' as 'submission'} id={submission.sid} />
         )}
         <Detection
           section_map={summary ? summary.heuristic_sections : null}
