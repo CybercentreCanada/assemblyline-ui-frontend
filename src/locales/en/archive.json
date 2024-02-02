@@ -53,6 +53,8 @@
   "file_info": "Related file:",
   "file_viewer": "File Viewer",
   "filter": "Filter archived files ...",
+  "filter.attributed": "Show attributed files",
+  "filter.labelled": "Show labelled files",
   "filtered": "archived file matching filter",
   "filtereds": "archived files matching filter",
   "graph.datatype": "Files",

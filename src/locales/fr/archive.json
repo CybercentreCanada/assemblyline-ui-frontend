@@ -53,6 +53,8 @@
   "file_info": "Fichier connexe:",
   "file_viewer": "Visualisateur de fichiers",
   "filter": "Filtrer les fichiers archivés...",
+  "filter.attributed": "Afficher les fichiers attribués",
+  "filter.labelled": "Afficher les fichiers étiquetés",
   "filtered": "fichier archivé qui correspond au filtre",
   "filtereds": "fichiers archivés qui correspondent au filtre",
   "graph.datatype": "Fichiers",

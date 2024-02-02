@@ -1,3 +1,5 @@
+import AssignmentLateOutlinedIcon from '@mui/icons-material/AssignmentLateOutlined';
+import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
 import { Chip, Grid, MenuItem, Select, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
@@ -331,6 +333,26 @@ export default function MalwareArchive() {
               onClear={handleClear}
               onSearch={handleSearch}
               buttons={[
+                {
+                  icon: <AssignmentLateOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                  tooltip: t('filter.attributed'),
+                  props: {
+                    onClick: () => {
+                      query.set('filters', 'label_categories.attribution:*');
+                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                    }
+                  }
+                },
+                {
+                  icon: <ClassOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                  tooltip: t('filter.labelled'),
+                  props: {
+                    onClick: () => {
+                      query.set('filters', 'labels:*');
+                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                    }
+                  }
+                },
                 query?.has('supplementary')
                   ? {
                       icon: <FileOpenIcon fontSize={downSM ? 'small' : 'medium'} />,
