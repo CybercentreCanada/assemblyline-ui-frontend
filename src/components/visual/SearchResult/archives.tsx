@@ -197,13 +197,8 @@ const WrappedLabelCell = ({ label_categories = null, onLabelClick = null }: Labe
   const labels = useMemo(
     () =>
       label_categories &&
-      Object.entries(label_categories).flatMap(
-        ([category, categoryLabels], j) =>
-          ['attribution', 'technique', 'info'].includes(category) &&
-          categoryLabels.map((label, k) => ({
-            category,
-            label
-          }))
+      ['attribution', 'technique', 'info'].flatMap(
+        category => category in label_categories && label_categories[category].map(label => ({ category, label }))
       ),
     [label_categories]
   );
