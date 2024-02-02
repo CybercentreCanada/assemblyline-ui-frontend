@@ -108,6 +108,10 @@ const WrappedASCIISection: React.FC<Props> = ({ sha256, type: propType = null, c
   useEffect(() => {
     return () => {
       setData(null);
+      setError(null);
+      setCodeError(null);
+      setCodeSummary(null);
+      setCodeTruncated(false);
     };
   }, [sha256]);
 

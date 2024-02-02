@@ -73,6 +73,10 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
           }
         }
       });
+    } else {
+      setError(null);
+      setSummary(null);
+      setTruncated(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configuration, id, type]);
