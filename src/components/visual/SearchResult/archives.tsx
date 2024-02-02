@@ -57,6 +57,19 @@ export type ArchivedFileResult = {
   size: number;
   ssdeep: string;
   type: string;
+  uri_info?: {
+    fragment?: string;
+    hostname: string;
+    netloc: string;
+    params?: string;
+    password?: string;
+    path?: string;
+    port: number;
+    query?: string;
+    scheme: string;
+    uri: string;
+    username?: string;
+  };
 };
 
 type SearchResults = {
@@ -103,11 +116,16 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
             <DivTableRow>
               {hasSupplementary && <DivTableCell />}
               <SortableHeaderCell children={t('header.seen.last')} sortField="seen.last" allowSort={allowSort} />
-              <SortableHeaderCell children={t('header.sha256')} sortField="sha256" allowSort={allowSort} />
-              <SortableHeaderCell children={t('header.type')} sortField="type" allowSort={allowSort} />
-              <SortableHeaderCell children={t('header.labels')} sortField="labels" allowSort={allowSort} />
+              <SortableHeaderCell
+                children={t('header.identification')}
+                sortField="uri_info.uri"
+                allowSort={allowSort}
+                inverted
+              />
+              <SortableHeaderCell children={t('header.type')} sortField="type" allowSort={allowSort} inverted />
+              <SortableHeaderCell children={t('header.labels')} sortField="labels" allowSort={allowSort} inverted />
               {c12nDef.enforce && (
-                <SortableHeaderCell sortField="classification" allowSort={allowSort}>
+                <SortableHeaderCell sortField="classification" allowSort={allowSort} inverted>
                   {t('header.classification')}
                 </SortableHeaderCell>
               )}
@@ -150,7 +168,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                 <DivTableCell>
                   {!('sha256' in file) ? null : (
                     <div
-                      children={file.sha256}
+                      children={file?.type?.startsWith('uri/') ? file?.uri_info?.uri : file.sha256}
                       style={{
                         // width: upLG ? '100%' : '10vw',
                         whiteSpace: 'nowrap',
