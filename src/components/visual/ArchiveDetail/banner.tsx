@@ -399,23 +399,31 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   const [initiated, setInitiated] = useState<boolean>(false);
 
   const initiate = useCallback(() => {
-    if (sha256 && !ref.current) setTimeout(() => initiate(), 100);
+    if (!ref.current) setTimeout(() => initiate(), 100);
     else setInitiated(true);
-  }, [sha256]);
-
-  useEffect(() => initiate(), [initiate]);
+  }, []);
 
   useEffect(() => {
     let element = ref.current;
-    if (!element || !initiated) return;
+    if (!element || !initiated) {
+      initiate();
+      return;
+    }
+
+    setShowMoreLabels(element.clientHeight > 30);
+
     const resizeObserver = new ResizeObserver(entries => {
-      entries.forEach(entry => setShowMoreLabels(entry.contentRect.height > 30));
+      entries.forEach(entry => {
+        setShowMoreLabels(entry.contentRect.height > 30);
+      });
     });
     resizeObserver.observe(element);
+
     return () => {
       resizeObserver.disconnect();
+      setInitiated(false);
     };
-  }, [initiated]);
+  }, [initiate, initiated, sha256]);
 
   return (
     <div className={clsx(classes.root, classes.backgroundColor, classes.border, VERDICTS[currentVerdict].className)}>
