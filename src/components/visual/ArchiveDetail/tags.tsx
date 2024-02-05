@@ -285,10 +285,9 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                       style={{
                         maxHeight: height,
                         width: width,
-                        gridTemplateColumns:
-                          true || c12nDef.enforce
-                            ? `minmax(auto, 1fr) 140px minmax(auto, 3fr) minmax(auto, 1fr) min-content`
-                            : `minmax(auto, 1fr) 140px minmax(auto, 3fr) min-content`
+                        gridTemplateColumns: c12nDef.enforce
+                          ? `minmax(auto, 1fr) 140px minmax(auto, 3fr) minmax(auto, 1fr) min-content`
+                          : `minmax(auto, 1fr) 140px minmax(auto, 3fr) min-content`
                       }}
                     >
                       <GridTableHead>
@@ -315,7 +314,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                             sortField="value"
                             onSort={handleSort}
                           />
-                          {(true || c12nDef.enforce) && (
+                          {c12nDef.enforce && (
                             <SortableGridHeaderCell
                               allowSort
                               children={t('classification')}
@@ -336,9 +335,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                           <FilterCell onChange={value => handleFilter('tag_type', value)} />
                           <SelectCell onChange={value => handleFilter('h_type', value)} />
                           <FilterCell onChange={value => handleFilter('value', value)} />
-                          {(true || c12nDef.enforce) && (
-                            <FilterCell onChange={value => handleFilter('classification', value)} />
-                          )}
+                          {c12nDef.enforce && <FilterCell onChange={value => handleFilter('classification', value)} />}
                           <GridTableCell variant="head" sx={{ position: 'sticky', top: '42.9px' }} />
                         </GridTableRow>
                       </GridTableHead>
@@ -382,6 +379,7 @@ const WrappedGroupedRow = ({
   query = new SimpleSearchQuery('')
 }: GroupedRowProps) => {
   const { t } = useTranslation(['archive']);
+  const { c12nDef } = useALContext();
 
   const [showMore, setShowMore] = useState<boolean>(false);
 
@@ -407,9 +405,9 @@ const WrappedGroupedRow = ({
         )}
       {!showMore && results?.length > 10 && (
         <GridTableRow hover sx={{ cursor: 'pointer', textDecoration: 'none' }} onClick={() => setShowMore(true)}>
-          <GridTableCell center sx={{ gridColumn: 'span 5' }}>{`+ ${results?.length - 10} ${
-            results?.length - 10 <= 1 ? t('row') : t('rows')
-          }`}</GridTableCell>
+          <GridTableCell center sx={{ gridColumn: c12nDef.enforce ? 'span 5' : 'span 4' }}>{`+ ${
+            results?.length - 10
+          } ${results?.length - 10 <= 1 ? t('row') : t('rows')}`}</GridTableCell>
         </GridTableRow>
       )}
     </>
@@ -599,7 +597,7 @@ const WrappedRow: React.FC<RowProps> = ({
       <GridTableRow>
         <GridTableCell
           sx={{
-            gridColumn: 'span 5',
+            gridColumn: c12nDef.enforce ? 'span 5' : 'span 4',
             padding: 0,
             backgroundColor: theme.palette.mode === 'dark' ? '#2f2f2f' : '#E2E2E2',
             borderBottom: open && resultResults?.total > 0 ? `1px solid ${theme.palette.divider}` : 'none'
