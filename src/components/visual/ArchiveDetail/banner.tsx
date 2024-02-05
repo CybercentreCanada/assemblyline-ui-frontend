@@ -397,7 +397,8 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   }, [sha256, badlistReason, file]);
 
   const resize = useCallback(() => {
-    ref.current && setShowMoreLabels(ref.current.clientHeight > 27.5);
+    if (!ref.current) setTimeout(() => resize(), 100);
+    else setShowMoreLabels(ref.current.clientHeight > 27.5);
   }, []);
 
   useEffect(() => {
