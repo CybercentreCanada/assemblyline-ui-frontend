@@ -18,9 +18,8 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.mode === 'dark' ? theme.palette.text.secondary : theme.palette.text.primary,
     padding: '16px 8px',
     textAlign: 'left',
-    whiteSpace: 'pre-wrap',
+    whiteSpace: 'normal',
     overflowY: 'auto',
-    whiteSpaceCollapse: 'collapse',
     borderLeftWidth: '0px',
     wordBreak: 'break-word',
     position: 'absolute',
@@ -31,7 +30,7 @@ const useStyles = makeStyles(theme => ({
   },
   spinner: {
     textAlign: 'center',
-    position: 'relative',
+    position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)'
