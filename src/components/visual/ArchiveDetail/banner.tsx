@@ -5,7 +5,6 @@ import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import MoodBadIcon from '@mui/icons-material/MoodBad';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
-import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
@@ -217,6 +216,8 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   const [resubmitAnchor, setResubmitAnchor] = useState<HTMLElement>(null);
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
   const [safelistReason, setSafelistReason] = useState<string>('');
+  const [badlistDialog, setBadlistDialog] = useState<boolean>(false);
+  const [badlistReason, setBadlistReason] = useState<string>('');
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [showMoreLabels, setShowMoreLabels] = useState<boolean>(false);
   const [collapseLabels, setCollapseLabels] = useState<boolean>(false);
@@ -337,8 +338,67 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256, safelistReason, file]);
 
+  const prepareBadlist = useCallback(() => {
+    setBadlistReason('');
+    setBadlistDialog(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256]);
+
+  const addToBadlist = useCallback(() => {
+    const data = {
+      attribution: {
+        actor: (file.tags['attribution.actor'] || []).map(item => item[0]),
+        campaign: (file.tags['attribution.campaign'] || []).map(item => item[0]),
+        category: (file.tags['attribution.category'] || []).map(item => item[0]),
+        exploit: (file.tags['attribution.exploit'] || []).map(item => item[0]),
+        implant: (file.tags['attribution.implant'] || []).map(item => item[0]),
+        family: (file.tags['attribution.family'] || []).map(item => item[0]),
+        network: (file.tags['attribution.network'] || []).map(item => item[0])
+      },
+      hashes: {
+        md5: file.file_info.md5,
+        sha1: file.file_info.sha1,
+        sha256: file.file_info.sha256,
+        ssdeep: file.file_info.ssdeep,
+        tlsh: file.file_info.tlsh
+      },
+      file: {
+        name: [],
+        size: file.file_info.size,
+        type: file.file_info.type
+      },
+      sources: [
+        {
+          classification: file.file_info.classification,
+          name: currentUser.username,
+          reason: [badlistReason],
+          type: 'user'
+        }
+      ],
+      type: 'file'
+    };
+
+    if (fileName !== sha256) {
+      data.file.name.push(fileName);
+    }
+
+    apiCall({
+      url: `/api/v4/badlist/`,
+      method: 'PUT',
+      body: data,
+      onSuccess: _ => {
+        setBadlistDialog(false);
+        showSuccessMessage(t('badlist.success'));
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256, badlistReason, file]);
+
   const resize = useCallback(() => {
-    ref.current && setShowMoreLabels(ref.current.clientHeight > 27.5);
+    if (!ref.current) setTimeout(() => resize(), 100);
+    else setShowMoreLabels(ref.current.clientHeight > 27.5);
   }, []);
 
   useEffect(() => {
@@ -362,6 +422,19 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
         acceptText={t('safelist.acceptText')}
         inputLabel={t('safelist.input')}
         text={t('safelist.text')}
+        waiting={waitingDialog}
+      />
+      <InputDialog
+        open={badlistDialog}
+        handleClose={() => setBadlistDialog(false)}
+        handleAccept={addToBadlist}
+        handleInputChange={event => setBadlistReason(event.target.value)}
+        inputValue={badlistReason}
+        title={t('badlist.title')}
+        cancelText={t('badlist.cancelText')}
+        acceptText={t('badlist.acceptText')}
+        inputLabel={t('badlist.input')}
+        text={t('badlist.text')}
         waiting={waitingDialog}
       />
       {file ? (
@@ -476,7 +549,14 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                 {currentUser.roles.includes('safelist_manage') && (
                   <Tooltip title={t('safelist')}>
                     <IconButton onClick={prepareSafelist} size="large">
-                      <PlaylistAddCheckIcon />
+                      <VerifiedUserOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {currentUser.roles.includes('badlist_manage') && (
+                  <Tooltip title={t('badlist')}>
+                    <IconButton onClick={prepareBadlist} size="large">
+                      <BugReportOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                 )}
