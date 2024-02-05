@@ -285,9 +285,10 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                       style={{
                         maxHeight: height,
                         width: width,
-                        gridTemplateColumns: c12nDef.enforce
-                          ? `minmax(auto, 1fr) 140px minmax(auto, 3fr) minmax(auto, 1fr) min-content`
-                          : `minmax(auto, 1fr) 140px minmax(auto, 3fr) min-content`
+                        gridTemplateColumns:
+                          true || c12nDef.enforce
+                            ? `minmax(auto, 1fr) 140px minmax(auto, 3fr) minmax(auto, 1fr) min-content`
+                            : `minmax(auto, 1fr) 140px minmax(auto, 3fr) min-content`
                       }}
                     >
                       <GridTableHead>
@@ -314,7 +315,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                             sortField="value"
                             onSort={handleSort}
                           />
-                          {c12nDef.enforce && (
+                          {(true || c12nDef.enforce) && (
                             <SortableGridHeaderCell
                               allowSort
                               children={t('classification')}
@@ -335,7 +336,9 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
                           <FilterCell onChange={value => handleFilter('tag_type', value)} />
                           <SelectCell onChange={value => handleFilter('h_type', value)} />
                           <FilterCell onChange={value => handleFilter('value', value)} />
-                          <FilterCell onChange={value => handleFilter('classification', value)} />
+                          {(true || c12nDef.enforce) && (
+                            <FilterCell onChange={value => handleFilter('classification', value)} />
+                          )}
                           <GridTableCell variant="head" sx={{ position: 'sticky', top: '42.9px' }} />
                         </GridTableRow>
                       </GridTableHead>
