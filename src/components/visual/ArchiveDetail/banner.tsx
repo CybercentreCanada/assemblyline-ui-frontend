@@ -396,18 +396,26 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256, badlistReason, file]);
 
-  const resize = useCallback(() => {
-    if (!ref.current) setTimeout(() => resize(), 100);
-    else setShowMoreLabels(ref.current.clientHeight > 27.5);
-  }, []);
+  const [initiated, setInitiated] = useState<boolean>(false);
+
+  const initiate = useCallback(() => {
+    if (sha256 && !ref.current) setTimeout(() => initiate(), 100);
+    else setInitiated(true);
+  }, [sha256]);
+
+  useEffect(() => initiate(), [initiate]);
 
   useEffect(() => {
-    resize();
-    window.addEventListener('resize', resize);
+    let element = ref.current;
+    if (!element || !initiated) return;
+    const resizeObserver = new ResizeObserver(entries => {
+      entries.forEach(entry => setShowMoreLabels(entry.contentRect.height > 30));
+    });
+    resizeObserver.observe(element);
     return () => {
-      window.removeEventListener('resize', resize);
+      resizeObserver.disconnect();
     };
-  }, [resize]);
+  }, [initiated]);
 
   return (
     <div className={clsx(classes.root, classes.backgroundColor, classes.border, VERDICTS[currentVerdict].className)}>
