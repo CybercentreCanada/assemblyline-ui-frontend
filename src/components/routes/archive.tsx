@@ -300,7 +300,7 @@ export default function MalwareArchive() {
               </Tooltip>
             </div>
           </Grid>
-          <Grid item sm={12} md={4} xl={2}>
+          <Grid item xs={12} md={4} xl={2}>
             <FormControl size="small" fullWidth>
               <Select
                 disabled={searching}
