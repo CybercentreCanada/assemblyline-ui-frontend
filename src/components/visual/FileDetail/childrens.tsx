@@ -54,7 +54,7 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({
           <Typography
             color="secondary"
             variant="subtitle1"
-            children={`${childrens?.length} ${t('childrens', { ns: 'fileDetail' })}`}
+            children={`${childrens?.length} ${t(childrens?.length === 1 ? 'file' : 'files', { ns: 'fileDetail' })}`}
             sx={{ fontStyle: 'italic' }}
           />
         )
