@@ -208,8 +208,6 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
     };
   }, [file]);
 
-  console.log(nbOfValues, nbOfValues > 0, nbOfValues && nbOfValues > 0 && 'asd');
-
   return show || (data && data.length !== 0) ? (
     <SectionContainer
       title={title ?? t('similar')}
