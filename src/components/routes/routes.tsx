@@ -163,10 +163,9 @@ const WrappedRoutes = () => {
         <div
           className="no-print"
           style={{
-            position: 'sticky',
-            bottom: '16px',
-            left: '0',
-            marginLeft: '16px',
+            position: 'fixed',
+            bottom: '8px',
+            marginLeft: '32px',
             opacity: '0.4',
             zIndex: 10000,
             marginTop: 'auto',
