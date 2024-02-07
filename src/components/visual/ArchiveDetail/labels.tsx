@@ -1,8 +1,11 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import {
   Autocomplete,
   Button,
   CircularProgress,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -26,6 +29,7 @@ import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { FileInfo } from 'components/routes/archive/detail';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import { useDebounce } from 'components/visual/HexViewer';
@@ -60,6 +64,12 @@ const DEFAULT_LABELS = {
   attribution: [],
   technique: [],
   info: []
+};
+
+const LABELS_COLOR_MAP = {
+  info: 'default',
+  technique: 'secondary',
+  attribution: 'primary'
 };
 
 const LABELS: Record<
@@ -418,6 +428,88 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
     </SectionContainer>
   );
 };
+
+type LabelCellProps = {
+  label_categories?: FileInfo['label_categories'];
+  onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
+};
+
+const WrappedLabelCell = ({ label_categories = null, onLabelClick = null }: LabelCellProps) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const [showMore, setShowMore] = useState<boolean>(false);
+
+  const labels = useMemo(
+    () =>
+      label_categories &&
+      ['attribution', 'technique', 'info'].flatMap(
+        category => category in label_categories && label_categories[category].map(label => ({ category, label }))
+      ),
+    [label_categories]
+  );
+
+  return (
+    labels?.length > 0 && (
+      <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(1), flexWrap: 'wrap' }}>
+        <Collapse
+          in={!showMore}
+          timeout="auto"
+          style={{ flex: 1 }}
+          collapsedSize={25}
+          // sx={{
+          //   '&.Mui-expanded': {
+          //     minHeight: 15,
+          //     maxHeight: 15,
+          //     backgroundColor: '#a5a5a5'
+          //   }
+          // }}
+        >
+          {labels
+            .filter((_, j) => (showMore ? true : j < 5))
+            .map(({ category, label }, j) => (
+              <CustomChip
+                key={`${j}`}
+                wrap
+                variant="outlined"
+                size="tiny"
+                type="rounded"
+                color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                label={label}
+                style={{ height: 'auto', minHeight: '20px' }}
+                onClick={
+                  !onLabelClick
+                    ? null
+                    : event => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        onLabelClick(event, label);
+                      }
+                }
+              />
+            ))}
+        </Collapse>
+
+        <div>
+          <Tooltip title={showMore ? t('more') : t('less')}>
+            <IconButton
+              size="small"
+              onClick={event => {
+                event.preventDefault();
+                event.stopPropagation();
+                setShowMore(v => !v);
+              }}
+              style={{ padding: 0 }}
+            >
+              {showMore ? <ExpandMore /> : <ExpandLess />}
+            </IconButton>
+          </Tooltip>
+        </div>
+      </div>
+    )
+  );
+};
+
+export const LabelCell = React.memo(WrappedLabelCell);
 
 export const LabelSection = React.memo(WrappedLabelSection);
 export default LabelSection;
