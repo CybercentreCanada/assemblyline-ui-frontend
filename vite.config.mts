@@ -44,8 +44,10 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
-    resolve: {
-      mainFields: []
-    }
+    ...(mode === 'development' && {
+      resolve: {
+        mainFields: []
+      }
+    })
   };
 });
