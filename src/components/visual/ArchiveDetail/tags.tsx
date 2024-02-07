@@ -235,6 +235,12 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
     });
   }, []);
 
+  useEffect(() => {
+    return () => {
+      setQuery(new SimpleSearchQuery(''));
+    };
+  }, [sha256]);
+
   return (
     <SectionContainer
       title={t('tags')}
