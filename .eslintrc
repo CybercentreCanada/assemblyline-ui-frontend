@@ -1,15 +1,24 @@
 {
-  "extends": ["airbnb-typescript", "prettier", "react-app"],
+  "extends": ["airbnb-typescript", "prettier", "plugin:import/recommended", "plugin:react/recommended"],
   "parser": "@typescript-eslint/parser",
+  "ignorePatterns": ["vite.config.ts"],
   "parserOptions": {
     "project": "tsconfig.json"
   },
-  "plugins": ["@typescript-eslint", "prettier"],
+  "plugins": ["@typescript-eslint", "testing-library", "prettier", "react-hooks", "import", "jsx-a11y"],
   "env": {
     "browser": true,
     "es6": true,
     "mocha": true,
     "node": true
+  },
+  "settings": {
+    // Needed to help eslint understand absolute imports, at least for intellij.
+    "import/resolver": {
+      "node": {
+        "paths": ["src"]
+      }
+    }
   },
   "rules": {
     "@typescript-eslint/space-before-function-paren": "off",
@@ -35,12 +44,7 @@
       }
     ],
     "arrow-parens": ["error", "as-needed"],
-    "import/no-extraneous-dependencies": [
-      "error", {
-        "devDependencies": true,
-        "packageDir": "./"
-      }
-    ],
+    "import/no-extraneous-dependencies": ["error", { "packageDir": "./" }],
     "import/imports-first": ["error", "absolute-first"],
     "import/newline-after-import": "error",
     "import/no-cycle": "off",
