@@ -128,6 +128,7 @@ export type ConfigurationDefinition = {
     external_source_tags: {
       [tag_name: string]: string[];
     };
+    fqdn: string;
     read_only: boolean;
     rss_feeds: string[];
     services_feed: string;
