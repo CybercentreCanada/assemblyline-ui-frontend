@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: ['./src/testHelpers/setupTests.ts'],
+      setupFiles: ['./src/tests/setupTests.ts'],
       exclude: [...configDefaults.exclude],
       testTimeout: 30000,
       clearMocks: true,

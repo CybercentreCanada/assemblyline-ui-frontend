@@ -1,4 +1,3 @@
-import { describe, expect, it } from '@jest/globals';
 import {
   bytesToSize,
   getFileName,
@@ -19,6 +18,7 @@ import {
   verdictRank,
   verdictToColor
 } from 'helpers/utils';
+import { describe, expect, it } from 'vitest';
 
 describe('Test `toTitleCase`', () => {
   it('Should split on whitespace and underscores', () => {
@@ -220,7 +220,7 @@ describe('Test `humanReadableNumber`', () => {
 describe('Test `resetFavicon`', () => {
   it('Should set favicon path to default', () => {
     const initial = 'https://not.the.default.url/favicon.ico';
-    const defaultURL = '/';
+    const defaultURL = '';
 
     let favicon = document.getElementById('favicon');
     if (!favicon) {
@@ -241,7 +241,7 @@ describe('Test `resetFavicon`', () => {
 describe('Test `setNotifyFavicon`', () => {
   it('Should set favicon path to the notify/done icon', () => {
     const initial = 'https://not.the.default.url/favicon_done.ico';
-    const defaultURL = '/';
+    const defaultURL = '';
 
     let favicon = document.getElementById('favicon');
     if (!favicon) {
