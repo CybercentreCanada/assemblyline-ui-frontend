@@ -189,7 +189,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
 
   const [data, setData] = useState<Result[]>(null);
 
-  const nbOfValues = useMemo<number | null>(() => data && data.map(i => i.total).reduce((a, v) => a + v), [data]);
+  const nbOfValues = useMemo<number | null>(() => data && data.map(i => i.total).reduce((a, v) => a + v, 0), [data]);
 
   useEffect(() => {
     if (!file || data) return;
