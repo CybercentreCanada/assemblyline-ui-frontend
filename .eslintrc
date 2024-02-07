@@ -48,6 +48,7 @@
     "import/imports-first": ["error", "absolute-first"],
     "import/newline-after-import": "error",
     "import/no-cycle": "off",
+    "import/no-named-as-default": 0,
     "import/prefer-default-export": 0,
     "jsx-a11y/anchor-is-valid": [
       "error",
