@@ -208,6 +208,8 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
     };
   }, [file]);
 
+  console.log(nbOfValues, nbOfValues > 0, nbOfValues && nbOfValues > 0 && 'asd');
+
   return show || (data && data.length !== 0) ? (
     <SectionContainer
       title={title ?? t('similar')}
@@ -222,14 +224,15 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
         }
       }}
       slots={{
-        end: nbOfValues && nbOfValues > 0 && (
-          <Typography
-            color="secondary"
-            variant="subtitle1"
-            children={`${nbOfValues} ${t(nbOfValues === 1 ? 'file' : 'files', { ns: 'fileDetail' })}`}
-            sx={{ fontStyle: 'italic' }}
-          />
-        )
+        end:
+          !nbOfValues || nbOfValues === 0 ? null : (
+            <Typography
+              color="secondary"
+              variant="subtitle1"
+              children={`${nbOfValues} ${t(nbOfValues === 1 ? 'file' : 'files', { ns: 'fileDetail' })}`}
+              sx={{ fontStyle: 'italic' }}
+            />
+          )
       }}
     >
       {!data ? (
