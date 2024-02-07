@@ -85,7 +85,7 @@ export const MyApp: React.FC<any> = () => {
   const mySitemap: AppSiteMapConfigs = useMySitemap();
   const myUser: CustomAppUserService = useMyUser();
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL}>
+    <BrowserRouter basename={'/'}>
       <SafeResultsProvider>
         <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
           <MyAppMain />

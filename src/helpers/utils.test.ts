@@ -220,7 +220,7 @@ describe('Test `humanReadableNumber`', () => {
 describe('Test `resetFavicon`', () => {
   it('Should set favicon path to default', () => {
     const initial = 'https://not.the.default.url/favicon.ico';
-    const defaultURL = process.env.PUBLIC_URL;
+    const defaultURL = '/';
 
     let favicon = document.getElementById('favicon');
     if (!favicon) {
@@ -241,7 +241,7 @@ describe('Test `resetFavicon`', () => {
 describe('Test `setNotifyFavicon`', () => {
   it('Should set favicon path to the notify/done icon', () => {
     const initial = 'https://not.the.default.url/favicon_done.ico';
-    const defaultURL = process.env.PUBLIC_URL;
+    const defaultURL = '/';
 
     let favicon = document.getElementById('favicon');
     if (!favicon) {
@@ -349,7 +349,7 @@ describe('Test `getProvider`', () => {
   it('Should return correct provider info if pathname provides oauth', () => {
     const location = {
       ...window.location,
-      pathname: `${process.env.PUBLIC_URL}/oauth/oauthProvider/`
+      pathname: `${'/'}/oauth/oauthProvider/`
     };
     Object.defineProperty(window, 'location', {
       writable: true,
@@ -363,7 +363,7 @@ describe('Test `getProvider`', () => {
     const location = {
       ...window.location,
       search: '?provider=otherProvider',
-      pathname: `${process.env.PUBLIC_URL}/notoauth/`
+      pathname: `${'/'}/notoauth/`
     };
     Object.defineProperty(window, 'location', {
       writable: true,
@@ -376,7 +376,7 @@ describe('Test `getProvider`', () => {
   it('Will always trim last character from oauth pathname ', () => {
     const location = {
       ...window.location,
-      pathname: `${process.env.PUBLIC_URL}/oauth/oauthProvider`
+      pathname: `${'/'}/oauth/oauthProvider`
     };
     Object.defineProperty(window, 'location', {
       writable: true,

@@ -111,7 +111,7 @@ export function humanReadableNumber(num: number | null) {
  */
 export function resetFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
-  favicon.href = `${process.env.PUBLIC_URL}/favicon.ico`;
+  favicon.href = `/favicon.ico`;
 }
 
 /**
@@ -123,7 +123,7 @@ export function resetFavicon() {
  */
 export function setNotifyFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
-  favicon.href = `${process.env.PUBLIC_URL}/favicon_done.ico`;
+  favicon.href = `/favicon_done.ico`;
 }
 
 /**
@@ -246,8 +246,8 @@ export function getValueFromPath(obj: object, path: string) {
  *
  */
 export function getProvider() {
-  if (window.location.pathname.indexOf(`${process.env.PUBLIC_URL}/oauth/`) !== -1) {
-    return window.location.pathname.split(`${process.env.PUBLIC_URL}/oauth/`).pop().slice(0, -1);
+  if (window.location.pathname.indexOf(`/oauth/`) !== -1) {
+    return window.location.pathname.split(`/oauth/`).pop().slice(0, -1);
   }
   const params = new URLSearchParams(window.location.search);
   return params.get('provider');
