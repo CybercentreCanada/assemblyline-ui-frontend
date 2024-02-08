@@ -43,11 +43,6 @@ export default defineConfig(({ mode }) => {
           minThreads: 3
         }
       }
-    },
-    ...(mode === 'development' && {
-      resolve: {
-        mainFields: []
-      }
-    })
+    }
   };
 });
