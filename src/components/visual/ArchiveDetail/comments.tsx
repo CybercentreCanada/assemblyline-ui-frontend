@@ -265,7 +265,7 @@ const WrappedCommentSection: React.FC<Props> = ({
       title={t('comments')}
       nocollapse={nocollapse}
       slots={{
-        end: (
+        end: currentUser.roles.includes('archive_comment') && (
           <Tooltip title={t('comment.tooltip.add')}>
             <span>
               <IconButton

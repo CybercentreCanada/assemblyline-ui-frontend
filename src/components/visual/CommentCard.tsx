@@ -386,36 +386,47 @@ const WrappedCommentCard: React.FC<Props> = ({
             classes={{ tooltip: classes.commentTooltip }}
             placement="top-end"
             title={
-              <Stack className={classes.actions} direction="row">
-                {Object.entries(REACTIONS).map(([icon, emoji]: [keyof typeof REACTIONS, string], i) => (
-                  <Tooltip key={i} classes={{ tooltip: classes.tooltip }} placement="top" title={t(`reaction.${icon}`)}>
-                    <Button
-                      className={classes.action}
-                      size="small"
-                      color="inherit"
-                      onClick={onReactionClick(currentComment, icon)}
+              currentUser.roles.includes('archive_comment') && (
+                <Stack className={classes.actions} direction="row">
+                  {Object.entries(REACTIONS).map(([icon, emoji]: [keyof typeof REACTIONS, string], i) => (
+                    <Tooltip
+                      key={i}
+                      classes={{ tooltip: classes.tooltip }}
+                      placement="top"
+                      title={t(`reaction.${icon}`)}
                     >
-                      <span className={classes.actionIcon}>{emoji}</span>
-                    </Button>
-                  </Tooltip>
-                ))}
+                      <Button
+                        className={classes.action}
+                        size="small"
+                        color="inherit"
+                        onClick={onReactionClick(currentComment, icon)}
+                      >
+                        <span className={classes.actionIcon}>{emoji}</span>
+                      </Button>
+                    </Tooltip>
+                  ))}
 
-                {isCurrentUser && (
-                  <>
-                    <Divider className={classes.divider} />
-                    <Tooltip classes={{ tooltip: classes.tooltip }} placement="top" title={t('comment.tooltip.edit')}>
-                      <Button className={classes.action} size="small" onClick={onEditClick(currentComment)}>
-                        <CreateOutlinedIcon />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip classes={{ tooltip: classes.tooltip }} placement="top" title={t('comment.tooltip.delete')}>
-                      <Button className={classes.action} size="small" onClick={onDeleteClick(currentComment)}>
-                        <ClearOutlinedIcon />
-                      </Button>
-                    </Tooltip>
-                  </>
-                )}
-              </Stack>
+                  {isCurrentUser && (
+                    <>
+                      <Divider className={classes.divider} />
+                      <Tooltip classes={{ tooltip: classes.tooltip }} placement="top" title={t('comment.tooltip.edit')}>
+                        <Button className={classes.action} size="small" onClick={onEditClick(currentComment)}>
+                          <CreateOutlinedIcon />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip
+                        classes={{ tooltip: classes.tooltip }}
+                        placement="top"
+                        title={t('comment.tooltip.delete')}
+                      >
+                        <Button className={classes.action} size="small" onClick={onDeleteClick(currentComment)}>
+                          <ClearOutlinedIcon />
+                        </Button>
+                      </Tooltip>
+                    </>
+                  )}
+                </Stack>
+              )
             }
           >
             <div
@@ -488,7 +499,9 @@ const WrappedCommentCard: React.FC<Props> = ({
                       size="small"
                       variant="outlined"
                       color={names.includes(currentUser?.username) ? 'primary' : 'default'}
-                      onClick={onReactionClick(currentComment, reaction)}
+                      onClick={
+                        currentUser.roles.includes('archive_comment') ? onReactionClick(currentComment, reaction) : null
+                      }
                     />
                   </div>
                 </Tooltip>

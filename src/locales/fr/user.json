@@ -69,6 +69,7 @@
   "role.archive_manage": "Gestion de l'Archive",
   "role.archive_trigger": "Déclencher Archivage",
   "role.archive_view": "Visionnement de l'Archive",
+  "role.archive_comment": "Commentaires sur l'Archive",
   "role.bundle_download": "Téléchargement de Paquets",
   "role.external_query": "Requête externe",
   "role.file_detail": "Détail de Fichiers",

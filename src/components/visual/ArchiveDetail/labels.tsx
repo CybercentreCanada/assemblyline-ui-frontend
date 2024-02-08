@@ -27,6 +27,7 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { FileInfo } from 'components/routes/archive/detail';
@@ -103,6 +104,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+  const { user: currentUser } = useALContext();
 
   const [labels, setLabels] = useState<Labels>(null);
   const [newLabel, setNewLabel] = useState<NewLabel>({ value: '', category: '' });
@@ -150,7 +152,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
       if (!sha256) return;
       apiCall({
         method: 'POST',
-        url: `/api/v4/file/label/`,
+        url: `/api/v4/archive/label/`,
         body: {
           include: value,
           mincount: 1,
@@ -170,7 +172,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
       if (!sha256) return;
       apiCall({
         method: 'PUT',
-        url: `/api/v4/file/label/${sha256}/`,
+        url: `/api/v4/archive/label/${sha256}/`,
         body: { [category]: [value] },
         onSuccess: ({ api_response }) => {
           const data = api_response?.label_categories ?? {};
@@ -196,7 +198,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
       if (!sha256) return;
       apiCall({
         method: 'DELETE',
-        url: `/api/v4/file/label/${sha256}/`,
+        url: `/api/v4/archive/label/${sha256}/`,
         body: { [category]: [value] },
         onSuccess: ({ api_response }) => {
           const data = api_response?.label_categories ?? {};
@@ -231,7 +233,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
       title={t('labels')}
       nocollapse={nocollapse}
       slots={{
-        end: (
+        end: currentUser.roles.includes('archive_manage') && (
           <Tooltip title={t('label.add.tooltip')}>
             <span>
               <IconButton
@@ -327,7 +329,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                               ))}
                             </Grid>
                             <Grid item md={1}>
-                              <CustomChip size="small" label={option?.total} />
+                              <CustomChip size="small" label={option?.count} />
                             </Grid>
                           </Grid>
                         );
@@ -418,7 +420,9 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                   label: value,
                   size: 'small',
                   variant: 'outlined',
-                  onDelete: () => handleDeleteConfirmation(cat as keyof typeof DEFAULT_LABELS, value)
+                  onDelete: currentUser.roles.includes('archive_manage')
+                    ? () => handleDeleteConfirmation(cat as keyof typeof DEFAULT_LABELS, value)
+                    : null
                 }))}
               />
             )}
