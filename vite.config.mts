@@ -13,6 +13,9 @@ export default defineConfig(({ mode }) => {
 
   return {
     // vite config
+    build: {
+      outDir: 'build'
+    },
     define: {
       __APP_ENV__: JSON.stringify(env.APP_ENV)
     },
