@@ -14,7 +14,7 @@ type Props = {
 };
 
 const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = false }) => {
-  const { t } = useTranslation(['fileDetail']);
+  const { t, i18n } = useTranslation(['fileDetail']);
 
   return (
     <SectionContainer title={t('frequency')} nocollapse={nocollapse}>
@@ -25,7 +25,8 @@ const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = fa
         <Grid item xs={8} sm={9} lg={10}>
           {seen ? (
             <div>
-              {moment(seen?.first).fromNow()} ({moment(seen?.first).format('YYYY-MM-DD HH:mm:ss')})
+              {moment(seen?.first).locale(i18n.language).fromNow()} ({moment(seen?.first).format('YYYY-MM-DD HH:mm:ss')}
+              )
             </div>
           ) : (
             <Skeleton />
@@ -38,7 +39,7 @@ const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = fa
         <Grid item xs={8} sm={9} lg={10}>
           {seen ? (
             <div>
-              {moment(seen?.last).fromNow()} ({moment(seen?.last).format('YYYY-MM-DD HH:mm:ss')})
+              {moment(seen?.last).locale(i18n.language).fromNow()} ({moment(seen?.last).format('YYYY-MM-DD HH:mm:ss')})
             </div>
           ) : (
             <Skeleton />
