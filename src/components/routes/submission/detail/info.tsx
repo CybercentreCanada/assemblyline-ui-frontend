@@ -6,9 +6,9 @@ import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/ma
 import makeStyles from '@mui/styles/makeStyles';
 import Priority from 'components/visual/Priority';
 import Verdict from 'components/visual/Verdict';
+import moment from 'moment';
 import React, { Fragment, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -175,11 +175,7 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                   <span style={{ fontWeight: 500 }}>{t('times.submitted')}</span>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10}>
-                  {submission ? (
-                    <Moment format="YYYY-MM-DD HH:mm:ss">{submission.times.submitted}</Moment>
-                  ) : (
-                    <Skeleton />
-                  )}
+                  {submission ? moment(submission.times.submitted).format('YYYY-MM-DD HH:mm:ss') : <Skeleton />}
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -187,7 +183,7 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10}>
                   {submission && submission.times.completed ? (
-                    <Moment format="YYYY-MM-DD HH:mm:ss">{submission.times.completed}</Moment>
+                    moment(submission.times.completed).format('YYYY-MM-DD HH:mm:ss')
                   ) : (
                     <Skeleton />
                   )}

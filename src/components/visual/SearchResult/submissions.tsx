@@ -7,10 +7,9 @@ import Classification from 'components/visual/Classification';
 import SubmissionState from 'components/visual/SubmissionState';
 import Verdict from 'components/visual/Verdict';
 import { maxLenStr } from 'helpers/utils';
-import 'moment/locale/fr';
+import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import {
   DivTable,
@@ -100,9 +99,7 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
               >
                 <DivTableCell>
                   <Tooltip title={submission.times.submitted}>
-                    <>
-                      <Moment fromNow locale={i18n.language} date={submission.times.submitted} />
-                    </>
+                    <>{moment(submission.times.submitted).locale(i18n.language).fromNow()}</>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>

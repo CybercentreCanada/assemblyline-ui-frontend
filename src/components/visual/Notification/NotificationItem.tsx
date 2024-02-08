@@ -2,10 +2,10 @@ import { Divider, Link, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import * as DOMPurify from 'dompurify';
+import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
-import Moment from 'react-moment';
 import { JSONFeedAuthor, JSONFeedItem } from '.';
 import CustomChip from '../CustomChip';
 
@@ -171,14 +171,11 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
       <>
         <div className={classes.container}>
           <Typography className={classes.time} variant="caption" color="secondary">
-            <Moment
-              locale={i18n.language}
-              format={
+            {moment(notification.date_published)
+              .locale(i18n.language)
+              .format(
                 i18n.language === 'en' ? 'MMMM Do YYYY' : i18n.language === 'fr' ? 'Do MMMM YYYY' : 'MMMM Do YYYY'
-              }
-            >
-              {notification.date_published}
-            </Moment>
+              )}
           </Typography>
           <div className={classes.header}>
             {notification.url ? (

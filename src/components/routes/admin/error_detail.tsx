@@ -14,11 +14,10 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import FileDownloader from 'components/visual/FileDownloader';
-import 'moment/locale/fr';
+import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import Moment from 'react-moment';
 import { Navigate } from 'react-router';
 import { Link, useLocation, useParams } from 'react-router-dom';
 
@@ -123,12 +122,10 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
             <Grid item xs={12} sm={4}>
               <div style={{ display: 'inline-block', textAlign: 'start' }}>
                 <Typography component="div" variant="body1">
-                  <Moment fromNow locale={i18n.language}>
-                    {error.created}
-                  </Moment>
+                  {moment(error.created).locale(i18n.language).fromNow()}
                 </Typography>
                 <Typography component="div" variant="caption">
-                  <Moment format="YYYY-MM-DD HH:mm:ss">{error.created}</Moment>
+                  {moment(error.created).format('YYYY-MM-DD HH:mm:ss')}
                 </Typography>
               </div>
             </Grid>

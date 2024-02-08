@@ -9,10 +9,9 @@ import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
 import { verdictToColor } from 'helpers/utils';
-import 'moment/locale/fr';
+import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import AlertListChip from './alert-chip-list';
 import AlertListChipDetailed from './alert-chip-list-detailed';
 import AlertExtendedScan from './alert-extended_scan';
@@ -117,9 +116,7 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           ) : null}
         </Grid>
         <Grid item xs={6} md={2} style={{ textAlign: 'right' }}>
-          <Moment fromNow locale={i18n.language}>
-            {item.reporting_ts}
-          </Moment>
+          {moment(item.reporting_ts).locale(i18n.language).fromNow()}
         </Grid>
         <Grid item xs={12} md={2}>
           <Grid container spacing={1}>

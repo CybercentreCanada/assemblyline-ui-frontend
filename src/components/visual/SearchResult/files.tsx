@@ -4,10 +4,9 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
-import 'moment/locale/fr';
+import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import {
   DivTable,
@@ -91,11 +90,7 @@ const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort =
               >
                 <DivTableCell>
                   <Tooltip title={file.seen.last}>
-                    <>
-                      <Moment fromNow locale={i18n.language}>
-                        {file.seen.last}
-                      </Moment>
-                    </>
+                    <>{moment(file.seen.last).locale(i18n.language).fromNow()}</>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>{file.seen.count}</DivTableCell>

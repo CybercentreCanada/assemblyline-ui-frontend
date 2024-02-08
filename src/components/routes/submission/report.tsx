@@ -34,9 +34,9 @@ import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
 import { bytesToSize } from 'helpers/utils';
+import moment from 'moment';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -690,7 +690,7 @@ export default function SubmissionReport() {
                 <span style={{ fontWeight: 500 }}>{t('submission.date')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10}>
-                {report ? <Moment date={report.times.submitted} /> : <Skeleton />}
+                {report ? <>{moment(report.times.submitted)}</> : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>

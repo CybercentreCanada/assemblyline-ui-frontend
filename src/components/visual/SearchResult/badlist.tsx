@@ -4,10 +4,9 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import { maxLenStr } from 'helpers/utils';
-import 'moment/locale/fr';
+import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import CustomChip from '../CustomChip';
 import {
@@ -109,11 +108,7 @@ const WrappedBadlistTable: React.FC<BadlistTableProps> = ({
               >
                 <DivTableCell>
                   <Tooltip title={sl_item.added}>
-                    <>
-                      <Moment fromNow locale={i18n.language}>
-                        {sl_item.added}
-                      </Moment>
-                    </>
+                    <>{moment(sl_item.added).locale(i18n.language).fromNow()}</>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>{sl_item.type}</DivTableCell>

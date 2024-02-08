@@ -10,10 +10,9 @@ import Classification from 'components/visual/Classification';
 import Histogram from 'components/visual/Histogram';
 import ResultsTable from 'components/visual/SearchResult/results';
 import { safeFieldValueURI } from 'helpers/utils';
-import 'moment/locale/fr';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
@@ -295,9 +294,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               <Grid item xs={9} sm={8} md={9} lg={10}>
                 {heuristic && stats ? (
                   stats.first_hit ? (
-                    <Moment fromNow locale={i18n.language}>
-                      {stats.first_hit}
-                    </Moment>
+                    moment(stats.first_hit).locale(i18n.language).fromNow()
                   ) : (
                     t('hit.none')
                   )
@@ -311,9 +308,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               <Grid item xs={9} sm={8} md={9} lg={10}>
                 {heuristic && stats ? (
                   stats.last_hit ? (
-                    <Moment fromNow locale={i18n.language}>
-                      {stats.last_hit}
-                    </Moment>
+                    moment(stats.last_hit).locale(i18n.language).fromNow()
                   ) : (
                     t('hit.none')
                   )

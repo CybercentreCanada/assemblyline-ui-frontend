@@ -16,10 +16,9 @@ import DatePicker from 'components/visual/DatePicker';
 import Histogram from 'components/visual/Histogram';
 import InputDialog from 'components/visual/InputDialog';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
-import 'moment/locale/fr';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -713,11 +712,8 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
               <Grid item xs={8} sm={9}>
                 {badlist ? (
                   <div>
-                    <Moment format="YYYY-MM-DD">{badlist.added}</Moment>&nbsp; (
-                    <Moment fromNow locale={i18n.language}>
-                      {badlist.added}
-                    </Moment>
-                    )
+                    {moment(badlist.added).format('YYYY-MM-DD')}&nbsp; (
+                    {moment(badlist.added).locale(i18n.language).fromNow()})
                   </div>
                 ) : (
                   <Skeleton />
@@ -729,11 +725,8 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
               <Grid item xs={8} sm={9}>
                 {badlist ? (
                   <div>
-                    <Moment format="YYYY-MM-DD">{badlist.updated}</Moment>&nbsp; (
-                    <Moment fromNow locale={i18n.language}>
-                      {badlist.updated}
-                    </Moment>
-                    )
+                    {moment(badlist.updated).format('YYYY-MM-DD')}&nbsp; (
+                    {moment(badlist.updated).locale(i18n.language).fromNow()})
                   </div>
                 ) : (
                   <Skeleton />
@@ -746,11 +739,8 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                 {badlist ? (
                   badlist.expiry_ts ? (
                     <div>
-                      <Moment format="YYYY-MM-DD">{badlist.expiry_ts}</Moment>&nbsp; (
-                      <Moment fromNow locale={i18n.language}>
-                        {badlist.expiry_ts}
-                      </Moment>
-                      )
+                      {moment(badlist.expiry_ts).format('YYYY-MM-DD')}&nbsp; (
+                      {moment(badlist.expiry_ts).locale(i18n.language).fromNow()})
                     </div>
                   ) : (
                     <span style={{ color: theme.palette.action.disabled }}>{t('expiry.forever')}</span>

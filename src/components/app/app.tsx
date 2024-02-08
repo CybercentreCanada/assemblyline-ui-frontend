@@ -16,6 +16,7 @@ import LockedPage from 'components/routes/locked';
 import LoginScreen from 'components/routes/login';
 import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
+import setFR from 'helpers/moment-fr-locale';
 import { getProvider } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
@@ -60,6 +61,8 @@ const MyAppMain = () => {
 
     bootstrap({ switchRenderedApp, setConfiguration, setLoginParams, setUser, setReady });
   });
+
+  setFR();
 
   return {
     load: <LoadingScreen />,

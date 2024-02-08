@@ -1,8 +1,8 @@
 import { Grid, Skeleton } from '@mui/material';
 import SectionContainer from 'components/visual/SectionContainer';
+import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 
 type Props = {
   seen: {
@@ -25,7 +25,7 @@ const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = fa
         <Grid item xs={8} sm={9} lg={10}>
           {seen ? (
             <div>
-              <Moment fromNow>{seen?.first}</Moment> (<Moment format="YYYY-MM-DD HH:mm:ss">{seen?.first}</Moment>)
+              {moment(seen?.first).fromNow()} ({moment(seen?.first).format('YYYY-MM-DD HH:mm:ss')})
             </div>
           ) : (
             <Skeleton />
@@ -38,7 +38,7 @@ const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = fa
         <Grid item xs={8} sm={9} lg={10}>
           {seen ? (
             <div>
-              <Moment fromNow>{seen?.last}</Moment> (<Moment format="YYYY-MM-DD HH:mm:ss">{seen?.last}</Moment>)
+              {moment(seen?.last).fromNow()} ({moment(seen?.last).format('YYYY-MM-DD HH:mm:ss')})
             </div>
           ) : (
             <Skeleton />

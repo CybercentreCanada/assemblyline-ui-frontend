@@ -17,10 +17,9 @@ import {
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SectionContainer from 'components/visual/SectionContainer';
 import { safeFieldValueURI } from 'helpers/utils';
-import 'moment/locale/fr';
+import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
@@ -250,9 +249,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
 
                             <GridTableCell>
                               <Tooltip title={item.seen.last}>
-                                <span>
-                                  <Moment fromNow locale={i18n.language} children={item.seen.last} />
-                                </span>
+                                <span>{moment(item.seen.last).locale(i18n.language).fromNow()}</span>
                               </Tooltip>
                             </GridTableCell>
 

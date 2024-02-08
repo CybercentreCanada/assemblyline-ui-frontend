@@ -3,10 +3,9 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
-import 'moment/locale/fr';
+import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import {
   DivTable,
@@ -82,17 +81,9 @@ const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults, se
                 }}
                 hover
               >
+                <DivTableCell>{moment(workflow.creation_date).locale(i18n.language).fromNow()}</DivTableCell>
                 <DivTableCell>
-                  <Moment fromNow locale={i18n.language}>
-                    {workflow.creation_date}
-                  </Moment>
-                </DivTableCell>
-                <DivTableCell>
-                  {workflow.last_seen && (
-                    <Moment fromNow locale={i18n.language}>
-                      {workflow.last_seen}
-                    </Moment>
-                  )}
+                  {workflow.last_seen && moment(workflow.last_seen).locale(i18n.language).fromNow()}
                 </DivTableCell>
                 <DivTableCell>{workflow.name}</DivTableCell>
                 <DivTableCell>{workflow.priority}</DivTableCell>

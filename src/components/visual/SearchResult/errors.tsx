@@ -13,10 +13,9 @@ import {
   LinkRow,
   SortableHeaderCell
 } from 'components/visual/DivTable';
-import 'moment/locale/fr';
+import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import InformativeAlert from '../InformativeAlert';
 
@@ -97,11 +96,7 @@ const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, setError
               >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                   <Tooltip title={error.created}>
-                    <>
-                      <Moment fromNow locale={i18n.language}>
-                        {error.created}
-                      </Moment>
-                    </>
+                    <>{moment(error.created).locale(i18n.language).fromNow()}</>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>{error.response.service_name}</DivTableCell>

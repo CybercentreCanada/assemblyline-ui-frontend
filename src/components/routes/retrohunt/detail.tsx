@@ -50,10 +50,9 @@ import { FileResult } from 'components/visual/SearchResult/files';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import SteppedProgress from 'components/visual/SteppedProgress';
 import { safeFieldValue } from 'helpers/utils';
-import 'moment/locale/fr';
+import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
@@ -471,9 +470,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
               retrohunt.creator && (
                 <Typography variant="subtitle2" color="textSecondary">
                   {`${t('created_by')} ${retrohunt.creator} `}
-                  <Moment fromNow locale={i18n.language}>
-                    {retrohunt.created}
-                  </Moment>
+                  {moment(retrohunt.created).locale(i18n.language).fromNow()}
                 </Typography>
               )
             ) : (
@@ -486,9 +483,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
               retrohunt.expiry_ts && (
                 <Typography variant="subtitle2" color="textSecondary">
                   {`${t('expire')} `}
-                  <Moment fromNow locale={i18n.language}>
-                    {retrohunt.expiry_ts}
-                  </Moment>
+                  {moment(retrohunt.expiry_ts).locale(i18n.language).fromNow()}
                 </Typography>
               )
             ) : (
@@ -568,7 +563,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                 'tags' in retrohunt &&
                 Object.keys(retrohunt.tags).length > 0 &&
                 Object.keys(retrohunt.tags).map((key, i) => (
-                  <Grid item>
+                  <Grid key={'tag-' + i} item>
                     <CustomChip
                       key={'tag-' + i}
                       type="round"
@@ -774,11 +769,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                       >
                         <DivTableCell>
                           <Tooltip title={file.seen.last}>
-                            <>
-                              <Moment fromNow locale={i18n.language}>
-                                {file.seen.last}
-                              </Moment>
-                            </>
+                            <>{moment(file.seen.last).locale(i18n.language).fromNow()}</>
                           </Tooltip>
                         </DivTableCell>
                         <DivTableCell>{file.seen.count}</DivTableCell>

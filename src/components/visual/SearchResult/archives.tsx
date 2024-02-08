@@ -18,10 +18,9 @@ import {
 } from 'components/visual/DivTable';
 import FileDownloader from 'components/visual/FileDownloader';
 import InformativeAlert from 'components/visual/InformativeAlert';
-import 'moment/locale/fr';
+import moment from 'moment';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 
 export type ArchivedFileResult = {
@@ -134,9 +133,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                 )}
                 <DivTableCell>
                   <Tooltip title={file.seen.last}>
-                    <span>
-                      <Moment fromNow locale={i18n.language} children={file.seen.last} />
-                    </span>
+                    <span>{moment(file.seen.last).locale(i18n.language).fromNow()}</span>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>

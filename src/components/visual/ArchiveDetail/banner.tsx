@@ -30,9 +30,9 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import { File } from 'components/routes/archive/detail';
 import CustomChip from 'components/visual/CustomChip';
 import { bytesToSize } from 'helpers/utils';
+import moment from 'moment';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 import FileDownloader from '../FileDownloader';
@@ -529,7 +529,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
             </>
           )}
           <div>{t('seen.last')}</div>
-          <div>{file ? <Moment fromNow>{file?.file_info?.seen?.last}</Moment> : <Skeleton />}</div>
+          <div>{file ? moment(file?.file_info?.seen?.last).fromNow() : <Skeleton />}</div>
         </div>
 
         <div>

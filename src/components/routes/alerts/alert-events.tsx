@@ -15,10 +15,10 @@ import {
   useTheme
 } from '@mui/material';
 import { ChipList } from 'components/visual/ChipList';
+import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
@@ -74,11 +74,7 @@ const WrappedAlertEventsTable = ({ alert, viewHistory, setViewHistory }) => {
                       return (
                         <TableRow key={`table-row-${i}`} hover tabIndex={-1}>
                           <Tooltip title={event.ts}>
-                            <TableCell>
-                              <Moment fromNow locale={i18n.language}>
-                                {event.ts}
-                              </Moment>
-                            </TableCell>
+                            <TableCell>{moment(event.ts).locale(i18n.language).fromNow()}</TableCell>
                           </Tooltip>
                           <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
                             <TableCell>{event.entity_name}</TableCell>

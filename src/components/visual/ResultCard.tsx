@@ -20,9 +20,9 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useSafeResults from 'components/hooks/useSafeResults';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
+import moment from 'moment';
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import ExtractedSection from './ResultCard/extracted';
 import { ExtractedFiles } from './ResultCard/extracted_file';
 import ResultSection, { Section, SectionItem } from './ResultCard/result_section';
@@ -109,7 +109,7 @@ export const emptyResult = (result: Result) =>
   result.response.supplementary.length === 0;
 
 const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null, force = false }) => {
-  const { t } = useTranslation(['fileDetail']);
+  const { t, i18n } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -204,14 +204,14 @@ const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates 
                     <span style={{ paddingRight: theme.spacing(2) }}>
                       {`${result.response.service_version} :: [${result.result.score}]`}
                     </span>
-                    <Moment format="YYYY-MM-DD HH:mm:ss">{result.created}</Moment>
+                    {moment(result.created).format('YYYY-MM-DD HH:mm:ss')}
                   </MenuItem>
                   {alternates.map(alt => (
                     <MenuItem disabled={selected === alt.id} key={alt.id} onClick={() => setSelected(alt.id)}>
                       <span style={{ paddingRight: theme.spacing(2) }}>
                         {`${alt.response.service_version} :: [${alt.result.score}]`}
                       </span>
-                      <Moment format="YYYY-MM-DD HH:mm:ss">{alt.created}</Moment>
+                      {moment(alt.created).format('YYYY-MM-DD HH:mm:ss')}
                     </MenuItem>
                   ))}
                 </MenuList>
@@ -247,7 +247,7 @@ const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates 
                 onClick={handlePopperClick}
                 style={{ fontSize: 'smaller' }}
               >
-                <Moment fromNow>{displayedResult.created}</Moment>
+                {moment(displayedResult.created).locale(i18n.language).fromNow()}
               </Button>
             ) : (
               <Typography
@@ -255,7 +255,7 @@ const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates 
                 variant="button"
                 style={{ fontSize: 'smaller', paddingRight: theme.spacing(1.4) }}
               >
-                <Moment fromNow>{displayedResult.created}</Moment>
+                {moment(displayedResult.created).locale(i18n.language).fromNow()}
               </Typography>
             )}
           </div>

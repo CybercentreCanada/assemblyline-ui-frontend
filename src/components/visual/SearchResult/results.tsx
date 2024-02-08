@@ -5,10 +5,9 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
-import 'moment/locale/fr';
+import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link, useLocation } from 'react-router-dom';
 import {
   DivTable,
@@ -94,11 +93,7 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, compo
               >
                 <DivTableCell>
                   <Tooltip title={result.created}>
-                    <>
-                      <Moment fromNow locale={i18n.language}>
-                        {result.created}
-                      </Moment>
-                    </>
+                    <>{moment(result.created).locale(i18n.language).fromNow()}</>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>

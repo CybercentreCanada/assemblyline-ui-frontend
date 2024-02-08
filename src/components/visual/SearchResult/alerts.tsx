@@ -4,10 +4,9 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
-import 'moment/locale/fr';
+import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import {
   DivTable,
@@ -97,11 +96,7 @@ const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults, allowSor
               >
                 <DivTableCell>
                   <Tooltip title={alert.reporting_ts}>
-                    <>
-                      <Moment fromNow locale={i18n.language}>
-                        {alert.reporting_ts}
-                      </Moment>
-                    </>
+                    <>{moment(alert.reporting_ts).locale(i18n.language).fromNow()}</>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>

@@ -13,10 +13,9 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import DatePicker from 'components/visual/DatePicker';
 import Histogram from 'components/visual/Histogram';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
-import 'moment/locale/fr';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -547,11 +546,8 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
               <Grid item xs={8} sm={9}>
                 {safelist ? (
                   <div>
-                    <Moment format="YYYY-MM-DD">{safelist.added}</Moment>&nbsp; (
-                    <Moment fromNow locale={i18n.language}>
-                      {safelist.added}
-                    </Moment>
-                    )
+                    {moment(safelist.added).format('YYYY-MM-DD')}&nbsp; (
+                    {moment(safelist.added).locale(i18n.language).fromNow()})
                   </div>
                 ) : (
                   <Skeleton />
@@ -563,11 +559,8 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
               <Grid item xs={8} sm={9}>
                 {safelist ? (
                   <div>
-                    <Moment format="YYYY-MM-DD">{safelist.updated}</Moment>&nbsp; (
-                    <Moment fromNow locale={i18n.language}>
-                      {safelist.updated}
-                    </Moment>
-                    )
+                    {moment(safelist.updated).format('YYYY-MM-DD')}&nbsp; (
+                    {moment(safelist.updated).locale(i18n.language).fromNow()})
                   </div>
                 ) : (
                   <Skeleton />
@@ -580,11 +573,8 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 {safelist ? (
                   safelist.expiry_ts ? (
                     <div>
-                      <Moment format="YYYY-MM-DD">{safelist.expiry_ts}</Moment>&nbsp; (
-                      <Moment fromNow locale={i18n.language}>
-                        {safelist.expiry_ts}
-                      </Moment>
-                      )
+                      {moment(safelist.expiry_ts).format('YYYY-MM-DD')}&nbsp; (
+                      {moment(safelist.expiry_ts).locale(i18n.language).fromNow()})
                     </div>
                   ) : (
                     <span style={{ color: theme.palette.action.disabled }}>{t('expiry.forever')}</span>

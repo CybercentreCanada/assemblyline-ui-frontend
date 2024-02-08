@@ -19,10 +19,9 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { AppUserAvatar } from 'commons/components/topnav/UserProfile';
 import useALContext from 'components/hooks/useALContext';
-import 'moment/locale/fr';
+import moment from 'moment';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 
 const PREVIOUS_CLASS = 'previous';
 const NEXT_CLASS = 'next';
@@ -372,7 +371,7 @@ const WrappedCommentCard: React.FC<Props> = ({
               )}
               {(!samePreviousAuthor || !previousNarrowTimeSpan) && (
                 <Typography className={classes.date} variant="caption">
-                  <Moment calendar={calendar} locale={i18n.language} children={currentComment?.date} />
+                  {moment(currentComment?.date).locale(i18n.language).calendar(calendar)}
                 </Typography>
               )}
             </div>
