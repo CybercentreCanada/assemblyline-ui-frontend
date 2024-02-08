@@ -1,3 +1,4 @@
+// TODO: change syntax to "import type {theme}" to avoid potential problems like type-only imports being incorrectly bundled.
 import { Theme } from '@mui/material/styles';
 import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import AppProvider from 'commons/components/app/AppProvider';
