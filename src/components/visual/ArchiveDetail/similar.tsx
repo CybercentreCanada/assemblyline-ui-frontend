@@ -195,7 +195,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
     if (!file || data) return;
     apiCall({
       method: 'GET',
-      url: `/api/v4/archive/similar/${file?.file_info?.sha256}/`,
+      url: `/api/v4/file/similar/${file?.file_info?.sha256}/?use_archive`,
       onSuccess: api_data => setData(api_data.api_response),
       onFailure: api_data => showErrorMessage(api_data.api_error_message)
     });
