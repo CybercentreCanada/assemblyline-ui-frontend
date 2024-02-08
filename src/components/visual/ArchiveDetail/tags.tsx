@@ -92,6 +92,8 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
   const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(''));
 
   const results = useMemo<Result[]>(() => {
+    if (!signatures && !tags) return null;
+
     const signatureResults = !signatures
       ? []
       : signatures.map(item => ({
@@ -167,23 +169,23 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
       );
   }, [filteredResults, query]);
 
-  const groupedResults = useMemo<Array<Result[]>>(
-    () =>
-      sortedResults.reduce((prev: Array<Result[]>, curr: Result, i: number, array: Result[]) => {
-        const node =
-          Array.isArray(prev) &&
-          prev?.length > 0 &&
-          prev[prev.length - 1].find(subItem => subItem?.tag_type === curr?.tag_type)
-            ? prev[prev.length - 1]
-            : null;
+  const groupedResults = useMemo<Array<Result[]>>(() => {
+    if (!sortedResults) return null;
 
-        if (node) node.push(curr);
-        else prev.push([curr]);
+    return sortedResults.reduce((prev: Array<Result[]>, curr: Result, i: number, array: Result[]) => {
+      const node =
+        Array.isArray(prev) &&
+        prev?.length > 0 &&
+        prev[prev.length - 1].find(subItem => subItem?.tag_type === curr?.tag_type)
+          ? prev[prev.length - 1]
+          : null;
 
-        return prev;
-      }, []),
-    [sortedResults]
-  );
+      if (node) node.push(curr);
+      else prev.push([curr]);
+
+      return prev;
+    }, []);
+  }, [sortedResults]);
 
   const tagUnsafeMap = useMemo(() => {
     if (!tags) return null;
@@ -234,6 +236,12 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
       return newQuery;
     });
   }, []);
+
+  useEffect(() => {
+    return () => {
+      setQuery(new SimpleSearchQuery(''));
+    };
+  }, [sha256]);
 
   return (
     <SectionContainer

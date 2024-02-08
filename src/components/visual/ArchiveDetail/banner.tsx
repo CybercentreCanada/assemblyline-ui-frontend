@@ -494,13 +494,13 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                 <Tooltip title={t('related')}>
                   <IconButton
                     component={Link}
-                    to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`}
+                    to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*&use_archive`}
                     size="large"
                   >
                     <ViewCarouselOutlinedIcon />
                   </IconButton>
                 </Tooltip>
-                {currentUser.roles.includes('file_download') && (
+                {currentUser.roles.includes('archive_download') && (
                   <FileDownloader
                     icon={<GetAppOutlinedIcon />}
                     link={`/api/v4/file/download/${file.file_info.sha256}/?${

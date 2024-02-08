@@ -78,5 +78,7 @@
   "verdict.malicious": "Malicious",
   "verdict.safe": "Safe",
   "verdict.suspicious": "Suspicious",
-  "view_file": "View file"
+  "view_file": "View file",
+  "file": "File",
+  "files": "Files"
 }
