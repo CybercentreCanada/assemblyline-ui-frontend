@@ -15,7 +15,6 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SubmissionParams } from '../service_detail';

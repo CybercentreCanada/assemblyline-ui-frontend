@@ -1,8 +1,6 @@
-import { IconButton, Paper, TableContainer, TableRow, Tooltip } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
-import { AlertTitle, Skeleton } from '@mui/material';
-import 'moment/locale/fr';
+import { AlertTitle, IconButton, Paper, Skeleton, TableContainer, TableRow, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { JSONFeedItem } from '.';
@@ -83,7 +81,8 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
                           onInstall([service]);
                         }}
                         disabled={installingServices?.includes(service?.summary)}
-                        size="large">
+                        size="large"
+                      >
                         <CloudDownloadOutlinedIcon />
                       </IconButton>
                     </span>

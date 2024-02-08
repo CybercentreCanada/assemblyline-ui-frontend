@@ -4,11 +4,11 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  Unstable_Grid2 as Grid,
   Radio,
   RadioGroup,
   TextField,
   Typography,
-  Unstable_Grid2 as Grid,
   useTheme
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -22,7 +22,6 @@ import Classification from 'components/visual/Classification';
 import DatePicker from 'components/visual/DatePicker';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 
-import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';

@@ -21,7 +21,6 @@ import SearchPager from 'components/visual/SearchPager';
 import ErrorsTable from 'components/visual/SearchResult/errors';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
-import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';

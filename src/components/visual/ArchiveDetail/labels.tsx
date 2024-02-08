@@ -30,7 +30,6 @@ import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import { useDebounce } from 'components/visual/HexViewer';
 import SectionContainer from 'components/visual/SectionContainer';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

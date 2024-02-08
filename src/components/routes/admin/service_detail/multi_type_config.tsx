@@ -2,7 +2,6 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactJson from 'react-json-view';

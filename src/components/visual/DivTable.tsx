@@ -2,7 +2,6 @@ import { Table, TableBody, TableCell, TableCellProps, TableHead, TableRow, Table
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import 'moment/locale/fr';
 import React from 'react';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';

@@ -6,7 +6,6 @@ import { RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import moment from 'moment';
-import 'moment/locale/fr';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';

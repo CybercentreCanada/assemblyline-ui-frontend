@@ -5,7 +5,6 @@ import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import { maxLenStr } from 'helpers/utils';
 import moment from 'moment';
-import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
