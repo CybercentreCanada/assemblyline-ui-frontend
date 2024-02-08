@@ -20,6 +20,9 @@ export default defineConfig(({ mode }) => {
       __APP_ENV__: JSON.stringify(env.APP_ENV)
     },
     plugins: [react(), tsconfigPaths(), splitVendorChunkPlugin(), mkcert()],
+    resolve: {
+      extensions: ['.tsx', '.ts', '.js', '.jsx', '.json', '.mjs', '.mts']
+    },
     server: {
       host: '0.0.0.0',
       port: 3000,
