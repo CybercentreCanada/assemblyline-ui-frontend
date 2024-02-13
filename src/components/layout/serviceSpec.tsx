@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -80,6 +80,10 @@ function Service({ disabled, service, idx, setParam, setParamAsync }) {
 function Param({ disabled, param, pidx, idx, setParam, setParamAsync }) {
   const classes = useStyles();
   const theme = useTheme();
+
+  const [value, setValue] = useState<number>(param.value);
+  const parsedValue = useMemo<string>(() => `${value}`, [value]);
+
   return (
     <div key={pidx} style={{ paddingBottom: theme.spacing(1) }}>
       {param.type === 'bool' ? (
@@ -129,15 +133,30 @@ function Param({ disabled, param, pidx, idx, setParam, setParamAsync }) {
                 )}
               </Select>
             </FormControl>
-          ) : (
+          ) : param.type === 'str' ? (
             <TextField
               variant="outlined"
               disabled={disabled}
-              type={param.type === 'int' ? 'number' : 'text'}
+              type="text"
               size="small"
               fullWidth
               defaultValue={param.value}
               onChange={event => setParamAsync(idx, pidx, event.target.value)}
+            />
+          ) : (
+            <TextField
+              variant="outlined"
+              disabled={disabled}
+              type="number"
+              size="small"
+              fullWidth
+              value={parsedValue}
+              onChange={event => {
+                let num = parseInt(event.target.value);
+                num = isNaN(num) ? 0 : num;
+                setValue(num);
+                setParamAsync(idx, pidx, num);
+              }}
             />
           )}
         </>
