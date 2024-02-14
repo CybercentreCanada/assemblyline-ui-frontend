@@ -1,12 +1,11 @@
-import { IconButton, Paper, TableContainer, TableRow, Tooltip } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
-import { AlertTitle, Skeleton } from '@mui/material';
+import { AlertTitle, IconButton, Paper, Skeleton, TableContainer, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import 'moment/locale/fr';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { JSONFeedItem } from '.';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow } from '../DivTable';
+import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, ExternalLinkRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
 export type ServiceResult = {
@@ -54,13 +53,7 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
           </DivTableHead>
           <DivTableBody>
             {services?.map((service, i) => (
-              <TableRow
-                key={i + ' - ' + service.title}
-                component={props => <div {...props} />}
-                hover
-                style={{ cursor: 'pointer', textDecoration: 'none' }}
-                onClick={() => navigate(service.url)}
-              >
+              <ExternalLinkRow key={i + ' - ' + service.title} hover href={service.url}>
                 <DivTableCell>{service.summary}</DivTableCell>
                 <DivTableCell>{service.content_text}</DivTableCell>
                 <DivTableCell
@@ -83,13 +76,14 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
                           onInstall([service]);
                         }}
                         disabled={installingServices?.includes(service?.summary)}
-                        size="large">
+                        size="large"
+                      >
                         <CloudDownloadOutlinedIcon />
                       </IconButton>
                     </span>
                   </Tooltip>
                 </DivTableCell>
-              </TableRow>
+              </ExternalLinkRow>
             ))}
           </DivTableBody>
         </DivTable>
