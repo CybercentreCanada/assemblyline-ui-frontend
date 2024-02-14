@@ -695,6 +695,7 @@ function Settings() {
               setParam={setParam}
               setParamAsync={setParam}
               compressed
+              hasResetButton
             />
           ) : (
             <div>
