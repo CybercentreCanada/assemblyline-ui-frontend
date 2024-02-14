@@ -1,11 +1,11 @@
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
-import { AlertTitle, IconButton, Paper, Skeleton, TableContainer, TableRow, Tooltip } from '@mui/material';
+import { AlertTitle, IconButton, Link, Paper, Skeleton, TableContainer, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import 'moment/locale/fr';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { JSONFeedItem } from '.';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow } from '../DivTable';
+import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, ExternalLinkRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
 export type ServiceResult = {
@@ -47,20 +47,27 @@ const WrappedCommunityServiceTable: React.FC<Props> = ({ services, installingSer
           <DivTableHead>
             <DivTableRow>
               <DivTableCell>{t('header.name')}</DivTableCell>
+              <DivTableCell>{t('header.author')}</DivTableCell>
               <DivTableCell>{t('header.description')}</DivTableCell>
               <DivTableCell />
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
             {services?.map((service, i) => (
-              <TableRow
-                key={i + ' - ' + service.title}
-                component={props => <div {...props} />}
-                hover
-                style={{ cursor: 'pointer', textDecoration: 'none' }}
-                onClick={() => navigate(service.url)}
-              >
+              <ExternalLinkRow key={i + ' - ' + service.title} hover href={service.url}>
                 <DivTableCell>{service.summary}</DivTableCell>
+                <DivTableCell>
+                  <Link
+                    href={service.authors[0].url}
+                    onClick={event => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      navigate(service.authors[0].url);
+                    }}
+                  >
+                    {service.authors[0].name}
+                  </Link>
+                </DivTableCell>
                 <DivTableCell>{service.content_text}</DivTableCell>
                 <DivTableCell
                   className={classes.center}
@@ -89,7 +96,7 @@ const WrappedCommunityServiceTable: React.FC<Props> = ({ services, installingSer
                     </span>
                   </Tooltip>
                 </DivTableCell>
-              </TableRow>
+              </ExternalLinkRow>
             ))}
           </DivTableBody>
         </DivTable>
