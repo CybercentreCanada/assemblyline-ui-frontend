@@ -254,7 +254,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
 
   const enableWorkflow = () => {
     apiCall({
-      body: false,
+      body: true,
       url: `/api/v4/workflow/enable/${workflowID}/`,
       method: 'PUT',
       onSuccess: () => {
