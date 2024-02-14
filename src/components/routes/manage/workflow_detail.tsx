@@ -2,8 +2,9 @@ import ControlPointDuplicateOutlinedIcon from '@mui/icons-material/ControlPointD
 import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-
 import {
   Autocomplete,
   Button,
@@ -34,7 +35,6 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import CustomChip from 'components/visual/CustomChip';
 import Histogram from 'components/visual/Histogram';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import AlertsTable from 'components/visual/SearchResult/alerts';
@@ -120,6 +120,8 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
   const [badQuery, setBadQuery] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [disableDialog, setDisableDialog] = useState(false);
+  const [enableDialog, setEnableDialog] = useState(false);
   const [viewMode, setViewMode] = useState(mode);
   const [workflowID, setWorkflowID] = useState(workflow_id || id);
   const { c12nDef, configuration } = useALContext();
@@ -128,6 +130,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
   const { apiCall } = useMyAPI();
   const classes = useStyles();
   const navigate = useNavigate();
+  const inputRef = React.useRef(null);
 
   const DEFAULT_WORKFLOW = {
     classification: c12nDef.UNRESTRICTED,
@@ -244,14 +247,41 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
     setWorkflow({ ...workflow, status: event.target.value });
   };
 
-  const handleToggleEnabled = () => {
-    setModified(true);
-    setWorkflow({ ...workflow, enabled: !workflow.enabled });
-  };
-
   const setClassification = classification => {
     setModified(true);
     setWorkflow({ ...workflow, classification });
+  };
+
+  const enableWorkflow = () => {
+    apiCall({
+      body: false,
+      url: `/api/v4/workflow/enable/${workflowID}/`,
+      method: 'PUT',
+      onSuccess: () => {
+        setEnableDialog(false);
+        showSuccessMessage(t('enable.success'));
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
+        setWorkflow({ ...workflow, enabled: false });
+      },
+      onEnter: () => setButtonLoading(true),
+      onExit: () => setButtonLoading(false)
+    });
+  };
+
+  const disableWorkflow = () => {
+    apiCall({
+      body: false,
+      url: `/api/v4/workflow/enable/${workflowID}/`,
+      method: 'PUT',
+      onSuccess: () => {
+        setDisableDialog(false);
+        showSuccessMessage(t('disable.success'));
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
+        setWorkflow({ ...workflow, enabled: false });
+      },
+      onEnter: () => setButtonLoading(true),
+      onExit: () => setButtonLoading(false)
+    });
   };
 
   const removeWorkflow = () => {
@@ -307,29 +337,34 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
         text={t('delete.text')}
         waiting={buttonLoading}
       />
+      <ConfirmationDialog
+        open={disableDialog}
+        handleClose={() => setDisableDialog(false)}
+        handleAccept={disableWorkflow}
+        title={t('disable.title')}
+        cancelText={t('disable.cancelText')}
+        acceptText={t('disable.acceptText')}
+        text={t('disable.text')}
+        waiting={buttonLoading}
+      />
+      <ConfirmationDialog
+        open={enableDialog}
+        handleClose={() => setEnableDialog(false)}
+        handleAccept={enableWorkflow}
+        title={t('enable.title')}
+        cancelText={t('enable.cancelText')}
+        acceptText={t('enable.acceptText')}
+        text={t('enable.text')}
+        waiting={buttonLoading}
+      />
 
-      {c12nDef.enforce && (
-        <div style={{ paddingBottom: theme.spacing(2) }}>
-          <Classification
-            type="picker"
-            c12n={workflow ? workflow.classification : null}
-            setClassification={setClassification}
-            disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
-          />
-        </div>
-      )}
-      {workflow ? (
-        <CustomChip
-          type="rounded"
-          color={workflow.enabled ? 'primary' : 'default'}
-          onClick={handleToggleEnabled}
-          label={workflow.enabled ? t('enabled') : t('disabled')}
-          fullWidth
-          style={{ marginBottom: theme.spacing(4) }}
+      <div style={{ paddingBottom: theme.spacing(2) }}>
+        <Classification
+          type={currentUser.roles.includes('workflow_manage') && viewMode === 'write' ? 'picker' : 'outlined'}
+          c12n={workflow ? workflow.classification : null}
+          setClassification={setClassification}
         />
-      ) : (
-        <Skeleton variant="rectangular" height="2.5rem" style={{ marginBottom: theme.spacing(1) }} />
-      )}
+      </div>
 
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: theme.spacing(2) }}>
@@ -340,33 +375,41 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 {workflow ? workflowID : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
-            {workflowID && currentUser.roles.includes('workflow_view') && viewMode === 'read' && (
-              <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
-                {workflow ? (
+            <Grid item xs={12} sm style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              {workflowID &&
+                currentUser.roles.includes('workflow_view') &&
+                (workflow ? (
                   <Tooltip title={t('usage')}>
                     <IconButton
                       component={Link}
-                      style={{ color: theme.palette.action.active }}
-                      to={`/search/alert/?query=events.entity_id:${workflowID}`}
+                      style={{ color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.action.active }}
+                      to={`/alerts/?q=events.entity_id:${workflowID}`}
                       size="large"
+                      disabled={viewMode !== 'read'}
                     >
                       <YoutubeSearchedForIcon />
                     </IconButton>
                   </Tooltip>
-                ) : null}
-              </Grid>
-            )}
-            {workflowID && currentUser.roles.includes('workflow_manage') && (
-              <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
-                {workflow ? (
+                ) : null)}
+              {workflowID &&
+                currentUser.roles.includes('workflow_manage') &&
+                (workflow ? (
                   <Tooltip title={t('duplicate')}>
                     <IconButton
                       style={{
-                        color: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark
+                        color:
+                          viewMode !== 'read'
+                            ? theme.palette.text.disabled
+                            : theme.palette.mode === 'dark'
+                            ? theme.palette.success.light
+                            : theme.palette.success.dark
                       }}
                       onClick={() => {
                         // Switch to write mode
                         setViewMode('write');
+                        setTimeout(() => {
+                          inputRef.current.focus();
+                        }, 250);
 
                         // Keep properties of workflow that are important
                         var keptProperties = {
@@ -381,32 +424,39 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                         // Apply important properties on top of default workflow template
                         setWorkflow({ ...DEFAULT_WORKFLOW, ...keptProperties });
                         setWorkflowID(null);
-                        setModified(false);
+                        setModified(true);
                       }}
                       size="large"
+                      disabled={viewMode !== 'read'}
                     >
                       <ControlPointDuplicateOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                )}
-              </Grid>
-            )}
-            {workflowID &&
-              currentUser.roles.includes('workflow_manage') &&
-              workflow &&
-              workflow.origin === configuration.ui.fqdn && (
-                <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
-                  {workflow ? (
-                    <Tooltip title={t(viewMode === 'read' ? 'edit' : 'cancel')}>
+                ))}
+              {workflowID &&
+                currentUser.roles.includes('workflow_manage') &&
+                (workflow ? (
+                  <Tooltip
+                    title={t(
+                      workflow.origin !== configuration.ui.fqdn
+                        ? 'edit.disabled'
+                        : viewMode === 'read'
+                        ? 'edit'
+                        : 'cancel'
+                    )}
+                  >
+                    <span>
                       <IconButton
                         style={{
                           color:
-                            viewMode === 'read'
+                            workflow.origin !== configuration.ui.fqdn
+                              ? theme.palette.text.disabled
+                              : viewMode === 'read'
                               ? theme.palette.mode === 'dark'
-                                ? theme.palette.info.light
-                                : theme.palette.info.dark
+                                ? theme.palette.primary.light
+                                : theme.palette.primary.dark
                               : theme.palette.mode === 'dark'
                               ? theme.palette.error.light
                               : theme.palette.error.dark
@@ -415,6 +465,9 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                           if (viewMode === 'read') {
                             // Switch to write mode
                             setViewMode('write');
+                            setTimeout(() => {
+                              inputRef.current.focus();
+                            }, 250);
                           } else {
                             // Reset the state of the workflow, cancel changes
                             setViewMode('read');
@@ -423,39 +476,57 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                           }
                         }}
                         size="large"
+                        disabled={workflow.origin !== configuration.ui.fqdn}
                       >
                         {viewMode === 'read' ? <EditOutlinedIcon /> : <EditOffOutlinedIcon />}
                       </IconButton>
-                    </Tooltip>
-                  ) : (
-                    <Skeleton
-                      variant="circular"
-                      height="2.5rem"
-                      width="2.5rem"
-                      style={{ margin: theme.spacing(0.5) }}
-                    />
-                  )}
-                </Grid>
-              )}
-            {workflowID && currentUser.roles.includes('workflow_manage') && viewMode === 'read' && (
-              <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
-                {workflow ? (
+                    </span>
+                  </Tooltip>
+                ) : (
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                ))}
+              {workflowID &&
+                currentUser.roles.includes('workflow_manage') &&
+                (workflow ? (
+                  <Tooltip title={workflow.enabled ? t('enabled') : t('disabled')}>
+                    <IconButton
+                      style={{
+                        color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.text.primary
+                      }}
+                      onClick={workflow.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
+                      size="large"
+                      disabled={viewMode !== 'read'}
+                    >
+                      {workflow.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                ))}
+              {workflowID &&
+                currentUser.roles.includes('workflow_manage') &&
+                (workflow ? (
                   <Tooltip title={t('remove')}>
                     <IconButton
                       style={{
-                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        color:
+                          viewMode !== 'read'
+                            ? theme.palette.text.disabled
+                            : theme.palette.mode === 'dark'
+                            ? theme.palette.error.light
+                            : theme.palette.error.dark
                       }}
                       onClick={() => setDeleteDialog(true)}
                       size="large"
+                      disabled={viewMode !== 'read'}
                     >
                       <RemoveCircleOutlineOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                )}
-              </Grid>
-            )}
+                ))}
+            </Grid>
           </Grid>
         </div>
         <Grid container spacing={2}>
@@ -463,6 +534,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
             <Typography variant="subtitle2">{t('name')}</Typography>
             {workflow ? (
               <TextField
+                inputRef={inputRef}
                 fullWidth
                 size="small"
                 margin="dense"
