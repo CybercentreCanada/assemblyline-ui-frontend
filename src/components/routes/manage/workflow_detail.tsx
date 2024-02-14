@@ -261,7 +261,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
         setEnableDialog(false);
         showSuccessMessage(t('enable.success'));
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
-        setWorkflow({ ...workflow, enabled: false });
+        setWorkflow({ ...workflow, enabled: true });
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
