@@ -197,9 +197,12 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
           return;
         }
 
-        const textResponse: string = await response.text();
-        const jsonFeed = JSON.parse(textResponse);
-        resolve(parseJSONFeed(jsonFeed));
+        if (response.ok) {
+          const textResponse: string = await response.text();
+          const jsonFeed = JSON.parse(textResponse);
+          resolve(parseJSONFeed(jsonFeed));
+        }
+
         return;
       }),
     [DEFAULT_JSON_FEED, parseJSONFeed]
