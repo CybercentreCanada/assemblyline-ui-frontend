@@ -34,6 +34,7 @@ type SettingsDefinition = {
   deep_scan: boolean;
   description: string;
   download_encoding: string;
+  executive_summary: boolean;
   expand_min_score: number;
   ignore_cache: boolean;
   ignore_dynamic_recursion_prevention: boolean;

@@ -30,6 +30,8 @@
   "submissions.deep_scan_desc": "Effectuez une analyse plus approfondie du fichier en activant davantage de vérifications. Plus lent et non recommandé pour l'analyse en vrac.",
   "submissions.dynamic_recursion": "Prévention de la récursivité dynamique",
   "submissions.dynamic_recursion_desc": "Garantit que les enfants des services d'analyse dynamique ne sont pas renvoyés ceux-ci pour l'analyse.",
+  "submissions.executive_summary": "Sommaire exécutif",
+  "submissions.executive_summary_desc": "Affichez les sommaires exécutifs générés par l'IA lors de l'affichage des pages de détails du fichier/soumission.",
   "submissions.filtering": "Filtration",
   "submissions.filtering_desc": "Autorisez les services de filtrage à ignorer les fichiers s'ils pensent que les fichiers sont sûrs.",
   "submissions.generate_alert": "Générer une alerte",

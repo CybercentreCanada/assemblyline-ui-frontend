@@ -124,7 +124,7 @@ function WrappedSubmissionDetail() {
   const { showSuccessMessage } = useMySnackbar();
   const location = useLocation();
   const navigate = useNavigate();
-  const { user: currentUser, c12nDef, configuration: systemConfig } = useALContext();
+  const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [baseFiles, setBaseFiles] = useState([]);
@@ -1261,7 +1261,7 @@ function WrappedSubmissionDetail() {
           metadata={submission ? submission.metadata : null}
           classification={submission ? submission.classification : null}
         />
-        {systemConfig.ui.ai.enabled && submission && submission.state === 'completed' && (
+        {systemConfig.ui.ai.enabled && settings.executive_summary && submission && submission.state === 'completed' && (
           <AISummarySection type={'submission' as 'submission'} id={submission.sid} />
         )}
         <Detection

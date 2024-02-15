@@ -143,7 +143,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const [badlistReason, setBadlistReason] = useState<string>('');
   const [waitingDialog, setWaitingDialog] = useState(false);
   const { apiCall } = useMyAPI();
-  const { c12nDef, configuration } = useALContext();
+  const { c12nDef, configuration, settings } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const theme = useTheme();
   const navigate = useNavigate();
@@ -521,7 +521,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         )}
         <FrequencySection seen={file ? file.file_info?.seen : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
-        {configuration.ui.ai.enabled && !liveErrors && !liveResultKeys && (
+        {configuration.ui.ai.enabled && settings.executive_summary && !liveErrors && !liveResultKeys && (
           <AISummarySection type="file" id={file ? file.file_info.sha256 : null} />
         )}
         <ChildrenSection childrens={file ? file.childrens : null} />
