@@ -10,13 +10,21 @@ import {
   Link,
   Paper,
   Skeleton,
+  Table,
+  TableBody,
+  TableCell,
   TableContainer,
-  Tooltip
+  TableRow,
+  Tooltip,
+  Typography,
+  useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import 'moment/locale/fr';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BsClipboard } from 'react-icons/bs';
 import { JSONFeedItem } from '.';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, ExternalLinkRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
@@ -39,20 +47,31 @@ type Props = {
   onInstall: (s: JSONFeedItem[]) => void;
 };
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   center: {
     textAlign: 'center'
+  },
+  noBorder: {
+    borderBottom: 'transparent'
+  },
+  noDecoration: {
+    textDecoration: 'none'
+  },
+  clipboardIcon: {
+    marginLeft: theme.spacing(1),
+    '&:hover': {
+      cursor: 'pointer',
+      transform: 'scale(1.1)'
+    }
   }
 }));
 
 const WrappedCommunityServiceTable: React.FC<Props> = ({ services, installingServices, onInstall }: Props) => {
-  const { t } = useTranslation(['search']);
+  const { t } = useTranslation(['adminCommunityServices']);
   const [serviceToInstall, setServiceToInstall] = useState<JSONFeedItem>(null);
   const classes = useStyles();
-
-  const navigate = useCallback(url => {
-    window.open(url, '_blank');
-  }, []);
+  const theme = useTheme();
+  const { copy } = useClipboard();
 
   return services ? (
     services.length !== 0 ? (
@@ -65,12 +84,64 @@ const WrappedCommunityServiceTable: React.FC<Props> = ({ services, installingSer
           maxWidth="md"
         >
           <DialogTitle id="serviceToInstall=title">{t('serviceToInstall.title')}</DialogTitle>
-          <DialogContent></DialogContent>
+          <DialogContent>{t('serviceToInstall.description')}</DialogContent>
+          <DialogContent>
+            <Typography variant="h5" style={{ padding: `${theme.spacing(0)} ${theme.spacing(2)}` }}>
+              {serviceToInstall?.summary}
+            </Typography>
+            <Table size="small">
+              <TableBody>
+                <TableRow>
+                  <TableCell className={classes.noBorder}>{t('serviceToInstall.author')}</TableCell>
+                  <TableCell className={classes.noBorder}>
+                    <Link className={classes.noDecoration} target="_blank" href={serviceToInstall?.authors[0].url}>
+                      {serviceToInstall?.authors[0].name}
+                    </Link>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className={classes.noBorder}>{t('serviceToInstall.code')}</TableCell>
+                  <TableCell className={classes.noBorder}>
+                    <Link className={classes.noDecoration} target="_blank" href={serviceToInstall?.url}>
+                      {serviceToInstall?.url}
+                    </Link>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className={classes.noBorder}>{t('serviceToInstall.pipeline')}</TableCell>
+                  <TableCell className={classes.noBorder}>
+                    <Link className={classes.noDecoration} target="_blank" href={serviceToInstall?.external_url}>
+                      {serviceToInstall?.external_url}
+                    </Link>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className={classes.noBorder}>{t('serviceToInstall.container')}</TableCell>
+                  <TableCell className={classes.noBorder}>
+                    docker pull {serviceToInstall?.id}{' '}
+                    <BsClipboard
+                      className={classes.clipboardIcon}
+                      onClick={() => copy(`docker pull ${serviceToInstall?.id}`)}
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </DialogContent>
+          <DialogContent>
+            <Typography variant="caption">{t('serviceToInstall.notes')}</Typography>
+          </DialogContent>
           <DialogActions>
             <Button onClick={() => setServiceToInstall(null)} color="secondary">
               {t('serviceToInstall.cancelText')}
             </Button>
-            <Button onClick={() => onInstall([serviceToInstall])} color="primary">
+            <Button
+              onClick={() => {
+                setServiceToInstall(null);
+                onInstall([serviceToInstall]);
+              }}
+              color="primary"
+            >
               {t('serviceToInstall.acceptText')}
             </Button>
           </DialogActions>
@@ -92,10 +163,9 @@ const WrappedCommunityServiceTable: React.FC<Props> = ({ services, installingSer
                   <DivTableCell>
                     <Link
                       href={service.authors[0].url}
+                      target="_blank"
                       onClick={event => {
-                        event.preventDefault();
                         event.stopPropagation();
-                        navigate(service.authors[0].url);
                       }}
                       style={{ textDecoration: 'none' }}
                     >
