@@ -1,3 +1,6 @@
+import AssistantOutlinedIcon from '@mui/icons-material/AssistantOutlined';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Alert, Button, CircularProgress, Grid, LinearProgress, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -10,6 +13,15 @@ import AIMarkdown from '../AiMarkdown';
 import MonacoEditor, { LANGUAGE_SELECTOR } from '../MonacoEditor';
 
 const useStyles = makeStyles(theme => ({
+  aiButton: {
+    height: '100%',
+    minWidth: theme.spacing(6),
+    padding: `${theme.spacing(2)} ${theme.spacing(1)}`,
+    borderColor: theme.palette.divider,
+    borderRadius: 0,
+    alignItems: 'flex-start',
+    borderLeftWidth: '0px'
+  },
   code: {
     display: 'flex',
     flexDirection: 'column',
@@ -65,6 +77,7 @@ const WrappedASCIISection: React.FC<Props> = ({
   const [codeError, setCodeError] = useState(null);
   const [codeSummary, setCodeSummary] = useState(null);
   const [codeTruncated, setCodeTruncated] = useState(false);
+  const [showCodeSummary, setShowCodeSummary] = useState(false);
 
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -121,6 +134,12 @@ const WrappedASCIISection: React.FC<Props> = ({
   }, [data, sha256]);
 
   useEffect(() => {
+    if (showCodeSummary && !codeSummary && !codeError && !analysing) {
+      getCodeSummary(false);
+    }
+  }, [analysing, codeError, codeSummary, getCodeSummary, showCodeSummary]);
+
+  useEffect(() => {
     return () => {
       setData(null);
       setError(null);
@@ -136,7 +155,7 @@ const WrappedASCIISection: React.FC<Props> = ({
   else
     return (
       <Grid container style={{ flexGrow: 1 }}>
-        <Grid item xs={12} md={codeAllowed && isMdUp ? 8 : 12} style={{ display: 'flex' }}>
+        <Grid item flexGrow={1} style={{ display: 'flex' }}>
           <MonacoEditor
             value={data}
             language={LANGUAGE_SELECTOR[type]}
@@ -144,42 +163,56 @@ const WrappedASCIISection: React.FC<Props> = ({
           />
         </Grid>
         {codeAllowed && isMdUp && (
-          <Grid item xs={12} md={4}>
-            <div style={{ position: 'relative', height: '100%' }}>
-              <div className={classes.code}>
-                {!analysing && !codeSummary && !codeError && (
-                  <div className={classes.spinner}>
-                    <Button onClick={() => getCodeSummary(false)} variant="outlined" color="inherit">
-                      {t('analyse_code')}
-                    </Button>
-                  </div>
-                )}
-                <div style={{ flexGrow: 1, marginTop: !analysing && !codeError ? theme.spacing(-4) : null }}>
-                  {analysing ? (
-                    <div className={classes.spinner}>
-                      <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_code')}</div>
-                      <CircularProgress variant="indeterminate" />
+          <>
+            <Grid item flexGrow={showCodeSummary ? 0.5 : 0}>
+              <div style={{ position: 'relative', height: '100%' }}>
+                {showCodeSummary && (
+                  <div className={classes.code}>
+                    <div style={{ flexGrow: 1, marginTop: !analysing && !codeError ? theme.spacing(-4) : null }}>
+                      {analysing ? (
+                        <div className={classes.spinner}>
+                          <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_code')}</div>
+                          <CircularProgress variant="indeterminate" />
+                        </div>
+                      ) : codeError ? (
+                        <Alert severity="error" style={{ marginTop: theme.spacing(2) }}>
+                          {codeError}
+                        </Alert>
+                      ) : (
+                        <AIMarkdown markdown={codeSummary} truncated={codeTruncated} />
+                      )}
                     </div>
-                  ) : codeError ? (
-                    <Alert severity="error" style={{ marginTop: theme.spacing(2) }}>
-                      {codeError}
-                    </Alert>
-                  ) : (
-                    <AIMarkdown markdown={codeSummary} truncated={codeTruncated} />
-                  )}
-                </div>
-                {!analysing && (codeSummary || codeError) && (
-                  <div>
-                    <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
-                      <div className={classes.watermark} onClick={() => getCodeSummary(true)}>
-                        {t('powered_by_ai')}
+                    {!analysing && (codeSummary || codeError) && (
+                      <div>
+                        <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
+                          <div className={classes.watermark} onClick={() => getCodeSummary(true)}>
+                            {t('powered_by_ai')}
+                          </div>
+                        </Tooltip>
                       </div>
-                    </Tooltip>
+                    )}
                   </div>
                 )}
               </div>
-            </div>
-          </Grid>
+            </Grid>
+            <Grid item style={{ minWidth: theme.spacing(6), height: '100%' }}>
+              <Tooltip title={t(`${showCodeSummary ? 'hide' : 'show'}_analyse_code`)} placement="top">
+                <Button
+                  onClick={() => setShowCodeSummary(!showCodeSummary)}
+                  variant="outlined"
+                  className={classes.aiButton}
+                  color="inherit"
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <AssistantOutlinedIcon color="action" />
+                    <div style={{ paddingTop: theme.spacing(2) }}>
+                      {showCodeSummary ? <ChevronRightIcon color="action" /> : <ChevronLeftIcon color="action" />}
+                    </div>
+                  </div>
+                </Button>
+              </Tooltip>
+            </Grid>
+          </>
         )}
       </Grid>
     );
