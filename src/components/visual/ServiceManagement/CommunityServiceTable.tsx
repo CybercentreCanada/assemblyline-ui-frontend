@@ -160,18 +160,7 @@ const WrappedCommunityServiceTable: React.FC<Props> = ({ services, installingSer
               {services?.map((service, i) => (
                 <ExternalLinkRow key={i + ' - ' + service.title} hover href={service.url}>
                   <DivTableCell>{service.summary}</DivTableCell>
-                  <DivTableCell>
-                    <Link
-                      href={service.authors[0].url}
-                      target="_blank"
-                      onClick={event => {
-                        event.stopPropagation();
-                      }}
-                      style={{ textDecoration: 'none' }}
-                    >
-                      {service.authors[0].name}
-                    </Link>
-                  </DivTableCell>
+                  <DivTableCell>{service.authors[0].name}</DivTableCell>
                   <DivTableCell>{service.content_text}</DivTableCell>
                   <DivTableCell
                     className={classes.center}
