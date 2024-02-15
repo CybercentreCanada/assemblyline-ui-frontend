@@ -56,6 +56,8 @@
   "container.privileged": "Exécuter le service en mode privilégié",
   "container.privileged.false": "Non - Le service obtient ses tâches et ses fichiers du serveur de services",
   "container.privileged.true": "Oui - Le service a un accès direct à tous les composantes principales",
+  "count.available.community": "services de la communauté disponibles pour être ajoutés au système",
+  "title.available.community": "Services de la communauté",
   "count": "services chargés dans le système",
   "count.available": "services disponibles pour être ajouter dans le système",
   "delete.acceptText": "Supprimé",
