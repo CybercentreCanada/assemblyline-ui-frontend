@@ -134,7 +134,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   const { apiCall } = useMyAPI();
   const { showErrorMessage } = useMySnackbar();
-  const { user: currentUser, c12nDef, configuration } = useALContext();
+  const { user: currentUser, c12nDef, configuration, settings } = useALContext();
 
   const [file, setFile] = useState<File | null>(null);
   const [promotedSections, setPromotedSections] = useState([]);
@@ -272,7 +272,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
                   </div>
                 ) : (
                   <div style={{ paddingBottom: theme.spacing(2) }}>
-                    {configuration.ui.ai.enabled && (
+                    {configuration.ui.ai.enabled && settings.executive_summary && (
                       <AISummarySection type="file" id={file ? file.file_info.sha256 : null} noCollapse archiveOnly />
                     )}
                     <Detection
