@@ -2,7 +2,7 @@ import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined
 import { AlertTitle, IconButton, Paper, Skeleton, TableContainer, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import 'moment/locale/fr';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { JSONFeedItem } from '.';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, ExternalLinkRow } from '../DivTable';
@@ -35,10 +35,6 @@ const useStyles = makeStyles(() => ({
 const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices, onInstall }: Props) => {
   const { t } = useTranslation(['search']);
   const classes = useStyles();
-
-  const navigate = useCallback(url => {
-    window.open(url, '_blank');
-  }, []);
 
   return services ? (
     services.length !== 0 ? (
