@@ -1,5 +1,6 @@
 {
-  "analyse_code": "Analyse Code",
+  "show_analyse_code": "Show AI Code Analysis",
+  "hide_analyse_code": "Hide AI Code Analysis",
   "analysing_code": "Asking the robots to make sense of this code...",
   "code_summary": "Code Summary",
   "detail": "File analysis details",
