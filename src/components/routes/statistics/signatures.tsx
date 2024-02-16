@@ -9,6 +9,7 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SignatureDetail from '../manage/signature_detail';
 
+// TODO: what is this and is this used?
 export default function StatisticsSignatures() {
   const { t } = useTranslation(['statisticsSignatures']);
   const { apiCall } = useMyAPI();
