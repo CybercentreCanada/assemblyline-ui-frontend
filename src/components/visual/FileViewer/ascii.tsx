@@ -168,7 +168,7 @@ const WrappedASCIISection: React.FC<Props> = ({
               <div style={{ position: 'relative', height: '100%' }}>
                 {showCodeSummary && (
                   <div className={classes.code}>
-                    <div style={{ flexGrow: 1, marginTop: !analysing && !codeError ? theme.spacing(-4) : null }}>
+                    <div style={{ flexGrow: 1, marginTop: !analysing && !codeError ? theme.spacing(-2) : null }}>
                       {analysing ? (
                         <div className={classes.spinner}>
                           <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_code')}</div>
