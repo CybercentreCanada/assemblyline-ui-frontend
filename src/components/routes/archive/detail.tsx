@@ -5,7 +5,6 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { Section } from 'components/models/base/result';
-import { API } from 'components/models/ui';
 import type { File } from 'components/models/ui/file';
 import {
   ArchiveBanner,
@@ -81,10 +80,10 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   useEffect(() => {
     if (!sha256) return;
-    apiCall({
+    apiCall<File>({
       url: `/api/v4/file/result/${sha256}/?archive_only=true`,
       onEnter: () => setFile(null),
-      onSuccess: (api_data: API<File>) => {
+      onSuccess: api_data => {
         setFile(patchFileDetails(api_data.api_response));
 
         if (api_data.api_response.file_info.type.indexOf('code/') === 0) {

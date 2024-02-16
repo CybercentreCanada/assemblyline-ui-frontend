@@ -33,7 +33,6 @@ import ExternalSources from 'components/layout/externalSources';
 import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
 import { UserSettings } from 'components/models/base/user_settings';
-import { API } from 'components/models/ui';
 import Classification from 'components/visual/Classification';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { memo, useState } from 'react';
@@ -263,9 +262,9 @@ function Settings() {
     setEditable(currentUser.is_admin || currentUser.roles.includes('self_manage'));
 
     // Load user on start
-    apiCall({
+    apiCall<UserSettings>({
       url: `/api/v4/user/settings/${currentUser.username}/`,
-      onSuccess: (api_data: API<UserSettings>) => {
+      onSuccess: api_data => {
         setSettings(api_data.api_response);
       }
     });

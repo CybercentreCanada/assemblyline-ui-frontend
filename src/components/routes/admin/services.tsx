@@ -27,7 +27,6 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { ServiceIndexed, ServiceUpdates } from 'components/models/base/service';
-import { API } from 'components/models/ui';
 import ServiceDetail from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDownloader from 'components/visual/FileDownloader';
@@ -118,21 +117,21 @@ export default function Services() {
   }
 
   const reload = useCallback(() => {
-    apiCall({
+    apiCall<ServiceIndexed[]>({
       url: '/api/v4/service/all/',
-      onSuccess: (api_data: API<ServiceIndexed[]>) => setServiceResults(api_data.api_response)
+      onSuccess: api_data => setServiceResults(api_data.api_response)
     });
-    apiCall({
+    apiCall<ServiceUpdates>({
       url: '/api/v4/service/updates/',
-      onSuccess: (api_data: API<ServiceUpdates>) => setUpdates(api_data.api_response)
+      onSuccess: api_data => setUpdates(api_data.api_response)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const pollInstalling = useCallback(first => {
-    apiCall({
+    apiCall<string[]>({
       url: '/api/v4/service/installing/',
-      onSuccess: (api_data: API<string[]>) => {
+      onSuccess: api_data => {
         if (first) {
           lastInstallingServices.current = api_data.api_response;
           if (api_data.api_response && api_data.api_response.length > 0)
@@ -177,9 +176,9 @@ export default function Services() {
 
   const updateAll = useCallback(
     () => {
-      apiCall({
+      apiCall<{ updated: string[]; updating: string[] }>({
         url: '/api/v4/service/update_all/',
-        onSuccess: (api_data: API<{ updated: string[]; updating: string[] }>) => {
+        onSuccess: api_data => {
           const newUpdates = { ...updates };
           for (const srv of api_data.api_response.updating) {
             newUpdates[srv] = { ...newUpdates[srv], updating: true };

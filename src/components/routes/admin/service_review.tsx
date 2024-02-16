@@ -19,7 +19,6 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { Service as ServiceData } from 'components/models/base/service';
-import { API } from 'components/models/ui';
 import { ServiceStats as ServiceStatsData } from 'components/models/ui/service';
 import LineGraph from 'components/visual/LineGraph';
 import { getVersionQuery } from 'helpers/utils';
@@ -230,9 +229,9 @@ export default function ServiceReview() {
   useEffect(() => {
     if (selectedService !== '' && version1) {
       setStats1(null);
-      apiCall({
+      apiCall<ServiceStats>({
         url: `/api/v4/service/stats/${selectedService}/?version=${version1}`,
-        onSuccess: (api_data: API<ServiceStats>) => {
+        onSuccess: api_data => {
           setStats1(api_data.api_response);
         }
       });
@@ -243,9 +242,9 @@ export default function ServiceReview() {
   useEffect(() => {
     if (selectedService !== '' && version2) {
       setStats2(null);
-      apiCall({
+      apiCall<ServiceStats>({
         url: `/api/v4/service/stats/${selectedService}/?version=${version2}`,
-        onSuccess: (api_data: API<ServiceStats>) => {
+        onSuccess: api_data => {
           setStats2(api_data.api_response);
         }
       });
@@ -255,9 +254,9 @@ export default function ServiceReview() {
 
   useEffect(() => {
     if (selectedService !== '') {
-      apiCall({
+      apiCall<string[]>({
         url: `/api/v4/service/versions/${selectedService}/`,
-        onSuccess: (api_data: API<string[]>) => {
+        onSuccess: api_data => {
           setPossibleVersions(api_data.api_response);
         }
       });
@@ -267,9 +266,9 @@ export default function ServiceReview() {
 
   useEffectOnce(() => {
     if (currentUser.is_admin) {
-      apiCall({
+      apiCall<ServiceData[]>({
         url: '/api/v4/service/all/',
-        onSuccess: (api_data: API<ServiceData[]>) => {
+        onSuccess: api_data => {
           setServices(api_data.api_response.map(srv => srv.name));
         }
       });

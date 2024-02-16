@@ -12,7 +12,6 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { FileIndexed } from 'components/models/base/file';
-import { API } from 'components/models/ui';
 import { FacetResult, FieldsResult, HistogramResult, SearchResult } from 'components/models/ui/search';
 import ArchiveDetail from 'components/routes/archive/detail';
 import { ChipList } from 'components/visual/ChipList';
@@ -173,24 +172,24 @@ export default function MalwareArchive() {
           q.add('filters', TC_MAP[tc]);
         }
 
-        apiCall({
+        apiCall<SearchResult<FileIndexed>>({
           url: `/api/v4/search/file/?${q.toString()}`,
-          onSuccess: (api_data: API<SearchResult<FileIndexed>>) => setFileResults(api_data.api_response),
+          onSuccess: api_data => setFileResults(api_data.api_response),
           onFailure: api_data => showErrorMessage(api_data.api_error_message),
           onEnter: () => setSearching(true),
           onFinalize: () => setSearching(false)
         });
 
-        apiCall({
+        apiCall<HistogramResult>({
           url: `/api/v4/search/histogram/file/seen.last/?start=${START_MAP[tc]}&end=now&gap=${
             GAP_MAP[tc]
           }&mincount=0&${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-          onSuccess: (api_data: API<HistogramResult>) => setHistogram(api_data.api_response)
+          onSuccess: api_data => setHistogram(api_data.api_response)
         });
 
-        apiCall({
+        apiCall<FacetResult>({
           url: `/api/v4/search/facet/file/labels/?${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-          onSuccess: ({ api_response }: API<FacetResult>) =>
+          onSuccess: ({ api_response }) =>
             setLabels(
               Object.fromEntries(
                 Object.keys(api_response)
@@ -200,9 +199,9 @@ export default function MalwareArchive() {
             )
         });
 
-        apiCall({
+        apiCall<FacetResult>({
           url: `/api/v4/search/facet/file/type/?${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-          onSuccess: ({ api_response }: API<FacetResult>) =>
+          onSuccess: ({ api_response }) =>
             setTypes(
               Object.fromEntries(
                 Object.keys(api_response)
@@ -260,9 +259,9 @@ export default function MalwareArchive() {
   }, [location.hash]);
 
   useEffect(() => {
-    apiCall({
+    apiCall<FieldsResult>({
       url: '/api/v4/search/fields/file/',
-      onSuccess: (api_data: API<FieldsResult>) => {
+      onSuccess: api_data => {
         setSuggestions([
           ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
           ...DEFAULT_SUGGESTION

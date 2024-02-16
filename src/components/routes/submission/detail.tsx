@@ -38,7 +38,6 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { ParsedErrors } from 'components/models/base/error';
 import { ParsedSubmission, Submission } from 'components/models/base/submission';
-import { API } from 'components/models/ui';
 import { Configuration } from 'components/models/ui/help';
 import { LiveStatus, OutstandingServices, WatchQueue } from 'components/models/ui/live';
 import { SubmissionSummary, SubmissionTags, SubmissionTree } from 'components/models/ui/submission';
@@ -601,15 +600,15 @@ function WrappedSubmissionDetail() {
 
   useEffect(() => {
     if (currentUser.roles.includes('submission_view')) {
-      apiCall({
+      apiCall<Configuration>({
         url: '/api/v4/help/configuration/',
-        onSuccess: (api_data: API<Configuration>) => {
+        onSuccess: api_data => {
           setConfiguration(api_data.api_response);
         }
       });
-      apiCall({
+      apiCall<Submission>({
         url: `/api/v4/submission/${id}/`,
-        onSuccess: (api_data: API<Submission>) => {
+        onSuccess: api_data => {
           setSubmission(parseSubmissionErrors(api_data.api_response));
         }
       });
@@ -622,9 +621,9 @@ function WrappedSubmissionDetail() {
       if (submission.state === 'completed') {
         if (socket) setNotifyFavicon();
         resetLiveMode();
-        apiCall({
+        apiCall<SubmissionSummary>({
           url: `/api/v4/submission/summary/${id}/`,
-          onSuccess: (summ_data: API<SubmissionSummary>) => {
+          onSuccess: summ_data => {
             setHighlightMap(summ_data.api_response.map);
             setSummary(summ_data.api_response);
             if (summ_data.api_response.filtered) {
@@ -635,9 +634,9 @@ function WrappedSubmissionDetail() {
             }
           }
         });
-        apiCall({
+        apiCall<SubmissionTree>({
           url: `/api/v4/submission/tree/${id}/`,
-          onSuccess: (tree_data: API<SubmissionTree>) => {
+          onSuccess: tree_data => {
             setTree(tree_data.api_response.tree);
             if (tree_data.api_response.filtered) {
               setFiltered(true);
@@ -672,9 +671,9 @@ function WrappedSubmissionDetail() {
 
   useEffect(() => {
     if (liveStatus === 'processing') {
-      apiCall({
+      apiCall<WatchQueue>({
         url: `/api/v4/live/setup_watch_queue/${id}/`,
-        onSuccess: (api_data: API<WatchQueue>) => {
+        onSuccess: api_data => {
           setWatchQueue(api_data.api_response.wq_id);
         },
         onFailure: () => {
@@ -865,9 +864,9 @@ function WrappedSubmissionDetail() {
       // eslint-disable-next-line no-console
       console.debug('LIVE :: Finding out oustanding services...');
 
-      apiCall({
+      apiCall<OutstandingServices>({
         url: `/api/v4/live/outstanding_services/${id}/`,
-        onSuccess: (api_data: API<OutstandingServices>) => {
+        onSuccess: api_data => {
           let newLiveStatus: 'processing' | 'rescheduled' | 'queued' = 'processing' as 'processing';
           // Set live status based on outstanding services output
           if (api_data.api_response === null) {
@@ -883,9 +882,9 @@ function WrappedSubmissionDetail() {
           if (liveStatus !== 'processing' && newLiveStatus !== 'processing') {
             // eslint-disable-next-line no-console
             console.debug('LIVE :: Checking if the submission is completed...');
-            apiCall({
+            apiCall<Submission>({
               url: `/api/v4/submission/${id}/`,
-              onSuccess: (submission_api_data: API<Submission>) => {
+              onSuccess: submission_api_data => {
                 if (submission_api_data.api_response.state === 'completed') {
                   if (loadInterval) clearInterval(loadInterval);
                   setLoadInterval(null);

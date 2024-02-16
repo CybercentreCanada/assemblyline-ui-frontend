@@ -11,13 +11,6 @@ type TestRoutes = {
   '/': string;
 };
 
-export type API<Data> = {
-  api_response: Data;
-  api_error_message: string;
-  api_server_version: string;
-  api_status_code: number;
-};
-
 export type Page = {
   audit: boolean;
   function: string;

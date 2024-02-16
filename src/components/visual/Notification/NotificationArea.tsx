@@ -40,7 +40,6 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import { SystemMessageDefinition } from 'components/hooks/useMyUser';
 import { Configuration } from 'components/models/base/config';
 import { ServiceIndexed } from 'components/models/base/service';
-import { API } from 'components/models/ui';
 import 'moment-timezone';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -360,9 +359,9 @@ const WrappedNotificationArea = () => {
   useEffect(() => {
     handleLastTimeOpen();
     if (!configuration || !currentUser) return;
-    apiCall({
+    apiCall<ServiceIndexed[]>({
       url: '/api/v4/service/all/',
-      onSuccess: (api_data: API<ServiceIndexed[]>) => {
+      onSuccess: api_data => {
         const services2: ServiceIndexed[] =
           api_data && api_data.api_response && Array.isArray(api_data.api_response) ? api_data.api_response : null;
         fetchJSONNotifications({

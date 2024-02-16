@@ -4,7 +4,6 @@ import { AlertTitle, IconButton, Skeleton, TableContainer, Tooltip, Typography, 
 import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { API } from 'components/models/ui';
 import type { File, SimilarResult, SimilarResults, SimilarType } from 'components/models/ui/file';
 import {
   GridLinkRow,
@@ -185,10 +184,10 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
 
   useEffect(() => {
     if (!file || data) return;
-    apiCall({
+    apiCall<SimilarResults>({
       method: 'GET',
       url: `/api/v4/file/similar/${file?.file_info?.sha256}/?use_archive`,
-      onSuccess: (api_data: API<SimilarResults>) => setData(api_data.api_response),
+      onSuccess: api_data => setData(api_data.api_response),
       onFailure: api_data => showErrorMessage(api_data.api_error_message)
     });
     // eslint-disable-next-line

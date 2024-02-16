@@ -9,7 +9,6 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { SubmissionIndexed } from 'components/models/base/submission';
-import { API } from 'components/models/ui';
 import { SearchResult } from 'components/models/ui/search';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -87,11 +86,11 @@ export default function Submissions() {
     if (query && currentUser.roles.includes('submission_view')) {
       query.set('rows', pageSize);
       query.set('offset', 0);
-      apiCall({
+      apiCall<SearchResult<SubmissionIndexed>>({
         method: 'POST',
         url: '/api/v4/search/submission/',
         body: query.getParams(),
-        onSuccess: (api_data: API<SearchResult<SubmissionIndexed>>) => setSubmissionResults(api_data.api_response),
+        onSuccess: api_data => setSubmissionResults(api_data.api_response),
         onFinalize: () => setSearching(false)
       });
     }

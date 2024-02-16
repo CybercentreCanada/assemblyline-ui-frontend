@@ -26,7 +26,6 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
 import { ResultIndexed } from 'components/models/base/result';
-import { API } from 'components/models/ui';
 import { SearchResult } from 'components/models/ui/search';
 import ActionMenu from 'components/visual/ActionMenu';
 import Classification from 'components/visual/Classification';
@@ -470,7 +469,7 @@ const WrappedRow: React.FC<RowProps> = ({
 
   useEffect(() => {
     if (!sha256 || !tag_type || !value || !open || !!resultResults) return;
-    apiCall({
+    apiCall<SearchResult<ResultIndexed>>({
       method: 'POST',
       url: `/api/v4/search/result/`,
       body: {
@@ -482,7 +481,7 @@ const WrappedRow: React.FC<RowProps> = ({
         offset: 0,
         filters: [`NOT(sha256:${sha256})`]
       },
-      onSuccess: (api_data: API<SearchResult<ResultIndexed>>) => {
+      onSuccess: api_data => {
         if (api_data.api_response?.total > 0) setResultResults(api_data.api_response);
         else setError('no_results_title');
       },
