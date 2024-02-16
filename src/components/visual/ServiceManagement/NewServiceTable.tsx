@@ -1,37 +1,24 @@
-import { IconButton, Paper, TableContainer, TableRow, Tooltip } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
-import { AlertTitle, Skeleton } from '@mui/material';
+import { AlertTitle, IconButton, Paper, Skeleton, TableContainer, TableRow, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import 'moment/locale/fr';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { JSONFeedItem } from '.';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
-
-export type ServiceResult = {
-  accepts: string;
-  category: string;
-  description: string;
-  enabled: boolean;
-  name: string;
-  privileged: boolean;
-  rejects: string;
-  stage: string;
-  version: string;
-};
-
-type Props = {
-  services: JSONFeedItem[];
-  installingServices: string[];
-  onInstall: (s: JSONFeedItem[]) => void;
-};
+import { JSONFeedItem } from '../Notification/useNotificationFeed';
 
 const useStyles = makeStyles(() => ({
   center: {
     textAlign: 'center'
   }
 }));
+
+type Props = {
+  services: JSONFeedItem[];
+  installingServices: string[];
+  onInstall: (s: JSONFeedItem[]) => void;
+};
 
 const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices, onInstall }: Props) => {
   const { t } = useTranslation(['search']);
@@ -83,7 +70,8 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
                           onInstall([service]);
                         }}
                         disabled={installingServices?.includes(service?.summary)}
-                        size="large">
+                        size="large"
+                      >
                         <CloudDownloadOutlinedIcon />
                       </IconButton>
                     </span>
