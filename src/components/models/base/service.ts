@@ -29,36 +29,59 @@ export type SubmissionParamType = (typeof SUBMISSION_PARAM_TYPES)[number];
 export type UpdateChannel = (typeof UPDATE_CHANNELS)[number];
 export type SignatureDelimiter = keyof typeof SIGNATURE_DELIMITERS;
 
+// TODO There is too much invalidation to make the multi_type_param work that should be necessary
+/**
+ * Submission Parameters for Service
+ * @param default Default value (must match value in `value` field)
+ * @param hide Should this parameter be hidden?
+ * @param list List of values if `type: list`
+ * @param name Name of parameter
+ * @param type Type of parameter
+ * @param value Default value (must match value in `default` field)
+ */
 export type ServiceParameter =
   | {
       type: 'bool';
-      hide: boolean;
+      hide: boolean | 'true' | 'false';
       name: string;
       value: boolean | 'true' | 'false';
-      default: boolean;
+      default: boolean | 'true' | 'false';
+      list?: string[];
     }
   | {
       type: 'int';
-      hide: boolean;
+      hide: boolean | 'true' | 'false';
       name: string;
       value: number;
       default: number;
+      list?: string[];
     }
   | {
       type: 'str';
-      hide: boolean;
+      hide: boolean | 'true' | 'false';
       name: string;
       value: string;
       default: string;
+      list?: string[];
     }
   | {
       type: 'list';
-      hide: boolean;
+      hide: boolean | 'true' | 'false';
       name: string;
       value: string;
       default: string;
       list: string[];
     };
+
+// TODO check the default value
+export const DEFAULT_SERVICE_PARAMETER: ServiceParameter = {
+  name: '',
+  type: 'bool',
+  default: 'false',
+  value: 'false',
+  list: [],
+  hide: 'false'
+} as any;
 
 /** Default service specific settings */
 export type ServiceSpecification = {
@@ -262,36 +285,6 @@ export type UpdateConfig = {
   wait_for_update: boolean;
 };
 
-/** Submission Parameters for Service */
-export type SubmissionParams = {
-  /** Default value (must match value in `value` field) */
-  default: any;
-
-  /** Should this parameter be hidden? */
-  hide: boolean | 'true' | 'false';
-
-  /** List of values if `type: list` */
-  list?: any;
-
-  /** Name of parameter */
-  name: string;
-
-  /** Type of parameter */
-  type: SubmissionParamType;
-
-  /** Default value (must match value in `default` field) */
-  value: any;
-};
-
-export const DEFAULT_SUBMISSION_PARAMS: SubmissionParams = {
-  name: '',
-  type: 'bool',
-  default: 'false',
-  value: 'false',
-  list: [],
-  hide: 'false'
-};
-
 /** Service Configuration */
 export type Service = {
   /** Regex to accept files as identified by Assemblyline */
@@ -355,7 +348,7 @@ export type Service = {
   stage: string;
 
   /** Submission parameters of service */
-  submission_params: SubmissionParams[];
+  submission_params: ServiceParameter[];
 
   /** Service task timeout, in seconds */
   timeout: number;
