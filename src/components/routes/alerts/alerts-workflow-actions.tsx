@@ -1,5 +1,6 @@
 import { Alert, Button, CircularProgress, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
+import { Alert as AlertData } from 'components/models/base/alert';
 import SearchQuery, { SearchFilter } from 'components/visual/SearchBar/search-query';
 import React, { SyntheticEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +21,7 @@ const DEFAULT_LABELS = [
 
 interface AlertsWorkflowActionsProps {
   searchQuery: SearchQuery;
-  alert: any;
+  alert: AlertData;
   labelFilters: SearchFilter[];
   onApplyBtnClick: (status: string, selectedPriority: string, selectedLabels: string[]) => void;
 }
