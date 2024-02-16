@@ -28,15 +28,17 @@ loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 export default function AdminTagSafelist() {
   const { t, i18n } = useTranslation(['adminTagSafelist']);
   const theme = useTheme();
-  const containerEL = useRef<HTMLDivElement>();
-  const containerDialogEL = useRef<HTMLDivElement>();
-  const [tagSafelist, setTagSafelist] = useState(null);
-  const [originalTagSafelist, setOriginalTagSafelist] = useState(null);
-  const [open, setOpen] = useState(false);
-  const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { isDark: isDarkTheme } = useAppTheme();
+  const { showSuccessMessage } = useMySnackbar();
+
+  const [tagSafelist, setTagSafelist] = useState<string>(null);
+  const [originalTagSafelist, setOriginalTagSafelist] = useState<string>(null);
+  const [open, setOpen] = useState<boolean>(false);
+
+  const containerEL = useRef<HTMLDivElement>();
+  const containerDialogEL = useRef<HTMLDivElement>();
 
   useEffectOnce(() => {
     if (currentUser.is_admin) {

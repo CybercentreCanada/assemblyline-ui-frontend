@@ -1,20 +1,36 @@
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
-import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import {
+  Grid,
+  IconButton,
+  MenuItem,
+  Select,
+  Skeleton,
+  Tooltip,
+  Typography,
+  TypographyProps,
+  useTheme
+} from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { Service as ServiceData } from 'components/models/base/service';
+import { API } from 'components/models/ui';
+import { ServiceStats as ServiceStatsData } from 'components/models/ui/service';
 import LineGraph from 'components/visual/LineGraph';
 import { getVersionQuery } from 'helpers/utils';
 import 'moment/locale/fr';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
+
+// TODO: version doesn't seem to be set correctly
+type ServiceStats = ServiceStatsData & { version: string };
 
 function getDescendantProp(obj, desc) {
   if (obj == null) return null;
@@ -24,7 +40,14 @@ function getDescendantProp(obj, desc) {
   return obj;
 }
 
-function DiffNumber({ stats, comp, field, variant = 'h4' as 'h4' }) {
+type DiffNumberProps = {
+  stats: ServiceStats;
+  comp: ServiceStats;
+  field: string;
+  variant?: TypographyProps['variant'];
+};
+
+function DiffNumber({ stats, comp, field, variant = 'h4' as 'h4' }: DiffNumberProps) {
   const prop1 = getDescendantProp(stats, field);
   const prop2 = getDescendantProp(comp, field);
   const v1 = Math.round(prop1);
@@ -44,7 +67,15 @@ function DiffNumber({ stats, comp, field, variant = 'h4' as 'h4' }) {
   );
 }
 
-function Counter({ stats, comp, field, titleVariant = 'h6' as 'h6', numberVariant = 'h4' as 'h4' }) {
+type CounterProps = {
+  stats: ServiceStats;
+  comp: ServiceStats;
+  field: string;
+  titleVariant?: TypographyProps['variant'];
+  numberVariant?: TypographyProps['variant'];
+};
+
+function Counter({ stats, comp, field, titleVariant = 'h6' as 'h6', numberVariant = 'h4' as 'h4' }: CounterProps) {
   const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
   return (
@@ -57,7 +88,13 @@ function Counter({ stats, comp, field, titleVariant = 'h6' as 'h6', numberVarian
   );
 }
 
-function ServiceDetail({ stats, comp, show }) {
+type ServiceDetailProps = {
+  stats: ServiceStats;
+  comp: ServiceStats;
+  show?: boolean;
+};
+
+function ServiceDetail({ stats, comp, show }: ServiceDetailProps) {
   const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
   return (
@@ -125,7 +162,15 @@ function ServiceDetail({ stats, comp, show }) {
   );
 }
 
-function VersionSelector({ possibleVersions, selectedService, version, setVersion, except }) {
+type VersionSelectorProps = {
+  possibleVersions: string[];
+  selectedService: string;
+  version: string;
+  setVersion: Dispatch<SetStateAction<string>>;
+  except: string;
+};
+
+function VersionSelector({ possibleVersions, selectedService, version, setVersion, except }: VersionSelectorProps) {
   const theme = useTheme();
   const { t } = useTranslation(['adminServiceReview']);
   return selectedService && possibleVersions ? (
@@ -165,13 +210,13 @@ export default function ServiceReview() {
   const defaultVersion1 = params.get('v1') || '';
   const defaultVersion2 = params.get('v2') || '';
 
-  const [services, setServices] = useState(null);
-  const [selectedService, setSelectedService] = useState(defaultSelectedService);
-  const [possibleVersions, setPossibleVersions] = useState(null);
-  const [version1, setVersion1] = useState(defaultVersion1);
-  const [version2, setVersion2] = useState(defaultVersion2);
-  const [stats1, setStats1] = useState(null);
-  const [stats2, setStats2] = useState(null);
+  const [services, setServices] = useState<ServiceData['name'][]>(null);
+  const [selectedService, setSelectedService] = useState<string>(defaultSelectedService);
+  const [possibleVersions, setPossibleVersions] = useState<string[]>(null);
+  const [version1, setVersion1] = useState<string>(defaultVersion1);
+  const [version2, setVersion2] = useState<string>(defaultVersion2);
+  const [stats1, setStats1] = useState<ServiceStats>(null);
+  const [stats2, setStats2] = useState<ServiceStats>(null);
 
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -187,7 +232,7 @@ export default function ServiceReview() {
       setStats1(null);
       apiCall({
         url: `/api/v4/service/stats/${selectedService}/?version=${version1}`,
-        onSuccess: api_data => {
+        onSuccess: (api_data: API<ServiceStats>) => {
           setStats1(api_data.api_response);
         }
       });
@@ -200,7 +245,7 @@ export default function ServiceReview() {
       setStats2(null);
       apiCall({
         url: `/api/v4/service/stats/${selectedService}/?version=${version2}`,
-        onSuccess: api_data => {
+        onSuccess: (api_data: API<ServiceStats>) => {
           setStats2(api_data.api_response);
         }
       });
@@ -212,7 +257,7 @@ export default function ServiceReview() {
     if (selectedService !== '') {
       apiCall({
         url: `/api/v4/service/versions/${selectedService}/`,
-        onSuccess: api_data => {
+        onSuccess: (api_data: API<string[]>) => {
           setPossibleVersions(api_data.api_response);
         }
       });
@@ -224,7 +269,7 @@ export default function ServiceReview() {
     if (currentUser.is_admin) {
       apiCall({
         url: '/api/v4/service/all/',
-        onSuccess: api_data => {
+        onSuccess: (api_data: API<ServiceData[]>) => {
           setServices(api_data.api_response.map(srv => srv.name));
         }
       });

@@ -11,7 +11,10 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import ArchiveDetail, { FileInfo } from 'components/routes/archive/detail';
+import { FileIndexed } from 'components/models/base/file';
+import { API } from 'components/models/ui';
+import { FacetResult, FieldsResult, HistogramResult, SearchResult } from 'components/models/ui/search';
+import ArchiveDetail from 'components/routes/archive/detail';
 import { ChipList } from 'components/visual/ChipList';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
@@ -51,12 +54,12 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type FileResults = {
-  items: FileInfo[];
-  offset: number;
-  rows: number;
-  total: number;
-};
+// type FileResults = {
+//   items: FileInfo[];
+//   offset: number;
+//   rows: number;
+//   total: number;
+// };
 
 const PAGE_SIZE = 25;
 
@@ -111,10 +114,10 @@ export default function MalwareArchive() {
   const { showErrorMessage } = useMySnackbar();
   const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
 
-  const [fileResults, setFileResults] = useState<FileResults>(null);
+  const [fileResults, setFileResults] = useState<SearchResult<FileIndexed>>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [parsedQuery, setParsedQuery] = useState<SimpleSearchQuery>(null);
-  const [histogram, setHistogram] = useState(null);
+  const [histogram, setHistogram] = useState<HistogramResult>(null);
   const [types, setTypes] = useState<Record<string, number>>(null);
   const [labels, setLabels] = useState<Record<string, number>>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -172,7 +175,7 @@ export default function MalwareArchive() {
 
         apiCall({
           url: `/api/v4/search/file/?${q.toString()}`,
-          onSuccess: api_data => setFileResults(api_data.api_response),
+          onSuccess: (api_data: API<SearchResult<FileIndexed>>) => setFileResults(api_data.api_response),
           onFailure: api_data => showErrorMessage(api_data.api_error_message),
           onEnter: () => setSearching(true),
           onFinalize: () => setSearching(false)
@@ -182,12 +185,12 @@ export default function MalwareArchive() {
           url: `/api/v4/search/histogram/file/seen.last/?start=${START_MAP[tc]}&end=now&gap=${
             GAP_MAP[tc]
           }&mincount=0&${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-          onSuccess: api_data => setHistogram(api_data.api_response)
+          onSuccess: (api_data: API<HistogramResult>) => setHistogram(api_data.api_response)
         });
 
         apiCall({
           url: `/api/v4/search/facet/file/labels/?${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-          onSuccess: ({ api_response }: { api_response: Record<string, number> }) =>
+          onSuccess: ({ api_response }: API<FacetResult>) =>
             setLabels(
               Object.fromEntries(
                 Object.keys(api_response)
@@ -199,7 +202,7 @@ export default function MalwareArchive() {
 
         apiCall({
           url: `/api/v4/search/facet/file/type/?${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-          onSuccess: ({ api_response }: { api_response: Record<string, number> }) =>
+          onSuccess: ({ api_response }: API<FacetResult>) =>
             setTypes(
               Object.fromEntries(
                 Object.keys(api_response)
@@ -259,7 +262,7 @@ export default function MalwareArchive() {
   useEffect(() => {
     apiCall({
       url: '/api/v4/search/fields/file/',
-      onSuccess: api_data => {
+      onSuccess: (api_data: API<FieldsResult>) => {
         setSuggestions([
           ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
           ...DEFAULT_SUGGESTION

@@ -26,12 +26,14 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
-import Service from 'components/routes/admin/service_detail';
+import { ServiceIndexed, ServiceUpdates } from 'components/models/base/service';
+import { API } from 'components/models/ui';
+import ServiceDetail from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDownloader from 'components/visual/FileDownloader';
-import ServiceTable, { ServiceResult } from 'components/visual/SearchResult/service';
+import { JSONFeedItem, useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
+import ServiceTable from 'components/visual/SearchResult/service';
 import NewServiceTable from 'components/visual/ServiceManagement/NewServiceTable';
-import { JSONFeedItem, useNotificationFeed } from 'components/visual/ServiceManagement/useNotificationFeed';
 import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,29 +41,32 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 
 export default function Services() {
   const { t } = useTranslation(['adminServices']);
-  const [serviceResults, setServiceResults] = useState<ServiceResult[]>(null);
-  const [updates, setUpdates] = useState(null);
-  const [open, setOpen] = useState<boolean>(false);
-  const [openRestore, setOpenRestore] = useState(false);
-  const [restoreConfirmation, setRestoreConfirmation] = useState(false);
-  const [waitingDialog, setWaitingDialog] = useState(false);
-  const [manifest, setManifest] = useState('');
-  const [restore, setRestore] = useState('');
-  const { showSuccessMessage, showInfoMessage, showErrorMessage } = useMySnackbar();
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const { setGlobalDrawer, closeGlobalDrawer, globalDrawerOpened } = useDrawer();
   const location = useLocation();
   const navigate = useNavigate();
-  const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const { configuration } = useALContext();
   const { fetchJSONNotifications } = useNotificationFeed();
+  const { apiCall } = useMyAPI();
+  const { user: currentUser } = useAppUser<CustomUser>();
+  const { showSuccessMessage, showInfoMessage, showErrorMessage } = useMySnackbar();
+  const { setGlobalDrawer, closeGlobalDrawer, globalDrawerOpened } = useDrawer();
+
+  const [serviceResults, setServiceResults] = useState<ServiceIndexed[]>(null);
+  const [updates, setUpdates] = useState<ServiceUpdates>(null);
+  const [open, setOpen] = useState<boolean>(false);
+  const [openRestore, setOpenRestore] = useState<boolean>(false);
+  const [restoreConfirmation, setRestoreConfirmation] = useState<boolean>(false);
+  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
+  const [manifest, setManifest] = useState<string>('');
+  const [restore, setRestore] = useState<string>('');
   const [serviceFeeds, setServiceFeeds] = useState<JSONFeedItem[]>(null);
   const [availableServices, setAvailableServices] = useState<JSONFeedItem[]>(null);
   const [installingServices, setInstallingServices] = useState<string[]>([]);
+
   const lastInstallingServices = useRef<string[]>([]);
   const installingServicesTimeout = useRef<NodeJS.Timeout>(null);
+
+  const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
   const handleAddService = () => {
     apiCall({
@@ -77,10 +82,10 @@ export default function Services() {
     });
   };
 
-  const closeServiceDialog = () => {
+  const closeServiceDialog = useCallback(() => {
     setManifest('');
     setOpen(false);
-  };
+  }, []);
 
   const handleRestore = () => {
     apiCall({
@@ -115,11 +120,11 @@ export default function Services() {
   const reload = useCallback(() => {
     apiCall({
       url: '/api/v4/service/all/',
-      onSuccess: api_data => setServiceResults(api_data.api_response)
+      onSuccess: (api_data: API<ServiceIndexed[]>) => setServiceResults(api_data.api_response)
     });
     apiCall({
       url: '/api/v4/service/updates/',
-      onSuccess: api_data => setUpdates(api_data.api_response)
+      onSuccess: (api_data: API<ServiceUpdates>) => setUpdates(api_data.api_response)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -127,7 +132,7 @@ export default function Services() {
   const pollInstalling = useCallback(first => {
     apiCall({
       url: '/api/v4/service/installing/',
-      onSuccess: api_data => {
+      onSuccess: (api_data: API<string[]>) => {
         if (first) {
           lastInstallingServices.current = api_data.api_response;
           if (api_data.api_response && api_data.api_response.length > 0)
@@ -174,13 +179,13 @@ export default function Services() {
     () => {
       apiCall({
         url: '/api/v4/service/update_all/',
-        onSuccess: resp => {
+        onSuccess: (api_data: API<{ updated: string[]; updating: string[] }>) => {
           const newUpdates = { ...updates };
-          for (const srv of resp.api_response.updating) {
+          for (const srv of api_data.api_response.updating) {
             newUpdates[srv] = { ...newUpdates[srv], updating: true };
           }
 
-          for (const srv of resp.api_response.updated) {
+          for (const srv of api_data.api_response.updated) {
             delete newUpdates[srv];
           }
           setUpdates(newUpdates);
@@ -224,7 +229,7 @@ export default function Services() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<Service name={location.hash.slice(1)} onDeleted={onDeleted} onUpdated={onUpdated} />);
+      setGlobalDrawer(<ServiceDetail name={location.hash.slice(1)} onDeleted={onDeleted} onUpdated={onUpdated} />);
     } else {
       closeGlobalDrawer();
     }

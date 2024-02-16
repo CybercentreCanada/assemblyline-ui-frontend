@@ -32,6 +32,8 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import ExternalSources from 'components/layout/externalSources';
 import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
+import { UserSettings } from 'components/models/base/user_settings';
+import { API } from 'components/models/ui';
 import Classification from 'components/visual/Classification';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { memo, useState } from 'react';
@@ -67,6 +69,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+const DRAWER_TYPES = ['ttl', 'view', 'encoding', 'score'] as const;
+
+type DrawerType = (typeof DRAWER_TYPES)[number];
+
 function Skel() {
   return (
     <div>
@@ -99,23 +105,24 @@ const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => 
 function Settings() {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
-  const [drawerType, setDrawerType] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [settings, setSettings] = useState(null);
-  const [modified, setModified] = useState(false);
-  const [editable, setEditable] = useState(false);
-  const [buttonLoading, setButtonLoading] = useState(false);
+  const classes = useStyles();
+  const { apiCall } = useMyAPI();
   const { user: currentUser, c12nDef, configuration } = useALContext();
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
+
+  const [settings, setSettings] = useState<UserSettings>(null);
+  const [drawerType, setDrawerType] = useState<DrawerType>(null);
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [modified, setModified] = useState<boolean>(false);
+  const [editable, setEditable] = useState<boolean>(false);
+  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
+
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
+
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
-
-  const { apiCall } = useMyAPI();
-
-  const classes = useStyles();
 
   const setParam = (service_idx, param_idx, p_value) => {
     if (settings) {
@@ -244,7 +251,7 @@ function Settings() {
     }
   }
 
-  function toggleDrawer(type) {
+  function toggleDrawer(type: DrawerType) {
     if (settings) {
       setDrawerType(type);
       setDrawerOpen(true);
@@ -258,7 +265,7 @@ function Settings() {
     // Load user on start
     apiCall({
       url: `/api/v4/user/settings/${currentUser.username}/`,
-      onSuccess: api_data => {
+      onSuccess: (api_data: API<UserSettings>) => {
         setSettings(api_data.api_response);
       }
     });

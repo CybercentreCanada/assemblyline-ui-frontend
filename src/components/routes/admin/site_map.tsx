@@ -20,6 +20,8 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { Role } from 'components/models/base/user';
+import { MuiColor, SiteMap as SiteMapData } from 'components/models/ui';
 import CustomChip from 'components/visual/CustomChip';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -44,11 +46,12 @@ const StyledTableCell = withStyles((theme: Theme) =>
 export default function SiteMap() {
   const { t } = useTranslation(['adminSiteMap']);
   const theme = useTheme();
-  const [siteMap, setSiteMap] = useState(null);
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const reqMapColor = {
+  const [siteMap, setSiteMap] = useState<SiteMapData>(null);
+
+  const reqMapColor: Record<Role, MuiColor> = {
     signature_import: 'success',
     signature_manage: 'info',
     signature_view: 'default',
@@ -77,7 +80,13 @@ export default function SiteMap() {
     file_detail: 'default',
     file_download: 'warning',
     replay_trigger: 'warning',
-    replay_system: 'info'
+    replay_system: 'warning',
+    archive_comment: 'default',
+    external_query: 'default',
+    file_purge: 'default',
+    heuristic_view: 'default',
+    retrohunt_run: 'default',
+    retrohunt_view: 'default'
   };
 
   useEffectOnce(() => {

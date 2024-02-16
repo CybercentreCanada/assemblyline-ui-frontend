@@ -5,12 +5,13 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import useALContext from 'components/hooks/useALContext';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { Role, Scope, SCOPES } from 'components/models/base/user';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 
-const VALID_SCOPES = ['r', 'w', 'rw'];
+const VALID_SCOPES: Omit<Scope, 'c'>[] = SCOPES.filter(s => s !== 'c');
 
 export default function AppRegistration() {
   const location = useLocation();
@@ -30,7 +31,7 @@ export default function AppRegistration() {
 
   let roles = [];
   if (rolesP) {
-    roles = rolesP.split(',').filter(r => configuration.user.roles.includes(r));
+    roles = (rolesP.split(',') as Role[]).filter(r => configuration.user.roles.includes(r));
   }
 
   return (

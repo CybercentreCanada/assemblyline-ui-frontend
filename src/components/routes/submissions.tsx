@@ -8,11 +8,14 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { SubmissionIndexed } from 'components/models/base/submission';
+import { API } from 'components/models/ui';
+import { SearchResult } from 'components/models/ui/search';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
-import SubmissionsTable, { SubmissionResult } from 'components/visual/SearchResult/submissions';
+import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
@@ -34,31 +37,27 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type SearchResults = {
-  items: SubmissionResult[];
-  offset: number;
-  rows: number;
-  total: number;
-};
-
 export default function Submissions() {
   const { t } = useTranslation(['submissions']);
-  const [pageSize] = useState(PAGE_SIZE);
-  const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
-  const [searching, setSearching] = useState(false);
-  const { user: currentUser, indexes } = useALContext();
-  const navigate = useNavigate();
-  const { apiCall } = useMyAPI();
   const theme = useTheme();
-  const location = useLocation();
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const upMD = useMediaQuery(theme.breakpoints.up('md'));
-  const filterValue = useRef<string>('');
   const classes = useStyles();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { apiCall } = useMyAPI();
+  const { user: currentUser, indexes } = useALContext();
+
+  const [pageSize] = useState(PAGE_SIZE);
+  const [submissionResults, setSubmissionResults] = useState<SearchResult<SubmissionIndexed>>(null);
+  const [searching, setSearching] = useState(false);
+  const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [suggestions] = useState([
     ...Object.keys(indexes.submission).filter(name => indexes.submission[name].indexed),
     ...DEFAULT_SUGGESTION
   ]);
+
+  const filterValue = useRef<string>('');
+
+  const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
   const onClear = () => {
     navigate(location.pathname);
@@ -92,12 +91,8 @@ export default function Submissions() {
         method: 'POST',
         url: '/api/v4/search/submission/',
         body: query.getParams(),
-        onSuccess: api_data => {
-          setSubmissionResults(api_data.api_response);
-        },
-        onFinalize: () => {
-          setSearching(false);
-        }
+        onSuccess: (api_data: API<SearchResult<SubmissionIndexed>>) => setSubmissionResults(api_data.api_response),
+        onFinalize: () => setSearching(false)
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

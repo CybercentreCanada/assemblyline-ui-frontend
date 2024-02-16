@@ -11,6 +11,8 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { Error } from 'components/models/base/error';
+import { SearchResult } from 'components/models/ui/search';
 import { ChipList } from 'components/visual/ChipList';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
@@ -48,13 +50,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type ErrorResults = {
-  items: any[];
-  offset: number;
-  rows: number;
-  total: number;
-};
-
 const DEFAULT_TC = '4d';
 
 const TC_MAP = {
@@ -84,7 +79,7 @@ export default function ErrorViewer() {
   const { t } = useTranslation(['adminErrorViewer']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const [errorResults, setErrorResults] = useState<ErrorResults>(null);
+  const [errorResults, setErrorResults] = useState<SearchResult<Error>>(null);
   const classes = useStyles();
   const navigate = useNavigate();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
