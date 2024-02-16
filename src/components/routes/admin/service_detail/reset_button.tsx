@@ -1,11 +1,12 @@
 import { Button, Tooltip, useTheme } from '@mui/material';
+import { DockerConfig, Service, UpdateConfig } from 'components/models/base/service';
 import 'moment/locale/fr';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
-  service: any;
-  defaults: any;
+  service: DockerConfig | Service | UpdateConfig;
+  defaults: DockerConfig | Service | UpdateConfig;
   field: string | string[];
   reset: () => void;
 };
