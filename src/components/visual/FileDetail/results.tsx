@@ -1,27 +1,21 @@
 import { Skeleton } from '@mui/material';
 import useSafeResults from 'components/hooks/useSafeResults';
-import ResultCard, { AlternateResult } from 'components/visual/ResultCard';
+import { FileResult } from 'components/models/base/result';
+import { Alternates } from 'components/models/ui/file';
+import ResultCard from 'components/visual/ResultCard';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-type ResultSectionProps = {
-  results: any;
+type Props = {
   sid: string;
-  alternates?: {
-    [serviceName: string]: AlternateResult[];
-  };
+  results: FileResult[];
+  alternates?: Alternates;
   force?: boolean;
   nocollapse?: boolean;
 };
 
-const WrappedResultSection: React.FC<ResultSectionProps> = ({
-  results,
-  sid,
-  alternates,
-  force = false,
-  nocollapse = false
-}) => {
+const WrappedResultSection: React.FC<Props> = ({ results, sid, alternates, force = false, nocollapse = false }) => {
   const { t } = useTranslation(['fileDetail']);
   const { showSafeResults } = useSafeResults();
 

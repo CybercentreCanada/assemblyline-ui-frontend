@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type ParentSectionProps = {
-  parents: any;
+  parents: string[];
   show?: boolean;
   title?: string;
   nocollapse?: boolean;

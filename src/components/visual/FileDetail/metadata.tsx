@@ -1,11 +1,12 @@
 import { Grid, Skeleton } from '@mui/material';
+import { Metadata } from 'components/models/ui/file';
 import CustomChip from 'components/visual/CustomChip';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type MetadataSectionProps = {
-  metadata: any;
+  metadata: Metadata;
   nocollapse?: boolean;
 };
 

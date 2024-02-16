@@ -6,15 +6,16 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
-import { Result } from 'components/visual/ResultCard';
-import ResultSection, { Section } from 'components/visual/ResultCard/result_section';
+import { HeuristicLevel, HEURISTIC_LEVELS } from 'components/models/base/heuristic';
+import { Section } from 'components/models/base/result';
+import type { File } from 'components/models/ui/file';
+import ResultSection from 'components/visual/ResultCard/result_section';
 import SectionContainer from 'components/visual/SectionContainer';
 import { safeFieldValueURI } from 'helpers/utils';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-const HEUR_LEVELS = ['malicious' as 'malicious', 'suspicious' as 'suspicious', 'info' as 'info', 'safe' as 'safe'];
 const DEFAULT_SEC_SCORE = -1000;
 const SCORE_SHOW_THRESHOLD = 0;
 
@@ -84,15 +85,15 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type WrappedHeuristicProps = {
+type HeuristicProps = {
   name: string;
   id: string;
   sections: Section[];
-  level: 'malicious' | 'suspicious' | 'info' | 'safe';
+  level: HeuristicLevel;
   force?: boolean;
 };
 
-const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections, level, force = false }) => {
+const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level, force = false }: HeuristicProps) => {
   const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
   const [render, setRender] = React.useState(false);
@@ -171,15 +172,13 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
 
 const Heuristic = React.memo(WrappedHeuristic);
 
-type WrappedDetectionProps = {
-  heuristics: { [category: string]: string[][] };
-  results?: Result[];
+type DetectionProps = Partial<File> & {
   section_map?: { [heur_id: string]: Section[] };
   force?: boolean;
   nocollapse?: boolean;
 };
 
-const WrappedDetection: React.FC<WrappedDetectionProps> = ({
+const WrappedDetection: React.FC<DetectionProps> = ({
   heuristics,
   results,
   section_map = null,
@@ -187,9 +186,10 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({
   nocollapse = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
-  const [sectionMap, setSectionMap] = React.useState({});
-  const [maxScore, setMaxScore] = React.useState(DEFAULT_SEC_SCORE);
   const { showSafeResults } = useSafeResults();
+
+  const [sectionMap, setSectionMap] = useState({});
+  const [maxScore, setMaxScore] = useState<number>(DEFAULT_SEC_SCORE);
 
   useEffect(() => {
     if (results) {
@@ -236,7 +236,7 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({
     (heuristics && maxScore < SCORE_SHOW_THRESHOLD && !showSafeResults && !force) ? null : (
     <SectionContainer title={t('heuristics')} nocollapse={nocollapse}>
       {sectionMap && heuristics
-        ? HEUR_LEVELS.map((lvl, lid) => {
+        ? HEURISTIC_LEVELS.map((lvl, lid) => {
             return heuristics[lvl] ? (
               <div key={lid}>
                 {heuristics[lvl].map(([hid, hname], idx) => {

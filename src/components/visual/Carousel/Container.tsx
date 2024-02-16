@@ -11,6 +11,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/carousel/Carousel';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { Image as ImageData } from 'components/models/base/result_body';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -222,13 +223,6 @@ const useStyles = makeStyles(theme => {
   };
 });
 
-export type Image = {
-  name: string;
-  description: string;
-  img: string;
-  thumb: string;
-};
-
 type Dragging = {
   isDown: boolean;
   isDragging?: boolean;
@@ -239,7 +233,7 @@ type Dragging = {
 };
 
 type CarouselContainerProps = {
-  images: Image[];
+  images: ImageData[];
   open: boolean;
   index: number;
   setIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -282,7 +276,7 @@ const WrappedCarouselContainer = ({
   const zoomTimer = useRef<number>(null);
   const zoomClass = useMemo<string | null>(() => isZooming && ZOOM_CLASS, [isZooming]);
 
-  const currentImage = useMemo<Image>(() => images && images[index], [images, index]);
+  const currentImage = useMemo<ImageData>(() => images && images[index], [images, index]);
   const dragTimer = useRef<number>(null);
 
   const handleClose = useCallback(

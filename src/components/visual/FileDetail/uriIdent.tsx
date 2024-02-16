@@ -1,59 +1,59 @@
 import { Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
+import { File as FileInfo } from 'components/models/base/file';
+import { Section } from 'components/models/base/result';
+import type { KeyValueBody, OrderedKeyValueBody } from 'components/models/base/result_body';
 import { ImageInlineBody } from 'components/visual/image_inline';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-type URIIdentificationSectionProps = {
-  fileinfo: any;
-  promotedSections?: any[];
-  nocollapse?: boolean;
-};
-
-const parseValue = value => {
-  if (value instanceof Array) {
-    return value.join(' | ');
-  } else if (value === true) {
-    return 'true';
-  } else if (value === false) {
-    return 'false';
-  } else if (typeof value === 'object') {
-    return JSON.stringify(value);
-  }
-  return value;
-};
-
-const KVItem = ({ name, value }) => (
+const KVItem = ({ name, value }: { name: string; value: any }) => (
   <>
     <Grid item xs={4} sm={3} lg={2}>
       <span style={{ fontWeight: 500, marginRight: '4px', display: 'flex', textTransform: 'capitalize' }}>{name}</span>
     </Grid>
     <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-      {parseValue(value)}
+      {(() => {
+        if (value instanceof Array) {
+          return value.join(' | ');
+        } else if (value === true) {
+          return 'true';
+        } else if (value === false) {
+          return 'false';
+        } else if (typeof value === 'object') {
+          return JSON.stringify(value);
+        }
+        return value;
+      })()}
     </Grid>
   </>
 );
 
-const WrappedOrderedKVExtra = ({ body }) => (
+const WrappedOrderedKVExtra = ({ body }: { body: OrderedKeyValueBody }) => (
   <>
-    {Object.keys(body).map(id => {
-      const item = body[id];
-      return <KVItem key={id} name={item[0]} value={item[1]} />;
-    })}
+    {Object.keys(body).map(id => (
+      <KVItem key={id} name={body[id][0]} value={body[id][1]} />
+    ))}
   </>
 );
 
 const OrderedKVExtra = React.memo(WrappedOrderedKVExtra);
 
-const WrappedKVExtra = ({ body }) => (
+const WrappedKVExtra = ({ body }: { body: KeyValueBody }) => (
   <>
-    {Object.keys(body).map((key, id) => {
-      return <KVItem key={id} name={key} value={body[key]} />;
-    })}
+    {Object.keys(body).map((key, id) => (
+      <KVItem key={id} name={key} value={body[key]} />
+    ))}
   </>
 );
 
 const KVExtra = React.memo(WrappedKVExtra);
+
+type URIIdentificationSectionProps = {
+  fileinfo: FileInfo;
+  promotedSections?: Section[];
+  nocollapse?: boolean;
+};
 
 const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> = ({
   fileinfo,
@@ -178,9 +178,9 @@ const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> =
               .map((section, idx) =>
                 section.body_format === 'KEY_VALUE' ? (
                   <KVExtra key={idx} body={section.body} />
-                ) : (
+                ) : section.body_format === 'ORDERED_KEY_VALUE' ? (
                   <OrderedKVExtra key={idx} body={section.body} />
-                )
+                ) : null
               )
           : null}
       </Grid>
@@ -189,7 +189,9 @@ const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> =
         {promotedSections
           ? promotedSections
               .filter(section => section.promote_to === 'SCREENSHOT')
-              .map((section, idx) => <ImageInlineBody key={idx} body={section.body} />)
+              .map((section, idx) =>
+                section.body_format === 'IMAGE' ? <ImageInlineBody key={idx} body={section.body} /> : null
+              )
           : null}
       </div>
     </SectionContainer>

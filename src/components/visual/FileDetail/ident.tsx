@@ -1,5 +1,7 @@
 import { Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
+import { File as FileInfo } from 'components/models/base/file';
+import { Section } from 'components/models/base/result';
 import ActionableText from 'components/visual/ActionableText';
 import Classification from 'components/visual/Classification';
 import { ImageInlineBody } from 'components/visual/image_inline';
@@ -10,8 +12,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type IdentificationSectionProps = {
-  fileinfo: any;
-  promotedSections?: any[];
+  fileinfo: FileInfo;
+  promotedSections?: Section[];
   nocollapse?: boolean;
 };
 
@@ -170,7 +172,9 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
           {promotedSections
             ? promotedSections
                 .filter(section => section.promote_to === 'ENTROPY')
-                .map((section, idx) => <GraphBody key={idx} body={section.body} />)
+                .map((section, idx) =>
+                  section.body_format === 'GRAPH_DATA' ? <GraphBody key={idx} body={section.body} /> : null
+                )
             : null}
         </Grid>
       </Grid>
@@ -179,7 +183,9 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
         {promotedSections
           ? promotedSections
               .filter(section => section.promote_to === 'SCREENSHOT')
-              .map((section, idx) => <ImageInlineBody key={idx} body={section.body} />)
+              .map((section, idx) =>
+                section.body_format === 'IMAGE' ? <ImageInlineBody key={idx} body={section.body} /> : null
+              )
           : null}
       </div>
     </SectionContainer>
