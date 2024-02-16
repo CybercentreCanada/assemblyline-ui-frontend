@@ -3,6 +3,8 @@ import { AlertTitle, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
+import type { ResultIndexed } from 'components/models/base/result';
+import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
 import 'moment/locale/fr';
@@ -21,34 +23,13 @@ import {
 } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
-export type ResultResult = {
-  classification: string;
-  created: number;
-  drop_file: boolean;
-  from_archive: boolean;
-  id: string;
-  response: {
-    service_name: string;
-    service_tool_version: string;
-  };
-  result: {
-    score: number;
-  };
-  type: number;
-};
-
-type SearchResults = {
-  items: ResultResult[];
-  total: number;
-};
-
-type ResultsTableProps = {
-  resultResults: SearchResults;
-  component?: any;
+type Props = {
+  resultResults: SearchResult<ResultIndexed>;
+  component?: React.ElementType;
   allowSort?: boolean;
 };
 
-const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, component = Paper, allowSort = true }) => {
+const WrappedResultsTable: React.FC<Props> = ({ resultResults, component = Paper, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
   const theme = useTheme();

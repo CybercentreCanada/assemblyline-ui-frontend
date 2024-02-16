@@ -1,8 +1,9 @@
+import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import { AlertTitle, Skeleton } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
-import { Statistics } from 'components/routes/manage/signature_detail';
+import type { SignatureIndexed } from 'components/models/base/signature';
+import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
 import React from 'react';
@@ -21,35 +22,13 @@ import {
 import InformativeAlert from '../InformativeAlert';
 import SignatureStatus from '../SignatureStatus';
 
-export type SignatureResult = {
-  classification: string;
-  id: string;
-  last_modified: string;
-  name: string;
-  revision: string;
-  signature_id: string;
-  source: string;
-  stats: Statistics;
-  status: 'DEPLOYED' | 'NOISY' | 'DISABLED';
-  type: string;
-};
-
-type SearchResults = {
-  items: SignatureResult[];
-  total: number;
-};
-
-type SignaturesTableProps = {
-  signatureResults: SearchResults;
+type Props = {
+  signatureResults: SearchResult<SignatureIndexed>;
   setSignatureID?: (id: string) => void;
   allowSort?: boolean;
 };
 
-const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({
-  signatureResults,
-  setSignatureID = null,
-  allowSort = true
-}) => {
+const WrappedSignaturesTable: React.FC<Props> = ({ signatureResults, setSignatureID = null, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 

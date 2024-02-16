@@ -3,6 +3,8 @@ import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
+import type { SubmissionIndexed } from 'components/models/base/submission';
+import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import SubmissionState from 'components/visual/SubmissionState';
 import Verdict from 'components/visual/Verdict';
@@ -23,35 +25,12 @@ import {
 } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
-export type SubmissionResult = {
-  classification: string;
-  error_count: number;
-  file_count: number;
-  from_archive: boolean;
-  id: string;
-  max_score: number;
-  params: {
-    description: string;
-    submitter: string;
-  };
-  sid: string;
-  state: string;
-  times: {
-    submitted: string;
-  };
-};
-
-type SearchResults = {
-  items: SubmissionResult[];
-  total: number;
-};
-
-type SubmissionsTableProps = {
-  submissionResults: SearchResults;
+type Props = {
+  submissionResults: SearchResult<SubmissionIndexed>;
   allowSort?: boolean;
 };
 
-const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionResults, allowSort = true }) => {
+const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
