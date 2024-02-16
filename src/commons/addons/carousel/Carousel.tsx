@@ -1,9 +1,8 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import makeStyles from '@mui/styles/makeStyles';
 import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEscape } from 'commons/components/utils/keyboard';
+import React, { useEffect, useRef } from 'react';
 
 // TODO: Add in the commons
-import React, { useEffect, useRef } from 'react';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -19,7 +18,7 @@ export interface CarouselProps {
   disableArrowRight?: boolean;
   escapeCallback?: () => void;
   enableSwipe?: boolean;
-  style?: any;
+  style?: React.CSSProperties;
   children: React.ReactNode;
   onNext: () => void;
   onPrevious: () => void;
