@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FFF',
     border: `1px solid ${theme.palette.divider}`,
     color: theme.palette.mode === 'dark' ? theme.palette.text.secondary : theme.palette.text.primary,
-    padding: '16px 8px',
+    padding: theme.spacing(2),
     textAlign: 'left',
     whiteSpace: 'normal',
     overflowY: 'auto',
