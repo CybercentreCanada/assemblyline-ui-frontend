@@ -37,14 +37,16 @@ import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { ConfigurationDefinition, SystemMessageDefinition } from 'components/hooks/useMyUser';
+import { SystemMessageDefinition } from 'components/hooks/useMyUser';
+import { Configuration } from 'components/models/base/config';
+import { ServiceIndexed } from 'components/models/base/service';
+import { API } from 'components/models/ui';
 import 'moment-timezone';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { JSONFeedItem, NotificationItem, useNotificationFeed } from '.';
 import ConfirmationDialog from '../ConfirmationDialog';
-import { ServiceResult } from '../SearchResult/service';
 
 const useStyles = makeStyles(theme => ({
   drawer: {
@@ -323,7 +325,7 @@ const WrappedNotificationArea = () => {
   );
 
   const getVersionType = useCallback(
-    (notification: JSONFeedItem, config: ConfigurationDefinition): null | 'newer' | 'current' | 'older' => {
+    (notification: JSONFeedItem, config: Configuration): null | 'newer' | 'current' | 'older' => {
       const notVer = notification?.url;
       const sysVer = config?.system?.version;
       if (
@@ -349,7 +351,7 @@ const WrappedNotificationArea = () => {
     []
   );
 
-  const getNewService = useCallback((notification: JSONFeedItem, services: Array<ServiceResult>): null | boolean => {
+  const getNewService = useCallback((notification: JSONFeedItem, services: ServiceIndexed[]): null | boolean => {
     if (!/(s|S)ervice/g.test(notification.title)) return null;
     const notificationTitle = notification?.title?.toLowerCase().slice(0, -16);
     return services.some(s => notificationTitle === s?.name?.toLowerCase());
@@ -360,8 +362,8 @@ const WrappedNotificationArea = () => {
     if (!configuration || !currentUser) return;
     apiCall({
       url: '/api/v4/service/all/',
-      onSuccess: api_data => {
-        const services2: Array<ServiceResult> =
+      onSuccess: (api_data: API<ServiceIndexed[]>) => {
+        const services2: ServiceIndexed[] =
           api_data && api_data.api_response && Array.isArray(api_data.api_response) ? api_data.api_response : null;
         fetchJSONNotifications({
           urls: configuration.ui.rss_feeds,
