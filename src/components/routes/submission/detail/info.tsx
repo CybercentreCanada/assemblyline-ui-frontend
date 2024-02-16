@@ -4,6 +4,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { ParsedSubmission } from 'components/models/base/submission';
 import Priority from 'components/visual/Priority';
 import Verdict from 'components/visual/Verdict';
 import React, { Fragment, useMemo } from 'react';
@@ -22,11 +23,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type InfoSectionProps = {
-  submission: any;
+type Props = {
+  submission: ParsedSubmission;
 };
 
-const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
+const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();

@@ -36,6 +36,12 @@ import useDrawer from 'components/hooks/useDrawer';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { ParsedErrors } from 'components/models/base/error';
+import { ParsedSubmission, Submission } from 'components/models/base/submission';
+import { API } from 'components/models/ui';
+import { Configuration } from 'components/models/ui/help';
+import { LiveStatus, OutstandingServices, WatchQueue } from 'components/models/ui/live';
+import { SubmissionSummary, SubmissionTags, SubmissionTree } from 'components/models/ui/submission';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
@@ -48,7 +54,7 @@ import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 import ForbiddenPage from '../403';
 import HeuristicDetail from '../manage/heuristic_detail';
 import AISummarySection from './detail/ai_summary';
@@ -59,9 +65,9 @@ import InfoSection from './detail/info';
 import MetaSection from './detail/meta';
 import TagSection from './detail/tags';
 
-const NAMESPACE = '/live_submission';
-const MESSAGE_TIMEOUT = 5000;
-const OUTSTANDING_TRIGGER_COUNT = 4;
+const NAMESPACE = '/live_submission' as const;
+const MESSAGE_TIMEOUT = 5000 as const;
+const OUTSTANDING_TRIGGER_COUNT = 4 as const;
 
 type ParamProps = {
   id: string;
@@ -95,44 +101,46 @@ const incrementReducer = (old: number, increment: number) => {
 
 function WrappedSubmissionDetail() {
   const { t } = useTranslation(['submissionDetail']);
-  const { id, fid } = useParams<ParamProps>();
   const theme = useTheme();
-  const [submission, setSubmission] = useState(null);
-  const [summary, setSummary] = useState(null);
-  const [tree, setTree] = useState(null);
-  const [filtered, setFiltered] = useState(false);
-  const [partial, setPartial] = useState(false);
-  const [watchQueue, setWatchQueue] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const { showSuccessMessage } = useMySnackbar();
+  const { user: currentUser, c12nDef, configuration: systemConfig } = useALContext();
+  const { setHighlightMap } = useHighlighter();
+  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
+  const { id, fid } = useParams<ParamProps>();
+
+  const [submission, setSubmission] = useState<ParsedSubmission>(null);
+  const [summary, setSummary] = useState<SubmissionSummary>(null);
+  const [tree, setTree] = useState<SubmissionTree['tree']>(null);
+  const [filtered, setFiltered] = useState<boolean>(false);
+  const [partial, setPartial] = useState<boolean>(false);
+  const [watchQueue, setWatchQueue] = useState<string>(null);
+  const [configuration, setConfiguration] = useState<Configuration>(null);
+  const [liveErrors, setLiveErrors] = useState<ParsedErrors>(null);
+  const [liveTagMap, setLiveTagMap] = useState<SubmissionTags>(null);
+  const [outstanding, setOutstanding] = useState<OutstandingServices>(null);
+  const [liveStatus, setLiveStatus] = useState<LiveStatus>('queued');
+  const [socket, setSocket] = useState<Socket>(null);
+  const [loadInterval, setLoadInterval] = useState<any>(null);
+  const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState<number>(0);
+  const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
+  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
+  const [resubmitAnchor, setResubmitAnchor] = useState<Element>(null);
+  const [baseFiles, setBaseFiles] = useState([]);
+
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
   const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
   const [liveResults, setLiveResults] = useReducer(resultReducer, null);
-  const [configuration, setConfiguration] = useState(null);
-  const [liveErrors, setLiveErrors] = useState(null);
-  const [liveTagMap, setLiveTagMap] = useState(null);
-  const [outstanding, setOutstanding] = useState(null);
   const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
-  const [liveStatus, setLiveStatus] = useState<'queued' | 'processing' | 'rescheduled'>('queued');
-  const [socket, setSocket] = useState(null);
-  const [loadInterval, setLoadInterval] = useState(null);
-  const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState(0);
-  const [deleteDialog, setDeleteDialog] = useState(false);
-  const [waitingDialog, setWaitingDialog] = useState(false);
-  const [resubmitAnchor, setResubmitAnchor] = useState(null);
-  const { apiCall } = useMyAPI();
-  const sp4 = theme.spacing(4);
-  const { showSuccessMessage } = useMySnackbar();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { user: currentUser, c12nDef, configuration: systemConfig } = useALContext();
-  const { setHighlightMap } = useHighlighter();
-  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
-  const [baseFiles, setBaseFiles] = useState([]);
 
+  const sp4 = theme.spacing(4);
   const popoverOpen = Boolean(resubmitAnchor);
 
   const updateLiveSumary = (results: object) => {
-    const tempSummary = summary !== null ? { ...summary } : { tags: {}, heuristics: {}, attack_matrix: {} };
+    const tempSummary: any = summary !== null ? { ...summary } : { tags: {}, heuristics: {}, attack_matrix: {} };
     const tempTagMap = liveTagMap !== null ? { ...liveTagMap } : {};
 
     Object.entries(results).forEach(([resultKey, result]) => {
@@ -273,9 +281,9 @@ function WrappedSubmissionDetail() {
         }
       }
     });
-    setLiveTagMap(tempTagMap);
-    setHighlightMap(tempTagMap);
-    setSummary(tempSummary);
+    setLiveTagMap(tempTagMap as any);
+    setHighlightMap(tempTagMap as any);
+    setSummary(tempSummary as any);
   };
 
   const updateLiveFileTree = (results: object) => {
@@ -367,7 +375,7 @@ function WrappedSubmissionDetail() {
     setTree(tempTree);
   };
 
-  const getParsedErrors = errorList => {
+  const getParsedErrors = useCallback((errorList: string[]): ParsedErrors => {
     const aggregated = errors => {
       const out = {
         depth: [],
@@ -432,14 +440,18 @@ function WrappedSubmissionDetail() {
 
     return {
       aggregated: aggregated(errorList),
-      listed: errorList
+      listed: errorList,
+      services: []
     };
-  };
+  }, []);
 
-  const parseSubmissionErrors = currentSubmission => ({
-    ...currentSubmission,
-    parsed_errors: getParsedErrors(currentSubmission.errors)
-  });
+  const parseSubmissionErrors = useCallback(
+    (current: Submission): ParsedSubmission => ({
+      ...current,
+      parsed_errors: getParsedErrors(current.errors)
+    }),
+    [getParsedErrors]
+  );
 
   const resetLiveMode = useCallback(() => {
     if (socket) {
@@ -591,13 +603,13 @@ function WrappedSubmissionDetail() {
     if (currentUser.roles.includes('submission_view')) {
       apiCall({
         url: '/api/v4/help/configuration/',
-        onSuccess: api_data => {
+        onSuccess: (api_data: API<Configuration>) => {
           setConfiguration(api_data.api_response);
         }
       });
       apiCall({
         url: `/api/v4/submission/${id}/`,
-        onSuccess: api_data => {
+        onSuccess: (api_data: API<Submission>) => {
           setSubmission(parseSubmissionErrors(api_data.api_response));
         }
       });
@@ -612,7 +624,7 @@ function WrappedSubmissionDetail() {
         resetLiveMode();
         apiCall({
           url: `/api/v4/submission/summary/${id}/`,
-          onSuccess: summ_data => {
+          onSuccess: (summ_data: API<SubmissionSummary>) => {
             setHighlightMap(summ_data.api_response.map);
             setSummary(summ_data.api_response);
             if (summ_data.api_response.filtered) {
@@ -625,7 +637,7 @@ function WrappedSubmissionDetail() {
         });
         apiCall({
           url: `/api/v4/submission/tree/${id}/`,
-          onSuccess: tree_data => {
+          onSuccess: (tree_data: API<SubmissionTree>) => {
             setTree(tree_data.api_response.tree);
             if (tree_data.api_response.filtered) {
               setFiltered(true);
@@ -662,8 +674,8 @@ function WrappedSubmissionDetail() {
     if (liveStatus === 'processing') {
       apiCall({
         url: `/api/v4/live/setup_watch_queue/${id}/`,
-        onSuccess: summ_data => {
-          setWatchQueue(summ_data.api_response.wq_id);
+        onSuccess: (api_data: API<WatchQueue>) => {
+          setWatchQueue(api_data.api_response.wq_id);
         },
         onFailure: () => {
           setLiveStatus('queued');
@@ -855,7 +867,7 @@ function WrappedSubmissionDetail() {
 
       apiCall({
         url: `/api/v4/live/outstanding_services/${id}/`,
-        onSuccess: api_data => {
+        onSuccess: (api_data: API<OutstandingServices>) => {
           let newLiveStatus: 'processing' | 'rescheduled' | 'queued' = 'processing' as 'processing';
           // Set live status based on outstanding services output
           if (api_data.api_response === null) {
@@ -873,7 +885,7 @@ function WrappedSubmissionDetail() {
             console.debug('LIVE :: Checking if the submission is completed...');
             apiCall({
               url: `/api/v4/submission/${id}/`,
-              onSuccess: submission_api_data => {
+              onSuccess: (submission_api_data: API<Submission>) => {
                 if (submission_api_data.api_response.state === 'completed') {
                   if (loadInterval) clearInterval(loadInterval);
                   setLoadInterval(null);
@@ -1113,7 +1125,7 @@ function WrappedSubmissionDetail() {
                       )}
                       {systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger') && (
                         <Tooltip title={t('replay')}>
-                          <IconButton onClick={replay} disabled={submission.metadata.replay} size="large">
+                          <IconButton onClick={replay} disabled={!!submission.metadata.replay} size="large">
                             <PublishOutlinedIcon />
                           </IconButton>
                         </Tooltip>
