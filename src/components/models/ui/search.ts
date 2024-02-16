@@ -1,5 +1,3 @@
-import { API } from '.';
-
 /** Data Types based on the elastic definitions */
 export const FIELD_TYPES = [
   'null',
@@ -87,12 +85,5 @@ export type FieldsResult = {
     type: FieldType;
 
     name: string;
-  };
-};
-
-export type SearchRoutes = {
-  '/search/file': {
-    GET: API<SearchResult<File>>;
-    POST: API<SearchResult<File>>;
   };
 };
