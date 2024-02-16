@@ -2,9 +2,10 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Box, Collapse } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { File } from 'components/models/base/result';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import ExtractedFile, { ExtractedFiles } from './extracted_file';
+import ExtractedFile from './extracted_file';
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -19,7 +20,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type SupplementarySectionProps = {
-  supplementary: ExtractedFiles[];
+  supplementary: File[];
   sid: string;
 };
 

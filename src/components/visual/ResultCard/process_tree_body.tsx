@@ -10,6 +10,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useSafeResults from 'components/hooks/useSafeResults';
+import type { ProcessTreeBody as ProcessTreeData } from 'components/models/base/result_body';
 import { humanReadableNumber } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -101,7 +102,12 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const ProcessTreeItem = ({ process, force = false }) => {
+type ProcessTreeItemProps = {
+  process: ProcessTreeData;
+  force?: boolean;
+};
+
+const ProcessTreeItem = ({ process, force = false }: ProcessTreeItemProps) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useTreeItemStyles();
   const { showSafeResults } = useSafeResults();
@@ -197,10 +203,25 @@ const ProcessTreeItem = ({ process, force = false }) => {
   );
 };
 
-const ProcessTreeItemList = ({ processes, force = false }) =>
-  processes.map((process, id) => <ProcessTreeItem key={id} process={process} force={force} />);
+type ProcessTreeItemListProps = {
+  processes: ProcessTreeData[];
+  force?: boolean;
+};
 
-const WrappedProcessTreeBody = ({ body, force = false }) => {
+const ProcessTreeItemList = ({ processes, force = false }: ProcessTreeItemListProps) => (
+  <>
+    {processes.map((process, id) => (
+      <ProcessTreeItem key={id} process={process} force={force} />
+    ))}
+  </>
+);
+
+type Props = {
+  body: ProcessTreeData[];
+  force?: boolean;
+};
+
+const WrappedProcessTreeBody = ({ body, force = false }: Props) => {
   try {
     const expanded = [];
 

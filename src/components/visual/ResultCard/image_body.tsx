@@ -2,8 +2,8 @@ import { Theme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useCarousel from 'components/hooks/useCarousel';
-import { Image } from 'components/visual/Carousel/Container';
-import { ImageBodyData, ImageItem } from 'components/visual/image_inline';
+import type { Image, ImageBody as ImageData } from 'components/models/base/result_body';
+import { ImageItem } from 'components/visual/image_inline';
 import { default as React, useEffect, useState } from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -20,13 +20,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-type ImageBodyProps = {
-  body: ImageBodyData;
+type Props = {
+  body: ImageData;
   printable?: boolean;
   small?: boolean;
 };
 
-const WrappedImageBody = ({ body, printable = false }: ImageBodyProps) => {
+const WrappedImageBody = ({ body, printable = false }: Props) => {
   const classes = useStyles();
   const { openCarousel } = useCarousel();
   const [data, setData] = useState<Image[]>([]);

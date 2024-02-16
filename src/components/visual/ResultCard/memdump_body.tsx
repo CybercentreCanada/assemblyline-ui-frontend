@@ -1,4 +1,5 @@
 import makeStyles from '@mui/styles/makeStyles';
+import type { MemDumpBody as MemDumpData } from 'components/models/base/result_body';
 import { default as React } from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -17,7 +18,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const WrappedMemDumpBody = ({ body }) => {
+type Props = {
+  body: MemDumpData;
+};
+
+const WrappedMemDumpBody = ({ body }: Props) => {
   const classes = useStyles();
   return <pre className={classes.memdump}>{body}</pre>;
 };

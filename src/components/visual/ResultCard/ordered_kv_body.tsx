@@ -1,7 +1,12 @@
+import type { OrderedKeyValueBody as OrderedKeyValueData } from 'components/models/base/result_body';
 import TitleKey from 'components/visual/TitleKey';
 import { default as React } from 'react';
 
-const WrappedOrderedKVBody = ({ body }) => (
+type Props = {
+  body: OrderedKeyValueData;
+};
+
+const WrappedOrderedKVBody = ({ body }: Props) => (
   <table cellSpacing={0}>
     <tbody>
       {Object.keys(body).map(id => {

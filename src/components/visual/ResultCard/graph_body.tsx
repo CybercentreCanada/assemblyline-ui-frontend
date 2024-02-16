@@ -1,5 +1,6 @@
 import { Theme, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import type { GraphBody as GraphData } from 'components/models/base/result_body';
 import { scaleLinear } from 'd3-scale';
 import React, { useState } from 'react';
 
@@ -10,7 +11,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const WrappedGraphBody = ({ body }) => {
+type Props = {
+  body: GraphData;
+};
+
+const WrappedGraphBody = ({ body }: Props) => {
   const theme = useTheme();
   const [currentValue, setCurrentValue] = useState(null);
 
