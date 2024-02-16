@@ -4,20 +4,22 @@ export const ES_SUBMITTED = 'submitted';
 export const ES_SKIPPED = 'skipped';
 export const ES_INCOMPLETE = 'incomplete';
 export const ES_COMPLETED = 'completed';
-export const EXTENDED_SCAN_VALUES = [ES_SUBMITTED, ES_SKIPPED, ES_INCOMPLETE, ES_COMPLETED] as const;
 export const EXTENDED_SCAN_PRIORITY = [ES_COMPLETED, ES_INCOMPLETE, ES_SKIPPED, ES_SUBMITTED] as const;
+export const EXTENDED_SCAN_VALUES = [ES_SUBMITTED, ES_SKIPPED, ES_INCOMPLETE, ES_COMPLETED] as const;
+export const ENTITY_TYPE = ['user', 'workflow'] as const;
 export const SUB_TYPE = ['EXP', 'CFG', 'OB', 'IMP', 'CFG', 'TA'] as const;
 export const VERDICT = ['safe', 'info', 'suspicious', 'highly_suspicious', 'malicious'] as const;
-export const ENTITY_TYPE = ['user', 'workflow'] as const;
 
-export type ExtendedScanValue = (typeof EXTENDED_SCAN_VALUES)[number];
+export type EntityType = (typeof ENTITY_TYPE)[number];
 export type ExtendedScanPriority = (typeof EXTENDED_SCAN_PRIORITY)[number];
+export type ExtendedScanValue = (typeof EXTENDED_SCAN_VALUES)[number];
+export type SubType = (typeof SUB_TYPE)[number];
 export type Verdict = (typeof VERDICT)[number];
 
 /** Assemblyline Results Block */
 export type DetailedItem = {
   /** Sub-type of the item */
-  subtype?: (typeof SUB_TYPE)[number];
+  subtype?: SubType;
 
   /** Type of data that generated this item */
   type: string;
@@ -241,8 +243,14 @@ export type Alert = {
   /** Are the alert results filtered? */
   filtered: boolean;
 
+  /** total number of alerts in the grouped search */
+  group_count: number;
+
   /** Heuristic Block */
   heuristic: Heuristic;
+
+  /** Owner of the hint */
+  hint_owner: boolean;
 
   /** ID of the alert */
   id: string;
@@ -304,3 +312,5 @@ export type AlertIndexed = Pick<
   | 'type'
   | 'workflows_completed'
 >;
+
+export type AlertUpdate = Partial<Pick<Alert, 'label' | 'owner' | 'priority' | 'status' | 'verdict'>>;

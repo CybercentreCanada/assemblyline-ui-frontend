@@ -13,6 +13,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { Alert } from 'components/models/base/alert';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import SearchQuery from 'components/visual/SearchBar/search-query';
 import { getValueFromPath } from 'helpers/utils';
@@ -22,13 +23,12 @@ import { BiNetworkChart } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
 import AlertEventsTable from './alert-events';
 import { AlertDrawerState } from './alerts';
-import { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
 
 export type PossibleVerdict = 'malicious' | 'non_malicious';
 
 interface AlertListItemActionsProps {
-  item: AlertItem;
+  item: Alert;
   index: number;
   currentQuery: SearchQuery;
   setDrawer: (state: AlertDrawerState) => void;

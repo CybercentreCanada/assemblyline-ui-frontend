@@ -24,7 +24,8 @@ import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
-import { AlertItem, DetailedItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
+import { Alert as AlertData, DetailedItem } from 'components/models/base/alert';
+import { detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
 import ActionableText from 'components/visual/ActionableText';
@@ -68,7 +69,7 @@ const useStyles = makeStyles(theme => ({
 
 type AlertDetailsProps = {
   id?: string;
-  alert?: AlertItem;
+  alert?: AlertData;
 };
 
 type AutoHideChipListProps = {
@@ -136,7 +137,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const { apiCall } = useMyAPI();
   const { c12nDef } = useALContext();
   const { copy } = useClipboard();
-  const [item, setItem] = useState<AlertItem>(null);
+  const [item, setItem] = useState<AlertData>(null);
   const { id: paramId } = useParams<{ id: string }>();
   const { configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();

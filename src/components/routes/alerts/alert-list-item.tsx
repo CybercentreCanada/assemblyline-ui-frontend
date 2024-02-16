@@ -4,7 +4,8 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Grid, Tooltip, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
-import { AlertItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
+import { Alert } from 'components/models/base/alert';
+import { detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
@@ -20,7 +21,7 @@ import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
 
 type AlertListItemProps = {
-  item: AlertItem;
+  item: Alert;
 };
 
 const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
