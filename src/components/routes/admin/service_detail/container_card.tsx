@@ -1,10 +1,10 @@
 import { Card, Grid, Tooltip, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { DockerConfig, PersistentVolume } from 'components/models/base/service';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CgSmartphoneChip, CgSmartphoneRam } from 'react-icons/cg';
-import { Container, Volume } from '../service_detail';
 import ContainerDialog from './container_dialog';
 
 const useStyles = makeStyles(theme => ({
@@ -33,11 +33,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type ContainerCardProps = {
-  container: Container;
-  defaults: Container;
+  container: DockerConfig;
+  defaults: DockerConfig;
   name?: string;
-  volumes?: { [name: string]: Volume };
-  onChange: (newContainer: Container, name?: string, newVolumes?: { [name: string]: Volume }) => void;
+  volumes?: { [name: string]: PersistentVolume };
+  onChange: (newContainer: DockerConfig, name?: string, newVolumes?: { [name: string]: PersistentVolume }) => void;
 };
 
 const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: ContainerCardProps) => {
@@ -94,7 +94,9 @@ const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: 
           </Grid>
           {container.service_account && (
             <>
-              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('container.card.service_account')}:`}</Grid>
+              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t(
+                'container.card.service_account'
+              )}:`}</Grid>
               <Grid item xs={7} sm={8} md={10} className={classes.mono}>
                 {container.service_account}
               </Grid>

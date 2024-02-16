@@ -13,19 +13,19 @@ import {
 import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
 import useALContext from 'components/hooks/useALContext';
+import { Service, ServiceConstants } from 'components/models/base/service';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ServiceConstants, ServiceDetail } from '../service_detail';
 import ResetButton from './reset_button';
 
 type ServiceGeneralProps = {
-  service: ServiceDetail;
-  defaults: ServiceDetail;
+  service: Service;
+  defaults: Service;
   constants: ServiceConstants;
   versions: string[];
-  setService: (value: ServiceDetail) => void;
+  setService: (value: Service) => void;
   setModified: (value: boolean) => void;
   setError: (value: boolean) => void;
 };

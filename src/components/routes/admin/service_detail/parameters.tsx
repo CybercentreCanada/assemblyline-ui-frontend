@@ -1,14 +1,14 @@
 import { Grid, Typography, useTheme } from '@mui/material';
+import { Service } from 'components/models/base/service';
 import 'moment/locale/fr';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ServiceDetail } from '../service_detail';
 import MultiTypeConfig from './multi_type_config';
 import MultiTypeParam from './multi_type_param';
 
 type ServiceParamsProps = {
-  service: ServiceDetail;
-  setService: (value: ServiceDetail) => void;
+  service: Service;
+  setService: (value: Service) => void;
   setModified: (value: boolean) => void;
 };
 

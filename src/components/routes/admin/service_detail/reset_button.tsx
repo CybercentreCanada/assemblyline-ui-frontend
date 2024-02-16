@@ -1,31 +1,31 @@
 import { Button, Tooltip, useTheme } from '@mui/material';
 import 'moment/locale/fr';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type ResetButtonProps = {
+type Props = {
   service: any;
   defaults: any;
   field: string | string[];
   reset: () => void;
 };
 
-const WrappedResetButton = ({ service, defaults, field, reset }: ResetButtonProps) => {
+const WrappedResetButton = ({ service, defaults, field, reset }: Props) => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
 
-  const getValue = (obj, fieldname) => {
+  const getValue = useCallback((obj, fieldname) => {
     const val = obj[fieldname] || null;
     return Array.isArray(val) ? JSON.stringify(val) : val;
-  };
+  }, []);
 
-  const hasChanges = () => {
+  const hasChanges = useCallback(() => {
     if (Array.isArray(field)) {
       return field.some(elem => getValue(service, elem) !== getValue(defaults, elem));
     } else {
       return getValue(service, field) !== getValue(defaults, field);
     }
-  };
+  }, [defaults, field, getValue, service]);
 
   return service && defaults && hasChanges() ? (
     <Tooltip title={t('reset.tooltip')}>

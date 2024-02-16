@@ -14,18 +14,18 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import { Service } from 'components/models/base/service';
 import 'moment/locale/fr';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ServiceDetail } from '../service_detail';
 import ContainerCard from './container_card';
 import ContainerDialog from './container_dialog';
 import ResetButton from './reset_button';
 
 type ServiceContainerProps = {
-  service: ServiceDetail;
-  defaults: ServiceDetail;
-  setService: (value: ServiceDetail) => void;
+  service: Service;
+  defaults: Service;
+  setService: (value: Service) => void;
   setModified: (value: boolean) => void;
 };
 

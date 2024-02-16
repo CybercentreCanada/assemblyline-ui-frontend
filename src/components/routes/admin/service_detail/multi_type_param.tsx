@@ -15,19 +15,10 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
+import { DEFAULT_SUBMISSION_PARAMS, SubmissionParams } from 'components/models/base/service';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SubmissionParams } from '../service_detail';
-
-type SimpleSubmissionParams = {
-  name: string;
-  type: 'int' | 'bool' | 'str' | 'list';
-  default: string;
-  value: string;
-  list: string[];
-  hide: string;
-};
 
 type MultiTypeParamProps = {
   param?: SubmissionParams;
@@ -37,18 +28,9 @@ type MultiTypeParamProps = {
   onDelete?: (id: number) => void;
 };
 
-const DEFAULT_USER_PARAM: SimpleSubmissionParams = {
-  name: '',
-  type: 'bool',
-  default: 'false',
-  value: 'false',
-  list: [],
-  hide: 'false'
-};
-
 const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTypeParamProps) => {
   const { t } = useTranslation(['adminServices']);
-  const [tempUserParams, setTempUserParams] = useState(DEFAULT_USER_PARAM);
+  const [tempUserParams, setTempUserParams] = useState<SubmissionParams>(DEFAULT_SUBMISSION_PARAMS);
   const theme = useTheme();
 
   const handleSubmissionParamUpdate = event => {
@@ -100,7 +82,7 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
       });
     }
 
-    setTempUserParams(DEFAULT_USER_PARAM);
+    setTempUserParams(DEFAULT_SUBMISSION_PARAMS);
   };
 
   const handleSPNameChange = event => {
