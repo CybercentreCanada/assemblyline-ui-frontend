@@ -4,7 +4,8 @@ import { AlertTitle, IconButton, Skeleton, TableContainer, Tooltip, Typography, 
 import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { File } from 'components/routes/archive/detail';
+import { API } from 'components/models/ui';
+import type { File, SimilarResult, SimilarResults, SimilarType } from 'components/models/ui/file';
 import {
   GridLinkRow,
   GridTable,
@@ -47,31 +48,14 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const DEFAULT_SIMILAR = {
+const DEFAULT_SIMILAR: Record<SimilarType, { label: string; prefix: string; suffix: string }> = {
   tlsh: { label: 'TLSH', prefix: '/search/file?query=tlsh:', suffix: '&use_archive=true' },
   ssdeep: { label: 'SSDEEP', prefix: '/search/file?query=ssdeep:', suffix: '~&use_archive=true' },
   vector: { label: 'Vector', prefix: '/search/result?query=result.sections.tags.vector:', suffix: '&use_archive=true' }
 };
 
-type Item = { from_archive: boolean; created?: string; sha256: string; type: string; seen?: { last: string } };
-
-type Result = {
-  items: Item[];
-  total: number;
-  type: string;
-  value: string;
-};
-
-type SectionProps = {
-  file: File;
-  show?: boolean;
-  title?: string;
-  drawer?: boolean;
-  nocollapse?: boolean;
-};
-
 type SimilarItemProps = {
-  data: Result;
+  data: SimilarResult;
   drawer?: boolean;
 };
 
@@ -174,6 +158,14 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
   );
 };
 
+type SectionProps = {
+  file: File;
+  show?: boolean;
+  title?: string;
+  drawer?: boolean;
+  nocollapse?: boolean;
+};
+
 const WrappedSimilarSection: React.FC<SectionProps> = ({
   file,
   show = false,
@@ -187,7 +179,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
   const { apiCall } = useMyAPI();
   const { showErrorMessage } = useMySnackbar();
 
-  const [data, setData] = useState<Result[]>(null);
+  const [data, setData] = useState<SimilarResults>(null);
 
   const nbOfValues = useMemo<number | null>(() => data && data.map(i => i.total).reduce((a, v) => a + v, 0), [data]);
 
@@ -196,7 +188,7 @@ const WrappedSimilarSection: React.FC<SectionProps> = ({
     apiCall({
       method: 'GET',
       url: `/api/v4/file/similar/${file?.file_info?.sha256}/?use_archive`,
-      onSuccess: api_data => setData(api_data.api_response),
+      onSuccess: (api_data: API<SimilarResults>) => setData(api_data.api_response),
       onFailure: api_data => showErrorMessage(api_data.api_error_message)
     });
     // eslint-disable-next-line

@@ -19,7 +19,8 @@ import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import CommentCard, { Authors, Comment, Comments, DEFAULT_COMMENT } from 'components/visual/CommentCard';
+import { Author, Comment, DEFAULT_COMMENT } from 'components/models/base/file';
+import CommentCard from 'components/visual/CommentCard';
 import SectionContainer from 'components/visual/SectionContainer';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -45,7 +46,7 @@ type Confirmation = {
 
 type Props = {
   sha256: string;
-  comments: Comments;
+  comments: Comment[];
   drawer?: boolean; // inside the drawer
   nocollapse?: boolean;
 };
@@ -65,8 +66,8 @@ const WrappedCommentSection: React.FC<Props> = ({
   const { user: currentUser } = useALContext();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
-  const [comments, setComments] = useState<Comments>(commentsProps);
-  const [authors, setAuthors] = useState<Authors>(null);
+  const [comments, setComments] = useState<Comment[]>(commentsProps);
+  const [authors, setAuthors] = useState<Author[]>(null);
   const [currentComment, setCurrentComment] = useState<Comment>(DEFAULT_COMMENT);
   const [confirmation, setConfirmation] = useState<Confirmation>({ open: false, type: 'add' });
   const [waiting, setWaiting] = useState<boolean>(false);

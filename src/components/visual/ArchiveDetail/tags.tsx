@@ -25,6 +25,9 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
+import { ResultIndexed } from 'components/models/base/result';
+import { API } from 'components/models/ui';
+import { SearchResult } from 'components/models/ui/search';
 import ActionMenu from 'components/visual/ActionMenu';
 import Classification from 'components/visual/Classification';
 import {
@@ -38,7 +41,7 @@ import {
 } from 'components/visual/GridTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import ResultsTable, { ResultResult } from 'components/visual/SearchResult/results';
+import ResultsTable from 'components/visual/SearchResult/results';
 import SectionContainer from 'components/visual/SectionContainer';
 import Verdict from 'components/visual/Verdict';
 import { safeFieldValue } from 'helpers/utils';
@@ -59,15 +62,6 @@ type Result = {
   classification: string;
 };
 
-type ArchivedTagSectionProps = {
-  sha256: string;
-  signatures: Signature[];
-  tags: Record<string, Tag[]>;
-  force?: boolean;
-  drawer?: boolean;
-  nocollapse?: boolean;
-};
-
 const VERDICT_MAP = {
   malicious: 4,
   highly_suspicious: 3,
@@ -76,7 +70,16 @@ const VERDICT_MAP = {
   safe: 0
 };
 
-const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
+type Props = {
+  sha256: string;
+  signatures: Signature[];
+  tags: Record<string, Tag[]>;
+  force?: boolean;
+  drawer?: boolean;
+  nocollapse?: boolean;
+};
+
+const WrappedArchivedTagSection: React.FC<Props> = ({
   sha256,
   signatures,
   tags,
@@ -458,12 +461,7 @@ const WrappedRow: React.FC<RowProps> = ({
   const { c12nDef } = useALContext();
   const { showErrorMessage } = useMySnackbar();
 
-  const [resultResults, setResultResults] = useState<{
-    items: ResultResult[];
-    offset: number;
-    rows: number;
-    total: number;
-  }>(null);
+  const [resultResults, setResultResults] = useState<SearchResult<ResultIndexed>>(null);
   const [error, setError] = useState<string>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
@@ -484,7 +482,7 @@ const WrappedRow: React.FC<RowProps> = ({
         offset: 0,
         filters: [`NOT(sha256:${sha256})`]
       },
-      onSuccess: api_data => {
+      onSuccess: (api_data: API<SearchResult<ResultIndexed>>) => {
         if (api_data.api_response?.total > 0) setResultResults(api_data.api_response);
         else setError('no_results_title');
       },
