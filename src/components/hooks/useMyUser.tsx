@@ -1,5 +1,7 @@
-import { AppSwitcherItem } from 'commons/components/app/AppConfigs';
-import { AppUser, AppUserService, AppUserValidatedProp } from 'commons/components/app/AppUserService';
+import { AppUserService, AppUserValidatedProp } from 'commons/components/app/AppUserService';
+import { Configuration } from 'components/models/base/config';
+import { User } from 'components/models/base/user';
+import { UserSettings } from 'components/models/base/user_settings';
 import { ClassificationDefinition } from 'helpers/classificationParser';
 import { useState } from 'react';
 
@@ -29,23 +31,6 @@ type IndexDefinitionMap = {
   workflow: IndexDefinition;
 };
 
-type SettingsDefinition = {
-  classification: string;
-  deep_scan: boolean;
-  description: string;
-  download_encoding: string;
-  expand_min_score: number;
-  ignore_cache: boolean;
-  ignore_dynamic_recursion_prevention: boolean;
-  ignore_filtering: boolean;
-  priority: number;
-  profile: boolean;
-  service_spec: any[];
-  services: any[];
-  submission_view: string;
-  ttl: number;
-};
-
 export type SystemMessageDefinition = {
   user: string;
   title: string;
@@ -53,142 +38,44 @@ export type SystemMessageDefinition = {
   message: string;
 };
 
-export type ExternalLink = {
-  allow_bypass: boolean;
-  double_encode: boolean;
-  max_classification: string;
-  name: string;
-  replace_pattern: string;
-  url: string;
-};
-
-export type ExternalSource = {
-  max_classification: string;
-  name: string;
-};
-
-export type ConfigurationDefinition = {
-  auth: {
-    allow_2fa: boolean;
-    allow_apikeys: boolean;
-    allow_extended_apikeys: boolean;
-    allow_security_tokens: boolean;
-  };
-  datastore: {
-    archive: {
-      enabled: boolean;
-    };
-  };
-  retrohunt: {
-    enabled: boolean;
-    dtl: number;
-    max_dtl: number;
-  };
-  submission: {
-    dtl: number;
-    max_dtl: number;
-    sha256_sources: string[];
-    verdicts: {
-      info: number;
-      suspicious: number;
-      highly_suspicious: number;
-      malicious: number;
-    };
-  };
-  system: {
-    organisation: string;
-    type: string;
-    version: string;
-  };
-  ui: {
-    ai: {
-      enabled: boolean;
-    };
-    alerting_meta: {
-      important: string[];
-      subject: string[];
-      url: string[];
-    };
-    allow_malicious_hinting: boolean;
-    allow_raw_downloads: boolean;
-    allow_replay: boolean;
-    allow_url_submissions: boolean;
-    allow_zip_downloads: boolean;
-    apps: AppSwitcherItem[];
-    banner: {
-      [lang: string]: string;
-    };
-    banner_level: 'info' | 'warning' | 'error' | 'success';
-    external_links: {
-      tag: { [key: string]: ExternalLink[] };
-      hash: { [key: string]: ExternalLink[] };
-      metadata: { [key: string]: ExternalLink[] };
-    };
-    external_sources: ExternalSource[];
-    external_source_tags: {
-      [tag_name: string]: string[];
-    };
-    read_only: boolean;
-    rss_feeds: string[];
-    services_feed: string;
-    tos: boolean;
-    tos_lockout: boolean;
-    tos_lockout_notify: boolean;
-    url_submission_auto_service_selection: string[];
-  };
-  user: {
-    api_priv_map: {
-      [api_priv: string]: string[];
-    };
-    priv_role_dependencies: {
-      [priv: string]: string[];
-    };
-    roles: string[];
-    role_dependencies: {
-      [role: string]: string[];
-    };
-    types: string[];
-  };
-};
-
-export interface CustomUser extends AppUser {
+export interface CustomUser extends User {
   // Al specific props
-  agrees_with_tos: boolean;
+  // agrees_with_tos: boolean;
   classification: string;
   default_view?: string;
   dynamic_group: string | null;
   groups: string[];
   is_active: boolean;
-  roles: string[];
+  // roles: string[];
 }
 
 export interface CustomAppUserService extends AppUserService<CustomUser> {
   c12nDef: ClassificationDefinition;
-  configuration: ConfigurationDefinition;
+  configuration: Configuration;
   indexes: IndexDefinitionMap;
-  settings: SettingsDefinition;
+  settings: UserSettings;
   systemMessage: SystemMessageDefinition;
-  setConfiguration: (cfg: ConfigurationDefinition) => void;
+  setConfiguration: (cfg: Configuration) => void;
   setSystemMessage: (msg: SystemMessageDefinition) => void;
   scoreToVerdict: (score: number) => string;
 }
 
 export interface WhoAmIProps extends CustomUser {
   c12nDef: ClassificationDefinition;
-  configuration: ConfigurationDefinition;
+  configuration: Configuration;
   indexes: IndexDefinitionMap;
   system_message: SystemMessageDefinition;
-  settings: SettingsDefinition;
+  settings: UserSettings;
 }
 
 // Application specific hook that will provide configuration to commons [useUser] hook.
 export default function useMyUser(): CustomAppUserService {
   const [user, setState] = useState<CustomUser>(null);
   const [c12nDef, setC12nDef] = useState<ClassificationDefinition>(null);
-  const [configuration, setConfiguration] = useState<ConfigurationDefinition>(null);
+  const [configuration, setConfiguration] = useState<Configuration>(null);
   const [indexes, setIndexes] = useState<IndexDefinitionMap>(null);
   const [systemMessage, setSystemMessage] = useState<SystemMessageDefinition>(null);
-  const [settings, setSettings] = useState<SettingsDefinition>(null);
+  const [settings, setSettings] = useState<UserSettings>(null);
   const [flattenedProps, setFlattenedProps] = useState(null);
 
   function flatten(ob) {

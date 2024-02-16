@@ -1,9 +1,11 @@
+import { API } from 'components/models/ui';
+import { WhoAmI } from 'components/models/ui/user';
 import { getFileName } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
 import useALContext from './useALContext';
 import useMySnackbar from './useMySnackbar';
-import { ConfigurationDefinition, WhoAmIProps } from './useMyUser';
+import { WhoAmIProps } from './useMyUser';
 
 const DEFAULT_RETRY_MS = 32;
 
@@ -53,7 +55,7 @@ export default function useMyAPI() {
 
   type BootstrapProps = {
     switchRenderedApp: (value: string) => void;
-    setConfiguration: (cfg: ConfigurationDefinition) => void;
+    setConfiguration: (cfg: WhoAmI) => void;
     setLoginParams: (params: LoginParamsProps) => void;
     setUser: (user: WhoAmIProps) => void;
     setReady: (isReady: boolean) => void;
@@ -117,7 +119,7 @@ export default function useMyAPI() {
         api_server_version: '4.3.0.0',
         api_status_code: 400
       }))
-      .then(api_data => {
+      .then((api_data: API<WhoAmI>) => {
         // eslint-disable-next-line no-prototype-builtins
         if (!isAPIData(api_data)) {
           // We got no response
