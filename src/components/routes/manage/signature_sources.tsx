@@ -29,6 +29,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { UpdateSource } from 'components/models/base/service';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
@@ -38,7 +39,6 @@ import { DiGitBranch } from 'react-icons/di';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import ForbiddenPage from '../403';
-import { Source } from '../admin/service_detail';
 import { SourceDetail } from './signature_sources_details';
 
 const useStyles = makeStyles(theme => ({
@@ -115,7 +115,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const DEFAULT_SOURCE: Source = {
+const DEFAULT_SOURCE: UpdateSource = {
   ca_cert: '',
   default_classification: '',
   headers: [],
@@ -137,8 +137,8 @@ const DEFAULT_SOURCE: Source = {
   sync: false
 };
 
-const isSourceUpdating = (source: Source) => source.status.state === 'UPDATING';
-const queueSourceUpdate = (source: Source) => ({
+const isSourceUpdating = (source: UpdateSource) => source.status.state === 'UPDATING';
+const queueSourceUpdate = (source: UpdateSource) => ({
   ...source,
   status: { ...source.status, state: 'UPDATING', message: 'Queued for update..' }
 });

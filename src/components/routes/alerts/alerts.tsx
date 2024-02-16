@@ -58,9 +58,9 @@ import usePromiseAPI from './hooks/usePromiseAPI';
 
 // Default size of a page to be used by the useAlert hook when fetching next load of data
 //  when scrolling has hit threshold.
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 50 as const;
 
-export const LOCAL_STORAGE = 'alert.search';
+export const LOCAL_STORAGE = 'alert.search' as const;
 
 export interface AlertDrawerState {
   open: boolean;
@@ -77,7 +77,7 @@ export interface AlertDrawerState {
   };
 }
 
-const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist';
+const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist' as const;
 
 // Just indicates whether there are any filters currently set..
 const hasFilters = (filters: SearchQueryFilters): boolean => {

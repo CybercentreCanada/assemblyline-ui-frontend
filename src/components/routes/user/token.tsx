@@ -12,18 +12,19 @@ import {
 } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { User } from 'components/models/base/user';
 // eslint-disable-next-line import/extensions
 import CBOR from 'helpers/cbor.js';
 import toArrayBuffer from 'helpers/toArrayBuffer';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type SecurityTokenProps = {
-  user: any;
+type Props = {
+  user: User;
   toggleToken: (token: string) => void;
 };
 
-export default function SecurityToken({ user, toggleToken }: SecurityTokenProps) {
+export default function SecurityToken({ user, toggleToken }: Props) {
   const { t } = useTranslation(['user']);
   const [selectedToken, setSelectedToken] = useState(null);
   const [tempToken, setTempToken] = useState('');

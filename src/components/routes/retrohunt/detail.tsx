@@ -23,9 +23,12 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { FileIndexed } from 'components/models/base/file';
+import { Retrohunt } from 'components/models/base/retrohunt';
+import { SearchResult } from 'components/models/ui/search';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
-import { RetrohuntPhase, RetrohuntResult } from 'components/routes/retrohunt';
+import { RetrohuntPhase } from 'components/routes/retrohunt';
 import RetrohuntErrors from 'components/routes/retrohunt/errors';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
@@ -46,7 +49,6 @@ import MonacoEditor from 'components/visual/MonacoEditor';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import { FileResult } from 'components/visual/SearchResult/files';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import SteppedProgress from 'components/visual/SteppedProgress';
 import { safeFieldValue } from 'helpers/utils';
@@ -116,14 +118,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type RetrohuntHitResult = {
-  items: FileResult[];
-  offset: number;
-  rows: number;
-  total: number;
-};
-
-type ParamProps = {
+type Params = {
   code: string;
 };
 
@@ -161,11 +156,11 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const { indexes } = useALContext();
 
   const { c12nDef, configuration } = useALContext();
-  const { code: paramCode } = useParams<ParamProps>();
+  const { code: paramCode } = useParams<Params>();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [retrohunt, setRetrohunt] = useState<RetrohuntResult>(null);
-  const [hitResults, setHitResults] = useState<RetrohuntHitResult>(null);
+  const [retrohunt, setRetrohunt] = useState<Retrohunt>(null);
+  const [hitResults, setHitResults] = useState<SearchResult<FileIndexed>>(null);
   const [isErrorOpen, setIsErrorOpen] = useState<boolean>(false);
   const [typeDataSet, setTypeDataSet] = useState<{ [k: string]: number }>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
@@ -174,7 +169,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const filterValue = useRef<string>('');
   const timer = useRef<boolean>(false);
 
-  const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
+  const DEFAULT_RETROHUNT = useMemo<Partial<Retrohunt>>(
     () => ({
       archive_only: false,
       classification: c12nDef.UNRESTRICTED,
@@ -322,7 +317,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   );
 
   const handleHitRowClick = useCallback(
-    (file: FileResult) => {
+    (file: FileIndexed) => {
       if (isDrawer) navigate(`/file/detail/${file.sha256}${location.hash}`);
       else navigate(`${location.pathname}${location.search}#${file.sha256}`);
     },

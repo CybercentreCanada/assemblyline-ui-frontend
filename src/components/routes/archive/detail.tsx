@@ -4,18 +4,17 @@ import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { Section } from 'components/models/base/result';
+import { API } from 'components/models/ui';
+import type { File } from 'components/models/ui/file';
 import {
   ArchiveBanner,
   ArchivedTagSection,
   CommentSection,
   LabelSection,
-  Signature,
-  SimilarSection,
-  Tag
+  SimilarSection
 } from 'components/visual/ArchiveDetail';
 import Classification from 'components/visual/Classification';
-import { Comments } from 'components/visual/CommentCard';
-import { Error } from 'components/visual/ErrorCard';
 import AttackSection from 'components/visual/FileDetail/attacks';
 import ChildrenSection from 'components/visual/FileDetail/childrens';
 import Detection from 'components/visual/FileDetail/detection';
@@ -30,7 +29,7 @@ import URIIdentificationSection from 'components/visual/FileDetail/uriIdent';
 import { ASCIISection, HexSection, ImageSection, StringsSection } from 'components/visual/FileViewer';
 import CodeSection from 'components/visual/FileViewer/code_summary';
 import InformativeAlert from 'components/visual/InformativeAlert';
-import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
+import { emptyResult } from 'components/visual/ResultCard';
 import { TabContainer } from 'components/visual/TabContainer';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,80 +38,6 @@ import { useLocation, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import NotFoundPage from '../404';
 import AISummarySection from '../submission/detail/ai_summary';
-
-export type FileInfo = {
-  archive_ts: string;
-  ascii: string;
-  classification: string;
-  comments: Comments;
-  entropy: number;
-  expiry_ts: string | null;
-  from_archive: boolean;
-  hex: string;
-  is_section_image: boolean;
-  is_supplementary: boolean;
-  labels: string[];
-  label_categories?: {
-    attribution: string[];
-    technique: string[];
-    info: string[];
-  };
-  magic: string;
-  md5: string;
-  mime: string;
-  seen: {
-    count: number;
-    first: string;
-    last: string;
-  };
-  sha1: string;
-  sha256: string;
-  size: number;
-  ssdeep: string;
-  tlsh: string;
-  type: string;
-  uri_info?: {
-    fragment?: string;
-    hostname: string;
-    netloc: string;
-    params?: string;
-    password?: string;
-    path?: string;
-    port: number;
-    query?: string;
-    scheme: string;
-    uri: string;
-    username?: string;
-  };
-};
-
-export type File = {
-  alternates: {
-    [serviceName: string]: AlternateResult[];
-  };
-  attack_matrix: {
-    [category: string]: string[][];
-  };
-  childrens: {
-    name: string;
-    sha256: string;
-  }[];
-  emptys: Result[];
-  errors: Error[];
-  file_info: FileInfo;
-  heuristics: {
-    [category: string]: string[][];
-  };
-  metadata: {
-    [level: string]: {
-      [key: string]: any;
-    };
-  };
-  parents: string[];
-  results: Result[];
-  signatures: Signature[];
-  tags: Record<string, Tag[]>;
-};
 
 type Params = {
   id?: string;
@@ -136,9 +61,9 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
   const { showErrorMessage } = useMySnackbar();
   const { user: currentUser, c12nDef, configuration } = useALContext();
 
-  const [file, setFile] = useState<File | null>(null);
-  const [promotedSections, setPromotedSections] = useState([]);
-  const [codeAllowed, setCodeAllowed] = useState(false);
+  const [file, setFile] = useState<File>(null);
+  const [promotedSections, setPromotedSections] = useState<Section[]>([]);
+  const [codeAllowed, setCodeAllowed] = useState<boolean>(false);
 
   const inDrawer = useMemo<boolean>(() => (propSha256 ? true : paramSha256 ? false : null), [paramSha256, propSha256]);
   const sha256 = useMemo<string>(() => paramSha256 || propSha256, [paramSha256, propSha256]);
@@ -159,7 +84,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
     apiCall({
       url: `/api/v4/file/result/${sha256}/?archive_only=true`,
       onEnter: () => setFile(null),
-      onSuccess: api_data => {
+      onSuccess: (api_data: API<File>) => {
         setFile(patchFileDetails(api_data.api_response));
 
         if (api_data.api_response.file_info.type.indexOf('code/') === 0) {
@@ -235,7 +160,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
           tabs={{
             details: {
               label: t('details'),
-              content: (
+              inner: (
                 <>
                   {file?.file_info?.type.startsWith('uri/') ? (
                     <URIIdentificationSection
@@ -257,7 +182,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             },
             detection: {
               label: t('detection'),
-              content:
+              inner:
                 file &&
                 file.results.length === 0 &&
                 Object.keys(file.heuristics).length === 0 &&
@@ -296,7 +221,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             },
             tags: {
               label: t('tags'),
-              content: (
+              inner: (
                 <ArchivedTagSection
                   sha256={sha256}
                   signatures={file ? file.signatures : null}
@@ -309,7 +234,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             },
             relations: {
               label: t('relations'),
-              content: (
+              inner: (
                 <>
                   <ChildrenSection
                     childrens={file ? file.childrens : null}
@@ -329,26 +254,24 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             },
             ascii: {
               label: t('ascii'),
-              content: (
-                <ASCIISection sha256={sha256} type={file?.file_info?.type} codeAllowed={codeAllowed} archiveOnly />
-              )
+              inner: <ASCIISection sha256={sha256} type={file?.file_info?.type} codeAllowed={codeAllowed} archiveOnly />
             },
 
             code: {
               label: t('code'),
-              content: <CodeSection sha256={sha256} archiveOnly />,
+              inner: <CodeSection sha256={sha256} archiveOnly />,
               disabled: isMdUp || !codeAllowed
             },
-            strings: { label: t('strings'), content: <StringsSection sha256={sha256} type={file?.file_info?.type} /> },
-            hex: { label: t('hex'), content: <HexSection sha256={sha256} /> },
+            strings: { label: t('strings'), inner: <StringsSection sha256={sha256} type={file?.file_info?.type} /> },
+            hex: { label: t('hex'), inner: <HexSection sha256={sha256} /> },
             image: {
               label: t('image'),
               disabled: !file?.file_info?.is_section_image,
-              content: <ImageSection sha256={sha256} name={sha256} />
+              inner: <ImageSection sha256={sha256} name={sha256} />
             },
             community: {
               label: t('community'),
-              content: (
+              inner: (
                 <>
                   <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} nocollapse />
                   <CommentSection
