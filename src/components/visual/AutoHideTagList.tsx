@@ -1,7 +1,8 @@
-import { IconButton, Tooltip } from '@mui/material';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import { IconButton, Tooltip } from '@mui/material';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
+import { Verdict } from 'components/models/base/alert';
 import Tag from 'components/visual/Tag';
 import { verdictRank } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
@@ -10,9 +11,9 @@ import Heuristic from './Heuristic';
 
 type TagProps = {
   value: string;
-  lvl: string;
+  lvl: Verdict;
   safelisted: boolean;
-  classification: string;
+  classification?: string;
 };
 
 type AutoHideTagListProps = {

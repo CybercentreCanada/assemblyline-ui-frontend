@@ -191,7 +191,7 @@ const WrappedHistogram = ({
 
   return histData ? (
     <div style={{ height: height }}>
-      <Line data={histData} options={options} plugins={plugins} />
+      <Line data={histData} options={options as any} plugins={plugins} />
     </div>
   ) : (
     <Skeleton variant="rectangular" height={height} />

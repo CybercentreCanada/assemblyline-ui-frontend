@@ -1,11 +1,12 @@
 import { Tooltip, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
+import { Verdict as VerdictType } from 'components/models/base/alert';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type VerdictProps = {
-  verdict?: 'info' | 'safe' | 'suspicious' | 'highly_suspicious' | 'malicious';
+  verdict?: VerdictType;
   score?: number;
   short?: boolean;
   variant?: 'outlined' | 'filled';

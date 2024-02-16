@@ -21,7 +21,6 @@ import { To, useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 
 interface StyledPaperProps extends PaperProps {
-  component?: any;
   paper?: boolean;
 }
 

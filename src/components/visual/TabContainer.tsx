@@ -2,7 +2,7 @@ import { Tab, TabProps, Tabs, TabsProps, useTheme } from '@mui/material';
 import React, { FC, ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 interface TabElement extends TabProps {
-  content?: ReactNode;
+  inner?: ReactNode;
 }
 
 type TabElements = Record<string, TabElement>;
@@ -111,8 +111,8 @@ const WrappedTabContainer = <T extends TabElements>({
         </Tabs>
       </div>
 
-      {Object.entries(tabs).map(([value, { label = '', disabled = false, content = null }], i) =>
-        disabled ? null : <TabContent key={i} open={tab === value} children={content} />
+      {Object.entries(tabs).map(([value, { label = '', disabled = false, inner = null }], i) =>
+        disabled ? null : <TabContent key={i} open={tab === value} children={inner} />
       )}
     </TabContext.Provider>
   );

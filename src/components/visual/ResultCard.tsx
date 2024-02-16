@@ -18,63 +18,15 @@ import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useSafeResults from 'components/hooks/useSafeResults';
+import { AlternateResult, FileResult } from 'components/models/base/result';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import ExtractedSection from './ResultCard/extracted';
-import { ExtractedFiles } from './ResultCard/extracted_file';
-import ResultSection, { Section, SectionItem } from './ResultCard/result_section';
+import ResultSection from './ResultCard/result_section';
 import SupplementarySection from './ResultCard/supplementary';
-
-export type Result = {
-  archive_ts: string;
-  classification: string;
-  created: string;
-  drop_file: boolean;
-  expiry_ts: string | null;
-  response: {
-    extracted: ExtractedFiles[];
-    milestones: {
-      service_completed: string;
-      service_started: string;
-    };
-    service_context: string;
-    service_debug_info: string;
-    service_name: string;
-    service_tool_version: string;
-    service_version: string;
-    supplementary: ExtractedFiles[];
-  };
-  result: {
-    score: number;
-    sections: Section[];
-  };
-  section_hierarchy: SectionItem[];
-  sha256: string;
-};
-
-export type AlternateResult = {
-  classification: string;
-  created: string;
-  drop_file: boolean;
-  id: string;
-  response: {
-    service_name: string;
-    service_version: string;
-  };
-  result: {
-    score: number;
-  };
-};
-
-type ResultCardProps = {
-  result: Result;
-  sid: string | null;
-  alternates?: AlternateResult[] | null;
-  force?: boolean;
-};
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -102,13 +54,20 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export const emptyResult = (result: Result) =>
+export const emptyResult = (result: FileResult) =>
   result.result.score === 0 &&
   result.result.sections.length === 0 &&
   result.response.extracted.length === 0 &&
   result.response.supplementary.length === 0;
 
-const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null, force = false }) => {
+type Props = {
+  result: FileResult;
+  sid: string | null;
+  alternates?: AlternateResult[] | null;
+  force?: boolean;
+};
+
+const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, force = false }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
@@ -116,7 +75,7 @@ const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates 
   const sp2 = theme.spacing(2);
   const { c12nDef, settings } = useALContext();
   const empty = emptyResult(result);
-  const [displayedResult, setDisplayedResult] = React.useState<Result>(result);
+  const [displayedResult, setDisplayedResult] = React.useState<FileResult>(result);
   const [open, setOpen] = React.useState(!empty && displayedResult.result.score >= settings.expand_min_score);
   const [render, setRender] = React.useState(!empty && displayedResult.result.score >= settings.expand_min_score);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

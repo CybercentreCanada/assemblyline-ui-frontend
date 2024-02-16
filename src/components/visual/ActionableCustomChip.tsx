@@ -1,4 +1,5 @@
 import useExternalLookup from 'components/hooks/useExternalLookup';
+import { ExternalLinkType } from 'components/models/base/config';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
 import CustomChip, { CustomChipProps } from './CustomChip';
@@ -6,7 +7,7 @@ import ExternalLinks from './ExternalSearch';
 
 export type ActionableCustomChipProps = CustomChipProps & {
   data_type?: string;
-  category?: 'hash' | 'metadata' | 'tag';
+  category?: ExternalLinkType;
   classification?: string;
   label?: string;
 };
