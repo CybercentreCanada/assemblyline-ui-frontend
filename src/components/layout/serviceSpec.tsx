@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
+import { ServiceParameter, ServiceSpecification } from 'components/models/base/user_settings';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +29,17 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function Service({ disabled, service, idx, setParam, setParamAsync }) {
+type ServiceProps = {
+  service: ServiceSpecification;
+  idx: number;
+  setParam: (service_id: number, param_id: number, param_value: any) => void;
+  setParamAsync: (service_id: number, param_id: number, param_value: any) => void;
+  isSelected?: (name: string) => boolean;
+  disabled?: boolean;
+  compressed?: boolean;
+};
+
+function Service({ disabled, service, idx, setParam, setParamAsync }: ServiceProps) {
   const theme = useTheme();
   const [showMore, setShowMore] = useState(false);
   const { t } = useTranslation();
@@ -77,7 +88,18 @@ function Service({ disabled, service, idx, setParam, setParamAsync }) {
   );
 }
 
-function Param({ disabled, param, pidx, idx, setParam, setParamAsync }) {
+type ParamProps = {
+  param: ServiceParameter;
+  idx: number;
+  pidx: number;
+  setParam: (service_id: number, param_id: number, param_value: any) => void;
+  setParamAsync: (service_id: number, param_id: number, param_value: any) => void;
+  isSelected?: (name: string) => boolean;
+  disabled?: boolean;
+  compressed?: boolean;
+};
+
+function Param({ disabled, param, pidx, idx, setParam, setParamAsync }: ParamProps) {
   const classes = useStyles();
   const theme = useTheme();
   return (
@@ -147,7 +169,7 @@ function Param({ disabled, param, pidx, idx, setParam, setParamAsync }) {
 }
 
 type ServiceSpecProps = {
-  service_spec: any[];
+  service_spec: ServiceSpecification[];
   setParam: (service_id: number, param_id: number, param_value: any) => void;
   setParamAsync: (service_id: number, param_id: number, param_value: any) => void;
   isSelected?: (name: string) => boolean;
