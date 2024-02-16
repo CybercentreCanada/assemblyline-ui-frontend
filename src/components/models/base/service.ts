@@ -1,4 +1,11 @@
 export const ACCESS_MODES = ['ReadWriteOnce', 'ReadWriteMany'] as const;
+export const DEFAULT_SERVICE_SELECTED = [
+  'Filtering',
+  'Antivirus',
+  'Static Analysis',
+  'Extraction',
+  'Networking'
+] as const;
 export const OPERATING_SYSTEMS = ['windows', 'linux'] as const;
 export const REGISTRY_TYPES = ['docker', 'harbor'] as const;
 export const SUBMISSION_PARAM_TYPES = ['str', 'int', 'list', 'bool'] as const;
@@ -15,11 +22,70 @@ export const SIGNATURE_DELIMITERS = {
 } as const;
 
 export type AccessMode = (typeof ACCESS_MODES)[number];
+export type DefaultServiceSelected = (typeof DEFAULT_SERVICE_SELECTED)[number];
 export type OperatingSystem = (typeof OPERATING_SYSTEMS)[number];
 export type RegistryType = (typeof REGISTRY_TYPES)[number];
 export type SubmissionParamType = (typeof SUBMISSION_PARAM_TYPES)[number];
 export type UpdateChannel = (typeof UPDATE_CHANNELS)[number];
 export type SignatureDelimiter = keyof typeof SIGNATURE_DELIMITERS;
+
+export type ServiceParameter =
+  | {
+      type: 'bool';
+      hide: boolean;
+      name: string;
+      value: boolean | 'true' | 'false';
+      default: boolean;
+    }
+  | {
+      type: 'int';
+      hide: boolean;
+      name: string;
+      value: number;
+      default: number;
+    }
+  | {
+      type: 'str';
+      hide: boolean;
+      name: string;
+      value: string;
+      default: string;
+    }
+  | {
+      type: 'list';
+      hide: boolean;
+      name: string;
+      value: string;
+      default: string;
+      list: string[];
+    };
+
+/** Default service specific settings */
+export type ServiceSpecification = {
+  /** Service name */
+  name: string;
+
+  /** Service parameters */
+  params: ServiceParameter[];
+};
+
+/** Selected services */
+export type SelectedService = {
+  /** Which category does this service belong to? */
+  category?: DefaultServiceSelected;
+
+  /** Does this service perform analysis outside of Assemblyline? */
+  is_external?: boolean;
+
+  /** Name of the service category */
+  name?: DefaultServiceSelected;
+
+  /** Is the category selected */
+  selected?: boolean;
+
+  /** List of services */
+  services?: SelectedService[];
+};
 
 /** Environment Variable Model */
 export type EnvironmentVariable = {

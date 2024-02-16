@@ -2,13 +2,7 @@ import { ParsedErrors } from './error';
 
 export const SUBMISSION_STATES = ['failed', 'submitted', 'completed'] as const;
 
-export const DEFAULT_SRV_SEL = ['Filtering', 'Antivirus', 'Static Analysis', 'Extraction', 'Networking'] as const;
-
-export const DEFAULT_RESUBMIT = [] as const;
-
 export type SubmissionState = (typeof SUBMISSION_STATES)[number];
-export type DefaultSRVSel = (typeof DEFAULT_SRV_SEL)[number];
-export type DefaultReSubmit = (typeof DEFAULT_RESUBMIT)[number];
 
 /** File Model of Submission */
 export type File = {

@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
-import { ServiceParameter, ServiceSpecification } from 'components/models/base/user_settings';
+import { ServiceParameter, ServiceSpecification } from 'components/models/base/service';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

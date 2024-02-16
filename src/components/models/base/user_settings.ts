@@ -1,51 +1,10 @@
-import { ServiceSelection } from './submission';
+import { SelectedService, ServiceSpecification } from './service';
 
 export const ENCODINGS = ['cart', 'raw', 'zip'] as const;
-export const TYPES = ['bool'] as const;
 export const VIEWS = ['report', 'details'] as const;
 
 export type Encoding = (typeof ENCODINGS)[number];
-export type Type = (typeof TYPES)[number];
 export type View = (typeof VIEWS)[number];
-
-export type ServiceParameter =
-  | {
-      type: 'bool';
-      hide: boolean;
-      name: string;
-      value: boolean | 'true' | 'false';
-      default: boolean;
-    }
-  | {
-      type: 'int';
-      hide: boolean;
-      name: string;
-      value: number;
-      default: number;
-    }
-  | {
-      type: 'str';
-      hide: boolean;
-      name: string;
-      value: string;
-      default: string;
-    }
-  | {
-      type: 'list';
-      hide: boolean;
-      name: string;
-      value: string;
-      default: string;
-      list: string[];
-    };
-
-export type ServiceSpecification = {
-  /** Service name */
-  name: string;
-
-  /** Service parameters */
-  params: ServiceParameter[];
-};
 
 export type UserSettings = {
   /** Default submission classification */
@@ -94,7 +53,7 @@ export type UserSettings = {
   service_spec: ServiceSpecification[];
 
   /** Default service selection */
-  services: ServiceSelection;
+  services: SelectedService[];
 
   /** Default view for completed submissions */
   submission_view: View;
