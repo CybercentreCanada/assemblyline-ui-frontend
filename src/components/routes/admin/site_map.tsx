@@ -21,7 +21,7 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { Role } from 'components/models/base/user';
-import { MuiColor, SiteMap as SiteMapData } from 'components/models/ui';
+import { MuiColor, SiteMap as TSiteMap } from 'components/models/ui';
 import CustomChip from 'components/visual/CustomChip';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -49,7 +49,7 @@ export default function SiteMap() {
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [siteMap, setSiteMap] = useState<SiteMapData>(null);
+  const [siteMap, setSiteMap] = useState<TSiteMap>(null);
 
   const reqMapColor: Record<Role, MuiColor> = {
     signature_import: 'success',

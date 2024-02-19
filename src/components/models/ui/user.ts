@@ -31,51 +31,49 @@ export type Indexes = {
  * @summary Response of the /whoami/ route
  * @description Return the currently logged in user as well as the system configuration
  * */
-export type WhoAmI =
-  | any
-  | {
-      /** Date the user agreed with TOS */
-      agrees_with_tos: string;
+export type WhoAmI = {
+  /** Date the user agreed with TOS */
+  agrees_with_tos: string;
 
-      /** Avatar data block */
-      avatar: string;
+  /** Avatar data block */
+  avatar: string;
 
-      /** Classification definition block */
-      c12nDef: ClassificationDefinition;
+  /** Classification definition block */
+  c12nDef: ClassificationDefinition;
 
-      /** Classification of the user */
-      classification: string;
+  /** Classification of the user */
+  classification: string;
 
-      /** Configuration block */
-      configuration: Configuration;
+  /** Configuration block */
+  configuration: Configuration;
 
-      /** Email of the user */
-      email: string;
+  /** Email of the user */
+  email: string;
 
-      /** Groups the user if member of */
-      groups: string[];
+  /** Groups the user if member of */
+  groups: string[];
 
-      /** Search indexes definitions */
-      indexes: Indexes;
+  /** Search indexes definitions */
+  indexes: Indexes;
 
-      /** Is the user active */
-      is_active: boolean;
+  /** Is the user active */
+  is_active: boolean;
 
-      /** Is the user an admin */
-      is_admin: boolean;
+  /** Is the user an admin */
+  is_admin: boolean;
 
-      /** Name of the user */
-      name: string;
+  /** Name of the user */
+  name: string;
 
-      /** Roles the user is member of */
-      roles: Role[];
+  /** Roles the user is member of */
+  roles: Role[];
 
-      /** User Settings configuration */
-      settings: UserSettings;
+  /** User Settings configuration */
+  settings: UserSettings;
 
-      /** Types the user is  */
-      type: Type[];
+  /** Types the user is  */
+  type: Type[];
 
-      /** Username of the current user */
-      username: string;
-    };
+  /** Username of the current user */
+  username: string;
+};

@@ -38,8 +38,6 @@ export type SearchResult<Item> = {
   total: number;
 };
 
-export type GroupResult<Item> = {};
-
 /** Perform statistical analysis of an integer field to get its min, max, average and count values */
 export type StatResult = {
   /** Number of times this field is seen */

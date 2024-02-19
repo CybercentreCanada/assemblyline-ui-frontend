@@ -1,9 +1,7 @@
 import { Role } from '../base/user';
 
-export const MUI_COLORS = ['default', 'info', 'success', 'warning', 'error'] as const;
 export const METHODS = ['GET', 'POST', 'DELETE', 'PUT'] as const;
 
-export type MuiColor = (typeof MUI_COLORS)[number];
 export type Method = (typeof METHODS)[number];
 
 export type Page = {
