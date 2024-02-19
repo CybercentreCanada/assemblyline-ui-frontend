@@ -3,6 +3,8 @@ import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
+import type { FileIndexed } from 'components/models/base/file';
+import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
 import React from 'react';
@@ -20,34 +22,12 @@ import {
 } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
-export type FileResult = {
-  classification: string;
-  entropy: number;
-  from_archive: boolean;
-  id: string;
-  md5: string;
-  seen: {
-    count: number;
-    first: string;
-    last: string;
-  };
-  sha1: string;
-  sha256: string;
-  size: number;
-  type: string;
-};
-
-type SearchResults = {
-  items: FileResult[];
-  total: number;
-};
-
-type FilesTableProps = {
-  fileResults: SearchResults;
+type Props = {
+  fileResults: SearchResult<FileIndexed>;
   allowSort?: boolean;
 };
 
-const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort = true }) => {
+const WrappedFilesTable: React.FC<Props> = ({ fileResults, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 

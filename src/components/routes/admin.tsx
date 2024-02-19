@@ -1,8 +1,8 @@
 import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
-import { CustomUser } from 'components/hooks/useMyUser';
 import LinkGrid from 'components/layout/linkgrid';
+import { CustomUser } from 'components/models/ui/user';
 import { Navigate } from 'react-router';
 
 export default function Admin() {

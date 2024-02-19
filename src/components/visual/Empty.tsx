@@ -1,8 +1,4 @@
-type EmptyProps = {
-  [string: string]: any;
-};
-
-function Empty(props: EmptyProps) {
+function Empty() {
   return <div />;
 }
 

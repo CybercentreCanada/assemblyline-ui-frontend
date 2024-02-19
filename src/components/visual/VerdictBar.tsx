@@ -1,16 +1,14 @@
 import { Tooltip, useTheme } from '@mui/material';
+import { SubmissionVerdict } from 'components/models/base/alert';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-type VerdictBarProps = {
-  verdicts: {
-    malicious: string[];
-    non_malicious: string[];
-  };
+type Props = {
+  verdicts: SubmissionVerdict;
   width?: string;
 };
 
-const VerdictBar: React.FC<VerdictBarProps> = ({ verdicts, width = '100%' }) => {
+const VerdictBar: React.FC<Props> = ({ verdicts, width = '100%' }) => {
   const { t } = useTranslation();
   const theme = useTheme();
 

@@ -1,10 +1,11 @@
+import { Error } from 'components/models/base/error';
 import ErrorCard from 'components/visual/ErrorCard';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ErrorSectionProps = {
-  errors: any;
+  errors: Error[];
   nocollapse?: boolean;
 };
 

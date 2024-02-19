@@ -1,22 +1,23 @@
+import { Configuration } from 'components/models/base/config';
 import { getFileName } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
 import useALContext from './useALContext';
 import useMySnackbar from './useMySnackbar';
-import { ConfigurationDefinition, WhoAmIProps } from './useMyUser';
+import { WhoAmIProps } from './useMyUser';
 
 const DEFAULT_RETRY_MS = 32;
 
-export type APIResponseProps = {
+export type APIResponseProps<APIResponse extends any> = {
   api_error_message: string;
-  api_response: any;
+  api_response: APIResponse;
   api_server_version: string;
   api_status_code: number;
 };
 
-export type DownloadResponseProps = {
+export type DownloadResponseProps<APIResponse extends any> = {
   api_error_message: string;
-  api_response: any;
+  api_response: APIResponse;
   api_server_version: string;
   api_status_code: number;
   filename?: string;
@@ -31,45 +32,51 @@ export type LoginParamsProps = {
   allow_pw_rest: boolean;
 };
 
-export default function useMyAPI() {
+type APICallProps<SuccessData extends any, FailureData extends any> = {
+  url: string;
+  contentType?: string;
+  method?: string;
+  body?: any;
+  reloadOnUnauthorize?: boolean;
+  allowCache?: boolean;
+  onSuccess?: (api_data: APIResponseProps<SuccessData>) => void;
+  onFailure?: (api_data: APIResponseProps<FailureData>) => void;
+  onEnter?: () => void;
+  onExit?: () => void;
+  onFinalize?: (api_data: APIResponseProps<any>) => void;
+  retryAfter?: number;
+};
+
+type BootstrapProps = {
+  switchRenderedApp: (value: string) => void;
+  setConfiguration: (cfg: Configuration) => void;
+  setLoginParams: (params: LoginParamsProps) => void;
+  setUser: (user: WhoAmIProps) => void;
+  setReady: (isReady: boolean) => void;
+  retryAfter?: number;
+};
+
+type DownloadBlobProps<SuccessData extends any, FailureData extends any> = {
+  url: string;
+  onSuccess?: (blob: DownloadResponseProps<SuccessData>) => void;
+  onFailure?: (api_data: DownloadResponseProps<FailureData>) => void;
+  onEnter?: () => void;
+  onExit?: () => void;
+  retryAfter?: number;
+};
+
+type UseMyAPIReturn = {
+  apiCall: <SuccessData = any, FailureData = any>(props: APICallProps<SuccessData, FailureData>) => void;
+  bootstrap: (props: BootstrapProps) => void;
+  downloadBlob: <SuccessData = any, FailureData = any>(props: DownloadBlobProps<SuccessData, FailureData>) => void;
+};
+
+const useMyAPI = (): UseMyAPIReturn => {
   const { t } = useTranslation();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { configuration: systemConfig } = useALContext();
 
-  type APICallProps = {
-    url: string;
-    contentType?: string;
-    method?: string;
-    body?: any;
-    reloadOnUnauthorize?: boolean;
-    allowCache?: boolean;
-    onSuccess?: (api_data: APIResponseProps) => void;
-    onFailure?: (api_data: APIResponseProps) => void;
-    onEnter?: () => void;
-    onExit?: () => void;
-    onFinalize?: (api_data: APIResponseProps) => void;
-    retryAfter?: number;
-  };
-
-  type BootstrapProps = {
-    switchRenderedApp: (value: string) => void;
-    setConfiguration: (cfg: ConfigurationDefinition) => void;
-    setLoginParams: (params: LoginParamsProps) => void;
-    setUser: (user: WhoAmIProps) => void;
-    setReady: (isReady: boolean) => void;
-    retryAfter?: number;
-  };
-
-  type DownloadBlobProps = {
-    url: string;
-    onSuccess?: (blob: DownloadResponseProps) => void;
-    onFailure?: (api_data: DownloadResponseProps) => void;
-    onEnter?: () => void;
-    onExit?: () => void;
-    retryAfter?: number;
-  };
-
-  function isAPIData(value: any) {
+  const isAPIData = (value: any): boolean => {
     if (
       value !== undefined &&
       value !== null &&
@@ -81,21 +88,19 @@ export default function useMyAPI() {
       return true;
     }
     return false;
-  }
+  };
 
-  function bootstrap({
+  const bootstrap = ({
     switchRenderedApp,
     setConfiguration,
     setLoginParams,
     setUser,
     setReady,
     retryAfter = DEFAULT_RETRY_MS
-  }: BootstrapProps) {
+  }: BootstrapProps) => {
     const requestOptions: RequestInit = {
       method: 'GET',
-      headers: {
-        'X-XSRF-TOKEN': getXSRFCookie()
-      },
+      headers: { 'X-XSRF-TOKEN': getXSRFCookie() },
       credentials: 'same-origin'
     };
 
@@ -167,9 +172,9 @@ export default function useMyAPI() {
           switchRenderedApp('load');
         }
       });
-  }
+  };
 
-  function apiCall({
+  const apiCall = <SuccessData, FailureData>({
     url,
     contentType = 'application/json',
     method = 'GET',
@@ -182,7 +187,7 @@ export default function useMyAPI() {
     onExit,
     onFinalize,
     retryAfter = DEFAULT_RETRY_MS
-  }: APICallProps) {
+  }: APICallProps<SuccessData, FailureData>) => {
     const requestOptions: RequestInit = {
       method,
       credentials: 'same-origin',
@@ -300,22 +305,20 @@ export default function useMyAPI() {
         }
         if (onFinalize) onFinalize(api_data);
       });
-  }
+  };
 
-  function downloadBlob({
+  const downloadBlob = <SuccessData, FailureData>({
     url,
     onSuccess,
     onFailure,
     onEnter,
     onExit,
     retryAfter = DEFAULT_RETRY_MS
-  }: DownloadBlobProps) {
+  }: DownloadBlobProps<SuccessData, FailureData>) => {
     const requestOptions: RequestInit = {
       method: 'GET',
       credentials: 'same-origin',
-      headers: {
-        'X-XSRF-TOKEN': getXSRFCookie()
-      }
+      headers: { 'X-XSRF-TOKEN': getXSRFCookie() }
     };
 
     // Run enter callback
@@ -409,7 +412,9 @@ export default function useMyAPI() {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
         }
       });
-  }
+  };
 
   return { apiCall, bootstrap, downloadBlob };
-}
+};
+
+export default useMyAPI;

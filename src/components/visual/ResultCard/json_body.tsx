@@ -1,5 +1,6 @@
 import { useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import type { JSONBody as JSONData } from 'components/models/base/result_body';
 import { default as React } from 'react';
 import ReactJson from 'react-json-view';
 
@@ -19,7 +20,12 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const WrappedJSONBody = ({ body, printable }) => {
+type Props = {
+  body: JSONData;
+  printable: boolean;
+};
+
+const WrappedJSONBody = ({ body, printable }: Props) => {
   const classes = useStyles();
   const theme = useTheme();
 

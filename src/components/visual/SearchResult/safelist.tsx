@@ -2,6 +2,8 @@ import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
+import type { Safelist } from 'components/models/base/safelist';
+import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import { maxLenStr } from 'helpers/utils';
 import 'moment/locale/fr';
@@ -21,49 +23,13 @@ import {
 } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
-export type Safelist = {
-  added: string;
-  classification: string;
-  enabled: boolean;
-  hashes: {
-    md5: string;
-    sha1: string;
-    sha256: string;
-  };
-  file: {
-    name: string[];
-  };
-  id: string;
-  sources: {
-    name: string;
-  }[];
-  signature: {
-    name: string;
-  };
-  tag: {
-    type: string;
-    value: string;
-  };
-  type: string;
-  updated: string;
-};
-
-type SearchResults = {
-  items: Safelist[];
-  total: number;
-};
-
-type SafelistTableProps = {
-  safelistResults: SearchResults;
+type Props = {
+  safelistResults: SearchResult<Safelist>;
   setSafelistID?: (id: string) => void;
   allowSort?: boolean;
 };
 
-const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
-  safelistResults,
-  setSafelistID = null,
-  allowSort = true
-}) => {
+const WrappedSafelistTable: React.FC<Props> = ({ safelistResults, setSafelistID = null, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 

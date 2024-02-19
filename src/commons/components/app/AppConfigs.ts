@@ -97,8 +97,8 @@ export type AppBarThemeConfigs = {
 
 // Specification interface of describing which appbar styles are configurable.
 export type AppBarStyles = {
-  color?: any; // Configure appbar css color style.
-  backgroundColor?: any; // Configure appbar css background color style.
+  color?: React.CSSProperties['color']; // Configure appbar css color style.
+  backgroundColor?: React.CSSProperties['backgroundColor']; // Configure appbar css background color style.
 };
 
 // Specification interface describing a sitemap route rendered within breadcrumbs.

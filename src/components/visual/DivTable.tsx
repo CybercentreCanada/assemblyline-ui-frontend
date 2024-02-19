@@ -1,10 +1,23 @@
-import { Table, TableBody, TableCell, TableCellProps, TableHead, TableRow, TableSortLabel, Theme } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableBodyProps,
+  TableCell,
+  TableCellProps,
+  TableHead,
+  TableHeadProps,
+  TableProps,
+  TableRow,
+  TableRowProps,
+  TableSortLabel,
+  Theme
+} from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import 'moment/locale/fr';
 import React from 'react';
-import { useNavigate } from 'react-router';
+import { To, useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 
 const StyledTableCell = withStyles((theme: Theme) =>
@@ -36,11 +49,10 @@ const BreakableTableCell = withStyles((theme: Theme) =>
   })
 )(TableCell);
 
-type CellProps = {
+interface CellProps extends TableCellProps {
   children?: React.ReactNode;
   breakable?: boolean;
-  [key: string]: any;
-};
+}
 
 export const DivTableCell = ({ children, breakable, ...other }: CellProps) =>
   breakable ? (
@@ -113,31 +125,35 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   );
 };
 
-export const LinkRow = ({ children, to, ...other }) => (
+interface LinkRowProps extends TableRowProps {
+  to: To;
+}
+
+export const LinkRow = ({ children, to, ...other }: LinkRowProps) => (
   <TableRow component={Link} {...other} to={to} style={{ cursor: 'pointer', textDecoration: 'none' }}>
     {children}
   </TableRow>
 );
 
-export const DivTableRow = ({ children, ...other }) => (
+export const DivTableRow = ({ children, ...other }: TableRowProps) => (
   <TableRow {...other} component="div">
     {children}
   </TableRow>
 );
 
-export const DivTableHead = ({ children, ...other }) => (
+export const DivTableHead = ({ children, ...other }: TableHeadProps) => (
   <TableHead {...other} component="div">
     {children}
   </TableHead>
 );
 
-export const DivTableBody = ({ children, ...other }) => (
+export const DivTableBody = ({ children, ...other }: TableBodyProps) => (
   <TableBody {...other} component="div">
     {children}
   </TableBody>
 );
 
-export const DivTable = ({ children, size = 'small' as 'small', ...other }) => (
+export const DivTable = ({ children, size = 'small' as 'small', ...other }: TableProps) => (
   <Table size={size} {...other} component="div">
     {children}
   </Table>

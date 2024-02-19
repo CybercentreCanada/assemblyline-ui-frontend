@@ -3,8 +3,9 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useSafeResults from 'components/hooks/useSafeResults';
+import { Tags } from 'components/models/ui/file';
 import AutoHideTagList from 'components/visual/AutoHideTagList';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -24,20 +25,22 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type TagSectionProps = {
+type Props = {
   tag_group: string;
-  tags: any;
+  tags: Tags;
   force?: boolean;
 };
 
-const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, force = false }) => {
+const WrappedTagSection: React.FC<Props> = ({ tag_group, tags, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
-  const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
-  const sp2 = theme.spacing(2);
   const { showSafeResults } = useSafeResults();
-  const [tagUnsafeMap, setTagUnsafeMap] = React.useState({});
+
+  const [tagUnsafeMap, setTagUnsafeMap] = useState<Tags>({});
+  const [open, setOpen] = useState<boolean>(true);
+
+  const sp2 = theme.spacing(2);
 
   useEffect(() => {
     if (tags) {

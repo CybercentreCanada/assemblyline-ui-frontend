@@ -9,6 +9,7 @@ import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
+import type { Section, SectionItem } from 'components/models/base/result';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
@@ -72,47 +73,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export type SectionItem = {
-  children: SectionItem[];
-  id: number;
-};
-
-export type Section = {
-  auto_collapse: boolean;
-  body: any;
-  body_format: string;
-  body_config?: {
-    column_order?: string[];
-  };
-  classification: string;
-  depth: number;
-  heuristic: {
-    attack: {
-      attack_id: string;
-      categories: string[];
-      pattern: string;
-    }[];
-    heur_id: string;
-    name: string;
-    score: number;
-    signature: {
-      frequency: number;
-      name: string;
-      safe: boolean;
-    }[];
-  };
-  tags: {
-    type: string;
-    short_type: string;
-    value: string;
-    safelisted: boolean;
-    classification: string;
-  }[];
-  title_text: string;
-  promote_to: string;
-};
-
-type ResultSectionProps = {
+type Props = {
   section: Section;
   section_list?: Section[];
   sub_sections?: SectionItem[];
@@ -123,7 +84,7 @@ type ResultSectionProps = {
   force?: boolean;
 };
 
-const WrappedResultSection: React.FC<ResultSectionProps> = ({
+const WrappedResultSection: React.FC<Props> = ({
   section,
   section_list = [],
   sub_sections = [],

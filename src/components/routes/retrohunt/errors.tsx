@@ -17,8 +17,8 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
-import { RetrohuntResult } from 'components/routes/retrohunt';
+import { Retrohunt } from 'components/models/base/retrohunt';
+import { CustomUser } from 'components/models/ui/user';
 import {
   DivTable,
   DivTableBody,
@@ -62,7 +62,7 @@ type RetrohuntErrorResult = {
 };
 
 type Prop = {
-  retrohunt?: RetrohuntResult;
+  retrohunt?: Retrohunt;
   open?: boolean;
   onClose?: () => void;
 };

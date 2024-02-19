@@ -2,6 +2,8 @@ import { Checkbox, FormControlLabel, Typography, useTheme } from '@mui/material'
 import Skeleton from '@mui/material/Skeleton';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
+import { SelectedService } from 'components/models/base/service';
+import { UserSettings } from 'components/models/base/user_settings';
 import React from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
@@ -30,7 +32,7 @@ function ServiceTreeItemSkel({ size = 'medium' }: ServiceTreeItemSkelProps) {
 }
 
 type ServiceTreeItemProps = {
-  item: any;
+  item: SelectedService;
   onChange: (name: string, category: string) => void;
   disabled?: boolean;
   size: 'medium' | 'small';
@@ -147,8 +149,8 @@ function SkelItems({ size, spacing }: SkelItemsProps) {
 }
 
 type ServiceTreeProps = {
-  settings: any;
-  setSettings: (settings: any) => void;
+  settings: UserSettings;
+  setSettings: (settings: UserSettings) => void;
   setModified?: (isModified: boolean) => void;
   compressed?: boolean;
   disabled?: boolean;

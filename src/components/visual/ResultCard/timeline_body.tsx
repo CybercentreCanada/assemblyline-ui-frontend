@@ -1,6 +1,7 @@
 import { Tooltip, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import useALContext from 'components/hooks/useALContext';
+import type { TimelineBody as TimelineData } from 'components/models/base/result_body';
 import { verdictToColor } from 'helpers/utils';
 import { AiOutlineFile, AiOutlineFileImage, AiOutlineFileUnknown, AiOutlineFileZip } from 'react-icons/ai';
 import { BsFileEarmarkCode, BsFileLock, BsFileText, BsGlobe2, BsHddNetwork, BsTerminal } from 'react-icons/bs';
@@ -30,7 +31,11 @@ const AL_TYPE_ICON = {
   NETWORK: <BsHddNetwork />
 };
 
-const WrappedTimelineBody = ({ body }) => {
+type Props = {
+  body: TimelineData[];
+};
+
+const WrappedTimelineBody = ({ body }: Props) => {
   const { scoreToVerdict } = useALContext();
   const theme = useTheme();
   const COLOR_MAP = {

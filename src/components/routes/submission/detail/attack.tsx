@@ -3,6 +3,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useHighlighter from 'components/hooks/useHighlighter';
+import { AttackMatrix } from 'components/models/ui/file';
 import Attack from 'components/visual/Attack';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +21,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type AttackSectionProps = {
-  attack_matrix: any;
+  attack_matrix: AttackMatrix;
   force?: boolean;
 };
 

@@ -1,7 +1,7 @@
 import { Alert, LinearProgress } from '@mui/material';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import React, { useEffect, useMemo, useState } from 'react';
 import MonacoEditor, { LANGUAGE_SELECTOR } from '../MonacoEditor';

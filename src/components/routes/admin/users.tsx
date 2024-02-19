@@ -25,6 +25,8 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { User } from 'components/models/base/user';
+import { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import SearchBar from 'components/visual/SearchBar/search-bar';
@@ -40,19 +42,6 @@ import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 
 const PAGE_SIZE = 25;
-const DEFAULT_USER = {
-  avatar: null,
-  groups: ['USERS'],
-  is_active: true,
-  type: ['user'],
-  classification: null,
-  email: '',
-  name: '',
-  new_pass: '',
-  uname: '',
-  api_quota: 10,
-  submission_quota: 5
-};
 
 const useStyles = makeStyles(theme => ({
   searchresult: {
@@ -78,40 +67,62 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type User = {
+// type User = {
+//   avatar: string;
+//   email: string;
+//   groups: string[];
+//   is_active: boolean;
+//   type: string[];
+//   classification: string;
+//   name: string;
+//   new_pass: string;
+//   uname: string;
+//   api_quota: number;
+//   submission_quota: number;
+//   roles?: string[];
+// };
+
+type UserData = Partial<User> & {
   avatar: string;
-  email: string;
-  groups: string[];
-  is_active: boolean;
-  type: string[];
-  classification: string;
-  name: string;
   new_pass: string;
-  uname: string;
-  api_quota: number;
-  submission_quota: number;
-  roles?: string[];
+};
+
+const DEFAULT_USER: UserData = {
+  avatar: null,
+  groups: ['USERS'],
+  is_active: true,
+  type: ['user'],
+  classification: null,
+  email: '',
+  name: '',
+  new_pass: '',
+  uname: '',
+  api_quota: 10,
+  submission_quota: 5
 };
 
 export default function Users() {
   const { t } = useTranslation(['adminUsers']);
-  const [pageSize] = useState(PAGE_SIZE);
-  const [searching, setSearching] = useState(false);
-  const [drawer, setDrawer] = useState(false);
-  const [buttonLoading, setButtonLoading] = useState(false);
-  const { user: currentUser, c12nDef, configuration } = useALContext();
-  const [userResults, setUserResults] = useState(null);
-  const [newUser, setNewUser] = useState<User>(DEFAULT_USER);
-  const location = useLocation();
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const { showSuccessMessage } = useMySnackbar();
-  const navigate = useNavigate();
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const upMD = useMediaQuery(theme.breakpoints.up('md'));
-  const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTION);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const { showSuccessMessage } = useMySnackbar();
+  const { user: currentUser, c12nDef, configuration } = useALContext();
+
+  const [userResults, setUserResults] = useState<SearchResult<User>>(null);
+  const [newUser, setNewUser] = useState<UserData>(DEFAULT_USER);
+  const [pageSize] = useState<number>(PAGE_SIZE);
+  const [query, setQuery] = useState<SimpleSearchQuery>(null);
+  const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
+  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
+  const [drawer, setDrawer] = useState<boolean>(false);
+  const [searching, setSearching] = useState<boolean>(false);
+
   const filterValue = useRef<string>('');
+
+  const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
   const closeDrawer = () => {
     setDrawer(false);

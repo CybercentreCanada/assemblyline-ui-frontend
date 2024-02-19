@@ -18,18 +18,18 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
+import { Service, UpdateSource } from 'components/models/base/service';
 import { SourceCard } from 'components/routes/manage/signature_sources';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ServiceDetail, Source } from '../service_detail';
 import ResetButton from './reset_button';
 import SourceDialog from './source_dialog';
 
 type ServiceUpdaterProps = {
-  service: ServiceDetail;
-  defaults: ServiceDetail;
-  setService: (value: ServiceDetail) => void;
+  service: Service;
+  defaults: Service;
+  setService: (value: Service) => void;
   setModified: (value: boolean) => void;
 };
 
@@ -58,8 +58,8 @@ const marks = [
 
 const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceUpdaterProps) => {
   const { t } = useTranslation(['adminServices']);
-  const [dialog, setDialog] = useState(false);
-  const [editDialog, setEditDialog] = useState(false);
+  const [dialog, setDialog] = useState<boolean>(false);
+  const [editDialog, setEditDialog] = useState<boolean>(false);
   const [editedSourceID, setEditedSourceID] = useState(-1);
   const theme = useTheme();
 
@@ -136,7 +136,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
     });
   };
 
-  const findDefaults = (curSource: Source) => {
+  const findDefaults = (curSource: UpdateSource) => {
     if (defaults && defaults.update_config && defaults.update_config.sources) {
       return defaults.update_config.sources.find(element => {
         if (curSource.name === element.name) {

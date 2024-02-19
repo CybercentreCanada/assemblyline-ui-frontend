@@ -30,7 +30,7 @@ import parse from 'autosuggest-highlight/parse';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { FileInfo } from 'components/routes/archive/detail';
+import { LabelCategories } from 'components/models/base/file';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import { useDebounce } from 'components/visual/HexViewer';
@@ -434,7 +434,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
 };
 
 type LabelCellProps = {
-  label_categories?: FileInfo['label_categories'];
+  label_categories?: LabelCategories;
   onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
 };
 

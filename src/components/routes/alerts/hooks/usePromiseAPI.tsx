@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import useMyAPI from 'components/hooks/useMyAPI';
+import { Alert } from 'components/models/base/alert';
 import SearchQuery from 'components/visual/SearchBar/search-query';
 import { useCallback } from 'react';
-import { AlertItem } from './useAlerts';
 
 // Specification interface of this hook.
 export interface UsingPromiseAPI {
-  fetchAlert: (alertId: string) => Promise<AlertItem>;
+  fetchAlert: (alertId: string) => Promise<Alert>;
   onApplyWorkflowAction: (
     query: SearchQuery,
     selectedStatus: string,
@@ -23,8 +23,8 @@ export default function usePromiseAPI(): UsingPromiseAPI {
   const { apiCall } = useMyAPI();
 
   // Hook API: fetch the alert for the specified alert_id.
-  const fetchAlert = async (alertId: string): Promise<AlertItem> =>
-    new Promise<AlertItem>((resolve, reject) => {
+  const fetchAlert = async (alertId: string): Promise<Alert> =>
+    new Promise<Alert>((resolve, reject) => {
       const url = `/api/v4/alert/${alertId}/`;
       apiCall({
         url,

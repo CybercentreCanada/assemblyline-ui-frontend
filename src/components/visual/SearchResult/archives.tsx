@@ -7,7 +7,8 @@ import TableContainer from '@mui/material/TableContainer';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import { CustomUser } from 'components/hooks/useMyUser';
-import { FileInfo } from 'components/routes/archive/detail';
+import type { FileIndexed, LabelCategories } from 'components/models/base/file';
+import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import {
@@ -27,27 +28,20 @@ import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 
-type SearchResults = {
-  items: FileInfo[];
-  rows: number;
-  offset: number;
-  total: number;
-};
+const LABELS_COLOR_MAP = {
+  info: 'default',
+  technique: 'secondary',
+  attribution: 'primary'
+} as const;
 
-type ArchivesTableProps = {
-  fileResults: SearchResults;
+type Props = {
+  fileResults: SearchResult<FileIndexed>;
   allowSort?: boolean;
   setFileID?: (id: string) => void;
   onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
 };
 
-const LABELS_COLOR_MAP = {
-  info: 'default',
-  technique: 'secondary',
-  attribution: 'primary'
-};
-
-const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
+const WrappedArchivesTable: React.FC<Props> = ({
   fileResults,
   allowSort = true,
   setFileID = null,
@@ -191,7 +185,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
 };
 
 type LabelCellProps = {
-  label_categories?: FileInfo['label_categories'];
+  label_categories?: LabelCategories;
   onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
 };
 

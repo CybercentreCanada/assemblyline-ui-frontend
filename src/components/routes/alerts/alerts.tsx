@@ -29,7 +29,8 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
+import { Alert, AlertUpdate } from 'components/models/base/alert';
+import { CustomUser } from 'components/models/ui/user';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
@@ -52,32 +53,34 @@ import AlertsFilters from './alerts-filters';
 import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
 import AlertsWorkflowActions from './alerts-workflow-actions';
-import useAlerts, { AlertItem } from './hooks/useAlerts';
+import useAlerts from './hooks/useAlerts';
 import useFavorites from './hooks/useFavorites';
 import usePromiseAPI from './hooks/usePromiseAPI';
 
 // Default size of a page to be used by the useAlert hook when fetching next load of data
 //  when scrolling has hit threshold.
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 50 as const;
 
-export const LOCAL_STORAGE = 'alert.search';
+export const LOCAL_STORAGE = 'alert.search' as const;
 
-export interface AlertDrawerState {
+export type AlertState = {
+  index: number;
+  alert_id: string;
+  priority: string;
+  status: string;
+  labels: string[];
+};
+
+export type AlertDrawerState = {
   open: boolean;
   type: 'filter' | 'favorites' | 'actions' | 'sort';
   actionData?: {
     query: SearchQuery;
-    alert?: {
-      index: number;
-      alert_id: string;
-      priority: string;
-      status: string;
-      labels: string[];
-    };
+    alert?: AlertState;
   };
-}
+};
 
-const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist';
+const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist' as const;
 
 // Just indicates whether there are any filters currently set..
 const hasFilters = (filters: SearchQueryFilters): boolean => {
@@ -230,7 +233,7 @@ const Alerts: React.FC = () => {
   };
 
   const onVerdictComplete = useCallback(
-    (index: number, item: AlertItem, verdict: PossibleVerdict) => {
+    (index: number, item: Alert, verdict: PossibleVerdict) => {
       const changes = { verdict: { ...item.verdict } };
       if (verdict === 'malicious') {
         if (changes.verdict.malicious.indexOf(currentUser.username) === -1) {
@@ -254,7 +257,7 @@ const Alerts: React.FC = () => {
   );
 
   const onTakeOwnershipComplete = useCallback(
-    (index: number, item: AlertItem) => {
+    (index: number, item: Alert) => {
       const changes = { owner: currentUser.username };
       updateAlert(index, changes);
       window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: item.id, changes } }));
@@ -264,7 +267,7 @@ const Alerts: React.FC = () => {
 
   // Handler for when an item of the InfiniteList is selected
   const onItemSelected = useCallback(
-    (item: AlertItem, index: number) => {
+    (item: Alert, index: number) => {
       if (item !== null && item !== undefined) {
         if (isLGDown) {
           // Unfocus the simple list so the drawer does not try to refocus it when closing...
@@ -339,7 +342,7 @@ const Alerts: React.FC = () => {
           status: selectedStatus || alert.status,
           priority: selectedPriority || alert.priority,
           label: [...Array.from(new Set([...alert.labels, ...selectedLabels]))]
-        };
+        } as AlertUpdate;
         updateAlert(alert.index, changes);
         window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: alert.alert_id, changes } }));
       } else {
@@ -350,7 +353,7 @@ const Alerts: React.FC = () => {
   };
 
   // Memoized callback to render one line-item of the list....
-  const onRenderListRow = useCallback((item: AlertItem) => <AlertListItem item={item} />, []);
+  const onRenderListRow = useCallback((item: Alert) => <AlertListItem item={item} />, []);
 
   //
   const onDrawerClose = () => {
@@ -358,13 +361,13 @@ const Alerts: React.FC = () => {
   };
 
   // Handler for when the cursor on the list changes via keybaord event.
-  const onListCursorChanges = (item: AlertItem, index: number) => {
+  const onListCursorChanges = (item: Alert, index: number) => {
     onItemSelected(item, index);
   };
 
   // Handler to render the action buttons of each list item.
   const onRenderListActions = useCallback(
-    (item: AlertItem, index: number) =>
+    (item: Alert, index: number) =>
       currentUser.roles.includes('submission_view') ||
       currentUser.roles.includes('alert_manage') ||
       item.group_count ? (

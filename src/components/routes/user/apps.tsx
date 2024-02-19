@@ -1,3 +1,4 @@
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import {
   Button,
   Dialog,
@@ -11,22 +12,22 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { Apps as AppData, User } from 'components/models/base/user';
+import CustomChip from 'components/visual/CustomChip';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import CustomChip from 'components/visual/CustomChip';
-import useALContext from 'components/hooks/useALContext';
 
 type AppsProps = {
-  user: any;
+  user: User;
   toggleApp: (apiKey: string) => void;
 };
 
 type APIKeyCardProps = {
   id: string;
-  app: any;
+  app: AppData;
   askForDelete: (name: string) => void;
 };
 

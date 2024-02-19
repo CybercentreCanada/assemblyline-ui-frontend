@@ -1,0 +1,30 @@
+import type { Core, Services, Submission, UI } from '../base/config';
+
+export type Configuration = {
+  'core.scaler.service_defaults.min_instances': Core['scaler']['service_defaults']['min_instances'];
+  'core.ingester.default_max_extracted': Core['ingester']['default_max_extracted'];
+  'core.ingester.default_max_supplementary': Core['ingester']['default_max_supplementary'];
+  'services.categories': Services['categories'];
+  'services.preferred_update_channel': Services['preferred_update_channel'];
+  'services.stages': Services['stages'];
+  'submission.default_max_extracted': Submission['default_max_extracted'];
+  'submission.default_max_supplementary': Submission['default_max_supplementary'];
+  'submission.dtl': Submission['dtl'];
+  'submission.max_dtl': Submission['max_dtl'];
+  'submission.max_extraction_depth': Submission['max_extraction_depth'];
+  'submission.max_file_size': Submission['max_file_size'];
+  'submission.max_metadata_length': Submission['max_metadata_length'];
+  'submission.tag_types.attribution': Submission['tag_types']['attribution'];
+  'submission.tag_types.behavior': Submission['tag_types']['behavior'];
+  'submission.tag_types.ioc': Submission['tag_types']['ioc'];
+  'submission.verdicts.info': Submission['verdicts']['info'];
+  'submission.verdicts.suspicious': Submission['verdicts']['suspicious'];
+  'submission.verdicts.highly_suspicious': Submission['verdicts']['highly_suspicious'];
+  'submission.verdicts.malicious': Submission['verdicts']['malicious'];
+  'ui.allow_raw_downloads': UI['allow_raw_downloads'];
+  'ui.allow_zip_downloads': UI['allow_zip_downloads'];
+  'ui.audit': UI['audit'];
+  'ui.download_encoding': UI['download_encoding'];
+  'ui.enforce_quota': UI['enforce_quota'];
+  'ui.ingest_max_priority': UI['ingest_max_priority'];
+};

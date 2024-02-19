@@ -5,6 +5,7 @@ import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/materi
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
+import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'components/models/base/service';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,40 +16,14 @@ import CustomChip from '../CustomChip';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
-export type ServiceResult = {
-  accepts: string;
-  category: string;
-  classification: string;
-  description: string;
-  enabled: boolean;
-  is_external: boolean;
-  name: string;
-  privileged: boolean;
-  rejects: string;
-  stage: string;
-  version: string;
-};
-
-type UpdateData = {
-  auth: string;
-  image: string;
-  latest_tag: string;
-  update_available: boolean;
-  updating: boolean;
-};
-
-type Updates = {
-  [name: string]: UpdateData;
-};
-
-type ServiceTableProps = {
-  serviceResults: ServiceResult[];
-  updates: Updates;
+type Props = {
+  serviceResults: ServiceIndexed[];
+  updates: ServiceUpdates;
   setService: (svc: string) => void;
-  onUpdate: (svc: string, updateData: UpdateData) => void;
+  onUpdate: (svc: string, updateData: ServiceUpdateData) => void;
 };
 
-const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, updates, setService, onUpdate }) => {
+const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setService, onUpdate }) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
   const theme = useTheme();

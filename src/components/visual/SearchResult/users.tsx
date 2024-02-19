@@ -4,6 +4,8 @@ import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
+import { UserIndexed } from 'components/models/base/user';
+import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import {
   DivTable,
@@ -19,29 +21,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import InformativeAlert from '../InformativeAlert';
 
-export type UserResult = {
-  classification: string;
-  email: string;
-  groups: string[];
-  id: string;
-  is_active: boolean;
-  name: string;
-  type: string[];
-  uname: string;
+type Props = {
+  userResults: SearchResult<UserIndexed>;
 };
 
-type SearchResults = {
-  items: UserResult[];
-  rows: number;
-  offset: number;
-  total: number;
-};
-
-type UsersTableProps = {
-  userResults: SearchResults;
-};
-
-const WrappedUsersTable: React.FC<UsersTableProps> = ({ userResults }) => {
+const WrappedUsersTable: React.FC<Props> = ({ userResults }) => {
   const { t } = useTranslation(['adminUsers']);
   const { c12nDef } = useALContext();
 

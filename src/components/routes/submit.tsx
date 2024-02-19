@@ -31,6 +31,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
+import { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
@@ -81,37 +82,41 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Submit: React.FC<any> = () => {
-  const { apiCall } = useMyAPI();
   const { t, i18n } = useTranslation(['submit']);
+  const { apiCall } = useMyAPI();
   const theme = useTheme();
   const classes = useStyles();
-  const { user: currentUser, c12nDef, configuration } = useALContext();
-  const [uuid, setUUID] = useState(null);
-  const [flow, setFlow] = useState(null);
-  const [settings, setSettings] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(null);
-  const [validate, setValidate] = useState(false);
-  const [validateCB, setValidateCB] = useState(null);
-  const [allowClick, setAllowClick] = useState(true);
-  const [file, setFile] = useState(null);
-  const downSM = useMediaQuery(theme.breakpoints.down('md'));
-  const md = useMediaQuery(theme.breakpoints.only('md'));
-  const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
   const navigate = useNavigate();
   const location = useLocation();
-  const sp1 = theme.spacing(1);
-  const sp2 = theme.spacing(2);
-  const sp4 = theme.spacing(4);
+  const banner = useAppBanner();
+  const { user: currentUser, c12nDef, configuration } = useALContext();
+  const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
+
   const state: SubmitState = location.state as SubmitState;
   const urlHashTitle = configuration.ui.allow_url_submissions ? 'URL/SHA256' : 'SHA256';
   const urlInputText = urlHashTitle + t('urlHash.input_suffix');
-  const [urlHash, setUrlHash] = useState(state ? state.hash : '');
-  const [submissionMetadata, setSubmissionMetadata] = useState(state ? state.metadata : undefined);
-  const [urlHashHasError, setUrlHashHasError] = useState(false);
-  const [urlAutoselection, setUrlAutoselection] = useState(false);
-  const [value, setValue] = useState(state ? state.tabContext : '0');
+
+  const [allowClick, setAllowClick] = useState<boolean>(true);
   const classification = useState(state ? state.c12n : null)[0];
-  const banner = useAppBanner();
+  const [file, setFile] = useState(null);
+  const [flow, setFlow] = useState(null);
+  const [settings, setSettings] = useState<UserSettings>(null);
+  const [submissionMetadata, setSubmissionMetadata] = useState(state ? state.metadata : undefined);
+  const [uploadProgress, setUploadProgress] = useState(null);
+  const [urlAutoselection, setUrlAutoselection] = useState(false);
+  const [urlHash, setUrlHash] = useState(state ? state.hash : '');
+  const [urlHashHasError, setUrlHashHasError] = useState(false);
+  const [uuid, setUUID] = useState(null);
+  const [validate, setValidate] = useState(false);
+  const [validateCB, setValidateCB] = useState(null);
+  const [value, setValue] = useState(state ? state.tabContext : '0');
+
+  const sp1 = theme.spacing(1);
+  const sp2 = theme.spacing(2);
+  const sp4 = theme.spacing(4);
+
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
+  const md = useMediaQuery(theme.breakpoints.only('md'));
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -408,7 +413,7 @@ const Submit: React.FC<any> = () => {
     );
 
     // Load user on start
-    apiCall({
+    apiCall<UserSettings>({
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: api_data => {
         setSettings(api_data.api_response);

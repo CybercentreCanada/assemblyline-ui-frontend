@@ -2,6 +2,8 @@ import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
+import type { AlertIndexed } from 'components/models/base/alert';
+import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
 import 'moment/locale/fr';
@@ -20,41 +22,12 @@ import {
 } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
-export type AlertResult = {
-  al: {
-    av: string[];
-    score: number;
-  };
-  alert_id: string;
-  classification: string;
-  file: {
-    md5: string;
-    sha1: string;
-    sha256: string;
-    type: string;
-  };
-  filtered: boolean;
-  id: string;
-  label: string[];
-  owner: string;
-  priority: string;
-  reporting_ts: string;
-  status: string;
-  ts: string;
-  type: string;
-};
-
-type SearchResults = {
-  items: AlertResult[];
-  total: number;
-};
-
-type AlertsTableProps = {
-  alertResults: SearchResults;
+type Props = {
+  alertResults: SearchResult<AlertIndexed>;
   allowSort?: boolean;
 };
 
-const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults, allowSort = true }) => {
+const WrappedAlertsTable: React.FC<Props> = ({ alertResults, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 

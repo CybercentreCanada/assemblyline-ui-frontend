@@ -2,7 +2,7 @@ import { Alert, Button, CircularProgress, Grid, LinearProgress, Tooltip, useMedi
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

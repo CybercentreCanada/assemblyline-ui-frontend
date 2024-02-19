@@ -20,6 +20,7 @@ import { Link } from 'react-router-dom';
 import Classification from '../Classification';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 
+// TODO: what is this and is this used?
 const throttler = new Throttler(250);
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -100,7 +101,7 @@ const WrappedEnhancedTableHead: React.FC<EnhancedTableHeadProps> = ({
             key={cell.id}
             className={!dense ? classes.comfortable : null}
             align={cell.numeric ? 'right' : 'left'}
-            padding={cell.disablePadding ? 'none' : 'default'}
+            padding={cell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === cell.id ? order : false}
           >
             <TableSortLabel

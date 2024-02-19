@@ -3,6 +3,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Button, Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
+import { Metadata } from 'components/models/base/submission';
 import ActionableText from 'components/visual/ActionableText';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,12 +34,12 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type MetaSectionProps = {
-  metadata: any;
+type Props = {
+  metadata: Metadata;
   classification: string;
 };
 
-const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata, classification }) => {
+const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const classes = useStyles();

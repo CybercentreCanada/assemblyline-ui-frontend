@@ -16,7 +16,7 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
+import { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import { RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';

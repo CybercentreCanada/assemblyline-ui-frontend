@@ -1,3 +1,5 @@
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import {
   Button,
   Card,
@@ -20,31 +22,15 @@ import FormControl from '@mui/material/FormControl';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { ApiKey, User } from 'components/models/base/user';
 import CustomChip from 'components/visual/CustomChip';
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type APIKeyProps = {
-  acl: string[];
-  roles: string[];
-};
-
 type APIKeyCardProps = {
   name: string;
-  apikey: APIKeyProps;
+  apikey: ApiKey;
   askForDelete: (name: string) => void;
-};
-
-type APIKeysProps = {
-  user: {
-    [name: string]: any;
-    apikeys: {
-      [name: string]: APIKeyProps;
-    };
-  };
-  toggleAPIKey: (name: string, apiKey?: APIKeyProps) => void;
 };
 
 const APIKeyCard = ({ name, apikey, askForDelete }: APIKeyCardProps) => {
@@ -79,6 +65,11 @@ const APIKeyCard = ({ name, apikey, askForDelete }: APIKeyCardProps) => {
       </div>
     </Paper>
   );
+};
+
+type APIKeysProps = {
+  user: User;
+  toggleAPIKey: (name: string, apiKey?: ApiKey) => void;
 };
 
 export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {

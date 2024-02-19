@@ -1,9 +1,9 @@
 import { Checkbox, FormControlLabel, Typography, useTheme } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
-import Skeleton from '@mui/material/Skeleton';
 import useALContext from 'components/hooks/useALContext';
-import React from 'react';
+import { UserSettings } from 'components/models/base/user_settings';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme =>
@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme =>
 );
 
 type ExternalSourcesProps = {
-  settings: any;
+  settings: UserSettings;
   onChange: (name: string) => void;
   disabled?: boolean;
   size?: 'medium' | 'small';

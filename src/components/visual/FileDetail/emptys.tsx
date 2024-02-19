@@ -1,11 +1,12 @@
 import { Skeleton } from '@mui/material';
+import { FileResult } from 'components/models/base/result';
 import ResultCard from 'components/visual/ResultCard';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type EmptySectionProps = {
-  emptys: any;
+  emptys: FileResult[];
   sid: string;
   nocollapse?: boolean;
 };

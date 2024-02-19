@@ -9,6 +9,7 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import HeuristicDetail from '../manage/heuristic_detail';
 
+// TODO: what is this and is this used?
 export default function StatisticsSignatures() {
   const { t } = useTranslation(['statisticsHeuristics']);
   const { apiCall } = useMyAPI();

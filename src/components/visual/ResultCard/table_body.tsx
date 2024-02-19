@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
+import type { TableBody as TableData } from 'components/models/base/result_body';
 import { default as React } from 'react';
 import TitleKey from '../TitleKey';
 import { KVBody } from './kv_body';
@@ -53,7 +54,13 @@ const StyledTableRow = withStyles((theme: Theme) =>
   })
 )(TableRow);
 
-const WrappedTblBody = ({ body, printable, order }) => {
+type Props = {
+  body: TableData;
+  printable: boolean;
+  order: string[];
+};
+
+const WrappedTblBody = ({ body, printable, order }: Props) => {
   const classes = useStyles(printable);
   const headers = [];
 

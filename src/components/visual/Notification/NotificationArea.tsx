@@ -37,14 +37,15 @@ import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { ConfigurationDefinition, SystemMessageDefinition } from 'components/hooks/useMyUser';
+import { Configuration } from 'components/models/base/config';
+import { ServiceIndexed } from 'components/models/base/service';
+import { SystemMessage } from 'components/models/ui/user';
 import 'moment-timezone';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { JSONFeedItem, NotificationItem, useNotificationFeed } from '.';
 import ConfirmationDialog from '../ConfirmationDialog';
-import { ServiceResult } from '../SearchResult/service';
 
 const useStyles = makeStyles(theme => ({
   drawer: {
@@ -186,7 +187,7 @@ const WrappedNotificationArea = () => {
   const { fetchJSONNotifications } = useNotificationFeed();
 
   const [notifications, setNotifications] = useState<Array<JSONFeedItem>>([]);
-  const [newSystemMessage, setNewSystemMessage] = useState<SystemMessageDefinition>({
+  const [newSystemMessage, setNewSystemMessage] = useState<SystemMessage>({
     user: '',
     title: '',
     severity: 'info',
@@ -286,7 +287,7 @@ const WrappedNotificationArea = () => {
   };
 
   const getColor = useCallback(
-    (sm: SystemMessageDefinition, color: 'color' | 'bgColor' = 'color', type: 1 | 2 | 3 = 1) => {
+    (sm: SystemMessage, color: 'color' | 'bgColor' = 'color', type: 1 | 2 | 3 = 1) => {
       if (sm === null || sm === undefined || sm.severity === null) return null;
       const c = classes[color + sm.severity.charAt(0).toUpperCase() + sm.severity.slice(1) + type];
       return c === undefined ? null : c;
@@ -323,7 +324,7 @@ const WrappedNotificationArea = () => {
   );
 
   const getVersionType = useCallback(
-    (notification: JSONFeedItem, config: ConfigurationDefinition): null | 'newer' | 'current' | 'older' => {
+    (notification: JSONFeedItem, config: Configuration): null | 'newer' | 'current' | 'older' => {
       const notVer = notification?.url;
       const sysVer = config?.system?.version;
       if (
@@ -349,7 +350,7 @@ const WrappedNotificationArea = () => {
     []
   );
 
-  const getNewService = useCallback((notification: JSONFeedItem, services: Array<ServiceResult>): null | boolean => {
+  const getNewService = useCallback((notification: JSONFeedItem, services: ServiceIndexed[]): null | boolean => {
     if (!/(s|S)ervice/g.test(notification.title)) return null;
     const notificationTitle = notification?.title?.toLowerCase().slice(0, -16);
     return services.some(s => notificationTitle === s?.name?.toLowerCase());
@@ -358,10 +359,10 @@ const WrappedNotificationArea = () => {
   useEffect(() => {
     handleLastTimeOpen();
     if (!configuration || !currentUser) return;
-    apiCall({
+    apiCall<ServiceIndexed[]>({
       url: '/api/v4/service/all/',
       onSuccess: api_data => {
-        const services2: Array<ServiceResult> =
+        const services2: ServiceIndexed[] =
           api_data && api_data.api_response && Array.isArray(api_data.api_response) ? api_data.api_response : null;
         fetchJSONNotifications({
           urls: configuration.ui.rss_feeds,

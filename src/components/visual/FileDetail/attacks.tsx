@@ -1,12 +1,13 @@
 import { Grid, Skeleton } from '@mui/material';
 import useHighlighter from 'components/hooks/useHighlighter';
+import { AttackMatrix } from 'components/models/ui/file';
 import Attack from 'components/visual/Attack';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type AttackSectionProps = {
-  attacks: any;
+  attacks: AttackMatrix;
   force?: boolean;
   nocollapse?: boolean;
 };

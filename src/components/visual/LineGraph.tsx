@@ -89,7 +89,7 @@ function WrappedLineGraph({ dataset, height, title, datatype, onClick, sorter, t
 
   return barData ? (
     <div style={{ height: height }}>
-      <Bar data={barData} options={options} />
+      <Bar data={barData} options={options as any} />
     </div>
   ) : (
     <Skeleton variant="rectangular" height={height} />

@@ -15,40 +15,22 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
+import { DEFAULT_SERVICE_PARAMETER, ServiceParameter } from 'components/models/base/service';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SubmissionParams } from '../service_detail';
-
-type SimpleSubmissionParams = {
-  name: string;
-  type: 'int' | 'bool' | 'str' | 'list';
-  default: string;
-  value: string;
-  list: string[];
-  hide: string;
-};
 
 type MultiTypeParamProps = {
-  param?: SubmissionParams;
+  param?: ServiceParameter;
   id?: number;
-  onAdd?: (param: SubmissionParams) => void;
-  onUpdate?: (param: SubmissionParams, id: number) => void;
+  onAdd?: (param: ServiceParameter) => void;
+  onUpdate?: (param: ServiceParameter, id: number) => void;
   onDelete?: (id: number) => void;
-};
-
-const DEFAULT_USER_PARAM: SimpleSubmissionParams = {
-  name: '',
-  type: 'bool',
-  default: 'false',
-  value: 'false',
-  list: [],
-  hide: 'false'
 };
 
 const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTypeParamProps) => {
   const { t } = useTranslation(['adminServices']);
-  const [tempUserParams, setTempUserParams] = useState(DEFAULT_USER_PARAM);
+  const [tempUserParams, setTempUserParams] = useState<ServiceParameter>(DEFAULT_SERVICE_PARAMETER);
   const theme = useTheme();
 
   const handleSubmissionParamUpdate = event => {
@@ -94,13 +76,13 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
     } else {
       onAdd({
         ...tempUserParams,
-        default: parseInt(tempUserParams.default) || 0,
-        value: parseInt(tempUserParams.default) || 0,
+        default: parseInt(tempUserParams.default as unknown as string) || 0,
+        value: parseInt(tempUserParams.default as unknown as string) || 0,
         hide: tempUserParams.hide === 'true'
       });
     }
 
-    setTempUserParams(DEFAULT_USER_PARAM);
+    setTempUserParams(DEFAULT_SERVICE_PARAMETER);
   };
 
   const handleSPNameChange = event => {

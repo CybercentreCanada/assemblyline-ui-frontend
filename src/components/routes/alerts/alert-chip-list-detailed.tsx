@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material';
+import { DetailedItem } from 'components/models/base/alert';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
-import { DetailedItem } from './hooks/useAlerts';
 
 type AlertListChipProps = {
   items: DetailedItem[];

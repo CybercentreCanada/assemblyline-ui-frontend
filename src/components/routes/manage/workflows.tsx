@@ -10,7 +10,7 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import { CustomUser } from 'components/models/ui/user';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';

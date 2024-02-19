@@ -9,6 +9,15 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { AlertIndexed } from 'components/models/base/alert';
+import type { FileIndexed } from 'components/models/base/file';
+import type { ResultIndexed } from 'components/models/base/result';
+import type { RetrohuntIndexed } from 'components/models/base/retrohunt';
+import type { SignatureIndexed } from 'components/models/base/signature';
+import type { SubmissionIndexed } from 'components/models/base/submission';
+import { Role } from 'components/models/base/user';
+import type { SearchResult } from 'components/models/ui/search';
+import { Indexes } from 'components/models/ui/user';
 import Empty from 'components/visual/Empty';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -22,7 +31,7 @@ import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { searchResultsDisplay } from 'helpers/utils';
-import { useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useLocation, useParams } from 'react-router-dom';
@@ -59,26 +68,21 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type SearchProps = {
+type SearchIndexes = Pick<Indexes, 'submission' | 'file' | 'result' | 'signature' | 'alert' | 'retrohunt'>;
+
+type Props = {
   index?: string | null;
 };
 
-type ParamProps = {
+type Params = {
   id: string;
 };
 
-type SearchResults = {
-  items: any[];
-  offset: number;
-  rows: number;
-  total: number;
-};
-
-function Search({ index }: SearchProps) {
-  const { id } = useParams<ParamProps>();
+function Search({ index }: Props) {
+  const { id } = useParams<Params>();
   const { t } = useTranslation(['search']);
-  const [pageSize] = useState(PAGE_SIZE);
-  const [searching, setSearching] = useState(false);
+  const [pageSize] = useState<number>(PAGE_SIZE);
+  const [searching, setSearching] = useState<boolean>(false);
   const { indexes, user: currentUser, configuration } = useALContext();
   const location = useLocation();
   const navigate = useNavigate();
@@ -92,17 +96,17 @@ function Search({ index }: SearchProps) {
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
   // Result lists
-  const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
-  const [fileResults, setFileResults] = useState<SearchResults>(null);
-  const [resultResults, setResultResults] = useState<SearchResults>(null);
-  const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
-  const [alertResults, setAlertResults] = useState<SearchResults>(null);
-  const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
+  const [submissionResults, setSubmissionResults] = useState<SearchResult<SubmissionIndexed>>(null);
+  const [fileResults, setFileResults] = useState<SearchResult<FileIndexed>>(null);
+  const [resultResults, setResultResults] = useState<SearchResult<ResultIndexed>>(null);
+  const [signatureResults, setSignatureResults] = useState<SearchResult<SignatureIndexed>>(null);
+  const [alertResults, setAlertResults] = useState<SearchResult<AlertIndexed>>(null);
+  const [retrohuntResults, setRetrohuntResults] = useState<SearchResult<RetrohuntIndexed>>(null);
 
   // Current index
   const currentIndex = index || id;
 
-  const stateMap = {
+  const stateMap: Record<keyof SearchIndexes, Dispatch<SetStateAction<SearchResult<any>>>> = {
     submission: setSubmissionResults,
     file: setFileResults,
     result: setResultResults,
@@ -111,7 +115,7 @@ function Search({ index }: SearchProps) {
     retrohunt: setRetrohuntResults
   };
 
-  const resMap = {
+  const resMap: Record<keyof SearchIndexes, SearchResult<any>> = {
     submission: submissionResults,
     file: fileResults,
     result: resultResults,
@@ -120,7 +124,7 @@ function Search({ index }: SearchProps) {
     retrohunt: retrohuntResults
   };
 
-  const permissionMap = {
+  const permissionMap: Record<keyof SearchIndexes, Role> = {
     submission: 'submission_view',
     file: 'submission_view',
     result: 'submission_view',

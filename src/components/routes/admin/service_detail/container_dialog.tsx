@@ -19,29 +19,29 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
+import {
+  DEFAULT_DOCKER_CONFIG,
+  DEFAULT_ENVIRONMENT_VARIABLE,
+  DEFAULT_PERSISTENT_VOLUME,
+  DockerConfig,
+  EnvironmentVariable,
+  PersistentVolume
+} from 'components/models/base/service';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Container, Volume } from '../service_detail';
 import ResetButton from './reset_button';
 
-type EnvironmentVar = {
-  name: string;
-  value: string;
-};
-
 type EnvironmentProps = {
-  envVar?: EnvironmentVar;
-  onAdd?: (envVar: EnvironmentVar) => void;
-  onUpdate?: (envVar: EnvironmentVar) => void;
-  onDelete?: (envVar: EnvironmentVar) => void;
+  envVar?: EnvironmentVariable;
+  onAdd?: (envVar: EnvironmentVariable) => void;
+  onUpdate?: (envVar: EnvironmentVariable) => void;
+  onDelete?: (envVar: EnvironmentVariable) => void;
 };
-
-const DEFAULT_ENV = { name: '', value: '' };
 
 const WrappedEnvironment = ({ envVar, onAdd, onUpdate, onDelete }: EnvironmentProps) => {
   const { t } = useTranslation(['adminServices']);
-  const [tempEnvVar, setTempEnvVar] = useState(DEFAULT_ENV);
+  const [tempEnvVar, setTempEnvVar] = useState(DEFAULT_ENVIRONMENT_VARIABLE);
   const theme = useTheme();
 
   const handleValueUpdate = event => {
@@ -50,7 +50,7 @@ const WrappedEnvironment = ({ envVar, onAdd, onUpdate, onDelete }: EnvironmentPr
 
   const addEnvironment = () => {
     onAdd(tempEnvVar);
-    setTempEnvVar(DEFAULT_ENV);
+    setTempEnvVar(DEFAULT_ENVIRONMENT_VARIABLE);
   };
 
   const handleNameChange = event => {
@@ -150,27 +150,20 @@ const Environment = React.memo(WrappedEnvironment);
 
 type VolumeControlProps = {
   name?: string;
-  vol?: Volume;
-  onAdd?: (name: string, vol: Volume) => void;
+  vol?: PersistentVolume;
+  onAdd?: (name: string, vol: PersistentVolume) => void;
   onDelete?: (name: string) => void;
-};
-
-const DEFAULT_VOL: Volume = {
-  capacity: '',
-  mount_path: '',
-  storage_class: '',
-  access_mode: 'ReadWriteOnce'
 };
 
 const WrappedVolumeControl = ({ name, vol, onAdd, onDelete }: VolumeControlProps) => {
   const { t } = useTranslation(['adminServices']);
-  const [tempVol, setTempVol] = useState(DEFAULT_VOL);
+  const [tempVol, setTempVol] = useState(DEFAULT_PERSISTENT_VOLUME);
   const [tempName, setTempName] = useState('');
   const theme = useTheme();
 
   const addVolume = () => {
     onAdd(tempName, tempVol);
-    setTempVol(DEFAULT_VOL);
+    setTempVol(DEFAULT_PERSISTENT_VOLUME);
     setTempName('');
   };
 
@@ -294,29 +287,14 @@ WrappedVolumeControl.defaultProps = {
 
 const VolumeControl = React.memo(WrappedVolumeControl);
 
-const DEFAULT_CONTAINER: Container = {
-  allow_internet_access: false,
-  command: null,
-  cpu_cores: 1,
-  environment: [],
-  image: '',
-  ports: [],
-  ram_mb: 512,
-  ram_mb_min: 128,
-  registry_password: '',
-  registry_username: '',
-  registry_type: 'docker',
-  service_account: ''
-};
-
 type ContainerDialogProps = {
   open: boolean;
   setOpen: (value: boolean) => void;
-  container?: Container;
-  defaults?: Container;
+  container?: DockerConfig;
+  defaults?: DockerConfig;
   name?: string;
-  volumes?: { [name: string]: Volume };
-  onSave: (newContainer: Container, name?: string, newVolumes?: { [name: string]: Volume }) => void;
+  volumes?: { [name: string]: PersistentVolume };
+  onSave: (newContainer: DockerConfig, name?: string, newVolumes?: { [name: string]: PersistentVolume }) => void;
 };
 
 const WrappedContainerDialog = ({
@@ -330,7 +308,7 @@ const WrappedContainerDialog = ({
 }: ContainerDialogProps) => {
   const { t } = useTranslation(['adminServices']);
   const [modified, setModified] = useState(false);
-  const [tempContainer, setTempContainer] = useState(container || DEFAULT_CONTAINER);
+  const [tempContainer, setTempContainer] = useState(container || DEFAULT_DOCKER_CONFIG);
   const [tempName, setTempName] = useState(name);
   const [tempVolumes, setTempVolumes] = useState(volumes);
   const theme = useTheme();
@@ -344,7 +322,7 @@ const WrappedContainerDialog = ({
   const handleClose = () => {
     setOpen(false);
     setModified(false);
-    setTempContainer(container || DEFAULT_CONTAINER);
+    setTempContainer(container || DEFAULT_DOCKER_CONFIG);
     setTempName(name);
     setTempVolumes(volumes);
   };

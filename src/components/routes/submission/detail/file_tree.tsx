@@ -6,6 +6,7 @@ import { Box, Collapse, Divider, IconButton, Skeleton, Tooltip, Typography, useT
 import makeStyles from '@mui/styles/makeStyles';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
+import { SubmissionTree } from 'components/models/ui/submission';
 import Verdict from 'components/visual/Verdict';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,36 +37,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type FileItemProps = {
-  children: {
-    [key: string]: FileItemProps;
-  };
-  name: string[];
-  score: number;
-  sha256: string;
-  size: number;
-  truncated: boolean;
-  type: string;
-};
-
-type FileTreeProps = {
-  tree: {
-    [key: string]: FileItemProps;
-  };
-  sid: string;
-  force: boolean;
-  defaultForceShown: Array<string>;
-};
-
-type FileTreeSectionProps = {
-  tree: {
-    [key: string]: FileItemProps;
-  };
-  sid: string;
-  baseFiles: string[];
-  force?: boolean;
-};
-
 const isVisible = (curItem, forcedShown, isHighlighted, showSafeResults) =>
   (curItem.score < 0 && !showSafeResults) ||
   curItem.score > 0 ||
@@ -73,6 +44,13 @@ const isVisible = (curItem, forcedShown, isHighlighted, showSafeResults) =>
   isHighlighted(curItem.sha256) ||
   (curItem.children &&
     Object.values(curItem.children).some(c => isVisible(c, forcedShown, isHighlighted, showSafeResults)));
+
+type FileTreeSectionProps = {
+  tree: SubmissionTree['tree'];
+  sid: string;
+  baseFiles: string[];
+  force?: boolean;
+};
 
 const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, baseFiles, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
@@ -118,6 +96,13 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, bas
       </Collapse>
     </div>
   );
+};
+
+type FileTreeProps = {
+  tree: SubmissionTree['tree'];
+  sid: string;
+  force: boolean;
+  defaultForceShown: Array<string>;
 };
 
 const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown, force = false }) => {
