@@ -1,8 +1,8 @@
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { ALField, CustomUser } from 'components/hooks/useMyUser';
 import { Alert, AlertUpdate, DetailedItem } from 'components/models/base/alert';
+import { CustomUser, Field } from 'components/models/ui/user';
 import SearchQuery, { SearchFilter, SearchFilterType } from 'components/visual/SearchBar/search-query';
 import { safeFieldValue, verdictRank } from 'helpers/utils';
 import { useCallback, useEffect, useReducer, useState } from 'react';
@@ -19,7 +19,7 @@ const DEFAULT_STATE = {
 // The Custom Hook API.
 interface UsingAlerts {
   loading: boolean;
-  fields: ALField[];
+  fields: Field[];
   total: number;
   countedTotal: number;
   alerts: Alert[];
@@ -103,7 +103,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const { user: currentUser } = useAppUser<CustomUser>();
   const { indexes: fieldIndexes } = useALContext();
   const [searchQuery, setSearchQuery] = useState<SearchQuery>(null);
-  const [fields, setFields] = useState<ALField[]>([]);
+  const [fields, setFields] = useState<Field[]>([]);
   const [statusFilters, setStatusFilters] = useState<SearchFilter[]>([]);
   const [priorityFilters, setPriorityFilters] = useState<SearchFilter[]>([]);
   const [labelFilters, setLabelFilters] = useState<SearchFilter[]>([]);

@@ -37,9 +37,9 @@ import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { SystemMessageDefinition } from 'components/hooks/useMyUser';
 import { Configuration } from 'components/models/base/config';
 import { ServiceIndexed } from 'components/models/base/service';
+import { SystemMessage } from 'components/models/ui/user';
 import 'moment-timezone';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -187,7 +187,7 @@ const WrappedNotificationArea = () => {
   const { fetchJSONNotifications } = useNotificationFeed();
 
   const [notifications, setNotifications] = useState<Array<JSONFeedItem>>([]);
-  const [newSystemMessage, setNewSystemMessage] = useState<SystemMessageDefinition>({
+  const [newSystemMessage, setNewSystemMessage] = useState<SystemMessage>({
     user: '',
     title: '',
     severity: 'info',
@@ -287,7 +287,7 @@ const WrappedNotificationArea = () => {
   };
 
   const getColor = useCallback(
-    (sm: SystemMessageDefinition, color: 'color' | 'bgColor' = 'color', type: 1 | 2 | 3 = 1) => {
+    (sm: SystemMessage, color: 'color' | 'bgColor' = 'color', type: 1 | 2 | 3 = 1) => {
       if (sm === null || sm === undefined || sm.severity === null) return null;
       const c = classes[color + sm.severity.charAt(0).toUpperCase() + sm.severity.slice(1) + type];
       return c === undefined ? null : c;

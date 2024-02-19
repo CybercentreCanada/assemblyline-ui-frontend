@@ -13,7 +13,7 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
+import { CustomUser } from 'components/models/ui/user';
 import Classification from 'components/visual/Classification';
 import { filterObject } from 'helpers/utils';
 import { useCallback, useEffect, useState } from 'react';

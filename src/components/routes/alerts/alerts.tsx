@@ -29,8 +29,8 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
 import { Alert, AlertUpdate } from 'components/models/base/alert';
+import { CustomUser } from 'components/models/ui/user';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
@@ -444,8 +444,6 @@ const Alerts: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalDrawerOpened]);
-
-  console.log(drawer);
 
   return currentUser.roles.includes('alert_view') ? (
     <PageFullWidth margin={4}>

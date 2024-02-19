@@ -1,4 +1,4 @@
-import { WhoAmI } from 'components/models/ui/user';
+import { Configuration } from 'components/models/base/config';
 import { getFileName } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
@@ -49,7 +49,7 @@ type APICallProps<SuccessData extends any, FailureData extends any> = {
 
 type BootstrapProps = {
   switchRenderedApp: (value: string) => void;
-  setConfiguration: (cfg: WhoAmI) => void;
+  setConfiguration: (cfg: Configuration) => void;
   setLoginParams: (params: LoginParamsProps) => void;
   setUser: (user: WhoAmIProps) => void;
   setReady: (isReady: boolean) => void;
@@ -122,7 +122,7 @@ const useMyAPI = (): UseMyAPIReturn => {
         api_server_version: '4.3.0.0',
         api_status_code: 400
       }))
-      .then((api_data: APIResponseProps<WhoAmI>) => {
+      .then(api_data => {
         // eslint-disable-next-line no-prototype-builtins
         if (!isAPIData(api_data)) {
           // We got no response

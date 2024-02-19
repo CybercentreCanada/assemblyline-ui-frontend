@@ -17,8 +17,8 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
 import { Retrohunt } from 'components/models/base/retrohunt';
+import { CustomUser } from 'components/models/ui/user';
 import {
   DivTable,
   DivTableBody,

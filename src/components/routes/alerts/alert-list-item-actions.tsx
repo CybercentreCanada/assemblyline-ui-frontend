@@ -12,8 +12,8 @@ import { Badge, SpeedDial, SpeedDialAction, SpeedDialIcon, Typography, useMediaQ
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
 import { Alert } from 'components/models/base/alert';
+import { CustomUser } from 'components/models/ui/user';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import SearchQuery from 'components/visual/SearchBar/search-query';
 import { getValueFromPath } from 'helpers/utils';

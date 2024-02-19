@@ -5,7 +5,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 

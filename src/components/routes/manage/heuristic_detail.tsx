@@ -5,7 +5,7 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import { CustomUser } from 'components/models/ui/user';
 import Classification from 'components/visual/Classification';
 import Histogram from 'components/visual/Histogram';
 import ResultsTable from 'components/visual/SearchResult/results';

@@ -8,7 +8,7 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import FileDownloader from 'components/visual/FileDownloader';
 import { ASCIISection, HexSection, ImageSection, StringsSection } from 'components/visual/FileViewer';

@@ -1,70 +1,26 @@
 import { AppUserService, AppUserValidatedProp } from 'commons/components/app/AppUserService';
 import { Configuration } from 'components/models/base/config';
-import { User } from 'components/models/base/user';
 import { UserSettings } from 'components/models/base/user_settings';
+import { CustomUser, Indexes, SystemMessage } from 'components/models/ui/user';
 import { ClassificationDefinition } from 'helpers/classificationParser';
 import { useState } from 'react';
-
-export type ALField = {
-  name: string;
-  indexed: boolean;
-  stored: boolean;
-  type: string;
-  default: boolean;
-  list: boolean;
-};
-
-type IndexDefinition = {
-  [propName: string]: ALField;
-};
-
-type IndexDefinitionMap = {
-  alert: IndexDefinition;
-  badlist: IndexDefinition;
-  file: IndexDefinition;
-  heuristic: IndexDefinition;
-  result: IndexDefinition;
-  retrohunt: IndexDefinition;
-  safelist: IndexDefinition;
-  signature: IndexDefinition;
-  submission: IndexDefinition;
-  workflow: IndexDefinition;
-};
-
-export type SystemMessageDefinition = {
-  user: string;
-  title: string;
-  severity: 'success' | 'info' | 'warning' | 'error';
-  message: string;
-};
-
-export interface CustomUser extends User {
-  // Al specific props
-  // agrees_with_tos: boolean;
-  classification: string;
-  default_view?: string;
-  dynamic_group: string | null;
-  groups: string[];
-  is_active: boolean;
-  // roles: string[];
-}
 
 export interface CustomAppUserService extends AppUserService<CustomUser> {
   c12nDef: ClassificationDefinition;
   configuration: Configuration;
-  indexes: IndexDefinitionMap;
+  indexes: Indexes;
   settings: UserSettings;
-  systemMessage: SystemMessageDefinition;
+  systemMessage: SystemMessage;
   setConfiguration: (cfg: Configuration) => void;
-  setSystemMessage: (msg: SystemMessageDefinition) => void;
+  setSystemMessage: (msg: SystemMessage) => void;
   scoreToVerdict: (score: number) => string;
 }
 
 export interface WhoAmIProps extends CustomUser {
   c12nDef: ClassificationDefinition;
   configuration: Configuration;
-  indexes: IndexDefinitionMap;
-  system_message: SystemMessageDefinition;
+  indexes: Indexes;
+  system_message: SystemMessage;
   settings: UserSettings;
 }
 
@@ -73,8 +29,8 @@ export default function useMyUser(): CustomAppUserService {
   const [user, setState] = useState<CustomUser>(null);
   const [c12nDef, setC12nDef] = useState<ClassificationDefinition>(null);
   const [configuration, setConfiguration] = useState<Configuration>(null);
-  const [indexes, setIndexes] = useState<IndexDefinitionMap>(null);
-  const [systemMessage, setSystemMessage] = useState<SystemMessageDefinition>(null);
+  const [indexes, setIndexes] = useState<Indexes>(null);
+  const [systemMessage, setSystemMessage] = useState<SystemMessage>(null);
   const [settings, setSettings] = useState<UserSettings>(null);
   const [flattenedProps, setFlattenedProps] = useState(null);
 

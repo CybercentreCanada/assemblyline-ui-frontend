@@ -9,7 +9,7 @@ import PageFullScreen from 'commons/components/pages/PageFullScreen';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import { CustomUser } from 'components/models/ui/user';
 import ArcGauge from 'components/visual/ArcGauge';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useReducer, useState } from 'react';

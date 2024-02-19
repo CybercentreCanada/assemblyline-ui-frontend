@@ -1,6 +1,6 @@
 import { ClassificationDefinition } from 'helpers/classificationParser';
 import { Configuration } from '../base/config';
-import { Role, Type } from '../base/user';
+import { Role, Type, User } from '../base/user';
 import { UserSettings } from '../base/user_settings';
 
 export type Field = {
@@ -12,19 +12,39 @@ export type Field = {
   list: boolean;
 };
 
+export type IndexDefinition = { [field: string]: Field };
+
 /** Search indexes definitions */
 export type Indexes = {
-  alert: { [field: string]: Field };
-  badlist: { [field: string]: Field };
-  file: { [field: string]: Field };
-  heuristic: { [field: string]: Field };
-  result: { [field: string]: Field };
-  retrohunt: { [field: string]: Field };
-  safelist: { [field: string]: Field };
-  signature: { [field: string]: Field };
-  submission: { [field: string]: Field };
-  workflow: { [field: string]: Field };
+  alert: IndexDefinition;
+  badlist: IndexDefinition;
+  file: IndexDefinition;
+  heuristic: IndexDefinition;
+  result: IndexDefinition;
+  retrohunt: IndexDefinition;
+  safelist: IndexDefinition;
+  signature: IndexDefinition;
+  submission: IndexDefinition;
+  workflow: IndexDefinition;
 };
+
+export type SystemMessage = {
+  user: string;
+  title: string;
+  severity: 'success' | 'info' | 'warning' | 'error';
+  message: string;
+};
+
+export interface CustomUser extends User {
+  // Al specific props
+  // agrees_with_tos: boolean;
+  // classification: string;
+  default_view?: string;
+  dynamic_group: string | null;
+  // groups: string[];
+  // is_active: boolean;
+  // roles: string[];
+}
 
 /**
  * User information and System Configuration
