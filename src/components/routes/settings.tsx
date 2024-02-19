@@ -188,6 +188,13 @@ function Settings() {
     }
   }
 
+  function toggleExecutiveSummary() {
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, executive_summary: !settings.executive_summary });
+    }
+  }
+
   function toggleProfile() {
     if (settings) {
       setModified(true);
@@ -491,6 +498,23 @@ function Settings() {
                 />
               </TableCell>
             </ClickRow>
+            {configuration.ui.ai.enabled && (
+              <ClickRow enabled={editable} onClick={toggleExecutiveSummary}>
+                <TableCell colSpan={2} width="100%">
+                  <Typography variant="body1">{t('submissions.executive_summary')}</Typography>
+                  <Typography variant="caption">{t('submissions.executive_summary_desc')}</Typography>
+                </TableCell>
+                <TableCell align="right">
+                  <Switch
+                    checked={settings ? settings.executive_summary : true}
+                    disabled={settings === null || !editable}
+                    onChange={() => toggleExecutiveSummary()}
+                    color="secondary"
+                    name="executive_summary"
+                  />
+                </TableCell>
+              </ClickRow>
+            )}
             <ClickRow enabled={editable} onClick={toggleProfile}>
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.profile')}</Typography>
