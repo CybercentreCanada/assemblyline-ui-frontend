@@ -63,20 +63,22 @@ const PAGE_SIZE = 50 as const;
 
 export const LOCAL_STORAGE = 'alert.search' as const;
 
-export interface AlertDrawerState {
+export type AlertState = {
+  index: number;
+  alert_id: string;
+  priority: string;
+  status: string;
+  labels: string[];
+};
+
+export type AlertDrawerState = {
   open: boolean;
   type: 'filter' | 'favorites' | 'actions' | 'sort';
   actionData?: {
     query: SearchQuery;
-    alert?: {
-      index: number;
-      alert_id: string;
-      priority: string;
-      status: string;
-      labels: string[];
-    };
+    alert?: AlertState;
   };
-}
+};
 
 const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist' as const;
 
@@ -442,6 +444,8 @@ const Alerts: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalDrawerOpened]);
+
+  console.log(drawer);
 
   return currentUser.roles.includes('alert_view') ? (
     <PageFullWidth margin={4}>

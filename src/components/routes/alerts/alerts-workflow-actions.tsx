@@ -1,9 +1,9 @@
 import { Alert, Button, CircularProgress, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import { Alert as AlertData } from 'components/models/base/alert';
 import SearchQuery, { SearchFilter } from 'components/visual/SearchBar/search-query';
 import React, { SyntheticEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AlertState } from './alerts';
 import AlertsFiltersSelected from './alerts-filters-selected';
 
 const POSSIBLE_STATUS = ['ASSESS', 'MALICIOUS', 'NON-MALICIOUS'];
@@ -19,12 +19,12 @@ const DEFAULT_LABELS = [
   'PENDING'
 ];
 
-interface AlertsWorkflowActionsProps {
+type AlertsWorkflowActionsProps = {
   searchQuery: SearchQuery;
-  alert: AlertData;
+  alert: AlertState;
   labelFilters: SearchFilter[];
   onApplyBtnClick: (status: string, selectedPriority: string, selectedLabels: string[]) => void;
-}
+};
 
 const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   searchQuery,
