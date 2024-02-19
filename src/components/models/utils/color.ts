@@ -1,1 +1,1 @@
-export type PossibleColors = 'default' | 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'error';
+export type PossibleColor = 'default' | 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'error';

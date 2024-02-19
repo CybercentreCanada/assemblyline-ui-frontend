@@ -21,7 +21,8 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { Role } from 'components/models/base/user';
-import { MuiColor, SiteMap as TSiteMap } from 'components/models/ui';
+import { SiteMap as TSiteMap } from 'components/models/ui';
+import { PossibleColor } from 'components/models/utils/color';
 import CustomChip from 'components/visual/CustomChip';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,7 +52,7 @@ export default function SiteMap() {
 
   const [siteMap, setSiteMap] = useState<TSiteMap>(null);
 
-  const reqMapColor: Record<Role, MuiColor> = {
+  const reqMapColor: Record<Role, PossibleColor> = {
     signature_import: 'success',
     signature_manage: 'info',
     signature_view: 'default',
