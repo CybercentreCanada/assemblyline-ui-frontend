@@ -58,6 +58,15 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
 
   const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
+      indices: null,
+      created_time: null,
+      started_time: null,
+      completed_time: null,
+      key: null,
+      finished: null,
+      truncated: false,
+      creator: '',
+
       archive_only: false,
       classification: c12nDef?.UNRESTRICTED,
       search_classification: currentUser.classification,

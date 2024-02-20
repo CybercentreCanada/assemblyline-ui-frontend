@@ -143,8 +143,8 @@ const DEFAULT_PARAMS = {
   query: '*',
   offset: 0,
   rows: PAGE_SIZE,
-  sort: 'seen.last+desc',
-  fl: 'seen.last,seen.count,sha256,type,size,classification,from_archive'
+  sort: 'seen.last+desc'
+  // fl: 'seen.last,seen.count,sha256,type,size,classification,from_archive'
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -177,10 +177,15 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
 
   const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
+      indices: null,
+      created_time: null,
+      started_time: null,
+      completed_time: null,
+      key: null,
+
       archive_only: false,
       classification: c12nDef.UNRESTRICTED,
       search_classification: currentUser.classification,
-      key: null,
       created: '2020-01-01T00:00:00.000000Z',
       creator: null,
       description: '',
@@ -757,9 +762,9 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                     </DivTableRow>
                   </DivTableHead>
                   <DivTableBody id="hit-body">
-                    {hitResults.items.map((file, id) => (
+                    {hitResults.items.map((file, i) => (
                       <LinkRow
-                        key={id}
+                        key={i}
                         component={Link}
                         to={`/file/detail/${file.sha256}`}
                         hover

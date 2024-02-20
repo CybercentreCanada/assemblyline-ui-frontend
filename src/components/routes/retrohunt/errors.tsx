@@ -105,12 +105,12 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
   );
 
   const reloadErrors = useCallback(
-    (curCode: string, searchParam: string) => {
+    (curKey: string, searchParam: string) => {
       if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         const curQuery = new SimpleSearchQuery(searchParam, DEFAULT_QUERY);
         apiCall({
           method: 'POST',
-          url: `/api/v4/retrohunt/errors/${curCode}/`,
+          url: `/api/v4/retrohunt/errors/${curKey}/`,
           body: curQuery.getParams(),
           onSuccess: api_data => setErrorResults(api_data.api_response),
           onEnter: () => setIsReloading(true),

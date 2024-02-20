@@ -44,8 +44,8 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
   const { c12nDef } = useALContext();
 
   const RetrohuntStatus = useCallback<React.FC<{ result: RetrohuntResult }>>(
-    (prop = { result: { finished: false, phase: 'finished', percentage: 100 } }) => {
-      let { finished = false, phase = null, percentage = null } = prop.result;
+    ({ result }) => {
+      let { finished = false, phase = 'finished', percentage = 100 } = result;
       phase = finished ? 'finished' : ['filtering', 'yara', 'finished'].includes(phase) ? phase : 'finished';
 
       return (
@@ -123,10 +123,10 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                 )}
               >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  <Tooltip title={retrohunt.created}>
+                  <Tooltip title={retrohunt.created_time}>
                     <>
                       <Moment fromNow locale={i18n.language}>
-                        {retrohunt?.created}
+                        {retrohunt?.created_time}
                       </Moment>
                     </>
                   </Tooltip>
@@ -147,7 +147,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                     <Classification type="text" size="tiny" c12n={retrohunt.classification} format="short" />
                   </DivTableCell>
                 )}
-                <DivTableCell>{retrohunt.total_hits}</DivTableCell>
+                <DivTableCell>{retrohunt?.total_hits}</DivTableCell>
                 <DivTableCell>
                   <RetrohuntStatus result={retrohunt} />
                 </DivTableCell>
