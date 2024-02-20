@@ -47,33 +47,50 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+export type RetrohuntIndex = null | 'hot' | 'archive' | 'hot_and_archive';
+
 export type RetrohuntPhase = null | 'filtering' | 'yara' | 'finished';
 
-export type RetrohuntResult = {
-  archive_only?: boolean;
+export type RetrohuntHit = {
+  key: string;
   classification?: string;
-  code?: string;
-  created?: string;
-  creator?: string;
-  description?: string;
-  errors?: string[];
+  sha256: string;
   expiry_ts?: string;
-  finished?: boolean;
-  hits?: string[];
-  id?: string;
-  percentage?: number;
-  phase?: RetrohuntPhase;
-  progress?: [number, number];
-  raw_query?: string;
-  tags?: object;
-  total_errors?: number;
-  total_hits?: number;
-  truncated?: boolean;
-  ttl?: number;
-  yara_signature?: string;
+  search: string;
 };
 
-type SearchResults = {
+export type RetrohuntResult = {
+  indices: RetrohuntIndex;
+  classification?: string;
+  search_classification?: string;
+  creator: string;
+  description: string;
+  expiry_ts?: string;
+
+  start_group?: number;
+  end_group?: number;
+
+  created_time: string;
+  started_time: string;
+  completed_time: string;
+
+  key: string;
+  raw_query?: string;
+  yara_signature?: string;
+
+  errors?: string[];
+  warnings?: string[];
+  finished: boolean;
+  truncated: boolean;
+
+  total_hits?: number;
+  total_errors?: number;
+
+  // to remove
+  [key: string]: any;
+};
+
+export type SearchResults = {
   items: RetrohuntResult[];
   offset: number;
   rows: number;
@@ -90,14 +107,14 @@ const DEFAULT_PARAMS: object = {
   query: '*',
   offset: 0,
   rows: PAGE_SIZE,
-  fl: 'archive_only,classification,code,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated'
+  fl: 'archive_only,classification,key,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated'
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
   .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
   .join('&');
 
-export default function Retrohunt() {
+export default function RetrohuntPage() {
   const { t } = useTranslation(['retrohunt']);
   const classes = useStyles();
   const location = useLocation();
@@ -172,7 +189,7 @@ export default function Retrohunt() {
 
   const handleCreateRetrohunt = useCallback(
     (retrohunt: RetrohuntResult) => {
-      navigate(`${location.pathname}${location.search}#${retrohunt?.code}`);
+      navigate(`${location.pathname}${location.search}#${retrohunt?.key}`);
     },
     [location.pathname, location.search, navigate]
   );
@@ -195,7 +212,7 @@ export default function Retrohunt() {
   const handleRowClick = useCallback(
     (item: RetrohuntResult) => {
       const hashSearch = new URL(`${window.location.origin}/${location.hash.slice(1)}`);
-      navigate(`${location.pathname}${location.search}#${item?.code}${hashSearch.search}`);
+      navigate(`${location.pathname}${location.search}#${item?.key}${hashSearch.search}`);
     },
     [location, navigate]
   );
@@ -227,7 +244,7 @@ export default function Retrohunt() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<RetrohuntDetail code={location.hash.substr(1)} isDrawer />, { hasMaximize: true });
+      setGlobalDrawer(<RetrohuntDetail search_key={location.hash.substr(1)} isDrawer />, { hasMaximize: true });
     }
   }, [location.hash, setGlobalDrawer]);
 

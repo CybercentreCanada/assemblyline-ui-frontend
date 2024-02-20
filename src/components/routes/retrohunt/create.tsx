@@ -27,6 +27,7 @@ import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
+import user from '../user';
 
 const useStyles = makeStyles(theme => ({
   circularProgress: {
@@ -57,9 +58,19 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
 
   const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
+      indices: null,
+      created_time: null,
+      started_time: null,
+      completed_time: null,
+      key: null,
+      finished: null,
+      truncated: false,
+      creator: '',
+
       archive_only: false,
       classification: c12nDef?.UNRESTRICTED,
-      code: null,
+      search_classification: currentUser.classification,
+      key: null,
       description: '',
       ttl: !configuration.retrohunt.dtl ? 30 : configuration.retrohunt.dtl,
       yara_signature: ''
@@ -87,6 +98,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
         body: {
           archive_only: result.archive_only,
           classification: result.classification,
+          search_classification: result.search_classification,
           description: result.description,
           ttl: result.ttl,
           yara_signature: result.yara_signature
@@ -117,7 +129,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
   }, []);
 
   useEffect(() => {
-    if (retrohunt && retrohunt?.code) {
+    if (retrohunt && retrohunt?.key) {
       onCreateRetrohunt(retrohunt);
     }
   }, [onCreateRetrohunt, retrohunt]);
@@ -149,6 +161,18 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
                 type="picker"
                 c12n={retrohunt.classification}
                 setClassification={(c12n: string) => handleRetrohuntChange({ classification: c12n })}
+                disabled={!currentUser.roles.includes('retrohunt_run') || isDisabled}
+              />
+            </Grid>
+          )}
+
+          {c12nDef.enforce && (
+            <Grid item paddingBottom={theme.spacing(2)}>
+              <Classification
+                format="long"
+                type="picker"
+                c12n={retrohunt.search_classification}
+                setClassification={(c12n: string) => handleRetrohuntChange({ search_classification: c12n })}
                 disabled={!currentUser.roles.includes('retrohunt_run') || isDisabled}
               />
             </Grid>
