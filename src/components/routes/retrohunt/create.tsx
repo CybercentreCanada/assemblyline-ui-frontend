@@ -70,7 +70,6 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
       archive_only: false,
       classification: c12nDef?.UNRESTRICTED,
       search_classification: currentUser.classification,
-      key: null,
       description: '',
       ttl: !configuration.retrohunt.dtl ? 30 : configuration.retrohunt.dtl,
       yara_signature: ''
