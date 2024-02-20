@@ -52,7 +52,8 @@ export type RetrohuntPhase = null | 'filtering' | 'yara' | 'finished';
 export type RetrohuntResult = {
   archive_only?: boolean;
   classification?: string;
-  code?: string;
+  search_classification?: string;
+  key?: string;
   created?: string;
   creator?: string;
   description?: string;
@@ -90,7 +91,7 @@ const DEFAULT_PARAMS: object = {
   query: '*',
   offset: 0,
   rows: PAGE_SIZE,
-  fl: 'archive_only,classification,code,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated'
+  fl: 'archive_only,classification,key,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated'
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -172,7 +173,7 @@ export default function Retrohunt() {
 
   const handleCreateRetrohunt = useCallback(
     (retrohunt: RetrohuntResult) => {
-      navigate(`${location.pathname}${location.search}#${retrohunt?.code}`);
+      navigate(`${location.pathname}${location.search}#${retrohunt?.key}`);
     },
     [location.pathname, location.search, navigate]
   );
@@ -195,7 +196,7 @@ export default function Retrohunt() {
   const handleRowClick = useCallback(
     (item: RetrohuntResult) => {
       const hashSearch = new URL(`${window.location.origin}/${location.hash.slice(1)}`);
-      navigate(`${location.pathname}${location.search}#${item?.code}${hashSearch.search}`);
+      navigate(`${location.pathname}${location.search}#${item?.key}${hashSearch.search}`);
     },
     [location, navigate]
   );
@@ -227,7 +228,7 @@ export default function Retrohunt() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<RetrohuntDetail code={location.hash.substr(1)} isDrawer />);
+      setGlobalDrawer(<RetrohuntDetail search_key={location.hash.substr(1)} isDrawer />);
     }
   }, [location.hash, setGlobalDrawer]);
 

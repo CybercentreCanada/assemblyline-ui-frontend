@@ -131,14 +131,14 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
   }, []);
 
   useEffect(() => {
-    if (open && retrohunt && 'code' in retrohunt) reloadErrors(retrohunt.code, query.getDeltaString());
+    if (open && retrohunt && 'key' in retrohunt) reloadErrors(retrohunt.key, query.getDeltaString());
   }, [open, query, reloadErrors, retrohunt]);
 
   useEffect(() => {
     if (!timer.current && open && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
       timer.current = true;
       setTimeout(() => {
-        reloadErrors(retrohunt.code, query.toString());
+        reloadErrors(retrohunt.key, query.toString());
         timer.current = false;
       }, RELOAD_DELAY);
     }

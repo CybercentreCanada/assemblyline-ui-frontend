@@ -110,7 +110,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
               <LinkRow
                 key={id}
                 component={Link}
-                to={`/retrohunt/${retrohunt.code}`}
+                to={`/retrohunt/${retrohunt.key}`}
                 onClick={event => {
                   if (!onRowClick) return;
                   event.preventDefault();
@@ -119,7 +119,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                 hover
                 style={{ textDecoration: 'none' }}
                 selected={new URL(`${window.location.origin}/${location.hash.slice(1)}`).pathname.endsWith(
-                  `/${retrohunt?.code}`
+                  `/${retrohunt?.key}`
                 )}
               >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>

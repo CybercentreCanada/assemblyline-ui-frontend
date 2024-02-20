@@ -55,6 +55,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import user from '../user';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -124,11 +125,11 @@ type RetrohuntHitResult = {
 };
 
 type ParamProps = {
-  code: string;
+  key: string;
 };
 
 type Props = {
-  code?: string;
+  search_key?: string;
   isDrawer?: boolean;
 };
 
@@ -150,7 +151,7 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
   .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
   .join('&');
 
-function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Props) {
+function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }: Props) {
   const { t, i18n } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const classes = useStyles();
@@ -161,7 +162,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const { indexes } = useALContext();
 
   const { c12nDef, configuration } = useALContext();
-  const { code: paramCode } = useParams<ParamProps>();
+  const { key: paramKey } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [retrohunt, setRetrohunt] = useState<RetrohuntResult>(null);
@@ -178,7 +179,8 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     () => ({
       archive_only: false,
       classification: c12nDef.UNRESTRICTED,
-      code: null,
+      search_classification: currentUser.classification,
+      key: null,
       created: '2020-01-01T00:00:00.000000Z',
       creator: null,
       description: '',
@@ -201,7 +203,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     [c12nDef.UNRESTRICTED]
   );
 
-  const code = useMemo<string>(() => (isDrawer ? propCode.split('?')[0] : paramCode), [isDrawer, paramCode, propCode]);
+  const key = useMemo<string>(() => (isDrawer ? propKey.split('?')[0] : paramKey), [isDrawer, paramKey, propKey]);
 
   const suggestions = useMemo<string[]>(
     () => [...Object.keys(indexes.file).filter(name => indexes.file[name].indexed), ...DEFAULT_SUGGESTION],
@@ -238,10 +240,10 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       if (isDrawer) {
         const delta = search.getDeltaString();
         const searchParam = delta && delta !== '' ? `?${delta}` : '';
-        navigate(`${location.pathname}${location.search}#${code}${searchParam}`);
+        navigate(`${location.pathname}${location.search}#${key}${searchParam}`);
       } else navigate(`${location.pathname}?${search.getDeltaString()}${location.hash}`);
     },
-    [code, isDrawer, location, navigate]
+    [key, isDrawer, location, navigate]
   );
 
   const handleQueryChange = useCallback(
@@ -265,7 +267,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
     () => {
       if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
-          url: `/api/v4/retrohunt/${code}/`,
+          url: `/api/v4/retrohunt/${key}/`,
           onSuccess: api_data => setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response }),
           onEnter: () => setIsReloading(true),
           onExit: () => setIsReloading(false)
@@ -273,7 +275,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [DEFAULT_RETROHUNT, code, configuration?.retrohunt?.enabled, currentUser.roles]
+    [DEFAULT_RETROHUNT, key, configuration?.retrohunt?.enabled, currentUser.roles]
   );
 
   const reloadHits = useCallback(
@@ -281,7 +283,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
           method: 'POST',
-          url: `/api/v4/retrohunt/hits/${code}/`,
+          url: `/api/v4/retrohunt/hits/${key}/`,
           body: {
             ...curQuery.getParams(),
             filters: curQuery.getAll('filters', [])
@@ -300,7 +302,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
         });
         apiCall({
           method: 'POST',
-          url: `/api/v4/retrohunt/types/${code}/`,
+          url: `/api/v4/retrohunt/types/${key}/`,
           body: {
             query: curQuery.get('query', DEFAULT_PARAMS?.query),
             filters: curQuery.getAll('filters', [])
@@ -318,7 +320,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [code, configuration?.retrohunt?.enabled, currentUser.roles]
+    [key, configuration?.retrohunt?.enabled, currentUser.roles]
   );
 
   const handleHitRowClick = useCallback(
@@ -342,7 +344,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
 
   useEffect(() => {
     reloadData();
-  }, [code, reloadData]);
+  }, [key, reloadData]);
 
   useEffect(() => {
     if (query) reloadHits(query);
@@ -414,7 +416,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
             <Grid container flexDirection="row">
               <Grid item flexGrow={1}>
                 <Typography variant="h4" children={!retrohunt ? <Skeleton width="30rem" /> : t('header.view')} />
-                <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.code} />
+                <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.key} />
               </Grid>
               {!retrohunt ? (
                 <Grid item>
@@ -810,10 +812,4 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
 }
 
 export const RetrohuntDetail = React.memo(WrappedRetrohuntDetail);
-
-const defaultProps: Props = {
-  code: null,
-  isDrawer: false
-};
-WrappedRetrohuntDetail.defaultProps = defaultProps;
 export default WrappedRetrohuntDetail;
