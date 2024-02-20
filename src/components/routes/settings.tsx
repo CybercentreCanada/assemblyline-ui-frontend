@@ -717,7 +717,6 @@ function Settings() {
               disabled={!editable}
               service_spec={settings.service_spec}
               setParam={setParam}
-              setParamAsync={setParam}
               compressed
               hasResetButton
             />
