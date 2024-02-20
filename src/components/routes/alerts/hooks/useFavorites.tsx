@@ -14,19 +14,27 @@ export interface Favorite {
 interface UsingFavorites {
   onAddUserFavorite: (
     favorite: { query: string; name: string },
-    onSuccess?: (favorite: { query: string; name: string }) => void
+    onSuccess?: (favorite: { query: string; name: string }) => void,
+    onEnter?: () => void,
+    onExit?: () => void
   ) => void;
   onDeleteUserFavorite: (
     favorite: { query: string; name: string },
-    onSuccess?: (favorite: { query: string; name: string }) => void
+    onSuccess?: (favorite: { query: string; name: string }) => void,
+    onEnter?: () => void,
+    onExit?: () => void
   ) => void;
   onAddGlobalFavorite: (
     favorite: { query: string; name: string },
-    onSuccess?: (favorite: { query: string; name: string }) => void
+    onSuccess?: (favorite: { query: string; name: string }) => void,
+    onEnter?: () => void,
+    onExit?: () => void
   ) => void;
   onDeleteGlobalFavorite: (
     favorite: { query: string; name: string },
-    onSuccess?: (favorite: { query: string; name: string }) => void
+    onSuccess?: (favorite: { query: string; name: string }) => void,
+    onEnter?: () => void,
+    onExit?: () => void
   ) => void;
   userFavorites: Favorite[];
   globalFavorites: Favorite[];
@@ -44,7 +52,9 @@ export default function useFavorites(): UsingFavorites {
   // Hook API:
   const onAddUserFavorite = (
     favorite: { query: string; name: string },
-    onSuccess: (favorite: { query: string; name: string }) => void
+    onSuccess: (favorite: { query: string; name: string }) => void,
+    onEnter: () => void = null,
+    onExit: () => void = null
   ) => {
     const url = `/api/v4/user/favorites/${user.username}/alert/`;
     apiCall({
@@ -58,12 +68,19 @@ export default function useFavorites(): UsingFavorites {
             onSuccess(favorite);
           }
         }
-      }
+      },
+      onEnter: () => onEnter && onEnter(),
+      onExit: () => onExit && onExit()
     });
   };
 
   // Hook API:
-  const onDeleteUserFavorite = (favorite: Favorite, onSuccess: (favorite: Favorite) => void) => {
+  const onDeleteUserFavorite = (
+    favorite: Favorite,
+    onSuccess: (favorite: Favorite) => void,
+    onEnter: () => void = null,
+    onExit: () => void = null
+  ) => {
     const url = `/api/v4/user/favorites/${user.username}/alert/`;
     apiCall({
       url,
@@ -76,7 +93,9 @@ export default function useFavorites(): UsingFavorites {
             onSuccess(favorite);
           }
         }
-      }
+      },
+      onEnter: () => onEnter && onEnter(),
+      onExit: () => onExit && onExit()
     });
   };
 
@@ -104,7 +123,9 @@ export default function useFavorites(): UsingFavorites {
 
   const onAddGlobalFavorite = (
     favorite: { query: string; name: string },
-    onSuccess: (favorite: { query: string; name: string }) => void
+    onSuccess: (favorite: { query: string; name: string }) => void,
+    onEnter: () => void = null,
+    onExit: () => void = null
   ) => {
     const url = '/api/v4/user/favorites/__global__/alert/';
     const fav = { ...favorite, created_by: user.username };
@@ -119,12 +140,19 @@ export default function useFavorites(): UsingFavorites {
             onSuccess(fav);
           }
         }
-      }
+      },
+      onEnter: () => onEnter && onEnter(),
+      onExit: () => onExit && onExit()
     });
   };
 
   // Hook API:
-  const onDeleteGlobalFavorite = (favorite: Favorite, onSuccess: (favorite: Favorite) => void) => {
+  const onDeleteGlobalFavorite = (
+    favorite: Favorite,
+    onSuccess: (favorite: Favorite) => void,
+    onEnter: () => void = null,
+    onExit: () => void = null
+  ) => {
     const url = '/api/v4/user/favorites/__global__/alert/';
     apiCall({
       url,
@@ -137,7 +165,9 @@ export default function useFavorites(): UsingFavorites {
             onSuccess(favorite);
           }
         }
-      }
+      },
+      onEnter: () => onEnter && onEnter(),
+      onExit: () => onExit && onExit()
     });
   };
 

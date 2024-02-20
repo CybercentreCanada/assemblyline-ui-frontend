@@ -9,7 +9,7 @@ import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   DivTable,
   DivTableBody,
@@ -44,17 +44,19 @@ type SearchResults = {
 
 type ResultsTableProps = {
   resultResults: SearchResults;
+  component?: any;
   allowSort?: boolean;
 };
 
-const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allowSort = true }) => {
+const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, component = Paper, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
   const theme = useTheme();
+  const location = useLocation();
 
   return resultResults ? (
     resultResults.total !== 0 ? (
-      <TableContainer component={Paper}>
+      <TableContainer component={component}>
         <DivTable>
           <DivTableHead>
             <DivTableRow>
@@ -86,7 +88,7 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
               <LinkRow
                 key={id}
                 component={Link}
-                to={`/file/detail/${result.id.substring(0, 64)}`}
+                to={`/file/detail/${result.id.substring(0, 64)}${location.hash}`}
                 hover
                 style={{ textDecoration: 'none' }}
               >

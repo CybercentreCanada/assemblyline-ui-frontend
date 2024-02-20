@@ -20,11 +20,13 @@ const Toc: ContentWithTOCItemDef[] = [
     subItems: [
       { id: 'fields.legend' },
       { id: 'fields.idx_alert' },
+      { id: 'fields.idx_badlist' },
       { id: 'fields.idx_emptyresult', is_admin: true },
       { id: 'fields.idx_error', is_admin: true },
       { id: 'fields.idx_file' },
       { id: 'fields.idx_heuristic' },
       { id: 'fields.idx_result' },
+      { id: 'fields.idx_retrohunt' },
       { id: 'fields.idx_safelist' },
       { id: 'fields.idx_signature' },
       { id: 'fields.idx_submission' },

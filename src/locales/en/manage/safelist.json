@@ -1,4 +1,5 @@
 {
+  "add_safelist": "Add an item to the safelist",
   "filter": "Filter safelisted hashes...",
   "filtered": "hash matching filter",
   "filtereds": "hashes matching filter",

@@ -11,6 +11,7 @@ import adminSiteMapEN from 'locales/en/admin/site_map.json';
 import adminTagSafelistEN from 'locales/en/admin/tag_safelist.json';
 import adminUsersEN from 'locales/en/admin/users.json';
 import alertsEN from 'locales/en/alerts.json';
+import archiveEN from 'locales/en/archive.json';
 import authorizeEN from 'locales/en/authorize.json';
 import carouselEN from 'locales/en/carousel.json';
 import dashboardEN from 'locales/en/dashboard.json';
@@ -26,9 +27,13 @@ import helpServicesEN from 'locales/en/help/services.json';
 import lockedEN from 'locales/en/locked.json';
 import loginEN from 'locales/en/login.json';
 import logoutEN from 'locales/en/logout.json';
+import manageBadlistEN from 'locales/en/manage/badlist.json';
+import manageBadlistAddEN from 'locales/en/manage/badlist_add.json';
+import manageBadlistDetailEN from 'locales/en/manage/badlist_detail.json';
 import manageHeuristicsEN from 'locales/en/manage/heuristics.json';
 import manageHeuristicDetailEN from 'locales/en/manage/heuristic_detail.json';
 import manageSafelistEN from 'locales/en/manage/safelist.json';
+import manageSafelistAddEN from 'locales/en/manage/safelist_add.json';
 import manageSafelistDetailEN from 'locales/en/manage/safelist_detail.json';
 import manageSignaturesEN from 'locales/en/manage/signatures.json';
 import manageSignatureDetailEN from 'locales/en/manage/signature_detail.json';
@@ -59,6 +64,7 @@ import adminSiteMapFR from 'locales/fr/admin/site_map.json';
 import adminTagSafelistFR from 'locales/fr/admin/tag_safelist.json';
 import adminUsersFR from 'locales/fr/admin/users.json';
 import alertsFR from 'locales/fr/alerts.json';
+import archiveFR from 'locales/fr/archive.json';
 import authorizeFR from 'locales/fr/authorize.json';
 import carouselFR from 'locales/fr/carousel.json';
 import dashboardFR from 'locales/fr/dashboard.json';
@@ -74,9 +80,13 @@ import helpServicesFR from 'locales/fr/help/services.json';
 import lockedFR from 'locales/fr/locked.json';
 import loginFR from 'locales/fr/login.json';
 import logoutFR from 'locales/fr/logout.json';
+import manageBadlistFR from 'locales/fr/manage/badlist.json';
+import manageBadlistAddFR from 'locales/fr/manage/badlist_add.json';
+import manageBadlistDetailFR from 'locales/fr/manage/badlist_detail.json';
 import manageHeuristicsFR from 'locales/fr/manage/heuristics.json';
 import manageHeuristicDetailFR from 'locales/fr/manage/heuristic_detail.json';
 import manageSafelistFR from 'locales/fr/manage/safelist.json';
+import manageSafelistAddFR from 'locales/fr/manage/safelist_add.json';
 import manageSafelistDetailFR from 'locales/fr/manage/safelist_detail.json';
 import manageSignaturesFR from 'locales/fr/manage/signatures.json';
 import manageSignatureDetailFR from 'locales/fr/manage/signature_detail.json';
@@ -108,6 +118,7 @@ const resources = {
     adminSiteMap: adminSiteMapEN,
     adminTagSafelist: adminTagSafelistEN,
     adminUsers: adminUsersEN,
+    archive: archiveEN,
     authorize: authorizeEN,
     carousel: carouselEN,
     dashboard: dashboardEN,
@@ -131,8 +142,12 @@ const resources = {
     manageSignatureSources: manageSignatureSourcesEN,
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
+    manageSafelistAdd: manageSafelistAddEN,
     manageSafelistDetail: manageSafelistDetailEN,
     manageSafelist: manageSafelistEN,
+    manageBadlistAdd: manageBadlistAddEN,
+    manageBadlistDetail: manageBadlistDetailEN,
+    manageBadlist: manageBadlistEN,
     notification: notificationEN,
     retrohunt: retrohuntEN,
     search: searchEN,
@@ -158,6 +173,7 @@ const resources = {
     adminSiteMap: adminSiteMapFR,
     adminTagSafelist: adminTagSafelistFR,
     adminUsers: adminUsersFR,
+    archive: archiveFR,
     authorize: authorizeFR,
     carousel: carouselFR,
     dashboard: dashboardFR,
@@ -181,8 +197,12 @@ const resources = {
     manageSignatureSources: manageSignatureSourcesFR,
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
+    manageSafelistAdd: manageSafelistAddFR,
     manageSafelistDetail: manageSafelistDetailFR,
     manageSafelist: manageSafelistFR,
+    manageBadlistAdd: manageBadlistAddFR,
+    manageBadlistDetail: manageBadlistDetailFR,
+    manageBadlist: manageBadlistFR,
     notification: notificationFR,
     retrohunt: retrohuntFR,
     search: searchFR,

@@ -1,33 +1,24 @@
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
-import { Collapse, Divider, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Collapse, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
+import { Result } from 'components/visual/ResultCard';
+import ResultSection, { Section } from 'components/visual/ResultCard/result_section';
+import SectionContainer from 'components/visual/SectionContainer';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Result } from '../ResultCard';
-import ResultSection, { Section } from '../ResultCard/result_section';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const HEUR_LEVELS = ['malicious' as 'malicious', 'suspicious' as 'suspicious', 'info' as 'info', 'safe' as 'safe'];
 const DEFAULT_SEC_SCORE = -1000;
 const SCORE_SHOW_THRESHOLD = 0;
 
 const useStyles = makeStyles(theme => ({
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  },
   header: {
     fontWeight: 500,
     fontSize: 'larger',
@@ -108,6 +99,8 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
   const { isHighlighted, triggerHighlight, getKey } = useHighlighter();
   const classes = useStyles();
   const theme = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { showSafeResults } = useSafeResults();
 
   const highlighted = isHighlighted(getKey('heuristic', id));
@@ -134,8 +127,9 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
         <div onClick={stopPropagating} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
           <Tooltip title={t('related')}>
             <IconButton
+              component={Link}
               size="small"
-              href={`/search/result?query=result.sections.heuristic.heur_id:${safeFieldValueURI(id)}`}
+              to={`/search/result?query=result.sections.heuristic.heur_id:${safeFieldValueURI(id)}`}
               color="inherit"
             >
               <SearchOutlinedIcon />
@@ -147,7 +141,16 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
             </IconButton>
           </Tooltip>
           <Tooltip title={t('goto_heuristic')}>
-            <IconButton size="small" href={`/manage/heuristic/${id}`} color="inherit">
+            <IconButton
+              component={Link}
+              size="small"
+              to={`/manage/heuristic/${id}`}
+              color="inherit"
+              onClick={e => {
+                e.preventDefault();
+                navigate(`${location.pathname.split('/').slice(0, 4).join('/')}#${id}`);
+              }}
+            >
               <OpenInNewOutlinedIcon />
             </IconButton>
           </Tooltip>
@@ -173,21 +176,19 @@ type WrappedDetectionProps = {
   results?: Result[];
   section_map?: { [heur_id: string]: Section[] };
   force?: boolean;
+  nocollapse?: boolean;
 };
 
 const WrappedDetection: React.FC<WrappedDetectionProps> = ({
   heuristics,
   results,
   section_map = null,
-  force = false
+  force = false,
+  nocollapse = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
-  const [open, setOpen] = React.useState(true);
   const [sectionMap, setSectionMap] = React.useState({});
   const [maxScore, setMaxScore] = React.useState(DEFAULT_SEC_SCORE);
-  const theme = useTheme();
-  const classes = useStyles();
-  const sp2 = theme.spacing(2);
   const { showSafeResults } = useSafeResults();
 
   useEffect(() => {
@@ -233,38 +234,23 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({
 
   return (heuristics && Object.keys(heuristics).length === 0) ||
     (heuristics && maxScore < SCORE_SHOW_THRESHOLD && !showSafeResults && !force) ? null : (
-    <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-      <Typography
-        variant="h6"
-        onClick={() => {
-          setOpen(!open);
-        }}
-        className={classes.title}
-      >
-        <span>{t('heuristics')}</span>
-        {open ? <ExpandLess /> : <ExpandMore />}
-      </Typography>
-      <Divider />
-      <Collapse in={open} timeout="auto">
-        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-          {sectionMap && heuristics
-            ? HEUR_LEVELS.map((lvl, lid) => {
-                return heuristics[lvl] ? (
-                  <div key={lid}>
-                    {heuristics[lvl].map(([hid, hname], idx) => {
-                      return (
-                        <div key={idx}>
-                          <Heuristic name={hname} id={hid} sections={sectionMap[hid]} level={lvl} force={force} />
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : null;
-              })
-            : [...Array(3)].map((_, i) => <Skeleton key={i} style={{ height: '3rem' }} />)}
-        </div>
-      </Collapse>
-    </div>
+    <SectionContainer title={t('heuristics')} nocollapse={nocollapse}>
+      {sectionMap && heuristics
+        ? HEUR_LEVELS.map((lvl, lid) => {
+            return heuristics[lvl] ? (
+              <div key={lid}>
+                {heuristics[lvl].map(([hid, hname], idx) => {
+                  return (
+                    <div key={idx}>
+                      <Heuristic name={hname} id={hid} sections={sectionMap[hid]} level={lvl} force={force} />
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null;
+          })
+        : [...Array(3)].map((_, i) => <Skeleton key={i} style={{ height: '3rem' }} />)}
+    </SectionContainer>
   );
 };
 

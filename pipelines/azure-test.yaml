@@ -1,0 +1,44 @@
+name: tests
+
+trigger: ['*']
+pr: ['*']
+
+pool:
+  vmImage: 'ubuntu-20.04'
+
+jobs:
+  - job: run_test
+    strategy:
+      matrix:
+        node_18:
+          node.version: '18.x'
+
+    timeoutInMinutes: 15
+
+    steps:
+      - task: NodeTool@0
+        displayName: 'Set node version'
+        inputs:
+          versionSpec: $(node.version)
+
+      - checkout: self
+        displayName: Checkout assemblyline-ui-frontend
+
+      - script: |
+          # Try to checkout the matching branch, if the command fails, don't care.
+          export BRANCH_NAME=$(basename -- "$SYSTEM_PULLREQUEST_SOURCEBRANCH")
+          export BRANCH_NAME=${BRANCH_NAME:-"$BUILD_SOURCEBRANCHNAME"}
+          git checkout -b $BRANCH_NAME -t origin/$BRANCH_NAME || true
+
+          yarn install
+        displayName: Install assemblyline-ui-frontend
+
+      - script: |
+          set -xv  # Echo commands before they are run
+          npm run ci
+        displayName: Test
+
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml

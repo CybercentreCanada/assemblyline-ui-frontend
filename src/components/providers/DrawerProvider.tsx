@@ -1,7 +1,10 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import { Drawer, IconButton, useMediaQuery, useTheme } from '@mui/material';
+import DoubleArrowOutlinedIcon from '@mui/icons-material/DoubleArrowOutlined';
+import { Drawer, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import clsx from 'clsx';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const GD_EVENT_PREVENTED = 'GlobalDrawerClose.Prevented';
 export const GD_EVENT_PROCEED = 'GlobalDrawerClose.Proceed';
@@ -9,6 +12,7 @@ const XLWidth = '45vw';
 const LGWidth = '75%';
 const MDWidth = '85%';
 const SMWidth = '100%';
+const MAXIMIZE_CLASS = 'maximize';
 
 const useStyles = makeStyles(theme => ({
   appMain: {
@@ -40,6 +44,7 @@ const useStyles = makeStyles(theme => ({
     transition: 'width 225ms cubic-bezier(0, 0, 0.2, 1) 0ms'
   },
   paper: {
+    transition: `${theme.transitions.create(['all'])} !important`,
     [theme.breakpoints.only('xl')]: {
       width: XLWidth
     },
@@ -51,6 +56,31 @@ const useStyles = makeStyles(theme => ({
     },
     [theme.breakpoints.down('md')]: {
       width: SMWidth
+    },
+    [`&.${MAXIMIZE_CLASS}`]: {
+      width: '90vw'
+    }
+  },
+  drawerTop: {
+    display: 'flex',
+    flexDirection: 'row',
+    columnGap: theme.spacing(1),
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(1),
+    position: 'sticky',
+    top: 0,
+    zIndex: 5
+  },
+  drawerContent: {
+    height: '100%',
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2)
+  },
+  maximizeIcon: {
+    transform: 'rotate(180deg)',
+    transition: theme.transitions.create(['all']),
+    [`&.${MAXIMIZE_CLASS}`]: {
+      transform: 'rotate(0deg)'
     }
   }
 }));
@@ -58,7 +88,7 @@ const useStyles = makeStyles(theme => ({
 export type DrawerContextProps = {
   closeGlobalDrawer: () => void;
   closeTemporaryDrawer: () => void;
-  setGlobalDrawer: (elements: React.ReactElement<any>) => void;
+  setGlobalDrawer: (elements: React.ReactElement<any>, options?: { hasMaximize?: boolean }) => void;
   setDrawerClosePrompt: (boolean) => void;
   subscribeCloseDrawer: (callback: () => void) => () => boolean;
   globalDrawer: React.ReactElement<any>;
@@ -71,30 +101,33 @@ export interface DrawerProviderProps {
 
 export const DrawerContext = React.createContext<DrawerContextProps>(null);
 
-function DrawerProvider(props: DrawerProviderProps) {
-  const { children } = props;
-  const [globalDrawer, setGlobalDrawerState] = useState(null);
-  const [globalDrawerOpened, setGlobalDrawerOpened] = useState(false);
-  const [drawerClosePrompt, setDrawerClosePrompt] = useState(false);
-  const [nextDrawer, setNextDrawer] = useState(null);
+function DrawerProvider({ children }: DrawerProviderProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const classes = useStyles();
   const isMD = useMediaQuery(theme.breakpoints.only('md'));
   const isLG = useMediaQuery(theme.breakpoints.only('lg'));
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
+  const [globalDrawer, setGlobalDrawerState] = useState<any>(null);
+  const [globalDrawerOpened, setGlobalDrawerOpened] = useState<boolean>(false);
+  const [drawerClosePrompt, setDrawerClosePrompt] = useState<boolean>(false);
+  const [nextDrawer, setNextDrawer] = useState<any>(null);
+  const [isMaximized, setIsMaximized] = useState<boolean>(null);
+
   const subscribers = useRef(new Set<() => void>());
 
   const drawerWidth = isXL ? XLWidth : isLG ? LGWidth : isMD ? MDWidth : SMWidth;
 
   const setGlobalDrawer = useCallback(
-    newDrawer => {
+    (newDrawer, options = { hasMaximize: false }) => {
       if (drawerClosePrompt) {
         setNextDrawer(newDrawer);
         window.dispatchEvent(new CustomEvent(GD_EVENT_PREVENTED));
       } else {
         setNextDrawer(null);
         setGlobalDrawerState(newDrawer);
+        setIsMaximized(options?.hasMaximize ? false : null);
       }
     },
     [drawerClosePrompt]
@@ -149,45 +182,34 @@ function DrawerProvider(props: DrawerProviderProps) {
           [children, classes.appContent]
         )}
         <Drawer
+          classes={{ root: classes.appRightDrawer, paper: clsx(classes.paper, isMaximized && MAXIMIZE_CLASS) }}
           open={globalDrawerOpened}
-          className={classes.appRightDrawer}
-          style={{
-            width: globalDrawer ? drawerWidth : 0
-          }}
-          classes={{ paper: classes.paper }}
           anchor="right"
           variant={isXL ? 'persistent' : 'temporary'}
+          style={{ width: globalDrawer ? drawerWidth : 0 }}
           onClose={closeGlobalDrawer}
         >
           {useMemo(
             () => (
               <>
-                <div
-                  id="drawerTop"
-                  style={{
-                    backgroundColor: theme.palette.background.paper,
-                    padding: theme.spacing(1),
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 5
-                  }}
-                >
-                  <IconButton onClick={closeGlobalDrawer} size="large">
-                    <CloseOutlinedIcon />
-                  </IconButton>
+                <div id="drawerTop" className={classes.drawerTop}>
+                  <IconButton size="large" onClick={closeGlobalDrawer} children={<CloseOutlinedIcon />} />
+                  {isXL && isMaximized !== null && (
+                    <Tooltip title={isMaximized ? t('drawer.minimize') : t('drawer.maximize')}>
+                      <IconButton size="large" onClick={() => setIsMaximized(v => !v)}>
+                        <DoubleArrowOutlinedIcon
+                          className={clsx(classes.maximizeIcon, isMaximized && MAXIMIZE_CLASS)}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </div>
-                <div
-                  style={{
-                    paddingLeft: theme.spacing(2),
-                    paddingRight: theme.spacing(2),
-                    flex: 1
-                  }}
-                >
+                <div id="drawerContent" className={classes.drawerContent}>
                   {globalDrawer}
                 </div>
               </>
             ),
-            [globalDrawer, theme, closeGlobalDrawer]
+            [classes, t, closeGlobalDrawer, isXL, isMaximized, globalDrawer]
           )}
         </Drawer>
       </div>

@@ -30,6 +30,7 @@
     "@types/react-dom": "^18.0.11",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
+    "autosuggest-highlight": "^3.3.4",
     "browser-detect": "^0.2.28",
     "buffer": "^6.0.3",
     "chart.js": "^4.2.1",
@@ -40,9 +41,9 @@
     "date-fns": "^2.29.3",
     "dompurify": "^3.0.0",
     "fontsource-roboto": "^2.2.6",
+    "history": "^5.3.0",
     "i18next": "^22.4.9",
     "i18next-browser-languagedetector": "^7.0.1",
-    "history": "^5.3.0",
     "lodash": "^4.17.21",
     "md5": "^2.3.0",
     "moment": "^2.29.4",
@@ -75,7 +76,8 @@
   "scripts": {
     "start": "WDS_SOCKET_PORT=443 HTTPS=true BROWSER=none react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --coverage",
+    "ci": "CI=true react-scripts test --coverage --coverageReporters=cobertura",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -100,6 +102,7 @@
     "@iconify/icons-logos": "^1.2.23",
     "@iconify/icons-simple-icons": "^1.2.43",
     "@iconify/react": "^4.1.0",
+    "@jest/globals": "^29.6.4",
     "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@types/react-window": "^1.8.5",
     "eslint": "^8.34.0",
@@ -117,6 +120,19 @@
     "prettier": "^2.8.4",
     "prettier-plugin-organize-imports": "^3.2.2",
     "react-icons": "^4.7.1",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.1",
     "webpack-cli": "^5.0.1"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(react-markdown)/)"
+    ],
+    "moduleNameMapper": {
+      "react-markdown": "<rootDir>/node_modules/react-markdown/react-markdown.min.js"
+    }
   }
 }

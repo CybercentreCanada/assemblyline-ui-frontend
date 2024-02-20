@@ -1,7 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
@@ -16,7 +18,6 @@ import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
-import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchIcon from '@mui/icons-material/Search';
@@ -24,6 +25,7 @@ import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplic
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { AppBarUserMenuElement, AppLeftNavElement, AppPreferenceConfigs } from 'commons/components/app/AppConfigs';
 import { Notification } from 'components/visual/Notification';
@@ -115,6 +117,20 @@ const useMyPreferences = () => {
           userPropValidators: [{ prop: 'user.roles', value: 'alert_view' }],
           icon: <NotificationImportantOutlinedIcon />,
           route: '/alerts',
+          nested: false
+        }
+      },
+      {
+        type: 'item' as 'item',
+        element: {
+          id: 'archive',
+          i18nKey: 'drawer.archive',
+          userPropValidators: [
+            { prop: 'user.roles', value: 'archive_view', enforce: true },
+            { prop: 'configuration.datastore.archive.enabled', value: true, enforce: true }
+          ],
+          icon: <ArchiveOutlinedIcon />,
+          route: '/archive',
           nested: false
         }
       },
@@ -219,6 +235,7 @@ const useMyPreferences = () => {
           id: 'manage',
           i18nKey: 'drawer.manage',
           userPropValidators: [
+            { prop: 'user.roles', value: 'badlist_view' },
             { prop: 'user.roles', value: 'heuristic_view' },
             { prop: 'user.roles', value: 'safelist_view' },
             { prop: 'user.roles', value: 'signature_view' },
@@ -227,6 +244,14 @@ const useMyPreferences = () => {
           ],
           icon: <BuildOutlinedIcon />,
           items: [
+            {
+              id: 'manage.badlist',
+              i18nKey: 'drawer.manage.badlist',
+              userPropValidators: [{ prop: 'user.roles', value: 'badlist_view' }],
+              icon: <BugReportOutlinedIcon />,
+              route: '/manage/badlist',
+              nested: true
+            },
             {
               id: 'manage.heuristics',
               i18nKey: 'drawer.manage.heuristics',
@@ -239,7 +264,7 @@ const useMyPreferences = () => {
               id: 'manage.safelist',
               i18nKey: 'drawer.manage.safelist',
               userPropValidators: [{ prop: 'user.roles', value: 'safelist_view' }],
-              icon: <PlaylistAddCheckIcon />,
+              icon: <VerifiedUserOutlinedIcon />,
               route: '/manage/safelist',
               nested: true
             },
@@ -325,7 +350,7 @@ const useMyPreferences = () => {
               id: 'adminmenu.tag_safelist',
               i18nKey: 'adminmenu.tag_safelist',
               route: '/admin/tag_safelist',
-              icon: <PlaylistAddCheckIcon />,
+              icon: <VerifiedUserOutlinedIcon />,
               nested: true
             },
             {

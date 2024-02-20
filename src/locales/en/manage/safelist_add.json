@@ -1,0 +1,23 @@
+{
+  "add.success": "The safelist item was successfully added to the system.",
+  "details": "Item Details",
+  "expiry.title": "Expiry date",
+  "file": "File",
+  "file.hashes": "File Hashes (One of MD5, SHA1 or SHA256 is required) *",
+  "file.prop": "File Properties (Optional)",
+  "file.name": "Name",
+  "file.size": "Size",
+  "file.type": "Type",
+  "information": "Information",
+  "information.tag": "Tag Information",
+  "information.signature": "Signature Information",
+  "information.file": "File Information",
+  "reason.title": "What is the reason for this to be added to the safelist?",
+  "signature": "Signature",
+  "signature.name.title": "Signature name",
+  "tag": "Tag",
+  "tag.type.title": "Type of tag",
+  "tag.value.title": "Value of the tag",
+  "title": "New Safelist Item",
+  "type.title": "Select the type of item to add"
+}

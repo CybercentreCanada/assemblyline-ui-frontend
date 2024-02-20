@@ -2,12 +2,11 @@ import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
-import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
+import ExternalLinks from 'components/visual/ExternalSearch';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
-import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 
-const STYLE = { height: 'auto', minHeight: '20px' };
+const STYLE = { height: 'auto', minHeight: '22px' };
 const initialMenuState = {
   mouseX: null,
   mouseY: null
@@ -45,14 +44,6 @@ const WrappedTag: React.FC<TagProps> = ({
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
-  const { lookupState, searchTagExternal } = useSearchTagExternal({
-    [type]: {
-      results: {},
-      errors: {},
-      success: null
-    }
-  });
-
   let maliciousness = lvl || scoreToVerdict(score);
   if (safelisted) {
     maliciousness = 'safe';
@@ -82,7 +73,6 @@ const WrappedTag: React.FC<TagProps> = ({
         value={value}
         state={state}
         setState={setState}
-        searchTagExternal={searchTagExternal}
         classification={classification}
         highlight_key={highlight_key}
       />
@@ -97,16 +87,7 @@ const WrappedTag: React.FC<TagProps> = ({
         onClick={highlight_key ? handleClick : null}
         fullWidth={fullWidth}
         onContextMenu={handleMenuClick}
-        icon={
-          lookupState && lookupState[type] ? (
-            <ExternalLinks
-              success={lookupState[type].success}
-              results={lookupState[type].results}
-              errors={lookupState[type].errors}
-              iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
-            />
-          ) : null
-        }
+        icon={<ExternalLinks category={'tag'} type={type} value={value} />}
       />
     </>
   );

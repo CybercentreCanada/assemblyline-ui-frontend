@@ -18,6 +18,7 @@ type IndexDefinition = {
 
 type IndexDefinitionMap = {
   alert: IndexDefinition;
+  badlist: IndexDefinition;
   file: IndexDefinition;
   heuristic: IndexDefinition;
   result: IndexDefinition;
@@ -33,6 +34,7 @@ type SettingsDefinition = {
   deep_scan: boolean;
   description: string;
   download_encoding: string;
+  executive_summary: boolean;
   expand_min_score: number;
   ignore_cache: boolean;
   ignore_dynamic_recursion_prevention: boolean;
@@ -59,6 +61,11 @@ export type ExternalLink = {
   name: string;
   replace_pattern: string;
   url: string;
+};
+
+export type ExternalSource = {
+  max_classification: string;
+  name: string;
 };
 
 export type ConfigurationDefinition = {
@@ -95,6 +102,9 @@ export type ConfigurationDefinition = {
     version: string;
   };
   ui: {
+    ai: {
+      enabled: boolean;
+    };
     alerting_meta: {
       important: string[];
       subject: string[];
@@ -115,16 +125,18 @@ export type ConfigurationDefinition = {
       hash: { [key: string]: ExternalLink[] };
       metadata: { [key: string]: ExternalLink[] };
     };
-    external_sources: string[];
+    external_sources: ExternalSource[];
     external_source_tags: {
       [tag_name: string]: string[];
     };
+    fqdn: string;
     read_only: boolean;
     rss_feeds: string[];
     services_feed: string;
     tos: boolean;
     tos_lockout: boolean;
     tos_lockout_notify: boolean;
+    url_submission_auto_service_selection: string[];
   };
   user: {
     api_priv_map: {

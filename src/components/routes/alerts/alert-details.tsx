@@ -13,6 +13,7 @@ import {
   Skeleton,
   Tooltip,
   Typography,
+  useMediaQuery,
   useTheme
 } from '@mui/material';
 import Alert from '@mui/material/Alert';
@@ -30,6 +31,7 @@ import ActionableText from 'components/visual/ActionableText';
 import { ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
+import { ImageInline } from 'components/visual/image_inline';
 import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
 import { verdictToColor } from 'helpers/utils';
@@ -141,8 +143,9 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const [metaOpen, setMetaOpen] = React.useState(false);
   const [viewHistory, setViewHistory] = React.useState(false);
   const [hasEvents, setHasEvents] = React.useState(false);
+  const upSM = useMediaQuery(theme.breakpoints.up('sm'));
   // eslint-disable-next-line
-  const { t, i18n } = useTranslation(['alerts']);
+  const { t } = useTranslation(['alerts']);
 
   useEffect(() => {
     const alertId = id || paramId;
@@ -191,32 +194,34 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
             <Grid item xs>
               <Typography variant="h4">{t('detail.title')}</Typography>
             </Grid>
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-              {item ? (
-                <>
-                  <Tooltip title={t(hasEvents ? 'history' : 'history.none')}>
-                    <IconButton
-                      disableRipple={!hasEvents}
-                      style={{
-                        color: hasEvents ? theme.palette.action.active : theme.palette.action.disabled
-                      }}
-                      size="large"
-                      onClick={() => {
-                        if (hasEvents) {
-                          setViewHistory(true);
-                        }
-                      }}
-                    >
-                      <WorkHistoryOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <AlertEventsTable alert={item} viewHistory={viewHistory} setViewHistory={setViewHistory} />
-                </>
-              ) : (
-                <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              )}
-            </Grid>
-            {currentUser.roles.includes('submission_view') && (
+            {!id && (
+              <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+                {item ? (
+                  <>
+                    <Tooltip title={t(hasEvents ? 'history' : 'history.none')}>
+                      <IconButton
+                        disableRipple={!hasEvents}
+                        style={{
+                          color: hasEvents ? theme.palette.action.active : theme.palette.action.disabled
+                        }}
+                        size="large"
+                        onClick={() => {
+                          if (hasEvents) {
+                            setViewHistory(true);
+                          }
+                        }}
+                      >
+                        <WorkHistoryOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <AlertEventsTable alert={item} viewHistory={viewHistory} setViewHistory={setViewHistory} />
+                  </>
+                ) : (
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                )}
+              </Grid>
+            )}
+            {!id && currentUser.roles.includes('submission_view') && (
               <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
                 {item ? (
                   <Tooltip title={t('submission')}>
@@ -377,7 +382,15 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
         <div className={classes.section}>
           <Typography className={classes.sectionTitle}>{t('file_info')}</Typography>
           <Divider />
-          <div className={classes.sectionContent}>
+          <div
+            className={classes.sectionContent}
+            style={{
+              display: 'flex',
+              alignItems: upSM ? 'start' : 'center',
+              flexDirection: upSM ? 'row' : 'column',
+              rowGap: theme.spacing(2)
+            }}
+          >
             <Grid container>
               <Grid
                 item
@@ -462,6 +475,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                 )}
               </Grid>
             </Grid>
+            {item && item.file.screenshots && <ImageInline data={item.file.screenshots} small />}
           </div>
         </div>
 

@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
-import { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -28,7 +28,39 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function Service({ disabled, service, idx, setParam, setParamAsync }) {
+type ResetButtonProps = {
+  value: any;
+  defaultValue: any;
+  hasResetButton?: boolean;
+  reset?: () => void;
+};
+
+const WrappedResetButton = ({ value, defaultValue, hasResetButton = false, reset }: ResetButtonProps) => {
+  const { t } = useTranslation(['adminServices']);
+  const theme = useTheme();
+
+  return hasResetButton && value !== defaultValue ? (
+    <Tooltip title={t('reset.tooltip')} placement="right">
+      <Button
+        style={{ marginLeft: theme.spacing(1), padding: 0, lineHeight: '1rem' }}
+        onClick={event => {
+          event.stopPropagation();
+          event.preventDefault();
+          reset();
+        }}
+        size="small"
+        color="secondary"
+        variant="outlined"
+      >
+        {t('reset')}
+      </Button>
+    </Tooltip>
+  ) : null;
+};
+
+const ResetButton = React.memo(WrappedResetButton);
+
+function WrappedService({ disabled, service, idx, hasResetButton = false, setParam }) {
   const theme = useTheme();
   const [showMore, setShowMore] = useState(false);
   const { t } = useTranslation();
@@ -46,8 +78,8 @@ function Service({ disabled, service, idx, setParam, setParamAsync }) {
               param={param}
               pidx={pidx}
               idx={idx}
+              hasResetButton={hasResetButton}
               setParam={setParam}
-              setParamAsync={setParamAsync}
             />
           )
       )}
@@ -61,8 +93,8 @@ function Service({ disabled, service, idx, setParam, setParamAsync }) {
                   param={param}
                   pidx={pidx}
                   idx={idx}
+                  hasResetButton={hasResetButton}
                   setParam={setParam}
-                  setParamAsync={setParamAsync}
                 />
               )
           )
@@ -77,9 +109,25 @@ function Service({ disabled, service, idx, setParam, setParamAsync }) {
   );
 }
 
-function Param({ disabled, param, pidx, idx, setParam, setParamAsync }) {
+const Service = React.memo(WrappedService);
+
+function WrappedParam({ disabled, param, pidx, idx, hasResetButton = false, setParam }) {
   const classes = useStyles();
   const theme = useTheme();
+
+  const [value, setValue] = useState<number>(param.value);
+  const parsedValue = useMemo<string>(() => `${value}`, [value]);
+
+  const handleIntChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      let num = parseInt(event.target.value);
+      num = isNaN(num) ? 0 : num;
+      setValue(num);
+      setParam(idx, pidx, num);
+    },
+    [idx, pidx, setParam]
+  );
+
   return (
     <div key={pidx} style={{ paddingBottom: theme.spacing(1) }}>
       {param.type === 'bool' ? (
@@ -97,6 +145,12 @@ function Param({ disabled, param, pidx, idx, setParam, setParamAsync }) {
             label={
               <Typography variant="body2" style={{ textTransform: 'capitalize' }}>
                 {param.name.replace(/_/g, ' ')}
+                <ResetButton
+                  value={param.value}
+                  defaultValue={param.default}
+                  hasResetButton={hasResetButton}
+                  reset={() => setParam(idx, pidx, param.default)}
+                />
               </Typography>
             }
             className={!disabled ? classes.item : null}
@@ -107,6 +161,15 @@ function Param({ disabled, param, pidx, idx, setParam, setParamAsync }) {
           <div>
             <Typography variant="caption" gutterBottom style={{ textTransform: 'capitalize' }}>
               {param.name.replace(/_/g, ' ')}
+              <ResetButton
+                value={param.value}
+                defaultValue={param.default}
+                hasResetButton={hasResetButton}
+                reset={() => {
+                  setValue(param.default);
+                  setParam(idx, pidx, param.default);
+                }}
+              />
             </Typography>
           </div>
           {param.type === 'list' ? (
@@ -129,15 +192,25 @@ function Param({ disabled, param, pidx, idx, setParam, setParamAsync }) {
                 )}
               </Select>
             </FormControl>
+          ) : param.type === 'str' ? (
+            <TextField
+              variant="outlined"
+              disabled={disabled}
+              type="text"
+              size="small"
+              fullWidth
+              value={param.value}
+              onChange={event => setParam(idx, pidx, event.target.value)}
+            />
           ) : (
             <TextField
               variant="outlined"
               disabled={disabled}
-              type={param.type === 'int' ? 'number' : 'text'}
+              type="number"
               size="small"
               fullWidth
-              defaultValue={param.value}
-              onChange={event => setParamAsync(idx, pidx, event.target.value)}
+              value={parsedValue}
+              onChange={handleIntChange}
             />
           )}
         </>
@@ -146,16 +219,25 @@ function Param({ disabled, param, pidx, idx, setParam, setParamAsync }) {
   );
 }
 
+const Param = React.memo(WrappedParam);
+
 type ServiceSpecProps = {
   service_spec: any[];
   setParam: (service_id: number, param_id: number, param_value: any) => void;
-  setParamAsync: (service_id: number, param_id: number, param_value: any) => void;
   isSelected?: (name: string) => boolean;
   disabled?: boolean;
   compressed?: boolean;
+  hasResetButton?: boolean;
 };
 
-function ServiceSpec({ service_spec, setParam, setParamAsync, isSelected, disabled, compressed }: ServiceSpecProps) {
+function WrappedServiceSpec({
+  service_spec,
+  setParam,
+  isSelected,
+  disabled,
+  compressed,
+  hasResetButton = false
+}: ServiceSpecProps) {
   const theme = useTheme();
   return (
     <div
@@ -181,8 +263,8 @@ function ServiceSpec({ service_spec, setParam, setParamAsync, isSelected, disabl
               disabled={disabled}
               service={service}
               idx={idx}
+              hasResetButton={hasResetButton}
               setParam={setParam}
-              setParamAsync={setParamAsync}
             />
           )
       )}
@@ -190,10 +272,11 @@ function ServiceSpec({ service_spec, setParam, setParamAsync, isSelected, disabl
   );
 }
 
-ServiceSpec.defaultProps = {
+WrappedServiceSpec.defaultProps = {
   isSelected: (name: string) => true,
   disabled: false,
   compressed: false
 };
 
+const ServiceSpec = React.memo(WrappedServiceSpec);
 export default ServiceSpec;

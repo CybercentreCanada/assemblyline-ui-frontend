@@ -13,6 +13,7 @@ import {
   LinkRow,
   SortableHeaderCell
 } from 'components/visual/DivTable';
+import { bytesToSize } from 'helpers/utils';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,6 +48,8 @@ type ErrorsTableProps = {
   setErrorKey?: (key: string) => void;
   allowSort?: boolean;
 };
+
+const MAX_MESSAGE_SIZE = 2500;
 
 const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, setErrorKey = null, allowSort = true }) => {
   const { t, i18n } = useTranslation(['adminErrorViewer']);
@@ -105,7 +108,18 @@ const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, setError
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>{error.response.service_name}</DivTableCell>
-                <DivTableCell>{error.response.message}</DivTableCell>
+                <DivTableCell style={{ wordBreak: 'break-word' }}>
+                  {error.response.message.length > MAX_MESSAGE_SIZE ? (
+                    <>
+                      <span>{error.response.message.slice(0, MAX_MESSAGE_SIZE)}... </span>
+                      <span style={{ color: theme.palette.secondary.main }}>{`(${bytesToSize(
+                        new Blob([error.response.message.slice(MAX_MESSAGE_SIZE)]).size
+                      )} ${t('more')})`}</span>
+                    </>
+                  ) : (
+                    <span>{error.response.message}</span>
+                  )}
+                </DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                   <Tooltip title={t(`type.${error.type}`)}>
                     <span>{errorMap[error.type]}</span>

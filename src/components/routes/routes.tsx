@@ -23,6 +23,7 @@ const AdminUsers = lazy(() => import('components/routes/admin/users'));
 const AlertDetails = lazy(() => import('components/routes/alerts/alert-details'));
 const Alerts = lazy(() => import('components/routes/alerts/alerts'));
 const AppRegistration = lazy(() => import('components/routes/authorize'));
+const ArchiveDetail = lazy(() => import('components/routes/archive/detail'));
 const CrashTest = lazy(() => import('components/routes/crash'));
 const Dashboard = lazy(() => import('components/routes/dashboard'));
 const FileFullDetail = lazy(() => import('components/routes/file/detail'));
@@ -34,11 +35,14 @@ const HelpConfiguration = lazy(() => import('components/routes/help/configuratio
 const HelpSearch = lazy(() => import('components/routes/help/search'));
 const HelpServices = lazy(() => import('components/routes/help/services'));
 const Logout = lazy(() => import('components/routes/logout'));
+const MalwareArchive = lazy(() => import('components/routes/archive'));
 const Manage = lazy(() => import('components/routes/manage'));
 const ManageHeuristics = lazy(() => import('components/routes/manage/heuristics'));
 const HeuristicDetail = lazy(() => import('components/routes/manage/heuristic_detail'));
 const ManageSafelist = lazy(() => import('components/routes/manage/safelist'));
 const SafelistDetail = lazy(() => import('components/routes/manage/safelist_detail'));
+const ManageBadlist = lazy(() => import('components/routes/manage/badlist'));
+const BadlistDetail = lazy(() => import('components/routes/manage/badlist_detail'));
 const ManageSignatures = lazy(() => import('components/routes/manage/signatures'));
 const SignatureDetail = lazy(() => import('components/routes/manage/signature_detail'));
 const ManageSignatureSources = lazy(() => import('components/routes/manage/signature_sources'));
@@ -110,10 +114,14 @@ const WrappedRoutes = () => {
         <Route path="/admin/tag_safelist" element={<AdminTagSafelist />} />
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/users/:id" element={<User />} />
+        <Route path="/archive" element={<MalwareArchive />} />
+        <Route path="/archive/:id" element={<ArchiveDetail />} />
+        <Route path="/archive/:id/:tab" element={<ArchiveDetail />} />
         <Route path="/authorize" element={<AppRegistration />} />
         <Route path="/crash" element={<CrashTest />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/file/detail/:id" element={<FileFullDetail />} />
+        <Route path="/file/viewer/:id/:tab" element={<FileViewer />} />
         <Route path="/file/viewer/:id" element={<FileViewer />} />
         <Route path="/help" element={<Help />} />
         <Route path="/help/api" element={<HelpApiDoc />} />
@@ -132,6 +140,8 @@ const WrappedRoutes = () => {
         <Route path="/manage/workflows" element={<ManageWorkflows />} />
         <Route path="/manage/safelist/:id" element={<SafelistDetail />} />
         <Route path="/manage/safelist" element={<ManageSafelist />} />
+        <Route path="/manage/badlist/:id" element={<BadlistDetail />} />
+        <Route path="/manage/badlist" element={<ManageBadlist />} />
         <Route path="/manage" element={<Manage />} />
         <Route path="/retrohunt" element={<RetroHunt />} />
         <Route path="/retrohunt/:key" element={<RetroHuntDetail />} />
@@ -153,10 +163,9 @@ const WrappedRoutes = () => {
         <div
           className="no-print"
           style={{
-            position: 'sticky',
-            bottom: '16px',
-            left: '0',
-            marginLeft: '16px',
+            position: 'fixed',
+            bottom: '8px',
+            marginLeft: '32px',
             opacity: '0.4',
             zIndex: 10000,
             marginTop: 'auto',

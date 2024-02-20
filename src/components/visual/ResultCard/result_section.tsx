@@ -109,6 +109,7 @@ export type Section = {
     classification: string;
   }[];
   title_text: string;
+  promote_to: string;
 };
 
 type ResultSectionProps = {
@@ -443,7 +444,7 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
                               key={idx}
                               type={tag.type}
                               value={tag.value}
-                              classification={tag.classification}
+                              classification={tag.classification || section.classification}
                               safelisted={tag.safelisted}
                               short_type={tag.short_type}
                               score={section.heuristic ? section.heuristic.score : 0}

@@ -1,0 +1,13 @@
+{
+  "add_badlist": "Ajouter un item à la liste mauvaise",
+  "filter": "Filtrer les hachages de la liste mauvaise...",
+  "filtered": "hachage correspondant au filtre",
+  "filtereds": "hachages correspondant au filtre",
+  "searching": "Recherche...",
+  "title": "Liste Mauvaise",
+  "total": "hachage dans la liste mauvaise",
+  "totals": "hachages dans la liste mauvaise",
+  "user": "Hachages ajoutés par les utilisateurs",
+  "disabled": "Hachages désactivés",
+  "tag": "Hachages basés sur des balises"
+}

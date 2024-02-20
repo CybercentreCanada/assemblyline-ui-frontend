@@ -14,7 +14,7 @@ const StyledTableCell = withStyles((theme: Theme) =>
       paddingLeft: theme.spacing(1)
     },
     head: {
-      backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
+      backgroundColor: 'rgba(0, 0, 0, 5%)',
       whiteSpace: 'nowrap'
     }
   })
@@ -30,7 +30,7 @@ const BreakableTableCell = withStyles((theme: Theme) =>
       }
     },
     head: {
-      backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
+      backgroundColor: 'rgba(0, 0, 0, 5%)',
       whiteSpace: 'nowrap'
     }
   })
@@ -63,6 +63,7 @@ type SortableHeaderCellProps = TableCellProps & {
   sortName?: string;
   sortField: string;
   allowSort?: boolean;
+  inverted?: boolean;
   onSort?: (event: React.MouseEvent<HTMLSpanElement, MouseEvent>, value: { name: string; field: string }) => void;
 };
 
@@ -72,6 +73,7 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   query = null,
   sortField,
   sortName = 'sort',
+  inverted = false,
   onSort = null,
   ...other
 }) => {
@@ -80,13 +82,15 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   const curSort = query ? query.get(sortName) : searchParams.get(sortName);
   const navigate = useNavigate();
   const active = curSort && curSort.indexOf(sortField) !== -1;
-  const dir = active && curSort.indexOf('asc') !== -1 ? 'asc' : 'desc';
+  const ascending = inverted ? 'desc' : 'asc';
+  const descending = inverted ? 'asc' : 'desc';
+  const dir = active && curSort.indexOf(ascending) !== -1 ? ascending : descending;
 
   const triggerSort = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-    if (curSort && curSort.indexOf(sortField) !== -1 && curSort.indexOf('asc') === -1) {
-      searchParams.set(sortName, `${sortField} asc`);
+    if (curSort && curSort.indexOf(sortField) !== -1 && curSort.indexOf(ascending) === -1) {
+      searchParams.set(sortName, `${sortField} ${ascending}`);
     } else {
-      searchParams.set(sortName, `${sortField} desc`);
+      searchParams.set(sortName, `${sortField} ${descending}`);
     }
 
     if (onSort) {

@@ -44,16 +44,16 @@ const WrappedTimelineBody = ({ body }) => {
   return (
     <div style={{ overflowX: 'auto' }}>
       <Timeline style={{ minWidth: '460px' }}>
-        {body.map(element => {
+        {body.map((element, key) => {
           return (
-            <TimelineItem>
+            <TimelineItem key={key}>
               {element.opposite_content ? (
                 <TimelineOppositeContent
                   alignSelf="center"
                   variant="body2"
                   textOverflow={'ellipsis'}
                   whiteSpace="nowrap"
-                  overflow={{ 'overflow-x': 'hidden' }}
+                  overflow={{ overflowX: 'hidden' }}
                 >
                   {element.opposite_content}
                 </TimelineOppositeContent>
@@ -79,7 +79,7 @@ const WrappedTimelineBody = ({ body }) => {
                 alignSelf="center"
                 textOverflow={'ellipsis'}
                 whiteSpace="nowrap"
-                overflow={{ 'overflow-x': 'hidden' }}
+                overflow={{ overflowX: 'hidden' }}
               >
                 <Typography variant="button" display="block">
                   {element.title}

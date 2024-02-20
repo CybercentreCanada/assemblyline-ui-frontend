@@ -1,3 +1,10 @@
 {
-  "not_found": "The API is preventing us from displaying this image."
+  "close": "Close (Esc)",
+  "description": "Description",
+  "name": "Name",
+  "next": "Next Image (→ or ↓)",
+  "not_found": "The API is preventing us from displaying this image.",
+  "prev": "Previous Image (← or ↑)",
+  "view_file": "View image in file viewer",
+  "zoom": "Zoom (double click)"
 }

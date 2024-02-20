@@ -3,6 +3,8 @@
     color: rgba(0, 0, 0, 0.87) !important;
     page-break-after: avoid;
     page-break-before: avoid;
+    -webkit-print-color-adjust: exact; /*chrome & webkit browsers*/
+    print-color-adjust: exact; /*firefox & IE */
   }
 
   #root {
@@ -34,8 +36,8 @@
   }
 
   @page {
-    size: auto;
-    margin: 0.5in;
+    size: 1020px 1320px;
+    margin: 0.4in;
   }
 
   .no-print,

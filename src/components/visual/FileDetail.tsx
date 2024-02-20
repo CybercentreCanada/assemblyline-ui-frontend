@@ -1,11 +1,12 @@
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
-import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import {
   Grid,
@@ -26,10 +27,12 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
+import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
+import AISummarySection from 'components/routes/submission/detail/ai_summary';
 import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
@@ -44,8 +47,23 @@ import MetadataSection from './FileDetail/metadata';
 import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
 import TagSection from './FileDetail/tags';
+import URIIdentificationSection from './FileDetail/uriIdent';
 import FileDownloader from './FileDownloader';
 import InputDialog from './InputDialog';
+
+type URIInfo = {
+  uri: string;
+  scheme: string;
+  netloc: string;
+  path: string;
+  params: string;
+  query: string;
+  fragment: string;
+  username: string;
+  password: string;
+  hostname: string;
+  port: number;
+};
 
 type FileInfo = {
   archive_ts: string;
@@ -68,6 +86,7 @@ type FileInfo = {
   ssdeep: string;
   tlsh: string;
   type: string;
+  uri_info: URIInfo;
 };
 
 type File = {
@@ -77,6 +96,7 @@ type File = {
   attack_matrix: {
     [category: string]: string[][];
   };
+  classification: string;
   childrens: {
     name: string;
     sha256: string;
@@ -119,14 +139,17 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const [file, setFile] = useState<File | null>(null);
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
   const [safelistReason, setSafelistReason] = useState<string>('');
+  const [badlistDialog, setBadlistDialog] = useState<boolean>(false);
+  const [badlistReason, setBadlistReason] = useState<string>('');
   const [waitingDialog, setWaitingDialog] = useState(false);
   const { apiCall } = useMyAPI();
-  const { c12nDef } = useALContext();
+  const { c12nDef, configuration, settings } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const theme = useTheme();
   const navigate = useNavigate();
   const { showSuccessMessage } = useMySnackbar();
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
+  const [promotedSections, setPromotedSections] = useState([]);
   const popoverOpen = Boolean(resubmitAnchor);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
@@ -134,6 +157,13 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const fileName = file ? params.get('name') || sha256 : null;
+
+  const fileViewerPath = useMemo<string>(() => {
+    const tab = TAB_OPTIONS.find(option => location.pathname.indexOf(option) >= 0);
+    if (!location.pathname.startsWith('/file/viewer') || !tab)
+      return `/file/viewer/${file?.file_info?.sha256}/${DEFAULT_TAB}/${location.search}${location.hash}`;
+    else return `/file/viewer/${file?.file_info?.sha256}/${tab}/${location.search}${location.hash}`;
+  }, [file?.file_info?.sha256, location.hash, location.pathname, location.search]);
 
   const elementInViewport = element => {
     const bounding = element.getBoundingClientRect();
@@ -227,6 +257,64 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256, safelistReason, file]);
 
+  const prepareBadlist = useCallback(() => {
+    setBadlistReason('');
+    setBadlistDialog(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256]);
+
+  const addToBadlist = useCallback(() => {
+    const data = {
+      attribution: {
+        actor: (file.tags['attribution.actor'] || []).map(item => item[0]),
+        campaign: (file.tags['attribution.campaign'] || []).map(item => item[0]),
+        category: (file.tags['attribution.category'] || []).map(item => item[0]),
+        exploit: (file.tags['attribution.exploit'] || []).map(item => item[0]),
+        implant: (file.tags['attribution.implant'] || []).map(item => item[0]),
+        family: (file.tags['attribution.family'] || []).map(item => item[0]),
+        network: (file.tags['attribution.network'] || []).map(item => item[0])
+      },
+      hashes: {
+        md5: file.file_info.md5,
+        sha1: file.file_info.sha1,
+        sha256: file.file_info.sha256,
+        ssdeep: file.file_info.ssdeep,
+        tlsh: file.file_info.tlsh
+      },
+      file: {
+        name: [],
+        size: file.file_info.size,
+        type: file.file_info.type
+      },
+      sources: [
+        {
+          classification: file.file_info.classification,
+          name: currentUser.username,
+          reason: [badlistReason],
+          type: 'user'
+        }
+      ],
+      type: 'file'
+    };
+
+    if (fileName !== sha256) {
+      data.file.name.push(fileName);
+    }
+
+    apiCall({
+      url: `/api/v4/badlist/`,
+      method: 'PUT',
+      body: data,
+      onSuccess: _ => {
+        setBadlistDialog(false);
+        showSuccessMessage(t('badlist.success'));
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256, badlistReason, file]);
+
   useEffect(() => {
     setFile(null);
 
@@ -252,6 +340,18 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
     // eslint-disable-next-line
   }, [sha256, sid]);
 
+  useEffect(() => {
+    if (file === null) {
+      setPromotedSections(null);
+    } else {
+      setPromotedSections(
+        file.results
+          .map(serviceResult => serviceResult.result.sections.filter(section => section.promote_to !== null))
+          .flat()
+      );
+    }
+  }, [file]);
+
   return currentUser.roles.includes('submission_view') ? (
     <div id="fileDetailTop" style={{ textAlign: 'left' }}>
       <InputDialog
@@ -267,17 +367,38 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         text={t('safelist.text')}
         waiting={waitingDialog}
       />
+      <InputDialog
+        open={badlistDialog}
+        handleClose={() => setBadlistDialog(false)}
+        handleAccept={addToBadlist}
+        handleInputChange={event => setBadlistReason(event.target.value)}
+        inputValue={badlistReason}
+        title={t('badlist.title')}
+        cancelText={t('badlist.cancelText')}
+        acceptText={t('badlist.acceptText')}
+        inputLabel={t('badlist.input')}
+        text={t('badlist.text')}
+        waiting={waitingDialog}
+      />
       {c12nDef.enforce && (
         <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
-          <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
+          <Classification size="tiny" c12n={file ? file.classification : null} />
         </div>
       )}
       <div style={{ paddingBottom: sp4 }}>
         <Grid container alignItems="center">
           <Grid item xs>
-            <Typography variant="h4">{t('title')}</Typography>
+            <Typography variant="h4">
+              {file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
+            </Typography>
             <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-              {file ? fileName : <Skeleton style={{ width: '10rem' }} />}
+              {file?.file_info?.type.startsWith('uri/') && file?.file_info?.uri_info?.uri ? (
+                file?.file_info?.uri_info?.uri
+              ) : file ? (
+                fileName
+              ) : (
+                <Skeleton style={{ width: '10rem' }} />
+              )}
             </Typography>
           </Grid>
           <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
@@ -303,7 +424,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                 )}
                 {currentUser.roles.includes('file_detail') && (
                   <Tooltip title={t('file_viewer')}>
-                    <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`} size="large">
+                    <IconButton component={Link} to={fileViewerPath} size="large">
                       <PageviewOutlinedIcon />
                     </IconButton>
                   </Tooltip>
@@ -364,7 +485,14 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                 {currentUser.roles.includes('safelist_manage') && (
                   <Tooltip title={t('safelist')}>
                     <IconButton onClick={prepareSafelist} size="large">
-                      <PlaylistAddCheckIcon />
+                      <VerifiedUserOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {currentUser.roles.includes('badlist_manage') && (
+                  <Tooltip title={t('badlist')}>
+                    <IconButton onClick={prepareBadlist} size="large">
+                      <BugReportOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                 )}
@@ -386,9 +514,16 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         </Grid>
       </div>
       <div style={{ paddingBottom: sp2 }}>
-        <IdentificationSection fileinfo={file ? file.file_info : null} />
-        <FrequencySection fileinfo={file ? file.file_info : null} />
+        {file?.file_info?.type.startsWith('uri/') ? (
+          <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+        ) : (
+          <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+        )}
+        <FrequencySection seen={file ? file.file_info?.seen : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
+        {configuration.ui.ai.enabled && settings.executive_summary && !liveErrors && !liveResultKeys && (
+          <AISummarySection type="file" id={file ? file.file_info.sha256 : null} />
+        )}
         <ChildrenSection childrens={file ? file.childrens : null} />
         <ParentSection parents={file ? file.parents : null} />
         <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />

@@ -118,8 +118,8 @@ function WrappedClassification({
         });
       }
     }
-    // eslint-disable-next-line
-  }, [c12n, currentUser, isMobile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [c12n, currentUser, isMobile, type]);
 
   function toggleGroups(grp) {
     const newGrp = validated.parts.groups;
@@ -202,9 +202,9 @@ function WrappedClassification({
   };
 
   const useClassification = () => {
-    const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile);
+    const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
     const originalParts = getParts(c12n.toLocaleUpperCase(), c12nDef, format, isMobile);
-    const originalC12n = normalizedClassification(originalParts, c12nDef, format, isMobile);
+    const originalC12n = normalizedClassification(originalParts, c12nDef, format, isMobile, isUser);
     if (setClassification && newC12n !== originalC12n) {
       setClassification(newC12n);
     }
@@ -214,11 +214,11 @@ function WrappedClassification({
   return (
     c12nDef &&
     c12nDef.enforce &&
-    (c12n ? (
+    (!!validated?.parts?.lvl && c12n ? (
       <>
         {type === 'text' ? (
           <span className={classes[computeColor()]}>
-            {normalizedClassification(validated.parts, c12nDef, format, isMobile)}
+            {normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser)}
           </span>
         ) : (
           <div style={{ display: inline ? 'inline-block' : null }}>
@@ -228,7 +228,7 @@ function WrappedClassification({
               size={size}
               color={computeColor()}
               className={classes.classification}
-              label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
+              label={normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser)}
               onClick={type === 'picker' ? () => setShowPicker(true) : null}
               fullWidth={fullWidth}
               disabled={disabled}
@@ -250,7 +250,7 @@ function WrappedClassification({
                 size={size}
                 color={computeColor()}
                 className={classes.classification}
-                label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
+                label={normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser)}
                 fullWidth={fullWidth}
               />
             </DialogTitle>

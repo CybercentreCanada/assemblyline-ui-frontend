@@ -46,10 +46,12 @@ import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
 import { setNotifyFavicon } from 'helpers/utils';
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import ForbiddenPage from '../403';
+import HeuristicDetail from '../manage/heuristic_detail';
+import AISummarySection from './detail/ai_summary';
 import AttackSection from './detail/attack';
 import ErrorSection from './detail/errors';
 import FileTreeSection from './detail/file_tree';
@@ -120,8 +122,9 @@ function WrappedSubmissionDetail() {
   const { apiCall } = useMyAPI();
   const sp4 = theme.spacing(4);
   const { showSuccessMessage } = useMySnackbar();
+  const location = useLocation();
   const navigate = useNavigate();
-  const { user: currentUser, c12nDef, configuration: systemConfig } = useALContext();
+  const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [baseFiles, setBaseFiles] = useState([]);
@@ -653,7 +656,7 @@ function WrappedSubmissionDetail() {
       setBaseFiles(submission.files.map(f => f.sha256));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [submission]);
+  }, [submission, systemConfig]);
 
   useEffect(() => {
     if (liveStatus === 'processing') {
@@ -794,14 +797,30 @@ function WrappedSubmissionDetail() {
             liveResultKeys={liveResultKeys}
             liveErrors={curFileLiveErrors}
             force={submission && submission.max_score < 0}
-          />
+          />,
+          { hasMaximize: true }
         );
       } else {
-        setGlobalDrawer(<FileDetail sha256={fid} sid={id} force={submission && submission.max_score < 0} />);
+        setGlobalDrawer(<FileDetail sha256={fid} sid={id} force={submission && submission.max_score < 0} />, {
+          hasMaximize: true
+        });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fid, submission]);
+
+  useEffect(() => {
+    if (!fid && location.hash) {
+      setGlobalDrawer(<HeuristicDetail heur_id={location.hash.slice(1)} />);
+    }
+  }, [fid, location.hash, setGlobalDrawer]);
+
+  useEffect(() => {
+    if (!fid && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fid, globalDrawerOpened]);
 
   useEffect(() => {
     if (loadTrigger === 0) return;
@@ -1016,9 +1035,13 @@ function WrappedSubmissionDetail() {
                         />
                       )}
                       {systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger') && (
-                        <Tooltip title={t(submission.archived ? 'archived' : 'archive')}>
+                        <Tooltip title={t(submission.archived || submission.from_archive ? 'archived' : 'archive')}>
                           <div>
-                            <IconButton onClick={archive} disabled={submission.archived} size="large">
+                            <IconButton
+                              onClick={archive}
+                              disabled={submission.archived || submission.from_archive}
+                              size="large"
+                            >
                               <ArchiveOutlinedIcon />
                             </IconButton>
                           </div>
@@ -1238,6 +1261,9 @@ function WrappedSubmissionDetail() {
           metadata={submission ? submission.metadata : null}
           classification={submission ? submission.classification : null}
         />
+        {systemConfig.ui.ai.enabled && settings.executive_summary && submission && submission.state === 'completed' && (
+          <AISummarySection type={'submission' as 'submission'} id={submission.sid} />
+        )}
         <Detection
           section_map={summary ? summary.heuristic_sections : null}
           heuristics={summary ? summary.heuristics : null}

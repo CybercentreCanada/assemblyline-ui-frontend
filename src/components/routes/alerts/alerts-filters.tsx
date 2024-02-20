@@ -1,5 +1,15 @@
 /* eslint-disable no-param-reassign */
-import { Autocomplete, Button, FormControl, MenuItem, Select, TextField, Typography, useTheme } from '@mui/material';
+import {
+  Autocomplete,
+  Button,
+  FormControl,
+  MenuItem,
+  Select,
+  TextField,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import CustomChip from 'components/visual/CustomChip';
 import SearchQuery, {
@@ -38,6 +48,13 @@ function ensureSearchFilter(selection): SearchFilter {
 const useStyles = makeStyles(theme => ({
   option: {
     backgroundColor: theme.palette.background.default
+  },
+  actions: {
+    display: 'flex',
+    gap: theme.spacing(1),
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap',
+    marginTop: theme.spacing(1)
   }
 }));
 
@@ -217,11 +234,6 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   return (
     <div>
       <div style={{ paddingBottom: theme.spacing(2) }}>
-        <div style={{ float: 'right' }}>
-          <Button variant="contained" onClick={onClearBtnClick}>
-            {t('filters.clear')}
-          </Button>
-        </div>
         <Typography variant="h4">{t('filters')}</Typography>
       </div>
       <div style={{ marginBottom: theme.spacing(2), marginTop: theme.spacing(2) }}>
@@ -333,10 +345,18 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
           />
         </div>
       </div>
-      <div style={{ textAlign: 'right', marginTop: theme.spacing(1) }}>
-        <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
-          {t('filters.apply')}
-        </Button>
+      <div className={classes.actions}>
+        <Tooltip title={t('filters.clear')}>
+          <Button variant="outlined" onClick={onClearBtnClick}>
+            {t('reset')}
+          </Button>
+        </Tooltip>
+
+        <Tooltip title={t('filters.apply')}>
+          <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
+            {t('apply')}
+          </Button>
+        </Tooltip>
       </div>
     </div>
   );
