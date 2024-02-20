@@ -304,13 +304,6 @@ const Submit: React.FC<any> = () => {
     }
   };
 
-  function setParamAsync(service_idx, param_idx, p_value) {
-    if (settings) {
-      const type = settings.service_spec[service_idx].params[param_idx].type;
-      settings.service_spec[service_idx].params[param_idx].value = type === 'int' ? parseInt(p_value) : p_value;
-    }
-  }
-
   function setSettingValue(field, fieldValue) {
     if (settings) {
       setSettings({ ...settings, [field]: fieldValue });
@@ -847,12 +840,7 @@ const Submit: React.FC<any> = () => {
                     <Typography variant="h6" gutterBottom>
                       {t('options.service_spec')}
                     </Typography>
-                    <ServiceSpec
-                      service_spec={settings.service_spec}
-                      setParam={setParam}
-                      setParamAsync={setParamAsync}
-                      isSelected={isSelected}
-                    />
+                    <ServiceSpec service_spec={settings.service_spec} setParam={setParam} isSelected={isSelected} />
                   </div>
                 )}
               </Grid>

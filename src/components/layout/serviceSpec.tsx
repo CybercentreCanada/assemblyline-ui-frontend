@@ -60,7 +60,7 @@ const WrappedResetButton = ({ value, defaultValue, hasResetButton = false, reset
 
 const ResetButton = React.memo(WrappedResetButton);
 
-function Service({ disabled, service, idx, hasResetButton = false, setParam, setParamAsync }) {
+function WrappedService({ disabled, service, idx, hasResetButton = false, setParam }) {
   const theme = useTheme();
   const [showMore, setShowMore] = useState(false);
   const { t } = useTranslation();
@@ -80,7 +80,6 @@ function Service({ disabled, service, idx, hasResetButton = false, setParam, set
               idx={idx}
               hasResetButton={hasResetButton}
               setParam={setParam}
-              setParamAsync={setParamAsync}
             />
           )
       )}
@@ -96,7 +95,6 @@ function Service({ disabled, service, idx, hasResetButton = false, setParam, set
                   idx={idx}
                   hasResetButton={hasResetButton}
                   setParam={setParam}
-                  setParamAsync={setParamAsync}
                 />
               )
           )
@@ -111,7 +109,9 @@ function Service({ disabled, service, idx, hasResetButton = false, setParam, set
   );
 }
 
-function Param({ disabled, param, pidx, idx, hasResetButton = false, setParam, setParamAsync }) {
+const Service = React.memo(WrappedService);
+
+function WrappedParam({ disabled, param, pidx, idx, hasResetButton = false, setParam }) {
   const classes = useStyles();
   const theme = useTheme();
 
@@ -123,9 +123,9 @@ function Param({ disabled, param, pidx, idx, hasResetButton = false, setParam, s
       let num = parseInt(event.target.value);
       num = isNaN(num) ? 0 : num;
       setValue(num);
-      setParamAsync(idx, pidx, num);
+      setParam(idx, pidx, num);
     },
-    [idx, pidx, setParamAsync]
+    [idx, pidx, setParam]
   );
 
   return (
@@ -200,7 +200,7 @@ function Param({ disabled, param, pidx, idx, hasResetButton = false, setParam, s
               size="small"
               fullWidth
               value={param.value}
-              onChange={event => setParamAsync(idx, pidx, event.target.value)}
+              onChange={event => setParam(idx, pidx, event.target.value)}
             />
           ) : (
             <TextField
@@ -219,20 +219,20 @@ function Param({ disabled, param, pidx, idx, hasResetButton = false, setParam, s
   );
 }
 
+const Param = React.memo(WrappedParam);
+
 type ServiceSpecProps = {
   service_spec: any[];
   setParam: (service_id: number, param_id: number, param_value: any) => void;
-  setParamAsync: (service_id: number, param_id: number, param_value: any) => void;
   isSelected?: (name: string) => boolean;
   disabled?: boolean;
   compressed?: boolean;
   hasResetButton?: boolean;
 };
 
-function ServiceSpec({
+function WrappedServiceSpec({
   service_spec,
   setParam,
-  setParamAsync,
   isSelected,
   disabled,
   compressed,
@@ -265,7 +265,6 @@ function ServiceSpec({
               idx={idx}
               hasResetButton={hasResetButton}
               setParam={setParam}
-              setParamAsync={setParamAsync}
             />
           )
       )}
@@ -273,10 +272,11 @@ function ServiceSpec({
   );
 }
 
-ServiceSpec.defaultProps = {
+WrappedServiceSpec.defaultProps = {
   isSelected: (name: string) => true,
   disabled: false,
   compressed: false
 };
 
+const ServiceSpec = React.memo(WrappedServiceSpec);
 export default ServiceSpec;
