@@ -192,7 +192,7 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
           console.error(`Notification Area: error caused by URL "${err}`)
         )) as Response;
 
-        if (!response) {
+        if (!response || !response.ok) {
           resolve({ ...DEFAULT_JSON_FEED });
           return;
         }

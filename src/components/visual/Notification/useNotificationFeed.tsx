@@ -33,7 +33,7 @@ export type JSONFeedItem = {
   date_published?: Date;
   date_modified?: Date;
   authors?: Array<JSONFeedAuthor>;
-  tags?: Array<'new' | 'current' | 'dev' | 'service' | 'blog'>;
+  tags?: Array<'new' | 'current' | 'dev' | 'service' | 'blog' | 'community'>;
   language?: string;
   attachments?: Array<JSONFeedItemAttachment>;
   _isNew: boolean;
