@@ -17,7 +17,7 @@ import withStyles from '@mui/styles/withStyles';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import 'moment/locale/fr';
 import React from 'react';
-import { To, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 
 const StyledTableCell = withStyles((theme: Theme) =>
@@ -125,11 +125,7 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   );
 };
 
-interface LinkRowProps extends TableRowProps {
-  to: To;
-}
-
-export const LinkRow = ({ children, to, ...other }: LinkRowProps) => (
+export const LinkRow = ({ children, to, ...other }) => (
   <TableRow component={Link} {...other} to={to} style={{ cursor: 'pointer', textDecoration: 'none' }}>
     {children}
   </TableRow>
