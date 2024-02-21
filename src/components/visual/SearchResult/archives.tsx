@@ -6,9 +6,9 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
-import { CustomUser } from 'components/hooks/useMyUser';
 import type { FileIndexed, LabelCategories } from 'components/models/base/file';
 import type { SearchResult } from 'components/models/ui/search';
+import { CustomUser } from 'components/models/ui/user';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import {

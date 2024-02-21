@@ -21,6 +21,7 @@ import { To, useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 
 interface StyledPaperProps extends PaperProps {
+  component?: any;
   paper?: boolean;
 }
 
@@ -29,9 +30,7 @@ export const StyledPaper: FC<StyledPaperProps> = memo(
     forwardRef(({ component, ...other }: StyledPaperProps, ref) => (
       <Paper component={component} {...other} ref={ref} />
     )),
-    {
-      shouldForwardProp: prop => prop !== 'paper'
-    }
+    { shouldForwardProp: prop => prop !== 'paper' }
   )<StyledPaperProps>(({ theme, paper = false }) => ({
     // backgroundColor: theme.palette.mode === 'dark' ? '#0000001A' : '#FFFFFF1A',
     backgroundColor: paper
@@ -138,15 +137,14 @@ export const GridTableRow: FC<GridTableRowProps> = memo(
   }))
 );
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface GridLinkRowProps extends GridTableRowProps {
   component?: never;
   to: To;
 }
 
-export const GridLinkRow: FC<GridLinkRowProps> = memo(
-  styled(({ to, ...other }: GridLinkRowProps) => (
-    <GridTableRow {...(other as any)} component={Link} to={to} />
-  ))<GridLinkRowProps>(() => ({
+export const GridLinkRow: FC<any> = memo(
+  styled(({ to, ...other }: any) => <GridTableRow {...(other as any)} component={Link} to={to} />)<any>(() => ({
     cursor: 'pointer',
     textDecoration: 'none'
   }))
