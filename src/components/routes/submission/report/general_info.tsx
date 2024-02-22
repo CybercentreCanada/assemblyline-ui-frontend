@@ -335,37 +335,37 @@ function WrappedGeneralInformation({ report }) {
                   </Grid>
                 </>
               )}
-
-              {report && report.promoted_sections
-                ? report.promoted_sections
-                    .filter(section => section.promote_to === 'URI_PARAMS')
-                    .sort.map((section, idx) =>
-                      section.body_format === 'KEY_VALUE' ? (
-                        <KVExtra key={idx} body={section.body} />
-                      ) : (
-                        <OrderedKVExtra key={idx} body={section.body} />
-                      )
-                    )
-                : null}
-
-              <Grid item xs={4} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t('entropy')}</span>
-              </Grid>
-              <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                {report ? report.file_info.entropy : <Skeleton />}
-              </Grid>
-
-              <Grid item xs={12} sm={9} lg={10}>
-                {report && report.promoted_sections
-                  ? report.promoted_sections
-                      .filter(section => section.promote_to === 'ENTROPY')
-                      .map((section, idx) =>
-                        section.body_format === 'GRAPH_DATA' ? <GraphBody key={idx} body={section.body} /> : null
-                      )
-                  : null}
-              </Grid>
             </>
           )}
+
+          {report && report.promoted_sections
+            ? report.promoted_sections
+                .filter(section => section.promote_to === 'URI_PARAMS')
+                .map((section, idx) =>
+                  section.body_format === 'KEY_VALUE' ? (
+                    <KVExtra key={idx} body={section.body} />
+                  ) : (
+                    <OrderedKVExtra key={idx} body={section.body} />
+                  )
+                )
+            : null}
+
+          <Grid item xs={4} sm={3} lg={2}>
+            <span style={{ fontWeight: 500 }}>{t('file.entropy')}</span>
+          </Grid>
+          <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+            {report ? report.file_info.entropy : <Skeleton />}
+          </Grid>
+
+          {report && report.file_info.entropy && report.promoted_sections ? (
+            <Grid item xs={12} sm={9} lg={10}>
+              {report.promoted_sections
+                .filter(section => section.promote_to === 'ENTROPY')
+                .map((section, idx) =>
+                  section.body_format === 'GRAPH_DATA' ? <GraphBody key={idx} body={section.body} /> : null
+                )}
+            </Grid>
+          ) : null}
         </Grid>
         <div>
           {report && report.promoted_sections
