@@ -1,5 +1,7 @@
-import { Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
+import { Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { ImageInlineBody } from 'components/visual/image_inline';
+import { GraphBody } from 'components/visual/ResultCard/graph_body';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
@@ -31,13 +33,24 @@ function WrappedGeneralInformation({ report }) {
   const theme = useTheme();
   const classes = useStyles();
 
+  const sp2 = theme.spacing(2);
+  const upSM = useMediaQuery(theme.breakpoints.up('sm'));
+
   return (
     <div className={classes.section}>
       <div className={classes.section_title}>
         <Typography variant="h6">{t('general')}</Typography>
         <Divider className={classes.divider} />
       </div>
-      <div className={classes.section_content}>
+      <div
+        className={classes.section_content}
+        style={{
+          display: 'flex',
+          alignItems: upSM ? 'start' : 'center',
+          flexDirection: upSM ? 'row' : 'column',
+          rowGap: sp2
+        }}
+      >
         <Grid container spacing={1}>
           <Grid item xs={4} sm={3} lg={2}>
             <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
@@ -277,9 +290,28 @@ function WrappedGeneralInformation({ report }) {
                   </Grid>
                 </>
               )}
+
+              <Grid item xs={12} sm={9} lg={10}>
+                {report && report.promoted_sections
+                  ? report.promoted_sections
+                      .filter(section => section.promote_to === 'ENTROPY')
+                      .map((section, idx) =>
+                        section.body_format === 'GRAPH_DATA' ? <GraphBody key={idx} body={section.body} /> : null
+                      )
+                  : null}
+              </Grid>
             </>
           )}
         </Grid>
+        <div>
+          {report && report.promoted_sections
+            ? report.promoted_sections
+                .filter(section => section.promote_to === 'SCREENSHOT')
+                .map((section, idx) =>
+                  section.body_format === 'IMAGE' ? <ImageInlineBody key={idx} body={section.body} /> : null
+                )
+            : null}
+        </div>
       </div>
     </div>
   );
