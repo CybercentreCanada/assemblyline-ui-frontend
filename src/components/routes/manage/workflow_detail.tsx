@@ -387,57 +387,63 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 currentUser.roles.includes('workflow_view') &&
                 (workflow ? (
                   <Tooltip title={t('usage')}>
-                    <IconButton
-                      component={Link}
-                      style={{ color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.action.active }}
-                      to={`/alerts/?q=events.entity_id:${workflowID}`}
-                      size="large"
-                      disabled={viewMode !== 'read'}
-                    >
-                      <YoutubeSearchedForIcon />
-                    </IconButton>
+                    <div>
+                      <IconButton
+                        component={Link}
+                        style={{
+                          color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.action.active
+                        }}
+                        to={`/alerts/?q=events.entity_id:${workflowID}`}
+                        size="large"
+                        disabled={viewMode !== 'read'}
+                      >
+                        <YoutubeSearchedForIcon />
+                      </IconButton>
+                    </div>
                   </Tooltip>
                 ) : null)}
               {workflowID &&
                 currentUser.roles.includes('workflow_manage') &&
                 (workflow ? (
                   <Tooltip title={t('duplicate')}>
-                    <IconButton
-                      style={{
-                        color:
-                          viewMode !== 'read'
-                            ? theme.palette.text.disabled
-                            : theme.palette.mode === 'dark'
-                            ? theme.palette.success.light
-                            : theme.palette.success.dark
-                      }}
-                      onClick={() => {
-                        // Switch to write mode
-                        setViewMode('write');
-                        setTimeout(() => {
-                          inputRef.current.focus();
-                        }, 250);
+                    <div>
+                      <IconButton
+                        style={{
+                          color:
+                            viewMode !== 'read'
+                              ? theme.palette.text.disabled
+                              : theme.palette.mode === 'dark'
+                              ? theme.palette.success.light
+                              : theme.palette.success.dark
+                        }}
+                        onClick={() => {
+                          // Switch to write mode
+                          setViewMode('write');
+                          setTimeout(() => {
+                            inputRef.current.focus();
+                          }, 250);
 
-                        // Keep properties of workflow that are important
-                        var keptProperties = {
-                          classification: workflow.classification,
-                          enabled: workflow.enabled,
-                          labels: workflow.labels,
-                          priority: workflow.priority,
-                          query: workflow.query,
-                          status: workflow.status
-                        };
+                          // Keep properties of workflow that are important
+                          var keptProperties = {
+                            classification: workflow.classification,
+                            enabled: workflow.enabled,
+                            labels: workflow.labels,
+                            priority: workflow.priority,
+                            query: workflow.query,
+                            status: workflow.status
+                          };
 
-                        // Apply important properties on top of default workflow template
-                        setWorkflow({ ...DEFAULT_WORKFLOW, ...keptProperties });
-                        setWorkflowID(null);
-                        setModified(true);
-                      }}
-                      size="large"
-                      disabled={viewMode !== 'read'}
-                    >
-                      <ControlPointDuplicateOutlinedIcon />
-                    </IconButton>
+                          // Apply important properties on top of default workflow template
+                          setWorkflow({ ...DEFAULT_WORKFLOW, ...keptProperties });
+                          setWorkflowID(null);
+                          setModified(true);
+                        }}
+                        size="large"
+                        disabled={viewMode !== 'read'}
+                      >
+                        <ControlPointDuplicateOutlinedIcon />
+                      </IconButton>
+                    </div>
                   </Tooltip>
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
@@ -496,16 +502,18 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 currentUser.roles.includes('workflow_manage') &&
                 (workflow ? (
                   <Tooltip title={workflow.enabled ? t('enabled') : t('disabled')}>
-                    <IconButton
-                      style={{
-                        color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.text.primary
-                      }}
-                      onClick={workflow.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
-                      size="large"
-                      disabled={viewMode !== 'read'}
-                    >
-                      {workflow.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
-                    </IconButton>
+                    <div>
+                      <IconButton
+                        style={{
+                          color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.text.primary
+                        }}
+                        onClick={workflow.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
+                        size="large"
+                        disabled={viewMode !== 'read'}
+                      >
+                        {workflow.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+                      </IconButton>
+                    </div>
                   </Tooltip>
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
@@ -514,21 +522,23 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 currentUser.roles.includes('workflow_manage') &&
                 (workflow ? (
                   <Tooltip title={t('remove')}>
-                    <IconButton
-                      style={{
-                        color:
-                          viewMode !== 'read'
-                            ? theme.palette.text.disabled
-                            : theme.palette.mode === 'dark'
-                            ? theme.palette.error.light
-                            : theme.palette.error.dark
-                      }}
-                      onClick={() => setDeleteDialog(true)}
-                      size="large"
-                      disabled={viewMode !== 'read'}
-                    >
-                      <RemoveCircleOutlineOutlinedIcon />
-                    </IconButton>
+                    <div>
+                      <IconButton
+                        style={{
+                          color:
+                            viewMode !== 'read'
+                              ? theme.palette.text.disabled
+                              : theme.palette.mode === 'dark'
+                              ? theme.palette.error.light
+                              : theme.palette.error.dark
+                        }}
+                        onClick={() => setDeleteDialog(true)}
+                        size="large"
+                        disabled={viewMode !== 'read'}
+                      >
+                        <RemoveCircleOutlineOutlinedIcon />
+                      </IconButton>
+                    </div>
                   </Tooltip>
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
