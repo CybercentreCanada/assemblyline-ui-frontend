@@ -28,6 +28,51 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+const parseValue = value => {
+  if (value instanceof Array) {
+    return value.join(' | ');
+  } else if (value === true) {
+    return 'true';
+  } else if (value === false) {
+    return 'false';
+  } else if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+  return value;
+};
+
+const KVItem = ({ name, value }) => (
+  <>
+    <Grid item xs={4} sm={3} lg={2}>
+      <span style={{ fontWeight: 500, marginRight: '4px', display: 'flex', textTransform: 'capitalize' }}>{name}</span>
+    </Grid>
+    <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+      {parseValue(value)}
+    </Grid>
+  </>
+);
+
+const WrappedOrderedKVExtra = ({ body }) => (
+  <>
+    {Object.keys(body).map(id => {
+      const item = body[id];
+      return <KVItem key={id} name={item[0]} value={item[1]} />;
+    })}
+  </>
+);
+
+const OrderedKVExtra = React.memo(WrappedOrderedKVExtra);
+
+const WrappedKVExtra = ({ body }) => (
+  <>
+    {Object.keys(body).map((key, id) => {
+      return <KVItem key={id} name={key} value={body[key]} />;
+    })}
+  </>
+);
+
+const KVExtra = React.memo(WrappedKVExtra);
+
 function WrappedGeneralInformation({ report }) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
@@ -290,6 +335,18 @@ function WrappedGeneralInformation({ report }) {
                   </Grid>
                 </>
               )}
+
+              {report && report.promoted_sections
+                ? report.promoted_sections
+                    .filter(section => section.promote_to === 'URI_PARAMS')
+                    .sort.map((section, idx) =>
+                      section.body_format === 'KEY_VALUE' ? (
+                        <KVExtra key={idx} body={section.body} />
+                      ) : (
+                        <OrderedKVExtra key={idx} body={section.body} />
+                      )
+                    )
+                : null}
 
               <Grid item xs={12} sm={9} lg={10}>
                 {report && report.promoted_sections
