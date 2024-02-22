@@ -123,7 +123,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
   const [disableDialog, setDisableDialog] = useState(false);
   const [enableDialog, setEnableDialog] = useState(false);
   const [viewMode, setViewMode] = useState(mode);
-  const [workflowID, setWorkflowID] = useState(workflow_id || id);
+  const [workflowID, setWorkflowID] = useState(null);
   const { c12nDef, configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -197,7 +197,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workflow_id, id]);
+  }, [workflowID, id]);
 
   const handleNameChange = event => {
     setModified(true);
@@ -324,6 +324,13 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
       onExit: () => setButtonLoading(false)
     });
   };
+
+  useEffect(() => {
+    setWorkflowID(workflow_id || id);
+    return () => {
+      setWorkflowID(null);
+    };
+  }, [id, workflow_id]);
 
   return currentUser.roles.includes('workflow_view') ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">
