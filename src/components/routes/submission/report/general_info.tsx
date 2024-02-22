@@ -348,6 +348,13 @@ function WrappedGeneralInformation({ report }) {
                     )
                 : null}
 
+              <Grid item xs={4} sm={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('entropy')}</span>
+              </Grid>
+              <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                {report ? report.file_info.entropy : <Skeleton />}
+              </Grid>
+
               <Grid item xs={12} sm={9} lg={10}>
                 {report && report.promoted_sections
                   ? report.promoted_sections
