@@ -13,6 +13,7 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { TSubmissionReport } from 'components/models/ui/submission_report';
 import { CustomUser } from 'components/models/ui/user';
 import Classification from 'components/visual/Classification';
 import { filterObject } from 'helpers/utils';
@@ -66,10 +67,10 @@ export default function SubmissionReport() {
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const theme = useTheme();
-  const [report, setReport] = useState(null);
-  const [originalReport, setOriginalReport] = useState(null);
-  const [showInfoContent, setShowInfoContent] = useState(false);
-  const [useAIReport, setUseAIReport] = useState(false);
+  const [report, setReport] = useState<TSubmissionReport>(null);
+  const [originalReport, setOriginalReport] = useState<TSubmissionReport>(null);
+  const [showInfoContent, setShowInfoContent] = useState<boolean>(false);
+  const [useAIReport, setUseAIReport] = useState<boolean>(false);
 
   const cleanupReport = useCallback(() => {
     const recursiveFileTreeCleanup = (tree, impFiles) => {
@@ -137,7 +138,7 @@ export default function SubmissionReport() {
       setReport({
         ...originalReport,
         attack_matrix: tempMatrix,
-        heuristics: tempHeur,
+        heuristics: tempHeur as any,
         heuristic_sections: tempHeurSec,
         important_files: tempImpFiles,
         tags: tempTags

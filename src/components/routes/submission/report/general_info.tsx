@@ -1,5 +1,6 @@
 import { Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { TSubmissionReport } from 'components/models/ui/submission_report';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
@@ -26,7 +27,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function WrappedGeneralInformation({ report }) {
+type Props = {
+  report: TSubmissionReport;
+};
+
+function WrappedGeneralInformation({ report }: Props) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
   const classes = useStyles();

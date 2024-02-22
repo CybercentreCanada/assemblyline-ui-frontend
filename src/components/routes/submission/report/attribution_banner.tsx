@@ -5,6 +5,7 @@ import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
+import { TSubmissionReport } from 'components/models/ui/submission_report';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
 import React from 'react';
@@ -30,7 +31,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export function WrappedAttributionBanner({ report }) {
+type Props = {
+  report: TSubmissionReport;
+};
+
+export function WrappedAttributionBanner({ report }: Props) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
   const classes = useStyles();

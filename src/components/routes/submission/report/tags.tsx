@@ -1,5 +1,6 @@
 import { Divider, Grid, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { TSubmissionReport } from 'components/models/ui/submission_report';
 import TextVerdict from 'components/visual/TextVerdict';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +31,12 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function TagTable({ group, items }) {
+type TagTableProps = {
+  group: string;
+  items: boolean;
+};
+
+function TagTable({ group, items }: TagTableProps) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
   const orderedItems = {};
@@ -93,7 +99,11 @@ function TagTable({ group, items }) {
   ) : null;
 }
 
-function WrappedTags({ report }) {
+type Props = {
+  report: TSubmissionReport;
+};
+
+function WrappedTags({ report }: Props) {
   return (
     report && (
       <>

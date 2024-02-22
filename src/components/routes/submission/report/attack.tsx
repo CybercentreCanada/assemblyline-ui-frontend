@@ -1,5 +1,6 @@
 import { Divider, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { TAttackMatrix, TSubmissionReport } from 'components/models/ui/submission_report';
 import TextVerdict from 'components/visual/TextVerdict';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,7 +39,12 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function AttackMatrixBlock({ attack, items }) {
+type AttackMatrixBlockProps = {
+  attack: string;
+  items: TAttackMatrix;
+};
+
+function AttackMatrixBlock({ attack, items }: AttackMatrixBlockProps) {
   const classes = useStyles();
   return (
     <div className={classes.attack_bloc}>
@@ -73,7 +79,11 @@ function AttackMatrixSkel() {
   );
 }
 
-function WrappedAttack({ report }) {
+type AttackProps = {
+  report: TSubmissionReport;
+};
+
+function WrappedAttack({ report }: AttackProps) {
   const { t } = useTranslation(['submissionReport']);
   const classes = useStyles();
 
