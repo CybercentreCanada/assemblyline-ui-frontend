@@ -2,11 +2,11 @@ import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
-import { RetrohuntResult } from 'components/routes/retrohunt';
+import { RetrohuntResult, RETROHUNT_PHASES } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import 'moment/locale/fr';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useLocation } from 'react-router-dom';
@@ -43,10 +43,15 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
   const location = useLocation();
   const { c12nDef } = useALContext();
 
+  const hasTotalHits = useMemo<boolean>(
+    () => retrohuntResults?.total > 0 && retrohuntResults.items.some(item => !!item.total_hits),
+    [retrohuntResults]
+  );
+
   const RetrohuntStatus = useCallback<React.FC<{ result: RetrohuntResult }>>(
     ({ result }) => {
       let { finished = false, phase = 'finished', percentage = 100 } = result;
-      phase = finished ? 'finished' : ['filtering', 'yara', 'finished'].includes(phase) ? phase : 'finished';
+      phase = finished ? 'finished' : RETROHUNT_PHASES.includes(phase) ? phase : 'finished';
 
       return (
         <CustomChip
@@ -72,7 +77,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
             <DivTableRow>
               <SortableHeaderCell
                 children={t('header.created')}
-                sortField="created"
+                sortField="created_time"
                 allowSort={allowSort}
                 onSort={(_, value) => onSort(value)}
               />
@@ -91,14 +96,9 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                   onSort={(_, value) => onSort(value)}
                 />
               )}
+              {hasTotalHits && <DivTableCell children={t('header.total_hits')} />}
               <SortableHeaderCell
-                children={t('header.numfiles')}
-                sortField="total_hits"
-                allowSort={allowSort}
-                onSort={(_, value) => onSort(value)}
-              />
-              <SortableHeaderCell
-                children={t('header.status')}
+                children={t('header.finished')}
                 sortField="finished"
                 allowSort={allowSort}
                 onSort={(_, value) => onSort(value)}
@@ -147,7 +147,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                     <Classification type="text" size="tiny" c12n={retrohunt.classification} format="short" />
                   </DivTableCell>
                 )}
-                <DivTableCell>{retrohunt?.total_hits}</DivTableCell>
+                {hasTotalHits && <DivTableCell>{retrohunt?.total_hits}</DivTableCell>}
                 <DivTableCell>
                   <RetrohuntStatus result={retrohunt} />
                 </DivTableCell>

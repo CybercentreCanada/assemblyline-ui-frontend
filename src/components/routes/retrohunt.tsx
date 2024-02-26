@@ -108,7 +108,8 @@ export type SearchResults = {
 const DEFAULT_PARAMS: object = {
   query: '*',
   offset: 0,
-  rows: PAGE_SIZE
+  rows: PAGE_SIZE,
+  fl: 'indices,classification,search_classification,creator,description,expiry_ts,start_group,end_group,created_time,started_time,completed_time,key,raw_query,yara_signature,finished,truncated'
   // fl: 'archive_only,classification,key,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated'
 };
 
