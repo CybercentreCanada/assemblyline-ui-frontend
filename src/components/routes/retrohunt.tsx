@@ -47,9 +47,14 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export type RetrohuntIndex = null | 'hot' | 'archive' | 'hot_and_archive';
+const PAGE_SIZE = 25;
+const MAX_TRACKED_RECORDS = 10000;
+const RELOAD_DELAY = 5000;
+export const RETROHUNT_INDICES = ['hot', 'archive', 'hot_and_archive'] as const;
+export const RETROHUNT_PHASES = ['filtering', 'yara', 'finished'] as const;
 
-export type RetrohuntPhase = null | 'filtering' | 'yara' | 'finished';
+export type RetrohuntIndex = (typeof RETROHUNT_INDICES)[number];
+export type RetrohuntPhase = (typeof RETROHUNT_PHASES)[number];
 
 export type RetrohuntHit = {
   key: string;
@@ -86,8 +91,11 @@ export type RetrohuntResult = {
   total_hits?: number;
   total_errors?: number;
 
-  // to remove
-  [key: string]: any;
+  // to delete ?
+  phase?: RetrohuntPhase;
+  percentage?: any;
+  ttl?: any;
+  archive_only?: any;
 };
 
 export type SearchResults = {
@@ -97,17 +105,11 @@ export type SearchResults = {
   total: number;
 };
 
-const PAGE_SIZE = 25;
-
-const MAX_TRACKED_RECORDS = 10000;
-
-const RELOAD_DELAY = 5000;
-
 const DEFAULT_PARAMS: object = {
   query: '*',
   offset: 0,
-  rows: PAGE_SIZE,
-  fl: 'archive_only,classification,key,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated'
+  rows: PAGE_SIZE
+  // fl: 'archive_only,classification,key,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated'
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
