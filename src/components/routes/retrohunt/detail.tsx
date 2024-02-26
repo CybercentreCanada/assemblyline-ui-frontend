@@ -25,7 +25,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
-import { RetrohuntPhase, RetrohuntResult } from 'components/routes/retrohunt';
+import { RetrohuntPhase, RetrohuntResult, RETROHUNT_PHASES } from 'components/routes/retrohunt';
 import RetrohuntErrors from 'components/routes/retrohunt/errors';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
@@ -55,7 +55,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import user from '../user';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -178,37 +177,60 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
       indices: null,
+      classification: c12nDef.UNRESTRICTED,
+      search_classification: currentUser.classification,
+      creator: null,
+      description: '',
+      expiry_ts: null,
+
+      start_group: null,
+      end_group: null,
+
       created_time: null,
       started_time: null,
       completed_time: null,
-      key: null,
 
-      archive_only: false,
-      classification: c12nDef.UNRESTRICTED,
-      search_classification: currentUser.classification,
-      created: '2020-01-01T00:00:00.000000Z',
-      creator: null,
-      description: '',
-      errors: [],
-      expiry_ts: null,
-      finished: false,
-      hits: [],
-      pending_candidates: 0,
-      pending_indices: 0,
-      phase: 'finished',
-      progress: [1, 1],
+      key: null,
       raw_query: null,
-      tags: {},
+      yara_signature: '',
+
+      errors: [],
+      warnings: [],
+      finished: null,
+      truncated: null,
+
       total_errors: 0,
       total_hits: 0,
       total_indices: 0,
-      truncated: false,
-      yara_signature: ''
+
+      phase: null
+
+      // archive_only: false,
+      // classification: c12nDef.UNRESTRICTED,
+      // search_classification: currentUser.classification,
+      // created: '2020-01-01T00:00:00.000000Z',
+      // creator: null,
+      // description: '',
+      // errors: [],
+      // expiry_ts: null,
+      // finished: false,
+      // hits: [],
+      // pending_candidates: 0,
+      // pending_indices: 0,
+      // phase: 'finished',
+      // progress: [1, 1],
+      // raw_query: null,
+      // tags: {},
+      // total_errors: 0,
+      // total_hits: 0,
+      // total_indices: 0,
+      // truncated: false,
+      // yara_signature: ''
     }),
-    [c12nDef.UNRESTRICTED]
+    [c12nDef.UNRESTRICTED, currentUser.classification]
   );
 
-  const key = useMemo<string>(() => (isDrawer ? propKey.split('?')[0] : paramKey), [isDrawer, paramKey, propKey]);
+  const searchKey = useMemo<string>(() => (isDrawer ? propKey.split('?')[0] : paramKey), [isDrawer, paramKey, propKey]);
 
   const suggestions = useMemo<string[]>(
     () => [...Object.keys(indexes.file).filter(name => indexes.file[name].indexed), ...DEFAULT_SUGGESTION],
@@ -216,10 +238,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   );
 
   const phase = useMemo<RetrohuntPhase>(
-    () =>
-      retrohunt && 'phase' in retrohunt && ['filtering', 'yara', 'finished'].includes(retrohunt.phase)
-        ? retrohunt.phase
-        : null,
+    () => (retrohunt && RETROHUNT_PHASES.includes(retrohunt?.phase) ? retrohunt.phase : null),
     [retrohunt]
   );
 
@@ -245,10 +264,10 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
       if (isDrawer) {
         const delta = search.getDeltaString();
         const searchParam = delta && delta !== '' ? `?${delta}` : '';
-        navigate(`${location.pathname}${location.search}#${key}${searchParam}`);
+        navigate(`${location.pathname}${location.search}#${searchKey}${searchParam}`);
       } else navigate(`${location.pathname}?${search.getDeltaString()}${location.hash}`);
     },
-    [key, isDrawer, location, navigate]
+    [isDrawer, location.hash, location.pathname, location.search, navigate, searchKey]
   );
 
   const handleQueryChange = useCallback(
@@ -272,7 +291,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
     () => {
       if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
-          url: `/api/v4/retrohunt/${key}/`,
+          url: `/api/v4/retrohunt/${searchKey}/`,
           onSuccess: api_data => setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response }),
           onEnter: () => setIsReloading(true),
           onExit: () => setIsReloading(false)
@@ -280,7 +299,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [DEFAULT_RETROHUNT, key, configuration?.retrohunt?.enabled, currentUser.roles]
+    [currentUser.roles, configuration?.retrohunt?.enabled, searchKey, DEFAULT_RETROHUNT]
   );
 
   const reloadHits = useCallback(
@@ -288,7 +307,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
       if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
           method: 'POST',
-          url: `/api/v4/retrohunt/hits/${key}/`,
+          url: `/api/v4/retrohunt/hits/${searchKey}/`,
           body: {
             ...curQuery.getParams(),
             filters: curQuery.getAll('filters', [])
@@ -307,7 +326,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
         });
         apiCall({
           method: 'POST',
-          url: `/api/v4/retrohunt/types/${key}/`,
+          url: `/api/v4/retrohunt/types/${searchKey}/`,
           body: {
             query: curQuery.get('query', DEFAULT_PARAMS?.query),
             filters: curQuery.getAll('filters', [])
@@ -325,7 +344,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [key, configuration?.retrohunt?.enabled, currentUser.roles]
+    [currentUser.roles, configuration?.retrohunt?.enabled, searchKey]
   );
 
   const handleHitRowClick = useCallback(
@@ -349,7 +368,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
 
   useEffect(() => {
     reloadData();
-  }, [key, reloadData]);
+  }, [searchKey, reloadData]);
 
   useEffect(() => {
     if (query) reloadHits(query);
@@ -479,7 +498,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                 <Typography variant="subtitle2" color="textSecondary">
                   {`${t('created_by')} ${retrohunt.creator} `}
                   <Moment fromNow locale={i18n.language}>
-                    {retrohunt.created}
+                    {retrohunt.created_time}
                   </Moment>
                 </Typography>
               )

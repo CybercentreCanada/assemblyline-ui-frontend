@@ -27,7 +27,6 @@ import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import user from '../user';
 
 const useStyles = makeStyles(theme => ({
   circularProgress: {
@@ -74,7 +73,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
       ttl: !configuration.retrohunt.dtl ? 30 : configuration.retrohunt.dtl,
       yara_signature: ''
     }),
-    [c12nDef?.UNRESTRICTED, configuration.retrohunt.dtl]
+    [c12nDef?.UNRESTRICTED, configuration.retrohunt.dtl, currentUser.classification]
   );
 
   const [retrohunt, setRetrohunt] = useState<RetrohuntResult>({ ...DEFAULT_RETROHUNT });
