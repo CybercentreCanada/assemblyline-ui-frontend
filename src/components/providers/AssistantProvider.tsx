@@ -16,6 +16,7 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
   useTheme
 } from '@mui/material';
 import MuiPopper from '@mui/material/Popper';
@@ -76,8 +77,10 @@ export interface AssistantInsightProps {
 }
 
 interface ContextMessageProps {
-  role: 'system' | 'user' | 'assistant' | 'al';
+  role: 'system' | 'user' | 'assistant';
   content: string;
+  isError?: boolean;
+  isInsight?: boolean;
 }
 
 export const AssistantContext = React.createContext<AssistantContextProps>(null);
@@ -98,6 +101,8 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const [currentHistory, setCurrentHistory] = React.useState<ContextMessageProps[]>([]);
   const [currentInput, setCurrentInput] = React.useState<string>('');
   const [serviceList, setServiceList] = React.useState(null);
+  const upSM = useMediaQuery(theme.breakpoints.up('md'));
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const inputRef = React.useRef(null);
 
   const handleClick = event => {
@@ -136,6 +141,8 @@ function AssistantProvider({ children }: AssistantProviderProps) {
         setCurrentContext(api_data.api_response.trace);
         setCurrentHistory([...history, ...api_data.api_response.trace.slice(-1)]);
       },
+      onFailure: api_data =>
+        setCurrentHistory([...history, { role: 'assistant', content: api_data.api_error_message, isError: true }]),
       onEnter: () => setThinking(true),
       onFinalize: () => {
         setThinking(false);
@@ -148,14 +155,23 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   };
 
   const askAssistantWithInsight = (insight: AssistantInsightProps) => {
+    setCurrentHistory(history => [
+      ...history,
+      { role: 'user', content: `${t(`insight.${insight.type}`)}: ${insight.value}`, isInsight: true }
+    ]);
     if (insight.type === 'submission' || insight.type === 'report') {
       apiCall({
         method: 'GET',
         url: `/api/v4/submission/ai/${insight.value}/?${insight.type === 'report' ? 'detailed&' : ''}with_trace`,
         onSuccess: api_data => {
           setCurrentContext(api_data.api_response.trace);
-          setCurrentHistory([...currentHistory, ...api_data.api_response.trace]);
+          setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
         },
+        onFailure: api_data =>
+          setCurrentHistory(history => [
+            ...history,
+            { role: 'assistant', content: api_data.api_error_message, isError: true }
+          ]),
         onEnter: () => setThinking(true),
         onFinalize: () => {
           setThinking(false);
@@ -171,8 +187,13 @@ function AssistantProvider({ children }: AssistantProviderProps) {
         url: `/api/v4/file/ai/${insight.value}/?with_trace`,
         onSuccess: api_data => {
           setCurrentContext(api_data.api_response.trace);
-          setCurrentHistory([...currentHistory, ...api_data.api_response.trace]);
+          setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
         },
+        onFailure: api_data =>
+          setCurrentHistory(history => [
+            ...history,
+            { role: 'assistant', content: api_data.api_error_message, isError: true }
+          ]),
         onEnter: () => setThinking(true),
         onFinalize: () => {
           setThinking(false);
@@ -188,8 +209,13 @@ function AssistantProvider({ children }: AssistantProviderProps) {
         url: `/api/v4/file/code_summary/${insight.value}/?with_trace`,
         onSuccess: api_data => {
           setCurrentContext(api_data.api_response.trace);
-          setCurrentHistory([...currentHistory, ...api_data.api_response.trace]);
+          setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
         },
+        onFailure: api_data =>
+          setCurrentHistory(history => [
+            ...history,
+            { role: 'assistant', content: api_data.api_error_message, isError: true }
+          ]),
         onEnter: () => setThinking(true),
         onFinalize: () => {
           setThinking(false);
@@ -304,7 +330,7 @@ considered malicious.`.replaceAll('\n', ' ');
           <Backdrop open={open} onClick={() => setOpen(false)}>
             <Popper
               // Note: The following zIndex style is specifically for documentation purposes and may not be necessary in your application.
-              sx={{ zIndex: 1301, width: '50%', maxWidth: '960px', height: '75%', display: 'flex' }}
+              sx={{ zIndex: 1301, width: upSM ? '60%' : '85%', maxWidth: '960px', height: '75%', display: 'flex' }}
               style={{ marginBottom: theme.spacing(4) }}
               open={open}
               anchorEl={anchorEl}
@@ -371,8 +397,8 @@ considered malicious.`.replaceAll('\n', ' ');
                                   >
                                     <div
                                       style={{
-                                        minWidth: '20rem',
-                                        maxWidth: '40rem',
+                                        minWidth: '10rem',
+                                        maxWidth: '25rem',
                                         textAlign: 'center',
                                         flexGrow: 1,
                                         color: theme.palette.text.disabled
@@ -386,7 +412,7 @@ considered malicious.`.replaceAll('\n', ' ');
                               ) : (
                                 <Stack
                                   key={id}
-                                  direction={message.role === 'assistant' ? 'row' : 'row-reverse'}
+                                  direction={isXS ? 'column' : message.role === 'assistant' ? 'row' : 'row-reverse'}
                                   p={1}
                                   spacing={1}
                                   style={{ wordBreak: 'break-word' }}
@@ -401,10 +427,17 @@ considered malicious.`.replaceAll('\n', ' ');
                                   <Paper
                                     sx={{
                                       p: 0,
-                                      backgroundColor:
-                                        theme.palette.mode === 'dark'
-                                          ? theme.palette.background.default
-                                          : theme.palette.background.paper
+                                      backgroundColor: message.isInsight
+                                        ? theme.palette.mode === 'dark'
+                                          ? '#414e64'
+                                          : '#cddee9'
+                                        : message.isError
+                                        ? theme.palette.mode === 'dark'
+                                          ? '#6e2020'
+                                          : '#ffd1d1'
+                                        : theme.palette.mode === 'dark'
+                                        ? theme.palette.background.default
+                                        : theme.palette.background.paper
                                     }}
                                   >
                                     <AIMarkdown markdown={message.content} truncated={false} dense />
