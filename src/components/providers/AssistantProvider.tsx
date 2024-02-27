@@ -313,7 +313,13 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                     <Paper style={{ height: '100%', display: 'flex', overflow: 'hidden' }} elevation={3}>
                       <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
                         <div style={{ display: 'flex', padding: theme.spacing(1) }}>
-                          <Typography style={{ flexGrow: 1, alignSelf: 'center' }}>{t('title')}</Typography>
+                          <div style={{ flexGrow: 1, alignSelf: 'center' }}>
+                            <Tooltip title={t('caveat')}>
+                              <Typography variant="caption" style={{ color: theme.palette.text.disabled }}>
+                                {t('watermark')}
+                              </Typography>
+                            </Tooltip>
+                          </div>
                           <Tooltip title={t('reset')}>
                             <IconButton onClick={resetAssistant} color="inherit">
                               <RestartAltOutlinedIcon />
