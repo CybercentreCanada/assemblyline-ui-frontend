@@ -40,7 +40,7 @@
   "container.dialog.image": "Nom de l'image du conteneur",
   "container.dialog.name": "Nom de la dépendance",
   "container.dialog.ram": "Plage de mémoire autorisée",
-  "container.dialog.registry_password": "Mot de passe du registre du conteneur",
+  "container.dialog.registry_password": "Mot de passe/jeton du registre de conteneurs",
   "container.dialog.registry_type": "Type de registre de conteneurs",
   "container.dialog.registry_username": "Nom d'utilisateur du registre de conteneurs",
   "container.dialog.service_account": "Compte de service Kubernetes",

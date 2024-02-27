@@ -40,7 +40,7 @@
   "container.dialog.image": "Container image name",
   "container.dialog.name": "Dependency name",
   "container.dialog.ram": "Allowed memory range",
-  "container.dialog.registry_password": "Container registry password",
+  "container.dialog.registry_password": "Container registry password/token",
   "container.dialog.registry_type": "Container registry type",
   "container.dialog.registry_username": "Container registry username",
   "container.dialog.service_account": "Kubernetes service account",
