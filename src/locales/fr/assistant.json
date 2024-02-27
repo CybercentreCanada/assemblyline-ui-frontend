@@ -5,7 +5,7 @@
   "insight.file": "Résumer l'analyse du fichier",
   "insight.report": "Résumer le rapport",
   "insight.submission": "Résumer la soumission",
-  "new_chat": "Nouveau contexte de discussion initialisé",
+  "new_chat": "Le contexte de l'assistant a été réinitialisé",
   "reset": "Réinitialiser le contexte de discussion",
   "send": "Envoyer la question à l'Assistant",
   "title": "Assistant d'Assemblyline",

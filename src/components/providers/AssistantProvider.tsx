@@ -157,6 +157,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const askAssistantWithInsight = (insight: AssistantInsightProps) => {
     setCurrentHistory(history => [
       ...history,
+      { role: 'system', content: `"Default system prompt for insight: ${insight.type}`, isInsight: true },
       { role: 'user', content: `${t(`insight.${insight.type}`)}: ${insight.value}`, isInsight: true }
     ]);
     if (insight.type === 'submission' || insight.type === 'report') {
@@ -392,7 +393,7 @@ considered malicious.`.replaceAll('\n', ' ');
                                       display: 'flex',
                                       justifyContent: 'center',
                                       marginTop: theme.spacing(2),
-                                      marginBottom: theme.spacing(2)
+                                      marginBottom: theme.spacing(1)
                                     }}
                                   >
                                     <div
@@ -401,11 +402,21 @@ considered malicious.`.replaceAll('\n', ' ');
                                         maxWidth: '25rem',
                                         textAlign: 'center',
                                         flexGrow: 1,
-                                        color: theme.palette.text.disabled
+                                        color: theme.palette.text.disabled,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        flexDirection: 'column'
                                       }}
                                     >
-                                      <Divider />
-                                      {t('new_chat')}
+                                      <Divider style={{ width: '100%' }} />
+                                      <span
+                                        style={{
+                                          marginTop: theme.spacing(-1.25),
+                                          backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa'
+                                        }}
+                                      >
+                                        &nbsp;&nbsp;&nbsp;{t('new_chat')}&nbsp;&nbsp;&nbsp;
+                                      </span>
                                     </div>
                                   </div>
                                 ) : null

@@ -5,7 +5,7 @@
   "insight.file": "Summarize file analysis",
   "insight.report": "Summarize report",
   "insight.submission": "Summarize submission",
-  "new_chat": "New chat context initialized",
+  "new_chat": "Assistant context was resetted",
   "reset": "Reset chat context",
   "send": "Send question to Assistant",
   "title": "Assemblyline Assistant",
