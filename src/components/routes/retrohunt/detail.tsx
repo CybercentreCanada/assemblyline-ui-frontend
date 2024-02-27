@@ -422,15 +422,15 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
     socket.on('connect', () => {
       socket.emit('listen', { key: searchKey });
       // eslint-disable-next-line no-console
-      console.debug('Socket-IO :: Connecting to socketIO server...');
+      console.log('Socket-IO :: Connecting to socketIO server...');
     });
 
     socket.on('disconnect', () => {
       // eslint-disable-next-line no-console
-      console.debug('Socket-IO :: Disconnected from socketIO server.');
+      console.log('Socket-IO :: Disconnected from socketIO server.');
     });
     // eslint-disable-next-line no-console
-    socket.on('status', data => console.debug('Socket-IO :: Connected to socket server', data));
+    socket.on('status', data => console.log('Socket-IO :: Connected to socket server', data));
 
     return () => {
       socket.disconnect();
