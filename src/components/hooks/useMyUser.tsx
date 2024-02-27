@@ -104,6 +104,9 @@ export type ConfigurationDefinition = {
   ui: {
     ai: {
       enabled: boolean;
+      assistant: {
+        system_message: string;
+      };
     };
     alerting_meta: {
       important: string[];
