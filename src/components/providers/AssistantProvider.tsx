@@ -23,7 +23,6 @@ import { styled } from '@mui/material/styles';
 import { AppUser } from 'commons/components/app/AppUserService';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import AppAvatar from 'commons/components/display/AppAvatar';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import { isEnter } from 'commons/components/utils/keyboard';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -81,56 +80,24 @@ interface ContextMessageProps {
   content: string;
 }
 
-const DEFAULT_CONTEXT = [
-  {
-    role: 'system' as 'system',
-    content:
-      'You are the Assemblyline AI Assistant, you are here to help users understand the different outputs of Assemblyline.'
-  }
-];
-
 export const AssistantContext = React.createContext<AssistantContextProps>(null);
-
-const ASSISTANT_EVENT_ADD_INSIGHT = 'Assistant.AddInsight';
-const ASSISTANT_EVENT_REMOVE_INSIGHT = 'Assistant.RemoveInsight';
 
 function AssistantProvider({ children }: AssistantProviderProps) {
   const { t } = useTranslation(['assistant']);
   const theme = useTheme();
+  const appUser = useAppUser<AppUser>();
+  const { user: currentUser, configuration } = useALContext();
+  const { apiCall } = useMyAPI();
+
+  const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [arrowRef, setArrowRef] = React.useState(null);
-  const [open, setOpen] = React.useState(false);
-  const appUser = useAppUser<AppUser>();
-  const { configuration } = useALContext();
-
-  const { apiCall } = useMyAPI();
   const [currentInsights, setCurrentInsights] = React.useState<AssistantInsightProps[]>([]);
   const [thinking, setThinking] = React.useState(false);
   const [currentContext, setCurrentContext] = React.useState<ContextMessageProps[]>([]);
   const [currentHistory, setCurrentHistory] = React.useState<ContextMessageProps[]>([]);
   const [currentInput, setCurrentInput] = React.useState<string>('');
   const inputRef = React.useRef(null);
-
-  useEffect(() => {
-    const proceedAddInsight = (event: CustomEvent) => {
-      const { detail: insight } = event;
-      if (!currentInsights.some(i => i.type === insight.type && i.value === insight.value)) {
-        setCurrentInsights([...currentInsights, insight]);
-      }
-    };
-
-    const proceedRemoveInsight = (event: CustomEvent) => {
-      const { detail: insight } = event;
-      setCurrentInsights([...currentInsights.filter(i => !(i.type === insight.type && i.value === insight.value))]);
-    };
-
-    window.addEventListener(ASSISTANT_EVENT_ADD_INSIGHT, proceedAddInsight);
-    window.addEventListener(ASSISTANT_EVENT_REMOVE_INSIGHT, proceedRemoveInsight);
-    return () => {
-      window.removeEventListener(ASSISTANT_EVENT_ADD_INSIGHT, proceedAddInsight);
-      window.removeEventListener(ASSISTANT_EVENT_REMOVE_INSIGHT, proceedRemoveInsight);
-    };
-  }, [currentInsights]);
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -142,18 +109,13 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   };
 
   const addInsight = (insight: AssistantInsightProps) => {
-    setTimeout(
-      () => {
-        window.dispatchEvent(new CustomEvent(ASSISTANT_EVENT_ADD_INSIGHT, { detail: insight }));
-      },
-      // We will delay adding insight event as it is possible that by switching page we try to re-add right away
-      // what we just remove and the events get proceesed in the wrong order
-      500
+    setCurrentInsights(current =>
+      !current.some(i => i.type === insight.type && i.value === insight.value) ? [...current, insight] : current
     );
   };
 
   const removeInsight = (insight: AssistantInsightProps) => {
-    window.dispatchEvent(new CustomEvent(ASSISTANT_EVENT_REMOVE_INSIGHT, { detail: insight }));
+    setCurrentInsights(current => [...current.filter(i => !(i.type === insight.type && i.value === insight.value))]);
   };
 
   const askAssistant = () => {
@@ -239,14 +201,25 @@ function AssistantProvider({ children }: AssistantProviderProps) {
     }
   };
 
+  const buildDefaultSystemMessage = () => {
+    const defaultSystemPrompt = {
+      role: 'system' as 'system',
+      content: configuration.ui.ai.assistant.system_message
+    };
+
+    return defaultSystemPrompt;
+  };
+
   const clearAssistant = () => {
-    setCurrentContext([...DEFAULT_CONTEXT]);
-    setCurrentHistory([...DEFAULT_CONTEXT]);
+    const defaultSystemPrompt = buildDefaultSystemMessage();
+    setCurrentContext([defaultSystemPrompt]);
+    setCurrentHistory([defaultSystemPrompt]);
   };
 
   const resetAssistant = () => {
-    setCurrentContext([...DEFAULT_CONTEXT]);
-    setCurrentHistory([...currentHistory, ...DEFAULT_CONTEXT]);
+    const defaultSystemPrompt = buildDefaultSystemMessage();
+    setCurrentContext([defaultSystemPrompt]);
+    setCurrentHistory([...currentHistory, defaultSystemPrompt]);
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
@@ -266,9 +239,12 @@ function AssistantProvider({ children }: AssistantProviderProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  useEffectOnce(() => {
-    clearAssistant();
-  });
+  useEffect(() => {
+    if (configuration) {
+      clearAssistant();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [configuration]);
 
   return (
     <AssistantContext.Provider
@@ -278,7 +254,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
       }}
     >
       {children}
-      {configuration && configuration.ui.ai.enabled && (
+      {currentUser && currentUser.roles.includes('assistant_use') && configuration && configuration.ui.ai.enabled && (
         <ClickAwayListener onClickAway={() => setOpen(false)}>
           <div
             style={{
