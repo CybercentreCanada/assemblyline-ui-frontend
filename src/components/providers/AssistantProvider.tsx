@@ -324,14 +324,20 @@ considered malicious.`.replaceAll('\n', ' ');
             display: 'flex',
             position: 'fixed',
             bottom: theme.spacing(2),
-            right: theme.spacing(4),
+            right: upSM ? theme.spacing(4) : theme.spacing(2.5),
             zIndex: 1300
           }}
         >
           <Backdrop open={open} onClick={() => setOpen(false)}>
             <Popper
               // Note: The following zIndex style is specifically for documentation purposes and may not be necessary in your application.
-              sx={{ zIndex: 1301, width: upSM ? '60%' : '85%', maxWidth: '960px', height: '75%', display: 'flex' }}
+              sx={{
+                zIndex: 1301,
+                width: upSM ? '65%' : '90%',
+                maxWidth: '1024px',
+                height: upSM ? '75%' : '85%',
+                display: 'flex'
+              }}
               style={{ marginBottom: theme.spacing(4) }}
               open={open}
               anchorEl={anchorEl}
@@ -353,7 +359,7 @@ considered malicious.`.replaceAll('\n', ' ');
                   <div style={{ flexGrow: 1, width: '100%' }}>
                     <Paper style={{ height: '100%', display: 'flex', overflow: 'hidden' }} elevation={3}>
                       <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
-                        <div style={{ display: 'flex', padding: theme.spacing(1) }}>
+                        <div style={{ display: 'flex', padding: `${theme.spacing(0.25)} ${theme.spacing(1)}` }}>
                           <div style={{ flexGrow: 1, alignSelf: 'center' }}>
                             <Tooltip title={t('caveat')}>
                               <Typography variant="caption" style={{ color: theme.palette.text.disabled }}>
@@ -440,12 +446,12 @@ considered malicious.`.replaceAll('\n', ' ');
                                       p: 0,
                                       backgroundColor: message.isInsight
                                         ? theme.palette.mode === 'dark'
-                                          ? '#414e64'
-                                          : '#cddee9'
+                                          ? '#444d5c'
+                                          : '#d0e7f3'
                                         : message.isError
                                         ? theme.palette.mode === 'dark'
-                                          ? '#6e2020'
-                                          : '#ffd1d1'
+                                          ? '#4f1717'
+                                          : '#ffe2e2'
                                         : theme.palette.mode === 'dark'
                                         ? theme.palette.background.default
                                         : theme.palette.background.paper
@@ -476,20 +482,26 @@ considered malicious.`.replaceAll('\n', ' ');
                           )}
                         </div>
                         {currentInsights.length > 0 && (
-                          <Stack direction={'row-reverse'} mt={1} ml={1} mr={1} spacing={1}>
+                          <Stack direction={'row-reverse'} mt={0.75} ml={1} mr={1} spacing={1}>
                             {currentInsights.map(insight => (
                               <CustomChip
                                 variant="outlined"
-                                color="secondary"
+                                color="primary"
                                 label={t(`insight.${insight.type}`)}
-                                tooltip={`ID: ${insight.value}`}
+                                tooltip={insight.value}
+                                tooltipPlacement="top-end"
                                 size="small"
                                 onClick={() => askAssistantWithInsight(insight)}
                               />
                             ))}
                           </Stack>
                         )}
-                        <div style={{ display: 'flex', margin: theme.spacing(1) }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            margin: `${theme.spacing(0)} ${theme.spacing(1)} ${theme.spacing(1)} ${theme.spacing(1)} `
+                          }}
+                        >
                           <TextField
                             inputRef={inputRef}
                             value={currentInput}
@@ -498,12 +510,30 @@ considered malicious.`.replaceAll('\n', ' ');
                             fullWidth
                             size="small"
                             disabled={thinking}
+                            sx={{}}
+                            margin="dense"
+                            InputProps={{
+                              endAdornment: (
+                                <>
+                                  <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+                                  <Tooltip title={t('send')}>
+                                    <Button
+                                      onClick={askAssistant}
+                                      disabled={thinking}
+                                      size="small"
+                                      sx={{
+                                        minWidth: 0,
+                                        padding: `${theme.spacing(0.5)} ${theme.spacing(1.5)}`,
+                                        marginRight: theme.spacing(-1)
+                                      }}
+                                    >
+                                      <SendOutlinedIcon />
+                                    </Button>
+                                  </Tooltip>
+                                </>
+                              )
+                            }}
                           />
-                          <Tooltip title={t('send')}>
-                            <Button onClick={askAssistant} color="inherit" disabled={thinking}>
-                              <SendOutlinedIcon />
-                            </Button>
-                          </Tooltip>
                         </div>
                       </div>
                     </Paper>
