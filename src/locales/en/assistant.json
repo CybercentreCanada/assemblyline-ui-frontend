@@ -1,0 +1,11 @@
+{
+  "clear": "Clear all chat history",
+  "insight.code": "Analyse code",
+  "insight.file": "Summarize file analysis",
+  "insight.report": "Summarize report",
+  "insight.submission": "Summarize submission",
+  "new_chat": "New chat context initialized",
+  "reset": "Reset chat context",
+  "send": "Send question to Assistant",
+  "title": "Assemblyline Assistant"
+}

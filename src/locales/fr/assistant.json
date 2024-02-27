@@ -1,0 +1,11 @@
+{
+  "clear": "Effacer tout l'historique des discussions",
+  "insight.code": "Analyser le code",
+  "insight.file": "Résumer l'analyse du fichier",
+  "insight.report": "Résumer le rapport",
+  "insight.submission": "Résumer la soumission",
+  "new_chat": "Nouveau contexte de discussion initialisé",
+  "reset": "Réinitialiser le contexte de discussion",
+  "send": "Envoyer la question à l'Assistant",
+  "title": "Assistant d'Assemblyline"
+}

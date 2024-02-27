@@ -11,6 +11,7 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
+import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -70,6 +71,7 @@ export default function SubmissionReport() {
   const [originalReport, setOriginalReport] = useState(null);
   const [showInfoContent, setShowInfoContent] = useState(false);
   const [useAIReport, setUseAIReport] = useState(false);
+  const { addInsight, removeInsight } = useAssistant();
 
   const cleanupReport = useCallback(() => {
     const recursiveFileTreeCleanup = (tree, impFiles) => {
@@ -180,6 +182,15 @@ export default function SubmissionReport() {
       setShowInfoContent(false);
     }
   }, [useAIReport]);
+
+  useEffect(() => {
+    addInsight({ type: 'report', value: id });
+
+    return () => {
+      removeInsight({ type: 'report', value: id });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
