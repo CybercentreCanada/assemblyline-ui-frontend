@@ -55,6 +55,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { io } from 'socket.io-client';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -137,6 +138,8 @@ const PAGE_SIZE = 10;
 const MAX_TRACKED_RECORDS = 10000;
 
 const RELOAD_DELAY = 5000;
+
+const SOCKETIO_NAMESPACE = '/retrohunt';
 
 const DEFAULT_PARAMS = {
   query: '*',
@@ -410,6 +413,29 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   useEffect(() => {
     if (!['/retrohunt', '/file/detail'].some(p => location.pathname.startsWith(p))) closeGlobalDrawer();
   }, [closeGlobalDrawer, location.pathname]);
+
+  useEffect(() => {
+    if (!searchKey) return;
+
+    const socket = io(SOCKETIO_NAMESPACE);
+
+    socket.on('connect', () => {
+      socket.emit('listen', { key: searchKey });
+      // eslint-disable-next-line no-console
+      console.debug('Socket-IO :: Connecting to socketIO server...');
+    });
+
+    socket.on('disconnect', () => {
+      // eslint-disable-next-line no-console
+      console.debug('Socket-IO :: Disconnected from socketIO server.');
+    });
+    // eslint-disable-next-line no-console
+    socket.on('status', data => console.debug('Socket-IO :: Connected to socket server', data));
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [searchKey]);
 
   if (!configuration?.retrohunt?.enabled) return <NotFoundPage />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
