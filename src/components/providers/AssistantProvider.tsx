@@ -5,8 +5,8 @@ import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import {
   Avatar,
+  Backdrop,
   Button,
-  ClickAwayListener,
   Divider,
   Fab,
   Fade,
@@ -292,19 +292,19 @@ considered malicious.`.replaceAll('\n', ' ');
     >
       {children}
       {currentUser && currentUser.roles.includes('assistant_use') && configuration && configuration.ui.ai.enabled && (
-        <ClickAwayListener onClickAway={() => setOpen(false)}>
-          <div
-            style={{
-              display: 'flex',
-              position: 'fixed',
-              bottom: theme.spacing(2),
-              right: theme.spacing(4),
-              zIndex: 1300
-            }}
-          >
+        <div
+          style={{
+            display: 'flex',
+            position: 'fixed',
+            bottom: theme.spacing(2),
+            right: theme.spacing(4),
+            zIndex: 1300
+          }}
+        >
+          <Backdrop open={open} onClick={() => setOpen(false)}>
             <Popper
               // Note: The following zIndex style is specifically for documentation purposes and may not be necessary in your application.
-              sx={{ zIndex: 1200, width: '50%', maxWidth: '960px', height: '75%', display: 'flex' }}
+              sx={{ zIndex: 1301, width: '50%', maxWidth: '960px', height: '75%', display: 'flex' }}
               style={{ marginBottom: theme.spacing(4) }}
               open={open}
               anchorEl={anchorEl}
@@ -319,6 +319,7 @@ considered malicious.`.replaceAll('\n', ' ');
                   }
                 }
               ]}
+              onClick={event => event.stopPropagation()}
             >
               {({ TransitionProps }) => (
                 <Fade {...TransitionProps} timeout={350}>
@@ -467,13 +468,13 @@ considered malicious.`.replaceAll('\n', ' ');
                 </Fade>
               )}
             </Popper>
-            <Tooltip title={t('title')}>
-              <Fab color="primary" onClick={handleClick}>
-                <AssistantIcon />
-              </Fab>
-            </Tooltip>
-          </div>
-        </ClickAwayListener>
+          </Backdrop>
+          <Tooltip title={t('title')}>
+            <Fab color="primary" onClick={handleClick}>
+              <AssistantIcon />
+            </Fab>
+          </Tooltip>
+        </div>
       )}
     </AssistantContext.Provider>
   );
