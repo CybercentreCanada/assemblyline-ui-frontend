@@ -86,7 +86,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const { t } = useTranslation(['assistant']);
   const theme = useTheme();
   const appUser = useAppUser<AppUser>();
-  const { user: currentUser, configuration } = useALContext();
+  const { user: currentUser, configuration, c12nDef } = useALContext();
   const { apiCall } = useMyAPI();
 
   const [open, setOpen] = React.useState(false);
@@ -97,6 +97,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const [currentContext, setCurrentContext] = React.useState<ContextMessageProps[]>([]);
   const [currentHistory, setCurrentHistory] = React.useState<ContextMessageProps[]>([]);
   const [currentInput, setCurrentInput] = React.useState<string>('');
+  const [serviceList, setServiceList] = React.useState(null);
   const inputRef = React.useRef(null);
 
   const handleClick = event => {
@@ -202,9 +203,33 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   };
 
   const buildDefaultSystemMessage = () => {
+    // Automatically create the prompting of the score ranges
+    const scoring = `Assemblyline uses a scoring mechanism where any scores below
+${configuration.submission.verdicts.info} is considered safe, scores between
+${configuration.submission.verdicts.info} and ${configuration.submission.verdicts.suspicious}
+are considered informational, scores between ${configuration.submission.verdicts.suspicious}
+and ${configuration.submission.verdicts.highly_suspicious} are considered suspicious,
+scores between ${configuration.submission.verdicts.highly_suspicious} and
+${configuration.submission.verdicts.malicious} are considered highly-suspicious
+and scores with ${configuration.submission.verdicts.malicious} points and up are
+considered malicious.`.replaceAll('\n', ' ');
+
+    // Create list of Assemblyline services
+    const services = `\nAssemblyline does its processing using only the following services/plugins:\n${serviceList
+      .map(srv => ` - name: ${srv.name}\n   category: ${srv.category}\n   description: """${srv.description}"""\n`)
+      .join('')}`;
+
+    // Define AL's classification engine
+    const classification = `Assemblyline can classify/restrict access to its output with the following markings:\n${Object.keys(
+      c12nDef.description
+    )
+      .map(marking => ` - ${marking}: ${c12nDef.description[marking]}\n`)
+      .join('')}`;
+
+    // Create the default system prompt
     const defaultSystemPrompt = {
       role: 'system' as 'system',
-      content: configuration.ui.ai.assistant.system_message
+      content: [configuration.ui.ai.assistant.system_message, scoring, services, classification].join('\n')
     };
 
     return defaultSystemPrompt;
@@ -241,10 +266,22 @@ function AssistantProvider({ children }: AssistantProviderProps) {
 
   useEffect(() => {
     if (configuration) {
-      clearAssistant();
+      apiCall({
+        url: `/api/v4/service/all/`,
+        onSuccess: api_data => {
+          setServiceList(api_data.api_response);
+        }
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configuration]);
+
+  useEffect(() => {
+    if (configuration && serviceList !== null) {
+      clearAssistant();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [configuration, serviceList]);
 
   return (
     <AssistantContext.Provider
