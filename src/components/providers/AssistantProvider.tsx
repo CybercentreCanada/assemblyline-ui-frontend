@@ -104,6 +104,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const upSM = useMediaQuery(theme.breakpoints.up('md'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const inputRef = React.useRef(null);
+  const chatRef = React.useRef(null);
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -310,6 +311,11 @@ considered malicious.`.replaceAll('\n', ' ');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configuration, serviceList]);
 
+  useEffect(() => {
+    if (chatRef && chatRef.current)
+      chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, left: 0, behavior: 'smooth' });
+  }, [currentHistory, thinking]);
+
   return (
     <AssistantContext.Provider
       value={{
@@ -379,6 +385,7 @@ considered malicious.`.replaceAll('\n', ' ');
                           </Tooltip>
                         </div>
                         <div
+                          ref={chatRef}
                           style={{
                             backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
                             flexGrow: 1,
