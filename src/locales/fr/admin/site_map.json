@@ -30,6 +30,7 @@
   "role.retrohunt_view": "Visionnement de Rétrohunt",
   "role.safelist_manage": "Gestion de la Liste sure",
   "role.safelist_view": "Visionnement de la Liste sure",
+  "role.assistant_use": "Utilisation de l'assistant",
   "role.badlist_manage": "Gestion de la Liste mauvaise",
   "role.badlist_view": "Visionnement de la Liste mauvaise",
   "role.search": "Recherche",
