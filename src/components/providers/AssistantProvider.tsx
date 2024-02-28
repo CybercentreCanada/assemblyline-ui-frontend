@@ -35,7 +35,7 @@ import { useTranslation } from 'react-i18next';
 
 const Popper = styled(MuiPopper, {
   shouldForwardProp: prop => prop !== 'arrow'
-})(({ theme }) => ({
+})(() => ({
   zIndex: 1,
   '& > div': {
     position: 'relative'
@@ -49,6 +49,7 @@ const Popper = styled(MuiPopper, {
 
 const Arrow = styled('div')(({ theme }) => ({
   position: 'absolute',
+  right: 21,
   '&::before': {
     content: '""',
     margin: 'auto',
@@ -94,7 +95,6 @@ function AssistantProvider({ children }: AssistantProviderProps) {
 
   const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [arrowRef, setArrowRef] = React.useState(null);
   const [currentInsights, setCurrentInsights] = React.useState<AssistantInsightProps[]>([]);
   const [thinking, setThinking] = React.useState(false);
   const [currentContext, setCurrentContext] = React.useState<ContextMessageProps[]>([]);
@@ -293,7 +293,7 @@ considered malicious.`.replaceAll('\n', ' ');
   };
 
   useEffect(() => {
-    if (currentContext.length === 1) {
+    if (open && currentContext.length === 1) {
       askAssistant();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -344,14 +344,13 @@ considered malicious.`.replaceAll('\n', ' ');
           style={{
             display: 'flex',
             position: 'fixed',
-            bottom: theme.spacing(2),
+            bottom: upSM ? theme.spacing(4) : theme.spacing(2.5),
             right: upSM ? theme.spacing(4) : theme.spacing(2.5),
             zIndex: 1300
           }}
         >
           <Backdrop open={open} onClick={() => setOpen(false)}>
             <Popper
-              // Note: The following zIndex style is specifically for documentation purposes and may not be necessary in your application.
               sx={{
                 zIndex: 1301,
                 width: upSM ? '65%' : '90%',
@@ -359,20 +358,10 @@ considered malicious.`.replaceAll('\n', ' ');
                 height: upSM ? '75%' : '85%',
                 display: 'flex'
               }}
-              style={{ marginBottom: theme.spacing(4) }}
               open={open}
               anchorEl={anchorEl}
               placement="top-end"
               transition
-              modifiers={[
-                {
-                  name: 'arrow',
-                  enabled: true,
-                  options: {
-                    element: arrowRef
-                  }
-                }
-              ]}
               onClick={event => event.stopPropagation()}
             >
               {({ TransitionProps }) => (
@@ -382,18 +371,18 @@ considered malicious.`.replaceAll('\n', ' ');
                       <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
                         <div style={{ display: 'flex', padding: `${theme.spacing(0.25)} ${theme.spacing(1)}` }}>
                           <div style={{ flexGrow: 1, alignSelf: 'center' }}>
-                            <Tooltip title={t('caveat')}>
+                            <Tooltip title={t('caveat')} placement="right">
                               <Typography variant="caption" style={{ color: theme.palette.text.disabled }}>
                                 {t('watermark')}
                               </Typography>
                             </Tooltip>
                           </div>
-                          <Tooltip title={t('reset')}>
+                          <Tooltip title={t('reset')} placement="top">
                             <IconButton onClick={resetAssistant} color="inherit">
                               <RestartAltOutlinedIcon />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title={t('clear')}>
+                          <Tooltip title={t('clear')} placement="top">
                             <IconButton onClick={clearAssistant} color="inherit">
                               <ClearAllIcon />
                             </IconButton>
@@ -417,6 +406,7 @@ considered malicious.`.replaceAll('\n', ' ');
                               message.role === 'system' ? (
                                 id !== 0 ? (
                                   <div
+                                    key={id}
                                     style={{
                                       display: 'flex',
                                       justifyContent: 'center',
@@ -505,8 +495,9 @@ considered malicious.`.replaceAll('\n', ' ');
                         </div>
                         {currentInsights.length > 0 && (
                           <Stack direction={'row-reverse'} mt={0.75} ml={1} mr={1} spacing={1}>
-                            {currentInsights.map(insight => (
+                            {currentInsights.map((insight, id) => (
                               <CustomChip
+                                key={id}
                                 variant="outlined"
                                 color="primary"
                                 label={t(`insight.${insight.type}`)}
@@ -538,19 +529,21 @@ considered malicious.`.replaceAll('\n', ' ');
                               endAdornment: (
                                 <>
                                   <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                                  <Tooltip title={t('send')}>
-                                    <Button
-                                      onClick={askAssistant}
-                                      disabled={thinking}
-                                      size="small"
-                                      sx={{
-                                        minWidth: 0,
-                                        padding: `${theme.spacing(0.5)} ${theme.spacing(1.5)}`,
-                                        marginRight: theme.spacing(-1)
-                                      }}
-                                    >
-                                      <SendOutlinedIcon />
-                                    </Button>
+                                  <Tooltip title={t('send')} placement="left">
+                                    <span>
+                                      <Button
+                                        onClick={askAssistant}
+                                        disabled={thinking}
+                                        size="small"
+                                        sx={{
+                                          minWidth: 0,
+                                          padding: `${theme.spacing(0.5)} ${theme.spacing(1.5)}`,
+                                          marginRight: theme.spacing(-1)
+                                        }}
+                                      >
+                                        <SendOutlinedIcon />
+                                      </Button>
+                                    </span>
                                   </Tooltip>
                                 </>
                               )
@@ -559,13 +552,13 @@ considered malicious.`.replaceAll('\n', ' ');
                         </div>
                       </div>
                     </Paper>
-                    <Arrow ref={setArrowRef} className="MuiPopper-arrow" />
+                    <Arrow className="MuiPopper-arrow" />
                   </div>
                 </Fade>
               )}
             </Popper>
           </Backdrop>
-          <Tooltip title={t('title')}>
+          <Tooltip title={t('title')} placement="left">
             <Fab color="primary" onClick={handleClick}>
               <AssistantIcon />
             </Fab>
