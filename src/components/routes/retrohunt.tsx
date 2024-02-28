@@ -1,4 +1,6 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import PauseCircleOutlineOutlinedIcon from '@mui/icons-material/PauseCircleOutlineOutlined';
+import PlayCircleFilledWhiteOutlinedIcon from '@mui/icons-material/PlayCircleFilledWhiteOutlined';
 import { Grid, IconButton, Pagination, Tooltip, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -51,7 +53,7 @@ const PAGE_SIZE = 25;
 const MAX_TRACKED_RECORDS = 10000;
 const RELOAD_DELAY = 5000;
 export const RETROHUNT_INDICES = ['hot', 'archive', 'hot_and_archive'] as const;
-export const RETROHUNT_PHASES = ['filtering', 'yara', 'finished'] as const;
+export const RETROHUNT_PHASES = ['starting', 'filtering', 'yara', 'finished'] as const;
 
 export type RetrohuntIndex = (typeof RETROHUNT_INDICES)[number];
 export type RetrohuntPhase = (typeof RETROHUNT_PHASES)[number];
@@ -90,6 +92,7 @@ export type RetrohuntResult = {
 
   total_hits?: number;
   total_errors?: number;
+  total_warnings?: number;
 
   // to delete ?
   phase?: RetrohuntPhase;
@@ -129,6 +132,7 @@ export default function RetrohuntPage() {
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [searching, setSearching] = useState<boolean>(false);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
 
   const filterValue = useRef<string>('');
   const timer = useRef<boolean>(false);
@@ -252,14 +256,14 @@ export default function RetrohuntPage() {
   }, [location.hash, setGlobalDrawer]);
 
   useEffect(() => {
-    if (!timer.current && retrohuntResults && retrohuntResults.items.some(item => !item?.finished)) {
+    if (!timer.current && !isPaused && retrohuntResults && retrohuntResults.items.some(item => !item?.finished)) {
       timer.current = true;
       setTimeout(() => {
         handleReload(query);
         timer.current = false;
       }, RELOAD_DELAY);
     }
-  }, [handleReload, query, retrohuntResults]);
+  }, [handleReload, isPaused, query, retrohuntResults]);
 
   if (!configuration?.retrohunt?.enabled) return <Navigate to="/notfound" replace />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <Navigate to="/forbidden" replace />;
@@ -271,10 +275,19 @@ export default function RetrohuntPage() {
             <Grid item xs>
               <Typography variant="h4">{t('title')}</Typography>
             </Grid>
+            {retrohuntResults && retrohuntResults.items.some(r => !r?.finished) && (
+              <Grid className={classes.headerButton} item xs>
+                <Tooltip title={isPaused ? t('tooltip.play') : t('tooltip.paused')}>
+                  <IconButton color="primary" size="large" onClick={() => setIsPaused(p => !p)}>
+                    {isPaused ? <PlayCircleFilledWhiteOutlinedIcon /> : <PauseCircleOutlineOutlinedIcon />}
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            )}
             {currentUser.roles.includes('retrohunt_run') && (
               <Grid className={classes.headerButton} item xs>
                 <Tooltip title={t('tooltip.add')}>
-                  <IconButton className={classes.headerIconButton} onClick={handleOpenCreatePage} size="large">
+                  <IconButton color="success" size="large" onClick={handleOpenCreatePage}>
                     <AddCircleOutlineOutlinedIcon />
                   </IconButton>
                 </Tooltip>

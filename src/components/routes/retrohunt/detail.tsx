@@ -3,6 +3,9 @@ import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DoneOutlinedIcon from '@mui/icons-material/DoneOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import PauseCircleOutlineOutlinedIcon from '@mui/icons-material/PauseCircleOutlineOutlined';
+import PlayCircleFilledWhiteOutlinedIcon from '@mui/icons-material/PlayCircleFilledWhiteOutlined';
 import {
   AlertTitle,
   Grid,
@@ -12,6 +15,7 @@ import {
   Skeleton,
   Tooltip,
   Typography,
+  useMediaQuery,
   useTheme
 } from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
@@ -56,6 +60,7 @@ import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import { RetrohuntRepeat } from './repeat';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -173,9 +178,12 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   const [typeDataSet, setTypeDataSet] = useState<{ [k: string]: number }>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
 
   const filterValue = useRef<string>('');
   const timer = useRef<boolean>(false);
+
+  const isSM = useMediaQuery(theme.breakpoints.down('md'));
 
   const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
@@ -378,7 +386,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   }, [query, reloadHits]);
 
   useEffect(() => {
-    if (!timer.current && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
+    if (!timer.current && !isPaused && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
       timer.current = true;
       setTimeout(() => {
         reloadData();
@@ -386,7 +394,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
         timer.current = false;
       }, RELOAD_DELAY);
     }
-  }, [reloadData, reloadHits, isDrawer, location.search, query, retrohunt]);
+  }, [reloadData, reloadHits, isDrawer, location.search, query, retrohunt, isPaused]);
 
   useEffect(() => {
     if (!isDrawer && location.hash) {
@@ -443,16 +451,9 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
     return (
       <PageLayout>
         <RetrohuntErrors retrohunt={retrohunt} open={isErrorOpen} onClose={() => setIsErrorOpen(false)} />
-        <Grid
-          container
-          flexDirection="column"
-          flexWrap="nowrap"
-          flex={1}
-          rowSpacing={1}
-          marginBottom={theme.spacing(4)}
-        >
+        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={2} marginBottom={theme.spacing(4)}>
           {c12nDef.enforce && (
-            <Grid item paddingBottom={4}>
+            <Grid item paddingBottom={1}>
               <Classification
                 format="long"
                 type="pill"
@@ -463,11 +464,49 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
           )}
 
           <Grid item>
-            <Grid container flexDirection="row">
-              <Grid item flexGrow={1}>
+            <Grid container flexDirection="row" rowGap={2}>
+              <Grid item flex={1}>
                 <Typography variant="h4" children={!retrohunt ? <Skeleton width="30rem" /> : t('header.view')} />
                 <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.key} />
               </Grid>
+              {retrohunt && retrohunt.finished === true && (
+                <Grid item flex={0}>
+                  <RetrohuntRepeat retrohunt={retrohunt} />
+                </Grid>
+              )}
+              {retrohunt && retrohunt.finished === false && (
+                <Grid item flex={0}>
+                  <Tooltip title={isPaused ? t('tooltip.play') : t('tooltip.paused')}>
+                    <IconButton color="primary" size="large" onClick={() => setIsPaused(p => !p)}>
+                      {isPaused ? <PlayCircleFilledWhiteOutlinedIcon /> : <PauseCircleOutlineOutlinedIcon />}
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+              )}
+              {!retrohunt ? (
+                <Grid item>
+                  <Skeleton className={classes.skeletonButton} variant="circular" />
+                </Grid>
+              ) : (
+                'total_warnings' in retrohunt &&
+                retrohunt?.total_warnings > 0 && (
+                  <Grid item>
+                    <Tooltip
+                      title={
+                        'total_errors' in retrohunt
+                          ? retrohunt.total_errors > 1
+                            ? `${retrohunt.total_errors} ${t('errors.totals')}`
+                            : `${retrohunt.total_errors} ${t('errors.total')}`
+                          : t('errors.tooltip')
+                      }
+                    >
+                      <IconButton color="error" size="large" onClick={() => setIsErrorOpen(true)}>
+                        <ErrorOutlineOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                )
+              )}
               {!retrohunt ? (
                 <Grid item>
                   <Skeleton className={classes.skeletonButton} variant="circular" />
@@ -485,7 +524,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                           : t('errors.tooltip')
                       }
                     >
-                      <IconButton className={classes.errorButton} size="large" onClick={() => setIsErrorOpen(true)}>
+                      <IconButton color="error" size="large" onClick={() => setIsErrorOpen(true)}>
                         <ErrorOutlineOutlinedIcon />
                       </IconButton>
                     </Tooltip>
@@ -518,7 +557,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
               )}
           </Grid>
 
-          <Grid item style={{ textAlign: 'center' }}>
+          <Grid item style={{ textAlign: 'center' }} rowGap={1}>
             {retrohunt ? (
               retrohunt.creator && (
                 <Typography variant="subtitle2" color="textSecondary">
@@ -531,9 +570,6 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
             ) : (
               <Skeleton />
             )}
-          </Grid>
-
-          <Grid item style={{ textAlign: 'center' }}>
             {retrohunt ? (
               retrohunt.expiry_ts && (
                 <Typography variant="subtitle2" color="textSecondary">
@@ -549,19 +585,44 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
           </Grid>
 
           <Grid item>
-            <Grid container flexDirection="row" rowGap={1} columnGap={3}>
-              <Grid item flex={1}>
-                <Typography variant="subtitle2">{t('details.description')}</Typography>
-                {!retrohunt ? (
-                  <Skeleton style={{ height: '2.5rem' }} />
-                ) : (
-                  <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {retrohunt?.description}
-                  </Paper>
-                )}
-              </Grid>
+            <Typography variant="subtitle2">{t('details.description')}</Typography>
+            {!retrohunt ? (
+              <Skeleton style={{ height: '2.5rem' }} />
+            ) : (
+              <Paper component="pre" variant="outlined" className={classes.preview}>
+                {retrohunt?.description}
+              </Paper>
+            )}
+          </Grid>
 
-              <Grid item sm={12} md={5}>
+          <Grid item>
+            <Grid container flexDirection="row" rowGap={1} columnGap={3}>
+              {c12nDef.enforce && (
+                <Grid item style={isSM ? { width: '100%' } : { flex: 8 }}>
+                  <Tooltip title={t('tooltip.search_classification')} placement="top">
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: theme.spacing(1),
+                        marginBottom: theme.spacing(0.5)
+                      }}
+                    >
+                      <Typography variant="subtitle2">{t('details.search_classification')}</Typography>
+                      <InfoOutlinedIcon />
+                    </div>
+                  </Tooltip>
+                  <Classification
+                    format="long"
+                    type="pill"
+                    size="tiny"
+                    c12n={retrohunt && 'search_classification' in retrohunt ? retrohunt.search_classification : null}
+                  />
+                </Grid>
+              )}
+
+              <Grid item style={isSM ? { width: '100%' } : { flex: 4 }}>
                 <Typography variant="subtitle2">{t('details.search')}</Typography>
                 {!retrohunt ? (
                   <Skeleton style={{ height: '2.5rem' }} />
@@ -576,11 +637,9 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
 
           <Grid item>
             {!retrohunt ? (
-              <Skeleton
-                style={{ height: '100%', minHeight: '450px', transform: 'none', marginTop: theme.spacing(1) }}
-              />
+              <Skeleton style={{ height: '100%', minHeight: '450px', transform: 'none' }} />
             ) : (
-              <Grid container flexDirection="column" height="100%" minHeight="450px" marginTop={theme.spacing(1)}>
+              <Grid container flexDirection="column" height="100%" minHeight="450px">
                 <MonacoEditor
                   language="yara"
                   value={'yara_signature' in retrohunt ? retrohunt.yara_signature : ''}
@@ -592,7 +651,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
 
           <Grid item>
             <Grid container gap={1}>
-              <Grid item xs={12} marginTop={2}>
+              <Grid item xs={12} marginTop={1}>
                 <Typography variant="h6">{t('header.results')}</Typography>
               </Grid>
               {!retrohunt ? (
@@ -635,7 +694,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
             </Grid>
           </Grid>
 
-          <Grid item marginTop={1}>
+          <Grid item>
             {!retrohunt ? (
               <Skeleton style={{ height: '100%', transform: 'none', marginTop: theme.spacing(1) }} />
             ) : (
