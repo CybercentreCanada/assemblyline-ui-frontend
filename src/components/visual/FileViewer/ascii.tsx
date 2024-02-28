@@ -70,7 +70,7 @@ const WrappedASCIISection: React.FC<Props> = ({
 }) => {
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { t } = useTranslation(['fileViewer']);
+  const { t, i18n } = useTranslation(['fileViewer']);
   const classes = useStyles();
   const theme = useTheme();
   const [analysing, setAnalysing] = useState(false);
@@ -88,7 +88,7 @@ const WrappedASCIISection: React.FC<Props> = ({
 
   const getCodeSummary = useCallback(
     noCache => {
-      const params = [];
+      const params = [`lang=${i18n.language === 'en' ? 'english' : 'french'}`];
       if (noCache) {
         params.push('no_cache');
       }
@@ -97,7 +97,7 @@ const WrappedASCIISection: React.FC<Props> = ({
       }
       apiCall({
         allowCache: !noCache,
-        url: `/api/v4/file/code_summary/${sha256}/${noCache ? '?no_cache' : ''}`,
+        url: `/api/v4/file/code_summary/${sha256}/${params ? `?${params.join('&')}` : ''}`,
         onSuccess: api_data => {
           if (codeError !== null) setCodeError(null);
           setCodeSummary(api_data.api_response.content);
