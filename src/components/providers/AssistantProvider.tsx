@@ -90,7 +90,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const { t, i18n } = useTranslation(['assistant']);
   const theme = useTheme();
   const appUser = useAppUser<AppUser>();
-  const { user: currentUser, configuration, c12nDef } = useALContext();
+  const { user: currentUser, configuration, c12nDef, indexes } = useALContext();
   const { apiCall } = useMyAPI();
 
   const [open, setOpen] = React.useState(false);
@@ -258,13 +258,28 @@ considered malicious.`.replaceAll('\n', ' ');
       .map(marking => ` - ${marking}: ${c12nDef.description[marking]}\n`)
       .join('')}`;
 
+    // Indices fields
+    const indices = `\nAssemblyline has multiple indices where it stores the data, theses indices can be queried with the lucene syntax.\n${Object.keys(
+      indexes
+    )
+      .filter(index => ['file', 'alert', 'result', 'signature', 'submission'].includes(index))
+      .map(
+        index =>
+          `\nThe '${index}' index as the following fields:\n${Object.keys(indexes[index])
+            .map(field => `  - ${field}`)
+            .join('\n')}`
+      )
+      .join('\n')}`;
+
     // Set language
     const lang = `\nYour answer must be written in plain ${i18n.language === 'en' ? 'english' : 'french'}.`;
 
     // Create the default system prompt
     const defaultSystemPrompt = {
       role: 'system' as 'system',
-      content: [configuration.ui.ai.assistant.system_message, scoring, services, classification, lang].join('\n')
+      content: [configuration.ui.ai.assistant.system_message, scoring, services, classification, indices, lang].join(
+        '\n'
+      )
     };
 
     return defaultSystemPrompt;
