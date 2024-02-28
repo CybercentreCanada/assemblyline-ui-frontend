@@ -1,4 +1,6 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import {
   AlertTitle,
   Dialog,
@@ -54,8 +56,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+type Error = {
+  type: 'warning' | 'error';
+  message: string;
+};
+
 type RetrohuntErrorResult = {
-  items: string[];
+  items: Error[];
   offset: number;
   rows: number;
   total: number;
@@ -207,9 +214,16 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
                   <DivTableRow>
                     <SortableHeaderCell
                       query={query}
+                      children={t('details.error_type')}
+                      sortName="sort"
+                      sortField="type"
+                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                    />
+                    <SortableHeaderCell
+                      query={query}
                       children={t('details.message')}
                       sortName="sort"
-                      sortField="error"
+                      sortField="message"
                       onSort={(e, { name, field }) => handleQueryChange(name, field)}
                     />
                   </DivTableRow>
@@ -217,7 +231,18 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
                 <DivTableBody>
                   {errorResults.items.map((error, id) => (
                     <DivTableRow key={id} hover style={{ textDecoration: 'none' }}>
-                      <DivTableCell>{error}</DivTableCell>
+                      {error.type === 'warning' ? (
+                        <DivTableCell>
+                          <WarningAmberOutlinedIcon color="warning" />
+                        </DivTableCell>
+                      ) : error.type === 'error' ? (
+                        <DivTableCell>
+                          <ErrorOutlineOutlinedIcon color="error" />
+                        </DivTableCell>
+                      ) : (
+                        <DivTableCell></DivTableCell>
+                      )}
+                      <DivTableCell>{error.message}</DivTableCell>
                     </DivTableRow>
                   ))}
                 </DivTableBody>

@@ -1,3 +1,4 @@
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
   Button,
   CircularProgress,
@@ -6,6 +7,7 @@ import {
   Radio,
   RadioGroup,
   TextField,
+  Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
@@ -151,7 +153,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
           text={t('validate.text')}
         />
 
-        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={2}>
+        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={1}>
           {c12nDef.enforce && (
             <Grid item paddingBottom={theme.spacing(2)}>
               <Classification
@@ -159,18 +161,6 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
                 type="picker"
                 c12n={retrohunt.classification}
                 setClassification={(c12n: string) => handleRetrohuntChange({ classification: c12n })}
-                disabled={!currentUser.roles.includes('retrohunt_run') || isDisabled}
-              />
-            </Grid>
-          )}
-
-          {c12nDef.enforce && (
-            <Grid item paddingBottom={theme.spacing(2)}>
-              <Classification
-                format="long"
-                type="picker"
-                c12n={retrohunt.search_classification}
-                setClassification={(c12n: string) => handleRetrohuntChange({ search_classification: c12n })}
                 disabled={!currentUser.roles.includes('retrohunt_run') || isDisabled}
               />
             </Grid>
@@ -249,6 +239,32 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
               </Grid>
             </Grid>
           </Grid>
+
+          {c12nDef.enforce && (
+            <Grid item marginBottom={1}>
+              <Tooltip title={t('tooltip.search_classification')} placement="top">
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: theme.spacing(1),
+                    marginBottom: theme.spacing(0.5)
+                  }}
+                >
+                  <Typography variant="subtitle2">{t('details.search_classification')}</Typography>
+                  <InfoOutlinedIcon />
+                </div>
+              </Tooltip>
+              <Classification
+                format="long"
+                type="picker"
+                c12n={retrohunt.search_classification}
+                setClassification={(c12n: string) => handleRetrohuntChange({ search_classification: c12n })}
+                disabled={!currentUser.roles.includes('retrohunt_run') || isDisabled}
+              />
+            </Grid>
+          )}
 
           <Grid item flex={1}>
             <Grid container flexDirection="column" height="100%" minHeight="500px">
