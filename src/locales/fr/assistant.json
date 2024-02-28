@@ -1,0 +1,13 @@
+{
+  "caveat": "Ce chatbot utilise un grand modèle de langage pour fournir des réponses à vos questions. Les réponses sont imprévisibles et ne reflètent pas toujours la réalité.",
+  "clear": "Effacer tout l'historique des discussions",
+  "insight.code": "Analyser le code",
+  "insight.file": "Résumer l'analyse du fichier",
+  "insight.report": "Résumer le rapport",
+  "insight.submission": "Résumer la soumission",
+  "new_chat": "Le contexte de l'assistant a été réinitialisé",
+  "reset": "Réinitialiser le contexte de discussion",
+  "send": "Envoyer la question à l'Assistant",
+  "title": "Assistant d'Assemblyline",
+  "watermark": "Propulsé par l'IA"
+}

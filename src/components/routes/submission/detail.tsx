@@ -32,6 +32,7 @@ import {
 } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
+import useAssistant from 'components/hooks/useAssistant';
 import useDrawer from 'components/hooks/useDrawer';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -120,6 +121,7 @@ function WrappedSubmissionDetail() {
   const [waitingDialog, setWaitingDialog] = useState(false);
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const { apiCall } = useMyAPI();
+  const { addInsight, removeInsight } = useAssistant();
   const sp4 = theme.spacing(4);
   const { showSuccessMessage } = useMySnackbar();
   const location = useLocation();
@@ -889,6 +891,15 @@ function WrappedSubmissionDetail() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadTrigger]);
+
+  useEffect(() => {
+    addInsight({ type: 'submission', value: id });
+
+    return () => {
+      removeInsight({ type: 'submission', value: id });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
