@@ -86,7 +86,7 @@ interface ContextMessageProps {
 export const AssistantContext = React.createContext<AssistantContextProps>(null);
 
 function AssistantProvider({ children }: AssistantProviderProps) {
-  const { t } = useTranslation(['assistant']);
+  const { t, i18n } = useTranslation(['assistant']);
   const theme = useTheme();
   const appUser = useAppUser<AppUser>();
   const { user: currentUser, configuration, c12nDef } = useALContext();
@@ -164,7 +164,9 @@ function AssistantProvider({ children }: AssistantProviderProps) {
     if (insight.type === 'submission' || insight.type === 'report') {
       apiCall({
         method: 'GET',
-        url: `/api/v4/submission/ai/${insight.value}/?${insight.type === 'report' ? 'detailed&' : ''}with_trace`,
+        url: `/api/v4/submission/ai/${insight.value}/?lang=${i18n.language === 'en' ? 'english' : 'french'}&${
+          insight.type === 'report' ? 'detailed&' : ''
+        }with_trace`,
         onSuccess: api_data => {
           setCurrentContext(api_data.api_response.trace);
           setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
@@ -186,7 +188,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
     } else if (insight.type === 'file') {
       apiCall({
         method: 'GET',
-        url: `/api/v4/file/ai/${insight.value}/?with_trace`,
+        url: `/api/v4/file/ai/${insight.value}/?lang=${i18n.language === 'en' ? 'english' : 'french'}&with_trace`,
         onSuccess: api_data => {
           setCurrentContext(api_data.api_response.trace);
           setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
@@ -208,7 +210,9 @@ function AssistantProvider({ children }: AssistantProviderProps) {
     } else if (insight.type === 'code') {
       apiCall({
         method: 'GET',
-        url: `/api/v4/file/code_summary/${insight.value}/?with_trace`,
+        url: `/api/v4/file/code_summary/${insight.value}/?lang=${
+          i18n.language === 'en' ? 'english' : 'french'
+        }&with_trace`,
         onSuccess: api_data => {
           setCurrentContext(api_data.api_response.trace);
           setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
@@ -254,10 +258,13 @@ considered malicious.`.replaceAll('\n', ' ');
       .map(marking => ` - ${marking}: ${c12nDef.description[marking]}\n`)
       .join('')}`;
 
+    // Set language
+    const lang = `\nYour answer must be written in plain ${i18n.language === 'en' ? 'english' : 'french'}.`;
+
     // Create the default system prompt
     const defaultSystemPrompt = {
       role: 'system' as 'system',
-      content: [configuration.ui.ai.assistant.system_message, scoring, services, classification].join('\n')
+      content: [configuration.ui.ai.assistant.system_message, scoring, services, classification, lang].join('\n')
     };
 
     return defaultSystemPrompt;
@@ -309,12 +316,20 @@ considered malicious.`.replaceAll('\n', ' ');
       clearAssistant();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration, serviceList]);
+  }, [configuration, serviceList, i18n.language]);
 
   useEffect(() => {
     if (chatRef && chatRef.current)
       chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, left: 0, behavior: 'smooth' });
   }, [currentHistory, thinking]);
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        if (chatRef && chatRef.current) chatRef.current.scrollTo(0, chatRef.current.scrollHeight);
+      }, 50);
+    }
+  }, [open]);
 
   return (
     <AssistantContext.Provider
