@@ -103,7 +103,7 @@ function WrappedRetrohuntRepeat({ retrohunt = null }: Props) {
       <>
         <Tooltip title={t('repeat.tooltip')}>
           <div>
-            <IconButton onClick={() => setOpen(o => !o)}>
+            <IconButton size="large" onClick={() => setOpen(o => !o)}>
               <ReplayOutlinedIcon />
             </IconButton>
           </div>
