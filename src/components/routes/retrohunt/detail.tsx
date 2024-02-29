@@ -629,7 +629,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                 }}
               >
                 <div className={classes.results}>
-                  {hitResults && 'total' in hitResults && hitResults.total !== 0 && (
+                  {hitResults && hitResults.total !== 0 && (
                     <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                       {isReloading ? (
                         <span>{t('searching')}</span>
@@ -639,14 +639,6 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                           {query.get('query') || query.get('filters')
                             ? t(`hits.filtered${hitResults.total === 1 ? '' : 's'}`)
                             : t(`hits.total${hitResults.total === 1 ? '' : 's'}`)}
-                          {retrohunt?.total_hits && (
-                            <>
-                              {` (`}
-                              <SearchResultCount count={retrohunt.total_hits} />
-                              {t(`total_hits.total${retrohunt.total_hits === 1 ? '' : 's'}`)}
-                              {')'}
-                            </>
-                          )}
                         </span>
                       )}
                     </Typography>
