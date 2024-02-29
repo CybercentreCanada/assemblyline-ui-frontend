@@ -70,9 +70,9 @@ function WrappedRetrohuntRepeat({ retrohunt = null }: Props) {
         method: 'POST',
         url: `/api/v4/retrohunt/repeat/`,
         body: {
-          key: retrohunt.key,
-          search_classification: retrohunt.search_classification,
-          ttl: retrohunt.ttl
+          key: data.key,
+          search_classification: data.search_classification,
+          ttl: data.ttl
         },
         onSuccess: api_data => {
           showSuccessMessage(t('repeat.success'));
