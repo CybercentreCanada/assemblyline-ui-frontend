@@ -1,7 +1,6 @@
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DoneOutlinedIcon from '@mui/icons-material/DoneOutlined';
-import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import PauseCircleOutlineOutlinedIcon from '@mui/icons-material/PauseCircleOutlineOutlined';
@@ -63,34 +62,6 @@ import { io } from 'socket.io-client';
 import { RetrohuntRepeat } from './repeat';
 
 const useStyles = makeStyles(theme => ({
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  },
-  title: {
-    fontWeight: 500,
-    marginRight: theme.spacing(0.5),
-    display: 'flex'
-  },
-  value: {
-    fontFamily: 'monospace',
-    wordBreak: 'break-word'
-  },
-  collapse: {
-    paddingBottom: theme.spacing(2),
-    paddingTop: theme.spacing(2)
-  },
-  containerSpacer: {
-    marginTop: theme.spacing(2)
-  },
-  tableContainer: {
-    maxHeight: `50vh`
-  },
   results: {
     fontStyle: 'italic',
     paddingTop: theme.spacing(0.5),
@@ -98,20 +69,12 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'flex-end',
     flexWrap: 'wrap'
   },
-  skeletonButton: {
-    height: '2.5rem',
-    width: '2.5rem',
-    margin: theme.spacing(0.5)
-  },
   skeletonCustomChip: {
     height: '1.5rem',
     width: '2rem',
     borderRadius: '4px',
     display: 'inline-block',
     verticalAlign: 'middle'
-  },
-  errorButton: {
-    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
   },
   preview: {
     margin: 0,
@@ -174,7 +137,6 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
 
   const [retrohunt, setRetrohunt] = useState<RetrohuntResult>(null);
   const [hitResults, setHitResults] = useState<RetrohuntHitResult>(null);
-  const [isErrorOpen, setIsErrorOpen] = useState<boolean>(false);
   const [typeDataSet, setTypeDataSet] = useState<{ [k: string]: number }>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
@@ -450,7 +412,6 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   else
     return (
       <PageLayout>
-        <RetrohuntErrors retrohunt={retrohunt} open={isErrorOpen} onClose={() => setIsErrorOpen(false)} />
         <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={2} marginBottom={theme.spacing(4)}>
           {c12nDef.enforce && (
             <Grid item paddingBottom={1}>
@@ -469,68 +430,21 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                 <Typography variant="h4" children={!retrohunt ? <Skeleton width="30rem" /> : t('header.view')} />
                 <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.key} />
               </Grid>
-              {retrohunt && retrohunt.finished === true && (
-                <Grid item flex={0}>
-                  <RetrohuntRepeat retrohunt={retrohunt} />
-                </Grid>
-              )}
-              {retrohunt && retrohunt.finished === false && (
-                <Grid item flex={0}>
-                  <Tooltip title={isPaused ? t('tooltip.play') : t('tooltip.paused')}>
-                    <IconButton color="primary" size="large" onClick={() => setIsPaused(p => !p)}>
-                      {isPaused ? <PlayCircleFilledWhiteOutlinedIcon /> : <PauseCircleOutlineOutlinedIcon />}
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-              )}
-              {!retrohunt ? (
-                <Grid item>
-                  <Skeleton className={classes.skeletonButton} variant="circular" />
-                </Grid>
-              ) : (
-                'total_warnings' in retrohunt &&
-                retrohunt?.total_warnings > 0 && (
-                  <Grid item>
-                    <Tooltip
-                      title={
-                        'total_errors' in retrohunt
-                          ? retrohunt.total_errors > 1
-                            ? `${retrohunt.total_errors} ${t('errors.totals')}`
-                            : `${retrohunt.total_errors} ${t('errors.total')}`
-                          : t('errors.tooltip')
-                      }
-                    >
-                      <IconButton color="error" size="large" onClick={() => setIsErrorOpen(true)}>
-                        <ErrorOutlineOutlinedIcon />
+              <Grid item flex={0}>
+                <Grid container flexDirection="row" rowGap={2} wrap="nowrap">
+                  {retrohunt && retrohunt.finished === true && <RetrohuntRepeat retrohunt={retrohunt} />}
+                  {retrohunt && retrohunt.finished === false && (
+                    <Tooltip title={isPaused ? t('tooltip.play') : t('tooltip.paused')}>
+                      <IconButton color="primary" size="large" onClick={() => setIsPaused(p => !p)}>
+                        {isPaused ? <PlayCircleFilledWhiteOutlinedIcon /> : <PauseCircleOutlineOutlinedIcon />}
                       </IconButton>
                     </Tooltip>
-                  </Grid>
-                )
-              )}
-              {!retrohunt ? (
-                <Grid item>
-                  <Skeleton className={classes.skeletonButton} variant="circular" />
+                  )}
+                  {retrohunt && (retrohunt.total_warnings > 0 || retrohunt.total_errors > 0) && (
+                    <RetrohuntErrors retrohunt={retrohunt} />
+                  )}
                 </Grid>
-              ) : (
-                'total_errors' in retrohunt &&
-                retrohunt?.total_errors > 0 && (
-                  <Grid item>
-                    <Tooltip
-                      title={
-                        'total_errors' in retrohunt
-                          ? retrohunt.total_errors > 1
-                            ? `${retrohunt.total_errors} ${t('errors.totals')}`
-                            : `${retrohunt.total_errors} ${t('errors.total')}`
-                          : t('errors.tooltip')
-                      }
-                    >
-                      <IconButton color="error" size="large" onClick={() => setIsErrorOpen(true)}>
-                        <ErrorOutlineOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
-                )
-              )}
+              </Grid>
             </Grid>
 
             {retrohunt &&

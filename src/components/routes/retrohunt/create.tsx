@@ -78,7 +78,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
     [c12nDef?.UNRESTRICTED, configuration.retrohunt.dtl, currentUser.classification]
   );
 
-  const [retrohunt, setRetrohunt] = useState<RetrohuntResult>({ ...DEFAULT_RETROHUNT });
+  const [retrohunt, setRetrohunt] = useState<RetrohuntResult>(null);
   const [isModified, setIsModified] = useState<boolean>(false);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false);
@@ -138,147 +138,154 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
     if (!location.pathname.startsWith('/retrohunt')) closeGlobalDrawer();
   }, [closeGlobalDrawer, location.pathname]);
 
+  useEffect(() => {
+    setRetrohunt({ ...DEFAULT_RETROHUNT });
+    return () => setRetrohunt(null);
+  }, [DEFAULT_RETROHUNT]);
+
   if (configuration?.retrohunt?.enabled && currentUser.roles.includes('retrohunt_run'))
     return (
-      <PageFullSize margin={isDrawer ? 2 : 4}>
-        <RouterPrompt when={isModified} />
-        <ConfirmationDialog
-          open={isConfirmationOpen}
-          handleClose={() => setIsConfirmationOpen(false)}
-          handleCancel={() => setIsConfirmationOpen(false)}
-          handleAccept={() => handleCreateRetrohunt(retrohunt)}
-          title={t('validate.title')}
-          cancelText={t('validate.cancelText')}
-          acceptText={t('validate.acceptText')}
-          text={t('validate.text')}
-        />
+      retrohunt && (
+        <PageFullSize margin={isDrawer ? 2 : 4}>
+          <RouterPrompt when={isModified} />
+          <ConfirmationDialog
+            open={isConfirmationOpen}
+            handleClose={() => setIsConfirmationOpen(false)}
+            handleCancel={() => setIsConfirmationOpen(false)}
+            handleAccept={() => handleCreateRetrohunt(retrohunt)}
+            title={t('validate.title')}
+            cancelText={t('validate.cancelText')}
+            acceptText={t('validate.acceptText')}
+            text={t('validate.text')}
+          />
 
-        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={1}>
-          {c12nDef.enforce && (
-            <Grid item paddingBottom={theme.spacing(2)}>
-              <Classification
-                format="long"
-                type="picker"
-                c12n={retrohunt.classification}
-                setClassification={(c12n: string) => handleRetrohuntChange({ classification: c12n })}
-                disabled={!currentUser.roles.includes('retrohunt_run') || isDisabled}
+          <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={1}>
+            {c12nDef.enforce && (
+              <Grid item paddingBottom={theme.spacing(2)}>
+                <Classification
+                  format="long"
+                  type="picker"
+                  c12n={retrohunt.classification}
+                  setClassification={(c12n: string) => handleRetrohuntChange({ classification: c12n })}
+                  disabled={!currentUser.roles.includes('retrohunt_run') || isDisabled}
+                />
+              </Grid>
+            )}
+
+            <Grid item>
+              <Grid container flexDirection="row">
+                <Grid item flexGrow={1}>
+                  <Typography variant="h4" children={t('header.add')} />
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    disabled={isButtonLoading || !retrohunt?.description || !retrohunt?.yara_signature}
+                    onClick={() => setIsConfirmationOpen(true)}
+                  >
+                    {t('add.button')}
+                    {isButtonLoading && <CircularProgress className={classes.circularProgress} size={24} />}
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item>
+              <Typography variant="subtitle2">{t('details.description')}</Typography>
+              <TextField
+                fullWidth
+                size="small"
+                multiline
+                rows={3}
+                margin="dense"
+                variant="outlined"
+                value={retrohunt.description}
+                onChange={event => handleRetrohuntChange({ description: event.target.value })}
+                disabled={isDisabled}
               />
             </Grid>
-          )}
 
-          <Grid item>
-            <Grid container flexDirection="row">
-              <Grid item flexGrow={1}>
-                <Typography variant="h4" children={t('header.add')} />
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={isButtonLoading || !retrohunt?.description || !retrohunt?.yara_signature}
-                  onClick={() => setIsConfirmationOpen(true)}
-                >
-                  {t('add.button')}
-                  {isButtonLoading && <CircularProgress className={classes.circularProgress} size={24} />}
-                </Button>
+            <Grid item>
+              <Grid container flexDirection="row" rowGap={2}>
+                <Grid item flexGrow={3}>
+                  <Typography variant="subtitle2">{t('details.search')}</Typography>
+                  <RadioGroup
+                    row
+                    value={retrohunt.archive_only ? 'archive_only' : 'all'}
+                    onChange={(_, value) => handleRetrohuntChange({ archive_only: value === 'archive_only' })}
+                  >
+                    <FormControlLabel value="all" control={<Radio />} label={t('details.all')} disabled={isDisabled} />
+                    <FormControlLabel
+                      value="archive_only"
+                      control={<Radio />}
+                      label={t('details.archive_only')}
+                      disabled={isDisabled}
+                    />
+                  </RadioGroup>
+                </Grid>
+                <Grid item flexGrow={2}>
+                  <Typography variant="subtitle2">
+                    {`${t('ttl')} (${maxDaysToLive ? `${t('ttl.max')}: ${maxDaysToLive}` : t('ttl.forever')})`}
+                  </Typography>
+                  <TextField
+                    id="ttl"
+                    type="number"
+                    margin="dense"
+                    size="small"
+                    inputProps={{
+                      min: maxDaysToLive ? 1 : 0,
+                      max: maxDaysToLive ? maxDaysToLive : 365
+                    }}
+                    defaultValue={retrohunt.ttl}
+                    onChange={event => handleRetrohuntChange({ ttl: parseInt(event.target.value) })}
+                    variant="outlined"
+                    fullWidth
+                  />
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
 
-          <Grid item>
-            <Typography variant="subtitle2">{t('details.description')}</Typography>
-            <TextField
-              fullWidth
-              size="small"
-              multiline
-              rows={3}
-              margin="dense"
-              variant="outlined"
-              value={retrohunt.description}
-              onChange={event => handleRetrohuntChange({ description: event.target.value })}
-              disabled={isDisabled}
-            />
-          </Grid>
-
-          <Grid item>
-            <Grid container flexDirection="row" rowGap={2}>
-              <Grid item flexGrow={3}>
-                <Typography variant="subtitle2">{t('details.search')}</Typography>
-                <RadioGroup
-                  row
-                  value={retrohunt.archive_only ? 'archive_only' : 'all'}
-                  onChange={(_, value) => handleRetrohuntChange({ archive_only: value === 'archive_only' })}
-                >
-                  <FormControlLabel value="all" control={<Radio />} label={t('details.all')} disabled={isDisabled} />
-                  <FormControlLabel
-                    value="archive_only"
-                    control={<Radio />}
-                    label={t('details.archive_only')}
-                    disabled={isDisabled}
-                  />
-                </RadioGroup>
+            {c12nDef.enforce && (
+              <Grid item marginBottom={1}>
+                <Tooltip title={t('tooltip.search_classification')} placement="top">
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: theme.spacing(1),
+                      marginBottom: theme.spacing(0.5)
+                    }}
+                  >
+                    <Typography variant="subtitle2">{t('details.search_classification')}</Typography>
+                    <InfoOutlinedIcon />
+                  </div>
+                </Tooltip>
+                <Classification
+                  format="long"
+                  type="picker"
+                  c12n={retrohunt.search_classification}
+                  setClassification={(c12n: string) => handleRetrohuntChange({ search_classification: c12n })}
+                  disabled={!currentUser.roles.includes('retrohunt_run') || isDisabled}
+                />
               </Grid>
-              <Grid item flexGrow={2}>
-                <Typography variant="subtitle2">
-                  {`${t('ttl')} (${maxDaysToLive ? `${t('ttl.max')}: ${maxDaysToLive}` : t('ttl.forever')})`}
-                </Typography>
-                <TextField
-                  id="ttl"
-                  type="number"
-                  margin="dense"
-                  size="small"
-                  inputProps={{
-                    min: maxDaysToLive ? 1 : 0,
-                    max: maxDaysToLive ? maxDaysToLive : 365
-                  }}
-                  defaultValue={retrohunt.ttl}
-                  onChange={event => handleRetrohuntChange({ ttl: parseInt(event.target.value) })}
-                  variant="outlined"
-                  fullWidth
+            )}
+
+            <Grid item flex={1}>
+              <Grid container flexDirection="column" height="100%" minHeight="500px">
+                <Typography variant="h6" children={t('details.yara_signature')} />
+                <MonacoEditor
+                  language="yara"
+                  value={retrohunt.yara_signature}
+                  onChange={data => handleRetrohuntChange({ yara_signature: data })}
+                  options={{ readOnly: isDisabled }}
                 />
               </Grid>
             </Grid>
           </Grid>
-
-          {c12nDef.enforce && (
-            <Grid item marginBottom={1}>
-              <Tooltip title={t('tooltip.search_classification')} placement="top">
-                <div
-                  style={{
-                    display: 'inline-flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: theme.spacing(1),
-                    marginBottom: theme.spacing(0.5)
-                  }}
-                >
-                  <Typography variant="subtitle2">{t('details.search_classification')}</Typography>
-                  <InfoOutlinedIcon />
-                </div>
-              </Tooltip>
-              <Classification
-                format="long"
-                type="picker"
-                c12n={retrohunt.search_classification}
-                setClassification={(c12n: string) => handleRetrohuntChange({ search_classification: c12n })}
-                disabled={!currentUser.roles.includes('retrohunt_run') || isDisabled}
-              />
-            </Grid>
-          )}
-
-          <Grid item flex={1}>
-            <Grid container flexDirection="column" height="100%" minHeight="500px">
-              <Typography variant="h6" children={t('details.yara_signature')} />
-              <MonacoEditor
-                language="yara"
-                value={retrohunt.yara_signature}
-                onChange={data => handleRetrohuntChange({ yara_signature: data })}
-                options={{ readOnly: isDisabled }}
-              />
-            </Grid>
-          </Grid>
-        </Grid>
-      </PageFullSize>
+        </PageFullSize>
+      )
     );
   else return <ForbiddenPage />;
 }
