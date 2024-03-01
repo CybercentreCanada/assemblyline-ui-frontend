@@ -62,6 +62,7 @@ export type Container = {
   command: string[];
   cpu_cores: number;
   environment: Environment[];
+  labels?: Environment[];
   image: string;
   ports: string[];
   ram_mb: number;

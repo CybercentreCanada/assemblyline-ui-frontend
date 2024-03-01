@@ -37,6 +37,7 @@
   "container.dialog.environment": "Environment variables",
   "container.dialog.environment.name": "Variable's name",
   "container.dialog.environment.value": "Variable's value",
+  "container.dialog.labels": "Container labels",
   "container.dialog.image": "Container image name",
   "container.dialog.name": "Dependency name",
   "container.dialog.ram": "Allowed memory range",
