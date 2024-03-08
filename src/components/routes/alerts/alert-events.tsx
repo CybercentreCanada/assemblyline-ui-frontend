@@ -88,8 +88,17 @@ const WrappedAlertEventsTable = ({ alert, viewHistory, setViewHistory }) => {
                           </TableCell>
                           <TableCell>{event.status ? <AlertStatus name={event.status} /> : null}</TableCell>
                           <TableCell width="40%">
-                            {event.labels ? (
-                              <ChipList items={event.labels.map(label => ({ label, variant: 'outlined' }))} nowrap />
+                            {event.labels || event.labels_removed ? (
+                              <ChipList
+                                items={event.labels
+                                  .concat(event.labels_removed ? event.labels_removed : [])
+                                  .map(label => ({
+                                    label,
+                                    variant: 'outlined',
+                                    color: event.labels.indexOf(label) > -1 ? 'success' : 'error'
+                                  }))}
+                                nowrap
+                              />
                             ) : null}
                           </TableCell>
                           <TableCell>
