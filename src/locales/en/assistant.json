@@ -8,6 +8,6 @@
   "new_chat": "Assistant context was resetted",
   "reset": "Reset chat context",
   "send": "Send question to Assistant",
-  "title": "Assemblyline Assistant",
+  "title": "AI Assistant",
   "watermark": "Powered by AI"
 }

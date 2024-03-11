@@ -6,6 +6,7 @@ import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import {
   Avatar,
   Backdrop,
+  Badge,
   Button,
   Divider,
   Fab,
@@ -19,8 +20,9 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import MuiPopper from '@mui/material/Popper';
+import MuiPopper, { PopperPlacementType } from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import { AppUser } from 'commons/components/app/AppUserService';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import AppAvatar from 'commons/components/display/AppAvatar';
@@ -49,7 +51,7 @@ const Popper = styled(MuiPopper, {
 
 const Arrow = styled('div')(({ theme }) => ({
   position: 'absolute',
-  right: 21,
+  right: 17,
   '&::before': {
     content: '""',
     margin: 'auto',
@@ -63,9 +65,18 @@ const Arrow = styled('div')(({ theme }) => ({
   }
 }));
 
+const useStyles = makeStyles(theme => ({
+  customBadge: {
+    backgroundColor: theme.palette.text.primary
+  }
+}));
+
 export type AssistantContextProps = {
+  assistantAllowed: boolean;
+  hasInsights: boolean;
   addInsight: (insigh: AssistantInsightProps) => void;
   removeInsight: (insigh: AssistantInsightProps) => void;
+  toggleAssistant: (event: any, placement: PopperPlacementType) => void;
 };
 
 export interface AssistantProviderProps {
@@ -89,6 +100,7 @@ export const AssistantContext = React.createContext<AssistantContextProps>(null)
 function AssistantProvider({ children }: AssistantProviderProps) {
   const { t, i18n } = useTranslation(['assistant']);
   const theme = useTheme();
+  const classes = useStyles();
   const appUser = useAppUser<AppUser>();
   const { user: currentUser, configuration, c12nDef, indexes } = useALContext();
   const { apiCall } = useMyAPI();
@@ -101,18 +113,20 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const [currentHistory, setCurrentHistory] = React.useState<ContextMessageProps[]>([]);
   const [currentInput, setCurrentInput] = React.useState<string>('');
   const [serviceList, setServiceList] = React.useState(null);
+  const [placement, setPlacement] = React.useState<PopperPlacementType>('top-end');
+  const [hasInsights, setHasInsights] = React.useState<boolean>(false);
   const upSM = useMediaQuery(theme.breakpoints.up('md'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const inputRef = React.useRef(null);
   const chatRef = React.useRef(null);
 
-  const handleClick = event => {
-    setAnchorEl(event.currentTarget);
-    setOpen(!open);
+  const assistantAllowed =
+    currentUser && currentUser.roles.includes('assistant_use') && configuration && configuration.ui.ai.enabled;
 
-    setTimeout(() => {
-      inputRef.current.focus();
-    }, 250);
+  const toggleAssistant = (target, newPlacement) => {
+    setPlacement(newPlacement);
+    setAnchorEl(target);
+    setOpen(!open);
   };
 
   const addInsight = (insight: AssistantInsightProps) => {
@@ -338,29 +352,38 @@ considered malicious.`.replaceAll('\n', ' ');
       chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, left: 0, behavior: 'smooth' });
   }, [currentHistory, thinking]);
 
+  useEffect(() => setHasInsights(currentInsights.length !== 0), [currentInsights]);
+
   useEffect(() => {
     if (open) {
       setTimeout(() => {
         if (chatRef && chatRef.current) chatRef.current.scrollTo(0, chatRef.current.scrollHeight);
       }, 50);
+
+      setTimeout(() => {
+        inputRef.current.focus();
+      }, 250);
     }
   }, [open]);
 
   return (
     <AssistantContext.Provider
       value={{
+        assistantAllowed,
         addInsight,
-        removeInsight
+        hasInsights,
+        removeInsight,
+        toggleAssistant
       }}
     >
       {children}
-      {currentUser && currentUser.roles.includes('assistant_use') && configuration && configuration.ui.ai.enabled && (
+      {assistantAllowed && (
         <div
           style={{
             display: 'flex',
             position: 'fixed',
-            bottom: upSM ? theme.spacing(4) : theme.spacing(2.5),
-            right: upSM ? theme.spacing(4) : theme.spacing(2.5),
+            bottom: theme.spacing(2.5),
+            right: theme.spacing(2.5),
             zIndex: 1300
           }}
         >
@@ -375,7 +398,7 @@ considered malicious.`.replaceAll('\n', ' ');
               }}
               open={open}
               anchorEl={anchorEl}
-              placement="top-end"
+              placement={placement}
               transition
               onClick={event => event.stopPropagation()}
             >
@@ -567,17 +590,21 @@ considered malicious.`.replaceAll('\n', ' ');
                         </div>
                       </div>
                     </Paper>
-                    <Arrow className="MuiPopper-arrow" />
+                    {placement === 'top-end' && <Arrow className="MuiPopper-arrow" />}
                   </div>
                 </Fade>
               )}
             </Popper>
           </Backdrop>
-          <Tooltip title={t('title')} placement="left">
-            <Fab color="primary" onClick={handleClick}>
-              <AssistantIcon />
-            </Fab>
-          </Tooltip>
+          {!upSM && (
+            <Tooltip title={t('title')} placement="left">
+              <Fab color="primary" onClick={event => toggleAssistant(event.currentTarget, 'top-end')} size="medium">
+                <Badge variant="dot" invisible={!hasInsights} classes={{ badge: classes.customBadge }}>
+                  <AssistantIcon />
+                </Badge>
+              </Fab>
+            </Tooltip>
+          )}
         </div>
       )}
     </AssistantContext.Provider>
