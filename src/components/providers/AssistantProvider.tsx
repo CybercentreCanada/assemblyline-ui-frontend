@@ -532,7 +532,13 @@ considered malicious.`.replaceAll('\n', ' ');
                           )}
                         </div>
                         {currentInsights.length > 0 && (
-                          <Stack direction={'row-reverse'} mt={0.75} ml={1} mr={1} spacing={1}>
+                          <Stack
+                            direction={placement === 'top-end' ? 'row-reverse' : 'row'}
+                            mt={0.75}
+                            ml={1}
+                            mr={1}
+                            spacing={1}
+                          >
                             {currentInsights.map((insight, id) => (
                               <CustomChip
                                 key={id}
