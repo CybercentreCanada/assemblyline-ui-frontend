@@ -6,7 +6,7 @@
   "serviceToInstall.container": "Pull command",
   "serviceToInstall.title": "Installing a Community Service",
   "serviceToInstall.notes": "* If you are having issues installing this service with the auto-install button, you can always go to the source code and build the container by hand.",
-  "serviceToInstall.description": "You are about to install a service from the community. This service was not developed and was not verified by the Assemblyline Team, we offer no support for this service and cannot help you if something goes wrong with it. Before installing the service make sure you trust the developer that created it. Here are the information we have about this service:",
+  "serviceToInstall.description": "You are about to install a community service. Be aware that this service was not developed and/or verified by the Assemblyline Team, we offer no support for this service at this time. It is the responsibility of the user to research the tools and developers who created them. Please refer to the links below for background information regarding the selected service.",
   "serviceToInstall.cancelText": "Cancel",
   "serviceToInstall.acceptText": "Yes, Install it!",
   "no_community_services_available_desc": "There are no new community services available to be added.",
