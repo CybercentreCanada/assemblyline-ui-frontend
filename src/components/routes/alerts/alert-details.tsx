@@ -69,6 +69,7 @@ const useStyles = makeStyles(theme => ({
 type AlertDetailsProps = {
   id?: string;
   alert?: AlertItem;
+  inDrawer?: boolean;
 };
 
 type AutoHideChipListProps = {
@@ -130,7 +131,7 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items, type 
 
 const AutoHideChipList = React.memo(WrappedAutoHideChipList);
 
-const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
+const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert, inDrawer = false }) => {
   const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
@@ -148,23 +149,24 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const { t } = useTranslation(['alerts']);
 
   useEffect(() => {
-    const alertId = id || paramId;
-    if (alertId && currentUser.roles.includes('alert_view')) {
-      apiCall({
-        url: `/api/v4/alert/${alertId}/`,
-        onSuccess: api_data => {
-          let alertItem = api_data.api_response;
-          setItem(alertItem);
-          setHasEvents(alertItem && alertItem.events && alertItem.events.length > 0 ? true : false);
-        }
-      });
+    if (alert) {
+      setItem(alert);
+      setHasEvents(alert.events && alert.events.length > 0 ? true : false);
+    } else {
+      const alertId = id || paramId;
+      if (alertId && currentUser.roles.includes('alert_view')) {
+        apiCall({
+          url: `/api/v4/alert/${alertId}/`,
+          onSuccess: api_data => {
+            let alertItem = api_data.api_response;
+            setItem(alertItem);
+            setHasEvents(alertItem && alertItem.events && alertItem.events.length > 0 ? true : false);
+          }
+        });
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, paramId]);
-
-  useEffect(() => {
-    if (alert) setItem(alert);
-  }, [alert]);
+  }, [id, paramId, alert]);
 
   useEffect(() => {
     function handleAlertUpdate(event: CustomEvent) {
@@ -180,7 +182,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   }, [item]);
 
   return currentUser.roles.includes('alert_view') ? (
-    <PageFullWidth margin={!alert ? 4 : 1}>
+    <PageFullWidth margin={inDrawer ? 1 : 4}>
       {c12nDef.enforce && (
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
           <div style={{ flex: 1 }}>
