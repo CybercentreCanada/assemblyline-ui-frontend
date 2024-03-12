@@ -893,9 +893,11 @@ function WrappedSubmissionDetail() {
   }, [loadTrigger]);
 
   useEffect(() => {
+    addInsight({ type: 'report', value: id });
     addInsight({ type: 'submission', value: id });
 
     return () => {
+      removeInsight({ type: 'report', value: id });
       removeInsight({ type: 'submission', value: id });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

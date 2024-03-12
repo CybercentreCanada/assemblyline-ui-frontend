@@ -1,8 +1,6 @@
-import AssistantIcon from '@mui/icons-material/Assistant';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {
-  Badge,
   Box,
   ClickAwayListener,
   Divider,
@@ -20,7 +18,6 @@ import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
 import useAppLeftNav from 'commons/components/app/hooks/useAppLeftNav';
 import LeftNavGroup from 'commons/components/leftnav/LeftNavGroup';
 import LeftNavItem from 'commons/components/leftnav/LeftNavItem';
-import useAssistant from 'components/hooks/useAssistant';
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppLeftNavGroup, AppLeftNavItem } from '../app/AppConfigs';
@@ -83,7 +80,6 @@ const LeftNavDrawer = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { preferences } = useAppConfigs();
-  const { assistantAllowed, hasInsights, toggleAssistant } = useAssistant();
   const leftnav = useAppLeftNav();
   const isSmDown = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -144,29 +140,6 @@ const LeftNavDrawer = () => {
           }}
           onClick={leftnav.toggle}
         />
-        <Divider />
-
-        {!isSmDown && assistantAllowed && (
-          <Tooltip title={leftnav.open ? '' : t('title', { ns: 'assistant' })} placement="right">
-            <List disablePadding>
-              <ListItem
-                button
-                key="chevron"
-                onClick={event => {
-                  onCloseDrawerIfOpen();
-                  toggleAssistant(event.currentTarget, 'right-end');
-                }}
-              >
-                <ListItemIcon>
-                  <Badge variant="dot" invisible={!hasInsights} color="primary">
-                    <AssistantIcon />
-                  </Badge>
-                </ListItemIcon>
-                <ListItemText primary={t('title', { ns: 'assistant' })} />
-              </ListItem>
-            </List>
-          </Tooltip>
-        )}
       </StyledDrawer>
     </ClickAwayListener>
   );
