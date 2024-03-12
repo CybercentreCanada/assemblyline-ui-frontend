@@ -22,6 +22,7 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
+import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { AlertItem, DetailedItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
@@ -144,8 +145,8 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const [viewHistory, setViewHistory] = React.useState(false);
   const [hasEvents, setHasEvents] = React.useState(false);
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
-  // eslint-disable-next-line
   const { t } = useTranslation(['alerts']);
+  const { addInsight, removeInsight } = useAssistant();
 
   useEffect(() => {
     const alertId = id || paramId;
@@ -177,6 +178,27 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
     return () => {
       window.removeEventListener('alertUpdate', handleAlertUpdate);
     };
+  }, [item]);
+
+  useEffect(() => {
+    if (item) {
+      addInsight({ type: 'submission', value: item.sid });
+      addInsight({ type: 'report', value: item.sid });
+      addInsight({ type: 'file', value: item.file.sha256 });
+      if (item.file.type.indexOf('code/') === 0) {
+        addInsight({ type: 'code', value: alert.file.sha256 });
+      }
+    }
+
+    return () => {
+      if (item) {
+        removeInsight({ type: 'submission', value: item.sid });
+        removeInsight({ type: 'report', value: item.sid });
+        removeInsight({ type: 'file', value: item.file.sha256 });
+        removeInsight({ type: 'code', value: item.file.sha256 });
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item]);
 
   return currentUser.roles.includes('alert_view') ? (

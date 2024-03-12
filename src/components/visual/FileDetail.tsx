@@ -363,6 +363,17 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256]);
 
+  useEffect(() => {
+    if (file && file.file_info.type.indexOf('code/') === 0) {
+      addInsight({ type: 'code', value: sha256 });
+    }
+
+    return () => {
+      removeInsight({ type: 'code', value: sha256 });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file]);
+
   return currentUser.roles.includes('submission_view') ? (
     <div id="fileDetailTop" style={{ textAlign: 'left' }}>
       <InputDialog

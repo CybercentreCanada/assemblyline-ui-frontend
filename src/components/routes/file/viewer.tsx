@@ -96,10 +96,12 @@ const WrappedFileViewer: React.FC<Props> = () => {
   useEffect(() => {
     if (codeAllowed) {
       addInsight({ type: 'code', value: sha256 });
+      addInsight({ type: 'file', value: sha256 });
     }
 
     return () => {
       removeInsight({ type: 'code', value: sha256 });
+      removeInsight({ type: 'file', value: sha256 });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [codeAllowed]);
