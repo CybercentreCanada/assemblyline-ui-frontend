@@ -23,6 +23,7 @@ import {
 import MuiPopper, { PopperPlacementType } from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
+import clsx from 'clsx';
 import { AppUser } from 'commons/components/app/AppUserService';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import AppAvatar from 'commons/components/display/AppAvatar';
@@ -46,18 +47,22 @@ const Popper = styled(MuiPopper, {
     '& > div': {
       marginBottom: 12
     }
+  },
+  '&[data-popper-placement*="right"]': {
+    '& > div': {
+      marginLeft: 12
+    }
   }
 }));
 
 const Arrow = styled('div')(({ theme }) => ({
   position: 'absolute',
-  right: 17,
   '&::before': {
     content: '""',
     margin: 'auto',
     display: 'block',
-    width: 14,
-    height: 14,
+    width: 12,
+    height: 12,
     backgroundColor: theme.palette.background.paper,
     transform: 'translateY(-50%) rotate(45deg)',
     boxShadow: '2px 2px 2px 0px rgb(0 0 0 / 25%)',
@@ -68,6 +73,21 @@ const Arrow = styled('div')(({ theme }) => ({
 const useStyles = makeStyles(theme => ({
   customBadge: {
     backgroundColor: theme.palette.text.primary
+  },
+  topEndArrow: {
+    right: 18,
+    '&::before': {
+      transform: 'translateY(-50%) rotate(45deg)',
+      boxShadow: '2px 2px 2px 0px rgb(0 0 0 / 25%)'
+    }
+  },
+  rightArrow: {
+    left: -6,
+    bottom: 12,
+    '&::before': {
+      transform: 'translateY(-50%) rotate(135deg)',
+      boxShadow: '2px 2px 2px 0px rgb(0 0 0 / 25%)'
+    }
   }
 }));
 
@@ -596,7 +616,12 @@ considered malicious.`.replaceAll('\n', ' ');
                         </div>
                       </div>
                     </Paper>
-                    {placement === 'top-end' && <Arrow className="MuiPopper-arrow" />}
+                    <Arrow
+                      className={clsx(
+                        'MuiPopper-arrow',
+                        placement === 'top-end' ? classes.topEndArrow : classes.rightArrow
+                      )}
+                    />
                   </div>
                 </Fade>
               )}
