@@ -51,6 +51,7 @@ const WorkflowDetail = lazy(() => import('components/routes/manage/workflow_deta
 const RetroHunt = lazy(() => import('components/routes/retrohunt'));
 const RetroHuntDetail = lazy(() => import('components/routes/retrohunt/detail'));
 const Search = lazy(() => import('components/routes/search'));
+const FieldSearch = lazy(() => import('components/routes/fieldsearch'));
 const Settings = lazy(() => import('components/routes/settings'));
 const SubmissionDetail = lazy(() => import('components/routes/submission/detail'));
 const SubmissionReport = lazy(() => import('components/routes/submission/report'));
@@ -147,6 +148,9 @@ const WrappedRoutes = () => {
         <Route path="/retrohunt/:key" element={<RetroHuntDetail />} />
         <Route path="/search" element={<Search />} />
         <Route path="/search/:id" element={<Search />} />
+        <Route path="/fieldsearch/:index/:field" element={<FieldSearch />} />
+        <Route path="/fieldsearch/:index" element={<FieldSearch />} />
+        <Route path="/fieldsearch" element={<FieldSearch />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/submit" element={<Submit />} />
         <Route path="/submission/detail/:id/:fid" element={<SubmissionDetail />} />
