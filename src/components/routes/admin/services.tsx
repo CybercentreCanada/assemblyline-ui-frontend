@@ -381,7 +381,13 @@ export default function Services() {
         </Grid>
         <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-            <Tooltip title={t('add')}>
+            <Tooltip
+              PopperProps={{
+                disablePortal: true
+              }}
+              disableInteractive
+              title={t('add')}
+            >
               <IconButton
                 style={{
                   color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
@@ -393,6 +399,10 @@ export default function Services() {
               </IconButton>
             </Tooltip>
             <Tooltip
+              PopperProps={{
+                disablePortal: true
+              }}
+              disableInteractive
               title={
                 updates && Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
                   ? t('update_all')
@@ -413,6 +423,10 @@ export default function Services() {
               </span>
             </Tooltip>
             <Tooltip
+              PopperProps={{
+                disablePortal: true
+              }}
+              disableInteractive
               title={
                 availableServices &&
                 availableServices.length > 0 &&
@@ -437,7 +451,13 @@ export default function Services() {
               </span>
             </Tooltip>
             <FileDownloader icon={<GetAppOutlinedIcon />} link={`/api/v4/service/backup/`} tooltip={t('backup')} />
-            <Tooltip title={t('restore')}>
+            <Tooltip
+              PopperProps={{
+                disablePortal: true
+              }}
+              disableInteractive
+              title={t('restore')}
+            >
               <IconButton onClick={() => setOpenRestore(true)} size="large">
                 <RestoreOutlinedIcon />
               </IconButton>
