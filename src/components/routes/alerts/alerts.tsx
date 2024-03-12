@@ -427,7 +427,7 @@ const Alerts: React.FC = () => {
             <ListNavigator id={ALERT_SIMPLELIST_ID} />
           </div>
           <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
-            <AlertDetails id={location.hash.slice(1)} />
+            <AlertDetails alert={item} id={location.hash.slice(1)} inDrawer />
           </ListCarousel>
         </div>,
         { hasMaximize: true }
