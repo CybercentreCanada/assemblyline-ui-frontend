@@ -20,10 +20,9 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import MuiPopper, { PopperPlacementType } from '@mui/material/Popper';
+import MuiPopper from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import { AppUser } from 'commons/components/app/AppUserService';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import AppAvatar from 'commons/components/display/AppAvatar';
@@ -47,16 +46,12 @@ const Popper = styled(MuiPopper, {
     '& > div': {
       marginBottom: 12
     }
-  },
-  '&[data-popper-placement*="right"]': {
-    '& > div': {
-      marginLeft: 12
-    }
   }
 }));
 
 const Arrow = styled('div')(({ theme }) => ({
   position: 'absolute',
+  right: 18,
   '&::before': {
     content: '""',
     margin: 'auto',
@@ -74,20 +69,8 @@ const useStyles = makeStyles(theme => ({
   customBadge: {
     backgroundColor: theme.palette.text.primary
   },
-  topEndArrow: {
-    right: 18,
-    '&::before': {
-      transform: 'translateY(-50%) rotate(45deg)',
-      boxShadow: '2px 2px 2px 0px rgb(0 0 0 / 25%)'
-    }
-  },
-  rightArrow: {
-    left: -6,
-    bottom: 12,
-    '&::before': {
-      transform: 'translateY(-50%) rotate(135deg)',
-      boxShadow: '2px 2px 2px 0px rgb(0 0 0 / 25%)'
-    }
+  customFab: {
+    backgroundColor: theme.palette.mode === 'dark' ? '#616161' : '#888'
   }
 }));
 
@@ -96,7 +79,7 @@ export type AssistantContextProps = {
   hasInsights: boolean;
   addInsight: (insigh: AssistantInsightProps) => void;
   removeInsight: (insigh: AssistantInsightProps) => void;
-  toggleAssistant: (event: any, placement: PopperPlacementType) => void;
+  toggleAssistant: (event: any) => void;
 };
 
 export interface AssistantProviderProps {
@@ -133,7 +116,6 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const [currentHistory, setCurrentHistory] = React.useState<ContextMessageProps[]>([]);
   const [currentInput, setCurrentInput] = React.useState<string>('');
   const [serviceList, setServiceList] = React.useState(null);
-  const [placement, setPlacement] = React.useState<PopperPlacementType>('top-end');
   const [hasInsights, setHasInsights] = React.useState<boolean>(false);
   const upSM = useMediaQuery(theme.breakpoints.up('md'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
@@ -143,8 +125,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const assistantAllowed =
     currentUser && currentUser.roles.includes('assistant_use') && configuration && configuration.ui.ai.enabled;
 
-  const toggleAssistant = (target, newPlacement) => {
-    setPlacement(newPlacement);
+  const toggleAssistant = target => {
     setAnchorEl(target);
     setOpen(!open);
   };
@@ -402,8 +383,8 @@ considered malicious.`.replaceAll('\n', ' ');
           style={{
             display: 'flex',
             position: 'fixed',
-            bottom: theme.spacing(2.5),
-            right: theme.spacing(2.5),
+            bottom: theme.spacing(upSM ? 2 : 1.5),
+            right: theme.spacing(upSM ? 3 : 1.5),
             zIndex: 1300
           }}
         >
@@ -418,7 +399,7 @@ considered malicious.`.replaceAll('\n', ' ');
               }}
               open={open}
               anchorEl={anchorEl}
-              placement={placement}
+              placement={'top-end'}
               transition
               onClick={event => event.stopPropagation()}
             >
@@ -552,13 +533,7 @@ considered malicious.`.replaceAll('\n', ' ');
                           )}
                         </div>
                         {currentInsights.length > 0 && (
-                          <Stack
-                            direction={placement === 'top-end' ? 'row-reverse' : 'row'}
-                            mt={0.75}
-                            ml={1}
-                            mr={1}
-                            spacing={1}
-                          >
+                          <Stack direction={'row-reverse'} mt={0.75} ml={1} mr={1} spacing={1}>
                             {currentInsights.map((insight, id) => (
                               <CustomChip
                                 key={id}
@@ -616,26 +591,24 @@ considered malicious.`.replaceAll('\n', ' ');
                         </div>
                       </div>
                     </Paper>
-                    <Arrow
-                      className={clsx(
-                        'MuiPopper-arrow',
-                        placement === 'top-end' ? classes.topEndArrow : classes.rightArrow
-                      )}
-                    />
+                    <Arrow className="MuiPopper-arrow" />
                   </div>
                 </Fade>
               )}
             </Popper>
           </Backdrop>
-          {!upSM && (
-            <Tooltip title={t('title')} placement="left">
-              <Fab color="primary" onClick={event => toggleAssistant(event.currentTarget, 'top-end')} size="medium">
-                <Badge variant="dot" invisible={!hasInsights} classes={{ badge: classes.customBadge }}>
-                  <AssistantIcon />
-                </Badge>
-              </Fab>
-            </Tooltip>
-          )}
+          <Tooltip title={t('title')} placement="left">
+            <Fab
+              color="primary"
+              className={classes.customFab}
+              onClick={event => toggleAssistant(event.currentTarget)}
+              size="medium"
+            >
+              <Badge variant="dot" invisible={!hasInsights} color="primary">
+                <AssistantIcon />
+              </Badge>
+            </Fab>
+          </Tooltip>
         </div>
       )}
     </AssistantContext.Provider>
