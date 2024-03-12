@@ -1,7 +1,6 @@
 {
   "alert": "Alert",
   "archive": "Found in archive",
-  "available": "available",
   "disabled": "Disabled",
   "enabled": "Enabled",
   "file": "File",
@@ -46,6 +45,7 @@
   "header.user": "User",
   "header.verdict": "Verdict",
   "header.version": "Version",
+  "install": "Install",
   "installing": "Installing...",
   "location.external": "External - Outside of Assemblyline infrastructure",
   "location.internal": "Internal - Inside of Assemblyline infrastructure",
@@ -87,6 +87,7 @@
   "status.submitted": "Scanning...",
   "status.yara": "YARA",
   "submission": "Submission",
+  "to": "to version",
   "title_alert": "Search Alerts",
   "title_all": "Search",
   "title_file": "Search Files",

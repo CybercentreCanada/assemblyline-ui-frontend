@@ -54,13 +54,18 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
                 <DivTableCell>{service.content_text}</DivTableCell>
                 <DivTableCell
                   className={classes.center}
-                  style={{ whiteSpace: 'nowrap', paddingTop: 0, paddingBottom: 0 }}
+                  style={{ whiteSpace: 'nowrap', paddingTop: 0, paddingBottom: 0, width: 0 }}
                 >
                   <Tooltip
+                    PopperProps={{
+                      disablePortal: true
+                    }}
+                    disableInteractive
+                    placement="left"
                     title={
                       installingServices?.includes(service?.summary)
                         ? t('installing')
-                        : `${service.title} ${t('available')}!`
+                        : `${t('install')} ${service.summary}`
                     }
                   >
                     <span>

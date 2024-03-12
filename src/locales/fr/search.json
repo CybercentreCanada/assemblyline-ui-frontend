@@ -1,7 +1,6 @@
 {
   "alert": "Alerte",
   "archive": "Trouvé dans l'archive",
-  "available": "disponible",
   "disabled": "Désactivé",
   "enabled": "Activé",
   "file": "Fichier",
@@ -46,6 +45,7 @@
   "header.user": "Utilisateur",
   "header.verdict": "Verdict",
   "header.version": "Version",
+  "install": "Installer",
   "installing": "Installation...",
   "location.external": "Externe - En dehors de l'infrastructure d'Assemblyline",
   "location.internal": "Interne - À l'intérieur de l'infrastructure d'Assemblyline",
@@ -87,6 +87,7 @@
   "status.submitted": "Examine...",
   "status.yara": "YARA",
   "submission": "Soumission",
+  "to": "à la version",
   "title_alert": "Recherche d'Alertes",
   "title_all": "Recherche",
   "title_file": "Recherche de Fichier",
