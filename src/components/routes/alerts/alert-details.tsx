@@ -186,7 +186,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
       addInsight({ type: 'report', value: item.sid });
       addInsight({ type: 'file', value: item.file.sha256 });
       if (item.file.type.indexOf('code/') === 0) {
-        addInsight({ type: 'code', value: alert.file.sha256 });
+        addInsight({ type: 'code', value: item.file.sha256 });
       }
     }
 
