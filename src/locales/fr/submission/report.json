@@ -6,6 +6,7 @@
   "error.too_early": "Il est trop tôt pour générer le rapport car la soumission n'est pas terminée. Vous serez rediriger vers la vue détaillée ...",
   "family": "Famille",
   "file.description": "Description",
+  "file.entropy": "Entropie",
   "file.fragment": "Fragment",
   "file.hostname": "Hôte",
   "file.magic": "Magic",

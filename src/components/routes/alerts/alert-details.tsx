@@ -507,7 +507,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert, inDrawer 
                 )}
               </Grid>
             </Grid>
-            {item && item.file.screenshots && <ImageInline data={item.file.screenshots} small />}
+            {item && item.file.screenshots && <ImageInline data={item.file.screenshots} size="small" />}
           </div>
         </div>
 
