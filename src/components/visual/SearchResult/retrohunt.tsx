@@ -50,17 +50,13 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
 
   const RetrohuntStatus = useCallback<React.FC<{ result: RetrohuntResult }>>(
     ({ result }) => {
-      let { finished = false, phase = 'finished', percentage = 100 } = result;
-      phase = finished ? 'finished' : RETROHUNT_PHASES.includes(phase) ? phase : 'finished';
+      let { finished = false } = result;
+      let phase = finished ? 'finished' : 'filtering';
 
       return (
         <CustomChip
-          label={
-            phase === 'finished' || !percentage
-              ? t(`status.${phase}`)
-              : `${Math.floor(percentage)}% ${t(`status.${phase}`)}`
-          }
-          color={phase === 'finished' ? 'primary' : 'default'}
+          label={t(`status.${phase}`)}
+          color={finished ? 'primary' : 'default'}
           size="small"
           variant="outlined"
         />
