@@ -358,13 +358,16 @@ function WrappedGeneralInformation({ report }) {
           </Grid>
 
           {report && report.file_info.entropy && report.promoted_sections ? (
-            <Grid item xs={12} sm={9} lg={10}>
-              {report.promoted_sections
-                .filter(section => section.promote_to === 'ENTROPY')
-                .map((section, idx) =>
-                  section.body_format === 'GRAPH_DATA' ? <GraphBody key={idx} body={section.body} /> : null
-                )}
-            </Grid>
+            <>
+              <Grid item xs={4} sm={3} lg={2} />
+              <Grid item xs={8} sm={9} lg={10}>
+                {report.promoted_sections
+                  .filter(section => section.promote_to === 'ENTROPY')
+                  .map((section, idx) =>
+                    section.body_format === 'GRAPH_DATA' ? <GraphBody key={idx} body={section.body} /> : null
+                  )}
+              </Grid>
+            </>
           ) : null}
         </Grid>
         <div>
@@ -372,7 +375,9 @@ function WrappedGeneralInformation({ report }) {
             ? report.promoted_sections
                 .filter(section => section.promote_to === 'SCREENSHOT')
                 .map((section, idx) =>
-                  section.body_format === 'IMAGE' ? <ImageInlineBody key={idx} body={section.body} /> : null
+                  section.body_format === 'IMAGE' ? (
+                    <ImageInlineBody key={idx} body={section.body} size="large" />
+                  ) : null
                 )
             : null}
         </div>
