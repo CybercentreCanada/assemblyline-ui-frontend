@@ -93,10 +93,8 @@ export type RetrohuntResult = {
   total_hits?: number;
   total_errors?: number;
   total_warnings?: number;
-
+  
   // to delete ?
-  phase?: RetrohuntPhase;
-  percentage?: any;
   ttl?: any;
   archive_only?: any;
 };

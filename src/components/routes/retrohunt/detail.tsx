@@ -211,7 +211,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   );
 
   const phase = useMemo<RetrohuntPhase>(
-    () => (retrohunt && RETROHUNT_PHASES.includes(retrohunt?.phase) ? retrohunt.phase : null),
+    () => ((retrohunt && retrohunt.finished) ? 'finished' : 'filtering'),
     [retrohunt]
   );
 
@@ -447,7 +447,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
               </Grid>
             </Grid>
 
-            {retrohunt &&
+            {/* {retrohunt &&
               'finished' in retrohunt &&
               !retrohunt.finished &&
               'percentage' in retrohunt &&
@@ -468,7 +468,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                     </Grid>
                   </Grid>
                 </Grid>
-              )}
+              )} */}
           </Grid>
 
           <Grid item style={{ textAlign: 'center' }} rowGap={1}>
