@@ -54,7 +54,7 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
   detailed = false,
   archiveOnly = false
 }) => {
-  const { t } = useTranslation(['submissionDetail']);
+  const { t, i18n } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
@@ -67,7 +67,7 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
 
   const getReportSummary = useCallback(
     noCache => {
-      const params = [];
+      const params = [`lang=${i18n.language === 'en' ? 'english' : 'french'}`];
       if (detailed) {
         params.push('detailed');
       }

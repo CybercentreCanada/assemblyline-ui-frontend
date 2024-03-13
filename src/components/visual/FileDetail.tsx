@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
+import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -153,6 +154,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const popoverOpen = Boolean(resubmitAnchor);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
+  const { addInsight, removeInsight } = useAssistant();
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -350,6 +352,26 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
           .flat()
       );
     }
+  }, [file]);
+
+  useEffect(() => {
+    addInsight({ type: 'file', value: sha256 });
+
+    return () => {
+      removeInsight({ type: 'file', value: sha256 });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256]);
+
+  useEffect(() => {
+    if (file && file.file_info.type.indexOf('code/') === 0) {
+      addInsight({ type: 'code', value: sha256 });
+    }
+
+    return () => {
+      removeInsight({ type: 'code', value: sha256 });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
 
   return currentUser.roles.includes('submission_view') ? (

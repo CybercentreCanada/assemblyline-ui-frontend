@@ -7,6 +7,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
+import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
@@ -61,6 +62,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
   const { user: currentUser } = useAppUser<CustomUser>();
   const [codeAllowed, setCodeAllowed] = useState(false);
   const { configuration } = useALContext();
+  const { addInsight, removeInsight } = useAssistant();
 
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -90,6 +92,19 @@ const WrappedFileViewer: React.FC<Props> = () => {
       setImageAllowed(null);
     };
   }, [sha256]);
+
+  useEffect(() => {
+    if (codeAllowed) {
+      addInsight({ type: 'code', value: sha256 });
+      addInsight({ type: 'file', value: sha256 });
+    }
+
+    return () => {
+      removeInsight({ type: 'code', value: sha256 });
+      removeInsight({ type: 'file', value: sha256 });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [codeAllowed]);
 
   return currentUser.roles.includes('file_detail') ? (
     <PageFullSize margin={4}>
