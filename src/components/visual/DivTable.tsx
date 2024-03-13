@@ -1,4 +1,14 @@
-import { Table, TableBody, TableCell, TableCellProps, TableHead, TableRow, TableSortLabel, Theme } from '@mui/material';
+import {
+  Link as MaterialLink,
+  Table,
+  TableBody,
+  TableCell,
+  TableCellProps,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  Theme
+} from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -115,6 +125,18 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
 
 export const LinkRow = ({ children, to, ...other }) => (
   <TableRow component={Link} {...other} to={to} style={{ cursor: 'pointer', textDecoration: 'none' }}>
+    {children}
+  </TableRow>
+);
+
+export const ExternalLinkRow = ({ children, href, ...other }) => (
+  <TableRow
+    component={MaterialLink}
+    {...other}
+    href={href}
+    target="_blank"
+    style={{ cursor: 'pointer', textDecoration: 'none' }}
+  >
     {children}
   </TableRow>
 );

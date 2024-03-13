@@ -30,6 +30,7 @@ import Service from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDownloader from 'components/visual/FileDownloader';
 import ServiceTable, { ServiceResult } from 'components/visual/SearchResult/service';
+import CommunityServiceTable from 'components/visual/ServiceManagement/CommunityServiceTable';
 import NewServiceTable from 'components/visual/ServiceManagement/NewServiceTable';
 import { JSONFeedItem, useNotificationFeed } from 'components/visual/ServiceManagement/useNotificationFeed';
 import 'moment/locale/fr';
@@ -58,7 +59,9 @@ export default function Services() {
   const { configuration } = useALContext();
   const { fetchJSONNotifications } = useNotificationFeed();
   const [serviceFeeds, setServiceFeeds] = useState<JSONFeedItem[]>(null);
+  const [communityFeeds, setCommunityFeeds] = useState<JSONFeedItem[]>(null);
   const [availableServices, setAvailableServices] = useState<JSONFeedItem[]>(null);
+  const [availableCommunityServices, setAvailableCommunityServices] = useState<JSONFeedItem[]>(null);
   const [installingServices, setInstallingServices] = useState<string[]>([]);
   const lastInstallingServices = useRef<string[]>([]);
   const installingServicesTimeout = useRef<NodeJS.Timeout>(null);
@@ -247,6 +250,19 @@ export default function Services() {
   }, [configuration?.ui?.services_feed, fetchJSONNotifications, setServiceFeeds]);
 
   useEffect(() => {
+    fetchJSONNotifications({
+      urls: configuration?.ui?.community_feed ? [configuration?.ui?.community_feed] : [],
+      onSuccess: values => setCommunityFeeds(values)
+    });
+  }, [configuration?.ui?.community_feed, fetchJSONNotifications, setCommunityFeeds]);
+
+  useEffect(() => {
+    if (!communityFeeds || !serviceResults) return;
+    const serviceResultNames = serviceResults.map(result => result?.name);
+    setAvailableCommunityServices(communityFeeds.filter(feed => !serviceResultNames.includes(feed.summary)));
+  }, [communityFeeds, serviceResults]);
+
+  useEffect(() => {
     if (!serviceFeeds || !serviceResults) return;
     const serviceResultNames = serviceResults.map(result => result?.name);
     setAvailableServices(serviceFeeds.filter(feed => !serviceResultNames.includes(feed.summary)));
@@ -365,7 +381,13 @@ export default function Services() {
         </Grid>
         <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-            <Tooltip title={t('add')}>
+            <Tooltip
+              PopperProps={{
+                disablePortal: true
+              }}
+              disableInteractive
+              title={t('add')}
+            >
               <IconButton
                 style={{
                   color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
@@ -377,6 +399,10 @@ export default function Services() {
               </IconButton>
             </Tooltip>
             <Tooltip
+              PopperProps={{
+                disablePortal: true
+              }}
+              disableInteractive
               title={
                 updates && Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
                   ? t('update_all')
@@ -397,6 +423,10 @@ export default function Services() {
               </span>
             </Tooltip>
             <Tooltip
+              PopperProps={{
+                disablePortal: true
+              }}
+              disableInteractive
               title={
                 availableServices &&
                 availableServices.length > 0 &&
@@ -421,7 +451,13 @@ export default function Services() {
               </span>
             </Tooltip>
             <FileDownloader icon={<GetAppOutlinedIcon />} link={`/api/v4/service/backup/`} tooltip={t('backup')} />
-            <Tooltip title={t('restore')}>
+            <Tooltip
+              PopperProps={{
+                disablePortal: true
+              }}
+              disableInteractive
+              title={t('restore')}
+            >
               <IconButton onClick={() => setOpenRestore(true)} size="large">
                 <RestoreOutlinedIcon />
               </IconButton>
@@ -459,6 +495,26 @@ export default function Services() {
       <div style={{ paddingTop: theme.spacing(2) }}>
         <NewServiceTable
           services={availableServices?.sort((a, b) => a.id.localeCompare(b.id))}
+          installingServices={installingServices}
+          onInstall={onInstallServices}
+        />
+      </div>
+
+      <Grid container alignItems="center" spacing={3} style={{ marginTop: theme.spacing(2) }}>
+        <Grid item xs>
+          <Typography variant="h5">{t('title.available.community')}</Typography>
+          {availableCommunityServices ? (
+            <Typography variant="caption" component="p">{`${availableCommunityServices.length} ${t(
+              'count.available.community'
+            )}`}</Typography>
+          ) : (
+            <Skeleton width="8rem" />
+          )}
+        </Grid>
+      </Grid>
+      <div style={{ paddingTop: theme.spacing(2) }}>
+        <CommunityServiceTable
+          services={availableCommunityServices?.sort((a, b) => a.id.localeCompare(b.id))}
           installingServices={installingServices}
           onInstall={onInstallServices}
         />
