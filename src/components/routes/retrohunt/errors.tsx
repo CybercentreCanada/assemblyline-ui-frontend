@@ -191,7 +191,11 @@ const WrappedRetrohuntErrors = ({ retrohunt = null }: Props) => {
         totals && (
           <Grid item>
             <Tooltip title={totals}>
-              <IconButton color="error" size="large" onClick={() => setOpen(true)}>
+              <IconButton
+                size="large"
+                onClick={() => setOpen(true)}
+                style={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
+              >
                 <ErrorOutlineOutlinedIcon />
               </IconButton>
             </Tooltip>
