@@ -52,6 +52,7 @@ const useStyles = makeStyles(theme => ({
 const PAGE_SIZE = 25;
 const MAX_TRACKED_RECORDS = 10000;
 const RELOAD_DELAY = 5000;
+const SOCKETIO_NAMESPACE = '/retrohunt';
 export const RETROHUNT_INDICES = ['hot', 'archive', 'hot_and_archive'] as const;
 export const RETROHUNT_PHASES = ['starting', 'filtering', 'yara', 'finished'] as const;
 
@@ -93,10 +94,6 @@ export type RetrohuntResult = {
   total_hits?: number;
   total_errors?: number;
   total_warnings?: number;
-  
-  // to delete ?
-  ttl?: any;
-  archive_only?: any;
 };
 
 export type SearchResults = {
@@ -110,8 +107,7 @@ const DEFAULT_PARAMS: object = {
   query: '*',
   offset: 0,
   rows: PAGE_SIZE,
-  fl: 'indices,classification,search_classification,creator,description,expiry_ts,start_group,end_group,created_time,started_time,completed_time,key,raw_query,yara_signature,finished,truncated'
-  // fl: 'archive_only,classification,key,created,creator,description,finished,id,percentage,phase,progress,total_errors,total_hits,truncated'
+  sort: 'created_time+desc'
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
