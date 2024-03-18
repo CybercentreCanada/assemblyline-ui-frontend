@@ -30,7 +30,6 @@ const StyledTitle = styled('div')(({ theme }) => ({
   alignItems: 'center',
   flex: '0 0 auto',
   fontSize: '1.5rem',
-  letterSpacing: '-1px',
   height: theme.spacing(8),
   padding: theme.spacing(0, 2),
   [theme.breakpoints.only('xs')]: {
