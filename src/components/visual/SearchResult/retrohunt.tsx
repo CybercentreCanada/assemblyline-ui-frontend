@@ -2,7 +2,7 @@ import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
-import { RetrohuntResult, RETROHUNT_PHASES } from 'components/routes/retrohunt';
+import { RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import 'moment/locale/fr';
@@ -50,17 +50,31 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
 
   const RetrohuntStatus = useCallback<React.FC<{ result: RetrohuntResult }>>(
     ({ result }) => {
-      let { finished = false } = result;
-      let phase = finished ? 'finished' : 'filtering';
+      const { finished = false, step, progress } = result;
+      let label = '';
 
-      return (
-        <CustomChip
-          label={t(`status.${phase}`)}
-          color={finished ? 'primary' : 'default'}
-          size="small"
-          variant="outlined"
-        />
-      );
+      if (finished) {
+        label = t(`status.finished`);
+      } else if (step) {
+        switch (step) {
+          case 'Starting':
+            label = t(`status.starting`);
+            break;
+          case 'Filtering':
+            label = `${Math.ceil(100 * progress)}% ${t(`status.filtering`)}`;
+            break;
+          case 'Yara':
+            label = `${Math.ceil(100 * progress)}% ${t(`status.yara`)}`;
+            break;
+          case 'Finished':
+            label = t(`status.finished`);
+            break;
+          default:
+            label = t(`status.in_progress`);
+        }
+      }
+
+      return <CustomChip label={label} color={finished ? 'primary' : 'default'} size="small" variant="outlined" />;
     },
     [t]
   );

@@ -15,7 +15,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
-import { RetrohuntResult } from 'components/routes/retrohunt';
+import { RetrohuntProgress, RetrohuntResult } from 'components/routes/retrohunt';
 import RetrohuntErrors from 'components/routes/retrohunt/errors';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
@@ -79,15 +79,9 @@ type RetrohuntHitResult = {
   total: number;
 };
 
-type ParamProps = {
+type Params = {
   key: string;
 };
-
-type RetrohuntProgress =
-  | { type: 'Starting' }
-  | { type: 'Filtering'; progress: number }
-  | { type: 'Yara'; progress: number }
-  | { type: 'Finished'; search: RetrohuntResult };
 
 type Props = {
   search_key?: string;
@@ -122,7 +116,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   const { indexes } = useALContext();
 
   const { c12nDef, configuration } = useALContext();
-  const { key: paramKey } = useParams<ParamProps>();
+  const { key: paramKey } = useParams<Params>();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [retrohunt, setRetrohunt] = useState<RetrohuntResult>(null);

@@ -76,6 +76,8 @@
   "status.submitted": "In progress...",
   "step.filtering": "Filtering",
   "step.finished": "Finished",
+  "step.in_progress": "In Progress",
+  "step.starting": "Starting",
   "step.yara": "YARA",
   "title": "Retrohunt",
   "tooltip.add": "Create a new Retrohunt search",

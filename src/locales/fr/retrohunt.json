@@ -76,6 +76,8 @@
   "status.submitted": "En cours de recherche...",
   "step.filtering": "Filtrage",
   "step.finished": "Complété",
+  "step.in_progress": "En cours",
+  "step.starting": "Démarré",
   "step.yara": "YARA",
   "title": "Rétrohunt",
   "tooltip.add": "Créer une nouvelle recherche Rétrohunt",

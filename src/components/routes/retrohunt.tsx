@@ -1,6 +1,4 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import PauseCircleOutlineOutlinedIcon from '@mui/icons-material/PauseCircleOutlineOutlined';
-import PlayCircleFilledWhiteOutlinedIcon from '@mui/icons-material/PlayCircleFilledWhiteOutlined';
 import { Grid, IconButton, Pagination, Tooltip, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -20,6 +18,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
+import { io, Socket } from 'socket.io-client';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -54,7 +53,7 @@ const MAX_TRACKED_RECORDS = 10000;
 const RELOAD_DELAY = 5000;
 const SOCKETIO_NAMESPACE = '/retrohunt';
 export const RETROHUNT_INDICES = ['hot', 'archive', 'hot_and_archive'] as const;
-export const RETROHUNT_PHASES = ['starting', 'filtering', 'yara', 'finished'] as const;
+export const RETROHUNT_PHASES = ['Starting', 'Filtering', 'Yara', 'Finished'] as const;
 
 export type RetrohuntIndex = (typeof RETROHUNT_INDICES)[number];
 export type RetrohuntPhase = (typeof RETROHUNT_PHASES)[number];
@@ -66,6 +65,12 @@ export type RetrohuntHit = {
   expiry_ts?: string;
   search: string;
 };
+
+export type RetrohuntProgress =
+  | { type: 'Starting'; key: string }
+  | { type: 'Filtering'; key: string; progress: number }
+  | { type: 'Yara'; key: string; progress: number }
+  | { type: 'Finished'; key: string; search: RetrohuntResult };
 
 export type RetrohuntResult = {
   indices: RetrohuntIndex;
@@ -94,6 +99,13 @@ export type RetrohuntResult = {
   total_hits?: number;
   total_errors?: number;
   total_warnings?: number;
+
+  // to delete ?
+  ttl?: any;
+  archive_only?: any;
+
+  step?: RetrohuntProgress['type'];
+  progress?: number;
 };
 
 export type SearchResults = {
@@ -107,7 +119,8 @@ const DEFAULT_PARAMS: object = {
   query: '*',
   offset: 0,
   rows: PAGE_SIZE,
-  sort: 'created_time+desc'
+  sort: 'created_time+desc',
+  fl: 'indices,classification,search_classification,creator,description,expiry_ts,start_group,end_group,created_time,started_time,completed_time,key,raw_query,yara_signature,finished,truncated'
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -126,10 +139,9 @@ export default function RetrohuntPage() {
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [searching, setSearching] = useState<boolean>(false);
-  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [socket, setSocket] = useState<Socket<any, any>>(null);
 
   const filterValue = useRef<string>('');
-  const timer = useRef<boolean>(false);
 
   const suggestions = useMemo<string[]>(
     () => [...Object.keys(indexes.retrohunt).filter(name => indexes.retrohunt[name].indexed), ...DEFAULT_SUGGESTION],
@@ -250,14 +262,47 @@ export default function RetrohuntPage() {
   }, [location.hash, setGlobalDrawer]);
 
   useEffect(() => {
-    if (!timer.current && !isPaused && retrohuntResults && retrohuntResults.items.some(item => !item?.finished)) {
-      timer.current = true;
-      setTimeout(() => {
-        handleReload(query);
-        timer.current = false;
-      }, RELOAD_DELAY);
-    }
-  }, [handleReload, isPaused, query, retrohuntResults]);
+    const socketio = io(SOCKETIO_NAMESPACE);
+    setSocket(socketio);
+
+    socketio.on('connect', () => {
+      // eslint-disable-next-line no-console
+      console.debug('Socket-IO :: Connecting to socketIO server...');
+    });
+
+    socketio.on('connect', () => {
+      // eslint-disable-next-line no-console
+      console.debug('Socket-IO :: Disconnected from socketIO server.');
+    });
+
+    socketio.on('status', (data: RetrohuntProgress) => {
+      setRetrohuntResults(results => ({
+        ...results,
+        items: results.items.map(result =>
+          result.key !== data.key
+            ? result
+            : {
+                ...result,
+                finished: data.type === 'Finished',
+                step: data.type,
+                progress: data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0
+              }
+        )
+      }));
+    });
+
+    return () => {
+      socketio.disconnect();
+      setSocket(null);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!socket || !socket.connected || !retrohuntResults || retrohuntResults.total === 0) return;
+    retrohuntResults.items.forEach(result => {
+      if (!result.finished) socket.emit('listen', { key: result.key });
+    });
+  }, [retrohuntResults, socket]);
 
   if (!configuration?.retrohunt?.enabled) return <Navigate to="/notfound" replace />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <Navigate to="/forbidden" replace />;
@@ -269,15 +314,6 @@ export default function RetrohuntPage() {
             <Grid item xs>
               <Typography variant="h4">{t('title')}</Typography>
             </Grid>
-            {retrohuntResults && retrohuntResults.items.some(r => !r?.finished) && (
-              <Grid className={classes.headerButton} item xs>
-                <Tooltip title={isPaused ? t('tooltip.play') : t('tooltip.paused')}>
-                  <IconButton color="primary" size="large" onClick={() => setIsPaused(p => !p)}>
-                    {isPaused ? <PlayCircleFilledWhiteOutlinedIcon /> : <PauseCircleOutlineOutlinedIcon />}
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-            )}
             {currentUser.roles.includes('retrohunt_run') && (
               <Grid className={classes.headerButton} item xs>
                 <Tooltip title={t('tooltip.add')}>
