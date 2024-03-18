@@ -291,8 +291,8 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   }, [searchKey, reloadData]);
 
   useEffect(() => {
-    if (query) reloadHits(query);
-  }, [query, reloadHits]);
+    if (query && status === null) reloadHits(query);
+  }, [query, reloadHits, status]);
 
   useEffect(() => {
     if (!isDrawer && location.hash) {
@@ -343,7 +343,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
           total_errors: data.search.errors.length,
           total_warnings: data.search.warnings.length
         });
-        reloadHits(query);
+        setStatus(null);
       } else {
         setStatus(data);
       }
@@ -388,7 +388,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
               </Grid>
             </Grid>
 
-            {!retrohunt || !!retrohunt?.finished ? null : (
+            {!status ? null : (
               <Grid item paddingTop={2}>
                 <Grid container flexDirection="row" justifyContent="center">
                   <Grid item xs={12} sm={11} lg={10}>

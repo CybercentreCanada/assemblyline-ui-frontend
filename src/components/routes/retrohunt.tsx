@@ -50,7 +50,6 @@ const useStyles = makeStyles(theme => ({
 
 const PAGE_SIZE = 25;
 const MAX_TRACKED_RECORDS = 10000;
-const RELOAD_DELAY = 5000;
 const SOCKETIO_NAMESPACE = '/retrohunt';
 export const RETROHUNT_INDICES = ['hot', 'archive', 'hot_and_archive'] as const;
 export const RETROHUNT_PHASES = ['Starting', 'Filtering', 'Yara', 'Finished'] as const;
