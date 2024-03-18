@@ -40,10 +40,10 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         alt={t('logo.alt')}
-        src={`${process.env.PUBLIC_URL}/images/al.svg`}
+        src={`${process.env.PUBLIC_URL}/images/logo.svg`}
         width="40"
         height="32"
-        style={{ marginLeft: '-5px' }}
+        style={{ marginLeft: '-8px' }}
       />
     ),
     [t]
@@ -53,10 +53,10 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         alt={t('logo.alt')}
-        src={`${process.env.PUBLIC_URL}/images/al_dark.svg`}
+        src={`${process.env.PUBLIC_URL}/images/logo_dark.svg`}
         width="40"
         height="32"
-        style={{ marginLeft: '-5px' }}
+        style={{ marginLeft: '-8px' }}
       />
     ),
     [t]
@@ -78,6 +78,28 @@ const useMyPreferences = () => {
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
         src={`${process.env.PUBLIC_URL}/images/banner_dark.svg`}
+        alt={t('banner.alt')}
+      />
+    ),
+    [t]
+  );
+
+  const AL_LIGHT_BANNER_VERT = useMemo(
+    (): ReactElement<any> => (
+      <img
+        style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
+        src={`${process.env.PUBLIC_URL}/images/banner_vertical.svg`}
+        alt={t('banner.alt')}
+      />
+    ),
+    [t]
+  );
+
+  const AL_DARK_BANNER_VERT = useMemo(
+    (): ReactElement<any> => (
+      <img
+        style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
+        src={`${process.env.PUBLIC_URL}/images/banner_dark_vertical.svg`}
         alt={t('banner.alt')}
       />
     ),
@@ -450,6 +472,8 @@ const useMyPreferences = () => {
       appIconLight: AL_LIGHT_LOGO,
       bannerDark: AL_DARK_BANNER,
       bannerLight: AL_LIGHT_BANNER,
+      bannerVertDark: AL_DARK_BANNER_VERT,
+      bannerVertLight: AL_LIGHT_BANNER_VERT,
       defaultAutoHideAppbar: false,
       defaultDrawerOpen: false,
       defaultLayout: 'side',
