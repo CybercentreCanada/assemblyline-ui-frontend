@@ -326,9 +326,9 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   }, [closeGlobalDrawer, location.pathname]);
 
   useEffect(() => {
-    if (!searchKey || !retrohunt || retrohunt.finished) return;
-
     const socket = io(SOCKETIO_NAMESPACE);
+
+    if (!searchKey || !retrohunt || retrohunt.finished) return;
 
     socket.on('connect', () => {
       // eslint-disable-next-line no-console

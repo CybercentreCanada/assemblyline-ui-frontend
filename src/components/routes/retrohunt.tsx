@@ -261,9 +261,9 @@ export default function RetrohuntPage() {
   }, [location.hash, setGlobalDrawer]);
 
   useEffect(() => {
-    if (!retrohuntResults || retrohuntResults.items.some(r => !r.finished)) return;
-
     const socket = io(SOCKETIO_NAMESPACE);
+
+    if (!retrohuntResults || retrohuntResults.items.every(r => r.finished)) return;
 
     socket.on('connect', () => {
       // eslint-disable-next-line no-console
