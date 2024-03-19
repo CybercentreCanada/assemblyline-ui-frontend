@@ -18,7 +18,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -138,7 +138,6 @@ export default function RetrohuntPage() {
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [searching, setSearching] = useState<boolean>(false);
-  const [socket, setSocket] = useState<Socket<any, any>>(null);
 
   const filterValue = useRef<string>('');
 
@@ -262,22 +261,33 @@ export default function RetrohuntPage() {
   }, [location.hash, setGlobalDrawer]);
 
   useEffect(() => {
-    const socketio = io(SOCKETIO_NAMESPACE);
-    setSocket(socketio);
+    if (!retrohuntResults || retrohuntResults.items.some(r => !r.finished)) return;
 
-    socketio.on('connect', () => {
+    const socket = io(SOCKETIO_NAMESPACE);
+
+    socket.on('connect', () => {
       // eslint-disable-next-line no-console
       console.debug(`Socket-IO :: /retrohunt (connect)`);
+
+      retrohuntResults.items
+        .filter(r => !r.finished)
+        .forEach(result => {
+          // eslint-disable-next-line no-console
+          console.debug(`Socket-IO :: /retrohunt (listen) :: ${result.key}`);
+          socket.emit('listen', { key: result.key });
+        });
     });
 
-    socketio.on('disconnect', () => {
+    socket.on('disconnect', () => {
       // eslint-disable-next-line no-console
       console.debug(`Socket-IO :: /retrohunt (disconnect)`);
     });
 
-    socketio.on('status', (data: RetrohuntProgress) => {
+    socket.on('status', (data: RetrohuntProgress) => {
+      const progress = data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0;
       // eslint-disable-next-line no-console
-      console.debug(`Socket-IO :: /retrohunt (status) :: ${data.type} - ${data.key}`);
+      console.debug(`Socket-IO :: /retrohunt (status) :: ${data.type} - ${Math.floor(100 * progress)}% - ${data.key}`);
+
       setRetrohuntResults(results => ({
         ...results,
         items: results.items.map(result =>
@@ -295,22 +305,10 @@ export default function RetrohuntPage() {
     });
 
     return () => {
-      socketio.disconnect();
-      setSocket(null);
+      socket.disconnect();
     };
-  }, []);
-
-  useEffect(() => {
-    if (!socket || !socket.connected || !retrohuntResults) return;
-    retrohuntResults.items
-      .filter(r => !r.finished)
-      .forEach(result => {
-        // eslint-disable-next-line no-console
-        console.debug(`Socket-IO :: /retrohunt (listen) :: ${result.key}`);
-        socket.emit('listen', { key: result.key });
-      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket, retrohuntResults && retrohuntResults.items.filter(r => !r.finished).map(r => r.key)]);
+  }, [retrohuntResults && retrohuntResults.items.map(r => [r.key, r.finished])]);
 
   if (!configuration?.retrohunt?.enabled) return <Navigate to="/notfound" replace />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <Navigate to="/forbidden" replace />;
