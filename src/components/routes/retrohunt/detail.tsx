@@ -45,7 +45,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { RetrohuntRepeat } from './repeat';
 
 const useStyles = makeStyles(theme => ({
@@ -120,11 +120,11 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [retrohunt, setRetrohunt] = useState<RetrohuntResult>(null);
-  const [status, setStatus] = useState<RetrohuntProgress>(null);
   const [hitResults, setHitResults] = useState<RetrohuntHitResult>(null);
   const [typeDataSet, setTypeDataSet] = useState<{ [k: string]: number }>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
+  const [socket, setSocket] = useState<Socket<any, any>>(null);
 
   const filterValue = useRef<string>('');
 
@@ -141,10 +141,12 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
       finished: null,
       indices: null,
       key: null,
+      progress: 0,
       raw_query: null,
       search_classification: currentUser.classification,
       start_group: null,
       started_time: null,
+      step: 'Finished',
       total_errors: 0,
       total_hits: 0,
       total_indices: 0,
@@ -275,6 +277,10 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
     [isDrawer, location.hash, location.pathname, location.search, navigate]
   );
 
+  const handleRepeat = useCallback((value: RetrohuntResult) => {
+    setRetrohunt(r => ({ ...r, ...value }));
+  }, []);
+
   useEffect(() => {
     if (isDrawer) {
       const url = new URL(`${window.location.origin}/${location.hash.slice(1)}`);
@@ -291,8 +297,8 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   }, [searchKey, reloadData]);
 
   useEffect(() => {
-    if (query && status === null) reloadHits(query);
-  }, [query, reloadHits, status]);
+    if (query && retrohunt?.finished) reloadHits(query);
+  }, [query, reloadHits, retrohunt?.finished]);
 
   useEffect(() => {
     if (!isDrawer && location.hash) {
@@ -321,39 +327,47 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   }, [closeGlobalDrawer, location.pathname]);
 
   useEffect(() => {
-    if (!searchKey) return;
+    const socketio = io(SOCKETIO_NAMESPACE);
+    setSocket(socketio);
 
-    const socket = io(SOCKETIO_NAMESPACE);
-
-    socket.on('connect', () => {
-      socket.emit('listen', { key: searchKey });
+    socketio.on('connect', () => {
       // eslint-disable-next-line no-console
       console.debug('Socket-IO :: Connecting to socketIO server...');
     });
 
-    socket.on('disconnect', () => {
+    socketio.on('disconnect', () => {
       // eslint-disable-next-line no-console
       console.debug('Socket-IO :: Disconnected from socketIO server.');
     });
-    // eslint-disable-next-line no-console
-    socket.on('status', (data: RetrohuntProgress) => {
-      if (data.type === 'Finished') {
-        setRetrohunt({
-          ...data.search,
-          total_errors: data.search.errors.length,
-          total_warnings: data.search.warnings.length
-        });
-        setStatus(null);
-      } else {
-        setStatus(data);
-      }
+
+    socketio.on('status', (data: RetrohuntProgress) => {
+      setRetrohunt(prev =>
+        prev.key !== data.key
+          ? prev
+          : {
+              ...prev,
+              ...(data.type === 'Finished' && {
+                ...data.search,
+                total_errors: data.search.errors.length,
+                total_warnings: data.search.warnings.length
+              }),
+              finished: data.type === 'Finished',
+              step: data.type,
+              progress: data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0
+            }
+      );
     });
 
     return () => {
-      socket.disconnect();
+      socketio.disconnect();
+      setSocket(null);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchKey]);
+  }, []);
+
+  useEffect(() => {
+    if (!searchKey || !socket || !socket.connected || retrohunt?.finished) return;
+    socket.emit('listen', { key: searchKey });
+  }, [retrohunt?.finished, searchKey, socket]);
 
   if (!configuration?.retrohunt?.enabled) return <NotFoundPage />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
@@ -380,7 +394,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
               </Grid>
               <Grid item flex={0}>
                 <Grid container flexDirection="row" rowGap={2} wrap="nowrap">
-                  {retrohunt && retrohunt.finished === true && <RetrohuntRepeat retrohunt={retrohunt} />}
+                  {retrohunt && retrohunt.finished && <RetrohuntRepeat retrohunt={retrohunt} onRepeat={handleRepeat} />}
                   {retrohunt && (retrohunt.total_warnings > 0 || retrohunt.total_errors > 0) && (
                     <RetrohuntErrors retrohunt={retrohunt} />
                   )}
@@ -388,13 +402,13 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
               </Grid>
             </Grid>
 
-            {!status ? null : (
+            {!retrohunt || retrohunt?.finished ? null : (
               <Grid item paddingTop={2}>
                 <Grid container flexDirection="row" justifyContent="center">
                   <Grid item xs={12} sm={11} lg={10}>
                     <SteppedProgress
-                      activeStep={['Filtering', 'Yara', 'Finished'].indexOf(status.type)}
-                      percentage={status.type === 'Filtering' || status.type === 'Yara' ? 100 * status?.progress : 0}
+                      activeStep={['Filtering', 'Yara', 'Finished'].indexOf(retrohunt.step)}
+                      percentage={Math.ceil(100 * retrohunt.progress)}
                       show100
                       steps={[
                         { label: t('step.filtering'), icon: <FilterAltOutlinedIcon /> },
