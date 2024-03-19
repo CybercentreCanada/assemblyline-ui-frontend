@@ -241,7 +241,8 @@ export default function RetrohuntPage() {
     return () => {
       window.removeEventListener('reloadRetrohunts', reload);
     };
-  }, [handleReload, query]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleReload]);
 
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
@@ -288,6 +289,7 @@ export default function RetrohuntPage() {
               }
         )
       }));
+      if (data.type === 'Finished') window.dispatchEvent(new CustomEvent('reloadRetrohunts'));
     });
 
     return () => {
@@ -298,9 +300,11 @@ export default function RetrohuntPage() {
 
   useEffect(() => {
     if (!socket || !socket.connected || !retrohuntResults || retrohuntResults.total === 0) return;
-    retrohuntResults.items.forEach(result => {
-      if (!result.finished) socket.emit('listen', { key: result.key });
-    });
+    retrohuntResults.items
+      .filter(r => !r.finished)
+      .forEach(result => {
+        socket.emit('listen', { key: result.key });
+      });
   }, [retrohuntResults, socket]);
 
   if (!configuration?.retrohunt?.enabled) return <Navigate to="/notfound" replace />;
