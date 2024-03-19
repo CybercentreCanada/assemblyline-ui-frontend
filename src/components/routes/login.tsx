@@ -190,7 +190,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
 
   return (
     <PageCardCentered>
-      <Box style={{ cursor: 'pointer' }} onClick={reset}>
+      <Box sx={{ cursor: 'pointer' }} onClick={reset}>
         {shownControls === 'oauth' ? banner : bannerVert}
       </Box>
       {
