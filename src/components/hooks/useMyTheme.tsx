@@ -21,15 +21,16 @@ const AL_THEME: AppThemeConfigs = {
   palette: {
     dark: {
       background: {
-        default: 'rgb(48, 48, 48)',
-        paper: 'rgb(66, 66, 66)'
+        default: 'rgb(32, 32, 32)',
+        paper: 'rgb(48, 48, 48)'
       },
       primary: {
-        main: 'rgb(124, 147, 185)'
+        main: '#83A0D2'
       },
       secondary: {
-        main: 'rgb(146, 156, 173)'
-      }
+        main: '#C0DEEC'
+      },
+      divider: '#414141'
     },
     light: {
       background: {
@@ -37,22 +38,25 @@ const AL_THEME: AppThemeConfigs = {
         paper: '#fff'
       },
       primary: {
-        main: 'rgb(11, 101, 161)'
+        main: '#1565C0'
       },
       secondary: {
-        main: '#939DAC'
+        main: '#7C889A'
       }
     }
   },
   appbar: {
     dark: {
-      backgroundColor: 'rgb(86, 102, 129)'
+      backgroundColor: 'rgb(48, 48, 48)'
     },
     light: {
-      backgroundColor: 'rgb(7, 70, 112)'
+      color: '#000000',
+      backgroundColor: '#fff'
     }
   }
 };
+
+const DEFAULT_THEME: AppThemeConfigs = {};
 
 const useMyTheme = () => useMemo((): AppThemeConfigs => AL_THEME, []);
 export default useMyTheme;
