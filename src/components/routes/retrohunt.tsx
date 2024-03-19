@@ -261,48 +261,50 @@ export default function RetrohuntPage() {
   }, [location.hash, setGlobalDrawer]);
 
   useEffect(() => {
-    if (!retrohuntResults || retrohuntResults.items.some(r => !r.finished)) return;
-
     const socket = io(SOCKETIO_NAMESPACE);
 
-    socket.on('connect', () => {
-      // eslint-disable-next-line no-console
-      console.debug(`Socket-IO :: /retrohunt (connect)`);
+    if (retrohuntResults && retrohuntResults.items.some(r => !r.finished)) {
+      socket.on('connect', () => {
+        // eslint-disable-next-line no-console
+        console.debug(`Socket-IO :: /retrohunt (connect)`);
 
-      retrohuntResults.items
-        .filter(r => !r.finished)
-        .forEach(result => {
-          // eslint-disable-next-line no-console
-          console.debug(`Socket-IO :: /retrohunt (listen) :: ${result.key}`);
-          socket.emit('listen', { key: result.key });
-        });
-    });
+        retrohuntResults.items
+          .filter(r => !r.finished)
+          .forEach(result => {
+            // eslint-disable-next-line no-console
+            console.debug(`Socket-IO :: /retrohunt (listen) :: ${result.key}`);
+            socket.emit('listen', { key: result.key });
+          });
+      });
 
-    socket.on('disconnect', () => {
-      // eslint-disable-next-line no-console
-      console.debug(`Socket-IO :: /retrohunt (disconnect)`);
-    });
+      socket.on('disconnect', () => {
+        // eslint-disable-next-line no-console
+        console.debug(`Socket-IO :: /retrohunt (disconnect)`);
+      });
 
-    socket.on('status', (data: RetrohuntProgress) => {
-      const progress = data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0;
-      // eslint-disable-next-line no-console
-      console.debug(`Socket-IO :: /retrohunt (status) :: ${data.type} - ${Math.floor(100 * progress)}% - ${data.key}`);
+      socket.on('status', (data: RetrohuntProgress) => {
+        const progress = data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0;
+        // eslint-disable-next-line no-console
+        console.debug(
+          `Socket-IO :: /retrohunt (status) :: ${data.type} - ${Math.floor(100 * progress)}% - ${data.key}`
+        );
 
-      setRetrohuntResults(results => ({
-        ...results,
-        items: results.items.map(result =>
-          result.key !== data.key
-            ? result
-            : {
-                ...result,
-                finished: data.type === 'Finished',
-                step: data.type,
-                progress: data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0
-              }
-        )
-      }));
-      if (data.type === 'Finished') setTimeout(() => window.dispatchEvent(new CustomEvent('reloadRetrohunts')), 250);
-    });
+        setRetrohuntResults(results => ({
+          ...results,
+          items: results.items.map(result =>
+            result.key !== data.key
+              ? result
+              : {
+                  ...result,
+                  finished: data.type === 'Finished',
+                  step: data.type,
+                  progress: data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0
+                }
+          )
+        }));
+        if (data.type === 'Finished') setTimeout(() => window.dispatchEvent(new CustomEvent('reloadRetrohunts')), 250);
+      });
+    }
 
     return () => {
       socket.disconnect();
