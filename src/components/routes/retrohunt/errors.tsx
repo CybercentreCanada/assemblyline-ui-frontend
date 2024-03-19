@@ -67,7 +67,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 const MAX_TRACKED_RECORDS = 10000;
 
