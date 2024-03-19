@@ -328,45 +328,45 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   useEffect(() => {
     const socket = io(SOCKETIO_NAMESPACE);
 
-    if (searchKey && retrohunt && !retrohunt.finished) {
-      socket.on('connect', () => {
-        // eslint-disable-next-line no-console
-        console.debug(`Socket-IO :: /retrohunt/detail (connect)`);
+    if (!searchKey || !retrohunt || retrohunt.finished) return;
 
-        // eslint-disable-next-line no-console
-        console.debug(`Socket-IO :: /retrohunt/detail (listen) :: ${searchKey}`);
-        socket.emit('listen', { key: searchKey });
-      });
+    socket.on('connect', () => {
+      // eslint-disable-next-line no-console
+      console.debug(`Socket-IO :: /retrohunt/detail (connect)`);
 
-      socket.on('disconnect', () => {
-        // eslint-disable-next-line no-console
-        console.debug(`Socket-IO :: /retrohunt/detail (disconnect)`);
-      });
+      // eslint-disable-next-line no-console
+      console.debug(`Socket-IO :: /retrohunt/detail (listen) :: ${searchKey}`);
+      socket.emit('listen', { key: searchKey });
+    });
 
-      socket.on('status', (data: RetrohuntProgress) => {
-        const progress = data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0;
-        // eslint-disable-next-line no-console
-        console.debug(
-          `Socket-IO :: /retrohunt/detail (status) :: ${data.type} - ${Math.floor(100 * progress)}% - ${data.key}`
-        );
+    socket.on('disconnect', () => {
+      // eslint-disable-next-line no-console
+      console.debug(`Socket-IO :: /retrohunt/detail (disconnect)`);
+    });
 
-        setRetrohunt(prev =>
-          prev.key !== data.key
-            ? prev
-            : {
-                ...prev,
-                ...(data.type === 'Finished' && {
-                  ...data.search,
-                  total_errors: data.search.errors.length,
-                  total_warnings: data.search.warnings.length
-                }),
-                finished: data.type === 'Finished',
-                step: data.type,
-                progress: data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0
-              }
-        );
-      });
-    }
+    socket.on('status', (data: RetrohuntProgress) => {
+      const progress = data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0;
+      // eslint-disable-next-line no-console
+      console.debug(
+        `Socket-IO :: /retrohunt/detail (status) :: ${data.type} - ${Math.floor(100 * progress)}% - ${data.key}`
+      );
+
+      setRetrohunt(prev =>
+        prev.key !== data.key
+          ? prev
+          : {
+              ...prev,
+              ...(data.type === 'Finished' && {
+                ...data.search,
+                total_errors: data.search.errors.length,
+                total_warnings: data.search.warnings.length
+              }),
+              finished: data.type === 'Finished',
+              step: data.type,
+              progress: data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0
+            }
+      );
+    });
 
     return () => {
       socket.disconnect();
