@@ -270,7 +270,7 @@ export default function RetrohuntPage() {
       console.debug('Socket-IO :: Connecting to socketIO server...');
     });
 
-    socketio.on('connect', () => {
+    socketio.on('disconnect', () => {
       // eslint-disable-next-line no-console
       console.debug('Socket-IO :: Disconnected from socketIO server.');
     });

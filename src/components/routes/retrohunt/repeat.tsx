@@ -43,9 +43,10 @@ type Retrohunt = Pick<RetrohuntResult, 'key' | 'search_classification' | 'ttl'>;
 
 type Props = {
   retrohunt: RetrohuntResult;
+  onRepeat: (value: RetrohuntResult) => void;
 };
 
-function WrappedRetrohuntRepeat({ retrohunt = null }: Props) {
+function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Props) {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const classes = useStyles();
@@ -74,9 +75,10 @@ function WrappedRetrohuntRepeat({ retrohunt = null }: Props) {
           search_classification: data.search_classification,
           ttl: data.ttl
         },
-        onSuccess: api_data => {
+        onSuccess: ({ api_response }) => {
           showSuccessMessage(t('repeat.success'));
           setOpen(false);
+          onRepeat(api_response);
           setTimeout(() => window.dispatchEvent(new CustomEvent('reloadRetrohunts')), 1000);
         },
         onFailure: api_data => showErrorMessage(api_data.api_error_message),
