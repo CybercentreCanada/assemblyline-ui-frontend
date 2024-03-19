@@ -372,7 +372,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
       socket.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [retrohunt?.finished, searchKey]);
+  }, [retrohunt?.finished === false, searchKey]);
 
   if (!configuration?.retrohunt?.enabled) return <NotFoundPage />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
