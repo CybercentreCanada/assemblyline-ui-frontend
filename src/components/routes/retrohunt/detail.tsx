@@ -332,15 +332,18 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
 
     socketio.on('connect', () => {
       // eslint-disable-next-line no-console
-      console.debug('Socket-IO :: Connecting to socketIO server...');
+      console.debug(`Socket-IO :: /retrohunt/detail (connect)`);
     });
 
     socketio.on('disconnect', () => {
       // eslint-disable-next-line no-console
-      console.debug('Socket-IO :: Disconnected from socketIO server.');
+      console.debug(`Socket-IO :: /retrohunt/detail (disconnect)`);
     });
 
     socketio.on('status', (data: RetrohuntProgress) => {
+      // eslint-disable-next-line no-console
+      console.debug(`Socket-IO :: /retrohunt/detail (status) :: ${data.type} - ${data.key}`);
+
       setRetrohunt(prev =>
         prev.key !== data.key
           ? prev
@@ -366,6 +369,8 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
 
   useEffect(() => {
     if (!searchKey || !socket || !socket.connected || retrohunt?.finished) return;
+    // eslint-disable-next-line no-console
+    console.debug(`Socket-IO :: /retrohunt/detail (listen) :: ${searchKey}`);
     socket.emit('listen', { key: searchKey });
   }, [retrohunt?.finished, searchKey, socket]);
 
