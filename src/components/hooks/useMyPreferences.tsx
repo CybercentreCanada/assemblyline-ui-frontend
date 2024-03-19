@@ -40,7 +40,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         alt={t('logo.alt')}
-        src={`${process.env.PUBLIC_URL}/images/logo.svg`}
+        src={`${process.env.PUBLIC_URL}/images/logo_swoop.svg`}
         width="40"
         height="32"
         style={{ marginLeft: '-8px' }}
@@ -53,7 +53,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         alt={t('logo.alt')}
-        src={`${process.env.PUBLIC_URL}/images/logo_dark.svg`}
+        src={`${process.env.PUBLIC_URL}/images/logo_swoop_dark.svg`}
         width="40"
         height="32"
         style={{ marginLeft: '-8px' }}
