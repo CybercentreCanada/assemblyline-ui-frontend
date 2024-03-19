@@ -242,7 +242,7 @@ export default function RetrohuntPage() {
       window.removeEventListener('reloadRetrohunts', reload);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleReload]);
+  }, [handleReload, query]);
 
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
@@ -289,7 +289,7 @@ export default function RetrohuntPage() {
               }
         )
       }));
-      if (data.type === 'Finished') window.dispatchEvent(new CustomEvent('reloadRetrohunts'));
+      if (data.type === 'Finished') setTimeout(() => window.dispatchEvent(new CustomEvent('reloadRetrohunts')), 250);
     });
 
     return () => {
