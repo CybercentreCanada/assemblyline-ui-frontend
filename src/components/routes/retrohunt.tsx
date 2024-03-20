@@ -267,26 +267,26 @@ export default function RetrohuntPage() {
 
     socket.on('connect', () => {
       // eslint-disable-next-line no-console
-      console.debug(`Socket-IO :: /retrohunt (connect)`);
+      console.debug(`Socket-IO :: /retrohunt/root (connect)`);
 
       retrohuntResults.items
         .filter(r => !r.finished)
         .forEach(result => {
           // eslint-disable-next-line no-console
-          console.debug(`Socket-IO :: /retrohunt (listen) :: ${result.key}`);
+          console.debug(`Socket-IO :: /retrohunt/root (listen) :: ${result.key}`);
           socket.emit('listen', { key: result.key });
         });
     });
 
     socket.on('disconnect', () => {
       // eslint-disable-next-line no-console
-      console.debug(`Socket-IO :: /retrohunt (disconnect)`);
+      console.debug(`Socket-IO :: /retrohunt/root (disconnect)`);
     });
 
     socket.on('status', (data: RetrohuntProgress) => {
-      const progress = data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0;
+      const progress = Math.floor(100 * (data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0));
       // eslint-disable-next-line no-console
-      console.debug(`Socket-IO :: /retrohunt (status) :: ${data.type} - ${Math.floor(100 * progress)}% - ${data.key}`);
+      console.debug(`Socket-IO :: /retrohunt/root (status) :: ${data.type} - ${progress}% - ${data.key}`);
 
       setRetrohuntResults(results => ({
         ...results,

@@ -328,7 +328,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   useEffect(() => {
     const socket = io(SOCKETIO_NAMESPACE);
 
-    if (!searchKey || !retrohunt || retrohunt.finished) return;
+    if (!searchKey) return;
 
     socket.on('connect', () => {
       // eslint-disable-next-line no-console
@@ -372,7 +372,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
       socket.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [retrohunt?.finished === false, searchKey]);
+  }, [searchKey]);
 
   if (!configuration?.retrohunt?.enabled) return <NotFoundPage />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
