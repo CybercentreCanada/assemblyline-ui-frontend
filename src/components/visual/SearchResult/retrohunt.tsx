@@ -72,6 +72,8 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
           default:
             label = t(`status.in_progress`);
         }
+      } else {
+        label = t(`status.in_progress`);
       }
 
       return <CustomChip label={label} color={finished ? 'primary' : 'default'} size="small" variant="outlined" />;

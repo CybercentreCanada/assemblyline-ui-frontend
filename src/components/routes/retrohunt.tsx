@@ -264,7 +264,6 @@ export default function RetrohuntPage() {
 
   useEffect(() => {
     const socket = io(SOCKETIO_NAMESPACE);
-    sio.current = socket;
 
     socket.on('connect', () => {
       // eslint-disable-next-line no-console
@@ -283,19 +282,23 @@ export default function RetrohuntPage() {
 
       setRetrohuntResults(results => ({
         ...results,
-        items: results.items.map(result =>
-          result.key !== data.key
-            ? result
-            : {
-                ...result,
-                finished: data.type === 'Finished',
-                step: data.type,
-                progress: data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0
-              }
-        )
+        items: results.items.map(result => {
+          if (result.key !== data.key) return result;
+
+          if (data.type === 'Finished' && result.finished === false)
+            setTimeout(() => window.dispatchEvent(new CustomEvent('reloadRetrohunts')), 1000);
+
+          return {
+            ...result,
+            finished: data.type === 'Finished',
+            step: data.type,
+            progress: data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0
+          };
+        })
       }));
-      if (data.type === 'Finished') setTimeout(() => window.dispatchEvent(new CustomEvent('reloadRetrohunts')), 250);
     });
+
+    sio.current = socket;
 
     return () => {
       socket.disconnect();
