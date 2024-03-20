@@ -45,7 +45,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { RetrohuntRepeat } from './repeat';
 
 const useStyles = makeStyles(theme => ({
@@ -126,6 +126,8 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
 
   const filterValue = useRef<string>('');
+  const sio = useRef<Socket<any, any>>(null);
+  const resultListeners = useRef<string[]>([]);
 
   const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
@@ -328,15 +330,9 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   useEffect(() => {
     const socket = io(SOCKETIO_NAMESPACE);
 
-    if (!searchKey) return;
-
     socket.on('connect', () => {
       // eslint-disable-next-line no-console
       console.debug(`Socket-IO :: /retrohunt/detail (connect)`);
-
-      // eslint-disable-next-line no-console
-      console.debug(`Socket-IO :: /retrohunt/detail (listen) :: ${searchKey}`);
-      socket.emit('listen', { key: searchKey });
     });
 
     socket.on('disconnect', () => {
@@ -368,10 +364,25 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
       );
     });
 
+    sio.current = socket;
+
     return () => {
       socket.disconnect();
+      sio.current = null;
+      resultListeners.current = [];
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!sio.current || !searchKey) return;
+
+    if (resultListeners.current.includes(searchKey)) return;
+
+    sio.current.emit('listen', { key: searchKey });
+    resultListeners.current = [...resultListeners.current, searchKey];
+
+    // eslint-disable-next-line no-console
+    console.debug(`Socket-IO :: /retrohunt/detail (listen) :: ${searchKey}`);
   }, [searchKey]);
 
   if (!configuration?.retrohunt?.enabled) return <NotFoundPage />;
