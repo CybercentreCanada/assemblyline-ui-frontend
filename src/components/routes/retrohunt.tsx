@@ -18,7 +18,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -140,6 +140,8 @@ export default function RetrohuntPage() {
   const [searching, setSearching] = useState<boolean>(false);
 
   const filterValue = useRef<string>('');
+  const sio = useRef<Socket<any, any>>(null);
+  const resultListeners = useRef<string[]>([]);
 
   const suggestions = useMemo<string[]>(
     () => [...Object.keys(indexes.retrohunt).filter(name => indexes.retrohunt[name].indexed), ...DEFAULT_SUGGESTION],
@@ -262,20 +264,11 @@ export default function RetrohuntPage() {
 
   useEffect(() => {
     const socket = io(SOCKETIO_NAMESPACE);
-
-    if (!retrohuntResults || retrohuntResults.items.every(r => r.finished)) return;
+    sio.current = socket;
 
     socket.on('connect', () => {
       // eslint-disable-next-line no-console
       console.debug(`Socket-IO :: /retrohunt/root (connect)`);
-
-      retrohuntResults.items
-        .filter(r => !r.finished)
-        .forEach(result => {
-          // eslint-disable-next-line no-console
-          console.debug(`Socket-IO :: /retrohunt/root (listen) :: ${result.key}`);
-          socket.emit('listen', { key: result.key });
-        });
     });
 
     socket.on('disconnect', () => {
@@ -306,9 +299,24 @@ export default function RetrohuntPage() {
 
     return () => {
       socket.disconnect();
+      sio.current = null;
+      resultListeners.current = [];
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [retrohuntResults && retrohuntResults.items.map(r => [r.key, r.finished])]);
+  }, []);
+
+  useEffect(() => {
+    if (!sio.current || !retrohuntResults) return;
+
+    retrohuntResults.items
+      .filter(result => !result.finished && !resultListeners.current.includes(result.key))
+      .forEach(result => {
+        // eslint-disable-next-line no-console
+        console.debug(`Socket-IO :: /retrohunt/root (listen) :: ${result.key}`);
+
+        resultListeners.current = [...resultListeners.current, result.key];
+        sio.current.emit('listen', { key: result.key });
+      });
+  }, [retrohuntResults]);
 
   if (!configuration?.retrohunt?.enabled) return <Navigate to="/notfound" replace />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <Navigate to="/forbidden" replace />;
