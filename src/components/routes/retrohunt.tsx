@@ -300,6 +300,7 @@ export default function RetrohuntPage() {
     return () => {
       socket.disconnect();
       sio.current = null;
+      resultListeners.current = [];
     };
   }, []);
 
