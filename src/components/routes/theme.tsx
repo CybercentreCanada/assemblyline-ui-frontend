@@ -35,7 +35,15 @@ import Typography from '@mui/material/Typography';
 import PageCenter from 'commons/components/pages/PageCenter';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
+import {
+  DivTable,
+  DivTableBody,
+  DivTableCell,
+  DivTableHead,
+  DivTableRow,
+  LinkRow,
+  SortableHeaderCell
+} from 'components/visual/DivTable';
 import AssemblylineIcon from 'components/visual/Icons';
 
 const Theme = () => {
@@ -302,10 +310,10 @@ const Theme = () => {
           <DivTable>
             <DivTableHead>
               <DivTableRow>
-                <DivTableCell>Head 1</DivTableCell>
-                <DivTableCell>Head 2</DivTableCell>
-                <DivTableCell>Head 3</DivTableCell>
-                <DivTableCell>Head 4</DivTableCell>
+                <SortableHeaderCell sortField="Head 1">Head 1</SortableHeaderCell>
+                <SortableHeaderCell sortField="Head 2">Head 2</SortableHeaderCell>
+                <SortableHeaderCell sortField="Head 3">Head 3</SortableHeaderCell>
+                <SortableHeaderCell sortField="Head 4">Head 4</SortableHeaderCell>
               </DivTableRow>
             </DivTableHead>
             <DivTableBody>
