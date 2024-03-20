@@ -285,11 +285,18 @@ export default function RetrohuntPage() {
         items: results.items.map(result => {
           if (result.key !== data.key) return result;
 
-          if (data.type === 'Finished' && result.finished === false)
+          if (data.type === 'Finished') {
+            resultListeners.current = resultListeners.current.filter(r => r !== data.key);
             setTimeout(() => window.dispatchEvent(new CustomEvent('reloadRetrohunts')), 1000);
+          }
 
           return {
             ...result,
+            ...(data.type === 'Finished' && {
+              ...data.search,
+              total_errors: data.search.errors.length,
+              total_warnings: data.search.warnings.length
+            }),
             finished: data.type === 'Finished',
             step: data.type,
             progress: data.type === 'Filtering' || data.type === 'Yara' ? data.progress : 0

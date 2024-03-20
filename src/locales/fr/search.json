@@ -84,6 +84,7 @@
   "status.error": "Terminé avec des erreurs",
   "status.filtering": "Filtration",
   "status.finished": "Complété",
+  "status.in_progress": "En cours",
   "status.submitted": "Examine...",
   "status.yara": "YARA",
   "submission": "Soumission",
