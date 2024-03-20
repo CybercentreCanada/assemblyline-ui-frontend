@@ -1,7 +1,7 @@
 import { AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import { useMemo } from 'react';
 
-const AL_THEME: AppThemeConfigs = {
+const ANALYTICAL_PLATFORM_THEME: AppThemeConfigs = {
   components: {
     MuiPaper: {
       styleOverrides: {
@@ -21,8 +21,8 @@ const AL_THEME: AppThemeConfigs = {
   palette: {
     dark: {
       background: {
-        default: 'rgb(32, 32, 32)',
-        paper: 'rgb(48, 48, 48)'
+        default: '#202020',
+        paper: '#303030'
       },
       primary: {
         main: '#83A0D2'
@@ -34,8 +34,8 @@ const AL_THEME: AppThemeConfigs = {
     },
     light: {
       background: {
-        default: '#fafafa',
-        paper: '#fff'
+        default: '#FAFAFA',
+        paper: '#FFFFFF'
       },
       primary: {
         main: '#1565C0'
@@ -47,16 +47,14 @@ const AL_THEME: AppThemeConfigs = {
   },
   appbar: {
     dark: {
-      backgroundColor: 'rgb(48, 48, 48)'
+      backgroundColor: '#303030'
     },
     light: {
       color: '#000000',
-      backgroundColor: '#fff'
+      backgroundColor: '#FFFFFF'
     }
   }
 };
 
-const DEFAULT_THEME: AppThemeConfigs = {};
-
-const useMyTheme = () => useMemo((): AppThemeConfigs => AL_THEME, []);
+const useMyTheme = () => useMemo((): AppThemeConfigs => ANALYTICAL_PLATFORM_THEME, []);
 export default useMyTheme;
