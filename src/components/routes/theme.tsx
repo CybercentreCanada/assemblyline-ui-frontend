@@ -1,50 +1,19 @@
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
-import {
-  Alert,
-  AlertTitle,
-  Box,
-  Button,
-  Card,
-  Checkbox,
-  CircularProgress,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  IconButton,
-  InputLabel,
-  LinearProgress,
-  MenuItem,
-  Paper,
-  Radio,
-  RadioGroup,
-  Rating,
-  Select,
-  Skeleton,
-  Slider,
-  Stack,
-  Switch,
-  Tab,
-  TableContainer,
-  Tabs,
-  TextField,
-  useTheme
-} from '@mui/material';
+import { Button, IconButton, Stack, Switch, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import PageCenter from 'commons/components/pages/PageCenter';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
-import {
-  DivTable,
-  DivTableBody,
-  DivTableCell,
-  DivTableHead,
-  DivTableRow,
-  LinkRow,
-  SortableHeaderCell
-} from 'components/visual/DivTable';
 import AssemblylineIcon from 'components/visual/Icons';
+import Priority from 'components/visual/Priority';
+import SignatureStatus from 'components/visual/SignatureStatus';
+import SubmissionState from 'components/visual/SubmissionState';
+import TextVerdict from 'components/visual/TextVerdict';
+import Verdict from 'components/visual/Verdict';
+import AlertExtendedScan from './alerts/alert-extended_scan';
+import AlertPriority from './alerts/alert-priority';
+import AlertStatus from './alerts/alert-status';
 
 const Theme = () => {
   const theme = useTheme();
@@ -140,125 +109,7 @@ const Theme = () => {
           ))}
         </Stack>
 
-        <Typography variant="h4">Custom Chips</Typography>
-        <Stack direction="row" spacing={1}>
-          {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'default' as 'default',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
-          ].map(val => (
-            <CustomChip color={val} label={val} />
-          ))}
-        </Stack>
-        <Stack direction="row" spacing={1}>
-          {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'default' as 'default',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
-          ].map(val => (
-            <CustomChip type="rounded" color={val} label={val} onClick={() => null} />
-          ))}
-        </Stack>
-        <Stack direction="row" spacing={1}>
-          {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'default' as 'default',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
-          ].map(val => (
-            <CustomChip variant="outlined" color={val} label={val} />
-          ))}
-        </Stack>
-        <Stack direction="row" spacing={1}>
-          {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'default' as 'default',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
-          ].map(val => (
-            <CustomChip variant="outlined" type="rounded" color={val} label={val} />
-          ))}
-        </Stack>
-        <Stack direction="row" spacing={1}>
-          {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'default' as 'default',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
-          ].map(val => (
-            <CustomChip variant="outlined" type="square" color={val} label={val} />
-          ))}
-        </Stack>
-
-        <Typography variant="h4">Classifications</Typography>
-        <Stack direction="row" spacing={1}>
-          {['TLP:C', 'TLP:G', 'TLP:A'].map(val => (
-            <Classification type="outlined" format="long" c12n={val} />
-          ))}
-        </Stack>
-        <Stack direction="row" spacing={1}>
-          {['TLP:C', 'TLP:G', 'TLP:A'].map(val => (
-            <Classification type="pill" format="long" c12n={val} />
-          ))}
-        </Stack>
-        <Stack direction="row" spacing={1}>
-          {['TLP:C', 'TLP:G', 'TLP:A'].map(val => (
-            <Classification type="picker" format="long" c12n={val} />
-          ))}
-        </Stack>
-        <Stack direction="row" spacing={1}>
-          {['TLP:C', 'TLP:G', 'TLP:A'].map(val => (
-            <Classification type="text" format="long" c12n={val} />
-          ))}
-        </Stack>
-
-        <Typography variant="h4">Forms</Typography>
-        <Stack direction="row" spacing={1}>
-          {['outlined' as 'outlined', 'standard' as 'standard', 'filled' as 'filled'].map(val => (
-            <TextField variant={val} size="small" placeholder={val} />
-          ))}
-        </Stack>
-        <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
-          {['outlined' as 'outlined', 'standard' as 'standard', 'filled' as 'filled'].map(val => (
-            <FormControl fullWidth>
-              <InputLabel>{val}</InputLabel>
-              <Select label={val} variant={val} fullWidth>
-                <MenuItem value={1}>Value 1</MenuItem>
-                <MenuItem value={2}>Value 1</MenuItem>
-                <MenuItem value={3}>Value 1</MenuItem>
-              </Select>
-            </FormControl>
-          ))}
-        </Stack>
-        <Box sx={{ width: '100%' }}>
-          <Divider />
-        </Box>
-        <CircularProgress variant="indeterminate" />
-        <Box sx={{ width: '100%' }}>
-          <LinearProgress variant="indeterminate" />
-        </Box>
-        <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
-          <Slider defaultValue={30} />
-          <Slider disabled defaultValue={20} />
-        </Stack>
-        <Skeleton sx={{ width: '100%' }}></Skeleton>
+        <Typography variant="h4">Switches</Typography>
         <Stack direction="row" spacing={1}>
           {[
             'primary' as 'primary',
@@ -287,88 +138,142 @@ const Theme = () => {
           ))}
           <Switch disabled />
         </Stack>
+
+        <Typography variant="h4">Custom Chips</Typography>
         <Stack direction="row" spacing={1}>
-          <Checkbox defaultChecked />
-          <Checkbox />
-          <Checkbox disabled />
-          <Checkbox checked />
+          {[
+            'primary' as 'primary',
+            'secondary' as 'secondary',
+            'default' as 'default',
+            'error' as 'error',
+            'info' as 'info',
+            'success' as 'success',
+            'warning' as 'warning'
+          ].map(val => (
+            <CustomChip color={val} label={val} />
+          ))}
         </Stack>
-        <FormControl>
-          <FormLabel>Radio Title</FormLabel>
-          <RadioGroup defaultValue="radio 2" name="radio-buttons-group">
-            {['radio 1', 'radio 2', 'radio 3'].map(val => (
-              <FormControlLabel value={val} control={<Radio />} label={val} />
-            ))}
-            <FormControlLabel disabled value="disabled" control={<Radio />} label="disabled" />
-          </RadioGroup>
-        </FormControl>
-
-        <Rating name="simple-controlled" value={2} />
-
-        <Typography variant="h4">Tables</Typography>
-        <TableContainer component={Paper}>
-          <DivTable>
-            <DivTableHead>
-              <DivTableRow>
-                <SortableHeaderCell sortField="Head 1">Head 1</SortableHeaderCell>
-                <SortableHeaderCell sortField="Head 2">Head 2</SortableHeaderCell>
-                <SortableHeaderCell sortField="Head 3">Head 3</SortableHeaderCell>
-                <SortableHeaderCell sortField="Head 4">Head 4</SortableHeaderCell>
-              </DivTableRow>
-            </DivTableHead>
-            <DivTableBody>
-              <LinkRow to="#" hover>
-                <DivTableCell>Cell 1.1</DivTableCell>
-                <DivTableCell>Cell 1.2</DivTableCell>
-                <DivTableCell>Cell 1.3</DivTableCell>
-                <DivTableCell>Cell 1.4</DivTableCell>
-              </LinkRow>
-            </DivTableBody>
-            <DivTableBody>
-              <LinkRow to="#" hover>
-                <DivTableCell>Cell 2.1</DivTableCell>
-                <DivTableCell>Cell 2.2</DivTableCell>
-                <DivTableCell>Cell 2.3</DivTableCell>
-                <DivTableCell>Cell 2.4</DivTableCell>
-              </LinkRow>
-            </DivTableBody>
-            <DivTableBody>
-              <LinkRow to="#" hover>
-                <DivTableCell>Cell 3.1</DivTableCell>
-                <DivTableCell>Cell 3.2</DivTableCell>
-                <DivTableCell>Cell 3.3</DivTableCell>
-                <DivTableCell>Cell 3.4</DivTableCell>
-              </LinkRow>
-            </DivTableBody>
-          </DivTable>
-        </TableContainer>
-
-        <Typography variant="h4">Alerts</Typography>
         <Stack direction="row" spacing={1}>
-          {['error' as 'error', 'info' as 'info', 'success' as 'success', 'warning' as 'warning'].map(val => (
-            <Alert severity={val}>
-              <AlertTitle>{val}</AlertTitle>
-              This is a {val} Alert with a title.
-            </Alert>
+          {[
+            'primary' as 'primary',
+            'secondary' as 'secondary',
+            'default' as 'default',
+            'error' as 'error',
+            'info' as 'info',
+            'success' as 'success',
+            'warning' as 'warning'
+          ].map(val => (
+            <CustomChip color={val} label={val} onClick={() => null} />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {[
+            'primary' as 'primary',
+            'secondary' as 'secondary',
+            'default' as 'default',
+            'error' as 'error',
+            'info' as 'info',
+            'success' as 'success',
+            'warning' as 'warning'
+          ].map(val => (
+            <CustomChip variant="outlined" color={val} label={val} />
           ))}
         </Stack>
 
-        <Typography variant="h4">Containers</Typography>
-        <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
-          <Card sx={{ width: '100%', height: '100px' }}>Card</Card>
-          <Paper sx={{ width: '100%', height: '100px' }}>Paper</Paper>
+        <Typography variant="h4">Classifications</Typography>
+        <Stack direction="row" spacing={1}>
+          {['TLP:C', 'TLP:G', 'TLP:A'].map(val => (
+            <Classification type="outlined" format="long" c12n={val} />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {['TLP:C', 'TLP:G', 'TLP:A'].map(val => (
+            <Classification type="pill" format="long" c12n={val} />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {['TLP:C', 'TLP:G', 'TLP:A'].map(val => (
+            <Classification type="picker" format="long" c12n={val} />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {['TLP:C', 'TLP:G', 'TLP:A'].map(val => (
+            <Classification type="text" format="long" c12n={val} />
+          ))}
         </Stack>
 
-        <Typography variant="h4">Navigation</Typography>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={2} aria-label="basic tabs example">
-            <Tab label="Item One" value={1} />
-            <Tab label="Item Two" value={2} />
-            <Tab label="Item Three" value={3} />
-          </Tabs>
-        </Box>
+        <Typography variant="h4">Verdicts</Typography>
+        <Stack direction="row" spacing={1}>
+          {[
+            'info' as 'info',
+            'safe' as 'safe',
+            'suspicious' as 'suspicious',
+            'highly_suspicious' as 'highly_suspicious',
+            'malicious' as 'malicious'
+          ].map(val => (
+            <>
+              <Verdict verdict={val} />
+              <TextVerdict verdict={val} />
+            </>
+          ))}
+        </Stack>
 
-        <Typography variant="h4">Assemblyline results</Typography>
+        <Typography variant="h4">Submission Priority</Typography>
+        <Stack direction="row" spacing={1}>
+          {[0, 100, 200, 300, 500, 1000, 1500].map(val => (
+            <Priority priority={val} />
+          ))}
+        </Stack>
+
+        <Typography variant="h4">Submission State</Typography>
+        <Stack direction="row" spacing={1}>
+          {['error', 'completed', 'submitted'].map(val => (
+            <SubmissionState state={val} />
+          ))}
+        </Stack>
+
+        <Typography variant="h4">Signature Status</Typography>
+        <Stack direction="row" spacing={1}>
+          {['DEPLOYED' as 'DEPLOYED', 'NOISY' as 'NOISY', 'DISABLED' as 'DISABLED'].map(val => (
+            <SignatureStatus status={val} />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {['DEPLOYED' as 'DEPLOYED', 'NOISY' as 'NOISY', 'DISABLED' as 'DISABLED'].map(val => (
+            <SignatureStatus status={val} variant="outlined" />
+          ))}
+        </Stack>
+
+        <Typography variant="h4">Alert Extended Scans</Typography>
+        <Stack direction="row" spacing={1}>
+          {['incomplete', 'completed', 'submitted', 'skipped'].map(val => (
+            <AlertExtendedScan name={val} />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {['incomplete', 'completed', 'submitted', 'skipped'].map(val => (
+            <AlertExtendedScan name={val} withChip />
+          ))}
+        </Stack>
+
+        <Typography variant="h4">Alert Priority</Typography>
+        <Stack direction="row" spacing={1}>
+          {['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].map(val => (
+            <AlertPriority name={val} />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].map(val => (
+            <AlertPriority name={val} withChip />
+          ))}
+        </Stack>
+
+        <Typography variant="h4">Alert Status</Typography>
+        <Stack direction="row" spacing={1}>
+          {['TRIAGE', 'MALICIOUS', 'ASSESS'].map(val => (
+            <AlertStatus name={val} />
+          ))}
+        </Stack>
       </Stack>
     </PageCenter>
   );
