@@ -7,7 +7,6 @@ import { AlertTitle, Divider, Grid, Pagination, Paper, Skeleton, Tooltip, Typogr
 import TableContainer from '@mui/material/TableContainer';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
-import PageCenter from 'commons/components/pages/PageCenter';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
@@ -175,7 +174,11 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
       isDrawer ? (
         <PageFullSize margin={2} {...props} />
       ) : (
-        <PageCenter mb={4} ml={0} mr={0} mt={4} width="100%" textAlign="left" {...props} />
+        <PageFullSize
+          margin={2}
+          styles={{ root: { alignItems: 'center' }, paper: { width: '95%', maxWidth: '1200px' } }}
+          {...props}
+        />
       ),
     [isDrawer]
   );
@@ -428,6 +431,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
           )}
 
           <TabContainer
+            paper={!isDrawer}
             style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(1) }}
             tabs={{
               details: {
@@ -562,7 +566,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                     <Grid item>
                       <Grid container gap={1}>
                         <Grid item xs={12} marginTop={1}>
-                          <Typography variant="h6">{t('header.results')}</Typography>
+                          <Typography variant="h6">{t('header.hits')}</Typography>
                           <Divider />
                         </Grid>
                         {!retrohunt ? (
@@ -713,8 +717,8 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                           ) : hitResults.total === 0 ? (
                             <div style={{ width: '100%' }}>
                               <InformativeAlert>
-                                <AlertTitle>{t('no_results_title')}</AlertTitle>
-                                {t('no_results_desc')}
+                                <AlertTitle>{t('no_files_title')}</AlertTitle>
+                                {t('no_files_desc')}
                               </InformativeAlert>
                             </div>
                           ) : (
@@ -842,7 +846,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                 )
               },
               yara: {
-                label: t('yara'),
+                label: t('yara_rule'),
                 content: (
                   <>
                     {!retrohunt ? (

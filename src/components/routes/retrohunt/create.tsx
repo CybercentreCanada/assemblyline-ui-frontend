@@ -274,7 +274,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
 
             <Grid item flex={1}>
               <Grid container flexDirection="column" height="100%" minHeight="500px">
-                <Typography variant="h6" children={t('details.yara_signature')} />
+                <Typography variant="h6" children={t('details.yara_rule')} />
                 <MonacoEditor
                   language="yara"
                   value={retrohunt.yara_signature}

@@ -102,8 +102,16 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
               />
               {c12nDef.enforce && (
                 <SortableHeaderCell
-                  children={t('header.classification')}
+                  children={t('header.rule_classification')}
                   sortField="classification"
+                  allowSort={allowSort}
+                  onSort={(_, value) => onSort(value)}
+                />
+              )}
+              {c12nDef.enforce && (
+                <SortableHeaderCell
+                  children={t('header.search_classification')}
+                  sortField="search_classification"
                   allowSort={allowSort}
                   onSort={(_, value) => onSort(value)}
                 />
@@ -157,6 +165,11 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                 {c12nDef.enforce && (
                   <DivTableCell>
                     <Classification type="text" size="tiny" c12n={retrohunt.classification} format="short" />
+                  </DivTableCell>
+                )}
+                {c12nDef.enforce && (
+                  <DivTableCell>
+                    <Classification type="text" size="tiny" c12n={retrohunt.search_classification} format="short" />
                   </DivTableCell>
                 )}
                 {hasTotalHits && <DivTableCell>{retrohunt?.total_hits}</DivTableCell>}
