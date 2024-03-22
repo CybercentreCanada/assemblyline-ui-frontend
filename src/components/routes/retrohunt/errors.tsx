@@ -20,7 +20,7 @@ import {
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -56,8 +56,6 @@ const useStyles = makeStyles(theme => ({
 const PAGE_SIZE = 10;
 
 const MAX_TRACKED_RECORDS = 10000;
-
-const RELOAD_DELAY = 5000;
 
 const DEFAULT_PARAMS: object = {
   offset: 0,
@@ -97,8 +95,6 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
   const [errorResults, setErrorResults] = useState<RetrohuntErrorResult>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(DEFAULT_QUERY));
   const [isReloading, setIsReloading] = useState<boolean>(true);
-
-  const timer = useRef<boolean>(false);
 
   const totals = useMemo<string>(() => {
     if (!retrohunt) return null;
