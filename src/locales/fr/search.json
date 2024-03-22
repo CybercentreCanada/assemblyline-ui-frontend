@@ -43,7 +43,7 @@
   "header.stage": "Stage",
   "header.starttime": "Heure de début",
   "header.status": "Status",
-  "header.total_hits": "résultats",
+  "header.total_hits": "Nombres de résultat",
   "header.type": "Type",
   "header.user": "Utilisateur",
   "header.verdict": "Verdict",

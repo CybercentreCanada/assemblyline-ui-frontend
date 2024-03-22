@@ -108,14 +108,6 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                   onSort={(_, value) => onSort(value)}
                 />
               )}
-              {c12nDef.enforce && (
-                <SortableHeaderCell
-                  children={t('header.search_classification')}
-                  sortField="search_classification"
-                  allowSort={allowSort}
-                  onSort={(_, value) => onSort(value)}
-                />
-              )}
               {hasTotalHits && <DivTableCell children={t('header.total_hits')} />}
               <SortableHeaderCell
                 children={t('header.finished')}
