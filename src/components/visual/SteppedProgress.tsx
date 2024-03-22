@@ -84,16 +84,15 @@ const StepIcon = React.memo(WrappedStepIcon);
 type ProgressProps = {
   percentage: number;
   loading?: boolean;
-  show100?: boolean;
 };
 
-const WrappedProgress = ({ percentage = 0, loading = false, show100 = false }: ProgressProps) => {
+const WrappedProgress = ({ percentage = 0, loading = false }: ProgressProps) => {
   const classes = useStyles();
 
   return (
     <span className={classes.percentageContainer}>
       <LinearProgress variant={loading ? 'indeterminate' : 'determinate'} value={percentage} />
-      {!loading && 0 < percentage && (show100 || percentage < 100) ? (
+      {!loading && 0 < percentage && percentage < 100 ? (
         <Typography variant="subtitle2">{`${percentage}%`}</Typography>
       ) : null}
     </span>
@@ -114,8 +113,7 @@ const WrappedSteppedPercentage: React.FC<Props> = ({
   steps = [],
   loading = false,
   activeStep = 0,
-  percentage: percentageProp = 0,
-  show100 = false
+  percentage: percentageProp = 0
 }) => {
   const classes = useStyles();
 
@@ -129,11 +127,7 @@ const WrappedSteppedPercentage: React.FC<Props> = ({
         </div>
         {steps.slice(1).map((step, i) => (
           <div key={i} className={classes.item}>
-            <Progress
-              percentage={i < activeStep ? 100 : activeStep < i ? 0 : percentage}
-              loading={loading}
-              show100={show100}
-            />
+            <Progress percentage={i < activeStep ? 100 : activeStep < i ? 0 : percentage} loading={loading} />
             <StepIcon step={step} index={i + 1} loading={loading} completed={i < activeStep} />
           </div>
         ))}

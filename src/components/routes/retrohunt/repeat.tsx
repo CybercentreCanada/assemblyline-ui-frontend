@@ -92,7 +92,7 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
 
   useEffect(() => {
     if (open) {
-      let ttl = Math.floor((new Date(retrohunt.expiry_ts).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+      let ttl = Math.ceil((new Date(retrohunt.expiry_ts).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
       ttl = Math.max(maxDaysToLive ? 1 : 0, Math.min(maxDaysToLive ? maxDaysToLive : 365, ttl));
       setData({ key: retrohunt.key, search_classification: retrohunt.search_classification, ttl: ttl });
     }
@@ -101,7 +101,7 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
   if (!configuration?.retrohunt?.enabled) return <NotFoundPage />;
   else if (!currentUser.roles.includes('retrohunt_run')) return <ForbiddenPage />;
   else
-    return (
+    return !retrohunt || !retrohunt.finished ? null : (
       <>
         <Tooltip title={t('repeat.tooltip')}>
           <div>
@@ -116,18 +116,15 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
             {data && (
               <DialogContentText component="div">
                 <Grid container flexDirection="column" spacing={2}>
-                  <Grid item>{t('repeat.content')}</Grid>
-
                   <Grid item>
-                    <Typography variant="subtitle2">{t('details.key')}</Typography>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      margin="dense"
-                      variant="outlined"
-                      value={retrohunt.key}
-                      disabled={true}
-                    />
+                    <span>{t('repeat.content1')}</span>
+                    <b>{retrohunt.key}</b>
+                    <span>{t('repeat.content2')}</span>
+                  </Grid>
+
+                  <Grid item style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
+                    <InfoOutlinedIcon />
+                    <span>{t('repeat.note')}</span>
                   </Grid>
 
                   {c12nDef.enforce && (

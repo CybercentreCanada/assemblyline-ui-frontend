@@ -3,7 +3,7 @@ import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DoneOutlinedIcon from '@mui/icons-material/DoneOutlined';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { AlertTitle, Grid, Pagination, Paper, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { AlertTitle, Divider, Grid, Pagination, Paper, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -39,6 +39,7 @@ import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { FileResult } from 'components/visual/SearchResult/files';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import SteppedProgress from 'components/visual/SteppedProgress';
+import { TabContainer } from 'components/visual/TabContainer';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -145,7 +146,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
       search_classification: currentUser.classification,
       start_group: null,
       started_time: null,
-      step: 'Finished',
+      step: 'Starting',
       total_errors: 0,
       total_hits: 0,
       total_indices: 0,
@@ -276,9 +277,12 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
     [isDrawer, location.hash, location.pathname, location.search, navigate]
   );
 
-  const handleRepeat = useCallback((value: RetrohuntResult) => {
-    setRetrohunt(r => ({ ...r, ...value }));
-  }, []);
+  const handleRepeat = useCallback(
+    (value: RetrohuntResult) => {
+      setRetrohunt(r => ({ ...DEFAULT_RETROHUNT, ...value }));
+    },
+    [DEFAULT_RETROHUNT]
+  );
 
   useEffect(() => {
     if (isDrawer) {
@@ -399,404 +403,473 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
               </Grid>
               <Grid item flex={0}>
                 <Grid container flexDirection="row" rowGap={2} wrap="nowrap">
-                  {retrohunt && retrohunt.finished && <RetrohuntRepeat retrohunt={retrohunt} onRepeat={handleRepeat} />}
-                  {retrohunt && (retrohunt.total_warnings > 0 || retrohunt.total_errors > 0) && (
-                    <RetrohuntErrors retrohunt={retrohunt} />
-                  )}
+                  <RetrohuntRepeat retrohunt={retrohunt} onRepeat={handleRepeat} />
                 </Grid>
               </Grid>
             </Grid>
+          </Grid>
 
-            {!retrohunt || retrohunt?.finished ? null : (
-              <Grid item paddingTop={2}>
-                <Grid container flexDirection="row" justifyContent="center">
-                  <Grid item xs={12} sm={11} lg={10}>
-                    <SteppedProgress
-                      activeStep={['Filtering', 'Yara', 'Finished'].indexOf(retrohunt.step)}
-                      percentage={Math.ceil(100 * retrohunt.progress)}
-                      show100
-                      steps={[
-                        { label: t('step.filtering'), icon: <FilterAltOutlinedIcon /> },
-                        { label: t('step.yara'), icon: <DataObjectOutlinedIcon /> },
-                        { label: t('step.finished'), icon: <DoneOutlinedIcon /> }
-                      ]}
-                    />
-                  </Grid>
+          {!retrohunt || retrohunt?.finished ? null : (
+            <Grid item paddingTop={2}>
+              <Grid container flexDirection="row" justifyContent="center">
+                <Grid item xs={12} sm={11} lg={10}>
+                  <SteppedProgress
+                    activeStep={['Filtering', 'Yara', 'Finished'].indexOf(retrohunt.step || 'Starting')}
+                    percentage={Math.ceil(100 * retrohunt.progress)}
+                    steps={[
+                      { label: t('step.filtering'), icon: <FilterAltOutlinedIcon /> },
+                      { label: t('step.yara'), icon: <DataObjectOutlinedIcon /> },
+                      { label: t('step.finished'), icon: <DoneOutlinedIcon /> }
+                    ]}
+                  />
                 </Grid>
-              </Grid>
-            )}
-          </Grid>
-
-          <Grid item>
-            <Typography variant="subtitle2" paddingBottom={0.5}>
-              {t('details.description')}
-            </Typography>
-            {!retrohunt ? (
-              <Skeleton style={{ height: '2.5rem' }} />
-            ) : (
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {retrohunt?.description}
-              </Paper>
-            )}
-          </Grid>
-
-          <Grid item>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
-                <Typography variant="subtitle2" paddingBottom={0.5}>
-                  {t('details.created')}
-                </Typography>
-                {!retrohunt ? (
-                  <Skeleton style={{ height: '2.5rem' }} />
-                ) : (
-                  <Paper className={classes.preview} component="pre" variant="outlined">
-                    {retrohunt.creator}
-                    {' ('}
-                    <Moment fromNow locale={i18n.language}>
-                      {retrohunt.created_time}
-                    </Moment>
-                    {')'}
-                  </Paper>
-                )}
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Typography variant="subtitle2" paddingBottom={0.5}>
-                  {t('details.expiry')}
-                </Typography>
-                {!retrohunt ? (
-                  <Skeleton style={{ height: '2.5rem' }} />
-                ) : (
-                  <Paper className={classes.preview} component="pre" variant="outlined">
-                    <Moment
-                      format={
-                        i18n.language === 'en'
-                          ? 'MMMM Do YYYY'
-                          : i18n.language === 'fr'
-                          ? 'Do MMMM YYYY'
-                          : 'MMMM Do YYYY'
-                      }
-                      locale={i18n.language}
-                    >
-                      {retrohunt.expiry_ts}
-                    </Moment>
-                    {' ('}
-                    <Moment fromNow locale={i18n.language}>
-                      {retrohunt.expiry_ts}
-                    </Moment>
-                    {')'}
-                  </Paper>
-                )}
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Typography variant="subtitle2" paddingBottom={0.5}>
-                  {t('details.search')}
-                </Typography>
-                {!retrohunt ? (
-                  <Skeleton style={{ height: '2.5rem' }} />
-                ) : (
-                  <Paper className={classes.preview} component="pre" variant="outlined">
-                    {retrohunt?.archive_only ? t('details.archive_only') : t('details.all')}
-                  </Paper>
-                )}
               </Grid>
             </Grid>
-          </Grid>
+          )}
 
-          <Grid item>
-            <Tooltip title={t('tooltip.search_classification')} placement="top">
-              <div
-                style={{
-                  display: 'inline-flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: theme.spacing(1),
-                  marginBottom: theme.spacing(0.5)
-                }}
-              >
-                <Typography variant="subtitle2">{t('details.search_classification')}</Typography>
-                <InfoOutlinedIcon />
-              </div>
-            </Tooltip>
-            <Classification
-              format="long"
-              type="pill"
-              size="small"
-              c12n={retrohunt && 'search_classification' in retrohunt ? retrohunt.search_classification : null}
-            />
-          </Grid>
+          <TabContainer
+            style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(1) }}
+            tabs={{
+              details: {
+                label: t('details'),
+                content: (
+                  <>
+                    <Grid item>
+                      <Typography variant="h6">{t('header.information')}</Typography>
+                      <Divider />
+                    </Grid>
 
-          <Grid item>
-            {!retrohunt ? (
-              <Skeleton style={{ height: '100%', minHeight: '450px', transform: 'none' }} />
-            ) : (
-              <Grid container flexDirection="column" height="100%" minHeight="450px">
-                <MonacoEditor
-                  language="yara"
-                  value={'yara_signature' in retrohunt ? retrohunt.yara_signature : ''}
-                  options={{ readOnly: true }}
-                />
-              </Grid>
-            )}
-          </Grid>
+                    <Grid item>
+                      <Grid container>
+                        <Grid item xs={4} sm={3} lg={2}>
+                          <span style={{ fontWeight: 500 }}>{t('details.description')}</span>
+                        </Grid>
+                        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                          {retrohunt ? retrohunt.description : <Skeleton />}
+                        </Grid>
 
-          <Grid item>
-            <Grid container gap={1}>
-              <Grid item xs={12} marginTop={1}>
-                <Typography variant="h6">{t('header.results')}</Typography>
-              </Grid>
-              {!retrohunt ? (
-                <Grid item>
-                  <Skeleton className={classes.skeletonCustomChip} variant="rectangular" />
-                </Grid>
-              ) : (
-                'truncated' in retrohunt &&
-                retrohunt.truncated && (
-                  <Grid item>
-                    <Tooltip title={t('truncated.tooltip')}>
-                      <span>
-                        <CustomChip type="round" size="small" variant="outlined" color="error" label={t('truncated')} />
-                      </span>
-                    </Tooltip>
-                  </Grid>
-                )
-              )}
-
-              {!retrohunt ? (
-                <Grid item>
-                  <Skeleton className={classes.skeletonCustomChip} variant="rectangular" />
-                </Grid>
-              ) : (
-                'tags' in retrohunt &&
-                Object.keys(retrohunt.tags).length > 0 &&
-                Object.keys(retrohunt.tags).map((key, i) => (
-                  <Grid item>
-                    <CustomChip
-                      key={'tag-' + i}
-                      type="round"
-                      size="small"
-                      variant="outlined"
-                      color="default"
-                      label={key}
-                    />
-                  </Grid>
-                ))
-              )}
-            </Grid>
-          </Grid>
-
-          <Grid item>
-            {!retrohunt ? (
-              <Skeleton style={{ height: '100%', transform: 'none', marginTop: theme.spacing(1) }} />
-            ) : (
-              <SearchBar
-                initValue={query ? query.get('query', '') : ''}
-                placeholder={t('hits.filter')}
-                searching={isReloading}
-                suggestions={suggestions}
-                onValueChange={value => {
-                  filterValue.current = value;
-                }}
-                onClear={() => handleQueryRemove(['query', 'rows', 'offset'])}
-                onSearch={() => {
-                  if (filterValue.current !== '') {
-                    handleQueryChange('query', filterValue.current);
-                    handleQueryChange('offset', 0);
-                  } else handleQueryRemove(['query', 'rows', 'offset']);
-                }}
-              >
-                <div className={classes.results}>
-                  {hitResults && hitResults.total !== 0 && (
-                    <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                      {isReloading ? (
-                        <span>{t('searching')}</span>
-                      ) : (
-                        <span>
-                          <SearchResultCount count={hitResults.total} />
-                          {query.get('query') || query.get('filters')
-                            ? t(`hits.filtered${hitResults.total === 1 ? '' : 's'}`)
-                            : t(`hits.total${hitResults.total === 1 ? '' : 's'}`)}
-                        </span>
-                      )}
-                    </Typography>
-                  )}
-                  {hitPageCount > 1 && (
-                    <Pagination
-                      page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
-                      onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
-                      count={hitPageCount}
-                      shape="rounded"
-                      size="small"
-                    />
-                  )}
-                </div>
-                {query && (
-                  <div>
-                    <ChipList
-                      items={query.getAll('filters', []).map(
-                        f =>
-                          ({
-                            color: f.indexOf('NOT ') === 0 ? 'error' : null,
-                            label: `${f}`,
-                            variant: 'outlined',
-                            onClick: () => {
-                              query.replace(
-                                'filters',
-                                f,
-                                f.indexOf('NOT ') === 0 ? f.substring(5, f.length - 1) : `NOT (${f})`
-                              );
-                              handleNavigate(query);
-                            },
-                            onDelete: () => {
-                              query.remove('filters', f);
-                              handleNavigate(query);
-                            }
-                          } as CustomChipProps)
-                      )}
-                    />
-                  </div>
-                )}
-              </SearchBar>
-            )}
-          </Grid>
-
-          <Grid item>
-            <LineGraph
-              dataset={typeDataSet}
-              height="200px"
-              title={t('graph.type.title')}
-              datatype={t('graph.type.datatype')}
-              onClick={(evt, element) => {
-                if (!isReloading && element.length > 0) {
-                  var ind = element[0].index;
-                  query.add('filters', `type:${safeFieldValue(Object.keys(typeDataSet)[ind])}`);
-                  handleNavigate(query);
-                }
-              }}
-            />
-          </Grid>
-
-          <Grid item>
-            {!hitResults ? (
-              <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-            ) : hitResults.total === 0 ? (
-              <div style={{ width: '100%' }}>
-                <InformativeAlert>
-                  <AlertTitle>{t('no_results_title')}</AlertTitle>
-                  {t('no_results_desc')}
-                </InformativeAlert>
-              </div>
-            ) : (
-              <TableContainer
-                id="hits-table"
-                component={Paper}
-                sx={{ border: isDrawer && `1px solid ${theme.palette.divider}` }}
-              >
-                <DivTable stickyHeader>
-                  <DivTableHead>
-                    <DivTableRow>
-                      <SortableHeaderCell
-                        query={query}
-                        children={t('details.lasttimeseen')}
-                        sortName="sort"
-                        sortField="seen.last"
-                        onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                        sx={{ zIndex: 'auto' }}
-                      />
-                      <SortableHeaderCell
-                        query={query}
-                        children={t('details.count')}
-                        sortName="sort"
-                        sortField="seen.count"
-                        onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                        sx={{ zIndex: 'auto' }}
-                      />
-                      <SortableHeaderCell
-                        query={query}
-                        children={t('details.sha256')}
-                        sortName="sort"
-                        sortField="sha256"
-                        onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                        sx={{ zIndex: 'auto' }}
-                      />
-                      <SortableHeaderCell
-                        query={query}
-                        children={t('details.filetype')}
-                        sortName="sort"
-                        sortField="type"
-                        onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                        sx={{ zIndex: 'auto' }}
-                      />
-                      <SortableHeaderCell
-                        query={query}
-                        children={t('details.size')}
-                        sortName="sort"
-                        sortField="size"
-                        onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                        sx={{ zIndex: 'auto' }}
-                      />
-                      {c12nDef.enforce && (
-                        <SortableHeaderCell
-                          query={query}
-                          children={t('details.classification')}
-                          sortName="sort"
-                          sortField="classification"
-                          onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                          sx={{ zIndex: 'auto' }}
-                        />
-                      )}
-                      <DivTableCell sx={{ zIndex: 'auto' }} />
-                    </DivTableRow>
-                  </DivTableHead>
-                  <DivTableBody id="hit-body">
-                    {hitResults.items.map((file, i) => (
-                      <LinkRow
-                        key={i}
-                        component={Link}
-                        to={`/file/detail/${file.sha256}`}
-                        hover
-                        style={{ textDecoration: 'none' }}
-                        onClick={event => {
-                          event.preventDefault();
-                          handleHitRowClick(file);
-                        }}
-                        selected={
-                          isDrawer
-                            ? location.pathname.endsWith(`/${file?.sha256}`)
-                            : location.hash.startsWith(`#${file?.sha256}`)
-                        }
-                      >
-                        <DivTableCell>
-                          <Tooltip title={file.seen.last}>
-                            <>
-                              <Moment fromNow locale={i18n.language}>
-                                {file.seen.last}
-                              </Moment>
-                            </>
-                          </Tooltip>
-                        </DivTableCell>
-                        <DivTableCell>{file.seen.count}</DivTableCell>
-                        <DivTableCell breakable>{file.sha256}</DivTableCell>
-                        <DivTableCell>{file.type}</DivTableCell>
-                        <DivTableCell>{file.size}</DivTableCell>
-                        {c12nDef.enforce && (
-                          <DivTableCell>
-                            <Classification type="text" size="tiny" c12n={file.classification} format="short" />
-                          </DivTableCell>
-                        )}
-                        <DivTableCell style={{ textAlign: 'center' }}>
-                          {file.from_archive && (
-                            <Tooltip title={t('archive')}>
-                              <ArchiveOutlinedIcon />
-                            </Tooltip>
+                        <Grid item xs={4} sm={3} lg={2}>
+                          <span style={{ fontWeight: 500 }}>{t('details.search')}</span>
+                        </Grid>
+                        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                          {retrohunt ? (
+                            retrohunt?.archive_only ? (
+                              t('details.archive_only')
+                            ) : (
+                              t('details.all')
+                            )
+                          ) : (
+                            <Skeleton />
                           )}
-                        </DivTableCell>
-                      </LinkRow>
-                    ))}
-                  </DivTableBody>
-                </DivTable>
-              </TableContainer>
-            )}
-          </Grid>
+                        </Grid>
+
+                        <Grid item xs={4} sm={3} lg={2}>
+                          <span style={{ fontWeight: 500 }}>{t('details.creator')}</span>
+                        </Grid>
+                        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                          {retrohunt ? retrohunt.creator : <Skeleton />}
+                        </Grid>
+
+                        <Grid item xs={4} sm={3} lg={2}>
+                          <span style={{ fontWeight: 500 }}>{t('details.created')}</span>
+                        </Grid>
+                        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                          {retrohunt ? (
+                            <>
+                              <Moment
+                                format={
+                                  i18n.language === 'en'
+                                    ? 'MMMM Do YYYY'
+                                    : i18n.language === 'fr'
+                                    ? 'Do MMMM YYYY'
+                                    : 'MMMM Do YYYY'
+                                }
+                                locale={i18n.language}
+                              >
+                                {retrohunt.created_time}
+                              </Moment>
+                              {' ('}
+                              <Moment fromNow locale={i18n.language}>
+                                {retrohunt.created_time}
+                              </Moment>
+                              {')'}
+                            </>
+                          ) : (
+                            <Skeleton />
+                          )}
+                        </Grid>
+
+                        <Grid item xs={4} sm={3} lg={2}>
+                          <span style={{ fontWeight: 500 }}>{t('details.expiry')}</span>
+                        </Grid>
+                        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                          {retrohunt ? (
+                            <>
+                              <Moment
+                                format={
+                                  i18n.language === 'en'
+                                    ? 'MMMM Do YYYY'
+                                    : i18n.language === 'fr'
+                                    ? 'Do MMMM YYYY'
+                                    : 'MMMM Do YYYY'
+                                }
+                                locale={i18n.language}
+                              >
+                                {retrohunt.expiry_ts}
+                              </Moment>
+                              {' ('}
+                              <Moment fromNow locale={i18n.language}>
+                                {retrohunt.expiry_ts}
+                              </Moment>
+                              {')'}
+                            </>
+                          ) : (
+                            <Skeleton />
+                          )}
+                        </Grid>
+                      </Grid>
+                    </Grid>
+
+                    <Grid item>
+                      <Tooltip
+                        title={t('tooltip.search_classification')}
+                        placement="top"
+                        slotProps={{ tooltip: { style: { backgroundColor: theme.palette.grey[700] } } }}
+                      >
+                        <div
+                          style={{
+                            display: 'inline-flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: theme.spacing(1),
+                            marginBottom: theme.spacing(0.5)
+                          }}
+                        >
+                          <Typography variant="subtitle2">{t('details.search_classification')}</Typography>
+                          <InfoOutlinedIcon />
+                        </div>
+                      </Tooltip>
+                      <Classification
+                        format="long"
+                        type="pill"
+                        size="small"
+                        c12n={
+                          retrohunt && 'search_classification' in retrohunt ? retrohunt.search_classification : null
+                        }
+                      />
+                    </Grid>
+
+                    <Grid item>
+                      <Grid container gap={1}>
+                        <Grid item xs={12} marginTop={1}>
+                          <Typography variant="h6">{t('header.results')}</Typography>
+                          <Divider />
+                        </Grid>
+                        {!retrohunt ? (
+                          <Grid item>
+                            <Skeleton className={classes.skeletonCustomChip} variant="rectangular" />
+                          </Grid>
+                        ) : (
+                          'truncated' in retrohunt &&
+                          retrohunt.truncated && (
+                            <Grid item>
+                              <Tooltip title={t('truncated.tooltip')}>
+                                <span>
+                                  <CustomChip
+                                    type="round"
+                                    size="small"
+                                    variant="outlined"
+                                    color="error"
+                                    label={t('truncated')}
+                                  />
+                                </span>
+                              </Tooltip>
+                            </Grid>
+                          )
+                        )}
+
+                        {!retrohunt ? (
+                          <Grid item>
+                            <Skeleton className={classes.skeletonCustomChip} variant="rectangular" />
+                          </Grid>
+                        ) : (
+                          'tags' in retrohunt &&
+                          Object.keys(retrohunt.tags).length > 0 &&
+                          Object.keys(retrohunt.tags).map((key, i) => (
+                            <Grid item>
+                              <CustomChip
+                                key={'tag-' + i}
+                                type="round"
+                                size="small"
+                                variant="outlined"
+                                color="default"
+                                label={key}
+                              />
+                            </Grid>
+                          ))
+                        )}
+                      </Grid>
+                    </Grid>
+
+                    {!retrohunt ? null : !retrohunt?.finished ? (
+                      <div style={{ width: '100%' }}>
+                        <InformativeAlert>
+                          <AlertTitle>{t('in_progress_title')}</AlertTitle>
+                          {t('in_progress_desc')}
+                        </InformativeAlert>
+                      </div>
+                    ) : (
+                      <>
+                        <Grid item>
+                          <SearchBar
+                            initValue={query ? query.get('query', '') : ''}
+                            placeholder={t('hits.filter')}
+                            searching={isReloading}
+                            suggestions={suggestions}
+                            onValueChange={value => {
+                              filterValue.current = value;
+                            }}
+                            onClear={() => handleQueryRemove(['query', 'rows', 'offset'])}
+                            onSearch={() => {
+                              if (filterValue.current !== '') {
+                                handleQueryChange('query', filterValue.current);
+                                handleQueryChange('offset', 0);
+                              } else handleQueryRemove(['query', 'rows', 'offset']);
+                            }}
+                          >
+                            <div className={classes.results}>
+                              {hitResults && hitResults.total !== 0 && (
+                                <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                                  {isReloading ? (
+                                    <span>{t('searching')}</span>
+                                  ) : (
+                                    <span>
+                                      <SearchResultCount count={hitResults.total} />
+                                      {query.get('query') || query.get('filters')
+                                        ? t(`hits.filtered${hitResults.total === 1 ? '' : 's'}`)
+                                        : t(`hits.total${hitResults.total === 1 ? '' : 's'}`)}
+                                    </span>
+                                  )}
+                                </Typography>
+                              )}
+                              {hitPageCount > 1 && (
+                                <Pagination
+                                  page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
+                                  onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
+                                  count={hitPageCount}
+                                  shape="rounded"
+                                  size="small"
+                                />
+                              )}
+                            </div>
+                            {query && (
+                              <div>
+                                <ChipList
+                                  items={query.getAll('filters', []).map(
+                                    f =>
+                                      ({
+                                        color: f.indexOf('NOT ') === 0 ? 'error' : null,
+                                        label: `${f}`,
+                                        variant: 'outlined',
+                                        onClick: () => {
+                                          query.replace(
+                                            'filters',
+                                            f,
+                                            f.indexOf('NOT ') === 0 ? f.substring(5, f.length - 1) : `NOT (${f})`
+                                          );
+                                          handleNavigate(query);
+                                        },
+                                        onDelete: () => {
+                                          query.remove('filters', f);
+                                          handleNavigate(query);
+                                        }
+                                      } as CustomChipProps)
+                                  )}
+                                />
+                              </div>
+                            )}
+                          </SearchBar>
+                        </Grid>
+
+                        <Grid item>
+                          <LineGraph
+                            dataset={typeDataSet}
+                            height="200px"
+                            title={t('graph.type.title')}
+                            datatype={t('graph.type.datatype')}
+                            onClick={(evt, element) => {
+                              if (!isReloading && element.length > 0) {
+                                var ind = element[0].index;
+                                query.add('filters', `type:${safeFieldValue(Object.keys(typeDataSet)[ind])}`);
+                                handleNavigate(query);
+                              }
+                            }}
+                          />
+                        </Grid>
+
+                        <Grid item>
+                          {!hitResults ? (
+                            <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
+                          ) : hitResults.total === 0 ? (
+                            <div style={{ width: '100%' }}>
+                              <InformativeAlert>
+                                <AlertTitle>{t('no_results_title')}</AlertTitle>
+                                {t('no_results_desc')}
+                              </InformativeAlert>
+                            </div>
+                          ) : (
+                            <TableContainer
+                              id="hits-table"
+                              component={Paper}
+                              sx={{ border: isDrawer && `1px solid ${theme.palette.divider}` }}
+                            >
+                              <DivTable stickyHeader>
+                                <DivTableHead>
+                                  <DivTableRow>
+                                    <SortableHeaderCell
+                                      query={query}
+                                      children={t('details.lasttimeseen')}
+                                      sortName="sort"
+                                      sortField="seen.last"
+                                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                                      sx={{ zIndex: 'auto' }}
+                                    />
+                                    <SortableHeaderCell
+                                      query={query}
+                                      children={t('details.count')}
+                                      sortName="sort"
+                                      sortField="seen.count"
+                                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                                      sx={{ zIndex: 'auto' }}
+                                    />
+                                    <SortableHeaderCell
+                                      query={query}
+                                      children={t('details.sha256')}
+                                      sortName="sort"
+                                      sortField="sha256"
+                                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                                      sx={{ zIndex: 'auto' }}
+                                    />
+                                    <SortableHeaderCell
+                                      query={query}
+                                      children={t('details.filetype')}
+                                      sortName="sort"
+                                      sortField="type"
+                                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                                      sx={{ zIndex: 'auto' }}
+                                    />
+                                    <SortableHeaderCell
+                                      query={query}
+                                      children={t('details.size')}
+                                      sortName="sort"
+                                      sortField="size"
+                                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                                      sx={{ zIndex: 'auto' }}
+                                    />
+                                    {c12nDef.enforce && (
+                                      <SortableHeaderCell
+                                        query={query}
+                                        children={t('details.classification')}
+                                        sortName="sort"
+                                        sortField="classification"
+                                        onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                                        sx={{ zIndex: 'auto' }}
+                                      />
+                                    )}
+                                    <DivTableCell sx={{ zIndex: 'auto' }} />
+                                  </DivTableRow>
+                                </DivTableHead>
+                                <DivTableBody id="hit-body">
+                                  {hitResults.items.map((file, i) => (
+                                    <LinkRow
+                                      key={i}
+                                      component={Link}
+                                      to={`/file/detail/${file.sha256}`}
+                                      hover
+                                      style={{ textDecoration: 'none' }}
+                                      onClick={event => {
+                                        event.preventDefault();
+                                        handleHitRowClick(file);
+                                      }}
+                                      selected={
+                                        isDrawer
+                                          ? location.pathname.endsWith(`/${file?.sha256}`)
+                                          : location.hash.startsWith(`#${file?.sha256}`)
+                                      }
+                                    >
+                                      <DivTableCell>
+                                        <Tooltip title={file.seen.last}>
+                                          <>
+                                            <Moment fromNow locale={i18n.language}>
+                                              {file.seen.last}
+                                            </Moment>
+                                          </>
+                                        </Tooltip>
+                                      </DivTableCell>
+                                      <DivTableCell>{file.seen.count}</DivTableCell>
+                                      <DivTableCell breakable>{file.sha256}</DivTableCell>
+                                      <DivTableCell>{file.type}</DivTableCell>
+                                      <DivTableCell>{file.size}</DivTableCell>
+                                      {c12nDef.enforce && (
+                                        <DivTableCell>
+                                          <Classification
+                                            type="text"
+                                            size="tiny"
+                                            c12n={file.classification}
+                                            format="short"
+                                          />
+                                        </DivTableCell>
+                                      )}
+                                      <DivTableCell style={{ textAlign: 'center' }}>
+                                        {file.from_archive && (
+                                          <Tooltip title={t('archive')}>
+                                            <ArchiveOutlinedIcon />
+                                          </Tooltip>
+                                        )}
+                                      </DivTableCell>
+                                    </LinkRow>
+                                  ))}
+                                </DivTableBody>
+                              </DivTable>
+                            </TableContainer>
+                          )}
+                        </Grid>
+
+                        <Grid item style={{ height: theme.spacing(8) }}></Grid>
+                      </>
+                    )}
+                  </>
+                )
+              },
+              yara: {
+                label: t('yara'),
+                content: (
+                  <>
+                    {!retrohunt ? (
+                      <Grid item>
+                        <Skeleton style={{ height: '100%', minHeight: '450px', transform: 'none' }} />
+                      </Grid>
+                    ) : (
+                      <MonacoEditor
+                        language="yara"
+                        value={'yara_signature' in retrohunt ? retrohunt.yara_signature : ''}
+                        options={{ readOnly: true }}
+                      />
+                    )}
+                  </>
+                )
+              },
+              errors: {
+                label: t('errors'),
+                disabled: !(
+                  retrohunt &&
+                  (retrohunt.total_warnings > 0 || retrohunt.total_errors > 0) &&
+                  currentUser.is_admin
+                ),
+                content: <RetrohuntErrors retrohunt={retrohunt} isDrawer={isDrawer} />
+              }
+            }}
+          />
         </Grid>
       </PageLayout>
     );

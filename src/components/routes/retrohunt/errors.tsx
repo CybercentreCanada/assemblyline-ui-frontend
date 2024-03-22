@@ -1,20 +1,6 @@
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
-import {
-  AlertTitle,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  IconButton,
-  Pagination,
-  Paper,
-  Skeleton,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@mui/material';
+import { AlertTitle, Divider, Grid, Pagination, Paper, Skeleton, Typography, useTheme } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
 import TableContainer from '@mui/material/TableContainer';
 import makeStyles from '@mui/styles/makeStyles';
@@ -93,13 +79,14 @@ type RetrohuntErrorResult = {
 
 type Props = {
   retrohunt: RetrohuntResult;
+  isDrawer: boolean;
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
   .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
   .join('&');
 
-const WrappedRetrohuntErrors = ({ retrohunt = null }: Props) => {
+const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) => {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const classes = useStyles();
@@ -108,9 +95,8 @@ const WrappedRetrohuntErrors = ({ retrohunt = null }: Props) => {
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [errorResults, setErrorResults] = useState<RetrohuntErrorResult>(null);
-  const [open, setOpen] = useState<boolean>(false);
-  const [isReloading, setIsReloading] = useState<boolean>(true);
   const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(DEFAULT_QUERY));
+  const [isReloading, setIsReloading] = useState<boolean>(true);
 
   const timer = useRef<boolean>(false);
 
@@ -168,131 +154,90 @@ const WrappedRetrohuntErrors = ({ retrohunt = null }: Props) => {
   }, []);
 
   useEffect(() => {
-    if (open && retrohunt && 'key' in retrohunt) reloadErrors(retrohunt.key, query.getDeltaString());
-  }, [open, query, reloadErrors, retrohunt]);
-
-  useEffect(() => {
-    if (!timer.current && open && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
-      timer.current = true;
-      setTimeout(() => {
-        reloadErrors(retrohunt.key, query.toString());
-        timer.current = false;
-      }, RELOAD_DELAY);
-    }
-  }, [open, query, reloadErrors, retrohunt]);
+    if (retrohunt && 'key' in retrohunt) reloadErrors(retrohunt.key, query.getDeltaString());
+  }, [query, reloadErrors, retrohunt]);
 
   return (
     <>
-      {!retrohunt ? (
-        <Grid item>
-          <Skeleton className={classes.skeletonButton} variant="circular" />
-        </Grid>
-      ) : (
-        totals && (
-          <Grid item>
-            <Tooltip title={totals}>
-              <IconButton
-                size="large"
-                onClick={() => setOpen(true)}
-                style={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
-              >
-                <ErrorOutlineOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          </Grid>
-        )
-      )}
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
-        <DialogTitle className={classes.dialogTitle}>
-          <div className={classes.titleContainer}>
-            <div>{t('errors.view.title')}</div>
+      <Grid item>
+        <Typography variant="h6">{t('errors.view.title')}</Typography>
+        <Divider />
+      </Grid>
+      <Grid item>
+        {!errorResults ? (
+          <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
+        ) : !('total' in errorResults) || errorResults.total === 0 ? (
+          <div style={{ width: '100%' }}>
+            <InformativeAlert>
+              <AlertTitle>{t('no_results_title')}</AlertTitle>
+              {t('no_results_desc')}
+            </InformativeAlert>
           </div>
-          <div>
-            <Tooltip title={t('errors.close')}>
-              <div>
-                <IconButton onClick={() => setOpen(false)}>
-                  <CloseOutlinedIcon />
-                </IconButton>
-              </div>
-            </Tooltip>
-          </div>
-        </DialogTitle>
-        <DialogContent>
-          {!errorResults ? (
-            <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-          ) : !('total' in errorResults) || errorResults.total === 0 ? (
-            <div style={{ width: '100%' }}>
-              <InformativeAlert>
-                <AlertTitle>{t('no_results_title')}</AlertTitle>
-                {t('no_results_desc')}
-              </InformativeAlert>
+        ) : (
+          <>
+            <div className={classes.searchBar}>
+              {totals && (
+                <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                  {totals}
+                </Typography>
+              )}
+              {pageCount > 1 && (
+                <Pagination
+                  page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
+                  onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
+                  count={pageCount}
+                  shape="rounded"
+                  size="small"
+                  classes={{
+                    ul: classes.pagination
+                  }}
+                />
+              )}
             </div>
-          ) : (
-            <>
-              <div className={classes.searchBar}>
-                {totals && (
-                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                    {totals}
-                  </Typography>
-                )}
-                {pageCount > 1 && (
-                  <Pagination
-                    page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
-                    onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
-                    count={pageCount}
-                    shape="rounded"
-                    size="small"
-                    classes={{
-                      ul: classes.pagination
-                    }}
-                  />
-                )}
-              </div>
-              <div style={{ height: '4px' }}>{isReloading && <LinearProgress />}</div>
-              <TableContainer component={Paper}>
-                <DivTable>
-                  <DivTableHead>
-                    <DivTableRow>
-                      <SortableHeaderCell
-                        query={query}
-                        children={t('details.type')}
-                        sortName="sort"
-                        sortField="type"
-                        onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                      />
-                      <SortableHeaderCell
-                        query={query}
-                        children={t('details.message')}
-                        sortName="sort"
-                        sortField="message"
-                        onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                      />
+            <div style={{ height: '4px' }}>{isReloading && <LinearProgress />}</div>
+            <TableContainer component={Paper} sx={{ border: isDrawer && `1px solid ${theme.palette.divider}` }}>
+              <DivTable>
+                <DivTableHead>
+                  <DivTableRow>
+                    <SortableHeaderCell
+                      query={query}
+                      children={t('details.type')}
+                      sortName="sort"
+                      sortField="type"
+                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                    />
+                    <SortableHeaderCell
+                      query={query}
+                      children={t('details.message')}
+                      sortName="sort"
+                      sortField="message"
+                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                    />
+                  </DivTableRow>
+                </DivTableHead>
+                <DivTableBody>
+                  {errorResults.items.map((error, id) => (
+                    <DivTableRow key={id} hover style={{ textDecoration: 'none' }}>
+                      {error.type === 'warning' ? (
+                        <DivTableCell style={{ paddingLeft: theme.spacing(2) }}>
+                          <WarningAmberOutlinedIcon color="warning" />
+                        </DivTableCell>
+                      ) : error.type === 'error' ? (
+                        <DivTableCell style={{ paddingLeft: theme.spacing(2) }}>
+                          <ErrorOutlineOutlinedIcon color="error" />
+                        </DivTableCell>
+                      ) : (
+                        <DivTableCell></DivTableCell>
+                      )}
+                      <DivTableCell>{error.message}</DivTableCell>
                     </DivTableRow>
-                  </DivTableHead>
-                  <DivTableBody>
-                    {errorResults.items.map((error, id) => (
-                      <DivTableRow key={id} hover style={{ textDecoration: 'none' }}>
-                        {error.type === 'warning' ? (
-                          <DivTableCell style={{ paddingLeft: theme.spacing(2) }}>
-                            <WarningAmberOutlinedIcon color="warning" />
-                          </DivTableCell>
-                        ) : error.type === 'error' ? (
-                          <DivTableCell style={{ paddingLeft: theme.spacing(2) }}>
-                            <ErrorOutlineOutlinedIcon color="error" />
-                          </DivTableCell>
-                        ) : (
-                          <DivTableCell></DivTableCell>
-                        )}
-                        <DivTableCell>{error.message}</DivTableCell>
-                      </DivTableRow>
-                    ))}
-                  </DivTableBody>
-                </DivTable>
-              </TableContainer>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+                  ))}
+                </DivTableBody>
+              </DivTable>
+            </TableContainer>
+          </>
+        )}
+      </Grid>
     </>
   );
 };
