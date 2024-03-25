@@ -25,7 +25,7 @@ const ANALYTICAL_PLATFORM_THEME: AppThemeConfigs = {
         paper: '#303030'
       },
       primary: {
-        main: '#83A0D2'
+        main: '#7DA1DB'
       },
       secondary: {
         main: '#C0DEEC'
@@ -38,10 +38,10 @@ const ANALYTICAL_PLATFORM_THEME: AppThemeConfigs = {
         paper: '#FFFFFF'
       },
       primary: {
-        main: '#1565C0'
+        main: '#0062BF'
       },
       secondary: {
-        main: '#7C889A'
+        main: '#5189A3'
       }
     }
   },
