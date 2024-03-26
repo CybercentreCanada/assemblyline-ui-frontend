@@ -457,11 +457,18 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                         </Grid>
                         <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
                           {retrohunt ? (
-                            retrohunt?.archive_only ? (
-                              t('details.archive_only')
-                            ) : (
-                              t('details.all')
-                            )
+                            (() => {
+                              switch (retrohunt?.indices) {
+                                case 'hot':
+                                  return t('details.hot');
+                                case 'archive':
+                                  return t('details.archive');
+                                case 'hot_and_archive':
+                                  return t('details.hot_and_archive');
+                                default:
+                                  return null;
+                              }
+                            })()
                           ) : (
                             <Skeleton />
                           )}
