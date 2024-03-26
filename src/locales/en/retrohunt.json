@@ -45,6 +45,8 @@
   "errors.tooltip": "View Errors",
   "errors.view.title": "Search Errors",
   "filter": "Filter Retrohunt searches...",
+  "filter.completed_last_24": "Show searches completed in the last 24h",
+  "filter.creator_self": "Show my searches",
   "filtered": "Retrohunt search matching filter",
   "filtereds": "Retrohunt searches matching filter",
   "graph.type.datatype": "Files",
