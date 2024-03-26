@@ -40,7 +40,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         alt={t('logo.alt')}
-        src={`${process.env.PUBLIC_URL}/images/logo.svg`}
+        src={`${process.env.PUBLIC_URL}/images/noswoop.svg`}
         width="40"
         height="32"
         style={{ marginLeft: '-8px' }}
@@ -53,7 +53,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         alt={t('logo.alt')}
-        src={`${process.env.PUBLIC_URL}/images/logo_dark.svg`}
+        src={`${process.env.PUBLIC_URL}/images/noswoop_dark.svg`}
         width="40"
         height="32"
         style={{ marginLeft: '-8px' }}
@@ -88,7 +88,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`${process.env.PUBLIC_URL}/images/banner_vertical.svg`}
+        src={`${process.env.PUBLIC_URL}/images/vertical_banner.svg`}
         alt={t('banner.alt')}
       />
     ),
@@ -99,7 +99,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`${process.env.PUBLIC_URL}/images/banner_dark_vertical.svg`}
+        src={`${process.env.PUBLIC_URL}/images/vertical_banner_dark.svg`}
         alt={t('banner.alt')}
       />
     ),
