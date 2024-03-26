@@ -1,7 +1,7 @@
-import { Avatar, Icon, LinearProgress, StepIcon, Typography, useTheme } from '@mui/material';
+import { Avatar, Icon, LinearProgress, StepIcon as MuiStepIcon, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 const useStyles = makeStyles(theme => ({
   main: {
@@ -49,11 +49,64 @@ type Step = {
   icon?: React.ReactNode;
 };
 
+type StepIconProps = {
+  step: Step;
+  index: number;
+  loading?: boolean;
+  completed?: boolean;
+};
+
+const WrappedStepIcon = ({ step = null, index = 0, loading = false, completed = false }: StepIconProps) => {
+  const theme = useTheme();
+  const classes = useStyles();
+
+  return (
+    <span className={classes.labelContainer}>
+      {'icon' in step ? (
+        <Avatar className={clsx(classes.icon, !loading && completed && classes.completed)}>
+          <Icon children={step.icon} />
+        </Avatar>
+      ) : (
+        <MuiStepIcon
+          icon={index}
+          active
+          completed={completed}
+          sx={{ height: theme.spacing(4), width: theme.spacing(4) }}
+        />
+      )}
+      {'label' in step ? <Typography className={classes.label} children={step.label} variant="subtitle2" /> : null}
+    </span>
+  );
+};
+
+const StepIcon = React.memo(WrappedStepIcon);
+
+type ProgressProps = {
+  percentage: number;
+  loading?: boolean;
+};
+
+const WrappedProgress = ({ percentage = 0, loading = false }: ProgressProps) => {
+  const classes = useStyles();
+
+  return (
+    <span className={classes.percentageContainer}>
+      <LinearProgress variant={loading ? 'indeterminate' : 'determinate'} value={percentage} />
+      {!loading && 0 < percentage && percentage < 100 ? (
+        <Typography variant="subtitle2">{`${percentage}%`}</Typography>
+      ) : null}
+    </span>
+  );
+};
+
+const Progress = React.memo(WrappedProgress);
+
 type Props = {
   steps?: Step[];
   loading?: boolean;
   activeStep?: number;
   percentage?: number;
+  show100?: boolean;
 };
 
 const WrappedSteppedPercentage: React.FC<Props> = ({
@@ -62,59 +115,20 @@ const WrappedSteppedPercentage: React.FC<Props> = ({
   activeStep = 0,
   percentage: percentageProp = 0
 }) => {
-  const theme = useTheme();
   const classes = useStyles();
 
   const percentage = useMemo(() => Math.min(Math.max(percentageProp, 0), 100), [percentageProp]);
-
-  const StepComponent = useCallback<React.FC<{ step: Step; index: number; loading?: boolean; completed?: boolean }>>(
-    (prop = { step: null, index: 0, loading: false, completed: false }) => (
-      <span className={classes.labelContainer}>
-        {'icon' in prop.step ? (
-          <Avatar className={clsx(classes.icon, !prop.loading && prop.completed && classes.completed)}>
-            <Icon children={prop.step.icon} />
-          </Avatar>
-        ) : (
-          <StepIcon
-            icon={prop.index}
-            active
-            completed={prop.completed}
-            sx={{ height: theme.spacing(4), width: theme.spacing(4) }}
-          />
-        )}
-        {'label' in prop.step ? (
-          <Typography className={classes.label} children={prop.step.label} variant="subtitle2" />
-        ) : null}
-      </span>
-    ),
-    [classes, theme]
-  );
-
-  const PercentageComponent = useCallback<React.FC<{ percentage: number; loading?: boolean }>>(
-    (prop = { percentage: 0, loading: false }) => (
-      <span className={classes.percentageContainer}>
-        <LinearProgress variant={prop.loading ? 'indeterminate' : 'determinate'} value={prop.percentage} />
-        {!prop.loading && 0 < prop.percentage && prop.percentage < 100 ? (
-          <Typography variant="subtitle2">{`${prop.percentage}%`}</Typography>
-        ) : null}
-      </span>
-    ),
-    [classes]
-  );
 
   if (steps && Array.isArray(steps) && steps.length >= 1)
     return (
       <div className={classes.main}>
         <div className={classes.item}>
-          <StepComponent step={steps[0]} index={0} loading={loading} completed={0 <= activeStep} />
+          <StepIcon step={steps[0]} index={0} loading={loading} completed={0 <= activeStep} />
         </div>
         {steps.slice(1).map((step, i) => (
           <div key={i} className={classes.item}>
-            <PercentageComponent
-              percentage={i < activeStep ? 100 : activeStep < i ? 0 : percentage}
-              loading={loading}
-            />
-            <StepComponent step={step} index={i + 1} loading={loading} completed={i < activeStep} />
+            <Progress percentage={i < activeStep ? 100 : activeStep < i ? 0 : percentage} loading={loading} />
+            <StepIcon step={step} index={i + 1} loading={loading} completed={i < activeStep} />
           </div>
         ))}
       </div>
