@@ -1,5 +1,7 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import { Grid, IconButton, Pagination, Tooltip, Typography } from '@mui/material';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
+import { Grid, IconButton, Pagination, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
@@ -8,6 +10,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { RetrohuntCreate } from 'components/routes/retrohunt/create';
 import { RetrohuntDetail } from 'components/routes/retrohunt/detail';
+import { ChipList } from 'components/visual/ChipList';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -126,12 +129,14 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
 
 export default function RetrohuntPage() {
   const { t } = useTranslation(['retrohunt']);
+  const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const { user: currentUser, indexes, configuration } = useALContext();
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
@@ -365,6 +370,32 @@ export default function RetrohuntPage() {
                   handleQueryChange('offset', 0);
                 } else handleQueryRemove(['query', 'rows', 'offset']);
               }}
+              buttons={[
+                {
+                  icon: <TimerOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                  tooltip: t('filter.completed_last_24'),
+                  props: {
+                    onClick: () => {
+                      const completedTime = new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+                        .toISOString()
+                        .replaceAll(':', '\\:')
+                        .replaceAll('.', '\\.');
+                      query.add('filters', `completed_time:>=${completedTime}`);
+                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                    }
+                  }
+                },
+                {
+                  icon: <PersonOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                  tooltip: t('filter.creator_self'),
+                  props: {
+                    onClick: () => {
+                      query.add('filters', `creator:${currentUser.username}`);
+                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                    }
+                  }
+                }
+              ]}
             >
               {retrohuntResults !== null && (
                 <div className={classes.searchBar}>
@@ -392,6 +423,30 @@ export default function RetrohuntPage() {
                       size="small"
                     />
                   )}
+                </div>
+              )}
+
+              {query && (
+                <div>
+                  <ChipList
+                    items={query.getAll('filters', []).map(v => ({
+                      variant: 'outlined',
+                      label: `${v}`,
+                      color: v.indexOf('NOT ') === 0 ? 'error' : null,
+                      onClick: () => {
+                        query.replace(
+                          'filters',
+                          v,
+                          v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
+                        );
+                        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                      },
+                      onDelete: () => {
+                        query.remove('filters', v);
+                        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                      }
+                    }))}
+                  />
                 </div>
               )}
             </SearchBar>
