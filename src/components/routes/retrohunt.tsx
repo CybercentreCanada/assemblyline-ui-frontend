@@ -99,9 +99,7 @@ export type RetrohuntResult = {
   total_errors?: number;
   total_warnings?: number;
 
-  // to delete ?
-  ttl?: any;
-  archive_only?: any;
+  ttl?: number;
 
   step?: RetrohuntProgress['type'];
   progress?: number;

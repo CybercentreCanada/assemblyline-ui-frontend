@@ -159,11 +159,6 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                     <Classification type="text" size="tiny" c12n={retrohunt.classification} format="short" />
                   </DivTableCell>
                 )}
-                {c12nDef.enforce && (
-                  <DivTableCell>
-                    <Classification type="text" size="tiny" c12n={retrohunt.search_classification} format="short" />
-                  </DivTableCell>
-                )}
                 {hasTotalHits && <DivTableCell>{retrohunt?.total_hits}</DivTableCell>}
                 <DivTableCell>
                   <RetrohuntStatus result={retrohunt} />

@@ -20,7 +20,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
-import { RetrohuntResult } from 'components/routes/retrohunt';
+import { RetrohuntIndex, RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { MonacoEditor } from 'components/visual/MonacoEditor';
@@ -40,12 +40,17 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+type RetrohuntData = Pick<
+  RetrohuntResult,
+  'classification' | 'search_classification' | 'description' | 'yara_signature' | 'indices' | 'key' | 'ttl'
+>;
+
 type Props = {
   isDrawer?: boolean;
-  onCreateRetrohunt?: (retrohunt: RetrohuntResult) => void;
+  onCreateRetrohunt?: (retrohunt: Partial<RetrohuntResult>) => void;
 };
 
-function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => null }: Props) {
+function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => null }: Props) {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const classes = useStyles();
@@ -57,28 +62,26 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
   const { c12nDef, configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
+  const DEFAULT_RETROHUNT = useMemo<RetrohuntData>(
     () => ({
-      indices: null,
-      created_time: null,
-      started_time: null,
-      completed_time: null,
-      key: null,
-      finished: null,
-      truncated: false,
-      creator: '',
-
-      archive_only: false,
       classification: c12nDef?.UNRESTRICTED,
-      search_classification: currentUser.classification,
+      completed_time: null,
+      created_time: null,
+      creator: '',
       description: '',
+      finished: null,
+      indices: 'hot_and_archive',
+      key: null,
+      search_classification: currentUser.classification,
+      started_time: null,
+      truncated: false,
       ttl: !configuration.retrohunt.dtl ? 30 : configuration.retrohunt.dtl,
       yara_signature: ''
     }),
     [c12nDef?.UNRESTRICTED, configuration.retrohunt.dtl, currentUser.classification]
   );
 
-  const [retrohunt, setRetrohunt] = useState<RetrohuntResult>(null);
+  const [retrohunt, setRetrohunt] = useState<RetrohuntData>(null);
   const [isModified, setIsModified] = useState<boolean>(false);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false);
@@ -90,16 +93,16 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
   );
 
   const handleCreateRetrohunt = useCallback(
-    (result: RetrohuntResult) => {
+    (result: RetrohuntData) => {
       if (!currentUser.roles.includes('retrohunt_run') && configuration?.retrohunt?.enabled) return;
       apiCall({
         method: 'PUT',
         url: `/api/v4/retrohunt/`,
         body: {
-          archive_only: result.archive_only,
           classification: result.classification,
-          search_classification: result.search_classification,
           description: result.description,
+          indices: result.indices,
+          search_classification: result.search_classification,
           ttl: result.ttl,
           yara_signature: result.yara_signature
         },
@@ -123,7 +126,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
     [DEFAULT_RETROHUNT, currentUser.roles, onCreateRetrohunt, showErrorMessage, showSuccessMessage, t]
   );
 
-  const handleRetrohuntChange = useCallback((newRetrohunt: Partial<RetrohuntResult>) => {
+  const handleRetrohuntChange = useCallback((newRetrohunt: Partial<RetrohuntData>) => {
     setRetrohunt(rh => ({ ...rh, ...newRetrohunt }));
     setIsModified(true);
   }, []);
@@ -212,14 +215,20 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = job => n
                   <Typography variant="subtitle2">{t('details.search')}</Typography>
                   <RadioGroup
                     row
-                    value={retrohunt.archive_only ? 'archive_only' : 'all'}
-                    onChange={(_, value) => handleRetrohuntChange({ archive_only: value === 'archive_only' })}
+                    value={retrohunt.indices}
+                    onChange={(_, value: RetrohuntIndex) => handleRetrohuntChange({ indices: value })}
                   >
-                    <FormControlLabel value="all" control={<Radio />} label={t('details.all')} disabled={isDisabled} />
+                    <FormControlLabel value="hot" control={<Radio />} label={t('details.hot')} disabled={isDisabled} />
                     <FormControlLabel
-                      value="archive_only"
+                      value="archive"
                       control={<Radio />}
-                      label={t('details.archive_only')}
+                      label={t('details.archive')}
+                      disabled={isDisabled}
+                    />
+                    <FormControlLabel
+                      value="hot_and_archive"
+                      control={<Radio />}
+                      label={t('details.hot_and_archive')}
                       disabled={isDisabled}
                     />
                   </RadioGroup>
