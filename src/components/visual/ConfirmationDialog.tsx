@@ -40,7 +40,9 @@ const ConfirmationDialog = ({
     <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
     {text && (
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">{text}</DialogContentText>
+        <DialogContentText id="alert-dialog-description" component="div">
+          {text}
+        </DialogContentText>
       </DialogContent>
     )}
     <DialogActions>
