@@ -466,113 +466,111 @@ const WrappedAlertFavoriteFilters = () => {
           </IconButton>
         </div>
         <div className={classes.drawerInner}>
-          <div>
-            <div style={{ paddingBottom: theme.spacing(2) }}>
-              <Typography variant="h4">{t('title')}</Typography>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <Button onClick={() => setGlobal(v => !v)} size="small" color="primary" disableElevation disableRipple>
-                <div>{t('private')}</div>
-                <div style={{ flex: 1 }}>
-                  <Switch checked={global} onChange={event => setGlobal(event.target.checked)} color="primary" />
-                </div>
-                <div>{t('public')}</div>
-              </Button>
-            </div>
-            {global && c12nDef.enforce ? (
-              <Classification
-                type="picker"
-                c12n={favorite.classification}
-                setClassification={value => setFavorite(f => ({ ...f, classification: value }))}
-              />
-            ) : (
-              <div style={{ padding: theme.spacing(2.25) }} />
-            )}
-            <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(2) }}>
-              <div>
-                <Typography variant="subtitle2">{t('query')}</Typography>
-                <TextField
-                  value={favorite.query}
-                  onChange={event => setFavorite(f => ({ ...f, query: event.target.value }))}
-                  variant="outlined"
-                  fullWidth
-                />
+          <div style={{ paddingBottom: theme.spacing(2) }}>
+            <Typography variant="h4">{t('title')}</Typography>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <Button onClick={() => setGlobal(v => !v)} size="small" color="primary" disableElevation disableRipple>
+              <div>{t('private')}</div>
+              <div style={{ flex: 1 }}>
+                <Switch checked={global} onChange={event => setGlobal(event.target.checked)} color="primary" />
               </div>
-              <div style={{ marginTop: theme.spacing(2) }}>
-                <Typography variant="subtitle2">{t('name')}</Typography>
-                <TextField
-                  value={favorite.name}
-                  onChange={event => setFavorite(f => ({ ...f, name: event.target.value }))}
-                  variant="outlined"
-                  fullWidth
-                />
-              </div>
-            </div>
-
-            <Grid container gap={1} justifyContent="flex-end" paddingTop={2} paddingBottom={4}>
-              <DeleteFavorite
-                favorite={favorite}
-                global={global}
-                show={isExistingFavorite}
-                onSuccess={handleDeleteFavorites}
-              />
-
-              <UpdateFavorite
-                favorite={favorite}
-                globalFavorites={globalFavorites}
-                userFavorites={userFavorites}
-                global={global}
-                show={isExistingFavorite}
-                onSuccess={handleUpdateFavorites}
-              />
-
-              <AddFavorite
-                favorite={favorite}
-                global={global}
-                show={!isExistingFavorite}
-                onSuccess={handleUpdateFavorites}
-              />
-            </Grid>
-
-            <Typography variant="h6">{t('yourfavorites')}</Typography>
-            <Divider />
-            <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(4) }}>
-              <ChipList
-                items={userFavorites.map(f => ({
-                  size: 'medium',
-                  variant: 'outlined',
-                  label: <span>{f.name}</span>,
-                  tooltip: f.query,
-                  deleteIcon: (
-                    <IconButton className={classes.editIconButton}>
-                      <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
-                    </IconButton>
-                  ),
-                  onClick: () => handleFavoriteClick(f),
-                  onDelete: handleEditClick(f, false)
-                }))}
+              <div>{t('public')}</div>
+            </Button>
+          </div>
+          {global && c12nDef.enforce ? (
+            <Classification
+              type="picker"
+              c12n={favorite.classification}
+              setClassification={value => setFavorite(f => ({ ...f, classification: value }))}
+            />
+          ) : (
+            <div style={{ padding: theme.spacing(2.25) }} />
+          )}
+          <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(2) }}>
+            <div>
+              <Typography variant="subtitle2">{t('query')}</Typography>
+              <TextField
+                value={favorite.query}
+                onChange={event => setFavorite(f => ({ ...f, query: event.target.value }))}
+                variant="outlined"
+                fullWidth
               />
             </div>
-
-            <Typography variant="h6">{t('globalfavorites')}</Typography>
-            <Divider />
-            <div style={{ marginTop: theme.spacing(1) }}>
-              <ChipList
-                items={globalFavorites.map(f => ({
-                  size: 'medium',
-                  variant: 'outlined',
-                  label: <span>{f.name}</span>,
-                  tooltip: f.query,
-                  deleteIcon: (
-                    <IconButton className={classes.editIconButton}>
-                      <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
-                    </IconButton>
-                  ),
-                  onClick: () => handleFavoriteClick(f),
-                  onDelete: handleEditClick(f, true)
-                }))}
+            <div style={{ marginTop: theme.spacing(2) }}>
+              <Typography variant="subtitle2">{t('name')}</Typography>
+              <TextField
+                value={favorite.name}
+                onChange={event => setFavorite(f => ({ ...f, name: event.target.value }))}
+                variant="outlined"
+                fullWidth
               />
             </div>
+          </div>
+
+          <Grid container gap={1} justifyContent="flex-end" paddingTop={2} paddingBottom={4}>
+            <DeleteFavorite
+              favorite={favorite}
+              global={global}
+              show={isExistingFavorite}
+              onSuccess={handleDeleteFavorites}
+            />
+
+            <UpdateFavorite
+              favorite={favorite}
+              globalFavorites={globalFavorites}
+              userFavorites={userFavorites}
+              global={global}
+              show={isExistingFavorite}
+              onSuccess={handleUpdateFavorites}
+            />
+
+            <AddFavorite
+              favorite={favorite}
+              global={global}
+              show={!isExistingFavorite}
+              onSuccess={handleUpdateFavorites}
+            />
+          </Grid>
+
+          <Typography variant="h6">{t('yourfavorites')}</Typography>
+          <Divider />
+          <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(4) }}>
+            <ChipList
+              items={userFavorites.map(f => ({
+                size: 'medium',
+                variant: 'outlined',
+                label: <span>{f.name}</span>,
+                tooltip: f.query,
+                deleteIcon: (
+                  <IconButton className={classes.editIconButton}>
+                    <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
+                  </IconButton>
+                ),
+                onClick: () => handleFavoriteClick(f),
+                onDelete: handleEditClick(f, false)
+              }))}
+            />
+          </div>
+
+          <Typography variant="h6">{t('globalfavorites')}</Typography>
+          <Divider />
+          <div style={{ marginTop: theme.spacing(1) }}>
+            <ChipList
+              items={globalFavorites.map(f => ({
+                size: 'medium',
+                variant: 'outlined',
+                label: <span>{f.name}</span>,
+                tooltip: f.query,
+                deleteIcon: (
+                  <IconButton className={classes.editIconButton}>
+                    <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
+                  </IconButton>
+                ),
+                onClick: () => handleFavoriteClick(f),
+                onDelete: handleEditClick(f, true)
+              }))}
+            />
           </div>
         </div>
       </Drawer>
