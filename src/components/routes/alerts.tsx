@@ -14,7 +14,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ForbiddenPage from './403';
-import FilterFavorites from './alerts2/components/FilterFavorites';
+import AlertFavoriteFilters from './alerts2/components/FavoriteFilters';
 
 const useStyles = makeStyles(theme => ({
   pageTitle: {
@@ -120,7 +120,8 @@ const WrappedAlertsPage = () => {
               onSearch={handleSearch}
               extras={
                 <>
-                  <FilterFavorites />
+                  <AlertFavoriteFilters />
+                  <AlertSortFilters />
                 </>
               }
             >
