@@ -333,7 +333,6 @@ const Alerts: React.FC = () => {
   const onWorkflowActionsApply = (
     selectedStatus: string,
     selectedPriority: string,
-    selectedLabels: string[],
     addedLabels: string[],
     removedLabels: string[]
   ) => {
@@ -345,7 +344,10 @@ const Alerts: React.FC = () => {
           const changes = {
             status: selectedStatus || alert.status,
             priority: selectedPriority || alert.priority,
-            label: [...Array.from(new Set([...alert.labels, ...selectedLabels]))]
+            // Merge existing labels with added labels but remove labels that were to be removed
+            label: [...Array.from(new Set([...alert.labels, ...addedLabels]))].filter(label => {
+              return removedLabels.indexOf(label) === -1;
+            })
           };
           updateAlert(alert.index, changes);
           window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: alert.alert_id, changes } }));
