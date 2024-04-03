@@ -372,47 +372,49 @@ const WrappedAlertFavoriteFilters = () => {
 
   const [userFavorites, setUserFavorites] = useState<Favorite[]>([]);
   const [globalFavorites, setGlobalFavorites] = useState<Favorite[]>([]);
-  const [favorite, setFavorite] = useState<Favorite>(defaultFavorite);
-  const [global, setGlobal] = useState<boolean>(false);
+  const [currentFavorite, setCurrentFavorite] = useState<Favorite>(defaultFavorite);
+  const [currentGlobal, setCurrentGlobal] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
 
   const isExistingFavorite = useMemo<boolean>(
     () =>
-      global ? globalFavorites.some(f => f.name === favorite.name) : userFavorites.some(f => f.name === favorite.name),
-    [favorite.name, global, globalFavorites, userFavorites]
+      global
+        ? globalFavorites.some(f => f.name === currentFavorite.name)
+        : userFavorites.some(f => f.name === currentFavorite.name),
+    [currentFavorite.name, globalFavorites, userFavorites]
   );
 
   const handleUpdateFavorites = useCallback(
-    (_favorite: Favorite, _global: boolean) => {
+    (favorite: Favorite, global: boolean) => {
       const update = (values: Favorite[]) => {
-        const index = values.findIndex(value => value.name === _favorite.name);
+        const index = values.findIndex(value => value.name === favorite.name);
         return index >= 0
-          ? [...values.slice(0, index), _favorite, ...values.slice(index + 1, values.length)]
-          : [...values, _favorite];
+          ? [...values.slice(0, index), favorite, ...values.slice(index + 1, values.length)]
+          : [...values, favorite];
       };
-      _global ? setGlobalFavorites(update) : setUserFavorites(update);
-      setFavorite(defaultFavorite);
+      global ? setGlobalFavorites(update) : setUserFavorites(update);
+      setCurrentFavorite(defaultFavorite);
     },
     [defaultFavorite]
   );
 
   const handleDeleteFavorites = useCallback(
-    (_favorite: Favorite, _global: boolean) => {
+    (favorite: Favorite, global: boolean) => {
       const toSpliced = (values: Favorite[]) => {
-        const index = values.findIndex(value => value.name === _favorite.name);
+        const index = values.findIndex(value => value.name === favorite.name);
         if (index >= 0) values.splice(index, 1);
         return values;
       };
-      _global ? setGlobalFavorites(toSpliced) : setUserFavorites(toSpliced);
-      setFavorite(defaultFavorite);
+      global ? setGlobalFavorites(toSpliced) : setUserFavorites(toSpliced);
+      setCurrentFavorite(defaultFavorite);
     },
     [defaultFavorite]
   );
 
   const handleFavoriteClick = useCallback(
-    (_favorite: Favorite) => {
+    (favorite: Favorite) => {
       const query = new SimpleSearchQuery(location.search);
-      query.add('fq', _favorite.query);
+      query.add('fq', favorite.query);
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
 
       setOpen(false);
@@ -421,9 +423,9 @@ const WrappedAlertFavoriteFilters = () => {
   );
 
   const handleEditClick = useCallback(
-    (_favorite: Favorite, _global: boolean) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      setFavorite(f => ({ ...f, ..._favorite }));
-      setGlobal(_global);
+    (favorite: Favorite, global: boolean) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setCurrentFavorite(f => ({ ...f, ...favorite }));
+      setCurrentGlobal(global);
     },
     []
   );
@@ -446,14 +448,14 @@ const WrappedAlertFavoriteFilters = () => {
   }, [currentUser.username]);
 
   useEffect(() => {
-    return () => setFavorite(defaultFavorite);
+    return () => setCurrentFavorite(defaultFavorite);
   }, [defaultFavorite, open]);
 
   return (
     <>
       <Tooltip title={t('favorites')}>
         <span>
-          <IconButton size="large" onClick={() => setOpen(true)}>
+          <IconButton size="large" onClick={() => setOpen(true)} style={{ marginRight: 0 }}>
             <StarIcon fontSize={isMDUp ? 'medium' : 'small'} />
           </IconButton>
         </span>
@@ -470,10 +472,20 @@ const WrappedAlertFavoriteFilters = () => {
             <Typography variant="h4">{t('title')}</Typography>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <Button onClick={() => setGlobal(v => !v)} size="small" color="primary" disableElevation disableRipple>
+            <Button
+              onClick={() => setCurrentGlobal(v => !v)}
+              size="small"
+              color="primary"
+              disableElevation
+              disableRipple
+            >
               <div>{t('private')}</div>
               <div style={{ flex: 1 }}>
-                <Switch checked={global} onChange={event => setGlobal(event.target.checked)} color="primary" />
+                <Switch
+                  checked={currentGlobal}
+                  onChange={event => setCurrentGlobal(event.target.checked)}
+                  color="primary"
+                />
               </div>
               <div>{t('public')}</div>
             </Button>
@@ -481,8 +493,8 @@ const WrappedAlertFavoriteFilters = () => {
           {global && c12nDef.enforce ? (
             <Classification
               type="picker"
-              c12n={favorite.classification}
-              setClassification={value => setFavorite(f => ({ ...f, classification: value }))}
+              c12n={currentFavorite.classification}
+              setClassification={value => setCurrentFavorite(f => ({ ...f, classification: value }))}
             />
           ) : (
             <div style={{ padding: theme.spacing(2.25) }} />
@@ -491,8 +503,8 @@ const WrappedAlertFavoriteFilters = () => {
             <div>
               <Typography variant="subtitle2">{t('query')}</Typography>
               <TextField
-                value={favorite.query}
-                onChange={event => setFavorite(f => ({ ...f, query: event.target.value }))}
+                value={currentFavorite.query}
+                onChange={event => setCurrentFavorite(f => ({ ...f, query: event.target.value }))}
                 variant="outlined"
                 fullWidth
               />
@@ -500,8 +512,8 @@ const WrappedAlertFavoriteFilters = () => {
             <div style={{ marginTop: theme.spacing(2) }}>
               <Typography variant="subtitle2">{t('name')}</Typography>
               <TextField
-                value={favorite.name}
-                onChange={event => setFavorite(f => ({ ...f, name: event.target.value }))}
+                value={currentFavorite.name}
+                onChange={event => setCurrentFavorite(f => ({ ...f, name: event.target.value }))}
                 variant="outlined"
                 fullWidth
               />
@@ -510,24 +522,24 @@ const WrappedAlertFavoriteFilters = () => {
 
           <Grid container gap={1} justifyContent="flex-end" paddingTop={2} paddingBottom={4}>
             <DeleteFavorite
-              favorite={favorite}
-              global={global}
+              favorite={currentFavorite}
+              global={currentGlobal}
               show={isExistingFavorite}
               onSuccess={handleDeleteFavorites}
             />
 
             <UpdateFavorite
-              favorite={favorite}
+              favorite={currentFavorite}
               globalFavorites={globalFavorites}
               userFavorites={userFavorites}
-              global={global}
+              global={currentGlobal}
               show={isExistingFavorite}
               onSuccess={handleUpdateFavorites}
             />
 
             <AddFavorite
-              favorite={favorite}
-              global={global}
+              favorite={currentFavorite}
+              global={currentGlobal}
               show={!isExistingFavorite}
               onSuccess={handleUpdateFavorites}
             />
