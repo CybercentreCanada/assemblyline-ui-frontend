@@ -64,7 +64,7 @@ const SORT_OPTIONS = [
 
 const DEFAULT_SORT = 'reporting_ts desc' as const;
 
-const WrappedAlertSortFilters = () => {
+const WrappedAlertFilters = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
@@ -158,5 +158,5 @@ const WrappedAlertSortFilters = () => {
   );
 };
 
-export const AlertSortFilters = React.memo(WrappedAlertSortFilters);
-export default AlertSortFilters;
+export const AlertFilters = React.memo(WrappedAlertFilters);
+export default AlertFilters;

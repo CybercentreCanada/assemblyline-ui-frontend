@@ -7,14 +7,16 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
-import AlertSession from 'components/routes/alerts2/components/SessionParameter';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery from 'components/visual/SearchBar/search-query';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ForbiddenPage from './403';
-import AlertFavoriteFilters from './alerts2/components/FavoriteFilters';
+import AlertDefaultSearchParameters from './alerts2/components/DefaultSearchParameters';
+import { AlertFavorites } from './alerts2/components/Favorites';
+import AlertFilters from './alerts2/components/Filters';
+import { AlertSorts } from './alerts2/components/Sorts';
 
 const useStyles = makeStyles(theme => ({
   pageTitle: {
@@ -105,7 +107,7 @@ const WrappedAlertsPage = () => {
           </Grid>
 
           <Grid item xs style={{ textAlign: 'right', flex: 0 }}>
-            <AlertSession />
+            <AlertDefaultSearchParameters />
           </Grid>
         </Grid>
         <PageHeader isSticky>
@@ -120,8 +122,10 @@ const WrappedAlertsPage = () => {
               onSearch={handleSearch}
               extras={
                 <>
-                  <AlertFavoriteFilters />
-                  <AlertSortFilters />
+                  <AlertFavorites />
+                  <AlertSorts />
+                  <AlertFilters />
+                  <div style={{ width: theme.spacing(0.5) }} />
                 </>
               }
             >

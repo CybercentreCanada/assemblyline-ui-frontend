@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const WrappedAlertSession = () => {
+const WrappedAlertDefaultSearchParameters = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const navigate = useNavigate();
@@ -168,5 +168,5 @@ const WrappedAlertSession = () => {
   );
 };
 
-export const AlertSession = React.memo(WrappedAlertSession);
-export default AlertSession;
+export const AlertDefaultSearchParameters = React.memo(WrappedAlertDefaultSearchParameters);
+export default AlertDefaultSearchParameters;

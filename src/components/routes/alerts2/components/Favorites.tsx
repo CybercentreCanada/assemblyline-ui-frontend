@@ -353,7 +353,7 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
   }
 );
 
-const WrappedAlertFavoriteFilters = () => {
+const WrappedAlertFavorites = () => {
   const { t } = useTranslation('favorites');
   const classes = useStyles();
   const theme = useTheme();
@@ -590,5 +590,5 @@ const WrappedAlertFavoriteFilters = () => {
   );
 };
 
-export const AlertFavoriteFilters = React.memo(WrappedAlertFavoriteFilters);
-export default AlertFavoriteFilters;
+export const AlertFavorites = React.memo(WrappedAlertFavorites);
+export default AlertFavorites;
