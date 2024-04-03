@@ -24,16 +24,13 @@ import { CustomUser } from 'components/hooks/useMyUser';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
-  pageTitle: {
-    // paddingTop: theme.spacing(3),
-    paddingBottom: theme.spacing(3)
-  },
   drawerInner: {
     display: 'flex',
     flexDirection: 'column',
@@ -43,44 +40,12 @@ const useStyles = makeStyles(theme => ({
       width: '100vw'
     }
   },
-  searchresult: {
-    marginTop: theme.spacing(1),
-    fontStyle: 'italic',
-    minHeight: theme.spacing(3)
-  },
-  modeToggler: {
-    border: 'none',
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    marginRight: '0px !important'
-  },
   preview: {
-    display: 'grid',
-    gridTemplateColumns: 'auto 1fr',
-    columnGap: theme.spacing(1),
     margin: 0,
     padding: theme.spacing(0.75, 1),
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word'
   },
-  dialogPaper: {
-    maxWidth: '850px'
-  },
-  dialogContent: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: theme.spacing(2),
-    '@media (max-width:850px)': {
-      gridTemplateColumns: '1fr'
-    }
-  },
-  dialogDescription: {
-    gridColumn: 'span 2',
-    '@media (max-width:850px)': {
-      gridColumn: 'span 1'
-    }
-  },
-
   editIconButton: {
     borderRadius: '50%',
     backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.26)' : 'rgba(0, 0, 0, 0.26)',
@@ -246,7 +211,7 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
         }
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [c12nDef.UNRESTRICTED, currentUser.username, favorite, global]);
+    }, [c12nDef, currentUser.username, favorite, global, isValid, onSuccess, showErrorMessage, showSuccessMessage, t]);
 
     return (
       <>
@@ -314,7 +279,6 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
     const classes = useStyles();
     const theme = useTheme();
     const { apiCall } = useMyAPI();
-    const { c12nDef } = useALContext();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
@@ -326,13 +290,6 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
     const handleAccept = useCallback(() => {
       if (!isValid) return;
 
-      const data: Favorite = {
-        query: favorite.query,
-        name: favorite.name,
-        classification: global && c12nDef.enforce ? favorite.classification : c12nDef.UNRESTRICTED,
-        created_by: currentUser.username
-      };
-
       apiCall({
         url: `/api/v4/user/favorites/${global ? '__global__' : currentUser.username}/alert/`,
         method: 'DELETE',
@@ -340,7 +297,7 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
         onSuccess: ({ api_response }) => {
           if (!api_response.success) return;
           showSuccessMessage(global ? t('deleted.global') : t('deleted.personal'));
-          onSuccess(data, global);
+          onSuccess(favorite, global);
         },
         onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
         onEnter: () => setWaiting(true),
@@ -350,7 +307,7 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
         }
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [c12nDef.UNRESTRICTED, currentUser.username, favorite, global]);
+    }, [currentUser.username, favorite, global, isValid, onSuccess, showErrorMessage, showSuccessMessage, t]);
 
     return (
       <>
@@ -405,7 +362,6 @@ const WrappedFilterFavorites = () => {
   const { apiCall } = useMyAPI();
   const { c12nDef } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { showSuccessMessage } = useMySnackbar();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -453,7 +409,16 @@ const WrappedFilterFavorites = () => {
     [defaultFavorite]
   );
 
-  const handleFavoriteClick = useCallback((fav: Favorite) => {}, []);
+  const handleFavoriteClick = useCallback(
+    (_favorite: Favorite) => {
+      const query = new SimpleSearchQuery(location.search);
+      query.add('fq', _favorite.query);
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+
+      setOpen(false);
+    },
+    [location.hash, location.pathname, location.search, navigate]
+  );
 
   const handleEditClick = useCallback(
     (_favorite: Favorite, _global: boolean) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -569,7 +534,6 @@ const WrappedFilterFavorites = () => {
               />
             </Grid>
 
-            {/* Your personnal favorites  */}
             <Typography variant="h6">{t('yourfavorites')}</Typography>
             <Divider />
             <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(4) }}>
@@ -590,7 +554,6 @@ const WrappedFilterFavorites = () => {
               />
             </div>
 
-            {/* The global favorites */}
             <Typography variant="h6">{t('globalfavorites')}</Typography>
             <Divider />
             <div style={{ marginTop: theme.spacing(1) }}>
