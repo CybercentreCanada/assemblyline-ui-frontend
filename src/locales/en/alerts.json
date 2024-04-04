@@ -91,6 +91,7 @@
   "result": "alert",
   "results": "alerts",
   "score": "System's verdict",
+  "search.placeholder": "Filter alerts...",
   "session.cancel": "Cancel",
   "session.clear": "Clear",
   "session.clear.confirm": "Would you like to clear the existing search parameters?",

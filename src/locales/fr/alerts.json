@@ -92,6 +92,7 @@
   "result": "alerte",
   "results": "alertes",
   "score": "Verdict du système",
+  "search.placeholder": "Filtrer les alertes...",
   "session.cancel": "Annuler",
   "session.clear": "Effacer",
   "session.clear.confirm": "Voulez-vous effacer les paramètres de recherche existants ?",
