@@ -58,7 +58,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type Favorite = {
+export type Favorite = {
   classification: string;
   name: string;
   query: string;

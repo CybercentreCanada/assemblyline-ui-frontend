@@ -66,6 +66,7 @@
   "label": "Étiquettes",
   "labels": "Étiquettes",
   "less": "Montrer moins",
+  "loading": "Chargement...",
   "metadata": "Métadonnées",
   "more": "Montrer plus",
   "no_alerts_desc": "La requête actuelle en combinaison avec les filtres sélectionnés ne correspond à aucune alerte.",

@@ -65,6 +65,7 @@
   "label": "Labels",
   "labels": "Labels",
   "less": "Show less",
+  "loading": "Loading...",
   "metadata": "Metadata",
   "more": "Show more",
   "no_alerts_desc": "The following query in combination with the current selected filters do not match any alerts.",
