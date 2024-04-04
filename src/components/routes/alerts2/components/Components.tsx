@@ -2,16 +2,42 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import BlockIcon from '@mui/icons-material/Block';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import SlowMotionVideoIcon from '@mui/icons-material/SlowMotionVideo';
-import { Box, Tooltip, useTheme } from '@mui/material';
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Skeleton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import { DetailedItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
+import { ActionableChipList } from 'components/visual/ActionableChipList';
+import { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
+import { ChipList } from 'components/visual/ChipList';
 import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
-import React, { ReactNode, useMemo } from 'react';
+import { verdictToColor } from 'helpers/utils';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DetailedItem } from '../models/Alert';
+import { HiOutlineExternalLink } from 'react-icons/hi';
+import Moment from 'react-moment';
+import { useNavigate } from 'react-router';
+import { AlertItem } from '../models/Alert';
 
 const useStyles = makeStyles(theme => ({
   extended: {
@@ -227,6 +253,180 @@ export const AlertListChip: React.FC<AlertListChipProps> = React.memo(
           cursor: 'inherit'
         }}
       />
+    );
+  }
+);
+
+export const SkeletonInline = () => <Skeleton style={{ display: 'inline-block', width: '10rem' }} />;
+
+type AutoHideChipListState = {
+  showExtra: boolean;
+  fullChipList: ActionableCustomChipProps[];
+};
+
+const TARGET_RESULT_COUNT = 10;
+
+type AutoHideChipListProps = {
+  items: DetailedItem[];
+  defaultClassification: string;
+  type?: string;
+};
+
+export const AutoHideChipList: React.FC<AutoHideChipListProps> = React.memo(
+  ({ items, defaultClassification, type = null }: AutoHideChipListProps) => {
+    const { t } = useTranslation();
+    const [state, setState] = useState<AutoHideChipListState | null>(null);
+    const [shownChips, setShownChips] = useState<ActionableCustomChipProps[]>([]);
+
+    useEffect(() => {
+      const fullChipList = items.sort(detailedItemCompare).map(
+        item =>
+          ({
+            category: 'tag',
+            data_type: type,
+            label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
+            variant: 'outlined',
+            color: verdictToColor(item.verdict),
+            classification: defaultClassification
+          } as ActionableCustomChipProps)
+      );
+      const showExtra = items.length <= TARGET_RESULT_COUNT;
+
+      setState({ showExtra, fullChipList });
+    }, [defaultClassification, items, type]);
+
+    useEffect(() => {
+      if (state !== null) {
+        if (state.showExtra) {
+          setShownChips(state.fullChipList);
+        } else {
+          setShownChips(state.fullChipList.slice(0, TARGET_RESULT_COUNT));
+        }
+      }
+    }, [state]);
+
+    return (
+      <>
+        <ActionableChipList items={shownChips} />
+        {state && !state.showExtra && (
+          <Tooltip title={t('more')}>
+            <IconButton size="small" onClick={() => setState({ ...state, showExtra: true })} style={{ padding: 0 }}>
+              <MoreHorizOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+      </>
+    );
+  }
+);
+
+type AlertEventsTableProps = {
+  alert: AlertItem;
+  viewHistory: boolean;
+  setViewHistory: (value: boolean) => void;
+};
+
+export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
+  ({ alert, viewHistory, setViewHistory }: AlertEventsTableProps) => {
+    const { t, i18n } = useTranslation('alerts');
+    const navigate = useNavigate();
+    const theme = useTheme();
+
+    return (
+      viewHistory && (
+        <Dialog
+          open={viewHistory}
+          onClose={(event, reason) => {
+            if (reason === 'backdropClick') {
+              setViewHistory(false);
+            }
+          }}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          maxWidth="xl"
+          fullWidth
+        >
+          <div>
+            <IconButton
+              style={{ float: 'right', padding: theme.spacing(2) }}
+              onClick={() => {
+                setViewHistory(false);
+              }}
+              size="large"
+            >
+              <CloseOutlinedIcon />
+            </IconButton>
+            <DialogTitle id="alert-dialog-title">{t('history.events')}</DialogTitle>
+            <DialogContent>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      {['ts', 'workflow_or_user', 'priority', 'status', 'labels'].map(column => (
+                        <TableCell key={column}>
+                          <Typography sx={{ fontWeight: 'bold' }}>{t(column)}</Typography>
+                        </TableCell>
+                      ))}
+                      <TableCell></TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {alert.events
+                      .sort((a, b) => a.ts.localeCompare(b.ts) || b.ts.localeCompare(a.ts))
+                      .reverse()
+                      .map((event, i) => {
+                        return (
+                          <TableRow key={`table-row-${i}`} hover tabIndex={-1}>
+                            <Tooltip title={event.ts}>
+                              <TableCell>
+                                <Moment fromNow locale={i18n.language}>
+                                  {event.ts}
+                                </Moment>
+                              </TableCell>
+                            </Tooltip>
+                            <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
+                              <TableCell>{event.entity_name}</TableCell>
+                            </Tooltip>
+                            <TableCell>
+                              {event.priority ? <AlertPriority name={event.priority} withChip /> : null}
+                            </TableCell>
+                            <TableCell>{event.status ? <AlertStatus name={event.status} /> : null}</TableCell>
+                            <TableCell width="40%">
+                              {event.labels ? (
+                                <ChipList items={event.labels.map(label => ({ label, variant: 'outlined' }))} nowrap />
+                              ) : null}
+                            </TableCell>
+                            <TableCell>
+                              {event.entity_type === 'workflow' && event.entity_id !== 'DEFAULT' ? (
+                                <Tooltip
+                                  title={t('workflow')}
+                                  onClick={() => {
+                                    navigate(`/manage/workflow/${event.entity_id}`);
+                                    setViewHistory(false);
+                                  }}
+                                >
+                                  <div>
+                                    <HiOutlineExternalLink
+                                      style={{
+                                        fontSize: 'x-large',
+                                        verticalAlign: 'middle',
+                                        color: theme.palette.primary.main
+                                      }}
+                                    />
+                                  </div>
+                                </Tooltip>
+                              ) : null}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </DialogContent>
+          </div>
+        </Dialog>
+      )
     );
   }
 );
