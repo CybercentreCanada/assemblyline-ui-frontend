@@ -18,12 +18,14 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { DEFAULT_PARAMS, DEFAULT_QUERY } from 'components/routes/alerts';
 import CustomChip from 'components/visual/CustomChip';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
+import { buildSearchQuery } from '../utils/buildSearchQuery';
 import { Favorite } from './Favorites';
 
 const useStyles = makeStyles(theme => ({
@@ -74,47 +76,6 @@ const GROUPBY_OPTIONS: Option[] = [
   { value: 'priority', label: 'groupBy.priority' },
   { value: 'status', label: 'groupBy.status' }
 ];
-
-const DEFAULT_PARAMS = {
-  offset: 0,
-  rows: 50,
-  tc: '4d',
-  group_by: 'file.sha256'
-} as const;
-
-const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
-  .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
-  .join('&');
-
-const buildSearchQuery = (
-  search: string,
-  singles: string[] = [],
-  multiples: string[] = [],
-  strip: string[] = []
-): string => {
-  const defaults = new SimpleSearchQuery(DEFAULT_QUERY);
-  const current = new SimpleSearchQuery(search);
-  const query = new SimpleSearchQuery('');
-
-  const groupBy = current.get('group_by');
-  if (groupBy && groupBy !== '') query.add('fq', `${groupBy}:*`);
-
-  singles.forEach(key => {
-    if (strip.includes(key)) return;
-    const value = current.get(key);
-    const other = defaults.get(key);
-    if (value && value !== '') query.set(key, value);
-    else if (!current.has(key) && other && other !== '') query.set(key, other);
-  });
-
-  multiples.forEach(key => {
-    [...defaults.getAll(key, []), ...current.getAll(key, [])]
-      .filter((f: string) => !strip.some((s: string) => f.startsWith(s)))
-      .forEach(value => query.add(key, value));
-  });
-
-  return query.toString();
-};
 
 type AlertSelectProps = {
   value: string;
@@ -527,7 +488,7 @@ const WrappedAlertFilters = () => {
   const handleClear = useCallback(() => setQuery(new SimpleSearchQuery('', DEFAULT_QUERY)), []);
 
   const handleApply = useCallback(() => {
-    navigate(`${location.pathname}?${query.toString([])}${location.hash}`);
+    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
     setOpen(false);
   }, [location.hash, location.pathname, navigate, query]);
 
@@ -631,7 +592,8 @@ const WrappedAlertFilters = () => {
                     query.toString([]),
                     ['q', 'tc', 'tc_start', 'no_delay'],
                     ['fq'],
-                    ['status:']
+                    ['status:'],
+                    DEFAULT_QUERY
                   )}
                   onChange={values => handleFilterChange('status:', values)}
                 />
@@ -644,7 +606,8 @@ const WrappedAlertFilters = () => {
                     query.toString([]),
                     ['q', 'tc', 'tc_start', 'no_delay'],
                     ['fq'],
-                    ['priority:']
+                    ['priority:'],
+                    DEFAULT_QUERY
                   )}
                   onChange={values => handleFilterChange('priority:', values)}
                 />
@@ -653,7 +616,13 @@ const WrappedAlertFilters = () => {
                   label="labels"
                   values={getParsedFilter(query, 'label:')}
                   pathname="/api/v4/alert/labels/"
-                  search={buildSearchQuery(query.toString([]), ['q', 'tc', 'tc_start', 'no_delay'], ['fq'], ['label:'])}
+                  search={buildSearchQuery(
+                    query.toString([]),
+                    ['q', 'tc', 'tc_start', 'no_delay'],
+                    ['fq'],
+                    ['label:'],
+                    DEFAULT_QUERY
+                  )}
                   onChange={values => handleFilterChange('label:', values)}
                 />
 
@@ -664,7 +633,13 @@ const WrappedAlertFilters = () => {
 
                 <Others
                   values={query.getAll('fq')}
-                  search={buildSearchQuery(query.toString([]), ['q', 'tc', 'tc_start', 'no_delay'], ['fq'])}
+                  search={buildSearchQuery(
+                    query.toString([]),
+                    ['q', 'tc', 'tc_start', 'no_delay'],
+                    ['fq'],
+                    [],
+                    DEFAULT_QUERY
+                  )}
                   onChange={(values, options) => handleOptionChange(values, options)}
                 />
               </div>
