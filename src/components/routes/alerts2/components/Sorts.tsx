@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import { DEFAULT_PARAMS, DEFAULT_QUERY } from 'components/routes/alerts';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -62,8 +63,6 @@ const SORT_OPTIONS = [
   { value: 'status', label: 'status' }
 ] as const;
 
-const DEFAULT_SORT = 'reporting_ts desc' as const;
-
 const WrappedAlertSorts = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
@@ -72,7 +71,7 @@ const WrappedAlertSorts = () => {
   const location = useLocation();
 
   const [currentSort, setCurrentSort] = useState<string>(
-    new SimpleSearchQuery(location.search).get('sort', DEFAULT_SORT)
+    new SimpleSearchQuery(location.search).get('sort', DEFAULT_PARAMS.sort)
   );
   const [open, setOpen] = useState<boolean>(false);
 
@@ -90,16 +89,16 @@ const WrappedAlertSorts = () => {
 
   const handleSubmit = useCallback(
     (sort: string) => {
-      const query = new SimpleSearchQuery(location.search);
+      const query = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
       query.set('sort', sort);
-      navigate(`${location.pathname}?${query.toString([])}${location.hash}`);
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
       setOpen(false);
     },
     [location.hash, location.pathname, location.search, navigate]
   );
 
   useEffect(() => {
-    setCurrentSort(new SimpleSearchQuery(location.search).get('sort', DEFAULT_SORT));
+    setCurrentSort(new SimpleSearchQuery(location.search).get('sort', DEFAULT_PARAMS.sort));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -142,7 +141,7 @@ const WrappedAlertSorts = () => {
           </div>
           <div className={classes.actions}>
             <Tooltip title={t('sorts.reset')}>
-              <Button variant="outlined" onClick={() => setCurrentSort(DEFAULT_SORT)}>
+              <Button variant="outlined" onClick={() => setCurrentSort(DEFAULT_PARAMS.sort)}>
                 {t('reset')}
               </Button>
             </Tooltip>
