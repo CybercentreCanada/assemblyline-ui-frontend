@@ -1,5 +1,5 @@
 import { CircularProgress, Typography, useTheme } from '@mui/material';
-import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import useAppBannerVert from 'commons/components/app/hooks/useAppBannerVert';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
@@ -11,7 +11,7 @@ function Logout() {
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { hideMenus } = useAppLayout();
-  const banner = useAppBanner();
+  const banner = useAppBannerVert();
 
   useEffectOnce(() => {
     hideMenus();
