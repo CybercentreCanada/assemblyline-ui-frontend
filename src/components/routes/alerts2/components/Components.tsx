@@ -14,12 +14,8 @@ import {
   DialogTitle,
   IconButton,
   Skeleton,
-  Table,
-  TableBody,
-  TableCell,
   TableContainer,
-  TableHead,
-  TableRow,
+  TableRowProps,
   Tooltip,
   Typography,
   useTheme
@@ -31,12 +27,13 @@ import { ActionableChipList } from 'components/visual/ActionableChipList';
 import { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
+import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
 import { verdictToColor } from 'helpers/utils';
-import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import Moment from 'react-moment';
-import { useNavigate } from 'react-router';
+import { To, useNavigate } from 'react-router';
 import { AlertItem } from '../models/Alert';
 
 const useStyles = makeStyles(theme => ({
@@ -320,6 +317,10 @@ export const AutoHideChipList: React.FC<AutoHideChipListProps> = React.memo(
   }
 );
 
+interface WrapperTableRowProps extends TableRowProps {
+  to: To;
+}
+
 type AlertEventsTableProps = {
   alert: AlertItem;
   viewHistory: boolean;
@@ -331,6 +332,18 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
     const { t, i18n } = useTranslation('alerts');
     const navigate = useNavigate();
     const theme = useTheme();
+
+    const Row = useCallback<React.FC<WrapperTableRowProps>>(
+      ({ to, children, ...others }) =>
+        to ? (
+          <LinkRow to={to} {...others}>
+            {children}
+          </LinkRow>
+        ) : (
+          <DivTableRow {...others}>{children}</DivTableRow>
+        ),
+      []
+    );
 
     return (
       viewHistory && (
@@ -359,53 +372,60 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
             <DialogTitle id="alert-dialog-title">{t('history.events')}</DialogTitle>
             <DialogContent>
               <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
+                <DivTable size="small">
+                  <DivTableHead>
+                    <DivTableRow>
                       {['ts', 'workflow_or_user', 'priority', 'status', 'labels'].map(column => (
-                        <TableCell key={column}>
+                        <DivTableCell key={column}>
                           <Typography sx={{ fontWeight: 'bold' }}>{t(column)}</Typography>
-                        </TableCell>
+                        </DivTableCell>
                       ))}
-                      <TableCell></TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
+                      <DivTableCell></DivTableCell>
+                    </DivTableRow>
+                  </DivTableHead>
+                  <DivTableBody>
                     {alert.events
                       .sort((a, b) => a.ts.localeCompare(b.ts) || b.ts.localeCompare(a.ts))
                       .reverse()
                       .map((event, i) => {
                         return (
-                          <TableRow key={`table-row-${i}`} hover tabIndex={-1}>
+                          <Row
+                            key={`DivTable-row-${i}`}
+                            hover
+                            tabIndex={-1}
+                            to={
+                              event.entity_type === 'workflow' && event.entity_id !== 'DEFAULT'
+                                ? `/manage/workflow/${event.entity_id}`
+                                : null
+                            }
+                          >
                             <Tooltip title={event.ts}>
-                              <TableCell>
-                                <Moment fromNow locale={i18n.language}>
-                                  {event.ts}
-                                </Moment>
-                              </TableCell>
+                              <span>
+                                <DivTableCell>
+                                  <Moment fromNow locale={i18n.language}>
+                                    {event.ts}
+                                  </Moment>
+                                </DivTableCell>
+                              </span>
                             </Tooltip>
                             <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
-                              <TableCell>{event.entity_name}</TableCell>
+                              <span>
+                                <DivTableCell>{event.entity_name}</DivTableCell>
+                              </span>
                             </Tooltip>
-                            <TableCell>
+                            <DivTableCell>
                               {event.priority ? <AlertPriority name={event.priority} withChip /> : null}
-                            </TableCell>
-                            <TableCell>{event.status ? <AlertStatus name={event.status} /> : null}</TableCell>
-                            <TableCell width="40%">
+                            </DivTableCell>
+                            <DivTableCell>{event.status ? <AlertStatus name={event.status} /> : null}</DivTableCell>
+                            <DivTableCell width="40%">
                               {event.labels ? (
                                 <ChipList items={event.labels.map(label => ({ label, variant: 'outlined' }))} nowrap />
                               ) : null}
-                            </TableCell>
-                            <TableCell>
+                            </DivTableCell>
+                            <DivTableCell>
                               {event.entity_type === 'workflow' && event.entity_id !== 'DEFAULT' ? (
-                                <Tooltip
-                                  title={t('workflow')}
-                                  onClick={() => {
-                                    navigate(`/manage/workflow/${event.entity_id}`);
-                                    setViewHistory(false);
-                                  }}
-                                >
-                                  <div>
+                                <Tooltip title={t('workflow')}>
+                                  <span>
                                     <HiOutlineExternalLink
                                       style={{
                                         fontSize: 'x-large',
@@ -413,15 +433,15 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                                         color: theme.palette.primary.main
                                       }}
                                     />
-                                  </div>
+                                  </span>
                                 </Tooltip>
                               ) : null}
-                            </TableCell>
-                          </TableRow>
+                            </DivTableCell>
+                          </Row>
                         );
                       })}
-                  </TableBody>
-                </Table>
+                  </DivTableBody>
+                </DivTable>
               </TableContainer>
             </DialogContent>
           </div>

@@ -164,10 +164,18 @@ type AlertHistoryProps = {
   open?: boolean;
   vertical?: boolean;
   permanent?: boolean;
+  onClick?: () => void;
 };
 
 export const AlertHistory: React.FC<AlertHistoryProps> = React.memo(
-  ({ alert, speedDial = false, open = false, vertical = false, permanent = false }: AlertHistoryProps) => {
+  ({
+    alert,
+    speedDial = false,
+    open = false,
+    vertical = false,
+    permanent = false,
+    onClick = () => null
+  }: AlertHistoryProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
 
@@ -192,7 +200,10 @@ export const AlertHistory: React.FC<AlertHistoryProps> = React.memo(
                 <WorkHistoryOutlinedIcon color={hasEvents ? 'inherit' : 'disabled'} />
               </Badge>
             }
-            onClick={() => (!hasEvents ? null : setViewHistory(true))}
+            onClick={() => {
+              if (hasEvents) setViewHistory(true);
+              onClick();
+            }}
           />
           <AlertEventsTable alert={alert} viewHistory={viewHistory} setViewHistory={setViewHistory} />
         </>
@@ -781,6 +792,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
                   speedDial
                   vertical={vertical}
                   permanent={permanent}
+                  onClick={() => setOpen(false)}
                 />
               ]}
         </SpeedDial>
