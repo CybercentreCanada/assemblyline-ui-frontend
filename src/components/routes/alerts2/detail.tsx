@@ -29,7 +29,15 @@ import { BsClipboard } from 'react-icons/bs';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import { ALERT_SIMPLELIST_ID } from '../alerts/alerts';
-import AlertActions from './components/Actions';
+import AlertActions, {
+  AlertBadlist,
+  AlertGroup,
+  AlertHistory,
+  AlertOwnership,
+  AlertSafelist,
+  AlertSubmission,
+  AlertWorkflow
+} from './components/Actions';
 import {
   AlertExtendedScan,
   AlertPriority,
@@ -189,12 +197,18 @@ const WrappedAlertDetail = ({ id: propId = null, inDrawer = false }: Props) => {
         {!inDrawer && (
           <div style={{ paddingBottom: theme.spacing(3), textAlign: 'left' }}>
             <Grid container alignItems="center">
-              <Grid item xs>
+              <Grid item flexGrow={1}>
                 <Typography variant="h4">{t('detail.title')}</Typography>
               </Grid>
 
-              <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-                {!inDrawer && <AlertActions alert={alert} inDrawer />}
+              <Grid item style={{ display: 'flex', flexDirection: 'row', textAlign: 'right', flexGrow: 0 }}>
+                <AlertHistory alert={alert} />
+                <AlertGroup alert={alert} />
+                <AlertOwnership alert={alert} />
+                <AlertSubmission alert={alert} />
+                <AlertWorkflow alert={alert} />
+                <AlertSafelist alert={alert} />
+                <AlertBadlist alert={alert} />
               </Grid>
             </Grid>
           </div>
