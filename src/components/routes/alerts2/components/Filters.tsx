@@ -588,13 +588,14 @@ const WrappedAlertFilters = () => {
                   label="status"
                   values={getParsedFilter(query, 'status:')}
                   pathname="/api/v4/alert/statuses/"
-                  search={buildSearchQuery(
-                    query.toString([]),
-                    ['q', 'tc', 'tc_start', 'no_delay'],
-                    ['fq'],
-                    ['status:'],
-                    DEFAULT_QUERY
-                  )}
+                  search={buildSearchQuery({
+                    search: location.search,
+                    singles: ['q', 'tc', 'tc_start', 'no_delay'],
+                    multiples: ['fq'],
+                    strip: ['status:'],
+                    defaultString: DEFAULT_QUERY,
+                    groupByAsFilter: true
+                  }).toString()}
                   onChange={values => handleFilterChange('status:', values)}
                 />
 
@@ -602,13 +603,14 @@ const WrappedAlertFilters = () => {
                   label="priority"
                   values={getParsedFilter(query, 'priority:')}
                   pathname="/api/v4/alert/priorities/"
-                  search={buildSearchQuery(
-                    query.toString([]),
-                    ['q', 'tc', 'tc_start', 'no_delay'],
-                    ['fq'],
-                    ['priority:'],
-                    DEFAULT_QUERY
-                  )}
+                  search={buildSearchQuery({
+                    search: location.search,
+                    singles: ['q', 'tc', 'tc_start', 'no_delay'],
+                    multiples: ['fq'],
+                    strip: ['priority:'],
+                    defaultString: DEFAULT_QUERY,
+                    groupByAsFilter: true
+                  }).toString()}
                   onChange={values => handleFilterChange('priority:', values)}
                 />
 
@@ -616,13 +618,14 @@ const WrappedAlertFilters = () => {
                   label="labels"
                   values={getParsedFilter(query, 'label:')}
                   pathname="/api/v4/alert/labels/"
-                  search={buildSearchQuery(
-                    query.toString([]),
-                    ['q', 'tc', 'tc_start', 'no_delay'],
-                    ['fq'],
-                    ['label:'],
-                    DEFAULT_QUERY
-                  )}
+                  search={buildSearchQuery({
+                    search: location.search,
+                    singles: ['q', 'tc', 'tc_start', 'no_delay'],
+                    multiples: ['fq'],
+                    strip: ['label:'],
+                    defaultString: DEFAULT_QUERY,
+                    groupByAsFilter: true
+                  }).toString()}
                   onChange={values => handleFilterChange('label:', values)}
                 />
 
@@ -633,13 +636,13 @@ const WrappedAlertFilters = () => {
 
                 <Others
                   values={query.getAll('fq')}
-                  search={buildSearchQuery(
-                    query.toString([]),
-                    ['q', 'tc', 'tc_start', 'no_delay'],
-                    ['fq'],
-                    [],
-                    DEFAULT_QUERY
-                  )}
+                  search={buildSearchQuery({
+                    search: location.search,
+                    singles: ['q', 'tc', 'tc_start', 'no_delay'],
+                    multiples: ['fq'],
+                    defaultString: DEFAULT_QUERY,
+                    groupByAsFilter: true
+                  }).toString()}
                   onChange={(values, options) => handleOptionChange(values, options)}
                 />
               </div>

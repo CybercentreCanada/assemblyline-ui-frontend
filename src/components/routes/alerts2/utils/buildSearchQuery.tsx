@@ -1,18 +1,30 @@
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 
-export const buildSearchQuery = (
-  search: string,
-  singles: string[] = [],
-  multiples: string[] = [],
-  strip: string[] = [],
-  defaultString: string = ''
-): string => {
+type BuildSearchQueryProps = {
+  search: string;
+  singles?: string[];
+  multiples?: string[];
+  strip?: string[];
+  defaultString?: string;
+  groupByAsFilter?: boolean;
+};
+
+export const buildSearchQuery = ({
+  search = '',
+  singles = [],
+  multiples = [],
+  strip = [],
+  defaultString = '',
+  groupByAsFilter = false
+}: BuildSearchQueryProps): SimpleSearchQuery => {
   const defaults = new SimpleSearchQuery(defaultString);
   const current = new SimpleSearchQuery(search);
   const query = new SimpleSearchQuery('');
 
-  const groupBy = current.get('group_by');
-  if (groupBy && groupBy !== '') query.add('fq', `${groupBy}:*`);
+  if (groupByAsFilter) {
+    const groupBy = current.get('group_by');
+    if (groupBy && groupBy !== '') query.add('fq', `${groupBy}:*`);
+  }
 
   singles.forEach(key => {
     if (strip.includes(key)) return;
@@ -28,7 +40,7 @@ export const buildSearchQuery = (
       .forEach(value => query.add(key, value));
   });
 
-  return query.toString();
+  return query;
 };
 
 export const getGroupBy = (search: string, defaults: string): string => {
