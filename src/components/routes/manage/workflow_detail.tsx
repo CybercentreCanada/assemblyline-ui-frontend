@@ -591,8 +591,11 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 options={DEFAULT_LABELS}
                 value={workflow.labels}
                 renderInput={params => <TextField {...params} variant="outlined" />}
-                onChange={(event, value) => handleLabelsChange(value as string[])}
+                onChange={(event, value) => handleLabelsChange(value.map(v => v.toUpperCase()) as string[])}
                 disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
+                isOptionEqualToValue={(option, value) => {
+                  return option.toUpperCase() === value.toUpperCase();
+                }}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
