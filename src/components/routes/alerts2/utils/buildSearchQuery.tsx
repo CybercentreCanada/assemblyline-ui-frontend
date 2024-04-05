@@ -30,3 +30,11 @@ export const buildSearchQuery = (
 
   return query.toString();
 };
+
+export const getGroupBy = (search: string, defaults: string): string => {
+  const current = new SimpleSearchQuery(search, defaults);
+  const params = current.getParams();
+  return (
+    current.has('group_by') && current.get('group_by', '') === '' ? '' : 'group_by' in params ? params.group_by : ''
+  ) as string;
+};

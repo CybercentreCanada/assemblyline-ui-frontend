@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Alert, AlertItem } from '../models/Alert';
+import { getGroupBy } from '../utils/buildSearchQuery';
 import { AlertActions } from './Actions';
 import AlertListItem from './ListItem';
 
@@ -42,6 +43,7 @@ export const WrappedALertList = () => {
 
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [countedTotal, setCountedTotal] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
 
@@ -76,12 +78,7 @@ export const WrappedALertList = () => {
       if (loadingRef.current) return;
       loadingRef.current = true;
 
-      const current = new SimpleSearchQuery(search, DEFAULT_QUERY);
-      const params = current.getParams();
-      const groupBy = (
-        current.has('group_by') && current.get('group_by', '') === '' ? '' : 'group_by' in params ? params.group_by : ''
-      ) as string;
-
+      const groupBy = getGroupBy(search, DEFAULT_QUERY);
       const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
       const query = buildSearchQuery(['q', 'no_delay', 'sort', 'tc', 'track_total_hits'], ['fq']);
 
@@ -94,6 +91,7 @@ export const WrappedALertList = () => {
         method: 'GET',
         onSuccess: ({ api_response }: { api_response: ListResponse | GroupedResponse }) => {
           setCountedTotal('counted_total' in api_response ? api_response.counted_total : api_response.items.length);
+          setTotal(api_response.total);
 
           if ('tc_start' in api_response) {
             executionTime.current = api_response.tc_start;
@@ -141,11 +139,27 @@ export const WrappedALertList = () => {
     handleFetch(location.search);
   }, [handleFetch, location.search]);
 
+  useEffect(() => {
+    const update = ({ detail }: CustomEvent<Alert>) => {
+      setAlerts(values => {
+        const index = values.findIndex(value => value.alert_id === detail.alert_id);
+        return index >= 0
+          ? [...values.slice(0, index), { ...values[index], ...detail }, ...values.slice(index + 1, values.length)]
+          : values;
+      });
+    };
+
+    window.addEventListener('alertUpdate', update);
+    return () => {
+      window.removeEventListener('alertUpdate', update);
+    };
+  }, []);
+
   return (
     <SimpleList
       id={ALERT_SIMPLELIST_ID}
       disableProgress
-      scrollInfinite={countedTotal > 0}
+      scrollInfinite={countedTotal > 0 && countedTotal < total}
       scrollReset={scrollReset}
       scrollLoadNextThreshold={75}
       scrollTargetId="app-scrollct"
@@ -162,7 +176,7 @@ export const WrappedALertList = () => {
       onLoadNext={() => handleFetch(location.search)}
       onCursorChange={handleSelectedItemChange}
       onItemSelected={handleSelectedItemChange}
-      onRenderActions={(item: Alert, index?: number) => <AlertActions />}
+      onRenderActions={(item: Alert, index?: number) => <AlertActions alert={item} />}
     >
       {(item: Alert) => <AlertListItem item={item} />}
     </SimpleList>
