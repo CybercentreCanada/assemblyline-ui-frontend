@@ -158,7 +158,7 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
   }
 );
 
-type AlertHistoryProps = {
+type AlertActionProps = {
   alert: AlertItem;
   speedDial?: boolean;
   open?: boolean;
@@ -167,7 +167,7 @@ type AlertHistoryProps = {
   onClick?: () => void;
 };
 
-export const AlertHistory: React.FC<AlertHistoryProps> = React.memo(
+export const AlertHistory: React.FC<AlertActionProps> = React.memo(
   ({
     alert,
     speedDial = false,
@@ -175,7 +175,7 @@ export const AlertHistory: React.FC<AlertHistoryProps> = React.memo(
     vertical = false,
     permanent = false,
     onClick = () => null
-  }: AlertHistoryProps) => {
+  }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
 
@@ -211,16 +211,7 @@ export const AlertHistory: React.FC<AlertHistoryProps> = React.memo(
   }
 );
 
-type AlertGroupProps = {
-  alert: AlertItem;
-  speedDial?: boolean;
-  open?: boolean;
-  vertical?: boolean;
-  permanent?: boolean;
-  onClick?: () => void;
-};
-
-export const AlertGroup: React.FC<AlertGroupProps> = React.memo(
+export const AlertGroup: React.FC<AlertActionProps> = React.memo(
   ({
     alert,
     open = false,
@@ -228,7 +219,7 @@ export const AlertGroup: React.FC<AlertGroupProps> = React.memo(
     vertical = false,
     permanent = false,
     onClick = () => null
-  }: AlertGroupProps) => {
+  }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const location = useLocation();
@@ -263,17 +254,8 @@ export const AlertGroup: React.FC<AlertGroupProps> = React.memo(
   }
 );
 
-type AlertOwnershipProps = {
-  alert: AlertItem;
-  speedDial?: boolean;
-  open?: boolean;
-  vertical?: boolean;
-  permanent?: boolean;
-  onClick?: () => void;
-};
-
 // TODO
-export const AlertOwnership: React.FC<AlertOwnershipProps> = React.memo(
+export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
   ({
     alert,
     open = false,
@@ -281,7 +263,7 @@ export const AlertOwnership: React.FC<AlertOwnershipProps> = React.memo(
     vertical = false,
     permanent = false,
     onClick = () => null
-  }: AlertOwnershipProps) => {
+  }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const location = useLocation();
@@ -405,16 +387,7 @@ export const AlertOwnership: React.FC<AlertOwnershipProps> = React.memo(
   }
 );
 
-type AlertSubmissionProps = {
-  alert: AlertItem;
-  speedDial?: boolean;
-  open?: boolean;
-  vertical?: boolean;
-  permanent?: boolean;
-  onClick?: () => void;
-};
-
-export const AlertSubmission: React.FC<AlertSubmissionProps> = React.memo(
+export const AlertSubmission: React.FC<AlertActionProps> = React.memo(
   ({
     alert,
     open = false,
@@ -422,7 +395,7 @@ export const AlertSubmission: React.FC<AlertSubmissionProps> = React.memo(
     vertical = false,
     permanent = false,
     onClick = () => null
-  }: AlertSubmissionProps) => {
+  }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const { user: currentUser } = useAppUser<CustomUser>();
@@ -447,16 +420,7 @@ export const AlertSubmission: React.FC<AlertSubmissionProps> = React.memo(
   }
 );
 
-type AlertWorkflowProps = {
-  alert: AlertItem;
-  speedDial?: boolean;
-  open?: boolean;
-  vertical?: boolean;
-  permanent?: boolean;
-  onClick?: () => void;
-};
-
-export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
+export const AlertWorkflow: React.FC<AlertActionProps> = React.memo(
   ({
     alert,
     open = false,
@@ -464,7 +428,7 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
     vertical = false,
     permanent = false,
     onClick = () => null
-  }: AlertWorkflowProps) => {
+  }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const { user: currentUser } = useAppUser<CustomUser>();
@@ -488,16 +452,7 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
   }
 );
 
-type AlertSafelistProps = {
-  alert: AlertItem;
-  speedDial?: boolean;
-  open?: boolean;
-  vertical?: boolean;
-  permanent?: boolean;
-  onClick?: () => void;
-};
-
-export const AlertSafelist: React.FC<AlertSafelistProps> = React.memo(
+export const AlertSafelist: React.FC<AlertActionProps> = React.memo(
   ({
     alert,
     open = false,
@@ -505,7 +460,7 @@ export const AlertSafelist: React.FC<AlertSafelistProps> = React.memo(
     vertical = false,
     permanent = false,
     onClick = () => null
-  }: AlertSafelistProps) => {
+  }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const { apiCall } = useMyAPI();
@@ -573,16 +528,7 @@ export const AlertSafelist: React.FC<AlertSafelistProps> = React.memo(
   }
 );
 
-type AlertBadlistProps = {
-  alert: AlertItem;
-  speedDial?: boolean;
-  open?: boolean;
-  vertical?: boolean;
-  permanent?: boolean;
-  onClick?: () => void;
-};
-
-export const AlertBadlist: React.FC<AlertBadlistProps> = React.memo(
+export const AlertBadlist: React.FC<AlertActionProps> = React.memo(
   ({
     alert,
     open = false,
@@ -590,7 +536,7 @@ export const AlertBadlist: React.FC<AlertBadlistProps> = React.memo(
     vertical = false,
     permanent = false,
     onClick = () => null
-  }: AlertBadlistProps) => {
+  }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const { apiCall } = useMyAPI();
