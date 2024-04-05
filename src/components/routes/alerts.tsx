@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, useTheme } from '@mui/material';
+import { Box, Divider, Grid, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -10,13 +10,19 @@ import { CustomUser } from 'components/hooks/useMyUser';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery from 'components/visual/SearchBar/search-query';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import React, { useCallback, useMemo, useState } from 'react';
+import 'moment/locale/fr';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import ForbiddenPage from './403';
 import AlertDefaultSearchParameters from './alerts2/components/DefaultSearchParameters';
 import { AlertFavorites } from './alerts2/components/Favorites';
 import AlertFilters from './alerts2/components/Filters';
+import ALertList from './alerts2/components/List';
 import { AlertSorts } from './alerts2/components/Sorts';
+import AlertWorkflows from './alerts2/components/Workflows';
+import AlertDetail2 from './alerts2/detail';
 
 const useStyles = makeStyles(theme => ({
   pageTitle: {
@@ -70,18 +76,33 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+export const DEFAULT_PARAMS = {
+  offset: 0,
+  rows: 50,
+  tc: '4d',
+  group_by: 'file.sha256',
+  sort: 'reporting_ts desc'
+} as const;
+
+export const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
+  .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
+  .join('&');
+
 const WrappedAlertsPage = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage } = useMySnackbar();
   const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
 
-  const [alerts, setAlerts] = useState<any[]>();
   const [searchQuery, setSearchQuery] = useState<SearchQuery>(null);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
   const suggestions = useMemo<string[]>(
     () =>
@@ -96,6 +117,19 @@ const WrappedAlertsPage = () => {
   const handleValueChange = useCallback(() => {}, []);
 
   const handleSearch = useCallback(() => {}, []);
+
+  useEffect(() => {
+    if (!globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawerOpened]);
+
+  useEffect(() => {
+    if (location.hash) {
+      setGlobalDrawer(<AlertDetail2 id={location.hash.substr(1)} inDrawer />, { hasMaximize: true });
+    }
+  }, [location.hash, setGlobalDrawer]);
 
   if (!currentUser.roles.includes('alert_view')) return <ForbiddenPage />;
   else
@@ -122,9 +156,15 @@ const WrappedAlertsPage = () => {
               onSearch={handleSearch}
               extras={
                 <>
+                  <Divider
+                    orientation="vertical"
+                    flexItem
+                    style={{ marginLeft: theme.spacing(upMD ? 1 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+                  />
                   <AlertFavorites />
                   <AlertSorts />
                   <AlertFilters />
+                  <AlertWorkflows />
                   <div style={{ width: theme.spacing(0.5) }} />
                 </>
               }
@@ -145,30 +185,7 @@ const WrappedAlertsPage = () => {
           </div>
         </PageHeader>
 
-        {/* <SimpleList
-          id={ALERT_SIMPLELIST_ID}
-          disableProgress
-          scrollInfinite={countedTotal < total}
-          scrollReset={scrollReset}
-          scrollLoadNextThreshold={75}
-          scrollTargetId="app-scrollct"
-          loading={loading}
-          items={alerts}
-          emptyValue={
-            <div style={{ width: '100%' }}>
-              <InformativeAlert>
-                <AlertTitle>{t('no_alerts_title')}</AlertTitle>
-                {t('no_alerts_desc')}
-              </InformativeAlert>
-            </div>
-          }
-          onItemSelected={onItemSelected}
-          onRenderActions={onRenderListActions}
-          onLoadNext={_onLoadMore}
-          onCursorChange={onListCursorChanges}
-        >
-          {onRenderListRow}
-        </SimpleList> */}
+        <ALertList />
       </PageFullWidth>
     );
 };
