@@ -230,8 +230,11 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             filterSelectedOptions={true}
             value={[...addedLabels, ...removedLabels].sort()}
             renderInput={params => <TextField {...params} label={t('labels')} variant="outlined" />}
-            onChange={(event, value, reason) => onLabelChange(value as string[], reason)}
+            onChange={(event, value, reason) => onLabelChange(value.map(v => v.toUpperCase()) as string[], reason)}
             renderTags={(value, getTagProps, ownerState) => renderLabelTags(value)}
+            isOptionEqualToValue={(option, value) => {
+              return option.toUpperCase() === value.toUpperCase();
+            }}
           />
         </div>
       </div>
