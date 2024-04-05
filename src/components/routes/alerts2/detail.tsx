@@ -123,7 +123,7 @@ const WrappedAlertDetail = ({ id: propId = null, inDrawer = false }: Props) => {
 
   useEffect(() => {
     const update = ({ detail }: CustomEvent<AlertItem>) => {
-      setAlert(a => (a.id !== detail.id ? a : { ...a, ...detail }));
+      setAlert(a => (a.alert_id !== detail.alert_id ? a : { ...a, ...detail }));
     };
 
     window.addEventListener('alertUpdate', update);
