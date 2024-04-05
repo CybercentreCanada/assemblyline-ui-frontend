@@ -22,6 +22,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+type Filters = {
+  statuses: string[];
+  priorities: string[];
+  labels: string[];
+  others: string[];
+};
+
 type Props = {
   hideQuery?: boolean;
   hideGroupBy?: boolean;
@@ -45,17 +52,17 @@ const WrappedAlertFiltersSelected = ({
     [location.search]
   );
   const params = useMemo<{ [key: string]: string }>(() => query.getParams(), [query]);
-  const filters = useMemo<string[]>(() => query.getAll('fq', []), [query]);
-  const statuses = useMemo<string[]>(() => filters.filter(filter => filter.startsWith('status:')), [filters]);
-  const priorities = useMemo<string[]>(() => filters.filter(filter => filter.startsWith('priority:')), [filters]);
-  const labels = useMemo<string[]>(() => filters.filter(filter => filter.startsWith('label:')), [filters]);
-  const others = useMemo<string[]>(
-    () =>
-      filters.filter(
-        filter => !filter.startsWith('status:') && !filter.startsWith('priority:') && !filter.startsWith('label:')
-      ),
-    [filters]
-  );
+
+  const { statuses, priorities, labels, others } = useMemo<Filters>(() => {
+    let filters = { statuses: [], priorities: [], labels: [], others: [] };
+    query.getAll('fq', []).forEach(filter => {
+      if (filter.startsWith('status:')) filters.statuses.push(filter);
+      else if (filter.startsWith('priority:')) filters.priorities.push(filter);
+      else if (filter.startsWith('label:')) filters.labels.push(filter);
+      else filters.others.push(filter);
+    });
+    return filters;
+  }, [query]);
 
   return (
     <div>
@@ -131,6 +138,7 @@ const WrappedAlertFiltersSelected = ({
               items={[params.group_by].map(v => ({
                 variant: 'outlined',
                 label: `${t('groupBy')}=${v}`,
+                deleteIcon: <ReplayOutlinedIcon />,
                 onDelete: disableActions
                   ? null
                   : () => {
