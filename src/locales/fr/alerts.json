@@ -138,6 +138,8 @@
   "uri_static": "Statique",
   "user_verdict": "Verdict des utilisateurs",
   "verdict": "Verdict",
+  "verdict.error.malicious": "Une erreur s'est produite lors de l'application d'un verdict malveillant à l'alerte.",
+  "verdict.error.non_malicious": "Une erreur s'est produite lors de l'application d'un verdict non-malveillant à l'alerte.",
   "verdict.failed": "Le système n'a pas été en mesure de rendre le verdict.",
   "verdict.malicious": "Malveillant",
   "verdict.malicious.action": "Définir le verdict d'alerte à malveillant",

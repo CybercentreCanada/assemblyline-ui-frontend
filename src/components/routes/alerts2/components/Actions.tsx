@@ -10,6 +10,7 @@ import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WorkHistoryOutlinedIcon from '@mui/icons-material/WorkHistoryOutlined';
 import {
   Badge,
+  CircularProgress,
   CloseReason,
   IconButton,
   OpenReason,
@@ -28,7 +29,6 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { DEFAULT_QUERY } from 'components/routes/alerts';
-import { PossibleVerdict } from 'components/routes/alerts/alert-list-item-actions';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -65,6 +65,14 @@ const useStyles = makeStyles(theme => ({
   },
   actionsClosed: {
     width: 0
+  },
+  buttonProgress: {
+    color: theme.palette.primary.main,
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
   }
 }));
 
@@ -72,6 +80,7 @@ type AlertActionButtonProps = {
   color?: CSSProperties['color'];
   disabled?: boolean;
   icon?: React.ReactNode;
+  loading?: boolean;
   open?: boolean;
   permanent?: boolean;
   speedDial?: boolean;
@@ -86,6 +95,7 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
     color = null,
     disabled = false,
     icon = null,
+    loading = false,
     open = false,
     permanent = false,
     speedDial = false,
@@ -95,6 +105,7 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
     onClick = () => null
   }: AlertActionButtonProps) => {
     const theme = useTheme();
+    const classes = useStyles();
 
     const Wrapper = useCallback<React.FC<{ children: React.ReactNode; href: To }>>(
       ({ children, href }) => (href ? <Link to={href}>{children}</Link> : <div>{children}</div>),
@@ -105,20 +116,25 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
       return (
         <Wrapper href={to}>
           <SpeedDialAction
-            icon={icon}
+            icon={
+              <>
+                {icon}
+                {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              </>
+            }
             open={open}
-            // disableRipple={disabled}
             tooltipTitle={tooltipTitle}
             tooltipPlacement={vertical ? 'left' : 'bottom'}
             FabProps={{
+              disabled: disabled || loading,
               size: permanent ? 'medium' : 'small',
               style: {
                 boxShadow: permanent ? theme.shadows[0] : null,
                 margin: permanent ? '8px 2px 8px 2px' : null,
-                ...(color && { color: color })
+                ...(loading ? { color: theme.palette.action.disabled } : color && { color: color })
               }
             }}
-            onClick={onClick}
+            onClick={disabled || loading ? null : onClick}
           />
         </Wrapper>
       );
@@ -128,12 +144,13 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
           <span>
             <IconButton
               href={!to ? null : typeof to === 'string' ? to : `${to.pathname}${to.search}${to.hash}`}
-              disabled={disabled}
+              disabled={disabled || loading}
               size="large"
-              onClick={onClick}
-              style={{ ...(color && { color: color }) }}
+              onClick={disabled || loading ? null : onClick}
+              style={{ ...(loading ? { color: theme.palette.action.disabled } : color && { color: color }) }}
             >
               {icon}
+              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </IconButton>
           </span>
         </Tooltip>
@@ -480,32 +497,43 @@ export const AlertSafelist: React.FC<AlertSafelistProps> = React.memo(
   }: AlertSafelistProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
+    const { apiCall } = useMyAPI();
     const { user: currentUser } = useAppUser<CustomUser>();
+    const { showErrorMessage, showSuccessMessage } = useMySnackbar();
+
+    const [loading, setLoading] = useState<boolean>(false);
 
     const hasSetNonMalicious = useMemo<boolean>(
       () => alert && alert.verdict.non_malicious.indexOf(currentUser.username) !== -1,
       [alert, currentUser.username]
     );
 
-    const handleVerdict = (verdict: PossibleVerdict) => {
-      // const handleVerdict = async (verdict: PossibleVerdict) => {
-      // try {
-      //   await setVerdict(item.alert_id, verdict);
-      //   showSuccessMessage(t(`verdict.${verdict}.success`));
-      //   if (verdict === 'malicious') {
-      //     setHasSetMalicious(true);
-      //     setHasSetNonMalicious(false);
-      //   } else {
-      //     setHasSetMalicious(false);
-      //     setHasSetNonMalicious(true);
-      //   }
-      //   if (onVerdictComplete) {
-      //     onVerdictComplete(verdict);
-      //   }
-      // } catch (api_data) {
-      //   showErrorMessage(t('verdict.failed'));
-      // }
-    };
+    const handleNonMaliciousChange = useCallback(() => {
+      apiCall({
+        method: 'PUT',
+        url: `/api/v4/alert/verdict/${alert.alert_id}/non_malicious/`,
+        onSuccess: ({ api_response }) => {
+          if (!api_response.success) {
+            showErrorMessage(t('verdict.error.non_malicious'));
+            return;
+          } else {
+            const verdict = {
+              non_malicious: [...alert.verdict.non_malicious, currentUser.username],
+              malicious: alert.verdict.malicious.filter(v => v !== currentUser.username)
+            };
+            window.dispatchEvent(new CustomEvent<AlertItem>('alertUpdate', { detail: { ...alert, verdict } }));
+            showSuccessMessage(t('verdict.success.non_malicious'));
+          }
+        },
+        onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
+        onEnter: () => setLoading(true),
+        onExit: () => {
+          setLoading(false);
+          onClick();
+        }
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [alert, currentUser.username, onClick, showErrorMessage, showSuccessMessage, t]);
 
     if (!alert)
       return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
@@ -515,6 +543,8 @@ export const AlertSafelist: React.FC<AlertSafelistProps> = React.memo(
         <AlertActionButton
           tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious.action')}
           open={open}
+          loading={loading}
+          disabled={hasSetNonMalicious}
           vertical={vertical}
           permanent={permanent}
           speedDial={speedDial}
@@ -526,14 +556,7 @@ export const AlertSafelist: React.FC<AlertSafelistProps> = React.memo(
               : null
           }
           icon={<VerifiedUserOutlinedIcon />}
-          onClick={
-            !hasSetNonMalicious
-              ? () => {
-                  handleVerdict('non_malicious');
-                  onClick();
-                }
-              : null
-          }
+          onClick={hasSetNonMalicious ? null : () => handleNonMaliciousChange()}
         />
       );
   }
@@ -559,34 +582,43 @@ export const AlertBadlist: React.FC<AlertBadlistProps> = React.memo(
   }: AlertBadlistProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
+    const { apiCall } = useMyAPI();
     const { user: currentUser } = useAppUser<CustomUser>();
+    const { showErrorMessage, showSuccessMessage } = useMySnackbar();
+
+    const [loading, setLoading] = useState<boolean>(false);
 
     const hasSetMalicious = useMemo<boolean>(
       () => alert && alert.verdict.malicious.indexOf(currentUser.username) !== -1,
       [alert, currentUser.username]
     );
 
-    const handleVerdict = (verdict: PossibleVerdict) => {
-      // const handleVerdict = async (verdict: PossibleVerdict) => {
-      // try {
-      //   await setVerdict(item.alert_id, verdict);
-      //   showSuccessMessage(t(`verdict.${verdict}.success`));
-      //   if (verdict === 'malicious') {
-      //     setHasSetMalicious(true);
-      //     setHasSetNonMalicious(false);
-      //   } else {
-      //     setHasSetMalicious(false);
-      //     setHasSetNonMalicious(true);
-      //   }
-      //   if (onVerdictComplete) {
-      //     onVerdictComplete(verdict);
-      //   }
-      // } catch (api_data) {
-      //   showErrorMessage(t('verdict.failed'));
-      // }
-    };
-
-    const handleSubmit = useCallback(() => {}, []);
+    const handleMaliciousChange = useCallback(() => {
+      apiCall({
+        method: 'PUT',
+        url: `/api/v4/alert/verdict/${alert.alert_id}/malicious/`,
+        onSuccess: ({ api_response }) => {
+          if (!api_response.success) {
+            showErrorMessage(t('verdict.error.malicious'));
+            return;
+          } else {
+            const verdict = {
+              malicious: [...alert.verdict.malicious, currentUser.username],
+              non_malicious: alert.verdict.non_malicious.filter(v => v !== currentUser.username)
+            };
+            window.dispatchEvent(new CustomEvent<AlertItem>('alertUpdate', { detail: { ...alert, verdict } }));
+            showSuccessMessage(t('verdict.success.malicious'));
+          }
+        },
+        onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
+        onEnter: () => setLoading(true),
+        onExit: () => {
+          setLoading(false);
+          onClick();
+        }
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [alert, currentUser.username, onClick, showErrorMessage, showSuccessMessage, t]);
 
     if (!alert)
       return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
@@ -596,6 +628,8 @@ export const AlertBadlist: React.FC<AlertBadlistProps> = React.memo(
         <AlertActionButton
           tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious.action')}
           open={open}
+          loading={loading}
+          disabled={hasSetMalicious}
           vertical={vertical}
           permanent={permanent}
           speedDial={speedDial}
@@ -607,14 +641,7 @@ export const AlertBadlist: React.FC<AlertBadlistProps> = React.memo(
               : null
           }
           icon={<BugReportOutlinedIcon />}
-          onClick={
-            !hasSetMalicious
-              ? () => {
-                  handleVerdict('malicious');
-                  onClick();
-                }
-              : null
-          }
+          onClick={hasSetMalicious ? null : () => handleMaliciousChange()}
         />
       );
   }
@@ -692,65 +719,70 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
             className: vertical ? classes.verticalSpeedDialFab : permanent ? classes.permanentSpeedDialFab : null
           }}
         >
-          {render && (
-            <>
-              <AlertBadlist
-                alert={alert}
-                open={open || permanent}
-                speedDial
-                vertical={vertical}
-                permanent={permanent}
-                onClick={() => setOpen(false)}
-              />
-              <AlertSafelist
-                alert={alert}
-                open={open || permanent}
-                speedDial
-                vertical={vertical}
-                permanent={permanent}
-                onClick={() => setOpen(false)}
-              />
-              <AlertWorkflow
-                alert={alert}
-                open={open || permanent}
-                speedDial
-                vertical={vertical}
-                permanent={permanent}
-                onClick={() => setOpen(false)}
-              />
-              <AlertSubmission
-                alert={alert}
-                open={open || permanent}
-                speedDial
-                vertical={vertical}
-                permanent={permanent}
-                onClick={() => setOpen(false)}
-              />
-              <AlertOwnership
-                alert={alert}
-                open={open || permanent}
-                speedDial
-                vertical={vertical}
-                permanent={permanent}
-                onClick={() => setOpen(false)}
-              />
-              <AlertGroup
-                alert={alert}
-                open={open || permanent}
-                speedDial
-                vertical={vertical}
-                permanent={permanent}
-                onClick={() => setOpen(false)}
-              />
-              <AlertHistory
-                alert={alert}
-                open={open || permanent}
-                speedDial
-                vertical={vertical}
-                permanent={permanent}
-              />
-            </>
-          )}
+          {!alert || !render
+            ? []
+            : [
+                <AlertBadlist
+                  key={`${alert.alert_id}.AlertBadlist`}
+                  alert={alert}
+                  open={open || permanent}
+                  speedDial
+                  vertical={vertical}
+                  permanent={permanent}
+                />,
+                <AlertSafelist
+                  key={`${alert.alert_id}.AlertSafelist`}
+                  alert={alert}
+                  open={open || permanent}
+                  speedDial
+                  vertical={vertical}
+                  permanent={permanent}
+                />,
+                <AlertWorkflow
+                  key={`${alert.alert_id}.AlertWorkflow`}
+                  alert={alert}
+                  open={open || permanent}
+                  speedDial
+                  vertical={vertical}
+                  permanent={permanent}
+                  onClick={() => setOpen(false)}
+                />,
+                <AlertSubmission
+                  key={`${alert.alert_id}.AlertSubmission`}
+                  alert={alert}
+                  open={open || permanent}
+                  speedDial
+                  vertical={vertical}
+                  permanent={permanent}
+                  onClick={() => setOpen(false)}
+                />,
+                <AlertOwnership
+                  key={`${alert.alert_id}.AlertOwnership`}
+                  alert={alert}
+                  open={open || permanent}
+                  speedDial
+                  vertical={vertical}
+                  permanent={permanent}
+                  onClick={() => setOpen(false)}
+                />,
+                <AlertGroup
+                  key={`${alert.alert_id}.AlertGroup`}
+                  alert={alert}
+                  open={open || permanent}
+                  speedDial
+                  vertical={vertical}
+                  permanent={permanent}
+                  onClick={() => setOpen(false)}
+                />,
+                <AlertHistory
+                  key={`${alert.alert_id}.AlertHistory`}
+                  alert={alert}
+                  open={open || permanent}
+                  speedDial
+                  vertical={vertical}
+                  permanent={permanent}
+                />
+              ]}
         </SpeedDial>
       </div>
     );
