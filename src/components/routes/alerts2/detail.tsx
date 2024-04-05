@@ -10,7 +10,6 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
-import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
@@ -26,7 +25,7 @@ import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import { ALERT_SIMPLELIST_ID } from '../alerts/alerts';
 import AlertActions, {
@@ -78,20 +77,15 @@ const WrappedAlertDetail = ({ id: propId = null, inDrawer = false }: Props) => {
   const { t } = useTranslation(['alerts']);
   const theme = useTheme();
   const classes = useStyles();
-  const location = useLocation();
-  const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { copy } = useClipboard();
   const { addInsight, removeInsight } = useAssistant();
   const { c12nDef, configuration } = useALContext();
   const { id: paramId } = useParams<Params>();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer, subscribeCloseDrawer } = useDrawer();
 
   const [alert, setAlert] = useState<AlertItem>(null);
   const [metaOpen, setMetaOpen] = useState<boolean>(false);
-  const [viewHistory, setViewHistory] = useState<boolean>(false);
-  const [hasEvents, setHasEvents] = useState<boolean>(false);
 
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
 
@@ -101,26 +95,10 @@ const WrappedAlertDetail = ({ id: propId = null, inDrawer = false }: Props) => {
     if (!id || !currentUser.roles.includes('alert_view')) return;
     apiCall({
       url: `/api/v4/alert/${id}/`,
-      onSuccess: ({ api_response }) => {
-        setAlert(api_response);
-        setHasEvents(api_response && api_response.events && api_response.events.length > 0 ? true : false);
-      }
+      onSuccess: ({ api_response }) => setAlert(api_response)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser.roles, id]);
-
-  // useEffect(() => {
-  //   function handleAlertUpdate(event: CustomEvent) {
-  //     const { detail } = event;
-  //     if (detail.id === alert.id) {
-  //       setAlert({ ...alert, ...detail.changes });
-  //     }
-  //   }
-  //   window.addEventListener('alertUpdate', handleAlertUpdate);
-  //   return () => {
-  //     window.removeEventListener('alertUpdate', handleAlertUpdate);
-  //   };
-  // }, [alert]);
 
   useEffect(() => {
     if (alert) {

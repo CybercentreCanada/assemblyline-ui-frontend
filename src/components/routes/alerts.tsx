@@ -1,5 +1,4 @@
 import { AlertTitle, Divider, Grid, Typography, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import SimpleList from 'commons/addons/lists/simplelist/SimpleList';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -7,11 +6,9 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SearchBar from 'components/visual/SearchBar/search-bar';
-import SearchQuery from 'components/visual/SearchBar/search-query';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -30,53 +27,6 @@ import AlertWorkflows from './alerts2/components/Workflows';
 import AlertDetail2 from './alerts2/detail';
 import { Alert, AlertItem } from './alerts2/models/Alert';
 import { getGroupBy } from './alerts2/utils/buildSearchQuery';
-
-const useStyles = makeStyles(theme => ({
-  pageTitle: {
-    paddingBottom: theme.spacing(3)
-  },
-  drawerInner: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: theme.spacing(3),
-    width: '600px',
-    [theme.breakpoints.only('xs')]: {
-      width: '100vw'
-    }
-  },
-  modeToggler: {
-    border: 'none',
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    marginRight: '0px !important'
-  },
-  preview: {
-    display: 'grid',
-    gridTemplateColumns: 'auto 1fr',
-    columnGap: theme.spacing(1),
-    margin: 0,
-    padding: theme.spacing(0.75, 1),
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
-  },
-  dialogPaper: {
-    maxWidth: '850px'
-  },
-  dialogContent: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: theme.spacing(2),
-    '@media (max-width:850px)': {
-      gridTemplateColumns: '1fr'
-    }
-  },
-  dialogDescription: {
-    gridColumn: 'span 2',
-    '@media (max-width:850px)': {
-      gridColumn: 'span 1'
-    }
-  }
-}));
 
 type ListResponse = {
   items: AlertItem[];
@@ -110,17 +60,14 @@ export const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
 
 const WrappedAlertsPage = () => {
   const { t } = useTranslation('alerts');
-  const classes = useStyles();
   const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { showSuccessMessage } = useMySnackbar();
   const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
 
-  const [searchQuery, setSearchQuery] = useState<SearchQuery>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [countedTotal, setCountedTotal] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
