@@ -16,6 +16,10 @@ import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import {
   Alert,
+  Autocomplete,
+  DialogContentText,
+  FormControl,
+  FormLabel,
   Grid,
   IconButton,
   LinearProgress,
@@ -26,6 +30,8 @@ import {
   Popover,
   Skeleton,
   Snackbar,
+  Stack,
+  TextField,
   Tooltip,
   Typography,
   useTheme
@@ -44,7 +50,7 @@ import Detection from 'components/visual/FileDetail/detection';
 import FileDownloader from 'components/visual/FileDownloader';
 import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
-import { setNotifyFavicon } from 'helpers/utils';
+import { setNotifyFavicon, toTitleCase } from 'helpers/utils';
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
@@ -118,6 +124,7 @@ function WrappedSubmissionDetail() {
   const [loadInterval, setLoadInterval] = useState(null);
   const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState(0);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [archiveDialog, setArchiveDialog] = useState(false);
   const [waitingDialog, setWaitingDialog] = useState(false);
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const { apiCall } = useMyAPI();
@@ -130,6 +137,7 @@ function WrappedSubmissionDetail() {
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [baseFiles, setBaseFiles] = useState([]);
+  const [archivingMetadata, setArchivingMetadata] = useState(systemConfig.core.archiver.metadata);
 
   const popoverOpen = Boolean(resubmitAnchor);
 
@@ -465,15 +473,19 @@ function WrappedSubmissionDetail() {
 
   const archive = useCallback(() => {
     if (submission != null) {
+      const data = Object.fromEntries(Object.entries(archivingMetadata).map(([k, v]) => [k, v.default]));
       apiCall({
         method: 'PUT',
         url: `/api/v4/archive/${submission.sid}/`,
+        body: data,
         onSuccess: api_data => {
           showSuccessMessage(
             t(api_data.api_response.action === 'archive' ? 'archive.success' : 'archive.success.resubmit')
           );
           setSubmission({ ...submission, archived: true });
-        }
+        },
+        onEnter: () => setWaitingDialog(true),
+        onExit: () => setWaitingDialog(false)
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -915,6 +927,49 @@ function WrappedSubmissionDetail() {
         text={t('delete.text')}
         waiting={waitingDialog}
       />
+      <ConfirmationDialog
+        open={archiveDialog}
+        handleClose={() => {
+          setArchiveDialog(false);
+          setTimeout(() => setArchivingMetadata(systemConfig.core.archiver.metadata), 250);
+        }}
+        handleAccept={archive}
+        title={t('archive.title')}
+        cancelText={t('archive.cancelText')}
+        acceptText={t('archive.acceptText')}
+        text={t('archive.text')}
+        children={
+          Object.keys(archivingMetadata).length !== 0 &&
+          systemConfig.core.archiver.use_metadata && (
+            <>
+              <DialogContentText>{t('archive.metadata')}</DialogContentText>
+              <Stack spacing={1}>
+                {Object.keys(archivingMetadata).map(metakey => (
+                  <FormControl key={metakey} size="small" fullWidth>
+                    <FormLabel>{toTitleCase(metakey)}</FormLabel>
+                    <Autocomplete
+                      value={archivingMetadata[metakey].default}
+                      freeSolo={archivingMetadata[metakey].editable}
+                      onChange={(event, newValue) =>
+                        setArchivingMetadata({
+                          ...archivingMetadata,
+                          [metakey]: { ...archivingMetadata[metakey], default: newValue }
+                        })
+                      }
+                      size="small"
+                      fullWidth
+                      options={archivingMetadata[metakey].values}
+                      renderInput={params => <TextField {...params} />}
+                    />
+                  </FormControl>
+                ))}
+              </Stack>
+            </>
+          )
+        }
+        waiting={waitingDialog}
+        unacceptable={Object.keys(archivingMetadata).some(metakey => !archivingMetadata[metakey].default)}
+      />
       {outstanding && Object.keys(outstanding).length > 0 && (
         <Snackbar
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -1051,7 +1106,7 @@ function WrappedSubmissionDetail() {
                         <Tooltip title={t(submission.archived || submission.from_archive ? 'archived' : 'archive')}>
                           <div>
                             <IconButton
-                              onClick={archive}
+                              onClick={() => setArchiveDialog(true)}
                               disabled={submission.archived || submission.from_archive}
                               size="large"
                             >
