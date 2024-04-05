@@ -26,7 +26,7 @@ import { AlertSorts } from './alerts2/components/Sorts';
 import AlertWorkflows from './alerts2/components/Workflows';
 import AlertDetail2 from './alerts2/detail';
 import { Alert, AlertItem } from './alerts2/models/Alert';
-import { getGroupBy } from './alerts2/utils/buildSearchQuery';
+import { buildSearchQuery, getGroupBy } from './alerts2/utils/buildSearchQuery';
 
 type ListResponse = {
   items: AlertItem[];
@@ -75,7 +75,8 @@ const WrappedAlertsPage = () => {
   const [scrollReset, setScrollReset] = useState<boolean>(false);
 
   const queryRef = useRef<string>('');
-  const nextOffset = useRef<number>(0);
+  const prevSearch = useRef<string>('');
+  const prevOffset = useRef<number>(0);
   const executionTime = useRef<string>('');
   const loadingRef = useRef<boolean>(false);
 
@@ -93,28 +94,6 @@ const WrappedAlertsPage = () => {
         ? [...Object.keys(indexes.alert).map(name => name), ...DEFAULT_SUGGESTION]
         : DEFAULT_SUGGESTION,
     [indexes]
-  );
-
-  const buildSearchQuery = useCallback(
-    (singles: string[] = [], multiples: string[] = []): SimpleSearchQuery => {
-      const defaults = new SimpleSearchQuery(DEFAULT_QUERY);
-      const current = new SimpleSearchQuery(location.search);
-      const newQuery = new SimpleSearchQuery('');
-
-      singles.forEach(key => {
-        const value = current.get(key);
-        const other = defaults.get(key);
-        if (value && value !== '') newQuery.set(key, value);
-        else if (!current.has(key) && other && other !== '') newQuery.set(key, other);
-      });
-
-      multiples.forEach(key => {
-        [...defaults.getAll(key, []), ...current.getAll(key, [])].forEach(value => newQuery.add(key, value));
-      });
-
-      return newQuery;
-    },
-    [location.search]
   );
 
   const handleClear = useCallback(() => {
@@ -141,15 +120,23 @@ const WrappedAlertsPage = () => {
   );
 
   const handleFetch = useCallback(
-    (search: string) => {
-      if (loadingRef.current) return;
+    (search: string, offset: number) => {
+      if (loadingRef.current || (search === prevSearch.current && offset === prevOffset.current)) return;
+      prevSearch.current = search;
+      prevOffset.current = offset;
       loadingRef.current = true;
 
       const groupBy = getGroupBy(search, DEFAULT_QUERY);
       const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
-      const newQuery = buildSearchQuery(['q', 'no_delay', 'sort', 'tc', 'track_total_hits'], ['fq']);
 
-      newQuery.set('offset', nextOffset.current);
+      const newQuery = buildSearchQuery({
+        search: search,
+        singles: ['q', 'no_delay', 'sort', 'tc', 'track_total_hits'],
+        multiples: ['fq'],
+        defaultString: DEFAULT_QUERY
+      });
+
+      newQuery.set('offset', offset);
       newQuery.set('rows', DEFAULT_PARAMS.rows);
       executionTime.current && newQuery.set('tc_start', executionTime.current);
 
@@ -166,11 +153,16 @@ const WrappedAlertsPage = () => {
             executionTime.current = api_response.items[0].reporting_ts;
           }
 
-          nextOffset.current = api_response.offset + api_response.rows;
+          if (executionTime.current) {
+            const nextQuery = new SimpleSearchQuery(search, DEFAULT_QUERY);
+            nextQuery.set('tc_start', executionTime.current);
+            navigate(`${location.pathname}?${nextQuery.getDeltaString()}${location.hash}`);
+          }
 
+          const max = api_response.offset + api_response.rows;
           setAlerts(values => [
-            ...values.filter(value => value.index < nextOffset.current),
-            ...api_response.items.map((item, i) => ({ ...item, id: item.alert_id, index: nextOffset.current + i }))
+            ...values.filter(value => value.index < max),
+            ...api_response.items.map((item, i) => ({ ...item, id: item.alert_id, index: max + i }))
           ]);
         },
         onEnter: () => {
@@ -184,7 +176,7 @@ const WrappedAlertsPage = () => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [buildSearchQuery, location.search]
+    [location.hash, location.pathname, navigate]
   );
 
   const handleSelectedItemChange = useCallback(
@@ -211,13 +203,12 @@ const WrappedAlertsPage = () => {
   }, [location.hash, setGlobalDrawer]);
 
   useEffect(() => {
-    nextOffset.current = 0;
     executionTime.current = null;
     setScrollReset(true);
-    setAlerts([]);
 
-    handleFetch(location.search);
-  }, [handleFetch, location.search]);
+    query.delete('tc_start');
+    handleFetch(query.toString([]), 0);
+  }, [handleFetch, query]);
 
   useEffect(() => {
     const update = ({ detail }: CustomEvent<Alert>) => {
@@ -295,7 +286,7 @@ const WrappedAlertsPage = () => {
               </InformativeAlert>
             </div>
           }
-          onLoadNext={() => handleFetch(location.search)}
+          onLoadNext={() => handleFetch(location.search, prevOffset.current + DEFAULT_PARAMS.rows)}
           onCursorChange={handleSelectedItemChange}
           onItemSelected={handleSelectedItemChange}
           onRenderActions={(item: Alert, index?: number) => <AlertActions alert={item} />}
