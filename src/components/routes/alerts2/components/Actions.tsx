@@ -39,7 +39,7 @@ import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
 import { getGroupBy } from '../utils/buildSearchQuery';
-import { AlertEventsTable } from './Components';
+import { AlertEventsTable } from './Results';
 
 const useStyles = makeStyles(theme => ({
   verticalSpeedDialFab: {
