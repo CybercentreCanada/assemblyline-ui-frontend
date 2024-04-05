@@ -33,7 +33,7 @@ import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'rea
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import Moment from 'react-moment';
-import { To, useNavigate } from 'react-router';
+import { To } from 'react-router';
 import { AlertItem } from '../models/Alert';
 
 const useStyles = makeStyles(theme => ({
@@ -330,7 +330,6 @@ type AlertEventsTableProps = {
 export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
   ({ alert, viewHistory, setViewHistory }: AlertEventsTableProps) => {
     const { t, i18n } = useTranslation('alerts');
-    const navigate = useNavigate();
     const theme = useTheme();
 
     const Row = useCallback<React.FC<WrapperTableRowProps>>(
