@@ -34,7 +34,7 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { getValueFromPath } from 'helpers/utils';
 import { To } from 'history';
-import React, { CSSProperties, useCallback, useMemo, useState } from 'react';
+import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
@@ -586,6 +586,8 @@ export const AlertBadlist: React.FC<AlertBadlistProps> = React.memo(
       // }
     };
 
+    const handleSubmit = useCallback(() => {}, []);
+
     if (!alert)
       return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
     else if (!currentUser.roles.includes('alert_manage')) return null;
@@ -627,14 +629,33 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const classes = useStyles();
+  const location = useLocation();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [open, setOpen] = useState<boolean>(false);
+  const [render, setRender] = useState<boolean>(false);
+
+  const prevSearch = useRef<string>('');
 
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
 
   const vertical = useMemo<boolean>(() => inDrawer && !upSM, [inDrawer, upSM]);
   const permanent = useMemo<boolean>(() => inDrawer && upSM, [inDrawer, upSM]);
+
+  useEffect(() => {
+    if (open || permanent) setRender(true);
+  }, [open, permanent]);
+
+  useEffect(() => {
+    return () => setRender(false);
+  }, []);
+
+  useEffect(() => {
+    if (location.search !== prevSearch.current) {
+      setOpen(false);
+      prevSearch.current = location.search;
+    }
+  }, [location.search]);
 
   if (
     !currentUser.roles.includes('submission_view') &&
@@ -671,55 +692,65 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
             className: vertical ? classes.verticalSpeedDialFab : permanent ? classes.permanentSpeedDialFab : null
           }}
         >
-          <AlertBadlist
-            alert={alert}
-            open={open || permanent}
-            speedDial
-            vertical={vertical}
-            permanent={permanent}
-            onClick={() => setOpen(false)}
-          />
-          <AlertSafelist
-            alert={alert}
-            open={open || permanent}
-            speedDial
-            vertical={vertical}
-            permanent={permanent}
-            onClick={() => setOpen(false)}
-          />
-          <AlertWorkflow
-            alert={alert}
-            open={open || permanent}
-            speedDial
-            vertical={vertical}
-            permanent={permanent}
-            onClick={() => setOpen(false)}
-          />
-          <AlertSubmission
-            alert={alert}
-            open={open || permanent}
-            speedDial
-            vertical={vertical}
-            permanent={permanent}
-            onClick={() => setOpen(false)}
-          />
-          <AlertOwnership
-            alert={alert}
-            open={open || permanent}
-            speedDial
-            vertical={vertical}
-            permanent={permanent}
-            onClick={() => setOpen(false)}
-          />
-          <AlertGroup
-            alert={alert}
-            open={open || permanent}
-            speedDial
-            vertical={vertical}
-            permanent={permanent}
-            onClick={() => setOpen(false)}
-          />
-          <AlertHistory alert={alert} open={open || permanent} speedDial vertical={vertical} permanent={permanent} />
+          {render && (
+            <>
+              <AlertBadlist
+                alert={alert}
+                open={open || permanent}
+                speedDial
+                vertical={vertical}
+                permanent={permanent}
+                onClick={() => setOpen(false)}
+              />
+              <AlertSafelist
+                alert={alert}
+                open={open || permanent}
+                speedDial
+                vertical={vertical}
+                permanent={permanent}
+                onClick={() => setOpen(false)}
+              />
+              <AlertWorkflow
+                alert={alert}
+                open={open || permanent}
+                speedDial
+                vertical={vertical}
+                permanent={permanent}
+                onClick={() => setOpen(false)}
+              />
+              <AlertSubmission
+                alert={alert}
+                open={open || permanent}
+                speedDial
+                vertical={vertical}
+                permanent={permanent}
+                onClick={() => setOpen(false)}
+              />
+              <AlertOwnership
+                alert={alert}
+                open={open || permanent}
+                speedDial
+                vertical={vertical}
+                permanent={permanent}
+                onClick={() => setOpen(false)}
+              />
+              <AlertGroup
+                alert={alert}
+                open={open || permanent}
+                speedDial
+                vertical={vertical}
+                permanent={permanent}
+                onClick={() => setOpen(false)}
+              />
+              <AlertHistory
+                alert={alert}
+                open={open || permanent}
+                speedDial
+                vertical={vertical}
+                permanent={permanent}
+              />
+            </>
+          )}
         </SpeedDial>
       </div>
     );
