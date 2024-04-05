@@ -12,7 +12,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Alert, DetailedItem } from '../models/Alert';
-import { AlertExtendedScan, AlertListChip, AlertListChipDetailed, AlertPriority, AlertStatus } from './Results';
+import { AlertExtendedScan, AlertListChip, AlertListChipDetailed, AlertPriority, AlertStatus } from './Components';
 
 type Props = {
   item: Alert;
