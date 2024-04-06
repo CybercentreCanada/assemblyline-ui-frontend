@@ -120,11 +120,20 @@ const WrappedAlertsPage = () => {
   );
 
   const handleFetch = useCallback(
-    (search: string, offset: number) => {
+    (current: SimpleSearchQuery, offset: number) => {
+      current.delete('tc_start');
+      const search = current.toString([]);
+
       if (loadingRef.current || (search === prevSearch.current && offset === prevOffset.current)) return;
       prevSearch.current = search;
       prevOffset.current = offset;
       loadingRef.current = true;
+
+      if (offset === 0) {
+        setScrollReset(true);
+        executionTime.current = null;
+        navigate(`${location.pathname}?${current.getDeltaString()}${location.hash}`);
+      }
 
       const groupBy = getGroupBy(search, DEFAULT_QUERY);
       const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
@@ -149,14 +158,12 @@ const WrappedAlertsPage = () => {
 
           if ('tc_start' in api_response) {
             executionTime.current = api_response.tc_start;
+            current.set('tc_start', executionTime.current);
+            navigate(`${location.pathname}?${current.getDeltaString()}${location.hash}`);
           } else if (!executionTime.current && api_response.items.length > 0) {
             executionTime.current = api_response.items[0].reporting_ts;
-          }
-
-          if (executionTime.current) {
-            const nextQuery = new SimpleSearchQuery(search, DEFAULT_QUERY);
-            nextQuery.set('tc_start', executionTime.current);
-            navigate(`${location.pathname}?${nextQuery.getDeltaString()}${location.hash}`);
+            current.set('tc_start', executionTime.current);
+            navigate(`${location.pathname}?${current.getDeltaString()}${location.hash}`);
           }
 
           const max = api_response.offset + api_response.rows;
@@ -203,11 +210,7 @@ const WrappedAlertsPage = () => {
   }, [location.hash, setGlobalDrawer]);
 
   useEffect(() => {
-    executionTime.current = null;
-    setScrollReset(true);
-
-    query.delete('tc_start');
-    handleFetch(query.toString([]), 0);
+    handleFetch(query, 0);
   }, [handleFetch, query]);
 
   useEffect(() => {
@@ -286,7 +289,7 @@ const WrappedAlertsPage = () => {
               </InformativeAlert>
             </div>
           }
-          onLoadNext={() => handleFetch(location.search, prevOffset.current + DEFAULT_PARAMS.rows)}
+          onLoadNext={() => handleFetch(query, prevOffset.current + DEFAULT_PARAMS.rows)}
           onCursorChange={handleSelectedItemChange}
           onItemSelected={handleSelectedItemChange}
           onRenderActions={(item: Alert, index?: number) => <AlertActions alert={item} />}
