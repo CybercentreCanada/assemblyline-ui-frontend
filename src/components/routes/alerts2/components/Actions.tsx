@@ -12,8 +12,10 @@ import {
   Badge,
   CircularProgress,
   CloseReason,
+  Grid,
   IconButton,
   OpenReason,
+  Paper,
   Skeleton,
   SpeedDial,
   SpeedDialAction,
@@ -38,7 +40,7 @@ import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
-import { getGroupBy } from '../utils/buildSearchQuery';
+import { buildSearchQuery, getGroupBy } from '../utils/buildSearchQuery';
 import { AlertEventsTable } from './Components';
 
 const useStyles = makeStyles(theme => ({
@@ -73,6 +75,15 @@ const useStyles = makeStyles(theme => ({
     left: '50%',
     marginTop: -12,
     marginLeft: -12
+  },
+  preview: {
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr',
+    columnGap: theme.spacing(1),
+    margin: 0,
+    padding: theme.spacing(0.75, 1),
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word'
   }
 }));
 
@@ -254,7 +265,6 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
   }
 );
 
-// TODO
 export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
   ({
     alert,
@@ -266,83 +276,55 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
   }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
+    const classes = useStyles();
     const location = useLocation();
     const { apiCall } = useMyAPI();
-    const { showErrorMessage, showSuccessMessage } = useMySnackbar();
     const { user: currentUser } = useAppUser<CustomUser>();
+    const { showErrorMessage, showSuccessMessage } = useMySnackbar();
 
     const [confirmation, setConfirmation] = useState<boolean>(false);
+    const [waiting, setWaiting] = useState<boolean>(false);
 
     const groupBy = useMemo<string>(() => getGroupBy(location.search, DEFAULT_QUERY), [location.search]);
 
-    // const buildActionQuery = (): SearchQuery => {
-    //   const _actionQuery = currentQuery.newBase(name => name === 'tc_start');
-    //   _actionQuery.setGroupBy('');
+    const query = useMemo<string>(() => {
+      const q = buildSearchQuery({ search: location.search, singles: ['tc_start', 'tc'], multiples: ['fq'] });
+      q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy)}` : `alert_id:${alert.alert_id}`);
+      return q.toString();
+    }, [alert, groupBy, location.search]);
 
-    //   if (groupBy) {
-    //     _actionQuery.setQuery(`${groupBy}:${getValueFromPath(item, groupBy)}`);
-    //   } else {
-    //     _actionQuery.setQuery(`alert_id:${item.alert_id}`);
-    //   }
-    //   return _actionQuery;
-    // };
+    const parseSearchParams = useCallback((search: string) => {
+      let entries = [];
+      for (const entry of new URLSearchParams(search).entries()) {
+        entries.push(entry);
+      }
+      entries.sort((a, b) => `${a[0]}${a[1]}`.localeCompare(`${b[0]}${b[1]}`));
+      return entries;
+    }, []);
 
-    // const handleTakeOwnership = useCallback(() => {
-    //   //       // https://malware-stg.cyber.gc.ca/api/v4/alert/ownership/batch/?
-    //   //       tc_start=2024-03-24T04%3A49%3A46.150416Z&
-    //   //       q=alert_id%3A2qotQ0i6nhXl3jr54veMfc
+    const handleTakeOwnership = useCallback(() => {
+      apiCall({
+        url: `/api/v4/alert/ownership/batch/?${query}`,
+        method: 'GET',
+        onSuccess: ({ api_response }) => {
+          if (!api_response.success) {
+            showErrorMessage(t('take_ownership.error'));
+            return;
+          } else {
+            new CustomEvent<AlertItem>('alertUpdate', { detail: { ...alert, owner: currentUser.username } });
+            showSuccessMessage(t('take_ownership.success'));
+          }
+        },
+        onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
+        onEnter: () => setWaiting(true),
+        onExit: () => {
+          setWaiting(false);
+          onClick();
+        }
+      });
 
-    //   // https://malware-stg.cyber.gc.ca/api/v4/alert/ownership/batch/?
-    //   // tc_start=2024-03-24T04%3A49%3A46.150416Z&
-    //   // q=alert_id%3A4iT7qG9nR6wTWp0ZaOO6oM
-
-    //   const search = buildSearchQuery(location.search, ['q', 'tc_start', 'tc'], ['fq']);
-
-    //   apiCall({
-    //     url: `/api/v4/alert/ownership/batch/?${search}`,
-    //     onSuccess: () => {
-    //       window.dispatchEvent(
-    //         new CustomEvent<AlertItem>('alertUpdate', { detail: { ...alert, owner: currentUser.username } })
-    //       );
-    //       showSuccessMessage(t(''));
-    //     },
-    //     onFailure: ({ api_error_message }) => {
-    //       showErrorMessage(api_error_message);
-    //     },
-    //     onEnter: () => setLoading(true),
-    //     onExit: () => setLoading(false)
-    //   });
-    // }, [alert, apiCall, currentUser.username, location.search]);
-
-    // const buildActionQuery = (): SearchQuery => {
-    //   const _actionQuery = currentQuery.newBase(name => name === 'tc_start');
-    //   _actionQuery.setGroupBy('');
-
-    //   if (groupBy) {
-    //     _actionQuery.setQuery(`${groupBy}:${getValueFromPath(item, groupBy)}`);
-    //   } else {
-    //     _actionQuery.setQuery(`alert_id:${item.alert_id}`);
-    //   }
-    //   return _actionQuery;
-    // };
-
-    // const onTakeOwnershipOkClick = async () => {
-    //   try {
-    //     await onTakeOwnership(takeOwnershipConfirmation.query);
-    //     setTakeOwnershipConfirmation({ open: false, query: null });
-    //     if (onTakeOwnershipComplete) {
-    //       onTakeOwnershipComplete();
-    //     }
-    //   } catch (api_data) {
-    //     setTakeOwnershipConfirmation({ open: false, query: null });
-    //   }
-    // };
-
-    // const onTakeOwnershipCancelClick = () => {
-    //   setTakeOwnershipConfirmation({ open: false, query: null });
-    // };
-
-    const handleTakeOwnership = useCallback(() => {}, []);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [alert, currentUser.username, onClick, query, showErrorMessage, showSuccessMessage, t]);
 
     if (!alert)
       return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
@@ -358,7 +340,10 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
             speedDial={speedDial}
             color={theme.palette.action.active}
             icon={<AssignmentIndIcon />}
-            onClick={() => setConfirmation(true)}
+            onClick={() => {
+              setConfirmation(true);
+              onClick();
+            }}
           />
           {confirmation && (
             <ConfirmationDialog
@@ -368,16 +353,36 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
               title={t('actions.takeownershipdiag.header')}
               cancelText={t('actions.cancel')}
               acceptText={t('actions.ok')}
+              waiting={waiting}
               text={
                 groupBy ? (
-                  <>
-                    <span style={{ display: 'inline-block' }}>{t('actions.takeownershipdiag.content.grouped')}</span>
-                    <span style={{ display: 'inline-block', padding: theme.spacing(1), wordBreak: 'break-word' }}>
-                      <Typography variant="caption">{`${groupBy}: ${getValueFromPath(alert, groupBy)}`}</Typography>
-                    </span>
-                  </>
+                  <Grid container rowGap={2}>
+                    <Grid>{t('actions.takeownershipdiag.content.grouped')}</Grid>
+                    <Grid item>
+                      <Typography variant="subtitle2">{t('actions.takeownershipdiag.properties')}</Typography>
+                      <Paper component="pre" variant="outlined" className={classes.preview}>
+                        {!query ? (
+                          <div>{t('none')}</div>
+                        ) : (
+                          parseSearchParams(query)?.map(([k, v], i) => (
+                            <div key={i} style={{ display: 'contents', wordBreak: 'break-word' }}>
+                              <b>{k}: </b>
+                              {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
+                            </div>
+                          ))
+                        )}
+                      </Paper>
+                    </Grid>
+                    <Grid>{t('actions.takeownershipdiag.confirm')}</Grid>
+                  </Grid>
                 ) : (
-                  t('actions.takeownershipdiag.content.single')
+                  <Grid container rowGap={2}>
+                    <Grid>
+                      {t('actions.takeownershipdiag.content.single')}
+                      <b>{`"${alert.alert_id}".`}</b>
+                    </Grid>
+                    <Grid>{t('actions.takeownershipdiag.confirm')}</Grid>
+                  </Grid>
                 )
               }
             />
