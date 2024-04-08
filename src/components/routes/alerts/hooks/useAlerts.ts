@@ -56,6 +56,7 @@ export interface WorkflowEvent {
   entity_type: 'user' | 'workflow';
   entity_id: string;
   labels?: string[];
+  labels_removed?: string[];
   status?: string;
   priority?: string;
   ts: string;

@@ -330,23 +330,33 @@ const Alerts: React.FC = () => {
   };
 
   // Handler/callback for when clicking the 'Apply' btn on the AlertsWorkflowActions component.
-  const onWorkflowActionsApply = (selectedStatus: string, selectedPriority: string, selectedLabels: string[]) => {
-    onApplyWorkflowAction(drawer.actionData.query, selectedStatus, selectedPriority, selectedLabels).then(() => {
-      setDrawer({ ...drawer, open: false });
-      const { alert } = drawer.actionData;
-      if (alert) {
-        const changes = {
-          status: selectedStatus || alert.status,
-          priority: selectedPriority || alert.priority,
-          label: [...Array.from(new Set([...alert.labels, ...selectedLabels]))]
-        };
-        updateAlert(alert.index, changes);
-        window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: alert.alert_id, changes } }));
-      } else {
-        setScrollReset(true);
-        onLoad();
+  const onWorkflowActionsApply = (
+    selectedStatus: string,
+    selectedPriority: string,
+    addedLabels: string[],
+    removedLabels: string[]
+  ) => {
+    onApplyWorkflowAction(drawer.actionData.query, selectedStatus, selectedPriority, addedLabels, removedLabels).then(
+      () => {
+        setDrawer({ ...drawer, open: false });
+        const { alert } = drawer.actionData;
+        if (alert) {
+          const changes = {
+            status: selectedStatus || alert.status,
+            priority: selectedPriority || alert.priority,
+            // Merge existing labels with added labels but remove labels that were to be removed
+            label: [...Array.from(new Set([...alert.labels, ...addedLabels]))].filter(label => {
+              return removedLabels.indexOf(label) === -1;
+            })
+          };
+          updateAlert(alert.index, changes);
+          window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: alert.alert_id, changes } }));
+        } else {
+          setScrollReset(true);
+          onLoad();
+        }
       }
-    });
+    );
   };
 
   // Memoized callback to render one line-item of the list....
