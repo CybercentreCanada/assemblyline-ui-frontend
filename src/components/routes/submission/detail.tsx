@@ -483,6 +483,7 @@ function WrappedSubmissionDetail() {
             t(api_data.api_response.action === 'archive' ? 'archive.success' : 'archive.success.resubmit')
           );
           setSubmission({ ...submission, archived: true });
+          setArchiveDialog(false);
         },
         onEnter: () => setWaitingDialog(true),
         onExit: () => setWaitingDialog(false)
