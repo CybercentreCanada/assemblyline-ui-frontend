@@ -30,23 +30,6 @@ import { buildSearchQuery } from '../utils/buildSearchQuery';
 import AlertFiltersSelected from './FiltersSelected';
 
 const useStyles = makeStyles(theme => ({
-  desc: {
-    transform: 'rotate(0deg)',
-    transition: theme.transitions.create('transform', {
-      easing: theme.transitions.easing.easeInOut,
-      duration: theme.transitions.duration.shortest
-    })
-  },
-  asc: {
-    transform: 'rotate(180deg)'
-  },
-  actions: {
-    display: 'flex',
-    gap: theme.spacing(1),
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap',
-    marginTop: theme.spacing(1)
-  },
   drawerInner: {
     display: 'flex',
     flexDirection: 'column',
@@ -55,6 +38,9 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.only('xs')]: {
       width: '100vw'
     }
+  },
+  selectMenu: {
+    backgroundColor: theme.palette.background.default
   }
 }));
 
@@ -210,6 +196,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
             <div style={{ margin: theme.spacing(1), marginTop: theme.spacing(2) }}>
               <div style={{ marginBottom: theme.spacing(2) }}>
                 <Autocomplete
+                  classes={{ listbox: classes.selectMenu }}
                   fullWidth
                   multiple={false}
                   options={STATUSES}
@@ -222,6 +209,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
               </div>
               <div style={{ marginBottom: theme.spacing(2) }}>
                 <Autocomplete
+                  classes={{ listbox: classes.selectMenu }}
                   fullWidth
                   multiple={false}
                   options={PRIORITIES}
@@ -234,6 +222,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
               </div>
               <div style={{ marginBottom: theme.spacing(2) }}>
                 <Autocomplete
+                  classes={{ listbox: classes.selectMenu }}
                   fullWidth
                   multiple
                   freeSolo
