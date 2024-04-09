@@ -288,7 +288,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
 
     const groupBy = useMemo<string>(() => getGroupBy(location.search, DEFAULT_QUERY), [location.search]);
 
-    const query = useMemo<string>(() => {
+    const queryString = useMemo<string>(() => {
       const q = buildSearchQuery({ search: location.search, singles: ['tc_start', 'tc'], multiples: ['fq'] });
       q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy)}` : `alert_id:${alert.alert_id}`);
       return q.toString();
@@ -303,29 +303,32 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
       return entries;
     }, []);
 
-    const handleTakeOwnership = useCallback(() => {
-      apiCall({
-        url: `/api/v4/alert/ownership/batch/?${query}`,
-        method: 'GET',
-        onSuccess: ({ api_response }) => {
-          if (!api_response.success) {
-            showErrorMessage(t('take_ownership.error'));
-            return;
-          } else {
-            new CustomEvent<AlertItem>('alertUpdate', { detail: { ...alert, owner: currentUser.username } });
-            showSuccessMessage(t('take_ownership.success'));
+    const handleTakeOwnership = useCallback(
+      (prevAlert: AlertItem, q: string) => {
+        apiCall({
+          url: `/api/v4/alert/ownership/batch/?${q}`,
+          method: 'GET',
+          onSuccess: ({ api_response }) => {
+            if (!api_response.success) {
+              showErrorMessage(t('take_ownership.error'));
+              return;
+            } else {
+              const detail: Partial<AlertItem>[] = [{ ...prevAlert, owner: currentUser.username }];
+              new CustomEvent<Partial<AlertItem>[]>('alertUpdate', { detail });
+              showSuccessMessage(t('take_ownership.success'));
+            }
+          },
+          onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
+          onEnter: () => setWaiting(true),
+          onExit: () => {
+            setWaiting(false);
+            onClick();
           }
-        },
-        onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
-        onEnter: () => setWaiting(true),
-        onExit: () => {
-          setWaiting(false);
-          onClick();
-        }
-      });
-
+        });
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [alert, currentUser.username, onClick, query, showErrorMessage, showSuccessMessage, t]);
+      [currentUser.username, onClick, showErrorMessage, showSuccessMessage, t]
+    );
 
     if (!alert)
       return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
@@ -350,7 +353,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
             <ConfirmationDialog
               open={confirmation}
               handleClose={() => setConfirmation(false)}
-              handleAccept={() => handleTakeOwnership()}
+              handleAccept={() => handleTakeOwnership(alert, queryString)}
               title={t('actions.takeownershipdiag.header')}
               cancelText={t('actions.cancel')}
               acceptText={t('actions.ok')}
@@ -362,10 +365,10 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
                     <Grid item>
                       <Typography variant="subtitle2">{t('actions.takeownershipdiag.properties')}</Typography>
                       <Paper component="pre" variant="outlined" className={classes.preview}>
-                        {!query ? (
+                        {!queryString || queryString === '' ? (
                           <div>{t('none')}</div>
                         ) : (
-                          parseSearchParams(query)?.map(([k, v], i) => (
+                          parseSearchParams(queryString)?.map(([k, v], i) => (
                             <div key={i} style={{ display: 'contents', wordBreak: 'break-word' }}>
                               <b>{k}: </b>
                               {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
@@ -465,7 +468,12 @@ export const AlertWorkflow: React.FC<AlertActionProps> = React.memo(
               setOpenWorkflow(o => !o);
             }}
           />
-          <AlertWorkflowDrawer query={query} open={openWorkflow} onOpenChange={o => setOpenWorkflow(o)} />
+          <AlertWorkflowDrawer
+            alerts={[alert]}
+            query={query}
+            open={openWorkflow}
+            onClose={() => setOpenWorkflow(false)}
+          />
         </>
       );
   }
@@ -493,32 +501,40 @@ export const AlertSafelist: React.FC<AlertActionProps> = React.memo(
       [alert, currentUser.username]
     );
 
-    const handleNonMaliciousChange = useCallback(() => {
-      apiCall({
-        method: 'PUT',
-        url: `/api/v4/alert/verdict/${alert.alert_id}/non_malicious/`,
-        onSuccess: ({ api_response }) => {
-          if (!api_response.success) {
-            showErrorMessage(t('verdict.error.non_malicious'));
-            return;
-          } else {
-            const verdict = {
-              non_malicious: [...alert.verdict.non_malicious, currentUser.username],
-              malicious: alert.verdict.malicious.filter(v => v !== currentUser.username)
-            };
-            window.dispatchEvent(new CustomEvent<AlertItem>('alertUpdate', { detail: { ...alert, verdict } }));
-            showSuccessMessage(t('verdict.success.non_malicious'));
+    const handleNonMaliciousChange = useCallback(
+      (prevAlert: AlertItem) => {
+        apiCall({
+          method: 'PUT',
+          url: `/api/v4/alert/verdict/${prevAlert.alert_id}/non_malicious/`,
+          onSuccess: ({ api_response }) => {
+            if (!api_response.success) {
+              showErrorMessage(t('verdict.error.non_malicious'));
+              return;
+            } else {
+              const detail: Partial<AlertItem>[] = [
+                {
+                  ...prevAlert,
+                  verdict: {
+                    non_malicious: [...prevAlert.verdict.non_malicious, currentUser.username],
+                    malicious: prevAlert.verdict.malicious.filter(v => v !== currentUser.username)
+                  }
+                }
+              ];
+              window.dispatchEvent(new CustomEvent<Partial<AlertItem>[]>('alertUpdate', { detail }));
+              showSuccessMessage(t('verdict.success.non_malicious'));
+            }
+          },
+          onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
+          onEnter: () => setLoading(true),
+          onExit: () => {
+            setLoading(false);
+            onClick();
           }
-        },
-        onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
-        onEnter: () => setLoading(true),
-        onExit: () => {
-          setLoading(false);
-          onClick();
-        }
-      });
+        });
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [alert, currentUser.username, onClick, showErrorMessage, showSuccessMessage, t]);
+      [currentUser.username, onClick, showErrorMessage, showSuccessMessage, t]
+    );
 
     if (!alert)
       return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
@@ -541,7 +557,7 @@ export const AlertSafelist: React.FC<AlertActionProps> = React.memo(
               : null
           }
           icon={<VerifiedUserOutlinedIcon />}
-          onClick={hasSetNonMalicious ? null : () => handleNonMaliciousChange()}
+          onClick={hasSetNonMalicious ? null : () => handleNonMaliciousChange(alert)}
         />
       );
   }
@@ -569,32 +585,40 @@ export const AlertBadlist: React.FC<AlertActionProps> = React.memo(
       [alert, currentUser.username]
     );
 
-    const handleMaliciousChange = useCallback(() => {
-      apiCall({
-        method: 'PUT',
-        url: `/api/v4/alert/verdict/${alert.alert_id}/malicious/`,
-        onSuccess: ({ api_response }) => {
-          if (!api_response.success) {
-            showErrorMessage(t('verdict.error.malicious'));
-            return;
-          } else {
-            const verdict = {
-              malicious: [...alert.verdict.malicious, currentUser.username],
-              non_malicious: alert.verdict.non_malicious.filter(v => v !== currentUser.username)
-            };
-            window.dispatchEvent(new CustomEvent<AlertItem>('alertUpdate', { detail: { ...alert, verdict } }));
-            showSuccessMessage(t('verdict.success.malicious'));
+    const handleMaliciousChange = useCallback(
+      (prevAlert: AlertItem) => {
+        apiCall({
+          method: 'PUT',
+          url: `/api/v4/alert/verdict/${prevAlert.alert_id}/malicious/`,
+          onSuccess: ({ api_response }) => {
+            if (!api_response.success) {
+              showErrorMessage(t('verdict.error.malicious'));
+              return;
+            } else {
+              const detail: Partial<AlertItem>[] = [
+                {
+                  ...prevAlert,
+                  verdict: {
+                    malicious: [...prevAlert.verdict.malicious, currentUser.username],
+                    non_malicious: prevAlert.verdict.non_malicious.filter(v => v !== currentUser.username)
+                  }
+                }
+              ];
+              window.dispatchEvent(new CustomEvent<Partial<AlertItem>[]>('alertUpdate', { detail }));
+              showSuccessMessage(t('verdict.success.malicious'));
+            }
+          },
+          onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
+          onEnter: () => setLoading(true),
+          onExit: () => {
+            setLoading(false);
+            onClick();
           }
-        },
-        onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
-        onEnter: () => setLoading(true),
-        onExit: () => {
-          setLoading(false);
-          onClick();
-        }
-      });
+        });
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [alert, currentUser.username, onClick, showErrorMessage, showSuccessMessage, t]);
+      [currentUser.username, onClick, showErrorMessage, showSuccessMessage, t]
+    );
 
     if (!alert)
       return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
@@ -617,7 +641,7 @@ export const AlertBadlist: React.FC<AlertActionProps> = React.memo(
               : null
           }
           icon={<BugReportOutlinedIcon />}
-          onClick={hasSetMalicious ? null : () => handleMaliciousChange()}
+          onClick={hasSetMalicious ? null : () => handleMaliciousChange(alert)}
         />
       );
   }

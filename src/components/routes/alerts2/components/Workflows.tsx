@@ -76,21 +76,22 @@ type WorkflowBody = {
   priority: Priority;
   status: Status;
   labels: Label[];
+  removed_labels: Label[];
 };
 
 type AlertWorkflowDrawerProps = {
+  alerts: AlertItem[];
   query: SimpleSearchQuery;
   open: boolean;
-  onOpenChange?: (open: boolean) => void;
-  onComplete?: () => void;
+  onClose?: () => void;
 };
 
 export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.memo(
   ({
+    alerts = [],
     query = new SimpleSearchQuery(''),
     open = false,
-    onOpenChange = () => null,
-    onComplete = () => null
+    onClose = () => null
   }: AlertWorkflowDrawerProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
@@ -100,7 +101,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
 
-    const [body, setBody] = useState<WorkflowBody>({ priority: null, status: null, labels: [] });
+    const [body, setBody] = useState<WorkflowBody>({ priority: null, status: null, labels: [], removed_labels: [] });
     const [waiting, setWaiting] = useState<boolean>(false);
 
     const params = useMemo<object>(() => query.getParams(), [query]);
@@ -117,37 +118,48 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
       [body]
     );
 
-    const handleWorkflowSubmit = useCallback(() => {
-      apiCall({
-        url: `/api/v4/alert/all/batch/?${query.toString()}`,
-        method: 'POST',
-        body: body,
-        onSuccess: ({ api_response }) => {
-          if (!api_response.success) {
-            showErrorMessage(t('workflow.error'));
-            return;
-          } else {
-            console.log(api_response);
-            new CustomEvent<AlertItem>('alertUpdate', { detail: { ...alert, owner: currentUser.username } });
-            showSuccessMessage(t('workflow.success'));
+    const handleWorkflowSubmit = useCallback(
+      (_query: SimpleSearchQuery, _body: WorkflowBody, _alerts: AlertItem[]) => {
+        apiCall({
+          url: `/api/v4/alert/all/batch/?${_query.toString()}`,
+          method: 'POST',
+          body: _body,
+          onSuccess: ({ api_response }) => {
+            if (!api_response.success) {
+              showErrorMessage(t('workflow.error'));
+              return;
+            } else {
+              const detail: Partial<AlertItem>[] = _alerts.map(alert => ({
+                ...alert,
+                ...(!STATUSES.includes(_body.status) ? null : { status: _body.status }),
+                ...(!PRIORITIES.includes(_body.priority) ? null : { priority: _body.priority }),
+                label: [
+                  ...alert.label.filter((label: Label) => !_body.removed_labels.includes(label)),
+                  ..._body.labels
+                ].sort((a: string, b: string) => a.localeCompare(b))
+              }));
+              window.dispatchEvent(new CustomEvent<Partial<AlertItem>[]>('alertUpdate', { detail }));
+              showSuccessMessage(t('workflow.success'));
+            }
+          },
+          onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
+          onEnter: () => setWaiting(true),
+          onExit: () => {
+            setWaiting(false);
+            onClose();
+            setBody({ priority: null, status: null, labels: [], removed_labels: [] });
           }
-        },
-        onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
-        onEnter: () => setWaiting(true),
-        onExit: () => {
-          setWaiting(false);
-          onComplete();
-        }
-      });
-
+        });
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [alert, currentUser.username, onComplete, query, showErrorMessage, showSuccessMessage, t]);
+      [onClose, showErrorMessage, showSuccessMessage, t]
+    );
 
     return (
       <>
-        <Drawer open={open} anchor="right" onClose={() => onOpenChange(false)}>
+        <Drawer open={open} anchor="right" onClose={() => onClose()}>
           <div style={{ padding: theme.spacing(1) }}>
-            <IconButton onClick={() => onOpenChange(false)} size="large">
+            <IconButton onClick={() => onClose()} size="large">
               <CloseOutlinedIcon />
             </IconButton>
           </div>
@@ -211,6 +223,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                   fullWidth
                   multiple
                   freeSolo
+                  disableCloseOnSelect
                   options={LABELS}
                   value={body.labels}
                   renderInput={props => <TextField {...props} label={t('labels')} variant="outlined" />}
@@ -224,7 +237,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => handleWorkflowSubmit()}
+                    onClick={() => handleWorkflowSubmit(query, body, alerts)}
                     startIcon={waiting ? <CircularProgress size={20} /> : null}
                     disabled={waiting || !validBody}
                   >
@@ -240,7 +253,11 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
   }
 );
 
-const WrappedAlertWorkflows = () => {
+type Props = {
+  alerts: AlertItem[];
+};
+
+const WrappedAlertWorkflows = ({ alerts = [] }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const location = useLocation();
@@ -273,7 +290,7 @@ const WrappedAlertWorkflows = () => {
           </span>
         </Tooltip>
 
-        <AlertWorkflowDrawer query={query} open={open} onOpenChange={o => setOpen(o)} />
+        <AlertWorkflowDrawer alerts={alerts} query={query} open={open} onClose={() => setOpen(false)} />
       </>
     );
 };
