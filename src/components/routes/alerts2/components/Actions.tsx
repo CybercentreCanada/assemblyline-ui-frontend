@@ -42,7 +42,7 @@ import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
 import { buildSearchQuery, getGroupBy } from '../utils/buildSearchQuery';
 import { AlertEventsTable } from './Components';
-import { AlertWorkflowDrawer, Priority, Status } from './Workflows';
+import { AlertWorkflowDrawer } from './Workflows';
 
 const useStyles = makeStyles(theme => ({
   verticalSpeedDialFab: {
@@ -89,12 +89,14 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type AlertActionButtonProps = {
+  authorized?: boolean;
   color?: CSSProperties['color'];
   disabled?: boolean;
   icon?: React.ReactNode;
   loading?: boolean;
   open?: boolean;
   permanent?: boolean;
+  showSkeleton?: boolean;
   speedDial?: boolean;
   to?: To;
   tooltipTitle?: string;
@@ -104,12 +106,14 @@ type AlertActionButtonProps = {
 
 const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
   ({
+    authorized = true,
     color = null,
     disabled = false,
     icon = null,
     loading = false,
     open = false,
     permanent = false,
+    showSkeleton = false,
     speedDial = false,
     to = null,
     tooltipTitle = '',
@@ -124,7 +128,10 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
       []
     );
 
-    if (speedDial)
+    if (showSkeleton)
+      return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
+    else if (!authorized) return null;
+    else if (speedDial)
       return (
         <Wrapper href={to}>
           <SpeedDialAction
@@ -195,31 +202,29 @@ export const AlertHistory: React.FC<AlertActionProps> = React.memo(
 
     const hasEvents = useMemo<boolean>(() => alert && alert.events && alert.events.length > 0, [alert]);
 
-    if (!alert)
-      return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
-    else
-      return (
-        <>
-          <AlertActionButton
-            tooltipTitle={t(hasEvents ? 'history' : 'history.none')}
-            open={open}
-            vertical={vertical}
-            permanent={permanent}
-            speedDial={speedDial}
-            color={hasEvents ? theme.palette.action.active : theme.palette.action.disabled}
-            icon={
-              <Badge badgeContent={hasEvents ? alert.events.length : 0}>
-                <WorkHistoryOutlinedIcon color={hasEvents ? 'inherit' : 'disabled'} />
-              </Badge>
-            }
-            onClick={() => {
-              if (hasEvents) setViewHistory(true);
-              onClick();
-            }}
-          />
-          <AlertEventsTable alert={alert} viewHistory={viewHistory} setViewHistory={setViewHistory} />
-        </>
-      );
+    return (
+      <>
+        <AlertActionButton
+          tooltipTitle={t(hasEvents ? 'history' : 'history.none')}
+          open={open}
+          vertical={vertical}
+          permanent={permanent}
+          speedDial={speedDial}
+          showSkeleton={!alert}
+          color={hasEvents ? theme.palette.action.active : theme.palette.action.disabled}
+          icon={
+            <Badge badgeContent={hasEvents ? alert.events.length : 0}>
+              <WorkHistoryOutlinedIcon color={hasEvents ? 'inherit' : 'disabled'} />
+            </Badge>
+          }
+          onClick={() => {
+            if (hasEvents) setViewHistory(true);
+            onClick();
+          }}
+        />
+        <AlertEventsTable alert={alert} viewHistory={viewHistory} setViewHistory={setViewHistory} />
+      </>
+    );
   }
 );
 
@@ -246,23 +251,21 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
       return query.getDeltaString();
     }, [alert, location.search]);
 
-    if (!alert)
-      return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
-    else if (!alert.group_count) return null;
-    else
-      return (
-        <AlertActionButton
-          tooltipTitle={t('focus')}
-          to={`${location.pathname}?${search}${location.hash}`}
-          open={open}
-          vertical={vertical}
-          permanent={permanent}
-          speedDial={speedDial}
-          color={theme.palette.action.active}
-          icon={<CenterFocusStrongOutlinedIcon />}
-          onClick={onClick}
-        />
-      );
+    return (
+      <AlertActionButton
+        tooltipTitle={t('focus')}
+        to={`${location.pathname}?${search}${location.hash}`}
+        open={open}
+        vertical={vertical}
+        permanent={permanent}
+        speedDial={speedDial}
+        showSkeleton={!alert}
+        authorized={alert.group_count > 0}
+        color={theme.palette.action.active}
+        icon={<CenterFocusStrongOutlinedIcon />}
+        onClick={onClick}
+      />
+    );
   }
 );
 
@@ -330,69 +333,67 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
       [currentUser.username, onClick, showErrorMessage, showSuccessMessage, t]
     );
 
-    if (!alert)
-      return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
-    else if (!currentUser.roles.includes('alert_manage') || alert.owner) return null;
-    else
-      return (
-        <>
-          <AlertActionButton
-            tooltipTitle={t('take_ownership')}
-            open={open}
-            vertical={vertical}
-            permanent={permanent}
-            speedDial={speedDial}
-            color={theme.palette.action.active}
-            icon={<AssignmentIndIcon />}
-            onClick={() => {
-              setConfirmation(true);
-              onClick();
-            }}
+    return (
+      <>
+        <AlertActionButton
+          tooltipTitle={t('take_ownership')}
+          open={open}
+          vertical={vertical}
+          permanent={permanent}
+          speedDial={speedDial}
+          showSkeleton={!alert}
+          authorized={currentUser.roles.includes('alert_manage') && !alert.owner}
+          color={theme.palette.action.active}
+          icon={<AssignmentIndIcon />}
+          onClick={() => {
+            setConfirmation(true);
+            onClick();
+          }}
+        />
+        {confirmation && (
+          <ConfirmationDialog
+            open={confirmation}
+            handleClose={() => setConfirmation(false)}
+            handleAccept={() => handleTakeOwnership(alert, queryString)}
+            title={t('actions.takeownershipdiag.header')}
+            cancelText={t('actions.cancel')}
+            acceptText={t('actions.ok')}
+            waiting={waiting}
+            text={
+              groupBy ? (
+                <Grid container rowGap={2}>
+                  <Grid>{t('actions.takeownershipdiag.content.grouped')}</Grid>
+                  <Grid item>
+                    <Typography variant="subtitle2">{t('actions.takeownershipdiag.properties')}</Typography>
+                    <Paper component="pre" variant="outlined" className={classes.preview}>
+                      {!queryString || queryString === '' ? (
+                        <div>{t('none')}</div>
+                      ) : (
+                        parseSearchParams(queryString)?.map(([k, v], i) => (
+                          <div key={i} style={{ display: 'contents', wordBreak: 'break-word' }}>
+                            <b>{k}: </b>
+                            {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
+                          </div>
+                        ))
+                      )}
+                    </Paper>
+                  </Grid>
+                  <Grid>{t('actions.takeownershipdiag.confirm')}</Grid>
+                </Grid>
+              ) : (
+                <Grid container rowGap={2}>
+                  <Grid>
+                    {t('actions.takeownershipdiag.content.single')}
+                    <b>{`"${alert.alert_id}".`}</b>
+                  </Grid>
+                  <Grid>{t('actions.takeownershipdiag.confirm')}</Grid>
+                </Grid>
+              )
+            }
           />
-          {confirmation && (
-            <ConfirmationDialog
-              open={confirmation}
-              handleClose={() => setConfirmation(false)}
-              handleAccept={() => handleTakeOwnership(alert, queryString)}
-              title={t('actions.takeownershipdiag.header')}
-              cancelText={t('actions.cancel')}
-              acceptText={t('actions.ok')}
-              waiting={waiting}
-              text={
-                groupBy ? (
-                  <Grid container rowGap={2}>
-                    <Grid>{t('actions.takeownershipdiag.content.grouped')}</Grid>
-                    <Grid item>
-                      <Typography variant="subtitle2">{t('actions.takeownershipdiag.properties')}</Typography>
-                      <Paper component="pre" variant="outlined" className={classes.preview}>
-                        {!queryString || queryString === '' ? (
-                          <div>{t('none')}</div>
-                        ) : (
-                          parseSearchParams(queryString)?.map(([k, v], i) => (
-                            <div key={i} style={{ display: 'contents', wordBreak: 'break-word' }}>
-                              <b>{k}: </b>
-                              {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
-                            </div>
-                          ))
-                        )}
-                      </Paper>
-                    </Grid>
-                    <Grid>{t('actions.takeownershipdiag.confirm')}</Grid>
-                  </Grid>
-                ) : (
-                  <Grid container rowGap={2}>
-                    <Grid>
-                      {t('actions.takeownershipdiag.content.single')}
-                      <b>{`"${alert.alert_id}".`}</b>
-                    </Grid>
-                    <Grid>{t('actions.takeownershipdiag.confirm')}</Grid>
-                  </Grid>
-                )
-              }
-            />
-          )}
-        </>
-      );
+        )}
+      </>
+    );
   }
 );
 
@@ -409,23 +410,21 @@ export const AlertSubmission: React.FC<AlertActionProps> = React.memo(
     const theme = useTheme();
     const { user: currentUser } = useAppUser<CustomUser>();
 
-    if (!alert)
-      return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
-    else if (!currentUser.roles.includes('submission_view')) return null;
-    else
-      return (
-        <AlertActionButton
-          tooltipTitle={t('submission')}
-          to={`/submission/${alert.sid}`}
-          open={open}
-          vertical={vertical}
-          permanent={permanent}
-          speedDial={speedDial}
-          color={theme.palette.action.active}
-          icon={<ViewCarouselOutlinedIcon />}
-          onClick={onClick}
-        />
-      );
+    return (
+      <AlertActionButton
+        tooltipTitle={t('submission')}
+        to={`/submission/${alert.sid}`}
+        open={open}
+        vertical={vertical}
+        permanent={permanent}
+        speedDial={speedDial}
+        showSkeleton={!alert}
+        authorized={currentUser.roles.includes('submission_view')}
+        color={theme.palette.action.active}
+        icon={<ViewCarouselOutlinedIcon />}
+        onClick={onClick}
+      />
+    );
   }
 );
 
@@ -440,48 +439,53 @@ export const AlertWorkflow: React.FC<AlertActionProps> = React.memo(
   }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
+    const location = useLocation();
     const { user: currentUser } = useAppUser<CustomUser>();
 
     const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
 
-    const query = useMemo<SimpleSearchQuery>(
-      () => (!alert ? null : new SimpleSearchQuery(`fq=alert_id:${alert.alert_id}`)),
-      [alert]
-    );
+    const groupBy = useMemo<string>(() => getGroupBy(location.search, DEFAULT_QUERY), [location.search]);
 
-    if (!query)
-      return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
-    else if (!currentUser.roles.includes('alert_manage')) return null;
-    else
-      return (
-        <>
-          <AlertActionButton
-            tooltipTitle={t('workflow_action')}
-            open={open}
-            vertical={vertical}
-            permanent={permanent}
-            speedDial={speedDial}
-            color={theme.palette.action.active}
-            icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
-            onClick={() => {
-              onClick();
-              setOpenWorkflow(o => !o);
-            }}
-          />
-          <AlertWorkflowDrawer
-            alerts={[alert]}
-            query={query}
-            open={openWorkflow}
-            initialBody={{
-              status: alert.status as Status,
-              priority: alert.priority as Priority,
-              labels: alert.label,
-              removed_labels: []
-            }}
-            onClose={() => setOpenWorkflow(false)}
-          />
-        </>
-      );
+    const query = useMemo<SimpleSearchQuery>(() => {
+      if (!alert) return null;
+      else {
+        const q = buildSearchQuery({ search: location.search, singles: ['tc_start', 'tc'], multiples: ['fq'] });
+        q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy)}` : `alert_id:${alert.alert_id}`);
+        return q;
+      }
+    }, [alert, groupBy, location.search]);
+
+    return (
+      <>
+        <AlertActionButton
+          tooltipTitle={t('workflow_action')}
+          open={open}
+          vertical={vertical}
+          permanent={permanent}
+          speedDial={speedDial}
+          showSkeleton={!query}
+          authorized={currentUser.roles.includes('alert_manage')}
+          color={theme.palette.action.active}
+          icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
+          onClick={() => {
+            onClick();
+            setOpenWorkflow(o => !o);
+          }}
+        />
+        <AlertWorkflowDrawer
+          alerts={[alert]}
+          query={query}
+          open={openWorkflow}
+          // initialBody={{
+          //   status: alert.status as Status,
+          //   priority: alert.priority as Priority,
+          //   labels: alert.label,
+          //   removed_labels: []
+          // }}
+          onClose={() => setOpenWorkflow(false)}
+        />
+      </>
+    );
   }
 );
 
@@ -542,30 +546,28 @@ export const AlertSafelist: React.FC<AlertActionProps> = React.memo(
       [currentUser.username, onClick, showErrorMessage, showSuccessMessage, t]
     );
 
-    if (!alert)
-      return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
-    else if (!currentUser.roles.includes('alert_manage')) return null;
-    else
-      return (
-        <AlertActionButton
-          tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious.action')}
-          open={open}
-          loading={loading}
-          disabled={hasSetNonMalicious}
-          vertical={vertical}
-          permanent={permanent}
-          speedDial={speedDial}
-          color={
-            hasSetNonMalicious
-              ? theme.palette.mode === 'dark'
-                ? theme.palette.success.light
-                : theme.palette.success.dark
-              : null
-          }
-          icon={<VerifiedUserOutlinedIcon />}
-          onClick={hasSetNonMalicious ? null : () => handleNonMaliciousChange(alert)}
-        />
-      );
+    return (
+      <AlertActionButton
+        tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious.action')}
+        open={open}
+        loading={loading}
+        disabled={hasSetNonMalicious}
+        vertical={vertical}
+        permanent={permanent}
+        speedDial={speedDial}
+        showSkeleton={!alert}
+        authorized={currentUser.roles.includes('alert_manage')}
+        color={
+          hasSetNonMalicious
+            ? theme.palette.mode === 'dark'
+              ? theme.palette.success.light
+              : theme.palette.success.dark
+            : null
+        }
+        icon={<VerifiedUserOutlinedIcon />}
+        onClick={hasSetNonMalicious ? null : () => handleNonMaliciousChange(alert)}
+      />
+    );
   }
 );
 
@@ -626,30 +628,28 @@ export const AlertBadlist: React.FC<AlertActionProps> = React.memo(
       [currentUser.username, onClick, showErrorMessage, showSuccessMessage, t]
     );
 
-    if (!alert)
-      return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
-    else if (!currentUser.roles.includes('alert_manage')) return null;
-    else
-      return (
-        <AlertActionButton
-          tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious.action')}
-          open={open}
-          loading={loading}
-          disabled={hasSetMalicious}
-          vertical={vertical}
-          permanent={permanent}
-          speedDial={speedDial}
-          color={
-            hasSetMalicious
-              ? theme.palette.mode === 'dark'
-                ? theme.palette.error.light
-                : theme.palette.error.dark
-              : null
-          }
-          icon={<BugReportOutlinedIcon />}
-          onClick={hasSetMalicious ? null : () => handleMaliciousChange(alert)}
-        />
-      );
+    return (
+      <AlertActionButton
+        tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious.action')}
+        open={open}
+        loading={loading}
+        disabled={hasSetMalicious}
+        vertical={vertical}
+        permanent={permanent}
+        speedDial={speedDial}
+        showSkeleton={!alert}
+        authorized={currentUser.roles.includes('alert_manage')}
+        color={
+          hasSetMalicious
+            ? theme.palette.mode === 'dark'
+              ? theme.palette.error.light
+              : theme.palette.error.dark
+            : null
+        }
+        icon={<BugReportOutlinedIcon />}
+        onClick={hasSetMalicious ? null : () => handleMaliciousChange(alert)}
+      />
+    );
   }
 );
 
