@@ -2,7 +2,6 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { DEFAULT_QUERY } from 'components/routes/alerts';
 import { ChipList } from 'components/visual/ChipList';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useMemo } from 'react';
@@ -30,6 +29,7 @@ type Filters = {
 };
 
 type Props = {
+  query: SimpleSearchQuery;
   hideQuery?: boolean;
   hideGroupBy?: boolean;
   hideSort?: boolean;
@@ -37,6 +37,7 @@ type Props = {
 };
 
 const WrappedAlertFiltersSelected = ({
+  query,
   hideQuery = false,
   hideGroupBy = false,
   hideSort = false,
@@ -47,10 +48,6 @@ const WrappedAlertFiltersSelected = ({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const query = useMemo<SimpleSearchQuery>(
-    () => new SimpleSearchQuery(location.search, DEFAULT_QUERY),
-    [location.search]
-  );
   const params = useMemo<{ [key: string]: string }>(() => query.getParams(), [query]);
 
   const { statuses, priorities, labels, others } = useMemo<Filters>(() => {

@@ -42,6 +42,7 @@ import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
 import { buildSearchQuery, getGroupBy } from '../utils/buildSearchQuery';
 import { AlertEventsTable } from './Components';
+import { AlertWorkflowDrawer } from './Workflows';
 
 const useStyles = makeStyles(theme => ({
   verticalSpeedDialFab: {
@@ -438,21 +439,34 @@ export const AlertWorkflow: React.FC<AlertActionProps> = React.memo(
     const theme = useTheme();
     const { user: currentUser } = useAppUser<CustomUser>();
 
-    if (!alert)
+    const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
+
+    const query = useMemo<SimpleSearchQuery>(
+      () => (!alert ? null : new SimpleSearchQuery(`fq=alert_id:${alert.alert_id}`)),
+      [alert]
+    );
+
+    if (!query)
       return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
     else if (!currentUser.roles.includes('alert_manage')) return null;
     else
       return (
-        <AlertActionButton
-          tooltipTitle={t('workflow_action')}
-          open={open}
-          vertical={vertical}
-          permanent={permanent}
-          speedDial={speedDial}
-          color={theme.palette.action.active}
-          icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
-          onClick={onClick}
-        />
+        <>
+          <AlertActionButton
+            tooltipTitle={t('workflow_action')}
+            open={open}
+            vertical={vertical}
+            permanent={permanent}
+            speedDial={speedDial}
+            color={theme.palette.action.active}
+            icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
+            onClick={() => {
+              onClick();
+              setOpenWorkflow(o => !o);
+            }}
+          />
+          <AlertWorkflowDrawer query={query} open={openWorkflow} onOpenChange={o => setOpenWorkflow(o)} />
+        </>
       );
   }
 );

@@ -12,6 +12,7 @@ import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { ALERT_SIMPLELIST_ID } from 'components/routes/alerts';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import ActionableText from 'components/visual/ActionableText';
@@ -21,13 +22,11 @@ import CustomChip from 'components/visual/CustomChip';
 import { ImageInline } from 'components/visual/image_inline';
 import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
-import { ALERT_SIMPLELIST_ID } from '../alerts/alerts';
 import AlertActions, {
   AlertBadlist,
   AlertGroup,

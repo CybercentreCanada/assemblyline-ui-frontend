@@ -158,12 +158,14 @@
   "verdict.user.non_malicious": "utilisateurs pensent que cette alerte est non-malveillante",
   "workflow": "Aller au flux de travail",
   "workflow.apply": "Appliquer les actions du flux de travail",
+  "workflow.error": "Une erreur s'est produite lors de l'exécution de l'action du flux de travail sur les alertes.",
   "workflow.impact.all": "L'action du flux de travail sera appliquée à toutes les alertes du système!",
   "workflow.impact.high": "L'action du flux de travail sera appliquée à toutes les alertes correspondant aux filtres suivants:",
-  "workflow.impact.low": "L'action de flu de travail affectera uniquement l'alerte actuellement sélectionnée qui correspond aux filtres suivants:",
-  "workflow.title": "Effectuer une action de flu de travail",
-  "workflow_action": "Effectuer une action de flu de travail",
+  "workflow.impact.low": "L'action du flux de travail affectera uniquement l'alerte actuellement sélectionnée qui correspond aux filtres suivants:",
+  "workflow.success": "L'action du flux de travail a été exécutée avec succès pour les alertes.",
+  "workflow.title": "Effectuer une action de flux de travail",
+  "workflow_action": "Effectuer une action de flux de travail",
   "workflow_or_user": "Flux de travail/Utilisateur",
-  "workflows": "Actions de flu de travail",
+  "workflows": "Actions de flux de travail",
   "yara": "Règles Yara déclenchées"
 }

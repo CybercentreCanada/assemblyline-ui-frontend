@@ -29,7 +29,7 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ searching = false, total =
     <div style={{ marginTop: theme.spacing(1), fontStyle: 'italic', minHeight: theme.spacing(3) }}>
       {isMDUp ? (
         <div style={{ position: 'relative' }}>
-          <AlertsFiltersSelected hideQuery />
+          <AlertsFiltersSelected query={query} hideQuery />
           <div style={{ position: 'absolute', top: theme.spacing(0.5), right: theme.spacing(1) }}>
             {searching ? (
               ''
