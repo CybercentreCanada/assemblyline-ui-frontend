@@ -42,7 +42,7 @@ import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
 import { buildSearchQuery, getGroupBy } from '../utils/buildSearchQuery';
 import { AlertEventsTable } from './Components';
-import { AlertWorkflowDrawer } from './Workflows';
+import { AlertWorkflowDrawer, Priority, Status } from './Workflows';
 
 const useStyles = makeStyles(theme => ({
   verticalSpeedDialFab: {
@@ -472,6 +472,12 @@ export const AlertWorkflow: React.FC<AlertActionProps> = React.memo(
             alerts={[alert]}
             query={query}
             open={openWorkflow}
+            initialBody={{
+              status: alert.status as Status,
+              priority: alert.priority as Priority,
+              labels: alert.label,
+              removed_labels: []
+            }}
             onClose={() => setOpenWorkflow(false)}
           />
         </>

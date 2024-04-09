@@ -214,13 +214,13 @@ const WrappedAlertsPage = () => {
   }, [handleFetch, query]);
 
   useEffect(() => {
-    const update = ({ detail }: CustomEvent<Alert>) => {
-      setAlerts(values => {
-        const index = values.findIndex(value => value.alert_id === detail.alert_id);
-        return index >= 0
-          ? [...values.slice(0, index), { ...values[index], ...detail }, ...values.slice(index + 1, values.length)]
-          : values;
-      });
+    const update = ({ detail }: CustomEvent<Alert[]>) => {
+      setAlerts(values =>
+        values.map(value => {
+          const index = detail.findIndex(item => item.alert_id === value.alert_id);
+          return index >= 0 ? { ...value, ...detail[index] } : value;
+        })
+      );
     };
 
     window.addEventListener('alertUpdate', update);
@@ -262,7 +262,7 @@ const WrappedAlertsPage = () => {
                   <AlertFavorites />
                   <AlertSorts />
                   <AlertFilters />
-                  <AlertWorkflows />
+                  <AlertWorkflows alerts={alerts} />
                   <div style={{ width: theme.spacing(0.5) }} />
                 </>
               }

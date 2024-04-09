@@ -1,4 +1,6 @@
+import AddIcon from '@mui/icons-material/Add';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import RemoveIcon from '@mui/icons-material/Remove';
 import {
   Alert,
   Button,
@@ -17,6 +19,7 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
+import CustomChip from 'components/visual/CustomChip';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { SyntheticEvent, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -75,14 +78,15 @@ export type Label = (typeof LABELS)[number];
 type WorkflowBody = {
   priority: Priority;
   status: Status;
-  labels: Label[];
-  removed_labels: Label[];
+  labels: (Label | string)[];
+  removed_labels: (Label | string)[];
 };
 
 type AlertWorkflowDrawerProps = {
   alerts: AlertItem[];
   query: SimpleSearchQuery;
   open: boolean;
+  initialBody?: WorkflowBody;
   onClose?: () => void;
 };
 
@@ -91,20 +95,17 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
     alerts = [],
     query = new SimpleSearchQuery(''),
     open = false,
+    initialBody = { priority: null, status: null, labels: [], removed_labels: [] },
     onClose = () => null
   }: AlertWorkflowDrawerProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const classes = useStyles();
-    const location = useLocation();
     const { apiCall } = useMyAPI();
-    const { user: currentUser } = useAppUser<CustomUser>();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
 
-    const [body, setBody] = useState<WorkflowBody>({ priority: null, status: null, labels: [], removed_labels: [] });
+    const [body, setBody] = useState<WorkflowBody>(initialBody);
     const [waiting, setWaiting] = useState<boolean>(false);
-
-    const params = useMemo<object>(() => query.getParams(), [query]);
 
     const hasParams = useMemo<boolean>(() => query.has('q') || query.has('fq'), [query]);
 
@@ -114,7 +115,8 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
       () =>
         PRIORITIES.includes(body.priority) ||
         STATUSES.includes(body.status) ||
-        (body.labels.length > 0 && body.labels.every(l => LABELS.includes(l))),
+        body.labels.length > 0 ||
+        body.removed_labels.length > 0,
       [body]
     );
 
@@ -133,10 +135,9 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                 ...alert,
                 ...(!STATUSES.includes(_body.status) ? null : { status: _body.status }),
                 ...(!PRIORITIES.includes(_body.priority) ? null : { priority: _body.priority }),
-                label: [
-                  ...alert.label.filter((label: Label) => !_body.removed_labels.includes(label)),
-                  ..._body.labels
-                ].sort((a: string, b: string) => a.localeCompare(b))
+                label: [...alert.label.filter((label: Label) => !_body.removed_labels.includes(label)), ..._body.labels]
+                  .filter((v, i, a) => a.indexOf(v) === i)
+                  .sort()
               }));
               window.dispatchEvent(new CustomEvent<Partial<AlertItem>[]>('alertUpdate', { detail }));
               showSuccessMessage(t('workflow.success'));
@@ -147,19 +148,32 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
           onExit: () => {
             setWaiting(false);
             onClose();
-            setBody({ priority: null, status: null, labels: [], removed_labels: [] });
+            setBody(initialBody);
           }
         });
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [onClose, showErrorMessage, showSuccessMessage, t]
+      [initialBody, onClose, showErrorMessage, showSuccessMessage, t]
     );
 
     return (
       <>
-        <Drawer open={open} anchor="right" onClose={() => onClose()}>
+        <Drawer
+          open={open}
+          anchor="right"
+          onClose={() => {
+            onClose();
+            setBody(initialBody);
+          }}
+        >
           <div style={{ padding: theme.spacing(1) }}>
-            <IconButton onClick={() => onClose()} size="large">
+            <IconButton
+              size="large"
+              onClick={() => {
+                onClose();
+                setBody(initialBody);
+              }}
+            >
               <CloseOutlinedIcon />
             </IconButton>
           </div>
@@ -224,10 +238,53 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                   multiple
                   freeSolo
                   disableCloseOnSelect
+                  filterSelectedOptions
                   options={LABELS}
-                  value={body.labels}
+                  value={[...body.labels, ...body.removed_labels].sort()}
                   renderInput={props => <TextField {...props} label={t('labels')} variant="outlined" />}
-                  onChange={(event, values: Label[]) => setBody(b => ({ ...b, labels: values }))}
+                  onChange={(event, values: Label[]) =>
+                    setBody(b => ({ ...b, labels: values.map(v => v.toUpperCase()) as Label[] }))
+                  }
+                  renderTags={(values, getTagProps, ownerState) =>
+                    values.map((value, index) =>
+                      body.labels.includes(value) ? (
+                        <CustomChip
+                          {...getTagProps({ index })}
+                          icon={<AddIcon color="success" />}
+                          label={value}
+                          color="success"
+                          variant="outlined"
+                          onClick={() =>
+                            setBody(b => ({
+                              ...b,
+                              labels: b.labels.filter(label => label !== value),
+                              removed_labels: [...b.removed_labels, value]
+                            }))
+                          }
+                          onDelete={() => setBody(b => ({ ...b, labels: b.labels.filter(label => label !== value) }))}
+                        />
+                      ) : (
+                        <CustomChip
+                          {...getTagProps({ index })}
+                          icon={<RemoveIcon color="error" />}
+                          label={value}
+                          color="error"
+                          variant="outlined"
+                          onClick={() =>
+                            setBody(b => ({
+                              ...b,
+                              removed_labels: b.removed_labels.filter(label => label !== value),
+                              labels: [...b.labels, value]
+                            }))
+                          }
+                          onDelete={() =>
+                            setBody(b => ({ ...b, removed_labels: b.removed_labels.filter(label => label !== value) }))
+                          }
+                        />
+                      )
+                    )
+                  }
+                  isOptionEqualToValue={(option, value) => option.toUpperCase() === value.toUpperCase()}
                 />
               </div>
             </div>
