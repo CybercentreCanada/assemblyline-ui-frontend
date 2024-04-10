@@ -4,6 +4,7 @@
   "archive": "Copy the submission into the malware archive",
   "archive.acceptText": "Yes, archive it!",
   "archive.cancelText": "Cancel",
+  "archive.failed": "The submission failed to be sent for archiving, try again later...",
   "archive.metadata": "You need to fill out the following metadata to proceed:",
   "archive.success": "Submission was successfully queued for archiving",
   "archive.success.resubmit": "Submission was resubmitted to meet the minimum service requirements for archiving and will be automatically archived one completed.",

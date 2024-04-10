@@ -4,6 +4,7 @@
   "archive": "Copiez la soumission dans l'archive des logiciels malveillants",
   "archive.acceptText": "Oui, archivez-le!",
   "archive.cancelText": "Annuler",
+  "archive.failed": "La soumission n'a pas pu être envoyée pour archivage, réessayez plus tard...",
   "archive.metadata": "Vous devez remplir les métadonnées suivantes pour continuer:",
   "archive.success": "La soumission a été mise en file d'attente avec succès pour l'archivage",
   "archive.success.resubmit": "La soumission a été soumise à nouveau pour répondre aux exigences de service minimales pour l'archivage et sera automatiquement archivée une fois terminée.",

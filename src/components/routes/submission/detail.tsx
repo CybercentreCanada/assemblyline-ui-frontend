@@ -130,7 +130,7 @@ function WrappedSubmissionDetail() {
   const { apiCall } = useMyAPI();
   const { addInsight, removeInsight } = useAssistant();
   const sp4 = theme.spacing(4);
-  const { showSuccessMessage } = useMySnackbar();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const location = useLocation();
   const navigate = useNavigate();
   const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
@@ -479,10 +479,18 @@ function WrappedSubmissionDetail() {
         url: `/api/v4/archive/${submission.sid}/`,
         body: data,
         onSuccess: api_data => {
-          showSuccessMessage(
-            t(api_data.api_response.action === 'archive' ? 'archive.success' : 'archive.success.resubmit')
-          );
-          setSubmission({ ...submission, archived: true });
+          if (api_data.api_response.success) {
+            showSuccessMessage(
+              t(
+                ['archive', 'hooked'].includes(api_data.api_response.action)
+                  ? 'archive.success'
+                  : 'archive.success.resubmit'
+              )
+            );
+            setSubmission({ ...submission, archived: true });
+          } else {
+            showErrorMessage(t('archive.failed'));
+          }
           setArchiveDialog(false);
         },
         onEnter: () => setWaitingDialog(true),
