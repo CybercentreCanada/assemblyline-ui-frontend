@@ -25,7 +25,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import { buildSearchQuery } from '../utils/buildSearchQuery';
+import { buildSearchQuery } from '../utils/alertUtils';
 import { Favorite } from './Favorites';
 
 const useStyles = makeStyles(theme => ({

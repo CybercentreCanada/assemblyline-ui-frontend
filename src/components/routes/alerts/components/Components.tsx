@@ -22,7 +22,6 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { DetailedItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
 import { ChipList } from 'components/visual/ChipList';
@@ -34,7 +33,8 @@ import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import Moment from 'react-moment';
 import { To } from 'react-router';
-import { AlertItem } from '../models/Alert';
+import { AlertItem, DetailedItem } from '../models/Alert';
+import { detailedItemCompare } from '../utils/alertUtils';
 
 const useStyles = makeStyles(theme => ({
   extended: {

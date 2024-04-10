@@ -1,4 +1,6 @@
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
+import { verdictRank } from 'helpers/utils';
+import { DetailedItem } from '../models/Alert';
 
 type BuildSearchQueryProps = {
   search: string;
@@ -49,4 +51,15 @@ export const getGroupBy = (search: string, defaults: string): string => {
   return (
     current.has('group_by') && current.get('group_by', '') === '' ? '' : 'group_by' in params ? params.group_by : ''
   ) as string;
+};
+
+export const detailedItemCompare = (a: DetailedItem, b: DetailedItem) => {
+  const aVerdict = verdictRank(a.verdict);
+  const bVerdict = verdictRank(b.verdict);
+
+  if (aVerdict === bVerdict) {
+    return a.value < b.value ? -1 : a.value > b.value ? 1 : 0;
+  } else {
+    return aVerdict < bVerdict ? -1 : 1;
+  }
 };

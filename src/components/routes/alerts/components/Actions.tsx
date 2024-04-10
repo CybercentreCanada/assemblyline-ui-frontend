@@ -31,7 +31,6 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { DEFAULT_QUERY } from 'components/routes/alerts';
-import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { getValueFromPath } from 'helpers/utils';
@@ -40,7 +39,8 @@ import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
-import { buildSearchQuery, getGroupBy } from '../utils/buildSearchQuery';
+import { AlertItem } from '../models/Alert';
+import { buildSearchQuery, getGroupBy } from '../utils/alertUtils';
 import { AlertEventsTable } from './Components';
 import { AlertWorkflowDrawer } from './Workflows';
 

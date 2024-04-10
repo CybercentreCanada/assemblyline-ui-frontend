@@ -13,7 +13,6 @@ import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { ALERT_SIMPLELIST_ID } from 'components/routes/alerts';
-import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import ActionableText from 'components/visual/ActionableText';
 import { ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
@@ -44,6 +43,7 @@ import {
   SkeletonInline
 } from './components/Components';
 import { FavoritesProvider } from './contexts/FavoritesContext';
+import { AlertItem } from './models/Alert';
 
 const useStyles = makeStyles(theme => ({
   section: {

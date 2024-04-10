@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { useLocation } from 'react-router-dom';
 import { AlertItem } from '../models/Alert';
-import { buildSearchQuery } from '../utils/buildSearchQuery';
+import { buildSearchQuery } from '../utils/alertUtils';
 import AlertFiltersSelected from './FiltersSelected';
 
 const useStyles = makeStyles(theme => ({
