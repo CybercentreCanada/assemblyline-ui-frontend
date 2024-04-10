@@ -177,7 +177,7 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
   }
 );
 
-type AlertActionProps = {
+type AlertActionProps<T = {}> = T & {
   alert: AlertItem;
   speedDial?: boolean;
   open?: boolean;
@@ -260,7 +260,7 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
         permanent={permanent}
         speedDial={speedDial}
         showSkeleton={!alert}
-        authorized={alert.group_count > 0}
+        authorized={alert?.group_count > 0}
         color={theme.palette.action.active}
         icon={<CenterFocusStrongOutlinedIcon />}
         onClick={onClick}
@@ -292,6 +292,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
     const groupBy = useMemo<string>(() => getGroupBy(location.search, DEFAULT_QUERY), [location.search]);
 
     const queryString = useMemo<string>(() => {
+      if (!alert) return null;
       const q = buildSearchQuery({ search: location.search, singles: ['tc_start', 'tc'], multiples: ['fq'] });
       q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy)}` : `alert_id:${alert.alert_id}`);
       return q.toString();
@@ -342,7 +343,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
           permanent={permanent}
           speedDial={speedDial}
           showSkeleton={!alert}
-          authorized={currentUser.roles.includes('alert_manage') && !alert.owner}
+          authorized={currentUser.roles.includes('alert_manage') && !alert?.owner}
           color={theme.palette.action.active}
           icon={<AssignmentIndIcon />}
           onClick={() => {
@@ -413,7 +414,7 @@ export const AlertSubmission: React.FC<AlertActionProps> = React.memo(
     return (
       <AlertActionButton
         tooltipTitle={t('submission')}
-        to={`/submission/${alert.sid}`}
+        to={`/submission/${alert?.sid}`}
         open={open}
         vertical={vertical}
         permanent={permanent}
@@ -428,15 +429,18 @@ export const AlertSubmission: React.FC<AlertActionProps> = React.memo(
   }
 );
 
-export const AlertWorkflow: React.FC<AlertActionProps> = React.memo(
+type AlertWorkflowProps = AlertActionProps<{ inDrawer?: boolean }>;
+
+export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
   ({
     alert,
     open = false,
     speedDial = false,
+    inDrawer = false,
     vertical = false,
     permanent = false,
     onClick = () => null
-  }: AlertActionProps) => {
+  }: AlertWorkflowProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const location = useLocation();
@@ -449,11 +453,14 @@ export const AlertWorkflow: React.FC<AlertActionProps> = React.memo(
     const query = useMemo<SimpleSearchQuery>(() => {
       if (!alert) return null;
       else {
-        const q = buildSearchQuery({ search: location.search, singles: ['tc_start', 'tc'], multiples: ['fq'] });
+        const q = buildSearchQuery({
+          search: location.search,
+          ...(speedDial && !inDrawer ? { singles: ['tc_start', 'tc'], multiples: ['fq'] } : null)
+        });
         q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy)}` : `alert_id:${alert.alert_id}`);
         return q;
       }
-    }, [alert, groupBy, location.search]);
+    }, [alert, groupBy, inDrawer, location.search, speedDial]);
 
     return (
       <>
@@ -476,6 +483,7 @@ export const AlertWorkflow: React.FC<AlertActionProps> = React.memo(
           alerts={[alert]}
           query={query}
           open={openWorkflow}
+          hideTC
           // initialBody={{
           //   status: alert.status as Status,
           //   priority: alert.priority as Priority,
@@ -693,7 +701,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
   if (
     !currentUser.roles.includes('submission_view') &&
     !currentUser.roles.includes('alert_manage') &&
-    !alert.group_count
+    !alert?.group_count
   )
     return null;
   else
@@ -729,7 +737,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
             ? []
             : [
                 <AlertBadlist
-                  key={`${alert.alert_id}.AlertBadlist`}
+                  key={`${alert?.alert_id}.AlertBadlist`}
                   alert={alert}
                   open={open || permanent}
                   speedDial
@@ -737,7 +745,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
                   permanent={permanent}
                 />,
                 <AlertSafelist
-                  key={`${alert.alert_id}.AlertSafelist`}
+                  key={`${alert?.alert_id}.AlertSafelist`}
                   alert={alert}
                   open={open || permanent}
                   speedDial
@@ -745,16 +753,17 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
                   permanent={permanent}
                 />,
                 <AlertWorkflow
-                  key={`${alert.alert_id}.AlertWorkflow`}
+                  key={`${alert?.alert_id}.AlertWorkflow`}
                   alert={alert}
                   open={open || permanent}
                   speedDial
+                  inDrawer={inDrawer}
                   vertical={vertical}
                   permanent={permanent}
                   onClick={() => setOpen(false)}
                 />,
                 <AlertSubmission
-                  key={`${alert.alert_id}.AlertSubmission`}
+                  key={`${alert?.alert_id}.AlertSubmission`}
                   alert={alert}
                   open={open || permanent}
                   speedDial
@@ -763,7 +772,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
                   onClick={() => setOpen(false)}
                 />,
                 <AlertOwnership
-                  key={`${alert.alert_id}.AlertOwnership`}
+                  key={`${alert?.alert_id}.AlertOwnership`}
                   alert={alert}
                   open={open || permanent}
                   speedDial
@@ -772,7 +781,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
                   onClick={() => setOpen(false)}
                 />,
                 <AlertGroup
-                  key={`${alert.alert_id}.AlertGroup`}
+                  key={`${alert?.alert_id}.AlertGroup`}
                   alert={alert}
                   open={open || permanent}
                   speedDial
@@ -781,7 +790,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
                   onClick={() => setOpen(false)}
                 />,
                 <AlertHistory
-                  key={`${alert.alert_id}.AlertHistory`}
+                  key={`${alert?.alert_id}.AlertHistory`}
                   alert={alert}
                   open={open || permanent}
                   speedDial

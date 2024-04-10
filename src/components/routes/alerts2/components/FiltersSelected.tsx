@@ -226,7 +226,7 @@ const ListFilter: React.FC<ListFilterProps> = React.memo(
       filters.length > 0 && (
         <div style={{ display: 'inline-block' }}>
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
-            <b style={{ color: theme.palette.text.primary, paddingRight: theme.spacing(1) }}>{`${t(label)}: `}</b>
+            <b style={{ wordBreak: 'initial', paddingRight: theme.spacing(1) }}>{`${t(label)}: `}</b>
             <ChipList
               items={filters.map((f, i) => ({
                 variant: variant,
@@ -292,221 +292,240 @@ const WrappedAlertFiltersSelected = ({
   }, [allFavorites, query]);
 
   return (
-    <div>
-      <div>
-        {!hideQuery && query.get('q', null) && (
-          <div style={{ display: 'inline-block' }}>
-            <ChipList
-              items={[query.get('q')].map(v => ({
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        flexDirection: 'row',
+        columnGap: theme.spacing(1),
+        rowGap: theme.spacing(0.5)
+      }}
+    >
+      {!hideQuery && query.get('q', null) && (
+        <div style={{ display: 'inline-block' }}>
+          <ChipList
+            items={[query.get('q')].map(v => ({
+              variant: 'outlined',
+              label: `${v}`,
+              onDelete: disableActions
+                ? null
+                : () => {
+                    query.delete('q');
+                    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                  }
+            }))}
+          />
+        </div>
+      )}
+
+      <MenuFilter
+        classes={{
+          deleteIcon: clsx(classes.deleteIcon, classes.desc, params.sort && params.sort.endsWith('asc') && classes.asc)
+        }}
+        getLabel={item => (
+          <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
+            <span>{`${t('sorts.title')}: ${t(item.substring(0, item.indexOf(' ')))}`}</span>
+            {disableActions && <ArrowDownwardIcon style={{ fontSize: 'medium' }} />}
+          </div>
+        )}
+        getListItemIcon={option =>
+          params.sort.startsWith(option.value) && (
+            <ArrowDownwardIcon className={clsx(classes.desc, params.sort.endsWith('asc') && classes.asc)} />
+          )
+        }
+        param={params.sort}
+        hide={hideSort}
+        disabled={disableActions}
+        getSelected={option => params.sort.startsWith(option.value)}
+        icon={<SortIcon />}
+        deleteIcon={<ArrowDownwardIcon />}
+        subHeader={t('sorts.title')}
+        options={SORT_OPTIONS}
+        disableCloseOnSelect
+        onClick={(event, option) => {
+          const newSort =
+            params.sort.startsWith(option.value) && params.sort.endsWith('desc')
+              ? `${option.value} asc`
+              : `${option.value} desc`;
+          query.set('sort', newSort);
+          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+        }}
+        onDelete={() => {
+          query.set(
+            'sort',
+            params.sort.endsWith('desc') ? params.sort.replace('desc', 'asc') : params.sort.replace('asc', 'desc')
+          );
+          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+        }}
+      />
+
+      <MenuFilter
+        getLabel={() => {
+          const option = TC_OPTIONS.find(o => o.value === params.tc);
+          return option && option.value !== '' ? `${t('tc')}: ${t(option.label)}` : `${t('tc')}: ${t('none')}`;
+        }}
+        param={params.tc}
+        hide={hideTC}
+        disabled={disableActions}
+        getSelected={option => params.tc === option.value}
+        icon={<DateRangeIcon />}
+        deleteIcon={<ReplayOutlinedIcon />}
+        subHeader={t('tc')}
+        options={TC_OPTIONS}
+        onClick={(event, option) => {
+          query.set('tc', option.value);
+          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+        }}
+        onDelete={() => {
+          query.delete('tc');
+          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+        }}
+      />
+
+      <MenuFilter
+        getLabel={() => {
+          const option = GROUPBY_OPTIONS.find(o => o.value === params.group_by);
+          return option && option.value !== ''
+            ? `${t('groupBy')}: ${t(option.label)}`
+            : `${t('groupBy')}: ${t('none')}`;
+        }}
+        param={params.group_by}
+        hide={hideGroupBy}
+        disabled={disableActions}
+        getSelected={option => params.group_by === option.value}
+        icon={<SourceIcon />}
+        deleteIcon={<ReplayOutlinedIcon />}
+        subHeader={t('groupBy')}
+        options={GROUPBY_OPTIONS}
+        onClick={(event, option) => {
+          query.set('group_by', option.value);
+          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+        }}
+        onDelete={() => {
+          query.delete('group_by');
+          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+        }}
+      />
+
+      {statuses.map((filter, i) => (
+        <ListFilter
+          key={`status-${i}`}
+          filter={filter}
+          query={query}
+          disabled={disableActions}
+          hide={false}
+          label={'status'}
+          prefix={'status:'}
+        />
+      ))}
+
+      {priorities.map((filter, i) => (
+        <ListFilter
+          key={`priority-${i}`}
+          filter={filter}
+          query={query}
+          disabled={disableActions}
+          hide={false}
+          label={'priority'}
+          prefix={'priority:'}
+        />
+      ))}
+
+      {labels.map((filter, i) => (
+        <ListFilter
+          key={`label-${i}`}
+          filter={filter}
+          query={query}
+          disabled={disableActions}
+          hide={false}
+          label={'label'}
+          prefix={'label:'}
+        />
+      ))}
+
+      {favorites.length !== 0 && (
+        <div>
+          <ChipList
+            items={favorites.map(v =>
+              v.query.startsWith('NOT(') && v.query.endsWith(')')
+                ? {
+                    icon: (
+                      <StarIcon
+                        style={{
+                          color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        }}
+                      />
+                    ),
+                    variant: 'outlined',
+                    color: 'error',
+                    label: <b>{v.name}</b>,
+                    tooltip: `${v.query} (${v.created_by})`,
+                    onClick: disableActions
+                      ? null
+                      : () => {
+                          const value = v.query.substring(4, v.query.length - 1);
+                          query.replace('fq', `NOT(${value})`, value);
+                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                        },
+                    onDelete: disableActions
+                      ? null
+                      : () => {
+                          query.remove('fq', v.query);
+                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                        }
+                  }
+                : {
+                    icon: <StarIcon />,
+                    variant: 'outlined',
+                    label: <b>{v.name}</b>,
+                    tooltip: `${v.query} (${v.created_by})`,
+                    onClick: disableActions
+                      ? null
+                      : () => {
+                          query.replace('fq', v.query, `NOT(${v.query})`);
+                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                        },
+                    onDelete: disableActions
+                      ? null
+                      : () => {
+                          query.remove('fq', v.query);
+                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                        }
+                  }
+            )}
+          />
+        </div>
+      )}
+
+      {others.length !== 0 && (
+        <div>
+          <ChipList
+            items={others.map(v => {
+              const isNot = v.startsWith('NOT(') && v.endsWith(')');
+              const value = isNot ? v.substring(4, v.length - 1) : v;
+
+              return {
                 variant: 'outlined',
-                label: `${v}`,
-                onDelete: disableActions
+                label: value,
+                color: isNot ? 'error' : 'default',
+                onClick: disableActions
                   ? null
                   : () => {
-                      query.delete('q');
+                      if (isNot) query.replace('fq', v, value);
+                      else query.replace('fq', v, `NOT(${v})`);
                       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    }
-              }))}
-            />
-          </div>
-        )}
-
-        <MenuFilter
-          classes={{
-            deleteIcon: clsx(classes.deleteIcon, classes.desc, params.sort.endsWith('asc') && classes.asc)
-          }}
-          getLabel={item => (
-            <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
-              <span>{`${t('sorts.title')}: ${t(item.substring(0, item.indexOf(' ')))}`}</span>
-              {disableActions && <ArrowDownwardIcon style={{ fontSize: 'medium' }} />}
-            </div>
-          )}
-          getListItemIcon={option =>
-            params.sort.startsWith(option.value) && (
-              <ArrowDownwardIcon className={clsx(classes.desc, params.sort.endsWith('asc') && classes.asc)} />
-            )
-          }
-          param={params.sort}
-          hide={hideSort}
-          disabled={disableActions}
-          getSelected={option => params.sort.startsWith(option.value)}
-          icon={<SortIcon />}
-          deleteIcon={<ArrowDownwardIcon />}
-          subHeader={t('sorts.title')}
-          options={SORT_OPTIONS}
-          disableCloseOnSelect
-          onClick={(event, option) => {
-            const newSort =
-              params.sort.startsWith(option.value) && params.sort.endsWith('desc')
-                ? `${option.value} asc`
-                : `${option.value} desc`;
-            query.set('sort', newSort);
-            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-          }}
-          onDelete={() => {
-            query.set(
-              'sort',
-              params.sort.endsWith('desc') ? params.sort.replace('desc', 'asc') : params.sort.replace('asc', 'desc')
-            );
-            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-          }}
-        />
-
-        <MenuFilter
-          getLabel={() => {
-            const option = TC_OPTIONS.find(o => o.value === params.tc);
-            return option && option.value !== '' ? `${t('tc')}: ${t(option.label)}` : `${t('tc')}: ${t('none')}`;
-          }}
-          param={params.tc}
-          hide={hideTC}
-          disabled={disableActions}
-          getSelected={option => params.tc === option.value}
-          icon={<DateRangeIcon />}
-          deleteIcon={<ReplayOutlinedIcon />}
-          subHeader={t('tc')}
-          options={TC_OPTIONS}
-          onClick={(event, option) => {
-            query.set('tc', option.value);
-            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-          }}
-          onDelete={() => {
-            query.delete('tc');
-            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-          }}
-        />
-
-        <MenuFilter
-          getLabel={() => {
-            const option = GROUPBY_OPTIONS.find(o => o.value === params.group_by);
-            return option && option.value !== ''
-              ? `${t('groupBy')}: ${t(option.label)}`
-              : `${t('groupBy')}: ${t('none')}`;
-          }}
-          param={params.group_by}
-          hide={hideGroupBy}
-          disabled={disableActions}
-          getSelected={option => params.group_by === option.value}
-          icon={<SourceIcon />}
-          deleteIcon={<ReplayOutlinedIcon />}
-          subHeader={t('groupBy')}
-          options={GROUPBY_OPTIONS}
-          onClick={(event, option) => {
-            query.set('group_by', option.value);
-            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-          }}
-          onDelete={() => {
-            query.delete('group_by');
-            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-          }}
-        />
-
-        {statuses.map((filter, i) => (
-          <ListFilter
-            key={`status-${i}`}
-            filter={filter}
-            query={query}
-            disabled={disableActions}
-            hide={false}
-            label={'status'}
-            prefix={'status:'}
-          />
-        ))}
-
-        {priorities.map((filter, i) => (
-          <ListFilter
-            key={`priority-${i}`}
-            filter={filter}
-            query={query}
-            disabled={disableActions}
-            hide={false}
-            label={'priority'}
-            prefix={'priority:'}
-          />
-        ))}
-
-        {labels.map((filter, i) => (
-          <ListFilter
-            key={`label-${i}`}
-            filter={filter}
-            query={query}
-            disabled={disableActions}
-            hide={false}
-            label={'label'}
-            prefix={'label:'}
-          />
-        ))}
-
-        {favorites.length !== 0 && (
-          <div style={{ display: 'inline-block' }}>
-            <ChipList
-              items={favorites.map(v =>
-                v.query.startsWith('NOT(') && v.query.endsWith(')')
-                  ? {
-                      icon: (
-                        <StarIcon
-                          style={{
-                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                          }}
-                        />
-                      ),
-                      variant: 'outlined',
-                      color: 'error',
-                      label: <b>{v.name}</b>,
-                      tooltip: v.query,
-                      onClick: disableActions
-                        ? null
-                        : () => {
-                            const value = v.query.substring(4, v.query.length - 1);
-                            query.replace('fq', `NOT(${value})`, value);
-                            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                          },
-                      onDelete: disableActions
-                        ? null
-                        : () => {
-                            query.remove('fq', v.query);
-                            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                          }
-                    }
-                  : {
-                      icon: <StarIcon />,
-                      variant: 'outlined',
-                      label: <b>{v.name}</b>,
-                      tooltip: v.query,
-                      onClick: disableActions
-                        ? null
-                        : () => {
-                            query.replace('fq', v.query, `NOT(${v.query})`);
-                            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                          },
-                      onDelete: disableActions
-                        ? null
-                        : () => {
-                            query.remove('fq', v.query);
-                            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                          }
-                    }
-              )}
-            />
-          </div>
-        )}
-
-        {others.length !== 0 && (
-          <div style={{ display: 'inline-block' }}>
-            <ChipList
-              items={others.map(v => ({
-                variant: 'outlined',
-                label: v,
+                    },
                 onDelete: disableActions
                   ? null
                   : () => {
                       query.remove('fq', v);
                       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                     }
-              }))}
-            />
-          </div>
-        )}
-      </div>
+              };
+            })}
+          />
+        </div>
+      )}
     </div>
   );
 };

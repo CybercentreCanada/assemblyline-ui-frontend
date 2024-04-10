@@ -72,6 +72,7 @@ type AlertWorkflowDrawerProps = {
   alerts: AlertItem[];
   query: SimpleSearchQuery;
   open: boolean;
+  hideTC?: boolean;
   initialBody?: WorkflowBody;
   onClose?: () => void;
 };
@@ -81,6 +82,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
     alerts = [],
     query = new SimpleSearchQuery(''),
     open = false,
+    hideTC = false,
     initialBody = { priority: null, status: null, labels: [], removed_labels: [] },
     onClose = () => null
   }: AlertWorkflowDrawerProps) => {
@@ -93,9 +95,12 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
     const [body, setBody] = useState<WorkflowBody>(initialBody);
     const [waiting, setWaiting] = useState<boolean>(false);
 
-    const hasParams = useMemo<boolean>(() => query.has('q') || query.has('fq'), [query]);
+    const hasParams = useMemo<boolean>(() => query && (query.has('q') || query.has('fq')), [query]);
 
-    const isSingleAlert = useMemo<boolean>(() => query.getAll('fq').some(fq => fq.startsWith('alert_id')), [query]);
+    const isSingleAlert = useMemo<boolean>(
+      () => query && query.getAll('fq').some(fq => fq.startsWith('alert_id')),
+      [query]
+    );
 
     const validBody = useMemo<boolean>(
       () =>
@@ -188,7 +193,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                     backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
                   }}
                 >
-                  <AlertFiltersSelected query={query} disableActions hideGroupBy hideSort />
+                  <AlertFiltersSelected query={query} disableActions hideGroupBy hideTC={hideTC} hideSort />
                 </div>
               </div>
             )}
