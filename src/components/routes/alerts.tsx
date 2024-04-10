@@ -24,6 +24,7 @@ import AlertListItem from './alerts2/components/ListItem';
 import { AlertSearchResults } from './alerts2/components/Results';
 import { AlertSorts } from './alerts2/components/Sorts';
 import AlertWorkflows from './alerts2/components/Workflows';
+import { FavoritesProvider } from './alerts2/contexts/FavoritesContext';
 import AlertDetail2 from './alerts2/detail';
 import { Alert, AlertItem } from './alerts2/models/Alert';
 import { buildSearchQuery, getGroupBy } from './alerts2/utils/buildSearchQuery';
@@ -232,71 +233,73 @@ const WrappedAlertsPage = () => {
   if (!currentUser.roles.includes('alert_view')) return <ForbiddenPage />;
   else
     return (
-      <PageFullWidth margin={4}>
-        <Grid container alignItems="center" paddingBottom={2}>
-          <Grid item xs>
-            <Typography variant="h4">{t('alerts')}</Typography>
-          </Grid>
+      <FavoritesProvider>
+        <PageFullWidth margin={4}>
+          <Grid container alignItems="center" paddingBottom={2}>
+            <Grid item xs>
+              <Typography variant="h4">{t('alerts')}</Typography>
+            </Grid>
 
-          <Grid item xs style={{ textAlign: 'right', flex: 0 }}>
-            <AlertDefaultSearchParameters />
+            <Grid item xs style={{ textAlign: 'right', flex: 0 }}>
+              <AlertDefaultSearchParameters />
+            </Grid>
           </Grid>
-        </Grid>
-        <PageHeader isSticky>
-          <div style={{ paddingTop: theme.spacing(1) }}>
-            <SearchBar
-              initValue={query.get('q', '')}
-              searching={loading}
-              suggestions={suggestions}
-              placeholder={t('search.placeholder')}
-              onValueChange={handleValueChange}
-              onClear={handleClear}
-              onSearch={handleSearch}
-              extras={
-                <>
-                  <Divider
-                    orientation="vertical"
-                    flexItem
-                    style={{ marginLeft: theme.spacing(upMD ? 1 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
-                  />
-                  <AlertFavorites />
-                  <AlertSorts />
-                  <AlertFilters />
-                  <AlertWorkflows alerts={alerts} />
-                  <div style={{ width: theme.spacing(0.5) }} />
-                </>
-              }
-            >
-              <AlertSearchResults searching={loading} total={total} />
-            </SearchBar>
-          </div>
-        </PageHeader>
-
-        <SimpleList
-          id={ALERT_SIMPLELIST_ID}
-          disableProgress
-          scrollInfinite={countedTotal > 0 && countedTotal < total}
-          scrollReset={scrollReset}
-          scrollLoadNextThreshold={75}
-          scrollTargetId="app-scrollct"
-          loading={loading}
-          items={alerts}
-          emptyValue={
-            <div style={{ width: '100%' }}>
-              <InformativeAlert>
-                <AlertTitle>{t('no_alerts_title')}</AlertTitle>
-                {t('no_alerts_desc')}
-              </InformativeAlert>
+          <PageHeader isSticky>
+            <div style={{ paddingTop: theme.spacing(1) }}>
+              <SearchBar
+                initValue={query.get('q', '')}
+                searching={loading}
+                suggestions={suggestions}
+                placeholder={t('search.placeholder')}
+                onValueChange={handleValueChange}
+                onClear={handleClear}
+                onSearch={handleSearch}
+                extras={
+                  <>
+                    <Divider
+                      orientation="vertical"
+                      flexItem
+                      style={{ marginLeft: theme.spacing(upMD ? 1 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+                    />
+                    <AlertFavorites />
+                    <AlertSorts />
+                    <AlertFilters />
+                    <AlertWorkflows alerts={alerts} />
+                    <div style={{ width: theme.spacing(0.5) }} />
+                  </>
+                }
+              >
+                <AlertSearchResults searching={loading} total={total} />
+              </SearchBar>
             </div>
-          }
-          onLoadNext={() => handleFetch(query, prevOffset.current + DEFAULT_PARAMS.rows)}
-          onCursorChange={handleSelectedItemChange}
-          onItemSelected={handleSelectedItemChange}
-          onRenderActions={(item: Alert, index?: number) => <AlertActions alert={item} />}
-        >
-          {(item: Alert) => <AlertListItem item={item} />}
-        </SimpleList>
-      </PageFullWidth>
+          </PageHeader>
+
+          <SimpleList
+            id={ALERT_SIMPLELIST_ID}
+            disableProgress
+            scrollInfinite={countedTotal > 0 && countedTotal < total}
+            scrollReset={scrollReset}
+            scrollLoadNextThreshold={75}
+            scrollTargetId="app-scrollct"
+            loading={loading}
+            items={alerts}
+            emptyValue={
+              <div style={{ width: '100%' }}>
+                <InformativeAlert>
+                  <AlertTitle>{t('no_alerts_title')}</AlertTitle>
+                  {t('no_alerts_desc')}
+                </InformativeAlert>
+              </div>
+            }
+            onLoadNext={() => handleFetch(query, prevOffset.current + DEFAULT_PARAMS.rows)}
+            onCursorChange={handleSelectedItemChange}
+            onItemSelected={handleSelectedItemChange}
+            onRenderActions={(item: Alert, index?: number) => <AlertActions alert={item} />}
+          >
+            {(item: Alert) => <AlertListItem item={item} />}
+          </SimpleList>
+        </PageFullWidth>
+      </FavoritesProvider>
     );
 };
 
