@@ -25,43 +25,46 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ searching = false, total =
     [location.search]
   );
 
-  return (
-    <div style={{ marginTop: theme.spacing(1), fontStyle: 'italic', minHeight: theme.spacing(3) }}>
-      {isMDUp ? (
-        <div style={{ position: 'relative' }}>
-          <AlertsFiltersSelected query={query} hideQuery />
-          <div style={{ position: 'absolute', top: theme.spacing(0.5), right: theme.spacing(1) }}>
-            {searching ? (
-              ''
-            ) : (
-              <span>
-                <SearchResultCount count={total} />
-                {total > 1 ? t('results') : t('result')}
-              </span>
-            )}
-          </div>
+  if (isMDUp)
+    return (
+      <div
+        style={{
+          marginTop: theme.spacing(1),
+          fontStyle: 'italic',
+          minHeight: theme.spacing(3),
+          display: 'flex',
+          flexWrap: 'nowrap',
+          columnGap: theme.spacing(1)
+        }}
+      >
+        <AlertsFiltersSelected query={query} hideQuery />
+        <div style={{ flex: 1 }} />
+        <div>
+          <SearchResultCount count={total} />
+          {total > 1 ? t('results') : t('result')}
         </div>
-      ) : (
-        <>
-          <div style={{ marginTop: theme.spacing(2), alignItems: 'center' }}>
-            {!searching && query.getAll('fq', []).length > 0 && (
-              <>
-                <FiFilter style={{ marginRight: theme.spacing(1) }} />
-              </>
-            )}
-            {searching ? (
-              ''
-            ) : (
-              <span>
-                <SearchResultCount count={total} />
-                {total > 1 ? t('results') : t('result')}
-              </span>
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  );
+      </div>
+    );
+  else
+    return (
+      <>
+        <div style={{ marginTop: theme.spacing(2), alignItems: 'center' }}>
+          {!searching && query.getAll('fq', []).length > 0 && (
+            <>
+              <FiFilter style={{ marginRight: theme.spacing(1) }} />
+            </>
+          )}
+          {searching ? (
+            ''
+          ) : (
+            <span>
+              <SearchResultCount count={total} />
+              {total > 1 ? t('results') : t('result')}
+            </span>
+          )}
+        </div>
+      </>
+    );
 };
 
 export const AlertSearchResults = React.memo(WrappedAlertSearchResults);
