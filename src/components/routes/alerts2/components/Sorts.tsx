@@ -23,6 +23,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
+import { Option } from './Filters';
 
 const useStyles = makeStyles(theme => ({
   desc: {
@@ -53,7 +54,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SORT_OPTIONS = [
+export const SORT_OPTIONS: Option[] = [
   { value: 'alert_id', label: 'alert_id' },
   { value: 'type', label: 'type' },
   { value: 'ts', label: 'received_ts' },
@@ -61,7 +62,7 @@ const SORT_OPTIONS = [
   { value: 'owner', label: 'owner' },
   { value: 'priority', label: 'priority' },
   { value: 'status', label: 'status' }
-] as const;
+];
 
 const WrappedAlertSorts = () => {
   const { t } = useTranslation('alerts');

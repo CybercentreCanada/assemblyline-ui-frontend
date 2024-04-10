@@ -58,9 +58,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type Option = { value: string; label: string };
+export type Option = { value: string; label: string };
 
-const TC_OPTIONS: Option[] = [
+export const TC_OPTIONS: Option[] = [
   { value: '', label: 'tc.none' },
   { value: '24h', label: 'tc.24h' },
   { value: '4d', label: 'tc.4d' },
@@ -68,7 +68,7 @@ const TC_OPTIONS: Option[] = [
   { value: '1M', label: 'tc.1month' }
 ];
 
-const GROUPBY_OPTIONS: Option[] = [
+export const GROUPBY_OPTIONS: Option[] = [
   { value: '', label: 'groupBy.none' },
   { value: 'file.md5', label: 'groupBy.md5' },
   { value: 'file.name', label: 'groupBy.name' },

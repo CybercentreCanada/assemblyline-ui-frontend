@@ -21,6 +21,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { DEFAULT_QUERY } from 'components/routes/alerts';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -29,6 +30,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
+import { useFavorites } from '../contexts/FavoritesContext';
 
 const useStyles = makeStyles(theme => ({
   drawerInner: {
@@ -359,19 +361,21 @@ const WrappedAlertFavorites = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const { apiCall } = useMyAPI();
+  // const { apiCall } = useMyAPI();
   const { c12nDef } = useALContext();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  // const { user: currentUser } = useAppUser<CustomUser>();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
-  const defaultFavorite = useMemo<Favorite>(
-    () => ({ classification: c12nDef.UNRESTRICTED, name: '', query: '', created_by: currentUser.username }),
-    [c12nDef.UNRESTRICTED, currentUser.username]
-  );
+  // const defaultFavorite = useMemo<Favorite>(
+  //   () => ({ classification: c12nDef.UNRESTRICTED, name: '', query: '', created_by: currentUser.username }),
+  //   [c12nDef.UNRESTRICTED, currentUser.username]
+  // );
 
-  const [userFavorites, setUserFavorites] = useState<Favorite[]>([]);
-  const [globalFavorites, setGlobalFavorites] = useState<Favorite[]>([]);
+  const { userFavorites, globalFavorites, defaultFavorite, updateFavorite, deleteFavorite } = useFavorites();
+
+  // const [userFavorites, setUserFavorites] = useState<Favorite[]>([]);
+  // const [globalFavorites, setGlobalFavorites] = useState<Favorite[]>([]);
   const [currentFavorite, setCurrentFavorite] = useState<Favorite>(defaultFavorite);
   const [currentGlobal, setCurrentGlobal] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
@@ -387,34 +391,23 @@ const WrappedAlertFavorites = () => {
 
   const handleUpdateFavorites = useCallback(
     (favorite: Favorite, global: boolean) => {
-      const update = (values: Favorite[]) => {
-        const index = values.findIndex(value => value.name === favorite.name);
-        return index >= 0
-          ? [...values.slice(0, index), favorite, ...values.slice(index + 1, values.length)]
-          : [...values, favorite];
-      };
-      global ? setGlobalFavorites(update) : setUserFavorites(update);
+      updateFavorite(favorite, global);
       setCurrentFavorite(defaultFavorite);
     },
-    [defaultFavorite]
+    [defaultFavorite, updateFavorite]
   );
 
   const handleDeleteFavorites = useCallback(
     (favorite: Favorite, global: boolean) => {
-      const toSpliced = (values: Favorite[]) => {
-        const index = values.findIndex(value => value.name === favorite.name);
-        if (index >= 0) values.splice(index, 1);
-        return values;
-      };
-      global ? setGlobalFavorites(toSpliced) : setUserFavorites(toSpliced);
+      deleteFavorite(favorite, global);
       setCurrentFavorite(defaultFavorite);
     },
-    [defaultFavorite]
+    [defaultFavorite, deleteFavorite]
   );
 
   const handleFavoriteClick = useCallback(
     (favorite: Favorite) => {
-      const query = new SimpleSearchQuery(location.search);
+      const query = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
       query.add('fq', favorite.query);
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
 
@@ -430,25 +423,6 @@ const WrappedAlertFavorites = () => {
     },
     []
   );
-
-  useEffect(() => {
-    if (!render) return;
-
-    apiCall({
-      url: `/api/v4/user/favorites/${currentUser.username}/`,
-      onSuccess: ({ api_response }) => setUserFavorites(api_response.alert)
-    });
-
-    apiCall({
-      url: '/api/v4/user/favorites/__global__/',
-      onSuccess: ({ api_response }) => setGlobalFavorites(api_response.alert)
-    });
-    return () => {
-      setUserFavorites([]);
-      setGlobalFavorites([]);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.username, render]);
 
   useEffect(() => {
     return () => setCurrentFavorite(defaultFavorite);

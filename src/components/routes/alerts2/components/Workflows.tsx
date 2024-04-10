@@ -243,6 +243,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                           label={value}
                           color="success"
                           variant="outlined"
+                          size="small"
                           onClick={() =>
                             setBody(b => ({
                               ...b,
@@ -259,6 +260,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                           label={value}
                           color="error"
                           variant="outlined"
+                          size="small"
                           onClick={() =>
                             setBody(b => ({
                               ...b,

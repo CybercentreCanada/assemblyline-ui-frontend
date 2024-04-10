@@ -46,7 +46,7 @@
   "filters.apply": "Apply current filter selection",
   "filters.clear": "Clear all filters",
   "focus": "Show all alerts from group",
-  "groupBy": "Grouped By",
+  "groupBy": "Group By",
   "groupBy.md5": "MD5",
   "groupBy.name": "File name",
   "groupBy.none": "No grouping",
