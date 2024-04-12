@@ -105,7 +105,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const theme = useTheme();
   const classes = useStyles();
   const appUser = useAppUser<AppUser>();
-  const { user: currentUser, configuration, c12nDef, indexes } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
   const { apiCall } = useMyAPI();
 
   const [open, setOpen] = React.useState(false);
@@ -250,54 +250,14 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   };
 
   const buildDefaultSystemMessage = () => {
-    // Automatically create the prompting of the score ranges
-    const scoring = `Assemblyline uses a scoring mechanism where any scores below
-${configuration.submission.verdicts.info} is considered safe, scores between
-${configuration.submission.verdicts.info} and ${configuration.submission.verdicts.suspicious}
-are considered informational, scores between ${configuration.submission.verdicts.suspicious}
-and ${configuration.submission.verdicts.highly_suspicious} are considered suspicious,
-scores between ${configuration.submission.verdicts.highly_suspicious} and
-${configuration.submission.verdicts.malicious} are considered highly-suspicious
-and scores with ${configuration.submission.verdicts.malicious} points and up are
-considered malicious.`.replaceAll('\n', ' ');
-
-    // Create list of Assemblyline services
-    const services = `\nAssemblyline does its processing using only the following services/plugins:\n${serviceList
-      .map(srv => ` - name: ${srv.name}\n   category: ${srv.category}\n   description: """${srv.description}"""\n`)
-      .join('')}`;
-
-    // Define AL's classification engine
-    const classification = `Assemblyline can classify/restrict access to its output with the following markings:\n${Object.keys(
-      c12nDef.description
-    )
-      .map(marking => ` - ${marking}: ${c12nDef.description[marking]}\n`)
-      .join('')}`;
-
-    // Indices fields
-    const indices = `\nAssemblyline has multiple indices where it stores the data, theses indices can be queried with the lucene syntax.\n${Object.keys(
-      indexes
-    )
-      .filter(index => ['file', 'alert', 'result', 'signature', 'submission'].includes(index))
-      .map(
-        index =>
-          `\nThe '${index}' index as the following fields:\n${Object.keys(indexes[index])
-            .map(field => `  - ${field}`)
-            .join('\n')}`
-      )
-      .join('\n')}`;
-
-    // Set language
-    const lang = `\nYour answer must be written in plain ${i18n.language === 'en' ? 'english' : 'french'}.`;
-
-    // Create the default system prompt
-    const defaultSystemPrompt = {
+    // return defaultSystemPrompt;
+    return {
       role: 'system' as 'system',
-      content: [configuration.ui.ai.assistant.system_message, scoring, services, classification, indices, lang].join(
-        '\n'
+      content: configuration.ui.ai.assistant.system_message.replaceAll(
+        '$(LANG)',
+        i18n.language === 'en' ? 'english' : 'french'
       )
     };
-
-    return defaultSystemPrompt;
   };
 
   const clearAssistant = () => {
