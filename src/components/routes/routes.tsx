@@ -5,6 +5,7 @@ import { resetFavicon } from 'helpers/utils';
 import { lazy, memo, Suspense, useEffect, useState } from 'react';
 import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router';
 import LoadingScreen from './loading';
+import Theme from './theme';
 
 const ForbiddenPage = lazy(() => import('components/routes/403'));
 const NotFoundPage = lazy(() => import('components/routes/404_dl'));
@@ -148,7 +149,7 @@ const WrappedRoutes = () => {
         <Route path="/manage/badlist" element={<ManageBadlist />} />
         <Route path="/manage" element={<Manage />} />
         <Route path="/retrohunt" element={<RetroHunt />} />
-        <Route path="/retrohunt/:code" element={<RetroHuntDetail />} />
+        <Route path="/retrohunt/:key" element={<RetroHuntDetail />} />
         <Route path="/search" element={<Search />} />
         <Route path="/search/:id" element={<Search />} />
         <Route path="/settings" element={<Settings />} />
@@ -158,6 +159,7 @@ const WrappedRoutes = () => {
         <Route path="/submission/report/:id" element={<SubmissionReport />} />
         <Route path="/submission/:id" element={<RedirectSubmission />} />
         <Route path="/submissions" element={<Submissions />} />
+        <Route path="/theme" element={<Theme />} />
         <Route path="/tos" element={<Tos />} />
         <Route path="/forbidden" element={<ForbiddenPage />} />
         <Route path="/notfound" element={<NotFoundPage />} />

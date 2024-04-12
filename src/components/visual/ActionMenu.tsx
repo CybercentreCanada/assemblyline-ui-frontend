@@ -420,7 +420,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             </div>
           </Tooltip>
         )}
-        {category === 'tag' && type.endsWith('.uri') && (
+        {category === 'tag' && type.endsWith('.uri') && !!currentUserConfig?.ui?.allow_url_submissions && (
           <MenuItem
             dense
             component={Link}

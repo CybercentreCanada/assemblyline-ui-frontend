@@ -572,7 +572,7 @@ considered malicious.`.replaceAll('\n', ' ');
                                     <span>
                                       <Button
                                         onClick={askAssistant}
-                                        disabled={thinking}
+                                        disabled={thinking || currentInput === ''}
                                         size="small"
                                         sx={{
                                           minWidth: 0,
