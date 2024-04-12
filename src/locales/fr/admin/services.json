@@ -96,7 +96,6 @@
   "message.failed": "Les services suivants n'ont pas pu être installés :",
   "message.installed": "Les services suivants ont été installés avec succès :",
   "message.installing": "Les services suivants sont en cours d'installation :",
-  "params.comma": "virgule",
   "params.config": "Variables de service",
   "params.config.current": "Variables de service actuelles",
   "params.config.new": "Ajouter une nouvelle variable de service",
