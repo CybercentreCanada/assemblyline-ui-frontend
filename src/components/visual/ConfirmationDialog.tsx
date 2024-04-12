@@ -46,7 +46,7 @@ const ConfirmationDialog = ({
     {text && (
       <DialogContent>
         <Stack spacing={2}>
-          <DialogContentText id="alert-dialog-description">{text}</DialogContentText>
+          <DialogContentText id="alert-dialog-description" component="div">{text}</DialogContentText>
           {children}
         </Stack>
       </DialogContent>
