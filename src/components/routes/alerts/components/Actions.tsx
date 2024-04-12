@@ -318,7 +318,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
               return;
             } else {
               const detail: Partial<AlertItem>[] = [{ ...prevAlert, owner: currentUser.username }];
-              new CustomEvent<Partial<AlertItem>[]>('alertUpdate', { detail });
+              window.dispatchEvent(new CustomEvent<Partial<AlertItem>[]>('alertUpdate', { detail }));
               showSuccessMessage(t('take_ownership.success'));
             }
           },
@@ -326,6 +326,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
           onEnter: () => setWaiting(true),
           onExit: () => {
             setWaiting(false);
+            setConfirmation(false);
             onClick();
           }
         });
