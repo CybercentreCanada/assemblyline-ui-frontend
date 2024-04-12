@@ -20,8 +20,10 @@ const ServiceReview = lazy(() => import('components/routes/admin/service_review'
 const AdminSiteMap = lazy(() => import('components/routes/admin/site_map'));
 const AdminTagSafelist = lazy(() => import('components/routes/admin/tag_safelist'));
 const AdminUsers = lazy(() => import('components/routes/admin/users'));
-const AlertDetails = lazy(() => import('components/routes/alerts/detail'));
-const Alerts = lazy(() => import('components/routes/alerts'));
+const AlertDetails = lazy(() => import('components/routes/alerts/alert-details'));
+const Alerts = lazy(() => import('components/routes/alerts/alerts'));
+const AlertDetails2 = lazy(() => import('components/routes/alerts2/detail'));
+const Alerts2 = lazy(() => import('components/routes/alerts'));
 const AppRegistration = lazy(() => import('components/routes/authorize'));
 const ArchiveDetail = lazy(() => import('components/routes/archive/detail'));
 const CrashTest = lazy(() => import('components/routes/crash'));
@@ -102,6 +104,8 @@ const WrappedRoutes = () => {
         <Route path="/account" element={<Account />} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/alerts/:id" element={<AlertDetails />} />
+        <Route path="/alerts2" element={<Alerts2 />} />
+        <Route path="/alerts2/:id" element={<AlertDetails2 />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/actions" element={<AdminActions />} />
         <Route path="/admin/errors" element={<AdminErrorViewer />} />

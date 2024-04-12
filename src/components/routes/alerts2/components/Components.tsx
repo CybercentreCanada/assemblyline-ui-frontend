@@ -341,7 +341,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
         ) : (
           <DivTableRow {...others}>{children}</DivTableRow>
         ),
-      []
+      [setViewHistory]
     );
 
     return (

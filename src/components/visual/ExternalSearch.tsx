@@ -30,7 +30,7 @@ import LaunchOutlinedIcon from '@mui/icons-material/LaunchOutlined';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import useALContext from 'components/hooks/useALContext';
 import { ExternalEnrichmentResult } from 'components/providers/ExternalLookupProvider';
-import { DetailedItem } from 'components/routes/alerts/models/Alert';
+import { DetailedItem } from 'components/routes/alerts2/models/Alert';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';

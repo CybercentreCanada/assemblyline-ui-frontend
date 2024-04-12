@@ -25,7 +25,7 @@ import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
-import { AlertItem, DetailedItem, detailedItemCompare } from 'components/routes/alerts2/hooks/useAlerts';
+import { AlertItem, DetailedItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
 import ActionableText from 'components/visual/ActionableText';
