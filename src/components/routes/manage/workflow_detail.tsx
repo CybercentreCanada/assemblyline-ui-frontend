@@ -145,6 +145,10 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
   };
 
   useEffect(() => {
+    setWorkflowID(workflow_id || id);
+  }, [id, workflow_id]);
+
+  useEffect(() => {
     if (workflowID && currentUser.roles.includes('workflow_view')) {
       apiCall({
         url: `/api/v4/workflow/${workflowID}/`,

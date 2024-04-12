@@ -335,7 +335,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
     const Row = useCallback<React.FC<WrapperTableRowProps>>(
       ({ to, children, ...others }) =>
         to ? (
-          <LinkRow to={to} {...others}>
+          <LinkRow to={to} onClick={() => setViewHistory(false)} {...others}>
             {children}
           </LinkRow>
         ) : (
@@ -379,7 +379,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                           <Typography sx={{ fontWeight: 'bold' }}>{t(column)}</Typography>
                         </DivTableCell>
                       ))}
-                      <DivTableCell></DivTableCell>
+                      <DivTableCell />
                     </DivTableRow>
                   </DivTableHead>
                   <DivTableBody>
@@ -398,20 +398,20 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                                 : null
                             }
                           >
-                            <Tooltip title={event.ts}>
-                              <span>
-                                <DivTableCell>
+                            <DivTableCell>
+                              <Tooltip title={event.ts}>
+                                <span>
                                   <Moment fromNow locale={i18n.language}>
                                     {event.ts}
                                   </Moment>
-                                </DivTableCell>
-                              </span>
-                            </Tooltip>
-                            <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
-                              <span>
-                                <DivTableCell>{event.entity_name}</DivTableCell>
-                              </span>
-                            </Tooltip>
+                                </span>
+                              </Tooltip>
+                            </DivTableCell>
+                            <DivTableCell>
+                              <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
+                                <span>{event.entity_name}</span>
+                              </Tooltip>
+                            </DivTableCell>
                             <DivTableCell>
                               {event.priority ? <AlertPriority name={event.priority} withChip /> : null}
                             </DivTableCell>
