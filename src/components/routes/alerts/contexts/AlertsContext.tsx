@@ -5,7 +5,10 @@ import { CustomUser } from 'components/hooks/useMyUser';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Favorite } from '../components/Favorites';
 
-type FavoritesContextProps = {
+type ContextProps = {
+  statusFilters: { [key: string]: number };
+  priorityFilters: { [key: string]: number };
+  labelFilters: { [key: string]: number };
   userFavorites: Favorite[];
   globalFavorites: Favorite[];
   defaultFavorite: Favorite;
@@ -17,11 +20,11 @@ type Props = {
   children: React.ReactNode;
 };
 
-const FavoritesContext = createContext<FavoritesContextProps>(null);
+const AlertsContext = createContext<ContextProps>(null);
 
-export const useFavorites = (): FavoritesContextProps => useContext(FavoritesContext);
+export const useAlerts = (): ContextProps => useContext(AlertsContext);
 
-export const FavoritesProvider = ({ children }: Props) => {
+export const AlertsProvider = ({ children }: Props) => {
   const { apiCall } = useMyAPI();
   const { c12nDef } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -31,6 +34,9 @@ export const FavoritesProvider = ({ children }: Props) => {
     [c12nDef.UNRESTRICTED, currentUser.username]
   );
 
+  const [statusFilters, setStatusFilters] = useState<{ [key: string]: number }>(null);
+  const [priorityFilters, setPriorityFilters] = useState<{ [key: string]: number }>(null);
+  const [labelFilters, setLabelFilters] = useState<{ [key: string]: number }>(null);
   const [userFavorites, setUserFavorites] = useState<Favorite[]>([]);
   const [globalFavorites, setGlobalFavorites] = useState<Favorite[]>([]);
 
@@ -59,23 +65,59 @@ export const FavoritesProvider = ({ children }: Props) => {
       onSuccess: ({ api_response }) => setUserFavorites(api_response.alert)
     });
 
+    return () => {
+      setUserFavorites([]);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser.username]);
+
+  useEffect(() => {
     apiCall({
       url: '/api/v4/user/favorites/__global__/',
       onSuccess: ({ api_response }) => setGlobalFavorites(api_response.alert)
     });
 
+    apiCall({
+      url: '/api/v4/alert/statuses/',
+      method: 'GET',
+      onSuccess: ({ api_response }) => setStatusFilters(api_response)
+    });
+
+    apiCall({
+      url: '/api/v4/alert/priorities/',
+      method: 'GET',
+      onSuccess: ({ api_response }) => setPriorityFilters(api_response)
+    });
+
+    apiCall({
+      url: '/api/v4/alert/labels/',
+      method: 'GET',
+      onSuccess: ({ api_response }) => setLabelFilters(api_response)
+    });
+
     return () => {
-      setUserFavorites([]);
+      setStatusFilters(null);
+      setPriorityFilters(null);
+      setLabelFilters(null);
       setGlobalFavorites([]);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.username]);
+  }, []);
 
   return (
-    <FavoritesContext.Provider
-      value={{ userFavorites, globalFavorites, defaultFavorite, updateFavorite, deleteFavorite }}
+    <AlertsContext.Provider
+      value={{
+        statusFilters,
+        priorityFilters,
+        labelFilters,
+        userFavorites,
+        globalFavorites,
+        defaultFavorite,
+        updateFavorite,
+        deleteFavorite
+      }}
     >
       {children}
-    </FavoritesContext.Provider>
+    </AlertsContext.Provider>
   );
 };

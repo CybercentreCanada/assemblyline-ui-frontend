@@ -22,7 +22,7 @@ import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import { useFavorites } from '../contexts/FavoritesContext';
+import { useAlerts } from '../contexts/AlertsContext';
 import { Favorite } from './Favorites';
 import { GROUPBY_OPTIONS, Option, TC_OPTIONS } from './Filters';
 import { SORT_OPTIONS } from './Sorts';
@@ -267,7 +267,7 @@ const WrappedAlertFiltersSelected = ({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { userFavorites, globalFavorites } = useFavorites();
+  const { userFavorites, globalFavorites } = useAlerts();
 
   const allFavorites = useMemo<Favorite[]>(
     () => [...userFavorites, ...globalFavorites],

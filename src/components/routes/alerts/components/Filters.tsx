@@ -15,9 +15,7 @@ import {
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
 import { DEFAULT_PARAMS, DEFAULT_QUERY } from 'components/routes/alerts';
 import CustomChip from 'components/visual/CustomChip';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -25,6 +23,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
+import { useAlerts } from '../contexts/AlertsContext';
 import { buildSearchQuery } from '../utils/alertUtils';
 import { Favorite } from './Favorites';
 
@@ -120,25 +119,25 @@ type Filter = {
 };
 
 type AlertFilterInputProps = {
-  values: string[];
   label: string;
-  pathname: string;
-  search: string;
+  values: string[];
+  totals: { [key: string]: number };
+  url: string;
   onChange: (values: string[]) => void;
 };
 
 const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
-  ({ values = [], label = '', pathname = '', search = '', onChange = () => null }: AlertFilterInputProps) => {
+  ({ label = '', values = [], totals = null, url = '', onChange = () => null }: AlertFilterInputProps) => {
     const { t } = useTranslation('alerts');
     const classes = useStyles();
     const theme = useTheme();
     const { apiCall } = useMyAPI();
 
     const [options, setOptions] = useState<{ [key: string]: number }>(null);
-    const [totals, setTotals] = useState<{ [key: string]: number }>(null);
+    const [inputValue, setInputValue] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
 
-    const prevSearch = useRef<string>(null);
+    const prevURL = useRef<string>(null);
 
     const parsedOptions = useMemo<Filter[]>(() => {
       const items = Object.keys({ ...options, ...totals }).map(key => ({
@@ -153,11 +152,11 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
     const fetchOptions = useCallback(
       () => {
         apiCall({
-          url: `${pathname}?${search}`,
+          url: url,
           method: 'GET',
           onSuccess: ({ api_response }) => {
             setOptions(api_response);
-            prevSearch.current = search;
+            prevURL.current = url;
           },
           onEnter: () => {
             setLoading(true);
@@ -167,22 +166,8 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
         });
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [pathname, search]
+      [url]
     );
-
-    useEffect(() => {
-      apiCall({
-        url: pathname,
-        method: 'GET',
-        onSuccess: ({ api_response }) => setTotals(api_response)
-      });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pathname]);
-
-    useEffect(() => {
-      fetchOptions();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     return (
       <div style={{ marginBottom: theme.spacing(2) }}>
@@ -191,7 +176,9 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
           classes={{ listbox: classes.listbox, option: classes.option }}
           value={values.map(v => ({ value: v, count: 0, total: 0 }))}
           onChange={(event, items) => onChange(items.map(i => i.value))}
-          onOpen={() => prevSearch.current !== search && fetchOptions()}
+          onOpen={() => prevURL.current !== url && fetchOptions()}
+          inputValue={inputValue}
+          onInputChange={(event, value) => setInputValue(value)}
           fullWidth
           multiple
           disableCloseOnSelect
@@ -243,36 +230,10 @@ const Favorites: React.FC<FavoritesProps> = React.memo(({ values = [], onChange 
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [globals, setGlobals] = useState<Favorite[]>([]);
-  const [users, setUsers] = useState<Favorite[]>([]);
-  const [loading, setLoading] = useState<{ user: boolean; global: boolean }>({ user: false, global: false });
+  const { userFavorites, globalFavorites } = useAlerts();
 
-  const options = useMemo<Favorite[]>(() => [...users, ...globals], [globals, users]);
-
-  useEffect(() => {
-    apiCall({
-      url: `/api/v4/user/favorites/${currentUser.username}/`,
-      onSuccess: ({ api_response }) => setUsers(api_response.alert),
-      onEnter: () => setLoading(v => ({ ...v, user: true })),
-      onExit: () => setLoading(v => ({ ...v, user: false }))
-    });
-
-    apiCall({
-      url: '/api/v4/user/favorites/__global__/',
-      onSuccess: ({ api_response }) => setGlobals(api_response.alert),
-      onEnter: () => setLoading(v => ({ ...v, global: true })),
-      onExit: () => setLoading(v => ({ ...v, global: false }))
-    });
-
-    return () => {
-      setUsers([]);
-      setGlobals([]);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.username]);
+  const options = useMemo<Favorite[]>(() => [...userFavorites, ...globalFavorites], [userFavorites, globalFavorites]);
 
   return (
     <div style={{ marginBottom: theme.spacing(2) }}>
@@ -291,8 +252,6 @@ const Favorites: React.FC<FavoritesProps> = React.memo(({ values = [], onChange 
         fullWidth
         multiple
         disableCloseOnSelect
-        loading={loading.user || loading.global}
-        loadingText={t('loading')}
         renderInput={params => <TextField {...params} variant="outlined" />}
         renderTags={(value, getTagProps) =>
           value.map((item, index) => (
@@ -354,24 +313,20 @@ const Others: React.FC<OthersProps> = React.memo(({ values = [], search = '', on
   const { apiCall } = useMyAPI();
 
   const [options, setOptions] = useState<{ [key: string]: { [item: string]: number } }>(null);
-  const [totals, setTotals] = useState<{ [key: string]: { [item: string]: number } }>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const prevSearch = useRef<string>(null);
 
   const parsedOptions = useMemo<Filter[]>(() => {
-    const items = Object.keys({ ...options, ...totals }).flatMap(key =>
-      Object.keys({
-        ...(options && key in options ? options[key] : null),
-        ...(totals && key in totals ? totals[key] : null)
-      }).map(value => ({
+    const items = Object.keys({ ...options }).flatMap(key =>
+      Object.keys({ ...(options && key in options ? options[key] : null) }).map(value => ({
         value: `${key}:${value}`,
         count: options && key in options && value in options[key] ? options[key][value] : 0,
-        total: totals && key in totals && value in totals[key] ? totals[key][value] : 0
+        total: 0
       }))
     );
     return items;
-  }, [options, totals]);
+  }, [options]);
 
   const fetchOptions = useCallback(() => {
     apiCall({
@@ -389,20 +344,6 @@ const Others: React.FC<OthersProps> = React.memo(({ values = [], search = '', on
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
-
-  useEffect(() => {
-    apiCall({
-      url: '/api/v4/alert/statistics/',
-      method: 'GET',
-      onSuccess: ({ api_response }) => setTotals(api_response)
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    fetchOptions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <div style={{ marginBottom: theme.spacing(2) }}>
@@ -440,7 +381,6 @@ const Others: React.FC<OthersProps> = React.memo(({ values = [], search = '', on
                 label={
                   <>
                     <span style={{ color: theme.palette.text.primary }}>{`${item.count} `}</span>
-                    <span style={{ color: theme.palette.text.secondary }}>{`/ ${item.total}`}</span>
                   </>
                 }
                 size="small"
@@ -467,11 +407,39 @@ const WrappedAlertFilters = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { statusFilters, priorityFilters, labelFilters } = useAlerts();
+
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const [query, setQuery] = useState(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
+
+  const { statusURL, priorityURL, labelURL } = useMemo<{
+    statusURL: string;
+    priorityURL: string;
+    labelURL: string;
+  }>(
+    () =>
+      Object.fromEntries(
+        [
+          ['statusURL', ['/api/v4/alert/statuses/', 'status:']],
+          ['priorityURL', ['/api/v4/alert/priorities/', 'priority:']],
+          ['labelURL', ['/api/v4/alert/labels/', 'labels:']]
+        ].map(([url, [pathname, strip]]) => [
+          url,
+          `${pathname}?${buildSearchQuery({
+            search: query.getDeltaString(),
+            singles: ['q', 'tc', 'tc_start', 'no_delay'],
+            multiples: ['fq'],
+            strip: [strip],
+            defaultString: DEFAULT_QUERY,
+            groupByAsFilter: true
+          }).toString()}`
+        ])
+      ),
+    [query]
+  );
 
   const getParsedFilter = useCallback((search: SimpleSearchQuery, prefix: string): string[] => {
     const item: string = search.getAll('fq', []).find((i: string) => i.startsWith(prefix));
@@ -510,7 +478,7 @@ const WrappedAlertFilters = () => {
           q.remove('fq', item);
         });
 
-      q.add('fq', `${key}(${values.join(' OR ')})`);
+      if (values.length > 0) q.add('fq', `${key}(${values.join(' OR ')})`);
 
       return q;
     });
@@ -587,45 +555,24 @@ const WrappedAlertFilters = () => {
                 <AlertFilterInput
                   label="status"
                   values={getParsedFilter(query, 'status:')}
-                  pathname="/api/v4/alert/statuses/"
-                  search={buildSearchQuery({
-                    search: location.search,
-                    singles: ['q', 'tc', 'tc_start', 'no_delay'],
-                    multiples: ['fq'],
-                    strip: ['status:'],
-                    defaultString: DEFAULT_QUERY,
-                    groupByAsFilter: true
-                  }).toString()}
+                  totals={statusFilters}
+                  url={statusURL}
                   onChange={values => handleFilterChange('status:', values)}
                 />
 
                 <AlertFilterInput
                   label="priority"
                   values={getParsedFilter(query, 'priority:')}
-                  pathname="/api/v4/alert/priorities/"
-                  search={buildSearchQuery({
-                    search: location.search,
-                    singles: ['q', 'tc', 'tc_start', 'no_delay'],
-                    multiples: ['fq'],
-                    strip: ['priority:'],
-                    defaultString: DEFAULT_QUERY,
-                    groupByAsFilter: true
-                  }).toString()}
+                  totals={priorityFilters}
+                  url={priorityURL}
                   onChange={values => handleFilterChange('priority:', values)}
                 />
 
                 <AlertFilterInput
                   label="labels"
                   values={getParsedFilter(query, 'label:')}
-                  pathname="/api/v4/alert/labels/"
-                  search={buildSearchQuery({
-                    search: location.search,
-                    singles: ['q', 'tc', 'tc_start', 'no_delay'],
-                    multiples: ['fq'],
-                    strip: ['label:'],
-                    defaultString: DEFAULT_QUERY,
-                    groupByAsFilter: true
-                  }).toString()}
+                  totals={labelFilters}
+                  url={labelURL}
                   onChange={values => handleFilterChange('label:', values)}
                 />
 
@@ -637,7 +584,7 @@ const WrappedAlertFilters = () => {
                 <Others
                   values={query.getAll('fq')}
                   search={buildSearchQuery({
-                    search: location.search,
+                    search: query.getDeltaString(),
                     singles: ['q', 'tc', 'tc_start', 'no_delay'],
                     multiples: ['fq'],
                     defaultString: DEFAULT_QUERY,

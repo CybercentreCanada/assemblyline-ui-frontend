@@ -42,7 +42,7 @@ import {
   AutoHideChipList,
   SkeletonInline
 } from './components/Components';
-import { FavoritesProvider } from './contexts/FavoritesContext';
+import { AlertsProvider } from './contexts/AlertsContext';
 import { AlertItem } from './models/Alert';
 
 const useStyles = makeStyles(theme => ({
@@ -166,7 +166,7 @@ const WrappedAlertDetail = ({ id: propId = null, inDrawer = false }: Props) => {
   );
 
   return currentUser.roles.includes('alert_view') ? (
-    <FavoritesProvider>
+    <AlertsProvider>
       <Wrapper>
         <PageFullWidth margin={inDrawer ? 1 : 4}>
           {c12nDef.enforce && (
@@ -993,7 +993,7 @@ const WrappedAlertDetail = ({ id: propId = null, inDrawer = false }: Props) => {
           </div>
         </PageFullWidth>
       </Wrapper>
-    </FavoritesProvider>
+    </AlertsProvider>
   ) : (
     <ForbiddenPage />
   );

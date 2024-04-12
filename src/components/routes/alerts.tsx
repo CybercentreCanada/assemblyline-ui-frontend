@@ -24,7 +24,7 @@ import AlertListItem from './alerts/components/ListItem';
 import { AlertSearchResults } from './alerts/components/Results';
 import { AlertSorts } from './alerts/components/Sorts';
 import AlertWorkflows from './alerts/components/Workflows';
-import { FavoritesProvider } from './alerts/contexts/FavoritesContext';
+import { AlertsProvider } from './alerts/contexts/AlertsContext';
 import AlertDetail2 from './alerts/detail';
 import { Alert, AlertItem } from './alerts/models/Alert';
 import { buildSearchQuery, getGroupBy } from './alerts/utils/alertUtils';
@@ -233,7 +233,7 @@ const WrappedAlertsPage = () => {
   if (!currentUser.roles.includes('alert_view')) return <ForbiddenPage />;
   else
     return (
-      <FavoritesProvider>
+      <AlertsProvider>
         <PageFullWidth margin={4}>
           <Grid container alignItems="center" paddingBottom={2}>
             <Grid item xs>
@@ -299,7 +299,7 @@ const WrappedAlertsPage = () => {
             {(item: Alert) => <AlertListItem item={item} />}
           </SimpleList>
         </PageFullWidth>
-      </FavoritesProvider>
+      </AlertsProvider>
     );
 };
 

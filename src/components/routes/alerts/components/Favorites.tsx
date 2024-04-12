@@ -30,7 +30,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import { useFavorites } from '../contexts/FavoritesContext';
+import { useAlerts } from '../contexts/AlertsContext';
 
 const useStyles = makeStyles(theme => ({
   drawerInner: {
@@ -361,21 +361,11 @@ const WrappedAlertFavorites = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  // const { apiCall } = useMyAPI();
   const { c12nDef } = useALContext();
-  // const { user: currentUser } = useAppUser<CustomUser>();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
-  // const defaultFavorite = useMemo<Favorite>(
-  //   () => ({ classification: c12nDef.UNRESTRICTED, name: '', query: '', created_by: currentUser.username }),
-  //   [c12nDef.UNRESTRICTED, currentUser.username]
-  // );
-
-  const { userFavorites, globalFavorites, defaultFavorite, updateFavorite, deleteFavorite } = useFavorites();
-
-  // const [userFavorites, setUserFavorites] = useState<Favorite[]>([]);
-  // const [globalFavorites, setGlobalFavorites] = useState<Favorite[]>([]);
+  const { userFavorites, globalFavorites, defaultFavorite, updateFavorite, deleteFavorite } = useAlerts();
   const [currentFavorite, setCurrentFavorite] = useState<Favorite>(defaultFavorite);
   const [currentGlobal, setCurrentGlobal] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
