@@ -438,7 +438,7 @@ const WrappedAlertDetail = ({ id: propId = null, inDrawer = false }: Props) => {
                     )}
                   </Grid>
                 </Grid>
-                {alert && alert.file.screenshots && <ImageInline data={alert.file.screenshots} small />}
+                {alert && alert.file.screenshots && <ImageInline data={alert.file.screenshots} size="small" />}
               </div>
             </div>
 
