@@ -3,6 +3,7 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import {
+  Autocomplete,
   Checkbox,
   FormControlLabel,
   Grid,
@@ -66,14 +67,12 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
     onUpdate({ ...param, hide: !param.hide }, id);
   };
 
-  const handleSubmissionParamListUpdate = event => {
-    const { value } = event.target;
-    const newList = value.split(',');
-    let newDefault = newList[0];
-    if (newList.indexOf(param.default) !== -1) {
+  const handleSubmissionParamListUpdate = selections => {
+    let newDefault = selections[0];
+    if (selections.indexOf(param.default) !== -1) {
       newDefault = param.default;
     }
-    onUpdate({ ...param, list: newList, default: newDefault, value: newDefault }, id);
+    onUpdate({ ...param, list: selections, default: newDefault, value: newDefault }, id);
   };
 
   const addUserSubmissionParam = () => {
@@ -126,13 +125,12 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
     setTempUserParams({ ...tempUserParams, hide: tempUserParams.hide === 'false' ? 'true' : 'false' });
   };
 
-  const handleSPListChange = event => {
-    const newList = event.target.value.split(',');
-    let newDefault = newList[0];
-    if (newList.indexOf(tempUserParams.default) !== -1) {
+  const handleSPListChange = selections => {
+    let newDefault = selections[0];
+    if (selections.indexOf(tempUserParams.default) !== -1) {
       newDefault = tempUserParams.default;
     }
-    setTempUserParams({ ...tempUserParams, list: newList, default: newDefault, value: newDefault });
+    setTempUserParams({ ...tempUserParams, list: selections, default: newDefault, value: newDefault });
   };
 
   return param ? (
@@ -149,14 +147,15 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
       </Grid>
       {param.type === 'list' && (
         <Grid item xs={10} sm={5}>
-          <TextField
+          <Autocomplete
             fullWidth
+            freeSolo
+            multiple
             size="small"
-            margin="dense"
-            variant="outlined"
-            onChange={handleSubmissionParamListUpdate}
-            value={param.list}
-            style={{ margin: 0 }}
+            options={[]}
+            defaultValue={param.list}
+            renderInput={params => <TextField {...params}></TextField>}
+            onChange={(event, value, reason) => handleSubmissionParamListUpdate(value as string[])}
           />
         </Grid>
       )}
@@ -245,21 +244,21 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
           >
             <MenuItem value="bool">bool</MenuItem>
             <MenuItem value="int">int</MenuItem>
-            <MenuItem value="list">list ({t('params.comma')})</MenuItem>
+            <MenuItem value="list">list</MenuItem>
             <MenuItem value="str">str</MenuItem>
           </Select>
         </FormControl>
       </Grid>
       {tempUserParams.type === 'list' && (
         <Grid item xs={10} sm={4}>
-          <TextField
+          <Autocomplete
             fullWidth
+            freeSolo
+            multiple
             size="small"
-            margin="dense"
-            variant="outlined"
-            value={tempUserParams.list}
-            onChange={handleSPListChange}
-            style={{ margin: 0 }}
+            options={tempUserParams.list}
+            renderInput={params => <TextField {...params}></TextField>}
+            onChange={(event, value, reason) => handleSPListChange(value as string[])}
           />
         </Grid>
       )}
