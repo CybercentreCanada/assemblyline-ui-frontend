@@ -105,7 +105,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const theme = useTheme();
   const classes = useStyles();
   const appUser = useAppUser<AppUser>();
-  const { user: currentUser, configuration, c12nDef, indexes } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
   const { apiCall } = useMyAPI();
 
   const [open, setOpen] = React.useState(false);
