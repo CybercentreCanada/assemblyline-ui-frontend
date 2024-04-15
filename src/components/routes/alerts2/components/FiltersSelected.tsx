@@ -459,7 +459,14 @@ const WrappedAlertFiltersSelected = ({
                     variant: 'outlined',
                     color: 'error',
                     label: <b>{v.name}</b>,
-                    tooltip: `${v.query} (${v.created_by})`,
+                    tooltip: (
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontStyle: 'normal' }}>{v.query}</div>
+                        <div
+                          style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}
+                        >{`(${v.created_by})`}</div>
+                      </div>
+                    ),
                     onClick: disableActions
                       ? null
                       : () => {
@@ -478,7 +485,14 @@ const WrappedAlertFiltersSelected = ({
                     icon: <StarIcon />,
                     variant: 'outlined',
                     label: <b>{v.name}</b>,
-                    tooltip: `${v.query} (${v.created_by})`,
+                    tooltip: (
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontStyle: 'normal' }}>{v.query}</div>
+                        <div
+                          style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}
+                        >{`(${v.created_by})`}</div>
+                      </div>
+                    ),
                     onClick: disableActions
                       ? null
                       : () => {
