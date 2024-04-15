@@ -497,14 +497,12 @@ considered malicious.`.replaceAll('\n', ' ');
                                       p: 0,
                                       backgroundColor: message.isInsight
                                         ? theme.palette.mode === 'dark'
-                                          ? '#444d5c'
-                                          : '#d0e7f3'
+                                          ? '#414f65'
+                                          : '#BADDFB'
                                         : message.isError
                                         ? theme.palette.mode === 'dark'
                                           ? '#4f1717'
                                           : '#ffe2e2'
-                                        : theme.palette.mode === 'dark'
-                                        ? theme.palette.background.default
                                         : theme.palette.background.paper
                                     }}
                                   >
