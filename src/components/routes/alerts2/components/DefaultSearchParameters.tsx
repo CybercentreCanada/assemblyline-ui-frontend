@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
@@ -56,18 +56,25 @@ const WrappedAlertDefaultSearchParameters = () => {
   const location = useLocation();
   const { showSuccessMessage } = useMySnackbar();
 
-  const [currentQuery, setCurrentQuery] = useState<string>('');
-  const [existingQuery, setExistingQuery] = useState<string>('');
+  const [currentQuery, setCurrentQuery] = useState<[string, string][]>(null);
+  const [existingQuery, setExistingQuery] = useState<[string, string][]>(null);
   const [open, setOpen] = useState<boolean>(false);
 
-  const parseSearchParams = useCallback((search: string) => {
+  const parseSearchParams = useCallback((search: string): [string, string][] => {
+    if ([null, undefined, ''].includes(search)) return null;
     let entries = [];
     for (const entry of new URLSearchParams(search).entries()) {
       entries.push(entry);
     }
+
     entries.sort((a, b) => `${a[0]}${a[1]}`.localeCompare(`${b[0]}${b[1]}`));
-    return entries;
+    return entries.filter(entry => !['tc_start'].includes(entry[0]));
   }, []);
+
+  const isSameQuery = useMemo<boolean>(
+    () => (!currentQuery && !existingQuery) || JSON.stringify(currentQuery) === JSON.stringify(existingQuery),
+    [currentQuery, existingQuery]
+  );
 
   useEffect(() => {
     if (location.search === '' && localStorage.getItem(LOCAL_STORAGE)) {
@@ -82,8 +89,8 @@ const WrappedAlertDefaultSearchParameters = () => {
           <IconButton
             size="large"
             onClick={() => {
-              setCurrentQuery(location.search);
-              setExistingQuery(localStorage.getItem(LOCAL_STORAGE));
+              setCurrentQuery(parseSearchParams(location.search));
+              setExistingQuery(parseSearchParams(localStorage.getItem(LOCAL_STORAGE)));
               setOpen(true);
             }}
           >
@@ -102,7 +109,7 @@ const WrappedAlertDefaultSearchParameters = () => {
               {!existingQuery ? (
                 <div>{t('none')}</div>
               ) : (
-                parseSearchParams(existingQuery)?.map(([k, v], i) => (
+                existingQuery.map(([k, v], i) => (
                   <div key={i} style={{ display: 'contents' }}>
                     <b>{k}: </b>
                     {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
@@ -118,7 +125,7 @@ const WrappedAlertDefaultSearchParameters = () => {
               {!currentQuery ? (
                 <div>{t('none')}</div>
               ) : (
-                parseSearchParams(currentQuery)?.map(([k, v], i) => (
+                currentQuery.map(([k, v], i) => (
                   <div key={i} style={{ display: 'contents' }}>
                     <b>{k}: </b>
                     {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
@@ -131,11 +138,7 @@ const WrappedAlertDefaultSearchParameters = () => {
           <div>{existingQuery ? t('session.clear.confirm') : t('session.clear.none')}</div>
 
           <div>
-            {existingQuery === currentQuery
-              ? t('session.save.same')
-              : currentQuery
-              ? t('session.save.confirm')
-              : t('session.save.none')}
+            {isSameQuery ? t('session.save.same') : currentQuery ? t('session.save.confirm') : t('session.save.none')}
           </div>
         </DialogContent>
         <DialogActions>
@@ -154,7 +157,7 @@ const WrappedAlertDefaultSearchParameters = () => {
           <Button autoFocus color="secondary" children={t('session.cancel')} onClick={() => setOpen(false)} />
           <Button
             color="primary"
-            disabled={!currentQuery || currentQuery === existingQuery}
+            disabled={!currentQuery || isSameQuery}
             children={t('session.save')}
             onClick={() => {
               setOpen(false);
