@@ -569,7 +569,14 @@ const WrappedAlertFavorites = () => {
                     size: 'medium',
                     variant: 'outlined',
                     label: <span>{f.name}</span>,
-                    tooltip: f.query,
+                    tooltip: (
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontStyle: 'normal' }}>{f.query}</div>
+                        <div
+                          style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}
+                        >{`(${f.created_by})`}</div>
+                      </div>
+                    ),
                     deleteIcon: (
                       <IconButton className={classes.editIconButton}>
                         <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
