@@ -39,9 +39,9 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ searching = false, total =
       >
         <AlertsFiltersSelected query={query} hideQuery />
         <div style={{ flex: 1 }} />
-        <div>
+        <div style={{ minWidth: 'fit-content' }}>
           <SearchResultCount count={total} />
-          {total > 1 ? t('results') : t('result')}
+          <span>{total > 1 ? t('results') : t('result')}</span>
         </div>
       </div>
     );
@@ -57,10 +57,10 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ searching = false, total =
           {searching ? (
             ''
           ) : (
-            <span>
+            <div style={{ minWidth: 'fit-content' }}>
               <SearchResultCount count={total} />
-              {total > 1 ? t('results') : t('result')}
-            </span>
+              <span>{total > 1 ? t('results') : t('result')}</span>
+            </div>
           )}
         </div>
       </>

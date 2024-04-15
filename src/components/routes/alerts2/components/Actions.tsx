@@ -26,6 +26,7 @@ import {
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import clsx from 'clsx';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -68,6 +69,11 @@ const useStyles = makeStyles(theme => ({
   },
   actionsClosed: {
     width: 0
+  },
+  disabled: {
+    '&.Mui-disabled': {
+      backgroundColor: 'initial'
+    }
   },
   buttonProgress: {
     color: theme.palette.primary.main,
@@ -145,6 +151,7 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
             tooltipTitle={tooltipTitle}
             tooltipPlacement={vertical ? 'left' : 'bottom'}
             FabProps={{
+              className: clsx(permanent && classes.disabled),
               disabled: disabled || loading,
               size: permanent ? 'medium' : 'small',
               style: {
@@ -162,6 +169,7 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
         <Tooltip title={tooltipTitle}>
           <span>
             <IconButton
+              className={classes.disabled}
               href={!to ? null : typeof to === 'string' ? to : `${to.pathname}${to.search}${to.hash}`}
               disabled={disabled || loading}
               size="large"
@@ -707,7 +715,12 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
     return null;
   else
     return (
-      <div style={{ marginTop: vertical ? null : theme.spacing(-1), marginRight: vertical ? null : theme.spacing(-1) }}>
+      <div
+        style={{
+          marginTop: vertical ? null : theme.spacing(-1),
+          marginRight: vertical ? null : theme.spacing(-1)
+        }}
+      >
         <SpeedDial
           ariaLabel={t('action_menu')}
           classes={{
@@ -735,7 +748,18 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
           }}
         >
           {!alert || !render
-            ? []
+            ? [
+                <AlertActionButton
+                  key={`alert.default`}
+                  open={true}
+                  loading={false}
+                  disabled={false}
+                  vertical={vertical}
+                  permanent={permanent}
+                  speedDial={true}
+                  showSkeleton={!alert}
+                />
+              ]
             : [
                 <AlertBadlist
                   key={`${alert?.alert_id}.AlertBadlist`}

@@ -19,6 +19,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { DEFAULT_PARAMS, DEFAULT_QUERY } from 'components/routes/alerts';
 import CustomChip from 'components/visual/CustomChip';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
+import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -320,7 +321,7 @@ const Others: React.FC<OthersProps> = React.memo(({ values = [], search = '', on
   const parsedOptions = useMemo<Filter[]>(() => {
     const items = Object.keys({ ...options }).flatMap(key =>
       Object.keys({ ...(options && key in options ? options[key] : null) }).map(value => ({
-        value: `${key}:${value}`,
+        value: `${key}:${safeFieldValue(value)}`,
         count: options && key in options && value in options[key] ? options[key][value] : 0,
         total: 0
       }))

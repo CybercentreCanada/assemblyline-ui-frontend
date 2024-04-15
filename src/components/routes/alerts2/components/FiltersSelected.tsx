@@ -279,9 +279,9 @@ const WrappedAlertFiltersSelected = ({
   const { statuses, priorities, labels, favorites, others } = useMemo<Filters>(() => {
     let filters = { statuses: [], priorities: [], labels: [], favorites: [], others: [] };
     query.getAll('fq', []).forEach(filter => {
-      if (filter.startsWith('status:')) filters.statuses.push(filter);
-      else if (filter.startsWith('priority:')) filters.priorities.push(filter);
-      else if (filter.startsWith('label:')) filters.labels.push(filter);
+      if (filter.startsWith('status:(') && filter.endsWith(')')) filters.statuses.push(filter);
+      else if (filter.startsWith('priority:(') && filter.endsWith(')')) filters.priorities.push(filter);
+      else if (filter.startsWith('label:(') && filter.endsWith(')')) filters.labels.push(filter);
       else {
         const favorite = allFavorites.find(f => f.query === filter || `NOT(${f.query})` === filter);
         if (favorite) filters.favorites.push({ ...favorite, query: filter });
