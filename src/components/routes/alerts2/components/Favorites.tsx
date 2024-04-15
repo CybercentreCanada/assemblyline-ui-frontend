@@ -168,7 +168,7 @@ type UpdateFavoriteProps = {
   userFavorites: Favorite[];
   global: boolean;
   show: boolean;
-  onSuccess?: (favorite: Favorite, global: boolean) => void;
+  onSuccess?: (nextFavorite: Favorite, prevFavorite: Favorite, global: boolean) => void;
 };
 
 const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
@@ -189,6 +189,10 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
     const handleAccept = useCallback(() => {
       if (!isValid) return;
 
+      const old = global
+        ? globalFavorites.find(f => f.name === favorite.name)
+        : userFavorites.find(f => f.name === favorite.name);
+
       const data: Favorite = {
         query: favorite.query,
         name: favorite.name,
@@ -203,7 +207,7 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
         onSuccess: ({ api_response }) => {
           if (!api_response.success) return;
           showSuccessMessage(global ? t('added.global') : t('added.personal'));
-          onSuccess(data, global);
+          onSuccess(data, old, global);
         },
         onFailure: ({ api_error_message }) => showErrorMessage(api_error_message),
         onEnter: () => setWaiting(true),
@@ -373,13 +377,13 @@ const WrappedAlertFavorites = () => {
 
   const isExistingFavorite = useMemo<boolean>(
     () =>
-      global
+      currentGlobal
         ? globalFavorites.some(f => f.name === currentFavorite.name)
         : userFavorites.some(f => f.name === currentFavorite.name),
-    [currentFavorite.name, globalFavorites, userFavorites]
+    [currentFavorite.name, currentGlobal, globalFavorites, userFavorites]
   );
 
-  const handleUpdateFavorites = useCallback(
+  const handleAddFavorites = useCallback(
     (favorite: Favorite, global: boolean) => {
       updateFavorite(favorite, global);
       setCurrentFavorite(defaultFavorite);
@@ -387,12 +391,28 @@ const WrappedAlertFavorites = () => {
     [defaultFavorite, updateFavorite]
   );
 
+  const handleUpdateFavorites = useCallback(
+    (nextFavorite: Favorite, prevFavorite: Favorite, global: boolean) => {
+      const query = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
+      query.replace('fq', prevFavorite.query, nextFavorite.query);
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+
+      updateFavorite(nextFavorite, global);
+      setCurrentFavorite(defaultFavorite);
+    },
+    [defaultFavorite, location.hash, location.pathname, location.search, navigate, updateFavorite]
+  );
+
   const handleDeleteFavorites = useCallback(
     (favorite: Favorite, global: boolean) => {
+      const query = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
+      query.remove('fq', favorite.query);
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+
       deleteFavorite(favorite, global);
       setCurrentFavorite(defaultFavorite);
     },
-    [defaultFavorite, deleteFavorite]
+    [defaultFavorite, deleteFavorite, location.hash, location.pathname, location.search, navigate]
   );
 
   const handleFavoriteClick = useCallback(
@@ -517,7 +537,7 @@ const WrappedAlertFavorites = () => {
                   favorite={currentFavorite}
                   global={currentGlobal}
                   show={!isExistingFavorite}
-                  onSuccess={handleUpdateFavorites}
+                  onSuccess={handleAddFavorites}
                 />
               </Grid>
 
@@ -549,7 +569,14 @@ const WrappedAlertFavorites = () => {
                     size: 'medium',
                     variant: 'outlined',
                     label: <span>{f.name}</span>,
-                    tooltip: f.query,
+                    tooltip: (
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontStyle: 'normal' }}>{f.query}</div>
+                        <div
+                          style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}
+                        >{`(${f.created_by})`}</div>
+                      </div>
+                    ),
                     deleteIcon: (
                       <IconButton className={classes.editIconButton}>
                         <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />

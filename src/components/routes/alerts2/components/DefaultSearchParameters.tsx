@@ -106,7 +106,7 @@ const WrappedAlertDefaultSearchParameters = () => {
           <Grid item>
             <Typography variant="subtitle2">{t('session.existing')}</Typography>
             <Paper component="pre" variant="outlined" className={classes.preview}>
-              {!existingQuery ? (
+              {!existingQuery || existingQuery.length === 0 ? (
                 <div>{t('none')}</div>
               ) : (
                 existingQuery.map(([k, v], i) => (
@@ -122,7 +122,7 @@ const WrappedAlertDefaultSearchParameters = () => {
           <Grid item>
             <Typography variant="subtitle2">{t('session.current')}</Typography>
             <Paper component="pre" variant="outlined" className={classes.preview}>
-              {!currentQuery ? (
+              {!currentQuery || currentQuery.length === 0 ? (
                 <div>{t('none')}</div>
               ) : (
                 currentQuery.map(([k, v], i) => (
@@ -162,7 +162,7 @@ const WrappedAlertDefaultSearchParameters = () => {
             onClick={() => {
               setOpen(false);
               showSuccessMessage(t('session.save.success'));
-              localStorage.setItem(LOCAL_STORAGE, location.search);
+              localStorage.setItem(LOCAL_STORAGE, new URLSearchParams(currentQuery).toString());
             }}
           />
         </DialogActions>
