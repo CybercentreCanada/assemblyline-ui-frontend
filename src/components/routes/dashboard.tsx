@@ -947,6 +947,7 @@ const WARN_SHARD_SIZE = 40_000_000_000;
 
 const WrappedElasticCard = ({ elastic }) => {
   const { t } = useTranslation(['dashboard']);
+  const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
   const classes = useStyles();
 
@@ -961,12 +962,18 @@ const WrappedElasticCard = ({ elastic }) => {
   useEffect(() => {
     if (elastic.initialized && elastic.instances === 0) {
       setError(t('elasticsearch.error.none'));
-    } else if (elastic.request_time > 0.1) {
+    } else if (elastic.initialized && elastic.request_time > 0.1) {
       setError(t('elasticsearch.error.slow'));
-    } else if (shardSize > WARN_SHARD_SIZE) {
+    } else if (elastic.initialized && shardSize > WARN_SHARD_SIZE) {
       setError(t('elasticsearch.error.shard_size'));
-    } else if (error !== null) {
-      setError(null);
+    } else if ((timer !== null && elastic.initialized) || (timer === null && !elastic.initialized)) {
+      if (error !== null) setError(null);
+      if (timer !== null) clearTimeout(timer);
+      setTimer(
+        setTimeout(() => {
+          setError(t('timeout'));
+        }, 10000)
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [elastic]);
@@ -1018,6 +1025,7 @@ const WARN_RETROHUNT_STORAGE = 10_000_000_000;
 
 const WrappedRetrohuntCard = ({ retrohunt }) => {
   const { t } = useTranslation(['dashboard']);
+  const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
   const classes = useStyles();
 
@@ -1029,10 +1037,16 @@ const WrappedRetrohuntCard = ({ retrohunt }) => {
   useEffect(() => {
     if (retrohunt.initialized && retrohunt.instances === 0) {
       setError(t('retrohunt.error.none'));
-    } else if (retrohunt.worker_storage_available < WARN_RETROHUNT_STORAGE) {
+    } else if (retrohunt.initialized && retrohunt.worker_storage_available < WARN_RETROHUNT_STORAGE) {
       setError(t('retrohunt.error.storage'));
-    } else if (error !== null) {
-      setError(null);
+    } else if ((timer !== null && retrohunt.initialized) || (timer === null && !retrohunt.initialized)) {
+      if (error !== null) setError(null);
+      if (timer !== null) clearTimeout(timer);
+      setTimer(
+        setTimeout(() => {
+          setError(t('timeout'));
+        }, 10000)
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [retrohunt]);
