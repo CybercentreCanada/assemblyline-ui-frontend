@@ -964,6 +964,8 @@ const WrappedElasticCard = ({ elastic }) => {
       setError(t('elasticsearch.error.none'));
     } else if (elastic.initialized && elastic.request_time > 0.1) {
       setError(t('elasticsearch.error.slow'));
+    } else if (elastic.initialized && elastic.unassigned_shards > 0) {
+      setError(t('elasticsearch.error.unassigned'));
     } else if (elastic.initialized && shardSize > WARN_SHARD_SIZE) {
       setError(t('elasticsearch.error.shard_size'));
     } else if ((timer !== null && elastic.initialized) || (timer === null && !elastic.initialized)) {
@@ -997,6 +999,12 @@ const WrappedElasticCard = ({ elastic }) => {
             value={humanSeconds(elastic.request_time, t)}
             title="P"
             tooltip={t('elasticsearch.ping')}
+          />
+          <MetricCounter
+            init={elastic.initialized}
+            value={elastic.unassigned_shards}
+            title="U"
+            tooltip={t('elasticsearch.unassigned')}
           />
         </Grid>
         <Grid item xs={12}>
@@ -1370,6 +1378,7 @@ const DEFAULT_SERVICE_LIST = {
 const DEFAULT_ELASTIC = {
   instances: 0,
   request_time: 0,
+  unassigned_shards: 0,
   shard_sizes: {},
   error: null,
   initialized: false
