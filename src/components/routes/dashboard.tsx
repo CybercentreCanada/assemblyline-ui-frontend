@@ -12,6 +12,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ArcGauge from 'components/visual/ArcGauge';
 import CustomChip from 'components/visual/CustomChip';
+import { bytesToSize, humanSeconds } from 'helpers/utils';
 import React, { useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import io from 'socket.io-client';
@@ -942,42 +943,19 @@ const WrappedServiceCard = ({ service, max_inflight }) => {
   );
 };
 
-
-function formatBytes(size: number) {
-  if(size < 2 ** 10) {
-    return size + ' B'
-  } else if (size < 2 ** 20){
-    return (size/2 ** 10).toFixed(1) + ' KB'
-  } else if (size < 2 ** 30){
-    return (size/2 ** 20).toFixed(1) + ' MB'
-  } else if (size < 2 ** 40){
-    return (size/2 ** 30).toFixed(1) + ' GB'
-  } else {
-    return (size/2 ** 40).toFixed(1) + ' TB'
-  }
-}
-
 const WARN_SHARD_SIZE = 40_000_000_000;
-
-function formatSeconds(seconds: number, t) {
-  if(seconds < 1) {
-    return Math.floor(seconds * 1000) + ' ' + t('milliseconds')
-  } else {
-    return seconds.toFixed(1) + ' ' + t('seconds')
-  } 
-}
 
 const WrappedElasticCard = ({ elastic }) => {
   const { t } = useTranslation(['dashboard']);
   const [error, setError] = useState(null);
   const classes = useStyles();
 
-  let largest_index = null;
-  let shard_size = null;
-  if(elastic.shard_sizes.length > 0) {
-    let row = elastic.shard_sizes.reduce((a, b) => a.shard_size > b.shard_size ? a : b);
-    largest_index = row.name;
-    shard_size = row.shard_size;
+  let largestIndex = null;
+  let shardSize = null;
+  if (elastic.shard_sizes.length > 0) {
+    let row = elastic.shard_sizes.reduce((a, b) => (a.shard_size > b.shard_size ? a : b));
+    largestIndex = row.name;
+    shardSize = row.shard_size;
   }
 
   useEffect(() => {
@@ -985,7 +963,7 @@ const WrappedElasticCard = ({ elastic }) => {
       setError(t('elasticsearch.error.none'));
     } else if (elastic.request_time > 0.1) {
       setError(t('elasticsearch.error.slow'));
-    } else if (shard_size > WARN_SHARD_SIZE) {
+    } else if (shardSize > WARN_SHARD_SIZE) {
       setError(t('elasticsearch.error.shard_size'));
     } else if (error !== null) {
       setError(null);
@@ -994,7 +972,7 @@ const WrappedElasticCard = ({ elastic }) => {
   }, [elastic]);
 
   return (
-    <Card className={`${classes.card} ${error || elastic.error ? classes.error : classes.ok}`}>
+    <Card className={`${classes.core_card} ${error || elastic.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
           {(error || elastic.error) && (
@@ -1004,32 +982,31 @@ const WrappedElasticCard = ({ elastic }) => {
               </div>
             </Tooltip>
           )}
-          <div className={classes.title}>
-            {`Elasticsearch :: ${elastic.instances}`}
-          </div>
+          <div className={classes.title}>{`${t('elasticsearch')} :: x${elastic.instances}`}</div>
         </Grid>
         <Grid item xs={12}>
-          <MetricCounter 
+          <MetricCounter
             init={elastic.initialized}
-            value={formatSeconds(elastic.request_time, t)} 
-            title="P" 
-            tooltip={t('elasticsearch.ping')} 
+            value={humanSeconds(elastic.request_time, t)}
+            title="P"
+            tooltip={t('elasticsearch.ping')}
           />
         </Grid>
-        <Grid item xs={6}>
-          <MetricCounter 
-            init={elastic.initialized} 
-            value={largest_index} 
-            title="I" 
-            tooltip={t('elasticsearch.shard.index')} 
+        <Grid item xs={12}>
+          <div>
+            <label>{t('big_index')}</label>
+          </div>
+          <MetricCounter
+            init={elastic.initialized}
+            value={largestIndex}
+            title="I"
+            tooltip={t('elasticsearch.shard.index')}
           />
-        </Grid>
-        <Grid item xs={6}>
-          <MetricCounter 
-            init={elastic.initialized} 
-            value={formatBytes(shard_size)} 
-            title="S" 
-            tooltip={t('elasticsearch.shard.size')} 
+          <MetricCounter
+            init={elastic.initialized}
+            value={bytesToSize(shardSize)}
+            title="S"
+            tooltip={t('elasticsearch.shard.size')}
           />
         </Grid>
       </Grid>
@@ -1037,18 +1014,31 @@ const WrappedElasticCard = ({ elastic }) => {
   );
 };
 
+const WARN_RETROHUNT_STORAGE = 10_000_000_000;
+
 const WrappedRetrohuntCard = ({ retrohunt }) => {
   const { t } = useTranslation(['dashboard']);
   const [error, setError] = useState(null);
   const classes = useStyles();
 
-  let pending_files = retrohunt.pending_files;
-  if(pending_files == 1_000_000){
-    pending_files = pending_files.toString() + "+";
+  let pendingFiles = retrohunt.pending_files;
+  if (pendingFiles === 1_000_000) {
+    pendingFiles = pendingFiles.toString() + '+';
   }
 
+  useEffect(() => {
+    if (retrohunt.initialized && retrohunt.instances === 0) {
+      setError(t('retrohunt.error.none'));
+    } else if (retrohunt.worker_storage_available < WARN_RETROHUNT_STORAGE) {
+      setError(t('retrohunt.error.storage'));
+    } else if (error !== null) {
+      setError(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [retrohunt]);
+
   return (
-    <Card className={`${classes.card} ${error || retrohunt.error ? classes.error : classes.ok}`}>
+    <Card className={`${classes.core_card} ${error || retrohunt.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
           {(error || retrohunt.error) && (
@@ -1058,35 +1048,61 @@ const WrappedRetrohuntCard = ({ retrohunt }) => {
               </div>
             </Tooltip>
           )}
-          <div className={classes.title}>
-            {`Retrohunt :: ${retrohunt.instances}`}
-          </div>
+          <div className={classes.title}>{`${t('retrohunt')} :: x${retrohunt.instances}`}</div>
         </Grid>
-        <Grid item xs={3}>
-          <MetricCounter init={retrohunt.initialized} value={retrohunt.active_searches} title="A" tooltip={t('retrohunt.active_searches')} />
-        </Grid>
-        <Grid item xs={3}>
-          <MetricCounter 
-            init={retrohunt.initialized} 
-            value={formatSeconds(retrohunt.request_time, t)} 
-            title="P" 
-            tooltip={t('retrohunt.request_time')} 
+        <Grid item xs={12}>
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={humanSeconds(retrohunt.request_time, t)}
+            title="P"
+            tooltip={t('retrohunt.request_time')}
           />
         </Grid>
-        <Grid item xs={3}>
-          <MetricCounter init={retrohunt.initialized} value={pending_files} title="F" tooltip={t('retrohunt.pending_files')} />
+        <Grid item xs={6}>
+          <div>
+            <label>{t('retrohunt.label.stats')}</label>
+          </div>
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={retrohunt.active_searches}
+            title="A"
+            tooltip={t('retrohunt.active_searches')}
+          />
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={pendingFiles}
+            title="F"
+            tooltip={t('retrohunt.pending_files')}
+          />
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={retrohunt.ingested_last_minute}
+            title="I"
+            tooltip={t('retrohunt.ingested')}
+          />
         </Grid>
-        <Grid item xs={3}>
-          <MetricCounter init={retrohunt.initialized} value={retrohunt.ingested_last_minute} title="I" tooltip={t('retrohunt.ingested')} />
-        </Grid>
-        <Grid item xs={4}>
-          <MetricCounter init={retrohunt.initialized} value={formatBytes(retrohunt.worker_storage_available)} title="S" tooltip={t('retrohunt.worker_storage')} />
-        </Grid>
-        <Grid item xs={4}>
-          <MetricCounter init={retrohunt.initialized} value={retrohunt.last_minute_cpu.toFixed(1)} title="C" tooltip={t('retrohunt.cpu_minute')} />
-        </Grid>
-        <Grid item xs={4}>
-          <MetricCounter init={retrohunt.initialized} value={formatBytes(retrohunt.total_memory_used)} title="M" tooltip={t('retrohunt.memory')} />
+        <Grid item xs={6}>
+          <div>
+            <label>{t('retrohunt.label.worker')}</label>
+          </div>
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={retrohunt.last_minute_cpu.toFixed(1)}
+            title="C"
+            tooltip={t('retrohunt.cpu_minute')}
+          />
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={bytesToSize(retrohunt.total_memory_used)}
+            title="M"
+            tooltip={t('retrohunt.memory')}
+          />
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={bytesToSize(retrohunt.worker_storage_available)}
+            title="S"
+            tooltip={t('retrohunt.worker_storage')}
+          />
         </Grid>
       </Grid>
     </Card>
@@ -1514,13 +1530,6 @@ const Dashboard = () => {
     };
   });
 
-  let retrohunt_card = null;
-  if(retrohunt.initialized) {
-    retrohunt_card = <Grid key='retrohunt' item xs={12} sm={6} md={4} lg={3} xl={2}>
-      <RetrohuntCard retrohunt={retrohunt} />
-    </Grid>;
-  }
-
   return (
     <PageFullScreen margin={4}>
       <Typography gutterBottom color="primary" variant="h2" align="center">
@@ -1541,26 +1550,63 @@ const Dashboard = () => {
         </Grid>
         <Grid
           item
-          xs={configuration.datastore.archive.enabled ? 6 : 12}
-          xl={configuration.datastore.archive.enabled ? 3 : 4}
+          xs={12}
+          md={6}
+          xl={
+            configuration.datastore.archive.enabled && configuration.retrohunt.enabled
+              ? 4
+              : !configuration.datastore.archive.enabled && !configuration.retrohunt.enabled
+              ? 3
+              : 6
+          }
         >
           <ExpiryCard expiry={expiry} />
         </Grid>
         {configuration.datastore.archive.enabled && (
-          <Grid item xs={6} xl={3}>
+          <Grid item xs={12} md={6} xl={configuration.retrohunt.enabled ? 4 : 6}>
             <ArchiveCard archive={archive} />
           </Grid>
         )}
-        <Grid item xs={12} md={8} xl={configuration.datastore.archive.enabled ? 3 : 4}>
-          <AlerterCard alerter={alerter} />
-        </Grid>
-        <Grid item xs={12} md={4} xl={configuration.datastore.archive.enabled ? 3 : 4}>
-          <ScalerResourcesCard scaler={scaler} />
-        </Grid>
-        <Grid key='elastic' item xs={12} sm={6} md={4} lg={3} xl={2}>
+        {configuration.retrohunt.enabled && (
+          <Grid key="retrohunt" item xs={12} md={6} xl={configuration.datastore.archive.enabled ? 4 : 6}>
+            <RetrohuntCard retrohunt={retrohunt} />
+          </Grid>
+        )}
+        <Grid
+          key="elastic"
+          item
+          xs={12}
+          md={
+            (!configuration.datastore.archive.enabled && configuration.retrohunt.enabled) ||
+            (configuration.datastore.archive.enabled && !configuration.retrohunt.enabled)
+              ? 4
+              : 6
+          }
+          xl={!configuration.datastore.archive.enabled && !configuration.retrohunt.enabled ? 3 : 4}
+        >
           <ElasticCard elastic={elastic} />
         </Grid>
-        {retrohunt_card}
+        <Grid
+          item
+          xs={12}
+          md={
+            (!configuration.datastore.archive.enabled && configuration.retrohunt.enabled) ||
+            (configuration.datastore.archive.enabled && !configuration.retrohunt.enabled)
+              ? 4
+              : 8
+          }
+          xl={!configuration.datastore.archive.enabled && !configuration.retrohunt.enabled ? 3 : 4}
+        >
+          <AlerterCard alerter={alerter} />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          md={4}
+          xl={!configuration.datastore.archive.enabled && !configuration.retrohunt.enabled ? 3 : 4}
+        >
+          <ScalerResourcesCard scaler={scaler} />
+        </Grid>
         {Object.keys(services)
           .sort()
           .map(key => (
