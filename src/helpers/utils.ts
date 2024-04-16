@@ -51,6 +51,23 @@ export function getFileName(disposition: string): string {
 
 /**
  *
+ * Convert a given second to human readable form
+ *
+ * @param seconds - seconds to convert
+ *
+ * @returns Human readable string
+ *
+ */
+export function humanSeconds(seconds: number, t) {
+  if (seconds < 1) {
+    return Math.floor(seconds * 1000) + ' ' + t('milliseconds');
+  } else {
+    return seconds.toFixed(1) + ' ' + t('seconds');
+  }
+}
+
+/**
+ *
  * Convert a given bytes to human readable form (base 2)
  *
  * @param bytes - total bytes to convert
