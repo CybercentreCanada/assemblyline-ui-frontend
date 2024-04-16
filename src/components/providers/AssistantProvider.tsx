@@ -479,10 +479,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                               <Paper
                                 sx={{
                                   p: 1,
-                                  backgroundColor:
-                                    theme.palette.mode === 'dark'
-                                      ? theme.palette.background.default
-                                      : theme.palette.background.paper
+                                  backgroundColor: theme.palette.background.paper
                                 }}
                               >
                                 <ThinkingBadge />
