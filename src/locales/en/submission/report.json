@@ -6,6 +6,7 @@
   "error.too_early": "It is too early to generate the report, the submission has not completed. Redirecting you to the detail view...",
   "family": "Family",
   "file.description": "Description",
+  "file.entropy": "Entropy",
   "file.fragment": "Fragment",
   "file.hostname": "Hostname",
   "file.magic": "Magic",
