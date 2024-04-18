@@ -5,6 +5,7 @@ import { resetFavicon } from 'helpers/utils';
 import { lazy, memo, Suspense, useEffect, useState } from 'react';
 import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router';
 import LoadingScreen from './loading';
+import Theme from './theme';
 
 const ForbiddenPage = lazy(() => import('components/routes/403'));
 const NotFoundPage = lazy(() => import('components/routes/404_dl'));
@@ -22,6 +23,8 @@ const AdminTagSafelist = lazy(() => import('components/routes/admin/tag_safelist
 const AdminUsers = lazy(() => import('components/routes/admin/users'));
 const AlertDetails = lazy(() => import('components/routes/alerts/alert-details'));
 const Alerts = lazy(() => import('components/routes/alerts/alerts'));
+const AlertDetails2 = lazy(() => import('components/routes/alerts2/detail'));
+const Alerts2 = lazy(() => import('components/routes/alerts'));
 const AppRegistration = lazy(() => import('components/routes/authorize'));
 const ArchiveDetail = lazy(() => import('components/routes/archive/detail'));
 const CrashTest = lazy(() => import('components/routes/crash'));
@@ -102,6 +105,8 @@ const WrappedRoutes = () => {
         <Route path="/account" element={<Account />} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/alerts/:id" element={<AlertDetails />} />
+        <Route path="/alerts2" element={<Alerts2 />} />
+        <Route path="/alerts2/:id" element={<AlertDetails2 />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/actions" element={<AdminActions />} />
         <Route path="/admin/errors" element={<AdminErrorViewer />} />
@@ -144,7 +149,7 @@ const WrappedRoutes = () => {
         <Route path="/manage/badlist" element={<ManageBadlist />} />
         <Route path="/manage" element={<Manage />} />
         <Route path="/retrohunt" element={<RetroHunt />} />
-        <Route path="/retrohunt/:code" element={<RetroHuntDetail />} />
+        <Route path="/retrohunt/:key" element={<RetroHuntDetail />} />
         <Route path="/search" element={<Search />} />
         <Route path="/search/:id" element={<Search />} />
         <Route path="/settings" element={<Settings />} />
@@ -154,6 +159,7 @@ const WrappedRoutes = () => {
         <Route path="/submission/report/:id" element={<SubmissionReport />} />
         <Route path="/submission/:id" element={<RedirectSubmission />} />
         <Route path="/submissions" element={<Submissions />} />
+        <Route path="/theme" element={<Theme />} />
         <Route path="/tos" element={<Tos />} />
         <Route path="/forbidden" element={<ForbiddenPage />} />
         <Route path="/notfound" element={<NotFoundPage />} />

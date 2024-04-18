@@ -75,6 +75,18 @@ export type ConfigurationDefinition = {
     allow_extended_apikeys: boolean;
     allow_security_tokens: boolean;
   };
+  core: {
+    archiver: {
+      metadata: {
+        [metakey: string]: {
+          default: string;
+          editable: boolean;
+          values: string[];
+        };
+      };
+      use_metadata: boolean;
+    };
+  };
   datastore: {
     archive: {
       enabled: boolean;

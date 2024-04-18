@@ -1,4 +1,4 @@
-import { Chip, ChipProps, Tooltip } from '@mui/material';
+import { Chip, ChipProps, Tooltip, TooltipProps } from '@mui/material';
 import { darken } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
@@ -32,20 +32,8 @@ export type CustomChipProps = ChipProps & {
   component?: React.ElementType;
   fullWidth?: boolean;
   mono?: boolean;
-  tooltip?: string;
-  tooltipPlacement?:
-    | 'bottom-end'
-    | 'bottom-start'
-    | 'bottom'
-    | 'left-end'
-    | 'left-start'
-    | 'left'
-    | 'right-end'
-    | 'right-start'
-    | 'right'
-    | 'top-end'
-    | 'top-start'
-    | 'top';
+  tooltip?: TooltipProps['title'];
+  tooltipPlacement?: TooltipProps['placement'];
   type?: 'round' | 'square' | 'rounded';
   wrap?: boolean;
 };
@@ -92,46 +80,45 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#616161' : '#999',
     color: theme.palette.common.white,
     '[role=button]&:hover, [role=button]&:focus': {
-      backgroundColor: darken(theme.palette.mode === 'dark' ? '#616161' : '#999', 0.15)
+      backgroundColor: darken(theme.palette.mode === 'dark' ? '#616161' : '#999', 0.2)
     }
   },
   primary: {
     '[role=button]&:hover, [role=button]&:focus': {
-      backgroundColor: darken(theme.palette.primary.main, 0.15)
+      backgroundColor: theme.palette.primary.dark
     }
   },
   secondary: {
-    color: theme.palette.common.white,
     '[role=button]&:hover, [role=button]&:focus': {
-      backgroundColor: darken(theme.palette.secondary.main, 0.15)
+      backgroundColor: theme.palette.secondary.dark
     }
   },
   success: {
     backgroundColor: theme.palette.success.main,
-    color: theme.palette.common.white,
+    color: theme.palette.success.contrastText,
     '[role=button]&:hover, [role=button]&:focus': {
-      backgroundColor: darken(theme.palette.success.main, 0.15)
+      backgroundColor: theme.palette.success.dark
     }
   },
   info: {
-    backgroundColor: theme.palette.mode === 'dark' ? '#28abd2' : '#00baf1',
-    color: theme.palette.common.white,
+    backgroundColor: theme.palette.info.main,
+    color: theme.palette.info.contrastText,
     '[role=button]&:hover, [role=button]&:focus': {
-      backgroundColor: darken(theme.palette.mode === 'dark' ? '#28abd2' : '#00baf1', 0.15)
+      backgroundColor: theme.palette.info.dark
     }
   },
   warning: {
-    backgroundColor: theme.palette.mode === 'dark' ? '#ed8b00' : '#ff9d12',
-    color: theme.palette.common.white,
+    backgroundColor: theme.palette.warning.main,
+    color: theme.palette.warning.contrastText,
     '[role=button]&:hover, [role=button]&:focus': {
-      backgroundColor: darken(theme.palette.mode === 'dark' ? '#ed8b00' : '#ff9d12', 0.15)
+      backgroundColor: theme.palette.warning.dark
     }
   },
   error: {
     backgroundColor: theme.palette.error.dark,
-    color: theme.palette.common.white,
+    color: theme.palette.error.contrastText,
     '[role=button]&:hover, [role=button]&:focus': {
-      backgroundColor: darken(theme.palette.error.dark, 0.15)
+      backgroundColor: darken(theme.palette.error.dark, 0.25)
     }
   },
   // Outlined
