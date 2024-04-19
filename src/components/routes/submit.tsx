@@ -34,7 +34,7 @@ import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
-import { matchSHA256, matchURL } from 'helpers/utils';
+import { matchURL } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -106,7 +106,7 @@ const Submit: React.FC<any> = () => {
   const params = new URLSearchParams(location.search);
   const [stringInput, setStringInput] = useState('');
   const [stringType, setStringType] = useState(undefined);
-  const stringInputTitle = 'Strings';
+  const stringInputTitle = 'URL / Hash ';
   const stringInputText = stringInputTitle + t('urlHash.input_suffix');
   const [stringInputHasError, setStringInputHasError] = useState(false);
   const [submissionMetadata, setSubmissionMetadata] = useState(undefined);
@@ -346,25 +346,15 @@ const Submit: React.FC<any> = () => {
   function analyseUrlHash() {
     let data: any = null;
     setAllowClick(false);
-    const sha256 = matchSHA256(stringInput);
-    const url = matchURL(stringInput);
 
-    if (!sha256 && (!url || !configuration.ui.allow_url_submissions)) {
+    if (!stringType && (stringType !== 'url' || !configuration.ui.allow_url_submissions)) {
       setAllowClick(true);
       setStringInputHasError(true);
       showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
       return;
     }
 
-    if (sha256) {
-      data = { ui_params: settings, name: sha256, sha256: sha256, metadata: submissionMetadata };
-    } else {
-      data = {
-        ui_params: settings,
-        url: stringInput,
-        metadata: submissionMetadata
-      };
-    }
+    data = { ui_params: settings, [stringType]: stringInput, metadata: submissionMetadata };
 
     setStringInputHasError(false);
     apiCall({
@@ -400,7 +390,7 @@ const Submit: React.FC<any> = () => {
       setSettings({ ...settings, services: newServices });
       setUrlAutoselection(true);
     }
-  }, [settings, stringInput, urlAutoselection, configuration.ui.url_submission_auto_service_selection]);
+  }, [settings, stringType, urlAutoselection, configuration.ui.url_submission_auto_service_selection]);
 
   useEffect(() => {
     if (state) {
@@ -408,11 +398,6 @@ const Submit: React.FC<any> = () => {
       setStringType('sha256');
       setSubmissionMetadata(state.metadata);
       setValue(state.tabContext);
-    } else if (params) {
-      var string = params.get('string') || '';
-      setStringInput(string);
-      handleStringChange(string);
-      setValue('1');
     }
   }, [state]);
 
@@ -442,6 +427,13 @@ const Submit: React.FC<any> = () => {
       }
     });
     setUUID(generateUUID());
+
+    if (params) {
+      var input = params.get('input') || '';
+      setStringInput(input);
+      handleStringChange(input);
+      setValue('1');
+    }
   });
 
   return (
