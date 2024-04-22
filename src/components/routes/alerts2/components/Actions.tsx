@@ -253,7 +253,7 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
       if (!alert || !alert.group_count) return '';
 
       const query = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
-      const groupBy = getGroupBy(location.search, DEFAULT_QUERY);
+      const groupBy = getGroupBy(location.search);
       query.set('group_by', '');
       query.add('fq', `${groupBy}:${getValueFromPath(alert, groupBy)}`);
       return query.getDeltaString();
@@ -297,7 +297,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
     const [confirmation, setConfirmation] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
 
-    const groupBy = useMemo<string>(() => getGroupBy(location.search, DEFAULT_QUERY), [location.search]);
+    const groupBy = useMemo<string>(() => getGroupBy(location.search), [location.search]);
 
     const queryString = useMemo<string>(() => {
       if (!alert) return null;
@@ -457,7 +457,7 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
 
     const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
 
-    const groupBy = useMemo<string>(() => getGroupBy(location.search, DEFAULT_QUERY), [location.search]);
+    const groupBy = useMemo<string>(() => getGroupBy(location.search), [location.search]);
 
     const query = useMemo<SimpleSearchQuery>(() => {
       if (!alert) return null;

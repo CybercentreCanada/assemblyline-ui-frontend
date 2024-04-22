@@ -342,7 +342,6 @@ const WrappedAlertFiltersSelected = ({
           variant="outlined"
           size="small"
           style={{ minHeight: '25px' }}
-          color={status.not ? 'error' : 'default'}
           icon={<DateRangeIcon fontSize="small" />}
           label={
             <div>
