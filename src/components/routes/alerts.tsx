@@ -22,7 +22,6 @@ import { AlertFavorites } from './alerts2/components/Favorites';
 import AlertFilters from './alerts2/components/Filters';
 import AlertListItem from './alerts2/components/ListItem';
 import { AlertSearchResults } from './alerts2/components/Results';
-import { AlertSorts } from './alerts2/components/Sorts';
 import AlertWorkflows from './alerts2/components/Workflows';
 import { AlertsProvider } from './alerts2/contexts/AlertsContext';
 import AlertDetail2 from './alerts2/detail';
@@ -160,11 +159,11 @@ const WrappedAlertsPage = () => {
           if ('tc_start' in api_response) {
             executionTime.current = api_response.tc_start;
             current.set('tc_start', executionTime.current);
-            navigate(`${location.pathname}?${current.getDeltaString()}${location.hash}`);
+            navigate(`${location.pathname}?${current.getDeltaString()}${location.hash}`, { replace: true });
           } else if (!executionTime.current && api_response.items.length > 0) {
             executionTime.current = api_response.items[0].reporting_ts;
             current.set('tc_start', executionTime.current);
-            navigate(`${location.pathname}?${current.getDeltaString()}${location.hash}`);
+            navigate(`${location.pathname}?${current.getDeltaString()}${location.hash}`, { replace: true });
           }
 
           const max = api_response.offset + api_response.rows;
@@ -206,8 +205,11 @@ const WrappedAlertsPage = () => {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<AlertDetail2 id={location.hash.substr(1)} inDrawer />, { hasMaximize: true });
+      const id = location.hash.substr(1);
+      const alert = alerts.find(item => item.alert_id === id);
+      setGlobalDrawer(<AlertDetail2 id={id} alert={alert} inDrawer />, { hasMaximize: true });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash, setGlobalDrawer]);
 
   useEffect(() => {
@@ -262,7 +264,6 @@ const WrappedAlertsPage = () => {
                       style={{ marginLeft: theme.spacing(upMD ? 1 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
                     />
                     <AlertFavorites />
-                    <AlertSorts />
                     <AlertFilters />
                     <AlertWorkflows alerts={alerts} />
                     <div style={{ width: theme.spacing(0.5) }} />

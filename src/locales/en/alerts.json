@@ -131,6 +131,7 @@
   "tc.24h": "24 Hours",
   "tc.4d": "4 Days",
   "tc.none": "No time constraint (can be slow)",
+  "tc_start": "Start Time",
   "tooltip.actions": "Alert Actions",
   "ts": "Timestamp",
   "type": "Type",

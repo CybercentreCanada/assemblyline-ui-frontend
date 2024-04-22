@@ -568,7 +568,6 @@ export const AlertSafelist: React.FC<AlertActionProps> = React.memo(
         tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious.action')}
         open={open}
         loading={loading}
-        disabled={hasSetNonMalicious}
         vertical={vertical}
         permanent={permanent}
         speedDial={speedDial}
@@ -650,7 +649,6 @@ export const AlertBadlist: React.FC<AlertActionProps> = React.memo(
         tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious.action')}
         open={open}
         loading={loading}
-        disabled={hasSetMalicious}
         vertical={vertical}
         permanent={permanent}
         speedDial={speedDial}
@@ -735,9 +733,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
           }
           direction={vertical ? 'down' : 'left'}
           open={open || permanent}
-          onOpen={(event, reason: OpenReason) =>
-            reason !== 'toggle' && reason !== 'mouseEnter' ? null : setOpen(true)
-          }
+          onOpen={(event, reason: OpenReason) => (reason !== 'toggle' ? null : setOpen(true))}
           onClose={(event, reason: CloseReason) =>
             reason !== 'toggle' && reason !== 'escapeKeyDown' ? null : setOpen(false)
           }

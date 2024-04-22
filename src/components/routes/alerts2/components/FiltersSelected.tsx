@@ -1,6 +1,5 @@
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import DateRangeIcon from '@mui/icons-material/DateRange';
-import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import SortIcon from '@mui/icons-material/Sort';
 import SourceIcon from '@mui/icons-material/Source';
 import StarIcon from '@mui/icons-material/Star';
@@ -16,10 +15,11 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { ChipList } from 'components/visual/ChipList';
+import CustomChip from 'components/visual/CustomChip';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import { useAlerts } from '../contexts/AlertsContext';
@@ -39,16 +39,23 @@ const useStyles = makeStyles(theme => ({
     transform: 'rotate(180deg)'
   },
   deleteIcon: {
+    fontSize: 'large !important',
     color: `${theme.palette.text.primary} !important`
   }
 }));
 
+type Filter = {
+  value: string;
+  filter: string;
+  not: boolean;
+};
+
 type Filters = {
-  statuses: string[];
-  priorities: string[];
-  labels: string[];
-  favorites: Favorite[];
-  others: string[];
+  status: Filter;
+  priority: Filter;
+  labels: Filter[];
+  favorites: (Favorite & Filter)[];
+  others: Filter[];
 };
 
 type MenuFilterProps = {
@@ -60,10 +67,11 @@ type MenuFilterProps = {
   size?: ChipProps['size'] | 'tiny';
 
   icon: ChipProps['icon'];
-  deleteIcon: ChipProps['deleteIcon'];
+  deleteIcon?: ChipProps['deleteIcon'];
 
-  subHeader: ReactNode;
+  title: ReactNode;
   options: Option[];
+  style?: ChipProps['style'];
   disableCloseOnSelect?: boolean;
 
   getLabel?: (item: string) => ChipProps['label'];
@@ -81,11 +89,12 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
     disabled = false,
     classes = null,
     variant = 'outlined',
-    size = 'medium',
+    size = 'small',
     icon = null,
     deleteIcon = null,
-    subHeader = null,
+    title = null,
     options = [],
+    style = null,
     disableCloseOnSelect = false,
 
     getLabel = null,
@@ -103,141 +112,42 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
 
     return (
       !hide && (
-        <div ref={ref} style={{ display: 'inline-block' }}>
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
-            <ChipList
-              items={[param].map(v => ({
-                classes: classes,
-                variant: variant,
-                label: getLabel(v),
-                size: size,
-                icon: icon,
-                deleteIcon: deleteIcon,
-                onClick: disabled ? null : () => setOpen(o => !o),
-                onDelete: disabled ? null : event => onDelete(event)
-              }))}
-            />
-            <Menu
-              anchorEl={ref.current}
-              keepMounted
-              open={open}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-              onClose={() => setOpen(o => !o)}
-            >
-              <ListSubheader style={{ lineHeight: 'inherit' }}>{subHeader}</ListSubheader>
-              {options.map((option, i) => (
-                <MenuItem
-                  key={`${param}-${i}`}
-                  dense
-                  selected={getSelected(option)}
-                  onClick={event => {
-                    onClick(event, option);
-                    !disableCloseOnSelect && setOpen(false);
-                  }}
-                >
-                  {getListItemIcon && <ListItemIcon>{getListItemIcon(option)}</ListItemIcon>}
-                  <ListItemText primary={t(option.label)} />
-                </MenuItem>
-              ))}
-            </Menu>
-          </div>
-        </div>
-      )
-    );
-  }
-);
-
-type FilterItem = {
-  value: string;
-  not: boolean;
-};
-
-type ListFilterProps = {
-  query: SimpleSearchQuery;
-  prefix: string;
-  filter: string;
-  disabled: boolean;
-  hide: boolean;
-  variant?: ChipProps['variant'];
-  size?: ChipProps['size'] | 'tiny';
-  label: string;
-
-  onClick?: (event: any) => void;
-  onDelete?: (event: any) => void;
-};
-
-const ListFilter: React.FC<ListFilterProps> = React.memo(
-  ({
-    query = null,
-    prefix = null,
-    filter = null,
-    hide = false,
-    variant = 'outlined',
-    size = 'small',
-    disabled = false,
-    label = null,
-    onClick = null,
-    onDelete = null
-  }: ListFilterProps) => {
-    const { t } = useTranslation('alerts');
-    const theme = useTheme();
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    const filters = useMemo<FilterItem[]>(
-      () =>
-        filter
-          .replace(`${prefix}(`, '')
-          .slice(0, -1)
-          .split(/\sor\s|\sOR\s/)
-          .filter((v: string) => v && v !== '')
-          .map((v: string) => {
-            const not = v.startsWith('NOT(') && v.endsWith(')');
-            return { value: not ? v.substring(4, v.length - 1) : v, not };
-          }),
-      [filter, prefix]
-    );
-
-    const handleClick = useCallback(
-      (item: FilterItem, index: number, array: FilterItem[]) => {
-        const values = array
-          .map(a => (a.value !== item.value ? a : { ...a, not: !a.not }))
-          .map(a => (a.not ? `NOT(${a.value})` : a.value));
-
-        query.replace('fq', filter, `${label}:(${values.join(' OR ')})`);
-        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-      },
-      [filter, label, location.hash, location.pathname, navigate, query]
-    );
-
-    const handleDelete = useCallback(
-      (item: FilterItem, index: number, array: FilterItem[]) => {
-        const values = array.filter(a => a.value !== item.value).map(a => (a.not ? `NOT(${a.value})` : a.value));
-        if (values.length > 0) query.replace('fq', filter, `${label}:(${values.join(' OR ')})`);
-        else query.remove('fq', filter);
-        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-      },
-      [filter, location.hash, location.pathname, navigate, label, query]
-    );
-
-    return (
-      !hide &&
-      filters.length > 0 && (
-        <div style={{ display: 'inline-block' }}>
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
-            <b style={{ wordBreak: 'initial', paddingRight: theme.spacing(1) }}>{`${t(label)}: `}</b>
-            <ChipList
-              items={filters.map((f, i) => ({
-                variant: variant,
-                label: f.value,
-                color: f.not ? 'error' : 'default',
-                size: size,
-                onClick: disabled ? null : () => handleClick(f, i, filters),
-                onDelete: disabled ? null : () => handleDelete(f, i, filters)
-              }))}
-            />
-          </div>
+        <div ref={ref}>
+          <CustomChip
+            classes={classes}
+            variant={variant}
+            label={getLabel(param)}
+            size={size}
+            icon={icon}
+            deleteIcon={deleteIcon}
+            style={{ minHeight: '25px', ...style }}
+            onClick={disabled ? null : () => setOpen(o => !o)}
+            onDelete={!deleteIcon || disabled ? null : event => onDelete(event)}
+          />
+          <Menu
+            anchorEl={ref.current}
+            keepMounted
+            open={open}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            onClose={() => setOpen(o => !o)}
+          >
+            <ListSubheader style={{ lineHeight: 'inherit' }}>{title}</ListSubheader>
+            {options.map((option, i) => (
+              <MenuItem
+                key={`${param}-${i}`}
+                dense
+                selected={getSelected(option)}
+                onClick={event => {
+                  onClick(event, option);
+                  !disableCloseOnSelect && setOpen(false);
+                }}
+              >
+                {getListItemIcon && <ListItemIcon>{getListItemIcon(option)}</ListItemIcon>}
+                <ListItemText primary={t(option.label)} />
+              </MenuItem>
+            ))}
+          </Menu>
         </div>
       )
     );
@@ -249,6 +159,7 @@ type Props = {
   hideQuery?: boolean;
   hideGroupBy?: boolean;
   hideTC?: boolean;
+  hideTCStart?: boolean;
   hideSort?: boolean;
   disableActions?: boolean;
 };
@@ -257,11 +168,12 @@ const WrappedAlertFiltersSelected = ({
   query,
   hideQuery = false,
   hideTC = false,
+  hideTCStart = false,
   hideGroupBy = false,
   hideSort = false,
   disableActions = false
 }: Props) => {
-  const { t } = useTranslation('alerts');
+  const { t, i18n } = useTranslation('alerts');
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
@@ -276,20 +188,42 @@ const WrappedAlertFiltersSelected = ({
 
   const params = useMemo<{ [key: string]: string }>(() => query.getParams(), [query]);
 
-  const { statuses, priorities, labels, favorites, others } = useMemo<Filters>(() => {
-    let filters = { statuses: [], priorities: [], labels: [], favorites: [], others: [] };
+  const { status, priority, labels, favorites, others } = useMemo<Filters>(() => {
+    let filters = { status: null, priority: null, labels: [], favorites: [], others: [] };
+
     query.getAll('fq', []).forEach(filter => {
-      if (filter.startsWith('status:(') && filter.endsWith(')')) filters.statuses.push(filter);
-      else if (filter.startsWith('priority:(') && filter.endsWith(')')) filters.priorities.push(filter);
-      else if (filter.startsWith('label:(') && filter.endsWith(')')) filters.labels.push(filter);
+      const not = filter.startsWith('NOT(') && filter.endsWith(')');
+      const value = not ? filter.substring(4, filter.length - 1) : filter;
+
+      if (value.startsWith('status:')) filters.status = { filter, not, value };
+      else if (value.startsWith('priority:')) filters.priority = { filter, not, value };
+      else if (value.startsWith('label:')) filters.labels.push({ filter, not, value });
       else {
         const favorite = allFavorites.find(f => f.query === filter || `NOT(${f.query})` === filter);
-        if (favorite) filters.favorites.push({ ...favorite, query: filter });
-        else filters.others.push(filter);
+        if (favorite) filters.favorites.push({ ...favorite, filter, not, value });
+        else filters.others.push({ filter, not, value });
       }
     });
     return filters;
   }, [allFavorites, query]);
+
+  const handleQueryChange = useCallback(
+    (filter: Filter) => {
+      filter.not
+        ? query.replace('fq', `NOT(${filter.value})`, filter.value)
+        : query.replace('fq', filter.value, `NOT(${filter.value})`);
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+    },
+    [location.hash, location.pathname, navigate, query]
+  );
+
+  const handleQueryRemove = useCallback(
+    (filter: Filter) => {
+      query.remove('fq', filter.filter);
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+    },
+    [location.hash, location.pathname, navigate, query]
+  );
 
   return (
     <div
@@ -298,24 +232,24 @@ const WrappedAlertFiltersSelected = ({
         flexWrap: 'wrap',
         flexDirection: 'row',
         columnGap: theme.spacing(1),
-        rowGap: theme.spacing(0.5)
+        rowGap: theme.spacing(1)
       }}
     >
-      {!hideQuery && query.get('q', null) && (
-        <div style={{ display: 'inline-block' }}>
-          <ChipList
-            items={[query.get('q')].map(v => ({
-              variant: 'outlined',
-              label: `${v}`,
-              onDelete: disableActions
-                ? null
-                : () => {
-                    query.delete('q');
-                    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                  }
-            }))}
-          />
-        </div>
+      {!hideQuery && query.has('q') && (
+        <CustomChip
+          variant="outlined"
+          size="small"
+          style={{ minHeight: '25px' }}
+          label={query.get('q')}
+          onDelete={
+            disableActions
+              ? null
+              : () => {
+                  query.delete('q');
+                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                }
+          }
+        />
       )}
 
       <MenuFilter
@@ -325,23 +259,27 @@ const WrappedAlertFiltersSelected = ({
         getLabel={item => (
           <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
             <span>{`${t('sorts.title')}: ${t(item.substring(0, item.indexOf(' ')))}`}</span>
-            {disableActions && <ArrowDownwardIcon style={{ fontSize: 'medium' }} />}
+            {disableActions && <ArrowDownwardIcon />}
           </div>
         )}
         getListItemIcon={option =>
           params.sort.startsWith(option.value) && (
-            <ArrowDownwardIcon className={clsx(classes.desc, params.sort.endsWith('asc') && classes.asc)} />
+            <ArrowDownwardIcon
+              className={clsx(classes.desc, params.sort.endsWith('asc') && classes.asc)}
+              fontSize="small"
+            />
           )
         }
         param={params.sort}
         hide={hideSort}
         disabled={disableActions}
         getSelected={option => params.sort.startsWith(option.value)}
-        icon={<SortIcon />}
+        icon={<SortIcon fontSize="small" />}
         deleteIcon={<ArrowDownwardIcon />}
-        subHeader={t('sorts.title')}
+        title={t('sorts.title')}
         options={SORT_OPTIONS}
         disableCloseOnSelect
+        style={{ minHeight: '25px' }}
         onClick={(event, option) => {
           const newSort =
             params.sort.startsWith(option.value) && params.sort.endsWith('desc')
@@ -361,29 +299,6 @@ const WrappedAlertFiltersSelected = ({
 
       <MenuFilter
         getLabel={() => {
-          const option = TC_OPTIONS.find(o => o.value === params.tc);
-          return option && option.value !== '' ? `${t('tc')}: ${t(option.label)}` : `${t('tc')}: ${t('none')}`;
-        }}
-        param={params.tc}
-        hide={hideTC}
-        disabled={disableActions}
-        getSelected={option => params.tc === option.value}
-        icon={<DateRangeIcon />}
-        deleteIcon={<ReplayOutlinedIcon />}
-        subHeader={t('tc')}
-        options={TC_OPTIONS}
-        onClick={(event, option) => {
-          query.set('tc', option.value);
-          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-        }}
-        onDelete={() => {
-          query.delete('tc');
-          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-        }}
-      />
-
-      <MenuFilter
-        getLabel={() => {
           const option = GROUPBY_OPTIONS.find(o => o.value === params.group_by);
           return option && option.value !== ''
             ? `${t('groupBy')}: ${t(option.label)}`
@@ -393,153 +308,141 @@ const WrappedAlertFiltersSelected = ({
         hide={hideGroupBy}
         disabled={disableActions}
         getSelected={option => params.group_by === option.value}
-        icon={<SourceIcon />}
-        deleteIcon={<ReplayOutlinedIcon />}
-        subHeader={t('groupBy')}
+        icon={<SourceIcon fontSize="small" />}
+        title={t('groupBy')}
         options={GROUPBY_OPTIONS}
+        style={{ minHeight: '25px' }}
         onClick={(event, option) => {
           query.set('group_by', option.value);
           navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
         }}
-        onDelete={() => {
-          query.delete('group_by');
+      />
+
+      <MenuFilter
+        getLabel={() => {
+          const option = TC_OPTIONS.find(o => o.value === params.tc);
+          return option && option.value !== '' ? `${t('tc')}: ${t(option.label)}` : `${t('tc')}: ${t('none')}`;
+        }}
+        param={params.tc}
+        hide={hideTC}
+        disabled={disableActions}
+        getSelected={option => params.tc === option.value}
+        icon={<DateRangeIcon fontSize="small" />}
+        title={t('tc')}
+        options={TC_OPTIONS}
+        style={{ minHeight: '25px' }}
+        onClick={(event, option) => {
+          query.set('tc', option.value);
           navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
         }}
       />
 
-      {statuses.map((filter, i) => (
-        <ListFilter
-          key={`status-${i}`}
-          filter={filter}
-          query={query}
-          disabled={disableActions}
-          hide={false}
-          label={'status'}
-          prefix={'status:'}
+      {!hideTCStart && query.has('tc_start') && (
+        <CustomChip
+          variant="outlined"
+          size="small"
+          style={{ minHeight: '25px' }}
+          color={status.not ? 'error' : 'default'}
+          icon={<DateRangeIcon fontSize="small" />}
+          label={
+            <div>
+              <span>{t('tc_start')}: </span>
+              <Moment
+                locale={i18n.language}
+                format={i18n.language === 'fr' ? 'Do MMMM YYYY H[h]mm' : 'MMMM D YYYY, h:mm a'}
+              >
+                {query.get('tc_start')}
+              </Moment>
+            </div>
+          }
+          onDelete={
+            disableActions
+              ? null
+              : () => {
+                  query.delete('tc_start');
+                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                }
+          }
         />
-      ))}
-
-      {priorities.map((filter, i) => (
-        <ListFilter
-          key={`priority-${i}`}
-          filter={filter}
-          query={query}
-          disabled={disableActions}
-          hide={false}
-          label={'priority'}
-          prefix={'priority:'}
-        />
-      ))}
-
-      {labels.map((filter, i) => (
-        <ListFilter
-          key={`label-${i}`}
-          filter={filter}
-          query={query}
-          disabled={disableActions}
-          hide={false}
-          label={'label'}
-          prefix={'label:'}
-        />
-      ))}
-
-      {favorites.length !== 0 && (
-        <div>
-          <ChipList
-            items={favorites.map(v =>
-              v.query.startsWith('NOT(') && v.query.endsWith(')')
-                ? {
-                    icon: (
-                      <StarIcon
-                        style={{
-                          color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                        }}
-                      />
-                    ),
-                    variant: 'outlined',
-                    color: 'error',
-                    label: <b>{v.name}</b>,
-                    tooltip: (
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ fontStyle: 'normal' }}>{v.query}</div>
-                        <div
-                          style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}
-                        >{`(${v.created_by})`}</div>
-                      </div>
-                    ),
-                    onClick: disableActions
-                      ? null
-                      : () => {
-                          const value = v.query.substring(4, v.query.length - 1);
-                          query.replace('fq', `NOT(${value})`, value);
-                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                        },
-                    onDelete: disableActions
-                      ? null
-                      : () => {
-                          query.remove('fq', v.query);
-                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                        }
-                  }
-                : {
-                    icon: <StarIcon />,
-                    variant: 'outlined',
-                    label: <b>{v.name}</b>,
-                    tooltip: (
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ fontStyle: 'normal' }}>{v.query}</div>
-                        <div
-                          style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}
-                        >{`(${v.created_by})`}</div>
-                      </div>
-                    ),
-                    onClick: disableActions
-                      ? null
-                      : () => {
-                          query.replace('fq', v.query, `NOT(${v.query})`);
-                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                        },
-                    onDelete: disableActions
-                      ? null
-                      : () => {
-                          query.remove('fq', v.query);
-                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                        }
-                  }
-            )}
-          />
-        </div>
       )}
 
-      {others.length !== 0 && (
-        <div>
-          <ChipList
-            items={others.map(v => {
-              const isNot = v.startsWith('NOT(') && v.endsWith(')');
-              const value = isNot ? v.substring(4, v.length - 1) : v;
-
-              return {
-                variant: 'outlined',
-                label: value,
-                color: isNot ? 'error' : 'default',
-                onClick: disableActions
-                  ? null
-                  : () => {
-                      if (isNot) query.replace('fq', v, value);
-                      else query.replace('fq', v, `NOT(${v})`);
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    },
-                onDelete: disableActions
-                  ? null
-                  : () => {
-                      query.remove('fq', v);
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    }
-              };
-            })}
-          />
-        </div>
+      {status && (
+        <CustomChip
+          variant="outlined"
+          size="small"
+          style={{ minHeight: '25px' }}
+          color={status.not ? 'error' : 'default'}
+          label={status.value}
+          onClick={disableActions ? null : () => handleQueryChange(status)}
+          onDelete={disableActions ? null : () => handleQueryRemove(status)}
+        />
       )}
+
+      {priority && (
+        <CustomChip
+          variant="outlined"
+          size="small"
+          style={{ minHeight: '25px' }}
+          color={priority.not ? 'error' : 'default'}
+          label={priority.value}
+          onClick={disableActions ? null : () => handleQueryChange(priority)}
+          onDelete={disableActions ? null : () => handleQueryRemove(priority)}
+        />
+      )}
+
+      {labels.map(label => (
+        <CustomChip
+          variant="outlined"
+          size="small"
+          style={{ minHeight: '25px' }}
+          color={label.not ? 'error' : 'default'}
+          label={label.value}
+          onClick={disableActions ? null : () => handleQueryChange(label)}
+          onDelete={disableActions ? null : () => handleQueryRemove(label)}
+        />
+      ))}
+
+      {favorites.map(favorite => (
+        <CustomChip
+          variant="outlined"
+          size="small"
+          style={{ minHeight: '25px' }}
+          color={favorite.not ? 'error' : 'default'}
+          label={favorite.value}
+          icon={
+            <StarIcon
+              style={{
+                ...(favorite.not && {
+                  fontSize: 'small',
+                  color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                })
+              }}
+            />
+          }
+          tooltip={
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ fontStyle: 'normal' }}>{favorite.query}</div>
+              <div
+                style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}
+              >{`(${favorite.created_by})`}</div>
+            </div>
+          }
+          onClick={disableActions ? null : () => handleQueryChange(favorite)}
+          onDelete={disableActions ? null : () => handleQueryRemove(favorite)}
+        />
+      ))}
+
+      {others.map(other => (
+        <CustomChip
+          variant="outlined"
+          size="small"
+          style={{ minHeight: '25px' }}
+          color={other.not ? 'error' : 'default'}
+          label={other.value}
+          onClick={disableActions ? null : () => handleQueryChange(other)}
+          onDelete={disableActions ? null : () => handleQueryRemove(other)}
+        />
+      ))}
     </div>
   );
 };

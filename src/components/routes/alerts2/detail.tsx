@@ -21,7 +21,7 @@ import CustomChip from 'components/visual/CustomChip';
 import { ImageInline } from 'components/visual/image_inline';
 import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { useParams } from 'react-router-dom';
@@ -70,10 +70,11 @@ type Params = {
 
 type Props = {
   id?: string;
+  alert?: AlertItem;
   inDrawer?: boolean;
 };
 
-const WrappedAlertDetail = ({ id: propId = null, inDrawer = false }: Props) => {
+const WrappedAlertDetail = ({ id: propId = null, alert: propAlert = null, inDrawer = false }: Props) => {
   const { t } = useTranslation(['alerts']);
   const theme = useTheme();
   const classes = useStyles();
@@ -89,16 +90,19 @@ const WrappedAlertDetail = ({ id: propId = null, inDrawer = false }: Props) => {
 
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
 
-  const id = useMemo<string>(() => (inDrawer ? propId.split('?')[0] : paramId), [inDrawer, paramId, propId]);
-
   useEffect(() => {
-    if (!id || !currentUser.roles.includes('alert_view')) return;
-    apiCall({
-      url: `/api/v4/alert/${id}/`,
-      onSuccess: ({ api_response }) => setAlert(api_response)
-    });
+    if (!currentUser.roles.includes('alert_view')) {
+      return;
+    } else if (propAlert) {
+      setAlert(propAlert);
+    } else {
+      apiCall({
+        url: `/api/v4/alert/${inDrawer ? propId.split('?')[0] : paramId}/`,
+        onSuccess: ({ api_response }) => setAlert(api_response)
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.roles, id]);
+  }, [currentUser.roles, inDrawer, paramId, propAlert, propId]);
 
   useEffect(() => {
     if (alert) {
@@ -438,7 +442,7 @@ const WrappedAlertDetail = ({ id: propId = null, inDrawer = false }: Props) => {
                     )}
                   </Grid>
                 </Grid>
-                {alert && alert.file.screenshots && <ImageInline data={alert.file.screenshots} small />}
+                {alert && alert.file.screenshots && <ImageInline data={alert.file.screenshots} size="small" />}
               </div>
             </div>
 
