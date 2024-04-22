@@ -43,6 +43,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { AlertItem } from '../models/Alert';
 import { buildSearchQuery, getGroupBy } from '../utils/alertUtils';
 import { AlertEventsTable } from './Components';
+import AlertFiltersSelected from './FiltersSelected';
 import { AlertWorkflowDrawer } from './Workflows';
 
 const useStyles = makeStyles(theme => ({
@@ -88,9 +89,10 @@ const useStyles = makeStyles(theme => ({
     gridTemplateColumns: 'auto 1fr',
     columnGap: theme.spacing(1),
     margin: 0,
-    padding: theme.spacing(0.75, 1),
+    padding: theme.spacing(1.5),
     whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
+    wordBreak: 'break-word',
+    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
   }
 }));
 
@@ -253,7 +255,7 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
       if (!alert || !alert.group_count) return '';
 
       const query = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
-      const groupBy = getGroupBy(location.search, DEFAULT_QUERY);
+      const groupBy = getGroupBy(location.search);
       query.set('group_by', '');
       query.add('fq', `${groupBy}:${getValueFromPath(alert, groupBy)}`);
       return query.getDeltaString();
@@ -297,23 +299,14 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
     const [confirmation, setConfirmation] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
 
-    const groupBy = useMemo<string>(() => getGroupBy(location.search, DEFAULT_QUERY), [location.search]);
+    const groupBy = useMemo<string>(() => getGroupBy(location.search), [location.search]);
 
-    const queryString = useMemo<string>(() => {
+    const query = useMemo<SimpleSearchQuery>(() => {
       if (!alert) return null;
       const q = buildSearchQuery({ search: location.search, singles: ['tc_start', 'tc'], multiples: ['fq'] });
       q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy)}` : `alert_id:${alert.alert_id}`);
-      return q.toString();
+      return q;
     }, [alert, groupBy, location.search]);
-
-    const parseSearchParams = useCallback((search: string) => {
-      let entries = [];
-      for (const entry of new URLSearchParams(search).entries()) {
-        entries.push(entry);
-      }
-      entries.sort((a, b) => `${a[0]}${a[1]}`.localeCompare(`${b[0]}${b[1]}`));
-      return entries;
-    }, []);
 
     const handleTakeOwnership = useCallback(
       (prevAlert: AlertItem, q: string) => {
@@ -364,7 +357,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
           <ConfirmationDialog
             open={confirmation}
             handleClose={() => setConfirmation(false)}
-            handleAccept={() => handleTakeOwnership(alert, queryString)}
+            handleAccept={() => handleTakeOwnership(alert, query.toString())}
             title={t('actions.takeownershipdiag.header')}
             cancelText={t('actions.cancel')}
             acceptText={t('actions.ok')}
@@ -376,15 +369,10 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
                   <Grid item>
                     <Typography variant="subtitle2">{t('actions.takeownershipdiag.properties')}</Typography>
                     <Paper component="pre" variant="outlined" className={classes.preview}>
-                      {!queryString || queryString === '' ? (
+                      {!query || query.toString() === '' ? (
                         <div>{t('none')}</div>
                       ) : (
-                        parseSearchParams(queryString)?.map(([k, v], i) => (
-                          <div key={i} style={{ display: 'contents', wordBreak: 'break-word' }}>
-                            <b>{k}: </b>
-                            {v ? <span>{v}</span> : <i>{t('session.none')}</i>}
-                          </div>
-                        ))
+                        <AlertFiltersSelected query={query} disableActions hideGroupBy />
                       )}
                     </Paper>
                   </Grid>
@@ -457,7 +445,7 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
 
     const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
 
-    const groupBy = useMemo<string>(() => getGroupBy(location.search, DEFAULT_QUERY), [location.search]);
+    const groupBy = useMemo<string>(() => getGroupBy(location.search), [location.search]);
 
     const query = useMemo<SimpleSearchQuery>(() => {
       if (!alert) return null;
@@ -568,7 +556,6 @@ export const AlertSafelist: React.FC<AlertActionProps> = React.memo(
         tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious.action')}
         open={open}
         loading={loading}
-        disabled={hasSetNonMalicious}
         vertical={vertical}
         permanent={permanent}
         speedDial={speedDial}
@@ -650,7 +637,6 @@ export const AlertBadlist: React.FC<AlertActionProps> = React.memo(
         tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious.action')}
         open={open}
         loading={loading}
-        disabled={hasSetMalicious}
         vertical={vertical}
         permanent={permanent}
         speedDial={speedDial}
@@ -735,9 +721,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
           }
           direction={vertical ? 'down' : 'left'}
           open={open || permanent}
-          onOpen={(event, reason: OpenReason) =>
-            reason !== 'toggle' && reason !== 'mouseEnter' ? null : setOpen(true)
-          }
+          onOpen={(event, reason: OpenReason) => (reason !== 'toggle' ? null : setOpen(true))}
           onClose={(event, reason: CloseReason) =>
             reason !== 'toggle' && reason !== 'escapeKeyDown' ? null : setOpen(false)
           }
