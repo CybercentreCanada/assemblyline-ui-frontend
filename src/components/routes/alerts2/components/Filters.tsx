@@ -280,9 +280,10 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
           inputValue={inputValue}
           onInputChange={(event, item) => setInputValue(item)}
           fullWidth
+          size="small"
           loading={loading}
           loadingText={t('loading')}
-          renderInput={params => <TextField {...params} variant="outlined" />}
+          renderInput={params => <TextField {...params} variant="outlined" size="medium" />}
           options={parsedOptions}
           getOptionLabel={option => option.value}
           isOptionEqualToValue={(option, item) => !!option && !!item && option.value === item.value}
@@ -378,13 +379,11 @@ const AlertFiltersInput: React.FC<AlertFiltersInputProps> = React.memo(
           onInputChange={(event, item) => setInputValue(item)}
           fullWidth
           multiple
+          size="small"
           disableCloseOnSelect
           loading={loading}
           loadingText={t('loading')}
-          renderInput={params => <TextField {...params} variant="outlined" />}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => <CustomChip size="small" label={option.value} {...getTagProps({ index })} />)
-          }
+          renderInput={params => <TextField {...params} variant="outlined" size="medium" />}
           options={parsedOptions}
           getOptionLabel={option => option.value}
           isOptionEqualToValue={(option, filter) => !!option && !!filter && option.value === filter.value}
@@ -413,7 +412,7 @@ const AlertFiltersInput: React.FC<AlertFiltersInputProps> = React.memo(
 );
 
 type FavoritesProps = {
-  values: string[];
+  values: (Filter & Favorite)[];
   onChange: (values: string[]) => void;
 };
 
@@ -431,23 +430,13 @@ const Favorites: React.FC<FavoritesProps> = React.memo(({ values = [], onChange 
       <label>{t('favorites')}</label>
       <Autocomplete
         classes={{ listbox: classes.listbox, option: classes.option }}
-        value={values
-          .filter(value => options.map(option => option.query).includes(value))
-          .map(value => ({ classification: '', name: '', query: value, created_by: '' }))}
+        value={values}
         onChange={(event, value) => onChange(value.map(item => item.query))}
         fullWidth
         multiple
+        size="small"
         disableCloseOnSelect
-        renderInput={params => <TextField {...params} variant="outlined" />}
-        renderTags={(value, getTagProps) =>
-          value.map((item, index) => (
-            <CustomChip
-              size="small"
-              label={options.find(option => option.query === item.query).name}
-              {...getTagProps({ index })}
-            />
-          ))
-        }
+        renderInput={params => <TextField {...params} variant="outlined" size="medium" />}
         options={options}
         getOptionLabel={option => option.name}
         isOptionEqualToValue={(option, against) =>
@@ -541,27 +530,24 @@ const Others: React.FC<OthersProps> = React.memo(({ values = [], search = '', on
       <label>{t('others')}</label>
       <Autocomplete
         classes={{ listbox: classes.listbox, option: classes.option }}
-        value={values
-          .filter(value => parsedOptions.map(option => option.value).includes(value))
-          .map(value => ({ value, count: 0, total: 0 }))}
+        value={values.map(value => ({ value, count: 0, total: 0 }))}
         onChange={(event, value) =>
           onChange(
-            value.map(item => item.value),
+            value.map(item => (typeof item === 'string' ? item : item.value)),
             parsedOptions.map(option => option.value)
           )
         }
         onOpen={() => prevSearch.current !== search && fetchOptions()}
         fullWidth
         multiple
+        size="small"
         disableCloseOnSelect
+        freeSolo
         loading={loading}
         loadingText={t('loading')}
-        renderInput={params => <TextField {...params} variant="outlined" />}
-        renderTags={(value, getTagProps) =>
-          value.map((option, index) => <CustomChip size="small" label={option.value} {...getTagProps({ index })} />)
-        }
+        renderInput={params => <TextField {...params} variant="outlined" size="medium" />}
         options={parsedOptions}
-        getOptionLabel={option => option.value}
+        getOptionLabel={option => (typeof option === 'string' ? option : option.value)}
         isOptionEqualToValue={(option, against) =>
           option === null || against === null ? false : option.value === against.value
         }
@@ -591,7 +577,7 @@ type Filters = {
   status: Filter;
   priority: Filter;
   labels: Filter[];
-  favorites: Filter[];
+  favorites: (Favorite & Filter)[];
   others: Filter[];
 };
 
@@ -629,7 +615,7 @@ const WrappedAlertFilters = () => {
         filters.labels.push({ query: filter, value: value.replace('label:', '') });
       } else {
         const favorite = allFavorites.find(f => f.query === filter || `NOT(${f.query})` === filter);
-        if (favorite) filters.favorites.push({ query: filter, value: value });
+        if (favorite) filters.favorites.push({ ...favorite, query: filter, value: value });
         else filters.others.push({ query: filter, value: value });
       }
     });
@@ -661,6 +647,21 @@ const WrappedAlertFilters = () => {
       ),
     [query]
   );
+
+  const otherURL = useMemo<string>(() => {
+    const q = buildSearchQuery({
+      search: query.getDeltaString(),
+      singles: ['q', 'tc', 'tc_start', 'no_delay'],
+      multiples: ['fq'],
+      defaultString: DEFAULT_QUERY,
+      groupByAsFilter: true
+    });
+
+    others.forEach(value => {
+      q.remove('fq', value.query);
+    });
+    return q.toString();
+  }, [others, query]);
 
   const handleClear = useCallback(() => setQuery(new SimpleSearchQuery('', DEFAULT_QUERY)), []);
 
@@ -786,21 +787,12 @@ const WrappedAlertFilters = () => {
                   onChange={values => handleFiltersChange('label:', values, labels)}
                 />
 
-                <Favorites
-                  values={favorites.map(item => item.value)}
-                  onChange={values => handleFiltersChange('', values, favorites)}
-                />
+                <Favorites values={favorites} onChange={values => handleFiltersChange('', values, favorites)} />
 
                 <Others
                   values={others.map(item => item.value)}
-                  search={buildSearchQuery({
-                    search: query.getDeltaString(),
-                    singles: ['q', 'tc', 'tc_start', 'no_delay'],
-                    multiples: ['fq'],
-                    defaultString: DEFAULT_QUERY,
-                    groupByAsFilter: true
-                  }).toString()}
-                  onChange={values => handleFiltersChange('', values, favorites)}
+                  search={otherURL}
+                  onChange={values => handleFiltersChange('', values, others)}
                 />
               </div>
               <div className={classes.actions}>

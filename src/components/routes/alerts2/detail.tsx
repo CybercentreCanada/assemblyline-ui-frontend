@@ -139,9 +139,9 @@ const WrappedAlertDetail = ({ id: propId = null, alert: propAlert = null, inDraw
     };
   }, []);
 
-  const Wrapper = useCallback<React.FC<{ children: React.ReactNode }>>(
-    ({ children }) =>
-      !inDrawer ? (
+  const Wrapper = useCallback<React.FC<{ children: React.ReactNode; alert: AlertItem; drawer: boolean }>>(
+    ({ children, alert: alertProp, drawer }) =>
+      !drawer ? (
         <>{children}</>
       ) : (
         <div>
@@ -158,7 +158,7 @@ const WrappedAlertDetail = ({ id: propId = null, alert: propAlert = null, inDraw
               zIndex: 10
             }}
           >
-            <AlertActions alert={alert} inDrawer />
+            <AlertActions alert={alertProp} inDrawer={drawer} />
             <ListNavigator id={ALERT_SIMPLELIST_ID} />
           </div>
           <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
@@ -166,12 +166,12 @@ const WrappedAlertDetail = ({ id: propId = null, alert: propAlert = null, inDraw
           </ListCarousel>
         </div>
       ),
-    [alert, inDrawer, theme]
+    [theme]
   );
 
   return currentUser.roles.includes('alert_view') ? (
     <AlertsProvider>
-      <Wrapper>
+      <Wrapper alert={alert} drawer={inDrawer}>
         <PageFullWidth margin={inDrawer ? 1 : 4}>
           {c12nDef.enforce && (
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
