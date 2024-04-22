@@ -542,12 +542,12 @@ const Others: React.FC<OthersProps> = React.memo(({ values = [], search = '', on
         multiple
         size="small"
         disableCloseOnSelect
-        freeSolo
         loading={loading}
         loadingText={t('loading')}
         renderInput={params => <TextField {...params} variant="outlined" size="medium" />}
         options={parsedOptions}
         getOptionLabel={option => (typeof option === 'string' ? option : option.value)}
+        noOptionsText={t('none')}
         isOptionEqualToValue={(option, against) =>
           option === null || against === null ? false : option.value === against.value
         }
