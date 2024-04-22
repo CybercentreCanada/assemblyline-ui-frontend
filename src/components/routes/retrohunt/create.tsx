@@ -211,28 +211,35 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
 
             <Grid item>
               <Grid container flexDirection="row" rowGap={2}>
-                <Grid item flexGrow={3}>
-                  <Typography variant="subtitle2">{t('details.search')}</Typography>
-                  <RadioGroup
-                    row
-                    value={retrohunt.indices}
-                    onChange={(_, value: RetrohuntIndex) => handleRetrohuntChange({ indices: value })}
-                  >
-                    <FormControlLabel value="hot" control={<Radio />} label={t('details.hot')} disabled={isDisabled} />
-                    <FormControlLabel
-                      value="archive"
-                      control={<Radio />}
-                      label={t('details.archive')}
-                      disabled={isDisabled}
-                    />
-                    <FormControlLabel
-                      value="hot_and_archive"
-                      control={<Radio />}
-                      label={t('details.hot_and_archive')}
-                      disabled={isDisabled}
-                    />
-                  </RadioGroup>
-                </Grid>
+                {configuration?.datastore?.archive?.enabled && (
+                  <Grid item flexGrow={3}>
+                    <Typography variant="subtitle2">{t('details.search')}</Typography>
+                    <RadioGroup
+                      row
+                      value={retrohunt.indices}
+                      onChange={(_, value: RetrohuntIndex) => handleRetrohuntChange({ indices: value })}
+                    >
+                      <FormControlLabel
+                        value="hot"
+                        control={<Radio />}
+                        label={t('details.hot')}
+                        disabled={isDisabled}
+                      />
+                      <FormControlLabel
+                        value="archive"
+                        control={<Radio />}
+                        label={t('details.archive')}
+                        disabled={isDisabled}
+                      />
+                      <FormControlLabel
+                        value="hot_and_archive"
+                        control={<Radio />}
+                        label={t('details.hot_and_archive')}
+                        disabled={isDisabled}
+                      />
+                    </RadioGroup>
+                  </Grid>
+                )}
                 <Grid item flexGrow={2}>
                   <Typography variant="subtitle2">
                     {`${t('ttl')} (${maxDaysToLive ? `${t('ttl.max')}: ${maxDaysToLive}` : t('ttl.forever')})`}
