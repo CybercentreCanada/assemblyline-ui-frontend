@@ -32,7 +32,8 @@ const useStyles = makeStyles(theme => ({
     margin: 0,
     padding: theme.spacing(1.5),
     whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
+    wordBreak: 'break-word',
+    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
   },
   dialogPaper: {
     maxWidth: '1000px'
