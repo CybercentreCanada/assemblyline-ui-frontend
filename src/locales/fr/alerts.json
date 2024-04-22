@@ -133,6 +133,7 @@
   "tc.24h": "24 heures",
   "tc.4d": "4 Jours",
   "tc.none": "Aucune contrainte de temps (peut être lent)",
+  "tc_start": "Temps de départ",
   "tooltip.actions": "Action d'alerte",
   "ts": "Horodatage",
   "type": "Type",

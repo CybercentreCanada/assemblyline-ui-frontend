@@ -37,7 +37,7 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ searching = false, total =
           columnGap: theme.spacing(1)
         }}
       >
-        <AlertsFiltersSelected query={query} hideQuery />
+        <AlertsFiltersSelected query={query} hideQuery hideTCStart />
         <div style={{ flex: 1 }} />
         <div style={{ minWidth: 'fit-content' }}>
           <SearchResultCount count={total} />
@@ -47,23 +47,28 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ searching = false, total =
     );
   else
     return (
-      <>
-        <div style={{ marginTop: theme.spacing(2), alignItems: 'center' }}>
-          {!searching && query.getAll('fq', []).length > 0 && (
-            <>
-              <FiFilter style={{ marginRight: theme.spacing(1) }} />
-            </>
-          )}
-          {searching ? (
-            ''
-          ) : (
+      <div
+        style={{
+          marginTop: theme.spacing(1),
+          fontStyle: 'italic',
+          minHeight: theme.spacing(3),
+          display: 'flex',
+          alignItems: 'center',
+          columnGap: theme.spacing(1)
+        }}
+      >
+        {searching ? (
+          ''
+        ) : (
+          <>
+            {query.getAll('fq', []).length > 0 && <FiFilter />}
             <div style={{ minWidth: 'fit-content' }}>
               <SearchResultCount count={total} />
               <span>{total > 1 ? t('results') : t('result')}</span>
             </div>
-          )}
-        </div>
-      </>
+          </>
+        )}
+      </div>
     );
 };
 

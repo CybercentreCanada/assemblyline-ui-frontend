@@ -190,7 +190,8 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                     marginTop: theme.spacing(1),
                     padding: theme.spacing(2),
                     color: theme.palette.primary.light,
-                    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
+                    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200],
+                    borderRadius: theme.spacing(0.5)
                   }}
                 >
                   <AlertFiltersSelected query={query} disableActions hideGroupBy hideTC={hideTC} hideSort />

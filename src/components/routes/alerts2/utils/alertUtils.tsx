@@ -45,7 +45,7 @@ export const buildSearchQuery = ({
   return query;
 };
 
-export const getGroupBy = (search: string, defaults: string): string => {
+export const getGroupBy = (search: string = '', defaults: string = ''): string => {
   const current = new SimpleSearchQuery(search, defaults);
   const params = current.getParams();
   return (
