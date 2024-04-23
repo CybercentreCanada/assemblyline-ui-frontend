@@ -75,7 +75,7 @@ const WrappedAlertDefaultSearchParameters = () => {
 
   useEffect(() => {
     if (location.search === '' && localStorage.getItem(LOCAL_STORAGE)) {
-      navigate(`${location.pathname}${localStorage.getItem(LOCAL_STORAGE)}${location.hash}`);
+      navigate(`${location.pathname}?${localStorage.getItem(LOCAL_STORAGE)}${location.hash}`);
     }
   }, [location.hash, location.pathname, location.search, navigate]);
 

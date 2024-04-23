@@ -197,7 +197,7 @@ const WrappedAlertsPage = () => {
   );
 
   useEffect(() => {
-    if (!globalDrawerOpened && location.hash) {
+    if (!globalDrawerOpened && location.hash && location.hash !== '') {
       navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
