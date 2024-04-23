@@ -23,11 +23,13 @@ import {
 } from '@mui/material';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
+import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
+import AISummarySection from 'components/routes/submission/detail/ai_summary';
 import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
@@ -142,7 +144,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const [badlistReason, setBadlistReason] = useState<string>('');
   const [waitingDialog, setWaitingDialog] = useState(false);
   const { apiCall } = useMyAPI();
-  const { c12nDef } = useALContext();
+  const { c12nDef, configuration, settings } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const theme = useTheme();
   const navigate = useNavigate();
@@ -152,6 +154,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const popoverOpen = Boolean(resubmitAnchor);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
+  const { addInsight, removeInsight } = useAssistant();
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -351,6 +354,26 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
     }
   }, [file]);
 
+  useEffect(() => {
+    addInsight({ type: 'file', value: sha256 });
+
+    return () => {
+      removeInsight({ type: 'file', value: sha256 });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256]);
+
+  useEffect(() => {
+    if (file && file.file_info.type.indexOf('code/') === 0) {
+      addInsight({ type: 'code', value: sha256 });
+    }
+
+    return () => {
+      removeInsight({ type: 'code', value: sha256 });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file]);
+
   return currentUser.roles.includes('submission_view') ? (
     <div id="fileDetailTop" style={{ textAlign: 'left' }}>
       <InputDialog
@@ -520,6 +543,9 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         )}
         <FrequencySection seen={file ? file.file_info?.seen : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
+        {configuration.ui.ai.enabled && settings.executive_summary && !liveErrors && !liveResultKeys && (
+          <AISummarySection type="file" id={file ? file.file_info.sha256 : null} />
+        )}
         <ChildrenSection childrens={file ? file.childrens : null} />
         <ParentSection parents={file ? file.parents : null} />
         <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />

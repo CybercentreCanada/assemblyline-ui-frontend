@@ -1,6 +1,8 @@
+import AssignmentLateOutlinedIcon from '@mui/icons-material/AssignmentLateOutlined';
+import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
-import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Chip, Grid, MenuItem, Select, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -9,7 +11,7 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import ArchiveDetail from 'components/routes/archive/detail';
+import ArchiveDetail, { FileInfo } from 'components/routes/archive/detail';
 import { ChipList } from 'components/visual/ChipList';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
@@ -17,7 +19,7 @@ import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
-import ArchivesTable, { ArchivedFileResult } from 'components/visual/SearchResult/archives';
+import ArchivesTable from 'components/visual/SearchResult/archives';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -49,7 +51,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type FileResults = {
-  items: ArchivedFileResult[];
+  items: FileInfo[];
   offset: number;
   rows: number;
   total: number;
@@ -227,7 +229,9 @@ export default function MalwareArchive() {
     curQuery.set('archive_only', true);
 
     const supp = curQuery.pop('supplementary') || false;
-    curQuery.add('filters', supp ? 'is_supplementary:*' : 'is_supplementary:false');
+    if (!supp) {
+      curQuery.add('filters', 'NOT is_supplementary:true');
+    }
 
     const tc = curQuery.pop('tc') || DEFAULT_TC;
     if (tc !== '1y') {
@@ -246,7 +250,7 @@ export default function MalwareArchive() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<ArchiveDetail sha256={location.hash.substr(1)} />);
+      setGlobalDrawer(<ArchiveDetail sha256={location.hash.substr(1)} />, { hasMaximize: true });
     } else {
       closeGlobalDrawer();
     }
@@ -287,10 +291,17 @@ export default function MalwareArchive() {
     return (
       <PageFullWidth margin={4}>
         <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
-          <Grid item xs={12} sm={7} md={9} xl={10}>
-            <Typography variant="h4">{t('title')}</Typography>
+          <Grid item xs={12} md={8} xl={10}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
+              <Typography variant="h4">{t('title')}</Typography>
+              <Tooltip title={t('beta.description')}>
+                <div>
+                  <Chip color="primary" size="small" variant="outlined" label={t('beta.title')} />
+                </div>
+              </Tooltip>
+            </div>
           </Grid>
-          <Grid item xs={12} sm={5} md={3} xl={2}>
+          <Grid item xs={12} md={4} xl={2}>
             <FormControl size="small" fullWidth>
               <Select
                 disabled={searching}
@@ -323,6 +334,26 @@ export default function MalwareArchive() {
               onClear={handleClear}
               onSearch={handleSearch}
               buttons={[
+                {
+                  icon: <AssignmentLateOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                  tooltip: t('filter.attributed'),
+                  props: {
+                    onClick: () => {
+                      query.add('filters', 'label_categories.attribution:*');
+                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                    }
+                  }
+                },
+                {
+                  icon: <ClassOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                  tooltip: t('filter.labelled'),
+                  props: {
+                    onClick: () => {
+                      query.add('filters', 'labels:*');
+                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                    }
+                  }
+                },
                 query?.has('supplementary')
                   ? {
                       icon: <FileOpenIcon fontSize={downSM ? 'small' : 'medium'} />,

@@ -53,7 +53,7 @@ const WrappedParentSection: React.FC<ParentSectionProps> = ({
           <Typography
             color="secondary"
             variant="subtitle1"
-            children={`${parents?.length} ${t('parents', { ns: 'fileDetail' })}`}
+            children={`${parents?.length} ${t(parents?.length === 1 ? 'file' : 'files', { ns: 'fileDetail' })}`}
             sx={{ fontStyle: 'italic' }}
           />
         )

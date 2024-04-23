@@ -11,7 +11,8 @@ export interface UsingPromiseAPI {
     query: SearchQuery,
     selectedStatus: string,
     selectedPriority: string,
-    selectedLabels: string[]
+    addedLabels: string[],
+    removedLabels: string[]
   ) => Promise<boolean>;
   onTakeOwnership: (query: SearchQuery) => Promise<boolean>;
   setVerdict: (alert_id: string, verdict: 'malicious' | 'non_malicious') => Promise<boolean>;
@@ -40,13 +41,19 @@ export default function usePromiseAPI(): UsingPromiseAPI {
     query: SearchQuery,
     selectedStatus: string,
     selectedPriority: string,
-    selectedLabels: string[]
+    addedLabels: string[],
+    removedLabels: string[]
   ): Promise<boolean> => {
     const actionPromise = new Promise((resolve, reject) => {
       apiCall({
         url: `/api/v4/alert/all/batch/?${query.buildAPIQueryString()}`,
         method: 'post',
-        body: { priority: selectedPriority, status: selectedStatus, labels: selectedLabels },
+        body: {
+          priority: selectedPriority,
+          status: selectedStatus,
+          labels: addedLabels,
+          removed_labels: removedLabels
+        },
         onSuccess: () => {
           resolve(true);
         },

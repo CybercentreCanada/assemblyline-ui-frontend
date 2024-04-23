@@ -1,8 +1,11 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import {
   Autocomplete,
   Button,
   CircularProgress,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -24,8 +27,10 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { FileInfo } from 'components/routes/archive/detail';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import { useDebounce } from 'components/visual/HexViewer';
@@ -61,6 +66,12 @@ const DEFAULT_LABELS = {
   info: []
 };
 
+const LABELS_COLOR_MAP = {
+  info: 'default',
+  technique: 'secondary',
+  attribution: 'primary'
+};
+
 const LABELS: Record<
   keyof typeof DEFAULT_LABELS,
   { color: 'default' | 'primary' | 'error' | 'info' | 'success' | 'warning' | 'secondary' }
@@ -92,6 +103,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+  const { user: currentUser } = useALContext();
 
   const [labels, setLabels] = useState<Labels>(null);
   const [newLabel, setNewLabel] = useState<NewLabel>({ value: '', category: '' });
@@ -139,7 +151,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
       if (!sha256) return;
       apiCall({
         method: 'POST',
-        url: `/api/v4/file/label/`,
+        url: `/api/v4/archive/label/`,
         body: {
           include: value,
           mincount: 1,
@@ -159,7 +171,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
       if (!sha256) return;
       apiCall({
         method: 'PUT',
-        url: `/api/v4/file/label/${sha256}/`,
+        url: `/api/v4/archive/label/${sha256}/`,
         body: { [category]: [value] },
         onSuccess: ({ api_response }) => {
           const data = api_response?.label_categories ?? {};
@@ -185,7 +197,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
       if (!sha256) return;
       apiCall({
         method: 'DELETE',
-        url: `/api/v4/file/label/${sha256}/`,
+        url: `/api/v4/archive/label/${sha256}/`,
         body: { [category]: [value] },
         onSuccess: ({ api_response }) => {
           const data = api_response?.label_categories ?? {};
@@ -220,7 +232,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
       title={t('labels')}
       nocollapse={nocollapse}
       slots={{
-        end: (
+        end: currentUser.roles.includes('archive_manage') && (
           <Tooltip title={t('label.add.tooltip')}>
             <span>
               <IconButton
@@ -316,7 +328,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                               ))}
                             </Grid>
                             <Grid item md={1}>
-                              <CustomChip size="small" label={option?.total} />
+                              <CustomChip size="small" label={option?.count} />
                             </Grid>
                           </Grid>
                         );
@@ -407,7 +419,9 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                   label: value,
                   size: 'small',
                   variant: 'outlined',
-                  onDelete: () => handleDeleteConfirmation(cat as keyof typeof DEFAULT_LABELS, value)
+                  onDelete: currentUser.roles.includes('archive_manage')
+                    ? () => handleDeleteConfirmation(cat as keyof typeof DEFAULT_LABELS, value)
+                    : null
                 }))}
               />
             )}
@@ -417,6 +431,88 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
     </SectionContainer>
   );
 };
+
+type LabelCellProps = {
+  label_categories?: FileInfo['label_categories'];
+  onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
+};
+
+const WrappedLabelCell = ({ label_categories = null, onLabelClick = null }: LabelCellProps) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const [showMore, setShowMore] = useState<boolean>(false);
+
+  const labels = useMemo(
+    () =>
+      label_categories &&
+      ['attribution', 'technique', 'info'].flatMap(
+        category => category in label_categories && label_categories[category].map(label => ({ category, label }))
+      ),
+    [label_categories]
+  );
+
+  return (
+    labels?.length > 0 && (
+      <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(1), flexWrap: 'wrap' }}>
+        <Collapse
+          in={!showMore}
+          timeout="auto"
+          style={{ flex: 1 }}
+          collapsedSize={25}
+          // sx={{
+          //   '&.Mui-expanded': {
+          //     minHeight: 15,
+          //     maxHeight: 15,
+          //     backgroundColor: '#a5a5a5'
+          //   }
+          // }}
+        >
+          {labels
+            .filter((_, j) => (showMore ? true : j < 5))
+            .map(({ category, label }, j) => (
+              <CustomChip
+                key={`${j}`}
+                wrap
+                variant="outlined"
+                size="tiny"
+                type="rounded"
+                color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                label={label}
+                style={{ height: 'auto', minHeight: '20px' }}
+                onClick={
+                  !onLabelClick
+                    ? null
+                    : event => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        onLabelClick(event, label);
+                      }
+                }
+              />
+            ))}
+        </Collapse>
+
+        <div>
+          <Tooltip title={showMore ? t('more') : t('less')}>
+            <IconButton
+              size="small"
+              onClick={event => {
+                event.preventDefault();
+                event.stopPropagation();
+                setShowMore(v => !v);
+              }}
+              style={{ padding: 0 }}
+            >
+              {showMore ? <ExpandMore /> : <ExpandLess />}
+            </IconButton>
+          </Tooltip>
+        </div>
+      </div>
+    )
+  );
+};
+
+export const LabelCell = React.memo(WrappedLabelCell);
 
 export const LabelSection = React.memo(WrappedLabelSection);
 export default LabelSection;

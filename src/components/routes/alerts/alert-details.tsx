@@ -22,6 +22,7 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
+import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { AlertItem, DetailedItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
@@ -69,10 +70,12 @@ const useStyles = makeStyles(theme => ({
 type AlertDetailsProps = {
   id?: string;
   alert?: AlertItem;
+  inDrawer?: boolean;
 };
 
 type AutoHideChipListProps = {
   items: DetailedItem[];
+  defaultClassification: string;
   type?: string;
 };
 
@@ -83,7 +86,7 @@ type AutoHideChipListState = {
   fullChipList: ActionableCustomChipProps[];
 };
 
-const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items, type = null }) => {
+const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items, defaultClassification, type = null }) => {
   const { t } = useTranslation();
   const [state, setState] = useState<AutoHideChipListState | null>(null);
   const [shownChips, setShownChips] = useState<ActionableCustomChipProps[]>([]);
@@ -96,13 +99,14 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items, type 
           data_type: type,
           label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
           variant: 'outlined',
-          color: verdictToColor(item.verdict)
+          color: verdictToColor(item.verdict),
+          classification: defaultClassification
         } as ActionableCustomChipProps)
     );
     const showExtra = items.length <= TARGET_RESULT_COUNT;
 
     setState({ showExtra, fullChipList });
-  }, [items, type]);
+  }, [defaultClassification, items, type]);
 
   useEffect(() => {
     if (state !== null) {
@@ -130,7 +134,7 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items, type 
 
 const AutoHideChipList = React.memo(WrappedAutoHideChipList);
 
-const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
+const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert, inDrawer = false }) => {
   const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
@@ -144,27 +148,28 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const [viewHistory, setViewHistory] = React.useState(false);
   const [hasEvents, setHasEvents] = React.useState(false);
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
-  // eslint-disable-next-line
   const { t } = useTranslation(['alerts']);
+  const { addInsight, removeInsight } = useAssistant();
 
   useEffect(() => {
-    const alertId = id || paramId;
-    if (alertId && currentUser.roles.includes('alert_view')) {
-      apiCall({
-        url: `/api/v4/alert/${alertId}/`,
-        onSuccess: api_data => {
-          let alertItem = api_data.api_response;
-          setItem(alertItem);
-          setHasEvents(alertItem && alertItem.events && alertItem.events.length > 0 ? true : false);
-        }
-      });
+    if (alert) {
+      setItem(alert);
+      setHasEvents(alert.events && alert.events.length > 0 ? true : false);
+    } else {
+      const alertId = id || paramId;
+      if (alertId && currentUser.roles.includes('alert_view')) {
+        apiCall({
+          url: `/api/v4/alert/${alertId}/`,
+          onSuccess: api_data => {
+            let alertItem = api_data.api_response;
+            setItem(alertItem);
+            setHasEvents(alertItem && alertItem.events && alertItem.events.length > 0 ? true : false);
+          }
+        });
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, paramId]);
-
-  useEffect(() => {
-    if (alert) setItem(alert);
-  }, [alert]);
+  }, [id, paramId, alert]);
 
   useEffect(() => {
     function handleAlertUpdate(event: CustomEvent) {
@@ -179,8 +184,29 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
     };
   }, [item]);
 
+  useEffect(() => {
+    if (item) {
+      addInsight({ type: 'submission', value: item.sid });
+      addInsight({ type: 'report', value: item.sid });
+      addInsight({ type: 'file', value: item.file.sha256 });
+      if (item.file.type.indexOf('code/') === 0) {
+        addInsight({ type: 'code', value: item.file.sha256 });
+      }
+    }
+
+    return () => {
+      if (item) {
+        removeInsight({ type: 'submission', value: item.sid });
+        removeInsight({ type: 'report', value: item.sid });
+        removeInsight({ type: 'file', value: item.file.sha256 });
+        removeInsight({ type: 'code', value: item.file.sha256 });
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [item]);
+
   return currentUser.roles.includes('alert_view') ? (
-    <PageFullWidth margin={!alert ? 4 : 1}>
+    <PageFullWidth margin={inDrawer ? 1 : 4}>
       {c12nDef.enforce && (
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
           <div style={{ flex: 1 }}>
@@ -371,7 +397,13 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                 <Typography className={classes.sectionTitle}>{t('label')}</Typography>
                 <Divider />
                 <div className={classes.sectionContent}>
-                  <ActionableChipList items={item ? item.label.map(label => ({ label, variant: 'outlined' })) : null} />
+                  <ActionableChipList
+                    items={
+                      item
+                        ? item.label.map(label => ({ label, variant: 'outlined', classification: item.classification }))
+                        : null
+                    }
+                  />
                 </div>
               </div>
             </div>
@@ -475,7 +507,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                 )}
               </Grid>
             </Grid>
-            {item && item.file.screenshots && <ImageInline data={item.file.screenshots} small />}
+            {item && item.file.screenshots && <ImageInline data={item.file.screenshots} size="small" />}
           </div>
         </div>
 
@@ -609,10 +641,18 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   <Grid item xs={9} sm={10}>
                     <div className={classes.sectionContent}>
                       {item && item.al.detailed ? (
-                        <AutoHideChipList items={item.al.detailed.attrib} />
+                        <AutoHideChipList items={item.al.detailed.attrib} defaultClassification={item.classification} />
                       ) : (
                         <ActionableChipList
-                          items={item ? item.al.attrib.map(label => ({ label, variant: 'outlined' })) : null}
+                          items={
+                            item
+                              ? item.al.attrib.map(label => ({
+                                  label,
+                                  variant: 'outlined',
+                                  classification: item.classification
+                                }))
+                              : null
+                          }
                         />
                       )}
                     </div>
@@ -629,10 +669,22 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   <Grid item xs={9} sm={10}>
                     <div className={classes.sectionContent}>
                       {item && item.al.detailed ? (
-                        <AutoHideChipList items={item.al.detailed.av} type="av.virus_name" />
+                        <AutoHideChipList
+                          items={item.al.detailed.av}
+                          type="av.virus_name"
+                          defaultClassification={item.classification}
+                        />
                       ) : (
                         <ActionableChipList
-                          items={item ? item.al.av.map(label => ({ label, variant: 'outlined' })) : null}
+                          items={
+                            item
+                              ? item.al.av.map(label => ({
+                                  label,
+                                  variant: 'outlined',
+                                  classification: item.classification
+                                }))
+                              : null
+                          }
                         />
                       )}
                     </div>
@@ -658,6 +710,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                               <AutoHideChipList
                                 items={item.al.detailed.ip.filter(ip => ip.type === 'network.dynamic.ip')}
                                 type="network.dynamic.ip"
+                                defaultClassification={item.classification}
                               />
                             ) : (
                               <ActionableChipList
@@ -665,7 +718,8 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                   item
                                     ? item.al.ip_dynamic.map(label => ({
                                         label,
-                                        variant: 'outlined'
+                                        variant: 'outlined',
+                                        classification: item.classification
                                       }))
                                     : null
                                 }
@@ -682,6 +736,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                               <AutoHideChipList
                                 items={item.al.detailed.ip.filter(ip => ip.type === 'network.static.ip')}
                                 type="network.static.ip"
+                                defaultClassification={item.classification}
                               />
                             ) : (
                               <ActionableChipList
@@ -689,7 +744,8 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                   item
                                     ? item.al.ip_static.map(label => ({
                                         label,
-                                        variant: 'outlined'
+                                        variant: 'outlined',
+                                        classification: item.classification
                                       }))
                                     : null
                                 }
@@ -723,6 +779,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                   domain => domain.type === 'network.dynamic.domain'
                                 )}
                                 type="network.dynamic.domain"
+                                defaultClassification={item.classification}
                               />
                             ) : (
                               <ActionableChipList
@@ -730,7 +787,8 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                   item
                                     ? item.al.domain_dynamic.map(label => ({
                                         label,
-                                        variant: 'outlined'
+                                        variant: 'outlined',
+                                        classification: item.classification
                                       }))
                                     : null
                                 }
@@ -749,6 +807,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                   domain => domain.type === 'network.static.domain'
                                 )}
                                 type="network.static.domain"
+                                defaultClassification={item.classification}
                               />
                             ) : (
                               <ActionableChipList
@@ -756,7 +815,8 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                   item
                                     ? item.al.domain_static.map(label => ({
                                         label,
-                                        variant: 'outlined'
+                                        variant: 'outlined',
+                                        classification: item.classification
                                       }))
                                     : null
                                 }
@@ -788,6 +848,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                               <AutoHideChipList
                                 items={item.al.detailed.uri.filter(uri => uri.type === 'network.dynamic.uri')}
                                 type="network.dynamic.uri"
+                                defaultClassification={item.classification}
                               />
                             ) : (
                               <ActionableChipList
@@ -795,7 +856,8 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                   item
                                     ? item.al.uri_dynamic.map(label => ({
                                         label,
-                                        variant: 'outlined'
+                                        variant: 'outlined',
+                                        classification: item.classification
                                       }))
                                     : null
                                 }
@@ -812,6 +874,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                               <AutoHideChipList
                                 items={item.al.detailed.uri.filter(uri => uri.type === 'network.static.uri')}
                                 type="network.static.uri"
+                                defaultClassification={item.classification}
                               />
                             ) : (
                               <ActionableChipList
@@ -819,7 +882,8 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                   item
                                     ? item.al.uri_static.map(label => ({
                                         label,
-                                        variant: 'outlined'
+                                        variant: 'outlined',
+                                        classification: item.classification
                                       }))
                                     : null
                                 }
@@ -842,10 +906,21 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   <Grid item xs={9} sm={10}>
                     <div className={classes.sectionContent}>
                       {item && item.al.detailed ? (
-                        <AutoHideChipList items={item.al.detailed.heuristic} />
+                        <AutoHideChipList
+                          items={item.al.detailed.heuristic}
+                          defaultClassification={item.classification}
+                        />
                       ) : (
                         <ActionableChipList
-                          items={item ? item.heuristic.name.map(label => ({ label, variant: 'outlined' })) : null}
+                          items={
+                            item
+                              ? item.heuristic.name.map(label => ({
+                                  label,
+                                  variant: 'outlined',
+                                  classification: item.classification
+                                }))
+                              : null
+                          }
                         />
                       )}
                     </div>
@@ -862,10 +937,22 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   <Grid item xs={9} sm={10}>
                     <div className={classes.sectionContent}>
                       {item && item.al.detailed ? (
-                        <AutoHideChipList items={item.al.detailed.behavior} type="file.behavior" />
+                        <AutoHideChipList
+                          items={item.al.detailed.behavior}
+                          type="file.behavior"
+                          defaultClassification={item.classification}
+                        />
                       ) : (
                         <ActionableChipList
-                          items={item ? item.al.behavior.map(label => ({ label, variant: 'outlined' })) : null}
+                          items={
+                            item
+                              ? item.al.behavior.map(label => ({
+                                  label,
+                                  variant: 'outlined',
+                                  classification: item.classification
+                                }))
+                              : null
+                          }
                         />
                       )}
                     </div>
@@ -882,10 +969,22 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   <Grid item xs={9} sm={10}>
                     <div className={classes.sectionContent}>
                       {item && item.al.detailed ? (
-                        <AutoHideChipList items={item.al.detailed.yara} type="file.rule.yara" />
+                        <AutoHideChipList
+                          items={item.al.detailed.yara}
+                          type="file.rule.yara"
+                          defaultClassification={item.classification}
+                        />
                       ) : (
                         <ActionableChipList
-                          items={item ? item.al.yara.map(label => ({ label, variant: 'outlined' })) : null}
+                          items={
+                            item
+                              ? item.al.yara.map(label => ({
+                                  label,
+                                  variant: 'outlined',
+                                  classification: item.classification
+                                }))
+                              : null
+                          }
                         />
                       )}
                     </div>
@@ -907,10 +1006,21 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                             <i>{t('attack_category')}</i>
                           </Typography>
                           {item && item.al.detailed ? (
-                            <AutoHideChipList items={item.al.detailed.attack_category} />
+                            <AutoHideChipList
+                              items={item.al.detailed.attack_category}
+                              defaultClassification={item.classification}
+                            />
                           ) : (
                             <ActionableChipList
-                              items={item ? item.attack.category.map(label => ({ label, variant: 'outlined' })) : null}
+                              items={
+                                item
+                                  ? item.attack.category.map(label => ({
+                                      label,
+                                      variant: 'outlined',
+                                      classification: item.classification
+                                    }))
+                                  : null
+                              }
                             />
                           )}
                         </Grid>
@@ -919,10 +1029,21 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                             <i>{t('attack_pattern')}</i>
                           </Typography>
                           {item && item.al.detailed ? (
-                            <AutoHideChipList items={item.al.detailed.attack_pattern} />
+                            <AutoHideChipList
+                              items={item.al.detailed.attack_pattern}
+                              defaultClassification={item.classification}
+                            />
                           ) : (
                             <ActionableChipList
-                              items={item ? item.attack.pattern.map(label => ({ label, variant: 'outlined' })) : null}
+                              items={
+                                item
+                                  ? item.attack.pattern.map(label => ({
+                                      label,
+                                      variant: 'outlined',
+                                      classification: item.classification
+                                    }))
+                                  : null
+                              }
                             />
                           )}
                         </Grid>

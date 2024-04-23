@@ -6,7 +6,7 @@ import { RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import moment from 'moment';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -42,23 +42,40 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
   const location = useLocation();
   const { c12nDef } = useALContext();
 
-  const RetrohuntStatus = useCallback<React.FC<{ result: RetrohuntResult }>>(
-    (prop = { result: { finished: false, phase: 'finished', percentage: 100 } }) => {
-      let { finished = false, phase = null, percentage = null } = prop.result;
-      phase = finished ? 'finished' : ['filtering', 'yara', 'finished'].includes(phase) ? phase : 'finished';
+  const hasTotalHits = useMemo<boolean>(
+    () => retrohuntResults?.total > 0 && retrohuntResults.items.some(item => !!item.total_hits),
+    [retrohuntResults]
+  );
 
-      return (
-        <CustomChip
-          label={
-            phase === 'finished' || !percentage
-              ? t(`status.${phase}`)
-              : `${Math.floor(percentage)}% ${t(`status.${phase}`)}`
-          }
-          color={phase === 'finished' ? 'primary' : 'default'}
-          size="small"
-          variant="outlined"
-        />
-      );
+  const RetrohuntStatus = useCallback<React.FC<{ result: RetrohuntResult }>>(
+    ({ result }) => {
+      const { finished = false, step, progress } = result;
+      let label = '';
+
+      if (finished) {
+        label = t(`status.finished`);
+      } else if (step) {
+        switch (step) {
+          case 'Starting':
+            label = t(`status.starting`);
+            break;
+          case 'Filtering':
+            label = `${Math.ceil(100 * progress)}% ${t(`status.filtering`)}`;
+            break;
+          case 'Yara':
+            label = `${Math.ceil(100 * progress)}% ${t(`status.yara`)}`;
+            break;
+          case 'Finished':
+            label = t(`status.finished`);
+            break;
+          default:
+            label = t(`status.in_progress`);
+        }
+      } else {
+        label = t(`status.in_progress`);
+      }
+
+      return <CustomChip label={label} color={finished ? 'primary' : 'default'} size="small" variant="outlined" />;
     },
     [t]
   );
@@ -71,7 +88,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
             <DivTableRow>
               <SortableHeaderCell
                 children={t('header.created')}
-                sortField="created"
+                sortField="created_time"
                 allowSort={allowSort}
                 onSort={(_, value) => onSort(value)}
               />
@@ -84,20 +101,15 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
               />
               {c12nDef.enforce && (
                 <SortableHeaderCell
-                  children={t('header.classification')}
+                  children={t('header.rule_classification')}
                   sortField="classification"
                   allowSort={allowSort}
                   onSort={(_, value) => onSort(value)}
                 />
               )}
+              {hasTotalHits && <DivTableCell children={t('header.total_hits')} />}
               <SortableHeaderCell
-                children={t('header.numfiles')}
-                sortField="total_hits"
-                allowSort={allowSort}
-                onSort={(_, value) => onSort(value)}
-              />
-              <SortableHeaderCell
-                children={t('header.status')}
+                children={t('header.finished')}
                 sortField="finished"
                 allowSort={allowSort}
                 onSort={(_, value) => onSort(value)}
@@ -109,7 +121,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
               <LinkRow
                 key={id}
                 component={Link}
-                to={`/retrohunt/${retrohunt.code}`}
+                to={`/retrohunt/${retrohunt.key}`}
                 onClick={event => {
                   if (!onRowClick) return;
                   event.preventDefault();
@@ -118,11 +130,11 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                 hover
                 style={{ textDecoration: 'none' }}
                 selected={new URL(`${window.location.origin}/${location.hash.slice(1)}`).pathname.endsWith(
-                  `/${retrohunt?.code}`
+                  `/${retrohunt?.key}`
                 )}
               >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  <Tooltip title={retrohunt.created}>
+                  <Tooltip title={retrohunt?.created}>
                     <>{moment(retrohunt?.created).locale(i18n.language).fromNow()}</>
                   </Tooltip>
                 </DivTableCell>
@@ -142,7 +154,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                     <Classification type="text" size="tiny" c12n={retrohunt.classification} format="short" />
                   </DivTableCell>
                 )}
-                <DivTableCell>{retrohunt.total_hits}</DivTableCell>
+                {hasTotalHits && <DivTableCell>{retrohunt?.total_hits}</DivTableCell>}
                 <DivTableCell>
                   <RetrohuntStatus result={retrohunt} />
                 </DivTableCell>

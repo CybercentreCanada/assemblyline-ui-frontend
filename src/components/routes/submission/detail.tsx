@@ -32,6 +32,7 @@ import {
 } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
+import useAssistant from 'components/hooks/useAssistant';
 import useDrawer from 'components/hooks/useDrawer';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -51,6 +52,7 @@ import { Link, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import ForbiddenPage from '../403';
 import HeuristicDetail from '../manage/heuristic_detail';
+import AISummarySection from './detail/ai_summary';
 import AttackSection from './detail/attack';
 import ErrorSection from './detail/errors';
 import FileTreeSection from './detail/file_tree';
@@ -119,11 +121,12 @@ function WrappedSubmissionDetail() {
   const [waitingDialog, setWaitingDialog] = useState(false);
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const { apiCall } = useMyAPI();
+  const { addInsight, removeInsight } = useAssistant();
   const sp4 = theme.spacing(4);
   const { showSuccessMessage } = useMySnackbar();
   const location = useLocation();
   const navigate = useNavigate();
-  const { user: currentUser, c12nDef, configuration: systemConfig } = useALContext();
+  const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [baseFiles, setBaseFiles] = useState([]);
@@ -655,7 +658,7 @@ function WrappedSubmissionDetail() {
       setBaseFiles(submission.files.map(f => f.sha256));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [submission]);
+  }, [submission, systemConfig]);
 
   useEffect(() => {
     if (liveStatus === 'processing') {
@@ -888,6 +891,17 @@ function WrappedSubmissionDetail() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadTrigger]);
+
+  useEffect(() => {
+    addInsight({ type: 'report', value: id });
+    addInsight({ type: 'submission', value: id });
+
+    return () => {
+      removeInsight({ type: 'report', value: id });
+      removeInsight({ type: 'submission', value: id });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
@@ -1260,6 +1274,9 @@ function WrappedSubmissionDetail() {
           metadata={submission ? submission.metadata : null}
           classification={submission ? submission.classification : null}
         />
+        {systemConfig.ui.ai.enabled && settings.executive_summary && submission && submission.state === 'completed' && (
+          <AISummarySection type={'submission' as 'submission'} id={submission.sid} />
+        )}
         <Detection
           section_map={summary ? summary.heuristic_sections : null}
           heuristics={summary ? summary.heuristics : null}

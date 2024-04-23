@@ -105,12 +105,11 @@ const Submit: React.FC<any> = () => {
   const state: SubmitState = location.state as SubmitState;
   const urlHashTitle = configuration.ui.allow_url_submissions ? 'URL/SHA256' : 'SHA256';
   const urlInputText = urlHashTitle + t('urlHash.input_suffix');
-  const [urlHash, setUrlHash] = useState(state ? state.hash : '');
-  const [submissionMetadata, setSubmissionMetadata] = useState(state ? state.metadata : undefined);
+  const [urlHash, setUrlHash] = useState('');
+  const [submissionMetadata, setSubmissionMetadata] = useState(undefined);
   const [urlHashHasError, setUrlHashHasError] = useState(false);
   const [urlAutoselection, setUrlAutoselection] = useState(false);
-  const [value, setValue] = useState(state ? state.tabContext : '0');
-  const classification = useState(state ? state.c12n : null)[0];
+  const [value, setValue] = useState('0');
   const banner = useAppBanner();
 
   const handleChange = (event, newValue) => {
@@ -304,13 +303,6 @@ const Submit: React.FC<any> = () => {
     }
   };
 
-  function setParamAsync(service_idx, param_idx, p_value) {
-    if (settings) {
-      const type = settings.service_spec[service_idx].params[param_idx].type;
-      settings.service_spec[service_idx].params[param_idx].value = type === 'int' ? parseInt(p_value) : p_value;
-    }
-  }
-
   function setSettingValue(field, fieldValue) {
     if (settings) {
       setSettings({ ...settings, [field]: fieldValue });
@@ -395,6 +387,14 @@ const Submit: React.FC<any> = () => {
     }
   }, [settings, urlHash, urlAutoselection, configuration.ui.url_submission_auto_service_selection]);
 
+  useEffect(() => {
+    if (state) {
+      setUrlHash(state.hash);
+      setSubmissionMetadata(state.metadata);
+      setValue(state.tabContext);
+    }
+  }, [state]);
+
   useEffectOnce(() => {
     // Setup Flow
     setFlow(
@@ -411,7 +411,11 @@ const Submit: React.FC<any> = () => {
     apiCall({
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: api_data => {
-        setSettings(api_data.api_response);
+        if (state) {
+          setSettings({ ...api_data.api_response, classification: state.c12n });
+        } else {
+          setSettings(api_data.api_response);
+        }
       }
     });
     setUUID(generateUUID());
@@ -443,7 +447,7 @@ const Submit: React.FC<any> = () => {
             <Classification
               format="long"
               type="picker"
-              c12n={classification ? classification : settings ? settings.classification : null}
+              c12n={settings ? settings.classification : null}
               setClassification={setClassification}
               disabled={!currentUser.roles.includes('submission_create')}
             />
@@ -847,12 +851,7 @@ const Submit: React.FC<any> = () => {
                     <Typography variant="h6" gutterBottom>
                       {t('options.service_spec')}
                     </Typography>
-                    <ServiceSpec
-                      service_spec={settings.service_spec}
-                      setParam={setParam}
-                      setParamAsync={setParamAsync}
-                      isSelected={isSelected}
-                    />
+                    <ServiceSpec service_spec={settings.service_spec} setParam={setParam} isSelected={isSelected} />
                   </div>
                 )}
               </Grid>

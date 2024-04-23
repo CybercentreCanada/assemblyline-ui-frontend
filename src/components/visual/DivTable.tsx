@@ -1,4 +1,14 @@
-import { Table, TableBody, TableCell, TableCellProps, TableHead, TableRow, TableSortLabel, Theme } from '@mui/material';
+import {
+  Link as MaterialLink,
+  Table,
+  TableBody,
+  TableCell,
+  TableCellProps,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  Theme
+} from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -62,6 +72,7 @@ type SortableHeaderCellProps = TableCellProps & {
   sortName?: string;
   sortField: string;
   allowSort?: boolean;
+  inverted?: boolean;
   onSort?: (event: React.MouseEvent<HTMLSpanElement, MouseEvent>, value: { name: string; field: string }) => void;
 };
 
@@ -71,6 +82,7 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   query = null,
   sortField,
   sortName = 'sort',
+  inverted = false,
   onSort = null,
   ...other
 }) => {
@@ -79,13 +91,15 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   const curSort = query ? query.get(sortName) : searchParams.get(sortName);
   const navigate = useNavigate();
   const active = curSort && curSort.indexOf(sortField) !== -1;
-  const dir = active && curSort.indexOf('asc') !== -1 ? 'asc' : 'desc';
+  const ascending = inverted ? 'desc' : 'asc';
+  const descending = inverted ? 'asc' : 'desc';
+  const dir = active && curSort.indexOf(ascending) !== -1 ? ascending : descending;
 
   const triggerSort = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-    if (curSort && curSort.indexOf(sortField) !== -1 && curSort.indexOf('asc') === -1) {
-      searchParams.set(sortName, `${sortField} asc`);
+    if (curSort && curSort.indexOf(sortField) !== -1 && curSort.indexOf(ascending) === -1) {
+      searchParams.set(sortName, `${sortField} ${ascending}`);
     } else {
-      searchParams.set(sortName, `${sortField} desc`);
+      searchParams.set(sortName, `${sortField} ${descending}`);
     }
 
     if (onSort) {
@@ -110,6 +124,18 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
 
 export const LinkRow = ({ children, to, ...other }) => (
   <TableRow component={Link} {...other} to={to} style={{ cursor: 'pointer', textDecoration: 'none' }}>
+    {children}
+  </TableRow>
+);
+
+export const ExternalLinkRow = ({ children, href, ...other }) => (
+  <TableRow
+    component={MaterialLink}
+    {...other}
+    href={href}
+    target="_blank"
+    style={{ cursor: 'pointer', textDecoration: 'none' }}
+  >
     {children}
   </TableRow>
 );

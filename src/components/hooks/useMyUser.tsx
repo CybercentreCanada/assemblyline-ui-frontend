@@ -34,6 +34,7 @@ type SettingsDefinition = {
   deep_scan: boolean;
   description: string;
   download_encoding: string;
+  executive_summary: boolean;
   expand_min_score: number;
   ignore_cache: boolean;
   ignore_dynamic_recursion_prevention: boolean;
@@ -101,6 +102,12 @@ export type ConfigurationDefinition = {
     version: string;
   };
   ui: {
+    ai: {
+      enabled: boolean;
+      assistant: {
+        system_message: string;
+      };
+    };
     alerting_meta: {
       important: string[];
       subject: string[];
@@ -125,9 +132,11 @@ export type ConfigurationDefinition = {
     external_source_tags: {
       [tag_name: string]: string[];
     };
+    fqdn: string;
     read_only: boolean;
     rss_feeds: string[];
     services_feed: string;
+    community_feed: string;
     tos: boolean;
     tos_lockout: boolean;
     tos_lockout_notify: boolean;

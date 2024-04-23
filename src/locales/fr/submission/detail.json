@@ -1,4 +1,6 @@
 {
+  "ai_summary": "Résumé exécutif",
+  "analysing_report": "Demander aux robots de résumer le rapport...",
   "archive": "Copiez la soumission dans l'archive des logiciels malveillants",
   "archive.success": "La soumission a été mise en file d'attente avec succès pour l'archivage",
   "archive.success.resubmit": "La soumission a été soumise à nouveau pour répondre aux exigences de service minimales pour l'archivage et sera automatiquement archivée une fois terminée.",
@@ -51,6 +53,8 @@
   "params.services.selected": "Services sélectionnés",
   "params.services.service_spec": "Paramètres de service",
   "params.submitter": "Soumis par",
+  "powered_by_ai": "Propulsé par l'IA",
+  "powered_by_ai.tooltip": "Les paragraphes précédents ont été générés automatiquement par un modèle LLM. Les résultats sont imprévisibles et peuvent ne pas donner une image complète de l’analyse. Référez-vous à l’analyse détaillée pour des résultats plus précis. Cliquez pour obtenir les nouveaux résultats du LLM...",
   "processing": "La soumission est en cours de traitement, réception des résultats en direct...",
   "psid": "Analyse étendue de",
   "queued": "La soumission est en attente d'être récupérée par le répartiteur pour traitement...",

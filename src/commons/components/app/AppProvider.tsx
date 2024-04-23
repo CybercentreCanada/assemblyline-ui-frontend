@@ -1,6 +1,7 @@
 import { CssBaseline, PaletteMode, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
 import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
+import AssistantProvider from 'components/providers/AssistantProvider';
 import CarouselProvider from 'components/providers/CarouselProvider';
 import DrawerProvider from 'components/providers/DrawerProvider';
 import { ExternalLookupProvider } from 'components/providers/ExternalLookupProvider';
@@ -79,19 +80,21 @@ export default function AppProvider<U extends AppUser>({
           <AppErrorProvider>
             <AppSnackbarProvider>
               <AppUserProvider service={user}>
-                <HighlightProvider>
-                  <ExternalLookupProvider>
-                    <CarouselProvider>
-                      <DrawerProvider>
-                        <AppBarProvider search={search}>
-                          <AppLeftNavProvider>
-                            <AppLayoutProvider>{children}</AppLayoutProvider>
-                          </AppLeftNavProvider>
-                        </AppBarProvider>
-                      </DrawerProvider>
-                    </CarouselProvider>
-                  </ExternalLookupProvider>
-                </HighlightProvider>
+                <AssistantProvider>
+                  <HighlightProvider>
+                    <ExternalLookupProvider>
+                      <CarouselProvider>
+                        <DrawerProvider>
+                          <AppBarProvider search={search}>
+                            <AppLeftNavProvider>
+                              <AppLayoutProvider>{children}</AppLayoutProvider>
+                            </AppLeftNavProvider>
+                          </AppBarProvider>
+                        </DrawerProvider>
+                      </CarouselProvider>
+                    </ExternalLookupProvider>
+                  </HighlightProvider>
+                </AssistantProvider>
               </AppUserProvider>
             </AppSnackbarProvider>
           </AppErrorProvider>

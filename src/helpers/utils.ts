@@ -51,6 +51,23 @@ export function getFileName(disposition: string): string {
 
 /**
  *
+ * Convert a given second to human readable form
+ *
+ * @param seconds - seconds to convert
+ *
+ * @returns Human readable string
+ *
+ */
+export function humanSeconds(seconds: number, t) {
+  if (seconds < 1) {
+    return Math.floor(seconds * 1000) + ' ' + t('milliseconds');
+  } else {
+    return seconds.toFixed(1) + ' ' + t('seconds');
+  }
+}
+
+/**
+ *
  * Convert a given bytes to human readable form (base 2)
  *
  * @param bytes - total bytes to convert
@@ -349,4 +366,18 @@ export function matchURL(data: string): RegExpExecArray | null {
   const urlParseRE =
     /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
   return urlParseRE.exec(data);
+}
+
+/**
+ *
+ * A function working the same way as array.filter but for object
+ *
+ * @param obj - obj to filter
+ * @param callback - function used to do the filtering
+ *
+ * @returns new object with filtered keys
+ *
+ */
+export function filterObject(obj: Object, callback) {
+  return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
 }

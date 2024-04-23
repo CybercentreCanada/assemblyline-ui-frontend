@@ -244,7 +244,7 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
             <div className={clsx(classes.row, classes.userRow)}>
               <div className={classes.tags}>
                 {notification.tags
-                  .filter(tag => ['new', 'current', 'dev', 'service', 'blog'].includes(tag))
+                  .filter(tag => ['new', 'current', 'dev', 'service', 'blog', 'community'].includes(tag))
                   .map((tag, i) => (
                     <CustomChip
                       className={classes.badge}
@@ -257,7 +257,7 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                           ? 'info'
                           : tag === 'current'
                           ? 'success'
-                          : tag === 'dev'
+                          : tag === 'dev' || tag === 'community'
                           ? 'warning'
                           : tag === 'service'
                           ? 'secondary'
