@@ -123,7 +123,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
   const [disableDialog, setDisableDialog] = useState(false);
   const [enableDialog, setEnableDialog] = useState(false);
   const [viewMode, setViewMode] = useState(mode);
-  const [workflowID, setWorkflowID] = useState(workflow_id || id);
+  const [workflowID, setWorkflowID] = useState(null);
   const { c12nDef, configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -197,7 +197,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workflow_id, id]);
+  }, [workflowID, id]);
 
   const handleNameChange = event => {
     setModified(true);
@@ -325,6 +325,13 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
     });
   };
 
+  useEffect(() => {
+    setWorkflowID(workflow_id || id);
+    return () => {
+      setWorkflowID(null);
+    };
+  }, [id, workflow_id]);
+
   return currentUser.roles.includes('workflow_view') ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">
       <ConfirmationDialog
@@ -380,57 +387,63 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 currentUser.roles.includes('workflow_view') &&
                 (workflow ? (
                   <Tooltip title={t('usage')}>
-                    <IconButton
-                      component={Link}
-                      style={{ color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.action.active }}
-                      to={`/alerts/?q=events.entity_id:${workflowID}`}
-                      size="large"
-                      disabled={viewMode !== 'read'}
-                    >
-                      <YoutubeSearchedForIcon />
-                    </IconButton>
+                    <div>
+                      <IconButton
+                        component={Link}
+                        style={{
+                          color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.action.active
+                        }}
+                        to={`/alerts/?q=events.entity_id:${workflowID}`}
+                        size="large"
+                        disabled={viewMode !== 'read'}
+                      >
+                        <YoutubeSearchedForIcon />
+                      </IconButton>
+                    </div>
                   </Tooltip>
                 ) : null)}
               {workflowID &&
                 currentUser.roles.includes('workflow_manage') &&
                 (workflow ? (
                   <Tooltip title={t('duplicate')}>
-                    <IconButton
-                      style={{
-                        color:
-                          viewMode !== 'read'
-                            ? theme.palette.text.disabled
-                            : theme.palette.mode === 'dark'
-                            ? theme.palette.success.light
-                            : theme.palette.success.dark
-                      }}
-                      onClick={() => {
-                        // Switch to write mode
-                        setViewMode('write');
-                        setTimeout(() => {
-                          inputRef.current.focus();
-                        }, 250);
+                    <div>
+                      <IconButton
+                        style={{
+                          color:
+                            viewMode !== 'read'
+                              ? theme.palette.text.disabled
+                              : theme.palette.mode === 'dark'
+                              ? theme.palette.success.light
+                              : theme.palette.success.dark
+                        }}
+                        onClick={() => {
+                          // Switch to write mode
+                          setViewMode('write');
+                          setTimeout(() => {
+                            inputRef.current.focus();
+                          }, 250);
 
-                        // Keep properties of workflow that are important
-                        var keptProperties = {
-                          classification: workflow.classification,
-                          enabled: workflow.enabled,
-                          labels: workflow.labels,
-                          priority: workflow.priority,
-                          query: workflow.query,
-                          status: workflow.status
-                        };
+                          // Keep properties of workflow that are important
+                          var keptProperties = {
+                            classification: workflow.classification,
+                            enabled: workflow.enabled,
+                            labels: workflow.labels,
+                            priority: workflow.priority,
+                            query: workflow.query,
+                            status: workflow.status
+                          };
 
-                        // Apply important properties on top of default workflow template
-                        setWorkflow({ ...DEFAULT_WORKFLOW, ...keptProperties });
-                        setWorkflowID(null);
-                        setModified(true);
-                      }}
-                      size="large"
-                      disabled={viewMode !== 'read'}
-                    >
-                      <ControlPointDuplicateOutlinedIcon />
-                    </IconButton>
+                          // Apply important properties on top of default workflow template
+                          setWorkflow({ ...DEFAULT_WORKFLOW, ...keptProperties });
+                          setWorkflowID(null);
+                          setModified(true);
+                        }}
+                        size="large"
+                        disabled={viewMode !== 'read'}
+                      >
+                        <ControlPointDuplicateOutlinedIcon />
+                      </IconButton>
+                    </div>
                   </Tooltip>
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
@@ -489,16 +502,18 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 currentUser.roles.includes('workflow_manage') &&
                 (workflow ? (
                   <Tooltip title={workflow.enabled ? t('enabled') : t('disabled')}>
-                    <IconButton
-                      style={{
-                        color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.text.primary
-                      }}
-                      onClick={workflow.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
-                      size="large"
-                      disabled={viewMode !== 'read'}
-                    >
-                      {workflow.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
-                    </IconButton>
+                    <div>
+                      <IconButton
+                        style={{
+                          color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.text.primary
+                        }}
+                        onClick={workflow.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
+                        size="large"
+                        disabled={viewMode !== 'read'}
+                      >
+                        {workflow.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+                      </IconButton>
+                    </div>
                   </Tooltip>
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
@@ -507,21 +522,23 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 currentUser.roles.includes('workflow_manage') &&
                 (workflow ? (
                   <Tooltip title={t('remove')}>
-                    <IconButton
-                      style={{
-                        color:
-                          viewMode !== 'read'
-                            ? theme.palette.text.disabled
-                            : theme.palette.mode === 'dark'
-                            ? theme.palette.error.light
-                            : theme.palette.error.dark
-                      }}
-                      onClick={() => setDeleteDialog(true)}
-                      size="large"
-                      disabled={viewMode !== 'read'}
-                    >
-                      <RemoveCircleOutlineOutlinedIcon />
-                    </IconButton>
+                    <div>
+                      <IconButton
+                        style={{
+                          color:
+                            viewMode !== 'read'
+                              ? theme.palette.text.disabled
+                              : theme.palette.mode === 'dark'
+                              ? theme.palette.error.light
+                              : theme.palette.error.dark
+                        }}
+                        onClick={() => setDeleteDialog(true)}
+                        size="large"
+                        disabled={viewMode !== 'read'}
+                      >
+                        <RemoveCircleOutlineOutlinedIcon />
+                      </IconButton>
+                    </div>
                   </Tooltip>
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
@@ -574,8 +591,11 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 options={DEFAULT_LABELS}
                 value={workflow.labels}
                 renderInput={params => <TextField {...params} variant="outlined" />}
-                onChange={(event, value) => handleLabelsChange(value as string[])}
+                onChange={(event, value) => handleLabelsChange(value.map(v => v.toUpperCase()) as string[])}
                 disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
+                isOptionEqualToValue={(option, value) => {
+                  return option.toUpperCase() === value.toUpperCase();
+                }}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
