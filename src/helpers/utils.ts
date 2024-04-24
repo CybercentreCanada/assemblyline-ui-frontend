@@ -1,3 +1,4 @@
+import { ConfigurationDefinition } from 'components/hooks/useMyUser';
 import { PossibleColors } from 'components/visual/CustomChip';
 
 /**
@@ -380,4 +381,29 @@ export function matchURL(data: string): RegExpExecArray | null {
  */
 export function filterObject(obj: Object, callback) {
   return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
+}
+
+/**
+ *
+ * A function that determines the submittable type of the input string, if any.
+ *
+ * @param input - value to check
+ *
+ * @returns type as string or NULL
+ *
+ */
+export function getSubmitType(input: string, configuration: ConfigurationDefinition): string | null {
+  // If we're trying to auto-detect the input type, iterate over file sources
+  var detectedHashType = null;
+  for (const [hashType, hashProps] of Object.entries(configuration.submission.file_sources)) {
+    if (input.match(new RegExp(hashProps.pattern))) {
+      detectedHashType = hashType;
+      break;
+    }
+  }
+  if (!detectedHashType && matchURL(input)) {
+    // Check to see if the input is a valid URL
+    detectedHashType = 'url';
+  }
+  return detectedHashType;
 }
