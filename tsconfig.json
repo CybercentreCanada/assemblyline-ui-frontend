@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "types": ["vite/client", "vitest/globals"],
+    "typeRoots": ["./node_modules/@types/", "./types", "./node_modules"],
     "module": "ESNext",
     "skipLibCheck": true,
 

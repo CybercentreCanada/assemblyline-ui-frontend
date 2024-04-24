@@ -39,6 +39,9 @@ export default defineConfig(({ mode }) => {
     define: {
       __APP_ENV__: JSON.stringify(env.APP_ENV)
     },
+    optimizeDeps: {
+      include: ['./src/**/*.{js,jsx,ts,tsx}']
+    },
     plugins: [react(), tsconfigPaths(), splitVendorChunkPlugin(), mkcert(), ...eslintPlugin],
     resolve: {
       extensions: ['.tsx', '.ts', '.js', '.jsx', '.json', '.mjs', '.mts']

@@ -2,9 +2,9 @@ import { Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@m
 import makeStyles from '@mui/styles/makeStyles';
 import { ImageInlineBody } from 'components/visual/image_inline';
 import { GraphBody } from 'components/visual/ResultCard/graph_body';
+import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 
 const useStyles = makeStyles(theme => ({
   divider: {
@@ -74,7 +74,7 @@ const WrappedKVExtra = ({ body }) => (
 const KVExtra = React.memo(WrappedKVExtra);
 
 function WrappedGeneralInformation({ report }) {
-  const { t } = useTranslation(['submissionReport']);
+  const { t, i18n } = useTranslation(['submissionReport']);
   const theme = useTheme();
   const classes = useStyles();
 
@@ -119,7 +119,7 @@ function WrappedGeneralInformation({ report }) {
             <span style={{ fontWeight: 500 }}>{t('submission.date')}</span>
           </Grid>
           <Grid item xs={8} sm={9} lg={10}>
-            {report ? <Moment date={report.times.submitted} /> : <Skeleton />}
+            {report ? <>{moment(report.times.submitted).locale(i18n.language)}</> : <Skeleton />}
           </Grid>
 
           <Grid item xs={4} sm={3} lg={2}>
