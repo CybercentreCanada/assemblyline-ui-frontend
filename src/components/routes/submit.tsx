@@ -106,7 +106,7 @@ const Submit: React.FC<any> = () => {
   const params = new URLSearchParams(location.search);
   const [stringInput, setStringInput] = useState('');
   const [stringType, setStringType] = useState(undefined);
-  const stringInputTitle = 'URL / Hash ';
+  const stringInputTitle = t('urlHash.input_title');
   const stringInputText = stringInputTitle + t('urlHash.input_suffix');
   const [stringInputHasError, setStringInputHasError] = useState(false);
   const [submissionMetadata, setSubmissionMetadata] = useState(undefined);
