@@ -131,78 +131,82 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
 
   return (
     <>
-      {Object.keys(tree).map((sha256, i) => {
-        const item = tree[sha256];
-        return !isVisible(tree[sha256], defaultForceShown, isHighlighted, showSafeResults) ||
-          (item.score < 0 && !showSafeResults && !force) ? null : (
-          <div key={i}>
-            <div style={{ display: 'flex', width: '100%', alignItems: 'flex-start' }}>
-              {item.children &&
-              Object.values(item.children).some(c => !isVisible(c, forcedShown, isHighlighted, showSafeResults)) ? (
-                <Tooltip title={t('tree_more')}>
-                  <IconButton
-                    size="small"
-                    style={{ padding: 0 }}
-                    onClick={() => {
-                      setForcedShown([...forcedShown, ...Object.keys(item.children)]);
-                    }}
-                  >
-                    <ArrowRightIcon />
-                  </IconButton>
-                </Tooltip>
-              ) : item.children && Object.keys(item.children).some(key => forcedShown.includes(key)) ? (
-                <Tooltip title={t('tree_less')}>
-                  <IconButton
-                    size="small"
-                    style={{ padding: 0 }}
-                    onClick={event => {
-                      const excluded = Object.keys(item.children);
-                      setForcedShown(forcedShown.filter(val => !excluded.includes(val)));
-                    }}
-                  >
-                    <ArrowDropDownIcon />
-                  </IconButton>
-                </Tooltip>
-              ) : (
-                <span style={{ marginLeft: theme.spacing(3) }} />
-              )}
-              <Box
-                className={classes.file_item}
-                component={item.sha256 ? Link : 'span'}
-                to={`/file/detail/${item.sha256}`}
-                onClick={e => {
-                  e.preventDefault();
-                  if (item.sha256) navigate(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
-                }}
-                style={{
-                  wordBreak: 'break-word',
-                  backgroundColor: isHighlighted(sha256)
-                    ? theme.palette.mode === 'dark'
-                      ? '#343a44'
-                      : '#d8e3ea'
-                    : null
-                }}
-              >
-                <div style={{ display: 'flex' }}>
-                  <span style={{ whiteSpace: 'nowrap', paddingRight: '4px' }}>
-                    <Verdict score={item.score} mono short />
-                    <span>::</span>
-                  </span>
-                  <span style={{ alignSelf: 'center', paddingTop: '2px' }}>
-                    <span style={{ paddingRight: '4px', unicodeBidi: 'isolate-override' }}>
-                      {item.name.join(' | ')}
+      {Object.entries(tree)
+        .sort((a: [string, FileItemProps], b: [string, FileItemProps]) => {
+          return a[1].name.join() > b[1].name.join() ? 1 : -1;
+        })
+        .map(([sha256, item], i) => {
+          return !isVisible(tree[sha256], defaultForceShown, isHighlighted, showSafeResults) ||
+            (item.score < 0 && !showSafeResults && !force) ? null : (
+            <div key={i}>
+              <div style={{ display: 'flex', width: '100%', alignItems: 'flex-start' }}>
+                {item.children &&
+                Object.values(item.children).some(c => !isVisible(c, forcedShown, isHighlighted, showSafeResults)) ? (
+                  <Tooltip title={t('tree_more')}>
+                    <IconButton
+                      size="small"
+                      style={{ padding: 0 }}
+                      onClick={() => {
+                        setForcedShown([...forcedShown, ...Object.keys(item.children)]);
+                      }}
+                    >
+                      <ArrowRightIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : item.children && Object.keys(item.children).some(key => forcedShown.includes(key)) ? (
+                  <Tooltip title={t('tree_less')}>
+                    <IconButton
+                      size="small"
+                      style={{ padding: 0 }}
+                      onClick={event => {
+                        const excluded = Object.keys(item.children);
+                        setForcedShown(forcedShown.filter(val => !excluded.includes(val)));
+                      }}
+                    >
+                      <ArrowDropDownIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <span style={{ marginLeft: theme.spacing(3) }} />
+                )}
+                <Box
+                  className={classes.file_item}
+                  component={item.sha256 ? Link : 'span'}
+                  to={`/file/detail/${item.sha256}`}
+                  onClick={e => {
+                    e.preventDefault();
+                    if (item.sha256)
+                      navigate(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
+                  }}
+                  style={{
+                    wordBreak: 'break-word',
+                    backgroundColor: isHighlighted(sha256)
+                      ? theme.palette.mode === 'dark'
+                        ? '#343a44'
+                        : '#d8e3ea'
+                      : null
+                  }}
+                >
+                  <div style={{ display: 'flex' }}>
+                    <span style={{ whiteSpace: 'nowrap', paddingRight: '4px' }}>
+                      <Verdict score={item.score} mono short />
+                      <span>::</span>
                     </span>
-                    <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
-                  </span>
-                </div>
-              </Box>
+                    <span style={{ alignSelf: 'center', paddingTop: '2px' }}>
+                      <span style={{ paddingRight: '4px', unicodeBidi: 'isolate-override' }}>
+                        {item.name.sort().join(' | ')}
+                      </span>
+                      <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
+                    </span>
+                  </div>
+                </Box>
+              </div>
+              <div style={{ marginLeft: theme.spacing(3) }}>
+                <FileTree tree={item.children} sid={sid} force={force} defaultForceShown={forcedShown} />
+              </div>
             </div>
-            <div style={{ marginLeft: theme.spacing(3) }}>
-              <FileTree tree={item.children} sid={sid} force={force} defaultForceShown={forcedShown} />
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
     </>
   );
 };

@@ -119,7 +119,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { enrichTagExternal, enrichmentState, getKey } = useExternalLookup();
   const externalLookupResults = enrichmentState[getKey(type, value)];
   const [allInProgress, setAllInProgress] = React.useState(false);
-  const submitType = category === 'tag' && type.endsWith('.uri') ? 'URL' : getSubmitType(value, currentUserConfig);
+  const submitType = category === 'tag' && type.endsWith('.uri') ? 'url' : getSubmitType(value, currentUserConfig);
 
   useEffect(() => {
     if (state.mouseY !== null) {
@@ -422,7 +422,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             </div>
           </Tooltip>
         )}
-        {submitType && (
+        {submitType !== "url" || (submitType === "url" && !!currentUserConfig?.ui?.allow_url_submissions) && (
           <MenuItem
             dense
             component={Link}
