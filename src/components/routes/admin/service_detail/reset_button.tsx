@@ -1,5 +1,4 @@
 import { Button, Tooltip, useTheme } from '@mui/material';
-import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

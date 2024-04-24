@@ -15,12 +15,11 @@ import {
   StyledPaper
 } from 'components/visual/GridTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
+import Moment from 'components/visual/Moment';
 import SectionContainer from 'components/visual/SectionContainer';
 import { safeFieldValueURI } from 'helpers/utils';
-import 'moment/locale/fr';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
@@ -157,7 +156,7 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
                 <GridTableCell>
                   <Tooltip title={item.created || item.seen.last}>
                     <span>
-                      <Moment fromNow locale={i18n.language} children={item.created || item.seen.last} />
+                      <Moment variant="fromNow">{item.created || item.seen.last}</Moment>
                     </span>
                   </Tooltip>
                 </GridTableCell>

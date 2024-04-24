@@ -18,7 +18,6 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import CustomChip from 'components/visual/CustomChip';
-import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SubmissionParams } from '../service_detail';

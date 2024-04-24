@@ -1,7 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { SourceDetail } from 'components/routes/manage/signature_sources_details';
-import 'moment/locale/fr';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Source } from '../service_detail';

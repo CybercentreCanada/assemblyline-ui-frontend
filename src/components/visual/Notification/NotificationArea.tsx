@@ -30,8 +30,8 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { blue } from '@mui/material/colors';
 import FormControl from '@mui/material/FormControl';
+import { blue } from '@mui/material/colors';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
@@ -39,7 +39,6 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { ConfigurationDefinition, SystemMessageDefinition } from 'components/hooks/useMyUser';
 import 'moment-timezone';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { JSONFeedItem, NotificationItem, useNotificationFeed } from '.';

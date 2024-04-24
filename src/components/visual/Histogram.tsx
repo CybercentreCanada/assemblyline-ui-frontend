@@ -10,7 +10,7 @@ import {
   Title,
   Tooltip
 } from 'chart.js';
-import 'chartjs-adapter-moment';
+import 'chartjs-adapter-date-fns';
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 
@@ -139,8 +139,8 @@ const WrappedHistogram = ({
               unit: 'day' as 'day',
               tooltipFormat:
                 dataset && Object.keys(dataset).every(val => val.indexOf('T00:00:00.000Z') !== -1)
-                  ? 'YYYY-MM-DD'
-                  : 'YYYY-MM-DD HH:mm:ss',
+                  ? 'yyyy-MM-dd'
+                  : 'yyyy-MM-dd HH:mm:ss',
               displayFormats: {
                 millisecond: 'HH:mm:ss.SSS',
                 second: 'HH:mm:ss',

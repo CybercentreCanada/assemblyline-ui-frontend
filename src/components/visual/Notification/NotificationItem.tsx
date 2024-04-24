@@ -1,11 +1,11 @@
 import { Divider, Link, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import * as DOMPurify from 'dompurify';
-import React from 'react';
+import Moment from 'components/visual/Moment';
+import DOMPurify from 'dompurify';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
-import Moment from 'react-moment';
 import { JSONFeedAuthor, JSONFeedItem } from '.';
 import CustomChip from '../CustomChip';
 
@@ -125,45 +125,48 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
   const classes = useStyles();
   const { i18n } = useTranslation('notification');
 
-  const Author = React.memo(({ author, index, last }: { author: JSONFeedAuthor; index: number; last: number }) => (
-    <>
-      {author?.url && author?.url !== '' ? (
-        <Link
-          className={clsx(classes.userItem)}
-          title={author.url}
-          href={author.url}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {author?.avatar && (
-            <img className={clsx(classes.userElement, classes.userImg)} src={author.avatar} alt={author.avatar} />
-          )}
-          {author?.name && (
-            <Typography
-              className={clsx(classes.userElement, classes.userLink)}
-              variant="caption"
-              color="textSecondary"
-              children={author.name}
-            />
-          )}
-        </Link>
-      ) : (
-        <div className={clsx(classes.userItem)}>
-          {author?.avatar && (
-            <img className={clsx(classes.userElement, classes.userImg)} src={author.avatar} alt={author.avatar} />
-          )}
-          {author?.name && (
-            <Typography
-              className={clsx(classes.userElement)}
-              variant="caption"
-              color="textSecondary"
-              children={author.name}
-            />
-          )}
-        </div>
-      )}
-    </>
-  ));
+  const Author = useCallback(
+    ({ author, index, last }: { author: JSONFeedAuthor; index: number; last: number }) => (
+      <>
+        {author?.url && author?.url !== '' ? (
+          <Link
+            className={clsx(classes.userItem)}
+            title={author.url}
+            href={author.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {author?.avatar && (
+              <img className={clsx(classes.userElement, classes.userImg)} src={author.avatar} alt={author.avatar} />
+            )}
+            {author?.name && (
+              <Typography
+                className={clsx(classes.userElement, classes.userLink)}
+                variant="caption"
+                color="textSecondary"
+                children={author.name}
+              />
+            )}
+          </Link>
+        ) : (
+          <div className={clsx(classes.userItem)}>
+            {author?.avatar && (
+              <img className={clsx(classes.userElement, classes.userImg)} src={author.avatar} alt={author.avatar} />
+            )}
+            {author?.name && (
+              <Typography
+                className={clsx(classes.userElement)}
+                variant="caption"
+                color="textSecondary"
+                children={author.name}
+              />
+            )}
+          </div>
+        )}
+      </>
+    ),
+    [classes]
+  );
 
   if (notification === null) return <></>;
   else
@@ -171,14 +174,7 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
       <>
         <div className={classes.container}>
           <Typography className={classes.time} variant="caption" color="secondary">
-            <Moment
-              locale={i18n.language}
-              format={
-                i18n.language === 'en' ? 'MMMM Do YYYY' : i18n.language === 'fr' ? 'Do MMMM YYYY' : 'MMMM Do YYYY'
-              }
-            >
-              {notification.date_published}
-            </Moment>
+            <Moment variant="localeDate">{notification.date_published}</Moment>
           </Typography>
           <div className={classes.header}>
             {notification.url ? (
