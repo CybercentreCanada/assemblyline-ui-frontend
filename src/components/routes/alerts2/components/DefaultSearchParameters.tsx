@@ -74,11 +74,11 @@ const WrappedAlertDefaultSearchParameters = () => {
   );
 
   useEffect(() => {
+    if (location.search !== '') return;
     const value = localStorage.getItem(LOCAL_STORAGE);
-    if (location.search === '' && value) {
-      const search = new SimpleSearchQuery(value, DEFAULT_QUERY);
-      navigate(`${location.pathname}?${search.getDeltaString()}${location.hash}`);
-    }
+    if (!value) return;
+    const search = new SimpleSearchQuery(value, DEFAULT_QUERY);
+    navigate(`${location.pathname}?${search.getDeltaString()}${location.hash}`);
   }, [location.hash, location.pathname, location.search, navigate]);
 
   return (
