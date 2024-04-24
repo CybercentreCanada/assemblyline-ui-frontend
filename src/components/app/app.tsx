@@ -1,5 +1,5 @@
 // TODO: change syntax to "import type {theme}" to avoid potential problems like type-only imports being incorrectly bundled.
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import AppProvider from 'commons/components/app/AppProvider';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
@@ -17,7 +17,7 @@ import LockedPage from 'components/routes/locked';
 import LoginScreen from 'components/routes/login';
 import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
-import setFR from 'helpers/moment-fr-locale';
+import setMomentFRLocale from 'helpers/moment-fr-locale';
 import { getProvider } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
@@ -63,7 +63,7 @@ const MyAppMain = () => {
     bootstrap({ switchRenderedApp, setConfiguration, setLoginParams, setUser, setReady });
   });
 
-  setFR();
+  setMomentFRLocale();
 
   return {
     load: <LoadingScreen />,
@@ -89,7 +89,7 @@ export const MyApp: React.FC<any> = () => {
   const mySitemap: AppSiteMapConfigs = useMySitemap();
   const myUser: CustomAppUserService = useMyUser();
   return (
-    <BrowserRouter basename={'/'}>
+    <BrowserRouter basename="/">
       <SafeResultsProvider>
         <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
           <MyAppMain />

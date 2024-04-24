@@ -14,7 +14,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import FileDownloader from 'components/visual/FileDownloader';
-import moment from 'moment';
+import Moment from 'components/visual/Moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
@@ -58,7 +58,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
-  const { t, i18n } = useTranslation(['adminErrorViewer']);
+  const { t } = useTranslation(['adminErrorViewer']);
   const classes = useStyles();
   const theme = useTheme();
   const { copy } = useClipboard();
@@ -122,10 +122,10 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
             <Grid item xs={12} sm={4}>
               <div style={{ display: 'inline-block', textAlign: 'start' }}>
                 <Typography component="div" variant="body1">
-                  {moment(error.created).locale(i18n.language).fromNow()}
+                  <Moment variant="fromNow">{error.created}</Moment>
                 </Typography>
                 <Typography component="div" variant="caption">
-                  {moment(error.created).format('YYYY-MM-DD HH:mm:ss')}
+                  <Moment format="YYYY-MM-DD HH:mm:ss">{error.created}</Moment>
                 </Typography>
               </div>
             </Grid>

@@ -3,8 +3,8 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
+import Moment from 'components/visual/Moment';
 import { maxLenStr } from 'helpers/utils';
-import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -108,7 +108,9 @@ const WrappedBadlistTable: React.FC<BadlistTableProps> = ({
               >
                 <DivTableCell>
                   <Tooltip title={sl_item.added}>
-                    <>{moment(sl_item.added).locale(i18n.language).fromNow()}</>
+                    <div>
+                      <Moment variant="fromNow">{sl_item.added}</Moment>
+                    </div>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>{sl_item.type}</DivTableCell>

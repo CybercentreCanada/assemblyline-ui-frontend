@@ -8,9 +8,9 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import Histogram from 'components/visual/Histogram';
+import Moment from 'components/visual/Moment';
 import ResultsTable from 'components/visual/SearchResult/results';
 import { safeFieldValueURI } from 'helpers/utils';
-import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
@@ -294,7 +294,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               <Grid item xs={9} sm={8} md={9} lg={10}>
                 {heuristic && stats ? (
                   stats.first_hit ? (
-                    moment(stats.first_hit).locale(i18n.language).fromNow()
+                    <Moment variant="fromNow">{stats.first_hit}</Moment>
                   ) : (
                     t('hit.none')
                   )
@@ -308,7 +308,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               <Grid item xs={9} sm={8} md={9} lg={10}>
                 {heuristic && stats ? (
                   stats.last_hit ? (
-                    moment(stats.last_hit).locale(i18n.language).fromNow()
+                    <Moment variant="fromNow">{stats.last_hit}</Moment>
                   ) : (
                     t('hit.none')
                   )

@@ -36,9 +36,9 @@ import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
+import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import AlertsTable from 'components/visual/SearchResult/alerts';
-import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -713,17 +713,21 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                     <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
                   </Grid>
                   <Grid item xs={9} sm={8} md={9} lg={9}>
-                    {workflow && workflow.first_seen
-                      ? moment(workflow.first_seen).locale(i18n.language).fromNow()
-                      : t('hit.none')}
+                    {workflow && workflow.first_seen ? (
+                      <Moment variant="fromNow">{workflow.first_seen}</Moment>
+                    ) : (
+                      t('hit.none')
+                    )}
                   </Grid>
                   <Grid item xs={3} sm={4} md={3} lg={3}>
                     <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
                   </Grid>
                   <Grid item xs={9} sm={8} md={9} lg={9}>
-                    {workflow && workflow.last_seen
-                      ? moment(workflow.last_seen).locale(i18n.language).fromNow()
-                      : t('hit.none')}
+                    {workflow && workflow.last_seen ? (
+                      <Moment variant="fromNow">{workflow.last_seen}</Moment>
+                    ) : (
+                      t('hit.none')
+                    )}
                   </Grid>
                 </Grid>
               </Grid>
@@ -738,7 +742,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                   <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.creator ? (
                       <>
-                        {workflow.creator} [{moment(workflow.creation_date).locale(i18n.language).fromNow()}]
+                        {workflow.creator} [<Moment variant="fromNow">{workflow.creation_date}</Moment>]
                       </>
                     ) : (
                       <Skeleton />
@@ -750,7 +754,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                   <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.edited_by ? (
                       <>
-                        {workflow.edited_by} [{moment(workflow.last_edit).locale(i18n.language).fromNow()}]
+                        {workflow.edited_by} [<Moment variant="fromNow">{workflow.last_edit}</Moment>]
                       </>
                     ) : (
                       <Skeleton />

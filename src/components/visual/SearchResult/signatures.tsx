@@ -4,7 +4,7 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import { Statistics } from 'components/routes/manage/signature_detail';
 import Classification from 'components/visual/Classification';
-import moment from 'moment';
+import Moment from 'components/visual/Moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -105,11 +105,15 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({
                 <DivTableCell>{signature.name}</DivTableCell>
                 <DivTableCell>{signature.stats ? signature.stats.count || 0 : 0}</DivTableCell>
                 <DivTableCell>
-                  {signature.stats && signature.stats.last_hit
-                    ? moment(signature.stats.last_hit).locale(i18n.language).fromNow()
-                    : t('never')}
+                  {signature.stats && signature.stats.last_hit ? (
+                    <Moment variant="fromNow">{signature.stats.last_hit}</Moment>
+                  ) : (
+                    t('never')
+                  )}
                 </DivTableCell>
-                <DivTableCell>{moment(signature.last_modified).locale(i18n.language).fromNow()}</DivTableCell>
+                <DivTableCell>
+                  <Moment variant="fromNow">{signature.last_modified}</Moment>
+                </DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>
                     <Classification type="text" size="tiny" c12n={signature.classification} format="short" />

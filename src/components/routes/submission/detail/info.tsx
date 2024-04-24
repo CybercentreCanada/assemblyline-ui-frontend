@@ -4,9 +4,9 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import Moment from 'components/visual/Moment';
 import Priority from 'components/visual/Priority';
 import Verdict from 'components/visual/Verdict';
-import moment from 'moment';
 import React, { Fragment, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -175,7 +175,11 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                   <span style={{ fontWeight: 500 }}>{t('times.submitted')}</span>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10}>
-                  {submission ? moment(submission.times.submitted).format('YYYY-MM-DD HH:mm:ss') : <Skeleton />}
+                  {submission ? (
+                    <Moment format="YYYY-MM-DD HH:mm:ss">{submission.times.submitted}</Moment>
+                  ) : (
+                    <Skeleton />
+                  )}
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -183,7 +187,7 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10}>
                   {submission && submission.times.completed ? (
-                    moment(submission.times.completed).format('YYYY-MM-DD HH:mm:ss')
+                    <Moment format="YYYY-MM-DD HH:mm:ss">{submission.times.completed}</Moment>
                   ) : (
                     <Skeleton />
                   )}

@@ -2,7 +2,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Box, Collapse, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import moment from 'moment';
+import Moment from 'components/visual/Moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -86,7 +86,9 @@ const ErrorCard: React.FC<ErrorCardProps> = ({ error }) => {
         ) : (
           <small style={{ flexGrow: 1 }}></small>
         )}
-        <small className={classes.muted}>{moment(error.created).locale(i18n.language).fromNow()}</small>
+        <small className={classes.muted}>
+          <Moment variant="fromNow">{error.created}</Moment>
+        </small>
         {open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />}
       </Box>
       <Collapse in={open} timeout="auto">

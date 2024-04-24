@@ -31,6 +31,7 @@ import {
 import FileDetail from 'components/visual/FileDetail';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import LineGraph from 'components/visual/LineGraph';
+import Moment from 'components/visual/Moment';
 import MonacoEditor from 'components/visual/MonacoEditor';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -40,7 +41,6 @@ import SearchResultCount from 'components/visual/SearchResultCount';
 import SteppedProgress from 'components/visual/SteppedProgress';
 import { TabContainer } from 'components/visual/TabContainer';
 import { safeFieldValue } from 'helpers/utils';
-import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -486,17 +486,9 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                         <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
                           {retrohunt ? (
                             <>
-                              {moment(retrohunt.created_time)
-                                .locale(i18n.language)
-                                .format(
-                                  i18n.language === 'en'
-                                    ? 'MMMM Do YYYY'
-                                    : i18n.language === 'fr'
-                                    ? 'Do MMMM YYYY'
-                                    : 'MMMM Do YYYY'
-                                )}
+                              <Moment variant="localeDate">{retrohunt.created_time}</Moment>
                               {' ('}
-                              {moment(retrohunt.created_time).locale(i18n.language).fromNow()}
+                              <Moment variant="fromNow">{retrohunt.created_time}</Moment>
                               {')'}
                             </>
                           ) : (
@@ -510,17 +502,9 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                         <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
                           {retrohunt ? (
                             <>
-                              {moment(retrohunt.expiry_ts)
-                                .locale(i18n.language)
-                                .format(
-                                  i18n.language === 'en'
-                                    ? 'MMMM Do YYYY'
-                                    : i18n.language === 'fr'
-                                    ? 'Do MMMM YYYY'
-                                    : 'MMMM Do YYYY'
-                                )}
+                              <Moment variant="localeDate">{retrohunt.expiry_ts}</Moment>
                               {' ('}
-                              {moment(retrohunt.expiry_ts).locale(i18n.language).fromNow()}
+                              <Moment variant="fromNow">{retrohunt.expiry_ts}</Moment>
                               {')'}
                             </>
                           ) : (
@@ -799,7 +783,9 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                                     >
                                       <DivTableCell>
                                         <Tooltip title={file.seen.last}>
-                                          <div>{moment(file.seen.last).locale(i18n.language).fromNow()}</div>
+                                          <div>
+                                            <Moment variant="fromNow">{file.seen.last}</Moment>
+                                          </div>
                                         </Tooltip>
                                       </DivTableCell>
                                       <DivTableCell>{file.seen.count}</DivTableCell>

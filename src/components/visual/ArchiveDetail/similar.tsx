@@ -15,9 +15,9 @@ import {
   StyledPaper
 } from 'components/visual/GridTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
+import Moment from 'components/visual/Moment';
 import SectionContainer from 'components/visual/SectionContainer';
 import { safeFieldValueURI } from 'helpers/utils';
-import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -156,9 +156,7 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
                 <GridTableCell>
                   <Tooltip title={item.created || item.seen.last}>
                     <span>
-                      {moment(item.created || item.seen.last)
-                        .locale(i18n.language)
-                        .fromNow()}
+                      <Moment variant="fromNow">{item.created || item.seen.last}</Moment>
                     </span>
                   </Tooltip>
                 </GridTableCell>

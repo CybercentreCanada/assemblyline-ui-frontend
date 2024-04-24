@@ -4,7 +4,7 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import { Statistics } from 'components/routes/manage/heuristic_detail';
 import Classification from 'components/visual/Classification';
-import moment from 'moment';
+import Moment from 'components/visual/Moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -104,9 +104,11 @@ const WrappedHeuristicsTable: React.FC<HeuristicsTableProps> = ({
                 <DivTableCell>{heuristic.score}</DivTableCell>
                 <DivTableCell>{heuristic.stats ? heuristic.stats.count || 0 : 0}</DivTableCell>
                 <DivTableCell>
-                  {heuristic.stats && heuristic.stats.last_hit
-                    ? moment(heuristic.stats.last_hit).locale(i18n.language).fromNow()
-                    : t('never')}
+                  {heuristic.stats && heuristic.stats.last_hit ? (
+                    <Moment variant="fromNow">{heuristic.stats.last_hit}</Moment>
+                  ) : (
+                    t('never')
+                  )}
                 </DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>

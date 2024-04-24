@@ -15,7 +15,7 @@ import {
   useTheme
 } from '@mui/material';
 import { ChipList } from 'components/visual/ChipList';
-import moment from 'moment';
+import Moment from 'components/visual/Moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
@@ -74,7 +74,9 @@ const WrappedAlertEventsTable = ({ alert, viewHistory, setViewHistory }) => {
                       return (
                         <TableRow key={`table-row-${i}`} hover tabIndex={-1}>
                           <Tooltip title={event.ts}>
-                            <TableCell>{moment(event.ts).locale(i18n.language).fromNow()}</TableCell>
+                            <TableCell>
+                              <Moment variant="fromNow">{event.ts}</Moment>
+                            </TableCell>
                           </Tooltip>
                           <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
                             <TableCell>{event.entity_name}</TableCell>

@@ -4,8 +4,8 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
+import Moment from 'components/visual/Moment';
 import Verdict from 'components/visual/Verdict';
-import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -93,7 +93,9 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, compo
               >
                 <DivTableCell>
                   <Tooltip title={result.created}>
-                    <>{moment(result.created).locale(i18n.language).fromNow()}</>
+                    <div>
+                      <Moment variant="fromNow">{result.created}</Moment>
+                    </div>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>

@@ -21,7 +21,7 @@ import {
 } from 'components/visual/DivTable';
 import FileDownloader from 'components/visual/FileDownloader';
 import InformativeAlert from 'components/visual/InformativeAlert';
-import moment from 'moment';
+import Moment from 'components/visual/Moment';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -182,7 +182,9 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                 )}
                 <DivTableCell>
                   <Tooltip title={file.seen.last}>
-                    <span>{moment(file.seen.last).locale(i18n.language).fromNow()}</span>
+                    <div>
+                      <Moment variant="fromNow">{file.seen.last}</Moment>
+                    </div>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>

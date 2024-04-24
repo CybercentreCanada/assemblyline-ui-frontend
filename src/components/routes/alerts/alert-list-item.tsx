@@ -7,9 +7,9 @@ import useALContext from 'components/hooks/useALContext';
 import { AlertItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
+import Moment from 'components/visual/Moment';
 import Verdict from 'components/visual/Verdict';
 import { verdictToColor } from 'helpers/utils';
-import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import AlertListChip from './alert-chip-list';
@@ -116,7 +116,7 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           ) : null}
         </Grid>
         <Grid item xs={6} md={2} style={{ textAlign: 'right' }}>
-          {moment(item.reporting_ts).locale(i18n.language).fromNow()}
+          <Moment variant="fromNow">{item.reporting_ts}</Moment>
         </Grid>
         <Grid item xs={12} md={2}>
           <Grid container spacing={1}>

@@ -4,10 +4,10 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
+import Moment from 'components/visual/Moment';
 import SubmissionState from 'components/visual/SubmissionState';
 import Verdict from 'components/visual/Verdict';
 import { maxLenStr } from 'helpers/utils';
-import moment from 'moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -99,7 +99,9 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
               >
                 <DivTableCell>
                   <Tooltip title={submission.times.submitted}>
-                    <>{moment(submission.times.submitted).locale(i18n.language).fromNow()}</>
+                    <div>
+                      <Moment variant="fromNow">{submission.times.submitted}</Moment>
+                    </div>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>
