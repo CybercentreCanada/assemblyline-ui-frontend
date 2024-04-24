@@ -383,11 +383,11 @@ const Submit: React.FC<any> = () => {
   useEffect(() => {
     if (state) {
       setStringInput(state.hash);
-      setStringType('sha256');
+      setStringType(getSubmitType(state.hash, configuration));
       setSubmissionMetadata(state.metadata);
       setValue(state.tabContext);
     }
-  }, [state]);
+  }, [state, configuration]);
 
   useEffectOnce(() => {
     // Setup Flow
