@@ -3,6 +3,8 @@
   "analysing_report": "Demander aux robots de résumer le rapport...",
   "archive": "Copiez la soumission dans l'archive des logiciels malveillants",
   "archive.acceptText": "Oui, archivez-le!",
+  "archive.alternate_expiry": "Quand cette soumission doit-elle être supprimée de l'archives de logiciels malveillants?",
+  "archive.alternate_expiry.never": "Jamais",
   "archive.cancelText": "Annuler",
   "archive.failed": "La soumission n'a pas pu être envoyée pour archivage, réessayez plus tard...",
   "archive.metadata": "Vous devez remplir les métadonnées suivantes pour continuer:",

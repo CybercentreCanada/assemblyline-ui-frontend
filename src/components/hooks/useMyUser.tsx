@@ -77,6 +77,7 @@ export type ConfigurationDefinition = {
   };
   core: {
     archiver: {
+      alternate_dtl: number;
       metadata: {
         [metakey: string]: {
           default: string;
