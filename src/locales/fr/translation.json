@@ -169,7 +169,7 @@
   "submission.state.completed": "Terminé",
   "submission.state.error": "Terminé avec des erreurs",
   "submission.state.submitted": "Examine...",
-  "submit_uri": "Soumettre l'URI",
+  "submit": "Soumettre",
   "theme": "Paramètres du thème",
   "tooltip.breadcrumbs.max": "Maximiser fils d'ariane",
   "tooltip.breadcrumbs.min": "Minimiser fils d'ariane",

@@ -34,7 +34,7 @@ import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
-import { matchURL } from 'helpers/utils';
+import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -325,19 +325,7 @@ const Submit: React.FC<any> = () => {
 
   function handleStringChange(string) {
     closeSnackbar();
-    // If we're trying to auto-detect the input type, iterate over file sources
-    var detectedHashType = null;
-    for (const [hashType, hashProps] of Object.entries(configuration.submission.file_sources)) {
-      if (string.match(new RegExp(hashProps.pattern))) {
-        detectedHashType = hashType;
-        break;
-      }
-    }
-    if (!detectedHashType && matchURL(string)) {
-      // Check to see if the input is a valid URL
-      detectedHashType = 'url';
-    }
-    setStringType(detectedHashType);
+    setStringType(getSubmitType(string, configuration));
     setStringInputHasError(false);
     setSubmissionMetadata(undefined);
     setStringInput(string);
@@ -428,10 +416,10 @@ const Submit: React.FC<any> = () => {
     });
     setUUID(generateUUID());
 
-    if (params) {
-      var input = params.get('input') || '';
-      setStringInput(input);
-      handleStringChange(input);
+    var inputParam = params.get('input') || '';
+
+    if (inputParam) {
+      handleStringChange(inputParam);
       setValue('1');
     }
   });

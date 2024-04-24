@@ -169,7 +169,7 @@
   "submission.state.completed": "Completed",
   "submission.state.error": "Completed with errors",
   "submission.state.submitted": "Scanning...",
-  "submit_uri": "Submit URI",
+  "submit": "Submit",
   "theme": "Theme settings",
   "tooltip.breadcrumbs.max": "Expand Breadcrumbs",
   "tooltip.breadcrumbs.min": "Collapse Breadcrumbs",

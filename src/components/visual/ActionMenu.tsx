@@ -15,7 +15,7 @@ import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { isAccessible } from 'helpers/classificationParser';
-import { safeFieldValueURI, toTitleCase } from 'helpers/utils';
+import { getSubmitType, safeFieldValueURI, toTitleCase } from 'helpers/utils';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
@@ -119,6 +119,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { enrichTagExternal, enrichmentState, getKey } = useExternalLookup();
   const externalLookupResults = enrichmentState[getKey(type, value)];
   const [allInProgress, setAllInProgress] = React.useState(false);
+  const submitType = category === 'tag' && type.endsWith('.uri') ? 'URL' : getSubmitType(value, currentUserConfig);
 
   useEffect(() => {
     if (state.mouseY !== null) {
@@ -315,6 +316,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
 
   return hasExternalLinks ||
     hasExternalQuery ||
+    submitType ||
     category === 'heuristic' ||
     category === 'signature' ||
     category === 'tag' ? (
@@ -420,7 +422,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             </div>
           </Tooltip>
         )}
-        {category === 'tag' && type.endsWith('.uri') && (
+        {submitType && (
           <MenuItem
             dense
             component={Link}
@@ -432,7 +434,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             }}
           >
             {SUBMIT_ICON}
-            {t('submit_uri')}
+            {t('submit') + ` ${submitType.toUpperCase()}`}
           </MenuItem>
         )}
         {hasExternalQuery && (
