@@ -452,27 +452,31 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                           {retrohunt ? retrohunt.description : <Skeleton />}
                         </Grid>
 
-                        <Grid item xs={4} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{t('details.search')}</span>
-                        </Grid>
-                        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                          {retrohunt ? (
-                            (() => {
-                              switch (retrohunt?.indices) {
-                                case 'hot':
-                                  return t('details.hot');
-                                case 'archive':
-                                  return t('details.archive');
-                                case 'hot_and_archive':
-                                  return t('details.hot_and_archive');
-                                default:
-                                  return null;
-                              }
-                            })()
-                          ) : (
-                            <Skeleton />
-                          )}
-                        </Grid>
+                        {configuration?.datastore?.archive?.enabled && (
+                          <>
+                            <Grid item xs={4} sm={3} lg={2}>
+                              <span style={{ fontWeight: 500 }}>{t('details.search')}</span>
+                            </Grid>
+                            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                              {retrohunt ? (
+                                (() => {
+                                  switch (retrohunt?.indices) {
+                                    case 'hot':
+                                      return t('details.hot');
+                                    case 'archive':
+                                      return t('details.archive');
+                                    case 'hot_and_archive':
+                                      return t('details.hot_and_archive');
+                                    default:
+                                      return null;
+                                  }
+                                })()
+                              ) : (
+                                <Skeleton />
+                              )}
+                            </Grid>
+                          </>
+                        )}
 
                         <Grid item xs={4} sm={3} lg={2}>
                           <span style={{ fontWeight: 500 }}>{t('details.creator')}</span>

@@ -101,6 +101,12 @@ export type ConfigurationDefinition = {
   submission: {
     dtl: number;
     max_dtl: number;
+    file_sources: {
+      [hash_type: string]: {
+        pattern: string;
+        sources: string[];
+      };
+    };
     sha256_sources: string[];
     verdicts: {
       info: number;

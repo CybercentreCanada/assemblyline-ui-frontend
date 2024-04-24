@@ -457,14 +457,12 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                                       p: 0,
                                       backgroundColor: message.isInsight
                                         ? theme.palette.mode === 'dark'
-                                          ? '#444d5c'
-                                          : '#d0e7f3'
+                                          ? '#414f65'
+                                          : '#BADDFB'
                                         : message.isError
                                         ? theme.palette.mode === 'dark'
                                           ? '#4f1717'
                                           : '#ffe2e2'
-                                        : theme.palette.mode === 'dark'
-                                        ? theme.palette.background.default
                                         : theme.palette.background.paper
                                     }}
                                   >
@@ -481,10 +479,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                               <Paper
                                 sx={{
                                   p: 1,
-                                  backgroundColor:
-                                    theme.palette.mode === 'dark'
-                                      ? theme.palette.background.default
-                                      : theme.palette.background.paper
+                                  backgroundColor: theme.palette.background.paper
                                 }}
                               >
                                 <ThinkingBadge />
