@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
 
 const ErrorCard: React.FC<ErrorCardProps> = ({ error }) => {
   const classes = useStyles();
-  const { t, i18n } = useTranslation(['adminErrorViewer']);
+  const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
   const sp2 = theme.spacing(2);
   const [open, setOpen] = React.useState(false);

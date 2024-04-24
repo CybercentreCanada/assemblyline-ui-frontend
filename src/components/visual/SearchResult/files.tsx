@@ -91,7 +91,7 @@ const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort =
                 <DivTableCell>
                   <Tooltip title={file.seen.last}>
                     <div>
-                      <Moment variant="fromNow">{file.seen.count}</Moment>
+                      <Moment variant="fromNow">{file.seen.last}</Moment>
                     </div>
                   </Tooltip>
                 </DivTableCell>

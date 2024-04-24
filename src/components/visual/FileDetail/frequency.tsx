@@ -14,7 +14,7 @@ type Props = {
 };
 
 const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = false }) => {
-  const { t, i18n } = useTranslation(['fileDetail']);
+  const { t } = useTranslation(['fileDetail']);
 
   return (
     <SectionContainer title={t('frequency')} nocollapse={nocollapse}>

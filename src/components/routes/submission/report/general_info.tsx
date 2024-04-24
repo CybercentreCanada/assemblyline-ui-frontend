@@ -74,7 +74,7 @@ const WrappedKVExtra = ({ body }) => (
 const KVExtra = React.memo(WrappedKVExtra);
 
 function WrappedGeneralInformation({ report }) {
-  const { t, i18n } = useTranslation(['submissionReport']);
+  const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
   const classes = useStyles();
 

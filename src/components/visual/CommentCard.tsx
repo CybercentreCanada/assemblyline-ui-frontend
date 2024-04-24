@@ -174,21 +174,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const CALENDAR_STRINGS = {
-  fr: {
-    sameDay: 'H[h]mm',
-    lastDay: '[Hier] H[h]mm',
-    lastWeek: 'dddd H[h]mm ',
-    sameElse: 'Do MMMM YYYY H[h]mm'
-  },
-  en: {
-    sameDay: 'h:mm a',
-    lastDay: '[Yesterday] h:mm a',
-    lastWeek: 'dddd h:mm a',
-    sameElse: 'MMMM D YYYY, h:mm a'
-  }
-};
-
 export const REACTIONS = {
   thumbs_up: '👍',
   thumbs_down: '👎',
@@ -293,11 +278,6 @@ const WrappedCommentCard: React.FC<Props> = ({
   const isCurrentUser = useMemo<boolean>(
     () => currentUser?.username === currentComment?.uname,
     [currentComment, currentUser]
-  );
-
-  const calendar = useMemo<(typeof CALENDAR_STRINGS)['en']>(
-    () => (i18n.language in CALENDAR_STRINGS ? CALENDAR_STRINGS[i18n.language] : true),
-    [i18n.language]
   );
 
   const samePreviousAuthor = useMemo<boolean>(

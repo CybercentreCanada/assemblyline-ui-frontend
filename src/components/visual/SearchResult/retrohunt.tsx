@@ -134,9 +134,9 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                 )}
               >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  <Tooltip title={retrohunt?.created}>
+                  <Tooltip title={retrohunt?.created_time}>
                     <div>
-                      <Moment variant="fromNow">{retrohunt?.created}</Moment>
+                      <Moment variant="fromNow">{retrohunt?.created_time}</Moment>
                     </div>
                   </Tooltip>
                 </DivTableCell>
