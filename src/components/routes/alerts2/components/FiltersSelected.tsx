@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import { DEFAULT_QUERY } from 'components/routes/alerts';
 import CustomChip from 'components/visual/CustomChip';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
@@ -24,8 +25,7 @@ import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import { useAlerts } from '../contexts/AlertsContext';
 import { Favorite } from './Favorites';
-import { GROUPBY_OPTIONS, Option, TC_OPTIONS } from './Filters';
-import { SORT_OPTIONS } from './Sorts';
+import { GROUPBY_OPTIONS, Option, SORT_OPTIONS, TC_OPTIONS } from './Filters';
 
 const useStyles = makeStyles(theme => ({
   desc: {
@@ -165,7 +165,7 @@ type Props = {
 };
 
 const WrappedAlertFiltersSelected = ({
-  query,
+  query = new SimpleSearchQuery('', DEFAULT_QUERY),
   hideQuery = false,
   hideTC = false,
   hideTCStart = false,
@@ -186,10 +186,11 @@ const WrappedAlertFiltersSelected = ({
     [globalFavorites, userFavorites]
   );
 
-  const params = useMemo<{ [key: string]: string }>(() => query.getParams(), [query]);
+  const params = useMemo<{ [key: string]: string }>(() => (!query ? {} : query.getParams()), [query]);
 
   const { status, priority, labels, favorites, others } = useMemo<Filters>(() => {
     let filters = { status: null, priority: null, labels: [], favorites: [], others: [] };
+    if (!query) return filters;
 
     query.getAll('fq', []).forEach(filter => {
       const not = filter.startsWith('NOT(') && filter.endsWith(')');
