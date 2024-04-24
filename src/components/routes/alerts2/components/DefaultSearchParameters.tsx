@@ -74,8 +74,10 @@ const WrappedAlertDefaultSearchParameters = () => {
   );
 
   useEffect(() => {
-    if (location.search === '' && localStorage.getItem(LOCAL_STORAGE)) {
-      navigate(`${location.pathname}?${localStorage.getItem(LOCAL_STORAGE)}${location.hash}`);
+    const value = localStorage.getItem(LOCAL_STORAGE);
+    if (location.search === '' && value) {
+      const search = new SimpleSearchQuery(value, DEFAULT_QUERY);
+      navigate(`${location.pathname}?${search.getDeltaString()}${location.hash}`);
     }
   }, [location.hash, location.pathname, location.search, navigate]);
 
@@ -103,7 +105,15 @@ const WrappedAlertDefaultSearchParameters = () => {
           </IconButton>
         </div>
       </Tooltip>
-      <Dialog classes={{ paper: classes.dialogPaper }} open={open} onClose={() => setOpen(false)}>
+      <Dialog
+        classes={{ paper: classes.dialogPaper }}
+        open={open}
+        onClose={() => {
+          setCurrentQuery(null);
+          setExistingQuery(null);
+          setOpen(false);
+        }}
+      >
         <DialogTitle>{t('session.title')}</DialogTitle>
         <DialogContent className={classes.dialogContent}>
           <div className={classes.dialogDescription}>{t('session.description')}</div>
