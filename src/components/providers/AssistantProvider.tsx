@@ -339,6 +339,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
       {children}
       {assistantAllowed && (
         <div
+          className="no-print"
           style={{
             display: 'flex',
             position: 'fixed',
