@@ -75,6 +75,7 @@
     "no-plusplus": "off",
     "no-underscore-dangle": "off",
     "radix": "off",
+    "react/display-name": false,
     "react/jsx-filename-extension": [
       1,
       {
