@@ -67,7 +67,7 @@
     "build": "vite build",
     "build-all": "tsc && vite build",
     "serve": "vite preview --port 3000",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "ci": "CI=true react-scripts test --coverage --coverageReporters=cobertura",
     "eject": "react-scripts eject"
   },

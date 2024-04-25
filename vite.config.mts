@@ -63,9 +63,11 @@ export default defineConfig(({ mode }) => {
       testTimeout: 30000,
       clearMocks: true,
       coverage: {
+        all: true,
+        include: ['src/**/*.tsx'],
         provider: 'v8',
-        reporter: ['clover', 'lcov'],
-        reportsDirectory: './target/coverage'
+        reporter: ['cobertura', 'clover', 'lcov'],
+        reportsDirectory: './coverage'
       },
       poolOptions: {
         threads: {
