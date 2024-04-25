@@ -17,10 +17,10 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { DEFAULT_QUERY } from 'components/routes/alerts';
 import CustomChip from 'components/visual/CustomChip';
+import Moment from 'components/visual/Moment';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import { useAlerts } from '../contexts/AlertsContext';
@@ -173,7 +173,7 @@ const WrappedAlertFiltersSelected = ({
   hideSort = false,
   disableActions = false
 }: Props) => {
-  const { t, i18n } = useTranslation('alerts');
+  const { t } = useTranslation('alerts');
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
@@ -253,56 +253,50 @@ const WrappedAlertFiltersSelected = ({
         />
       )}
 
-      {!hideSort && query.has('sort') && (
-        <MenuFilter
-          classes={{
-            deleteIcon: clsx(
-              classes.deleteIcon,
-              classes.desc,
-              params.sort && params.sort.endsWith('asc') && classes.asc
-            )
-          }}
-          getLabel={item => (
-            <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
-              <span>{`${t('sorts.title')}: ${t(item.substring(0, item.indexOf(' ')))}`}</span>
-              {disableActions && <ArrowDownwardIcon />}
-            </div>
-          )}
-          getListItemIcon={option =>
-            params.sort.startsWith(option.value) && (
-              <ArrowDownwardIcon
-                className={clsx(classes.desc, params.sort.endsWith('asc') && classes.asc)}
-                fontSize="small"
-              />
-            )
-          }
-          param={params.sort}
-          hide={hideSort}
-          disabled={disableActions}
-          getSelected={option => params.sort.startsWith(option.value)}
-          icon={<SortIcon fontSize="small" />}
-          deleteIcon={<ArrowDownwardIcon />}
-          title={t('sorts.title')}
-          options={SORT_OPTIONS}
-          disableCloseOnSelect
-          style={{ minHeight: '25px' }}
-          onClick={(event, option) => {
-            const newSort =
-              params.sort.startsWith(option.value) && params.sort.endsWith('desc')
-                ? `${option.value} asc`
-                : `${option.value} desc`;
-            query.set('sort', newSort);
-            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-          }}
-          onDelete={() => {
-            query.set(
-              'sort',
-              params.sort.endsWith('desc') ? params.sort.replace('desc', 'asc') : params.sort.replace('asc', 'desc')
-            );
-            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-          }}
-        />
-      )}
+      <MenuFilter
+        classes={{
+          deleteIcon: clsx(classes.deleteIcon, classes.desc, params.sort && params.sort.endsWith('asc') && classes.asc)
+        }}
+        getLabel={item => (
+          <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
+            <span>{`${t('sorts.title')}: ${t(item.substring(0, item.indexOf(' ')))}`}</span>
+            {disableActions && <ArrowDownwardIcon />}
+          </div>
+        )}
+        getListItemIcon={option =>
+          params.sort.startsWith(option.value) && (
+            <ArrowDownwardIcon
+              className={clsx(classes.desc, params.sort.endsWith('asc') && classes.asc)}
+              fontSize="small"
+            />
+          )
+        }
+        param={params.sort}
+        hide={hideSort}
+        disabled={disableActions}
+        getSelected={option => params.sort.startsWith(option.value)}
+        icon={<SortIcon fontSize="small" />}
+        deleteIcon={<ArrowDownwardIcon />}
+        title={t('sorts.title')}
+        options={SORT_OPTIONS}
+        disableCloseOnSelect
+        style={{ minHeight: '25px' }}
+        onClick={(event, option) => {
+          const newSort =
+            params.sort.startsWith(option.value) && params.sort.endsWith('desc')
+              ? `${option.value} asc`
+              : `${option.value} desc`;
+          query.set('sort', newSort);
+          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+        }}
+        onDelete={() => {
+          query.set(
+            'sort',
+            params.sort.endsWith('desc') ? params.sort.replace('desc', 'asc') : params.sort.replace('asc', 'desc')
+          );
+          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+        }}
+      />
 
       <MenuFilter
         getLabel={() => {
@@ -353,12 +347,7 @@ const WrappedAlertFiltersSelected = ({
           label={
             <div>
               <span>{t('tc_start')}: </span>
-              <Moment
-                locale={i18n.language}
-                format={i18n.language === 'fr' ? 'Do MMMM YYYY H[h]mm' : 'MMMM D YYYY, h:mm a'}
-              >
-                {query.get('tc_start')}
-              </Moment>
+              <Moment variant="localeDate">{query.get('tc_start')}</Moment>
             </div>
           }
           onDelete={
