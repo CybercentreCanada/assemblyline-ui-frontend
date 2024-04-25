@@ -253,56 +253,50 @@ const WrappedAlertFiltersSelected = ({
         />
       )}
 
-      {!hideSort && query.has('sort') && (
-        <MenuFilter
-          classes={{
-            deleteIcon: clsx(
-              classes.deleteIcon,
-              classes.desc,
-              params.sort && params.sort.endsWith('asc') && classes.asc
-            )
-          }}
-          getLabel={item => (
-            <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
-              <span>{`${t('sorts.title')}: ${t(item.substring(0, item.indexOf(' ')))}`}</span>
-              {disableActions && <ArrowDownwardIcon />}
-            </div>
-          )}
-          getListItemIcon={option =>
-            params.sort.startsWith(option.value) && (
-              <ArrowDownwardIcon
-                className={clsx(classes.desc, params.sort.endsWith('asc') && classes.asc)}
-                fontSize="small"
-              />
-            )
-          }
-          param={params.sort}
-          hide={hideSort}
-          disabled={disableActions}
-          getSelected={option => params.sort.startsWith(option.value)}
-          icon={<SortIcon fontSize="small" />}
-          deleteIcon={<ArrowDownwardIcon />}
-          title={t('sorts.title')}
-          options={SORT_OPTIONS}
-          disableCloseOnSelect
-          style={{ minHeight: '25px' }}
-          onClick={(event, option) => {
-            const newSort =
-              params.sort.startsWith(option.value) && params.sort.endsWith('desc')
-                ? `${option.value} asc`
-                : `${option.value} desc`;
-            query.set('sort', newSort);
-            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-          }}
-          onDelete={() => {
-            query.set(
-              'sort',
-              params.sort.endsWith('desc') ? params.sort.replace('desc', 'asc') : params.sort.replace('asc', 'desc')
-            );
-            navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-          }}
-        />
-      )}
+      <MenuFilter
+        classes={{
+          deleteIcon: clsx(classes.deleteIcon, classes.desc, params.sort && params.sort.endsWith('asc') && classes.asc)
+        }}
+        getLabel={item => (
+          <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
+            <span>{`${t('sorts.title')}: ${t(item.substring(0, item.indexOf(' ')))}`}</span>
+            {disableActions && <ArrowDownwardIcon />}
+          </div>
+        )}
+        getListItemIcon={option =>
+          params.sort.startsWith(option.value) && (
+            <ArrowDownwardIcon
+              className={clsx(classes.desc, params.sort.endsWith('asc') && classes.asc)}
+              fontSize="small"
+            />
+          )
+        }
+        param={params.sort}
+        hide={hideSort}
+        disabled={disableActions}
+        getSelected={option => params.sort.startsWith(option.value)}
+        icon={<SortIcon fontSize="small" />}
+        deleteIcon={<ArrowDownwardIcon />}
+        title={t('sorts.title')}
+        options={SORT_OPTIONS}
+        disableCloseOnSelect
+        style={{ minHeight: '25px' }}
+        onClick={(event, option) => {
+          const newSort =
+            params.sort.startsWith(option.value) && params.sort.endsWith('desc')
+              ? `${option.value} asc`
+              : `${option.value} desc`;
+          query.set('sort', newSort);
+          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+        }}
+        onDelete={() => {
+          query.set(
+            'sort',
+            params.sort.endsWith('desc') ? params.sort.replace('desc', 'asc') : params.sort.replace('asc', 'desc')
+          );
+          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+        }}
+      />
 
       <MenuFilter
         getLabel={() => {
@@ -398,6 +392,7 @@ const WrappedAlertFiltersSelected = ({
 
       {labels.map(label => (
         <CustomChip
+          key={JSON.stringify(label)}
           variant="outlined"
           size="small"
           style={{ minHeight: '25px' }}
@@ -410,6 +405,7 @@ const WrappedAlertFiltersSelected = ({
 
       {favorites.map(favorite => (
         <CustomChip
+          key={JSON.stringify(favorite)}
           variant="outlined"
           size="small"
           style={{ minHeight: '25px' }}
@@ -440,6 +436,7 @@ const WrappedAlertFiltersSelected = ({
 
       {others.map(other => (
         <CustomChip
+          key={JSON.stringify(other)}
           variant="outlined"
           size="small"
           style={{ minHeight: '25px' }}
