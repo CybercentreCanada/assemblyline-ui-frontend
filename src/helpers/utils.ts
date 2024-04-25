@@ -394,13 +394,12 @@ export function filterObject(obj: Object, callback) {
  */
 export function getSubmitType(input: string, configuration: ConfigurationDefinition): string | null {
   // If we're trying to auto-detect the input type, iterate over file sources
-  var detectedHashType = null;
-  for (const [hashType, hashProps] of Object.entries(configuration.submission.file_sources)) {
-    if (input.match(new RegExp(hashProps.pattern))) {
-      detectedHashType = hashType;
-      break;
-    }
-  }
+  if (!configuration?.submission?.file_sources) return null;
+
+  let detectedHashType = Object.entries(configuration.submission.file_sources).find(
+    ([_, hashProps]) => hashProps && input.match(new RegExp(hashProps?.pattern))
+  )?.[0];
+
   if (!detectedHashType && matchURL(input)) {
     // Check to see if the input is a valid URL
     detectedHashType = 'url';
