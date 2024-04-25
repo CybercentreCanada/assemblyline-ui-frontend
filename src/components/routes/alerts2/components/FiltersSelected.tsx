@@ -390,9 +390,9 @@ const WrappedAlertFiltersSelected = ({
         />
       )}
 
-      {labels.map(label => (
+      {labels.map((label, i) => (
         <CustomChip
-          key={JSON.stringify(label)}
+          key={`${label.filter}-${i}`}
           variant="outlined"
           size="small"
           style={{ minHeight: '25px' }}
@@ -403,9 +403,9 @@ const WrappedAlertFiltersSelected = ({
         />
       ))}
 
-      {favorites.map(favorite => (
+      {favorites.map((favorite, i) => (
         <CustomChip
-          key={JSON.stringify(favorite)}
+          key={`${favorite.filter}-${i}`}
           variant="outlined"
           size="small"
           style={{ minHeight: '25px' }}
@@ -434,9 +434,9 @@ const WrappedAlertFiltersSelected = ({
         />
       ))}
 
-      {others.map(other => (
+      {others.map((other, i) => (
         <CustomChip
-          key={JSON.stringify(other)}
+          key={`${other.filter}-${i}`}
           variant="outlined"
           size="small"
           style={{ minHeight: '25px' }}
