@@ -152,7 +152,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
     apiCall({
       method: 'POST',
       body: data,
-      url: `/api/v4/assistant/`,
+      url: `/api/v4/assistant/?lang=${i18n.language === 'en' ? 'english' : 'french'}`,
       onSuccess: api_data => {
         setCurrentContext(api_data.api_response.trace);
         setCurrentHistory([...history, ...api_data.api_response.trace.slice(-1)]);
@@ -250,13 +250,9 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   };
 
   const buildDefaultSystemMessage = () => {
-    // return defaultSystemPrompt;
     return {
       role: 'system' as 'system',
-      content: configuration.ui.ai.assistant.system_message.replaceAll(
-        '$(LANG)',
-        i18n.language === 'en' ? 'english' : 'french'
-      )
+      content: ''
     };
   };
 
