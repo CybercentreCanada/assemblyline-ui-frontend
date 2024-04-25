@@ -249,7 +249,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
     }
   };
 
-  const buildDefaultSystemMessage = () => {
+  const buildDefaultSystemMessage = (): ContextMessageProps => {
     return {
       role: 'system' as 'system',
       content: null
@@ -264,8 +264,11 @@ function AssistantProvider({ children }: AssistantProviderProps) {
 
   const resetAssistant = () => {
     const defaultSystemPrompt = buildDefaultSystemMessage();
+    const lastPrompt = currentHistory[currentHistory.length - 1];
     setCurrentContext([defaultSystemPrompt]);
-    setCurrentHistory([...currentHistory, defaultSystemPrompt]);
+    if (lastPrompt?.content !== defaultSystemPrompt.content) {
+      setCurrentHistory([...currentHistory, defaultSystemPrompt]);
+    }
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
