@@ -252,7 +252,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const buildDefaultSystemMessage = () => {
     return {
       role: 'system' as 'system',
-      content: ''
+      content: null
     };
   };
 
