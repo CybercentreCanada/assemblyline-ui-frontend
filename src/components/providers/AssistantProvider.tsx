@@ -152,7 +152,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
     apiCall({
       method: 'POST',
       body: data,
-      url: `/api/v4/assistant/`,
+      url: `/api/v4/assistant/?lang=${i18n.language === 'en' ? 'english' : 'french'}`,
       onSuccess: api_data => {
         setCurrentContext(api_data.api_response.trace);
         setCurrentHistory([...history, ...api_data.api_response.trace.slice(-1)]);
@@ -249,14 +249,10 @@ function AssistantProvider({ children }: AssistantProviderProps) {
     }
   };
 
-  const buildDefaultSystemMessage = () => {
-    // return defaultSystemPrompt;
+  const buildDefaultSystemMessage = (): ContextMessageProps => {
     return {
       role: 'system' as 'system',
-      content: configuration.ui.ai.assistant.system_message.replaceAll(
-        '$(LANG)',
-        i18n.language === 'en' ? 'english' : 'french'
-      )
+      content: null
     };
   };
 
@@ -268,8 +264,11 @@ function AssistantProvider({ children }: AssistantProviderProps) {
 
   const resetAssistant = () => {
     const defaultSystemPrompt = buildDefaultSystemMessage();
+    const lastPrompt = currentHistory[currentHistory.length - 1];
     setCurrentContext([defaultSystemPrompt]);
-    setCurrentHistory([...currentHistory, defaultSystemPrompt]);
+    if (lastPrompt?.content !== defaultSystemPrompt.content) {
+      setCurrentHistory([...currentHistory, defaultSystemPrompt]);
+    }
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
@@ -340,6 +339,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
       {children}
       {assistantAllowed && (
         <div
+          className="no-print"
           style={{
             display: 'flex',
             position: 'fixed',
