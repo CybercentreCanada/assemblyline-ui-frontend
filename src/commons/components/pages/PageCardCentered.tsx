@@ -1,45 +1,51 @@
-import { Card, styled, useMediaQuery, useTheme } from '@mui/material';
-import { memo } from 'react';
+import { Paper, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { memo, ReactNode } from 'react';
 
-const StyledCard = styled(Card)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  position: 'absolute',
-  left: '50%', // X
-  top: '50%', // Y
-  transform: 'translate(-50%, -50%)',
-  maxWidth: '22rem',
-  backgroundColor: theme.palette.background.paper,
-  borderRadius: '4px',
-  maxHeight: '100%',
-  overflow: 'hidden',
-  [theme.breakpoints.down('sm')]: {
-    backgroundColor: theme.palette.background.default,
+const useStyles = makeStyles(theme => ({
+  root: {
+    height: '100%',
     width: '100%',
-    maxWidth: '22rem'
+    display: 'grid',
+    placeItems: 'center'
   },
-  [theme.breakpoints.up('sm')]: {
-    width: '22rem'
+  card: {
+    maxWidth: '22rem',
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: '4px',
+    padding: '0 2rem 3rem',
+    [theme.breakpoints.down('sm')]: {
+      backgroundColor: theme.palette.background.default,
+      width: '100%',
+      maxWidth: '22rem'
+    },
+    [theme.breakpoints.up('sm')]: {
+      width: '22rem'
+    },
+    [theme.breakpoints.only('xs')]: {
+      padding: '0 1rem 2rem'
+    }
   }
 }));
 
-function PageCardCentered({ children }) {
+type Props = {
+  children?: ReactNode;
+};
+
+const PageCardCentered = ({ children = null }: Props) => {
   const theme = useTheme();
+  const classes = useStyles();
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));
+
   return (
-    <StyledCard elevation={isXs ? 0 : 4}>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          padding: isXs ? '0 1rem 2rem' : '0 2rem 3rem',
-          overflow: 'auto'
-        }}
-      >
-        {children}
+    <div className={classes.root}>
+      <div style={{ padding: theme.spacing(1) }}>
+        <Paper className={classes.card} elevation={isXs ? 0 : 4}>
+          {children}
+        </Paper>
       </div>
-    </StyledCard>
+    </div>
   );
-}
+};
 
 export default memo(PageCardCentered);
