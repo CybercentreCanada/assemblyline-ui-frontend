@@ -6,9 +6,6 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { Favorite } from '../components/Favorites';
 
 type ContextProps = {
-  statusFilters: { [key: string]: number };
-  priorityFilters: { [key: string]: number };
-  labelFilters: { [key: string]: number };
   userFavorites: Favorite[];
   globalFavorites: Favorite[];
   defaultFavorite: Favorite;
@@ -34,9 +31,6 @@ export const AlertsProvider = ({ children }: Props) => {
     [c12nDef.UNRESTRICTED, currentUser.username]
   );
 
-  const [statusFilters, setStatusFilters] = useState<{ [key: string]: number }>(null);
-  const [priorityFilters, setPriorityFilters] = useState<{ [key: string]: number }>(null);
-  const [labelFilters, setLabelFilters] = useState<{ [key: string]: number }>(null);
   const [userFavorites, setUserFavorites] = useState<Favorite[]>([]);
   const [globalFavorites, setGlobalFavorites] = useState<Favorite[]>([]);
 
@@ -77,28 +71,7 @@ export const AlertsProvider = ({ children }: Props) => {
       onSuccess: ({ api_response }) => setGlobalFavorites(api_response.alert)
     });
 
-    apiCall({
-      url: '/api/v4/alert/statuses/',
-      method: 'GET',
-      onSuccess: ({ api_response }) => setStatusFilters(api_response)
-    });
-
-    apiCall({
-      url: '/api/v4/alert/priorities/',
-      method: 'GET',
-      onSuccess: ({ api_response }) => setPriorityFilters(api_response)
-    });
-
-    apiCall({
-      url: '/api/v4/alert/labels/',
-      method: 'GET',
-      onSuccess: ({ api_response }) => setLabelFilters(api_response)
-    });
-
     return () => {
-      setStatusFilters(null);
-      setPriorityFilters(null);
-      setLabelFilters(null);
       setGlobalFavorites([]);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,9 +80,6 @@ export const AlertsProvider = ({ children }: Props) => {
   return (
     <AlertsContext.Provider
       value={{
-        statusFilters,
-        priorityFilters,
-        labelFilters,
         userFavorites,
         globalFavorites,
         defaultFavorite,

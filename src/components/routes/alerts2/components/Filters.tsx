@@ -1,6 +1,7 @@
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import StarIcon from '@mui/icons-material/Star';
 import {
   Autocomplete,
   Button,
@@ -70,6 +71,14 @@ const useStyles = makeStyles(theme => ({
     transform: 'rotate(180deg)'
   }
 }));
+
+export type Filter = {
+  label?: string;
+  value?: string;
+  not?: boolean;
+  count?: number;
+  total?: number;
+};
 
 export type Option = { value: string; label: string };
 
@@ -206,199 +215,91 @@ const AlertSelect: React.FC<AlertSelectProps> = React.memo(
   }
 );
 
-type Filter = {
-  value?: string;
-  query?: string;
-  count?: number;
-  total?: number;
-};
-
 type AlertFilterInputProps = {
   label: string;
-  value: string;
-  totals: { [key: string]: number };
-  url: string;
-  onChange: (value: string) => void;
+  value: Filter[];
+  loading?: boolean;
+  freeSolo?: boolean;
+  disableCloseOnSelect?: boolean;
+  options: Filter[];
+  onOpen?: () => void;
+  onChange: (values: Filter[]) => void;
 };
 
 const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
-  ({ label = '', value: filter = null, totals = null, url = '', onChange = () => null }: AlertFilterInputProps) => {
+  ({
+    label = '',
+    value: filters = [],
+    loading = false,
+    freeSolo = false,
+    disableCloseOnSelect = false,
+    options = [],
+    onOpen = () => null,
+    onChange = () => null
+  }: AlertFilterInputProps) => {
     const { t } = useTranslation('alerts');
     const classes = useStyles();
     const theme = useTheme();
-    const { apiCall } = useMyAPI();
 
-    const [options, setOptions] = useState<{ [key: string]: number }>(null);
     const [inputValue, setInputValue] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false);
-
-    const prevURL = useRef<string>(null);
-
-    const parsedOptions = useMemo<Filter[]>(() => {
-      const items = Object.keys({ ...options, ...totals }).map(key => ({
-        value: key,
-        count: options && key in options ? options[key] : 0,
-        total: totals && key in totals ? totals[key] : 0
-      }));
-      items.sort((a, b) => (b.count !== a.count ? b.count - a.count : b.total - a.total));
-      return items;
-    }, [options, totals]);
-
-    const currentFilter = useMemo<Filter>(
-      () => (!filter ? null : parsedOptions.find(o => o.value === filter) ?? null),
-      [filter, parsedOptions]
-    );
-
-    const fetchOptions = useCallback(
-      (currentURL: string) => {
-        apiCall({
-          url: currentURL,
-          method: 'GET',
-          onSuccess: ({ api_response }) => {
-            setOptions(api_response);
-            prevURL.current = url;
-          },
-          onEnter: () => {
-            setLoading(true);
-            setOptions(null);
-          },
-          onExit: () => setLoading(false)
-        });
-      },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
-    );
 
     return (
       <div style={{ marginBottom: theme.spacing(2) }}>
         <label>{t(label)}</label>
         <Autocomplete
           classes={{ listbox: classes.listbox, option: classes.option }}
-          value={currentFilter}
-          onChange={(event, item) => onChange(item?.value)}
-          onOpen={() => prevURL.current !== url && fetchOptions(url)}
-          inputValue={inputValue}
-          onInputChange={(event, item) => setInputValue(item)}
-          fullWidth
-          size="small"
-          loading={loading}
-          loadingText={t('loading')}
-          renderInput={params => <TextField {...params} variant="outlined" size="medium" />}
-          options={parsedOptions}
-          getOptionLabel={option => option.value}
-          isOptionEqualToValue={(option, item) => !!option && !!item && option.value === item.value}
-          renderOption={(props, item, state) => (
-            <li {...props} key={JSON.stringify(item)} style={{ justifyContent: 'space-between' }}>
-              <Typography
-                color={item.count > 0 ? theme.palette.text.primary : theme.palette.text.disabled}
-                style={{ wordBreak: 'break-all' }}
-                children={item.value}
-              />
-              <CustomChip
-                label={
-                  <>
-                    <span style={{ color: theme.palette.text.primary }}>{`${item.count} `}</span>
-                    <span style={{ color: theme.palette.text.secondary }}>{`/ ${item.total}`}</span>
-                  </>
-                }
-                size="small"
-              />
-            </li>
-          )}
-        />
-      </div>
-    );
-  }
-);
-
-type AlertFiltersInputProps = {
-  label: string;
-  values: string[];
-  totals: { [key: string]: number };
-  url: string;
-  onChange: (values: string[]) => void;
-};
-
-const AlertFiltersInput: React.FC<AlertFiltersInputProps> = React.memo(
-  ({ label = '', values: filters = [], totals = null, url = '', onChange = () => null }: AlertFiltersInputProps) => {
-    const { t } = useTranslation('alerts');
-    const classes = useStyles();
-    const theme = useTheme();
-    const { apiCall } = useMyAPI();
-
-    const [options, setOptions] = useState<{ [key: string]: number }>(null);
-    const [inputValue, setInputValue] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false);
-
-    const prevURL = useRef<string>(null);
-
-    const parsedOptions = useMemo<Filter[]>(() => {
-      const items = Object.keys({ ...options, ...totals }).map(key => ({
-        value: key,
-        count: options && key in options ? options[key] : 0,
-        total: totals && key in totals ? totals[key] : 0
-      }));
-      items.sort((a, b) => (b.count !== a.count ? b.count - a.count : b.total - a.total));
-      return items;
-    }, [options, totals]);
-
-    const currentFilters = useMemo<Filter[]>(
-      () => (!filters ? [] : parsedOptions.filter(o => filters.includes(o.value))),
-      [filters, parsedOptions]
-    );
-
-    const fetchOptions = useCallback(
-      (currentURL: string) => {
-        apiCall({
-          url: currentURL,
-          method: 'GET',
-          onSuccess: ({ api_response }) => {
-            setOptions(api_response);
-            prevURL.current = url;
-          },
-          onEnter: () => {
-            setLoading(true);
-            setOptions(null);
-          },
-          onExit: () => setLoading(false)
-        });
-      },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
-    );
-
-    return (
-      <div style={{ marginBottom: theme.spacing(2) }}>
-        <label>{t(label)}</label>
-        <Autocomplete
-          classes={{ listbox: classes.listbox, option: classes.option }}
-          value={currentFilters}
-          onChange={(event, items) => onChange(items.map(f => f.value))}
-          onOpen={() => prevURL.current !== url && fetchOptions(url)}
+          value={filters}
+          onChange={(event, items) =>
+            onChange(items.map(item => (typeof item !== 'string' ? item : { label: item, value: item, not: false })))
+          }
+          onOpen={onOpen}
           inputValue={inputValue}
           onInputChange={(event, item) => setInputValue(item)}
           fullWidth
           multiple
           size="small"
-          disableCloseOnSelect
+          freeSolo={freeSolo}
+          disableCloseOnSelect={disableCloseOnSelect}
           loading={loading}
           loadingText={t('loading')}
           renderInput={params => <TextField {...params} variant="outlined" size="medium" />}
-          options={parsedOptions}
-          getOptionLabel={option => option.value}
-          isOptionEqualToValue={(option, filter) => !!option && !!filter && option.value === filter.value}
+          renderTags={(items: Filter[], getTagProps) =>
+            items.map((item, index) => (
+              <CustomChip
+                {...getTagProps({ index })}
+                label={item.label}
+                size="small"
+                variant={item.not ? 'outlined' : 'filled'}
+                color={item.not ? 'error' : 'default'}
+                onClick={() =>
+                  onChange(
+                    items.map(value =>
+                      value.label !== item.label
+                        ? value
+                        : typeof value !== 'string'
+                        ? { ...value, not: !value.not }
+                        : { label: value, value: value, not: true }
+                    )
+                  )
+                }
+              />
+            ))
+          }
+          options={options}
+          getOptionLabel={option => (typeof option === 'string' ? option : option.label)}
+          isOptionEqualToValue={(option, filter) => !!option && !!filter && option.label === filter.label}
           renderOption={(props, item, state) => (
-            <li {...props} key={JSON.stringify(item)} style={{ justifyContent: 'space-between' }}>
+            <li {...props} key={item.value} style={{ justifyContent: 'space-between' }}>
               <Typography
                 color={item.count > 0 ? theme.palette.text.primary : theme.palette.text.disabled}
                 style={{ wordBreak: 'break-all' }}
-                children={item.value}
+                children={item.label}
               />
               <CustomChip
                 label={
                   <>
                     <span style={{ color: theme.palette.text.primary }}>{`${item.count} `}</span>
-                    <span style={{ color: theme.palette.text.secondary }}>{`/ ${item.total}`}</span>
+                    {item.total && <span style={{ color: theme.palette.text.secondary }}>{`/ ${item.total}`}</span>}
                   </>
                 }
                 size="small"
@@ -412,170 +313,109 @@ const AlertFiltersInput: React.FC<AlertFiltersInputProps> = React.memo(
 );
 
 type FavoritesProps = {
-  values: (Filter & Favorite)[];
-  onChange: (values: string[]) => void;
+  value: (Filter & Favorite)[];
+  onChange: (values: (Filter & Favorite)[]) => void;
 };
 
-const Favorites: React.FC<FavoritesProps> = React.memo(({ values = [], onChange = () => null }: FavoritesProps) => {
-  const { t } = useTranslation('alerts');
-  const classes = useStyles();
-  const theme = useTheme();
+const Favorites: React.FC<FavoritesProps> = React.memo(
+  ({ value: favorites = [], onChange = () => null }: FavoritesProps) => {
+    const { t } = useTranslation('alerts');
+    const classes = useStyles();
+    const theme = useTheme();
 
-  const { userFavorites, globalFavorites } = useAlerts();
+    const alertValues = useAlerts();
 
-  const options = useMemo<Favorite[]>(() => [...userFavorites, ...globalFavorites], [userFavorites, globalFavorites]);
-
-  return (
-    <div style={{ marginBottom: theme.spacing(2) }}>
-      <label>{t('favorites')}</label>
-      <Autocomplete
-        classes={{ listbox: classes.listbox, option: classes.option }}
-        value={values}
-        onChange={(event, value) => onChange(value.map(item => item.query))}
-        fullWidth
-        multiple
-        size="small"
-        disableCloseOnSelect
-        renderInput={params => <TextField {...params} variant="outlined" size="medium" />}
-        options={options}
-        getOptionLabel={option => option.name}
-        isOptionEqualToValue={(option, against) =>
-          option === null || against === null ? false : option.query === against.query
-        }
-        renderOption={(props, item, state) => (
-          <li {...props} key={JSON.stringify(item)}>
-            <div
-              style={{
-                flex: 1,
-                minWidth: 0,
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                columnGap: theme.spacing(2)
-              }}
-            >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <Typography color={theme.palette.text.primary} noWrap children={item.name} />
-                <Typography
-                  color={theme.palette.text.secondary}
-                  noWrap
-                  component="div"
-                  variant="caption"
-                  children={item.query}
-                />
-              </div>
-              <div>
-                <Typography
-                  color={theme.palette.text.disabled}
-                  variant="body2"
-                  noWrap
-                  children={`(${item.created_by})`}
-                />
-              </div>
-            </div>
-          </li>
-        )}
-      />
-    </div>
-  );
-});
-
-type OthersProps = {
-  values: string[];
-  search: string;
-  onChange: (values: string[], favorites: string[]) => void;
-};
-
-const Others: React.FC<OthersProps> = React.memo(({ values = [], search = '', onChange = () => null }: OthersProps) => {
-  const { t } = useTranslation('alerts');
-  const classes = useStyles();
-  const theme = useTheme();
-  const { apiCall } = useMyAPI();
-
-  const [options, setOptions] = useState<{ [key: string]: { [item: string]: number } }>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const prevSearch = useRef<string>(null);
-
-  const parsedOptions = useMemo<Filter[]>(() => {
-    const items = Object.keys({ ...options }).flatMap(key =>
-      Object.keys({ ...(options && key in options ? options[key] : null) }).map(value => ({
-        value: `${key}:${safeFieldValue(value)}`,
-        count: options && key in options && value in options[key] ? options[key][value] : 0,
-        total: 0
-      }))
+    const options = useMemo<(Filter & Favorite)[]>(
+      () => (!alertValues ? [] : [...alertValues?.userFavorites, ...alertValues?.globalFavorites]),
+      [alertValues]
     );
-    return items;
-  }, [options]);
 
-  const fetchOptions = useCallback(() => {
-    apiCall({
-      url: `/api/v4/alert/statistics/?${search}`,
-      method: 'GET',
-      onSuccess: ({ api_response }) => {
-        setOptions(api_response);
-        prevSearch.current = search;
-      },
-      onEnter: () => {
-        setLoading(true);
-        setOptions(null);
-      },
-      onExit: () => setLoading(false)
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+    return (
+      <div style={{ marginBottom: theme.spacing(2) }}>
+        <label>{t('favorites')}</label>
+        <Autocomplete
+          classes={{ listbox: classes.listbox, option: classes.option }}
+          value={favorites}
+          onChange={(event, items) =>
+            onChange(items.map(item => ({ ...item, label: item.query, value: item.query, not: false })))
+          }
+          fullWidth
+          multiple
+          size="small"
+          disableCloseOnSelect
+          renderInput={params => <TextField {...params} variant="outlined" size="medium" />}
+          renderTags={(items: (Filter & Favorite)[], getTagProps) =>
+            items.map((item, index) => (
+              <CustomChip
+                {...getTagProps({ index })}
+                label={item.name}
+                icon={
+                  <StarIcon
+                    style={{
+                      ...(item.not && {
+                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      })
+                    }}
+                  />
+                }
+                size="small"
+                variant={item.not ? 'outlined' : 'filled'}
+                color={item.not ? 'error' : 'default'}
+                onClick={() =>
+                  onChange(items.map(value => (value.label !== item.label ? value : { ...value, not: !value.not })))
+                }
+              />
+            ))
+          }
+          options={options}
+          getOptionLabel={option => option.name}
+          isOptionEqualToValue={(option, against) =>
+            option === null || against === null ? false : option.query === against.query
+          }
+          renderOption={(props, item, state) => (
+            <li {...props} key={`${item.name}-${item.query}`}>
+              <div
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  columnGap: theme.spacing(2)
+                }}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <Typography color={theme.palette.text.primary} noWrap children={item.name} />
+                  <Typography
+                    color={theme.palette.text.secondary}
+                    noWrap
+                    component="div"
+                    variant="caption"
+                    children={item.query}
+                  />
+                </div>
+                <div>
+                  <Typography
+                    color={theme.palette.text.disabled}
+                    variant="body2"
+                    noWrap
+                    children={`(${item.created_by})`}
+                  />
+                </div>
+              </div>
+            </li>
+          )}
+        />
+      </div>
+    );
+  }
+);
 
-  return (
-    <div style={{ marginBottom: theme.spacing(2) }}>
-      <label>{t('others')}</label>
-      <Autocomplete
-        classes={{ listbox: classes.listbox, option: classes.option }}
-        value={values.map(value => ({ value, count: 0, total: 0 }))}
-        onChange={(event, value) =>
-          onChange(
-            value.map(item => (typeof item === 'string' ? item : item.value)),
-            parsedOptions.map(option => option.value)
-          )
-        }
-        onOpen={() => prevSearch.current !== search && fetchOptions()}
-        fullWidth
-        multiple
-        size="small"
-        disableCloseOnSelect
-        loading={loading}
-        loadingText={t('loading')}
-        renderInput={params => <TextField {...params} variant="outlined" size="medium" />}
-        options={parsedOptions}
-        getOptionLabel={option => (typeof option === 'string' ? option : option.value)}
-        noOptionsText={t('none')}
-        isOptionEqualToValue={(option, against) =>
-          option === null || against === null ? false : option.value === against.value
-        }
-        renderOption={(props, item, state) => (
-          <li {...props} key={JSON.stringify(item)} style={{ justifyContent: 'space-between' }}>
-            <Typography
-              color={item.count > 0 ? theme.palette.text.primary : theme.palette.text.disabled}
-              style={{ wordBreak: 'break-all' }}
-              children={item.value}
-            />
-            <CustomChip
-              label={
-                <>
-                  <span style={{ color: theme.palette.text.primary }}>{`${item.count} `}</span>
-                </>
-              }
-              size="small"
-            />
-          </li>
-        )}
-      />
-    </div>
-  );
-});
+type FilterType = 'status' | 'priority' | 'label' | 'other';
 
 type Filters = {
-  status: Filter;
-  priority: Filter;
+  status: Filter[];
+  priority: Filter[];
   labels: Filter[];
   favorites: (Favorite & Filter)[];
   others: Filter[];
@@ -587,52 +427,68 @@ const WrappedAlertFilters = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+  const { apiCall } = useMyAPI();
 
-  const { userFavorites, globalFavorites, statusFilters, priorityFilters, labelFilters } = useAlerts();
+  const alertValues = useAlerts();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const [query, setQuery] = useState(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
+  const [options, setOptions] = useState<Record<FilterType, Record<string, { count: number; total: number }>>>({
+    status: {},
+    priority: {},
+    label: {},
+    other: {}
+  });
+  const [loadings, setLoadings] = useState<Record<FilterType, boolean>>({
+    status: false,
+    priority: false,
+    label: false,
+    other: false
+  });
+
+  const prevURLs = useRef<Record<FilterType, string>>({ status: '', priority: '', label: '', other: '' });
 
   const allFavorites = useMemo<Favorite[]>(
-    () => [...userFavorites, ...globalFavorites],
-    [globalFavorites, userFavorites]
+    () => (!alertValues ? [] : [...alertValues?.userFavorites, ...alertValues?.globalFavorites]),
+    [alertValues]
   );
 
-  const { status, priority, labels, favorites, others } = useMemo<Filters>(() => {
-    let filters = { status: null, priority: null, labels: [], favorites: [], others: [] };
+  const filters = useMemo<Filters>(() => {
+    let defaults: Filters = { status: [], priority: [], labels: [], favorites: [], others: [] };
 
-    query.getAll('fq', []).forEach(filter => {
-      const value = filter.startsWith('NOT(') && filter.endsWith(')') ? filter.substring(4, filter.length - 1) : filter;
+    const statuses = Object.fromEntries(Object.keys(options.status).map(v => [`status:${v}`, v]));
+    const priorities = Object.fromEntries(Object.keys(options.priority).map(v => [`priority:${v}`, v]));
+    const labels = Object.fromEntries(Object.keys(options.label).map(v => [`label:${v}`, v]));
 
-      if (value.startsWith('status:')) {
-        filters.status = { query: filter, value: value.replace('status:', '') };
-      } else if (value.startsWith('priority:')) {
-        filters.priority = { query: filter, value: value.replace('priority:', '') };
-      } else if (value.startsWith('label:')) {
-        filters.labels.push({ query: filter, value: value.replace('label:', '') });
+    query.getAll('fq', []).forEach((fq: string) => {
+      const not = fq.startsWith('NOT(') && fq.endsWith(')');
+      const value = not ? fq.substring(4, fq.length - 1) : fq;
+
+      if (value in statuses) {
+        defaults.status = [{ not, value, label: statuses[value] }];
+      } else if (value in priorities) {
+        defaults.priority = [{ not, value, label: priorities[value] }];
+      } else if (value in labels) {
+        defaults.labels.push({ not, value, label: labels[value] });
       } else {
-        const favorite = allFavorites.find(f => f.query === filter || `NOT(${f.query})` === filter);
-        if (favorite) filters.favorites.push({ ...favorite, query: filter, value: value });
-        else filters.others.push({ query: filter, value: value });
+        const favorite = allFavorites.find(f => f.query === value);
+        if (favorite) defaults.favorites.push({ ...favorite, not, value, label: value });
+        else defaults.others.push({ not, value, label: value });
       }
     });
-    return filters;
-  }, [allFavorites, query]);
+    return defaults;
+  }, [allFavorites, options.label, options.priority, options.status, query]);
 
-  const { statusURL, priorityURL, labelURL } = useMemo<{
-    statusURL: string;
-    priorityURL: string;
-    labelURL: string;
-  }>(
-    () =>
-      Object.fromEntries(
+  const urls = useMemo<Record<FilterType, string>>(
+    () => ({
+      ...Object.fromEntries(
         [
-          ['statusURL', ['/api/v4/alert/statuses/', 'status:']],
-          ['priorityURL', ['/api/v4/alert/priorities/', 'priority:']],
-          ['labelURL', ['/api/v4/alert/labels/', 'labels:']]
+          ['status', ['/api/v4/alert/statuses/', 'status:']],
+          ['priority', ['/api/v4/alert/priorities/', 'priority:']],
+          ['label', ['/api/v4/alert/labels/', 'labels:']]
         ].map(([url, [pathname, strip]]) => [
           url,
           `${pathname}?${buildSearchQuery({
@@ -645,6 +501,8 @@ const WrappedAlertFilters = () => {
           }).toString()}`
         ])
       ),
+      other: ''
+    }),
     [query]
   );
 
@@ -657,11 +515,25 @@ const WrappedAlertFilters = () => {
       groupByAsFilter: true
     });
 
-    others.forEach(value => {
-      q.remove('fq', value.query);
+    filters.others.forEach(filter => {
+      q.remove('fq', filter.value);
     });
-    return q.toString();
-  }, [others, query]);
+    return `/api/v4/alert/statistics/?${q.toString()}`;
+  }, [filters.others, query]);
+
+  const toFilterOptions = useCallback(
+    (values: Record<string, { count: number; total: number }>, prefix: string = ''): Filter[] => {
+      let data = Object.keys(values).map(key => ({
+        ...values[key],
+        not: false,
+        label: key,
+        value: `${prefix}${key}`
+      }));
+      data.sort((a, b) => a.value.localeCompare(b.value));
+      return data;
+    },
+    []
+  );
 
   const handleClear = useCallback(() => setQuery(new SimpleSearchQuery('', DEFAULT_QUERY)), []);
 
@@ -678,39 +550,92 @@ const WrappedAlertFilters = () => {
     });
   }, []);
 
-  const handleFilterChange = useCallback((prefix: string, next: string, previous: Filter) => {
-    setQuery(prev => {
-      const q = new SimpleSearchQuery(prev.toString([]), DEFAULT_QUERY);
-      if (previous) q.remove('fq', previous?.query);
-      if (next) q.add('fq', `${prefix}${next}`);
-      return q;
-    });
+  const handleFiltersChange = useCallback(
+    (prefix: string, next: Filter[], previous: Filter[], limit: number = null) => {
+      setQuery(prev => {
+        const q = new SimpleSearchQuery(prev.toString([]), DEFAULT_QUERY);
+
+        console.log(previous, next);
+
+        previous.forEach(fq => {
+          q.remove('fq', fq.not ? `NOT(${fq.value})` : `${fq.value}`);
+        });
+
+        next.slice(!limit ? 0 : -1 * limit).forEach(fq => {
+          q.add('fq', fq.not ? `NOT(${prefix}${fq.label})` : `${prefix}${fq.label}`);
+        });
+
+        return q;
+      });
+    },
+    []
+  );
+
+  const handleOptionsChange = useCallback(
+    (type: FilterType, data: Record<string, number>, asTotal: boolean = false) => {
+      setOptions(v => {
+        if (!(type in v)) return v;
+        return {
+          ...v,
+          [type]: Object.fromEntries(
+            Object.keys({ ...v[type], ...data }).map(k => [
+              k,
+              {
+                count: 0,
+                total: 0,
+                ...(k in v[type] && v[type][k]),
+                ...(!(k in data) ? null : asTotal ? { total: data[k] } : { count: data[k] })
+              }
+            ])
+          )
+        };
+      });
+    },
+    []
+  );
+
+  const handleOthersChange = useCallback((data: Record<string, Record<string, number>>, asTotal: boolean = false) => {
+    setOptions(v => ({
+      ...v,
+      other: Object.fromEntries(
+        Object.keys(data).flatMap(key =>
+          Object.keys(data[key]).map(value => [
+            `${key}:${safeFieldValue(value)}`,
+            { count: data[key][value], total: null }
+          ])
+        )
+      )
+    }));
   }, []);
 
-  const handleFiltersChange = useCallback((prefix: string, next: string[], previous: Filter[]) => {
-    setQuery(prev => {
-      const q = new SimpleSearchQuery(prev.toString([]), DEFAULT_QUERY);
-
-      previous
-        .filter(fq => !next.includes(fq.value))
-        .forEach(fq => {
-          q.remove('fq', fq?.query);
-        });
-
-      const values = previous.map(p => p.value);
-      next
-        .filter(fq => !values.includes(fq))
-        .forEach(fq => {
-          q.add('fq', `${prefix}${fq}`);
-        });
-
-      return q;
+  const handleFetch = useCallback((type: FilterType, url: string, onChange: (data: any) => void) => {
+    if (!type || !url || prevURLs.current?.[type] === url) return;
+    apiCall({
+      url: url,
+      method: 'GET',
+      onSuccess: ({ api_response }) => {
+        onChange(api_response);
+        prevURLs.current[type] = url;
+      },
+      onEnter: () => setLoadings(v => ({ ...v, [type]: true })),
+      onExit: () => setLoadings(v => ({ ...v, [type]: false }))
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (open) setQuery(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
   }, [location.search, open]);
+
+  useEffect(() => {
+    if (render) {
+      handleFetch('status', '/api/v4/alert/statuses/', data => handleOptionsChange('status', data, true));
+      handleFetch('priority', '/api/v4/alert/priorities/', data => handleOptionsChange('priority', data, true));
+      handleFetch('label', '/api/v4/alert/labels/', data => handleOptionsChange('label', data, true));
+    }
+  }, [handleFetch, handleOptionsChange, handleOthersChange, render]);
+
+  console.log(filters.favorites);
 
   return (
     <>
@@ -765,34 +690,46 @@ const WrappedAlertFilters = () => {
 
                 <AlertFilterInput
                   label="status"
-                  value={status?.value}
-                  totals={statusFilters}
-                  url={statusURL}
-                  onChange={value => handleFilterChange('status:', value, status)}
+                  value={filters.status}
+                  loading={loadings.status}
+                  options={toFilterOptions(options.status, 'status:')}
+                  onOpen={() => handleFetch('status', urls.status, data => handleOptionsChange('status', data))}
+                  onChange={value => handleFiltersChange('status:', value, filters.status, 1)}
                 />
 
                 <AlertFilterInput
                   label="priority"
-                  value={priority?.value}
-                  totals={priorityFilters}
-                  url={priorityURL}
-                  onChange={value => handleFilterChange('priority:', value, priority)}
+                  value={filters.priority}
+                  loading={loadings.priority}
+                  options={toFilterOptions(options.priority, 'priority:')}
+                  onOpen={() => handleFetch('priority', urls.priority, data => handleOptionsChange('priority', data))}
+                  onChange={value => handleFiltersChange('priority:', value, filters.priority, 1)}
                 />
 
-                <AlertFiltersInput
+                <AlertFilterInput
                   label="labels"
-                  values={labels.map(l => l.value)}
-                  totals={labelFilters}
-                  url={labelURL}
-                  onChange={values => handleFiltersChange('label:', values, labels)}
+                  value={filters.labels}
+                  loading={loadings.label}
+                  disableCloseOnSelect
+                  options={toFilterOptions(options.label, 'label:')}
+                  onOpen={() => handleFetch('label', urls.label, data => handleOptionsChange('label', data))}
+                  onChange={value => handleFiltersChange('label:', value, filters.labels)}
                 />
 
-                <Favorites values={favorites} onChange={values => handleFiltersChange('', values, favorites)} />
+                <Favorites
+                  value={filters.favorites}
+                  onChange={value => handleFiltersChange('', value, filters.favorites)}
+                />
 
-                <Others
-                  values={others.map(item => item.value)}
-                  search={otherURL}
-                  onChange={values => handleFiltersChange('', values, others)}
+                <AlertFilterInput
+                  label="others"
+                  value={filters.others}
+                  loading={loadings.other}
+                  freeSolo
+                  disableCloseOnSelect
+                  options={toFilterOptions(options.other)}
+                  onOpen={() => handleFetch('other', otherURL, data => handleOthersChange(data))}
+                  onChange={value => handleFiltersChange('', value, filters.others)}
                 />
               </div>
               <div className={classes.actions}>
