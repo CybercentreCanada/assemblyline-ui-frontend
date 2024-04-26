@@ -42,7 +42,6 @@ import {
   AutoHideChipList,
   SkeletonInline
 } from './components/Components';
-import { AlertsProvider } from './contexts/AlertsContext';
 import { AlertItem } from './models/Alert';
 
 const useStyles = makeStyles(theme => ({
@@ -170,790 +169,490 @@ const WrappedAlertDetail = ({ id: propId = null, alert: propAlert = null, inDraw
   );
 
   return currentUser.roles.includes('alert_view') ? (
-    <AlertsProvider>
-      <Wrapper alert={alert} drawer={inDrawer}>
-        <PageFullWidth margin={inDrawer ? 1 : 4}>
-          {c12nDef.enforce && (
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
-              <div style={{ flex: 1 }}>
-                <Classification c12n={alert ? alert.classification : null} type="outlined" />
-              </div>
+    <Wrapper alert={alert} drawer={inDrawer}>
+      <PageFullWidth margin={inDrawer ? 1 : 4}>
+        {c12nDef.enforce && (
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
+            <div style={{ flex: 1 }}>
+              <Classification c12n={alert ? alert.classification : null} type="outlined" />
             </div>
-          )}
-          {!inDrawer && (
-            <div style={{ paddingBottom: theme.spacing(3), textAlign: 'left' }}>
-              <Grid container alignItems="center">
-                <Grid item flexGrow={1}>
-                  <Typography variant="h4">{t('detail.title')}</Typography>
-                </Grid>
-
-                <Grid item style={{ display: 'flex', flexDirection: 'row', textAlign: 'right', flexGrow: 0 }}>
-                  <AlertHistory alert={alert} />
-                  <AlertGroup alert={alert} />
-                  <AlertOwnership alert={alert} />
-                  <AlertSubmission alert={alert} />
-                  <AlertWorkflow alert={alert} />
-                  <AlertSafelist alert={alert} />
-                  <AlertBadlist alert={alert} />
-                </Grid>
+          </div>
+        )}
+        {!inDrawer && (
+          <div style={{ paddingBottom: theme.spacing(3), textAlign: 'left' }}>
+            <Grid container alignItems="center">
+              <Grid item flexGrow={1}>
+                <Typography variant="h4">{t('detail.title')}</Typography>
               </Grid>
+
+              <Grid item style={{ display: 'flex', flexDirection: 'row', textAlign: 'right', flexGrow: 0 }}>
+                <AlertHistory alert={alert} />
+                <AlertGroup alert={alert} />
+                <AlertOwnership alert={alert} />
+                <AlertSubmission alert={alert} />
+                <AlertWorkflow alert={alert} />
+                <AlertSafelist alert={alert} />
+                <AlertBadlist alert={alert} />
+              </Grid>
+            </Grid>
+          </div>
+        )}
+        <div style={{ textAlign: 'left' }}>
+          {alert && alert.filtered && (
+            <div style={{ marginBottom: theme.spacing(3) }}>
+              <Alert severity="warning">{t('data_filtered_msg')}</Alert>
             </div>
           )}
-          <div style={{ textAlign: 'left' }}>
-            {alert && alert.filtered && (
-              <div style={{ marginBottom: theme.spacing(3) }}>
-                <Alert severity="warning">{t('data_filtered_msg')}</Alert>
+          <Grid container spacing={1}>
+            <Grid item xs={12} md={6}>
+              {/* Alert Information Section */}
+              <div className={classes.section}>
+                <Typography className={classes.sectionTitle}>{t('alert_info')}</Typography>
+                <Divider />
+                <div className={classes.sectionContent}>
+                  <Grid container alignItems="center">
+                    {/* Alert ID */}
+                    <Grid item xs={3} sm={2} md={4}>
+                      {t('alert_id')}
+                    </Grid>
+                    <Grid item xs={9} sm={10} md={8}>
+                      <span style={{ wordBreak: 'break-word' }}>{alert ? alert.alert_id : <Skeleton />}</span>
+                    </Grid>
+                    {/* Alert Type */}
+                    <Grid item xs={3} sm={2} md={4}>
+                      {t('type')}
+                    </Grid>
+                    <Grid item xs={9} sm={10} md={8}>
+                      {alert ? alert.type : <Skeleton />}
+                    </Grid>
+                    {/* Submission received date */}
+                    <Grid item xs={3} sm={2} md={4}>
+                      {t('received_date')}
+                    </Grid>
+                    <Grid item xs={9} sm={10} md={8}>
+                      {alert ? `${alert.ts.replace('T', ' ').replace('Z', '')} (UTC)` : <Skeleton />}
+                    </Grid>
+                    {/* Alerted date */}
+                    <Grid item xs={3} sm={2} md={4}>
+                      {t('alerted_date')}
+                    </Grid>
+                    <Grid item xs={9} sm={10} md={8}>
+                      {alert ? `${alert.reporting_ts.replace('T', ' ').replace('Z', '')} (UTC)` : <Skeleton />}
+                    </Grid>
+                    {/* Alert owner */}
+                    <Grid item xs={3} sm={2} md={4}>
+                      {t('ownership')}
+                    </Grid>
+                    <Grid item xs={9} sm={10} md={8}>
+                      {alert ? (
+                        alert.owner ? (
+                          alert.owner
+                        ) : (
+                          <div style={{ color: theme.palette.text.disabled }}>
+                            {alert.hint_owner ? t('hint_owner_detail') : t('owned_none')}
+                          </div>
+                        )
+                      ) : (
+                        <Skeleton />
+                      )}
+                    </Grid>
+                    {/* Alert Extended scan status */}
+                    <Grid item xs={3} sm={2} md={4}>
+                      {t('extended')}
+                    </Grid>
+                    <Grid item xs={9} sm={10} md={8} style={{ marginTop: theme.spacing(0.5) }}>
+                      {alert ? <AlertExtendedScan name={alert.extended_scan} withChip /> : <Skeleton />}
+                    </Grid>
+                    {/* Alert Priority */}
+                    <Grid item xs={3} sm={2} md={4}>
+                      {t('priority')}
+                    </Grid>
+                    <Grid item xs={9} sm={10} md={8} style={{ marginTop: theme.spacing(0.5) }}>
+                      {alert ? <AlertPriority name={alert ? alert.priority : null} withChip /> : <ChipSkeleton />}
+                    </Grid>
+                    {/* Alert Status */}
+                    <Grid item xs={3} sm={2} md={4}>
+                      {t('status')}
+                    </Grid>
+                    <Grid item xs={9} sm={10} md={8} style={{ marginTop: theme.spacing(0.5) }}>
+                      {alert ? (
+                        alert.status ? (
+                          <AlertStatus name={alert.status} />
+                        ) : (
+                          <CustomChip size="small" variant="outlined" label={t(`status_unset`)} disabled />
+                        )
+                      ) : (
+                        <ChipSkeleton />
+                      )}
+                    </Grid>
+                  </Grid>
+                </div>
               </div>
-            )}
-            <Grid container spacing={1}>
-              <Grid item xs={12} md={6}>
-                {/* Alert Information Section */}
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <div>
+                {/* Score Section. */}
                 <div className={classes.section}>
-                  <Typography className={classes.sectionTitle}>{t('alert_info')}</Typography>
+                  <Typography className={classes.sectionTitle}>{t('verdict')}</Typography>
                   <Divider />
                   <div className={classes.sectionContent}>
-                    <Grid container alignItems="center">
-                      {/* Alert ID */}
+                    <Grid container>
                       <Grid item xs={3} sm={2} md={4}>
-                        {t('alert_id')}
+                        {t('score')}
                       </Grid>
                       <Grid item xs={9} sm={10} md={8}>
-                        <span style={{ wordBreak: 'break-word' }}>{alert ? alert.alert_id : <Skeleton />}</span>
+                        {alert ? <Verdict size="tiny" score={alert.al.score} fullWidth /> : <Skeleton />}
                       </Grid>
-                      {/* Alert Type */}
                       <Grid item xs={3} sm={2} md={4}>
-                        {t('type')}
-                      </Grid>
-                      <Grid item xs={9} sm={10} md={8}>
-                        {alert ? alert.type : <Skeleton />}
-                      </Grid>
-                      {/* Submission received date */}
-                      <Grid item xs={3} sm={2} md={4}>
-                        {t('received_date')}
-                      </Grid>
-                      <Grid item xs={9} sm={10} md={8}>
-                        {alert ? `${alert.ts.replace('T', ' ').replace('Z', '')} (UTC)` : <Skeleton />}
-                      </Grid>
-                      {/* Alerted date */}
-                      <Grid item xs={3} sm={2} md={4}>
-                        {t('alerted_date')}
-                      </Grid>
-                      <Grid item xs={9} sm={10} md={8}>
-                        {alert ? `${alert.reporting_ts.replace('T', ' ').replace('Z', '')} (UTC)` : <Skeleton />}
-                      </Grid>
-                      {/* Alert owner */}
-                      <Grid item xs={3} sm={2} md={4}>
-                        {t('ownership')}
+                        <div style={{ marginTop: theme.spacing(0.5) }}>{t('user_verdict')}</div>
                       </Grid>
                       <Grid item xs={9} sm={10} md={8}>
                         {alert ? (
-                          alert.owner ? (
-                            alert.owner
-                          ) : (
-                            <div style={{ color: theme.palette.text.disabled }}>
-                              {alert.hint_owner ? t('hint_owner_detail') : t('owned_none')}
-                            </div>
-                          )
+                          <div style={{ marginTop: theme.spacing(0.5), marginBottom: theme.spacing(0.5) }}>
+                            <VerdictBar verdicts={alert.verdict} />
+                          </div>
                         ) : (
-                          <Skeleton />
-                        )}
-                      </Grid>
-                      {/* Alert Extended scan status */}
-                      <Grid item xs={3} sm={2} md={4}>
-                        {t('extended')}
-                      </Grid>
-                      <Grid item xs={9} sm={10} md={8} style={{ marginTop: theme.spacing(0.5) }}>
-                        {alert ? <AlertExtendedScan name={alert.extended_scan} withChip /> : <Skeleton />}
-                      </Grid>
-                      {/* Alert Priority */}
-                      <Grid item xs={3} sm={2} md={4}>
-                        {t('priority')}
-                      </Grid>
-                      <Grid item xs={9} sm={10} md={8} style={{ marginTop: theme.spacing(0.5) }}>
-                        {alert ? <AlertPriority name={alert ? alert.priority : null} withChip /> : <ChipSkeleton />}
-                      </Grid>
-                      {/* Alert Status */}
-                      <Grid item xs={3} sm={2} md={4}>
-                        {t('status')}
-                      </Grid>
-                      <Grid item xs={9} sm={10} md={8} style={{ marginTop: theme.spacing(0.5) }}>
-                        {alert ? (
-                          alert.status ? (
-                            <AlertStatus name={alert.status} />
-                          ) : (
-                            <CustomChip size="small" variant="outlined" label={t(`status_unset`)} disabled />
-                          )
-                        ) : (
-                          <ChipSkeleton />
+                          <>
+                            <Skeleton />
+                            <Skeleton />
+                          </>
                         )}
                       </Grid>
                     </Grid>
                   </div>
                 </div>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <div>
-                  {/* Score Section. */}
-                  <div className={classes.section}>
-                    <Typography className={classes.sectionTitle}>{t('verdict')}</Typography>
-                    <Divider />
-                    <div className={classes.sectionContent}>
-                      <Grid container>
-                        <Grid item xs={3} sm={2} md={4}>
-                          {t('score')}
-                        </Grid>
-                        <Grid item xs={9} sm={10} md={8}>
-                          {alert ? <Verdict size="tiny" score={alert.al.score} fullWidth /> : <Skeleton />}
-                        </Grid>
-                        <Grid item xs={3} sm={2} md={4}>
-                          <div style={{ marginTop: theme.spacing(0.5) }}>{t('user_verdict')}</div>
-                        </Grid>
-                        <Grid item xs={9} sm={10} md={8}>
-                          {alert ? (
-                            <div style={{ marginTop: theme.spacing(0.5), marginBottom: theme.spacing(0.5) }}>
-                              <VerdictBar verdicts={alert.verdict} />
-                            </div>
-                          ) : (
-                            <>
-                              <Skeleton />
-                              <Skeleton />
-                            </>
-                          )}
-                        </Grid>
-                      </Grid>
-                    </div>
-                  </div>
-                  {/* Labels Section */}
-                  <div className={classes.section}>
-                    <Typography className={classes.sectionTitle}>{t('label')}</Typography>
-                    <Divider />
-                    <div className={classes.sectionContent}>
-                      <ActionableChipList
-                        items={
-                          alert
-                            ? alert.label.map(label => ({
-                                label,
-                                variant: 'outlined',
-                                classification: alert.classification
-                              }))
-                            : null
-                        }
-                      />
-                    </div>
+                {/* Labels Section */}
+                <div className={classes.section}>
+                  <Typography className={classes.sectionTitle}>{t('label')}</Typography>
+                  <Divider />
+                  <div className={classes.sectionContent}>
+                    <ActionableChipList
+                      items={
+                        alert
+                          ? alert.label.map(label => ({
+                              label,
+                              variant: 'outlined',
+                              classification: alert.classification
+                            }))
+                          : null
+                      }
+                    />
                   </div>
                 </div>
-              </Grid>
+              </div>
             </Grid>
+          </Grid>
 
-            {/* File Info */}
+          {/* File Info */}
+          <div className={classes.section}>
+            <Typography className={classes.sectionTitle}>{t('file_info')}</Typography>
+            <Divider />
+            <div
+              className={classes.sectionContent}
+              style={{
+                display: 'flex',
+                alignItems: upSM ? 'start' : 'center',
+                flexDirection: upSM ? 'row' : 'column',
+                rowGap: theme.spacing(2)
+              }}
+            >
+              <Grid container>
+                <Grid
+                  item
+                  xs={12}
+                  style={{ marginBottom: theme.spacing(1), display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}
+                >
+                  <div style={{ marginRight: theme.spacing(1), wordBreak: 'break-word' }}>
+                    {alert ? alert.file.name : <SkeletonInline />}
+                  </div>
+                  <div style={{ marginRight: theme.spacing(1), wordBreak: 'break-word' }}>
+                    {alert ? (
+                      <CustomChip label={alert.file.type} variant="outlined" size="small" />
+                    ) : (
+                      <ChipSkeletonInline />
+                    )}
+                  </div>
+                  <Typography variant="caption" component={Box}>
+                    {alert ? `${alert.file.size} (${(alert.file.size / 1024).toFixed(2)} Kb)` : <SkeletonInline />}
+                  </Typography>
+                </Grid>
+                <Grid item xs={3} sm={2}>
+                  <BsClipboard
+                    className={classes.clipboardIcon}
+                    onClick={alert ? () => copy(alert.file.md5, 'drawerTop') : null}
+                  />
+                  <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
+                    MD5:
+                  </Typography>
+                </Grid>
+                <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
+                  {alert ? (
+                    <ActionableText
+                      category="hash"
+                      type="md5"
+                      value={alert.file.md5}
+                      classification={alert.classification}
+                    />
+                  ) : (
+                    <SkeletonInline />
+                  )}
+                </Grid>
+                <Grid item xs={3} sm={2}>
+                  <BsClipboard
+                    className={classes.clipboardIcon}
+                    onClick={alert ? () => copy(alert.file.sha1, 'drawerTop') : null}
+                  />
+                  <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
+                    SHA1:
+                  </Typography>
+                </Grid>
+                <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
+                  {alert ? (
+                    <ActionableText
+                      category="hash"
+                      type="sha1"
+                      value={alert.file.sha1}
+                      classification={alert.classification}
+                    />
+                  ) : (
+                    <SkeletonInline />
+                  )}
+                </Grid>
+                <Grid item xs={3} sm={2}>
+                  <BsClipboard
+                    className={classes.clipboardIcon}
+                    onClick={alert ? () => copy(alert.file.sha256, 'drawerTop') : null}
+                  />
+                  <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
+                    SHA256:
+                  </Typography>
+                </Grid>
+                <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
+                  {alert ? (
+                    <ActionableText
+                      category="hash"
+                      type="sha256"
+                      value={alert.file.sha256}
+                      classification={alert.classification}
+                    />
+                  ) : (
+                    <SkeletonInline />
+                  )}
+                </Grid>
+              </Grid>
+              {alert && alert.file.screenshots && <ImageInline data={alert.file.screenshots} size="small" />}
+            </div>
+          </div>
+
+          {/* Metadata Section */}
+          {!alert || (alert.metadata && Object.keys(alert.metadata).length > 0) ? (
             <div className={classes.section}>
-              <Typography className={classes.sectionTitle}>{t('file_info')}</Typography>
-              <Divider />
               <div
-                className={classes.sectionContent}
                 style={{
                   display: 'flex',
-                  alignItems: upSM ? 'start' : 'center',
-                  flexDirection: upSM ? 'row' : 'column',
-                  rowGap: theme.spacing(2)
+                  alignItems: 'flex-end',
+                  justifyContent: 'space-between'
                 }}
               >
-                <Grid container>
-                  <Grid
-                    item
-                    xs={12}
-                    style={{ marginBottom: theme.spacing(1), display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}
-                  >
-                    <div style={{ marginRight: theme.spacing(1), wordBreak: 'break-word' }}>
-                      {alert ? alert.file.name : <SkeletonInline />}
-                    </div>
-                    <div style={{ marginRight: theme.spacing(1), wordBreak: 'break-word' }}>
-                      {alert ? (
-                        <CustomChip label={alert.file.type} variant="outlined" size="small" />
+                <Typography className={classes.sectionTitle}>{t('metadata')}</Typography>
+                {alert &&
+                  Object.keys(alert.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
+                    .length !== 0 && (
+                    <Button
+                      size="small"
+                      onClick={() => setMetaOpen(!metaOpen)}
+                      style={{ color: theme.palette.text.secondary }}
+                    >
+                      {!metaOpen ? (
+                        <>
+                          {t('more')}
+                          <KeyboardArrowDownIcon style={{ marginLeft: theme.spacing(1) }} />
+                        </>
                       ) : (
-                        <ChipSkeletonInline />
+                        <>
+                          {t('less')}
+                          <KeyboardArrowUpIcon style={{ marginLeft: theme.spacing(1) }} />
+                        </>
                       )}
-                    </div>
-                    <Typography variant="caption" component={Box}>
-                      {alert ? `${alert.file.size} (${(alert.file.size / 1024).toFixed(2)} Kb)` : <SkeletonInline />}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={3} sm={2}>
-                    <BsClipboard
-                      className={classes.clipboardIcon}
-                      onClick={alert ? () => copy(alert.file.md5, 'drawerTop') : null}
-                    />
-                    <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
-                      MD5:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
-                    {alert ? (
-                      <ActionableText
-                        category="hash"
-                        type="md5"
-                        value={alert.file.md5}
-                        classification={alert.classification}
-                      />
-                    ) : (
-                      <SkeletonInline />
-                    )}
-                  </Grid>
-                  <Grid item xs={3} sm={2}>
-                    <BsClipboard
-                      className={classes.clipboardIcon}
-                      onClick={alert ? () => copy(alert.file.sha1, 'drawerTop') : null}
-                    />
-                    <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
-                      SHA1:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
-                    {alert ? (
-                      <ActionableText
-                        category="hash"
-                        type="sha1"
-                        value={alert.file.sha1}
-                        classification={alert.classification}
-                      />
-                    ) : (
-                      <SkeletonInline />
-                    )}
-                  </Grid>
-                  <Grid item xs={3} sm={2}>
-                    <BsClipboard
-                      className={classes.clipboardIcon}
-                      onClick={alert ? () => copy(alert.file.sha256, 'drawerTop') : null}
-                    />
-                    <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
-                      SHA256:
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
-                    {alert ? (
-                      <ActionableText
-                        category="hash"
-                        type="sha256"
-                        value={alert.file.sha256}
-                        classification={alert.classification}
-                      />
-                    ) : (
-                      <SkeletonInline />
-                    )}
-                  </Grid>
-                </Grid>
-                {alert && alert.file.screenshots && <ImageInline data={alert.file.screenshots} size="small" />}
+                    </Button>
+                  )}
               </div>
-            </div>
-
-            {/* Metadata Section */}
-            {!alert || (alert.metadata && Object.keys(alert.metadata).length > 0) ? (
-              <div className={classes.section}>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    justifyContent: 'space-between'
-                  }}
-                >
-                  <Typography className={classes.sectionTitle}>{t('metadata')}</Typography>
+              <Divider />
+              <div className={classes.sectionContent}>
+                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                  {alert ? (
+                    Object.keys(alert.metadata)
+                      .filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
+                      .map(k => (
+                        <Grid container spacing={1} key={`alert-metadata-${k}`}>
+                          <Grid
+                            item
+                            xs={3}
+                            sm={2}
+                            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                          >
+                            {k}
+                          </Grid>
+                          <Grid item xs={9} sm={10}>
+                            <ActionableText
+                              category="metadata"
+                              type={k}
+                              value={alert.metadata[k]}
+                              classification={alert.classification}
+                            />
+                          </Grid>
+                        </Grid>
+                      ))
+                  ) : (
+                    <>
+                      <Skeleton />
+                      <Skeleton />
+                      <Skeleton />
+                    </>
+                  )}
                   {alert &&
                     Object.keys(alert.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
                       .length !== 0 && (
-                      <Button
-                        size="small"
-                        onClick={() => setMetaOpen(!metaOpen)}
-                        style={{ color: theme.palette.text.secondary }}
-                      >
-                        {!metaOpen ? (
-                          <>
-                            {t('more')}
-                            <KeyboardArrowDownIcon style={{ marginLeft: theme.spacing(1) }} />
-                          </>
+                      <Collapse in={metaOpen} timeout="auto" style={{ marginTop: theme.spacing(0.5) }}>
+                        {alert ? (
+                          Object.keys(alert.metadata)
+                            .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
+                            .map(k => (
+                              <Grid container spacing={1} key={`alert-metadata-${k}`}>
+                                <Grid
+                                  item
+                                  xs={3}
+                                  sm={2}
+                                  style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                                >
+                                  {k}
+                                </Grid>
+                                <Grid item xs={9} sm={10}>
+                                  <ActionableText
+                                    category="metadata"
+                                    type={k}
+                                    value={alert.metadata[k]}
+                                    classification={alert.classification}
+                                  />
+                                </Grid>
+                              </Grid>
+                            ))
                         ) : (
                           <>
-                            {t('less')}
-                            <KeyboardArrowUpIcon style={{ marginLeft: theme.spacing(1) }} />
+                            <Skeleton />
+                            <Skeleton />
+                            <Skeleton />
                           </>
                         )}
-                      </Button>
+                      </Collapse>
                     )}
-                </div>
-                <Divider />
-                <div className={classes.sectionContent}>
-                  <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                    {alert ? (
-                      Object.keys(alert.metadata)
-                        .filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
-                        .map(k => (
-                          <Grid container spacing={1} key={`alert-metadata-${k}`}>
-                            <Grid
-                              item
-                              xs={3}
-                              sm={2}
-                              style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                            >
-                              {k}
-                            </Grid>
-                            <Grid item xs={9} sm={10}>
-                              <ActionableText
-                                category="metadata"
-                                type={k}
-                                value={alert.metadata[k]}
-                                classification={alert.classification}
-                              />
-                            </Grid>
-                          </Grid>
-                        ))
-                    ) : (
-                      <>
-                        <Skeleton />
-                        <Skeleton />
-                        <Skeleton />
-                      </>
-                    )}
-                    {alert &&
-                      Object.keys(alert.metadata).filter(
-                        k => configuration.ui.alerting_meta.important.indexOf(k) === -1
-                      ).length !== 0 && (
-                        <Collapse in={metaOpen} timeout="auto" style={{ marginTop: theme.spacing(0.5) }}>
-                          {alert ? (
-                            Object.keys(alert.metadata)
-                              .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
-                              .map(k => (
-                                <Grid container spacing={1} key={`alert-metadata-${k}`}>
-                                  <Grid
-                                    item
-                                    xs={3}
-                                    sm={2}
-                                    style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                                  >
-                                    {k}
-                                  </Grid>
-                                  <Grid item xs={9} sm={10}>
-                                    <ActionableText
-                                      category="metadata"
-                                      type={k}
-                                      value={alert.metadata[k]}
-                                      classification={alert.classification}
-                                    />
-                                  </Grid>
-                                </Grid>
-                              ))
-                          ) : (
-                            <>
-                              <Skeleton />
-                              <Skeleton />
-                              <Skeleton />
-                            </>
-                          )}
-                        </Collapse>
-                      )}
-                  </pre>
-                </div>
+                </pre>
               </div>
-            ) : null}
+            </div>
+          ) : null}
 
-            {(!alert ||
-              alert.al.attrib.length !== 0 ||
-              alert.al.av.length !== 0 ||
-              alert.al.ip.length !== 0 ||
-              alert.al.domain.length !== 0 ||
-              (alert.al.uri && alert.al.uri.length !== 0) ||
-              alert.attack.category.length !== 0 ||
-              (alert.heuristic && alert.heuristic.name && alert.heuristic.name.length !== 0) ||
-              alert.al.behavior.length !== 0 ||
-              alert.al.yara.length !== 0) && (
-              <>
-                <Typography className={classes.sectionTitle}>{t('al_results')}</Typography>
-                <Divider />
-                <Grid container spacing={1} style={{ marginTop: theme.spacing(1) }}>
-                  {/* AL Attributions Section */}
-                  {!alert || alert.al.attrib.length !== 0 ? (
-                    <>
-                      <Grid item xs={3} sm={2}>
-                        {t('attributions')}
-                      </Grid>
-                      <Grid item xs={9} sm={10}>
-                        <div className={classes.sectionContent}>
-                          {alert && alert.al.detailed ? (
-                            <AutoHideChipList
-                              items={alert.al.detailed.attrib}
-                              defaultClassification={alert.classification}
-                            />
-                          ) : (
-                            <ActionableChipList
-                              items={
-                                alert
-                                  ? alert.al.attrib.map(label => ({
-                                      label,
-                                      variant: 'outlined',
-                                      classification: alert.classification
-                                    }))
-                                  : null
-                              }
-                            />
-                          )}
-                        </div>
-                      </Grid>
-                    </>
-                  ) : null}
+          {(!alert ||
+            alert.al.attrib.length !== 0 ||
+            alert.al.av.length !== 0 ||
+            alert.al.ip.length !== 0 ||
+            alert.al.domain.length !== 0 ||
+            (alert.al.uri && alert.al.uri.length !== 0) ||
+            alert.attack.category.length !== 0 ||
+            (alert.heuristic && alert.heuristic.name && alert.heuristic.name.length !== 0) ||
+            alert.al.behavior.length !== 0 ||
+            alert.al.yara.length !== 0) && (
+            <>
+              <Typography className={classes.sectionTitle}>{t('al_results')}</Typography>
+              <Divider />
+              <Grid container spacing={1} style={{ marginTop: theme.spacing(1) }}>
+                {/* AL Attributions Section */}
+                {!alert || alert.al.attrib.length !== 0 ? (
+                  <>
+                    <Grid item xs={3} sm={2}>
+                      {t('attributions')}
+                    </Grid>
+                    <Grid item xs={9} sm={10}>
+                      <div className={classes.sectionContent}>
+                        {alert && alert.al.detailed ? (
+                          <AutoHideChipList
+                            items={alert.al.detailed.attrib}
+                            defaultClassification={alert.classification}
+                          />
+                        ) : (
+                          <ActionableChipList
+                            items={
+                              alert
+                                ? alert.al.attrib.map(label => ({
+                                    label,
+                                    variant: 'outlined',
+                                    classification: alert.classification
+                                  }))
+                                : null
+                            }
+                          />
+                        )}
+                      </div>
+                    </Grid>
+                  </>
+                ) : null}
 
-                  {/* AL AV Hits */}
-                  {!alert || alert.al.av.length !== 0 ? (
-                    <>
-                      <Grid item xs={3} sm={2}>
-                        {t('avhits')}
-                      </Grid>
-                      <Grid item xs={9} sm={10}>
-                        <div className={classes.sectionContent}>
-                          {alert && alert.al.detailed ? (
-                            <AutoHideChipList
-                              items={alert.al.detailed.av}
-                              type="av.virus_name"
-                              defaultClassification={alert.classification}
-                            />
-                          ) : (
-                            <ActionableChipList
-                              items={
-                                alert
-                                  ? alert.al.av.map(label => ({
-                                      label,
-                                      variant: 'outlined',
-                                      classification: alert.classification
-                                    }))
-                                  : null
-                              }
-                            />
-                          )}
-                        </div>
-                      </Grid>
-                    </>
-                  ) : null}
+                {/* AL AV Hits */}
+                {!alert || alert.al.av.length !== 0 ? (
+                  <>
+                    <Grid item xs={3} sm={2}>
+                      {t('avhits')}
+                    </Grid>
+                    <Grid item xs={9} sm={10}>
+                      <div className={classes.sectionContent}>
+                        {alert && alert.al.detailed ? (
+                          <AutoHideChipList
+                            items={alert.al.detailed.av}
+                            type="av.virus_name"
+                            defaultClassification={alert.classification}
+                          />
+                        ) : (
+                          <ActionableChipList
+                            items={
+                              alert
+                                ? alert.al.av.map(label => ({
+                                    label,
+                                    variant: 'outlined',
+                                    classification: alert.classification
+                                  }))
+                                : null
+                            }
+                          />
+                        )}
+                      </div>
+                    </Grid>
+                  </>
+                ) : null}
 
-                  {/* IPs sections */}
-                  {!alert || alert.al.ip.length !== 0 ? (
-                    <>
-                      <Grid item xs={3} sm={2}>
-                        {t('ip')}
-                      </Grid>
-                      <Grid item xs={9} sm={10}>
-                        <div className={classes.sectionContent}>
-                          <Grid container spacing={1}>
-                            {(!alert || alert.al.ip_dynamic.length !== 0) && (
-                              <Grid item xs={12} md={!alert || alert.al.ip_static.length !== 0 ? 6 : 12}>
-                                <Typography variant="caption" component={'div'}>
-                                  <i>{t('ip_dynamic')}</i>
-                                </Typography>
-                                {alert && alert.al.detailed ? (
-                                  <AutoHideChipList
-                                    items={alert.al.detailed.ip.filter(ip => ip.type === 'network.dynamic.ip')}
-                                    type="network.dynamic.ip"
-                                    defaultClassification={alert.classification}
-                                  />
-                                ) : (
-                                  <ActionableChipList
-                                    items={
-                                      alert
-                                        ? alert.al.ip_dynamic.map(label => ({
-                                            label,
-                                            variant: 'outlined',
-                                            classification: alert.classification
-                                          }))
-                                        : null
-                                    }
-                                  />
-                                )}
-                              </Grid>
-                            )}
-                            {(!alert || alert.al.ip_static.length !== 0) && (
-                              <Grid item xs={12} md={!alert || alert.al.ip_dynamic.length !== 0 ? 6 : 12}>
-                                <Typography variant="caption" component={'div'}>
-                                  <i>{t('ip_static')}</i>
-                                </Typography>
-                                {alert && alert.al.detailed ? (
-                                  <AutoHideChipList
-                                    items={alert.al.detailed.ip.filter(ip => ip.type === 'network.static.ip')}
-                                    type="network.static.ip"
-                                    defaultClassification={alert.classification}
-                                  />
-                                ) : (
-                                  <ActionableChipList
-                                    items={
-                                      alert
-                                        ? alert.al.ip_static.map(label => ({
-                                            label,
-                                            variant: 'outlined',
-                                            classification: alert.classification
-                                          }))
-                                        : null
-                                    }
-                                  />
-                                )}
-                              </Grid>
-                            )}
-                          </Grid>
-                        </div>
-                      </Grid>
-                    </>
-                  ) : null}
-
-                  {/* Domains sections */}
-                  {!alert || alert.al.domain.length !== 0 ? (
-                    <>
-                      <Grid item xs={3} sm={2}>
-                        {t('domain')}
-                      </Grid>
-                      <Grid item xs={9} sm={10}>
-                        <div className={classes.sectionContent}>
-                          <Grid container spacing={1}>
-                            {(!alert || alert.al.domain_dynamic.length !== 0) && (
-                              <Grid item xs={12} md={!alert || alert.al.domain_static.length !== 0 ? 6 : 12}>
-                                <Typography variant="caption" component={'div'}>
-                                  <i>{t('domain_dynamic')}</i>
-                                </Typography>
-                                {alert && alert.al.detailed ? (
-                                  <AutoHideChipList
-                                    items={alert.al.detailed.domain.filter(
-                                      domain => domain.type === 'network.dynamic.domain'
-                                    )}
-                                    type="network.dynamic.domain"
-                                    defaultClassification={alert.classification}
-                                  />
-                                ) : (
-                                  <ActionableChipList
-                                    items={
-                                      alert
-                                        ? alert.al.domain_dynamic.map(label => ({
-                                            label,
-                                            variant: 'outlined',
-                                            classification: alert.classification
-                                          }))
-                                        : null
-                                    }
-                                  />
-                                )}
-                              </Grid>
-                            )}
-                            {(!alert || alert.al.domain_static.length !== 0) && (
-                              <Grid item xs={12} md={!alert || alert.al.domain_dynamic.length !== 0 ? 6 : 12}>
-                                <Typography variant="caption" component={'div'}>
-                                  <i>{t('domain_static')}</i>
-                                </Typography>
-                                {alert && alert.al.detailed ? (
-                                  <AutoHideChipList
-                                    items={alert.al.detailed.domain.filter(
-                                      domain => domain.type === 'network.static.domain'
-                                    )}
-                                    type="network.static.domain"
-                                    defaultClassification={alert.classification}
-                                  />
-                                ) : (
-                                  <ActionableChipList
-                                    items={
-                                      alert
-                                        ? alert.al.domain_static.map(label => ({
-                                            label,
-                                            variant: 'outlined',
-                                            classification: alert.classification
-                                          }))
-                                        : null
-                                    }
-                                  />
-                                )}
-                              </Grid>
-                            )}
-                          </Grid>
-                        </div>
-                      </Grid>
-                    </>
-                  ) : null}
-
-                  {/* uri sections */}
-                  {!alert || (alert.al.uri && alert.al.uri.length !== 0) ? (
-                    <>
-                      <Grid item xs={3} sm={2}>
-                        {t('uri')}
-                      </Grid>
-                      <Grid item xs={9} sm={10}>
-                        <div className={classes.sectionContent}>
-                          <Grid container spacing={1}>
-                            {(!alert || alert.al.uri_dynamic.length !== 0) && (
-                              <Grid item xs={12} md={!alert || alert.al.uri_static.length !== 0 ? 6 : 12}>
-                                <Typography variant="caption" component={'div'}>
-                                  <i>{t('uri_dynamic')}</i>
-                                </Typography>
-                                {alert && alert.al.detailed ? (
-                                  <AutoHideChipList
-                                    items={alert.al.detailed.uri.filter(uri => uri.type === 'network.dynamic.uri')}
-                                    type="network.dynamic.uri"
-                                    defaultClassification={alert.classification}
-                                  />
-                                ) : (
-                                  <ActionableChipList
-                                    items={
-                                      alert
-                                        ? alert.al.uri_dynamic.map(label => ({
-                                            label,
-                                            variant: 'outlined',
-                                            classification: alert.classification
-                                          }))
-                                        : null
-                                    }
-                                  />
-                                )}
-                              </Grid>
-                            )}
-                            {(!alert || alert.al.uri_static.length !== 0) && (
-                              <Grid item xs={12} md={!alert || alert.al.uri_dynamic.length !== 0 ? 6 : 12}>
-                                <Typography variant="caption" component={'div'}>
-                                  <i>{t('uri_static')}</i>
-                                </Typography>
-                                {alert && alert.al.detailed ? (
-                                  <AutoHideChipList
-                                    items={alert.al.detailed.uri.filter(uri => uri.type === 'network.static.uri')}
-                                    type="network.static.uri"
-                                    defaultClassification={alert.classification}
-                                  />
-                                ) : (
-                                  <ActionableChipList
-                                    items={
-                                      alert
-                                        ? alert.al.uri_static.map(label => ({
-                                            label,
-                                            variant: 'outlined',
-                                            classification: alert.classification
-                                          }))
-                                        : null
-                                    }
-                                  />
-                                )}
-                              </Grid>
-                            )}
-                          </Grid>
-                        </div>
-                      </Grid>
-                    </>
-                  ) : null}
-
-                  {/* Heuristics Section */}
-                  {!alert || (alert.heuristic && alert.heuristic.name && alert.heuristic.name.length !== 0) ? (
-                    <>
-                      <Grid item xs={3} sm={2}>
-                        {t('heuristic')}
-                      </Grid>
-                      <Grid item xs={9} sm={10}>
-                        <div className={classes.sectionContent}>
-                          {alert && alert.al.detailed ? (
-                            <AutoHideChipList
-                              items={alert.al.detailed.heuristic}
-                              defaultClassification={alert.classification}
-                            />
-                          ) : (
-                            <ActionableChipList
-                              items={
-                                alert
-                                  ? alert.heuristic.name.map(label => ({
-                                      label,
-                                      variant: 'outlined',
-                                      classification: alert.classification
-                                    }))
-                                  : null
-                              }
-                            />
-                          )}
-                        </div>
-                      </Grid>
-                    </>
-                  ) : null}
-
-                  {/* AL Behaviours Section */}
-                  {!alert || alert.al.behavior.length !== 0 ? (
-                    <>
-                      <Grid item xs={3} sm={2}>
-                        {t('behaviors')}
-                      </Grid>
-                      <Grid item xs={9} sm={10}>
-                        <div className={classes.sectionContent}>
-                          {alert && alert.al.detailed ? (
-                            <AutoHideChipList
-                              items={alert.al.detailed.behavior}
-                              type="file.behavior"
-                              defaultClassification={alert.classification}
-                            />
-                          ) : (
-                            <ActionableChipList
-                              items={
-                                alert
-                                  ? alert.al.behavior.map(label => ({
-                                      label,
-                                      variant: 'outlined',
-                                      classification: alert.classification
-                                    }))
-                                  : null
-                              }
-                            />
-                          )}
-                        </div>
-                      </Grid>
-                    </>
-                  ) : null}
-
-                  {/* YARA Hits */}
-                  {!alert || alert.al.yara.length !== 0 ? (
-                    <>
-                      <Grid item xs={3} sm={2}>
-                        {t('yara')}
-                      </Grid>
-                      <Grid item xs={9} sm={10}>
-                        <div className={classes.sectionContent}>
-                          {alert && alert.al.detailed ? (
-                            <AutoHideChipList
-                              items={alert.al.detailed.yara}
-                              type="file.rule.yara"
-                              defaultClassification={alert.classification}
-                            />
-                          ) : (
-                            <ActionableChipList
-                              items={
-                                alert
-                                  ? alert.al.yara.map(label => ({
-                                      label,
-                                      variant: 'outlined',
-                                      classification: alert.classification
-                                    }))
-                                  : null
-                              }
-                            />
-                          )}
-                        </div>
-                      </Grid>
-                    </>
-                  ) : null}
-
-                  {/* Attack Section */}
-                  {!alert || alert.attack.category.length !== 0 ? (
-                    <>
-                      <Grid item xs={3} sm={2}>
-                        {t('attack')}
-                      </Grid>
-                      <Grid item xs={9} sm={10}>
-                        <div className={classes.sectionContent}>
-                          <Grid container spacing={1}>
-                            <Grid item xs={12} md={6}>
-                              <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component={'div'}>
-                                <i>{t('attack_category')}</i>
+                {/* IPs sections */}
+                {!alert || alert.al.ip.length !== 0 ? (
+                  <>
+                    <Grid item xs={3} sm={2}>
+                      {t('ip')}
+                    </Grid>
+                    <Grid item xs={9} sm={10}>
+                      <div className={classes.sectionContent}>
+                        <Grid container spacing={1}>
+                          {(!alert || alert.al.ip_dynamic.length !== 0) && (
+                            <Grid item xs={12} md={!alert || alert.al.ip_static.length !== 0 ? 6 : 12}>
+                              <Typography variant="caption" component={'div'}>
+                                <i>{t('ip_dynamic')}</i>
                               </Typography>
                               {alert && alert.al.detailed ? (
                                 <AutoHideChipList
-                                  items={alert.al.detailed.attack_category}
+                                  items={alert.al.detailed.ip.filter(ip => ip.type === 'network.dynamic.ip')}
+                                  type="network.dynamic.ip"
                                   defaultClassification={alert.classification}
                                 />
                               ) : (
                                 <ActionableChipList
                                   items={
                                     alert
-                                      ? alert.attack.category.map(label => ({
+                                      ? alert.al.ip_dynamic.map(label => ({
                                           label,
                                           variant: 'outlined',
                                           classification: alert.classification
@@ -963,20 +662,23 @@ const WrappedAlertDetail = ({ id: propId = null, alert: propAlert = null, inDraw
                                 />
                               )}
                             </Grid>
-                            <Grid item xs={12} md={6}>
-                              <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component={'div'}>
-                                <i>{t('attack_pattern')}</i>
+                          )}
+                          {(!alert || alert.al.ip_static.length !== 0) && (
+                            <Grid item xs={12} md={!alert || alert.al.ip_dynamic.length !== 0 ? 6 : 12}>
+                              <Typography variant="caption" component={'div'}>
+                                <i>{t('ip_static')}</i>
                               </Typography>
                               {alert && alert.al.detailed ? (
                                 <AutoHideChipList
-                                  items={alert.al.detailed.attack_pattern}
+                                  items={alert.al.detailed.ip.filter(ip => ip.type === 'network.static.ip')}
+                                  type="network.static.ip"
                                   defaultClassification={alert.classification}
                                 />
                               ) : (
                                 <ActionableChipList
                                   items={
                                     alert
-                                      ? alert.attack.pattern.map(label => ({
+                                      ? alert.al.ip_static.map(label => ({
                                           label,
                                           variant: 'outlined',
                                           classification: alert.classification
@@ -986,18 +688,312 @@ const WrappedAlertDetail = ({ id: propId = null, alert: propAlert = null, inDraw
                                 />
                               )}
                             </Grid>
+                          )}
+                        </Grid>
+                      </div>
+                    </Grid>
+                  </>
+                ) : null}
+
+                {/* Domains sections */}
+                {!alert || alert.al.domain.length !== 0 ? (
+                  <>
+                    <Grid item xs={3} sm={2}>
+                      {t('domain')}
+                    </Grid>
+                    <Grid item xs={9} sm={10}>
+                      <div className={classes.sectionContent}>
+                        <Grid container spacing={1}>
+                          {(!alert || alert.al.domain_dynamic.length !== 0) && (
+                            <Grid item xs={12} md={!alert || alert.al.domain_static.length !== 0 ? 6 : 12}>
+                              <Typography variant="caption" component={'div'}>
+                                <i>{t('domain_dynamic')}</i>
+                              </Typography>
+                              {alert && alert.al.detailed ? (
+                                <AutoHideChipList
+                                  items={alert.al.detailed.domain.filter(
+                                    domain => domain.type === 'network.dynamic.domain'
+                                  )}
+                                  type="network.dynamic.domain"
+                                  defaultClassification={alert.classification}
+                                />
+                              ) : (
+                                <ActionableChipList
+                                  items={
+                                    alert
+                                      ? alert.al.domain_dynamic.map(label => ({
+                                          label,
+                                          variant: 'outlined',
+                                          classification: alert.classification
+                                        }))
+                                      : null
+                                  }
+                                />
+                              )}
+                            </Grid>
+                          )}
+                          {(!alert || alert.al.domain_static.length !== 0) && (
+                            <Grid item xs={12} md={!alert || alert.al.domain_dynamic.length !== 0 ? 6 : 12}>
+                              <Typography variant="caption" component={'div'}>
+                                <i>{t('domain_static')}</i>
+                              </Typography>
+                              {alert && alert.al.detailed ? (
+                                <AutoHideChipList
+                                  items={alert.al.detailed.domain.filter(
+                                    domain => domain.type === 'network.static.domain'
+                                  )}
+                                  type="network.static.domain"
+                                  defaultClassification={alert.classification}
+                                />
+                              ) : (
+                                <ActionableChipList
+                                  items={
+                                    alert
+                                      ? alert.al.domain_static.map(label => ({
+                                          label,
+                                          variant: 'outlined',
+                                          classification: alert.classification
+                                        }))
+                                      : null
+                                  }
+                                />
+                              )}
+                            </Grid>
+                          )}
+                        </Grid>
+                      </div>
+                    </Grid>
+                  </>
+                ) : null}
+
+                {/* uri sections */}
+                {!alert || (alert.al.uri && alert.al.uri.length !== 0) ? (
+                  <>
+                    <Grid item xs={3} sm={2}>
+                      {t('uri')}
+                    </Grid>
+                    <Grid item xs={9} sm={10}>
+                      <div className={classes.sectionContent}>
+                        <Grid container spacing={1}>
+                          {(!alert || alert.al.uri_dynamic.length !== 0) && (
+                            <Grid item xs={12} md={!alert || alert.al.uri_static.length !== 0 ? 6 : 12}>
+                              <Typography variant="caption" component={'div'}>
+                                <i>{t('uri_dynamic')}</i>
+                              </Typography>
+                              {alert && alert.al.detailed ? (
+                                <AutoHideChipList
+                                  items={alert.al.detailed.uri.filter(uri => uri.type === 'network.dynamic.uri')}
+                                  type="network.dynamic.uri"
+                                  defaultClassification={alert.classification}
+                                />
+                              ) : (
+                                <ActionableChipList
+                                  items={
+                                    alert
+                                      ? alert.al.uri_dynamic.map(label => ({
+                                          label,
+                                          variant: 'outlined',
+                                          classification: alert.classification
+                                        }))
+                                      : null
+                                  }
+                                />
+                              )}
+                            </Grid>
+                          )}
+                          {(!alert || alert.al.uri_static.length !== 0) && (
+                            <Grid item xs={12} md={!alert || alert.al.uri_dynamic.length !== 0 ? 6 : 12}>
+                              <Typography variant="caption" component={'div'}>
+                                <i>{t('uri_static')}</i>
+                              </Typography>
+                              {alert && alert.al.detailed ? (
+                                <AutoHideChipList
+                                  items={alert.al.detailed.uri.filter(uri => uri.type === 'network.static.uri')}
+                                  type="network.static.uri"
+                                  defaultClassification={alert.classification}
+                                />
+                              ) : (
+                                <ActionableChipList
+                                  items={
+                                    alert
+                                      ? alert.al.uri_static.map(label => ({
+                                          label,
+                                          variant: 'outlined',
+                                          classification: alert.classification
+                                        }))
+                                      : null
+                                  }
+                                />
+                              )}
+                            </Grid>
+                          )}
+                        </Grid>
+                      </div>
+                    </Grid>
+                  </>
+                ) : null}
+
+                {/* Heuristics Section */}
+                {!alert || (alert.heuristic && alert.heuristic.name && alert.heuristic.name.length !== 0) ? (
+                  <>
+                    <Grid item xs={3} sm={2}>
+                      {t('heuristic')}
+                    </Grid>
+                    <Grid item xs={9} sm={10}>
+                      <div className={classes.sectionContent}>
+                        {alert && alert.al.detailed ? (
+                          <AutoHideChipList
+                            items={alert.al.detailed.heuristic}
+                            defaultClassification={alert.classification}
+                          />
+                        ) : (
+                          <ActionableChipList
+                            items={
+                              alert
+                                ? alert.heuristic.name.map(label => ({
+                                    label,
+                                    variant: 'outlined',
+                                    classification: alert.classification
+                                  }))
+                                : null
+                            }
+                          />
+                        )}
+                      </div>
+                    </Grid>
+                  </>
+                ) : null}
+
+                {/* AL Behaviours Section */}
+                {!alert || alert.al.behavior.length !== 0 ? (
+                  <>
+                    <Grid item xs={3} sm={2}>
+                      {t('behaviors')}
+                    </Grid>
+                    <Grid item xs={9} sm={10}>
+                      <div className={classes.sectionContent}>
+                        {alert && alert.al.detailed ? (
+                          <AutoHideChipList
+                            items={alert.al.detailed.behavior}
+                            type="file.behavior"
+                            defaultClassification={alert.classification}
+                          />
+                        ) : (
+                          <ActionableChipList
+                            items={
+                              alert
+                                ? alert.al.behavior.map(label => ({
+                                    label,
+                                    variant: 'outlined',
+                                    classification: alert.classification
+                                  }))
+                                : null
+                            }
+                          />
+                        )}
+                      </div>
+                    </Grid>
+                  </>
+                ) : null}
+
+                {/* YARA Hits */}
+                {!alert || alert.al.yara.length !== 0 ? (
+                  <>
+                    <Grid item xs={3} sm={2}>
+                      {t('yara')}
+                    </Grid>
+                    <Grid item xs={9} sm={10}>
+                      <div className={classes.sectionContent}>
+                        {alert && alert.al.detailed ? (
+                          <AutoHideChipList
+                            items={alert.al.detailed.yara}
+                            type="file.rule.yara"
+                            defaultClassification={alert.classification}
+                          />
+                        ) : (
+                          <ActionableChipList
+                            items={
+                              alert
+                                ? alert.al.yara.map(label => ({
+                                    label,
+                                    variant: 'outlined',
+                                    classification: alert.classification
+                                  }))
+                                : null
+                            }
+                          />
+                        )}
+                      </div>
+                    </Grid>
+                  </>
+                ) : null}
+
+                {/* Attack Section */}
+                {!alert || alert.attack.category.length !== 0 ? (
+                  <>
+                    <Grid item xs={3} sm={2}>
+                      {t('attack')}
+                    </Grid>
+                    <Grid item xs={9} sm={10}>
+                      <div className={classes.sectionContent}>
+                        <Grid container spacing={1}>
+                          <Grid item xs={12} md={6}>
+                            <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component={'div'}>
+                              <i>{t('attack_category')}</i>
+                            </Typography>
+                            {alert && alert.al.detailed ? (
+                              <AutoHideChipList
+                                items={alert.al.detailed.attack_category}
+                                defaultClassification={alert.classification}
+                              />
+                            ) : (
+                              <ActionableChipList
+                                items={
+                                  alert
+                                    ? alert.attack.category.map(label => ({
+                                        label,
+                                        variant: 'outlined',
+                                        classification: alert.classification
+                                      }))
+                                    : null
+                                }
+                              />
+                            )}
                           </Grid>
-                        </div>
-                      </Grid>
-                    </>
-                  ) : null}
-                </Grid>
-              </>
-            )}
-          </div>
-        </PageFullWidth>
-      </Wrapper>
-    </AlertsProvider>
+                          <Grid item xs={12} md={6}>
+                            <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component={'div'}>
+                              <i>{t('attack_pattern')}</i>
+                            </Typography>
+                            {alert && alert.al.detailed ? (
+                              <AutoHideChipList
+                                items={alert.al.detailed.attack_pattern}
+                                defaultClassification={alert.classification}
+                              />
+                            ) : (
+                              <ActionableChipList
+                                items={
+                                  alert
+                                    ? alert.attack.pattern.map(label => ({
+                                        label,
+                                        variant: 'outlined',
+                                        classification: alert.classification
+                                      }))
+                                    : null
+                                }
+                              />
+                            )}
+                          </Grid>
+                        </Grid>
+                      </div>
+                    </Grid>
+                  </>
+                ) : null}
+              </Grid>
+            </>
+          )}
+        </div>
+      </PageFullWidth>
+    </Wrapper>
   ) : (
     <ForbiddenPage />
   );
