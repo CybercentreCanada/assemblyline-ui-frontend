@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
   // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
   const env = loadEnv(mode, process.cwd(), '');
 
-  const eslintPlugin = false
+  const eslintPlugin = env.NODE_ENV === 'production'
     ? []
     : [
         {
