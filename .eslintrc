@@ -1,5 +1,11 @@
 {
-  "extends": ["airbnb-typescript", "prettier", "eslint:recommended", "plugin:react/recommended"],
+  "extends": [
+    "airbnb-typescript",
+    "prettier",
+    "eslint:recommended",
+    "plugin:import/recommended",
+    "plugin:react/recommended"
+  ],
   "parser": "@typescript-eslint/parser",
   "ignorePatterns": ["vite.config.mts"],
   "parserOptions": {
@@ -21,30 +27,34 @@
     }
   },
   "rules": {
-    "@typescript-eslint/no-unused-vars": "warn",
-    "@typescript-eslint/space-before-function-paren": "off",
+    "@typescript-eslint/consistent-type-imports": "warn",
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/naming-convention": [
       "error",
       // Allow camelCase variables (23.2), PascalCase variables (23.8), and UPPER_CASE variables (23.10)
       {
-        "selector": "variable",
         "format": ["camelCase", "PascalCase", "UPPER_CASE"],
-        "leadingUnderscore": "allow"
+        "leadingUnderscore": "allow",
+        "selector": "variable"
       },
       // Allow camelCase functions (23.2), and PascalCase functions (23.8)
       {
-        "selector": "function",
         "format": ["camelCase", "PascalCase"],
-        "leadingUnderscore": "allow"
+        "leadingUnderscore": "allow",
+        "selector": "function"
       },
       // Airbnb recommends PascalCase for classes (23.3), and although Airbnb does not make TypeScript recommendations, we are assuming this rule would similarly apply to anything "type like", including interfaces, type aliases, and enums
       {
-        "selector": "typeLike",
-        "format": ["PascalCase"]
+        "format": ["PascalCase"],
+        "selector": "typeLike"
       }
     ],
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/space-before-function-paren": "off",
     "arrow-parens": ["error", "as-needed"],
+    "import/imports-first": ["error", "absolute-first"],
+    "import/newline-after-import": "error",
+    "import/no-cycle": "off",
     "import/no-extraneous-dependencies": [
       "error",
       {
@@ -52,17 +62,14 @@
         "packageDir": "./"
       }
     ],
-    "import/imports-first": ["error", "absolute-first"],
-    "import/newline-after-import": "error",
-    "import/no-cycle": "off",
-    "import/no-named-as-default": 0,
-    "import/prefer-default-export": 0,
+    "import/no-named-as-default": "off",
+    "import/prefer-default-export": "off",
     "jsx-a11y/anchor-is-valid": [
       "error",
       {
+        "aspects": ["noHref", "invalidHref", "preferButton"],
         "components": ["Link"],
-        "specialLink": ["to", "hrefLeft", "hrefRight"],
-        "aspects": ["noHref", "invalidHref", "preferButton"]
+        "specialLink": ["to", "hrefLeft", "hrefRight"]
       }
     ],
     "jsx-a11y/control-has-associated-label": "off",
@@ -72,9 +79,9 @@
       "off",
       {
         "code": 120,
+        "ignoreComments": true,
         "ignoreRegExpLiterals": true,
-        "tabWidth": 2,
-        "ignoreComments": true
+        "tabWidth": 2
       }
     ],
     "no-async-promise-executor": "off",
@@ -86,25 +93,30 @@
     "no-underscore-dangle": "off",
     "no-unused-vars": "warn",
     "radix": "off",
-    "react/display-name": 1,
+    "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
+    "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
+    "react/display-name": "warn",
+    "react/jsx-curly-newline": "off",
     "react/jsx-filename-extension": [
       1,
       {
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }
     ],
-    "react/jsx-curly-newline": "off",
-    "react/jsx-one-expression-per-line": ["off", { "allow": "literal" }],
+    "react/jsx-one-expression-per-line": [
+      "off",
+      {
+        "allow": "literal"
+      }
+    ],
     "react/jsx-props-no-spreading": "off",
+    "react/jsx-uses-react": "off",
     "react/jsx-wrap-multilines": "off",
     "react/no-array-index-key": "off",
+    "react/no-children-prop": "off",
     "react/prop-types": "off",
-    "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
-    "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
-    "semi": "error",
-    "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
-    "react/no-children-prop": 0
+    "semi": "error"
   },
   "globals": {
     "Blob": true,
