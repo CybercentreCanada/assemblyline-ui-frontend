@@ -569,9 +569,9 @@ describe('Test `getSubmitType`', () => {
   const configuration: ConfigurationDefinition = {
     submission: {
       file_sources: {
-        md5: { pattern: '^[a-f0-9]{32}$' },
-        sha1: { pattern: '^[a-f0-9]{40}$' },
-        sha256: { pattern: '^[a-f0-9]{64}$' }
+        md5: { pattern: '^[a-f0-9]{32}$', sources: [] },
+        sha1: { pattern: '^[a-f0-9]{40}$', sources: [] },
+        sha256: { pattern: '^[a-f0-9]{64}$', sources: [] }
       }
     }
   };
