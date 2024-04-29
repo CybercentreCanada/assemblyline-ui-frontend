@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { Box, Button, CircularProgress, Link, Theme, Typography, useTheme } from '@mui/material';
+import { Box, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     buttonProgress: {
       position: 'absolute',
@@ -66,11 +66,6 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   const [buttonLoading, setButtonLoading] = useState(false);
   const pwPadding = allowSignup ? 1 : 2;
 
-  function onSubmit(event) {
-    login(event.target[0]);
-    event.preventDefault();
-  }
-
   function reset(event) {
     if ((shownControls === 'oauth' && oAuthTokenID) || shownControls !== 'oauth') {
       setWebAuthNResponse(null);
@@ -85,16 +80,6 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
     if (event) {
       event.preventDefault();
     }
-  }
-
-  function resetPW(event) {
-    setShownControls('reset');
-    event.preventDefault();
-  }
-
-  function signup(event) {
-    setShownControls('signup');
-    event.preventDefault();
   }
 
   function login(focusTarget) {
@@ -143,6 +128,21 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
         window.location.reload();
       }
     });
+  }
+
+  function onSubmit(event) {
+    login(event.target[0]);
+    event.preventDefault();
+  }
+
+  function resetPW(event) {
+    setShownControls('reset');
+    event.preventDefault();
+  }
+
+  function signup(event) {
+    setShownControls('signup');
+    event.preventDefault();
   }
 
   useEffect(() => {

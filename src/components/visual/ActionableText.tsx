@@ -57,14 +57,16 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, clas
       {value ? (
         actionable ? (
           <>
-            <ActionMenu
-              category={category}
-              type={type}
-              value={value}
-              state={state}
-              setState={setState}
-              classification={classification}
-            />
+            {state !== initialMenuState && (
+              <ActionMenu
+                category={category}
+                type={type}
+                value={value}
+                state={state}
+                setState={setState}
+                classification={classification}
+              />
+            )}
             <MaterialLink className={classes.link} onClick={handleMenuClick} onContextMenu={handleMenuClick}>
               <div style={{ marginTop: '2px' }}>{value}</div>
               <ExternalLinks category={category} type={type} value={value} />

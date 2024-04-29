@@ -394,6 +394,7 @@ export function filterObject(obj: Object, callback) {
  */
 export function getSubmitType(input: string, configuration: ConfigurationDefinition): string | null {
   // If we're trying to auto-detect the input type, iterate over file sources
+  if (!input || input === undefined) return null;
   if (!configuration?.submission?.file_sources) return null;
 
   let detectedHashType = Object.entries(configuration.submission.file_sources).find(

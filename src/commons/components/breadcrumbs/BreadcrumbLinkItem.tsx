@@ -1,6 +1,7 @@
 import { Link, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppSitemap, { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
+import type { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
+import useAppSitemap from 'commons/components/app/hooks/useAppSitemap';
 import BreadcrumbIcon from 'commons/components/breadcrumbs/BreadcrumbIcon';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -10,7 +11,7 @@ type BreadcrumbLinkItemProps = {
   item: BreadcrumbItem;
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   link: {
     display: 'flex',
     alignItems: 'center',

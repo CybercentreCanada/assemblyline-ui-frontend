@@ -3,7 +3,7 @@ import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { AppLeftNavItem } from '../app/AppConfigs';
+import type { AppLeftNavItem } from '../app/AppConfigs';
 import useAppLeftNav from '../app/hooks/useAppLeftNav';
 import useAppUser from '../app/hooks/useAppUser';
 

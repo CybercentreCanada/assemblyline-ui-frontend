@@ -1,5 +1,5 @@
 import getXSRFCookie from 'helpers/xsrf';
-import { vi } from 'vitest';
+import { expect, vi } from 'vitest';
 
 describe('Test `getXSRFCookie`', () => {
   beforeEach(function () {

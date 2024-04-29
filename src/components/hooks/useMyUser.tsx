@@ -107,7 +107,6 @@ export type ConfigurationDefinition = {
         sources: string[];
       };
     };
-    sha256_sources: string[];
     verdicts: {
       info: number;
       suspicious: number;
@@ -123,9 +122,6 @@ export type ConfigurationDefinition = {
   ui: {
     ai: {
       enabled: boolean;
-      assistant: {
-        system_message: string;
-      };
     };
     alerting_meta: {
       important: string[];

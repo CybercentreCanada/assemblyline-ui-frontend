@@ -10,6 +10,7 @@ import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsAc
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import type { SelectChangeEvent } from '@mui/material';
 import {
   Badge,
   Button,
@@ -23,7 +24,6 @@ import {
   IconButton,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Skeleton,
   TextField,
   Tooltip,
@@ -383,6 +383,7 @@ const WrappedNotificationArea = () => {
 
               newNots = newNots.map(n => {
                 const _isNew = setIsNew(n);
+                // eslint-disable-next-line no-unsafe-optional-chaining
                 let tags = [...n?.tags];
                 if (isAdmin) {
                   const isNewService = getNewService(n, services2);
