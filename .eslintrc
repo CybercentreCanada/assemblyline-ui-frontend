@@ -1,5 +1,5 @@
 {
-  "extends": ["airbnb-typescript", "prettier", "plugin:import/recommended", "plugin:react/recommended"],
+  "extends": ["airbnb-typescript", "prettier", "eslint:recommended", "plugin:react/recommended"],
   "parser": "@typescript-eslint/parser",
   "ignorePatterns": ["vite.config.mts"],
   "parserOptions": {
@@ -21,6 +21,7 @@
     }
   },
   "rules": {
+    "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/space-before-function-paren": "off",
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/naming-convention": [
@@ -44,7 +45,13 @@
       }
     ],
     "arrow-parens": ["error", "as-needed"],
-    "import/no-extraneous-dependencies": ["error", { "packageDir": "./" }],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true,
+        "packageDir": "./"
+      }
+    ],
     "import/imports-first": ["error", "absolute-first"],
     "import/newline-after-import": "error",
     "import/no-cycle": "off",
@@ -70,12 +77,16 @@
         "ignoreComments": true
       }
     ],
-    "no-console": [1],
+    "no-async-promise-executor": "off",
+    "no-console": "warn",
+    "no-extra-boolean-cast": "off",
     "no-nested-ternary": "off",
     "no-plusplus": "off",
+    "no-prototype-builtins": "warn",
     "no-underscore-dangle": "off",
+    "no-unused-vars": "warn",
     "radix": "off",
-    "react/display-name": false,
+    "react/display-name": 1,
     "react/jsx-filename-extension": [
       1,
       {
@@ -93,8 +104,7 @@
     "semi": "error",
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
-    "react/no-children-prop": 0,
-    "@typescript-eslint/no-unused-vars": 0
+    "react/no-children-prop": 0
   },
   "globals": {
     "window": true,
