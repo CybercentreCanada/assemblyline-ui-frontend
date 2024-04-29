@@ -1,7 +1,8 @@
 import { useMediaQuery, useTheme } from '@mui/material';
 import useAppBreadcrumbs from 'commons/components/app/hooks/useAppBreadcrumbs';
 import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
-import useAppSitemap, { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
+import type { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
+import useAppSitemap from 'commons/components/app/hooks/useAppSitemap';
 import BreadcrumbList from 'commons/components/breadcrumbs/BreadcrumbList';
 import { memo, useMemo } from 'react';
 

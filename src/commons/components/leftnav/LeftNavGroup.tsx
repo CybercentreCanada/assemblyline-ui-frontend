@@ -4,7 +4,7 @@ import { Collapse, List, ListItem, ListItemIcon, ListItemText, Popover, Tooltip 
 import LeftNavItem from 'commons/components/leftnav/LeftNavItem';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AppLeftNavGroup } from '../app/AppConfigs';
+import type { AppLeftNavGroup } from '../app/AppConfigs';
 import useAppLeftNav from '../app/hooks/useAppLeftNav';
 import useAppUser from '../app/hooks/useAppUser';
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Clear, Search } from '@mui/icons-material';
 import type { InputBaseProps } from '@mui/material';
 import { CircularProgress, IconButton, InputAdornment, InputBase, Stack, Typography } from '@mui/material';

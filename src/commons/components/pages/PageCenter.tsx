@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import React, { memo } from 'react';
 import PageContent from './PageContent';
-import { PageProps } from './hooks/usePageProps';
+import type { PageProps } from './hooks/usePageProps';
 
 type PageCenterProps = PageProps & {
   children: React.ReactNode;

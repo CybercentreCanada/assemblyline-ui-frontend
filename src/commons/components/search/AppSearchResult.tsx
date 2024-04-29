@@ -1,8 +1,9 @@
 import type { MenuListProps } from '@mui/material';
 import { Box, MenuItem, MenuList, Typography } from '@mui/material';
-import { KeyboardEvent, memo, useMemo } from 'react';
+import type { KeyboardEvent } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AppSearchItem } from '../app/AppSearchService';
+import type { AppSearchItem } from '../app/AppSearchService';
 import useAppSearchService from '../app/hooks/useAppSearchService';
 
 import AppListEmpty from '../display/AppListEmpty';

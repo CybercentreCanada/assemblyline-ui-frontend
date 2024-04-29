@@ -1,7 +1,7 @@
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Tooltip } from '@mui/material';
 import MuiBreadcrumbs from '@mui/material/Breadcrumbs';
-import { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
+import type { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
 import BreadcrumbLastItem from 'commons/components/breadcrumbs/BreadcrumbLastItem';
 import BreadcrumbLinkItem from 'commons/components/breadcrumbs/BreadcrumbLinkItem';
 import { useState } from 'react';

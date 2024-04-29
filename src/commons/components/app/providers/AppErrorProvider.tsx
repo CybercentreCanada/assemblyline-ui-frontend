@@ -158,6 +158,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const ExpandMore = styled((props: any & { expand: boolean }) => {
+  // eslint-disable-next-line no-unused-vars
   const { expand, ...other } = props;
   return <SvgIcon {...other} />;
 })(({ theme, expand }) => ({

@@ -1,16 +1,18 @@
 // TODO: change syntax to "import type {theme}" to avoid potential problems like type-only imports being incorrectly bundled.
 import type { Theme } from '@mui/material/styles';
-import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
+import type { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import AppProvider from 'commons/components/app/AppProvider';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useAppSwitcher from 'commons/components/app/hooks/useAppSwitcher';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI, { LoginParamsProps } from 'components/hooks/useMyAPI';
+import type { LoginParamsProps } from 'components/hooks/useMyAPI';
+import useMyAPI from 'components/hooks/useMyAPI';
 import useMyPreferences from 'components/hooks/useMyPreferences';
 import useMySitemap from 'components/hooks/useMySitemap';
 import useMyTheme from 'components/hooks/useMyTheme';
-import useMyUser, { CustomAppUserService } from 'components/hooks/useMyUser';
+import type { CustomAppUserService } from 'components/hooks/useMyUser';
+import useMyUser from 'components/hooks/useMyUser';
 import SafeResultsProvider from 'components/providers/SafeResultsProvider';
 import LoadingScreen from 'components/routes/loading';
 import LockedPage from 'components/routes/locked';

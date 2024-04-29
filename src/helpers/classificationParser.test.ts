@@ -1,6 +1,6 @@
+/* eslint-disable no-console */
+import type { ClassificationDefinition, ClassificationParts } from 'helpers/classificationParser';
 import {
-  ClassificationDefinition,
-  ClassificationParts,
   applyClassificationRules,
   getLevelText,
   getMaxClassification,
