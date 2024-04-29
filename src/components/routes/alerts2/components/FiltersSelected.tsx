@@ -41,6 +41,14 @@ const useStyles = makeStyles(theme => ({
   deleteIcon: {
     fontSize: 'large !important',
     color: `${theme.palette.text.primary} !important`
+  },
+  icon: {
+    marginLeft: `${theme.spacing(0.5)} !important`
+  },
+  other: {
+    '&>.MuiChip-icon': {
+      marginLeft: `${theme.spacing(0.5)} !important`
+    }
   }
 }));
 
@@ -51,8 +59,8 @@ type Filter = {
 };
 
 type Filters = {
-  status: Filter;
-  priority: Filter;
+  status: Filter[];
+  priority: Filter[];
   labels: Filter[];
   favorites: (Favorite & Filter)[];
   others: Filter[];
@@ -110,46 +118,44 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
 
     const ref = useRef<HTMLDivElement>(null);
 
-    return (
-      !hide && (
-        <div ref={ref}>
-          <CustomChip
-            classes={classes}
-            variant={variant}
-            label={getLabel(param)}
-            size={size}
-            icon={icon}
-            deleteIcon={deleteIcon}
-            style={{ minHeight: '25px', ...style }}
-            onClick={disabled ? null : () => setOpen(o => !o)}
-            onDelete={!deleteIcon || disabled ? null : event => onDelete(event)}
-          />
-          <Menu
-            anchorEl={ref.current}
-            keepMounted
-            open={open}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-            onClose={() => setOpen(o => !o)}
-          >
-            <ListSubheader style={{ lineHeight: 'inherit' }}>{title}</ListSubheader>
-            {options.map((option, i) => (
-              <MenuItem
-                key={`${param}-${i}`}
-                dense
-                selected={getSelected(option)}
-                onClick={event => {
-                  onClick(event, option);
-                  !disableCloseOnSelect && setOpen(false);
-                }}
-              >
-                {getListItemIcon && <ListItemIcon>{getListItemIcon(option)}</ListItemIcon>}
-                <ListItemText primary={t(option.label)} />
-              </MenuItem>
-            ))}
-          </Menu>
-        </div>
-      )
+    return hide || param === null || param === undefined ? null : (
+      <div ref={ref}>
+        <CustomChip
+          classes={classes}
+          variant={variant}
+          label={getLabel(param)}
+          size={size}
+          icon={icon}
+          deleteIcon={deleteIcon}
+          style={{ minHeight: '25px', ...style }}
+          onClick={disabled ? null : () => setOpen(o => !o)}
+          onDelete={!deleteIcon || disabled ? null : event => onDelete(event)}
+        />
+        <Menu
+          anchorEl={ref.current}
+          keepMounted
+          open={open}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+          onClose={() => setOpen(o => !o)}
+        >
+          <ListSubheader style={{ lineHeight: 'inherit' }}>{title}</ListSubheader>
+          {options.map((option, i) => (
+            <MenuItem
+              key={`${param}-${i}`}
+              dense
+              selected={getSelected(option)}
+              onClick={event => {
+                onClick(event, option);
+                !disableCloseOnSelect && setOpen(false);
+              }}
+            >
+              {getListItemIcon && <ListItemIcon>{getListItemIcon(option)}</ListItemIcon>}
+              <ListItemText primary={t(option.label)} />
+            </MenuItem>
+          ))}
+        </Menu>
+      </div>
     );
   }
 );
@@ -179,33 +185,32 @@ const WrappedAlertFiltersSelected = ({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { userFavorites, globalFavorites } = useAlerts();
+  const alertValues = useAlerts();
 
   const allFavorites = useMemo<Favorite[]>(
-    () => [...userFavorites, ...globalFavorites],
-    [globalFavorites, userFavorites]
+    () => (!alertValues ? [] : [...alertValues?.userFavorites, ...alertValues?.globalFavorites]),
+    [alertValues]
   );
 
   const params = useMemo<{ [key: string]: string }>(() => (!query ? {} : query.getParams()), [query]);
 
-  const { status, priority, labels, favorites, others } = useMemo<Filters>(() => {
-    let filters = { status: null, priority: null, labels: [], favorites: [], others: [] };
-    if (!query) return filters;
+  const filters = useMemo<Filters>(() => {
+    let defaults = { status: [], priority: [], labels: [], favorites: [], others: [] };
+    if (!query) return defaults;
 
     query.getAll('fq', []).forEach(filter => {
       const not = filter.startsWith('NOT(') && filter.endsWith(')');
       const value = not ? filter.substring(4, filter.length - 1) : filter;
 
-      if (value.startsWith('status:')) filters.status = { filter, not, value };
-      else if (value.startsWith('priority:')) filters.priority = { filter, not, value };
-      else if (value.startsWith('label:')) filters.labels.push({ filter, not, value });
-      else {
-        const favorite = allFavorites.find(f => f.query === filter || `NOT(${f.query})` === filter);
-        if (favorite) filters.favorites.push({ ...favorite, filter, not, value });
-        else filters.others.push({ filter, not, value });
-      }
+      const favorite = allFavorites.find(f => f.query === filter || `NOT(${f.query})` === filter);
+
+      if (favorite) defaults.favorites.push({ ...favorite, filter, not, value });
+      else if (value.startsWith('status:')) defaults.status.push({ filter, not, value });
+      else if (value.startsWith('priority:')) defaults.priority.push({ filter, not, value });
+      else if (value.startsWith('label:')) defaults.labels.push({ filter, not, value });
+      else defaults.others.push({ filter, not, value });
     });
-    return filters;
+    return defaults;
   }, [allFavorites, query]);
 
   const handleQueryChange = useCallback(
@@ -240,6 +245,7 @@ const WrappedAlertFiltersSelected = ({
         <CustomChip
           variant="outlined"
           size="small"
+          wrap
           style={{ minHeight: '25px' }}
           label={query.get('q')}
           onDelete={
@@ -255,6 +261,7 @@ const WrappedAlertFiltersSelected = ({
 
       <MenuFilter
         classes={{
+          icon: classes.icon,
           deleteIcon: clsx(classes.deleteIcon, classes.desc, params.sort && params.sort.endsWith('asc') && classes.asc)
         }}
         getLabel={item => (
@@ -299,6 +306,7 @@ const WrappedAlertFiltersSelected = ({
       />
 
       <MenuFilter
+        classes={{ icon: classes.icon }}
         getLabel={() => {
           const option = GROUPBY_OPTIONS.find(o => o.value === params.group_by);
           return option && option.value !== ''
@@ -320,6 +328,7 @@ const WrappedAlertFiltersSelected = ({
       />
 
       <MenuFilter
+        classes={{ icon: classes.icon }}
         getLabel={() => {
           const option = TC_OPTIONS.find(o => o.value === params.tc);
           return option && option.value !== '' ? `${t('tc')}: ${t(option.label)}` : `${t('tc')}: ${t('none')}`;
@@ -340,8 +349,10 @@ const WrappedAlertFiltersSelected = ({
 
       {!hideTCStart && query.has('tc_start') && (
         <CustomChip
+          classes={{ icon: classes.icon }}
           variant="outlined"
           size="small"
+          wrap
           style={{ minHeight: '25px' }}
           icon={<DateRangeIcon fontSize="small" />}
           label={
@@ -361,54 +372,20 @@ const WrappedAlertFiltersSelected = ({
         />
       )}
 
-      {status && (
+      {filters.favorites.map((favorite, i) => (
         <CustomChip
+          className={classes.other}
+          key={`${favorite.filter}-${i}`}
           variant="outlined"
           size="small"
-          style={{ minHeight: '25px' }}
-          color={status.not ? 'error' : 'default'}
-          label={status.value}
-          onClick={disableActions ? null : () => handleQueryChange(status)}
-          onDelete={disableActions ? null : () => handleQueryRemove(status)}
-        />
-      )}
-
-      {priority && (
-        <CustomChip
-          variant="outlined"
-          size="small"
-          style={{ minHeight: '25px' }}
-          color={priority.not ? 'error' : 'default'}
-          label={priority.value}
-          onClick={disableActions ? null : () => handleQueryChange(priority)}
-          onDelete={disableActions ? null : () => handleQueryRemove(priority)}
-        />
-      )}
-
-      {labels.map(label => (
-        <CustomChip
-          variant="outlined"
-          size="small"
-          style={{ minHeight: '25px' }}
-          color={label.not ? 'error' : 'default'}
-          label={label.value}
-          onClick={disableActions ? null : () => handleQueryChange(label)}
-          onDelete={disableActions ? null : () => handleQueryRemove(label)}
-        />
-      ))}
-
-      {favorites.map(favorite => (
-        <CustomChip
-          variant="outlined"
-          size="small"
+          wrap
           style={{ minHeight: '25px' }}
           color={favorite.not ? 'error' : 'default'}
-          label={favorite.value}
+          label={favorite.name}
           icon={
             <StarIcon
               style={{
                 ...(favorite.not && {
-                  fontSize: 'small',
                   color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                 })
               }}
@@ -427,10 +404,53 @@ const WrappedAlertFiltersSelected = ({
         />
       ))}
 
-      {others.map(other => (
+      {filters.status.map((status, i) => (
         <CustomChip
           variant="outlined"
           size="small"
+          wrap
+          style={{ minHeight: '25px' }}
+          color={status.not ? 'error' : 'default'}
+          label={status.value}
+          onClick={disableActions ? null : () => handleQueryChange(status)}
+          onDelete={disableActions ? null : () => handleQueryRemove(status)}
+        />
+      ))}
+
+      {filters.priority.map((priority, i) => (
+        <CustomChip
+          variant="outlined"
+          size="small"
+          wrap
+          style={{ minHeight: '25px' }}
+          color={priority.not ? 'error' : 'default'}
+          label={priority.value}
+          onClick={disableActions ? null : () => handleQueryChange(priority)}
+          onDelete={disableActions ? null : () => handleQueryRemove(priority)}
+        />
+      ))}
+
+      {filters.labels.map((label, i) => (
+        <CustomChip
+          key={`${label.filter}-${i}`}
+          variant="outlined"
+          size="small"
+          wrap
+          style={{ minHeight: '25px' }}
+          color={label.not ? 'error' : 'default'}
+          label={label.value}
+          onClick={disableActions ? null : () => handleQueryChange(label)}
+          onDelete={disableActions ? null : () => handleQueryRemove(label)}
+        />
+      ))}
+
+      {filters.others.map((other, i) => (
+        <CustomChip
+          className={classes.other}
+          key={`${other.filter}-${i}`}
+          variant="outlined"
+          size="small"
+          wrap
           style={{ minHeight: '25px' }}
           color={other.not ? 'error' : 'default'}
           label={other.value}

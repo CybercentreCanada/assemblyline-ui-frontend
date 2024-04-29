@@ -299,7 +299,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
     const [confirmation, setConfirmation] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
 
-    const groupBy = useMemo<string>(() => getGroupBy(location.search), [location.search]);
+    const groupBy = useMemo<string>(() => getGroupBy(location.search, DEFAULT_QUERY), [location.search]);
 
     const query = useMemo<SimpleSearchQuery>(() => {
       if (!alert) return null;
@@ -445,14 +445,17 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
 
     const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
 
-    const groupBy = useMemo<string>(() => getGroupBy(location.search), [location.search]);
+    const groupBy = useMemo<string>(
+      () => (speedDial || inDrawer ? getGroupBy(location.search, DEFAULT_QUERY) : null),
+      [inDrawer, location.search, speedDial]
+    );
 
     const query = useMemo<SimpleSearchQuery>(() => {
       if (!alert) return null;
       else {
         const q = buildSearchQuery({
           search: location.search,
-          ...(speedDial && !inDrawer ? { singles: ['tc_start', 'tc'], multiples: ['fq'] } : null)
+          ...(speedDial || inDrawer ? { singles: ['tc_start', 'tc'], multiples: ['fq'] } : null)
         });
         q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy)}` : `alert_id:${alert.alert_id}`);
         return q;
