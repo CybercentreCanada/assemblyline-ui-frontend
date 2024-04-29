@@ -94,7 +94,6 @@ export type ConfigurationDefinition = {
         sources: string[];
       };
     };
-    sha256_sources: string[];
     verdicts: {
       info: number;
       suspicious: number;
