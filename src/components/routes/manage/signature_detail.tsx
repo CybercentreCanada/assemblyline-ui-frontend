@@ -28,16 +28,15 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
+import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import ResultsTable from 'components/visual/SearchResult/results';
 import SignatureStatus from 'components/visual/SignatureStatus';
 import { suricataConfig, suricataDef } from 'helpers/suricata';
 import { safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import { yaraConfig, yaraDef } from 'helpers/yara';
-import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -464,9 +463,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
               <Grid item xs={9} sm={8} md={9} lg={10}>
                 {signature && stats ? (
                   stats.first_hit ? (
-                    <Moment fromNow locale={i18n.language}>
-                      {stats.first_hit}
-                    </Moment>
+                    <Moment variant="fromNow">{stats.first_hit}</Moment>
                   ) : (
                     t('hit.none')
                   )
@@ -480,9 +477,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
               <Grid item xs={9} sm={8} md={9} lg={10}>
                 {signature && stats ? (
                   stats.last_hit ? (
-                    <Moment fromNow locale={i18n.language}>
-                      {stats.last_hit}
-                    </Moment>
+                    <Moment variant="fromNow">{stats.last_hit}</Moment>
                   ) : (
                     t('hit.none')
                   )

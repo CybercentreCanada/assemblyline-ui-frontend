@@ -1,4 +1,4 @@
-import { AppThemeConfigs } from 'commons/components/app/AppConfigs';
+import type { AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import { useMemo } from 'react';
 
 const ANALYTICAL_PLATFORM_THEME: AppThemeConfigs = {

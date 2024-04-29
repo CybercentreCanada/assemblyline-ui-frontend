@@ -42,7 +42,6 @@ import ResultsTable, { ResultResult } from 'components/visual/SearchResult/resul
 import SectionContainer from 'components/visual/SectionContainer';
 import Verdict from 'components/visual/Verdict';
 import { safeFieldValue } from 'helpers/utils';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import AutoSizer from 'react-virtualized-auto-sizer';

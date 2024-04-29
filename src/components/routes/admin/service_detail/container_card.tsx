@@ -1,6 +1,5 @@
 import { Card, Grid, Tooltip, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CgSmartphoneChip, CgSmartphoneRam } from 'react-icons/cg';
@@ -94,7 +93,9 @@ const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: 
           </Grid>
           {container.service_account && (
             <>
-              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('container.card.service_account')}:`}</Grid>
+              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t(
+                'container.card.service_account'
+              )}:`}</Grid>
               <Grid item xs={7} sm={8} md={10} className={classes.mono}>
                 {container.service_account}
               </Grid>

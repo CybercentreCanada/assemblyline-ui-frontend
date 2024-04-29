@@ -1,4 +1,5 @@
-import { Chip, ChipProps, Tooltip, TooltipProps } from '@mui/material';
+import type { ChipProps, TooltipProps } from '@mui/material';
+import { Chip, Tooltip } from '@mui/material';
 import { darken } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';

@@ -14,7 +14,6 @@ import {
   LinkRow,
   SortableHeaderCell
 } from 'components/visual/DivTable';
-import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import InformativeAlert from '../InformativeAlert';

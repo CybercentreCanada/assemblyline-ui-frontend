@@ -33,7 +33,6 @@ import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import UsersTable from 'components/visual/SearchResult/users';
 import SearchResultCount from 'components/visual/SearchResultCount';
-import 'moment/locale/fr';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';

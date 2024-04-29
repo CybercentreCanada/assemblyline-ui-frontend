@@ -17,7 +17,8 @@ import {
 
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import { parseEvent } from 'commons/components/utils/keyboard';
-import { ChangeEvent, forwardRef, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
+import type { ChangeEvent, KeyboardEvent } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useAppSearchService from '../app/hooks/useAppSearchService';
 import AppSearchInput from './AppSearchInput';

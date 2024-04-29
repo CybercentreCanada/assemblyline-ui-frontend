@@ -2,7 +2,6 @@ import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { useTheme } from '@mui/material';
 import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import { registerYaraCompletionItemProvider, yaraConfig, yaraDef } from 'helpers/yara';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import AutoSizer from 'react-virtualized-auto-sizer';

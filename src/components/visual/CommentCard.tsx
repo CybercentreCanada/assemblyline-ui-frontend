@@ -19,10 +19,9 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { AppUserAvatar } from 'commons/components/topnav/UserProfile';
 import useALContext from 'components/hooks/useALContext';
-import 'moment/locale/fr';
+import Moment from 'components/visual/Moment';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 
 const PREVIOUS_CLASS = 'previous';
 const NEXT_CLASS = 'next';
@@ -175,21 +174,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const CALENDAR_STRINGS = {
-  fr: {
-    sameDay: 'H[h]mm',
-    lastDay: '[Hier] H[h]mm',
-    lastWeek: 'dddd H[h]mm ',
-    sameElse: 'Do MMMM YYYY H[h]mm'
-  },
-  en: {
-    sameDay: 'h:mm a',
-    lastDay: '[Yesterday] h:mm a',
-    lastWeek: 'dddd h:mm a',
-    sameElse: 'MMMM D YYYY, h:mm a'
-  }
-};
-
 export const REACTIONS = {
   thumbs_up: '👍',
   thumbs_down: '👎',
@@ -296,11 +280,6 @@ const WrappedCommentCard: React.FC<Props> = ({
     [currentComment, currentUser]
   );
 
-  const calendar = useMemo<(typeof CALENDAR_STRINGS)['en']>(
-    () => (i18n.language in CALENDAR_STRINGS ? CALENDAR_STRINGS[i18n.language] : true),
-    [i18n.language]
-  );
-
   const samePreviousAuthor = useMemo<boolean>(
     () => currentComment?.uname === previousComment?.uname,
     [currentComment?.uname, previousComment?.uname]
@@ -372,7 +351,7 @@ const WrappedCommentCard: React.FC<Props> = ({
               )}
               {(!samePreviousAuthor || !previousNarrowTimeSpan) && (
                 <Typography className={classes.date} variant="caption">
-                  <Moment calendar={calendar} locale={i18n.language} children={currentComment?.date} />
+                  <Moment variant="fromDateTime">{currentComment?.date}</Moment>
                 </Typography>
               )}
             </div>

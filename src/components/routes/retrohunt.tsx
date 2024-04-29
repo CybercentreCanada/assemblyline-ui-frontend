@@ -16,7 +16,6 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import RetrohuntTable from 'components/visual/SearchResult/retrohunt';
 import SearchResultCount from 'components/visual/SearchResultCount';
-import 'moment/locale/fr';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';

@@ -14,7 +14,6 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import 'moment/locale/fr';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceDetail } from '../service_detail';

@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import clsx from 'clsx';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import { CustomUser } from 'components/hooks/useMyUser';
-import { memo, useEffect } from 'react';
+import React, { memo, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineSecurityScan } from 'react-icons/ai';

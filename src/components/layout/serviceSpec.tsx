@@ -60,57 +60,6 @@ const WrappedResetButton = ({ value, defaultValue, hasResetButton = false, reset
 
 const ResetButton = React.memo(WrappedResetButton);
 
-function WrappedService({ disabled, service, idx, hasResetButton = false, setParam }) {
-  const theme = useTheme();
-  const [showMore, setShowMore] = useState(false);
-  const { t } = useTranslation();
-  return (
-    <div key={idx} style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1), pageBreakInside: 'avoid' }}>
-      <Typography variant="subtitle1" gutterBottom>
-        <b>{service.name}</b>
-      </Typography>
-      {service.params.map(
-        (param, pidx) =>
-          !param.hide && (
-            <Param
-              key={pidx}
-              disabled={disabled}
-              param={param}
-              pidx={pidx}
-              idx={idx}
-              hasResetButton={hasResetButton}
-              setParam={setParam}
-            />
-          )
-      )}
-      {showMore
-        ? service.params.map(
-            (param, pidx) =>
-              param.hide && (
-                <Param
-                  key={pidx}
-                  disabled={disabled}
-                  param={param}
-                  pidx={pidx}
-                  idx={idx}
-                  hasResetButton={hasResetButton}
-                  setParam={setParam}
-                />
-              )
-          )
-        : service.params.filter(param => param.hide).length !== 0 && (
-            <Tooltip title={t('show_more')}>
-              <Button size="small" onClick={() => setShowMore(true)} style={{ padding: 0 }}>
-                <MoreHorizIcon />
-              </Button>
-            </Tooltip>
-          )}
-    </div>
-  );
-}
-
-const Service = React.memo(WrappedService);
-
 function WrappedParam({ disabled, param, pidx, idx, hasResetButton = false, setParam }) {
   const classes = useStyles();
   const theme = useTheme();
@@ -220,6 +169,57 @@ function WrappedParam({ disabled, param, pidx, idx, hasResetButton = false, setP
 }
 
 const Param = React.memo(WrappedParam);
+
+function WrappedService({ disabled, service, idx, hasResetButton = false, setParam }) {
+  const theme = useTheme();
+  const [showMore, setShowMore] = useState(false);
+  const { t } = useTranslation();
+  return (
+    <div key={idx} style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1), pageBreakInside: 'avoid' }}>
+      <Typography variant="subtitle1" gutterBottom>
+        <b>{service.name}</b>
+      </Typography>
+      {service.params.map(
+        (param, pidx) =>
+          !param.hide && (
+            <Param
+              key={pidx}
+              disabled={disabled}
+              param={param}
+              pidx={pidx}
+              idx={idx}
+              hasResetButton={hasResetButton}
+              setParam={setParam}
+            />
+          )
+      )}
+      {showMore
+        ? service.params.map(
+            (param, pidx) =>
+              param.hide && (
+                <Param
+                  key={pidx}
+                  disabled={disabled}
+                  param={param}
+                  pidx={pidx}
+                  idx={idx}
+                  hasResetButton={hasResetButton}
+                  setParam={setParam}
+                />
+              )
+          )
+        : service.params.filter(param => param.hide).length !== 0 && (
+            <Tooltip title={t('show_more')}>
+              <Button size="small" onClick={() => setShowMore(true)} style={{ padding: 0 }}>
+                <MoreHorizIcon />
+              </Button>
+            </Tooltip>
+          )}
+    </div>
+  );
+}
+
+const Service = React.memo(WrappedService);
 
 type ServiceSpecProps = {
   service_spec: any[];
