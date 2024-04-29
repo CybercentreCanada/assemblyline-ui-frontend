@@ -567,12 +567,89 @@ describe('Test `getSubmitType`', () => {
   });
 
   const configuration: ConfigurationDefinition = {
+    auth: {
+      allow_2fa: false,
+      allow_apikeys: false,
+      allow_extended_apikeys: false,
+      allow_security_tokens: false
+    },
+    core: {
+      archiver: {
+        alternate_dtl: 0,
+        metadata: {},
+        use_metadata: false
+      }
+    },
+    datastore: {
+      archive: {
+        enabled: false
+      }
+    },
+    retrohunt: {
+      enabled: false,
+      dtl: 0,
+      max_dtl: 0
+    },
     submission: {
       file_sources: {
         md5: { pattern: '^[a-f0-9]{32}$', sources: [] },
         sha1: { pattern: '^[a-f0-9]{40}$', sources: [] },
         sha256: { pattern: '^[a-f0-9]{64}$', sources: [] }
+      },
+      dtl: 0,
+      max_dtl: 0,
+      verdicts: {
+        info: 0,
+        suspicious: 0,
+        highly_suspicious: 0,
+        malicious: 0
       }
+    },
+    system: {
+      organisation: '',
+      type: '',
+      version: ''
+    },
+    ui: {
+      ai: {
+        enabled: false
+      },
+      alerting_meta: {
+        important: [],
+        subject: [],
+        url: []
+      },
+      allow_malicious_hinting: false,
+      allow_raw_downloads: false,
+      allow_replay: false,
+      allow_url_submissions: false,
+      allow_zip_downloads: false,
+      apps: [],
+      banner: {},
+      banner_level: 'info',
+      external_links: {
+        tag: {},
+        hash: {},
+        metadata: {}
+      },
+      external_sources: [],
+      external_source_tags: {},
+      fqdn: '',
+      read_only: false,
+      rss_feeds: [],
+      services_feed: '',
+      community_feed: '',
+      tos: false,
+      tos_lockout: false,
+      tos_lockout_notify: false,
+      url_submission_auto_service_selection: []
+    },
+    user: {
+      api_priv_map: {},
+      priv_role_dependencies: {},
+      roles: [],
+      role_dependencies: {},
+      types: []
     }
   };
 
