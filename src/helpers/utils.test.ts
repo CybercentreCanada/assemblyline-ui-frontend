@@ -1,8 +1,10 @@
 import { describe, expect, it } from '@jest/globals';
+import { ConfigurationDefinition } from 'components/hooks/useMyUser';
 import {
   bytesToSize,
   getFileName,
   getProvider,
+  getSubmitType,
   getValueFromPath,
   getVersionQuery,
   humanReadableNumber,
@@ -555,5 +557,39 @@ describe('Test `matchURL`', () => {
     // expect(matchURL('hxxp://blah.com')).toBe(null);
     // expect(matchURL('http://1.1.1.1:123:123')).toBe(null);
     // expect(matchURL('http://blah.com:abc')).toBe(null);
+  });
+});
+
+describe('Test `getSubmitType`', () => {
+  it('Should return null', () => {
+    expect(getSubmitType(undefined, undefined)).toBe(null);
+    expect(getSubmitType(null, null)).toBe(null);
+  });
+
+  const configuration: ConfigurationDefinition = {
+    submission: {
+      file_sources: {
+        md5: { pattern: '^[a-f0-9]{32}$' },
+        sha1: { pattern: '^[a-f0-9]{40}$' },
+        sha256: { pattern: '^[a-f0-9]{64}$' }
+      }
+    }
+  };
+
+  it('Should not match the input string with any type', () => {
+    expect(getSubmitType('', configuration)).toBe(null);
+    expect(getSubmitType('test', configuration)).toBe(null);
+    expect(getSubmitType('qwerty1234567890qwerty1234567890', configuration)).toBe(null);
+    expect(getSubmitType('qwerty1234567890qwerty1234567890qwerty12', configuration)).toBe(null);
+    expect(getSubmitType('qwerty1234567890qwerty1234567890qwerty1234567890qwerty1234567890', configuration)).toBe(null);
+  });
+
+  it('Should match the input string with its corresponding type', () => {
+    expect(getSubmitType('abcdef1234567890abcdef1234567890', configuration)).toBe('md5');
+    expect(getSubmitType('abcdef1234567890abcdef1234567890abcdef12', configuration)).toBe('sha1');
+    expect(getSubmitType('abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', configuration)).toBe(
+      'sha256'
+    );
+    expect(getSubmitType('http://blah.com', configuration)).toBe('url');
   });
 });
