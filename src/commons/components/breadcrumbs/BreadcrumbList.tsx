@@ -33,6 +33,26 @@ const splitItems = (
   return { before, after, hasEllipsis: hasEllipsis || expanded };
 };
 
+const BreadcrumbsEllipsis = ({ onClick, expanded }) => {
+  const { t } = useTranslation();
+  return (
+    <Tooltip title={t(expanded ? 'tooltip.breadcrumbs.min' : 'tooltip.breadcrumbs.max')}>
+      <MoreHorizIcon
+        fontSize="small"
+        sx={{
+          verticalAlign: 'bottom',
+          marginTop: '5px',
+          display: 'inline-flex',
+          '&:hover': {
+            cursor: 'pointer'
+          }
+        }}
+        onClick={onClick}
+      />
+    </Tooltip>
+  );
+};
+
 export default function BreadcrumbList({
   items,
   disableStyle,
@@ -66,23 +86,3 @@ export default function BreadcrumbList({
     </MuiBreadcrumbs>
   );
 }
-
-const BreadcrumbsEllipsis = ({ onClick, expanded }) => {
-  const { t } = useTranslation();
-  return (
-    <Tooltip title={t(expanded ? 'tooltip.breadcrumbs.min' : 'tooltip.breadcrumbs.max')}>
-      <MoreHorizIcon
-        fontSize="small"
-        sx={{
-          verticalAlign: 'bottom',
-          marginTop: '5px',
-          display: 'inline-flex',
-          '&:hover': {
-            cursor: 'pointer'
-          }
-        }}
-        onClick={onClick}
-      />
-    </Tooltip>
-  );
-};

@@ -4,7 +4,8 @@ import { styled } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import PageCenter from 'commons/components/pages/PageCenter';
 import * as React from 'react';
-import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
+import type { FallbackProps } from 'react-error-boundary';
+import { ErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 import { GiSpottedBug } from 'react-icons/gi';
 

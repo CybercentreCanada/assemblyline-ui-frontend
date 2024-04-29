@@ -1,4 +1,5 @@
-import { CssBaseline, PaletteMode, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
+import type { PaletteMode } from '@mui/material';
+import { CssBaseline, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
 import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
 import AssistantProvider from 'components/providers/AssistantProvider';
@@ -7,7 +8,7 @@ import DrawerProvider from 'components/providers/DrawerProvider';
 import { ExternalLookupProvider } from 'components/providers/ExternalLookupProvider';
 import HighlightProvider from 'components/providers/HighlightProvider';
 import i18n from 'i18n';
-import { createContext, ReactNode, useCallback, useMemo } from 'react';
+import { ReactNode, createContext, useCallback, useMemo } from 'react';
 import useThemeBuilder from '../utils/hooks/useThemeBuilder';
 import { AppStorageKeys } from './AppConstants';
 import { AppContextType } from './AppContexts';

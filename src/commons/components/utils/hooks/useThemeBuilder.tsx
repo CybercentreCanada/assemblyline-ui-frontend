@@ -1,4 +1,5 @@
-import { Components, createTheme, CSSObject, PaletteOptions, Theme } from '@mui/material';
+import type { Components, CSSObject, PaletteOptions, Theme } from '@mui/material';
+import { createTheme } from '@mui/material';
 import { AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import { AppDefaultsThemeConfigs } from 'commons/components/app/AppDefaults';
 import { useMemo } from 'react';

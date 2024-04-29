@@ -1,6 +1,7 @@
 import i18n from 'i18n';
 import { useMemo } from 'react';
-import { matchPath, PathMatch } from 'react-router-dom';
+import type { PathMatch } from 'react-router-dom';
+import { matchPath } from 'react-router-dom';
 import { AppSiteMapRoute } from '../AppConfigs';
 import useAppConfigs from './useAppConfigs';
 

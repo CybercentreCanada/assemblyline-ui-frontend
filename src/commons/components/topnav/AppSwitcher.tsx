@@ -14,7 +14,7 @@ import {
   useTheme
 } from '@mui/material';
 import useAppSwitcher from 'commons/components/app/hooks/useAppSwitcher';
-import { memo, useCallback, useRef, useState } from 'react';
+import React, { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSwitcherItem } from '../app/AppConfigs';
 

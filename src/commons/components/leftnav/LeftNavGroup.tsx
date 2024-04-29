@@ -2,11 +2,34 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, List, ListItem, ListItemIcon, ListItemText, Popover, Tooltip } from '@mui/material';
 import LeftNavItem from 'commons/components/leftnav/LeftNavItem';
-import { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppLeftNavGroup } from '../app/AppConfigs';
 import useAppLeftNav from '../app/hooks/useAppLeftNav';
 import useAppUser from '../app/hooks/useAppUser';
+
+type GroupListItemProps = {
+  group: AppLeftNavGroup;
+  leftNavOpen: boolean;
+  collapsed: boolean;
+  onClick: (event: React.MouseEvent) => void;
+};
+
+const WrappedGroupListItem = ({ group, leftNavOpen, collapsed, onClick }: GroupListItemProps) => {
+  const { t } = useTranslation();
+  const title = group.i18nKey ? t(group.i18nKey) : group.title;
+  return (
+    <Tooltip title={!leftNavOpen ? title : ''} aria-label={title} placement="right">
+      <ListItem button key={group.id} onClick={onClick}>
+        <ListItemIcon>{group.icon}</ListItemIcon>
+        <ListItemText primary={title} />
+        {collapsed ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
+      </ListItem>
+    </Tooltip>
+  );
+};
+
+const GroupListItem = memo(WrappedGroupListItem);
 
 interface LeftNavGroupProps {
   group: AppLeftNavGroup;
@@ -71,31 +94,5 @@ const LeftNavGroup = ({ group, onItemClick }: LeftNavGroupProps) => {
     </div>
   ) : null;
 };
-
-const GroupListItem = memo(
-  ({
-    group,
-    leftNavOpen,
-    collapsed,
-    onClick
-  }: {
-    group: AppLeftNavGroup;
-    leftNavOpen: boolean;
-    collapsed: boolean;
-    onClick: (event: React.MouseEvent) => void;
-  }) => {
-    const { t } = useTranslation();
-    const title = group.i18nKey ? t(group.i18nKey) : group.title;
-    return (
-      <Tooltip title={!leftNavOpen ? title : ''} aria-label={title} placement="right">
-        <ListItem button key={group.id} onClick={onClick}>
-          <ListItemIcon>{group.icon}</ListItemIcon>
-          <ListItemText primary={title} />
-          {collapsed ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
-        </ListItem>
-      </Tooltip>
-    );
-  }
-);
 
 export default memo(LeftNavGroup);
