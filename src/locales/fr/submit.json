@@ -42,6 +42,7 @@
   "terms3": "Conditions d'utilisation",
   "urlHash.button": "Analyser",
   "urlHash.input_suffix": " à Analyser",
+  "urlHash.input_title": "Hachage/URL",
   "validate.acceptText": "Continuer",
   "validate.cancelText": "Désélectionner les services externes",
   "validate.text": "Vous avez activé l'analyze d'URL sur Internet ou avez selectioné un service à l'extérieur de l'infrastructure d'Assemblyline. Voulez-vous continuez?",

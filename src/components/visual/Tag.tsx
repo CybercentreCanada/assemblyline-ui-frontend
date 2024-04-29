@@ -67,15 +67,17 @@ const WrappedTag: React.FC<TagProps> = ({
 
   return maliciousness === 'safe' && !showSafeResults && !force ? null : (
     <>
-      <ActionMenu
-        category={'tag'}
-        type={type}
-        value={value}
-        state={state}
-        setState={setState}
-        classification={classification}
-        highlight_key={highlight_key}
-      />
+      {state !== initialMenuState && (
+        <ActionMenu
+          category={'tag'}
+          type={type}
+          value={value}
+          state={state}
+          setState={setState}
+          classification={classification}
+          highlight_key={highlight_key}
+        />
+      )}
       <CustomChip
         wrap
         variant={safelisted ? 'outlined' : 'filled'}
