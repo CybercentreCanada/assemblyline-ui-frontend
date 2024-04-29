@@ -107,15 +107,16 @@
     "react/no-children-prop": 0
   },
   "globals": {
-    "window": true,
-    "document": true,
-    "localStorage": true,
-    "FormData": true,
-    "FileReader": true,
     "Blob": true,
-    "navigator": true,
+    "document": true,
+    "fetch": true,
+    "FileReader": true,
+    "FormData": true,
     "Headers": true,
+    "localStorage": true,
+    "navigator": true,
     "Request": true,
-    "fetch": true
+    "vi": true,
+    "window": true
   }
 }
