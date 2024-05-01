@@ -18,11 +18,6 @@ export default defineConfig(({ mode }) => {
       ...eslint({ failOnWarning: false, failOnError: false }),
       apply: () => env.npm_lifecycle_event === 'dev'
     },
-    { apply: () => env?.npm_lifecycle_event === 'start' },
-    { apply: () => env?.npm_lifecycle_event === 'build' },
-    { apply: () => env?.npm_lifecycle_event === 'build-all' },
-    { apply: () => env?.npm_lifecycle_event === 'serve' },
-    { apply: () => env?.npm_lifecycle_event === 'test' },
     { ...eslint({ failOnWarning: false, failOnError: false }), apply: () => env?.npm_lifecycle_event === 'ci' }
   ];
 
