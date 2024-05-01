@@ -13,24 +13,13 @@ export default defineConfig(({ mode }) => {
   // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
   const env = loadEnv(mode, process.cwd(), '');
 
-  const eslintPlugin = env.NODE_ENV === 'production'
-    ? []
-    : [
-        {
-          // default settings on build (i.e. fail on error)
-          ...eslint(),
-          apply: 'build'
-        },
-        {
-          // do not fail on serve (i.e. local development)
-          ...eslint({
-            failOnWarning: false,
-            failOnError: false
-          }),
-          apply: 'serve',
-          enforce: 'post'
-        }
-      ];
+  const eslintPlugin = [
+    {
+      ...eslint({ failOnWarning: false, failOnError: false }),
+      apply: () => env.npm_lifecycle_event === 'dev'
+    },
+    { ...eslint({ failOnWarning: false, failOnError: false }), apply: () => env?.npm_lifecycle_event === 'ci' }
+  ];
 
   return {
     // vite config
