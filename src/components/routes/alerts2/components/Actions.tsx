@@ -255,7 +255,7 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
       if (!alert || !alert.group_count) return '';
 
       const query = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
-      const groupBy = getGroupBy(location.search);
+      const groupBy = getGroupBy(location.search, DEFAULT_QUERY);
       query.set('group_by', '');
       query.add('fq', `${groupBy}:${getValueFromPath(alert, groupBy)}`);
       return query.getDeltaString();
@@ -366,13 +366,13 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
               groupBy ? (
                 <Grid container rowGap={2}>
                   <Grid>{t('actions.takeownershipdiag.content.grouped')}</Grid>
-                  <Grid item>
+                  <Grid item style={{ width: '100%' }}>
                     <Typography variant="subtitle2">{t('actions.takeownershipdiag.properties')}</Typography>
                     <Paper component="pre" variant="outlined" className={classes.preview}>
                       {!query || query.toString() === '' ? (
                         <div>{t('none')}</div>
                       ) : (
-                        <AlertFiltersSelected query={query} disableActions hideGroupBy />
+                        <AlertFiltersSelected query={query} disableActions hideGroupBy hideTCStart />
                       )}
                     </Paper>
                   </Grid>
