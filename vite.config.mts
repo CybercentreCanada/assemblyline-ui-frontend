@@ -24,7 +24,14 @@ export default defineConfig(({ mode }) => {
   return {
     // vite config
     build: {
-      outDir: 'build'
+      outDir: 'build',
+      rollupOptions: {
+        output: {
+          entryFileNames: `[name].js`,
+          chunkFileNames: 'js/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash][extname]'
+        }
+      }
     },
     define: {
       __APP_ENV__: JSON.stringify(env.APP_ENV)
