@@ -555,8 +555,6 @@ const WrappedAlertFilters = () => {
       setQuery(prev => {
         const q = new SimpleSearchQuery(prev.toString([]), DEFAULT_QUERY);
 
-        console.log(previous, next);
-
         previous.forEach(fq => {
           q.remove('fq', fq.not ? `NOT(${fq.value})` : `${fq.value}`);
         });
@@ -634,8 +632,6 @@ const WrappedAlertFilters = () => {
       handleFetch('label', '/api/v4/alert/labels/', data => handleOptionsChange('label', data, true));
     }
   }, [handleFetch, handleOptionsChange, handleOthersChange, render]);
-
-  console.log(filters.favorites);
 
   return (
     <>
