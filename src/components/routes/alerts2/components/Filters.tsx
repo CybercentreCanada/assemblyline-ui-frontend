@@ -587,10 +587,8 @@ const WrappedAlertFilters = () => {
             Object.keys({ ...v[type], ...data }).map(k => [
               k,
               {
-                count: 0,
-                total: 0,
-                ...(k in v[type] && v[type][k]),
-                ...(!(k in data) ? null : asTotal ? { total: data[k] } : { count: data[k] })
+                count: !asTotal && k in data ? data[k] : 0,
+                total: asTotal && k in data ? data[k] : k in v[type] && 'total' in v[type][k] ? v[type][k].total : 0
               }
             ])
           )
