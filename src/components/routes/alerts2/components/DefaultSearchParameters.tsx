@@ -118,7 +118,7 @@ const WrappedAlertDefaultSearchParameters = () => {
         <DialogContent className={classes.dialogContent}>
           <div className={classes.dialogDescription}>{t('session.description')}</div>
 
-          <Grid item>
+          <Grid item style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.existing')}</Typography>
             <Paper
               component="pre"
@@ -136,7 +136,7 @@ const WrappedAlertDefaultSearchParameters = () => {
             </Paper>
           </Grid>
 
-          <Grid item>
+          <Grid item style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.current')}</Typography>
             <Paper
               component="pre"

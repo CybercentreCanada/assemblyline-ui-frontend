@@ -75,7 +75,7 @@ type AddFavoriteProps = {
 };
 
 const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
-  ({ favorite, global, show = true, onSuccess }: AddFavoriteProps) => {
+  ({ favorite, global = false, show = true, onSuccess }: AddFavoriteProps) => {
     const { t } = useTranslation('favorites');
     const classes = useStyles();
     const theme = useTheme();
@@ -146,7 +146,7 @@ const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
                 {global ? t('confirmation.content.public') : t('confirmation.content.private')}
               </Grid>
 
-              <Grid item>
+              <Grid item style={{ width: '100%' }}>
                 <Typography variant="subtitle2">{t('confirmation.query')}</Typography>
                 <Paper component="pre" variant="outlined" className={classes.preview}>
                   {favorite.query}
@@ -172,7 +172,7 @@ type UpdateFavoriteProps = {
 };
 
 const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
-  ({ favorite, globalFavorites, userFavorites, global, show = true, onSuccess }: UpdateFavoriteProps) => {
+  ({ favorite, globalFavorites, userFavorites, global = false, show = true, onSuccess }: UpdateFavoriteProps) => {
     const { t } = useTranslation('favorites');
     const classes = useStyles();
     const theme = useTheme();
@@ -247,7 +247,7 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
                 {global ? t('confirmation.content.public') : t('confirmation.content.private')}
               </Grid>
 
-              <Grid item>
+              <Grid item style={{ width: '100%' }}>
                 <Typography variant="subtitle2">{t('confirmation.from')}</Typography>
                 <Paper component="pre" variant="outlined" className={classes.preview}>
                   {global
@@ -256,7 +256,7 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
                 </Paper>
               </Grid>
 
-              <Grid item>
+              <Grid item style={{ width: '100%' }}>
                 <Typography variant="subtitle2">{t('confirmation.to')}</Typography>
                 <Paper component="pre" variant="outlined" className={classes.preview}>
                   {favorite.query}
@@ -280,7 +280,7 @@ type DeleteFavoriteProps = {
 };
 
 const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
-  ({ favorite, global, show = true, onSuccess }: DeleteFavoriteProps) => {
+  ({ favorite, global = false, show = true, onSuccess }: DeleteFavoriteProps) => {
     const { t } = useTranslation('favorites');
     const classes = useStyles();
     const theme = useTheme();
@@ -343,7 +343,7 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
                 {global ? t('confirmation.content.public') : t('confirmation.content.private')}
               </Grid>
 
-              <Grid item>
+              <Grid item style={{ width: '100%' }}>
                 <Typography variant="subtitle2">{t('confirmation.query')}</Typography>
                 <Paper component="pre" variant="outlined" className={classes.preview}>
                   {favorite.query}
@@ -486,7 +486,7 @@ const WrappedAlertFavorites = () => {
                   <div>{t('public')}</div>
                 </Button>
               </div>
-              {global && c12nDef.enforce ? (
+              {currentGlobal && c12nDef.enforce ? (
                 <Classification
                   type="picker"
                   c12n={currentFavorite.classification}

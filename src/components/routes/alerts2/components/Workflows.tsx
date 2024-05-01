@@ -95,12 +95,9 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
     const [body, setBody] = useState<WorkflowBody>(initialBody);
     const [waiting, setWaiting] = useState<boolean>(false);
 
-    const hasParams = useMemo<boolean>(() => query && (query.has('q') || query.has('fq')), [query]);
+    const hasParams = useMemo<boolean>(() => query && (query.has('q') || query.has('fq') || query.has('tc')), [query]);
 
-    const isSingleAlert = useMemo<boolean>(
-      () => query && query.getAll('fq').some(fq => fq.startsWith('alert_id')),
-      [query]
-    );
+    const isSingleAlert = useMemo<boolean>(() => query && !!query?.get('q')?.startsWith('alert_id'), [query]);
 
     const validBody = useMemo<boolean>(
       () =>
@@ -194,7 +191,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                     borderRadius: theme.spacing(0.5)
                   }}
                 >
-                  <AlertFiltersSelected query={query} disableActions hideTCStart hideTC={hideTC} hideSort />
+                  <AlertFiltersSelected query={query} disableActions hideTCStart hideTC={isSingleAlert} hideSort />
                 </div>
               </div>
             )}
