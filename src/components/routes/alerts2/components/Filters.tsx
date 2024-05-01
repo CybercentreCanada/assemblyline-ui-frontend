@@ -358,6 +358,14 @@ const Favorites: React.FC<FavoritesProps> = React.memo(
                     }}
                   />
                 }
+                tooltip={
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ fontStyle: 'normal' }}>{item.query}</div>
+                    <div
+                      style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}
+                    >{`(${item.created_by})`}</div>
+                  </div>
+                }
                 size="small"
                 variant={item.not ? 'outlined' : 'filled'}
                 color={item.not ? 'error' : 'default'}
