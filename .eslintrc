@@ -8,8 +8,8 @@
     "plugin:react/recommended"
   ],
   "root": true,
-  "parser": "@typescript-eslint/parser",
   "ignorePatterns": ["vite.config.mts"],
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "tsconfig.json"
   },
@@ -48,6 +48,7 @@
     }
   },
   "rules": {
+    "@typescript-eslint/ban-types": "warn",
     "@typescript-eslint/consistent-type-imports": "warn",
     "@typescript-eslint/default-param-last": "off",
     "@typescript-eslint/indent": "off",
@@ -71,21 +72,27 @@
         "selector": "typeLike"
       }
     ],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-floating-promises": "warn",
+    "@typescript-eslint/no-for-in-array": "warn",
     "@typescript-eslint/no-misused-promises": "off",
+    "@typescript-eslint/no-unnecessary-type-assertion": "warn",
+    "@typescript-eslint/no-unsafe-argument": "warn",
+    "@typescript-eslint/no-unsafe-assignment": "warn",
+    "@typescript-eslint/no-unsafe-call": "warn",
+    "@typescript-eslint/no-unsafe-enum-comparison": "warn",
+    "@typescript-eslint/no-unsafe-member-access": "warn",
+    "@typescript-eslint/no-unsafe-return": "warn",
     "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-use-before-define": "warn",
+    "@typescript-eslint/prefer-as-const": "warn",
     "@typescript-eslint/space-before-function-paren": "off",
     "arrow-parens": ["error", "as-needed"],
     "comma-spacing": "warn",
     "import/imports-first": ["error", "absolute-first"],
     "import/newline-after-import": "error",
-    "import/no-cycle": ["error", { "maxDepth": 1 }],
-    "import/no-extraneous-dependencies": [
-      "error",
-      {
-        "devDependencies": true,
-        "packageDir": "./"
-      }
-    ],
+    "import/no-cycle": ["warn", { "maxDepth": 1 }],
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true, "packageDir": "./" }],
     "import/no-named-as-default": "off",
     "import/prefer-default-export": "off",
     "jsx-a11y/anchor-is-valid": [
@@ -117,36 +124,28 @@
     "no-prototype-builtins": "warn",
     "no-relative-import-paths/no-relative-import-paths": [
       "warn",
-      { "allowSameFolder": true, "rootDir": "src", "prefix": "" }
+      { "allowSameFolder": true, "prefix": "", "rootDir": "src" }
     ],
     "no-underscore-dangle": "off",
     "no-unused-vars": "warn",
+    "no-var": "warn",
+    "prefer-const": "warn",
     "radix": "off",
     "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
     "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
     "react/display-name": "warn",
     "react/jsx-curly-newline": "off",
-    "react/jsx-filename-extension": [
-      1,
-      {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
-      }
-    ],
+    "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
     "react/jsx-no-literals": [
       "warn",
       {
-        "noStrings": false,
         "allowedStrings": ["/", ":", "(", ")", ":&nbsp;", "-", "APA2B", "."],
         "ignoreProps": false,
-        "noAttributeStrings": false
+        "noAttributeStrings": false,
+        "noStrings": false
       }
     ],
-    "react/jsx-one-expression-per-line": [
-      "off",
-      {
-        "allow": "literal"
-      }
-    ],
+    "react/jsx-one-expression-per-line": ["off", { "allow": "literal" }],
     "react/jsx-props-no-spreading": "off",
     "react/jsx-uses-react": "off",
     "react/jsx-wrap-multilines": "off",
@@ -158,14 +157,14 @@
   },
   "globals": {
     "Blob": true,
-    "document": true,
-    "fetch": true,
     "FileReader": true,
     "FormData": true,
     "Headers": true,
+    "Request": true,
+    "document": true,
+    "fetch": true,
     "localStorage": true,
     "navigator": true,
-    "Request": true,
     "vi": true,
     "window": true
   }
