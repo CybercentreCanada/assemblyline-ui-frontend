@@ -135,8 +135,9 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
   };
 
   const renderParamLabelTags = (values: string[]) => {
-    return values.map(value => (
+    return values.map((value, i) => (
       <CustomChip
+        key={i}
         label={
           <div style={{ display: 'flex' }}>
             {value === param.default ? (
@@ -161,8 +162,9 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
   };
 
   const renderSPLabelTags = (values: string[]) => {
-    return values.map(value => (
+    return values.map((value, i) => (
       <CustomChip
+        key={i}
         label={
           <div style={{ display: 'flex' }}>
             {value === tempUserParams.default ? (

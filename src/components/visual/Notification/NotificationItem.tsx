@@ -269,7 +269,12 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
               {notification.authors
                 .filter((_, i) => i < 2)
                 .map((author, i) => (
-                  <Author key={`${i} - ${author}`} author={author} index={i} last={notification.authors.length - 1} />
+                  <Author
+                    key={`${i} - ${author.name}`}
+                    author={author}
+                    index={i}
+                    last={notification.authors.length - 1}
+                  />
                 ))}
             </div>
           )}

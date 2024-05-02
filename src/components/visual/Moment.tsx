@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { ReactNode, memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const MOMENT_VARIANTS = [
@@ -14,7 +14,7 @@ const MOMENT_VARIANTS = [
 type MomentVariant = (typeof MOMENT_VARIANTS)[number];
 
 type MomentProps = {
-  children?: ReactNode;
+  children: string;
   format?: string;
   variant?: MomentVariant;
 };
@@ -22,7 +22,7 @@ type MomentProps = {
 const WrappedMoment = ({ children = null, format = null, variant = null }: MomentProps) => {
   const { i18n } = useTranslation();
 
-  const data = useMemo<string | any>(() => {
+  const data = useMemo<string>(() => {
     try {
       const input = new Date(children.toString()).toISOString();
       const time = moment(input).locale(i18n.language);
@@ -73,12 +73,13 @@ const WrappedMoment = ({ children = null, format = null, variant = null }: Momen
                 }
           );
         default:
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
           return time.toString();
       }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.debug(error);
-      return children.toString();
+      return children;
     }
   }, [children, format, i18n.language, variant]);
 

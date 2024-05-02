@@ -75,18 +75,21 @@
         "selector": "typeLike"
       }
     ],
+    "@typescript-eslint/no-duplicate-type-constituents": "off",
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-floating-promises": "warn",
     "@typescript-eslint/no-for-in-array": "warn",
     "@typescript-eslint/no-misused-promises": "off",
     "@typescript-eslint/no-redundant-type-constituents": "warn",
     "@typescript-eslint/no-unnecessary-type-assertion": "warn",
+    "@typescript-eslint/no-unnecessary-type-constraint": "warn",
     "@typescript-eslint/no-unsafe-argument": "warn",
     "@typescript-eslint/no-unsafe-assignment": "warn",
     "@typescript-eslint/no-unsafe-call": "warn",
     "@typescript-eslint/no-unsafe-enum-comparison": "warn",
     "@typescript-eslint/no-unsafe-member-access": "warn",
     "@typescript-eslint/no-unsafe-return": "warn",
+    "@typescript-eslint/no-unused-expressions": "off",
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-use-before-define": "warn",
     "@typescript-eslint/prefer-as-const": "warn",
@@ -131,6 +134,7 @@
       { "allowSameFolder": true, "prefix": "", "rootDir": "src" }
     ],
     "no-underscore-dangle": "off",
+    "no-unsafe-optional-chaining": "warn",
     "no-unused-vars": "warn",
     "no-var": "warn",
     "prefer-const": "warn",
@@ -138,7 +142,7 @@
     "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
     "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
     "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }],
-    "react/display-name": "warn",
+    "react/display-name": "off",
     "react/jsx-curly-newline": "off",
     "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
     "react/jsx-no-literals": [

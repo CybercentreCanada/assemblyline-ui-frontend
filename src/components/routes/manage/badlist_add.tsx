@@ -501,7 +501,13 @@ const BadlistNew = () => {
                       renderInput={params => <TextField {...params} />}
                       renderTags={(value, getTagProps) =>
                         value.map((option, index) => (
-                          <Chip size="small" variant="outlined" label={option} {...getTagProps({ index })} />
+                          <Chip
+                            key={index}
+                            size="small"
+                            variant="outlined"
+                            label={option}
+                            {...getTagProps({ index })}
+                          />
                         ))
                       }
                       onChange={(_, value) =>
