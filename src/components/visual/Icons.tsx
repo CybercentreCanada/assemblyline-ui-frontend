@@ -31,12 +31,12 @@ const AssemblylineIcon = ({ ...props }: SvgIconProps) => {
           gradientUnits="userSpaceOnUse"
           gradientTransform="matrix(1.2,0,0,1.2,-8.208,0)"
         >
-          <stop offset="0" stop-color={lighten(theme.palette.primary.main, 0.4)} />
-          <stop offset=".51" stop-color={lighten(theme.palette.primary.main, 0.2)} />
-          <stop offset=".7" stop-color={lighten(theme.palette.primary.main, 0.1)} />
-          <stop offset=".83" stop-color={lighten(theme.palette.primary.main, 0.05)} />
-          <stop offset=".93" stop-color={lighten(theme.palette.primary.main, 0.025)} />
-          <stop offset="1" stop-color={theme.palette.primary.main} />
+          <stop offset="0" stopColor={lighten(theme.palette.primary.main, 0.4)} />
+          <stop offset=".51" stopColor={lighten(theme.palette.primary.main, 0.2)} />
+          <stop offset=".7" stopColor={lighten(theme.palette.primary.main, 0.1)} />
+          <stop offset=".83" stopColor={lighten(theme.palette.primary.main, 0.05)} />
+          <stop offset=".93" stopColor={lighten(theme.palette.primary.main, 0.025)} />
+          <stop offset="1" stopColor={theme.palette.primary.main} />
         </radialGradient>
       </defs>
       <g transform="translate(-1.1150504,7.211)">
