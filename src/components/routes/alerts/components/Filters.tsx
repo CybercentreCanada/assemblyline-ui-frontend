@@ -157,9 +157,9 @@ const AlertSort: React.FC<AlertSortProps> = React.memo(({ value = null, onChange
             </div>
           )}
         >
-          {SORT_OPTIONS.map(option => (
+          {SORT_OPTIONS.map((option, i) => (
             <MenuItem
-              key={option.value}
+              key={`${option.value}-${i}`}
               value={option.value}
               onClick={(event: any) =>
                 onChange(field === option.value && dir === 'desc' ? `${option.value} asc` : `${option.value} desc`)
@@ -203,8 +203,8 @@ const AlertSelect: React.FC<AlertSelectProps> = React.memo(
             onChange={event => onChange(event.target.value as string)}
             MenuProps={{ className: classes.selectMenu }}
           >
-            {options.map(option => (
-              <MenuItem key={option.value} value={option.value}>
+            {options.map((option, i) => (
+              <MenuItem key={`${option.value}-${i}`} value={option.value}>
                 {t(option.label)}
               </MenuItem>
             ))}
@@ -290,7 +290,7 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
           getOptionLabel={option => (typeof option === 'string' ? option : option.label)}
           isOptionEqualToValue={(option, filter) => !!option && !!filter && option.label === filter.label}
           renderOption={(props, item, state) => (
-            <li {...props} key={item.value} style={{ justifyContent: 'space-between' }}>
+            <li {...props} key={`${item.value}-${state.index}`} style={{ justifyContent: 'space-between' }}>
               <Typography
                 color={item.count > 0 ? theme.palette.text.primary : theme.palette.text.disabled}
                 style={{ wordBreak: 'break-all' }}
@@ -349,7 +349,7 @@ const Favorites: React.FC<FavoritesProps> = React.memo(
             items.map((item, index) => (
               <CustomChip
                 {...getTagProps({ index })}
-                key={index}
+                key={`${item.name}-${item.query}-${index}`}
                 label={item.name}
                 icon={
                   <StarIcon
@@ -383,7 +383,7 @@ const Favorites: React.FC<FavoritesProps> = React.memo(
             option === null || against === null ? false : option.query === against.query
           }
           renderOption={(props, item, state) => (
-            <li {...props} key={`${item.name}-${item.query}`}>
+            <li {...props} key={`${item.name}-${item.query}-${state.index}`}>
               <div
                 style={{
                   flex: 1,
