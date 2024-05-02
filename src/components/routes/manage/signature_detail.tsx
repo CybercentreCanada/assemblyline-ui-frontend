@@ -121,7 +121,11 @@ const defaultStats = {
   sum: 0
 };
 
-const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetailProps) => {
+const SignatureDetail = ({
+  signature_id = null,
+  onUpdated = () => null,
+  onDeleted = () => null
+}: SignatureDetailProps) => {
   const { t, i18n } = useTranslation(['manageSignatureDetail']);
   const { id, type, source, name } = useParams<ParamProps>();
   const theme = useTheme();
@@ -562,12 +566,6 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   ) : (
     <ForbiddenPage />
   );
-};
-
-SignatureDetail.defaultProps = {
-  signature_id: null,
-  onUpdated: () => {},
-  onDeleted: () => {}
 };
 
 export default SignatureDetail;

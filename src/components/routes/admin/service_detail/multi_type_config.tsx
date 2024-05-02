@@ -30,7 +30,15 @@ const DEFAULT_CONFIG: ExtendedServiceConfig = {
   value: 'false'
 };
 
-const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiTypeConfigProps) => {
+const WrappedMultiTypeConfig = ({
+  config = null,
+  // eslint-disable-next-line no-console
+  onAdd = c => console.log('ADD', c),
+  // eslint-disable-next-line no-console
+  onUpdate = c => console.log('UPDATE', c),
+  // eslint-disable-next-line no-console
+  onDelete = c => console.log('DELETE', c)
+}: MultiTypeConfigProps) => {
   const { t } = useTranslation(['adminServices']);
   const [tempConfig, setTempConfig] = useState(DEFAULT_CONFIG);
   const theme = useTheme();
@@ -316,16 +324,6 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
       </Grid>
     </Grid>
   );
-};
-
-WrappedMultiTypeConfig.defaultProps = {
-  config: null,
-  // eslint-disable-next-line no-console
-  onAdd: config => console.log('ADD', config),
-  // eslint-disable-next-line no-console
-  onUpdate: config => console.log('UPDATE', config),
-  // eslint-disable-next-line no-console
-  onDelete: config => console.log('DELETE', config)
 };
 
 const MultiTypeConfig = React.memo(WrappedMultiTypeConfig);

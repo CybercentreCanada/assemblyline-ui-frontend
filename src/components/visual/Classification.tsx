@@ -17,11 +17,11 @@ import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import CustomChip, { ColorMap, PossibleColors } from 'components/visual/CustomChip';
 import {
+  FormatProp,
   applyClassificationRules,
   defaultClassificationValidator,
   defaultDisabled,
   defaultParts,
-  FormatProp,
   getLevelText,
   getParts,
   normalizedClassification
@@ -35,8 +35,8 @@ interface ClassificationProps {
   size?: 'medium' | 'small' | 'tiny';
   type?: 'picker' | 'pill' | 'outlined' | 'text';
   format?: FormatProp;
-  inline: boolean;
-  isUser: boolean;
+  inline?: boolean;
+  isUser?: boolean;
   fullWidth?: boolean;
   dynGroup?: string;
   disabled?: boolean;
@@ -83,15 +83,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function WrappedClassification({
-  c12n,
-  format,
-  inline,
-  setClassification,
-  size,
-  type,
-  isUser,
-  fullWidth,
-  dynGroup,
+  c12n = null,
+  format = 'short',
+  inline = false,
+  setClassification = null,
+  size = 'medium',
+  type = 'pill',
+  isUser = false,
+  fullWidth = true,
+  dynGroup = null,
   disabled = false
 }: ClassificationProps) {
   const classes = useStyles();
@@ -424,17 +424,6 @@ function WrappedClassification({
     ))
   );
 }
-
-WrappedClassification.defaultProps = {
-  setClassification: null,
-  size: 'medium' as 'medium',
-  type: 'pill' as 'pill',
-  format: 'short' as 'short',
-  inline: false,
-  isUser: false,
-  fullWidth: true,
-  dynGroup: null
-};
 
 const Classification = React.memo(WrappedClassification);
 export default Classification;

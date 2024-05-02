@@ -6,11 +6,12 @@ import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { alpha, CircularProgress, IconButton, Modal, Skeleton, Slider, Tooltip } from '@mui/material';
+import { CircularProgress, IconButton, Modal, Skeleton, Slider, Tooltip, alpha } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/carousel/Carousel';
 import useMyAPI from 'components/hooks/useMyAPI';
+import md5 from 'md5';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -276,6 +277,10 @@ const WrappedCarouselContainer = ({
     startX: 0,
     startY: 0
   });
+
+  const test = md5('asd');
+
+  const test2 = useMemo(() => md5('asd'), []);
 
   const [imageRendering, setImageRendering] = useState<'auto' | 'pixelated'>('auto' as 'auto');
 

@@ -38,6 +38,11 @@ jobs:
           npm run ci
         displayName: Test
 
+      - script: |
+          set -xv  # Echo commands before they are run
+          npm run ci-lint
+        displayName: ESLint
+
       - task: PublishCodeCoverageResults@2
         inputs:
           codeCoverageTool: Cobertura

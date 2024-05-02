@@ -127,7 +127,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const BadlistNew = () => {
+type Props = {
+  badlist_id?: string;
+  close?: () => void;
+};
+
+// eslint-disable-next-line no-empty-pattern
+const BadlistNew = ({}: Props) => {
   const { t } = useTranslation(['manageBadlistAdd']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -501,7 +507,13 @@ const BadlistNew = () => {
                       renderInput={params => <TextField {...params} />}
                       renderTags={(value, getTagProps) =>
                         value.map((option, index) => (
-                          <Chip size="small" variant="outlined" label={option} {...getTagProps({ index })} />
+                          <Chip
+                            key={index}
+                            size="small"
+                            variant="outlined"
+                            label={option}
+                            {...getTagProps({ index })}
+                          />
                         ))
                       }
                       onChange={(_, value) =>
@@ -525,11 +537,6 @@ const BadlistNew = () => {
   ) : (
     <ForbiddenPage />
   );
-};
-
-BadlistNew.defaultProps = {
-  badlist_id: null,
-  close: () => {}
 };
 
 export default BadlistNew;

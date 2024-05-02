@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
+export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
   const { t } = useTranslation(['adminErrorViewer']);
   const classes = useStyles();
   const theme = useTheme();
@@ -213,10 +213,6 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
   ) : (
     <Navigate to="/forbidden" replace />
   );
-};
-
-ErrorDetail.defaultProps = {
-  error_key: null
 };
 
 export default ErrorDetail;

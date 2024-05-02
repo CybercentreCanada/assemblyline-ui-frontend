@@ -39,7 +39,7 @@ type ContainerCardProps = {
   onChange: (newContainer: Container, name?: string, newVolumes?: { [name: string]: Volume }) => void;
 };
 
-const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: ContainerCardProps) => {
+const WrappedContainerCard = ({ container, defaults, name = null, volumes = null, onChange }: ContainerCardProps) => {
   const { t } = useTranslation(['adminServices']);
   const [dialog, setDialog] = useState(false);
   const theme = useTheme();
@@ -144,11 +144,6 @@ const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: 
       </Card>
     </div>
   ) : null;
-};
-
-WrappedContainerCard.defaultProps = {
-  name: null,
-  volumes: null
 };
 
 const ContainerCard = React.memo(WrappedContainerCard);
