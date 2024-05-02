@@ -20,7 +20,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import { buildSearchQuery } from '../utils/alertUtils';
 import AlertFiltersSelected from './FiltersSelected';
 
 const LOCAL_STORAGE = 'alert.search';
@@ -89,22 +88,16 @@ const WrappedAlertDefaultSearchParameters = () => {
           <IconButton
             size="large"
             onClick={() => {
-              setCurrentQuery(() =>
-                buildSearchQuery({
-                  search: location.search,
-                  singles: ['q', 'sort', 'group_by', 'tc'],
-                  multiples: ['fq'],
-                  defaultString: DEFAULT_QUERY
-                })
-              );
-              setExistingQuery(() =>
-                buildSearchQuery({
-                  search: localStorage.getItem(LOCAL_STORAGE),
-                  singles: ['q', 'sort', 'group_by', 'tc'],
-                  multiples: ['fq'],
-                  defaultString: DEFAULT_QUERY
-                })
-              );
+              setCurrentQuery(() => {
+                const q = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
+                q.delete('tc_start');
+                return q;
+              });
+              setExistingQuery(() => {
+                const q = new SimpleSearchQuery(localStorage.getItem(LOCAL_STORAGE) || '', DEFAULT_QUERY);
+                q.delete('tc_start');
+                return q;
+              });
               setOpen(true);
             }}
           >
@@ -133,7 +126,7 @@ const WrappedAlertDefaultSearchParameters = () => {
                 backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
               }}
             >
-              {!existingQuery || existingQuery.toString() === '' ? (
+              {!existingQuery ? (
                 <div>{t('none')}</div>
               ) : (
                 <AlertFiltersSelected query={existingQuery} disableActions hideTCStart />
@@ -151,7 +144,7 @@ const WrappedAlertDefaultSearchParameters = () => {
                 backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
               }}
             >
-              {!currentQuery || currentQuery.toString() === '' ? (
+              {!currentQuery ? (
                 <div>{t('none')}</div>
               ) : (
                 <AlertFiltersSelected query={currentQuery} disableActions hideTCStart />
