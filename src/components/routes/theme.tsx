@@ -42,8 +42,8 @@ const Theme = () => {
             'info' as 'info',
             'success' as 'success',
             'warning' as 'warning'
-          ].map(val => (
-            <Button variant="contained" color={val}>
+          ].map((val, i) => (
+            <Button key={i} variant="contained" color={val}>
               {val}
             </Button>
           ))}
@@ -56,8 +56,8 @@ const Theme = () => {
             'info' as 'info',
             'success' as 'success',
             'warning' as 'warning'
-          ].map(val => (
-            <Button variant="outlined" color={val}>
+          ].map((val, i) => (
+            <Button key={i} variant="outlined" color={val}>
               {val}
             </Button>
           ))}
@@ -70,8 +70,8 @@ const Theme = () => {
             'info' as 'info',
             'success' as 'success',
             'warning' as 'warning'
-          ].map(val => (
-            <Button variant="text" color={val}>
+          ].map((val, i) => (
+            <Button key={i} variant="text" color={val}>
               {val}
             </Button>
           ))}
@@ -87,8 +87,8 @@ const Theme = () => {
             'info' as 'info',
             'success' as 'success',
             'warning' as 'warning'
-          ].map(val => (
-            <IconButton color={val}>
+          ].map((val, i) => (
+            <IconButton key={i} color={val}>
               <FileOpenIcon />
             </IconButton>
           ))}
@@ -102,8 +102,8 @@ const Theme = () => {
             'info' as 'info',
             'success' as 'success',
             'warning' as 'warning'
-          ].map(val => (
-            <IconButton color={val}>
+          ].map((val, i) => (
+            <IconButton key={i} color={val}>
               <AddPhotoAlternateOutlinedIcon />
             </IconButton>
           ))}
@@ -119,8 +119,8 @@ const Theme = () => {
             'info' as 'info',
             'success' as 'success',
             'warning' as 'warning'
-          ].map(val => (
-            <Switch color={val} defaultChecked />
+          ].map((val, i) => (
+            <Switch key={i} color={val} defaultChecked />
           ))}
           <Switch />
         </Stack>
@@ -133,8 +133,8 @@ const Theme = () => {
             'info' as 'info',
             'success' as 'success',
             'warning' as 'warning'
-          ].map(val => (
-            <Switch color={val} defaultChecked disabled />
+          ].map((val, i) => (
+            <Switch key={i} color={val} defaultChecked disabled />
           ))}
           <Switch disabled />
         </Stack>
@@ -149,8 +149,8 @@ const Theme = () => {
             'info' as 'info',
             'success' as 'success',
             'warning' as 'warning'
-          ].map(val => (
-            <CustomChip color={val} label={val} />
+          ].map((val, i) => (
+            <CustomChip key={i} color={val} label={val} />
           ))}
         </Stack>
         <Stack direction="row" spacing={1}>
@@ -162,8 +162,8 @@ const Theme = () => {
             'info' as 'info',
             'success' as 'success',
             'warning' as 'warning'
-          ].map(val => (
-            <CustomChip color={val} label={val} onClick={() => null} />
+          ].map((val, i) => (
+            <CustomChip key={i} color={val} label={val} onClick={() => null} />
           ))}
         </Stack>
         <Stack direction="row" spacing={1}>
@@ -175,30 +175,30 @@ const Theme = () => {
             'info' as 'info',
             'success' as 'success',
             'warning' as 'warning'
-          ].map(val => (
-            <CustomChip variant="outlined" color={val} label={val} />
+          ].map((val, i) => (
+            <CustomChip key={i} variant="outlined" color={val} label={val} />
           ))}
         </Stack>
 
         <Typography variant="h4">Classifications</Typography>
         <Stack direction="row" spacing={1}>
-          {['TLP:C', 'TLP:G', 'TLP:A'].map(val => (
-            <Classification type="outlined" format="long" c12n={val} />
+          {['TLP:C', 'TLP:G', 'TLP:A'].map((val, i) => (
+            <Classification key={i} type="outlined" format="long" c12n={val} />
           ))}
         </Stack>
         <Stack direction="row" spacing={1}>
-          {['TLP:C', 'TLP:G', 'TLP:A'].map(val => (
-            <Classification type="pill" format="long" c12n={val} />
+          {['TLP:C', 'TLP:G', 'TLP:A'].map((val, i) => (
+            <Classification key={i} type="pill" format="long" c12n={val} />
           ))}
         </Stack>
         <Stack direction="row" spacing={1}>
-          {['TLP:C', 'TLP:G', 'TLP:A'].map(val => (
-            <Classification type="picker" format="long" c12n={val} />
+          {['TLP:C', 'TLP:G', 'TLP:A'].map((val, i) => (
+            <Classification key={i} type="picker" format="long" c12n={val} />
           ))}
         </Stack>
         <Stack direction="row" spacing={1}>
-          {['TLP:C', 'TLP:G', 'TLP:A'].map(val => (
-            <Classification type="text" format="long" c12n={val} />
+          {['TLP:C', 'TLP:G', 'TLP:A'].map((val, i) => (
+            <Classification key={i} type="text" format="long" c12n={val} />
           ))}
         </Stack>
 
@@ -210,68 +210,68 @@ const Theme = () => {
             'suspicious' as 'suspicious',
             'highly_suspicious' as 'highly_suspicious',
             'malicious' as 'malicious'
-          ].map(val => (
-            <>
+          ].map((val, i) => (
+            <div key={i} style={{ display: 'contents' }}>
               <Verdict verdict={val} />
               <TextVerdict verdict={val} />
-            </>
+            </div>
           ))}
         </Stack>
 
         <Typography variant="h4">Submission Priority</Typography>
         <Stack direction="row" spacing={1}>
-          {[0, 100, 200, 300, 500, 1000, 1500].map(val => (
-            <Priority priority={val} />
+          {[0, 100, 200, 300, 500, 1000, 1500].map((val, i) => (
+            <Priority key={i} priority={val} />
           ))}
         </Stack>
 
         <Typography variant="h4">Submission State</Typography>
         <Stack direction="row" spacing={1}>
-          {['error', 'completed', 'submitted'].map(val => (
-            <SubmissionState state={val} />
+          {['error', 'completed', 'submitted'].map((val, i) => (
+            <SubmissionState key={i} state={val} />
           ))}
         </Stack>
 
         <Typography variant="h4">Signature Status</Typography>
         <Stack direction="row" spacing={1}>
-          {['DEPLOYED' as 'DEPLOYED', 'NOISY' as 'NOISY', 'DISABLED' as 'DISABLED'].map(val => (
-            <SignatureStatus status={val} />
+          {['DEPLOYED' as 'DEPLOYED', 'NOISY' as 'NOISY', 'DISABLED' as 'DISABLED'].map((val, i) => (
+            <SignatureStatus key={i} status={val} />
           ))}
         </Stack>
         <Stack direction="row" spacing={1}>
-          {['DEPLOYED' as 'DEPLOYED', 'NOISY' as 'NOISY', 'DISABLED' as 'DISABLED'].map(val => (
-            <SignatureStatus status={val} variant="outlined" />
+          {['DEPLOYED' as 'DEPLOYED', 'NOISY' as 'NOISY', 'DISABLED' as 'DISABLED'].map((val, i) => (
+            <SignatureStatus key={i} status={val} variant="outlined" />
           ))}
         </Stack>
 
         <Typography variant="h4">Alert Extended Scans</Typography>
         <Stack direction="row" spacing={1}>
-          {['incomplete', 'completed', 'submitted', 'skipped'].map(val => (
-            <AlertExtendedScan name={val} />
+          {['incomplete', 'completed', 'submitted', 'skipped'].map((val, i) => (
+            <AlertExtendedScan key={i} name={val} />
           ))}
         </Stack>
         <Stack direction="row" spacing={1}>
-          {['incomplete', 'completed', 'submitted', 'skipped'].map(val => (
-            <AlertExtendedScan name={val} withChip />
+          {['incomplete', 'completed', 'submitted', 'skipped'].map((val, i) => (
+            <AlertExtendedScan key={i} name={val} withChip />
           ))}
         </Stack>
 
         <Typography variant="h4">Alert Priority</Typography>
         <Stack direction="row" spacing={1}>
-          {['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].map(val => (
-            <AlertPriority name={val} />
+          {['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].map((val, i) => (
+            <AlertPriority key={i} name={val} />
           ))}
         </Stack>
         <Stack direction="row" spacing={1}>
-          {['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].map(val => (
-            <AlertPriority name={val} withChip />
+          {['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].map((val, i) => (
+            <AlertPriority key={i} name={val} withChip />
           ))}
         </Stack>
 
         <Typography variant="h4">Alert Status</Typography>
         <Stack direction="row" spacing={1}>
-          {['TRIAGE', 'MALICIOUS', 'ASSESS'].map(val => (
-            <AlertStatus name={val} />
+          {['TRIAGE', 'MALICIOUS', 'ASSESS'].map((val, i) => (
+            <AlertStatus key={i} name={val} />
           ))}
         </Stack>
       </Stack>
