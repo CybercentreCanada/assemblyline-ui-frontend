@@ -69,7 +69,7 @@ const WrappedAlertDefaultSearchParameters = () => {
   const isSameQuery = useMemo<boolean>(
     () =>
       (!currentQuery && !existingQuery) ||
-      JSON.stringify(currentQuery.getDeltaString()) === JSON.stringify(existingQuery.getDeltaString()),
+      JSON.stringify(currentQuery?.getDeltaString()) === JSON.stringify(existingQuery?.getDeltaString()),
     [currentQuery, existingQuery]
   );
 
@@ -94,7 +94,7 @@ const WrappedAlertDefaultSearchParameters = () => {
                 return q;
               });
               setExistingQuery(() => {
-                const q = new SimpleSearchQuery(localStorage.getItem(LOCAL_STORAGE), DEFAULT_QUERY);
+                const q = new SimpleSearchQuery(localStorage.getItem(LOCAL_STORAGE) || '', DEFAULT_QUERY);
                 q.delete('tc_start');
                 return q;
               });
@@ -109,8 +109,6 @@ const WrappedAlertDefaultSearchParameters = () => {
         classes={{ paper: classes.dialogPaper }}
         open={open}
         onClose={() => {
-          setCurrentQuery(null);
-          setExistingQuery(null);
           setOpen(false);
         }}
       >
@@ -128,7 +126,7 @@ const WrappedAlertDefaultSearchParameters = () => {
                 backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
               }}
             >
-              {!existingQuery || existingQuery.toString() === '' ? (
+              {!existingQuery ? (
                 <div>{t('none')}</div>
               ) : (
                 <AlertFiltersSelected query={existingQuery} disableActions hideTCStart />
@@ -146,7 +144,7 @@ const WrappedAlertDefaultSearchParameters = () => {
                 backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
               }}
             >
-              {!currentQuery || currentQuery.toString() === '' ? (
+              {!currentQuery ? (
                 <div>{t('none')}</div>
               ) : (
                 <AlertFiltersSelected query={currentQuery} disableActions hideTCStart />

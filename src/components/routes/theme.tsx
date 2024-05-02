@@ -11,9 +11,7 @@ import SignatureStatus from 'components/visual/SignatureStatus';
 import SubmissionState from 'components/visual/SubmissionState';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
-import AlertExtendedScan from './alerts/alert-extended_scan';
-import AlertPriority from './alerts/alert-priority';
-import AlertStatus from './alerts/alert-status';
+import { AlertExtendedScan, AlertPriority, AlertStatus } from './alerts/components/Components';
 
 const Theme = () => {
   const theme = useTheme();
