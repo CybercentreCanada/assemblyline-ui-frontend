@@ -221,7 +221,7 @@ export function priorityText(priority: number | null) {
  * @returns value from path
  *
  */
-export function getValueFromPath(obj: object, path: string) {
+export function getValueFromPath(obj: object, path: string): undefined | string | object {
   if (path === undefined || path === null) {
     return undefined;
   }
