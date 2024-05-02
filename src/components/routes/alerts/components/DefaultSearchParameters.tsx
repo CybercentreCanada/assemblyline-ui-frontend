@@ -20,6 +20,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
+import { buildSearchQuery } from '../utils/alertUtils';
 import AlertFiltersSelected from './FiltersSelected';
 
 const LOCAL_STORAGE = 'alert.search';
@@ -69,7 +70,7 @@ const WrappedAlertDefaultSearchParameters = () => {
   const isSameQuery = useMemo<boolean>(
     () =>
       (!currentQuery && !existingQuery) ||
-      JSON.stringify(currentQuery.getDeltaString()) === JSON.stringify(existingQuery.getDeltaString()),
+      JSON.stringify(currentQuery?.getDeltaString()) === JSON.stringify(existingQuery?.getDeltaString()),
     [currentQuery, existingQuery]
   );
 
@@ -88,16 +89,22 @@ const WrappedAlertDefaultSearchParameters = () => {
           <IconButton
             size="large"
             onClick={() => {
-              setCurrentQuery(() => {
-                const q = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
-                q.delete('tc_start');
-                return q;
-              });
-              setExistingQuery(() => {
-                const q = new SimpleSearchQuery(localStorage.getItem(LOCAL_STORAGE), DEFAULT_QUERY);
-                q.delete('tc_start');
-                return q;
-              });
+              setCurrentQuery(() =>
+                buildSearchQuery({
+                  search: location.search,
+                  singles: ['q', 'sort', 'group_by', 'tc'],
+                  multiples: ['fq'],
+                  defaultString: DEFAULT_QUERY
+                })
+              );
+              setExistingQuery(() =>
+                buildSearchQuery({
+                  search: localStorage.getItem(LOCAL_STORAGE),
+                  singles: ['q', 'sort', 'group_by', 'tc'],
+                  multiples: ['fq'],
+                  defaultString: DEFAULT_QUERY
+                })
+              );
               setOpen(true);
             }}
           >
@@ -109,8 +116,6 @@ const WrappedAlertDefaultSearchParameters = () => {
         classes={{ paper: classes.dialogPaper }}
         open={open}
         onClose={() => {
-          setCurrentQuery(null);
-          setExistingQuery(null);
           setOpen(false);
         }}
       >
