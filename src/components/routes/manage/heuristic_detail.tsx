@@ -85,7 +85,7 @@ const defaultStats = {
   sum: 0
 };
 
-const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
+const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
   const { t, i18n } = useTranslation(['manageHeuristicDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -369,10 +369,6 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   ) : (
     <ForbiddenPage />
   );
-};
-
-HeuristicDetail.defaultProps = {
-  heur_id: null
 };
 
 export default HeuristicDetail;

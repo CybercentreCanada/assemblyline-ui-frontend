@@ -51,7 +51,7 @@ type CellProps = {
   [key: string]: any;
 };
 
-export const DivTableCell = ({ children, breakable, ...other }: CellProps) =>
+export const DivTableCell = ({ children = null, breakable = false, ...other }: CellProps) =>
   breakable ? (
     <BreakableTableCell {...other} component="div">
       {children}
@@ -61,11 +61,6 @@ export const DivTableCell = ({ children, breakable, ...other }: CellProps) =>
       {children}
     </StyledTableCell>
   );
-
-DivTableCell.defaultProps = {
-  children: null,
-  breakable: false
-};
 
 type SortableHeaderCellProps = TableCellProps & {
   query?: SimpleSearchQuery;

@@ -48,7 +48,13 @@ const DEFAULT_USER_PARAM: SimpleSubmissionParams = {
   hide: 'false'
 };
 
-const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTypeParamProps) => {
+const WrappedMultiTypeParam = ({
+  param = null,
+  id = null,
+  onAdd = () => null,
+  onUpdate = () => null,
+  onDelete = () => null
+}: MultiTypeParamProps) => {
   const { t } = useTranslation(['adminServices']);
   const [tempUserParams, setTempUserParams] = useState(DEFAULT_USER_PARAM);
   const theme = useTheme();
@@ -351,14 +357,6 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
       </Grid>
     </Grid>
   );
-};
-
-WrappedMultiTypeParam.defaultProps = {
-  param: null,
-  id: null,
-  onAdd: () => null,
-  onUpdate: () => null,
-  onDelete: () => null
 };
 
 const MultiTypeParam = React.memo(WrappedMultiTypeParam);

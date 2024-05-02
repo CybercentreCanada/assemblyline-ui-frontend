@@ -35,7 +35,7 @@ type SourceDialogProps = {
   onSave: (newSource: Source) => void;
 };
 
-const WrappedSourceDialog = ({ open, setOpen, source, defaults, onSave }: SourceDialogProps) => {
+const WrappedSourceDialog = ({ open, setOpen, source = null, defaults, onSave }: SourceDialogProps) => {
   const { t } = useTranslation(['adminServices']);
   const [modified, setModified] = useState(false);
   const { c12nDef } = useALContext();
@@ -95,10 +95,6 @@ const WrappedSourceDialog = ({ open, setOpen, source, defaults, onSave }: Source
       </div>
     )
   );
-};
-
-WrappedSourceDialog.defaultProps = {
-  source: null
 };
 
 const SourceDialog = React.memo(WrappedSourceDialog);
