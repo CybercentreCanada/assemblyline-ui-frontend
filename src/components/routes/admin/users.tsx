@@ -262,7 +262,9 @@ export default function Users() {
                 defaultValue={newUser.groups}
                 renderInput={params => <TextField {...params} />}
                 renderTags={(value, getTagProps) =>
-                  value.map((option, index) => <Chip variant="outlined" label={option} {...getTagProps({ index })} />)
+                  value.map((option, index) => (
+                    <Chip key={index} variant="outlined" label={option} {...getTagProps({ index })} />
+                  ))
                 }
                 onChange={(event, chips) => updateNewUser('groups', chips)}
               />

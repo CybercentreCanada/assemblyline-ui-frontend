@@ -32,9 +32,7 @@ const plugins = [
   {
     id: 'vLineTooltip',
     afterDraw: (chart, args, cfg: TooltipVertLinePluginConfig) => {
-      // @ts-ignore
       if (cfg.display && chart.tooltip?._active?.length) {
-        // @ts-ignore
         let selected = chart.tooltip._active[0].element.x;
         let axis = chart.scales[cfg.yAxis || 'yAxis'];
         if (axis) {
@@ -54,9 +52,7 @@ const plugins = [
   {
     id: 'hLineTooltip',
     afterDraw: (chart, args, cfg: HorizontalLinePluginConfig) => {
-      // @ts-ignore
       if (cfg.display && chart.tooltip?._active?.length) {
-        // @ts-ignore
         let selected = chart.tooltip._active[0].element.y;
         let axis = chart.scales[cfg.xAxis || 'xAxis'];
         if (axis) {
@@ -106,7 +102,7 @@ const WrappedHistogram = ({
     maintainAspectRatio: false,
     responsive: true,
     interaction: {
-      mode: 'index' as 'index',
+      mode: 'index' as const,
       intersect: !verticalLine
     },
     plugins: {
@@ -136,7 +132,7 @@ const WrappedHistogram = ({
         },
         time: isDate
           ? {
-              unit: 'day' as 'day',
+              unit: 'day' as const,
               tooltipFormat:
                 dataset && Object.keys(dataset).every(val => val.indexOf('T00:00:00.000Z') !== -1)
                   ? 'yyyy-MM-dd'
@@ -149,7 +145,7 @@ const WrappedHistogram = ({
               }
             }
           : null,
-        type: isDate ? ('time' as 'time') : ('linear' as 'linear')
+        type: isDate ? ('time' as const) : ('linear' as const)
       },
       yAxis: {
         beginAtZero: true,
@@ -191,7 +187,7 @@ const WrappedHistogram = ({
 
   return histData ? (
     <div style={{ height: height }}>
-      <Line data={histData} options={options} plugins={plugins} />
+      <Line data={histData as unknown} options={options as unknown} plugins={plugins} />
     </div>
   ) : (
     <Skeleton variant="rectangular" height={height} />

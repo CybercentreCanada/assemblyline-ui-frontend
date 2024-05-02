@@ -73,7 +73,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
     const ref = useRef<any>(null);
 
     const resize = useCallback(() => {
-      ref.current && setDisabled(ref.current.scrollWidth <= ref.current.clientWidth);
+      ref.current && setDisabled(() => ref.current.scrollWidth <= ref.current.clientWidth);
     }, []);
 
     useEffect(() => {
