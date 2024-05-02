@@ -75,8 +75,10 @@ export default function AppRegistration() {
                   <Typography variant="caption" color="secondary" gutterBottom style={{ marginTop: '1rem' }}>
                     {t(`roles`)}
                   </Typography>
-                  {roles.map(role => (
-                    <Typography variant="caption">{t(`role.${role}`)}</Typography>
+                  {roles.map((role, i) => (
+                    <Typography key={i} variant="caption">
+                      {t(`role.${role}`)}
+                    </Typography>
                   ))}
                 </>
               )}

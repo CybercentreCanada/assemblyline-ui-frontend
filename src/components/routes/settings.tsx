@@ -112,7 +112,10 @@ function Settings() {
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
-
+  var fileSources = [];
+  for (const v of Object.values(configuration.submission.file_sources || [])) {
+    v.sources.forEach(i => (fileSources.indexOf(i) === -1 ? fileSources.push(i) : null));
+  }
   const { apiCall } = useMyAPI();
 
   const classes = useStyles();
@@ -686,7 +689,7 @@ function Settings() {
         </Table>
       </TableContainer>
 
-      {configuration.submission.sha256_sources && configuration.submission.sha256_sources.length > 0 && (
+      {fileSources && fileSources.length > 0 && (
         <Paper className={classes.group}>
           <ExternalSources disabled={!editable} settings={settings} onChange={toggleExternalSource} />
         </Paper>

@@ -5,10 +5,9 @@ import useALContext from 'components/hooks/useALContext';
 import { RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
-import 'moment/locale/fr';
+import Moment from 'components/visual/Moment';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link, useLocation } from 'react-router-dom';
 import {
   DivTable,
@@ -135,12 +134,10 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
                 )}
               >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  <Tooltip title={retrohunt.created_time}>
-                    <>
-                      <Moment fromNow locale={i18n.language}>
-                        {retrohunt?.created_time}
-                      </Moment>
-                    </>
+                  <Tooltip title={retrohunt?.created_time}>
+                    <div>
+                      <Moment variant="fromNow">{retrohunt?.created_time}</Moment>
+                    </div>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell

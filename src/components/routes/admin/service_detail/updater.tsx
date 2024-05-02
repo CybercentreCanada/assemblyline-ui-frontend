@@ -19,7 +19,6 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import { SourceCard } from 'components/routes/manage/signature_sources';
-import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceDetail, Source } from '../service_detail';

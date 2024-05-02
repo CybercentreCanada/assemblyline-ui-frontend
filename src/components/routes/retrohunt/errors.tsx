@@ -19,7 +19,6 @@ import {
 } from 'components/visual/DivTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

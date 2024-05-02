@@ -10,7 +10,7 @@ import {
   Title,
   Tooltip
 } from 'chart.js';
-import 'chartjs-adapter-moment';
+import 'chartjs-adapter-date-fns';
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 
@@ -32,9 +32,7 @@ const plugins = [
   {
     id: 'vLineTooltip',
     afterDraw: (chart, args, cfg: TooltipVertLinePluginConfig) => {
-      // @ts-ignore
       if (cfg.display && chart.tooltip?._active?.length) {
-        // @ts-ignore
         let selected = chart.tooltip._active[0].element.x;
         let axis = chart.scales[cfg.yAxis || 'yAxis'];
         if (axis) {
@@ -54,9 +52,7 @@ const plugins = [
   {
     id: 'hLineTooltip',
     afterDraw: (chart, args, cfg: HorizontalLinePluginConfig) => {
-      // @ts-ignore
       if (cfg.display && chart.tooltip?._active?.length) {
-        // @ts-ignore
         let selected = chart.tooltip._active[0].element.y;
         let axis = chart.scales[cfg.xAxis || 'xAxis'];
         if (axis) {
@@ -89,8 +85,8 @@ type HistogramProps = {
 
 const WrappedHistogram = ({
   dataset,
-  height,
-  title,
+  height = null,
+  title = null,
   datatype,
   onClick,
   isDate = false,
@@ -106,7 +102,7 @@ const WrappedHistogram = ({
     maintainAspectRatio: false,
     responsive: true,
     interaction: {
-      mode: 'index' as 'index',
+      mode: 'index' as const,
       intersect: !verticalLine
     },
     plugins: {
@@ -136,11 +132,11 @@ const WrappedHistogram = ({
         },
         time: isDate
           ? {
-              unit: 'day' as 'day',
+              unit: 'day' as const,
               tooltipFormat:
                 dataset && Object.keys(dataset).every(val => val.indexOf('T00:00:00.000Z') !== -1)
-                  ? 'YYYY-MM-DD'
-                  : 'YYYY-MM-DD HH:mm:ss',
+                  ? 'yyyy-MM-dd'
+                  : 'yyyy-MM-dd HH:mm:ss',
               displayFormats: {
                 millisecond: 'HH:mm:ss.SSS',
                 second: 'HH:mm:ss',
@@ -149,7 +145,7 @@ const WrappedHistogram = ({
               }
             }
           : null,
-        type: isDate ? ('time' as 'time') : ('linear' as 'linear')
+        type: isDate ? ('time' as const) : ('linear' as const)
       },
       yAxis: {
         beginAtZero: true,
@@ -191,17 +187,11 @@ const WrappedHistogram = ({
 
   return histData ? (
     <div style={{ height: height }}>
-      <Line data={histData} options={options} plugins={plugins} />
+      <Line data={histData} options={options as unknown} plugins={plugins} />
     </div>
   ) : (
     <Skeleton variant="rectangular" height={height} />
   );
-};
-
-WrappedHistogram.defaultProps = {
-  title: null,
-  height: null,
-  isDate: false
 };
 
 const Histogram = React.memo(WrappedHistogram);

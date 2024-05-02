@@ -12,11 +12,10 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import DatePicker from 'components/visual/DatePicker';
 import Histogram from 'components/visual/Histogram';
+import Moment from 'components/visual/Moment';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
-import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -63,7 +62,7 @@ type SafelistDetailProps = {
   close?: () => void;
 };
 
-const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
+const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDetailProps) => {
   const { t, i18n } = useTranslation(['manageSafelistDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -548,10 +547,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 {safelist ? (
                   <div>
                     <Moment format="YYYY-MM-DD">{safelist.added}</Moment>&nbsp; (
-                    <Moment fromNow locale={i18n.language}>
-                      {safelist.added}
-                    </Moment>
-                    )
+                    <Moment variant="fromNow">{safelist.added}</Moment>)
                   </div>
                 ) : (
                   <Skeleton />
@@ -564,10 +560,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 {safelist ? (
                   <div>
                     <Moment format="YYYY-MM-DD">{safelist.updated}</Moment>&nbsp; (
-                    <Moment fromNow locale={i18n.language}>
-                      {safelist.updated}
-                    </Moment>
-                    )
+                    <Moment variant="fromNow">{safelist.updated}</Moment>)
                   </div>
                 ) : (
                   <Skeleton />
@@ -581,10 +574,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                   safelist.expiry_ts ? (
                     <div>
                       <Moment format="YYYY-MM-DD">{safelist.expiry_ts}</Moment>&nbsp; (
-                      <Moment fromNow locale={i18n.language}>
-                        {safelist.expiry_ts}
-                      </Moment>
-                      )
+                      <Moment variant="fromNow">{safelist.expiry_ts}</Moment>)
                     </div>
                   ) : (
                     <span style={{ color: theme.palette.action.disabled }}>{t('expiry.forever')}</span>
@@ -613,11 +603,6 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   ) : (
     <ForbiddenPage />
   );
-};
-
-SafelistDetail.defaultProps = {
-  safelist_id: null,
-  close: () => {}
 };
 
 export default SafelistDetail;

@@ -6,11 +6,11 @@ import { Grid, Tooltip, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
+import Moment from 'components/visual/Moment';
 import Verdict from 'components/visual/Verdict';
 import { verdictRank, verdictToColor } from 'helpers/utils';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Alert, DetailedItem } from '../models/Alert';
 import { AlertExtendedScan, AlertListChip, AlertListChipDetailed, AlertPriority, AlertStatus } from './Components';
 
@@ -129,9 +129,7 @@ const WrappedAlertListItem = ({ item }: Props) => {
           ) : null}
         </Grid>
         <Grid item xs={6} md={2} style={{ textAlign: 'right' }}>
-          <Moment fromNow locale={i18n.language}>
-            {item.reporting_ts}
-          </Moment>
+          <Moment variant="fromNow">{item.reporting_ts}</Moment>
         </Grid>
         <Grid item xs={12} md={2}>
           <Grid container spacing={1}>

@@ -17,10 +17,10 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { DEFAULT_QUERY } from 'components/routes/alerts';
 import CustomChip from 'components/visual/CustomChip';
+import Moment from 'components/visual/Moment';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import { useAlerts } from '../contexts/AlertsContext';
@@ -179,7 +179,7 @@ const WrappedAlertFiltersSelected = ({
   hideSort = false,
   disableActions = false
 }: Props) => {
-  const { t, i18n } = useTranslation('alerts');
+  const { t } = useTranslation('alerts');
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
@@ -358,12 +358,7 @@ const WrappedAlertFiltersSelected = ({
           label={
             <div>
               <span>{t('tc_start')}: </span>
-              <Moment
-                locale={i18n.language}
-                format={i18n.language === 'fr' ? 'Do MMMM YYYY H[h]mm' : 'MMMM D YYYY, h:mm a'}
-              >
-                {query.get('tc_start')}
-              </Moment>
+              <Moment variant="localeDate">{query.get('tc_start')}</Moment>
             </div>
           }
           onDelete={

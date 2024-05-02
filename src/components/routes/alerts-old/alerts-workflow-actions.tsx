@@ -63,8 +63,9 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   };
 
   const renderLabelTags = (values: string[]) => {
-    return values.map(value => (
+    return values.map((value, i) => (
       <CustomChip
+        key={i}
         label={
           <div style={{ display: 'flex' }}>
             {removedLabels.indexOf(value) > -1 ? (

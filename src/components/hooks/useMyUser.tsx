@@ -77,6 +77,7 @@ export type ConfigurationDefinition = {
   };
   core: {
     archiver: {
+      alternate_dtl: number;
       metadata: {
         [metakey: string]: {
           default: string;
@@ -100,7 +101,12 @@ export type ConfigurationDefinition = {
   submission: {
     dtl: number;
     max_dtl: number;
-    sha256_sources: string[];
+    file_sources: {
+      [hash_type: string]: {
+        pattern: string;
+        sources: string[];
+      };
+    };
     verdicts: {
       info: number;
       suspicious: number;
@@ -116,9 +122,6 @@ export type ConfigurationDefinition = {
   ui: {
     ai: {
       enabled: boolean;
-      assistant: {
-        system_message: string;
-      };
     };
     alerting_meta: {
       important: string[];

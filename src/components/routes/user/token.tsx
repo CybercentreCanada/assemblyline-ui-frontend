@@ -12,8 +12,7 @@ import {
 } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-// eslint-disable-next-line import/extensions
-import CBOR from 'helpers/cbor.js';
+import { decode, encode } from 'helpers/cbor';
 import toArrayBuffer from 'helpers/toArrayBuffer';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -59,14 +58,14 @@ export default function SecurityToken({ user, toggleToken }: SecurityTokenProps)
       method: 'POST',
       onSuccess: api_data => {
         const arrayData = toArrayBuffer(api_data.api_response);
-        const options = CBOR.decode(arrayData.buffer);
+        const options = decode(arrayData.buffer);
         const credentialHelper = navigator.credentials;
         if (credentialHelper !== undefined) {
           credentialHelper
             .create(options)
             .then((assertion: PublicKeyCredential) => {
               const response = assertion.response as AuthenticatorAttestationResponse;
-              const attestationData = CBOR.encode({
+              const attestationData = encode({
                 attestationObject: new Uint8Array(response.attestationObject),
                 clientDataJSON: new Uint8Array(response.clientDataJSON)
               });
