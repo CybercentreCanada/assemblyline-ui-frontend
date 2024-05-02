@@ -379,8 +379,8 @@ const WrappedAlertFiltersSelected = ({
 
       {filters.favorites.map((favorite, i) => (
         <CustomChip
-          className={classes.other}
           key={`${favorite.filter}-${i}`}
+          className={classes.other}
           variant="outlined"
           size="small"
           wrap
@@ -411,6 +411,7 @@ const WrappedAlertFiltersSelected = ({
 
       {filters.status.map((status, i) => (
         <CustomChip
+          key={`${status.filter}-${i}`}
           variant="outlined"
           size="small"
           wrap
@@ -424,6 +425,7 @@ const WrappedAlertFiltersSelected = ({
 
       {filters.priority.map((priority, i) => (
         <CustomChip
+          key={`${priority.filter}-${i}`}
           variant="outlined"
           size="small"
           wrap
@@ -451,8 +453,8 @@ const WrappedAlertFiltersSelected = ({
 
       {filters.others.map((other, i) => (
         <CustomChip
-          className={classes.other}
           key={`${other.filter}-${i}`}
+          className={classes.other}
           variant="outlined"
           size="small"
           wrap

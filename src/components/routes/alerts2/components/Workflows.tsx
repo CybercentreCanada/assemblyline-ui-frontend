@@ -80,7 +80,7 @@ type AlertWorkflowDrawerProps = {
 export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.memo(
   ({
     alerts = [],
-    query = new SimpleSearchQuery(''),
+    query: queryProp = new SimpleSearchQuery(''),
     open = false,
     hideTC = false,
     initialBody = { priority: null, status: null, labels: [], removed_labels: [] },
@@ -95,9 +95,22 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
     const [body, setBody] = useState<WorkflowBody>(initialBody);
     const [waiting, setWaiting] = useState<boolean>(false);
 
-    const hasParams = useMemo<boolean>(() => query && (query.has('q') || query.has('fq') || query.has('tc')), [query]);
+    const isSingleAlert = useMemo<boolean>(
+      () => queryProp && !!queryProp?.get('q')?.startsWith('alert_id'),
+      [queryProp]
+    );
 
-    const isSingleAlert = useMemo<boolean>(() => query && !!query?.get('q')?.startsWith('alert_id'), [query]);
+    const query = useMemo<SimpleSearchQuery>(
+      () =>
+        buildSearchQuery({
+          search: queryProp.toString([]),
+          singles: ['q', 'tc_start', 'tc'],
+          multiples: isSingleAlert ? [] : ['fq']
+        }),
+      [isSingleAlert, queryProp]
+    );
+
+    const hasParams = useMemo<boolean>(() => query && (query.has('q') || query.has('fq') || query.has('tc')), [query]);
 
     const validBody = useMemo<boolean>(
       () =>
@@ -239,9 +252,10 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                   }
                   renderTags={(values, getTagProps, ownerState) =>
                     values.map((value, index) =>
-                      body.labels.includes(value) ? (
+                      body.labels.includes(value, index) ? (
                         <CustomChip
                           {...getTagProps({ index })}
+                          key={index}
                           icon={<AddIcon color="success" />}
                           label={value}
                           color="success"
@@ -259,6 +273,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                       ) : (
                         <CustomChip
                           {...getTagProps({ index })}
+                          key={index}
                           icon={<RemoveIcon color="error" />}
                           label={value}
                           color="error"
