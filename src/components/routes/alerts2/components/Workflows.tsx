@@ -103,7 +103,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
     const query = useMemo<SimpleSearchQuery>(
       () =>
         buildSearchQuery({
-          search: queryProp.toString([]),
+          search: queryProp && queryProp.toString([]),
           singles: ['q', 'tc_start', 'tc'],
           multiples: isSingleAlert ? [] : ['fq']
         }),
