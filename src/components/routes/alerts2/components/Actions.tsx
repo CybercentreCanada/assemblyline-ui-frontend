@@ -257,7 +257,7 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
       const query = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
       const groupBy = getGroupBy(location.search, DEFAULT_QUERY);
       query.set('group_by', '');
-      query.add('fq', `${groupBy}:${getValueFromPath(alert, groupBy)}`);
+      query.add('fq', `${groupBy}:${getValueFromPath(alert, groupBy) as string}`);
       return query.getDeltaString();
     }, [alert, location.search]);
 
@@ -279,15 +279,20 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
   }
 );
 
-export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
+type AlertOwnershipProps = AlertActionProps & {
+  defaultGroupBy?: string;
+};
+
+export const AlertOwnership: React.FC<AlertOwnershipProps> = React.memo(
   ({
     alert,
     open = false,
     speedDial = false,
     vertical = false,
     permanent = false,
+    defaultGroupBy = DEFAULT_QUERY,
     onClick = () => null
-  }: AlertActionProps) => {
+  }: AlertOwnershipProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const classes = useStyles();
@@ -299,12 +304,15 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
     const [confirmation, setConfirmation] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
 
-    const groupBy = useMemo<string>(() => getGroupBy(location.search, DEFAULT_QUERY), [location.search]);
+    const groupBy = useMemo<string>(
+      () => getGroupBy(location.search, defaultGroupBy),
+      [defaultGroupBy, location.search]
+    );
 
     const query = useMemo<SimpleSearchQuery>(() => {
       if (!alert) return null;
       const q = buildSearchQuery({ search: location.search, singles: ['tc_start', 'tc'], multiples: ['fq'] });
-      q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy)}` : `alert_id:${alert.alert_id}`);
+      q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy) as string}` : `alert_id:${alert.alert_id}`);
       return q;
     }, [alert, groupBy, location.search]);
 
@@ -457,7 +465,7 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
           search: location.search,
           ...(speedDial || inDrawer ? { singles: ['tc_start', 'tc'], multiples: ['fq'] } : null)
         });
-        q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy)}` : `alert_id:${alert.alert_id}`);
+        q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy) as string}` : `alert_id:${alert.alert_id}`);
         return q;
       }
     }, [alert, groupBy, inDrawer, location.search, speedDial]);

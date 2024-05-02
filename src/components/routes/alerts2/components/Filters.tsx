@@ -267,6 +267,7 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
             items.map((item, index) => (
               <CustomChip
                 {...getTagProps({ index })}
+                key={index}
                 label={item.label}
                 size="small"
                 variant={item.not ? 'outlined' : 'filled'}
@@ -348,6 +349,7 @@ const Favorites: React.FC<FavoritesProps> = React.memo(
             items.map((item, index) => (
               <CustomChip
                 {...getTagProps({ index })}
+                key={index}
                 label={item.name}
                 icon={
                   <StarIcon
