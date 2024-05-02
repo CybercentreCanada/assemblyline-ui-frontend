@@ -79,7 +79,7 @@ type BadlistDetailProps = {
   close?: () => void;
 };
 
-const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
+const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailProps) => {
   const { t, i18n } = useTranslation(['manageBadlistDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -769,11 +769,6 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
   ) : (
     <ForbiddenPage />
   );
-};
-
-BadlistDetail.defaultProps = {
-  badlist_id: null,
-  close: () => {}
 };
 
 export default BadlistDetail;

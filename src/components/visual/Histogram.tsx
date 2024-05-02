@@ -85,8 +85,8 @@ type HistogramProps = {
 
 const WrappedHistogram = ({
   dataset,
-  height,
-  title,
+  height = null,
+  title = null,
   datatype,
   onClick,
   isDate = false,
@@ -187,17 +187,11 @@ const WrappedHistogram = ({
 
   return histData ? (
     <div style={{ height: height }}>
-      <Line data={histData as unknown} options={options as unknown} plugins={plugins} />
+      <Line data={histData} options={options as unknown} plugins={plugins} />
     </div>
   ) : (
     <Skeleton variant="rectangular" height={height} />
   );
-};
-
-WrappedHistogram.defaultProps = {
-  title: null,
-  height: null,
-  isDate: false
 };
 
 const Histogram = React.memo(WrappedHistogram);

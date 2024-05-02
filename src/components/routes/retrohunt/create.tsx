@@ -300,9 +300,4 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
 
 export const RetrohuntCreate = React.memo(WrappedRetrohuntCreate);
 
-WrappedRetrohuntCreate.defaultProps = {
-  isDrawer: false,
-  retrohuntRef: null
-} as Props;
-
 export default WrappedRetrohuntCreate;

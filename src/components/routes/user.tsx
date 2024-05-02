@@ -109,7 +109,7 @@ const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => 
   </TableRow>
 );
 
-function User({ username }: UserProps) {
+function User({ username = null }: UserProps) {
   const { id } = useParams<ParamProps>();
   const location = useLocation();
   const inputRef = useRef(null);
@@ -786,9 +786,5 @@ function User({ username }: UserProps) {
     </PageCenter>
   );
 }
-
-User.defaultProps = {
-  username: null
-};
 
 export default memo(User);

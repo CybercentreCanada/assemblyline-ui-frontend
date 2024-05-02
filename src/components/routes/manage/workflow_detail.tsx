@@ -105,7 +105,7 @@ const useStyles = makeStyles(theme => ({
 
 const THROTTLER = new Throttler(250);
 
-const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailProps) => {
+const WrappedWorkflowDetail = ({ workflow_id = null, close = () => null, mode = 'read' }: WorkflowDetailProps) => {
   const { t, i18n } = useTranslation(['manageWorkflowDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -789,11 +789,6 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
   ) : (
     <ForbiddenPage />
   );
-};
-
-WrappedWorkflowDetail.defaultProps = {
-  workflow_id: null,
-  close: () => {}
 };
 
 const WorkflowDetail = React.memo(WrappedWorkflowDetail);

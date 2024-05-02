@@ -141,7 +141,7 @@
     "radix": "off",
     "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
     "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
-    "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }],
+    "react-refresh/only-export-components": "off",
     "react/display-name": "off",
     "react/jsx-curly-newline": "off",
     "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],

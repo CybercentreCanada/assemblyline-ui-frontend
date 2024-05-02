@@ -62,7 +62,7 @@ type SafelistDetailProps = {
   close?: () => void;
 };
 
-const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
+const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDetailProps) => {
   const { t, i18n } = useTranslation(['manageSafelistDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -603,11 +603,6 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   ) : (
     <ForbiddenPage />
   );
-};
-
-SafelistDetail.defaultProps = {
-  safelist_id: null,
-  close: () => {}
 };
 
 export default SafelistDetail;

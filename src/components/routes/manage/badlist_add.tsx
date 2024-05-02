@@ -127,7 +127,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const BadlistNew = () => {
+type Props = {
+  badlist_id?: string;
+  close?: () => void;
+};
+
+// eslint-disable-next-line no-empty-pattern
+const BadlistNew = ({}: Props) => {
   const { t } = useTranslation(['manageBadlistAdd']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -531,11 +537,6 @@ const BadlistNew = () => {
   ) : (
     <ForbiddenPage />
   );
-};
-
-BadlistNew.defaultProps = {
-  badlist_id: null,
-  close: () => {}
 };
 
 export default BadlistNew;
