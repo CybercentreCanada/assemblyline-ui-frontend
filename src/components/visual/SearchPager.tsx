@@ -1,7 +1,7 @@
 import { Pagination } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 const MAX_TRACKED_RECORDS = 10000;
 
@@ -41,36 +41,48 @@ const WrappedSearchPager: React.FC<SearchPagerProps> = ({
   ...otherProps
 }) => {
   const { apiCall } = useMyAPI();
-  const count = Math.ceil(Math.min(total, MAX_TRACKED_RECORDS) / pageSize);
 
-  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    if (setSearching) {
-      setSearching(true);
-    }
-    const pageQuery = new SimpleSearchQuery(query.toString(), query.getDefaultString());
-    pageQuery.set('rows', pageSize);
-    pageQuery.set('offset', (value - 1) * pageSize);
+  const [page, setPage] = useState<number>(1);
 
-    apiCall({
-      method,
-      url: `${url || `/api/v4/search/${index}/`}${method === 'GET' ? `?${pageQuery.toString()}` : ''}`,
-      body: method === 'POST' ? pageQuery.getParams() : null,
-      onSuccess: api_data => {
-        setResults(api_data.api_response);
-        if (scrollToTop) {
-          window.scrollTo(0, 0);
-        }
-      },
-      onFinalize: () => {
-        if (setSearching) {
-          setSearching(false);
-        }
+  const count = useMemo<number>(() => Math.ceil(Math.min(total, MAX_TRACKED_RECORDS) / pageSize), [pageSize, total]);
+
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<unknown>, value: number) => {
+      if (setSearching) {
+        setSearching(true);
       }
-    });
-  };
+      const pageQuery = new SimpleSearchQuery(query.toString(), query.getDefaultString());
+      pageQuery.set('rows', pageSize);
+      pageQuery.set('offset', (value - 1) * pageSize);
+      setPage(value);
+
+      apiCall({
+        method,
+        url: `${url || `/api/v4/search/${index}/`}${method === 'GET' ? `?${pageQuery.toString()}` : ''}`,
+        body: method === 'POST' ? pageQuery.getParams() : null,
+        onSuccess: api_data => {
+          setResults(api_data.api_response);
+          if (scrollToTop) {
+            window.scrollTo(0, 0);
+          }
+        },
+        onFinalize: () => {
+          if (setSearching) {
+            setSearching(false);
+          }
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [index, method, pageSize, query, scrollToTop, setResults, setSearching, url]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [index, method, pageSize, query, total, url]);
 
   return count > 1 ? (
-    <Pagination {...otherProps} count={count} onChange={handleChange} shape="rounded" size={size} />
+    <Pagination {...otherProps} count={count} page={page} onChange={handleChange} shape="rounded" size={size} />
   ) : null;
 };
 
