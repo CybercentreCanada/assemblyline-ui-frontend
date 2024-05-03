@@ -51,7 +51,9 @@ const DEFAULT_USER = {
   new_pass: '',
   uname: '',
   api_quota: 10,
-  submission_quota: 5
+  submission_quota: 5,
+  api_daily_quota: 10000,
+  submission_daily_quota: 500
 };
 
 const useStyles = makeStyles(theme => ({
@@ -90,6 +92,8 @@ type User = {
   uname: string;
   api_quota: number;
   submission_quota: number;
+  api_daily_quota: number;
+  submission_daily_quota: number;
   roles?: string[];
 };
 
@@ -320,6 +324,18 @@ export default function Users() {
               />
             </Grid>
             <Grid item xs={12} md={6}>
+              <Typography variant="caption">{t('newuser.api_daily_quota')}</Typography>
+              <TextField
+                fullWidth
+                type="number"
+                margin="dense"
+                size="small"
+                variant="outlined"
+                onChange={event => updateNewUser('api_daily_quota', event.target.value)}
+                value={newUser.api_daily_quota}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
               <Typography variant="caption">{t('newuser.submission_quota')}</Typography>
               <TextField
                 fullWidth
@@ -329,6 +345,18 @@ export default function Users() {
                 variant="outlined"
                 onChange={event => updateNewUser('submission_quota', event.target.value)}
                 value={newUser.submission_quota}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="caption">{t('newuser.submission_daily_quota')}</Typography>
+              <TextField
+                fullWidth
+                type="number"
+                margin="dense"
+                size="small"
+                variant="outlined"
+                onChange={event => updateNewUser('submission_daily_quota', event.target.value)}
+                value={newUser.submission_daily_quota}
               />
             </Grid>
           </Grid>
