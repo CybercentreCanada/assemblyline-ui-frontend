@@ -241,6 +241,16 @@ function User({ username }: UserProps) {
     setUser({ ...user, submission_quota: value });
   }
 
+  function setDailyAPIQuota(value) {
+    setModified(true);
+    setUser({ ...user, api_daily_quota: value });
+  }
+
+  function setDailySubmissionQuota(value) {
+    setModified(true);
+    setUser({ ...user, submission_daily_quota: value });
+  }
+
   function toggleAccountEnabled() {
     setModified(true);
     setUser({ ...user, is_active: !user.is_active });
@@ -344,6 +354,23 @@ function User({ username }: UserProps) {
                       />
                     </>
                   ),
+                  api_daily_quota: (
+                    <>
+                      <Typography variant="h4">{t('api_daily_quota')}</Typography>
+                      <Typography variant="caption" color="textSecondary" gutterBottom>
+                        {t('api_daily_quota_edit_title')}
+                      </Typography>
+                      <TextField
+                        autoFocus
+                        type="number"
+                        margin="dense"
+                        size="small"
+                        variant="outlined"
+                        onChange={event => setDailyAPIQuota(event.target.value)}
+                        value={user.api_daily_quota}
+                      />
+                    </>
+                  ),
                   change_password: (
                     <>
                       <Typography variant="h4" gutterBottom>
@@ -416,6 +443,23 @@ function User({ username }: UserProps) {
                         variant="outlined"
                         onChange={event => setSubmissionQuota(event.target.value)}
                         value={user.submission_quota}
+                      />
+                    </>
+                  ),
+                  submission_daily_quota: (
+                    <>
+                      <Typography variant="h4">{t('submission_daily_quota')}</Typography>
+                      <Typography variant="caption" color="textSecondary" gutterBottom>
+                        {t('submission_daily_quota_edit_title')}
+                      </Typography>
+                      <TextField
+                        autoFocus
+                        type="number"
+                        margin="dense"
+                        size="small"
+                        variant="outlined"
+                        onChange={event => setDailySubmissionQuota(event.target.value)}
+                        value={user.submission_daily_quota}
                       />
                     </>
                   ),
@@ -678,12 +722,38 @@ function User({ username }: UserProps) {
                   className={classes.row}
                   hover={currentUser.is_admin}
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
+                  onClick={currentUser.is_admin ? event => toggleDrawer('api_daily_quota') : null}
+                >
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_daily_quota')}</TableCell>}
+                  <TableCell width="100%">
+                    {!isXS ? null : <Typography variant="caption">{t('api_daily_quota')}</Typography>}
+                    {user ? <div>{user.api_daily_quota}</div> : <Skeleton />}
+                  </TableCell>
+                  <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
+                </TableRow>
+                <TableRow
+                  className={classes.row}
+                  hover={currentUser.is_admin}
+                  style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? event => toggleDrawer('submission_quota') : null}
                 >
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>}
                   <TableCell width="100%">
                     {!isXS ? null : <Typography variant="caption">{t('submission_quota')}</Typography>}
                     {user ? <div>{user.submission_quota}</div> : <Skeleton />}
+                  </TableCell>
+                  <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
+                </TableRow>
+                <TableRow
+                  className={classes.row}
+                  hover={currentUser.is_admin}
+                  style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
+                  onClick={currentUser.is_admin ? event => toggleDrawer('submission_daily_quota') : null}
+                >
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_daily_quota')}</TableCell>}
+                  <TableCell width="100%">
+                    {!isXS ? null : <Typography variant="caption">{t('submission_quota')}</Typography>}
+                    {user ? <div>{user.submission_daily_quota}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                 </TableRow>
