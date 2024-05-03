@@ -158,7 +158,8 @@ export default function useMyAPI() {
           if (
             api_data.api_status_code === 503 &&
             api_data.api_error_message.includes('quota') &&
-            api_data.api_error_message.includes('daily')
+            api_data.api_error_message.includes('daily') &&
+            api_data.api_error_message.includes('API')
           ) {
             // Daily quota error, stop everything!
             switchRenderedApp('quota');
@@ -249,7 +250,8 @@ export default function useMyAPI() {
           (api_data.api_status_code === 401 && reloadOnUnauthorize) ||
           (api_data.api_status_code === 503 &&
             api_data.api_error_message.includes('quota') &&
-            api_data.api_error_message.includes('daily'))
+            api_data.api_error_message.includes('daily') &&
+            api_data.api_error_message.includes('API'))
         ) {
           // Detect login request
           // Do nothing... we are reloading the page
@@ -381,7 +383,8 @@ export default function useMyAPI() {
           api_data.api_status_code === 401 ||
           (api_data.api_status_code === 503 &&
             api_data.api_error_message.includes('quota') &&
-            api_data.api_error_message.includes('daily'))
+            api_data.api_error_message.includes('daily') &&
+            api_data.api_error_message.includes('API'))
         ) {
           // Detect login request
           // Do nothing... we are reloading the page

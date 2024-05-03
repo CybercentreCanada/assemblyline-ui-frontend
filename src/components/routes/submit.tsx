@@ -198,7 +198,8 @@ const Submit: React.FC<any> = () => {
             data.api_status_code === 401 ||
             (data.api_status_code === 503 &&
               data.api_error_message.includes('quota') &&
-              data.api_error_message.includes('daily'))
+              data.api_error_message.includes('daily') &&
+              api_data.api_error_message.includes('API'))
           ) {
             window.location.reload();
           }
