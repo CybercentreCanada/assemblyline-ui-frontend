@@ -335,7 +335,7 @@ export default function ErrorViewer() {
             {query && (
               <div>
                 <ChipList
-                  items={query.getAll('filters', []).map((v, i) => ({
+                  items={query.getAll('filters', []).map(v => ({
                     variant: 'outlined',
                     label: `${v}`,
                     color: v.indexOf('NOT ') === 0 ? 'error' : null,
