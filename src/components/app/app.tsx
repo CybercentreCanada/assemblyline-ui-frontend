@@ -14,6 +14,7 @@ import SafeResultsProvider from 'components/providers/SafeResultsProvider';
 import LoadingScreen from 'components/routes/loading';
 import LockedPage from 'components/routes/locked';
 import LoginScreen from 'components/routes/login';
+import QuotaExceeded from 'components/routes/quota';
 import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
 import { getProvider } from 'helpers/utils';
@@ -75,7 +76,8 @@ const MyAppMain = () => {
       <LoadingScreen />
     ),
     routes: <Routes />,
-    tos: <Tos />
+    tos: <Tos />,
+    quota: <QuotaExceeded />
   }[renderedApp];
 };
 
