@@ -1,3 +1,4 @@
+import type { PaginationProps } from '@mui/material';
 import { Pagination } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -12,7 +13,7 @@ type SearchResults = {
   total: number;
 };
 
-export interface SearchPagerProps {
+export interface SearchPagerProps extends Omit<PaginationProps, 'children'> {
   total: number;
   pageSize: number;
   index: string;
@@ -23,7 +24,6 @@ export interface SearchPagerProps {
   size?: 'small' | 'large' | null;
   setSearching?: (value: boolean) => void | null;
   url?: string;
-  [propName: string]: any;
 }
 
 const WrappedSearchPager: React.FC<SearchPagerProps> = ({
@@ -37,7 +37,6 @@ const WrappedSearchPager: React.FC<SearchPagerProps> = ({
   size = 'small',
   setSearching = null,
   url = null,
-  children,
   ...otherProps
 }) => {
   const { apiCall } = useMyAPI();
@@ -47,10 +46,9 @@ const WrappedSearchPager: React.FC<SearchPagerProps> = ({
   const count = useMemo<number>(() => Math.ceil(Math.min(total, MAX_TRACKED_RECORDS) / pageSize), [pageSize, total]);
 
   const handleChange = useCallback(
-    (event: React.ChangeEvent<unknown>, value: number) => {
-      if (setSearching) {
-        setSearching(true);
-      }
+    (_event: React.ChangeEvent<unknown>, value: number) => {
+      if (setSearching) setSearching(true);
+
       const pageQuery = new SimpleSearchQuery(query.toString(), query.getDefaultString());
       pageQuery.set('rows', pageSize);
       pageQuery.set('offset', (value - 1) * pageSize);
