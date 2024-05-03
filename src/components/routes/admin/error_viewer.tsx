@@ -7,10 +7,9 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/hooks/useMyUser';
 import { ChipList } from 'components/visual/ChipList';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
@@ -22,7 +21,7 @@ import ErrorsTable from 'components/visual/SearchResult/errors';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
@@ -55,16 +54,17 @@ type ErrorResults = {
   total: number;
 };
 
-const DEFAULT_TC = '4d';
+type TimeContraint = '24h' | '4d' | '7d' | '1m' | '1y';
 
-const TC_MAP = {
+const TC_MAP: Record<TimeContraint, string> = {
   '24h': 'created:[now-24h TO now]',
   '4d': 'created:[now-4d TO now]',
   '7d': 'created:[now-7d TO now]',
-  '1m': 'created:[now-1M TO now]'
+  '1m': 'created:[now-1M TO now]',
+  '1y': null
 };
 
-const START_MAP = {
+const START_MAP: Record<TimeContraint, string> = {
   '24h': 'now-1d',
   '4d': 'now-4d',
   '7d': 'now-7d',
@@ -72,13 +72,15 @@ const START_MAP = {
   '1y': 'now-1y'
 };
 
-const GAP_MAP = {
+const GAP_MAP: Record<TimeContraint, string> = {
   '24h': '1h',
   '4d': '2h',
   '7d': '4h',
   '1m': '1d',
   '1y': '15d'
 };
+
+const DEFAULT_TC: TimeContraint = '4d';
 
 export default function ErrorViewer() {
   const { t } = useTranslation(['adminErrorViewer']);
@@ -99,6 +101,18 @@ export default function ErrorViewer() {
   const [histogram, setHistogram] = useState(null);
   const [types, setTypes] = useState(null);
   const [names, setNames] = useState(null);
+
+  const parsedQuery = useMemo<SimpleSearchQuery>(() => {
+    if (!query || !currentUser.is_admin) return null;
+
+    const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
+    curQuery.set('rows', pageSize);
+    curQuery.set('offset', 0);
+    const tc = (curQuery.pop('tc') as TimeContraint) || DEFAULT_TC;
+    if (tc in GAP_MAP && tc !== '1y') curQuery.add('filters', TC_MAP[tc]);
+
+    return curQuery;
+  }, [currentUser.is_admin, pageSize, query]);
 
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`));
@@ -121,55 +135,53 @@ export default function ErrorViewer() {
   }, [location.hash]);
 
   useEffect(() => {
-    if (query && currentUser.is_admin) {
-      const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
-      const tc = curQuery.pop('tc') || DEFAULT_TC;
-      curQuery.set('rows', pageSize);
-      curQuery.set('offset', 0);
-      if (tc !== '1y') {
-        curQuery.add('filters', TC_MAP[tc]);
-      }
-      setSearching(true);
-      apiCall({
-        url: `/api/v4/error/list/?${curQuery.toString()}`,
-        onSuccess: api_data => {
-          setErrorResults(api_data.api_response);
-        },
-        onFinalize: () => {
-          setSearching(false);
-        }
-      });
-      apiCall({
-        url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
-          'rows',
-          'offset',
-          'sort',
-          'track_total_hits'
-        ])}`,
-        onSuccess: api_data => {
-          setNames(api_data.api_response);
-        }
-      });
-      apiCall({
-        url: `/api/v4/search/facet/error/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-        onSuccess: api_data => {
-          setTypes(api_data.api_response);
-        }
-      });
-      apiCall({
-        url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
-          GAP_MAP[tc]
-        }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-        onSuccess: api_data => {
-          setHistogram(api_data.api_response);
-        }
-      });
-    }
-
+    if (!parsedQuery) return;
+    apiCall({
+      url: `/api/v4/error/list/?${parsedQuery.toString()}`,
+      onSuccess: api_data => setErrorResults(api_data.api_response),
+      onEnter: () => setSearching(true),
+      onExit: () => setSearching(false)
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
+  }, [parsedQuery]);
 
-  useEffectOnce(() => {
+  useEffect(() => {
+    if (!query) return;
+    const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
+    curQuery.set('rows', pageSize);
+    curQuery.set('offset', 0);
+
+    const tc = (curQuery.pop('tc') as TimeContraint) || DEFAULT_TC;
+    if (tc in GAP_MAP && tc !== '1y') curQuery.add('filters', TC_MAP[tc]);
+    apiCall({
+      url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
+        'rows',
+        'offset',
+        'sort',
+        'track_total_hits'
+      ])}`,
+      onSuccess: api_data => {
+        setNames(api_data.api_response);
+      }
+    });
+    apiCall({
+      url: `/api/v4/search/facet/error/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+      onSuccess: api_data => {
+        setTypes(api_data.api_response);
+      }
+    });
+    apiCall({
+      url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
+        GAP_MAP[tc]
+      }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+      onSuccess: api_data => {
+        setHistogram(api_data.api_response);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageSize, query]);
+
+  useEffect(() => {
     apiCall({
       url: '/api/v4/search/fields/error/',
       onSuccess: api_data => {
@@ -179,7 +191,8 @@ export default function ErrorViewer() {
         ]);
       }
     });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onClear = useCallback(
     () => {
@@ -207,9 +220,9 @@ export default function ErrorViewer() {
     [query, location.pathname, onClear]
   );
 
-  const onFilterValueChange = (inputValue: string) => {
+  const onFilterValueChange = useCallback((inputValue: string) => {
     filterValue.current = inputValue;
-  };
+  }, []);
 
   const setErrorKey = useCallback(
     (error_key: string) => {
@@ -308,7 +321,7 @@ export default function ErrorViewer() {
                 )}
 
                 <SearchPager
-                  query={query}
+                  query={parsedQuery}
                   pageSize={pageSize}
                   total={errorResults.total}
                   index={null}
@@ -323,7 +336,7 @@ export default function ErrorViewer() {
             {query && (
               <div>
                 <ChipList
-                  items={query.getAll('filters', []).map(v => ({
+                  items={query.getAll('filters', []).map((v, i) => ({
                     variant: 'outlined',
                     label: `${v}`,
                     color: v.indexOf('NOT ') === 0 ? 'error' : null,
