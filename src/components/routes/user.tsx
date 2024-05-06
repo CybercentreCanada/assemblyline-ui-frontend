@@ -349,6 +349,7 @@ function User({ username }: UserProps) {
                         margin="dense"
                         size="small"
                         variant="outlined"
+                        InputProps={{ inputProps: { min: 0 } }}
                         onChange={event => setAPIQuota(event.target.value)}
                         value={user.api_quota}
                       />
@@ -366,6 +367,7 @@ function User({ username }: UserProps) {
                         margin="dense"
                         size="small"
                         variant="outlined"
+                        InputProps={{ inputProps: { min: 0 } }}
                         onChange={event => setDailyAPIQuota(event.target.value)}
                         value={user.api_daily_quota}
                       />
@@ -441,6 +443,7 @@ function User({ username }: UserProps) {
                         type="number"
                         margin="normal"
                         variant="outlined"
+                        InputProps={{ inputProps: { min: 0 } }}
                         onChange={event => setSubmissionQuota(event.target.value)}
                         value={user.submission_quota}
                       />
@@ -458,6 +461,7 @@ function User({ username }: UserProps) {
                         margin="dense"
                         size="small"
                         variant="outlined"
+                        InputProps={{ inputProps: { min: 0 } }}
                         onChange={event => setDailySubmissionQuota(event.target.value)}
                         value={user.submission_daily_quota}
                       />
@@ -714,7 +718,18 @@ function User({ username }: UserProps) {
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_quota')}</TableCell>}
                   <TableCell width="100%">
                     {!isXS ? null : <Typography variant="caption">{t('api_quota')}</Typography>}
-                    {user ? <div>{user.api_quota}</div> : <Skeleton />}
+                    {user ? (
+                      <div
+                        style={{
+                          color:
+                            user.api_quota === 0 || user.api_quota === '0' ? theme.palette.action.disabled : 'inherit'
+                        }}
+                      >
+                        {user.api_quota === 0 || user.api_quota === '0' ? t('no_quota') : user.api_quota}
+                      </div>
+                    ) : (
+                      <Skeleton />
+                    )}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                 </TableRow>
@@ -727,7 +742,22 @@ function User({ username }: UserProps) {
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_daily_quota')}</TableCell>}
                   <TableCell width="100%">
                     {!isXS ? null : <Typography variant="caption">{t('api_daily_quota')}</Typography>}
-                    {user ? <div>{user.api_daily_quota}</div> : <Skeleton />}
+                    {user ? (
+                      <div
+                        style={{
+                          color:
+                            user.api_daily_quota === 0 || user.api_daily_quota === '0'
+                              ? theme.palette.action.disabled
+                              : 'inherit'
+                        }}
+                      >
+                        {user.api_daily_quota === 0 || user.api_daily_quota === '0'
+                          ? t('no_quota')
+                          : user.api_daily_quota}
+                      </div>
+                    ) : (
+                      <Skeleton />
+                    )}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                 </TableRow>
@@ -740,7 +770,22 @@ function User({ username }: UserProps) {
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>}
                   <TableCell width="100%">
                     {!isXS ? null : <Typography variant="caption">{t('submission_quota')}</Typography>}
-                    {user ? <div>{user.submission_quota}</div> : <Skeleton />}
+                    {user ? (
+                      <div
+                        style={{
+                          color:
+                            user.submission_quota === 0 || user.submission_quota === '0'
+                              ? theme.palette.action.disabled
+                              : 'inherit'
+                        }}
+                      >
+                        {user.submission_quota === 0 || user.submission_quota === '0'
+                          ? t('no_quota')
+                          : user.submission_quota}
+                      </div>
+                    ) : (
+                      <Skeleton />
+                    )}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                 </TableRow>
@@ -753,7 +798,22 @@ function User({ username }: UserProps) {
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_daily_quota')}</TableCell>}
                   <TableCell width="100%">
                     {!isXS ? null : <Typography variant="caption">{t('submission_quota')}</Typography>}
-                    {user ? <div>{user.submission_daily_quota}</div> : <Skeleton />}
+                    {user ? (
+                      <div
+                        style={{
+                          color:
+                            user.submission_daily_quota === 0 || user.submission_daily_quota === '0'
+                              ? theme.palette.action.disabled
+                              : 'inherit'
+                        }}
+                      >
+                        {user.submission_daily_quota === 0 || user.submission_daily_quota === '0'
+                          ? t('no_quota')
+                          : user.submission_daily_quota}
+                      </div>
+                    ) : (
+                      <Skeleton />
+                    )}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                 </TableRow>
