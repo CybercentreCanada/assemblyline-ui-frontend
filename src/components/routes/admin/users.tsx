@@ -52,8 +52,8 @@ const DEFAULT_USER = {
   uname: '',
   api_quota: 10,
   submission_quota: 5,
-  api_daily_quota: 10000,
-  submission_daily_quota: 500
+  api_daily_quota: 0,
+  submission_daily_quota: 0
 };
 
 const useStyles = makeStyles(theme => ({
