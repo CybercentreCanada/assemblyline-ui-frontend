@@ -154,17 +154,29 @@ export default function useMyAPI() {
           if (api_data.api_status_code !== 503) {
             showErrorMessage(api_data.api_error_message, 30000);
           }
-          setTimeout(() => {
-            bootstrap({
-              switchRenderedApp,
-              setConfiguration,
-              setLoginParams,
-              setUser,
-              setReady,
-              retryAfter: Math.min(retryAfter * 2, 10000)
-            });
-          }, retryAfter);
-          switchRenderedApp('load');
+
+          if (
+            api_data.api_status_code === 503 &&
+            api_data.api_error_message.includes('quota') &&
+            api_data.api_error_message.includes('daily') &&
+            api_data.api_error_message.includes('API')
+          ) {
+            // Daily quota error, stop everything!
+            switchRenderedApp('quota');
+          } else {
+            // Concurent quota error ... retry
+            setTimeout(() => {
+              bootstrap({
+                switchRenderedApp,
+                setConfiguration,
+                setLoginParams,
+                setUser,
+                setReady,
+                retryAfter: Math.min(retryAfter * 2, 10000)
+              });
+            }, retryAfter);
+            switchRenderedApp('load');
+          }
         }
       });
   }
@@ -234,7 +246,13 @@ export default function useMyAPI() {
         if (!isAPIData(api_data)) {
           showErrorMessage(t('api.invalid'));
           return;
-        } else if (api_data.api_status_code === 401 && reloadOnUnauthorize) {
+        } else if (
+          (api_data.api_status_code === 401 && reloadOnUnauthorize) ||
+          (api_data.api_status_code === 503 &&
+            api_data.api_error_message.includes('quota') &&
+            api_data.api_error_message.includes('daily') &&
+            api_data.api_error_message.includes('API'))
+        ) {
           // Detect login request
           // Do nothing... we are reloading the page
           window.location.reload();
@@ -361,7 +379,13 @@ export default function useMyAPI() {
         if (!isAPIData(api_data)) {
           showErrorMessage(t('api.invalid'));
           return;
-        } else if (api_data.api_status_code === 401) {
+        } else if (
+          api_data.api_status_code === 401 ||
+          (api_data.api_status_code === 503 &&
+            api_data.api_error_message.includes('quota') &&
+            api_data.api_error_message.includes('daily') &&
+            api_data.api_error_message.includes('API'))
+        ) {
           // Detect login request
           // Do nothing... we are reloading the page
           window.location.reload();
