@@ -7,14 +7,13 @@ import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import { Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
+import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { TSubmissionReport } from 'components/models/ui/submission_report';
-import { CustomUser } from 'components/models/ui/user';
 import Classification from 'components/visual/Classification';
 import { filterObject } from 'helpers/utils';
 import { useCallback, useEffect, useState } from 'react';
@@ -60,13 +59,14 @@ const useStyles = makeStyles(theme => ({
 export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
-  const { c12nDef, configuration } = useALContext();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser, c12nDef, configuration, settings } = useALContext();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
   const classes = useStyles();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const theme = useTheme();
+  const { addInsight, removeInsight } = useAssistant();
+
   const [report, setReport] = useState<TSubmissionReport>(null);
   const [originalReport, setOriginalReport] = useState<TSubmissionReport>(null);
   const [showInfoContent, setShowInfoContent] = useState<boolean>(false);
@@ -181,6 +181,22 @@ export default function SubmissionReport() {
       setShowInfoContent(false);
     }
   }, [useAIReport]);
+
+  useEffect(() => {
+    addInsight({ type: 'report', value: id });
+    addInsight({ type: 'submission', value: id });
+
+    return () => {
+      removeInsight({ type: 'report', value: id });
+      removeInsight({ type: 'submission', value: id });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  useEffect(() => {
+    setUseAIReport(settings.executive_summary);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings]);
 
   return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">

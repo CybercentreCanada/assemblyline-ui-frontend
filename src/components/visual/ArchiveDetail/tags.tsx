@@ -511,14 +511,16 @@ const WrappedRow: React.FC<RowProps> = ({
 
   return (
     <>
-      <ActionMenu
-        category={tag_type === 'heuristic.signature' ? 'signature' : 'tag'}
-        type={tag_type === 'heuristic.signature' ? '' : tag_type}
-        value={value}
-        state={state}
-        setState={setState}
-        classification={classification}
-      />
+      {state !== initialMenuState && (
+        <ActionMenu
+          category={tag_type === 'heuristic.signature' ? 'signature' : 'tag'}
+          type={tag_type === 'heuristic.signature' ? '' : tag_type}
+          value={value}
+          state={state}
+          setState={setState}
+          classification={classification}
+        />
+      )}
       <GridLinkRow
         hover
         to={

@@ -1,0 +1,18 @@
+{
+  "header.author": "Auteur",
+  "header.description": "Description",
+  "header.name": "Nom",
+  "install": "Installer",
+  "installing": "Installation...",
+  "no_community_services_available_desc": "Il n’y a aucun nouveau service de la communauté disponible à ajouter.",
+  "no_community_services_available_title": "Aucun service trouvé !",
+  "serviceToInstall.acceptText": "Oui, installez-le !",
+  "serviceToInstall.author": "Auteur",
+  "serviceToInstall.cancelText": "Annuler",
+  "serviceToInstall.code": "Code source",
+  "serviceToInstall.container": "Commande d'extraction",
+  "serviceToInstall.description": "Vous êtes sur le point d'installer un service de la communauté. Sachez que ce service n'a pas été développé et/ou vérifié par l'équipe Assemblyline, nous n'offrons aucun support pour ce service pour le moment. Il est de la responsabilité de l'utilisateur de rechercher les outils et les développeurs qui les ont créés. Veuillez vous référer aux liens ci-dessous pour obtenir des informations générales concernant le service sélectionné.",
+  "serviceToInstall.notes": "* Si vous rencontrez des problèmes pour installer ce service avec le bouton d'installation automatique, vous pouvez toujours accéder au code source et créer le conteneur à la main.",
+  "serviceToInstall.pipeline": "Pipeline du service",
+  "serviceToInstall.title": "Installation d'un service de la communauté"
+}

@@ -35,7 +35,7 @@ import ServiceTree from 'components/layout/serviceTree';
 import { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import React, { memo, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -123,6 +123,14 @@ function Settings() {
 
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
 
+  const fileSources = useMemo<string[]>(
+    () =>
+      Object.values(configuration?.submission?.file_sources || {})
+        .flatMap(file => file?.sources)
+        .filter((value, index, array) => value && array.indexOf(value) === index),
+    [configuration]
+  );
+
   const setParam = (service_idx, param_idx, p_value) => {
     if (settings) {
       const newSettings = { ...settings };
@@ -191,6 +199,13 @@ function Settings() {
     if (settings) {
       setModified(true);
       setSettings({ ...settings, deep_scan: !settings.deep_scan });
+    }
+  }
+
+  function toggleExecutiveSummary() {
+    if (settings) {
+      setModified(true);
+      setSettings(() => ({ ...settings, executive_summary: !settings.executive_summary }));
     }
   }
 
@@ -497,6 +512,23 @@ function Settings() {
                 />
               </TableCell>
             </ClickRow>
+            {configuration.ui.ai.enabled && (
+              <ClickRow enabled={editable} onClick={toggleExecutiveSummary}>
+                <TableCell colSpan={2} width="100%">
+                  <Typography variant="body1">{t('submissions.executive_summary')}</Typography>
+                  <Typography variant="caption">{t('submissions.executive_summary_desc')}</Typography>
+                </TableCell>
+                <TableCell align="right">
+                  <Switch
+                    checked={settings ? settings.executive_summary : true}
+                    disabled={settings === null || !editable}
+                    onChange={() => toggleExecutiveSummary()}
+                    color="secondary"
+                    name="executive_summary"
+                  />
+                </TableCell>
+              </ClickRow>
+            )}
             <ClickRow enabled={editable} onClick={toggleProfile}>
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.profile')}</Typography>
@@ -668,7 +700,7 @@ function Settings() {
         </Table>
       </TableContainer>
 
-      {configuration.submission.sha256_sources && configuration.submission.sha256_sources.length > 0 && (
+      {fileSources && fileSources.length > 0 && (
         <Paper className={classes.group}>
           <ExternalSources disabled={!editable} settings={settings} onChange={toggleExternalSource} />
         </Paper>
@@ -699,8 +731,8 @@ function Settings() {
               disabled={!editable}
               service_spec={settings.service_spec}
               setParam={setParam}
-              setParamAsync={setParam}
               compressed
+              hasResetButton
             />
           ) : (
             <div>

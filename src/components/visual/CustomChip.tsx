@@ -234,7 +234,14 @@ const WrappedCustomChip: React.FC<CustomChipProps> = ({
 
   // Do we have a tooltip?
   return tooltip ? (
-    <Tooltip title={tooltip} placement={tooltipPlacement}>
+    <Tooltip
+      PopperProps={{
+        disablePortal: true
+      }}
+      title={tooltip}
+      placement={tooltipPlacement}
+      disableInteractive
+    >
       {chip}
     </Tooltip>
   ) : (

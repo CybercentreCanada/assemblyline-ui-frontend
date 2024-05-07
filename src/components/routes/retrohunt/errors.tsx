@@ -1,16 +1,6 @@
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import {
-  AlertTitle,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Pagination,
-  Paper,
-  Skeleton,
-  Tooltip,
-  Typography
-} from '@mui/material';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
+import { AlertTitle, Divider, Grid, Pagination, Paper, Skeleton, Typography, useTheme } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
 import TableContainer from '@mui/material/TableContainer';
 import makeStyles from '@mui/styles/makeStyles';
@@ -18,6 +8,7 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { Retrohunt } from 'components/models/base/retrohunt';
+import { SearchResult } from 'components/models/ui/search';
 import { CustomUser } from 'components/models/ui/user';
 import {
   DivTable,
@@ -29,9 +20,8 @@ import {
 } from 'components/visual/DivTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -51,27 +41,22 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'flex-end'
+  },
+  title: {
+    fontWeight: 500,
+    marginRight: theme.spacing(0.5),
+    display: 'flex'
+  },
+  skeletonButton: {
+    height: '2.5rem',
+    width: '2.5rem',
+    margin: theme.spacing(0.5)
   }
 }));
 
-type RetrohuntErrorResult = {
-  items: string[];
-  offset: number;
-  rows: number;
-  total: number;
-};
-
-type Prop = {
-  retrohunt?: Retrohunt;
-  open?: boolean;
-  onClose?: () => void;
-};
-
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 const MAX_TRACKED_RECORDS = 10000;
-
-const RELOAD_DELAY = 5000;
 
 const DEFAULT_PARAMS: object = {
   offset: 0,
@@ -79,24 +64,52 @@ const DEFAULT_PARAMS: object = {
   sort: null
 };
 
+type Error = {
+  type: 'warning' | 'error';
+  message: string;
+};
+
+type Props = {
+  retrohunt: Retrohunt;
+  isDrawer: boolean;
+};
+
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
   .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
   .join('&');
 
-const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () => null }: Prop) => {
+const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) => {
   const { t } = useTranslation(['retrohunt']);
+  const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [errorResults, setErrorResults] = useState<RetrohuntErrorResult>(null);
-  const [isReloading, setIsReloading] = useState<boolean>(true);
+  const [errorResults, setErrorResults] = useState<SearchResult<Error>>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(DEFAULT_QUERY));
+  const [isReloading, setIsReloading] = useState<boolean>(true);
 
-  const timer = useRef<boolean>(false);
+  const totals = useMemo<string>(() => {
+    if (!retrohunt) return null;
+    const warnings =
+      !retrohunt?.total_warnings || retrohunt?.total_warnings === 0
+        ? null
+        : retrohunt?.total_warnings === 1
+        ? `1 ${t('warning')}`
+        : `${retrohunt?.total_warnings} ${t('warnings')}`;
 
-  const errorPageCount = useMemo<number>(
+    const errors =
+      !retrohunt?.total_errors || retrohunt?.total_errors === 0
+        ? null
+        : retrohunt?.total_errors === 1
+        ? `1 ${t('error')}`
+        : `${retrohunt?.total_errors} ${t('errors')}`;
+
+    return warnings && errors ? `${warnings} ${t('and')} ${errors}` : warnings ? warnings : errors ? errors : null;
+  }, [retrohunt, t]);
+
+  const pageCount = useMemo<number>(
     () =>
       errorResults && 'total' in errorResults
         ? Math.ceil(Math.min(errorResults.total, MAX_TRACKED_RECORDS) / PAGE_SIZE)
@@ -105,12 +118,12 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
   );
 
   const reloadErrors = useCallback(
-    (curCode: string, searchParam: string) => {
+    (curKey: string, searchParam: string) => {
       if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         const curQuery = new SimpleSearchQuery(searchParam, DEFAULT_QUERY);
         apiCall({
           method: 'POST',
-          url: `/api/v4/retrohunt/errors/${curCode}/`,
+          url: `/api/v4/retrohunt/errors/${curKey}/`,
           body: curQuery.getParams(),
           onSuccess: api_data => setErrorResults(api_data.api_response),
           onEnter: () => setIsReloading(true),
@@ -131,36 +144,16 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
   }, []);
 
   useEffect(() => {
-    if (open && retrohunt && 'code' in retrohunt) reloadErrors(retrohunt.code, query.getDeltaString());
-  }, [open, query, reloadErrors, retrohunt]);
-
-  useEffect(() => {
-    if (!timer.current && open && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
-      timer.current = true;
-      setTimeout(() => {
-        reloadErrors(retrohunt.code, query.toString());
-        timer.current = false;
-      }, RELOAD_DELAY);
-    }
-  }, [open, query, reloadErrors, retrohunt]);
+    if (retrohunt && 'key' in retrohunt) reloadErrors(retrohunt.key, query.getDeltaString());
+  }, [query, reloadErrors, retrohunt]);
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle className={classes.dialogTitle}>
-        <div className={classes.titleContainer}>
-          <div>{t('errors.view.title')}</div>
-        </div>
-        <div>
-          <Tooltip title={t('errors.close')}>
-            <div>
-              <IconButton onClick={onClose}>
-                <CloseOutlinedIcon />
-              </IconButton>
-            </div>
-          </Tooltip>
-        </div>
-      </DialogTitle>
-      <DialogContent>
+    <>
+      <Grid item>
+        <Typography variant="h6">{t('errors.view.title')}</Typography>
+        <Divider />
+      </Grid>
+      <Grid item>
         {!errorResults ? (
           <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
         ) : !('total' in errorResults) || errorResults.total === 0 ? (
@@ -173,25 +166,16 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
         ) : (
           <>
             <div className={classes.searchBar}>
-              {errorResults && 'total' in errorResults && errorResults.total !== 0 && (
+              {totals && (
                 <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                  {isReloading ? (
-                    <span>{t('searching')}</span>
-                  ) : (
-                    <span>
-                      <SearchResultCount count={errorResults.total} />
-                      {query.get('query')
-                        ? t(`errors.filtered${errorResults.total === 1 ? '' : 's'}`)
-                        : t(`errors.total${errorResults.total === 1 ? '' : 's'}`)}
-                    </span>
-                  )}
+                  {totals}
                 </Typography>
               )}
-              {errorPageCount > 1 && (
+              {pageCount > 1 && (
                 <Pagination
                   page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
                   onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
-                  count={errorPageCount}
+                  count={pageCount}
                   shape="rounded"
                   size="small"
                   classes={{
@@ -201,15 +185,22 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
               )}
             </div>
             <div style={{ height: '4px' }}>{isReloading && <LinearProgress />}</div>
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} sx={{ border: isDrawer && `1px solid ${theme.palette.divider}` }}>
               <DivTable>
                 <DivTableHead>
                   <DivTableRow>
                     <SortableHeaderCell
                       query={query}
+                      children={t('details.type')}
+                      sortName="sort"
+                      sortField="type"
+                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
+                    />
+                    <SortableHeaderCell
+                      query={query}
                       children={t('details.message')}
                       sortName="sort"
-                      sortField="error"
+                      sortField="message"
                       onSort={(e, { name, field }) => handleQueryChange(name, field)}
                     />
                   </DivTableRow>
@@ -217,7 +208,18 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
                 <DivTableBody>
                   {errorResults.items.map((error, id) => (
                     <DivTableRow key={id} hover style={{ textDecoration: 'none' }}>
-                      <DivTableCell>{error}</DivTableCell>
+                      {error.type === 'warning' ? (
+                        <DivTableCell style={{ paddingLeft: theme.spacing(2) }}>
+                          <WarningAmberOutlinedIcon color="warning" />
+                        </DivTableCell>
+                      ) : error.type === 'error' ? (
+                        <DivTableCell style={{ paddingLeft: theme.spacing(2) }}>
+                          <ErrorOutlineOutlinedIcon color="error" />
+                        </DivTableCell>
+                      ) : (
+                        <DivTableCell></DivTableCell>
+                      )}
+                      <DivTableCell>{error.message}</DivTableCell>
                     </DivTableRow>
                   ))}
                 </DivTableBody>
@@ -225,8 +227,8 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, open = false, onClose = () =
             </TableContainer>
           </>
         )}
-      </DialogContent>
-    </Dialog>
+      </Grid>
+    </>
   );
 };
 

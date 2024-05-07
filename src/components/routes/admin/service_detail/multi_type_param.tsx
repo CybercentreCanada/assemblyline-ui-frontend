@@ -1,8 +1,10 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import StarIcon from '@mui/icons-material/Star';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import {
+  Autocomplete,
   Checkbox,
   FormControlLabel,
   Grid,
@@ -16,6 +18,7 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import { DEFAULT_SERVICE_PARAMETER, ServiceParameter } from 'components/models/base/service';
+import CustomChip from 'components/visual/CustomChip';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +40,7 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
     const { value } = event.target;
     if (param.type === 'bool') {
       onUpdate({ ...param, default: value === 'true', value: value === 'true' }, id);
-    } else if (param.type === 'list' || param.type === 'str') {
+    } else if (param.type === 'str') {
       onUpdate({ ...param, default: value, value }, id);
     } else {
       onUpdate({ ...param, default: parseInt(value) || 0, value: parseInt(value) || 0 }, id);
@@ -48,14 +51,12 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
     onUpdate({ ...param, hide: !param.hide }, id);
   };
 
-  const handleSubmissionParamListUpdate = event => {
-    const { value } = event.target;
-    const newList = value.split(',');
-    let newDefault = newList[0];
-    if (newList.indexOf(param.default) !== -1) {
+  const handleSubmissionParamListUpdate = selections => {
+    let newDefault = selections[0];
+    if (selections.indexOf(param.default) !== -1) {
       newDefault = param.default;
     }
-    onUpdate({ ...param, list: newList, default: newDefault, value: newDefault }, id);
+    onUpdate({ ...param, list: selections, default: newDefault, value: newDefault }, id);
   };
 
   const addUserSubmissionParam = () => {
@@ -108,13 +109,64 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
     setTempUserParams({ ...tempUserParams, hide: tempUserParams.hide === 'false' ? 'true' : 'false' });
   };
 
-  const handleSPListChange = event => {
-    const newList = event.target.value.split(',');
-    let newDefault = newList[0];
-    if (newList.indexOf(tempUserParams.default) !== -1) {
+  const handleSPListChange = selections => {
+    let newDefault = selections[0];
+    if (selections.indexOf(tempUserParams.default) !== -1) {
       newDefault = tempUserParams.default;
     }
-    setTempUserParams({ ...tempUserParams, list: newList, default: newDefault, value: newDefault });
+    setTempUserParams({ ...tempUserParams, list: selections, default: newDefault, value: newDefault });
+  };
+
+  const renderParamLabelTags = (values: string[]) => {
+    return values.map(value => (
+      <CustomChip
+        label={
+          <div style={{ display: 'flex' }}>
+            {value === param.default ? (
+              <StarIcon fontSize="small" style={{ marginLeft: '-6px', marginRight: '6px', marginTop: '1px' }} />
+            ) : null}
+            {value}
+          </div>
+        }
+        // Render labels to show what are options to the user and what is selected by default
+        style={{ marginRight: theme.spacing(0.5) }}
+        onClick={() => onUpdate({ ...param, default: value, value }, id)}
+        onDelete={() =>
+          handleSubmissionParamListUpdate(
+            param.list.filter(v => {
+              return v !== value;
+            })
+          )
+        }
+        color={value === param.default ? 'primary' : null}
+      />
+    ));
+  };
+
+  const renderSPLabelTags = (values: string[]) => {
+    return values.map(value => (
+      <CustomChip
+        label={
+          <div style={{ display: 'flex' }}>
+            {value === tempUserParams.default ? (
+              <StarIcon fontSize="small" style={{ marginLeft: '-6px', marginRight: '6px', marginTop: '1px' }} />
+            ) : null}
+            {value}
+          </div>
+        }
+        // Render labels to show what are options to the user and what is selected by default
+        style={{ marginRight: theme.spacing(0.5) }}
+        onClick={() => setTempUserParams({ ...tempUserParams, default: value, value })}
+        onDelete={() =>
+          handleSPListChange(
+            tempUserParams.list.filter(v => {
+              return v !== value;
+            })
+          )
+        }
+        color={value === tempUserParams.default ? 'primary' : null}
+      />
+    ));
   };
 
   return param ? (
@@ -129,20 +181,7 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
           </IconButton>
         </Tooltip>
       </Grid>
-      {param.type === 'list' && (
-        <Grid item xs={10} sm={5}>
-          <TextField
-            fullWidth
-            size="small"
-            margin="dense"
-            variant="outlined"
-            onChange={handleSubmissionParamListUpdate}
-            value={param.list}
-            style={{ margin: 0 }}
-          />
-        </Grid>
-      )}
-      <Grid item xs={10} sm={param.type === 'list' ? 2 : 7}>
+      <Grid item xs={10} sm={7}>
         {param.type === 'bool' ? (
           <FormControl size="small" fullWidth>
             <Select
@@ -157,25 +196,17 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
             </Select>
           </FormControl>
         ) : param.type === 'list' ? (
-          <FormControl size="small" fullWidth>
-            <Select
-              id="user_spec_params"
-              fullWidth
-              value={param.default}
-              onChange={handleSubmissionParamUpdate}
-              variant="outlined"
-            >
-              {param.list ? (
-                param.list.map((value, x) => (
-                  <MenuItem key={x} value={value}>
-                    {value}
-                  </MenuItem>
-                ))
-              ) : (
-                <MenuItem value="" />
-              )}
-            </Select>
-          </FormControl>
+          <Autocomplete
+            fullWidth
+            freeSolo
+            multiple
+            size="small"
+            options={[]}
+            renderInput={params => <TextField {...params}></TextField>}
+            onChange={(event, value, reason) => handleSubmissionParamListUpdate(value as string[])}
+            renderTags={(value, getTagProps, ownerState) => renderParamLabelTags(value)}
+            value={param.list}
+          />
         ) : (
           <TextField
             fullWidth
@@ -227,25 +258,12 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
           >
             <MenuItem value="bool">bool</MenuItem>
             <MenuItem value="int">int</MenuItem>
-            <MenuItem value="list">list ({t('params.comma')})</MenuItem>
+            <MenuItem value="list">list</MenuItem>
             <MenuItem value="str">str</MenuItem>
           </Select>
         </FormControl>
       </Grid>
-      {tempUserParams.type === 'list' && (
-        <Grid item xs={10} sm={4}>
-          <TextField
-            fullWidth
-            size="small"
-            margin="dense"
-            variant="outlined"
-            value={tempUserParams.list}
-            onChange={handleSPListChange}
-            style={{ margin: 0 }}
-          />
-        </Grid>
-      )}
-      <Grid item xs={10} sm={tempUserParams.type === 'list' ? 2 : 6}>
+      <Grid item xs={10} sm={6}>
         {tempUserParams.type === 'bool' ? (
           <FormControl size="small" fullWidth>
             <Select
@@ -260,21 +278,17 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
             </Select>
           </FormControl>
         ) : tempUserParams.type === 'list' ? (
-          <FormControl size="small" fullWidth>
-            <Select
-              id="user_spec_params"
-              fullWidth
-              value={tempUserParams.default}
-              onChange={handleSPDefaultChange}
-              variant="outlined"
-            >
-              {tempUserParams.list.map((value, x) => (
-                <MenuItem key={x} value={value}>
-                  {value}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Autocomplete
+            fullWidth
+            freeSolo
+            multiple
+            size="small"
+            options={[]}
+            value={tempUserParams.list}
+            renderInput={params => <TextField {...params}></TextField>}
+            renderTags={(value, getTagProps, ownerState) => renderSPLabelTags(value)}
+            onChange={(event, value, reason) => handleSPListChange(value as string[])}
+          />
         ) : (
           <TextField
             fullWidth

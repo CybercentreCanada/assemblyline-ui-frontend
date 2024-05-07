@@ -1,4 +1,5 @@
 import {
+  Link as MaterialLink,
   Table,
   TableBody,
   TableBodyProps,
@@ -8,7 +9,6 @@ import {
   TableHeadProps,
   TableProps,
   TableRow,
-  TableRowProps,
   TableSortLabel,
   Theme
 } from '@mui/material';
@@ -131,7 +131,19 @@ export const LinkRow = ({ children, to, ...other }) => (
   </TableRow>
 );
 
-export const DivTableRow = ({ children, ...other }: TableRowProps) => (
+export const ExternalLinkRow = ({ children, href, ...other }) => (
+  <TableRow
+    component={MaterialLink}
+    {...other}
+    href={href}
+    target="_blank"
+    style={{ cursor: 'pointer', textDecoration: 'none' }}
+  >
+    {children}
+  </TableRow>
+);
+
+export const DivTableRow = ({ children, ...other }) => (
   <TableRow {...other} component="div">
     {children}
   </TableRow>

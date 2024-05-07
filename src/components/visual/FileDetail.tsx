@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
+import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Error } from 'components/models/base/error';
@@ -72,9 +73,10 @@ const WrappedFileDetail: React.FC<Props> = ({
   const location = useLocation();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
-  const { c12nDef, configuration } = useALContext();
+  const { c12nDef, configuration, settings } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage } = useMySnackbar();
+  const { addInsight, removeInsight } = useAssistant();
 
   const [file, setFile] = useState<File | null>(null);
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
@@ -87,7 +89,9 @@ const WrappedFileDetail: React.FC<Props> = ({
 
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
+
   const popoverOpen = Boolean(resubmitAnchor);
+
   const params = new URLSearchParams(location.search);
   const fileName = file ? params.get('name') || sha256 : null;
 
@@ -285,6 +289,26 @@ const WrappedFileDetail: React.FC<Props> = ({
     }
   }, [file]);
 
+  useEffect(() => {
+    addInsight({ type: 'file', value: sha256 });
+
+    return () => {
+      removeInsight({ type: 'file', value: sha256 });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256]);
+
+  useEffect(() => {
+    if (file && file.file_info.type.indexOf('code/') === 0) {
+      addInsight({ type: 'code', value: sha256 });
+    }
+
+    return () => {
+      removeInsight({ type: 'code', value: sha256 });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file]);
+
   return currentUser.roles.includes('submission_view') ? (
     <div id="fileDetailTop" style={{ textAlign: 'left' }}>
       <InputDialog
@@ -454,7 +478,7 @@ const WrappedFileDetail: React.FC<Props> = ({
         )}
         <FrequencySection seen={file ? file.file_info?.seen : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
-        {configuration.ui.ai.enabled && !liveErrors && !liveResultKeys && (
+        {configuration.ui.ai.enabled && settings.executive_summary && !liveErrors && !liveResultKeys && (
           <AISummarySection type="file" id={file ? file.file_info.sha256 : null} />
         )}
         <ChildrenSection childrens={file ? file.childrens : null} />

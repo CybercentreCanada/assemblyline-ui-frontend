@@ -125,38 +125,6 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
             <Grid item xs={12} sm={4} style={{ alignSelf: 'center' }}>
               <span style={{ verticalAlign: 'middle' }}>{t(`fail.${error.response.status}`)}</span>
             </Grid>
-            <Grid item xs={12}>
-              <label>{t('message')}</label>
-              <Card variant="outlined">
-                <pre
-                  style={{
-                    paddingLeft: theme.spacing(1),
-                    paddingRight: theme.spacing(1),
-                    whiteSpace: 'pre-wrap',
-                    minHeight: '10rem'
-                  }}
-                >
-                  {error.response.message}
-                </pre>
-              </Card>
-            </Grid>
-
-            {error.response.service_debug_info && (
-              <Grid item xs={12}>
-                <label>{t('debug_info')}</label>
-                <Card variant="outlined">
-                  <pre
-                    style={{
-                      paddingLeft: theme.spacing(1),
-                      paddingRight: theme.spacing(1),
-                      whiteSpace: 'pre-wrap'
-                    }}
-                  >
-                    {error.response.service_debug_info}
-                  </pre>
-                </Card>
-              </Grid>
-            )}
 
             <Grid item xs={12} md={8}>
               <label>{t('file_info')}</label>
@@ -193,6 +161,40 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
                 </Tooltip>
               </div>
             </Grid>
+
+            <Grid item xs={12}>
+              <label>{t('message')}</label>
+              <Card variant="outlined">
+                <pre
+                  style={{
+                    paddingLeft: theme.spacing(1),
+                    paddingRight: theme.spacing(1),
+                    whiteSpace: 'pre-wrap',
+                    minHeight: '10rem',
+                    wordBreak: 'break-word'
+                  }}
+                >
+                  {error.response.message}
+                </pre>
+              </Card>
+            </Grid>
+
+            {error.response.service_debug_info && (
+              <Grid item xs={12}>
+                <label>{t('debug_info')}</label>
+                <Card variant="outlined">
+                  <pre
+                    style={{
+                      paddingLeft: theme.spacing(1),
+                      paddingRight: theme.spacing(1),
+                      whiteSpace: 'pre-wrap'
+                    }}
+                  >
+                    {error.response.service_debug_info}
+                  </pre>
+                </Card>
+              </Grid>
+            )}
           </Grid>
         </div>
       )}

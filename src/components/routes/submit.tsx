@@ -35,7 +35,7 @@ import { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
-import { matchSHA256, matchURL } from 'helpers/utils';
+import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -92,24 +92,20 @@ const Submit: React.FC<any> = () => {
   const { user: currentUser, c12nDef, configuration } = useALContext();
   const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
 
-  const state: SubmitState = location.state as SubmitState;
-  const urlHashTitle = configuration.ui.allow_url_submissions ? 'URL/SHA256' : 'SHA256';
-  const urlInputText = urlHashTitle + t('urlHash.input_suffix');
-
   const [allowClick, setAllowClick] = useState<boolean>(true);
-  const classification = useState(state ? state.c12n : null)[0];
   const [file, setFile] = useState(null);
   const [flow, setFlow] = useState(null);
   const [settings, setSettings] = useState<UserSettings>(null);
-  const [submissionMetadata, setSubmissionMetadata] = useState(state ? state.metadata : undefined);
+  const [submissionMetadata, setSubmissionMetadata] = useState(undefined);
   const [uploadProgress, setUploadProgress] = useState(null);
   const [urlAutoselection, setUrlAutoselection] = useState(false);
-  const [urlHash, setUrlHash] = useState(state ? state.hash : '');
-  const [urlHashHasError, setUrlHashHasError] = useState(false);
   const [uuid, setUUID] = useState(null);
   const [validate, setValidate] = useState(false);
   const [validateCB, setValidateCB] = useState(null);
-  const [value, setValue] = useState(state ? state.tabContext : '0');
+  const [value, setValue] = useState('0');
+  const [stringInput, setStringInput] = useState('');
+  const [stringType, setStringType] = useState(undefined);
+  const [stringInputHasError, setStringInputHasError] = useState(false);
 
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
@@ -117,6 +113,11 @@ const Submit: React.FC<any> = () => {
 
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
+
+  const state: SubmitState = location.state as SubmitState;
+  const params = new URLSearchParams(location.search);
+  const stringInputTitle = t('urlHash.input_title');
+  const stringInputText = stringInputTitle + t('urlHash.input_suffix');
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -309,13 +310,6 @@ const Submit: React.FC<any> = () => {
     }
   };
 
-  function setParamAsync(service_idx, param_idx, p_value) {
-    if (settings) {
-      const type = settings.service_spec[service_idx].params[param_idx].type;
-      settings.service_spec[service_idx].params[param_idx].value = type === 'int' ? parseInt(p_value) : p_value;
-    }
-  }
-
   function setSettingValue(field, fieldValue) {
     if (settings) {
       setSettings({ ...settings, [field]: fieldValue });
@@ -334,37 +328,28 @@ const Submit: React.FC<any> = () => {
     }
   }
 
-  function handleUrlHashChange(event) {
+  function handleStringChange(string) {
     closeSnackbar();
-    setUrlHashHasError(false);
-    setUrlHash(event.target.value);
+    setStringType(getSubmitType(string, configuration));
+    setStringInputHasError(false);
     setSubmissionMetadata(undefined);
+    setStringInput(string);
   }
 
   function analyseUrlHash() {
     let data: any = null;
     setAllowClick(false);
-    const sha256 = matchSHA256(urlHash);
-    const url = matchURL(urlHash);
 
-    if (!sha256 && (!url || !configuration.ui.allow_url_submissions)) {
+    if (!stringType && (stringType !== 'url' || !configuration.ui.allow_url_submissions)) {
       setAllowClick(true);
-      setUrlHashHasError(true);
+      setStringInputHasError(true);
       showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
       return;
     }
 
-    if (sha256) {
-      data = { ui_params: settings, name: sha256, sha256: sha256, metadata: submissionMetadata };
-    } else {
-      data = {
-        ui_params: settings,
-        url: urlHash,
-        metadata: submissionMetadata
-      };
-    }
+    data = { ui_params: settings, [stringType]: stringInput, metadata: submissionMetadata };
 
-    setUrlHashHasError(false);
+    setStringInputHasError(false);
     apiCall({
       url: '/api/v4/submit/',
       method: 'POST',
@@ -378,14 +363,14 @@ const Submit: React.FC<any> = () => {
       },
       onFailure: api_data => {
         showErrorMessage(api_data.api_error_message);
-        setUrlHashHasError(true);
+        setStringInputHasError(true);
         setAllowClick(true);
       }
     });
   }
 
   useEffect(() => {
-    if (settings && !urlAutoselection && matchURL(urlHash)) {
+    if (settings && !urlAutoselection && stringType === 'url') {
       const newServices = settings.services;
       for (const cat of newServices) {
         for (const srv of cat.services) {
@@ -398,7 +383,16 @@ const Submit: React.FC<any> = () => {
       setSettings({ ...settings, services: newServices });
       setUrlAutoselection(true);
     }
-  }, [settings, urlHash, urlAutoselection, configuration.ui.url_submission_auto_service_selection]);
+  }, [settings, stringType, urlAutoselection, configuration.ui.url_submission_auto_service_selection]);
+
+  useEffect(() => {
+    if (state) {
+      setStringInput(state.hash);
+      setStringType(getSubmitType(state.hash, configuration));
+      setSubmissionMetadata(state.metadata);
+      setValue(state.tabContext);
+    }
+  }, [state, configuration]);
 
   useEffectOnce(() => {
     // Setup Flow
@@ -416,10 +410,23 @@ const Submit: React.FC<any> = () => {
     apiCall<UserSettings>({
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: api_data => {
-        setSettings(api_data.api_response);
+        if (state) {
+          setSettings({ ...api_data.api_response, classification: state.c12n });
+        } else if (params.get('classification')) {
+          setSettings({ ...api_data.api_response, classification: params.get('classification') });
+        } else {
+          setSettings(api_data.api_response);
+        }
       }
     });
     setUUID(generateUUID());
+
+    var inputParam = params.get('input') || '';
+
+    if (inputParam) {
+      handleStringChange(inputParam);
+      setValue('1');
+    }
   });
 
   return (
@@ -448,7 +455,7 @@ const Submit: React.FC<any> = () => {
             <Classification
               format="long"
               type="picker"
-              c12n={classification ? classification : settings ? settings.classification : null}
+              c12n={settings ? settings.classification : null}
               setClassification={setClassification}
               disabled={!currentUser.roles.includes('submission_create')}
             />
@@ -464,7 +471,7 @@ const Submit: React.FC<any> = () => {
               className={classes.tweaked_tabs}
             >
               <Tab label={t('file')} value="0" disabled={!currentUser.roles.includes('submission_create')} />
-              <Tab label={urlHashTitle} value="1" disabled={!currentUser.roles.includes('submission_create')} />
+              <Tab label={stringInputTitle} value="1" disabled={!currentUser.roles.includes('submission_create')} />
               <Tab label={t('options')} value="2" disabled={!currentUser.roles.includes('submission_create')} />
             </TabList>
           </Paper>
@@ -534,22 +541,23 @@ const Submit: React.FC<any> = () => {
               {settings ? (
                 <>
                   <TextField
-                    label={urlInputText}
-                    error={urlHashHasError}
+                    label={stringInputText}
+                    error={stringInputHasError}
                     size="small"
-                    type="urlHash"
+                    type="stringInput"
                     variant="outlined"
-                    value={urlHash}
-                    onChange={handleUrlHashChange}
+                    value={stringInput}
+                    onChange={event => handleStringChange(event.target.value as String)}
                     style={{ flexGrow: 1, marginRight: '1rem' }}
                   />
                   <Button
-                    disabled={!urlHash || !allowClick}
+                    disabled={!(stringInput && stringType) || !allowClick}
                     color="primary"
                     variant="contained"
                     onClick={() => validateServiceSelection('urlHash')}
+                    style={{ height: '40px' }}
                   >
-                    {t('urlHash.button')}
+                    {stringType ? `${t('urlHash.button')} ${stringType}` : t('urlHash.button')}
                     {!allowClick && <CircularProgress size={24} className={classes.buttonProgress} />}
                   </Button>
                 </>
@@ -560,7 +568,7 @@ const Submit: React.FC<any> = () => {
                 </>
               )}
             </div>
-            {matchURL(urlHash) &&
+            {stringType === 'url' &&
               configuration.ui.url_submission_auto_service_selection &&
               configuration.ui.url_submission_auto_service_selection.length > 0 && (
                 <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
@@ -589,12 +597,13 @@ const Submit: React.FC<any> = () => {
                   ))}
                 </div>
               )}
-            {matchSHA256(urlHash) &&
-              configuration.submission.sha256_sources &&
-              configuration.submission.sha256_sources.length > 0 && (
+            {stringType &&
+              configuration.submission.file_sources[stringType] &&
+              configuration.submission.file_sources[stringType].sources &&
+              configuration.submission.file_sources[stringType].sources.length > 0 && (
                 <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
                   <Typography variant="subtitle1">{t('options.submission.default_external_sources')}</Typography>
-                  {configuration.submission.sha256_sources.map((source, i) => (
+                  {configuration.submission.file_sources[stringType].sources.map((source, i) => (
                     <div key={i}>
                       <FormControlLabel
                         control={
@@ -852,12 +861,7 @@ const Submit: React.FC<any> = () => {
                     <Typography variant="h6" gutterBottom>
                       {t('options.service_spec')}
                     </Typography>
-                    <ServiceSpec
-                      service_spec={settings.service_spec}
-                      setParam={setParam}
-                      setParamAsync={setParamAsync}
-                      isSelected={isSelected}
-                    />
+                    <ServiceSpec service_spec={settings.service_spec} setParam={setParam} isSelected={isSelected} />
                   </div>
                 )}
               </Grid>

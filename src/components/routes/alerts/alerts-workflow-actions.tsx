@@ -1,7 +1,10 @@
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import { Alert, Button, CircularProgress, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
+import CustomChip from 'components/visual/CustomChip';
 import SearchQuery, { SearchFilter } from 'components/visual/SearchBar/search-query';
-import React, { SyntheticEvent, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertState } from './alerts';
 import AlertsFiltersSelected from './alerts-filters-selected';
@@ -23,7 +26,7 @@ type AlertsWorkflowActionsProps = {
   searchQuery: SearchQuery;
   alert: AlertState;
   labelFilters: SearchFilter[];
-  onApplyBtnClick: (status: string, selectedPriority: string, selectedLabels: string[]) => void;
+  onApplyBtnClick: (status: string, selectedPriority: string, addedLabels: string[], removedLabels: string[]) => void;
 };
 
 const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
@@ -42,7 +45,8 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   ]);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
-  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+  const [addedLabels, setAddedLabels] = useState<string[]>([]);
+  const [removedLabels, setRemovedLabels] = useState<string[]>([]);
 
   const validateForm = (status: string, priority: string, labels: string[]) => {
     const valid = (status || priority || (labels && labels.length > 0)) as boolean;
@@ -50,24 +54,98 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   };
 
   const onStatusChange = (selection: string) => {
-    validateForm(selection, selectedPriority, selectedLabels);
+    validateForm(selection, selectedPriority, [...addedLabels, ...removedLabels]);
     setSelectedStatus(selection);
   };
 
   const onPriorityChange = (selection: string) => {
-    validateForm(selectedStatus, selection, selectedLabels);
+    validateForm(selectedStatus, selection, [...addedLabels, ...removedLabels]);
     setSelectedPriority(selection);
   };
 
-  const onLabelChange = (selections: string[]) => {
-    validateForm(selectedStatus, selectedPriority, selections);
-    setSelectedLabels(selections.map(val => val.toUpperCase()));
+  const renderLabelTags = (values: string[]) => {
+    return values.map(value => (
+      <CustomChip
+        label={
+          <div style={{ display: 'flex' }}>
+            {removedLabels.indexOf(value) > -1 ? (
+              <RemoveIcon fontSize="small" style={{ marginLeft: '-6px', marginRight: '4px', marginTop: '1px' }} />
+            ) : (
+              <AddIcon fontSize="small" style={{ marginLeft: '-6px', marginRight: '4px', marginTop: '1px' }} />
+            )}
+            {value}
+          </div>
+        }
+        // Render adding labels as positive, removed labels as negative
+        style={{ marginRight: theme.spacing(0.5) }}
+        onDelete={() => onLabelDelete(value)}
+        onClick={() => onLabelClick(value)}
+        color={removedLabels.indexOf(value) > -1 ? 'error' : 'success'}
+        variant="outlined"
+      />
+    ));
+  };
+
+  const onLabelChange = (selections: string[], reason: string) => {
+    if (reason === 'clear') {
+      // On clear, we'll reset all the label lists to factory values
+      setAddedLabels([]);
+      setRemovedLabels([]);
+    } else {
+      setAddedLabels(
+        selections.filter(s => {
+          return removedLabels.indexOf(s) === -1;
+        })
+      );
+    }
+  };
+
+  const onLabelClick = (name: string) => {
+    // Toggle between added and removed labels
+    if (removedLabels.indexOf(name) > -1) {
+      // Remove from removed label list only and add to added list
+      setRemovedLabels(
+        removedLabels.filter(label => {
+          return label !== name;
+        })
+      );
+      setAddedLabels([...addedLabels, name]);
+    } else {
+      // Remove from added label list only and add to removed list
+      setAddedLabels(
+        addedLabels.filter(label => {
+          return label !== name;
+        })
+      );
+      setRemovedLabels([...removedLabels, name]);
+    }
+  };
+
+  const onLabelDelete = (name: string) => {
+    // If we're trying to undo removing an existing label, then we need to revert it's visual state
+    if (removedLabels.indexOf(name) > -1) {
+      // Remove from removed label list only
+      setRemovedLabels(
+        removedLabels.filter(label => {
+          return label !== name;
+        })
+      );
+    }
+    // If the label being deleted was a new label, then we can get rid of it
+    else if (addedLabels.indexOf(name) > -1) {
+      // Remove from added label list
+      setAddedLabels(
+        addedLabels.filter(label => {
+          return label !== name;
+        })
+      );
+    }
   };
 
   const _onApplyBtnClick = () => {
     if (formValid) {
       setApplying(true);
-      onApplyBtnClick(selectedStatus, selectedPriority, selectedLabels);
+      onApplyBtnClick(selectedStatus, selectedPriority, addedLabels, removedLabels);
     }
   };
 
@@ -87,6 +165,10 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   };
 
   const query = searchQuery.getQuery();
+
+  useEffect(() => {
+    validateForm(selectedStatus, selectedPriority, [...addedLabels, ...removedLabels]);
+  }, [selectedStatus, selectedPriority, addedLabels, removedLabels]);
 
   return (
     <div>
@@ -146,9 +228,14 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             multiple
             freeSolo
             options={possibleLabels}
-            value={selectedLabels}
+            filterSelectedOptions={true}
+            value={[...addedLabels, ...removedLabels].sort()}
             renderInput={params => <TextField {...params} label={t('labels')} variant="outlined" />}
-            onChange={(event, value) => onLabelChange(value as string[])}
+            onChange={(event, value, reason) => onLabelChange(value.map(v => v.toUpperCase()) as string[], reason)}
+            renderTags={(value, getTagProps, ownerState) => renderLabelTags(value)}
+            isOptionEqualToValue={(option, value) => {
+              return option.toUpperCase() === value.toUpperCase();
+            }}
           />
         </div>
       </div>

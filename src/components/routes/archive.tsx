@@ -232,7 +232,9 @@ export default function MalwareArchive() {
     curQuery.set('archive_only', true);
 
     const supp = curQuery.pop('supplementary') || false;
-    curQuery.add('filters', supp ? 'is_supplementary:*' : 'is_supplementary:false');
+    if (!supp) {
+      curQuery.add('filters', 'NOT is_supplementary:true');
+    }
 
     const tc = curQuery.pop('tc') || DEFAULT_TC;
     if (tc !== '1y') {

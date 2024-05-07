@@ -16,6 +16,11 @@ import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import {
   Alert,
+  Autocomplete,
+  DialogContentText,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
   Grid,
   IconButton,
   LinearProgress,
@@ -24,18 +29,24 @@ import {
   ListItemIcon,
   ListItemText,
   Popover,
+  Radio,
+  RadioGroup,
   Skeleton,
   Snackbar,
+  Stack,
+  TextField,
   Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
+import useAssistant from 'components/hooks/useAssistant';
 import useDrawer from 'components/hooks/useDrawer';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { ArchiverMetadata } from 'components/models/base/config';
 import { ParsedErrors } from 'components/models/base/error';
 import { ParsedSubmission, Submission } from 'components/models/base/submission';
 import { Configuration } from 'components/models/ui/help';
@@ -48,7 +59,8 @@ import Detection from 'components/visual/FileDetail/detection';
 import FileDownloader from 'components/visual/FileDownloader';
 import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
-import { setNotifyFavicon } from 'helpers/utils';
+import { setNotifyFavicon, toTitleCase } from 'helpers/utils';
+import moment from 'moment';
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
@@ -104,8 +116,9 @@ function WrappedSubmissionDetail() {
   const location = useLocation();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
-  const { showSuccessMessage } = useMySnackbar();
-  const { user: currentUser, c12nDef, configuration: systemConfig } = useALContext();
+  const { addInsight, removeInsight } = useAssistant();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+  const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const { id, fid } = useParams<ParamProps>();
@@ -124,10 +137,15 @@ function WrappedSubmissionDetail() {
   const [socket, setSocket] = useState<Socket>(null);
   const [loadInterval, setLoadInterval] = useState<any>(null);
   const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState<number>(0);
+  const [archiveDialog, setArchiveDialog] = useState<boolean>(false);
   const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [resubmitAnchor, setResubmitAnchor] = useState<Element>(null);
   const [baseFiles, setBaseFiles] = useState([]);
+  const [archivingMetadata, setArchivingMetadata] = useState<Record<string, ArchiverMetadata>>(
+    systemConfig.core.archiver.metadata
+  );
+  const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState('false');
 
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
@@ -474,15 +492,28 @@ function WrappedSubmissionDetail() {
 
   const archive = useCallback(() => {
     if (submission != null) {
+      const data = Object.fromEntries(Object.entries(archivingMetadata).map(([k, v]) => [k, v.default]));
       apiCall({
         method: 'PUT',
-        url: `/api/v4/archive/${submission.sid}/`,
+        url: `/api/v4/archive/${submission.sid}/${archivingUseAlternateDtl === 'true' ? '?use_alternate_dtl' : ''}`,
+        body: data,
         onSuccess: api_data => {
-          showSuccessMessage(
-            t(api_data.api_response.action === 'archive' ? 'archive.success' : 'archive.success.resubmit')
-          );
-          setSubmission({ ...submission, archived: true });
-        }
+          if (api_data.api_response.success) {
+            showSuccessMessage(
+              t(
+                ['archive', 'hooked'].includes(api_data.api_response.action)
+                  ? 'archive.success'
+                  : 'archive.success.resubmit'
+              )
+            );
+            setSubmission({ ...submission, archived: true });
+          } else {
+            showErrorMessage(t('archive.failed'));
+          }
+          setArchiveDialog(false);
+        },
+        onEnter: () => setWaitingDialog(true),
+        onExit: () => setWaitingDialog(false)
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -901,6 +932,17 @@ function WrappedSubmissionDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadTrigger]);
 
+  useEffect(() => {
+    addInsight({ type: 'report', value: id });
+    addInsight({ type: 'submission', value: id });
+
+    return () => {
+      removeInsight({ type: 'report', value: id });
+      removeInsight({ type: 'submission', value: id });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
   return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
       <ConfirmationDialog
@@ -912,6 +954,78 @@ function WrappedSubmissionDetail() {
         acceptText={t('delete.acceptText')}
         text={t('delete.text')}
         waiting={waitingDialog}
+      />
+      <ConfirmationDialog
+        open={archiveDialog}
+        handleClose={() => {
+          setArchiveDialog(false);
+          setTimeout(() => setArchivingMetadata(systemConfig.core.archiver.metadata), 250);
+        }}
+        handleAccept={archive}
+        title={t('archive.title')}
+        cancelText={t('archive.cancelText')}
+        acceptText={t('archive.acceptText')}
+        text={t('archive.text')}
+        children={
+          <>
+            {systemConfig.core.archiver.alternate_dtl !== 0 && (
+              <>
+                <DialogContentText>{t('archive.alternate_expiry')}</DialogContentText>
+                <Stack spacing={1}>
+                  <FormControl>
+                    <RadioGroup
+                      value={archivingUseAlternateDtl}
+                      name="alternate-expiry"
+                      onChange={event => setArchivingUseAlternateDtl(event.target.value)}
+                      row
+                    >
+                      <FormControlLabel
+                        value={'false'}
+                        control={<Radio />}
+                        label={t('archive.alternate_expiry.never')}
+                      />
+                      <FormControlLabel
+                        value={'true'}
+                        control={<Radio />}
+                        label={moment().from(
+                          new Date().getTime() - systemConfig.core.archiver.alternate_dtl * 24 * 60 * 60 * 1000
+                        )}
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Stack>
+              </>
+            )}
+            {Object.keys(archivingMetadata).length !== 0 && systemConfig.core.archiver.use_metadata && (
+              <>
+                <DialogContentText>{t('archive.metadata')}</DialogContentText>
+                <Stack spacing={1}>
+                  {Object.keys(archivingMetadata).map(metakey => (
+                    <FormControl key={metakey} size="small" fullWidth>
+                      <FormLabel>{toTitleCase(metakey)}</FormLabel>
+                      <Autocomplete
+                        value={archivingMetadata[metakey].default}
+                        freeSolo={archivingMetadata[metakey].editable}
+                        onChange={(event, newValue) =>
+                          setArchivingMetadata({
+                            ...archivingMetadata,
+                            [metakey]: { ...archivingMetadata[metakey], default: newValue }
+                          })
+                        }
+                        size="small"
+                        fullWidth
+                        options={archivingMetadata[metakey].values}
+                        renderInput={params => <TextField {...params} />}
+                      />
+                    </FormControl>
+                  ))}
+                </Stack>
+              </>
+            )}
+          </>
+        }
+        waiting={waitingDialog}
+        unacceptable={Object.keys(archivingMetadata).some(metakey => !archivingMetadata[metakey].default)}
       />
       {outstanding && Object.keys(outstanding).length > 0 && (
         <Snackbar
@@ -1049,7 +1163,7 @@ function WrappedSubmissionDetail() {
                         <Tooltip title={t(submission.archived || submission.from_archive ? 'archived' : 'archive')}>
                           <div>
                             <IconButton
-                              onClick={archive}
+                              onClick={() => setArchiveDialog(true)}
                               disabled={submission.archived || submission.from_archive}
                               size="large"
                             >
@@ -1272,7 +1386,7 @@ function WrappedSubmissionDetail() {
           metadata={submission ? submission.metadata : null}
           classification={submission ? submission.classification : null}
         />
-        {systemConfig.ui.ai.enabled && submission && submission.state === 'completed' && (
+        {systemConfig.ui.ai.enabled && settings.executive_summary && submission && submission.state === 'completed' && (
           <AISummarySection type={'submission' as 'submission'} id={submission.sid} />
         )}
         <Detection

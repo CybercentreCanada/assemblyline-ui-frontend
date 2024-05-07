@@ -15,7 +15,7 @@ import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { isAccessible } from 'helpers/classificationParser';
-import { safeFieldValueURI, toTitleCase } from 'helpers/utils';
+import { getSubmitType, safeFieldValueURI, toTitleCase } from 'helpers/utils';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
@@ -119,6 +119,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { enrichTagExternal, enrichmentState, getKey } = useExternalLookup();
   const externalLookupResults = enrichmentState[getKey(type, value)];
   const [allInProgress, setAllInProgress] = React.useState(false);
+  const submitType = category === 'tag' && type.endsWith('.uri') ? 'url' : getSubmitType(value, currentUserConfig);
 
   useEffect(() => {
     if (state.mouseY !== null) {
@@ -315,6 +316,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
 
   return hasExternalLinks ||
     hasExternalQuery ||
+    submitType ||
     category === 'heuristic' ||
     category === 'signature' ||
     category === 'tag' ? (
@@ -420,21 +422,22 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             </div>
           </Tooltip>
         )}
-        {category === 'tag' && type.endsWith('.uri') && (
-          <MenuItem
-            dense
-            component={Link}
-            to="/submit"
-            state={{
-              hash: value,
-              tabContext: '1',
-              c12n: classification
-            }}
-          >
-            {SUBMIT_ICON}
-            {t('submit_uri')}
-          </MenuItem>
-        )}
+        {submitType &&
+          (submitType !== 'url' || (submitType === 'url' && !!currentUserConfig?.ui?.allow_url_submissions)) && (
+            <MenuItem
+              dense
+              component={Link}
+              to="/submit"
+              state={{
+                hash: value,
+                tabContext: '1',
+                c12n: classification
+              }}
+            >
+              {SUBMIT_ICON}
+              {t('submit') + ` ${submitType.toUpperCase()}`}
+            </MenuItem>
+          )}
         {hasExternalQuery && (
           <div>
             <Divider />

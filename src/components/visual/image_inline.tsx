@@ -69,16 +69,45 @@ const useStyles = makeStyles((theme: Theme) => ({
     objectFit: 'contain',
     boxShadow: theme.shadows[2],
     imageRendering: 'pixelated'
+  },
+  imageBoxLG: {
+    height: theme.spacing(24),
+    width: theme.spacing(24),
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  imageItemLG: {
+    display: 'inherit',
+    padding: theme.spacing(0.5),
+    textDecoration: 'none'
+  },
+  imageLoadingLG: {
+    borderRadius: theme.spacing(0.5),
+    display: 'grid',
+    minHeight: theme.spacing(24),
+    minWidth: theme.spacing(24),
+    placeItems: 'center'
+  },
+  imageLG: {
+    borderRadius: theme.spacing(0.5),
+    minWidth: theme.spacing(8),
+    minHeight: theme.spacing(8),
+    maxHeight: theme.spacing(24),
+    maxWidth: theme.spacing(24),
+    objectFit: 'contain',
+    boxShadow: theme.shadows[3],
+    imageRendering: 'pixelated'
   }
 }));
 
 type ImageInlineBodyProps = {
   body: ImageBody;
   printable?: boolean;
-  small?: boolean;
+  size?: 'small' | 'medium' | 'large';
 };
 
-const WrappedImageInlineBody = ({ body, printable = false, small = false }: ImageInlineBodyProps) => {
+const WrappedImageInlineBody = ({ body, printable = false, size = 'medium' }: ImageInlineBodyProps) => {
   const [data, setData] = useState<Image[]>([]);
 
   useEffect(() => {
@@ -96,28 +125,28 @@ const WrappedImageInlineBody = ({ body, printable = false, small = false }: Imag
     };
   }, [body]);
 
-  return body && Array.isArray(body) ? <ImageInline data={data} printable={printable} small={small} /> : null;
+  return body && Array.isArray(body) ? <ImageInline data={data} printable={printable} size={size} /> : null;
 };
 
 type ImageInlineProps = {
   data: Image[];
   printable?: boolean;
-  small?: boolean;
+  size?: 'small' | 'medium' | 'large';
 };
 
-const WrappedImageInline = ({ data, printable = false, small = false }: ImageInlineProps) => {
+const WrappedImageInline = ({ data, printable = false, size = 'medium' }: ImageInlineProps) => {
   const classes = useStyles();
   const { openCarousel } = useCarousel();
 
   return data && data.length > 0 ? (
     <div className={clsx(printable && classes.printable)}>
       <ImageItem
-        src={data[0].thumb}
+        src={size === 'large' ? data[0].img : data[0].thumb}
         alt={data[0].name}
         index={0}
         to={data[0].img}
         count={data.length}
-        small={small}
+        size={size}
         onImageClick={(e, index) => openCarousel(index, data)}
       />
     </div>
@@ -130,7 +159,7 @@ type ImageItemProps = {
   index: number;
   to?: string;
   count?: number;
-  small?: boolean;
+  size?: 'small' | 'medium' | 'large';
   onImageClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, index: number) => void;
 };
 
@@ -140,7 +169,7 @@ const WrappedImageItem = ({
   index,
   to = null,
   count = 0,
-  small = false,
+  size = 'medium',
   onImageClick = () => null
 }: ImageItemProps) => {
   const classes = useStyles();
@@ -154,7 +183,7 @@ const WrappedImageItem = ({
       url: `/api/v4/file/image/${src}/`,
       allowCache: true,
       onSuccess: api_data => setImage(api_data.api_response),
-      onFailure: api_data => setImage(null),
+      onFailure: () => setImage(null),
       onEnter: () => setLoading(false),
       onExit: () => setLoading(false)
     });
@@ -165,7 +194,10 @@ const WrappedImageItem = ({
     <div>
       <Tooltip title={alt}>
         <Button
-          className={clsx(classes.imageItem, small && classes.imageItemSM)}
+          className={clsx(
+            classes.imageItem,
+            size === 'small' ? classes.imageItemSM : size === 'large' ? classes.imageItemLG : null
+          )}
           component={Link}
           to={`/file/viewer/${to}/image/`}
           color="secondary"
@@ -174,10 +206,22 @@ const WrappedImageItem = ({
             onImageClick(event, index);
           }}
         >
-          <div className={clsx(classes.imageLoading, small && classes.imageLoadingSM)}>
+          <div
+            className={clsx(
+              classes.imageLoading,
+              size === 'small' ? classes.imageLoadingSM : size === 'large' ? classes.imageLoadingLG : null
+            )}
+          >
             {image ? (
               <Badge badgeContent={count > 1 ? count : 0} color="primary">
-                <img className={clsx(classes.image, small && classes.imageSM)} src={image} alt={alt} />
+                <img
+                  className={clsx(
+                    classes.image,
+                    size === 'small' ? classes.imageSM : size === 'large' ? classes.imageLG : null
+                  )}
+                  src={image}
+                  alt={alt}
+                />
               </Badge>
             ) : loading ? (
               <CircularProgress />

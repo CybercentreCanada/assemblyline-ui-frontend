@@ -1,0 +1,13 @@
+{
+  "caveat": "This chat bot uses a Large Language Model to deliver answers to your questions. The answers are unpredictable and may not always reflect reality.",
+  "clear": "Clear all chat history",
+  "insight.code": "Analyse code",
+  "insight.file": "Summarize file analysis",
+  "insight.report": "Summarize report",
+  "insight.submission": "Summarize submission",
+  "new_chat": "Assistant context was resetted",
+  "reset": "Reset chat context",
+  "send": "Send question to Assistant",
+  "title": "AI Assistant",
+  "watermark": "Powered by AI"
+}

@@ -1,7 +1,7 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
-import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Grid, MenuItem, Pagination, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -19,12 +19,11 @@ import LineGraph from 'components/visual/LineGraph';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import SearchPager from 'components/visual/SearchPager';
 import ErrorsTable from 'components/visual/SearchResult/errors';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
@@ -49,6 +48,8 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
+
+const MAX_TRACKED_RECORDS = 10000;
 
 const DEFAULT_TC = '4d';
 
@@ -95,6 +96,14 @@ export default function ErrorViewer() {
   const [types, setTypes] = useState(null);
   const [names, setNames] = useState(null);
 
+  const pageCount = useMemo<number>(
+    () =>
+      errorResults && 'total' in errorResults
+        ? Math.ceil(Math.min(errorResults.total, MAX_TRACKED_RECORDS) / PAGE_SIZE)
+        : 0,
+    [errorResults]
+  );
+
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`));
   }, [location.pathname, location.search, pageSize]);
@@ -117,7 +126,7 @@ export default function ErrorViewer() {
 
   useEffect(() => {
     if (query && currentUser.is_admin) {
-      const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0`);
+      const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
       const tc = curQuery.pop('tc') || DEFAULT_TC;
       curQuery.set('rows', pageSize);
       curQuery.set('offset', 0);
@@ -214,6 +223,22 @@ export default function ErrorViewer() {
     [location.search]
   );
 
+  const handleNavigate = useCallback(
+    (searchQuery: SimpleSearchQuery) => {
+      const search = new SimpleSearchQuery(searchQuery.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
+      navigate(`${location.pathname}?${search.getDeltaString()}${location.hash}`);
+    },
+    [location.hash, location.pathname, navigate, pageSize]
+  );
+
+  const handleQueryChange = useCallback(
+    (key: string, value: string | number) => {
+      query.set(key, value);
+      handleNavigate(query);
+    },
+    [handleNavigate, query]
+  );
+
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
       <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
@@ -302,15 +327,12 @@ export default function ErrorViewer() {
                   </Typography>
                 )}
 
-                <SearchPager
-                  method="GET"
-                  url="/api/v4/error/list/"
-                  total={errorResults.total}
-                  setResults={setErrorResults}
-                  pageSize={pageSize}
-                  index="user"
-                  query={query}
-                  setSearching={setSearching}
+                <Pagination
+                  page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
+                  onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
+                  count={pageCount}
+                  shape="rounded"
+                  size="small"
                 />
               </div>
             )}

@@ -67,7 +67,14 @@ const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setServ
                 <DivTableCell breakable>{result.accepts}</DivTableCell>
                 <DivTableCell>
                   {result.is_external ? (
-                    <Tooltip title={t('location.external')}>
+                    <Tooltip
+                      PopperProps={{
+                        disablePortal: true
+                      }}
+                      disableInteractive
+                      placement="left"
+                      title={t('location.external')}
+                    >
                       <div>
                         <HiOutlineExternalLink
                           style={{ fontSize: 'x-large', verticalAlign: 'middle', color: theme.palette.primary.main }}
@@ -75,9 +82,15 @@ const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setServ
                       </div>
                     </Tooltip>
                   ) : (
-                    <Tooltip title={t('location.internal')}>
+                    <Tooltip
+                      PopperProps={{
+                        disablePortal: true
+                      }}
+                      disableInteractive
+                      placement="left"
+                      title={t('location.internal')}
+                    >
                       <div>&nbsp;</div>
-                      {/* <ClearIcon color="disabled" /> */}
                     </Tooltip>
                   )}
                 </DivTableCell>
@@ -89,6 +102,7 @@ const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setServ
                     label={result.privileged ? 'P' : 'S'}
                     color={result.privileged ? 'primary' : 'default'}
                     tooltip={result.privileged ? t('mode.privileged') : t('mode.service')}
+                    tooltipPlacement="left"
                   />
                 </DivTableCell>
                 {c12nDef.enforce ? (
@@ -101,13 +115,18 @@ const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setServ
                 <DivTableCell>
                   {result.enabled ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
                 </DivTableCell>
-                <DivTableCell style={{ whiteSpace: 'nowrap', paddingTop: 0, paddingBottom: 0 }}>
+                <DivTableCell style={{ whiteSpace: 'nowrap', paddingTop: 0, paddingBottom: 0, width: 0 }}>
                   {updates[result.name] && updates[result.name].update_available && (
                     <Tooltip
+                      PopperProps={{
+                        disablePortal: true
+                      }}
+                      disableInteractive
+                      placement="left"
                       title={
                         updates[result.name].updating
                           ? t('updating')
-                          : `${result.name} ${updates[result.name].latest_tag} ${t('available')}!`
+                          : `${t('update')} ${result.name} ${t('to')} ${updates[result.name].latest_tag}`
                       }
                     >
                       <span>

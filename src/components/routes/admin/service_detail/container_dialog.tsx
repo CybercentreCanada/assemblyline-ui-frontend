@@ -367,6 +367,25 @@ const WrappedContainerDialog = ({
     setTempContainer({ ...tempContainer, environment: newEnvironment });
   };
 
+  const handleLabelAddUpdate = newLabel => {
+    const newLabels = [...(tempContainer.labels || [])];
+    let index = -1;
+    newLabels.forEach((element, i) => {
+      if (element.name === newLabel.name) {
+        index = i;
+      }
+    });
+
+    if (index === -1) {
+      newLabels.push(newLabel);
+    } else {
+      newLabels[index] = newLabel;
+    }
+
+    setModified(true);
+    setTempContainer({ ...tempContainer, labels: newLabels });
+  };
+
   const handleEnvDelete = delEnv => {
     const newEnvironment = [...tempContainer.environment];
     let index = -1;
@@ -379,6 +398,21 @@ const WrappedContainerDialog = ({
       newEnvironment.splice(index, 1);
       setModified(true);
       setTempContainer({ ...tempContainer, environment: newEnvironment });
+    }
+  };
+
+  const handleLabelDelete = delLabel => {
+    const newLabels = [...tempContainer.labels];
+    let index = -1;
+    newLabels.forEach((element, i) => {
+      if (element.name === delLabel.name) {
+        index = i;
+      }
+    });
+    if (index !== -1) {
+      newLabels.splice(index, 1);
+      setModified(true);
+      setTempContainer({ ...tempContainer, labels: newLabels });
     }
   };
 
@@ -639,6 +673,15 @@ const WrappedContainerDialog = ({
             </Grid>
             <Grid item xs={12}>
               <Environment onAdd={handleEnvAddUpdate} />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2">{t('container.dialog.labels')}</Typography>
+              {(tempContainer.labels || []).map((env, i) => (
+                <Environment key={i} envVar={env} onUpdate={handleLabelAddUpdate} onDelete={handleLabelDelete} />
+              ))}
+            </Grid>
+            <Grid item xs={12}>
+              <Environment onAdd={handleLabelAddUpdate} />
             </Grid>
             {name !== null && (
               <>

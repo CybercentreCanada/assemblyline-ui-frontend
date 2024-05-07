@@ -4,6 +4,7 @@ import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import { UserSettings } from 'components/models/base/user_settings';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme =>
@@ -29,13 +30,22 @@ function ExternalSources({ settings, onChange, disabled = false, size = 'medium'
   const classes = useStyles();
   const theme = useTheme();
   const { configuration } = useALContext();
+
+  const fileSources = useMemo<string[]>(
+    () =>
+      Object.values(configuration?.submission?.file_sources || {})
+        .flatMap(file => file?.sources)
+        .filter((value, index, array) => value && array.indexOf(value) === index),
+    [configuration]
+  );
+
   return (
     <div style={{ padding: theme.spacing(2), textAlign: 'left' }}>
       <Typography variant="h6">{t('submissions.default_external_sources')}</Typography>
       <Typography variant="caption" gutterBottom>
         {t('submissions.default_external_sources_desc')}
       </Typography>
-      {configuration.submission.sha256_sources.map((source, i) => (
+      {fileSources.sort().map((source, i) => (
         <div key={i}>
           <FormControlLabel
             control={

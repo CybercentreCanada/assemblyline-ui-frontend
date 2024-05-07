@@ -1,0 +1,18 @@
+{
+  "header.author": "Author",
+  "header.description": "Description",
+  "header.name": "Name",
+  "install": "Install",
+  "installing": "Installing...",
+  "no_community_services_available_desc": "There are no new community services available to be added.",
+  "no_community_services_available_title": "No services found!",
+  "serviceToInstall.acceptText": "Yes, Install it!",
+  "serviceToInstall.author": "Author",
+  "serviceToInstall.cancelText": "Cancel",
+  "serviceToInstall.code": "Source Code",
+  "serviceToInstall.container": "Pull command",
+  "serviceToInstall.description": "You are about to install a community service. Be aware that this service was not developed and/or verified by the Assemblyline Team, we offer no support for this service at this time. It is the responsibility of the user to research the tools and developers who created them. Please refer to the links below for background information regarding the selected service.",
+  "serviceToInstall.notes": "* If you are having issues installing this service with the auto-install button, you can always go to the source code and build the container by hand.",
+  "serviceToInstall.pipeline": "Build pipeline",
+  "serviceToInstall.title": "Installing a Community Service"
+}

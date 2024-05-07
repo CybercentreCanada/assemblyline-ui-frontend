@@ -29,7 +29,7 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { Alert, AlertUpdate } from 'components/models/base/alert';
+import { Alert } from 'components/models/base/alert';
 import { CustomUser } from 'components/models/ui/user';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SearchBar from 'components/visual/SearchBar/search-bar';
@@ -333,23 +333,33 @@ const Alerts: React.FC = () => {
   };
 
   // Handler/callback for when clicking the 'Apply' btn on the AlertsWorkflowActions component.
-  const onWorkflowActionsApply = (selectedStatus: string, selectedPriority: string, selectedLabels: string[]) => {
-    onApplyWorkflowAction(drawer.actionData.query, selectedStatus, selectedPriority, selectedLabels).then(() => {
-      setDrawer({ ...drawer, open: false });
-      const { alert } = drawer.actionData;
-      if (alert) {
-        const changes = {
-          status: selectedStatus || alert.status,
-          priority: selectedPriority || alert.priority,
-          label: [...Array.from(new Set([...alert.labels, ...selectedLabels]))]
-        } as AlertUpdate;
-        updateAlert(alert.index, changes);
-        window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: alert.alert_id, changes } }));
-      } else {
-        setScrollReset(true);
-        onLoad();
+  const onWorkflowActionsApply = (
+    selectedStatus: string,
+    selectedPriority: string,
+    addedLabels: string[],
+    removedLabels: string[]
+  ) => {
+    onApplyWorkflowAction(drawer.actionData.query, selectedStatus, selectedPriority, addedLabels, removedLabels).then(
+      () => {
+        setDrawer({ ...drawer, open: false });
+        const { alert } = drawer.actionData;
+        if (alert) {
+          const changes = {
+            status: selectedStatus || alert.status,
+            priority: selectedPriority || alert.priority,
+            // Merge existing labels with added labels but remove labels that were to be removed
+            label: [...Array.from(new Set([...alert.labels, ...addedLabels]))].filter(label => {
+              return removedLabels.indexOf(label) === -1;
+            })
+          };
+          updateAlert(alert.index, changes);
+          window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: alert.alert_id, changes } }));
+        } else {
+          setScrollReset(true);
+          onLoad();
+        }
       }
-    });
+    );
   };
 
   // Memoized callback to render one line-item of the list....
@@ -430,7 +440,7 @@ const Alerts: React.FC = () => {
             <ListNavigator id={ALERT_SIMPLELIST_ID} />
           </div>
           <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
-            <AlertDetails id={location.hash.slice(1)} />
+            <AlertDetails alert={item} id={location.hash.slice(1)} inDrawer />
           </ListCarousel>
         </div>,
         { hasMaximize: true }

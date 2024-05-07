@@ -1,3 +1,4 @@
+import { ConfigurationDefinition } from 'components/hooks/useMyUser';
 import { PossibleColors } from 'components/visual/CustomChip';
 
 /**
@@ -47,6 +48,23 @@ export function getFileName(disposition: string): string {
     }
   }
   return fileName;
+}
+
+/**
+ *
+ * Convert a given second to human readable form
+ *
+ * @param seconds - seconds to convert
+ *
+ * @returns Human readable string
+ *
+ */
+export function humanSeconds(seconds: number, t) {
+  if (seconds < 1) {
+    return Math.floor(seconds * 1000) + ' ' + t('milliseconds');
+  } else {
+    return seconds.toFixed(1) + ' ' + t('seconds');
+  }
 }
 
 /**
@@ -363,4 +381,29 @@ export function matchURL(data: string): RegExpExecArray | null {
  */
 export function filterObject(obj: Object, callback) {
   return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
+}
+
+/**
+ *
+ * A function that determines the submittable type of the input string, if any.
+ *
+ * @param input - value to check
+ *
+ * @returns type as string or NULL
+ *
+ */
+export function getSubmitType(input: string, configuration: ConfigurationDefinition): string | null {
+  // If we're trying to auto-detect the input type, iterate over file sources
+  if (!input || input === undefined) return null;
+  if (!configuration?.submission?.file_sources) return null;
+
+  let detectedHashType = Object.entries(configuration.submission.file_sources).find(
+    ([_, hashProps]) => hashProps && input.match(new RegExp(hashProps?.pattern))
+  )?.[0];
+
+  if (!detectedHashType && matchURL(input)) {
+    // Check to see if the input is a valid URL
+    detectedHashType = 'url';
+  }
+  return detectedHashType;
 }

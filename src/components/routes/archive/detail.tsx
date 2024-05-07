@@ -2,6 +2,7 @@ import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
+import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { Section } from 'components/models/base/result';
@@ -58,7 +59,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   const { apiCall } = useMyAPI();
   const { showErrorMessage } = useMySnackbar();
-  const { user: currentUser, c12nDef, configuration } = useALContext();
+  const { user: currentUser, c12nDef, configuration, settings } = useALContext();
 
   const [file, setFile] = useState<File>(null);
   const [promotedSections, setPromotedSections] = useState<Section[]>([]);
@@ -66,6 +67,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
 
   const inDrawer = useMemo<boolean>(() => (propSha256 ? true : paramSha256 ? false : null), [paramSha256, propSha256]);
   const sha256 = useMemo<string>(() => paramSha256 || propSha256, [paramSha256, propSha256]);
+  const { addInsight, removeInsight } = useAssistant();
 
   const patchFileDetails = useCallback((data: File) => {
     const newData = { ...data };
@@ -128,6 +130,26 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
       );
     }
   }, [file]);
+
+  useEffect(() => {
+    addInsight({ type: 'file', value: sha256 });
+
+    return () => {
+      removeInsight({ type: 'file', value: sha256 });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256]);
+
+  useEffect(() => {
+    if (codeAllowed) {
+      addInsight({ type: 'code', value: sha256 });
+    }
+
+    return () => {
+      removeInsight({ type: 'code', value: sha256 });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [codeAllowed]);
 
   if (!configuration?.datastore?.archive?.enabled)
     return inDrawer ? <NotFoundPage /> : <Navigate to="/notfound" replace />;
@@ -196,7 +218,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
                   </div>
                 ) : (
                   <div style={{ paddingBottom: theme.spacing(2) }}>
-                    {configuration.ui.ai.enabled && (
+                    {configuration.ui.ai.enabled && settings.executive_summary && (
                       <AISummarySection type="file" id={file ? file.file_info.sha256 : null} noCollapse archiveOnly />
                     )}
                     <Detection

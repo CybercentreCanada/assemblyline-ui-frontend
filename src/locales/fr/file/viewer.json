@@ -1,5 +1,6 @@
 {
-  "analyse_code": "Analyser le code",
+  "show_analyse_code": "Afficher l'analyse du code par l'IA",
+  "hide_analyse_code": "Masquer l'analyse du code par l'IA",
   "analysing_code": "Demander aux robots de donner un sens à ce code...",
   "code_summary": "Résumé du code",
   "detail": "Détails de l'analyse du fichier",
