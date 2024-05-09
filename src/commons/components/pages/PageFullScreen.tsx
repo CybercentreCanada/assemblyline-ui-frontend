@@ -5,7 +5,7 @@ import useAppBar from 'commons/components/app/hooks/useAppBar';
 import useAppBarHeight from 'commons/components/app/hooks/useAppBarHeight';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useFullscreenStatus from 'commons/components/utils/hooks/useFullscreenStatus';
-import { memo, useCallback, useMemo, useRef } from 'react';
+import { memo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageContent from './PageContent';
 
@@ -31,8 +31,6 @@ const PageFullscreen = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 
 
   const barWillHide = layout.current !== 'top' && appbar.autoHide;
 
-  const isFirefox = useMemo(() => /Firefox|firefox/.test(navigator.userAgent.toString()), []);
-
   try {
     [isFullscreen, setIsFullscreen] = useFullscreenStatus(maximizableElement);
   } catch (e) {
@@ -57,35 +55,27 @@ const PageFullscreen = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 
         overflowY: isFullscreen ? 'auto' : 'unset'
       }}
     >
-      <div
-        style={{
-          top: barWillHide || isFullscreen ? 0 : appBarHeight,
-          float: 'right',
-          paddingTop: theme.spacing(2),
-          right: theme.spacing(2),
-          zIndex: theme.zIndex.appBar + 1,
-          ...(isFirefox
-            ? {
-                position: 'fixed',
-                top: isFullscreen ? 0 : appBarHeight
-              }
-            : {
-                position: 'sticky',
-                top: barWillHide || isFullscreen ? 0 : appBarHeight
-              })
-        }}
-      >
-        {fullscreenSupported ? null : (
-          <Tooltip title={t(isFullscreen ? 'fullscreen.off' : 'fullscreen.on')}>
-            <div>
-              <IconButton onClick={isFullscreen ? handleExitFullscreen : handleEnterFullscreen} size="large">
-                {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
-              </IconButton>
-            </div>
-          </Tooltip>
-        )}
-      </div>
       <PageContent margin={margin} mb={mb} ml={ml} mr={mr} mt={mt}>
+        <div
+          style={{
+            position: 'sticky',
+            float: 'right',
+            paddingTop: theme.spacing(2),
+            right: theme.spacing(2),
+            zIndex: theme.zIndex.appBar + 1,
+            top: barWillHide || isFullscreen ? 0 : appBarHeight
+          }}
+        >
+          {fullscreenSupported ? null : (
+            <Tooltip title={t(isFullscreen ? 'fullscreen.off' : 'fullscreen.on')}>
+              <div>
+                <IconButton onClick={isFullscreen ? handleExitFullscreen : handleEnterFullscreen} size="large">
+                  {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+                </IconButton>
+              </div>
+            </Tooltip>
+          )}
+        </div>
         {children}
       </PageContent>
     </div>
