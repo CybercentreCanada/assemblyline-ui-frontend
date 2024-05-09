@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export type QuotaContextProps = {
   apiQuotaRemaining: number;
@@ -18,6 +18,16 @@ function QuotaProvider(props: QuotaProviderProps) {
 
   const [apiQuotaRemaining, setApiQuotaremaining] = useState<number>(null);
   const [submissionQuotaRemaining, setSubmissionQuotaremaining] = useState<number>(null);
+
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('API Quota Remaining: ', apiQuotaRemaining);
+  }, [apiQuotaRemaining]);
+
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('Submission Quota Remaining: ', submissionQuotaRemaining);
+  }, [submissionQuotaRemaining]);
 
   return (
     <QuotaContext.Provider
