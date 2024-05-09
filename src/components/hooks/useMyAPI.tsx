@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import useALContext from './useALContext';
 import useMySnackbar from './useMySnackbar';
 import type { ConfigurationDefinition, WhoAmIProps } from './useMyUser';
+import useQuota from './useQuota';
 
 const DEFAULT_RETRY_MS = 32;
 
@@ -35,6 +36,7 @@ export default function useMyAPI() {
   const { t } = useTranslation();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { configuration: systemConfig } = useALContext();
+  const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
 
   type APICallProps = {
     url: string;
@@ -101,11 +103,19 @@ export default function useMyAPI() {
 
     fetch('/api/v4/user/whoami/', requestOptions)
       .then(res => {
+        const apiQuota = res.headers.get('X-Remaining-Quota-Api');
+        if (apiQuota) {
+          setApiQuotaremaining(parseInt(apiQuota));
+        }
+        const submissionQuota = res.headers.get('X-Remaining-Quota-Submission');
+        if (submissionQuota) {
+          setSubmissionQuotaremaining(parseInt(submissionQuota));
+        }
         if (res.status === 502) {
           return {
             api_error_message: t('api.unreachable'),
             api_response: '',
-            api_server_version: '4.3.0.0',
+            api_server_version: '4.5.0.0',
             api_status_code: 502
           };
         }
@@ -114,7 +124,7 @@ export default function useMyAPI() {
       .catch(() => ({
         api_error_message: t('api.invalid'),
         api_response: '',
-        api_server_version: '4.3.0.0',
+        api_server_version: '4.5.0.0',
         api_status_code: 400
       }))
       .then(api_data => {
@@ -221,6 +231,14 @@ export default function useMyAPI() {
     // Fetch the URL
     fetch(url, requestOptions)
       .then(res => {
+        const apiQuota = res.headers.get('X-Remaining-Quota-Api');
+        if (apiQuota) {
+          setApiQuotaremaining(parseInt(apiQuota));
+        }
+        const submissionQuota = res.headers.get('X-Remaining-Quota-Submission');
+        if (submissionQuota) {
+          setSubmissionQuotaremaining(parseInt(submissionQuota));
+        }
         if (res.status === 502) {
           return {
             api_error_message: t('api.unreachable'),
@@ -342,6 +360,14 @@ export default function useMyAPI() {
     // Fetch the URL
     fetch(url, requestOptions)
       .then(res => {
+        const apiQuota = res.headers.get('X-Remaining-Quota-Api');
+        if (apiQuota) {
+          setApiQuotaremaining(parseInt(apiQuota));
+        }
+        const submissionQuota = res.headers.get('X-Remaining-Quota-Submission');
+        if (submissionQuota) {
+          setSubmissionQuotaremaining(parseInt(submissionQuota));
+        }
         if (res.status === 502) {
           return {
             api_error_message: t('api.unreachable'),

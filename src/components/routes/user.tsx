@@ -120,6 +120,7 @@ function User({ username = null }: UserProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [user, setUser] = useState(null);
+  const [quotas, setQuotas] = useState(null);
   const [modified, setModified] = useState(false);
   const [editable, setEditable] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -161,6 +162,7 @@ function User({ username = null }: UserProps) {
       body: user,
       onSuccess: () => {
         setModified(false);
+        getQuotas();
         showSuccessMessage(t('success_save'));
       },
       onEnter: () => setButtonLoading(true),
@@ -298,6 +300,15 @@ function User({ username = null }: UserProps) {
     reader.readAsDataURL(file);
   }
 
+  function getQuotas() {
+    apiCall({
+      url: `/api/v4/user/quotas/${username || id}/`,
+      onSuccess: api_data => {
+        setQuotas(api_data.api_response);
+      }
+    });
+  }
+
   useEffectOnce(() => {
     // Make interface editable
     setEditable(currentUser.is_admin || currentUser.roles.includes('self_manage'));
@@ -311,6 +322,8 @@ function User({ username = null }: UserProps) {
         }
       });
     }
+
+    getQuotas();
   });
 
   return !currentUser.is_admin && location.pathname.includes('/admin/') ? (
@@ -751,9 +764,18 @@ function User({ username = null }: UserProps) {
                               : 'inherit'
                         }}
                       >
-                        {user.api_daily_quota === 0 || user.api_daily_quota === '0'
-                          ? t('no_quota')
-                          : user.api_daily_quota}
+                        {user.api_daily_quota === 0 || user.api_daily_quota === '0' ? (
+                          t('no_quota')
+                        ) : (
+                          <>
+                            <span>{user.api_daily_quota}</span>
+                            {quotas && (
+                              <span style={{ paddingLeft: theme.spacing(2), color: theme.palette.action.disabled }}>
+                                ({quotas.daily_api} {t('remaining')})
+                              </span>
+                            )}
+                          </>
+                        )}
                       </div>
                     ) : (
                       <Skeleton />
@@ -807,9 +829,18 @@ function User({ username = null }: UserProps) {
                               : 'inherit'
                         }}
                       >
-                        {user.submission_daily_quota === 0 || user.submission_daily_quota === '0'
-                          ? t('no_quota')
-                          : user.submission_daily_quota}
+                        {user.submission_daily_quota === 0 || user.submission_daily_quota === '0' ? (
+                          t('no_quota')
+                        ) : (
+                          <>
+                            <span>{user.submission_daily_quota}</span>
+                            {quotas && (
+                              <span style={{ paddingLeft: theme.spacing(2), color: theme.palette.action.disabled }}>
+                                ({quotas.daily_submission} {t('remaining')})
+                              </span>
+                            )}
+                          </>
+                        )}
                       </div>
                     ) : (
                       <Skeleton />

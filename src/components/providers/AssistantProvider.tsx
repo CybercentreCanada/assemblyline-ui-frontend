@@ -115,7 +115,6 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const [currentContext, setCurrentContext] = React.useState<ContextMessageProps[]>([]);
   const [currentHistory, setCurrentHistory] = React.useState<ContextMessageProps[]>([]);
   const [currentInput, setCurrentInput] = React.useState<string>('');
-  const [serviceList, setServiceList] = React.useState(null);
   const [hasInsights, setHasInsights] = React.useState<boolean>(false);
   const upSM = useMediaQuery(theme.breakpoints.up('md'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
@@ -290,22 +289,10 @@ function AssistantProvider({ children }: AssistantProviderProps) {
 
   useEffect(() => {
     if (configuration) {
-      apiCall({
-        url: `/api/v4/service/all/`,
-        onSuccess: api_data => {
-          setServiceList(api_data.api_response);
-        }
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration]);
-
-  useEffect(() => {
-    if (configuration && serviceList !== null) {
       clearAssistant();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration, serviceList, i18n.language]);
+  }, [configuration, i18n.language]);
 
   useEffect(() => {
     if (chatRef && chatRef.current)
