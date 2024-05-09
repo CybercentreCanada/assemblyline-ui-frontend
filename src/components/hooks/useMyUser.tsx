@@ -181,6 +181,8 @@ export interface CustomUser extends AppUser {
   groups: string[];
   is_active: boolean;
   roles: string[];
+  api_daily_quota: number;
+  submission_daily_quota: number;
 }
 
 export interface CustomAppUserService extends AppUserService<CustomUser> {
