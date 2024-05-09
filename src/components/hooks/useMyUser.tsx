@@ -138,6 +138,7 @@ export type ConfigurationDefinition = {
       [lang: string]: string;
     };
     banner_level: 'info' | 'warning' | 'error' | 'success';
+    enforce_quota: boolean;
     external_links: {
       tag: { [key: string]: ExternalLink[] };
       hash: { [key: string]: ExternalLink[] };
