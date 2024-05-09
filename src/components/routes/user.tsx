@@ -162,6 +162,7 @@ function User({ username }: UserProps) {
       body: user,
       onSuccess: () => {
         setModified(false);
+        getQuotas();
         showSuccessMessage(t('success_save'));
       },
       onEnter: () => setButtonLoading(true),
@@ -299,6 +300,15 @@ function User({ username }: UserProps) {
     reader.readAsDataURL(file);
   }
 
+  function getQuotas() {
+    apiCall({
+      url: `/api/v4/user/quotas/${username || id}/`,
+      onSuccess: api_data => {
+        setQuotas(api_data.api_response);
+      }
+    });
+  }
+
   useEffectOnce(() => {
     // Make interface editable
     setEditable(currentUser.is_admin || currentUser.roles.includes('self_manage'));
@@ -313,12 +323,7 @@ function User({ username }: UserProps) {
       });
     }
 
-    apiCall({
-      url: `/api/v4/user/quotas/${username || id}/`,
-      onSuccess: api_data => {
-        setQuotas(api_data.api_response);
-      }
-    });
+    getQuotas();
   });
 
   return !currentUser.is_admin && location.pathname.includes('/admin/') ? (
