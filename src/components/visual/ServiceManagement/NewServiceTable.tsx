@@ -1,7 +1,6 @@
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import { AlertTitle, IconButton, Paper, Skeleton, TableContainer, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { JSONFeedItem } from '.';

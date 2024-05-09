@@ -5,7 +5,7 @@ import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEscape } from 'com
 // TODO: Add in the commons
 import React, { useEffect, useRef } from 'react';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   container: {
     outline: 'none'
   }

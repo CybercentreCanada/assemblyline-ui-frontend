@@ -36,7 +36,6 @@ import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/sea
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchResultCount from 'components/visual/SearchResultCount';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
@@ -506,7 +505,7 @@ const Alerts: React.FC = () => {
         <DialogContent className={classes.dialogContent}>
           <div className={classes.dialogDescription}>{t('session.description')}</div>
 
-          <Grid item>
+          <Grid item style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.existing')}</Typography>
             <Paper component="pre" variant="outlined" className={classes.preview}>
               {!session.existing ? (
@@ -522,7 +521,7 @@ const Alerts: React.FC = () => {
             </Paper>
           </Grid>
 
-          <Grid item>
+          <Grid item style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.current')}</Typography>
             <Paper component="pre" variant="outlined" className={classes.preview}>
               {!session.current ? (

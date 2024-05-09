@@ -5,7 +5,6 @@ import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/materi
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
-import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';

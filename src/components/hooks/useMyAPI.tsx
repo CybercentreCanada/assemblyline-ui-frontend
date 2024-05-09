@@ -3,7 +3,7 @@ import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
 import useALContext from './useALContext';
 import useMySnackbar from './useMySnackbar';
-import { ConfigurationDefinition, WhoAmIProps } from './useMyUser';
+import type { ConfigurationDefinition, WhoAmIProps } from './useMyUser';
 import useQuota from './useQuota';
 
 const DEFAULT_RETRY_MS = 32;

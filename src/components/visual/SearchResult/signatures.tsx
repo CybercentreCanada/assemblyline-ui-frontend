@@ -1,13 +1,12 @@
+import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import { AlertTitle, Skeleton } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { Statistics } from 'components/routes/manage/signature_detail';
 import Classification from 'components/visual/Classification';
-import 'moment/locale/fr';
+import Moment from 'components/visual/Moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import {
   DivTable,
@@ -107,17 +106,13 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({
                 <DivTableCell>{signature.stats ? signature.stats.count || 0 : 0}</DivTableCell>
                 <DivTableCell>
                   {signature.stats && signature.stats.last_hit ? (
-                    <Moment fromNow locale={i18n.language}>
-                      {signature.stats.last_hit}
-                    </Moment>
+                    <Moment variant="fromNow">{signature.stats.last_hit}</Moment>
                   ) : (
                     t('never')
                   )}
                 </DivTableCell>
                 <DivTableCell>
-                  <Moment fromNow locale={i18n.language}>
-                    {signature.last_modified}
-                  </Moment>
+                  <Moment variant="fromNow">{signature.last_modified}</Moment>
                 </DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>

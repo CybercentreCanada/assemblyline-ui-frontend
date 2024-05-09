@@ -12,7 +12,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ArcGauge from 'components/visual/ArcGauge';
 import CustomChip from 'components/visual/CustomChip';
-import { bytesToSize, humanSeconds } from 'helpers/utils';
+import { bytesToSize, humanSeconds, sumValues } from 'helpers/utils';
 import React, { useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import io from 'socket.io-client';
@@ -621,7 +621,9 @@ const WrappedExpiryCard = ({ expiry }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    if ((timer !== null && expiry.initialized) || (timer === null && !expiry.initialized)) {
+    if (expiry.initialized && sumValues(expiry.queues) > 0 && sumValues(expiry.metrics) === 0) {
+      setError(t('expiry.error.not_expiring'));
+    } else if ((timer !== null && expiry.initialized) || (timer === null && !expiry.initialized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
       setTimer(
@@ -681,6 +683,18 @@ const WrappedExpiryCard = ({ expiry }) => {
               title="S"
               tooltip={t('queues.submission')}
             />
+            <MetricCounter
+              init={expiry.initialized}
+              value={expiry.queues.badlist}
+              title="B"
+              tooltip={t('queues.badlist')}
+            />
+            <MetricCounter
+              init={expiry.initialized}
+              value={expiry.queues.safelist}
+              title="S"
+              tooltip={t('queues.safelist')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -717,6 +731,18 @@ const WrappedExpiryCard = ({ expiry }) => {
               value={expiry.metrics.submission + expiry.metrics.submission_summary + expiry.metrics.submission_tree}
               title="S"
               tooltip={t('expired.submission')}
+            />
+            <MetricCounter
+              init={expiry.initialized}
+              value={expiry.metrics.badlist}
+              title="B"
+              tooltip={t('expired.badlist')}
+            />
+            <MetricCounter
+              init={expiry.initialized}
+              value={expiry.metrics.safelist}
+              title="S"
+              tooltip={t('expired.safelist')}
             />
           </div>
         </Grid>
@@ -1243,36 +1269,28 @@ const DEFAULT_EXPIRY = {
   instances: 0,
   queues: {
     alert: 0,
+    badlist: 0,
     cached_file: 0,
     emptyresult: 0,
     error: 0,
     file: 0,
     filescore: 0,
     result: 0,
+    safelist: 0,
     submission: 0,
     submission_tree: 0,
     submission_summary: 0
   },
   metrics: {
     alert: 0,
+    badlist: 0,
     cached_file: 0,
     emptyresult: 0,
     error: 0,
     file: 0,
     filescore: 0,
     result: 0,
-    submission: 0,
-    submission_tree: 0,
-    submission_summary: 0
-  },
-  archive: {
-    alert: 0,
-    cached_file: 0,
-    emptyresult: 0,
-    error: 0,
-    file: 0,
-    filescore: 0,
-    result: 0,
+    safelist: 0,
     submission: 0,
     submission_tree: 0,
     submission_summary: 0
