@@ -42,7 +42,7 @@ const UserProfile = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const configs = useAppConfigs();
-  const { user } = useALContext();
+  const { user, configuration } = useALContext();
   const anchorRef = useRef();
   const { apiQuotaRemaining, submissionQuotaRemaining } = useQuota();
   const [open, setOpen] = useState<boolean>(false);
@@ -253,7 +253,9 @@ const UserProfile = () => {
                     </Box>
                   </ListItem>
                 </List>
-                {(user.api_daily_quota !== 0 || user.submission_daily_quota !== 0) && renderQuotas()}
+                {configuration.ui.enforce_quota &&
+                  (user.api_daily_quota !== 0 || user.submission_daily_quota !== 0) &&
+                  renderQuotas()}
                 {configs.preferences.topnav.userMenuType === 'list' &&
                   renderMenu(
                     'usermenu',
