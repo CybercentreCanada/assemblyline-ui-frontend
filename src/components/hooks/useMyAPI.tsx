@@ -105,7 +105,7 @@ export default function useMyAPI() {
           return {
             api_error_message: t('api.unreachable'),
             api_response: '',
-            api_server_version: '4.3.0.0',
+            api_server_version: '4.5.0.0',
             api_status_code: 502
           };
         }
@@ -114,7 +114,7 @@ export default function useMyAPI() {
       .catch(() => ({
         api_error_message: t('api.invalid'),
         api_response: '',
-        api_server_version: '4.3.0.0',
+        api_server_version: '4.5.0.0',
         api_status_code: 400
       }))
       .then(api_data => {
