@@ -10,6 +10,7 @@ import useMyPreferences from 'components/hooks/useMyPreferences';
 import useMySitemap from 'components/hooks/useMySitemap';
 import useMyTheme from 'components/hooks/useMyTheme';
 import useMyUser, { CustomAppUserService } from 'components/hooks/useMyUser';
+import QuotaProvider from 'components/providers/QuotaProvider';
 import SafeResultsProvider from 'components/providers/SafeResultsProvider';
 import LoadingScreen from 'components/routes/loading';
 import LockedPage from 'components/routes/locked';
@@ -89,9 +90,11 @@ export const MyApp: React.FC<any> = () => {
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>
       <SafeResultsProvider>
-        <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
-          <MyAppMain />
-        </AppProvider>
+        <QuotaProvider>
+          <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
+            <MyAppMain />
+          </AppProvider>
+        </QuotaProvider>
       </SafeResultsProvider>
     </BrowserRouter>
   );
