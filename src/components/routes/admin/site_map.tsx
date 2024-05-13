@@ -1,3 +1,4 @@
+import DataUsageOutlinedIcon from '@mui/icons-material/DataUsageOutlined';
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
 import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
 import {
@@ -18,6 +19,7 @@ import withStyles from '@mui/styles/withStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import CustomChip from 'components/visual/CustomChip';
@@ -45,6 +47,7 @@ export default function SiteMap() {
   const { t } = useTranslation(['adminSiteMap']);
   const theme = useTheme();
   const [siteMap, setSiteMap] = useState(null);
+  const { configuration } = useALContext();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
 
@@ -111,6 +114,7 @@ export default function SiteMap() {
                 <StyledTableCell>{t('header.function')}</StyledTableCell>
                 <StyledTableCell>{t('header.methods')}</StyledTableCell>
                 <StyledTableCell>{t('header.protected')}</StyledTableCell>
+                {configuration.ui.enforce_quota && <StyledTableCell>{t('header.quota')}</StyledTableCell>}
                 <StyledTableCell>{t('header.roles')}</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -129,6 +133,11 @@ export default function SiteMap() {
                       <NoEncryptionOutlinedIcon color="error" />
                     )}
                   </StyledTableCell>
+                  {configuration.ui.enforce_quota && (
+                    <StyledTableCell>
+                      {path.count_towards_quota && <DataUsageOutlinedIcon color="primary" />}
+                    </StyledTableCell>
+                  )}
                   <StyledTableCell>
                     {path.required_type &&
                       path.required_type.map((req, rid) => (
