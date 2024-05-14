@@ -194,7 +194,13 @@ const Submit: React.FC<any> = () => {
       try {
         const data = JSON.parse(api_data);
         if (Object.hasOwnProperty.call(data, 'api_status_code')) {
-          if (data.api_status_code === 401) {
+          if (
+            data.api_status_code === 401 ||
+            (data.api_status_code === 503 &&
+              data.api_error_message.includes('quota') &&
+              data.api_error_message.includes('daily') &&
+              api_data.api_error_message.includes('API'))
+          ) {
             window.location.reload();
           }
         }
