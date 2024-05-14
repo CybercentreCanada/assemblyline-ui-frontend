@@ -68,6 +68,17 @@ export type ExternalSource = {
   name: string;
 };
 
+export type MetadataConfiguration = {
+  required: boolean;
+  validator_type: string;
+  validator_params: {
+    validation_regex?: string;
+    values?: string[];
+    max?: number;
+    min?: number;
+  };
+};
+
 export type ConfigurationDefinition = {
   auth: {
     allow_2fa: boolean;
@@ -105,6 +116,14 @@ export type ConfigurationDefinition = {
       [hash_type: string]: {
         pattern: string;
         sources: string[];
+      };
+    };
+    metadata: {
+      archive: {
+        [field_name: string]: MetadataConfiguration;
+      };
+      submit: {
+        [field_name: string]: MetadataConfiguration;
       };
     };
     verdicts: {

@@ -1,8 +1,12 @@
-import { Checkbox, FormControlLabel, Typography, useTheme } from '@mui/material';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { Checkbox, Collapse, FormControlLabel, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
-import React from 'react';
+import Service from 'components/layout/service';
+import React, { useState } from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
 const useStyles = makeStyles(theme =>
@@ -34,52 +38,119 @@ type ServiceTreeItemProps = {
   onChange: (name: string, category: string) => void;
   disabled?: boolean;
   size: 'medium' | 'small';
+  service_spec;
+  setParam;
 };
 
-function ServiceTreeItem({ item, onChange, disabled = false, size = 'medium' as 'medium' }: ServiceTreeItemProps) {
+function ServiceTreeItem({
+  item,
+  onChange,
+  disabled = false,
+  size = 'medium' as 'medium',
+  service_spec,
+  setParam
+}: ServiceTreeItemProps) {
   const classes = useStyles();
   const theme = useTheme();
-  const sp1 = theme.spacing(1);
-  const sp4 = theme.spacing(4);
+  const sp2 = theme.spacing(2);
+  const [open, setOpen] = useState(false);
+
+  function hasParams(name) {
+    for (const svc of service_spec) {
+      if (svc.name === name && svc.params) {
+        return true;
+      }
+    }
+  }
+
+  function getService(name) {
+    for (const svc of service_spec) {
+      if (svc.name === name) {
+        return svc;
+      }
+    }
+  }
+
+  function getServiceIndex(name) {
+    for (const [key, svc] of service_spec.entries()) {
+      if (svc.name === name) {
+        return key;
+      }
+    }
+  }
   return (
     <div
       style={{
-        paddingLeft: sp1,
         height: '100%',
         width: '100%',
         display: 'inline-block',
-        pageBreakInside: 'avoid'
+        pageBreakInside: 'avoid',
+        paddingRight: sp2
       }}
     >
-      <FormControlLabel
-        control={
-          <Checkbox
-            size={size}
-            disabled={disabled}
-            indeterminate={
-              item.services ? !item.services.every(e => e.selected) && !item.services.every(e => !e.selected) : false
-            }
-            checked={item.services ? item.services.some(e => e.selected) : item.selected}
-            name="label"
-            onChange={() => onChange(item.name, item.category)}
-          />
-        }
-        label={
-          <Typography variant={size === 'small' ? 'body2' : 'body1'}>
-            {item.name}
-            {item.is_external && (
-              <HiOutlineExternalLink
-                style={{ fontSize: 'large', verticalAlign: 'middle', marginLeft: theme.spacing(2) }}
+      <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              size={size}
+              disabled={disabled}
+              indeterminate={
+                item.services ? !item.services.every(e => e.selected) && !item.services.every(e => !e.selected) : false
+              }
+              checked={item.services ? item.services.some(e => e.selected) : item.selected}
+              name="label"
+              onChange={() => onChange(item.name, item.category)}
+            />
+          }
+          label={
+            <Typography variant={size === 'small' ? 'body2' : 'body1'}>
+              {item.name}
+              {item.description && (
+                <Tooltip title={item.description} placement="top">
+                  <InfoOutlinedIcon
+                    style={{ fontSize: 'large', verticalAlign: 'middle', marginLeft: theme.spacing(2) }}
+                  />
+                </Tooltip>
+              )}
+              {item.is_external && (
+                <HiOutlineExternalLink
+                  style={{ fontSize: 'large', verticalAlign: 'middle', marginLeft: theme.spacing(2) }}
+                />
+              )}
+            </Typography>
+          }
+          className={!disabled ? classes.item : null}
+        />
+        {setParam && hasParams(item.name) && (
+          <IconButton onClick={() => setOpen(!open)} disableRipple>
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        )}
+      </div>
+      <div style={{ paddingLeft: sp2 }}>
+        {setParam && (
+          <Collapse in={open}>
+            {hasParams(item.name) && !disabled && (
+              <Service
+                disabled={disabled}
+                setParam={setParam}
+                service={getService(item.name)}
+                idx={getServiceIndex(item.name)}
               />
             )}
-          </Typography>
-        }
-        className={!disabled ? classes.item : null}
-      />
-      <div style={{ paddingLeft: sp4 }}>
+          </Collapse>
+        )}
         {item.services
           ? item.services.map((service, service_id) => (
-              <ServiceTreeItem disabled={disabled} size={size} key={service_id} item={service} onChange={onChange} />
+              <ServiceTreeItem
+                disabled={disabled}
+                size={size}
+                key={service_id}
+                item={service}
+                onChange={onChange}
+                service_spec={service_spec}
+                setParam={setParam}
+              />
             ))
           : null}
       </div>
@@ -153,6 +224,7 @@ type ServiceTreeProps = {
   compressed?: boolean;
   disabled?: boolean;
   size?: 'medium' | 'small';
+  setParam?: (service_idx, param_idx, p_value) => void;
 };
 
 const ServiceTree: React.FC<ServiceTreeProps> = ({
@@ -161,7 +233,8 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
   setModified = null,
   compressed = false,
   disabled = false,
-  size = 'medium' as 'medium'
+  size = 'medium' as 'medium',
+  setParam
 }) => {
   const theme = useTheme();
   const sp2 = theme.spacing(2);
@@ -240,6 +313,8 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
               key={cat_id}
               item={category}
               onChange={handleServiceChange}
+              service_spec={settings.service_spec}
+              setParam={setParam}
             />
           ))
       ) : (

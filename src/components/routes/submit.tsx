@@ -9,10 +9,9 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
-  MenuItem,
   Paper,
-  Select,
   Skeleton,
+  Slider,
   Switch,
   Tab,
   TextField,
@@ -21,7 +20,6 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import FormControl from '@mui/material/FormControl';
 import { makeStyles } from '@mui/styles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
@@ -29,14 +27,14 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
+import MetadataInputField from 'components/visual/MetadataInputField';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -109,7 +107,7 @@ const Submit: React.FC<any> = () => {
   const stringInputTitle = t('urlHash.input_title');
   const stringInputText = stringInputTitle + t('urlHash.input_suffix');
   const [stringInputHasError, setStringInputHasError] = useState(false);
-  const [submissionMetadata, setSubmissionMetadata] = useState(undefined);
+  const [submissionMetadata, setSubmissionMetadata] = useState(new Map<string, any>());
   const [urlAutoselection, setUrlAutoselection] = useState(false);
   const [value, setValue] = useState('0');
   const banner = useAppBanner();
@@ -279,11 +277,6 @@ const Submit: React.FC<any> = () => {
       }
       setSettings({ ...settings, services: newServices });
     }
-  };
-
-  const anySelected = () => {
-    const serviceList = settings.service_spec.map(srv => srv.name);
-    return serviceList.some(isSelected);
   };
 
   const setFileDropperFile = selectedFile => {
@@ -673,7 +666,7 @@ const Submit: React.FC<any> = () => {
                   <Typography variant="h6" gutterBottom>
                     {t('options.service')}
                   </Typography>
-                  <ServiceTree size="small" settings={settings} setSettings={setSettings} />
+                  <ServiceTree size="small" settings={settings} setSettings={setSettings} setParam={setParam} />
                 </div>
               </Grid>
               <Grid item xs={12} md>
@@ -707,19 +700,22 @@ const Submit: React.FC<any> = () => {
                       {t('options.submission.priority')}
                     </Typography>
                     {settings ? (
-                      <FormControl size="small" fullWidth>
-                        <Select
-                          id="priority"
-                          value={settings.priority}
-                          variant="outlined"
-                          onChange={event => setSettingValue('priority', event.target.value)}
-                          fullWidth
-                        >
-                          <MenuItem value="500">{t('options.submission.priority.low')}</MenuItem>
-                          <MenuItem value="1000">{t('options.submission.priority.medium')}</MenuItem>
-                          <MenuItem value="1500">{t('options.submission.priority.high')}</MenuItem>
-                        </Select>
-                      </FormControl>
+                      <div style={{ marginLeft: '20px', marginRight: '20px' }}>
+                        <Slider
+                          defaultValue={settings.priority}
+                          valueLabelDisplay={'auto'}
+                          size="small"
+                          min={500}
+                          max={1500}
+                          marks={[
+                            { label: t('options.submission.priority.low'), value: 500 },
+                            { label: t('options.submission.priority.medium'), value: 1000 },
+                            { label: t('options.submission.priority.high'), value: 1500 }
+                          ]}
+                          step={null}
+                          onChange={(_, e_value) => setSettingValue('priority', e_value)}
+                        ></Slider>
+                      </div>
                     ) : (
                       <Skeleton style={{ height: '3rem' }} />
                     )}
@@ -855,16 +851,24 @@ const Submit: React.FC<any> = () => {
                       <Skeleton style={{ height: '3rem' }} />
                     )}
                   </div>
+                  {configuration.submission.metadata && (
+                    <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
+                      <Typography variant="body2" color="textSecondary" gutterBottom>
+                        {t('options.submission.metadata')}
+                      </Typography>
+                    </div>
+                  )}
+                  {Object.entries(configuration.submission.metadata.submit).map(([field_name, field_cfg]) => (
+                    <MetadataInputField
+                      name={field_name}
+                      configuration={field_cfg}
+                      value={submissionMetadata[field_name]}
+                      onChange={v => {
+                        setSubmissionMetadata({ ...submissionMetadata, ...{ [field_name]: v } });
+                      }}
+                    />
+                  ))}
                 </div>
-
-                {settings && settings.service_spec.length !== 0 && anySelected() && (
-                  <div style={{ textAlign: 'left', marginTop: sp4 }}>
-                    <Typography variant="h6" gutterBottom>
-                      {t('options.service_spec')}
-                    </Typography>
-                    <ServiceSpec service_spec={settings.service_spec} setParam={setParam} isSelected={isSelected} />
-                  </div>
-                )}
               </Grid>
             </Grid>
           </TabPanel>

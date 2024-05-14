@@ -14,6 +14,7 @@ interface DatePickerProps {
   tooltip?: string;
   type?: 'button' | 'input';
   defaultDateOffset?: number | null;
+  textFieldProps?: any;
 }
 
 function WrappedDatePicker({
@@ -21,7 +22,8 @@ function WrappedDatePicker({
   setDate,
   tooltip = null,
   type = 'button',
-  defaultDateOffset = null
+  defaultDateOffset = null,
+  textFieldProps = {}
 }: DatePickerProps) {
   const [tempDate, setTempDate] = React.useState(null);
   const [tomorrow, setTomorrow] = React.useState(null);
@@ -116,7 +118,6 @@ function WrappedDatePicker({
             setTempDate(newValue);
             setDate(newValue && newValue.isValid() ? `${newValue.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null);
           }}
-          // renderInput={params => <TextField {...params} />}
           renderInput={({ inputRef, inputProps, InputProps }) => (
             <TextField
               size="small"
@@ -124,6 +125,7 @@ function WrappedDatePicker({
               ref={inputRef}
               inputProps={{ ...inputProps }}
               InputProps={{ ...InputProps }}
+              {...textFieldProps}
             />
           )}
           minDate={tomorrow}
