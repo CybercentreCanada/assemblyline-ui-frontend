@@ -72,6 +72,7 @@ const WrappedAlertsPage = () => {
   const [countedTotal, setCountedTotal] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
+  const [initialized, setInitialized] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
 
   const queryRef = useRef<string>(null);
@@ -213,8 +214,12 @@ const WrappedAlertsPage = () => {
   }, [location.hash, setGlobalDrawer]);
 
   useEffect(() => {
-    handleFetch(query, 0);
-  }, [handleFetch, query]);
+    if (location.search === '') setInitialized(false);
+  }, [location.search]);
+
+  useEffect(() => {
+    initialized && handleFetch(query, 0);
+  }, [handleFetch, initialized, query]);
 
   useEffect(() => {
     const update = ({ detail }: CustomEvent<Alert[]>) => {
@@ -259,7 +264,7 @@ const WrappedAlertsPage = () => {
             </Grid>
 
             <Grid item xs style={{ textAlign: 'right', flex: 0 }}>
-              <AlertDefaultSearchParameters />
+              <AlertDefaultSearchParameters value={initialized} onChange={value => setInitialized(value)} />
             </Grid>
           </Grid>
           <PageHeader isSticky>

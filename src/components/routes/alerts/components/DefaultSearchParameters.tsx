@@ -54,7 +54,12 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const WrappedAlertDefaultSearchParameters = () => {
+type Props = {
+  value: boolean;
+  onChange: (value: boolean) => void;
+};
+
+const WrappedAlertDefaultSearchParameters = ({ value = false, onChange = () => null }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const classes = useStyles();
@@ -74,12 +79,13 @@ const WrappedAlertDefaultSearchParameters = () => {
   );
 
   useEffect(() => {
+    !value && onChange(true);
     if (location.search !== '') return;
-    const value = localStorage.getItem(LOCAL_STORAGE);
-    if (!value) return;
-    const search = new SimpleSearchQuery(value, DEFAULT_QUERY);
+    const storage = localStorage.getItem(LOCAL_STORAGE);
+    if (!storage) return;
+    const search = new SimpleSearchQuery(storage, DEFAULT_QUERY);
     navigate(`${location.pathname}?${search.getDeltaString()}${location.hash}`);
-  }, [location.hash, location.pathname, location.search, navigate]);
+  }, [location.hash, location.pathname, location.search, navigate, onChange, value]);
 
   return (
     <>
