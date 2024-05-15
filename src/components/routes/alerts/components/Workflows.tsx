@@ -13,15 +13,17 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import Autocomplete from '@mui/material/Autocomplete';
+import Autocomplete, { AutocompleteChangeReason } from '@mui/material/Autocomplete';
 import makeStyles from '@mui/styles/makeStyles';
+import match from 'autosuggest-highlight/match';
+import parse from 'autosuggest-highlight/parse';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import CustomChip from 'components/visual/CustomChip';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import React, { SyntheticEvent, useCallback, useMemo, useState } from 'react';
+import React, { SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { useLocation } from 'react-router-dom';
@@ -94,6 +96,15 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
 
     const [body, setBody] = useState<WorkflowBody>(initialBody);
     const [waiting, setWaiting] = useState<boolean>(false);
+    const [labelFilters, setLabelFilters] = useState<string[]>([]);
+
+    const prevQuery = useRef<string>(null);
+
+    const possibleLabels = useMemo<string[]>(() => {
+      let values = [...LABELS, ...labelFilters].filter((v, i, a) => a.indexOf(v) === i);
+      values.sort((a, b) => a.localeCompare(b));
+      return values;
+    }, [labelFilters]);
 
     const isSingleAlert = useMemo<boolean>(
       () => queryProp && !!queryProp?.get('q')?.startsWith('alert_id'),
@@ -122,7 +133,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
     );
 
     const handleWorkflowSubmit = useCallback(
-      (_query: SimpleSearchQuery, _body: WorkflowBody, _alerts: AlertItem[]) => {
+      (_query: SimpleSearchQuery, _body: WorkflowBody, _alerts: AlertItem[], _isSingleAlert: boolean) => {
         apiCall({
           url: `/api/v4/alert/all/batch/?${_query.toString()}`,
           method: 'POST',
@@ -141,6 +152,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                   .sort()
               }));
               window.dispatchEvent(new CustomEvent<Partial<AlertItem>[]>('alertUpdate', { detail }));
+              !_isSingleAlert && window.dispatchEvent(new CustomEvent('alertRefresh', null));
               showSuccessMessage(t('workflow.success'));
             }
           },
@@ -156,6 +168,17 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [initialBody, onClose, showErrorMessage, showSuccessMessage, t]
     );
+
+    useEffect(() => {
+      if (!open || prevQuery.current === query.toString([])) return;
+      prevQuery.current = query.toString([]);
+
+      apiCall({
+        url: `/api/v4/alert/labels/?${query.toString([])}`,
+        onSuccess: ({ api_response }) => setLabelFilters(Object.keys(api_response))
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open]);
 
     return (
       <>
@@ -244,15 +267,34 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                   freeSolo
                   disableCloseOnSelect
                   filterSelectedOptions
-                  options={LABELS}
+                  isOptionEqualToValue={(option, value) => option.toUpperCase() === value.toUpperCase()}
+                  options={possibleLabels}
                   value={[...body.labels, ...body.removed_labels].sort()}
+                  onChange={(event, values: Label[], reason: AutocompleteChangeReason) => {
+                    if (reason === 'clear') setBody(b => ({ ...b, labels: [], removed_labels: [] }));
+                    else
+                      setBody(b => ({
+                        ...b,
+                        labels: values.filter(v => !b.removed_labels.includes(v)).map(v => v.toUpperCase()) as Label[]
+                      }));
+                  }}
                   renderInput={props => <TextField {...props} label={t('labels')} variant="outlined" />}
-                  onChange={(event, values: Label[]) =>
-                    setBody(b => ({ ...b, labels: values.map(v => v.toUpperCase()) as Label[] }))
-                  }
+                  renderOption={(props, option, state, ownerState) => {
+                    const matches = match(option, state.inputValue, { insideWords: true });
+                    const parts = parse(option, matches);
+                    return (
+                      <li {...props} key={state.index}>
+                        {parts.map((part, index) => (
+                          <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                            {part.text}
+                          </span>
+                        ))}
+                      </li>
+                    );
+                  }}
                   renderTags={(values, getTagProps, ownerState) =>
                     values.map((value, index) =>
-                      body.labels.includes(value, index) ? (
+                      body.labels.includes(value) ? (
                         <CustomChip
                           {...getTagProps({ index })}
                           key={index}
@@ -293,7 +335,6 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                       )
                     )
                   }
-                  isOptionEqualToValue={(option, value) => option.toUpperCase() === value.toUpperCase()}
                 />
               </div>
             </div>
@@ -303,7 +344,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => handleWorkflowSubmit(query, body, alerts)}
+                    onClick={() => handleWorkflowSubmit(query, body, alerts, isSingleAlert)}
                     startIcon={waiting ? <CircularProgress size={20} /> : null}
                     disabled={waiting || !validBody}
                   >

@@ -74,11 +74,11 @@ const WrappedAlertsPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
 
-  const queryRef = useRef<string>('');
-  const prevSearch = useRef<string>('');
-  const prevOffset = useRef<number>(0);
-  const executionTime = useRef<string>('');
-  const loadingRef = useRef<boolean>(false);
+  const queryRef = useRef<string>(null);
+  const prevSearch = useRef<string>(null);
+  const prevOffset = useRef<number>(null);
+  const executionTime = useRef<string>(null);
+  const loadingRef = useRef<boolean>(null);
 
   const isLGDown = useMediaQuery(theme.breakpoints.down('lg'));
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
@@ -231,6 +231,20 @@ const WrappedAlertsPage = () => {
       window.removeEventListener('alertUpdate', update);
     };
   }, []);
+
+  useEffect(() => {
+    const refresh = () => {
+      prevSearch.current = null;
+      prevOffset.current = null;
+      loadingRef.current = null;
+      handleFetch(query, 0);
+    };
+
+    window.addEventListener('alertRefresh', refresh);
+    return () => {
+      window.removeEventListener('alertRefresh', refresh);
+    };
+  }, [handleFetch, query]);
 
   if (!currentUser.roles.includes('alert_view')) return <ForbiddenPage />;
   else
