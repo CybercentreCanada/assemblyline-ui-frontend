@@ -234,10 +234,12 @@ const WrappedAlertsPage = () => {
 
   useEffect(() => {
     const refresh = () => {
-      prevSearch.current = null;
-      prevOffset.current = null;
-      loadingRef.current = null;
-      handleFetch(query, 0);
+      setTimeout(() => {
+        prevSearch.current = null;
+        prevOffset.current = null;
+        loadingRef.current = null;
+        handleFetch(query, 0);
+      }, 1000);
     };
 
     window.addEventListener('alertRefresh', refresh);
