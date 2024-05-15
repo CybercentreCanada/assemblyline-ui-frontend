@@ -161,7 +161,7 @@ type AlertStatusProps = {
 export const AlertStatus: React.FC<AlertStatusProps> = React.memo(({ name, size = 'small' }: AlertStatusProps) => {
   const { t } = useTranslation('alerts');
 
-  const data = useMemo<{ color: PossibleColors; arrow: ReactNode }>(() => {
+  const data = useMemo<PossibleColors>(() => {
     const dataMap = {
       TRIAGE: 'default',
       MALICIOUS: 'error',
@@ -178,7 +178,7 @@ export const AlertStatus: React.FC<AlertStatusProps> = React.memo(({ name, size 
       wrap={false}
       size={size}
       variant="outlined"
-      color={data[name]}
+      color={data}
       label={t(`status_${name}`)}
       style={{ cursor: 'inherit' }}
     />
@@ -370,7 +370,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
             </IconButton>
             <DialogTitle id="alert-dialog-title">{t('history.events')}</DialogTitle>
             <DialogContent>
-              <TableContainer>
+              <TableContainer sx={{ borderRadius: theme.spacing(0.5), border: `1px solid ${theme.palette.divider}` }}>
                 <DivTable size="small">
                   <DivTableHead>
                     <DivTableRow>
@@ -417,8 +417,15 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                             </DivTableCell>
                             <DivTableCell>{event.status ? <AlertStatus name={event.status} /> : null}</DivTableCell>
                             <DivTableCell width="40%">
-                              {event.labels ? (
-                                <ChipList items={event.labels.map(label => ({ label, variant: 'outlined' }))} nowrap />
+                              {event.labels || event.labels_removed ? (
+                                <ChipList
+                                  nowrap
+                                  items={[...event.labels, ...event.labels_removed].map(label => ({
+                                    label,
+                                    variant: 'outlined',
+                                    color: [...event.labels].includes(label) ? 'success' : 'error'
+                                  }))}
+                                />
                               ) : null}
                             </DivTableCell>
                             <DivTableCell>

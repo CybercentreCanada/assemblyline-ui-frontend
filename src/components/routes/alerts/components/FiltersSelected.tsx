@@ -3,16 +3,7 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 import SortIcon from '@mui/icons-material/Sort';
 import SourceIcon from '@mui/icons-material/Source';
 import StarIcon from '@mui/icons-material/Star';
-import {
-  ChipProps,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-  Menu,
-  MenuItem,
-  MenuItemProps,
-  useTheme
-} from '@mui/material';
+import { ChipProps, ListItemIcon, ListItemText, Menu, MenuItem, MenuItemProps, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { DEFAULT_QUERY } from 'components/routes/alerts';
@@ -139,7 +130,6 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
           transformOrigin={{ vertical: 'top', horizontal: 'left' }}
           onClose={() => setOpen(o => !o)}
         >
-          <ListSubheader style={{ lineHeight: 'inherit' }}>{title}</ListSubheader>
           {options.map((option, i) => (
             <MenuItem
               key={`${param}-${i}`}
