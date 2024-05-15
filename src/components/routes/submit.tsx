@@ -108,6 +108,7 @@ const Submit: React.FC<any> = () => {
   const stringInputText = stringInputTitle + t('urlHash.input_suffix');
   const [stringInputHasError, setStringInputHasError] = useState(false);
   const [submissionMetadata, setSubmissionMetadata] = useState(new Map<string, any>());
+  const [possibleSubmissionMetadataValues, setPossibleSubmissionMetadataValues] = useState(new Map<string, any>());
   const [urlAutoselection, setUrlAutoselection] = useState(false);
   const [value, setValue] = useState('0');
   const banner = useAppBanner();
@@ -231,6 +232,10 @@ const Submit: React.FC<any> = () => {
           }, 500);
         },
         onFailure: api_data => {
+          if (api_data.api_status_code === 400 && api_data.api_error_message.includes('metadata')) {
+            setValue('2');
+          }
+
           if (
             api_data.api_status_code === 503 ||
             api_data.api_status_code === 403 ||
@@ -355,6 +360,9 @@ const Submit: React.FC<any> = () => {
         }, 500);
       },
       onFailure: api_data => {
+        if (api_data.api_status_code === 400 && api_data.api_error_message.includes('metadata')) {
+          setValue('2');
+        }
         showErrorMessage(api_data.api_error_message);
         setStringInputHasError(true);
         setAllowClick(true);
@@ -414,8 +422,29 @@ const Submit: React.FC<any> = () => {
     });
     setUUID(generateUUID());
 
-    var inputParam = params.get('input') || '';
+    // Gather the possible values for metadata fields
+    var possibleValues = new Map<string, any[]>();
+    for (const [field, config] of Object.entries(configuration.submission.metadata.submit)) {
+      if (config.validator_type in ['enum', 'boolean', 'integer']) {
+        continue;
+      }
 
+      apiCall({
+        url: `/api/v4/search/facet/submission/metadata.${field}/`,
+        onSuccess: api_data => {
+          // Update with all possible values for field
+          possibleValues[field] = Object.keys(api_data.api_response) as string[];
+        },
+        onFailure: _ => {
+          // Default to no possible values for field
+          possibleValues[field] = [];
+        }
+      });
+    }
+    setPossibleSubmissionMetadataValues(possibleValues);
+
+    // Handle if we've been given input via param
+    var inputParam = params.get('input') || '';
     if (inputParam) {
       handleStringChange(inputParam);
       setValue('1');
@@ -865,6 +894,7 @@ const Submit: React.FC<any> = () => {
                       onChange={v => {
                         setSubmissionMetadata({ ...submissionMetadata, ...{ [field_name]: v } });
                       }}
+                      options={possibleSubmissionMetadataValues[field_name]}
                     />
                   ))}
                 </div>

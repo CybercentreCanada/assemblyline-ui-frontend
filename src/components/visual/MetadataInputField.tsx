@@ -1,4 +1,4 @@
-import { MenuItem, TextField, Tooltip, Typography } from '@mui/material';
+import { Autocomplete, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
 import { MetadataConfiguration } from 'components/hooks/useMyUser';
 import DatePicker from 'components/visual/DatePicker';
 import { matchURL } from 'helpers/utils';
@@ -8,6 +8,7 @@ interface MetadataInputFieldProps {
   configuration: MetadataConfiguration;
   value: any;
   onChange: (value: any) => void;
+  options?: string[];
 }
 
 const isValid = (input: string, field_cfg: MetadataConfiguration) => {
@@ -28,7 +29,13 @@ const isValid = (input: string, field_cfg: MetadataConfiguration) => {
   return false;
 };
 
-const MetadataInputField: React.FC<MetadataInputFieldProps> = ({ name, configuration, value, onChange }) => {
+const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
+  name,
+  configuration,
+  value,
+  onChange,
+  options = []
+}) => {
   // Default set of properties that apply to all text fields
   const defaultTextFieldProps = {
     id: `metadata.${name}`,
@@ -51,6 +58,12 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({ name, configura
     error: !isValid(value, configuration)
   };
 
+  const defaultAutoCompleteProps = {
+    options: options,
+    autoComplete: true,
+    freeSolo: true
+  };
+
   if (configuration.validator_type === 'boolean' || configuration.validator_type === 'enum') {
     return (
       <TextField select {...defaultTextFieldProps}>
@@ -69,7 +82,10 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({ name, configura
         title={configuration.validator_type === 'regex' ? configuration.validator_params?.validation_regex : null}
         placement="right"
       >
-        <TextField {...defaultTextFieldProps} />
+        <Autocomplete
+          {...defaultAutoCompleteProps}
+          renderInput={params => <TextField {...params} {...defaultTextFieldProps} />}
+        />
       </Tooltip>
     );
   } else if (configuration.validator_type === 'integer') {
@@ -85,7 +101,12 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({ name, configura
   } else if (configuration.validator_type === 'date') {
     return <DatePicker date={value} setDate={onChange} type="input" textFieldProps={{ ...defaultTextFieldProps }} />;
   }
-  return <TextField {...defaultTextFieldProps}></TextField>;
+  return (
+    <Autocomplete
+      {...defaultAutoCompleteProps}
+      renderInput={params => <TextField {...params} {...defaultTextFieldProps} />}
+    />
+  );
 };
 
 export default MetadataInputField;
