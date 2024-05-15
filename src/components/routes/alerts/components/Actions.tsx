@@ -370,7 +370,7 @@ export const AlertOwnership: React.FC<AlertOwnershipProps> = React.memo(
             cancelText={t('actions.cancel')}
             acceptText={t('actions.ok')}
             waiting={waiting}
-            text={
+            children={
               groupBy ? (
                 <Grid container rowGap={2}>
                   <Grid>{t('actions.takeownershipdiag.content.grouped')}</Grid>

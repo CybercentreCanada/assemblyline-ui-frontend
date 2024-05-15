@@ -8,6 +8,7 @@
   "priv.R": "Read",
   "priv.W": "Write",
   "protected": "Requires login",
+  "quota": "Count towards quota",
   "require_role": "Required user roles",
   "role.administration": "Administration",
   "role.alert_manage": "Alert Manage",
