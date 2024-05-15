@@ -326,7 +326,6 @@ const Submit: React.FC<any> = () => {
     closeSnackbar();
     setStringType(getSubmitType(string, configuration));
     setStringInputHasError(false);
-    setSubmissionMetadata(undefined);
     setStringInput(string);
   }
 

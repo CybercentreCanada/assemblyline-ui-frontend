@@ -46,7 +46,7 @@ function WrappedDatePicker({
       defaultDate.setDate(defaultDate.getDate() + defaultDateOffset);
       defaultDate.setHours(0, 0, 0, 0);
       setTempDate(moment(defaultDate));
-    } else {
+    } else if (date) {
       setTempDate(moment(date));
     }
   }, [date, defaultDateOffset]);

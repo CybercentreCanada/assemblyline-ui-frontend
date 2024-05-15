@@ -10,10 +10,11 @@ interface MetadataInputFieldProps {
   onChange: (value: any) => void;
 }
 
-const isValid = (input: string, field_cfg) => {
+const isValid = (input: string, field_cfg: MetadataConfiguration) => {
   if (!input) {
     // No input provided or is unset at the moment
-    return false;
+    // Validity depends on whether or not the field is required
+    return !field_cfg.required;
   }
 
   if (field_cfg.validator_type === 'uri' && matchURL(input)) {
@@ -40,21 +41,19 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({ name, configura
       </Typography>
     ),
     onChange: (event: any) => {
-      onChange(event.target.value);
+      configuration.validator_type === 'boolean'
+        ? onChange(event.target.value === 'true')
+        : onChange(event.target.value);
     },
     required: configuration.required,
-    fullWidth: true
+    fullWidth: true,
+    value: value,
+    error: !isValid(value, configuration)
   };
 
   if (configuration.validator_type === 'boolean' || configuration.validator_type === 'enum') {
     return (
-      <TextField
-        select
-        {...defaultTextFieldProps}
-        onChange={e =>
-          configuration.validator_type === 'boolean' ? onChange(e.target.value === 'true') : onChange(e.target.value)
-        }
-      >
+      <TextField select {...defaultTextFieldProps}>
         {(configuration.validator_type === 'boolean' ? ['true', 'false'] : configuration.validator_params.values).map(
           v => (
             <MenuItem key={v} value={v}>
@@ -70,7 +69,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({ name, configura
         title={configuration.validator_type === 'regex' ? configuration.validator_params?.validation_regex : null}
         placement="right"
       >
-        <TextField {...defaultTextFieldProps} error={!isValid(value, configuration)} />
+        <TextField {...defaultTextFieldProps} />
       </Tooltip>
     );
   } else if (configuration.validator_type === 'integer') {
@@ -84,7 +83,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({ name, configura
       />
     );
   } else if (configuration.validator_type === 'date') {
-    return <DatePicker date={value} setDate={onChange} type="input" textFieldProps={defaultTextFieldProps} />;
+    return <DatePicker date={value} setDate={onChange} type="input" textFieldProps={{ ...defaultTextFieldProps }} />;
   }
   return <TextField {...defaultTextFieldProps}></TextField>;
 };
