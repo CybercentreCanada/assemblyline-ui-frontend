@@ -70,15 +70,20 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
       creator: '',
       description: '',
       finished: null,
-      indices: 'hot_and_archive',
+      indices: configuration?.datastore?.archive?.enabled ? 'hot_and_archive' : 'hot',
       key: null,
       search_classification: currentUser.classification,
       started_time: null,
       truncated: false,
-      ttl: !configuration.retrohunt.dtl ? 30 : configuration.retrohunt.dtl,
+      ttl: !configuration?.retrohunt?.dtl ? 30 : configuration?.retrohunt?.dtl,
       yara_signature: ''
     }),
-    [c12nDef?.UNRESTRICTED, configuration.retrohunt.dtl, currentUser.classification]
+    [
+      c12nDef?.UNRESTRICTED,
+      configuration?.datastore?.archive?.enabled,
+      configuration?.retrohunt?.dtl,
+      currentUser.classification
+    ]
   );
 
   const [retrohunt, setRetrohunt] = useState<RetrohuntData>(null);
