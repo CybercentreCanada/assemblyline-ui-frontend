@@ -75,6 +75,19 @@ export type ConfigurationDefinition = {
     allow_extended_apikeys: boolean;
     allow_security_tokens: boolean;
   };
+  core: {
+    archiver: {
+      alternate_dtl: number;
+      metadata: {
+        [metakey: string]: {
+          default: string;
+          editable: boolean;
+          values: string[];
+        };
+      };
+      use_metadata: boolean;
+    };
+  };
   datastore: {
     archive: {
       enabled: boolean;
@@ -88,7 +101,12 @@ export type ConfigurationDefinition = {
   submission: {
     dtl: number;
     max_dtl: number;
-    sha256_sources: string[];
+    file_sources: {
+      [hash_type: string]: {
+        pattern: string;
+        sources: string[];
+      };
+    };
     verdicts: {
       info: number;
       suspicious: number;
@@ -104,9 +122,6 @@ export type ConfigurationDefinition = {
   ui: {
     ai: {
       enabled: boolean;
-      assistant: {
-        system_message: string;
-      };
     };
     alerting_meta: {
       important: string[];
@@ -123,6 +138,7 @@ export type ConfigurationDefinition = {
       [lang: string]: string;
     };
     banner_level: 'info' | 'warning' | 'error' | 'success';
+    enforce_quota: boolean;
     external_links: {
       tag: { [key: string]: ExternalLink[] };
       hash: { [key: string]: ExternalLink[] };
@@ -166,6 +182,8 @@ export interface CustomUser extends AppUser {
   groups: string[];
   is_active: boolean;
   roles: string[];
+  api_daily_quota: number;
+  submission_daily_quota: number;
 }
 
 export interface CustomAppUserService extends AppUserService<CustomUser> {

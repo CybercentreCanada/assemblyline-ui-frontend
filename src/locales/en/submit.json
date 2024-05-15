@@ -42,6 +42,7 @@
   "terms3": "Terms of Service",
   "urlHash.button": "Scan",
   "urlHash.input_suffix": " to Scan",
+  "urlHash.input_title": "Hash/URL",
   "validate.acceptText": "Continue",
   "validate.cancelText": "Deselect external services",
   "validate.text": "You've enabled URL analysis to the Internet or selected a service outside Assemblyline's infrastructure. Do you want to continue?",

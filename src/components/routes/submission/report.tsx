@@ -192,7 +192,9 @@ export default function SubmissionReport() {
   }, [id]);
 
   useEffect(() => {
-    setUseAIReport(settings.executive_summary);
+    if (configuration.ui.ai.enabled) {
+      setUseAIReport(settings.executive_summary);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings]);
 

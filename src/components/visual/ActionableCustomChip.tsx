@@ -41,7 +41,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
   // Do the menu rendering here
   return (
     <>
-      {actionable && (
+      {actionable && state !== initialMenuState && (
         <ActionMenu
           category={category}
           type={data_type}
