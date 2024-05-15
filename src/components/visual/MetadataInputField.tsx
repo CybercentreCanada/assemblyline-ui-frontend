@@ -18,6 +18,11 @@ const isValid = (input: string, field_cfg: MetadataConfiguration) => {
     return !field_cfg.required;
   }
 
+  if (field_cfg.validator_type === 'boolean' || field_cfg.validator_type === 'enum') {
+    // Limited selection so should always be valid
+    return true;
+  }
+
   if (field_cfg.validator_type === 'uri' && matchURL(input)) {
     return true;
   } else if (
