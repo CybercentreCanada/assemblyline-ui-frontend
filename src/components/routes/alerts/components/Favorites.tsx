@@ -137,7 +137,7 @@ const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
           title={t('confirmation.header.add')}
           acceptText={t('confirmation.ok.add')}
           cancelText={t('cancel')}
-          text={
+          children={
             <Grid container flexDirection="column" spacing={theme.spacing(2)}>
               <Grid item component="span">
                 {t('confirmation.content.add')}
@@ -238,7 +238,7 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
           title={t('confirmation.header.add')}
           acceptText={t('confirmation.ok.add')}
           cancelText={t('cancel')}
-          text={
+          children={
             <Grid container flexDirection="column" spacing={theme.spacing(2)}>
               <Grid item component="span">
                 {t('confirmation.content.update')}
@@ -334,7 +334,7 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
           title={t('confirmation.header.delete')}
           cancelText={t('cancel')}
           acceptText={t('confirmation.ok.delete')}
-          text={
+          children={
             <Grid container flexDirection="column" spacing={theme.spacing(2)}>
               <Grid item component="span">
                 {t('confirmation.content.delete')}
