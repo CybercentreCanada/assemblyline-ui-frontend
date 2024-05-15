@@ -1,6 +1,5 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Checkbox, Collapse, FormControlLabel, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import createStyles from '@mui/styles/createStyles';
@@ -52,7 +51,8 @@ function ServiceTreeItem({
 }: ServiceTreeItemProps) {
   const classes = useStyles();
   const theme = useTheme();
-  const sp2 = theme.spacing(2);
+  const sp1 = theme.spacing(1);
+  const sp3 = theme.spacing(3);
   const [open, setOpen] = useState(false);
 
   function hasParams(name) {
@@ -81,14 +81,14 @@ function ServiceTreeItem({
   return (
     <div
       style={{
+        paddingLeft: sp1,
         height: '100%',
         width: '100%',
         display: 'inline-block',
-        pageBreakInside: 'avoid',
-        paddingRight: sp2
+        pageBreakInside: 'avoid'
       }}
     >
-      <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+      <Tooltip title={item.description} placement="right">
         <FormControlLabel
           control={
             <Checkbox
@@ -103,31 +103,32 @@ function ServiceTreeItem({
             />
           }
           label={
-            <Typography variant={size === 'small' ? 'body2' : 'body1'}>
+            <Typography
+              variant={size === 'small' ? 'body2' : 'body1'}
+              style={{ width: '100%', display: 'flex', alignItems: 'center' }}
+            >
               {item.name}
-              {item.description && (
-                <Tooltip title={item.description} placement="top">
-                  <InfoOutlinedIcon
-                    style={{ fontSize: 'large', verticalAlign: 'middle', marginLeft: theme.spacing(2) }}
-                  />
-                </Tooltip>
-              )}
               {item.is_external && (
-                <HiOutlineExternalLink
-                  style={{ fontSize: 'large', verticalAlign: 'middle', marginLeft: theme.spacing(2) }}
-                />
+                <HiOutlineExternalLink style={{ fontSize: 'large', marginLeft: theme.spacing(2) }} />
+              )}
+              {setParam && hasParams(item.name) && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+                  <IconButton
+                    onClick={e => {
+                      e.preventDefault();
+                      setOpen(!open);
+                    }}
+                  >
+                    {open ? <ExpandLess /> : <ExpandMore />}
+                  </IconButton>
+                </div>
               )}
             </Typography>
           }
           className={!disabled ? classes.item : null}
         />
-        {setParam && hasParams(item.name) && (
-          <IconButton onClick={() => setOpen(!open)} disableRipple>
-            {open ? <ExpandLess /> : <ExpandMore />}
-          </IconButton>
-        )}
-      </div>
-      <div style={{ paddingLeft: sp2 }}>
+      </Tooltip>
+      <div style={{ paddingLeft: sp3 }}>
         {setParam && (
           <Collapse in={open}>
             {hasParams(item.name) && !disabled && (
