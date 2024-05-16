@@ -273,6 +273,25 @@ export function getProvider() {
 
 /**
  *
+ * Check if we are receiving a SAML sign-in message
+ *
+ * @returns oauth provider
+ *
+ */
+export function getSAMLData() {
+  if (window.location.pathname.indexOf(`${process.env.PUBLIC_URL}/saml/`) !== -1) {
+    const params = new URLSearchParams(window.location.search);
+    const data = params.get('data');
+    if (data !== null || data !== undefined) {
+      return JSON.parse(atob(data).toString());
+    }
+  }
+
+  return null;
+}
+
+/**
+ *
  * Convert the returned result count from an Elasticsearch query into a meaningful string.
  * Only in the case of results exactly totaling the limit, Elastic may or may not still have more results.
  * In this case, a '+' is appended to indicate an approximiation.
