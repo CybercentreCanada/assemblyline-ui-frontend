@@ -34,12 +34,19 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type LoginScreenProps = {
   allowUserPass: boolean;
+  allowSAML: boolean;
   allowSignup: boolean;
   allowPWReset: boolean;
   oAuthProviders: string[];
 };
 
-export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, oAuthProviders }: LoginScreenProps) {
+export default function LoginScreen({
+  allowUserPass,
+  allowSAML,
+  allowSignup,
+  allowPWReset,
+  oAuthProviders
+}: LoginScreenProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
@@ -178,9 +185,11 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
         onSuccess: () => showSuccessMessage(t('signup.completed'), 10000),
         onFinalize: () => navigate('/')
       });
+    } else if (allowSAML) {
+      window.location.href = '/api/v4/auth/saml/sso/';
     }
     // eslint-disable-next-line
-  }, [webAuthNResponse, shownControls]);
+  }, [webAuthNResponse, shownControls, allowSAML]);
 
   useEffect(() => {
     hideMenus();

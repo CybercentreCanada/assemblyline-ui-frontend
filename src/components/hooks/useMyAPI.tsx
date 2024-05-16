@@ -30,6 +30,7 @@ export type LoginParamsProps = {
   allow_userpass_login: boolean;
   allow_signup: boolean;
   allow_pw_rest: boolean;
+  allow_saml_login: boolean;
 };
 
 export default function useMyAPI() {
