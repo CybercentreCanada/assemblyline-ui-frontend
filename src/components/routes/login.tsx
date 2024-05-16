@@ -78,7 +78,7 @@ export default function LoginScreen({
   }
 
   function reset(event) {
-    if ((['oauth', 'saml'].includes(shownControls) && tokenID) || !['oauth', 'saml'].includes(shownControls)) {
+    if ((['oauth'].includes(shownControls) && tokenID) || !['oauth'].includes(shownControls)) {
       setWebAuthNResponse(null);
       setShownControls('login');
       setUsername('');
@@ -193,12 +193,13 @@ export default function LoginScreen({
 
   useEffect(() => {
     if (samlData !== null) {
-      setUsername(cur_username => samlData.username || cur_username);
-      setEmail(cur_email => samlData.email || cur_email);
-      setAvatar(cur_avatar => samlData.avatar || cur_avatar);
-      setTokenID(cur_token => samlData.saml_token_id || cur_token);
       if (samlData.error !== null && samlData.error !== undefined) {
         showErrorMessage(samlData.error);
+        reset(null);
+      } else {
+        setUsername(cur_username => samlData.username || cur_username);
+        setEmail(cur_email => samlData.email || cur_email);
+        setTokenID(cur_token => samlData.saml_token_id || cur_token);
       }
       navigate(localStorage.getItem('nextLocation') || '/');
     }
