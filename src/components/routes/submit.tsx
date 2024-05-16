@@ -107,7 +107,7 @@ const Submit: React.FC<any> = () => {
   const stringInputTitle = t('urlHash.input_title');
   const stringInputText = stringInputTitle + t('urlHash.input_suffix');
   const [stringInputHasError, setStringInputHasError] = useState(false);
-  const [submissionMetadata, setSubmissionMetadata] = useState(new Map<string, any>());
+  const [submissionMetadata, setSubmissionMetadata] = useState(undefined);
   const [possibleSubmissionMetadataValues, setPossibleSubmissionMetadataValues] = useState(new Map<string, any>());
   const [urlAutoselection, setUrlAutoselection] = useState(false);
   const [value, setValue] = useState('0');
@@ -890,9 +890,14 @@ const Submit: React.FC<any> = () => {
                     <MetadataInputField
                       name={field_name}
                       configuration={field_cfg}
-                      value={submissionMetadata[field_name]}
+                      value={submissionMetadata ? submissionMetadata[field_name] : null}
                       onChange={v => {
                         var cleanMetadata = submissionMetadata;
+                        if (cleanMetadata === undefined) {
+                          // Instatiate as a new Map
+                          cleanMetadata = new Map<string, any>();
+                        }
+
                         if (v === undefined) {
                           // Remove field from metadata if value is null
                           cleanMetadata.delete(field_name);
