@@ -666,7 +666,7 @@ const Submit: React.FC<any> = () => {
                         <span style={{ fontWeight: 500 }}>{meta}</span>
                       </Grid>
                       <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                        {submissionMetadata[meta]}
+                        {submissionMetadata[meta].toString()}
                       </Grid>
                     </Grid>
                   ))}
@@ -892,7 +892,15 @@ const Submit: React.FC<any> = () => {
                       configuration={field_cfg}
                       value={submissionMetadata[field_name]}
                       onChange={v => {
-                        setSubmissionMetadata({ ...submissionMetadata, ...{ [field_name]: v } });
+                        var cleanMetadata = submissionMetadata;
+                        if (v === undefined) {
+                          // Remove field from metadata if value is null
+                          cleanMetadata.delete(field_name);
+                        } else {
+                          // Otherwise add/overwrite value
+                          cleanMetadata[field_name] = v;
+                        }
+                        setSubmissionMetadata({ ...cleanMetadata });
                       }}
                       options={possibleSubmissionMetadataValues[field_name]}
                     />

@@ -66,7 +66,8 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
   const defaultAutoCompleteProps = {
     options: options,
     autoComplete: true,
-    freeSolo: true
+    freeSolo: true,
+    onInputChange: (_, v, __) => onChange(v)
   };
 
   if (configuration.validator_type === 'boolean' || configuration.validator_type === 'enum') {
