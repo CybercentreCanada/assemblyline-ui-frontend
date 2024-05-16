@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Avatar, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
-import Skeleton from '@mui/material/Skeleton';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(() =>
@@ -17,17 +17,17 @@ const useStyles = makeStyles(() =>
   })
 );
 
-type OAuthProps = {
+type SSOProps = {
   avatar: string;
   username: string;
   email: string;
-  oAuthTokenID: string;
+  tokenID: string;
   buttonLoading: boolean;
   onSubmit: (event) => void;
   reset: (event) => void;
 };
 
-export function OAuthLogin({ avatar, username, email, oAuthTokenID, buttonLoading, onSubmit, reset }: OAuthProps) {
+export function SSOLogin({ avatar, username, email, tokenID, buttonLoading, onSubmit, reset }: SSOProps) {
   const { t } = useTranslation(['login']);
   const classes = useStyles();
   const theme = useTheme();
@@ -35,16 +35,16 @@ export function OAuthLogin({ avatar, username, email, oAuthTokenID, buttonLoadin
   return (
     <form onSubmit={onSubmit}>
       <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center', justifyContent: 'center' }}>
-        {!oAuthTokenID ? (
+        {!tokenID ? (
           <Skeleton variant="circular" style={{ alignSelf: 'center' }} width={144} height={144} />
         ) : (
           <Avatar style={{ alignSelf: 'center', width: theme.spacing(18), height: theme.spacing(18) }} src={avatar} />
         )}
-        <Typography color="textPrimary">{!oAuthTokenID ? <Skeleton /> : username}</Typography>
+        <Typography color="textPrimary">{!tokenID ? <Skeleton /> : username}</Typography>
         <Typography variant="caption" color="textSecondary" gutterBottom>
-          {!oAuthTokenID ? <Skeleton /> : email}
+          {!tokenID ? <Skeleton /> : email}
         </Typography>
-        {!oAuthTokenID ? (
+        {!tokenID ? (
           <Skeleton variant="rectangular" style={{ height: '36px', marginTop: '1.5rem', marginBottom: '1.5rem' }} />
         ) : (
           <Button
@@ -58,7 +58,7 @@ export function OAuthLogin({ avatar, username, email, oAuthTokenID, buttonLoadin
             {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
           </Button>
         )}
-        {!oAuthTokenID ? (
+        {!tokenID ? (
           <Skeleton />
         ) : (
           <Link variant="body2" href="#" onClick={reset}>
