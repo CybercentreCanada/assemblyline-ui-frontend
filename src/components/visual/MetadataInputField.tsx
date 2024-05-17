@@ -93,7 +93,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
     return (
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant="caption" style={{ textTransform: 'capitalize', width: '100%' }} color="textSecondary">
-          {`${name} [ ${configuration.validator_type.toUpperCase().replace('_', ' ')} ]`}
+          {`${name.replace('_', ' ')} [ ${configuration.validator_type.toUpperCase()} ]`}
         </Typography>
         {onReset && value !== null && value !== undefined && (
           <IconButton
@@ -115,7 +115,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
         disableTypography
         label={
           <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="body2">{name}</Typography>
+            <Typography variant="body2">{name.replace('_', ' ')}</Typography>
             {onReset && value !== null && value !== undefined && (
               <IconButton
                 size="small"
