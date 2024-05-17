@@ -115,7 +115,9 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
         disableTypography
         label={
           <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="body2">{name.replace('_', ' ')}</Typography>
+            <Typography variant="body2" style={{ textTransform: 'capitalize' }}>
+              {name.replace('_', ' ')}
+            </Typography>
             {onReset && value !== null && value !== undefined && (
               <IconButton
                 size="small"
