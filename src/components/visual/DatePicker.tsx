@@ -15,6 +15,8 @@ interface DatePickerProps {
   type?: 'button' | 'input';
   defaultDateOffset?: number | null;
   textFieldProps?: any;
+  minDateTomorrow?: boolean;
+  maxDateToday?: boolean;
 }
 
 function WrappedDatePicker({
@@ -23,10 +25,13 @@ function WrappedDatePicker({
   tooltip = null,
   type = 'button',
   defaultDateOffset = null,
-  textFieldProps = {}
+  textFieldProps = {},
+  minDateTomorrow = false,
+  maxDateToday = false
 }: DatePickerProps) {
   const [tempDate, setTempDate] = React.useState(null);
   const [tomorrow, setTomorrow] = React.useState(null);
+  const [today, setToday] = React.useState(null);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -34,10 +39,15 @@ function WrappedDatePicker({
   const { t } = useTranslation();
 
   useEffectOnce(() => {
-    const temp = new Date();
-    temp.setDate(temp.getDate() + 1);
-    temp.setHours(0, 0, 0, 0);
-    setTomorrow(moment(temp));
+    const tempTomorrow = new Date();
+    tempTomorrow.setDate(tempTomorrow.getDate() + 1);
+    tempTomorrow.setHours(0, 0, 0, 0);
+    setTomorrow(moment(tempTomorrow));
+
+    const tempToday = new Date();
+    tempToday.setDate(tempToday.getDate() + 1);
+    tempToday.setHours(0, 0, 0, 0);
+    setToday(moment(tempToday));
   });
 
   useEffect(() => {
@@ -48,6 +58,8 @@ function WrappedDatePicker({
       setTempDate(moment(defaultDate));
     } else if (date) {
       setTempDate(moment(date));
+    } else if (date === undefined || date === null) {
+      setTempDate(null);
     }
   }, [date, defaultDateOffset]);
 
@@ -74,7 +86,8 @@ function WrappedDatePicker({
                 setTempDate(newValue);
               }}
               renderInput={params => <TextField {...params} />}
-              minDate={tomorrow}
+              minDate={minDateTomorrow ? tomorrow : null}
+              maxDate={maxDateToday ? today : null}
             />
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
               <Button
@@ -128,7 +141,8 @@ function WrappedDatePicker({
               {...textFieldProps}
             />
           )}
-          minDate={tomorrow}
+          minDate={minDateTomorrow ? tomorrow : null}
+          maxDate={maxDateToday ? today : null}
         />
       )}
     </LocalizationProvider>
