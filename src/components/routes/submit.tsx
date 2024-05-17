@@ -879,15 +879,16 @@ const Submit: React.FC<any> = () => {
                       <Skeleton style={{ height: '3rem' }} />
                     )}
                   </div>
-                  {configuration.submission.metadata && (
-                    <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
-                      <Typography variant="body2" color="textSecondary" gutterBottom>
+                  {configuration.submission.metadata &&
+                    configuration.submission.metadata.submit &&
+                    Object.keys(configuration.submission.metadata.submit).length !== 0 && (
+                      <Typography variant="h6" gutterBottom style={{ paddingTop: theme.spacing(2) }}>
                         {t('options.submission.metadata')}
                       </Typography>
-                    </div>
-                  )}
+                    )}
                   {Object.entries(configuration.submission.metadata.submit).map(([field_name, field_cfg]) => (
                     <MetadataInputField
+                      key={field_name}
                       name={field_name}
                       configuration={field_cfg}
                       value={submissionMetadata ? submissionMetadata[field_name] : null}
