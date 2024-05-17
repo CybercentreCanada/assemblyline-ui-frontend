@@ -225,7 +225,7 @@ const Submit: React.FC<any> = () => {
       apiCall({
         url: `/api/v4/ui/start/${uuid}/`,
         method: 'POST',
-        body: { ...settings, filename: file.path },
+        body: { ...settings, filename: file.path, metadata: submissionMetadata },
         onSuccess: api_data => {
           showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
           setTimeout(() => {
