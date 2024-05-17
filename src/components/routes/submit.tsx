@@ -12,6 +12,7 @@ import {
   Paper,
   Skeleton,
   Slider,
+  Stack,
   Switch,
   Tab,
   TextField,
@@ -451,8 +452,6 @@ const Submit: React.FC<any> = () => {
     }
   });
 
-  useEffect(() => console.log('metadata', submissionMetadata), [submissionMetadata]);
-
   return (
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
       <ConfirmationDialog
@@ -884,30 +883,39 @@ const Submit: React.FC<any> = () => {
                   {configuration.submission.metadata &&
                     configuration.submission.metadata.submit &&
                     Object.keys(configuration.submission.metadata.submit).length !== 0 && (
-                      <Typography variant="h6" gutterBottom style={{ paddingTop: theme.spacing(2) }}>
-                        {t('options.submission.metadata')}
-                      </Typography>
+                      <>
+                        <Typography variant="h6" gutterBottom style={{ paddingTop: theme.spacing(2) }}>
+                          {t('options.submission.metadata')}
+                        </Typography>
+                        <Stack spacing={1}>
+                          {Object.entries(configuration.submission.metadata.submit).map(([field_name, field_cfg]) => (
+                            <MetadataInputField
+                              key={field_name}
+                              name={field_name}
+                              configuration={field_cfg}
+                              value={submissionMetadata[field_name]}
+                              onChange={v => {
+                                var cleanMetadata = submissionMetadata;
+                                if (v === undefined || v === null || v === '') {
+                                  // Remove field from metadata if value is null
+                                  delete cleanMetadata[field_name];
+                                } else {
+                                  // Otherwise add/overwrite value
+                                  cleanMetadata[field_name] = v;
+                                }
+                                setSubmissionMetadata({ ...cleanMetadata });
+                              }}
+                              onReset={() => {
+                                var cleanMetadata = submissionMetadata;
+                                delete cleanMetadata[field_name];
+                                setSubmissionMetadata({ ...cleanMetadata });
+                              }}
+                              options={possibleSubmissionMetadataValues[field_name]}
+                            />
+                          ))}
+                        </Stack>
+                      </>
                     )}
-                  {Object.entries(configuration.submission.metadata.submit).map(([field_name, field_cfg]) => (
-                    <MetadataInputField
-                      key={field_name}
-                      name={field_name}
-                      configuration={field_cfg}
-                      value={submissionMetadata[field_name] || ''}
-                      onChange={v => {
-                        var cleanMetadata = submissionMetadata;
-                        if (v === undefined || v === null || v === '') {
-                          // Remove field from metadata if value is null
-                          delete cleanMetadata[field_name];
-                        } else {
-                          // Otherwise add/overwrite value
-                          cleanMetadata[field_name] = v;
-                        }
-                        setSubmissionMetadata({ ...cleanMetadata });
-                      }}
-                      options={possibleSubmissionMetadataValues[field_name]}
-                    />
-                  ))}
                 </div>
               </Grid>
             </Grid>
