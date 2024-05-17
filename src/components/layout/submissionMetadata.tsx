@@ -32,7 +32,7 @@ function SubmissionMetadata({ submissionMetadata, setSubmissionMetadata }: Exter
   return (
     submissionMetadata &&
     Object.keys(submissionMetadata).length !== 0 && (
-      <div style={{ textAlign: 'start', marginTop: theme.spacing(2) }}>
+      <div style={{ textAlign: 'start', marginTop: theme.spacing(3), marginBottom: theme.spacing(3) }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Typography style={{ flexGrow: 1 }} variant="subtitle1">
             {t('options.submission.metadata')}
