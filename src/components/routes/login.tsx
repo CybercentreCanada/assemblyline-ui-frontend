@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { Box, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
+import { Box, Button, CircularProgress, Link, Stack, Theme, Typography, useTheme } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
@@ -8,14 +8,14 @@ import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { OAuthLogin } from 'components/routes/login/oauth';
 import { OneTimePassLogin } from 'components/routes/login/otp';
 import { ResetPassword, ResetPasswordNow } from 'components/routes/login/reset';
 import { SecurityTokenLogin } from 'components/routes/login/sectoken';
 import { SignUp } from 'components/routes/login/signup';
+import { SSOLogin } from 'components/routes/login/sso';
 import { UserPassLogin } from 'components/routes/login/userpass';
 import TextDivider from 'components/visual/TextDivider';
-import { getProvider } from 'helpers/utils';
+import { getProvider, getSAMLData } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -35,12 +35,19 @@ const useStyles = makeStyles(() =>
 
 type LoginScreenProps = {
   allowUserPass: boolean;
+  allowSAML: boolean;
   allowSignup: boolean;
   allowPWReset: boolean;
   oAuthProviders: string[];
 };
 
-export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, oAuthProviders }: LoginScreenProps) {
+export default function LoginScreen({
+  allowUserPass,
+  allowSAML,
+  allowSignup,
+  allowPWReset,
+  oAuthProviders
+}: LoginScreenProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
@@ -52,29 +59,30 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   const banner = useAppBanner();
   const { hideMenus } = useAppLayout();
   const provider = getProvider();
+  const samlData = getSAMLData();
   const [shownControls, setShownControls] = useState(
-    provider ? 'oauth' : params.get('reset_id') ? 'reset_now' : 'login'
+    provider ? 'oauth' : params.get('reset_id') ? 'reset_now' : samlData ? 'saml' : 'login'
   );
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [avatar, setAvatar] = useState('');
-  const [oAuthTokenID, setOAuthTokenID] = useState('');
+  const [tokenID, setTokenID] = useState('');
   const [oneTimePass, setOneTimePass] = useState('');
   const [webAuthNResponse, setWebAuthNResponse] = useState(null);
   const [buttonLoading, setButtonLoading] = useState(false);
   const pwPadding = allowSignup ? 1 : 2;
 
   function reset(event) {
-    if ((shownControls === 'oauth' && oAuthTokenID) || shownControls !== 'oauth') {
+    if ((['oauth'].includes(shownControls) && tokenID) || !['oauth'].includes(shownControls)) {
       setWebAuthNResponse(null);
       setShownControls('login');
       setUsername('');
       setEmail('');
       setPassword('');
       setAvatar('');
-      setOAuthTokenID('');
+      setTokenID('');
       setOneTimePass('');
     }
     if (event) {
@@ -92,7 +100,8 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
       password,
       otp: oneTimePass,
       webauthn_auth_resp: webAuthNResponse,
-      oauth_token_id: oAuthTokenID
+      oauth_token_id: shownControls !== 'oauth' ? tokenID : null,
+      saml_token_id: shownControls !== 'saml' ? tokenID : null
     };
 
     apiCall({
@@ -110,7 +119,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
           showErrorMessage(t('securitytoken.error'));
         } else if (api_data.api_error_message === 'Wrong Security Token' && shownControls !== 'sectoken') {
           setShownControls('sectoken');
-        } else if (shownControls === 'oauth') {
+        } else if (shownControls === 'oauth' || shownControls === 'saml') {
           showErrorMessage(api_data.api_error_message);
           reset(null);
         } else {
@@ -160,7 +169,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
           setAvatar(api_data.api_response.avatar);
           setUsername(api_data.api_response.username);
           setEmail(api_data.api_response.email_adr || '');
-          setOAuthTokenID(api_data.api_response.oauth_token_id);
+          setTokenID(api_data.api_response.oauth_token_id);
         },
         onFailure: api_data => {
           showErrorMessage(api_data.api_error_message);
@@ -183,6 +192,22 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
     }
     // eslint-disable-next-line
   }, [webAuthNResponse, shownControls]);
+
+  useEffect(() => {
+    if (samlData !== null) {
+      if (samlData.error !== null && samlData.error !== undefined) {
+        showErrorMessage(samlData.error);
+        reset(null);
+      } else {
+        setUsername(cur_username => samlData.username || cur_username);
+        setEmail(cur_email => samlData.email || cur_email);
+        setTokenID(cur_token => samlData.saml_token_id || cur_token);
+      }
+      navigate(localStorage.getItem('nextLocation') || '/');
+    }
+
+    // eslint-disable-next-line
+  }, [samlData]);
 
   useEffect(() => {
     hideMenus();
@@ -221,14 +246,34 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
                   </Link>
                 </Typography>
               ) : null}
-              {oAuthProviders !== undefined && oAuthProviders.length !== 0 ? (
+              {(oAuthProviders !== undefined && oAuthProviders.length !== 0) || allowSAML ? (
                 <>
                   {allowUserPass ? <TextDivider /> : null}
-                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    {oAuthProviders.map((item, idx) => (
+                  <Stack spacing={3}>
+                    {oAuthProviders !== undefined &&
+                      oAuthProviders.map((item, idx) => (
+                        <Button
+                          key={idx}
+                          variant="contained"
+                          color="primary"
+                          disabled={buttonLoading}
+                          onClick={() => {
+                            localStorage.setItem(
+                              'nextLocation',
+                              location.pathname === '/logout'
+                                ? '/'
+                                : `${location.pathname}${location.search}${location.hash}`
+                            );
+                            setButtonLoading(true);
+                          }}
+                          href={`/api/v4/auth/login/?oauth_provider=${item}`}
+                        >
+                          {`${t('button_oauth')} ${item.replace(/_/g, ' ')}`}
+                          {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                        </Button>
+                      ))}
+                    {allowSAML && (
                       <Button
-                        key={idx}
-                        style={idx !== 0 ? { marginTop: '1.5rem' } : null}
                         variant="contained"
                         color="primary"
                         disabled={buttonLoading}
@@ -241,13 +286,13 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
                           );
                           setButtonLoading(true);
                         }}
-                        href={`/api/v4/auth/login/?oauth_provider=${item}`}
+                        href={'/api/v4/auth/saml/sso/'}
                       >
-                        {`${t('button_oauth')} ${item.replace(/_/g, ' ')}`}
+                        {t('button_saml')}
                         {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                       </Button>
-                    ))}
-                  </div>
+                    )}
+                  </Stack>
                 </>
               ) : null}
             </>
@@ -258,9 +303,9 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
             <ResetPasswordNow setButtonLoading={setButtonLoading} buttonLoading={buttonLoading} reset={reset} />
           ),
           oauth: (
-            <OAuthLogin
+            <SSOLogin
               reset={reset}
-              oAuthTokenID={oAuthTokenID}
+              tokenID={tokenID}
               avatar={avatar}
               username={username}
               email={email}
@@ -274,6 +319,17 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
               setShownControls={setShownControls}
               setWebAuthNResponse={setWebAuthNResponse}
               username={username}
+            />
+          ),
+          saml: (
+            <SSOLogin
+              reset={reset}
+              tokenID={tokenID}
+              avatar={avatar}
+              username={username}
+              email={email}
+              onSubmit={onSubmit}
+              buttonLoading={buttonLoading}
             />
           )
         }[shownControls]

@@ -459,15 +459,17 @@ const WrappedCarouselContainer = ({
   }, [imgData, index]);
 
   useEffect(() => {
-    var i = new Image();
-    i.onload = function () {
-      if (i.width <= 128 || i.height <= 128) {
-        setImageRendering('pixelated');
-      } else {
-        setImageRendering('auto');
-      }
-    };
-    i.src = imgData;
+    if (imgData !== null) {
+      var i = new Image();
+      i.onload = function () {
+        if (i.width <= 128 || i.height <= 128) {
+          setImageRendering('pixelated');
+        } else {
+          setImageRendering('auto');
+        }
+      };
+      i.src = imgData;
+    }
   }, [imgData]);
 
   return (
