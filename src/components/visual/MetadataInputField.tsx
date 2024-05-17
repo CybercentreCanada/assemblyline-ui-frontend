@@ -1,4 +1,5 @@
-import { Autocomplete, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
+import { Autocomplete, Checkbox, FormControlLabel, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { MetadataConfiguration } from 'components/hooks/useMyUser';
 import DatePicker from 'components/visual/DatePicker';
 import { matchURL } from 'helpers/utils';
@@ -10,6 +11,16 @@ interface MetadataInputFieldProps {
   onChange: (value: any) => void;
   options?: string[];
 }
+
+const useStyles = makeStyles(theme => ({
+  checkbox: {
+    marginLeft: 0,
+    width: '100%',
+    '&:hover': {
+      background: theme.palette.action.hover
+    }
+  }
+}));
 
 const isValid = (input: string, field_cfg: MetadataConfiguration) => {
   if (!input) {
@@ -41,6 +52,8 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
   onChange,
   options = []
 }) => {
+  const classes = useStyles();
+
   // Default set of properties that apply to all text fields
   const defaultTextFieldProps = {
     id: `metadata.${name}`,
@@ -52,11 +65,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
         {`${name} [ ${configuration.validator_type.toUpperCase()} ]`}
       </Typography>
     ),
-    onChange: (event: any) => {
-      configuration.validator_type === 'boolean'
-        ? onChange(event.target.value === 'true')
-        : onChange(event.target.value);
-    },
+    onChange: (event: any) => onChange(event.target.value),
     required: configuration.required,
     fullWidth: true,
     value: value,
@@ -71,16 +80,22 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
     onInputChange: (_, v, __) => onChange(v)
   };
 
-  if (configuration.validator_type === 'boolean' || configuration.validator_type === 'enum') {
+  if (configuration.validator_type === 'boolean') {
+    return (
+      <FormControlLabel
+        control={<Checkbox size="small" checked={value || false} name="label" onChange={() => onChange(!!!value)} />}
+        label={<Typography variant="body2">{name}</Typography>}
+        className={classes.checkbox}
+      />
+    );
+  } else if (configuration.validator_type === 'enum') {
     return (
       <TextField select {...defaultTextFieldProps}>
-        {(configuration.validator_type === 'boolean' ? ['true', 'false'] : configuration.validator_params.values).map(
-          v => (
-            <MenuItem key={v} value={v}>
-              {v}
-            </MenuItem>
-          )
-        )}
+        {configuration.validator_params.values.map(v => (
+          <MenuItem key={v} value={v}>
+            {v}
+          </MenuItem>
+        ))}
       </TextField>
     );
   } else if (configuration.validator_params?.validation_regex || configuration.validator_type === 'uri') {
