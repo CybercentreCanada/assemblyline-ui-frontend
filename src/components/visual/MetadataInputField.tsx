@@ -1,5 +1,15 @@
-import { Autocomplete, Checkbox, FormControlLabel, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import ClearIcon from '@mui/icons-material/Clear';
+import {
+  Autocomplete,
+  Checkbox,
+  FormControlLabel,
+  IconButton,
+  MenuItem,
+  TextField,
+  Tooltip,
+  Typography
+} from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 import { MetadataConfiguration } from 'components/hooks/useMyUser';
 import DatePicker from 'components/visual/DatePicker';
 import { matchURL } from 'helpers/utils';
@@ -9,6 +19,7 @@ interface MetadataInputFieldProps {
   configuration: MetadataConfiguration;
   value: any;
   onChange: (value: any) => void;
+  onReset?: () => void;
   options?: string[];
 }
 
@@ -50,9 +61,11 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
   configuration,
   value,
   onChange,
+  onReset = null,
   options = []
 }) => {
   const classes = useStyles();
+  const theme = useTheme();
 
   // Default set of properties that apply to all text fields
   const defaultTextFieldProps = {
@@ -60,15 +73,10 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
     margin: 'dense' as const,
     size: 'small' as const,
     variant: 'outlined' as const,
-    label: (
-      <Typography variant="caption" gutterBottom>
-        {`${name} [ ${configuration.validator_type.toUpperCase()} ]`}
-      </Typography>
-    ),
     onChange: (event: any) => onChange(event.target.value),
     required: configuration.required,
     fullWidth: true,
-    value: value,
+    value: value || '',
     error: !isValid(value, configuration)
   };
 
@@ -76,58 +84,113 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
     options: options,
     autoComplete: true,
     freeSolo: true,
-    value: value,
+    disableClearable: true,
+    value: value || '',
     onInputChange: (_, v, __) => onChange(v)
+  };
+
+  const header = () => {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Typography variant="caption" style={{ textTransform: 'capitalize', width: '100%' }} color="textSecondary">
+          {`${name} [ ${configuration.validator_type.toUpperCase().replace('_', ' ')} ]`}
+        </Typography>
+        {onReset && value !== null && value !== undefined && (
+          <IconButton
+            size="small"
+            onClick={() => onReset()}
+            style={{ marginTop: theme.spacing(-0.625), marginBottom: theme.spacing(-0.625) }}
+          >
+            <ClearIcon style={{ width: theme.spacing(2.5), height: theme.spacing(2.5) }} />
+          </IconButton>
+        )}
+      </div>
+    );
   };
 
   if (configuration.validator_type === 'boolean') {
     return (
       <FormControlLabel
         control={<Checkbox size="small" checked={value || false} name="label" onChange={() => onChange(!!!value)} />}
-        label={<Typography variant="body2">{name}</Typography>}
+        disableTypography
+        label={
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="body2">{name}</Typography>
+            {onReset && value !== null && value !== undefined && (
+              <IconButton
+                size="small"
+                onClick={event => {
+                  onReset();
+                  event.preventDefault();
+                  event.stopPropagation();
+                }}
+                style={{ marginTop: theme.spacing(-0.625), marginBottom: theme.spacing(-0.625) }}
+              >
+                <ClearIcon style={{ width: theme.spacing(2.5), height: theme.spacing(2.5) }} />
+              </IconButton>
+            )}
+          </div>
+        }
         className={classes.checkbox}
       />
     );
   } else if (configuration.validator_type === 'enum') {
     return (
-      <TextField select {...defaultTextFieldProps}>
-        {configuration.validator_params.values.map(v => (
-          <MenuItem key={v} value={v}>
-            {v}
-          </MenuItem>
-        ))}
-      </TextField>
+      <div>
+        {header()}
+        <TextField select {...defaultTextFieldProps}>
+          {configuration.validator_params.values.map(v => (
+            <MenuItem key={v} value={v}>
+              {v}
+            </MenuItem>
+          ))}
+        </TextField>
+      </div>
     );
   } else if (configuration.validator_params?.validation_regex || configuration.validator_type === 'uri') {
     return (
-      <Tooltip
-        title={configuration.validator_type === 'regex' ? configuration.validator_params?.validation_regex : null}
-        placement="right"
-      >
-        <Autocomplete
-          {...defaultAutoCompleteProps}
-          renderInput={params => <TextField {...params} {...defaultTextFieldProps} />}
-        />
-      </Tooltip>
+      <div>
+        {header()}
+        <Tooltip
+          title={configuration.validator_type === 'regex' ? configuration.validator_params?.validation_regex : null}
+          placement="right"
+        >
+          <Autocomplete
+            {...defaultAutoCompleteProps}
+            renderInput={params => <TextField {...params} {...defaultTextFieldProps} />}
+          />
+        </Tooltip>
+      </div>
     );
   } else if (configuration.validator_type === 'integer') {
     return (
-      <TextField
-        {...defaultTextFieldProps}
-        type="number"
-        InputProps={{
-          inputProps: { max: configuration.validator_params.max, min: configuration.validator_params.min }
-        }}
-      />
+      <div>
+        {header()}
+        <TextField
+          {...defaultTextFieldProps}
+          type="number"
+          InputProps={{
+            inputProps: { max: configuration.validator_params.max, min: configuration.validator_params.min }
+          }}
+        />
+      </div>
     );
   } else if (configuration.validator_type === 'date') {
-    return <DatePicker date={value} setDate={onChange} type="input" textFieldProps={{ ...defaultTextFieldProps }} />;
+    return (
+      <div>
+        {header()}
+        <DatePicker date={value} setDate={onChange} type="input" textFieldProps={{ ...defaultTextFieldProps }} />
+      </div>
+    );
   }
   return (
-    <Autocomplete
-      {...defaultAutoCompleteProps}
-      renderInput={params => <TextField {...params} {...defaultTextFieldProps} />}
-    />
+    <div>
+      {header()}
+      <Autocomplete
+        {...defaultAutoCompleteProps}
+        renderInput={params => <TextField {...params} {...defaultTextFieldProps} />}
+      />
+    </div>
   );
 };
 
