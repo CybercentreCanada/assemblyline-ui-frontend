@@ -106,6 +106,7 @@ function ServiceTreeItem({
             <Typography
               variant={size === 'small' ? 'body2' : 'body1'}
               style={{ width: '100%', display: 'flex', alignItems: 'center' }}
+              component="div"
             >
               {item.name}
               {item.is_external && (
