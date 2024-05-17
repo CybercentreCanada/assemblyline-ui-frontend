@@ -67,6 +67,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
     options: options,
     autoComplete: true,
     freeSolo: true,
+    value: value,
     onInputChange: (_, v, __) => onChange(v)
   };
 

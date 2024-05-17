@@ -107,8 +107,8 @@ const Submit: React.FC<any> = () => {
   const stringInputTitle = t('urlHash.input_title');
   const stringInputText = stringInputTitle + t('urlHash.input_suffix');
   const [stringInputHasError, setStringInputHasError] = useState(false);
-  const [submissionMetadata, setSubmissionMetadata] = useState(undefined);
-  const [possibleSubmissionMetadataValues, setPossibleSubmissionMetadataValues] = useState(new Map<string, any>());
+  const [submissionMetadata, setSubmissionMetadata] = useState({});
+  const [possibleSubmissionMetadataValues, setPossibleSubmissionMetadataValues] = useState({});
   const [urlAutoselection, setUrlAutoselection] = useState(false);
   const [value, setValue] = useState('0');
   const banner = useAppBanner();
@@ -423,7 +423,7 @@ const Submit: React.FC<any> = () => {
     setUUID(generateUUID());
 
     // Gather the possible values for metadata fields
-    var possibleValues = new Map<string, any[]>();
+    var possibleValues = {};
     for (const [field, config] of Object.entries(configuration.submission.metadata.submit)) {
       if (config.validator_type in ['enum', 'boolean', 'integer']) {
         continue;
@@ -450,6 +450,8 @@ const Submit: React.FC<any> = () => {
       setValue('1');
     }
   });
+
+  useEffect(() => console.log('metadata', submissionMetadata), [submissionMetadata]);
 
   return (
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
@@ -654,7 +656,7 @@ const Submit: React.FC<any> = () => {
                     {t('options.submission.metadata')}
                   </Typography>
                   <Tooltip title={t('options.submission.metadata.clear')}>
-                    <IconButton onClick={() => setSubmissionMetadata(undefined)}>
+                    <IconButton onClick={() => setSubmissionMetadata({})}>
                       <ClearIcon />
                     </IconButton>
                   </Tooltip>
@@ -891,17 +893,12 @@ const Submit: React.FC<any> = () => {
                       key={field_name}
                       name={field_name}
                       configuration={field_cfg}
-                      value={submissionMetadata ? submissionMetadata[field_name] : null}
+                      value={submissionMetadata[field_name] || ''}
                       onChange={v => {
                         var cleanMetadata = submissionMetadata;
-                        if (cleanMetadata === undefined) {
-                          // Instatiate as a new Map
-                          cleanMetadata = new Map<string, any>();
-                        }
-
-                        if (v === undefined) {
+                        if (v === undefined || v === null || v === '') {
                           // Remove field from metadata if value is null
-                          cleanMetadata.delete(field_name);
+                          delete cleanMetadata[field_name];
                         } else {
                           // Otherwise add/overwrite value
                           cleanMetadata[field_name] = v;
@@ -917,9 +914,6 @@ const Submit: React.FC<any> = () => {
           </TabPanel>
         </TabContext>
       </>
-      {/* ) : (
-        <div>Cannot submit files</div>
-      )} */}
     </PageCenter>
   );
 };
