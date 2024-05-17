@@ -1,10 +1,10 @@
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import {
   Button,
+  Checkbox,
   FormControlLabel,
   MenuItem,
   Select,
-  Switch,
   TextField,
   Tooltip,
   Typography,
@@ -130,7 +130,14 @@ function WrappedParam({ disabled, param, pidx, idx, hasResetButton = false, setP
       {param.type === 'bool' ? (
         <div>
           <FormControlLabel
-            control={<Switch defaultChecked={param.default} size="small" />}
+            control={
+              <Checkbox
+                size="small"
+                checked={param.value}
+                name="label"
+                onChange={() => setParam(idx, pidx, !param.value)}
+              />
+            }
             label={
               <Typography variant="body2" style={{ textTransform: 'capitalize' }}>
                 {param.name.replace(/_/g, ' ')}
@@ -148,7 +155,7 @@ function WrappedParam({ disabled, param, pidx, idx, hasResetButton = false, setP
       ) : (
         <>
           <div>
-            <Typography variant="caption" gutterBottom style={{ textTransform: 'capitalize' }}>
+            <Typography variant="caption" gutterBottom style={{ textTransform: 'capitalize' }} color="textSecondary">
               {param.name.replace(/_/g, ' ')}
               <ResetButton
                 value={param.value}
