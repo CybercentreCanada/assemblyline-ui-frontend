@@ -1,5 +1,4 @@
 import Flow from '@flowjs/flow.js';
-import ClearIcon from '@mui/icons-material/Clear';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
   Alert,
@@ -8,7 +7,6 @@ import {
   CircularProgress,
   FormControlLabel,
   Grid,
-  IconButton,
   Paper,
   Skeleton,
   Slider,
@@ -29,6 +27,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceTree from 'components/layout/serviceTree';
+import SubmissionMetadata from 'components/layout/submissionMetadata';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
@@ -559,6 +558,7 @@ const Submit: React.FC<any> = () => {
             ) : (
               <Skeleton style={{ height: '280px' }} />
             )}
+            <SubmissionMetadata submissionMetadata={submissionMetadata} setSubmissionMetadata={setSubmissionMetadata} />
             {configuration.ui.tos ? (
               <div style={{ marginTop: sp4, textAlign: 'center' }}>
                 <Typography variant="body2">
@@ -662,32 +662,7 @@ const Submit: React.FC<any> = () => {
                   ))}
                 </div>
               )}
-            {submissionMetadata && Object.keys(submissionMetadata).length !== 0 && (
-              <div style={{ textAlign: 'start', marginTop: theme.spacing(2) }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography style={{ flexGrow: 1 }} variant="subtitle1">
-                    {t('options.submission.metadata')}
-                  </Typography>
-                  <Tooltip title={t('options.submission.metadata.clear')}>
-                    <IconButton onClick={() => setSubmissionMetadata({})}>
-                      <ClearIcon />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-                <div>
-                  {Object.keys(submissionMetadata).map((meta, i) => (
-                    <Grid container key={i}>
-                      <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
-                        <span style={{ fontWeight: 500 }}>{meta}</span>
-                      </Grid>
-                      <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                        {submissionMetadata[meta].toString()}
-                      </Grid>
-                    </Grid>
-                  ))}
-                </div>
-              </div>
-            )}
+            <SubmissionMetadata submissionMetadata={submissionMetadata} setSubmissionMetadata={setSubmissionMetadata} />
             {configuration.ui.tos ? (
               <div style={{ marginTop: sp4, textAlign: 'center' }}>
                 <Typography variant="body2">
