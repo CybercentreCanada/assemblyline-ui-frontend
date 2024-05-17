@@ -21,10 +21,9 @@ import {
 } from 'components/visual/DivTable';
 import FileDownloader from 'components/visual/FileDownloader';
 import InformativeAlert from 'components/visual/InformativeAlert';
-import 'moment/locale/fr';
+import Moment from 'components/visual/Moment';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 
 type SearchResults = {
@@ -34,17 +33,90 @@ type SearchResults = {
   total: number;
 };
 
+const LABELS_COLOR_MAP = {
+  info: 'default',
+  technique: 'secondary',
+  attribution: 'primary'
+};
+
+type LabelCellProps = {
+  label_categories?: FileInfo['label_categories'];
+  onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
+};
+
+const WrappedLabelCell = ({ label_categories = null, onLabelClick = null }: LabelCellProps) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const [showMore, setShowMore] = useState<boolean>(false);
+
+  const labels = useMemo(
+    () =>
+      label_categories &&
+      ['attribution', 'technique', 'info'].flatMap(
+        category =>
+          category in label_categories &&
+          label_categories[category]
+            .sort((a: string, b: string) => a.valueOf().localeCompare(b.valueOf()))
+            .map(label => ({ category, label }))
+      ),
+    [label_categories]
+  );
+
+  return (
+    <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
+      {labels?.length > 0 && (
+        <>
+          {labels
+            .filter((_, j) => (showMore ? true : j < 5))
+            .map(({ category, label }, j) => (
+              <CustomChip
+                key={`${j}`}
+                wrap
+                variant="outlined"
+                size="tiny"
+                type="rounded"
+                color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                label={label}
+                style={{ height: 'auto', minHeight: '20px' }}
+                onClick={
+                  !onLabelClick
+                    ? null
+                    : event => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        onLabelClick(event, label);
+                      }
+                }
+              />
+            ))}
+          {!showMore && labels?.length > 5 && (
+            <Tooltip title={t('more')}>
+              <IconButton
+                size="small"
+                onClick={event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setShowMore(true);
+                }}
+                style={{ padding: 0 }}
+              >
+                <MoreHorizOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+const LabelCell = React.memo(WrappedLabelCell);
+
 type ArchivesTableProps = {
   fileResults: SearchResults;
   allowSort?: boolean;
   setFileID?: (id: string) => void;
   onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
-};
-
-const LABELS_COLOR_MAP = {
-  info: 'default',
-  technique: 'secondary',
-  attribution: 'primary'
 };
 
 const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
@@ -110,9 +182,9 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                 )}
                 <DivTableCell>
                   <Tooltip title={file.seen.last}>
-                    <span>
-                      <Moment fromNow locale={i18n.language} children={file.seen.last} />
-                    </span>
+                    <div>
+                      <Moment variant="fromNow">{file.seen.last}</Moment>
+                    </div>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>
@@ -189,79 +261,6 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
     <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
   );
 };
-
-type LabelCellProps = {
-  label_categories?: FileInfo['label_categories'];
-  onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
-};
-
-const WrappedLabelCell = ({ label_categories = null, onLabelClick = null }: LabelCellProps) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const [showMore, setShowMore] = useState<boolean>(false);
-
-  const labels = useMemo(
-    () =>
-      label_categories &&
-      ['attribution', 'technique', 'info'].flatMap(
-        category =>
-          category in label_categories &&
-          label_categories[category]
-            .sort((a: string, b: string) => a.valueOf().localeCompare(b.valueOf()))
-            .map(label => ({ category, label }))
-      ),
-    [label_categories]
-  );
-
-  return (
-    <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
-      {labels?.length > 0 && (
-        <>
-          {labels
-            .filter((_, j) => (showMore ? true : j < 5))
-            .map(({ category, label }, j) => (
-              <CustomChip
-                key={`${j}`}
-                wrap
-                variant="outlined"
-                size="tiny"
-                type="rounded"
-                color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
-                label={label}
-                style={{ height: 'auto', minHeight: '20px' }}
-                onClick={
-                  !onLabelClick
-                    ? null
-                    : event => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        onLabelClick(event, label);
-                      }
-                }
-              />
-            ))}
-          {!showMore && labels?.length > 5 && (
-            <Tooltip title={t('more')}>
-              <IconButton
-                size="small"
-                onClick={event => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  setShowMore(true);
-                }}
-                style={{ padding: 0 }}
-              >
-                <MoreHorizOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-        </>
-      )}
-    </div>
-  );
-};
-
-const LabelCell = React.memo(WrappedLabelCell);
 
 const ArchivesTable = React.memo(WrappedArchivesTable);
 export default ArchivesTable;

@@ -1,7 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { SourceDetail } from 'components/routes/manage/signature_sources_details';
-import 'moment/locale/fr';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Source } from '../service_detail';
@@ -36,7 +35,7 @@ type SourceDialogProps = {
   onSave: (newSource: Source) => void;
 };
 
-const WrappedSourceDialog = ({ open, setOpen, source, defaults, onSave }: SourceDialogProps) => {
+const WrappedSourceDialog = ({ open, setOpen, source = null, defaults, onSave }: SourceDialogProps) => {
   const { t } = useTranslation(['adminServices']);
   const [modified, setModified] = useState(false);
   const { c12nDef } = useALContext();
@@ -96,10 +95,6 @@ const WrappedSourceDialog = ({ open, setOpen, source, defaults, onSave }: Source
       </div>
     )
   );
-};
-
-WrappedSourceDialog.defaultProps = {
-  source: null
 };
 
 const SourceDialog = React.memo(WrappedSourceDialog);

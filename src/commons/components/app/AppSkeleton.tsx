@@ -205,7 +205,7 @@ const TopLayoutSkeleton = () => {
               style={{ paddingTop: sp1, paddingBottom: sp1, paddingLeft: sp2, paddingRight: sp4 }}
             />
             <Skeleton variant="text" animation="wave" style={{ marginRight: sp3 }}>
-              <div style={{ fontSize: '1.5rem', letterSpacing: '-1px' }}>{configs.preferences.appName}</div>
+              <div style={{ fontSize: '1.5rem' }}>{configs.preferences.appName}</div>
             </Skeleton>
             {showTopBarBreadcrumbs && <StyledBreadcrumbsSkeleton variant="text" animation="wave" width={100} />}
             {showSpacer && <div style={{ flexGrow: 1 }} />}

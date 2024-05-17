@@ -33,7 +33,6 @@ import ServiceTable, { ServiceResult } from 'components/visual/SearchResult/serv
 import CommunityServiceTable from 'components/visual/ServiceManagement/CommunityServiceTable';
 import NewServiceTable from 'components/visual/ServiceManagement/NewServiceTable';
 import { JSONFeedItem, useNotificationFeed } from 'components/visual/ServiceManagement/useNotificationFeed';
-import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';

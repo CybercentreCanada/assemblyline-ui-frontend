@@ -8,6 +8,7 @@ import {
   DialogTitle,
   Stack
 } from '@mui/material';
+import React from 'react';
 
 export type ConfirmationDialogProps = {
   open: boolean;
@@ -43,10 +44,10 @@ const ConfirmationDialog = ({
     aria-describedby="alert-dialog-description"
   >
     <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
-    {text && (
+    {(text || children) && (
       <DialogContent>
         <Stack spacing={2}>
-          <DialogContentText id="alert-dialog-description">{text}</DialogContentText>
+          {text && <DialogContentText id="alert-dialog-description">{text}</DialogContentText>}
           {children}
         </Stack>
       </DialogContent>

@@ -23,8 +23,8 @@ import {
   useTheme
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import { red } from '@mui/material/colors';
 import Skeleton from '@mui/material/Skeleton';
+import { red } from '@mui/material/colors';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
 import PageCenter from 'commons/components/pages/PageCenter';
@@ -109,7 +109,7 @@ const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => 
   </TableRow>
 );
 
-function User({ username }: UserProps) {
+function User({ username = null }: UserProps) {
   const { id } = useParams<ParamProps>();
   const location = useLocation();
   const inputRef = useRef(null);
@@ -423,7 +423,7 @@ function User({ username }: UserProps) {
                         renderInput={params => <TextField {...params} />}
                         renderTags={(value, getTagProps) =>
                           value.map((option, index) => (
-                            <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                            <Chip key={index} variant="outlined" label={option} {...getTagProps({ index })} />
                           ))
                         }
                         onChange={(event, value) => setGroups([...new Set(value.map(x => x.toUpperCase()))])}
@@ -947,9 +947,5 @@ function User({ username }: UserProps) {
     </PageCenter>
   );
 }
-
-User.defaultProps = {
-  username: null
-};
 
 export default memo(User);

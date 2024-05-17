@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material';
-import { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
+import type { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
 import * as React from 'react';
 
 type BreadcrumbIconProps = {

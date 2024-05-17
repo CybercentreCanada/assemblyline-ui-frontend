@@ -1,10 +1,10 @@
-import { Box, Collapse, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import { Box, Collapse, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import Moment from 'components/visual/Moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 
 export type Error = {
   archive_ts: string;
@@ -86,10 +86,8 @@ const ErrorCard: React.FC<ErrorCardProps> = ({ error }) => {
         ) : (
           <small style={{ flexGrow: 1 }}></small>
         )}
-        <small>
-          <Moment className={classes.muted} fromNow>
-            {error.created}
-          </Moment>
+        <small className={classes.muted}>
+          <Moment variant="fromNow">{error.created}</Moment>
         </small>
         {open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />}
       </Box>

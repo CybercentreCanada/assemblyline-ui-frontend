@@ -1,5 +1,6 @@
 import { Tooltip, Typography } from '@mui/material';
-import useAppSitemap, { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
+import type { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
+import useAppSitemap from 'commons/components/app/hooks/useAppSitemap';
 import BreadcrumbIcon from 'commons/components/breadcrumbs/BreadcrumbIcon';
 import * as React from 'react';
 
