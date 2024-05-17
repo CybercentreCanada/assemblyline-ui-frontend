@@ -450,6 +450,20 @@ const Submit: React.FC<any> = () => {
       handleStringChange(inputParam);
       setValue('1');
     }
+
+    // Load the default submission metadata
+    if (configuration.submission.metadata && configuration.submission.metadata.submit) {
+      const tempMeta = {};
+      for (const metaKey in configuration.submission.metadata.submit) {
+        const metaConfig = configuration.submission.metadata.submit[metaKey];
+        if (metaConfig.default !== null) {
+          tempMeta[metaKey] = metaConfig.default;
+        }
+      }
+      if (tempMeta) {
+        setSubmissionMetadata({ ...tempMeta, ...submissionMetadata });
+      }
+    }
   });
 
   return (

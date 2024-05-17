@@ -71,6 +71,8 @@ export type ExternalSource = {
 export type MetadataConfiguration = {
   required: boolean;
   validator_type: string;
+  default: string;
+  suggestions: string[];
   validator_params: {
     validation_regex?: string;
     values?: string[];

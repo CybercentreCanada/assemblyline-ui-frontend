@@ -81,7 +81,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
   };
 
   const defaultAutoCompleteProps = {
-    options: options,
+    options: [...new Set([...options, ...configuration.suggestions])],
     autoComplete: true,
     freeSolo: true,
     disableClearable: true,
