@@ -5,7 +5,7 @@ import Skeleton from '@mui/material/Skeleton';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import Service from 'components/layout/service';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
 const useStyles = makeStyles(theme =>
@@ -78,6 +78,13 @@ function ServiceTreeItem({
       }
     }
   }
+
+  useEffect(() => {
+    if (!item.selected) {
+      setOpen(false);
+    }
+  }, [item.selected]);
+
   return (
     <div
       style={{
@@ -115,6 +122,7 @@ function ServiceTreeItem({
               {setParam && hasParams(item.name) && (
                 <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
                   <IconButton
+                    disabled={!item.selected}
                     onClick={e => {
                       e.preventDefault();
                       setOpen(!open);
