@@ -17,6 +17,7 @@ interface DatePickerProps {
   textFieldProps?: any;
   minDateTomorrow?: boolean;
   maxDateToday?: boolean;
+  disabled?: boolean;
 }
 
 function WrappedDatePicker({
@@ -27,7 +28,8 @@ function WrappedDatePicker({
   defaultDateOffset = null,
   textFieldProps = {},
   minDateTomorrow = false,
-  maxDateToday = false
+  maxDateToday = false,
+  disabled = false
 }: DatePickerProps) {
   const [tempDate, setTempDate] = React.useState(null);
   const [tomorrow, setTomorrow] = React.useState(null);
@@ -143,6 +145,7 @@ function WrappedDatePicker({
           )}
           minDate={minDateTomorrow ? tomorrow : null}
           maxDate={maxDateToday ? today : null}
+          disabled={disabled}
         />
       )}
     </LocalizationProvider>

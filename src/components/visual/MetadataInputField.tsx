@@ -21,6 +21,7 @@ interface MetadataInputFieldProps {
   onChange: (value: any) => void;
   onReset?: () => void;
   options?: string[];
+  disabled?: boolean;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -62,7 +63,8 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
   value,
   onChange,
   onReset = null,
-  options = []
+  options = [],
+  disabled = false
 }) => {
   const classes = useStyles();
   const theme = useTheme();
@@ -96,7 +98,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
         <Typography variant="caption" style={{ textTransform: 'capitalize', width: '100%' }} color="textSecondary">
           {`${name.replace('_', ' ')} [ ${configuration.validator_type.toUpperCase()} ]`}
         </Typography>
-        {onReset && value !== null && value !== undefined && (
+        {onReset && value !== null && value !== undefined && !disabled && (
           <IconButton
             size="small"
             onClick={() => onReset()}
@@ -119,7 +121,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
             <Typography variant="body2" style={{ textTransform: 'capitalize' }}>
               {name.replace('_', ' ')}
             </Typography>
-            {onReset && value !== null && value !== undefined && (
+            {onReset && value !== null && value !== undefined && !disabled && (
               <IconButton
                 size="small"
                 onClick={event => {
@@ -135,13 +137,14 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
           </div>
         }
         className={classes.checkbox}
+        disabled={disabled}
       />
     );
   } else if (configuration.validator_type === 'enum') {
     return (
       <div>
         {header()}
-        <TextField select {...defaultTextFieldProps}>
+        <TextField select {...defaultTextFieldProps} disabled={disabled}>
           {configuration.validator_params.values.map(v => (
             <MenuItem key={v} value={v}>
               {v}
@@ -160,7 +163,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
         >
           <Autocomplete
             {...defaultAutoCompleteProps}
-            renderInput={params => <TextField {...params} {...defaultTextFieldProps} />}
+            renderInput={params => <TextField {...params} {...defaultTextFieldProps} disabled={disabled} />}
           />
         </Tooltip>
       </div>
@@ -172,6 +175,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
         <TextField
           {...defaultTextFieldProps}
           type="number"
+          disabled={disabled}
           InputProps={{
             inputProps: { max: configuration.validator_params.max, min: configuration.validator_params.min }
           }}
@@ -182,7 +186,13 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
     return (
       <div>
         {header()}
-        <DatePicker date={value} setDate={onChange} type="input" textFieldProps={{ ...defaultTextFieldProps }} />
+        <DatePicker
+          date={value}
+          setDate={onChange}
+          type="input"
+          textFieldProps={{ ...defaultTextFieldProps }}
+          disabled={disabled}
+        />
       </div>
     );
   }
@@ -191,7 +201,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
       {header()}
       <Autocomplete
         {...defaultAutoCompleteProps}
-        renderInput={params => <TextField {...params} {...defaultTextFieldProps} />}
+        renderInput={params => <TextField {...params} {...defaultTextFieldProps} disabled={disabled} />}
       />
     </div>
   );

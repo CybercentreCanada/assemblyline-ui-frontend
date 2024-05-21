@@ -623,7 +623,7 @@ function WrappedSubmissionDetail() {
         }
       }
       if (tempMeta) {
-        setArchivingMetadata(tempMeta);
+        setArchivingMetadata(submission ? { ...tempMeta, ...submission.metadata } : tempMeta);
       }
     }
   };
@@ -1025,6 +1025,7 @@ function WrappedSubmissionDetail() {
                           delete cleanMetadata[field_name];
                           setArchivingMetadata({ ...cleanMetadata });
                         }}
+                        disabled={Object.keys(submission.metadata).includes(field_name)}
                       />
 
                       {/* <FormControl key={metakey} size="small" fullWidth>
