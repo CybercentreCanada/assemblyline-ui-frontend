@@ -91,14 +91,6 @@ export type ConfigurationDefinition = {
   core: {
     archiver: {
       alternate_dtl: number;
-      metadata: {
-        [metakey: string]: {
-          default: string;
-          editable: boolean;
-          values: string[];
-        };
-      };
-      use_metadata: boolean;
     };
   };
   datastore: {
