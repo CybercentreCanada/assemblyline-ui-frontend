@@ -108,7 +108,6 @@ const Submit: React.FC<any> = () => {
   const stringInputText = stringInputTitle + t('urlHash.input_suffix');
   const [stringInputHasError, setStringInputHasError] = useState(false);
   const [submissionMetadata, setSubmissionMetadata] = useState({});
-  const [possibleSubmissionMetadataValues, setPossibleSubmissionMetadataValues] = useState({});
   const [urlAutoselection, setUrlAutoselection] = useState(false);
   const [value, setValue] = useState('0');
   const banner = useAppBanner();
@@ -421,27 +420,6 @@ const Submit: React.FC<any> = () => {
       }
     });
     setUUID(generateUUID());
-
-    // Gather the possible values for metadata fields
-    var possibleValues = {};
-    for (const [field, config] of Object.entries(configuration.submission.metadata.submit)) {
-      if (config.validator_type in ['enum', 'boolean', 'integer']) {
-        continue;
-      }
-
-      apiCall({
-        url: `/api/v4/search/facet/submission/metadata.${field}/`,
-        onSuccess: api_data => {
-          // Update with all possible values for field
-          possibleValues[field] = Object.keys(api_data.api_response) as string[];
-        },
-        onFailure: _ => {
-          // Default to no possible values for field
-          possibleValues[field] = [];
-        }
-      });
-    }
-    setPossibleSubmissionMetadataValues(possibleValues);
 
     // Handle if we've been given input via param
     var inputParam = params.get('input') || '';
@@ -899,7 +877,6 @@ const Submit: React.FC<any> = () => {
                                 delete cleanMetadata[field_name];
                                 setSubmissionMetadata({ ...cleanMetadata });
                               }}
-                              options={possibleSubmissionMetadataValues[field_name]}
                             />
                           ))}
                         </Stack>
