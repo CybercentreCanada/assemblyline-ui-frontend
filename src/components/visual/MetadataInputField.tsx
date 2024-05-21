@@ -77,7 +77,8 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
     required: configuration.required,
     fullWidth: true,
     value: value || '',
-    error: !isValid(value, configuration)
+    error: !isValid(value, configuration),
+    autoFocus: !isValid(value, configuration)
   };
 
   const defaultAutoCompleteProps = {
