@@ -10,9 +10,11 @@ import {
   Typography
 } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
+import useMyAPI from 'components/hooks/useMyAPI';
 import { MetadataConfiguration } from 'components/hooks/useMyUser';
 import DatePicker from 'components/visual/DatePicker';
 import { matchURL } from 'helpers/utils';
+import { useEffect, useState } from 'react';
 
 interface MetadataInputFieldProps {
   name: string;
@@ -20,7 +22,6 @@ interface MetadataInputFieldProps {
   value: any;
   onChange: (value: any) => void;
   onReset?: () => void;
-  options?: string[];
   disabled?: boolean;
 }
 
@@ -63,11 +64,32 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
   value,
   onChange,
   onReset = null,
-  options = [],
   disabled = false
 }) => {
   const classes = useStyles();
   const theme = useTheme();
+  const [options, setOptions] = useState([]);
+
+  const { apiCall } = useMyAPI();
+
+  useEffect(() => {
+    if (disabled || configuration.validator_type in ['enum', 'boolean', 'integer', 'date']) {
+      return;
+    }
+
+    apiCall({
+      url: `/api/v4/search/facet/submission/metadata.${name}/`,
+      onSuccess: api_data => {
+        // Update with all possible values for field
+        setOptions(Object.keys(api_data.api_response) as string[]);
+      },
+      onFailure: () => {
+        // We can ignore failures here as this field might never have been set.
+        return;
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [configuration.validator_type, name, disabled]);
 
   // Default set of properties that apply to all text fields
   const defaultTextFieldProps = {
@@ -80,16 +102,18 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
     fullWidth: true,
     value: value || '',
     error: !isValid(value, configuration),
-    autoFocus: !isValid(value, configuration)
+    autoFocus: !isValid(value, configuration),
+    disabled: disabled
   };
 
   const defaultAutoCompleteProps = {
-    options: [...new Set([...options, ...configuration.suggestions])],
+    options: !disabled ? [...new Set([...options, ...configuration.suggestions])] : [],
     autoComplete: true,
     freeSolo: true,
     disableClearable: true,
     value: value || '',
-    onInputChange: (_, v, __) => onChange(v)
+    onInputChange: (_, v, __) => onChange(v),
+    disabled: disabled
   };
 
   const header = () => {
@@ -144,7 +168,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
     return (
       <div>
         {header()}
-        <TextField select {...defaultTextFieldProps} disabled={disabled}>
+        <TextField select {...defaultTextFieldProps}>
           {configuration.validator_params.values.map(v => (
             <MenuItem key={v} value={v}>
               {v}
@@ -163,7 +187,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
         >
           <Autocomplete
             {...defaultAutoCompleteProps}
-            renderInput={params => <TextField {...params} {...defaultTextFieldProps} disabled={disabled} />}
+            renderInput={params => <TextField {...params} {...defaultTextFieldProps} />}
           />
         </Tooltip>
       </div>
@@ -175,7 +199,6 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
         <TextField
           {...defaultTextFieldProps}
           type="number"
-          disabled={disabled}
           InputProps={{
             inputProps: { max: configuration.validator_params.max, min: configuration.validator_params.min }
           }}
@@ -201,7 +224,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
       {header()}
       <Autocomplete
         {...defaultAutoCompleteProps}
-        renderInput={params => <TextField {...params} {...defaultTextFieldProps} disabled={disabled} />}
+        renderInput={params => <TextField {...params} {...defaultTextFieldProps} />}
       />
     </div>
   );
