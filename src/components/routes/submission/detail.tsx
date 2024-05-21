@@ -1003,49 +1003,29 @@ function WrappedSubmissionDetail() {
                 <DialogContentText>{t('archive.metadata')}</DialogContentText>
                 <Stack spacing={1}>
                   {Object.entries(systemConfig.submission.metadata.archive).map(([field_name, field_cfg]) => (
-                    <>
-                      <MetadataInputField
-                        key={field_name}
-                        name={field_name}
-                        configuration={field_cfg}
-                        value={archivingMetadata[field_name]}
-                        onChange={v => {
-                          var cleanMetadata = archivingMetadata;
-                          if (v === undefined || v === null || v === '') {
-                            // Remove field from metadata if value is null
-                            delete cleanMetadata[field_name];
-                          } else {
-                            // Otherwise add/overwrite value
-                            cleanMetadata[field_name] = v;
-                          }
-                          setArchivingMetadata({ ...cleanMetadata });
-                        }}
-                        onReset={() => {
-                          var cleanMetadata = archivingMetadata;
+                    <MetadataInputField
+                      key={field_name}
+                      name={field_name}
+                      configuration={field_cfg}
+                      value={archivingMetadata[field_name]}
+                      onChange={v => {
+                        var cleanMetadata = archivingMetadata;
+                        if (v === undefined || v === null || v === '') {
+                          // Remove field from metadata if value is null
                           delete cleanMetadata[field_name];
-                          setArchivingMetadata({ ...cleanMetadata });
-                        }}
-                        disabled={Object.keys(submission.metadata).includes(field_name)}
-                      />
-
-                      {/* <FormControl key={metakey} size="small" fullWidth>
-                        <FormLabel>{toTitleCase(metakey)}</FormLabel>
-                        <Autocomplete
-                          value={archivingMetadata[metakey].default}
-                          freeSolo={archivingMetadata[metakey].editable}
-                          onChange={(event, newValue) =>
-                            setArchivingMetadata({
-                              ...archivingMetadata,
-                              [metakey]: { ...archivingMetadata[metakey], default: newValue }
-                            })
-                          }
-                          size="small"
-                          fullWidth
-                          options={archivingMetadata[metakey].values}
-                          renderInput={params => <TextField {...params} />}
-                        />
-                      </FormControl> */}
-                    </>
+                        } else {
+                          // Otherwise add/overwrite value
+                          cleanMetadata[field_name] = v;
+                        }
+                        setArchivingMetadata({ ...cleanMetadata });
+                      }}
+                      onReset={() => {
+                        var cleanMetadata = archivingMetadata;
+                        delete cleanMetadata[field_name];
+                        setArchivingMetadata({ ...cleanMetadata });
+                      }}
+                      disabled={submission ? Object.keys(submission.metadata).includes(field_name) : false}
+                    />
                   ))}
                 </Stack>
               </>
