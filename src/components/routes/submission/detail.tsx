@@ -16,11 +16,9 @@ import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import {
   Alert,
-  Autocomplete,
   DialogContentText,
   FormControl,
   FormControlLabel,
-  FormLabel,
   Grid,
   IconButton,
   LinearProgress,
@@ -34,7 +32,6 @@ import {
   Skeleton,
   Snackbar,
   Stack,
-  TextField,
   Tooltip,
   Typography,
   useTheme
@@ -51,9 +48,10 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
 import Detection from 'components/visual/FileDetail/detection';
 import FileDownloader from 'components/visual/FileDownloader';
+import MetadataInputField from 'components/visual/MetadataInputField';
 import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
-import { setNotifyFavicon, toTitleCase } from 'helpers/utils';
+import { setNotifyFavicon } from 'helpers/utils';
 import moment from 'moment';
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -141,7 +139,7 @@ function WrappedSubmissionDetail() {
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [baseFiles, setBaseFiles] = useState([]);
-  const [archivingMetadata, setArchivingMetadata] = useState(systemConfig.core.archiver.metadata);
+  const [archivingMetadata, setArchivingMetadata] = useState({});
   const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState('false');
 
   const popoverOpen = Boolean(resubmitAnchor);
@@ -478,11 +476,10 @@ function WrappedSubmissionDetail() {
 
   const archive = useCallback(() => {
     if (submission != null) {
-      const data = Object.fromEntries(Object.entries(archivingMetadata).map(([k, v]) => [k, v.default]));
       apiCall({
         method: 'PUT',
         url: `/api/v4/archive/${submission.sid}/${archivingUseAlternateDtl === 'true' ? '?use_alternate_dtl' : ''}`,
-        body: data,
+        body: archivingMetadata,
         onSuccess: api_data => {
           if (api_data.api_response.success) {
             showSuccessMessage(
@@ -615,6 +612,22 @@ function WrappedSubmissionDetail() {
     [currentUser.username, submission]
   );
 
+  const loadDefaultArchivingMetadata = () => {
+    // Load the default archiving metadata
+    if (systemConfig.submission.metadata && systemConfig.submission.metadata.archive) {
+      const tempMeta = {};
+      for (const metaKey in systemConfig.submission.metadata.archive) {
+        const metaConfig = systemConfig.submission.metadata.archive[metaKey];
+        if (metaConfig.default !== null) {
+          tempMeta[metaKey] = metaConfig.default;
+        }
+      }
+      if (tempMeta) {
+        setArchivingMetadata(submission ? { ...tempMeta, ...submission.metadata } : tempMeta);
+      }
+    }
+  };
+
   useEffect(() => {
     if (currentUser.roles.includes('submission_view')) {
       apiCall({
@@ -663,6 +676,9 @@ function WrappedSubmissionDetail() {
             }
           }
         });
+
+        // Load the default values for the archiving metadata
+        loadDefaultArchivingMetadata();
       } else {
         if (!socket) {
           // eslint-disable-next-line no-console
@@ -945,7 +961,7 @@ function WrappedSubmissionDetail() {
         open={archiveDialog}
         handleClose={() => {
           setArchiveDialog(false);
-          setTimeout(() => setArchivingMetadata(systemConfig.core.archiver.metadata), 250);
+          setTimeout(() => loadDefaultArchivingMetadata(), 250);
         }}
         handleAccept={archive}
         title={t('archive.title')}
@@ -982,28 +998,34 @@ function WrappedSubmissionDetail() {
                 </Stack>
               </>
             )}
-            {Object.keys(archivingMetadata).length !== 0 && systemConfig.core.archiver.use_metadata && (
+            {Object.keys(systemConfig.submission.metadata.archive).length !== 0 && (
               <>
                 <DialogContentText>{t('archive.metadata')}</DialogContentText>
                 <Stack spacing={1}>
-                  {Object.keys(archivingMetadata).map(metakey => (
-                    <FormControl key={metakey} size="small" fullWidth>
-                      <FormLabel>{toTitleCase(metakey)}</FormLabel>
-                      <Autocomplete
-                        value={archivingMetadata[metakey].default}
-                        freeSolo={archivingMetadata[metakey].editable}
-                        onChange={(event, newValue) =>
-                          setArchivingMetadata({
-                            ...archivingMetadata,
-                            [metakey]: { ...archivingMetadata[metakey], default: newValue }
-                          })
+                  {Object.entries(systemConfig.submission.metadata.archive).map(([field_name, field_cfg]) => (
+                    <MetadataInputField
+                      key={field_name}
+                      name={field_name}
+                      configuration={field_cfg}
+                      value={archivingMetadata[field_name]}
+                      onChange={v => {
+                        var cleanMetadata = archivingMetadata;
+                        if (v === undefined || v === null || v === '') {
+                          // Remove field from metadata if value is null
+                          delete cleanMetadata[field_name];
+                        } else {
+                          // Otherwise add/overwrite value
+                          cleanMetadata[field_name] = v;
                         }
-                        size="small"
-                        fullWidth
-                        options={archivingMetadata[metakey].values}
-                        renderInput={params => <TextField {...params} />}
-                      />
-                    </FormControl>
+                        setArchivingMetadata({ ...cleanMetadata });
+                      }}
+                      onReset={() => {
+                        var cleanMetadata = archivingMetadata;
+                        delete cleanMetadata[field_name];
+                        setArchivingMetadata({ ...cleanMetadata });
+                      }}
+                      disabled={submission ? Object.keys(submission.metadata).includes(field_name) : false}
+                    />
                   ))}
                 </Stack>
               </>
@@ -1011,7 +1033,9 @@ function WrappedSubmissionDetail() {
           </>
         }
         waiting={waitingDialog}
-        unacceptable={Object.keys(archivingMetadata).some(metakey => !archivingMetadata[metakey].default)}
+        unacceptable={Object.keys(systemConfig.submission.metadata.archive)
+          .filter(metakey => systemConfig.submission.metadata.archive[metakey].required)
+          .some(metakey => !Object.keys(archivingMetadata).includes(metakey))}
       />
       {outstanding && Object.keys(outstanding).length > 0 && (
         <Snackbar

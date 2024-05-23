@@ -527,6 +527,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
                       setDate={handleExpiryDateChange}
                       tooltip={t('expiry.change')}
                       defaultDateOffset={1}
+                      minDateTomorrow
                     />
                   ) : (
                     <Skeleton

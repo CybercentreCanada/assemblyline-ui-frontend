@@ -484,6 +484,7 @@ const BadlistNew = ({}: Props) => {
                     date={badlist.expiry_ts}
                     setDate={date => setBadlist({ ...badlist, expiry_ts: date })}
                     type="input"
+                    minDateTomorrow
                   />
                 </FormControl>
               </Grid>

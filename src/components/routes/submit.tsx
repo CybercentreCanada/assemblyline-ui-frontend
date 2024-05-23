@@ -1,5 +1,4 @@
 import Flow from '@flowjs/flow.js';
-import ClearIcon from '@mui/icons-material/Clear';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
   Alert,
@@ -8,11 +7,10 @@ import {
   CircularProgress,
   FormControlLabel,
   Grid,
-  IconButton,
-  MenuItem,
   Paper,
-  Select,
   Skeleton,
+  Slider,
+  Stack,
   Switch,
   Tab,
   TextField,
@@ -21,7 +19,6 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import FormControl from '@mui/material/FormControl';
 import { makeStyles } from '@mui/styles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
@@ -29,11 +26,12 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
+import SubmissionMetadata from 'components/layout/submissionMetadata';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
+import MetadataInputField from 'components/visual/MetadataInputField';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import React, { memo, useEffect, useState } from 'react';
@@ -109,7 +107,7 @@ const Submit: React.FC<any> = () => {
   const stringInputTitle = t('urlHash.input_title');
   const stringInputText = stringInputTitle + t('urlHash.input_suffix');
   const [stringInputHasError, setStringInputHasError] = useState(false);
-  const [submissionMetadata, setSubmissionMetadata] = useState(undefined);
+  const [submissionMetadata, setSubmissionMetadata] = useState({});
   const [urlAutoselection, setUrlAutoselection] = useState(false);
   const [value, setValue] = useState('0');
   const banner = useAppBanner();
@@ -174,7 +172,7 @@ const Submit: React.FC<any> = () => {
       apiCall({
         url: `/api/v4/ui/start/${uuid}/`,
         method: 'POST',
-        body: { ...settings, filename: file.path },
+        body: { ...settings, filename: file.path, metadata: submissionMetadata },
         onSuccess: api_data => {
           showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
           setTimeout(() => {
@@ -182,6 +180,10 @@ const Submit: React.FC<any> = () => {
           }, 500);
         },
         onFailure: api_data => {
+          if (api_data.api_status_code === 400 && api_data.api_error_message.includes('metadata')) {
+            setValue('2');
+          }
+
           if (
             api_data.api_status_code === 503 ||
             api_data.api_status_code === 403 ||
@@ -314,11 +316,6 @@ const Submit: React.FC<any> = () => {
     }
   };
 
-  const anySelected = () => {
-    const serviceList = settings.service_spec.map(srv => srv.name);
-    return serviceList.some(isSelected);
-  };
-
   const setFileDropperFile = selectedFile => {
     setFile(selectedFile);
   };
@@ -366,8 +363,43 @@ const Submit: React.FC<any> = () => {
     closeSnackbar();
     setStringType(getSubmitType(string, configuration));
     setStringInputHasError(false);
-    setSubmissionMetadata(undefined);
     setStringInput(string);
+  }
+
+  function analyseUrlHash() {
+    let data: any = null;
+    setAllowClick(false);
+
+    if (!stringType && (stringType !== 'url' || !configuration.ui.allow_url_submissions)) {
+      setAllowClick(true);
+      setStringInputHasError(true);
+      showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
+      return;
+    }
+
+    data = { ui_params: settings, [stringType]: stringInput, metadata: submissionMetadata };
+
+    setStringInputHasError(false);
+    apiCall({
+      url: '/api/v4/submit/',
+      method: 'POST',
+      body: data,
+      onSuccess: api_data => {
+        setAllowClick(false);
+        showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
+        setTimeout(() => {
+          navigate(`/submission/detail/${api_data.api_response.sid}`);
+        }, 500);
+      },
+      onFailure: api_data => {
+        if (api_data.api_status_code === 400 && api_data.api_error_message.includes('metadata')) {
+          setValue('2');
+        }
+        showErrorMessage(api_data.api_error_message);
+        setStringInputHasError(true);
+        setAllowClick(true);
+      }
+    });
   }
 
   useEffect(() => {
@@ -422,11 +454,25 @@ const Submit: React.FC<any> = () => {
     });
     setUUID(generateUUID());
 
+    // Handle if we've been given input via param
     var inputParam = params.get('input') || '';
-
     if (inputParam) {
       handleStringChange(inputParam);
       setValue('1');
+    }
+
+    // Load the default submission metadata
+    if (configuration.submission.metadata && configuration.submission.metadata.submit) {
+      const tempMeta = {};
+      for (const metaKey in configuration.submission.metadata.submit) {
+        const metaConfig = configuration.submission.metadata.submit[metaKey];
+        if (metaConfig.default !== null) {
+          tempMeta[metaKey] = metaConfig.default;
+        }
+      }
+      if (tempMeta) {
+        setSubmissionMetadata({ ...tempMeta, ...submissionMetadata });
+      }
     }
   });
 
@@ -523,6 +569,7 @@ const Submit: React.FC<any> = () => {
             ) : (
               <Skeleton style={{ height: '280px' }} />
             )}
+            <SubmissionMetadata submissionMetadata={submissionMetadata} setSubmissionMetadata={setSubmissionMetadata} />
             {configuration.ui.tos ? (
               <div style={{ marginTop: sp4, textAlign: 'center' }}>
                 <Typography variant="body2">
@@ -626,32 +673,7 @@ const Submit: React.FC<any> = () => {
                   ))}
                 </div>
               )}
-            {submissionMetadata && Object.keys(submissionMetadata).length !== 0 && (
-              <div style={{ textAlign: 'start', marginTop: theme.spacing(2) }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography style={{ flexGrow: 1 }} variant="subtitle1">
-                    {t('options.submission.metadata')}
-                  </Typography>
-                  <Tooltip title={t('options.submission.metadata.clear')}>
-                    <IconButton onClick={() => setSubmissionMetadata(undefined)}>
-                      <ClearIcon />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-                <div>
-                  {Object.keys(submissionMetadata).map((meta, i) => (
-                    <Grid container key={i}>
-                      <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
-                        <span style={{ fontWeight: 500 }}>{meta}</span>
-                      </Grid>
-                      <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                        {submissionMetadata[meta]}
-                      </Grid>
-                    </Grid>
-                  ))}
-                </div>
-              </div>
-            )}
+            <SubmissionMetadata submissionMetadata={submissionMetadata} setSubmissionMetadata={setSubmissionMetadata} />
             {configuration.ui.tos ? (
               <div style={{ marginTop: sp4, textAlign: 'center' }}>
                 <Typography variant="body2">
@@ -673,7 +695,7 @@ const Submit: React.FC<any> = () => {
                   <Typography variant="h6" gutterBottom>
                     {t('options.service')}
                   </Typography>
-                  <ServiceTree size="small" settings={settings} setSettings={setSettings} />
+                  <ServiceTree size="small" settings={settings} setSettings={setSettings} setParam={setParam} />
                 </div>
               </Grid>
               <Grid item xs={12} md>
@@ -707,19 +729,22 @@ const Submit: React.FC<any> = () => {
                       {t('options.submission.priority')}
                     </Typography>
                     {settings ? (
-                      <FormControl size="small" fullWidth>
-                        <Select
-                          id="priority"
-                          value={settings.priority}
-                          variant="outlined"
-                          onChange={event => setSettingValue('priority', event.target.value)}
-                          fullWidth
-                        >
-                          <MenuItem value="500">{t('options.submission.priority.low')}</MenuItem>
-                          <MenuItem value="1000">{t('options.submission.priority.medium')}</MenuItem>
-                          <MenuItem value="1500">{t('options.submission.priority.high')}</MenuItem>
-                        </Select>
-                      </FormControl>
+                      <div style={{ marginLeft: '20px', marginRight: '20px' }}>
+                        <Slider
+                          defaultValue={settings.priority}
+                          valueLabelDisplay={'auto'}
+                          size="small"
+                          min={500}
+                          max={1500}
+                          marks={[
+                            { label: t('options.submission.priority.low'), value: 500 },
+                            { label: t('options.submission.priority.medium'), value: 1000 },
+                            { label: t('options.submission.priority.high'), value: 1500 }
+                          ]}
+                          step={null}
+                          onChange={(_, e_value) => setSettingValue('priority', e_value)}
+                        ></Slider>
+                      </div>
                     ) : (
                       <Skeleton style={{ height: '3rem' }} />
                     )}
@@ -855,24 +880,47 @@ const Submit: React.FC<any> = () => {
                       <Skeleton style={{ height: '3rem' }} />
                     )}
                   </div>
+                  {configuration.submission.metadata &&
+                    configuration.submission.metadata.submit &&
+                    Object.keys(configuration.submission.metadata.submit).length !== 0 && (
+                      <>
+                        <Typography variant="h6" gutterBottom style={{ paddingTop: theme.spacing(2) }}>
+                          {t('options.submission.metadata')}
+                        </Typography>
+                        <Stack spacing={1}>
+                          {Object.entries(configuration.submission.metadata.submit).map(([field_name, field_cfg]) => (
+                            <MetadataInputField
+                              key={field_name}
+                              name={field_name}
+                              configuration={field_cfg}
+                              value={submissionMetadata[field_name]}
+                              onChange={v => {
+                                var cleanMetadata = submissionMetadata;
+                                if (v === undefined || v === null || v === '') {
+                                  // Remove field from metadata if value is null
+                                  delete cleanMetadata[field_name];
+                                } else {
+                                  // Otherwise add/overwrite value
+                                  cleanMetadata[field_name] = v;
+                                }
+                                setSubmissionMetadata({ ...cleanMetadata });
+                              }}
+                              onReset={() => {
+                                var cleanMetadata = submissionMetadata;
+                                delete cleanMetadata[field_name];
+                                setSubmissionMetadata({ ...cleanMetadata });
+                              }}
+                            />
+                          ))}
+                        </Stack>
+                      </>
+                    )}
                 </div>
-
-                {settings && settings.service_spec.length !== 0 && anySelected() && (
-                  <div style={{ textAlign: 'left', marginTop: sp4 }}>
-                    <Typography variant="h6" gutterBottom>
-                      {t('options.service_spec')}
-                    </Typography>
-                    <ServiceSpec service_spec={settings.service_spec} setParam={setParam} isSelected={isSelected} />
-                  </div>
-                )}
               </Grid>
             </Grid>
           </TabPanel>
         </TabContext>
       </>
-      {/* ) : (
-        <div>Cannot submit files</div>
-      )} */}
     </PageCenter>
   );
 };

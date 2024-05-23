@@ -68,6 +68,19 @@ export type ExternalSource = {
   name: string;
 };
 
+export type MetadataConfiguration = {
+  required: boolean;
+  validator_type: string;
+  default: string;
+  suggestions: string[];
+  validator_params: {
+    validation_regex?: string;
+    values?: string[];
+    max?: number;
+    min?: number;
+  };
+};
+
 export type ConfigurationDefinition = {
   auth: {
     allow_2fa: boolean;
@@ -78,14 +91,6 @@ export type ConfigurationDefinition = {
   core: {
     archiver: {
       alternate_dtl: number;
-      metadata: {
-        [metakey: string]: {
-          default: string;
-          editable: boolean;
-          values: string[];
-        };
-      };
-      use_metadata: boolean;
     };
   };
   datastore: {
@@ -105,6 +110,14 @@ export type ConfigurationDefinition = {
       [hash_type: string]: {
         pattern: string;
         sources: string[];
+      };
+    };
+    metadata: {
+      archive: {
+        [field_name: string]: MetadataConfiguration;
+      };
+      submit: {
+        [field_name: string]: MetadataConfiguration;
       };
     };
     verdicts: {
