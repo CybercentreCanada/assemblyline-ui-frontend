@@ -113,8 +113,8 @@ export default function LoginScreen({
       password,
       otp: oneTimePass,
       webauthn_auth_resp: webAuthNResponse,
-      oauth_token_id: shownControls !== 'oauth' ? tokenID : null,
-      saml_token_id: shownControls !== 'saml' ? tokenID : null
+      oauth_token_id: shownControls === 'oauth' ? tokenID : null,
+      saml_token_id: shownControls === 'saml' ? tokenID : null
     };
 
     apiCall({
