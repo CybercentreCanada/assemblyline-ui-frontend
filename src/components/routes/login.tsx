@@ -228,7 +228,7 @@ export default function LoginScreen({
                   setUsername={setUsername}
                 />
               ) : null}
-              {allowSignup ? (
+              {allowUserPass && allowSignup ? (
                 <Typography align="center" variant="caption" style={{ marginTop: theme.spacing(2) }}>
                   {t('signup')}&nbsp;&nbsp;
                   <Link href="#" onClick={signup}>
@@ -236,7 +236,7 @@ export default function LoginScreen({
                   </Link>
                 </Typography>
               ) : null}
-              {allowPWReset ? (
+              {allowUserPass && allowPWReset ? (
                 <Typography align="center" variant="caption" style={{ marginTop: theme.spacing(pwPadding) }}>
                   {t('reset.desc')}&nbsp;&nbsp;
                   <Link href="#" onClick={resetPW}>
