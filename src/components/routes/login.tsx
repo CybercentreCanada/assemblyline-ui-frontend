@@ -100,8 +100,8 @@ export default function LoginScreen({
       password,
       otp: oneTimePass,
       webauthn_auth_resp: webAuthNResponse,
-      oauth_token_id: shownControls !== 'oauth' ? tokenID : null,
-      saml_token_id: shownControls !== 'saml' ? tokenID : null
+      oauth_token_id: shownControls === 'oauth' ? tokenID : null,
+      saml_token_id: shownControls === 'saml' ? tokenID : null
     };
 
     apiCall({
@@ -230,7 +230,7 @@ export default function LoginScreen({
                   setUsername={setUsername}
                 />
               ) : null}
-              {allowSignup ? (
+              {allowUserPass && allowSignup ? (
                 <Typography align="center" variant="caption" style={{ marginTop: theme.spacing(2) }}>
                   {t('signup')}&nbsp;&nbsp;
                   <Link href="#" onClick={signup}>
@@ -238,7 +238,7 @@ export default function LoginScreen({
                   </Link>
                 </Typography>
               ) : null}
-              {allowPWReset ? (
+              {allowUserPass && allowPWReset ? (
                 <Typography align="center" variant="caption" style={{ marginTop: theme.spacing(pwPadding) }}>
                   {t('reset.desc')}&nbsp;&nbsp;
                   <Link href="#" onClick={resetPW}>
