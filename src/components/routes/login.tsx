@@ -68,22 +68,25 @@ export default function LoginScreen({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [avatar, setAvatar] = useState('');
-  const [tokenID, setTokenID] = useState('');
+  const [oauthTokenID, setOAuthTokenID] = useState('');
+  const [samlTokenID, setSAMLTokenID] = useState('');
   const [oneTimePass, setOneTimePass] = useState('');
   const [webAuthNResponse, setWebAuthNResponse] = useState(null);
   const [buttonLoading, setButtonLoading] = useState(false);
   const pwPadding = allowSignup ? 1 : 2;
 
   function reset(event) {
-    if ((['oauth'].includes(shownControls) && tokenID) || !['oauth'].includes(shownControls)) {
+    if ((['oauth'].includes(shownControls) && oauthTokenID) || !['oauth'].includes(shownControls)) {
       setWebAuthNResponse(null);
       setShownControls('login');
       setUsername('');
       setEmail('');
       setPassword('');
       setAvatar('');
-      setTokenID('');
+      setOAuthTokenID('');
+      setSAMLTokenID('');
       setOneTimePass('');
+      setButtonLoading(false);
     }
     if (event) {
       event.preventDefault();
@@ -100,8 +103,8 @@ export default function LoginScreen({
       password,
       otp: oneTimePass,
       webauthn_auth_resp: webAuthNResponse,
-      oauth_token_id: shownControls === 'oauth' ? tokenID : null,
-      saml_token_id: shownControls === 'saml' ? tokenID : null
+      oauth_token_id: oauthTokenID,
+      saml_token_id: samlTokenID
     };
 
     apiCall({
@@ -169,7 +172,7 @@ export default function LoginScreen({
           setAvatar(api_data.api_response.avatar);
           setUsername(api_data.api_response.username);
           setEmail(api_data.api_response.email_adr || '');
-          setTokenID(api_data.api_response.oauth_token_id);
+          setOAuthTokenID(api_data.api_response.oauth_token_id);
         },
         onFailure: api_data => {
           showErrorMessage(api_data.api_error_message);
@@ -201,7 +204,7 @@ export default function LoginScreen({
       } else {
         setUsername(cur_username => samlData.username || cur_username);
         setEmail(cur_email => samlData.email || cur_email);
-        setTokenID(cur_token => samlData.saml_token_id || cur_token);
+        setSAMLTokenID(cur_token => samlData.saml_token_id || cur_token);
       }
       navigate(localStorage.getItem('nextLocation') || '/');
     }
@@ -305,7 +308,7 @@ export default function LoginScreen({
           oauth: (
             <SSOLogin
               reset={reset}
-              tokenID={tokenID}
+              tokenID={oauthTokenID}
               avatar={avatar}
               username={username}
               email={email}
@@ -324,7 +327,7 @@ export default function LoginScreen({
           saml: (
             <SSOLogin
               reset={reset}
-              tokenID={tokenID}
+              tokenID={samlTokenID}
               avatar={avatar}
               username={username}
               email={email}
