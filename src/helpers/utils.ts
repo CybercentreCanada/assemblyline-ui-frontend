@@ -279,7 +279,7 @@ export function getProvider() {
  *
  */
 export function getSAMLData() {
-  if (window.location.pathname.indexOf(`${process.env.PUBLIC_URL}/saml/`) !== -1) {
+  if (window.location.pathname.indexOf('/saml/') !== -1) {
     const params = new URLSearchParams(window.location.search);
     const data = params.get('data');
     if (data !== null || data !== undefined) {
