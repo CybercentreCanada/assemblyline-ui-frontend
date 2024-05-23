@@ -15,7 +15,6 @@ import {
   TableSortLabel
 } from '@mui/material';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import 'moment/locale/fr';
 import React, { FC, forwardRef, memo } from 'react';
 import { To, useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';

@@ -133,57 +133,6 @@ const Submit: React.FC<any> = () => {
     setUUID(generateUUID());
   };
 
-  const validateServiceSelection = cbType => {
-    let showPopup = false;
-
-    // Check if we need the popup, and if we do
-    settings.services.forEach(cat => {
-      cat.services.forEach(srv => {
-        if (srv.selected && srv.is_external) {
-          showPopup = true;
-        }
-      });
-    });
-
-    if (showPopup) {
-      // External service selected, show popup
-      setValidateCB(cbType);
-      setValidate(true);
-    } else if (cbType === 'file') {
-      // No external service and file submitted
-      uploadAndScan();
-    } else if (cbType === 'urlHash') {
-      // No external service and url/SHA256 submitted
-      analyseUrlHash();
-    }
-  };
-
-  const cleanupServiceSelection = () => {
-    // eslint-disable-next-line guard-for-in
-    for (const i in settings.services) {
-      const cat = settings.services[i];
-      // eslint-disable-next-line guard-for-in
-      for (const j in settings.services[i].services) {
-        const srv = settings.services[i].services[j];
-        if (srv.selected && srv.is_external) {
-          srv.selected = false;
-        }
-      }
-      cat.selected = cat.services.every(e => e.selected);
-    }
-
-    executeCB();
-  };
-
-  const executeCB = () => {
-    setValidate(false);
-    if (validateCB === 'file') {
-      uploadAndScan();
-    } else {
-      analyseUrlHash();
-    }
-  };
-
   const uploadAndScan = () => {
     flow.opts.generateUniqueIdentifier = getFileUUID;
     setAllowClick(false);
@@ -253,6 +202,90 @@ const Submit: React.FC<any> = () => {
 
     flow.addFile(file);
     flow.upload();
+  };
+
+  function analyseUrlHash() {
+    let data: any = null;
+    setAllowClick(false);
+
+    if (!stringType && (stringType !== 'url' || !configuration.ui.allow_url_submissions)) {
+      setAllowClick(true);
+      setStringInputHasError(true);
+      showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
+      return;
+    }
+
+    data = { ui_params: settings, [stringType]: stringInput, metadata: submissionMetadata };
+
+    setStringInputHasError(false);
+    apiCall({
+      url: '/api/v4/submit/',
+      method: 'POST',
+      body: data,
+      onSuccess: api_data => {
+        setAllowClick(false);
+        showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
+        setTimeout(() => {
+          navigate(`/submission/detail/${api_data.api_response.sid}`);
+        }, 500);
+      },
+      onFailure: api_data => {
+        showErrorMessage(api_data.api_error_message);
+        setStringInputHasError(true);
+        setAllowClick(true);
+      }
+    });
+  }
+
+  const executeCB = () => {
+    setValidate(false);
+    if (validateCB === 'file') {
+      uploadAndScan();
+    } else {
+      analyseUrlHash();
+    }
+  };
+
+  const validateServiceSelection = cbType => {
+    let showPopup = false;
+
+    // Check if we need the popup, and if we do
+    settings.services.forEach(cat => {
+      cat.services.forEach(srv => {
+        if (srv.selected && srv.is_external) {
+          showPopup = true;
+        }
+      });
+    });
+
+    if (showPopup) {
+      // External service selected, show popup
+      setValidateCB(cbType);
+      setValidate(true);
+    } else if (cbType === 'file') {
+      // No external service and file submitted
+      uploadAndScan();
+    } else if (cbType === 'urlHash') {
+      // No external service and url/SHA256 submitted
+      analyseUrlHash();
+    }
+  };
+
+  const cleanupServiceSelection = () => {
+    // eslint-disable-next-line guard-for-in
+    for (const i in settings.services) {
+      const cat = settings.services[i];
+      // eslint-disable-next-line guard-for-in
+      for (const j in settings.services[i].services) {
+        const srv = settings.services[i].services[j];
+        if (srv.selected && srv.is_external) {
+          srv.selected = false;
+        }
+      }
+      cat.selected = cat.services.every(e => e.selected);
+    }
+
+    executeCB();
   };
 
   const isSelected = service_name => {

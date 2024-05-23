@@ -1,4 +1,5 @@
-import { Avatar, AvatarProps } from '@mui/material';
+import type { AvatarProps } from '@mui/material';
+import { Avatar } from '@mui/material';
 import md5 from 'md5';
 import { useMemo } from 'react';
 import useAppConfigs from '../app/hooks/useAppConfigs';

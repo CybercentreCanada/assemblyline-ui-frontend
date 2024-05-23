@@ -42,7 +42,6 @@ import ResultsTable, { ResultResult } from 'components/visual/SearchResult/resul
 import SectionContainer from 'components/visual/SectionContainer';
 import Verdict from 'components/visual/Verdict';
 import { safeFieldValue } from 'helpers/utils';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -727,7 +726,7 @@ const SelectCell: React.FC<FilterFieldProps> = React.memo(({ onChange = () => nu
         fullWidth
         size="small"
         onChange={event => handleChange(event)}
-        renderValue={values => values.map(v => <Verdict short verdict={v as any} />)}
+        renderValue={values => values.map((v, i) => <Verdict key={i} short verdict={v as any} />)}
         sx={{
           maxWidth: '140px',
           '& .MuiOutlinedInput-input': {

@@ -16,7 +16,7 @@ import {
 } from 'components/visual/ArchiveDetail';
 import Classification from 'components/visual/Classification';
 import { Comments } from 'components/visual/CommentCard';
-import { Error } from 'components/visual/ErrorCard';
+import type { Error } from 'components/visual/ErrorCard';
 import AttackSection from 'components/visual/FileDetail/attacks';
 import ChildrenSection from 'components/visual/FileDetail/childrens';
 import Detection from 'components/visual/FileDetail/detection';
@@ -31,7 +31,7 @@ import URIIdentificationSection from 'components/visual/FileDetail/uriIdent';
 import { ASCIISection, HexSection, ImageSection, StringsSection } from 'components/visual/FileViewer';
 import CodeSection from 'components/visual/FileViewer/code_summary';
 import InformativeAlert from 'components/visual/InformativeAlert';
-import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
+import { AlternateResult, Result, emptyResult } from 'components/visual/ResultCard';
 import { TabContainer } from 'components/visual/TabContainer';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

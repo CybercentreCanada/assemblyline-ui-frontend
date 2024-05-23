@@ -1,6 +1,7 @@
 {
   "button": "Se connecter",
   "button_oauth": "Se connecter avec",
+  "button_saml": "Se connecter avec SAML",
   "other": "Ou connectez-vous avec un utilisateur différent...",
   "otp": "Mot de passe à usage unique",
   "password": "Mot de passe",

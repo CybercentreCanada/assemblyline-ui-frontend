@@ -24,7 +24,7 @@ import useQuota from 'components/hooks/useQuota';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { AppBarUserMenuElement } from '../app/AppConfigs';
+import type { AppBarUserMenuElement } from '../app/AppConfigs';
 import AppAvatar from '../display/AppAvatar';
 
 export const AppUserAvatar = styled(AppAvatar)(({ theme }) => ({

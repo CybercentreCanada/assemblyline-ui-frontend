@@ -27,9 +27,10 @@ import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { AppBarUserMenuElement, AppLeftNavElement, AppPreferenceConfigs } from 'commons/components/app/AppConfigs';
+import type { AppBarUserMenuElement, AppLeftNavElement, AppPreferenceConfigs } from 'commons/components/app/AppConfigs';
 import { Notification } from 'components/visual/Notification';
-import { ReactElement, ReactNode, useMemo } from 'react';
+import type { ReactElement, ReactNode } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 
@@ -38,26 +39,14 @@ const useMyPreferences = () => {
 
   const AL_LIGHT_LOGO = useMemo(
     (): ReactElement<any> => (
-      <img
-        alt={t('logo.alt')}
-        src={`${process.env.PUBLIC_URL}/images/al.svg`}
-        width="40"
-        height="32"
-        style={{ marginLeft: '-5px' }}
-      />
+      <img alt={t('logo.alt')} src={`/images/noswoop.svg`} width="40" height="32" style={{ marginLeft: '-8px' }} />
     ),
     [t]
   );
 
   const AL_DARK_LOGO = useMemo(
     (): ReactElement<any> => (
-      <img
-        alt={t('logo.alt')}
-        src={`${process.env.PUBLIC_URL}/images/al_dark.svg`}
-        width="40"
-        height="32"
-        style={{ marginLeft: '-5px' }}
-      />
+      <img alt={t('logo.alt')} src={`/images/noswoop_dark.svg`} width="40" height="32" style={{ marginLeft: '-8px' }} />
     ),
     [t]
   );
@@ -66,7 +55,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`${process.env.PUBLIC_URL}/images/banner.svg`}
+        src={`/images/banner.svg`}
         alt={t('banner.alt')}
       />
     ),
@@ -77,7 +66,29 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`${process.env.PUBLIC_URL}/images/banner_dark.svg`}
+        src={`/images/banner_dark.svg`}
+        alt={t('banner.alt')}
+      />
+    ),
+    [t]
+  );
+
+  const AL_LIGHT_BANNER_VERT = useMemo(
+    (): ReactElement<any> => (
+      <img
+        style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
+        src={`/images/vertical_banner.svg`}
+        alt={t('banner.alt')}
+      />
+    ),
+    [t]
+  );
+
+  const AL_DARK_BANNER_VERT = useMemo(
+    (): ReactElement<any> => (
+      <img
+        style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
+        src={`/images/vertical_banner_dark.svg`}
         alt={t('banner.alt')}
       />
     ),
@@ -450,6 +461,8 @@ const useMyPreferences = () => {
       appIconLight: AL_LIGHT_LOGO,
       bannerDark: AL_DARK_BANNER,
       bannerLight: AL_LIGHT_BANNER,
+      bannerVertDark: AL_DARK_BANNER_VERT,
+      bannerVertLight: AL_LIGHT_BANNER_VERT,
       defaultAutoHideAppbar: false,
       defaultDrawerOpen: false,
       defaultLayout: 'side',

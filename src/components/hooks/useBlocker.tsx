@@ -4,8 +4,10 @@
 // this restores that feature since we don't care about the edge cases
 
 import type { Blocker, History, Transition } from 'history';
-import { ContextType, useContext, useEffect, useRef } from 'react';
-import { Navigator as BaseNavigator, UNSAFE_NavigationContext as NavigationContext } from 'react-router-dom';
+import type { ContextType } from 'react';
+import { useContext, useEffect, useRef } from 'react';
+import type { Navigator as BaseNavigator } from 'react-router-dom';
+import { UNSAFE_NavigationContext as NavigationContext } from 'react-router-dom';
 
 interface Navigator extends BaseNavigator {
   block: History['block'];

@@ -1,6 +1,5 @@
 import { Card, Grid, Tooltip, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CgSmartphoneChip, CgSmartphoneRam } from 'react-icons/cg';
@@ -40,7 +39,7 @@ type ContainerCardProps = {
   onChange: (newContainer: Container, name?: string, newVolumes?: { [name: string]: Volume }) => void;
 };
 
-const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: ContainerCardProps) => {
+const WrappedContainerCard = ({ container, defaults, name = null, volumes = null, onChange }: ContainerCardProps) => {
   const { t } = useTranslation(['adminServices']);
   const [dialog, setDialog] = useState(false);
   const theme = useTheme();
@@ -94,7 +93,9 @@ const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: 
           </Grid>
           {container.service_account && (
             <>
-              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('container.card.service_account')}:`}</Grid>
+              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t(
+                'container.card.service_account'
+              )}:`}</Grid>
               <Grid item xs={7} sm={8} md={10} className={classes.mono}>
                 {container.service_account}
               </Grid>
@@ -143,11 +144,6 @@ const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: 
       </Card>
     </div>
   ) : null;
-};
-
-WrappedContainerCard.defaultProps = {
-  name: null,
-  volumes: null
 };
 
 const ContainerCard = React.memo(WrappedContainerCard);

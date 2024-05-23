@@ -163,7 +163,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
     _actionQuery.setGroupBy('');
 
     if (groupBy) {
-      _actionQuery.setQuery(`${groupBy}:${getValueFromPath(item, groupBy)}`);
+      _actionQuery.setQuery(`${groupBy}:${getValueFromPath(item, groupBy) as string}`);
     } else {
       _actionQuery.setQuery(`alert_id:${item.alert_id}`);
     }
@@ -173,7 +173,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
   const buildFocusQuery = (): SearchQuery => {
     const focusQuery = currentQuery.build();
     focusQuery.setGroupBy('');
-    focusQuery.addFq(`${groupBy}:${getValueFromPath(item, groupBy)}`);
+    focusQuery.addFq(`${groupBy}:${getValueFromPath(item, groupBy) as string}`);
     return focusQuery;
   };
 
@@ -391,7 +391,9 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
               <>
                 <span style={{ display: 'inline-block' }}>{t('actions.takeownershipdiag.content.grouped')}</span>
                 <span style={{ display: 'inline-block', padding: theme.spacing(1), wordBreak: 'break-word' }}>
-                  <Typography variant="caption">{`${groupBy}: ${getValueFromPath(item, groupBy)}`}</Typography>
+                  <Typography variant="caption">{`${groupBy}: ${
+                    getValueFromPath(item, groupBy) as string
+                  }`}</Typography>
                 </span>
               </>
             ) : (

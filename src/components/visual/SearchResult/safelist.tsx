@@ -3,11 +3,10 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
+import Moment from 'components/visual/Moment';
 import { maxLenStr } from 'helpers/utils';
-import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import CustomChip from '../CustomChip';
 import {
@@ -109,11 +108,9 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
               >
                 <DivTableCell>
                   <Tooltip title={sl_item.added}>
-                    <>
-                      <Moment fromNow locale={i18n.language}>
-                        {sl_item.added}
-                      </Moment>
-                    </>
+                    <div>
+                      <Moment variant="fromNow">{sl_item.added}</Moment>
+                    </div>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>{sl_item.type}</DivTableCell>

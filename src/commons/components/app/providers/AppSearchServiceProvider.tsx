@@ -1,7 +1,8 @@
-import { createContext, ReactElement, useMemo, useState } from 'react';
+import type { ReactElement } from 'react';
+import { createContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { AppSearchServiceContextType, AppSearchServiceState } from '../AppContexts';
-import { AppSearchService } from '../AppSearchService';
+import type { AppSearchServiceContextType, AppSearchServiceState } from '../AppContexts';
+import type { AppSearchService } from '../AppSearchService';
 import useAppConfigs from '../hooks/useAppConfigs';
 
 const DEFAULT_CONTEXT: AppSearchServiceContextType = {

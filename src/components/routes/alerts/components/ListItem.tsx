@@ -4,47 +4,59 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Grid, Tooltip, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
-import { AlertItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
+import Moment from 'components/visual/Moment';
 import Verdict from 'components/visual/Verdict';
-import { verdictToColor } from 'helpers/utils';
-import 'moment/locale/fr';
-import React from 'react';
+import { verdictRank, verdictToColor } from 'helpers/utils';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
-import AlertListChip from './alert-chip-list';
-import AlertListChipDetailed from './alert-chip-list-detailed';
-import AlertExtendedScan from './alert-extended_scan';
-import AlertPriority from './alert-priority';
-import AlertStatus from './alert-status';
+import { Alert, DetailedItem } from '../models/Alert';
+import { AlertExtendedScan, AlertListChip, AlertListChipDetailed, AlertPriority, AlertStatus } from './Components';
 
-type AlertListItemProps = {
-  item: AlertItem;
+type Props = {
+  item: Alert;
 };
 
-const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
+const WrappedAlertListItem = ({ item }: Props) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation('alerts');
   const { configuration } = useALContext();
 
-  let subject = '';
-  for (let subItem of configuration.ui.alerting_meta.subject) {
-    let metaVal = item.metadata[subItem];
-    if (metaVal !== undefined && metaVal !== null) {
-      subject = metaVal;
-      break;
+  const subject = useMemo<string>(() => {
+    let data = '';
+    for (let subItem of configuration.ui.alerting_meta.subject) {
+      let metaVal = item.metadata[subItem];
+      if (metaVal !== undefined && metaVal !== null) {
+        data = metaVal;
+        break;
+      }
     }
-  }
+    return data;
+  }, [configuration.ui.alerting_meta.subject, item.metadata]);
 
-  let url = '';
-  for (let subItem of configuration.ui.alerting_meta.url) {
-    let metaVal = item.metadata[subItem];
-    if (metaVal !== undefined && metaVal !== null) {
-      url = metaVal;
-      break;
+  const url = useMemo<string>(() => {
+    let data = '';
+    for (let subItem of configuration.ui.alerting_meta.url) {
+      let metaVal = item.metadata[subItem];
+      if (metaVal !== undefined && metaVal !== null) {
+        data = metaVal;
+        break;
+      }
     }
-  }
+    return data;
+  }, [configuration.ui.alerting_meta.url, item.metadata]);
+
+  const detailedItemCompare = useCallback((a: DetailedItem, b: DetailedItem) => {
+    const aVerdict = verdictRank(a.verdict);
+    const bVerdict = verdictRank(b.verdict);
+
+    if (aVerdict === bVerdict) {
+      return a.value < b.value ? -1 : a.value > b.value ? 1 : 0;
+    } else {
+      return aVerdict < bVerdict ? -1 : 1;
+    }
+  }, []);
 
   return (
     <div style={{ padding: theme.spacing(2) }}>
@@ -117,9 +129,7 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           ) : null}
         </Grid>
         <Grid item xs={6} md={2} style={{ textAlign: 'right' }}>
-          <Moment fromNow locale={i18n.language}>
-            {item.reporting_ts}
-          </Moment>
+          <Moment variant="fromNow">{item.reporting_ts}</Moment>
         </Grid>
         <Grid item xs={12} md={2}>
           <Grid container spacing={1}>
