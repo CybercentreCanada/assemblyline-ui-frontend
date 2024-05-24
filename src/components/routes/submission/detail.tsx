@@ -103,7 +103,7 @@ const incrementReducer = (old: number, increment: number) => {
 };
 
 function WrappedSubmissionDetail() {
-  const { t } = useTranslation(['submissionDetail']);
+  const { t, i18n } = useTranslation(['submissionDetail']);
   const { id, fid } = useParams<ParamProps>();
   const theme = useTheme();
   const [submission, setSubmission] = useState(null);
@@ -989,9 +989,9 @@ function WrappedSubmissionDetail() {
                       <FormControlLabel
                         value={'true'}
                         control={<Radio />}
-                        label={moment().from(
-                          new Date().getTime() - systemConfig.core.archiver.alternate_dtl * 24 * 60 * 60 * 1000
-                        )}
+                        label={moment()
+                          .locale(i18n.language)
+                          .from(new Date().getTime() - systemConfig.core.archiver.alternate_dtl * 24 * 60 * 60 * 1000)}
                       />
                     </RadioGroup>
                   </FormControl>
