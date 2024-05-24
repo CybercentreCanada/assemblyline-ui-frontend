@@ -191,7 +191,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   return (
     <PageCardCentered>
       <Box sx={{ cursor: 'pointer' }} onClick={reset}>
-        {['oauth', 'sectoken', 'otp', 'reset', 'signup'].includes(shownControls) ? banner : bannerVert}
+        {shownControls === 'login' ? bannerVert : banner}
       </Box>
       {
         {
