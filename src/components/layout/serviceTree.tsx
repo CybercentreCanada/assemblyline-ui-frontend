@@ -119,10 +119,9 @@ function ServiceTreeItem({
               {item.is_external && (
                 <HiOutlineExternalLink style={{ fontSize: 'large', marginLeft: theme.spacing(2) }} />
               )}
-              {setParam && hasParams(item.name) && (
+              {setParam && hasParams(item.name) && item.selected && (
                 <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
                   <IconButton
-                    disabled={!item.selected}
                     onClick={e => {
                       e.preventDefault();
                       setOpen(!open);
