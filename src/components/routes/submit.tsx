@@ -411,13 +411,29 @@ const Submit: React.FC<any> = () => {
     apiCall({
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: api_data => {
+        const tempSettings = { ...api_data.api_response };
+
         if (state) {
-          setSettings({ ...api_data.api_response, classification: state.c12n });
+          // Get the classification from the state
+          tempSettings.classification = state.c12n;
         } else if (params.get('classification')) {
-          setSettings({ ...api_data.api_response, classification: params.get('classification') });
-        } else {
-          setSettings(api_data.api_response);
+          // Or get the classification from the params
+          tempSettings.classification = params.get('classification');
         }
+
+        // Check if some file sources should auto-select and do so
+        const defaultExternalSources = [...tempSettings.default_external_sources];
+        for (let srcType in configuration.submission.file_sources) {
+          let sourceDef = configuration.submission.file_sources[srcType];
+          for (let source of sourceDef.auto_selected) {
+            if (!defaultExternalSources.includes(source)) {
+              defaultExternalSources.push(source);
+            }
+          }
+        }
+        tempSettings.default_external_sources = defaultExternalSources;
+
+        setSettings(tempSettings);
       }
     });
     setUUID(generateUUID());
