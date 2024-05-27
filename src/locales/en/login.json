@@ -1,6 +1,7 @@
 {
   "button": "Sign in",
   "button_oauth": "Sign in with",
+  "button_saml": "Sign in with SAML",
   "other": "Or sign in as a different user...",
   "otp": "One Time Password",
   "password": "Password",
