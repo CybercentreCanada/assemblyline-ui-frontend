@@ -54,7 +54,7 @@ services:
 
   # Create test data
   create_test_data:
-    image: cccs/assemblyline-core:4.3.stable
+    image: cccs/assemblyline-core:4.5.stable
     environment:
       DEV_ADMIN_PASS: $DEV_ADMIN_PASS
       DEV_USER_PASS: $DEV_USER_PASS
@@ -68,7 +68,7 @@ services:
 
   # UI
   al_ui:
-    image: cccs/assemblyline-ui:4.3.stable
+    image: cccs/assemblyline-ui:4.5.stable
     ports:
       - '5000:5000'
     volumes:
@@ -81,7 +81,7 @@ services:
 
   # SocketIO Server
   al_socketio:
-    image: cccs/assemblyline-socketio:4.3.stable
+    image: cccs/assemblyline-socketio:4.5.stable
     ports:
       - '5002:5002'
     volumes:
@@ -100,7 +100,7 @@ services:
 
   # Hearbeat manager
   # al_heartbeat:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -110,7 +110,7 @@ services:
   #       condition: service_healthy
 
   # al_alerter:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -121,7 +121,7 @@ services:
 
   # # Expiry
   # al_expiry:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -131,7 +131,7 @@ services:
   #       condition: service_healthy
 
   # al_dispatcher_files:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -141,7 +141,7 @@ services:
   #       condition: service_healthy
 
   # al_dispatcher_submissions:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -152,7 +152,7 @@ services:
 
   # # Ingester Processes
   # al_ingester_ingest:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -162,7 +162,7 @@ services:
   #       condition: service_healthy
 
   # al_ingester_internal:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -172,7 +172,7 @@ services:
   #       condition: service_healthy
 
   # al_ingester_submit:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro

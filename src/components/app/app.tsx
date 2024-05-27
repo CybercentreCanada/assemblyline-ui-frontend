@@ -13,10 +13,12 @@ import useMySitemap from 'components/hooks/useMySitemap';
 import useMyTheme from 'components/hooks/useMyTheme';
 import type { CustomAppUserService } from 'components/hooks/useMyUser';
 import useMyUser from 'components/hooks/useMyUser';
+import QuotaProvider from 'components/providers/QuotaProvider';
 import SafeResultsProvider from 'components/providers/SafeResultsProvider';
 import LoadingScreen from 'components/routes/loading';
 import LockedPage from 'components/routes/locked';
 import LoginScreen from 'components/routes/login';
+import QuotaExceeded from 'components/routes/quota';
 import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
 import setMomentFRLocale from 'helpers/moment-fr-locale';
@@ -81,7 +83,8 @@ const MyAppMain = () => {
       <LoadingScreen />
     ),
     routes: <Routes />,
-    tos: <Tos />
+    tos: <Tos />,
+    quota: <QuotaExceeded />
   }[renderedApp];
 };
 
@@ -93,9 +96,11 @@ export const MyApp: React.FC<any> = () => {
   return (
     <BrowserRouter basename="/">
       <SafeResultsProvider>
-        <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
-          <MyAppMain />
-        </AppProvider>
+        <QuotaProvider>
+          <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
+            <MyAppMain />
+          </AppProvider>
+        </QuotaProvider>
       </SafeResultsProvider>
     </BrowserRouter>
   );

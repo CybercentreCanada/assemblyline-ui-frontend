@@ -407,3 +407,17 @@ export function getSubmitType(input: string, configuration: ConfigurationDefinit
   }
   return detectedHashType;
 }
+
+/**
+ *
+ * Sum all the values of an object
+ *
+ * @param obj an object of values to be added together
+ *
+ * @returns type as number
+ *
+ */
+type ObjectOfInts = {
+  [name: string]: number;
+};
+export const sumValues = (obj: ObjectOfInts) => Object.values(obj).reduce((a, b) => a + b, 0);
