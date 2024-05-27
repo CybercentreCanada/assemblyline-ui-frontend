@@ -273,6 +273,25 @@ export function getProvider() {
 
 /**
  *
+ * Check if we are receiving a SAML sign-in message
+ *
+ * @returns oauth provider
+ *
+ */
+export function getSAMLData() {
+  if (window.location.pathname.indexOf('/saml/') !== -1) {
+    const params = new URLSearchParams(window.location.search);
+    const data = params.get('data');
+    if (data !== null || data !== undefined) {
+      return JSON.parse(atob(data).toString());
+    }
+  }
+
+  return null;
+}
+
+/**
+ *
  * Convert the returned result count from an Elasticsearch query into a meaningful string.
  * Only in the case of results exactly totaling the limit, Elastic may or may not still have more results.
  * In this case, a '+' is appended to indicate an approximiation.
@@ -393,19 +412,17 @@ export function filterObject(obj: Object, callback) {
  *
  */
 export function getSubmitType(input: string, configuration: ConfigurationDefinition): string | null {
-  // If we're trying to auto-detect the input type, iterate over file sources
-  if (!input || input === undefined) return null;
-  if (!configuration?.submission?.file_sources) return null;
+  // Return null if the parameters are invalid
+  if (!input || !configuration?.submission?.file_sources) return null;
 
-  let detectedHashType = Object.entries(configuration.submission.file_sources).find(
+  // If we're trying to auto-detect the input type, iterate over file sources
+  const detectedHashType = Object.entries(configuration.submission.file_sources).find(
     ([_, hashProps]) => hashProps && input.match(new RegExp(hashProps?.pattern))
   )?.[0];
 
-  if (!detectedHashType && matchURL(input)) {
-    // Check to see if the input is a valid URL
-    detectedHashType = 'url';
-  }
-  return detectedHashType;
+  if (detectedHashType) return detectedHashType;
+  else if (!detectedHashType && matchURL(input)) return 'url';
+  else return null;
 }
 
 /**
