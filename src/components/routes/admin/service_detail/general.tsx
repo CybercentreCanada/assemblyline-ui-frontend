@@ -14,7 +14,6 @@ import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
-import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceConstants, ServiceDetail } from '../service_detail';

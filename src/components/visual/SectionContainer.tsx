@@ -3,7 +3,6 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import 'moment/locale/fr';
 import React, { useState } from 'react';
 
 const useStyles = makeStyles(theme => ({

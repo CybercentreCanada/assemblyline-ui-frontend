@@ -19,7 +19,6 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Container, Volume } from '../service_detail';
@@ -39,7 +38,15 @@ type EnvironmentProps = {
 
 const DEFAULT_ENV = { name: '', value: '' };
 
-const WrappedEnvironment = ({ envVar, onAdd, onUpdate, onDelete }: EnvironmentProps) => {
+const WrappedEnvironment = ({
+  envVar = null,
+  // eslint-disable-next-line no-console
+  onAdd = value => console.log('ADD', value),
+  // eslint-disable-next-line no-console
+  onUpdate = value => console.log('UPDATE', value),
+  // eslint-disable-next-line no-console
+  onDelete = value => console.log('DELETE', value)
+}: EnvironmentProps) => {
   const { t } = useTranslation(['adminServices']);
   const [tempEnvVar, setTempEnvVar] = useState(DEFAULT_ENV);
   const theme = useTheme();
@@ -136,16 +143,6 @@ const WrappedEnvironment = ({ envVar, onAdd, onUpdate, onDelete }: EnvironmentPr
   );
 };
 
-WrappedEnvironment.defaultProps = {
-  envVar: null,
-  // eslint-disable-next-line no-console
-  onAdd: envVar => console.log('ADD', envVar),
-  // eslint-disable-next-line no-console
-  onUpdate: envVar => console.log('UPDATE', envVar),
-  // eslint-disable-next-line no-console
-  onDelete: envVar => console.log('DELETE', envVar)
-};
-
 const Environment = React.memo(WrappedEnvironment);
 
 type VolumeControlProps = {
@@ -162,7 +159,14 @@ const DEFAULT_VOL: Volume = {
   access_mode: 'ReadWriteOnce'
 };
 
-const WrappedVolumeControl = ({ name, vol, onAdd, onDelete }: VolumeControlProps) => {
+const WrappedVolumeControl = ({
+  name = null,
+  vol = null,
+  // eslint-disable-next-line no-console
+  onAdd = (n, v) => console.log('ADD', n, v),
+  // eslint-disable-next-line no-console
+  onDelete = n => console.log('DELETE', n)
+}: VolumeControlProps) => {
   const { t } = useTranslation(['adminServices']);
   const [tempVol, setTempVol] = useState(DEFAULT_VOL);
   const [tempName, setTempName] = useState('');
@@ -283,15 +287,6 @@ const WrappedVolumeControl = ({ name, vol, onAdd, onDelete }: VolumeControlProps
   );
 };
 
-WrappedVolumeControl.defaultProps = {
-  name: null,
-  vol: null,
-  // eslint-disable-next-line no-console
-  onAdd: (name, vol) => console.log('ADD', name, vol),
-  // eslint-disable-next-line no-console
-  onDelete: name => console.log('DELETE', name)
-};
-
 const VolumeControl = React.memo(WrappedVolumeControl);
 
 const DEFAULT_CONTAINER: Container = {
@@ -323,10 +318,10 @@ type ContainerDialogProps = {
 const WrappedContainerDialog = ({
   open,
   setOpen,
-  container,
+  container = null,
   defaults,
-  name,
-  volumes,
+  name = null,
+  volumes = null,
   onSave
 }: ContainerDialogProps) => {
   const { t } = useTranslation(['adminServices']);
@@ -738,12 +733,6 @@ const WrappedContainerDialog = ({
       </Dialog>
     </div>
   );
-};
-
-WrappedContainerDialog.defaultProps = {
-  container: null,
-  name: null,
-  volumes: null
 };
 
 const ContainerDialog = React.memo(WrappedContainerDialog);

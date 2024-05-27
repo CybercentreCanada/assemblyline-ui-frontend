@@ -167,7 +167,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function Service({ name, onDeleted, onUpdated }: ServiceProps) {
+function Service({ name = null, onDeleted = () => null, onUpdated = () => null }: ServiceProps) {
   const { svc } = useParams<ParamProps>();
   const { t } = useTranslation(['adminServices']);
   const [service, setService] = useState<ServiceDetail>(null);
@@ -454,11 +454,5 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
     </PageCenter>
   );
 }
-
-Service.defaultProps = {
-  name: null,
-  onDeleted: () => null,
-  onUpdated: () => null
-};
 
 export default Service;

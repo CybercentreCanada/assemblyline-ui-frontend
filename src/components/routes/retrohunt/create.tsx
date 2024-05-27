@@ -25,7 +25,6 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { MonacoEditor } from 'components/visual/MonacoEditor';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -70,15 +69,20 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
       creator: '',
       description: '',
       finished: null,
-      indices: 'hot_and_archive',
+      indices: configuration?.datastore?.archive?.enabled ? 'hot_and_archive' : 'hot',
       key: null,
       search_classification: currentUser.classification,
       started_time: null,
       truncated: false,
-      ttl: !configuration.retrohunt.dtl ? 30 : configuration.retrohunt.dtl,
+      ttl: !configuration?.retrohunt?.dtl ? 30 : configuration?.retrohunt?.dtl,
       yara_signature: ''
     }),
-    [c12nDef?.UNRESTRICTED, configuration.retrohunt.dtl, currentUser.classification]
+    [
+      c12nDef?.UNRESTRICTED,
+      configuration?.datastore?.archive?.enabled,
+      configuration?.retrohunt?.dtl,
+      currentUser.classification
+    ]
   );
 
   const [retrohunt, setRetrohunt] = useState<RetrohuntData>(null);
@@ -211,28 +215,35 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
 
             <Grid item>
               <Grid container flexDirection="row" rowGap={2}>
-                <Grid item flexGrow={3}>
-                  <Typography variant="subtitle2">{t('details.search')}</Typography>
-                  <RadioGroup
-                    row
-                    value={retrohunt.indices}
-                    onChange={(_, value: RetrohuntIndex) => handleRetrohuntChange({ indices: value })}
-                  >
-                    <FormControlLabel value="hot" control={<Radio />} label={t('details.hot')} disabled={isDisabled} />
-                    <FormControlLabel
-                      value="archive"
-                      control={<Radio />}
-                      label={t('details.archive')}
-                      disabled={isDisabled}
-                    />
-                    <FormControlLabel
-                      value="hot_and_archive"
-                      control={<Radio />}
-                      label={t('details.hot_and_archive')}
-                      disabled={isDisabled}
-                    />
-                  </RadioGroup>
-                </Grid>
+                {configuration?.datastore?.archive?.enabled && (
+                  <Grid item flexGrow={3}>
+                    <Typography variant="subtitle2">{t('details.search')}</Typography>
+                    <RadioGroup
+                      row
+                      value={retrohunt.indices}
+                      onChange={(_, value: RetrohuntIndex) => handleRetrohuntChange({ indices: value })}
+                    >
+                      <FormControlLabel
+                        value="hot"
+                        control={<Radio />}
+                        label={t('details.hot')}
+                        disabled={isDisabled}
+                      />
+                      <FormControlLabel
+                        value="archive"
+                        control={<Radio />}
+                        label={t('details.archive')}
+                        disabled={isDisabled}
+                      />
+                      <FormControlLabel
+                        value="hot_and_archive"
+                        control={<Radio />}
+                        label={t('details.hot_and_archive')}
+                        disabled={isDisabled}
+                      />
+                    </RadioGroup>
+                  </Grid>
+                )}
                 <Grid item flexGrow={2}>
                   <Typography variant="subtitle2">
                     {`${t('ttl')} (${maxDaysToLive ? `${t('ttl.max')}: ${maxDaysToLive}` : t('ttl.forever')})`}
@@ -300,10 +311,5 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
 }
 
 export const RetrohuntCreate = React.memo(WrappedRetrohuntCreate);
-
-WrappedRetrohuntCreate.defaultProps = {
-  isDrawer: false,
-  retrohuntRef: null
-} as Props;
 
 export default WrappedRetrohuntCreate;

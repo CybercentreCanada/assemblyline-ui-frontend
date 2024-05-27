@@ -36,7 +36,6 @@ import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/sea
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchResultCount from 'components/visual/SearchResultCount';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';

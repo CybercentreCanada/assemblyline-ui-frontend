@@ -4,9 +4,9 @@ import { Checkbox, FormControlLabel, Grid, IconButton, TextField, Typography, us
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
+import Moment from 'components/visual/Moment';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Environment } from '../admin/service_detail';
 import ResetButton from '../admin/service_detail/reset_button';
 
@@ -454,9 +454,7 @@ const WrappedSourceDetail = ({
           <div style={{ textAlign: 'center', paddingTop: theme.spacing(3), flexGrow: 1 }}>
             <Typography variant="subtitle2" color="textSecondary">
               {`${t('update.label.last_successful')}: `}
-              <Moment fromNow locale={i18n.language}>
-                {source.status.last_successful_update}
-              </Moment>
+              <Moment variant="fromNow">{source.status.last_successful_update}</Moment>
             </Typography>
             <Typography variant="subtitle2" color="textSecondary">
               {`${t('update.label.status')}: ${source.status.message}`}

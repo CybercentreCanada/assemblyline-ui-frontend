@@ -5,11 +5,11 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  Unstable_Grid2 as Grid,
   Radio,
   RadioGroup,
   TextField,
   Typography,
-  Unstable_Grid2 as Grid,
   useTheme
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -23,7 +23,6 @@ import Classification from 'components/visual/Classification';
 import DatePicker from 'components/visual/DatePicker';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 
-import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -128,7 +127,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const BadlistNew = () => {
+type Props = {
+  badlist_id?: string;
+  close?: () => void;
+};
+
+// eslint-disable-next-line no-empty-pattern
+const BadlistNew = ({}: Props) => {
   const { t } = useTranslation(['manageBadlistAdd']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -479,6 +484,7 @@ const BadlistNew = () => {
                     date={badlist.expiry_ts}
                     setDate={date => setBadlist({ ...badlist, expiry_ts: date })}
                     type="input"
+                    minDateTomorrow
                   />
                 </FormControl>
               </Grid>
@@ -502,7 +508,13 @@ const BadlistNew = () => {
                       renderInput={params => <TextField {...params} />}
                       renderTags={(value, getTagProps) =>
                         value.map((option, index) => (
-                          <Chip size="small" variant="outlined" label={option} {...getTagProps({ index })} />
+                          <Chip
+                            key={index}
+                            size="small"
+                            variant="outlined"
+                            label={option}
+                            {...getTagProps({ index })}
+                          />
                         ))
                       }
                       onChange={(_, value) =>
@@ -526,11 +538,6 @@ const BadlistNew = () => {
   ) : (
     <ForbiddenPage />
   );
-};
-
-BadlistNew.defaultProps = {
-  badlist_id: null,
-  close: () => {}
 };
 
 export default BadlistNew;
