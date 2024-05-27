@@ -510,6 +510,7 @@ const SafelistNew = () => {
                     date={safelist.expiry_ts}
                     setDate={date => setSafelist({ ...safelist, expiry_ts: date })}
                     type="input"
+                    minDateTomorrow
                   />
                 </FormControl>
               </Grid>

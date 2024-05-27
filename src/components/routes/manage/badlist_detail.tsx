@@ -694,6 +694,7 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                       setDate={handleExpiryDateChange}
                       tooltip={t('expiry.change')}
                       defaultDateOffset={1}
+                      minDateTomorrow
                     />
                   ) : (
                     <Skeleton
