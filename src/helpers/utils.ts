@@ -1,3 +1,4 @@
+import { ConfigurationDefinition } from 'components/hooks/useMyUser';
 import { PossibleColors } from 'components/visual/CustomChip';
 
 /**
@@ -47,6 +48,23 @@ export function getFileName(disposition: string): string {
     }
   }
   return fileName;
+}
+
+/**
+ *
+ * Convert a given second to human readable form
+ *
+ * @param seconds - seconds to convert
+ *
+ * @returns Human readable string
+ *
+ */
+export function humanSeconds(seconds: number, t) {
+  if (seconds < 1) {
+    return Math.floor(seconds * 1000) + ' ' + t('milliseconds');
+  } else {
+    return seconds.toFixed(1) + ' ' + t('seconds');
+  }
 }
 
 /**
@@ -111,7 +129,7 @@ export function humanReadableNumber(num: number | null) {
  */
 export function resetFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
-  favicon.href = `${process.env.PUBLIC_URL}/favicon.ico`;
+  favicon.href = `/favicon.ico`;
 }
 
 /**
@@ -123,7 +141,7 @@ export function resetFavicon() {
  */
 export function setNotifyFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
-  favicon.href = `${process.env.PUBLIC_URL}/favicon_done.ico`;
+  favicon.href = `/favicon_done.ico`;
 }
 
 /**
@@ -221,7 +239,7 @@ export function priorityText(priority: number | null) {
  * @returns value from path
  *
  */
-export function getValueFromPath(obj: object, path: string) {
+export function getValueFromPath(obj: object, path: string): undefined | string | object {
   if (path === undefined || path === null) {
     return undefined;
   }
@@ -246,11 +264,30 @@ export function getValueFromPath(obj: object, path: string) {
  *
  */
 export function getProvider() {
-  if (window.location.pathname.indexOf(`${process.env.PUBLIC_URL}/oauth/`) !== -1) {
-    return window.location.pathname.split(`${process.env.PUBLIC_URL}/oauth/`).pop().slice(0, -1);
+  if (window.location.pathname.indexOf(`/oauth/`) !== -1) {
+    return window.location.pathname.split(`/oauth/`).pop().slice(0, -1);
   }
   const params = new URLSearchParams(window.location.search);
   return params.get('provider');
+}
+
+/**
+ *
+ * Check if we are receiving a SAML sign-in message
+ *
+ * @returns oauth provider
+ *
+ */
+export function getSAMLData() {
+  if (window.location.pathname.indexOf('/saml/') !== -1) {
+    const params = new URLSearchParams(window.location.search);
+    const data = params.get('data');
+    if (data !== null || data !== undefined) {
+      return JSON.parse(atob(data).toString());
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -364,3 +401,40 @@ export function matchURL(data: string): RegExpExecArray | null {
 export function filterObject(obj: Object, callback) {
   return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
 }
+
+/**
+ *
+ * A function that determines the submittable type of the input string, if any.
+ *
+ * @param input - value to check
+ *
+ * @returns type as string or NULL
+ *
+ */
+export function getSubmitType(input: string, configuration: ConfigurationDefinition): string | null {
+  // Return null if the parameters are invalid
+  if (!input || !configuration?.submission?.file_sources) return null;
+
+  // If we're trying to auto-detect the input type, iterate over file sources
+  const detectedHashType = Object.entries(configuration.submission.file_sources).find(
+    ([_, hashProps]) => hashProps && input.match(new RegExp(hashProps?.pattern))
+  )?.[0];
+
+  if (detectedHashType) return detectedHashType;
+  else if (!detectedHashType && matchURL(input)) return 'url';
+  else return null;
+}
+
+/**
+ *
+ * Sum all the values of an object
+ *
+ * @param obj an object of values to be added together
+ *
+ * @returns type as number
+ *
+ */
+type ObjectOfInts = {
+  [name: string]: number;
+};
+export const sumValues = (obj: ObjectOfInts) => Object.values(obj).reduce((a, b) => a + b, 0);

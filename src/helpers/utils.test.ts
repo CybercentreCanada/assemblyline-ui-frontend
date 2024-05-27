@@ -1,8 +1,9 @@
-import { describe, expect, it } from '@jest/globals';
+import { ConfigurationDefinition } from 'components/hooks/useMyUser';
 import {
   bytesToSize,
   getFileName,
   getProvider,
+  getSubmitType,
   getValueFromPath,
   getVersionQuery,
   humanReadableNumber,
@@ -19,6 +20,7 @@ import {
   verdictRank,
   verdictToColor
 } from 'helpers/utils';
+import { describe, expect, it } from 'vitest';
 
 describe('Test `toTitleCase`', () => {
   it('Should split on whitespace and underscores', () => {
@@ -220,7 +222,7 @@ describe('Test `humanReadableNumber`', () => {
 describe('Test `resetFavicon`', () => {
   it('Should set favicon path to default', () => {
     const initial = 'https://not.the.default.url/favicon.ico';
-    const defaultURL = process.env.PUBLIC_URL;
+    const defaultURL = '';
 
     let favicon = document.getElementById('favicon');
     if (!favicon) {
@@ -241,7 +243,7 @@ describe('Test `resetFavicon`', () => {
 describe('Test `setNotifyFavicon`', () => {
   it('Should set favicon path to the notify/done icon', () => {
     const initial = 'https://not.the.default.url/favicon_done.ico';
-    const defaultURL = process.env.PUBLIC_URL;
+    const defaultURL = '';
 
     let favicon = document.getElementById('favicon');
     if (!favicon) {
@@ -349,7 +351,7 @@ describe('Test `getProvider`', () => {
   it('Should return correct provider info if pathname provides oauth', () => {
     const location = {
       ...window.location,
-      pathname: `${process.env.PUBLIC_URL}/oauth/oauthProvider/`
+      pathname: `${'/'}/oauth/oauthProvider/`
     };
     Object.defineProperty(window, 'location', {
       writable: true,
@@ -363,7 +365,7 @@ describe('Test `getProvider`', () => {
     const location = {
       ...window.location,
       search: '?provider=otherProvider',
-      pathname: `${process.env.PUBLIC_URL}/notoauth/`
+      pathname: `${'/'}/notoauth/`
     };
     Object.defineProperty(window, 'location', {
       writable: true,
@@ -376,7 +378,7 @@ describe('Test `getProvider`', () => {
   it('Will always trim last character from oauth pathname ', () => {
     const location = {
       ...window.location,
-      pathname: `${process.env.PUBLIC_URL}/oauth/oauthProvider`
+      pathname: `${'/'}/oauth/oauthProvider`
     };
     Object.defineProperty(window, 'location', {
       writable: true,
@@ -555,5 +557,116 @@ describe('Test `matchURL`', () => {
     // expect(matchURL('hxxp://blah.com')).toBe(null);
     // expect(matchURL('http://1.1.1.1:123:123')).toBe(null);
     // expect(matchURL('http://blah.com:abc')).toBe(null);
+  });
+});
+
+describe('Test `getSubmitType`', () => {
+  it('Should return null', () => {
+    expect(getSubmitType(undefined, undefined)).toBe(null);
+    expect(getSubmitType(null, null)).toBe(null);
+  });
+
+  const configuration: ConfigurationDefinition = {
+    auth: {
+      allow_2fa: false,
+      allow_apikeys: false,
+      allow_extended_apikeys: false,
+      allow_security_tokens: false
+    },
+    core: {
+      archiver: {
+        alternate_dtl: 0,
+        metadata: {},
+        use_metadata: false
+      }
+    },
+    datastore: {
+      archive: {
+        enabled: false
+      }
+    },
+    retrohunt: {
+      enabled: false,
+      dtl: 0,
+      max_dtl: 0
+    },
+    submission: {
+      file_sources: {
+        md5: { pattern: '^[a-f0-9]{32}$', sources: [], auto_selected: null },
+        sha1: { pattern: '^[a-f0-9]{40}$', sources: [], auto_selected: null },
+        sha256: { pattern: '^[a-f0-9]{64}$', sources: [], auto_selected: null }
+      },
+      dtl: 0,
+      max_dtl: 0,
+      verdicts: {
+        info: 0,
+        suspicious: 0,
+        highly_suspicious: 0,
+        malicious: 0
+      }
+    },
+    system: {
+      organisation: '',
+      type: '',
+      version: ''
+    },
+    ui: {
+      ai: {
+        enabled: false
+      },
+      alerting_meta: {
+        important: [],
+        subject: [],
+        url: []
+      },
+      allow_malicious_hinting: false,
+      allow_raw_downloads: false,
+      allow_replay: false,
+      allow_url_submissions: false,
+      allow_zip_downloads: false,
+      apps: [],
+      banner: {},
+      banner_level: 'info',
+      external_links: {
+        tag: {},
+        hash: {},
+        metadata: {}
+      },
+      external_sources: [],
+      external_source_tags: {},
+      fqdn: '',
+      read_only: false,
+      rss_feeds: [],
+      services_feed: '',
+      community_feed: '',
+      tos: false,
+      tos_lockout: false,
+      tos_lockout_notify: false,
+      url_submission_auto_service_selection: []
+    },
+    user: {
+      api_priv_map: {},
+      priv_role_dependencies: {},
+      roles: [],
+      role_dependencies: {},
+      types: []
+    }
+  };
+
+  it('Should not match the input string with any type', () => {
+    expect(getSubmitType('', configuration)).toBe(null);
+    expect(getSubmitType('test', configuration)).toBe(null);
+    expect(getSubmitType('qwerty1234567890qwerty1234567890', configuration)).toBe(null);
+    expect(getSubmitType('qwerty1234567890qwerty1234567890qwerty12', configuration)).toBe(null);
+    expect(getSubmitType('qwerty1234567890qwerty1234567890qwerty1234567890qwerty1234567890', configuration)).toBe(null);
+  });
+
+  it('Should match the input string with its corresponding type', () => {
+    expect(getSubmitType('abcdef1234567890abcdef1234567890', configuration)).toBe('md5');
+    expect(getSubmitType('abcdef1234567890abcdef1234567890abcdef12', configuration)).toBe('sha1');
+    expect(getSubmitType('abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', configuration)).toBe(
+      'sha256'
+    );
+    expect(getSubmitType('http://blah.com', configuration)).toBe('url');
   });
 });

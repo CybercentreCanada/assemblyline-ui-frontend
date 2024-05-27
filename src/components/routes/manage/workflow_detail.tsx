@@ -36,12 +36,11 @@ import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
+import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import AlertsTable from 'components/visual/SearchResult/alerts';
-import 'moment/locale/fr';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -106,7 +105,7 @@ const useStyles = makeStyles(theme => ({
 
 const THROTTLER = new Throttler(250);
 
-const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailProps) => {
+const WrappedWorkflowDetail = ({ workflow_id = null, close = () => null, mode = 'read' }: WorkflowDetailProps) => {
   const { t, i18n } = useTranslation(['manageWorkflowDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -123,7 +122,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
   const [disableDialog, setDisableDialog] = useState(false);
   const [enableDialog, setEnableDialog] = useState(false);
   const [viewMode, setViewMode] = useState(mode);
-  const [workflowID, setWorkflowID] = useState(workflow_id || id);
+  const [workflowID, setWorkflowID] = useState(null);
   const { c12nDef, configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -197,7 +196,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workflow_id, id]);
+  }, [workflowID, id]);
 
   const handleNameChange = event => {
     setModified(true);
@@ -325,6 +324,13 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
     });
   };
 
+  useEffect(() => {
+    setWorkflowID(workflow_id || id);
+    return () => {
+      setWorkflowID(null);
+    };
+  }, [id, workflow_id]);
+
   return currentUser.roles.includes('workflow_view') ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">
       <ConfirmationDialog
@@ -380,57 +386,63 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 currentUser.roles.includes('workflow_view') &&
                 (workflow ? (
                   <Tooltip title={t('usage')}>
-                    <IconButton
-                      component={Link}
-                      style={{ color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.action.active }}
-                      to={`/alerts/?q=events.entity_id:${workflowID}`}
-                      size="large"
-                      disabled={viewMode !== 'read'}
-                    >
-                      <YoutubeSearchedForIcon />
-                    </IconButton>
+                    <div>
+                      <IconButton
+                        component={Link}
+                        style={{
+                          color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.action.active
+                        }}
+                        to={`/alerts/?q=events.entity_id:${workflowID}`}
+                        size="large"
+                        disabled={viewMode !== 'read'}
+                      >
+                        <YoutubeSearchedForIcon />
+                      </IconButton>
+                    </div>
                   </Tooltip>
                 ) : null)}
               {workflowID &&
                 currentUser.roles.includes('workflow_manage') &&
                 (workflow ? (
                   <Tooltip title={t('duplicate')}>
-                    <IconButton
-                      style={{
-                        color:
-                          viewMode !== 'read'
-                            ? theme.palette.text.disabled
-                            : theme.palette.mode === 'dark'
-                            ? theme.palette.success.light
-                            : theme.palette.success.dark
-                      }}
-                      onClick={() => {
-                        // Switch to write mode
-                        setViewMode('write');
-                        setTimeout(() => {
-                          inputRef.current.focus();
-                        }, 250);
+                    <div>
+                      <IconButton
+                        style={{
+                          color:
+                            viewMode !== 'read'
+                              ? theme.palette.text.disabled
+                              : theme.palette.mode === 'dark'
+                              ? theme.palette.success.light
+                              : theme.palette.success.dark
+                        }}
+                        onClick={() => {
+                          // Switch to write mode
+                          setViewMode('write');
+                          setTimeout(() => {
+                            inputRef.current.focus();
+                          }, 250);
 
-                        // Keep properties of workflow that are important
-                        var keptProperties = {
-                          classification: workflow.classification,
-                          enabled: workflow.enabled,
-                          labels: workflow.labels,
-                          priority: workflow.priority,
-                          query: workflow.query,
-                          status: workflow.status
-                        };
+                          // Keep properties of workflow that are important
+                          var keptProperties = {
+                            classification: workflow.classification,
+                            enabled: workflow.enabled,
+                            labels: workflow.labels,
+                            priority: workflow.priority,
+                            query: workflow.query,
+                            status: workflow.status
+                          };
 
-                        // Apply important properties on top of default workflow template
-                        setWorkflow({ ...DEFAULT_WORKFLOW, ...keptProperties });
-                        setWorkflowID(null);
-                        setModified(true);
-                      }}
-                      size="large"
-                      disabled={viewMode !== 'read'}
-                    >
-                      <ControlPointDuplicateOutlinedIcon />
-                    </IconButton>
+                          // Apply important properties on top of default workflow template
+                          setWorkflow({ ...DEFAULT_WORKFLOW, ...keptProperties });
+                          setWorkflowID(null);
+                          setModified(true);
+                        }}
+                        size="large"
+                        disabled={viewMode !== 'read'}
+                      >
+                        <ControlPointDuplicateOutlinedIcon />
+                      </IconButton>
+                    </div>
                   </Tooltip>
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
@@ -489,16 +501,18 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 currentUser.roles.includes('workflow_manage') &&
                 (workflow ? (
                   <Tooltip title={workflow.enabled ? t('enabled') : t('disabled')}>
-                    <IconButton
-                      style={{
-                        color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.text.primary
-                      }}
-                      onClick={workflow.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
-                      size="large"
-                      disabled={viewMode !== 'read'}
-                    >
-                      {workflow.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
-                    </IconButton>
+                    <div>
+                      <IconButton
+                        style={{
+                          color: viewMode !== 'read' ? theme.palette.text.disabled : theme.palette.text.primary
+                        }}
+                        onClick={workflow.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
+                        size="large"
+                        disabled={viewMode !== 'read'}
+                      >
+                        {workflow.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+                      </IconButton>
+                    </div>
                   </Tooltip>
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
@@ -507,21 +521,23 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 currentUser.roles.includes('workflow_manage') &&
                 (workflow ? (
                   <Tooltip title={t('remove')}>
-                    <IconButton
-                      style={{
-                        color:
-                          viewMode !== 'read'
-                            ? theme.palette.text.disabled
-                            : theme.palette.mode === 'dark'
-                            ? theme.palette.error.light
-                            : theme.palette.error.dark
-                      }}
-                      onClick={() => setDeleteDialog(true)}
-                      size="large"
-                      disabled={viewMode !== 'read'}
-                    >
-                      <RemoveCircleOutlineOutlinedIcon />
-                    </IconButton>
+                    <div>
+                      <IconButton
+                        style={{
+                          color:
+                            viewMode !== 'read'
+                              ? theme.palette.text.disabled
+                              : theme.palette.mode === 'dark'
+                              ? theme.palette.error.light
+                              : theme.palette.error.dark
+                        }}
+                        onClick={() => setDeleteDialog(true)}
+                        size="large"
+                        disabled={viewMode !== 'read'}
+                      >
+                        <RemoveCircleOutlineOutlinedIcon />
+                      </IconButton>
+                    </div>
                   </Tooltip>
                 ) : (
                   <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
@@ -574,8 +590,11 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                 options={DEFAULT_LABELS}
                 value={workflow.labels}
                 renderInput={params => <TextField {...params} variant="outlined" />}
-                onChange={(event, value) => handleLabelsChange(value as string[])}
+                onChange={(event, value) => handleLabelsChange(value.map(v => v.toUpperCase()) as string[])}
                 disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
+                isOptionEqualToValue={(option, value) => {
+                  return option.toUpperCase() === value.toUpperCase();
+                }}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -695,9 +714,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                   </Grid>
                   <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.first_seen ? (
-                      <Moment fromNow locale={i18n.language}>
-                        {workflow.first_seen}
-                      </Moment>
+                      <Moment variant="fromNow">{workflow.first_seen}</Moment>
                     ) : (
                       t('hit.none')
                     )}
@@ -707,9 +724,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                   </Grid>
                   <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.last_seen ? (
-                      <Moment fromNow locale={i18n.language}>
-                        {workflow.last_seen}
-                      </Moment>
+                      <Moment variant="fromNow">{workflow.last_seen}</Moment>
                     ) : (
                       t('hit.none')
                     )}
@@ -727,11 +742,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                   <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.creator ? (
                       <>
-                        {workflow.creator} [
-                        <Moment fromNow locale={i18n.language}>
-                          {workflow.creation_date}
-                        </Moment>
-                        ]
+                        {workflow.creator} [<Moment variant="fromNow">{workflow.creation_date}</Moment>]
                       </>
                     ) : (
                       <Skeleton />
@@ -743,11 +754,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                   <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.edited_by ? (
                       <>
-                        {workflow.edited_by} [
-                        <Moment fromNow locale={i18n.language}>
-                          {workflow.last_edit}
-                        </Moment>
-                        ]
+                        {workflow.edited_by} [<Moment variant="fromNow">{workflow.last_edit}</Moment>]
                       </>
                     ) : (
                       <Skeleton />
@@ -782,11 +789,6 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
   ) : (
     <ForbiddenPage />
   );
-};
-
-WrappedWorkflowDetail.defaultProps = {
-  workflow_id: null,
-  close: () => {}
 };
 
 const WorkflowDetail = React.memo(WrappedWorkflowDetail);

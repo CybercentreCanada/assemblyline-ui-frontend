@@ -12,6 +12,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ArcGauge from 'components/visual/ArcGauge';
 import CustomChip from 'components/visual/CustomChip';
+import { bytesToSize, humanSeconds, sumValues } from 'helpers/utils';
 import React, { useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import io from 'socket.io-client';
@@ -620,7 +621,9 @@ const WrappedExpiryCard = ({ expiry }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    if ((timer !== null && expiry.initialized) || (timer === null && !expiry.initialized)) {
+    if (expiry.initialized && sumValues(expiry.queues) > 0 && sumValues(expiry.metrics) === 0) {
+      setError(t('expiry.error.not_expiring'));
+    } else if ((timer !== null && expiry.initialized) || (timer === null && !expiry.initialized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
       setTimer(
@@ -680,6 +683,18 @@ const WrappedExpiryCard = ({ expiry }) => {
               title="S"
               tooltip={t('queues.submission')}
             />
+            <MetricCounter
+              init={expiry.initialized}
+              value={expiry.queues.badlist}
+              title="B"
+              tooltip={t('queues.badlist')}
+            />
+            <MetricCounter
+              init={expiry.initialized}
+              value={expiry.queues.safelist}
+              title="S"
+              tooltip={t('queues.safelist')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -716,6 +731,18 @@ const WrappedExpiryCard = ({ expiry }) => {
               value={expiry.metrics.submission + expiry.metrics.submission_summary + expiry.metrics.submission_tree}
               title="S"
               tooltip={t('expired.submission')}
+            />
+            <MetricCounter
+              init={expiry.initialized}
+              value={expiry.metrics.badlist}
+              title="B"
+              tooltip={t('expired.badlist')}
+            />
+            <MetricCounter
+              init={expiry.initialized}
+              value={expiry.metrics.safelist}
+              title="S"
+              tooltip={t('expired.safelist')}
             />
           </div>
         </Grid>
@@ -942,6 +969,194 @@ const WrappedServiceCard = ({ service, max_inflight }) => {
   );
 };
 
+const WARN_SHARD_SIZE = 40_000_000_000;
+
+const WrappedElasticCard = ({ elastic }) => {
+  const { t } = useTranslation(['dashboard']);
+  const [timer, setTimer] = useState(null);
+  const [error, setError] = useState(null);
+  const classes = useStyles();
+
+  let largestIndex = null;
+  let shardSize = null;
+  if (elastic.shard_sizes.length > 0) {
+    let row = elastic.shard_sizes.reduce((a, b) => (a.shard_size > b.shard_size ? a : b));
+    largestIndex = row.name;
+    shardSize = row.shard_size;
+  }
+
+  useEffect(() => {
+    if (elastic.initialized && elastic.instances === 0) {
+      setError(t('elasticsearch.error.none'));
+    } else if (elastic.initialized && elastic.request_time > 0.1) {
+      setError(t('elasticsearch.error.slow'));
+    } else if (elastic.initialized && elastic.unassigned_shards > 0) {
+      setError(t('elasticsearch.error.unassigned'));
+    } else if (elastic.initialized && shardSize > WARN_SHARD_SIZE) {
+      setError(t('elasticsearch.error.shard_size'));
+    } else if ((timer !== null && elastic.initialized) || (timer === null && !elastic.initialized)) {
+      if (error !== null) setError(null);
+      if (timer !== null) clearTimeout(timer);
+      setTimer(
+        setTimeout(() => {
+          setError(t('timeout'));
+        }, 10000)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [elastic]);
+
+  return (
+    <Card className={`${classes.core_card} ${error || elastic.error ? classes.error : classes.ok}`}>
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          {(error || elastic.error) && (
+            <Tooltip title={error || elastic.error}>
+              <div className={classes.error_icon}>
+                <ErrorOutlineOutlinedIcon />
+              </div>
+            </Tooltip>
+          )}
+          <div className={classes.title}>{`${t('elasticsearch')} :: x${elastic.instances}`}</div>
+        </Grid>
+        <Grid item xs={12}>
+          <MetricCounter
+            init={elastic.initialized}
+            value={humanSeconds(elastic.request_time, t)}
+            title="P"
+            tooltip={t('elasticsearch.ping')}
+          />
+          <MetricCounter
+            init={elastic.initialized}
+            value={elastic.unassigned_shards}
+            title="U"
+            tooltip={t('elasticsearch.unassigned')}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <div>
+            <label>{t('big_index')}</label>
+          </div>
+          <MetricCounter
+            init={elastic.initialized}
+            value={largestIndex}
+            title="I"
+            tooltip={t('elasticsearch.shard.index')}
+          />
+          <MetricCounter
+            init={elastic.initialized}
+            value={bytesToSize(shardSize)}
+            title="S"
+            tooltip={t('elasticsearch.shard.size')}
+          />
+        </Grid>
+      </Grid>
+    </Card>
+  );
+};
+
+const WARN_RETROHUNT_STORAGE = 10_000_000_000;
+
+const WrappedRetrohuntCard = ({ retrohunt }) => {
+  const { t } = useTranslation(['dashboard']);
+  const [timer, setTimer] = useState(null);
+  const [error, setError] = useState(null);
+  const classes = useStyles();
+
+  let pendingFiles = retrohunt.pending_files;
+  if (pendingFiles === 1_000_000) {
+    pendingFiles = pendingFiles.toString() + '+';
+  }
+
+  useEffect(() => {
+    if (retrohunt.initialized && retrohunt.instances === 0) {
+      setError(t('retrohunt.error.none'));
+    } else if (retrohunt.initialized && retrohunt.worker_storage_available < WARN_RETROHUNT_STORAGE) {
+      setError(t('retrohunt.error.storage'));
+    } else if ((timer !== null && retrohunt.initialized) || (timer === null && !retrohunt.initialized)) {
+      if (error !== null) setError(null);
+      if (timer !== null) clearTimeout(timer);
+      setTimer(
+        setTimeout(() => {
+          setError(t('timeout'));
+        }, 10000)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [retrohunt]);
+
+  return (
+    <Card className={`${classes.core_card} ${error || retrohunt.error ? classes.error : classes.ok}`}>
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          {(error || retrohunt.error) && (
+            <Tooltip title={error || retrohunt.error}>
+              <div className={classes.error_icon}>
+                <ErrorOutlineOutlinedIcon />
+              </div>
+            </Tooltip>
+          )}
+          <div className={classes.title}>{`${t('retrohunt')} :: x${retrohunt.instances}`}</div>
+        </Grid>
+        <Grid item xs={12}>
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={humanSeconds(retrohunt.request_time, t)}
+            title="P"
+            tooltip={t('retrohunt.request_time')}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <div>
+            <label>{t('retrohunt.label.stats')}</label>
+          </div>
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={retrohunt.active_searches}
+            title="A"
+            tooltip={t('retrohunt.active_searches')}
+          />
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={pendingFiles}
+            title="F"
+            tooltip={t('retrohunt.pending_files')}
+          />
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={retrohunt.ingested_last_minute}
+            title="I"
+            tooltip={t('retrohunt.ingested')}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <div>
+            <label>{t('retrohunt.label.worker')}</label>
+          </div>
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={retrohunt.last_minute_cpu.toFixed(1)}
+            title="C"
+            tooltip={t('retrohunt.cpu_minute')}
+          />
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={bytesToSize(retrohunt.total_memory_used)}
+            title="M"
+            tooltip={t('retrohunt.memory')}
+          />
+          <MetricCounter
+            init={retrohunt.initialized}
+            value={bytesToSize(retrohunt.worker_storage_available)}
+            title="S"
+            tooltip={t('retrohunt.worker_storage')}
+          />
+        </Grid>
+      </Grid>
+    </Card>
+  );
+};
+
 const IngestCard = React.memo(WrappedIngestCard);
 const DispatcherCard = React.memo(WrappedDispatcherCard);
 const ExpiryCard = React.memo(WrappedExpiryCard);
@@ -949,6 +1164,8 @@ const ArchiveCard = React.memo(WrappedArchiveCard);
 const AlerterCard = React.memo(WrappedAlerterCard);
 const ScalerResourcesCard = React.memo(WrappedScalerResourcesCard);
 const ServiceCard = React.memo(WrappedServiceCard);
+const ElasticCard = React.memo(WrappedElasticCard);
+const RetrohuntCard = React.memo(WrappedRetrohuntCard);
 
 const basicReducer = (state, newState) => ({ ...state, ...newState });
 
@@ -1052,36 +1269,28 @@ const DEFAULT_EXPIRY = {
   instances: 0,
   queues: {
     alert: 0,
+    badlist: 0,
     cached_file: 0,
     emptyresult: 0,
     error: 0,
     file: 0,
     filescore: 0,
     result: 0,
+    safelist: 0,
     submission: 0,
     submission_tree: 0,
     submission_summary: 0
   },
   metrics: {
     alert: 0,
+    badlist: 0,
     cached_file: 0,
     emptyresult: 0,
     error: 0,
     file: 0,
     filescore: 0,
     result: 0,
-    submission: 0,
-    submission_tree: 0,
-    submission_summary: 0
-  },
-  archive: {
-    alert: 0,
-    cached_file: 0,
-    emptyresult: 0,
-    error: 0,
-    file: 0,
-    filescore: 0,
-    result: 0,
+    safelist: 0,
     submission: 0,
     submission_tree: 0,
     submission_summary: 0
@@ -1184,6 +1393,29 @@ const DEFAULT_SERVICE_LIST = {
   timing: {}
 };
 
+const DEFAULT_ELASTIC = {
+  instances: 0,
+  request_time: 0,
+  unassigned_shards: 0,
+  shard_sizes: {},
+  error: null,
+  initialized: false
+};
+
+const DEFAULT_RETROHUNT = {
+  instances: 0,
+  request_time: 0,
+  pending_files: 0,
+  ingested_last_minute: 0,
+  worker_storage_available: 0,
+  total_storage_available: 0,
+  active_searches: 0,
+  last_minute_cpu: 0,
+  total_memory_used: 0,
+  error: null,
+  initialized: false
+};
+
 const Dashboard = () => {
   const { t } = useTranslation(['dashboard']);
   const [alerter, setAlerter] = useReducer(basicReducer, DEFAULT_ALERTER);
@@ -1192,6 +1424,8 @@ const Dashboard = () => {
   const [expiry, setExpiry] = useReducer(basicReducer, DEFAULT_EXPIRY);
   const [ingester, setIngester] = useReducer(basicReducer, DEFAULT_INGESTER);
   const [scaler, setScaler] = useReducer(basicReducer, DEFAULT_SCALER);
+  const [elastic, setElastic] = useReducer(basicReducer, DEFAULT_ELASTIC);
+  const [retrohunt, setRetrohunt] = useReducer(basicReducer, DEFAULT_RETROHUNT);
   const [services, setServices] = useReducer(serviceReducer, {});
   const [servicesList, setServicesList] = useReducer(serviceListReducer, DEFAULT_SERVICE_LIST);
 
@@ -1280,6 +1514,18 @@ const Dashboard = () => {
     setScaler({ ...hb, initialized: true });
   };
 
+  const handleElasticHeartbeat = hb => {
+    // eslint-disable-next-line no-console
+    console.debug('Socket-IO :: ElasticHeartbeat', hb);
+    setElastic({ ...hb, initialized: true });
+  };
+
+  const handleRetrohuntHeartbeat = hb => {
+    // eslint-disable-next-line no-console
+    console.debug('Socket-IO :: RetrohuntHeartbeat', hb);
+    setRetrohunt({ ...hb, initialized: true });
+  };
+
   const handleServiceHeartbeat = hb => {
     // eslint-disable-next-line no-console
     console.debug(`Socket-IO :: ServiceHeartbeat ${hb.service_name}`, hb);
@@ -1317,6 +1563,8 @@ const Dashboard = () => {
     socket.on('ScalerHeartbeat', handleScalerHeartbeat);
     socket.on('ScalerStatusHeartbeat', handleScalerStatusHeartbeat);
     socket.on('ServiceHeartbeat', handleServiceHeartbeat);
+    socket.on('ElasticHeartbeat', handleElasticHeartbeat);
+    socket.on('RetrohuntHeartbeat', handleRetrohuntHeartbeat);
 
     return () => {
       socket.disconnect();
@@ -1343,20 +1591,61 @@ const Dashboard = () => {
         </Grid>
         <Grid
           item
-          xs={configuration.datastore.archive.enabled ? 6 : 12}
-          xl={configuration.datastore.archive.enabled ? 3 : 4}
+          xs={12}
+          md={6}
+          xl={
+            configuration.datastore.archive.enabled && configuration.retrohunt.enabled
+              ? 4
+              : !configuration.datastore.archive.enabled && !configuration.retrohunt.enabled
+              ? 3
+              : 6
+          }
         >
           <ExpiryCard expiry={expiry} />
         </Grid>
         {configuration.datastore.archive.enabled && (
-          <Grid item xs={6} xl={3}>
+          <Grid item xs={12} md={6} xl={configuration.retrohunt.enabled ? 4 : 6}>
             <ArchiveCard archive={archive} />
           </Grid>
         )}
-        <Grid item xs={12} md={8} xl={configuration.datastore.archive.enabled ? 3 : 4}>
+        {configuration.retrohunt.enabled && (
+          <Grid key="retrohunt" item xs={12} md={6} xl={configuration.datastore.archive.enabled ? 4 : 6}>
+            <RetrohuntCard retrohunt={retrohunt} />
+          </Grid>
+        )}
+        <Grid
+          key="elastic"
+          item
+          xs={12}
+          md={
+            (!configuration.datastore.archive.enabled && configuration.retrohunt.enabled) ||
+            (configuration.datastore.archive.enabled && !configuration.retrohunt.enabled)
+              ? 4
+              : 6
+          }
+          xl={!configuration.datastore.archive.enabled && !configuration.retrohunt.enabled ? 3 : 4}
+        >
+          <ElasticCard elastic={elastic} />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          md={
+            (!configuration.datastore.archive.enabled && configuration.retrohunt.enabled) ||
+            (configuration.datastore.archive.enabled && !configuration.retrohunt.enabled)
+              ? 4
+              : 8
+          }
+          xl={!configuration.datastore.archive.enabled && !configuration.retrohunt.enabled ? 3 : 4}
+        >
           <AlerterCard alerter={alerter} />
         </Grid>
-        <Grid item xs={12} md={4} xl={configuration.datastore.archive.enabled ? 3 : 4}>
+        <Grid
+          item
+          xs={12}
+          md={4}
+          xl={!configuration.datastore.archive.enabled && !configuration.retrohunt.enabled ? 3 : 4}
+        >
           <ScalerResourcesCard scaler={scaler} />
         </Grid>
         {Object.keys(services)

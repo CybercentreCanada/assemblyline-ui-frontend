@@ -4,6 +4,7 @@ import {
   Divider,
   Fade,
   IconButton,
+  LinearProgress,
   List,
   ListItem,
   ListItemIcon,
@@ -17,12 +18,13 @@ import {
   useTheme
 } from '@mui/material';
 import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
-import useUser from 'commons/components/app/hooks/useAppUser';
 import ThemeSelection from 'commons/components/topnav/ThemeSelection';
+import useALContext from 'components/hooks/useALContext';
+import useQuota from 'components/hooks/useQuota';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { AppBarUserMenuElement } from '../app/AppConfigs';
+import type { AppBarUserMenuElement } from '../app/AppConfigs';
 import AppAvatar from '../display/AppAvatar';
 
 export const AppUserAvatar = styled(AppAvatar)(({ theme }) => ({
@@ -40,8 +42,9 @@ const UserProfile = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const configs = useAppConfigs();
-  const { user } = useUser();
+  const { user, configuration } = useALContext();
   const anchorRef = useRef();
+  const { apiQuotaRemaining, submissionQuotaRemaining } = useQuota();
   const [open, setOpen] = useState<boolean>(false);
   const onProfileClick = useCallback(() => setOpen(_open => !_open), []);
   const onClickAway = useCallback(() => setOpen(false), []);
@@ -62,6 +65,52 @@ const UserProfile = () => {
     },
     [configs.allowPersonalization, configs.preferences.allowTranslate, configs.preferences.allowReset]
   );
+
+  const renderQuotas = useCallback(() => {
+    const useAPIPercent = ((user.api_daily_quota - apiQuotaRemaining) / user.api_daily_quota) * 100;
+    const useSubmissionPercent =
+      ((user.submission_daily_quota - submissionQuotaRemaining) / user.submission_daily_quota) * 100;
+
+    if (
+      (user.api_daily_quota !== 0 && apiQuotaRemaining !== null) ||
+      (user.submission_daily_quota !== 0 && submissionQuotaRemaining !== null)
+    ) {
+      return (
+        <div>
+          <Divider />
+          <List dense subheader={<ListSubheader disableSticky>{t('quotas')}</ListSubheader>}>
+            {user.api_daily_quota !== 0 && apiQuotaRemaining && (
+              <Tooltip title={`${apiQuotaRemaining} ${t('quotas.api.remaining')}`}>
+                <ListItem>
+                  <span style={{ whiteSpace: 'nowrap' }}>{t('quotas.api')}</span>
+                  <LinearProgress
+                    variant="determinate"
+                    color={useAPIPercent < 65 ? 'success' : useAPIPercent < 90 ? 'warning' : 'error'}
+                    value={useAPIPercent}
+                    style={{ marginLeft: theme.spacing(2), width: '100%' }}
+                  />
+                </ListItem>
+              </Tooltip>
+            )}
+            {user.submission_daily_quota !== 0 && submissionQuotaRemaining && (
+              <Tooltip title={`${submissionQuotaRemaining} ${t('quotas.submission.remaining')}`}>
+                <ListItem>
+                  <span style={{ whiteSpace: 'nowrap' }}>{t('quotas.submission')}</span>
+                  <LinearProgress
+                    variant="determinate"
+                    color={useSubmissionPercent < 65 ? 'success' : useSubmissionPercent < 90 ? 'warning' : 'error'}
+                    value={useSubmissionPercent}
+                    style={{ marginLeft: theme.spacing(2), width: '100%' }}
+                  />
+                </ListItem>
+              </Tooltip>
+            )}
+          </List>
+        </div>
+      );
+    }
+    return null;
+  }, [apiQuotaRemaining, submissionQuotaRemaining, t, theme, user.api_daily_quota, user.submission_daily_quota]);
 
   const renderMenu = useCallback(
     (type: AppBarUserMenuType, menuItems: AppBarUserMenuElement[], title: string, i18nKey: string) => {
@@ -204,6 +253,9 @@ const UserProfile = () => {
                     </Box>
                   </ListItem>
                 </List>
+                {configuration.ui.enforce_quota &&
+                  (user.api_daily_quota !== 0 || user.submission_daily_quota !== 0) &&
+                  renderQuotas()}
                 {configs.preferences.topnav.userMenuType === 'list' &&
                   renderMenu(
                     'usermenu',

@@ -33,7 +33,6 @@ import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import UsersTable from 'components/visual/SearchResult/users';
 import SearchResultCount from 'components/visual/SearchResultCount';
-import 'moment/locale/fr';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
@@ -51,7 +50,9 @@ const DEFAULT_USER = {
   new_pass: '',
   uname: '',
   api_quota: 10,
-  submission_quota: 5
+  submission_quota: 5,
+  api_daily_quota: 0,
+  submission_daily_quota: 0
 };
 
 const useStyles = makeStyles(theme => ({
@@ -90,6 +91,8 @@ type User = {
   uname: string;
   api_quota: number;
   submission_quota: number;
+  api_daily_quota: number;
+  submission_daily_quota: number;
   roles?: string[];
 };
 
@@ -263,7 +266,9 @@ export default function Users() {
                 defaultValue={newUser.groups}
                 renderInput={params => <TextField {...params} />}
                 renderTags={(value, getTagProps) =>
-                  value.map((option, index) => <Chip variant="outlined" label={option} {...getTagProps({ index })} />)
+                  value.map((option, index) => (
+                    <Chip key={index} variant="outlined" label={option} {...getTagProps({ index })} />
+                  ))
                 }
                 onChange={(event, chips) => updateNewUser('groups', chips)}
               />
@@ -320,6 +325,18 @@ export default function Users() {
               />
             </Grid>
             <Grid item xs={12} md={6}>
+              <Typography variant="caption">{t('newuser.api_daily_quota')}</Typography>
+              <TextField
+                fullWidth
+                type="number"
+                margin="dense"
+                size="small"
+                variant="outlined"
+                onChange={event => updateNewUser('api_daily_quota', event.target.value)}
+                value={newUser.api_daily_quota}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
               <Typography variant="caption">{t('newuser.submission_quota')}</Typography>
               <TextField
                 fullWidth
@@ -329,6 +346,18 @@ export default function Users() {
                 variant="outlined"
                 onChange={event => updateNewUser('submission_quota', event.target.value)}
                 value={newUser.submission_quota}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="caption">{t('newuser.submission_daily_quota')}</Typography>
+              <TextField
+                fullWidth
+                type="number"
+                margin="dense"
+                size="small"
+                variant="outlined"
+                onChange={event => updateNewUser('submission_daily_quota', event.target.value)}
+                value={newUser.submission_daily_quota}
               />
             </Grid>
           </Grid>

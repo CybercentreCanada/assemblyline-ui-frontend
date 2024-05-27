@@ -1,5 +1,5 @@
-import { describe, expect, it } from '@jest/globals';
 import generateUUID from 'helpers/uuid';
+import { describe, expect, it } from 'vitest';
 
 describe('Test `generateUUID`', () => {
   it('Should generate a standard UUID', () => {

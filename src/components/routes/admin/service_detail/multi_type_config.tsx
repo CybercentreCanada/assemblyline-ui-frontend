@@ -1,8 +1,7 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
-import { Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
+import { Autocomplete, Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactJson from 'react-json-view';
@@ -31,7 +30,15 @@ const DEFAULT_CONFIG: ExtendedServiceConfig = {
   value: 'false'
 };
 
-const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiTypeConfigProps) => {
+const WrappedMultiTypeConfig = ({
+  config = null,
+  // eslint-disable-next-line no-console
+  onAdd = c => console.log('ADD', c),
+  // eslint-disable-next-line no-console
+  onUpdate = c => console.log('UPDATE', c),
+  // eslint-disable-next-line no-console
+  onDelete = c => console.log('DELETE', c)
+}: MultiTypeConfigProps) => {
   const { t } = useTranslation(['adminServices']);
   const [tempConfig, setTempConfig] = useState(DEFAULT_CONFIG);
   const theme = useTheme();
@@ -66,7 +73,7 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
 
     if (typeof cfg.value === 'object') {
       if (Array.isArray(cfg.value)) {
-        return { ...cfg, type: 'list', value: cfg.value.toString() };
+        return { ...cfg, type: 'list' };
       }
       return { ...cfg, type: 'json' };
     }
@@ -84,7 +91,7 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
     if (parsedConfig.type === 'bool') {
       onUpdate({ ...parsedConfig, value: value === 'true' });
     } else if (parsedConfig.type === 'list') {
-      onUpdate({ ...parsedConfig, value: value.split(',') });
+      onUpdate({ ...parsedConfig, value: event.target });
     } else if (parsedConfig.type === 'str') {
       onUpdate({ ...parsedConfig, value });
     } else if (parsedConfig.type === 'int') {
@@ -101,7 +108,7 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
     if (tempConfig.type === 'bool') {
       onAdd({ ...tempConfig, value: tempConfig.value === 'true' });
     } else if (tempConfig.type === 'list') {
-      onAdd({ ...tempConfig, value: tempConfig.value.split(',') });
+      onAdd({ ...tempConfig, value: tempConfig.value });
     } else if (tempConfig.type === 'str') {
       onAdd({ ...tempConfig, value: tempConfig.value });
     } else if (tempConfig.type === 'int') {
@@ -174,6 +181,17 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
               overflowX: 'auto'
             }}
           />
+        ) : parsedConfig.type === 'list' ? (
+          <Autocomplete
+            fullWidth
+            freeSolo
+            multiple
+            size="small"
+            defaultValue={parsedConfig.value}
+            options={[]}
+            renderInput={params => <TextField {...params}></TextField>}
+            onChange={(event, value, reason) => handleConfigUpdate({ target: value })}
+          />
         ) : (
           <TextField
             fullWidth
@@ -226,7 +244,7 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
             <MenuItem value="bool">bool</MenuItem>
             <MenuItem value="int">int</MenuItem>
             <MenuItem value="json">json</MenuItem>
-            <MenuItem value="list">list ({t('params.comma')})</MenuItem>
+            <MenuItem value="list">list</MenuItem>
             <MenuItem value="str">str</MenuItem>
           </Select>
         </FormControl>
@@ -266,6 +284,16 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
               overflowX: 'auto'
             }}
           />
+        ) : tempConfig.type === 'list' ? (
+          <Autocomplete
+            fullWidth
+            freeSolo
+            multiple
+            size="small"
+            options={[]}
+            renderInput={params => <TextField {...params}></TextField>}
+            onChange={(event, value, reason) => setTempConfig({ ...tempConfig, value: value as string[] })}
+          />
         ) : (
           <TextField
             fullWidth
@@ -296,16 +324,6 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
       </Grid>
     </Grid>
   );
-};
-
-WrappedMultiTypeConfig.defaultProps = {
-  config: null,
-  // eslint-disable-next-line no-console
-  onAdd: config => console.log('ADD', config),
-  // eslint-disable-next-line no-console
-  onUpdate: config => console.log('UPDATE', config),
-  // eslint-disable-next-line no-console
-  onDelete: config => console.log('DELETE', config)
 };
 
 const MultiTypeConfig = React.memo(WrappedMultiTypeConfig);

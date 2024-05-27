@@ -64,14 +64,16 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
 
   return maliciousness === 'safe' && !showSafeResults && !force ? null : (
     <>
-      <ActionMenu
-        category={signature ? 'signature' : 'heuristic'}
-        type={''}
-        value={text}
-        state={state}
-        setState={setState}
-        highlight_key={highlight_key}
-      />
+      {state !== initialMenuState && (
+        <ActionMenu
+          category={signature ? 'signature' : 'heuristic'}
+          type={''}
+          value={text}
+          state={state}
+          setState={setState}
+          highlight_key={highlight_key}
+        />
+      )}
       <CustomChip
         wrap
         variant={safe ? 'outlined' : 'filled'}

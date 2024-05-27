@@ -105,7 +105,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const theme = useTheme();
   const classes = useStyles();
   const appUser = useAppUser<AppUser>();
-  const { user: currentUser, configuration, c12nDef, indexes } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
   const { apiCall } = useMyAPI();
 
   const [open, setOpen] = React.useState(false);
@@ -115,7 +115,6 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const [currentContext, setCurrentContext] = React.useState<ContextMessageProps[]>([]);
   const [currentHistory, setCurrentHistory] = React.useState<ContextMessageProps[]>([]);
   const [currentInput, setCurrentInput] = React.useState<string>('');
-  const [serviceList, setServiceList] = React.useState(null);
   const [hasInsights, setHasInsights] = React.useState<boolean>(false);
   const upSM = useMediaQuery(theme.breakpoints.up('md'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
@@ -152,7 +151,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
     apiCall({
       method: 'POST',
       body: data,
-      url: `/api/v4/assistant/`,
+      url: `/api/v4/assistant/?lang=${i18n.language === 'en' ? 'english' : 'french'}`,
       onSuccess: api_data => {
         setCurrentContext(api_data.api_response.trace);
         setCurrentHistory([...history, ...api_data.api_response.trace.slice(-1)]);
@@ -249,55 +248,11 @@ function AssistantProvider({ children }: AssistantProviderProps) {
     }
   };
 
-  const buildDefaultSystemMessage = () => {
-    // Automatically create the prompting of the score ranges
-    const scoring = `Assemblyline uses a scoring mechanism where any scores below
-${configuration.submission.verdicts.info} is considered safe, scores between
-${configuration.submission.verdicts.info} and ${configuration.submission.verdicts.suspicious}
-are considered informational, scores between ${configuration.submission.verdicts.suspicious}
-and ${configuration.submission.verdicts.highly_suspicious} are considered suspicious,
-scores between ${configuration.submission.verdicts.highly_suspicious} and
-${configuration.submission.verdicts.malicious} are considered highly-suspicious
-and scores with ${configuration.submission.verdicts.malicious} points and up are
-considered malicious.`.replaceAll('\n', ' ');
-
-    // Create list of Assemblyline services
-    const services = `\nAssemblyline does its processing using only the following services/plugins:\n${serviceList
-      .map(srv => ` - name: ${srv.name}\n   category: ${srv.category}\n   description: """${srv.description}"""\n`)
-      .join('')}`;
-
-    // Define AL's classification engine
-    const classification = `Assemblyline can classify/restrict access to its output with the following markings:\n${Object.keys(
-      c12nDef.description
-    )
-      .map(marking => ` - ${marking}: ${c12nDef.description[marking]}\n`)
-      .join('')}`;
-
-    // Indices fields
-    const indices = `\nAssemblyline has multiple indices where it stores the data, theses indices can be queried with the lucene syntax.\n${Object.keys(
-      indexes
-    )
-      .filter(index => ['file', 'alert', 'result', 'signature', 'submission'].includes(index))
-      .map(
-        index =>
-          `\nThe '${index}' index as the following fields:\n${Object.keys(indexes[index])
-            .map(field => `  - ${field}`)
-            .join('\n')}`
-      )
-      .join('\n')}`;
-
-    // Set language
-    const lang = `\nYour answer must be written in plain ${i18n.language === 'en' ? 'english' : 'french'}.`;
-
-    // Create the default system prompt
-    const defaultSystemPrompt = {
+  const buildDefaultSystemMessage = (): ContextMessageProps => {
+    return {
       role: 'system' as 'system',
-      content: [configuration.ui.ai.assistant.system_message, scoring, services, classification, indices, lang].join(
-        '\n'
-      )
+      content: null
     };
-
-    return defaultSystemPrompt;
   };
 
   const clearAssistant = () => {
@@ -308,8 +263,11 @@ considered malicious.`.replaceAll('\n', ' ');
 
   const resetAssistant = () => {
     const defaultSystemPrompt = buildDefaultSystemMessage();
+    const lastPrompt = currentHistory[currentHistory.length - 1];
     setCurrentContext([defaultSystemPrompt]);
-    setCurrentHistory([...currentHistory, defaultSystemPrompt]);
+    if (lastPrompt?.content !== defaultSystemPrompt.content) {
+      setCurrentHistory([...currentHistory, defaultSystemPrompt]);
+    }
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
@@ -331,22 +289,10 @@ considered malicious.`.replaceAll('\n', ' ');
 
   useEffect(() => {
     if (configuration) {
-      apiCall({
-        url: `/api/v4/service/all/`,
-        onSuccess: api_data => {
-          setServiceList(api_data.api_response);
-        }
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration]);
-
-  useEffect(() => {
-    if (configuration && serviceList !== null) {
       clearAssistant();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration, serviceList, i18n.language]);
+  }, [configuration, i18n.language]);
 
   useEffect(() => {
     if (chatRef && chatRef.current)
@@ -380,6 +326,7 @@ considered malicious.`.replaceAll('\n', ' ');
       {children}
       {assistantAllowed && (
         <div
+          className="no-print"
           style={{
             display: 'flex',
             position: 'fixed',
@@ -567,7 +514,7 @@ considered malicious.`.replaceAll('\n', ' ');
                                     <span>
                                       <Button
                                         onClick={askAssistant}
-                                        disabled={thinking}
+                                        disabled={thinking || currentInput === ''}
                                         size="small"
                                         sx={{
                                           minWidth: 0,

@@ -27,9 +27,10 @@ import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { AppBarUserMenuElement, AppLeftNavElement, AppPreferenceConfigs } from 'commons/components/app/AppConfigs';
+import type { AppBarUserMenuElement, AppLeftNavElement, AppPreferenceConfigs } from 'commons/components/app/AppConfigs';
 import { Notification } from 'components/visual/Notification';
-import { ReactElement, ReactNode, useMemo } from 'react';
+import type { ReactElement, ReactNode } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 
@@ -40,7 +41,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         alt={t('logo.alt')}
-        src={`${process.env.PUBLIC_URL}/images/noswoop.svg`}
+        src={`/images/noswoop.svg`}
         width="40"
         height="32"
         style={{ marginLeft: '-8px' }}
@@ -53,7 +54,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         alt={t('logo.alt')}
-        src={`${process.env.PUBLIC_URL}/images/noswoop_dark.svg`}
+        src={`/images/noswoop_dark.svg`}
         width="40"
         height="32"
         style={{ marginLeft: '-8px' }}
@@ -66,7 +67,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`${process.env.PUBLIC_URL}/images/banner.svg`}
+        src={`/images/banner.svg`}
         alt={t('banner.alt')}
       />
     ),
@@ -77,7 +78,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`${process.env.PUBLIC_URL}/images/banner_dark.svg`}
+        src={`/images/banner_dark.svg`}
         alt={t('banner.alt')}
       />
     ),

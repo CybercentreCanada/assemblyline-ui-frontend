@@ -5,8 +5,10 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle
+  DialogTitle,
+  Stack
 } from '@mui/material';
+import React from 'react';
 
 export type ConfirmationDialogProps = {
   open: boolean;
@@ -16,7 +18,9 @@ export type ConfirmationDialogProps = {
   cancelText: string;
   acceptText: string;
   waiting?: boolean;
+  unacceptable?: boolean;
   text?: string | React.ReactNode;
+  children?: React.ReactNode;
   handleCancel?: (event?: any) => void;
 };
 
@@ -28,7 +32,9 @@ const ConfirmationDialog = ({
   cancelText,
   acceptText,
   waiting = false,
+  unacceptable = false,
   text = null,
+  children = null,
   handleCancel = null
 }: ConfirmationDialogProps) => (
   <Dialog
@@ -40,14 +46,17 @@ const ConfirmationDialog = ({
     <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
     {text && (
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">{text}</DialogContentText>
+        <Stack spacing={2}>
+          <DialogContentText id="alert-dialog-description">{text}</DialogContentText>
+          {children}
+        </Stack>
       </DialogContent>
     )}
     <DialogActions>
       <Button onClick={handleCancel || handleClose} color="secondary">
         {cancelText}
       </Button>
-      <Button onClick={handleAccept} color="primary" autoFocus disabled={waiting}>
+      <Button onClick={handleAccept} color="primary" autoFocus disabled={waiting || unacceptable}>
         {acceptText}
         {waiting && (
           <CircularProgress

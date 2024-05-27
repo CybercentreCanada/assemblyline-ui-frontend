@@ -1,5 +1,4 @@
 import Flow from '@flowjs/flow.js';
-import ClearIcon from '@mui/icons-material/Clear';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
   Alert,
@@ -8,11 +7,10 @@ import {
   CircularProgress,
   FormControlLabel,
   Grid,
-  IconButton,
-  MenuItem,
   Paper,
-  Select,
   Skeleton,
+  Slider,
+  Stack,
   Switch,
   Tab,
   TextField,
@@ -21,7 +19,6 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import FormControl from '@mui/material/FormControl';
 import { makeStyles } from '@mui/styles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
@@ -29,14 +26,15 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
+import SubmissionMetadata from 'components/layout/submissionMetadata';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
-import { matchSHA256, matchURL } from 'helpers/utils';
+import MetadataInputField from 'components/visual/MetadataInputField';
+import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -103,11 +101,13 @@ const Submit: React.FC<any> = () => {
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const state: SubmitState = location.state as SubmitState;
-  const urlHashTitle = configuration.ui.allow_url_submissions ? 'URL/SHA256' : 'SHA256';
-  const urlInputText = urlHashTitle + t('urlHash.input_suffix');
-  const [urlHash, setUrlHash] = useState('');
-  const [submissionMetadata, setSubmissionMetadata] = useState(undefined);
-  const [urlHashHasError, setUrlHashHasError] = useState(false);
+  const params = new URLSearchParams(location.search);
+  const [stringInput, setStringInput] = useState('');
+  const [stringType, setStringType] = useState(undefined);
+  const stringInputTitle = t('urlHash.input_title');
+  const stringInputText = stringInputTitle + t('urlHash.input_suffix');
+  const [stringInputHasError, setStringInputHasError] = useState(false);
+  const [submissionMetadata, setSubmissionMetadata] = useState({});
   const [urlAutoselection, setUrlAutoselection] = useState(false);
   const [value, setValue] = useState('0');
   const banner = useAppBanner();
@@ -131,6 +131,119 @@ const Submit: React.FC<any> = () => {
     flow.off('fileError');
     flow.off('progress');
     setUUID(generateUUID());
+  };
+
+  const uploadAndScan = () => {
+    flow.opts.generateUniqueIdentifier = getFileUUID;
+    setAllowClick(false);
+    setUploadProgress(0);
+    flow.on('fileError', (event, api_data) => {
+      try {
+        const data = JSON.parse(api_data);
+        if (Object.hasOwnProperty.call(data, 'api_status_code')) {
+          if (
+            data.api_status_code === 401 ||
+            (data.api_status_code === 503 &&
+              data.api_error_message.includes('quota') &&
+              data.api_error_message.includes('daily') &&
+              api_data.api_error_message.includes('API'))
+          ) {
+            window.location.reload();
+          }
+        }
+      } catch (ex) {
+        cancelUpload();
+        showErrorMessage(t('submit.file.upload_fail'));
+      }
+    });
+    flow.on('progress', () => {
+      setUploadProgress(Math.trunc(flow.progress() * 100));
+    });
+    flow.on('complete', () => {
+      if (flow.files.length === 0) {
+        return;
+      }
+
+      for (let x = 0; x < flow.files.length; x++) {
+        if (flow.files[x].error) {
+          return;
+        }
+      }
+      apiCall({
+        url: `/api/v4/ui/start/${uuid}/`,
+        method: 'POST',
+        body: { ...settings, filename: file.path, metadata: submissionMetadata },
+        onSuccess: api_data => {
+          showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
+          setTimeout(() => {
+            navigate(`/submission/detail/${api_data.api_response.sid}`);
+          }, 500);
+        },
+        onFailure: api_data => {
+          if (api_data.api_status_code === 400 && api_data.api_error_message.includes('metadata')) {
+            setValue('2');
+          }
+
+          if (
+            api_data.api_status_code === 503 ||
+            api_data.api_status_code === 403 ||
+            api_data.api_status_code === 404 ||
+            api_data.api_status_code === 400
+          ) {
+            showErrorMessage(api_data.api_error_message);
+          } else {
+            showErrorMessage(t('submit.file.failure'));
+          }
+          setAllowClick(true);
+          cancelUpload();
+        }
+      });
+    });
+
+    flow.addFile(file);
+    flow.upload();
+  };
+
+  function analyseUrlHash() {
+    let data: any = null;
+    setAllowClick(false);
+
+    if (!stringType && (stringType !== 'url' || !configuration.ui.allow_url_submissions)) {
+      setAllowClick(true);
+      setStringInputHasError(true);
+      showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
+      return;
+    }
+
+    data = { ui_params: settings, [stringType]: stringInput, metadata: submissionMetadata };
+
+    setStringInputHasError(false);
+    apiCall({
+      url: '/api/v4/submit/',
+      method: 'POST',
+      body: data,
+      onSuccess: api_data => {
+        setAllowClick(false);
+        showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
+        setTimeout(() => {
+          navigate(`/submission/detail/${api_data.api_response.sid}`);
+        }, 500);
+      },
+      onFailure: api_data => {
+        showErrorMessage(api_data.api_error_message);
+        setStringInputHasError(true);
+        setAllowClick(true);
+      }
+    });
+  }
+
+  const executeCB = () => {
+    setValidate(false);
+    if (validateCB === 'file') {
+      uploadAndScan();
+    } else {
+      analyseUrlHash();
+    }
   };
 
   const validateServiceSelection = cbType => {
@@ -175,76 +288,6 @@ const Submit: React.FC<any> = () => {
     executeCB();
   };
 
-  const executeCB = () => {
-    setValidate(false);
-    if (validateCB === 'file') {
-      uploadAndScan();
-    } else {
-      analyseUrlHash();
-    }
-  };
-
-  const uploadAndScan = () => {
-    flow.opts.generateUniqueIdentifier = getFileUUID;
-    setAllowClick(false);
-    setUploadProgress(0);
-    flow.on('fileError', (event, api_data) => {
-      try {
-        const data = JSON.parse(api_data);
-        if (Object.hasOwnProperty.call(data, 'api_status_code')) {
-          if (data.api_status_code === 401) {
-            window.location.reload();
-          }
-        }
-      } catch (ex) {
-        cancelUpload();
-        showErrorMessage(t('submit.file.upload_fail'));
-      }
-    });
-    flow.on('progress', () => {
-      setUploadProgress(Math.trunc(flow.progress() * 100));
-    });
-    flow.on('complete', () => {
-      if (flow.files.length === 0) {
-        return;
-      }
-
-      for (let x = 0; x < flow.files.length; x++) {
-        if (flow.files[x].error) {
-          return;
-        }
-      }
-      apiCall({
-        url: `/api/v4/ui/start/${uuid}/`,
-        method: 'POST',
-        body: { ...settings, filename: file.path },
-        onSuccess: api_data => {
-          showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
-          setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
-          }, 500);
-        },
-        onFailure: api_data => {
-          if (
-            api_data.api_status_code === 503 ||
-            api_data.api_status_code === 403 ||
-            api_data.api_status_code === 404 ||
-            api_data.api_status_code === 400
-          ) {
-            showErrorMessage(api_data.api_error_message);
-          } else {
-            showErrorMessage(t('submit.file.failure'));
-          }
-          setAllowClick(true);
-          cancelUpload();
-        }
-      });
-    });
-
-    flow.addFile(file);
-    flow.upload();
-  };
-
   const isSelected = service_name => {
     let selected = false;
     settings.services.forEach(cat => {
@@ -271,11 +314,6 @@ const Submit: React.FC<any> = () => {
       }
       setSettings({ ...settings, services: newServices });
     }
-  };
-
-  const anySelected = () => {
-    const serviceList = settings.service_spec.map(srv => srv.name);
-    return serviceList.some(isSelected);
   };
 
   const setFileDropperFile = selectedFile => {
@@ -321,37 +359,27 @@ const Submit: React.FC<any> = () => {
     }
   }
 
-  function handleUrlHashChange(event) {
+  function handleStringChange(string) {
     closeSnackbar();
-    setUrlHashHasError(false);
-    setUrlHash(event.target.value);
-    setSubmissionMetadata(undefined);
+    setStringType(getSubmitType(string, configuration));
+    setStringInputHasError(false);
+    setStringInput(string);
   }
 
   function analyseUrlHash() {
     let data: any = null;
     setAllowClick(false);
-    const sha256 = matchSHA256(urlHash);
-    const url = matchURL(urlHash);
 
-    if (!sha256 && (!url || !configuration.ui.allow_url_submissions)) {
+    if (!stringType && (stringType !== 'url' || !configuration.ui.allow_url_submissions)) {
       setAllowClick(true);
-      setUrlHashHasError(true);
+      setStringInputHasError(true);
       showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
       return;
     }
 
-    if (sha256) {
-      data = { ui_params: settings, name: sha256, sha256: sha256, metadata: submissionMetadata };
-    } else {
-      data = {
-        ui_params: settings,
-        url: urlHash,
-        metadata: submissionMetadata
-      };
-    }
+    data = { ui_params: settings, [stringType]: stringInput, metadata: submissionMetadata };
 
-    setUrlHashHasError(false);
+    setStringInputHasError(false);
     apiCall({
       url: '/api/v4/submit/',
       method: 'POST',
@@ -364,15 +392,18 @@ const Submit: React.FC<any> = () => {
         }, 500);
       },
       onFailure: api_data => {
+        if (api_data.api_status_code === 400 && api_data.api_error_message.includes('metadata')) {
+          setValue('2');
+        }
         showErrorMessage(api_data.api_error_message);
-        setUrlHashHasError(true);
+        setStringInputHasError(true);
         setAllowClick(true);
       }
     });
   }
 
   useEffect(() => {
-    if (settings && !urlAutoselection && matchURL(urlHash)) {
+    if (settings && !urlAutoselection && stringType === 'url') {
       const newServices = settings.services;
       for (const cat of newServices) {
         for (const srv of cat.services) {
@@ -385,15 +416,16 @@ const Submit: React.FC<any> = () => {
       setSettings({ ...settings, services: newServices });
       setUrlAutoselection(true);
     }
-  }, [settings, urlHash, urlAutoselection, configuration.ui.url_submission_auto_service_selection]);
+  }, [settings, stringType, urlAutoselection, configuration.ui.url_submission_auto_service_selection]);
 
   useEffect(() => {
     if (state) {
-      setUrlHash(state.hash);
+      setStringInput(state.hash);
+      setStringType(getSubmitType(state.hash, configuration));
       setSubmissionMetadata(state.metadata);
       setValue(state.tabContext);
     }
-  }, [state]);
+  }, [state, configuration]);
 
   useEffectOnce(() => {
     // Setup Flow
@@ -411,14 +443,53 @@ const Submit: React.FC<any> = () => {
     apiCall({
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: api_data => {
+        const tempSettings = { ...api_data.api_response };
+
         if (state) {
-          setSettings({ ...api_data.api_response, classification: state.c12n });
-        } else {
-          setSettings(api_data.api_response);
+          // Get the classification from the state
+          tempSettings.classification = state.c12n;
+        } else if (params.get('classification')) {
+          // Or get the classification from the params
+          tempSettings.classification = params.get('classification');
         }
+
+        // Check if some file sources should auto-select and do so
+        const defaultExternalSources = [...tempSettings.default_external_sources];
+        for (let srcType in configuration.submission.file_sources) {
+          let sourceDef = configuration.submission.file_sources[srcType];
+          for (let source of sourceDef.auto_selected) {
+            if (!defaultExternalSources.includes(source)) {
+              defaultExternalSources.push(source);
+            }
+          }
+        }
+        tempSettings.default_external_sources = defaultExternalSources;
+
+        setSettings(tempSettings);
       }
     });
     setUUID(generateUUID());
+
+    // Handle if we've been given input via param
+    var inputParam = params.get('input') || '';
+    if (inputParam) {
+      handleStringChange(inputParam);
+      setValue('1');
+    }
+
+    // Load the default submission metadata
+    if (configuration.submission.metadata && configuration.submission.metadata.submit) {
+      const tempMeta = {};
+      for (const metaKey in configuration.submission.metadata.submit) {
+        const metaConfig = configuration.submission.metadata.submit[metaKey];
+        if (metaConfig.default !== null) {
+          tempMeta[metaKey] = metaConfig.default;
+        }
+      }
+      if (tempMeta) {
+        setSubmissionMetadata({ ...tempMeta, ...submissionMetadata });
+      }
+    }
   });
 
   return (
@@ -463,7 +534,7 @@ const Submit: React.FC<any> = () => {
               className={classes.tweaked_tabs}
             >
               <Tab label={t('file')} value="0" disabled={!currentUser.roles.includes('submission_create')} />
-              <Tab label={urlHashTitle} value="1" disabled={!currentUser.roles.includes('submission_create')} />
+              <Tab label={stringInputTitle} value="1" disabled={!currentUser.roles.includes('submission_create')} />
               <Tab label={t('options')} value="2" disabled={!currentUser.roles.includes('submission_create')} />
             </TabList>
           </Paper>
@@ -514,6 +585,7 @@ const Submit: React.FC<any> = () => {
             ) : (
               <Skeleton style={{ height: '280px' }} />
             )}
+            <SubmissionMetadata submissionMetadata={submissionMetadata} setSubmissionMetadata={setSubmissionMetadata} />
             {configuration.ui.tos ? (
               <div style={{ marginTop: sp4, textAlign: 'center' }}>
                 <Typography variant="body2">
@@ -533,22 +605,23 @@ const Submit: React.FC<any> = () => {
               {settings ? (
                 <>
                   <TextField
-                    label={urlInputText}
-                    error={urlHashHasError}
+                    label={stringInputText}
+                    error={stringInputHasError}
                     size="small"
-                    type="urlHash"
+                    type="stringInput"
                     variant="outlined"
-                    value={urlHash}
-                    onChange={handleUrlHashChange}
+                    value={stringInput}
+                    onChange={event => handleStringChange(event.target.value as String)}
                     style={{ flexGrow: 1, marginRight: '1rem' }}
                   />
                   <Button
-                    disabled={!urlHash || !allowClick}
+                    disabled={!(stringInput && stringType) || !allowClick}
                     color="primary"
                     variant="contained"
                     onClick={() => validateServiceSelection('urlHash')}
+                    style={{ height: '40px' }}
                   >
-                    {t('urlHash.button')}
+                    {stringType ? `${t('urlHash.button')} ${stringType}` : t('urlHash.button')}
                     {!allowClick && <CircularProgress size={24} className={classes.buttonProgress} />}
                   </Button>
                 </>
@@ -559,7 +632,7 @@ const Submit: React.FC<any> = () => {
                 </>
               )}
             </div>
-            {matchURL(urlHash) &&
+            {stringType === 'url' &&
               configuration.ui.url_submission_auto_service_selection &&
               configuration.ui.url_submission_auto_service_selection.length > 0 && (
                 <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
@@ -588,12 +661,13 @@ const Submit: React.FC<any> = () => {
                   ))}
                 </div>
               )}
-            {matchSHA256(urlHash) &&
-              configuration.submission.sha256_sources &&
-              configuration.submission.sha256_sources.length > 0 && (
+            {stringType &&
+              configuration.submission.file_sources[stringType] &&
+              configuration.submission.file_sources[stringType].sources &&
+              configuration.submission.file_sources[stringType].sources.length > 0 && (
                 <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
                   <Typography variant="subtitle1">{t('options.submission.default_external_sources')}</Typography>
-                  {configuration.submission.sha256_sources.map((source, i) => (
+                  {configuration.submission.file_sources[stringType].sources.map((source, i) => (
                     <div key={i}>
                       <FormControlLabel
                         control={
@@ -615,32 +689,7 @@ const Submit: React.FC<any> = () => {
                   ))}
                 </div>
               )}
-            {submissionMetadata && Object.keys(submissionMetadata).length !== 0 && (
-              <div style={{ textAlign: 'start', marginTop: theme.spacing(2) }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography style={{ flexGrow: 1 }} variant="subtitle1">
-                    {t('options.submission.metadata')}
-                  </Typography>
-                  <Tooltip title={t('options.submission.metadata.clear')}>
-                    <IconButton onClick={() => setSubmissionMetadata(undefined)}>
-                      <ClearIcon />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-                <div>
-                  {Object.keys(submissionMetadata).map((meta, i) => (
-                    <Grid container key={i}>
-                      <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
-                        <span style={{ fontWeight: 500 }}>{meta}</span>
-                      </Grid>
-                      <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                        {submissionMetadata[meta]}
-                      </Grid>
-                    </Grid>
-                  ))}
-                </div>
-              </div>
-            )}
+            <SubmissionMetadata submissionMetadata={submissionMetadata} setSubmissionMetadata={setSubmissionMetadata} />
             {configuration.ui.tos ? (
               <div style={{ marginTop: sp4, textAlign: 'center' }}>
                 <Typography variant="body2">
@@ -662,7 +711,7 @@ const Submit: React.FC<any> = () => {
                   <Typography variant="h6" gutterBottom>
                     {t('options.service')}
                   </Typography>
-                  <ServiceTree size="small" settings={settings} setSettings={setSettings} />
+                  <ServiceTree size="small" settings={settings} setSettings={setSettings} setParam={setParam} />
                 </div>
               </Grid>
               <Grid item xs={12} md>
@@ -696,19 +745,22 @@ const Submit: React.FC<any> = () => {
                       {t('options.submission.priority')}
                     </Typography>
                     {settings ? (
-                      <FormControl size="small" fullWidth>
-                        <Select
-                          id="priority"
-                          value={settings.priority}
-                          variant="outlined"
-                          onChange={event => setSettingValue('priority', event.target.value)}
-                          fullWidth
-                        >
-                          <MenuItem value="500">{t('options.submission.priority.low')}</MenuItem>
-                          <MenuItem value="1000">{t('options.submission.priority.medium')}</MenuItem>
-                          <MenuItem value="1500">{t('options.submission.priority.high')}</MenuItem>
-                        </Select>
-                      </FormControl>
+                      <div style={{ marginLeft: '20px', marginRight: '20px' }}>
+                        <Slider
+                          defaultValue={settings.priority}
+                          valueLabelDisplay={'auto'}
+                          size="small"
+                          min={500}
+                          max={1500}
+                          marks={[
+                            { label: t('options.submission.priority.low'), value: 500 },
+                            { label: t('options.submission.priority.medium'), value: 1000 },
+                            { label: t('options.submission.priority.high'), value: 1500 }
+                          ]}
+                          step={null}
+                          onChange={(_, e_value) => setSettingValue('priority', e_value)}
+                        ></Slider>
+                      </div>
                     ) : (
                       <Skeleton style={{ height: '3rem' }} />
                     )}
@@ -844,24 +896,47 @@ const Submit: React.FC<any> = () => {
                       <Skeleton style={{ height: '3rem' }} />
                     )}
                   </div>
+                  {configuration.submission.metadata &&
+                    configuration.submission.metadata.submit &&
+                    Object.keys(configuration.submission.metadata.submit).length !== 0 && (
+                      <>
+                        <Typography variant="h6" gutterBottom style={{ paddingTop: theme.spacing(2) }}>
+                          {t('options.submission.metadata')}
+                        </Typography>
+                        <Stack spacing={1}>
+                          {Object.entries(configuration.submission.metadata.submit).map(([field_name, field_cfg]) => (
+                            <MetadataInputField
+                              key={field_name}
+                              name={field_name}
+                              configuration={field_cfg}
+                              value={submissionMetadata[field_name]}
+                              onChange={v => {
+                                var cleanMetadata = submissionMetadata;
+                                if (v === undefined || v === null || v === '') {
+                                  // Remove field from metadata if value is null
+                                  delete cleanMetadata[field_name];
+                                } else {
+                                  // Otherwise add/overwrite value
+                                  cleanMetadata[field_name] = v;
+                                }
+                                setSubmissionMetadata({ ...cleanMetadata });
+                              }}
+                              onReset={() => {
+                                var cleanMetadata = submissionMetadata;
+                                delete cleanMetadata[field_name];
+                                setSubmissionMetadata({ ...cleanMetadata });
+                              }}
+                            />
+                          ))}
+                        </Stack>
+                      </>
+                    )}
                 </div>
-
-                {settings && settings.service_spec.length !== 0 && anySelected() && (
-                  <div style={{ textAlign: 'left', marginTop: sp4 }}>
-                    <Typography variant="h6" gutterBottom>
-                      {t('options.service_spec')}
-                    </Typography>
-                    <ServiceSpec service_spec={settings.service_spec} setParam={setParam} isSelected={isSelected} />
-                  </div>
-                )}
               </Grid>
             </Grid>
           </TabPanel>
         </TabContext>
       </>
-      {/* ) : (
-        <div>Cannot submit files</div>
-      )} */}
     </PageCenter>
   );
 };

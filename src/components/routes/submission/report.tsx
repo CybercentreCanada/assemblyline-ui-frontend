@@ -192,7 +192,9 @@ export default function SubmissionReport() {
   }, [id]);
 
   useEffect(() => {
-    setUseAIReport(settings.executive_summary);
+    if (configuration.ui.ai.enabled) {
+      setUseAIReport(settings.executive_summary);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings]);
 
@@ -215,11 +217,7 @@ export default function SubmissionReport() {
               </div>
             </Grid>
             <Grid item xs className="print-only" style={{ textAlign: 'right' }}>
-              <img
-                src={`${process.env.PUBLIC_URL}/images/banner.svg`}
-                alt="Assemblyline Banner"
-                style={{ height: theme.spacing(8) }}
-              />
+              <img src={`/images/banner.svg`} alt="Assemblyline Banner" style={{ height: theme.spacing(8) }} />
             </Grid>
             <Grid item xs={12} sm={3} className="no-print">
               <div style={{ textAlign: 'right' }}>

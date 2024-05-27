@@ -145,7 +145,7 @@ const WrappedRoutes = () => {
         <Route path="/manage/badlist" element={<ManageBadlist />} />
         <Route path="/manage" element={<Manage />} />
         <Route path="/retrohunt" element={<RetroHunt />} />
-        <Route path="/retrohunt/:code" element={<RetroHuntDetail />} />
+        <Route path="/retrohunt/:key" element={<RetroHuntDetail />} />
         <Route path="/search" element={<Search />} />
         <Route path="/search/:id" element={<Search />} />
         <Route path="/settings" element={<Settings />} />
