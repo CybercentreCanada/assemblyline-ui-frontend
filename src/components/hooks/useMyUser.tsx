@@ -110,6 +110,7 @@ export type ConfigurationDefinition = {
       [hash_type: string]: {
         pattern: string;
         sources: string[];
+        auto_selected: string[];
       };
     };
     metadata: {
