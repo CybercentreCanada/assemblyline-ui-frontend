@@ -1,22 +1,22 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
-import { Grid, MenuItem, Pagination, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/hooks/useMyUser';
 import { ChipList } from 'components/visual/ChipList';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
+import SearchPager from 'components/visual/SearchPager';
 import ErrorsTable from 'components/visual/SearchResult/errors';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
@@ -54,18 +54,17 @@ type ErrorResults = {
   total: number;
 };
 
-const MAX_TRACKED_RECORDS = 10000;
+type TimeContraint = '24h' | '4d' | '7d' | '1m' | '1y';
 
-const DEFAULT_TC = '4d';
-
-const TC_MAP = {
+const TC_MAP: Record<TimeContraint, string> = {
   '24h': 'created:[now-24h TO now]',
   '4d': 'created:[now-4d TO now]',
   '7d': 'created:[now-7d TO now]',
-  '1m': 'created:[now-1M TO now]'
+  '1m': 'created:[now-1M TO now]',
+  '1y': null
 };
 
-const START_MAP = {
+const START_MAP: Record<TimeContraint, string> = {
   '24h': 'now-1d',
   '4d': 'now-4d',
   '7d': 'now-7d',
@@ -73,13 +72,15 @@ const START_MAP = {
   '1y': 'now-1y'
 };
 
-const GAP_MAP = {
+const GAP_MAP: Record<TimeContraint, string> = {
   '24h': '1h',
   '4d': '2h',
   '7d': '4h',
   '1m': '1d',
   '1y': '15d'
 };
+
+const DEFAULT_TC: TimeContraint = '4d';
 
 export default function ErrorViewer() {
   const { t } = useTranslation(['adminErrorViewer']);
@@ -101,13 +102,17 @@ export default function ErrorViewer() {
   const [types, setTypes] = useState(null);
   const [names, setNames] = useState(null);
 
-  const pageCount = useMemo<number>(
-    () =>
-      errorResults && 'total' in errorResults
-        ? Math.ceil(Math.min(errorResults.total, MAX_TRACKED_RECORDS) / PAGE_SIZE)
-        : 0,
-    [errorResults]
-  );
+  const parsedQuery = useMemo<SimpleSearchQuery>(() => {
+    if (!query || !currentUser.is_admin) return null;
+
+    const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
+    curQuery.set('rows', pageSize);
+    curQuery.set('offset', 0);
+    const tc = (curQuery.pop('tc') as TimeContraint) || DEFAULT_TC;
+    if (tc in GAP_MAP && tc !== '1y') curQuery.add('filters', TC_MAP[tc]);
+
+    return curQuery;
+  }, [currentUser.is_admin, pageSize, query]);
 
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`));
@@ -130,55 +135,53 @@ export default function ErrorViewer() {
   }, [location.hash]);
 
   useEffect(() => {
-    if (query && currentUser.is_admin) {
-      const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
-      const tc = curQuery.pop('tc') || DEFAULT_TC;
-      curQuery.set('rows', pageSize);
-      curQuery.set('offset', 0);
-      if (tc !== '1y') {
-        curQuery.add('filters', TC_MAP[tc]);
-      }
-      setSearching(true);
-      apiCall({
-        url: `/api/v4/error/list/?${curQuery.toString()}`,
-        onSuccess: api_data => {
-          setErrorResults(api_data.api_response);
-        },
-        onFinalize: () => {
-          setSearching(false);
-        }
-      });
-      apiCall({
-        url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
-          'rows',
-          'offset',
-          'sort',
-          'track_total_hits'
-        ])}`,
-        onSuccess: api_data => {
-          setNames(api_data.api_response);
-        }
-      });
-      apiCall({
-        url: `/api/v4/search/facet/error/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-        onSuccess: api_data => {
-          setTypes(api_data.api_response);
-        }
-      });
-      apiCall({
-        url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
-          GAP_MAP[tc]
-        }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-        onSuccess: api_data => {
-          setHistogram(api_data.api_response);
-        }
-      });
-    }
-
+    if (!parsedQuery) return;
+    apiCall({
+      url: `/api/v4/error/list/?${parsedQuery.toString()}`,
+      onSuccess: api_data => setErrorResults(api_data.api_response),
+      onEnter: () => setSearching(true),
+      onExit: () => setSearching(false)
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
+  }, [parsedQuery]);
 
-  useEffectOnce(() => {
+  useEffect(() => {
+    if (!query) return;
+    const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
+    curQuery.set('rows', pageSize);
+    curQuery.set('offset', 0);
+
+    const tc = (curQuery.pop('tc') as TimeContraint) || DEFAULT_TC;
+    if (tc in GAP_MAP && tc !== '1y') curQuery.add('filters', TC_MAP[tc]);
+    apiCall({
+      url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
+        'rows',
+        'offset',
+        'sort',
+        'track_total_hits'
+      ])}`,
+      onSuccess: api_data => {
+        setNames(api_data.api_response);
+      }
+    });
+    apiCall({
+      url: `/api/v4/search/facet/error/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+      onSuccess: api_data => {
+        setTypes(api_data.api_response);
+      }
+    });
+    apiCall({
+      url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
+        GAP_MAP[tc]
+      }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+      onSuccess: api_data => {
+        setHistogram(api_data.api_response);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageSize, query]);
+
+  useEffect(() => {
     apiCall({
       url: '/api/v4/search/fields/error/',
       onSuccess: api_data => {
@@ -188,7 +191,8 @@ export default function ErrorViewer() {
         ]);
       }
     });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onClear = useCallback(
     () => {
@@ -216,9 +220,9 @@ export default function ErrorViewer() {
     [query, location.pathname, onClear]
   );
 
-  const onFilterValueChange = (inputValue: string) => {
+  const onFilterValueChange = useCallback((inputValue: string) => {
     filterValue.current = inputValue;
-  };
+  }, []);
 
   const setErrorKey = useCallback(
     (error_key: string) => {
@@ -226,22 +230,6 @@ export default function ErrorViewer() {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.search]
-  );
-
-  const handleNavigate = useCallback(
-    (searchQuery: SimpleSearchQuery) => {
-      const search = new SimpleSearchQuery(searchQuery.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
-      navigate(`${location.pathname}?${search.getDeltaString()}${location.hash}`);
-    },
-    [location.hash, location.pathname, navigate, pageSize]
-  );
-
-  const handleQueryChange = useCallback(
-    (key: string, value: string | number) => {
-      query.set(key, value);
-      handleNavigate(query);
-    },
-    [handleNavigate, query]
   );
 
   return currentUser.is_admin ? (
@@ -332,12 +320,15 @@ export default function ErrorViewer() {
                   </Typography>
                 )}
 
-                <Pagination
-                  page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
-                  onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
-                  count={pageCount}
-                  shape="rounded"
-                  size="small"
+                <SearchPager
+                  query={parsedQuery}
+                  pageSize={pageSize}
+                  total={errorResults.total}
+                  index={null}
+                  url="/api/v4/error/list/"
+                  method="GET"
+                  setResults={setErrorResults}
+                  setSearching={setSearching}
                 />
               </div>
             )}
