@@ -575,9 +575,7 @@ describe('Test `getSubmitType`', () => {
     },
     core: {
       archiver: {
-        alternate_dtl: 0,
-        metadata: {},
-        use_metadata: false
+        alternate_dtl: 0
       }
     },
     datastore: {
@@ -592,12 +590,16 @@ describe('Test `getSubmitType`', () => {
     },
     submission: {
       file_sources: {
-        md5: { pattern: '^[a-f0-9]{32}$', sources: [], auto_selected: null },
-        sha1: { pattern: '^[a-f0-9]{40}$', sources: [], auto_selected: null },
-        sha256: { pattern: '^[a-f0-9]{64}$', sources: [], auto_selected: null }
+        md5: { pattern: '^[a-f0-9]{32}$', sources: [], auto_selected: [] },
+        sha1: { pattern: '^[a-f0-9]{40}$', sources: [], auto_selected: [] },
+        sha256: { pattern: '^[a-f0-9]{64}$', sources: [], auto_selected: [] }
       },
       dtl: 0,
       max_dtl: 0,
+      metadata: {
+        archive: {},
+        submit: {}
+      },
       verdicts: {
         info: 0,
         suspicious: 0,
@@ -627,6 +629,7 @@ describe('Test `getSubmitType`', () => {
       apps: [],
       banner: {},
       banner_level: 'info',
+      enforce_quota: false,
       external_links: {
         tag: {},
         hash: {},
