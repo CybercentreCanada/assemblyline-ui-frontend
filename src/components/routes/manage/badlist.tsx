@@ -18,7 +18,6 @@ import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import BadlistTable from 'components/visual/SearchResult/badlist';
 import SearchResultCount from 'components/visual/SearchResultCount';
-import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';

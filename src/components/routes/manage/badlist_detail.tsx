@@ -15,11 +15,10 @@ import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
 import Histogram from 'components/visual/Histogram';
 import InputDialog from 'components/visual/InputDialog';
+import Moment from 'components/visual/Moment';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
-import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -80,7 +79,7 @@ type BadlistDetailProps = {
   close?: () => void;
 };
 
-const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
+const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailProps) => {
   const { t, i18n } = useTranslation(['manageBadlistDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -715,10 +714,7 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                 {badlist ? (
                   <div>
                     <Moment format="YYYY-MM-DD">{badlist.added}</Moment>&nbsp; (
-                    <Moment fromNow locale={i18n.language}>
-                      {badlist.added}
-                    </Moment>
-                    )
+                    <Moment variant="fromNow">{badlist.added}</Moment>)
                   </div>
                 ) : (
                   <Skeleton />
@@ -731,10 +727,7 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                 {badlist ? (
                   <div>
                     <Moment format="YYYY-MM-DD">{badlist.updated}</Moment>&nbsp; (
-                    <Moment fromNow locale={i18n.language}>
-                      {badlist.updated}
-                    </Moment>
-                    )
+                    <Moment variant="fromNow">{badlist.updated}</Moment>)
                   </div>
                 ) : (
                   <Skeleton />
@@ -748,10 +741,7 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
                   badlist.expiry_ts ? (
                     <div>
                       <Moment format="YYYY-MM-DD">{badlist.expiry_ts}</Moment>&nbsp; (
-                      <Moment fromNow locale={i18n.language}>
-                        {badlist.expiry_ts}
-                      </Moment>
-                      )
+                      <Moment variant="fromNow">{badlist.expiry_ts}</Moment>)
                     </div>
                   ) : (
                     <span style={{ color: theme.palette.action.disabled }}>{t('expiry.forever')}</span>
@@ -780,11 +770,6 @@ const BadlistDetail = ({ badlist_id, close }: BadlistDetailProps) => {
   ) : (
     <ForbiddenPage />
   );
-};
-
-BadlistDetail.defaultProps = {
-  badlist_id: null,
-  close: () => {}
 };
 
 export default BadlistDetail;

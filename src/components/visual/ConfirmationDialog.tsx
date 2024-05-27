@@ -8,6 +8,7 @@ import {
   DialogTitle,
   Stack
 } from '@mui/material';
+import React from 'react';
 
 export type ConfirmationDialogProps = {
   open: boolean;

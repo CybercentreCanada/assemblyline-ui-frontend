@@ -4,10 +4,11 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import LeftNavDrawer from 'commons/components/leftnav/LeftNavDrawer';
 import AppBar from 'commons/components/topnav/AppBar';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
-import { createContext, ReactNode, useCallback, useMemo, useState } from 'react';
-import { AppLayoutMode } from '../AppConfigs';
+import type { ReactNode } from 'react';
+import { createContext, useCallback, useMemo, useState } from 'react';
+import type { AppLayoutMode } from '../AppConfigs';
 import { AppStorageKeys } from '../AppConstants';
-import { AppLayoutContextType } from '../AppContexts';
+import type { AppLayoutContextType } from '../AppContexts';
 
 const { LS_KEY_LAYOUT_MODE } = AppStorageKeys;
 

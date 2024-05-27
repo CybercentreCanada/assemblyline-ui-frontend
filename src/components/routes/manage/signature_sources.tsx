@@ -31,11 +31,11 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiGitBranch } from 'react-icons/di';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import { Source } from '../admin/service_detail';
@@ -415,11 +415,9 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
               <div>
                 <span className={classes.card_caption}>{t('update.label.last_successful')}:&nbsp;</span>
                 <Tooltip title={source.status.last_successful_update}>
-                  <>
-                    <Moment className={classes.card_caption} fromNow locale={i18n.language}>
-                      {source.status.last_successful_update}
-                    </Moment>
-                  </>
+                  <div className={classes.card_caption}>
+                    <Moment variant="fromNow">{source.status.last_successful_update}</Moment>
+                  </div>
                 </Tooltip>
               </div>
               <Tooltip title={`${source.status.message} @ ${source.status.ts}`}>

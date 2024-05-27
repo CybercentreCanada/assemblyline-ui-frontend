@@ -25,7 +25,6 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { MonacoEditor } from 'components/visual/MonacoEditor';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -312,10 +311,5 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
 }
 
 export const RetrohuntCreate = React.memo(WrappedRetrohuntCreate);
-
-WrappedRetrohuntCreate.defaultProps = {
-  isDrawer: false,
-  retrohuntRef: null
-} as Props;
 
 export default WrappedRetrohuntCreate;

@@ -1,4 +1,5 @@
-import { OptionsObject, useSnackbar } from 'notistack';
+import type { OptionsObject } from 'notistack';
+import { useSnackbar } from 'notistack';
 
 export default function useMySnackbar() {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();

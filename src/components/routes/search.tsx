@@ -74,7 +74,7 @@ type SearchResults = {
   total: number;
 };
 
-function Search({ index }: SearchProps) {
+function Search({ index = null }: SearchProps) {
   const { id } = useParams<ParamProps>();
   const { t } = useTranslation(['search']);
   const [pageSize] = useState(PAGE_SIZE);
@@ -421,9 +421,5 @@ function Search({ index }: SearchProps) {
     </PageFullWidth>
   );
 }
-
-Search.defaultProps = {
-  index: null
-};
 
 export default Search;

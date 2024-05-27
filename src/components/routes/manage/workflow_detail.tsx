@@ -36,12 +36,11 @@ import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
+import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import AlertsTable from 'components/visual/SearchResult/alerts';
-import 'moment/locale/fr';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -106,7 +105,7 @@ const useStyles = makeStyles(theme => ({
 
 const THROTTLER = new Throttler(250);
 
-const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDetailProps) => {
+const WrappedWorkflowDetail = ({ workflow_id = null, close = () => null, mode = 'read' }: WorkflowDetailProps) => {
   const { t, i18n } = useTranslation(['manageWorkflowDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -715,9 +714,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                   </Grid>
                   <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.first_seen ? (
-                      <Moment fromNow locale={i18n.language}>
-                        {workflow.first_seen}
-                      </Moment>
+                      <Moment variant="fromNow">{workflow.first_seen}</Moment>
                     ) : (
                       t('hit.none')
                     )}
@@ -727,9 +724,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                   </Grid>
                   <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.last_seen ? (
-                      <Moment fromNow locale={i18n.language}>
-                        {workflow.last_seen}
-                      </Moment>
+                      <Moment variant="fromNow">{workflow.last_seen}</Moment>
                     ) : (
                       t('hit.none')
                     )}
@@ -747,11 +742,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                   <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.creator ? (
                       <>
-                        {workflow.creator} [
-                        <Moment fromNow locale={i18n.language}>
-                          {workflow.creation_date}
-                        </Moment>
-                        ]
+                        {workflow.creator} [<Moment variant="fromNow">{workflow.creation_date}</Moment>]
                       </>
                     ) : (
                       <Skeleton />
@@ -763,11 +754,7 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
                   <Grid item xs={9} sm={8} md={9} lg={9}>
                     {workflow && workflow.edited_by ? (
                       <>
-                        {workflow.edited_by} [
-                        <Moment fromNow locale={i18n.language}>
-                          {workflow.last_edit}
-                        </Moment>
-                        ]
+                        {workflow.edited_by} [<Moment variant="fromNow">{workflow.last_edit}</Moment>]
                       </>
                     ) : (
                       <Skeleton />
@@ -802,11 +789,6 @@ const WrappedWorkflowDetail = ({ workflow_id, close, mode = 'read' }: WorkflowDe
   ) : (
     <ForbiddenPage />
   );
-};
-
-WrappedWorkflowDetail.defaultProps = {
-  workflow_id: null,
-  close: () => {}
 };
 
 const WorkflowDetail = React.memo(WrappedWorkflowDetail);
