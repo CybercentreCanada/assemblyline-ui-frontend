@@ -204,39 +204,6 @@ const Submit: React.FC<any> = () => {
     flow.upload();
   };
 
-  function analyseUrlHash() {
-    let data: any = null;
-    setAllowClick(false);
-
-    if (!stringType && (stringType !== 'url' || !configuration.ui.allow_url_submissions)) {
-      setAllowClick(true);
-      setStringInputHasError(true);
-      showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
-      return;
-    }
-
-    data = { ui_params: settings, [stringType]: stringInput, metadata: submissionMetadata };
-
-    setStringInputHasError(false);
-    apiCall({
-      url: '/api/v4/submit/',
-      method: 'POST',
-      body: data,
-      onSuccess: api_data => {
-        setAllowClick(false);
-        showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
-        setTimeout(() => {
-          navigate(`/submission/detail/${api_data.api_response.sid}`);
-        }, 500);
-      },
-      onFailure: api_data => {
-        showErrorMessage(api_data.api_error_message);
-        setStringInputHasError(true);
-        setAllowClick(true);
-      }
-    });
-  }
-
   const executeCB = () => {
     setValidate(false);
     if (validateCB === 'file') {
