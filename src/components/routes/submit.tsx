@@ -230,6 +230,9 @@ const Submit: React.FC<any> = () => {
         }, 500);
       },
       onFailure: api_data => {
+        if (api_data.api_status_code === 400 && api_data.api_error_message.includes('metadata')) {
+          setValue('2');
+        }
         showErrorMessage(api_data.api_error_message);
         setStringInputHasError(true);
         setAllowClick(true);
@@ -364,42 +367,6 @@ const Submit: React.FC<any> = () => {
     setStringType(getSubmitType(string, configuration));
     setStringInputHasError(false);
     setStringInput(string);
-  }
-
-  function analyseUrlHash() {
-    let data: any = null;
-    setAllowClick(false);
-
-    if (!stringType && (stringType !== 'url' || !configuration.ui.allow_url_submissions)) {
-      setAllowClick(true);
-      setStringInputHasError(true);
-      showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
-      return;
-    }
-
-    data = { ui_params: settings, [stringType]: stringInput, metadata: submissionMetadata };
-
-    setStringInputHasError(false);
-    apiCall({
-      url: '/api/v4/submit/',
-      method: 'POST',
-      body: data,
-      onSuccess: api_data => {
-        setAllowClick(false);
-        showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
-        setTimeout(() => {
-          navigate(`/submission/detail/${api_data.api_response.sid}`);
-        }, 500);
-      },
-      onFailure: api_data => {
-        if (api_data.api_status_code === 400 && api_data.api_error_message.includes('metadata')) {
-          setValue('2');
-        }
-        showErrorMessage(api_data.api_error_message);
-        setStringInputHasError(true);
-        setAllowClick(true);
-      }
-    });
   }
 
   useEffect(() => {
