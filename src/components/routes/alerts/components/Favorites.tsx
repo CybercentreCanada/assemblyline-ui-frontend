@@ -21,7 +21,6 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
-import { DEFAULT_QUERY } from 'components/routes/alerts';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -31,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import { useAlerts } from '../contexts/AlertsContext';
+import { useDefaultSearchParams } from '../contexts/DefaultSearchParamsContext';
 
 const useStyles = makeStyles(theme => ({
   drawerInner: {
@@ -83,6 +83,7 @@ const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
     const { c12nDef } = useALContext();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+    const { defaultQuery } = useDefaultSearchParams();
 
     const [open, setOpen] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
@@ -366,6 +367,7 @@ const WrappedAlertFavorites = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { c12nDef } = useALContext();
+  const { defaultQuery } = useDefaultSearchParams();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -393,37 +395,37 @@ const WrappedAlertFavorites = () => {
 
   const handleUpdateFavorites = useCallback(
     (nextFavorite: Favorite, prevFavorite: Favorite, global: boolean) => {
-      const query = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
+      const query = new SimpleSearchQuery(location.search, defaultQuery);
       query.replace('fq', prevFavorite.query, nextFavorite.query);
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
 
       updateFavorite(nextFavorite, global);
       setCurrentFavorite(defaultFavorite);
     },
-    [defaultFavorite, location.hash, location.pathname, location.search, navigate, updateFavorite]
+    [defaultFavorite, defaultQuery, location.hash, location.pathname, location.search, navigate, updateFavorite]
   );
 
   const handleDeleteFavorites = useCallback(
     (favorite: Favorite, global: boolean) => {
-      const query = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
+      const query = new SimpleSearchQuery(location.search, defaultQuery);
       query.remove('fq', favorite.query);
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
 
       deleteFavorite(favorite, global);
       setCurrentFavorite(defaultFavorite);
     },
-    [defaultFavorite, deleteFavorite, location.hash, location.pathname, location.search, navigate]
+    [defaultFavorite, defaultQuery, deleteFavorite, location.hash, location.pathname, location.search, navigate]
   );
 
   const handleFavoriteClick = useCallback(
     (favorite: Favorite) => {
-      const query = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
+      const query = new SimpleSearchQuery(location.search, defaultQuery);
       query.add('fq', favorite.query);
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
 
       setOpen(false);
     },
-    [location.hash, location.pathname, location.search, navigate]
+    [defaultQuery, location.hash, location.pathname, location.search, navigate]
   );
 
   const handleEditClick = useCallback(

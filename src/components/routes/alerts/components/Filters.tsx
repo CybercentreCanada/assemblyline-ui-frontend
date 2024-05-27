@@ -20,7 +20,7 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { DEFAULT_PARAMS, DEFAULT_QUERY } from 'components/routes/alerts';
+import { DEFAULT_PARAMS } from 'components/routes/alerts';
 import CustomChip from 'components/visual/CustomChip';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { safeFieldValue } from 'helpers/utils';
@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import { useAlerts } from '../contexts/AlertsContext';
+import { useDefaultSearchParams } from '../contexts/DefaultSearchParamsContext';
 import { buildSearchQuery } from '../utils/alertUtils';
 import { Favorite } from './Favorites';
 
@@ -438,12 +439,13 @@ const WrappedAlertFilters = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { apiCall } = useMyAPI();
+  const { defaultQuery } = useDefaultSearchParams();
 
   const alertValues = useAlerts();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
-  const [query, setQuery] = useState(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
+  const [query, setQuery] = useState(new SimpleSearchQuery(location.search, defaultQuery));
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
   const [options, setOptions] = useState<Record<FilterType, Record<string, { count: number; total: number }>>>({
@@ -506,14 +508,14 @@ const WrappedAlertFilters = () => {
             singles: ['q', 'tc', 'tc_start', 'no_delay'],
             multiples: ['fq'],
             strip: [strip],
-            defaultString: DEFAULT_QUERY,
+            defaultString: defaultQuery,
             groupByAsFilter: true
           }).toString()}`
         ])
       ),
       other: ''
     }),
-    [query]
+    [defaultQuery, query]
   );
 
   const otherURL = useMemo<string>(() => {
@@ -521,7 +523,7 @@ const WrappedAlertFilters = () => {
       search: query.getDeltaString(),
       singles: ['q', 'tc', 'tc_start', 'no_delay'],
       multiples: ['fq'],
-      defaultString: DEFAULT_QUERY,
+      defaultString: defaultQuery,
       groupByAsFilter: true
     });
 
@@ -529,7 +531,7 @@ const WrappedAlertFilters = () => {
       q.remove('fq', filter.value);
     });
     return `/api/v4/alert/statistics/?${q.toString()}`;
-  }, [filters.others, query]);
+  }, [defaultQuery, filters.others, query]);
 
   const toFilterOptions = useCallback(
     (values: Record<string, { count: number; total: number }>, prefix: string = ''): Filter[] => {
@@ -545,25 +547,28 @@ const WrappedAlertFilters = () => {
     []
   );
 
-  const handleClear = useCallback(() => setQuery(new SimpleSearchQuery('', DEFAULT_QUERY)), []);
+  const handleClear = useCallback(() => setQuery(new SimpleSearchQuery('', defaultQuery)), [defaultQuery]);
 
   const handleApply = useCallback(() => {
     navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
     setOpen(false);
   }, [location.hash, location.pathname, navigate, query]);
 
-  const handleQueryChange = useCallback((key: string, value: string) => {
-    setQuery(prev => {
-      const q = new SimpleSearchQuery(prev.toString([]), DEFAULT_QUERY);
-      q.set(key, value);
-      return q;
-    });
-  }, []);
+  const handleQueryChange = useCallback(
+    (key: string, value: string) => {
+      setQuery(prev => {
+        const q = new SimpleSearchQuery(prev.toString([]), defaultQuery);
+        q.set(key, value);
+        return q;
+      });
+    },
+    [defaultQuery]
+  );
 
   const handleFiltersChange = useCallback(
     (prefix: string, next: Filter[], previous: Filter[], limit: number = null) => {
       setQuery(prev => {
-        const q = new SimpleSearchQuery(prev.toString([]), DEFAULT_QUERY);
+        const q = new SimpleSearchQuery(prev.toString([]), defaultQuery);
 
         previous.forEach(fq => {
           q.remove('fq', fq.not ? `NOT(${fq.value})` : `${fq.value}`);
@@ -576,7 +581,7 @@ const WrappedAlertFilters = () => {
         return q;
       });
     },
-    []
+    [defaultQuery]
   );
 
   const handleOptionsChange = useCallback(
@@ -630,8 +635,8 @@ const WrappedAlertFilters = () => {
   }, []);
 
   useEffect(() => {
-    if (open) setQuery(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
-  }, [location.search, open]);
+    if (open) setQuery(new SimpleSearchQuery(location.search, defaultQuery));
+  }, [defaultQuery, location.search, open]);
 
   useEffect(() => {
     if (render) {

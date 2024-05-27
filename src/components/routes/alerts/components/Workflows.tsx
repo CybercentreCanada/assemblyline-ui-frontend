@@ -279,7 +279,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                       }));
                   }}
                   renderInput={props => <TextField {...props} label={t('labels')} variant="outlined" />}
-                  renderOption={(props, option, state, ownerState) => {
+                  renderOption={(props, option, state) => {
                     const matches = match(option, state.inputValue, { insideWords: true });
                     const parts = parse(option, matches);
                     return (

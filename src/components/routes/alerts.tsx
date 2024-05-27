@@ -24,7 +24,8 @@ import AlertListItem from './alerts/components/ListItem';
 import { AlertSearchResults } from './alerts/components/Results';
 import AlertWorkflows from './alerts/components/Workflows';
 import { AlertsProvider } from './alerts/contexts/AlertsContext';
-import AlertDetail2 from './alerts/detail';
+import { DefaultSearchParamsProvider, useDefaultSearchParams } from './alerts/contexts/DefaultSearchParamsContext';
+import { AlertDetail } from './alerts/detail';
 import { Alert, AlertItem } from './alerts/models/Alert';
 import { buildSearchQuery, getGroupBy } from './alerts/utils/alertUtils';
 
@@ -46,19 +47,23 @@ type GroupedResponse = {
 
 export const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist';
 
+export const LOCAL_STORAGE = 'alert.search';
+
 export const DEFAULT_PARAMS = {
   offset: 0,
   rows: 50,
   tc: '4d',
   group_by: 'file.sha256',
-  sort: 'reporting_ts desc'
+  sort: 'reporting_ts desc',
+  fq: [],
+  tc_start: null
 } as const;
 
 export const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
   .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
   .join('&');
 
-const WrappedAlertsPage = () => {
+const WrappedAlertsContent = () => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const location = useLocation();
@@ -67,12 +72,12 @@ const WrappedAlertsPage = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
+  const { defaultQuery } = useDefaultSearchParams();
 
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [countedTotal, setCountedTotal] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
-  const [initialized, setInitialized] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
 
   const queryRef = useRef<string>(null);
@@ -85,8 +90,8 @@ const WrappedAlertsPage = () => {
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
   const query = useMemo<SimpleSearchQuery>(
-    () => new SimpleSearchQuery(location.search, DEFAULT_QUERY),
-    [location.search]
+    () => new SimpleSearchQuery(location.search, defaultQuery),
+    [defaultQuery, location.search]
   );
 
   const suggestions = useMemo<string[]>(
@@ -122,10 +127,19 @@ const WrappedAlertsPage = () => {
 
   const handleFetch = useCallback(
     (current: SimpleSearchQuery, offset: number) => {
-      current.delete('tc_start');
-      const search = current.toString([]);
+      const q = buildSearchQuery({
+        search: current.toString([]),
+        singles: ['q', 'no_delay', 'sort', 'tc', 'track_total_hits'],
+        multiples: ['fq'],
+        defaultString: defaultQuery
+      });
 
-      if (loadingRef.current || (search === prevSearch.current && offset === prevOffset.current)) return;
+      q.set('offset', offset);
+      q.set('rows', DEFAULT_PARAMS.rows);
+
+      const search = JSON.stringify(q.getParams());
+
+      if (loadingRef.current || search === prevSearch.current) return;
       prevSearch.current = search;
       prevOffset.current = offset;
       loadingRef.current = true;
@@ -136,22 +150,12 @@ const WrappedAlertsPage = () => {
         navigate(`${location.pathname}?${current.getDeltaString()}${location.hash}`);
       }
 
-      const groupBy = getGroupBy(search, DEFAULT_QUERY);
+      const groupBy = getGroupBy(search, defaultQuery);
       const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
-
-      const newQuery = buildSearchQuery({
-        search: search,
-        singles: ['q', 'no_delay', 'sort', 'tc', 'track_total_hits'],
-        multiples: ['fq'],
-        defaultString: DEFAULT_QUERY
-      });
-
-      newQuery.set('offset', offset);
-      newQuery.set('rows', DEFAULT_PARAMS.rows);
-      executionTime.current && newQuery.set('tc_start', executionTime.current);
+      executionTime.current && q.set('tc_start', executionTime.current);
 
       apiCall({
-        url: `${pathname}?${newQuery.toString()}`,
+        url: `${pathname}?${q.toString()}`,
         method: 'GET',
         onSuccess: ({ api_response }: { api_response: ListResponse | GroupedResponse }) => {
           setCountedTotal('counted_total' in api_response ? api_response.counted_total : api_response.items.length);
@@ -184,7 +188,7 @@ const WrappedAlertsPage = () => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.hash, location.pathname, navigate]
+    [defaultQuery, location.hash, location.pathname, navigate]
   );
 
   const handleSelectedItemChange = useCallback(
@@ -208,18 +212,14 @@ const WrappedAlertsPage = () => {
     if (location.hash) {
       const id = location.hash.substr(1);
       const alert = alerts.find(item => item.alert_id === id);
-      setGlobalDrawer(<AlertDetail2 id={id} alert={alert} inDrawer />, { hasMaximize: true });
+      setGlobalDrawer(<AlertDetail id={id} alert={alert} inDrawer />, { hasMaximize: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash, setGlobalDrawer]);
 
   useEffect(() => {
-    if (location.search === '') setInitialized(false);
-  }, [location.search]);
-
-  useEffect(() => {
-    initialized && handleFetch(query, 0);
-  }, [handleFetch, initialized, query]);
+    handleFetch(query, 0);
+  }, [handleFetch, query]);
 
   useEffect(() => {
     const update = ({ detail }: CustomEvent<Alert[]>) => {
@@ -264,7 +264,7 @@ const WrappedAlertsPage = () => {
             </Grid>
 
             <Grid item xs style={{ textAlign: 'right', flex: 0 }}>
-              <AlertDefaultSearchParameters value={initialized} onChange={value => setInitialized(value)} />
+              <AlertDefaultSearchParameters />
             </Grid>
           </Grid>
           <PageHeader isSticky>
@@ -324,6 +324,19 @@ const WrappedAlertsPage = () => {
       </AlertsProvider>
     );
 };
+
+export const AlertsContent = React.memo(WrappedAlertsContent);
+
+const WrappedAlertsPage = () => (
+  <DefaultSearchParamsProvider
+    params={DEFAULT_PARAMS}
+    storageKey={LOCAL_STORAGE}
+    enforceParams={['offset', 'rows']}
+    ignoreParams={['tc_start']}
+  >
+    <AlertsContent />
+  </DefaultSearchParamsProvider>
+);
 
 export const AlertsPage = React.memo(WrappedAlertsPage);
 export default AlertsPage;

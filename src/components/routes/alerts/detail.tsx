@@ -12,7 +12,7 @@ import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
-import { ALERT_SIMPLELIST_ID } from 'components/routes/alerts';
+import { ALERT_SIMPLELIST_ID, DEFAULT_PARAMS, LOCAL_STORAGE } from 'components/routes/alerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import ActionableText from 'components/visual/ActionableText';
 import { ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
@@ -42,6 +42,7 @@ import {
   AutoHideChipList,
   SkeletonInline
 } from './components/Components';
+import { DefaultSearchParamsProvider } from './contexts/DefaultSearchParamsContext';
 import { AlertItem } from './models/Alert';
 
 const useStyles = makeStyles(theme => ({
@@ -73,7 +74,7 @@ type Props = {
   inDrawer?: boolean;
 };
 
-const WrappedAlertDetail = ({ id: propId = null, alert: propAlert = null, inDrawer = false }: Props) => {
+const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null, inDrawer = false }: Props) => {
   const { t } = useTranslation(['alerts']);
   const theme = useTheme();
   const classes = useStyles();
@@ -998,6 +999,19 @@ const WrappedAlertDetail = ({ id: propId = null, alert: propAlert = null, inDraw
     <ForbiddenPage />
   );
 };
+
+const AlertDetailContent = React.memo(WrappedAlertDetailContent);
+
+const WrappedAlertDetail = (props: Props) => (
+  <DefaultSearchParamsProvider
+    params={DEFAULT_PARAMS}
+    storageKey={LOCAL_STORAGE}
+    enforceParams={['offset', 'rows']}
+    ignoreParams={['tc_start']}
+  >
+    <AlertDetailContent {...props} />
+  </DefaultSearchParamsProvider>
+);
 
 export const AlertDetail = React.memo(WrappedAlertDetail);
 export default AlertDetail;

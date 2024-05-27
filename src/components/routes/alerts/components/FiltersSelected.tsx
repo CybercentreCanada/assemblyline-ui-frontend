@@ -6,7 +6,6 @@ import StarIcon from '@mui/icons-material/Star';
 import { ChipProps, ListItemIcon, ListItemText, Menu, MenuItem, MenuItemProps, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { DEFAULT_QUERY } from 'components/routes/alerts';
 import CustomChip from 'components/visual/CustomChip';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
@@ -161,7 +160,7 @@ type Props = {
 };
 
 const WrappedAlertFiltersSelected = ({
-  query = new SimpleSearchQuery('', DEFAULT_QUERY),
+  query = null,
   hideQuery = false,
   hideTC = false,
   hideTCStart = false,
@@ -174,7 +173,6 @@ const WrappedAlertFiltersSelected = ({
   const classes = useStyles();
   const location = useLocation();
   const navigate = useNavigate();
-
   const alertValues = useAlerts();
 
   const allFavorites = useMemo<Favorite[]>(
@@ -183,6 +181,8 @@ const WrappedAlertFiltersSelected = ({
   );
 
   const params = useMemo<{ [key: string]: string }>(() => (!query ? {} : query.getParams()), [query]);
+
+  console.log(params);
 
   const filters = useMemo<Filters>(() => {
     let defaults = { status: [], priority: [], labels: [], favorites: [], others: [] };
