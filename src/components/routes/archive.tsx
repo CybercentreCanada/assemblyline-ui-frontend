@@ -62,10 +62,10 @@ const PAGE_SIZE = 25;
 const DEFAULT_TC = '1m';
 
 const TC_MAP = {
-  '24h': 'seen.last:[now-24h TO now]',
-  '4d': 'seen.last:[now-4d TO now]',
-  '7d': 'seen.last:[now-7d TO now]',
-  '1m': 'seen.last:[now-1M TO now]'
+  '24h': '(archive_ts:* AND archive_ts:[now-24h TO now]) OR (NOT archive_ts:* AND seen.last:[now-24h TO now])',
+  '4d': '(archive_ts:* AND archive_ts:[now-4d TO now]) OR (NOT archive_ts:* AND seen.last:[now-4d TO now])',
+  '7d': '(archive_ts:* AND archive_ts:[now-7d TO now]) OR (NOT archive_ts:* AND seen.last:[now-7d TO now])',
+  '1m': '(archive_ts:* AND archive_ts:[now-1M TO now]) OR (NOT archive_ts:* AND seen.last:[now-1M TO now])'
 };
 
 const START_MAP = {
@@ -90,7 +90,8 @@ const DEFAULT_PARAMS: object = {
   rows: PAGE_SIZE,
   archive_only: true,
   is_supplementary: false,
-  tc: DEFAULT_TC
+  tc: DEFAULT_TC,
+  sort: 'archive_ts desc'
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -178,7 +179,7 @@ export default function MalwareArchive() {
         });
 
         apiCall({
-          url: `/api/v4/search/histogram/file/seen.last/?start=${START_MAP[tc]}&end=now&gap=${
+          url: `/api/v4/search/histogram/file/archive_ts/?start=${START_MAP[tc]}&end=now&gap=${
             GAP_MAP[tc]
           }&mincount=0&${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
           onSuccess: api_data => setHistogram(api_data.api_response)
@@ -449,7 +450,7 @@ export default function MalwareArchive() {
                     const keys = Object.keys(histogram);
                     query.add(
                       'filters',
-                      `seen.last:[${keys[ind]} TO ${keys.length - 1 === ind ? 'now' : keys[ind + 1]}]`
+                      `archive_ts:[${keys[ind]} TO ${keys.length - 1 === ind ? 'now' : keys[ind + 1]}]`
                     );
                     navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                   }
