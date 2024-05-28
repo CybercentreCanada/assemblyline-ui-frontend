@@ -39,26 +39,14 @@ const useMyPreferences = () => {
 
   const AL_LIGHT_LOGO = useMemo(
     (): ReactElement<any> => (
-      <img
-        alt={t('logo.alt')}
-        src={`/images/noswoop.svg`}
-        width="40"
-        height="32"
-        style={{ marginLeft: '-8px' }}
-      />
+      <img alt={t('logo.alt')} src={`/images/noswoop.svg`} width="40" height="32" style={{ marginLeft: '-8px' }} />
     ),
     [t]
   );
 
   const AL_DARK_LOGO = useMemo(
     (): ReactElement<any> => (
-      <img
-        alt={t('logo.alt')}
-        src={`/images/noswoop_dark.svg`}
-        width="40"
-        height="32"
-        style={{ marginLeft: '-8px' }}
-      />
+      <img alt={t('logo.alt')} src={`/images/noswoop_dark.svg`} width="40" height="32" style={{ marginLeft: '-8px' }} />
     ),
     [t]
   );
@@ -89,7 +77,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`${process.env.PUBLIC_URL}/images/vertical_banner.svg`}
+        src={`/images/vertical_banner.svg`}
         alt={t('banner.alt')}
       />
     ),
@@ -100,7 +88,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`${process.env.PUBLIC_URL}/images/vertical_banner_dark.svg`}
+        src={`/images/vertical_banner_dark.svg`}
         alt={t('banner.alt')}
       />
     ),
