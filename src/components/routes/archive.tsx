@@ -153,7 +153,7 @@ export default function MalwareArchive() {
   );
 
   const handleLabelClick = useCallback(
-    (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => {
+    (_event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => {
       if (!searching) {
         query.add('filters', `labels:${safeFieldValue(label)}`);
         navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
@@ -444,7 +444,7 @@ export default function MalwareArchive() {
                 datatype={t('graph.datatype')}
                 isDate
                 verticalLine
-                onClick={(evt, element) => {
+                onClick={(_evt, element) => {
                   if (!searching && element.length > 0) {
                     const ind = element[0].index;
                     const keys = Object.keys(histogram);
@@ -463,7 +463,7 @@ export default function MalwareArchive() {
                 height="200px"
                 title={t('graph.labels.title')}
                 datatype={t('graph.datatype')}
-                onClick={(evt, element) => {
+                onClick={(_evt, element) => {
                   if (!searching && element.length > 0) {
                     var ind = element[0].index;
                     query.add('filters', `labels:${safeFieldValue(Object.keys(labels)[ind])}`);
@@ -478,7 +478,7 @@ export default function MalwareArchive() {
                 height="200px"
                 title={t('graph.type.title')}
                 datatype={t('graph.datatype')}
-                onClick={(evt, element) => {
+                onClick={(_evt, element) => {
                   if (!searching && element.length > 0) {
                     var ind = element[0].index;
                     query.add('filters', `type:${safeFieldValue(Object.keys(types)[ind])}`);
