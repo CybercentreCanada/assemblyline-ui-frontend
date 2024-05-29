@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
-import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import useAppBannerVert from 'commons/components/app/hooks/useAppBannerVert';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import useALContext from 'components/hooks/useALContext';
@@ -17,7 +17,7 @@ export default function AppRegistration() {
   const navigate = useNavigate();
   const { t } = useTranslation(['authorize']);
   const theme = useTheme();
-  const banner = useAppBanner();
+  const banner = useAppBannerVert();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { configuration } = useALContext();
 
