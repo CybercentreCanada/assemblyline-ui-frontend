@@ -234,11 +234,6 @@ export default function MalwareArchive() {
       curQuery.add('filters', 'NOT is_supplementary:true');
     }
 
-    const tc = curQuery.pop('tc') || DEFAULT_TC;
-    if (tc !== '1y') {
-      curQuery.add('filters', TC_MAP[tc]);
-    }
-
     setParsedQuery(new SimpleSearchQuery(curQuery.toString()));
   }, [query]);
 
