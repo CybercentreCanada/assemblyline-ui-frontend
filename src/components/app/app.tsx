@@ -77,7 +77,6 @@ const MyAppMain = () => {
         oAuthProviders={loginParams.oauth_providers}
         allowUserPass={loginParams.allow_userpass_login}
         allowSignup={loginParams.allow_signup}
-        allowPWReset={loginParams.allow_pw_rest}
         allowSAML={loginParams.allow_saml_login}
       />
     ) : (
