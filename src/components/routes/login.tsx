@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { Box, Button, CircularProgress, Link, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Button, CircularProgress, Link, Stack, Typography } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
@@ -37,22 +37,14 @@ type LoginScreenProps = {
   allowUserPass: boolean;
   allowSAML: boolean;
   allowSignup: boolean;
-  allowPWReset: boolean;
   oAuthProviders: string[];
 };
 
-export default function LoginScreen({
-  allowUserPass,
-  allowSAML,
-  allowSignup,
-  allowPWReset,
-  oAuthProviders
-}: LoginScreenProps) {
+export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAuthProviders }: LoginScreenProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const { t } = useTranslation(['login']);
-  const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const bannerVert = useAppBannerVert();
@@ -73,7 +65,6 @@ export default function LoginScreen({
   const [oneTimePass, setOneTimePass] = useState('');
   const [webAuthNResponse, setWebAuthNResponse] = useState(null);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const pwPadding = allowSignup ? 1 : 2;
 
   function reset(event) {
     if ((['oauth'].includes(shownControls) && oauthTokenID) || !['oauth'].includes(shownControls)) {
@@ -226,28 +217,30 @@ export default function LoginScreen({
           login: (
             <>
               {allowUserPass ? (
-                <UserPassLogin
-                  onSubmit={onSubmit}
-                  buttonLoading={buttonLoading}
-                  setPassword={setPassword}
-                  setUsername={setUsername}
-                />
-              ) : null}
-              {allowUserPass && allowSignup ? (
-                <Typography align="center" variant="caption" style={{ marginTop: theme.spacing(2) }}>
-                  {t('signup')}&nbsp;&nbsp;
-                  <Link href="#" onClick={signup}>
-                    {t('signup.link')}
-                  </Link>
-                </Typography>
-              ) : null}
-              {allowUserPass && allowPWReset ? (
-                <Typography align="center" variant="caption" style={{ marginTop: theme.spacing(pwPadding) }}>
-                  {t('reset.desc')}&nbsp;&nbsp;
-                  <Link href="#" onClick={resetPW}>
-                    {t('reset.link')}
-                  </Link>
-                </Typography>
+                <Stack spacing={1}>
+                  <UserPassLogin
+                    onSubmit={onSubmit}
+                    buttonLoading={buttonLoading}
+                    setPassword={setPassword}
+                    setUsername={setUsername}
+                  />
+                  {allowSignup ? (
+                    <>
+                      <Typography align="center" variant="caption">
+                        {t('signup')}&nbsp;&nbsp;
+                        <Link href="#" onClick={signup}>
+                          {t('signup.link')}
+                        </Link>
+                      </Typography>
+                      <Typography align="center" variant="caption">
+                        {t('reset.desc')}&nbsp;&nbsp;
+                        <Link href="#" onClick={resetPW}>
+                          {t('reset.link')}
+                        </Link>
+                      </Typography>
+                    </>
+                  ) : null}
+                </Stack>
               ) : null}
               {(oAuthProviders !== undefined && oAuthProviders.length !== 0) || allowSAML ? (
                 <>
