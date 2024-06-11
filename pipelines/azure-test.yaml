@@ -35,7 +35,7 @@ jobs:
 
       - script: |
           set -xv  # Echo commands before they are run
-          npm run ci
+          npm run ci-test
         displayName: Test
 
       - script: |
