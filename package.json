@@ -77,9 +77,10 @@
     "build-all": "tsc && vite build",
     "serve": "vite preview --port 3000",
     "test": "vitest run",
-    "ci": "CI=true vitest run --coverage",
+    "ci-test": "CI=true vitest run --coverage",
     "ci-lint": "TIMING=all eslint --color --exit-on-fatal-error .",
-    "eject": "react-scripts eject"
+    "build-test": "CI=true vitest run",
+    "build-lint": "TIMING=all eslint --color --quiet --exit-on-fatal-error ."
   },
   "browserslist": {
     "production": [
