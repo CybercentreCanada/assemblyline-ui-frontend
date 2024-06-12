@@ -30,23 +30,6 @@ services:
       timeout: 30s
       retries: 3
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.10.2
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    ports:
-      - 5601:5601
-    environment:
-      - node.name=kibana
-      - cluster.name=es-docker-cluster
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    healthcheck:
-      test: ['CMD-SHELL', "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'"]
-      interval: 10s
-      timeout: 10s
-      retries: 120
-
   redis:
     image: redis
     ports:
@@ -111,6 +94,27 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
+
+  # # #####################################
+  # # Elasticsearch Components
+  # # #####################################
+
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.10.2
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
+  #   ports:
+  #     - 5601:5601
+  #   environment:
+  #     - node.name=kibana
+  #     - cluster.name=es-docker-cluster
+  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  #   healthcheck:
+  #     test: ['CMD-SHELL', "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'"]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 120
 
   # # #####################################
   # # Test Components
