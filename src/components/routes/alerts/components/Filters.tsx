@@ -20,7 +20,7 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { DEFAULT_PARAMS } from 'components/routes/alerts';
+import { ALERT_DEFAULT_PARAMS } from 'components/routes/alerts';
 import CustomChip from 'components/visual/CustomChip';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { safeFieldValue } from 'helpers/utils';
@@ -29,7 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import { useAlerts } from '../contexts/AlertsContext';
-import { useDefaultSearchParams } from '../contexts/DefaultSearchParamsContext';
+import { useDefaultParams } from '../contexts/DefaultParamsContext';
 import { buildSearchQuery } from '../utils/alertUtils';
 import { Favorite } from './Favorites';
 
@@ -125,7 +125,7 @@ const AlertSort: React.FC<AlertSortProps> = React.memo(({ value = null, onChange
   const menuRef = useRef(null);
 
   const [field, dir] = useMemo<[string, string]>(() => {
-    const defaults = DEFAULT_PARAMS.sort.toString().split(' ');
+    const defaults = ALERT_DEFAULT_PARAMS.sort.toString().split(' ');
     try {
       if (SORT_OPTIONS.some(o => value.startsWith(o.value)) && ['asc', 'desc'].some(v => value.endsWith(v))) {
         const values = value.split(' ');
@@ -439,13 +439,13 @@ const WrappedAlertFilters = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { apiCall } = useMyAPI();
-  const { defaultQuery } = useDefaultSearchParams();
+  const { defaultParams } = useDefaultParams();
 
   const alertValues = useAlerts();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
-  const [query, setQuery] = useState(new SimpleSearchQuery(location.search, defaultQuery));
+  const [query, setQuery] = useState(new SimpleSearchQuery(location.search, defaultParams));
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
   const [options, setOptions] = useState<Record<FilterType, Record<string, { count: number; total: number }>>>({
@@ -508,14 +508,14 @@ const WrappedAlertFilters = () => {
             singles: ['q', 'tc', 'tc_start', 'no_delay'],
             multiples: ['fq'],
             strip: [strip],
-            defaultString: defaultQuery,
+            defaultString: defaultParams,
             groupByAsFilter: true
           }).toString()}`
         ])
       ),
       other: ''
     }),
-    [defaultQuery, query]
+    [defaultParams, query]
   );
 
   const otherURL = useMemo<string>(() => {
@@ -523,7 +523,7 @@ const WrappedAlertFilters = () => {
       search: query.getDeltaString(),
       singles: ['q', 'tc', 'tc_start', 'no_delay'],
       multiples: ['fq'],
-      defaultString: defaultQuery,
+      defaultString: defaultParams.toString(),
       groupByAsFilter: true
     });
 
@@ -531,7 +531,7 @@ const WrappedAlertFilters = () => {
       q.remove('fq', filter.value);
     });
     return `/api/v4/alert/statistics/?${q.toString()}`;
-  }, [defaultQuery, filters.others, query]);
+  }, [defaultParams, filters.others, query]);
 
   const toFilterOptions = useCallback(
     (values: Record<string, { count: number; total: number }>, prefix: string = ''): Filter[] => {
@@ -547,7 +547,7 @@ const WrappedAlertFilters = () => {
     []
   );
 
-  const handleClear = useCallback(() => setQuery(new SimpleSearchQuery('', defaultQuery)), [defaultQuery]);
+  const handleClear = useCallback(() => setQuery(new SimpleSearchQuery('', defaultParams.toString())), [defaultParams]);
 
   const handleApply = useCallback(() => {
     navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
@@ -557,18 +557,18 @@ const WrappedAlertFilters = () => {
   const handleQueryChange = useCallback(
     (key: string, value: string) => {
       setQuery(prev => {
-        const q = new SimpleSearchQuery(prev.toString([]), defaultQuery);
+        const q = new SimpleSearchQuery(prev.toString([]), defaultParams.toString());
         q.set(key, value);
         return q;
       });
     },
-    [defaultQuery]
+    [defaultParams]
   );
 
   const handleFiltersChange = useCallback(
     (prefix: string, next: Filter[], previous: Filter[], limit: number = null) => {
       setQuery(prev => {
-        const q = new SimpleSearchQuery(prev.toString([]), defaultQuery);
+        const q = new SimpleSearchQuery(prev.toString([]), defaultParams.toString());
 
         previous.forEach(fq => {
           q.remove('fq', fq.not ? `NOT(${fq.value})` : `${fq.value}`);
@@ -581,7 +581,7 @@ const WrappedAlertFilters = () => {
         return q;
       });
     },
-    [defaultQuery]
+    [defaultParams]
   );
 
   const handleOptionsChange = useCallback(
@@ -635,8 +635,8 @@ const WrappedAlertFilters = () => {
   }, []);
 
   useEffect(() => {
-    if (open) setQuery(new SimpleSearchQuery(location.search, defaultQuery));
-  }, [defaultQuery, location.search, open]);
+    if (open) setQuery(new SimpleSearchQuery(location.search, defaultParams.toString()));
+  }, [defaultParams, location.search, open]);
 
   useEffect(() => {
     if (render) {
@@ -677,22 +677,22 @@ const WrappedAlertFilters = () => {
               </div>
               <div style={{ marginBottom: theme.spacing(2), marginTop: theme.spacing(2) }}>
                 <AlertSort
-                  value={query.has('sort') ? query.get('sort', '') : DEFAULT_PARAMS.sort.toString()}
+                  value={query.has('sort') ? query.get('sort', '') : ALERT_DEFAULT_PARAMS.sort.toString()}
                   onChange={value => handleQueryChange('sort', value)}
                 />
 
                 <AlertSelect
                   label="tc"
-                  value={query.has('tc') ? query.get('tc', '') : DEFAULT_PARAMS.tc.toString()}
-                  defaultValue={DEFAULT_PARAMS.tc}
+                  value={query.has('tc') ? query.get('tc', '') : ALERT_DEFAULT_PARAMS.tc.toString()}
+                  defaultValue={ALERT_DEFAULT_PARAMS.tc}
                   options={TC_OPTIONS}
                   onChange={value => handleQueryChange('tc', value)}
                 />
 
                 <AlertSelect
                   label="groupBy"
-                  value={query.has('group_by') ? query.get('group_by', '') : DEFAULT_PARAMS.group_by.toString()}
-                  defaultValue={DEFAULT_PARAMS.group_by}
+                  value={query.has('group_by') ? query.get('group_by', '') : ALERT_DEFAULT_PARAMS.group_by.toString()}
+                  defaultValue={ALERT_DEFAULT_PARAMS.group_by}
                   options={GROUPBY_OPTIONS}
                   onChange={value => handleQueryChange('group_by', value)}
                 />

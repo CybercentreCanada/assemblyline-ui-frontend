@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import { useAlerts } from '../contexts/AlertsContext';
-import { useDefaultSearchParams } from '../contexts/DefaultSearchParamsContext';
+import { useDefaultParams } from '../contexts/DefaultParamsContext';
 
 const useStyles = makeStyles(theme => ({
   drawerInner: {
@@ -83,7 +83,7 @@ const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
     const { c12nDef } = useALContext();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showSuccessMessage, showErrorMessage } = useMySnackbar();
-    const { defaultQuery } = useDefaultSearchParams();
+    const { defaultParams } = useDefaultParams();
 
     const [open, setOpen] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
@@ -367,7 +367,7 @@ const WrappedAlertFavorites = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { c12nDef } = useALContext();
-  const { defaultQuery } = useDefaultSearchParams();
+  const { defaultParams } = useDefaultParams();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -395,37 +395,37 @@ const WrappedAlertFavorites = () => {
 
   const handleUpdateFavorites = useCallback(
     (nextFavorite: Favorite, prevFavorite: Favorite, global: boolean) => {
-      const query = new SimpleSearchQuery(location.search, defaultQuery);
+      const query = new SimpleSearchQuery(location.search, defaultParams.toString());
       query.replace('fq', prevFavorite.query, nextFavorite.query);
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
 
       updateFavorite(nextFavorite, global);
       setCurrentFavorite(defaultFavorite);
     },
-    [defaultFavorite, defaultQuery, location.hash, location.pathname, location.search, navigate, updateFavorite]
+    [defaultFavorite, defaultParams, location.hash, location.pathname, location.search, navigate, updateFavorite]
   );
 
   const handleDeleteFavorites = useCallback(
     (favorite: Favorite, global: boolean) => {
-      const query = new SimpleSearchQuery(location.search, defaultQuery);
+      const query = new SimpleSearchQuery(location.search, defaultParams.toString());
       query.remove('fq', favorite.query);
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
 
       deleteFavorite(favorite, global);
       setCurrentFavorite(defaultFavorite);
     },
-    [defaultFavorite, defaultQuery, deleteFavorite, location.hash, location.pathname, location.search, navigate]
+    [defaultFavorite, defaultParams, deleteFavorite, location.hash, location.pathname, location.search, navigate]
   );
 
   const handleFavoriteClick = useCallback(
     (favorite: Favorite) => {
-      const query = new SimpleSearchQuery(location.search, defaultQuery);
+      const query = new SimpleSearchQuery(location.search, defaultParams.toString());
       query.add('fq', favorite.query);
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
 
       setOpen(false);
     },
-    [defaultQuery, location.hash, location.pathname, location.search, navigate]
+    [defaultParams, location.hash, location.pathname, location.search, navigate]
   );
 
   const handleEditClick = useCallback(

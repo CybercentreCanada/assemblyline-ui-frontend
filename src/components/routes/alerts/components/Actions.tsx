@@ -39,7 +39,7 @@ import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
-import { useDefaultSearchParams } from '../contexts/DefaultSearchParamsContext';
+import { useDefaultParams } from '../contexts/DefaultParamsContext';
 import { AlertItem } from '../models/Alert';
 import { buildSearchQuery, getGroupBy } from '../utils/alertUtils';
 import { AlertEventsTable } from './Components';
@@ -250,17 +250,17 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const location = useLocation();
-    const { defaultQuery } = useDefaultSearchParams();
+    const { defaultParams } = useDefaultParams();
 
     const search = useMemo<string>(() => {
       if (!alert || !alert.group_count) return '';
 
-      const query = new SimpleSearchQuery(location.search, defaultQuery);
-      const groupBy = getGroupBy(location.search, defaultQuery);
+      const query = new SimpleSearchQuery(location.search, defaultParams);
+      const groupBy = getGroupBy(location.search, defaultParams);
       query.set('group_by', '');
       query.add('fq', `${groupBy}:${getValueFromPath(alert, groupBy) as string}`);
       return query.getDeltaString();
-    }, [alert, defaultQuery, location.search]);
+    }, [alert, defaultParams, location.search]);
 
     return (
       <AlertActionButton
@@ -451,13 +451,13 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
     const theme = useTheme();
     const location = useLocation();
     const { user: currentUser } = useAppUser<CustomUser>();
-    const { defaultQuery } = useDefaultSearchParams();
+    const { defaultParams } = useDefaultParams();
 
     const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
 
     const groupBy = useMemo<string>(
-      () => (speedDial || inDrawer ? getGroupBy(location.search, defaultQuery) : null),
-      [defaultQuery, inDrawer, location.search, speedDial]
+      () => (speedDial || inDrawer ? getGroupBy(location.search, defaultParams) : null),
+      [defaultParams, inDrawer, location.search, speedDial]
     );
 
     const query = useMemo<SimpleSearchQuery>(() => {
@@ -680,7 +680,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
   const classes = useStyles();
   const location = useLocation();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { defaultQuery } = useDefaultSearchParams();
+  const { defaultParams } = useDefaultParams();
 
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
@@ -801,7 +801,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
                   speedDial
                   vertical={vertical}
                   permanent={permanent}
-                  defaultGroupBy={defaultQuery}
+                  defaultGroupBy={defaultParams}
                   onClick={() => setOpen(false)}
                 />,
                 <AlertGroup

@@ -14,11 +14,11 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { useDefaultSearchParams } from '../contexts/DefaultSearchParamsContext';
+import { useDefaultParams } from '../contexts/DefaultParamsContext';
+import { useSearchParams } from '../contexts/SearchParamsContext';
 import { buildSearchQuery } from '../utils/alertUtils';
 import AlertFiltersSelected from './FiltersSelected';
 
@@ -60,31 +60,32 @@ const WrappedAlertDefaultSearchParameters = () => {
   const classes = useStyles();
   const location = useLocation();
   const { showSuccessMessage } = useMySnackbar();
-  const { defaultQuery, onDefaultQueryChange, onDefaultQueryClear } = useDefaultSearchParams();
+  const { defaultParams, onDefaultChange, onDefaultClear } = useDefaultParams();
+  const { searchParams } = useSearchParams();
 
   const [open, setOpen] = useState<boolean>(false);
 
-  const existingQuery = useMemo<SimpleSearchQuery>(
+  const existingQuery = useMemo<URLSearchParams>(
     () =>
       !open
         ? null
         : buildSearchQuery({
-            search: defaultQuery,
+            search: defaultParams.toString(),
             singles: ['tc', 'group_by', 'sort', 'tc_start'],
             multiples: ['fq']
           }),
-    [defaultQuery, open]
+    [defaultParams, open]
   );
 
   // const existingQuery = useMemo<SimpleSearchQuery>(() => {
   //   if (!open) return null;
   //   return;
-  //   const q = new SimpleSearchQuery(defaultQuery, DEFAULT_QUERY);
+  //   const q = new SimpleSearchQuery(defaultParams, DEFAULT_QUERY);
   //   q.delete('tc_start');
   //   return q;
-  // }, [defaultQuery, open]);
+  // }, [defaultParams, open]);
 
-  const currentQuery = useMemo<SimpleSearchQuery>(
+  const currentQuery = useMemo<URLSearchParams>(
     () =>
       !open
         ? null
@@ -92,17 +93,17 @@ const WrappedAlertDefaultSearchParameters = () => {
             search: location.search,
             singles: ['tc', 'group_by', 'sort', 'tc_start'],
             multiples: ['fq'],
-            defaultString: defaultQuery
+            defaultString: defaultParams.toString()
           }),
-    [defaultQuery, location.search, open]
+    [defaultParams, location.search, open]
   );
 
   // const currentQuery = useMemo<SimpleSearchQuery>(() => {
   //   if (!open) return null;
-  //   const q = new SimpleSearchQuery(location.search, defaultQuery);
+  //   const q = new SimpleSearchQuery(location.search, defaultParams);
   //   q.delete('tc_start');
   //   return q;
-  // }, [defaultQuery, location.search, open]);
+  // }, [defaultParams, location.search, open]);
 
   const hasExistingQuery = useMemo(() => (!open ? false : !localStorage.getItem(LOCAL_STORAGE)), [open]);
 
@@ -170,7 +171,7 @@ const WrappedAlertDefaultSearchParameters = () => {
             disabled={hasExistingQuery}
             children={t('session.clear')}
             onClick={() => {
-              onDefaultQueryClear();
+              onDefaultClear();
               showSuccessMessage(t('session.clear.success'));
               setOpen(false);
             }}
@@ -182,7 +183,7 @@ const WrappedAlertDefaultSearchParameters = () => {
             disabled={!currentQuery || isSameQuery}
             children={t('session.save')}
             onClick={() => {
-              onDefaultQueryChange(location.search);
+              onDefaultChange(location.search);
               showSuccessMessage(t('session.save.success'));
               setOpen(false);
             }}

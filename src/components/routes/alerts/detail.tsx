@@ -11,21 +11,26 @@ import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
-import { ALERT_SIMPLELIST_ID, DEFAULT_PARAMS, LOCAL_STORAGE } from 'components/routes/alerts';
+import type { CustomUser } from 'components/hooks/useMyUser';
+import ForbiddenPage from 'components/routes/403';
+import {
+  ALERT_DEFAULT_QUERY,
+  ALERT_SEARCH_FORMAT,
+  ALERT_SIMPLELIST_ID,
+  ALERT_STORAGE_KEY
+} from 'components/routes/alerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import ActionableText from 'components/visual/ActionableText';
 import { ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
-import { ImageInline } from 'components/visual/image_inline';
 import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
+import { ImageInline } from 'components/visual/image_inline';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { useParams } from 'react-router-dom';
-import ForbiddenPage from '../403';
 import AlertActions, {
   AlertBadlist,
   AlertGroup,
@@ -42,8 +47,8 @@ import {
   AutoHideChipList,
   SkeletonInline
 } from './components/Components';
-import { DefaultSearchParamsProvider } from './contexts/DefaultSearchParamsContext';
-import { AlertItem } from './models/Alert';
+import { DefaultParamsProvider } from './contexts/DefaultParamsContext';
+import type { AlertItem } from './models/Alert';
 
 const useStyles = makeStyles(theme => ({
   section: {
@@ -1003,14 +1008,15 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
 const AlertDetailContent = React.memo(WrappedAlertDetailContent);
 
 const WrappedAlertDetail = (props: Props) => (
-  <DefaultSearchParamsProvider
-    params={DEFAULT_PARAMS}
-    storageKey={LOCAL_STORAGE}
-    enforceParams={['offset', 'rows']}
-    ignoreParams={['tc_start']}
+  <DefaultParamsProvider
+    defaultValue={ALERT_DEFAULT_QUERY}
+    format={ALERT_SEARCH_FORMAT}
+    storageKey={ALERT_STORAGE_KEY}
+    enforced={['offset', 'rows']}
+    ignored={['tc_start']}
   >
     <AlertDetailContent {...props} />
-  </DefaultSearchParamsProvider>
+  </DefaultParamsProvider>
 );
 
 export const AlertDetail = React.memo(WrappedAlertDetail);

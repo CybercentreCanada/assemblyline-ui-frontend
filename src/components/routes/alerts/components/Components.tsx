@@ -27,11 +27,11 @@ import { ActionableCustomChipProps } from 'components/visual/ActionableCustomChi
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
+import Moment from 'components/visual/Moment';
 import { verdictToColor } from 'helpers/utils';
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import Moment from 'react-moment';
 import { To } from 'react-router';
 import { AlertItem, DetailedItem } from '../models/Alert';
 import { detailedItemCompare } from '../utils/alertUtils';
@@ -401,9 +401,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                             <DivTableCell>
                               <Tooltip title={event.ts}>
                                 <span>
-                                  <Moment fromNow locale={i18n.language}>
-                                    {event.ts}
-                                  </Moment>
+                                  <Moment variant="fromNow">{event.ts}</Moment>
                                 </span>
                               </Tooltip>
                             </DivTableCell>
