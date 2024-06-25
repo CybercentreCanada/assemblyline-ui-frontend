@@ -96,7 +96,9 @@ export const DefaultParamsProvider = <T extends Format>({
 }: Props<T>) => {
   const DefaultParamsContext = createCurrentContext<T>();
 
-  const [storageParams, setStorageParams] = useState<URLSearchParams>(new URLSearchParams());
+  const [storageParams, setStorageParams] = useState<URLSearchParams>(() => {
+    return new URLSearchParams(!storageKey ? null : localStorage.getItem(storageKey));
+  });
 
   const searchParams = useMemo<URLSearchParams>(() => new URLSearchParams(defaultValue), [defaultValue]);
 
