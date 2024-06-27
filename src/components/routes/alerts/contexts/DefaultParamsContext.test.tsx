@@ -1,4 +1,5 @@
 import { renderHook } from '@testing-library/react';
+import type { SearchFormat } from './DefaultParamsContext';
 import { DefaultParamsProvider, useDefaultParams } from './DefaultParamsContext';
 
 const storageKey = 'testing.defaultsearchparameters';
@@ -15,8 +16,8 @@ type TestingDefaultSearchParamsProps = {
   value: string;
   defaultValue: string;
   expectedValue: string;
-  expectedObject: any;
-  format: Record<string, 'boolean' | 'number' | 'string' | 'string[]'>;
+  expectedObject: Record<string, boolean | number | string | string[]>;
+  format: SearchFormat<Record<string, boolean | number | string | string[]>>;
   testName?: string;
 };
 

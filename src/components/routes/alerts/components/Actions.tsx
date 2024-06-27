@@ -8,13 +8,12 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WorkHistoryOutlinedIcon from '@mui/icons-material/WorkHistoryOutlined';
+import type { CloseReason, OpenReason } from '@mui/material';
 import {
   Badge,
   CircularProgress,
-  CloseReason,
   Grid,
   IconButton,
-  OpenReason,
   Paper,
   Skeleton,
   SpeedDial,
@@ -30,18 +29,19 @@ import clsx from 'clsx';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/hooks/useMyUser';
+import type { AlertSearchParams } from 'components/routes/alerts';
+import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
+import type { AlertItem } from 'components/routes/alerts/models/Alert';
+import { buildSearchQuery, getGroupBy } from 'components/routes/alerts/utils/alertUtils';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { getValueFromPath } from 'helpers/utils';
-import { To } from 'history';
-import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { To } from 'history';
+import type { CSSProperties } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
-import { useDefaultParams } from '../contexts/DefaultParamsContext';
-import { AlertItem } from '../models/Alert';
-import { buildSearchQuery, getGroupBy } from '../utils/alertUtils';
 import { AlertEventsTable } from './Components';
 import AlertFiltersSelected from './FiltersSelected';
 import { AlertWorkflowDrawer } from './Workflows';
@@ -109,7 +109,7 @@ type AlertActionButtonProps = {
   to?: To;
   tooltipTitle?: string;
   vertical?: boolean;
-  onClick?: React.MouseEventHandler<any>;
+  onClick?: React.MouseEventHandler;
 };
 
 const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
@@ -250,17 +250,20 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const location = useLocation();
-    const { defaultParams } = useDefaultParams();
+
+    const { getSearchParams } = useSearchParams<AlertSearchParams>();
 
     const search = useMemo<string>(() => {
       if (!alert || !alert.group_count) return '';
 
-      const query = new SimpleSearchQuery(location.search, defaultParams);
-      const groupBy = getGroupBy(location.search, defaultParams);
+      const query = getSearchParams();
+      const groupBy = !query.has('group_by') ? '' : query.get('group_by');
+
       query.set('group_by', '');
-      query.add('fq', `${groupBy}:${getValueFromPath(alert, groupBy) as string}`);
-      return query.getDeltaString();
-    }, [alert, defaultParams, location.search]);
+      query.append('fq', `${groupBy}:${getValueFromPath(alert, groupBy) as string}`);
+
+      return query.toString();
+    }, [alert, getSearchParams]);
 
     return (
       <AlertActionButton
@@ -301,21 +304,22 @@ export const AlertOwnership: React.FC<AlertOwnershipProps> = React.memo(
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
+    const { searchParams, getSearchParams } = useSearchParams<AlertSearchParams>();
 
     const [confirmation, setConfirmation] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
 
     const groupBy = useMemo<string>(
-      () => getGroupBy(location.search, defaultGroupBy),
-      [defaultGroupBy, location.search]
+      () => (!searchParams.has('group_by') ? '' : searchParams.get('group_by')),
+      [searchParams]
     );
 
-    const query = useMemo<SimpleSearchQuery>(() => {
+    const query = useMemo<URLSearchParams>(() => {
       if (!alert) return null;
-      const q = buildSearchQuery({ search: location.search, singles: ['tc_start', 'tc'], multiples: ['fq'] });
+      const q = getSearchParams({ keys: ['tc', 'tc_start', 'fq'] });
       q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy) as string}` : `alert_id:${alert.alert_id}`);
       return q;
-    }, [alert, groupBy, location.search]);
+    }, [alert, getSearchParams, groupBy]);
 
     const handleTakeOwnership = useCallback(
       (prevAlert: AlertItem, q: string) => {
@@ -381,7 +385,7 @@ export const AlertOwnership: React.FC<AlertOwnershipProps> = React.memo(
                       {!query || query.toString() === '' ? (
                         <div>{t('none')}</div>
                       ) : (
-                        <AlertFiltersSelected query={query} disableActions hideGroupBy hideTCStart />
+                        <AlertFiltersSelected query={query} hidden={['group_by', 'tc_start']} disableActions />
                       )}
                     </Paper>
                   </Grid>
@@ -451,7 +455,6 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
     const theme = useTheme();
     const location = useLocation();
     const { user: currentUser } = useAppUser<CustomUser>();
-    const { defaultParams } = useDefaultParams();
 
     const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
 
@@ -460,7 +463,7 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
       [defaultParams, inDrawer, location.search, speedDial]
     );
 
-    const query = useMemo<SimpleSearchQuery>(() => {
+    const query = useMemo<URLSearchParams>(() => {
       if (!alert) return null;
       else {
         const q = buildSearchQuery({
@@ -680,7 +683,6 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
   const classes = useStyles();
   const location = useLocation();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { defaultParams } = useDefaultParams();
 
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
@@ -735,8 +737,8 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
           }
           direction={vertical ? 'down' : 'left'}
           open={open || permanent}
-          onOpen={(event, reason: OpenReason) => (reason !== 'toggle' ? null : setOpen(true))}
-          onClose={(event, reason: CloseReason) =>
+          onOpen={(_event, reason: OpenReason) => (reason !== 'toggle' ? null : setOpen(true))}
+          onClose={(_event, reason: CloseReason) =>
             reason !== 'toggle' && reason !== 'escapeKeyDown' ? null : setOpen(false)
           }
           FabProps={{

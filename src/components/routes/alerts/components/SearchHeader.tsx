@@ -58,7 +58,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'flex-end',
-    fontStyle: 'italic',
+    // fontStyle: 'italic',
     // color: theme.palette.primary.light,
     paddingLeft: theme.spacing(1),
     paddingBottom: theme.spacing(1),
@@ -197,9 +197,10 @@ const WrappedSearchHeader = ({
   const handleQuerySubmit = useCallback(
     (v: string) => {
       params.set(queryKey, v);
+      params.set(offsetKey, '0');
       onChange(params);
     },
-    [onChange, queryKey, params]
+    [params, queryKey, offsetKey, onChange]
   );
 
   const handlePageChange = useCallback(
@@ -214,18 +215,20 @@ const WrappedSearchHeader = ({
     (f: string) => {
       const newFilter = f.startsWith('NOT(') && f.endsWith(')') ? f.substring(4, f.length - 1) : `NOT(${f})`;
       params.set(filtersKey, newFilter);
+      params.set(offsetKey, '0');
       params.delete(filtersKey, f);
       onChange(params);
     },
-    [filtersKey, onChange, params]
+    [filtersKey, offsetKey, onChange, params]
   );
 
   const handleFilterDelete = useCallback(
     (f: string) => {
       params.delete(filtersKey, f);
+      params.set(offsetKey, '0');
       onChange(params);
     },
-    [filtersKey, onChange, params]
+    [filtersKey, offsetKey, onChange, params]
   );
 
   useEffect(() => {
@@ -310,7 +313,7 @@ const WrappedSearchHeader = ({
           )}
           <div className={classes.searchresult}>{children}</div>
 
-          <div className={classes.searchresult}>
+          <div className={classes.searchresult} style={{ fontStyle: 'italic' }}>
             {disableTotalResults ? null : loading ? (
               <Typography variant="subtitle1" color="primary" style={{ flexGrow: 1 }} children={t('loading')} />
             ) : (

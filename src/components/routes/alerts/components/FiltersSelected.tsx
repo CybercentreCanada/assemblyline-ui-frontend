@@ -1,21 +1,24 @@
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import DateRangeIcon from '@mui/icons-material/DateRange';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SortIcon from '@mui/icons-material/Sort';
 import SourceIcon from '@mui/icons-material/Source';
 import StarIcon from '@mui/icons-material/Star';
-import { ChipProps, ListItemIcon, ListItemText, Menu, MenuItem, MenuItemProps, useTheme } from '@mui/material';
+import type { ChipProps, MenuItemProps } from '@mui/material';
+import { ListItemIcon, ListItemText, Menu, MenuItem, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import type { AlertSearchParams } from 'components/routes/alerts';
+import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
+import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import CustomChip from 'components/visual/CustomChip';
 import Moment from 'components/visual/Moment';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
-import { useAlerts } from '../contexts/AlertsContext';
-import { Favorite } from './Favorites';
-import { GROUPBY_OPTIONS, Option, SORT_OPTIONS, TC_OPTIONS } from './Filters';
+import type { Favorite } from './Favorites';
+import type { Option } from './Filters';
+import { GROUPBY_OPTIONS, SORT_OPTIONS, TC_OPTIONS } from './Filters';
 
 const useStyles = makeStyles(theme => ({
   desc: {
@@ -90,7 +93,6 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
     size = 'small',
     icon = null,
     deleteIcon = null,
-    title = null,
     options = [],
     style = null,
     disableCloseOnSelect = false,
@@ -150,43 +152,28 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
 );
 
 type Props = {
-  query: SimpleSearchQuery;
-  hideQuery?: boolean;
-  hideGroupBy?: boolean;
-  hideTC?: boolean;
-  hideTCStart?: boolean;
-  hideSort?: boolean;
+  query: URLSearchParams;
+  hidden?: (keyof AlertSearchParams)[];
   disableActions?: boolean;
 };
 
-const WrappedAlertFiltersSelected = ({
-  query = null,
-  hideQuery = false,
-  hideTC = false,
-  hideTCStart = false,
-  hideGroupBy = false,
-  hideSort = false,
-  disableActions = false
-}: Props) => {
-  const { t, i18n } = useTranslation('alerts');
+const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [], disableActions = false }: Props) => {
+  const { t } = useTranslation('alerts');
   const theme = useTheme();
   const classes = useStyles();
-  const location = useLocation();
-  const navigate = useNavigate();
   const alertValues = useAlerts();
+  const { setSearchParams, setSearchObj } = useSearchParams<AlertSearchParams>();
 
   const allFavorites = useMemo<Favorite[]>(
-    () => (!alertValues ? [] : [...alertValues?.userFavorites, ...alertValues?.globalFavorites]),
+    () => (!alertValues ? [] : [...alertValues.userFavorites, ...alertValues.globalFavorites]),
     [alertValues]
   );
 
-  const params = useMemo<{ [key: string]: string }>(() => (!query ? {} : query.getParams()), [query]);
-
   const filters = useMemo<Filters>(() => {
-    let defaults = { status: [], priority: [], labels: [], favorites: [], others: [] };
+    const defaults = { status: [], priority: [], labels: [], favorites: [], others: [] };
     if (!query) return defaults;
 
-    query.getAll('fq', []).forEach(filter => {
+    query.getAll('fq').forEach(filter => {
       const not = filter.startsWith('NOT(') && filter.endsWith(')');
       const value = not ? filter.substring(4, filter.length - 1) : filter;
 
@@ -203,20 +190,25 @@ const WrappedAlertFiltersSelected = ({
 
   const handleQueryChange = useCallback(
     (filter: Filter) => {
-      filter.not
-        ? query.replace('fq', `NOT(${filter.value})`, filter.value)
-        : query.replace('fq', filter.value, `NOT(${filter.value})`);
-      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+      setSearchObj(v => ({
+        ...v,
+        fq: v.fq.map(f =>
+          filter.filter !== f
+            ? f
+            : filter.not
+            ? f.replace(`NOT(${filter.value})`, filter.value)
+            : f.replace(filter.value, `NOT(${filter.value})`)
+        )
+      }));
     },
-    [location.hash, location.pathname, navigate, query]
+    [setSearchObj]
   );
 
   const handleQueryRemove = useCallback(
     (filter: Filter) => {
-      query.remove('fq', filter.filter);
-      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+      setSearchObj(v => ({ ...v, fq: v.fq.filter(f => f !== filter.filter) }));
     },
-    [location.hash, location.pathname, navigate, query]
+    [setSearchObj]
   );
 
   return (
@@ -229,20 +221,26 @@ const WrappedAlertFiltersSelected = ({
         rowGap: theme.spacing(1)
       }}
     >
-      {!hideQuery && query.has('q') && (
+      {!hidden.includes('q') && query.get('q') && (
         <CustomChip
-          variant="outlined"
+          icon={<SearchOutlinedIcon fontSize="small" />}
+          label={
+            <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
+              <span>{`${t('query')}: ${query.get('q')}`}</span>
+            </div>
+          }
           size="small"
-          wrap
           style={{ minHeight: '25px' }}
-          label={query.get('q')}
+          variant="outlined"
+          wrap
           onDelete={
             disableActions
               ? null
-              : () => {
-                  query.delete('q');
-                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                }
+              : () =>
+                  setSearchParams(v => {
+                    v.delete('q');
+                    return v;
+                  })
           }
         />
       )}
@@ -250,92 +248,90 @@ const WrappedAlertFiltersSelected = ({
       <MenuFilter
         classes={{
           icon: classes.icon,
-          deleteIcon: clsx(classes.deleteIcon, classes.desc, params.sort && params.sort.endsWith('asc') && classes.asc)
+          deleteIcon: clsx(
+            classes.deleteIcon,
+            classes.desc,
+            query.get('sort') && query.get('sort').endsWith('asc') && classes.asc
+          )
         }}
         getLabel={item => (
           <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
             <span>{`${t('sorts.title')}: ${t(item.substring(0, item.indexOf(' ')))}`}</span>
-            {disableActions && <ArrowDownwardIcon />}
+            {disableActions && <ArrowDownwardIcon fontSize="small" />}
           </div>
         )}
         getListItemIcon={option =>
-          params.sort.startsWith(option.value) && (
+          query.get('sort').startsWith(option.value) && (
             <ArrowDownwardIcon
-              className={clsx(classes.desc, params.sort.endsWith('asc') && classes.asc)}
+              className={clsx(classes.desc, query.get('sort').endsWith('asc') && classes.asc)}
               fontSize="small"
             />
           )
         }
-        param={params.sort}
-        hide={hideSort}
+        param={query.get('sort')}
+        hide={hidden.includes('sort')}
         disabled={disableActions}
-        getSelected={option => params.sort.startsWith(option.value)}
+        getSelected={option => query.get('sort').startsWith(option.value)}
         icon={<SortIcon fontSize="small" />}
         deleteIcon={<ArrowDownwardIcon />}
         title={t('sorts.title')}
         options={SORT_OPTIONS}
         disableCloseOnSelect
         style={{ minHeight: '25px' }}
-        onClick={(event, option) => {
-          const newSort =
-            params.sort.startsWith(option.value) && params.sort.endsWith('desc')
-              ? `${option.value} asc`
-              : `${option.value} desc`;
-          query.set('sort', newSort);
-          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-        }}
-        onDelete={() => {
-          query.set(
-            'sort',
-            params.sort.endsWith('desc') ? params.sort.replace('desc', 'asc') : params.sort.replace('asc', 'desc')
-          );
-          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-        }}
+        onClick={(_, option) =>
+          setSearchObj(v => ({
+            ...v,
+            sort:
+              v.sort.startsWith(option.value) && v.sort.endsWith('desc')
+                ? `${option.value} asc`
+                : `${option.value} desc`
+          }))
+        }
+        onDelete={() =>
+          setSearchObj(v => ({
+            ...v,
+            sort: v.sort.endsWith('desc') ? v.sort.replace('desc', 'asc') : v.sort.replace('asc', 'desc')
+          }))
+        }
       />
 
       <MenuFilter
         classes={{ icon: classes.icon }}
         getLabel={() => {
-          const option = GROUPBY_OPTIONS.find(o => o.value === params.group_by);
+          const option = GROUPBY_OPTIONS.find(o => o.value === query.get('group_by'));
           return option && option.value !== ''
             ? `${t('groupBy')}: ${t(option.label)}`
             : `${t('groupBy')}: ${t('none')}`;
         }}
-        param={params.group_by}
-        hide={hideGroupBy}
+        param={query.get('group_by')}
+        hide={hidden.includes('group_by')}
         disabled={disableActions}
-        getSelected={option => params.group_by === option.value}
+        getSelected={option => query.get('group_by') === option.value}
         icon={<SourceIcon fontSize="small" />}
         title={t('groupBy')}
         options={GROUPBY_OPTIONS}
         style={{ minHeight: '25px' }}
-        onClick={(event, option) => {
-          query.set('group_by', option.value);
-          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-        }}
+        onClick={(_, option) => setSearchObj(v => ({ ...v, group_by: option.value }))}
       />
 
       <MenuFilter
         classes={{ icon: classes.icon }}
         getLabel={() => {
-          const option = TC_OPTIONS.find(o => o.value === params.tc);
+          const option = TC_OPTIONS.find(o => o.value === query.get('tc'));
           return option && option.value !== '' ? `${t('tc')}: ${t(option.label)}` : `${t('tc')}: ${t('none')}`;
         }}
-        param={params.tc}
-        hide={hideTC}
+        param={query.get('tc')}
+        hide={hidden.includes('tc')}
         disabled={disableActions}
-        getSelected={option => params.tc === option.value}
+        getSelected={option => query.get('tc') === option.value}
         icon={<DateRangeIcon fontSize="small" />}
         title={t('tc')}
         options={TC_OPTIONS}
         style={{ minHeight: '25px' }}
-        onClick={(event, option) => {
-          query.set('tc', option.value);
-          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-        }}
+        onClick={(_, option) => setSearchObj(v => ({ ...v, tc: option.value }))}
       />
 
-      {!hideTCStart && query.has('tc_start') && (
+      {!hidden.includes('tc_start') && query.get('tc_start') && (
         <CustomChip
           classes={{ icon: classes.icon }}
           variant="outlined"
@@ -352,10 +348,11 @@ const WrappedAlertFiltersSelected = ({
           onDelete={
             disableActions
               ? null
-              : () => {
-                  query.delete('tc_start');
-                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                }
+              : () =>
+                  setSearchParams(v => {
+                    v.delete('tc_start');
+                    return v;
+                  })
           }
         />
       )}

@@ -1,4 +1,4 @@
-import { AlertTitle, Button, Grid, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { AlertTitle, Grid, Typography, useMediaQuery, useTheme } from '@mui/material';
 import SimpleList from 'commons/addons/lists/simplelist/SimpleList';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -22,8 +22,10 @@ import { AlertSearchResults } from './alerts/components/Results';
 import SearchHeader from './alerts/components/SearchHeader';
 import AlertWorkflows from './alerts/components/Workflows';
 import { AlertsProvider } from './alerts/contexts/AlertsContext';
+import type { SearchFormat } from './alerts/contexts/DefaultParamsContext';
 import { DefaultParamsProvider } from './alerts/contexts/DefaultParamsContext';
 import { SearchParamsProvider, useSearchParams } from './alerts/contexts/SearchParamsContext';
+import AlertDetail from './alerts/detail';
 import type { Alert, AlertItem } from './alerts/models/Alert';
 
 type ListResponse = {
@@ -42,35 +44,47 @@ type GroupedResponse = {
   total: number;
 };
 
-export const ALERT_SEARCH_FORMAT = {
+export type AlertSearchParams = {
+  fq: string[];
+  group_by: string;
+  no_delay: boolean;
+  offset: number;
+  q: string;
+  rows: number;
+  sort: string;
+  tc_start: string;
+  tc: string;
+};
+
+export const ALERT_SEARCH_FORMAT: SearchFormat<AlertSearchParams> = {
   fq: 'string[]',
   group_by: 'string',
+  no_delay: 'boolean',
   offset: 'number',
   q: 'string',
   rows: 'number',
   sort: 'string',
   tc_start: 'string',
   tc: 'string'
-} as const;
+};
 
-export type AlertSearchFormat = typeof ALERT_SEARCH_FORMAT;
-
-export const PAGE_SIZE = 2;
+export const PAGE_SIZE = 25;
 
 export const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist';
 
 export const ALERT_STORAGE_KEY = 'alert.search';
 
-export const ALERT_DEFAULT_PARAMS = {
+export const ALERT_DEFAULT_PARAMS: AlertSearchParams = {
   fq: [],
   group_by: 'file.sha256',
+  no_delay: false,
   offset: 0,
   q: '',
   rows: PAGE_SIZE,
   sort: 'reporting_ts desc',
   tc_start: '',
   tc: '4d'
-} as const;
+};
 
 export const ALERT_DEFAULT_QUERY: string = Object.keys(ALERT_DEFAULT_PARAMS)
   .map(k => `${k}=${ALERT_DEFAULT_PARAMS[k]}`)
@@ -101,7 +115,7 @@ const WrappedAlertsContent = () => {
   const isLGDown = useMediaQuery(theme.breakpoints.down('lg'));
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
-  const { searchParams, setSearchParams, searchObj, setSearchObj } = useSearchParams<AlertSearchFormat>();
+  const { searchParams, setSearchParams, setSearchObj } = useSearchParams<AlertSearchParams>();
 
   const suggestions = useMemo<string[]>(
     () =>
@@ -110,185 +124,6 @@ const WrappedAlertsContent = () => {
         : DEFAULT_SUGGESTION,
     [indexes]
   );
-
-  // const handleClear = useCallback(() => {
-  //   setSearchParams(p => {
-  //     p.delete('q');
-  //     return p;
-  //   });
-  // }, [setSearchParams]);
-
-  // const handleValueChange = (inputValue: string) => {
-  //   queryRef.current = inputValue;
-  // };
-
-  // const handleSearch = useCallback(
-  //   (filterValue: string = '', inputEl: HTMLInputElement = null) => {
-  //     if (queryRef.current !== '') {
-  //       setSearchParams(p => {
-  //         p.set('q', queryRef.current);
-  //         return p;
-  //       });
-  //     } else {
-  //       handleClear();
-  //     }
-  //     if (inputEl) inputEl.focus();
-  //   },
-  //   [handleClear, setSearchParams]
-  // );
-
-  // const handleFetch = useCallback(
-  //   (current: URLSearchParams, offset: number) => {
-  //     // const groupBy = getGroupBy(search, defaultQuery);
-  //     // const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
-
-  //     const pathname = `/api/v4/alert/list/`;
-
-  //     apiCall({
-  //       url: `${pathname}?${current.toString()}`,
-  //       method: 'GET',
-  //       onSuccess: ({ api_response }: { api_response: ListResponse | GroupedResponse }) => {},
-  //       onEnter: () => {
-  //         setLoading(true);
-  //       },
-  //       onExit: () => {
-  //         setLoading(false);
-  //         setScrollReset(false);
-  //         loadingRef.current = false;
-  //       }
-  //     });
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   []
-  // );
-
-  // const handleFetch = useCallback(
-  //   (current: SimpleSearchQuery, offset: number) => {
-  //     const q = buildSearchQuery({
-  //       search: current.toString([]),
-  //       singles: ['q', 'no_delay', 'sort', 'tc', 'track_total_hits'],
-  //       multiples: ['fq'],
-  //       defaultString: defaultQuery
-  //     });
-
-  //     q.set('offset', offset);
-  //     q.set('rows', DEFAULT_PARAMS.rows);
-
-  //     const search = JSON.stringify(q.getParams());
-
-  //     if (loadingRef.current || search === prevSearch.current) return;
-  //     prevSearch.current = search;
-  //     prevOffset.current = offset;
-  //     loadingRef.current = true;
-
-  //     if (offset === 0) {
-  //       setScrollReset(true);
-  //       executionTime.current = null;
-  //       navigate(`${location.pathname}?${current.getDeltaString()}${location.hash}`);
-  //     }
-
-  //     const groupBy = getGroupBy(search, defaultQuery);
-  //     const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
-  //     executionTime.current && q.set('tc_start', executionTime.current);
-
-  //     apiCall({
-  //       url: `${pathname}?${q.toString()}`,
-  //       method: 'GET',
-  //       onSuccess: ({ api_response }: { api_response: ListResponse | GroupedResponse }) => {
-  //         setCountedTotal('counted_total' in api_response ? api_response.counted_total : api_response.items.length);
-  //         setTotal(api_response.total);
-
-  //         if ('tc_start' in api_response) {
-  //           executionTime.current = api_response.tc_start;
-  //           current.set('tc_start', executionTime.current);
-  //           navigate(`${location.pathname}?${current.getDeltaString()}${location.hash}`, { replace: true });
-  //         } else if (!executionTime.current && api_response.items.length > 0) {
-  //           executionTime.current = api_response.items[0].reporting_ts;
-  //           current.set('tc_start', executionTime.current);
-  //           navigate(`${location.pathname}?${current.getDeltaString()}${location.hash}`, { replace: true });
-  //         }
-
-  //         const max = api_response.offset + api_response.rows;
-  //         setAlerts(values => [
-  //           ...values.filter(value => value.index < max),
-  //           ...api_response.items.map((item, i) => ({ ...item, id: item.alert_id, index: max + i }))
-  //         ]);
-  //       },
-  //       onEnter: () => {
-  //         setLoading(true);
-  //       },
-  //       onExit: () => {
-  //         setLoading(false);
-  //         setScrollReset(false);
-  //         loadingRef.current = false;
-  //       }
-  //     });
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [defaultQuery, location.hash, location.pathname, navigate]
-  // );
-
-  // const handleSelectedItemChange = useCallback(
-  //   (item: Alert, index?: number) => {
-  //     if (!item) return;
-  //     // Unfocus the simple list so the drawer does not try to refocus it when closing...
-  //     if (isLGDown) document.getElementById(ALERT_SIMPLELIST_ID).blur();
-  //     navigate(`${location.pathname}${location.search}#${item.alert_id}`);
-  //   },
-  //   [isLGDown, location.pathname, location.search, navigate]
-  // );
-
-  // useEffect(() => {
-  //   if (!globalDrawerOpened && location.hash && location.hash !== '') {
-  //     navigate(`${location.pathname}${location.search ? location.search : ''}`);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [globalDrawerOpened]);
-
-  // useEffect(() => {
-  //   if (location.hash) {
-  //     const id = location.hash.substr(1);
-  //     const alert = alerts.find(item => item.alert_id === id);
-  //     setGlobalDrawer(<AlertDetail id={id} alert={alert} inDrawer />, { hasMaximize: true });
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [location.hash, setGlobalDrawer]);
-
-  // useEffect(() => {
-  //   handleFetch(searchParams, 0);
-  // }, [handleFetch, searchParams]);
-
-  // useEffect(() => {
-  //   const update = ({ detail }: CustomEvent<Alert[]>) => {
-  //     setAlerts(values =>
-  //       values.map(value => {
-  //         const index = detail.findIndex(item => item.alert_id === value.alert_id);
-  //         return index >= 0 ? { ...value, ...detail[index] } : value;
-  //       })
-  //     );
-  //   };
-
-  //   window.addEventListener('alertUpdate', update);
-  //   return () => {
-  //     window.removeEventListener('alertUpdate', update);
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   const refresh = () => {
-  //     setTimeout(() => {
-  //       prevSearch.current = null;
-  //       prevOffset.current = null;
-  //       loadingRef.current = null;
-  //       handleFetch(searchParams, 0);
-  //     }, 1000);
-  //   };
-
-  //   window.addEventListener('alertRefresh', refresh);
-  //   return () => {
-  //     window.removeEventListener('alertRefresh', refresh);
-  //   };
-  // }, [handleFetch, searchParams]);
 
   const handleFetch = useCallback(
     (search: URLSearchParams) => {
@@ -301,13 +136,26 @@ const WrappedAlertsContent = () => {
       const groupBy = search.get('group_by');
       const pathname = groupBy ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
 
-      console.log(search.toString());
+      if (Number(search.get('offset') || 0) === 0) {
+        setScrollReset(true);
+        executionTime.current = null;
+        search.delete('tc_start');
+        // setSearchParams(search);
+      }
 
       apiCall({
         url: `${pathname}?${search.toString()}`,
         method: 'GET',
         onSuccess: ({ api_response }: { api_response: ListResponse | GroupedResponse }) => {
-          console.log(api_response);
+          if ('tc_start' in api_response) {
+            executionTime.current = api_response.tc_start;
+            search.set('tc_start', executionTime.current);
+            // setSearchParams(search);
+          } else if (!executionTime.current && api_response.items.length > 0) {
+            executionTime.current = api_response.items[0].reporting_ts;
+            search.set('tc_start', executionTime.current);
+            // setSearchParams(search);
+          }
 
           const max = api_response.offset + api_response.rows;
           setAlerts(values => [
@@ -328,11 +176,69 @@ const WrappedAlertsContent = () => {
         }
       });
     },
-    [apiCall]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setSearchParams]
+  );
+
+  const handleSelectedItemChange = useCallback(
+    (item: Alert) => {
+      if (!item) return;
+      if (isLGDown) document.getElementById(ALERT_SIMPLELIST_ID).blur();
+      navigate(`${location.pathname}${location.search}#${item.alert_id}`);
+    },
+    [isLGDown, location.pathname, location.search, navigate]
   );
 
   useEffect(() => {
     handleFetch(searchParams);
+  }, [handleFetch, searchParams]);
+
+  useEffect(() => {
+    if (!globalDrawerOpened && location.hash && location.hash !== '') {
+      navigate(`${location.pathname}${location.search}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawerOpened]);
+
+  useEffect(() => {
+    if (location.hash && location.hash !== '') {
+      const id = location.hash.substr(1);
+      const alert = alerts.find(item => item.alert_id === id);
+      setGlobalDrawer(<AlertDetail id={id} alert={alert} inDrawer />, { hasMaximize: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.hash, setGlobalDrawer]);
+
+  useEffect(() => {
+    const update = ({ detail }: CustomEvent<Alert[]>) => {
+      setAlerts(values =>
+        values.map(value => {
+          const index = detail.findIndex(item => item.alert_id === value.alert_id);
+          return index >= 0 ? { ...value, ...detail[index] } : value;
+        })
+      );
+    };
+
+    window.addEventListener('alertUpdate', update);
+    return () => {
+      window.removeEventListener('alertUpdate', update);
+    };
+  }, []);
+
+  useEffect(() => {
+    const refresh = () => {
+      setTimeout(() => {
+        prevSearch.current = null;
+        prevOffset.current = null;
+        loadingRef.current = null;
+        handleFetch(searchParams);
+      }, 1000);
+    };
+
+    window.addEventListener('alertRefresh', refresh);
+    return () => {
+      window.removeEventListener('alertRefresh', refresh);
+    };
   }, [handleFetch, searchParams]);
 
   if (!currentUser.roles.includes('alert_view')) return <ForbiddenPage />;
@@ -342,43 +248,12 @@ const WrappedAlertsContent = () => {
         <Grid container alignItems="center" paddingBottom={2}>
           <Grid item xs>
             <Typography variant="h4">{t('alerts')}</Typography>
-            <Button onClick={() => setSearchObj(p => ({ ...p, offset: p.offset + 10, rows: p.rows + 10 }))}>
-              {'click'}
-            </Button>
           </Grid>
 
           <Grid item xs style={{ textAlign: 'right', flex: 0 }}>
             <AlertDefaultSearchParameters />
           </Grid>
         </Grid>
-        {/* <PageHeader isSticky>
-          <div style={{ paddingTop: theme.spacing(1) }}>
-            <SearchBar
-              initValue={searchParams.get('q') || ''}
-              searching={loading}
-              suggestions={suggestions}
-              placeholder={t('search.placeholder')}
-              onValueChange={handleValueChange}
-              onClear={handleClear}
-              onSearch={handleSearch}
-              extras={
-                <>
-                  <Divider
-                    orientation="vertical"
-                    flexItem
-                    style={{ marginLeft: theme.spacing(upMD ? 1 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
-                  />
-                  <AlertFavorites />
-                  <AlertFilters />
-                  <AlertWorkflows alerts={alerts} />
-                  <div style={{ width: theme.spacing(0.5) }} />
-                </>
-              }
-            >
-              <AlertSearchResults searching={loading} total={total} />
-            </SearchBar>
-          </div>
-        </PageHeader> */}
 
         <SearchHeader
           value={searchParams}
@@ -407,7 +282,7 @@ const WrappedAlertsContent = () => {
         <SimpleList
           id={ALERT_SIMPLELIST_ID}
           disableProgress
-          scrollInfinite={countedTotal > 0 && countedTotal < total}
+          scrollInfinite={0 < countedTotal && countedTotal < total}
           scrollReset={scrollReset}
           scrollLoadNextThreshold={75}
           scrollTargetId="app-scrollct"
@@ -421,10 +296,10 @@ const WrappedAlertsContent = () => {
               </InformativeAlert>
             </div>
           }
-          // onLoadNext={() => handleFetch(searchParams, prevOffset.current + ALERT_DEFAULT_PARAMS.rows)}
-          // onCursorChange={handleSelectedItemChange}
-          // onItemSelected={handleSelectedItemChange}
-          onRenderActions={(item: Alert, index?: number) => <AlertActions alert={item} />}
+          onLoadNext={() => setSearchObj(v => ({ ...v, offset: v.offset + v.rows }))}
+          onCursorChange={handleSelectedItemChange}
+          onItemSelected={handleSelectedItemChange}
+          onRenderActions={(item: Alert) => <AlertActions alert={item} />}
         >
           {(item: Alert) => <AlertListItem item={item} />}
         </SimpleList>

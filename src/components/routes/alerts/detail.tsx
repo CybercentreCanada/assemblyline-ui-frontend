@@ -48,6 +48,7 @@ import {
   SkeletonInline
 } from './components/Components';
 import { DefaultParamsProvider } from './contexts/DefaultParamsContext';
+import { SearchParamsProvider } from './contexts/SearchParamsContext';
 import type { AlertItem } from './models/Alert';
 
 const useStyles = makeStyles(theme => ({
@@ -388,7 +389,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                     onClick={alert ? () => copy(alert.file.md5, 'drawerTop') : null}
                   />
                   <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
-                    MD5:
+                    {'MD5:'}
                   </Typography>
                 </Grid>
                 <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
@@ -409,7 +410,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                     onClick={alert ? () => copy(alert.file.sha1, 'drawerTop') : null}
                   />
                   <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
-                    SHA1:
+                    {'SHA1:'}
                   </Typography>
                 </Grid>
                 <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
@@ -430,7 +431,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                     onClick={alert ? () => copy(alert.file.sha256, 'drawerTop') : null}
                   />
                   <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
-                    SHA256:
+                    {'SHA256:'}
                   </Typography>
                 </Grid>
                 <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
@@ -1015,7 +1016,14 @@ const WrappedAlertDetail = (props: Props) => (
     enforced={['offset', 'rows']}
     ignored={['tc_start']}
   >
-    <AlertDetailContent {...props} />
+    <SearchParamsProvider
+      format={ALERT_SEARCH_FORMAT}
+      hidden={['rows', 'offset', 'tc_start']}
+      enforced={['rows']}
+      usingDefaultSearchParams
+    >
+      <AlertDetailContent {...props} />
+    </SearchParamsProvider>
   </DefaultParamsProvider>
 );
 

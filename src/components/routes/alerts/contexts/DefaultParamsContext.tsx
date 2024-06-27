@@ -1,19 +1,19 @@
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-type Format = Record<string, 'boolean' | 'number' | 'string' | 'string[]'>;
+export type Params = Record<string, boolean | number | string | string[]>;
 
-type SearchObj<T extends Format> = {
-  [P in keyof T]: T[P] extends 'string[]'
-    ? string[]
-    : T[P] extends 'number'
-    ? number
-    : T[P] extends 'boolean'
-    ? boolean
-    : string;
+export type SearchFormat<T extends Params> = {
+  [P in keyof T]: T[P] extends Array<string>
+    ? 'string[]'
+    : T[P] extends number
+    ? 'number'
+    : T[P] extends boolean
+    ? 'boolean'
+    : 'string';
 };
 
-type ContextProps<T extends Format> = {
+type ContextProps<T extends Params> = {
   /**
    * Default search params as a formatted URLSearchParams
    */
@@ -22,7 +22,12 @@ type ContextProps<T extends Format> = {
   /**
    * Default search params as a formatted object
    */
-  defaultObj: SearchObj<T>;
+  defaultObj: T;
+
+  /**
+   * Is there a search params stored in the local storage
+   */
+  hasStorageParams: boolean;
 
   /**
    * Change the default search params in the local storage
@@ -33,9 +38,21 @@ type ContextProps<T extends Format> = {
    * Clear the default search params from the local storage
    */
   onDefaultClear: () => void;
+
+  getDefaultParams: (props?: {
+    keys?: (keyof T)[];
+    strip?: [keyof T, string?][];
+    transforms?: ((value: URLSearchParams) => URLSearchParams)[];
+  }) => URLSearchParams;
+
+  getDefaultObj: (props?: {
+    keys?: (keyof T)[];
+    strip?: [keyof T, string?][];
+    transforms?: ((value: Partial<T>) => Partial<T>)[];
+  }) => Partial<T>;
 };
 
-type Props<T extends Format> = {
+type Props<T extends Params> = {
   children: React.ReactNode;
 
   /**
@@ -46,7 +63,7 @@ type Props<T extends Format> = {
   /**
    * Format of the search parameters
    */
-  format: T;
+  format: SearchFormat<T>;
 
   /**
    * key of where the search parameters will be stored in the Local Storage
@@ -56,12 +73,12 @@ type Props<T extends Format> = {
   /**
    * Enforced search parameters will always be its default value
    */
-  enforced?: (keyof T | string)[];
+  enforced?: (keyof T)[];
 
   /**
    * Ignored search parameters will not be stored in the local storage
    */
-  ignored?: (keyof T | string)[];
+  ignored?: (keyof T)[];
 
   /**
    * modifiers for the multiple search parameters
@@ -79,10 +96,10 @@ type Props<T extends Format> = {
   };
 };
 
-const createCurrentContext = once(<T extends Format>() => createContext<ContextProps<T>>(null));
-export const useDefaultParams = <T extends Format>(): ContextProps<T> => useContext(createCurrentContext<T>());
+const createCurrentContext = once(<T extends Params>() => createContext<ContextProps<T>>(null));
+export const useDefaultParams = <T extends Params>(): ContextProps<T> => useContext(createCurrentContext<T>());
 
-export const DefaultParamsProvider = <T extends Format>({
+export const DefaultParamsProvider = <T extends Params>({
   children,
   defaultValue = null,
   format = null,
@@ -98,6 +115,9 @@ export const DefaultParamsProvider = <T extends Format>({
 
   const [storageParams, setStorageParams] = useState<URLSearchParams>(() => {
     return new URLSearchParams(!storageKey ? null : localStorage.getItem(storageKey));
+  });
+  const [hasStorageParams, setHasStorageParams] = useState<boolean>(() => {
+    return !!storageKey && !!localStorage.getItem(storageKey);
   });
 
   const searchParams = useMemo<URLSearchParams>(() => new URLSearchParams(defaultValue), [defaultValue]);
@@ -120,7 +140,7 @@ export const DefaultParamsProvider = <T extends Format>({
   /**
    * Default search values as a formatted URLSearchParams
    */
-  const defaultParams = useMemo<URLSearchParams>(
+  const defaultParams = useMemo<ContextProps<T>['defaultParams']>(
     () =>
       new URLSearchParams(
         Object.entries(format).reduce((current: string[][], [k, t]) => {
@@ -141,7 +161,7 @@ export const DefaultParamsProvider = <T extends Format>({
   /**
    * Default search values as a formatted object
    */
-  const defaultObj = useMemo<SearchObj<T>>(
+  const defaultObj = useMemo<ContextProps<T>['defaultObj']>(
     () =>
       Object.entries(format).reduce((current, [k, t]) => {
         const value = defaultParams.has(k) && defaultParams.get(k);
@@ -151,15 +171,63 @@ export const DefaultParamsProvider = <T extends Format>({
         else if (t === 'number') return { ...current, [k]: Number(value) };
         else if (t === 'string') return { ...current, [k]: String(value) };
         else return current;
-      }, {}) as SearchObj<T>,
+      }, {}) as T,
     [defaultParams, format]
+  );
+
+  const getDefaultParams = useCallback<ContextProps<T>['getDefaultParams']>(
+    (props = { keys: [], strip: [], transforms: [] }) => {
+      const { keys = [], strip = [], transforms = [] } = props;
+      let q = new URLSearchParams(defaultParams);
+
+      transforms.forEach(transform => {
+        q = transform(q);
+      });
+
+      q.forEach(([v, k]) => {
+        if (strip.some(([k2, v2 = null]) => (k === k2 && v2 ? `${v}`.startsWith(v2) : true))) q.delete(k, v);
+        else if (!keys.includes(k)) q.delete(k, v);
+      });
+
+      q.sort();
+
+      return q;
+    },
+    [defaultParams]
+  );
+
+  const getDefaultObj = useCallback<ContextProps<T>['getDefaultObj']>(
+    (props = { keys: [], strip: [], transforms: [] }) => {
+      const { keys = [], strip = [], transforms = [] } = props;
+      let q = Object.assign({}, defaultObj) as Partial<T>;
+
+      transforms.forEach(transform => {
+        q = transform(q);
+      });
+
+      q = Object.entries(q).reduce((current, [k, v]) => {
+        if (keys.includes(k)) {
+          if (Array.isArray(v)) {
+            return {
+              ...current,
+              [k]: v.filter(f => !strip.some(([k2, v2 = null]) => (k === k2 && v2 ? `${f}`.startsWith(v2) : true)))
+            };
+          } else if (!strip.some(([k2, v2 = null]) => (k === k2 && v2 ? `${v}`.startsWith(v2) : true))) {
+            return { ...current, [k]: v as unknown };
+          }
+        }
+      }, {});
+
+      return q;
+    },
+    [defaultObj]
   );
 
   /**
    * Change the default search parameters and save them to the local storage
    */
-  const onDefaultChange = useCallback(
-    (value: string | URLSearchParams | string[][] | Record<string, string>) => {
+  const onDefaultChange = useCallback<ContextProps<T>['onDefaultChange']>(
+    value => {
       const input = new URLSearchParams(value);
 
       input.forEach((v, k) => {
@@ -168,6 +236,7 @@ export const DefaultParamsProvider = <T extends Format>({
 
       localStorage.setItem(storageKey, input.toString());
       setStorageParams(input);
+      setHasStorageParams(true);
     },
     [defaultParams, ignored, storageKey]
   );
@@ -175,9 +244,10 @@ export const DefaultParamsProvider = <T extends Format>({
   /**
    * Clear the default search parameters from the local storage
    */
-  const onDefaultClear = useCallback(() => {
+  const onDefaultClear = useCallback<ContextProps<T>['onDefaultClear']>(() => {
     localStorage.removeItem(storageKey);
     setStorageParams(new URLSearchParams());
+    setHasStorageParams(false);
   }, [storageKey]);
 
   /**
@@ -185,6 +255,7 @@ export const DefaultParamsProvider = <T extends Format>({
    */
   useEffect(() => {
     setStorageParams(new URLSearchParams(!storageKey ? null : localStorage.getItem(storageKey)));
+    setHasStorageParams(!!storageKey && !!localStorage.getItem(storageKey));
   }, [storageKey]);
 
   return (
@@ -192,6 +263,9 @@ export const DefaultParamsProvider = <T extends Format>({
       value={{
         defaultParams,
         defaultObj,
+        hasStorageParams,
+        getDefaultParams,
+        getDefaultObj,
         onDefaultChange,
         onDefaultClear
       }}

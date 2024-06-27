@@ -14,15 +14,13 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { AlertSearchParams } from 'components/routes/alerts';
+import { useDefaultParams } from 'components/routes/alerts/contexts/DefaultParamsContext';
+import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { useDefaultParams } from '../contexts/DefaultParamsContext';
-import { useSearchParams } from '../contexts/SearchParamsContext';
-import { buildSearchQuery } from '../utils/alertUtils';
 import AlertFiltersSelected from './FiltersSelected';
-
-const LOCAL_STORAGE = 'alert.search';
 
 const useStyles = makeStyles(theme => ({
   preview: {
@@ -60,54 +58,21 @@ const WrappedAlertDefaultSearchParameters = () => {
   const classes = useStyles();
   const location = useLocation();
   const { showSuccessMessage } = useMySnackbar();
-  const { defaultParams, onDefaultChange, onDefaultClear } = useDefaultParams();
-  const { searchParams } = useSearchParams();
+
+  const { searchParams, getSearchParams } = useSearchParams<AlertSearchParams>();
+  const { defaultParams, hasStorageParams, getDefaultParams, onDefaultChange, onDefaultClear } =
+    useDefaultParams<AlertSearchParams>();
 
   const [open, setOpen] = useState<boolean>(false);
 
-  const existingQuery = useMemo<URLSearchParams>(
+  const isSameParams = useMemo<boolean>(
     () =>
       !open
-        ? null
-        : buildSearchQuery({
-            search: defaultParams.toString(),
-            singles: ['tc', 'group_by', 'sort', 'tc_start'],
-            multiples: ['fq']
-          }),
-    [defaultParams, open]
+        ? false
+        : getDefaultParams({ strip: [['offset'], ['rows'], ['tc_start']] }).toString() ===
+          getSearchParams({ strip: [['offset'], ['rows'], ['tc_start']] }).toString(),
+    [getDefaultParams, getSearchParams, open]
   );
-
-  // const existingQuery = useMemo<SimpleSearchQuery>(() => {
-  //   if (!open) return null;
-  //   return;
-  //   const q = new SimpleSearchQuery(defaultParams, DEFAULT_QUERY);
-  //   q.delete('tc_start');
-  //   return q;
-  // }, [defaultParams, open]);
-
-  const currentQuery = useMemo<URLSearchParams>(
-    () =>
-      !open
-        ? null
-        : buildSearchQuery({
-            search: location.search,
-            singles: ['tc', 'group_by', 'sort', 'tc_start'],
-            multiples: ['fq'],
-            defaultString: defaultParams.toString()
-          }),
-    [defaultParams, location.search, open]
-  );
-
-  // const currentQuery = useMemo<SimpleSearchQuery>(() => {
-  //   if (!open) return null;
-  //   const q = new SimpleSearchQuery(location.search, defaultParams);
-  //   q.delete('tc_start');
-  //   return q;
-  // }, [defaultParams, location.search, open]);
-
-  const hasExistingQuery = useMemo(() => (!open ? false : !localStorage.getItem(LOCAL_STORAGE)), [open]);
-
-  const isSameQuery = useMemo<boolean>(() => !currentQuery || currentQuery.getDeltaString() === '', [currentQuery]);
 
   return (
     <>
@@ -133,10 +98,10 @@ const WrappedAlertDefaultSearchParameters = () => {
                 backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
               }}
             >
-              {!existingQuery ? (
+              {!defaultParams ? (
                 <div>{t('none')}</div>
               ) : (
-                <AlertFiltersSelected query={existingQuery} disableActions hideTCStart />
+                <AlertFiltersSelected query={defaultParams} hidden={['tc_start']} disableActions />
               )}
             </Paper>
           </Grid>
@@ -151,24 +116,24 @@ const WrappedAlertDefaultSearchParameters = () => {
                 backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
               }}
             >
-              {!currentQuery ? (
+              {!searchParams ? (
                 <div>{t('none')}</div>
               ) : (
-                <AlertFiltersSelected query={currentQuery} disableActions hideTCStart />
+                <AlertFiltersSelected query={searchParams} hidden={['tc_start']} disableActions />
               )}
             </Paper>
           </Grid>
 
-          <div>{existingQuery ? t('session.clear.confirm') : t('session.clear.none')}</div>
+          <div>{hasStorageParams ? t('session.clear.confirm') : t('session.clear.none')}</div>
 
           <div>
-            {isSameQuery ? t('session.save.same') : currentQuery ? t('session.save.confirm') : t('session.save.none')}
+            {isSameParams ? t('session.save.same') : searchParams ? t('session.save.confirm') : t('session.save.none')}
           </div>
         </DialogContent>
         <DialogActions>
           <Button
             color="primary"
-            disabled={hasExistingQuery}
+            disabled={!hasStorageParams}
             children={t('session.clear')}
             onClick={() => {
               onDefaultClear();
@@ -180,7 +145,7 @@ const WrappedAlertDefaultSearchParameters = () => {
           <Button autoFocus color="secondary" children={t('session.cancel')} onClick={() => setOpen(false)} />
           <Button
             color="primary"
-            disabled={!currentQuery || isSameQuery}
+            disabled={!searchParams || isSameParams}
             children={t('session.save')}
             onClick={() => {
               onDefaultChange(location.search);

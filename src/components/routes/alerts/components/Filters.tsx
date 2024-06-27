@@ -20,18 +20,16 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useMyAPI from 'components/hooks/useMyAPI';
+import type { AlertSearchParams } from 'components/routes/alerts';
 import { ALERT_DEFAULT_PARAMS } from 'components/routes/alerts';
+import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
+import { useDefaultParams } from 'components/routes/alerts/contexts/DefaultParamsContext';
+import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import CustomChip from 'components/visual/CustomChip';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
-import { useAlerts } from '../contexts/AlertsContext';
-import { useDefaultParams } from '../contexts/DefaultParamsContext';
-import { buildSearchQuery } from '../utils/alertUtils';
-import { Favorite } from './Favorites';
+import type { Favorite } from './Favorites';
 
 const useStyles = makeStyles(theme => ({
   drawerInner: {
@@ -201,7 +199,7 @@ const AlertSelect: React.FC<AlertSelectProps> = React.memo(
           <Select
             displayEmpty
             value={options.map(option => option.value).includes(value) ? value : defaultValue}
-            onChange={event => onChange(event.target.value as string)}
+            onChange={event => onChange(event.target.value)}
             MenuProps={{ className: classes.selectMenu }}
           >
             {options.map((option, i) => (
@@ -436,16 +434,15 @@ const WrappedAlertFilters = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
-  const navigate = useNavigate();
-  const location = useLocation();
   const { apiCall } = useMyAPI();
-  const { defaultParams } = useDefaultParams();
 
   const alertValues = useAlerts();
+  const { defaultParams } = useDefaultParams<AlertSearchParams>();
+  const { searchParams, setSearchParams } = useSearchParams<AlertSearchParams>();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
-  const [query, setQuery] = useState(new SimpleSearchQuery(location.search, defaultParams));
+  const [query, setQuery] = useState<URLSearchParams>(searchParams);
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
   const [options, setOptions] = useState<Record<FilterType, Record<string, { count: number; total: number }>>>({
@@ -464,18 +461,18 @@ const WrappedAlertFilters = () => {
   const prevURLs = useRef<Record<FilterType, string>>({ status: '', priority: '', label: '', other: '' });
 
   const allFavorites = useMemo<Favorite[]>(
-    () => (!alertValues ? [] : [...alertValues?.userFavorites, ...alertValues?.globalFavorites]),
+    () => (!alertValues ? [] : [...alertValues.userFavorites, ...alertValues.globalFavorites]),
     [alertValues]
   );
 
   const filters = useMemo<Filters>(() => {
-    let defaults: Filters = { status: [], priority: [], labels: [], favorites: [], others: [] };
+    const defaults: Filters = { status: [], priority: [], labels: [], favorites: [], others: [] };
 
     const statuses = Object.fromEntries(Object.keys(options.status).map(v => [`status:${v}`, v]));
     const priorities = Object.fromEntries(Object.keys(options.priority).map(v => [`priority:${v}`, v]));
     const labels = Object.fromEntries(Object.keys(options.label).map(v => [`label:${v}`, v]));
 
-    query.getAll('fq', []).forEach((fq: string) => {
+    query.getAll('fq').forEach((fq: string) => {
       const not = fq.startsWith('NOT(') && fq.endsWith(')');
       const value = not ? fq.substring(4, fq.length - 1) : fq;
 
@@ -495,47 +492,53 @@ const WrappedAlertFilters = () => {
   }, [allFavorites, options.label, options.priority, options.status, query]);
 
   const urls = useMemo<Record<FilterType, string>>(
-    () => ({
-      ...Object.fromEntries(
-        [
-          ['status', ['/api/v4/alert/statuses/', 'status:']],
-          ['priority', ['/api/v4/alert/priorities/', 'priority:']],
-          ['label', ['/api/v4/alert/labels/', 'labels:']]
-        ].map(([url, [pathname, strip]]) => [
-          url,
-          `${pathname}?${buildSearchQuery({
-            search: query.getDeltaString(),
-            singles: ['q', 'tc', 'tc_start', 'no_delay'],
-            multiples: ['fq'],
-            strip: [strip],
-            defaultString: defaultParams,
-            groupByAsFilter: true
-          }).toString()}`
-        ])
-      ),
-      other: ''
-    }),
-    [defaultParams, query]
+    () =>
+      Object.fromEntries(
+        Object.entries({
+          status: ['/api/v4/alert/statuses/', 'status:'],
+          priority: ['/api/v4/alert/priorities/', 'priority:'],
+          label: ['/api/v4/alert/labels/', 'labels:'],
+          other: ['', 'other:']
+        }).map(([url, [pathname, strip]]) => {
+          const q = new URLSearchParams(query);
+
+          if (q.has('group_by') && q.get('group_by') !== '') {
+            q.append('fq', `${q.get('group_by')}:*`);
+            q.delete('group_by');
+          }
+
+          q.forEach(([v, k]) => {
+            if (k === 'fq' && v.startsWith(strip)) q.delete(k, v);
+            else if (!['q', 'tc', 'tc_start', 'no_delay'].includes(k)) q.delete(k, v);
+          });
+
+          return [url, `${pathname}?${q.toString()}`];
+        })
+      ) as Record<FilterType, string>,
+    [query]
   );
 
   const otherURL = useMemo<string>(() => {
-    const q = buildSearchQuery({
-      search: query.getDeltaString(),
-      singles: ['q', 'tc', 'tc_start', 'no_delay'],
-      multiples: ['fq'],
-      defaultString: defaultParams.toString(),
-      groupByAsFilter: true
+    const q = new URLSearchParams(query);
+
+    if (q.has('group_by') && q.get('group_by') !== '') {
+      q.append('fq', `${q.get('group_by')}:*`);
+      q.delete('group_by');
+    }
+
+    q.forEach(([v, k]) => {
+      if (!['q', 'tc', 'tc_start', 'no_delay', 'fq'].includes(k)) q.delete(k, v);
     });
 
     filters.others.forEach(filter => {
-      q.remove('fq', filter.value);
+      q.delete('fq', filter.value);
     });
     return `/api/v4/alert/statistics/?${q.toString()}`;
-  }, [defaultParams, filters.others, query]);
+  }, [filters.others, query]);
 
   const toFilterOptions = useCallback(
     (values: Record<string, { count: number; total: number }>, prefix: string = ''): Filter[] => {
-      let data = Object.keys(values).map(key => ({
+      const data = Object.keys(values).map(key => ({
         ...values[key],
         not: false,
         label: key,
@@ -547,41 +550,38 @@ const WrappedAlertFilters = () => {
     []
   );
 
-  const handleClear = useCallback(() => setQuery(new SimpleSearchQuery('', defaultParams.toString())), [defaultParams]);
+  const handleClear = useCallback(() => setQuery(defaultParams), [defaultParams]);
 
   const handleApply = useCallback(() => {
-    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+    setSearchParams(query);
     setOpen(false);
-  }, [location.hash, location.pathname, navigate, query]);
+  }, [query, setSearchParams]);
 
-  const handleQueryChange = useCallback(
-    (key: string, value: string) => {
-      setQuery(prev => {
-        const q = new SimpleSearchQuery(prev.toString([]), defaultParams.toString());
-        q.set(key, value);
-        return q;
-      });
-    },
-    [defaultParams]
-  );
+  const handleQueryChange = useCallback((key: string, value: string) => {
+    setQuery(prev => {
+      const q = new URLSearchParams(prev);
+      q.set(key, value);
+      return q;
+    });
+  }, []);
 
   const handleFiltersChange = useCallback(
     (prefix: string, next: Filter[], previous: Filter[], limit: number = null) => {
       setQuery(prev => {
-        const q = new SimpleSearchQuery(prev.toString([]), defaultParams.toString());
+        const q = new URLSearchParams(prev);
 
         previous.forEach(fq => {
-          q.remove('fq', fq.not ? `NOT(${fq.value})` : `${fq.value}`);
+          q.delete('fq', fq.not ? `NOT(${fq.value})` : `${fq.value}`);
         });
 
         next.slice(!limit ? 0 : -1 * limit).forEach(fq => {
-          q.add('fq', fq.not ? `NOT(${prefix}${fq.label})` : `${prefix}${fq.label}`);
+          q.append('fq', fq.not ? `NOT(${prefix}${fq.label})` : `${prefix}${fq.label}`);
         });
 
         return q;
       });
     },
-    [defaultParams]
+    []
   );
 
   const handleOptionsChange = useCallback(
@@ -635,14 +635,20 @@ const WrappedAlertFilters = () => {
   }, []);
 
   useEffect(() => {
-    if (open) setQuery(new SimpleSearchQuery(location.search, defaultParams.toString()));
-  }, [defaultParams, location.search, open]);
+    if (open) setQuery(searchParams);
+  }, [open, searchParams]);
 
   useEffect(() => {
     if (render) {
-      handleFetch('status', '/api/v4/alert/statuses/', data => handleOptionsChange('status', data, true));
-      handleFetch('priority', '/api/v4/alert/priorities/', data => handleOptionsChange('priority', data, true));
-      handleFetch('label', '/api/v4/alert/labels/', data => handleOptionsChange('label', data, true));
+      handleFetch('status', '/api/v4/alert/statuses/', (data: Record<string, number>) =>
+        handleOptionsChange('status', data, true)
+      );
+      handleFetch('priority', '/api/v4/alert/priorities/', (data: Record<string, number>) =>
+        handleOptionsChange('priority', data, true)
+      );
+      handleFetch('label', '/api/v4/alert/labels/', (data: Record<string, number>) =>
+        handleOptionsChange('label', data, true)
+      );
     }
   }, [handleFetch, handleOptionsChange, handleOthersChange, render]);
 
@@ -677,13 +683,13 @@ const WrappedAlertFilters = () => {
               </div>
               <div style={{ marginBottom: theme.spacing(2), marginTop: theme.spacing(2) }}>
                 <AlertSort
-                  value={query.has('sort') ? query.get('sort', '') : ALERT_DEFAULT_PARAMS.sort.toString()}
+                  value={query.has('sort') ? query.get('sort') : ALERT_DEFAULT_PARAMS.sort.toString()}
                   onChange={value => handleQueryChange('sort', value)}
                 />
 
                 <AlertSelect
                   label="tc"
-                  value={query.has('tc') ? query.get('tc', '') : ALERT_DEFAULT_PARAMS.tc.toString()}
+                  value={query.has('tc') ? query.get('tc') : ALERT_DEFAULT_PARAMS.tc.toString()}
                   defaultValue={ALERT_DEFAULT_PARAMS.tc}
                   options={TC_OPTIONS}
                   onChange={value => handleQueryChange('tc', value)}
@@ -691,7 +697,7 @@ const WrappedAlertFilters = () => {
 
                 <AlertSelect
                   label="groupBy"
-                  value={query.has('group_by') ? query.get('group_by', '') : ALERT_DEFAULT_PARAMS.group_by.toString()}
+                  value={query.has('group_by') ? query.get('group_by') : ALERT_DEFAULT_PARAMS.group_by.toString()}
                   defaultValue={ALERT_DEFAULT_PARAMS.group_by}
                   options={GROUPBY_OPTIONS}
                   onChange={value => handleQueryChange('group_by', value)}
@@ -702,7 +708,11 @@ const WrappedAlertFilters = () => {
                   value={filters.status}
                   loading={loadings.status}
                   options={toFilterOptions(options.status, 'status:')}
-                  onOpen={() => handleFetch('status', urls.status, data => handleOptionsChange('status', data))}
+                  onOpen={() =>
+                    handleFetch('status', urls.status, (data: Record<string, number>) =>
+                      handleOptionsChange('status', data)
+                    )
+                  }
                   onChange={value => handleFiltersChange('status:', value, filters.status, 1)}
                 />
 
@@ -711,7 +721,11 @@ const WrappedAlertFilters = () => {
                   value={filters.priority}
                   loading={loadings.priority}
                   options={toFilterOptions(options.priority, 'priority:')}
-                  onOpen={() => handleFetch('priority', urls.priority, data => handleOptionsChange('priority', data))}
+                  onOpen={() =>
+                    handleFetch('priority', urls.priority, (data: Record<string, number>) =>
+                      handleOptionsChange('priority', data)
+                    )
+                  }
                   onChange={value => handleFiltersChange('priority:', value, filters.priority, 1)}
                 />
 
@@ -721,7 +735,11 @@ const WrappedAlertFilters = () => {
                   loading={loadings.label}
                   disableCloseOnSelect
                   options={toFilterOptions(options.label, 'label:')}
-                  onOpen={() => handleFetch('label', urls.label, data => handleOptionsChange('label', data))}
+                  onOpen={() =>
+                    handleFetch('label', urls.label, (data: Record<string, number>) =>
+                      handleOptionsChange('label', data)
+                    )
+                  }
                   onChange={value => handleFiltersChange('label:', value, filters.labels)}
                 />
 
@@ -737,7 +755,11 @@ const WrappedAlertFilters = () => {
                   freeSolo
                   disableCloseOnSelect
                   options={toFilterOptions(options.other)}
-                  onOpen={() => handleFetch('other', otherURL, data => handleOthersChange(data))}
+                  onOpen={() =>
+                    handleFetch('other', otherURL, (data: Record<string, Record<string, number>>) =>
+                      handleOthersChange(data)
+                    )
+                  }
                   onChange={value => handleFiltersChange('', value, filters.others)}
                 />
               </div>

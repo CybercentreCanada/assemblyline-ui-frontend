@@ -13,22 +13,23 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import Autocomplete, { AutocompleteChangeReason } from '@mui/material/Autocomplete';
+import type { AutocompleteChangeReason } from '@mui/material/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
 import makeStyles from '@mui/styles/makeStyles';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/hooks/useMyUser';
+import { AlertSearchParams } from 'components/routes/alerts';
+import type { AlertItem } from 'components/routes/alerts/models/Alert';
 import CustomChip from 'components/visual/CustomChip';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import React, { SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { SyntheticEvent } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { useLocation } from 'react-router-dom';
-import { AlertItem } from '../models/Alert';
-import { buildSearchQuery } from '../utils/alertUtils';
+import { useSearchParams } from '../contexts/SearchParamsContext';
 import AlertFiltersSelected from './FiltersSelected';
 
 const useStyles = makeStyles(theme => ({
@@ -66,23 +67,23 @@ export type Label = (typeof LABELS)[number];
 type WorkflowBody = {
   priority: Priority;
   status: Status;
-  labels: (Label | string)[];
-  removed_labels: (Label | string)[];
+  labels: Label[];
+  removed_labels: Label[];
 };
 
 type AlertWorkflowDrawerProps = {
   alerts: AlertItem[];
-  query: SimpleSearchQuery;
+  query: URLSearchParams;
   open: boolean;
   hideTC?: boolean;
   initialBody?: WorkflowBody;
   onClose?: () => void;
 };
 
-export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.memo(
+export const AlertWorkflowDrawer = React.memo(
   ({
     alerts = [],
-    query: queryProp = new SimpleSearchQuery(''),
+    query: queryProp = new URLSearchParams(''),
     open = false,
     hideTC = false,
     initialBody = { priority: null, status: null, labels: [], removed_labels: [] },
@@ -101,25 +102,28 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
     const prevQuery = useRef<string>(null);
 
     const possibleLabels = useMemo<string[]>(() => {
-      let values = [...LABELS, ...labelFilters].filter((v, i, a) => a.indexOf(v) === i);
+      const values = [...LABELS, ...labelFilters].filter((v, i, a) => a.indexOf(v) === i);
       values.sort((a, b) => a.localeCompare(b));
       return values;
     }, [labelFilters]);
 
     const isSingleAlert = useMemo<boolean>(
-      () => queryProp && !!queryProp?.get('q')?.startsWith('alert_id'),
+      () => queryProp && queryProp.has('q') && !!queryProp.get('q').startsWith('alert_id'),
       [queryProp]
     );
 
-    const query = useMemo<SimpleSearchQuery>(
-      () =>
-        buildSearchQuery({
-          search: queryProp && queryProp.toString([]),
-          singles: ['q', 'tc_start', 'tc'],
-          multiples: isSingleAlert ? [] : ['fq']
-        }),
-      [isSingleAlert, queryProp]
-    );
+    const query = useMemo<URLSearchParams>(() => {
+      if (!queryProp) return new URLSearchParams('');
+
+      const q = new URLSearchParams(queryProp);
+
+      q.forEach((v, k) => {
+        if (!['q', 'tc', 'tc_start', 'fq'].includes(k)) queryProp.delete(k, v);
+        else if (isSingleAlert && k === 'fq') queryProp.delete(k, v);
+      });
+
+      return q;
+    }, [isSingleAlert, queryProp]);
 
     const hasParams = useMemo<boolean>(() => query && (query.has('q') || query.has('fq') || query.has('tc')), [query]);
 
@@ -133,7 +137,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
     );
 
     const handleWorkflowSubmit = useCallback(
-      (_query: SimpleSearchQuery, _body: WorkflowBody, _alerts: AlertItem[], _isSingleAlert: boolean) => {
+      (_query: URLSearchParams, _body: WorkflowBody, _alerts: AlertItem[], _isSingleAlert: boolean) => {
         apiCall({
           url: `/api/v4/alert/all/batch/?${_query.toString()}`,
           method: 'POST',
@@ -170,11 +174,11 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
     );
 
     useEffect(() => {
-      if (!open || prevQuery.current === query.toString([])) return;
-      prevQuery.current = query.toString([]);
+      if (!open || prevQuery.current === query.toString()) return;
+      prevQuery.current = query.toString();
 
       apiCall({
-        url: `/api/v4/alert/labels/?${query.toString([])}`,
+        url: `/api/v4/alert/labels/?${query.toString()}`,
         onSuccess: ({ api_response }) => setLabelFilters(Object.keys(api_response))
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -227,7 +231,11 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                     borderRadius: theme.spacing(0.5)
                   }}
                 >
-                  <AlertFiltersSelected query={query} disableActions hideTCStart hideTC={isSingleAlert} hideSort />
+                  <AlertFiltersSelected
+                    query={query}
+                    hidden={isSingleAlert ? ['tc_start', 'sort'] : ['tc_start', 'sort', 'tc']}
+                    disableActions
+                  />
                 </div>
               </div>
             )}
@@ -293,7 +301,7 @@ export const AlertWorkflowDrawer: React.FC<AlertWorkflowDrawerProps> = React.mem
                     );
                   }}
                   renderTags={(values, getTagProps, ownerState) =>
-                    values.map((value, index) =>
+                    values.map((value: Label, index) =>
                       body.labels.includes(value) ? (
                         <CustomChip
                           {...getTagProps({ index })}
@@ -367,16 +375,16 @@ type Props = {
 const WrappedAlertWorkflows = ({ alerts = [] }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
-  const location = useLocation();
   const { user: currentUser } = useAppUser<CustomUser>();
+  const { getSearchParams } = useSearchParams<AlertSearchParams>();
 
   const [open, setOpen] = useState<boolean>(false);
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
-  const query = useMemo<SimpleSearchQuery>(
-    () => buildSearchQuery({ search: location.search, singles: ['q', 'tc_start', 'tc'], multiples: ['fq'] }),
-    [location.search]
+  const query = useMemo<URLSearchParams>(
+    () => getSearchParams({ keys: ['q', 'tc_start', 'tc', 'fq'] }),
+    [getSearchParams]
   );
 
   if (!currentUser.roles.includes('alert_manage')) return null;

@@ -1,34 +1,27 @@
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
+import type { Params, SearchFormat } from './DefaultParamsContext';
 import { useDefaultParams } from './DefaultParamsContext';
 
-type Format = Record<string, 'boolean' | 'number' | 'string' | 'string[]'>;
-
-type SearchObj<T extends Format> = {
-  [P in keyof T]: T[P] extends 'string[]'
-    ? string[]
-    : T[P] extends 'number'
-    ? number
-    : T[P] extends 'boolean'
-    ? boolean
-    : string;
-};
-
-type GetSearchObjProps<T extends Format> = {
-  strip?: (keyof T)[];
-  groupByAsFilter?: boolean;
-};
-
-type ContextProps<T extends Format> = {
+type ContextProps<T extends Params> = {
   searchParams: URLSearchParams;
-  searchObj: SearchObj<T>;
-  getSearchObj: (props: GetSearchObjProps<T>) => SearchObj<T>;
+  searchObj: T;
   setSearchParams: (value: URLSearchParams | ((params: URLSearchParams) => URLSearchParams)) => void;
-  setSearchObj: (value: SearchObj<T> | ((params: SearchObj<T>) => SearchObj<T>)) => void;
+  setSearchObj: (value: T | ((params: T) => T)) => void;
+  getSearchParams: (props?: {
+    keys?: (keyof T)[];
+    strip?: [keyof T, string?][];
+    transforms?: ((value: URLSearchParams) => URLSearchParams)[];
+  }) => URLSearchParams;
+  getSearchObj: (props?: {
+    keys?: (keyof T)[];
+    strip?: [keyof T, string?][];
+    transforms?: ((value: Partial<T>) => Partial<T>)[];
+  }) => Partial<T>;
 };
 
-type Props<T extends Format> = {
+type Props<T extends Params> = {
   children: React.ReactNode;
 
   /**
@@ -39,7 +32,7 @@ type Props<T extends Format> = {
   /**
    *
    */
-  format: T;
+  format: SearchFormat<T>;
 
   /**
    * Hidden search parameters will not be shown in the URL
@@ -72,10 +65,10 @@ type Props<T extends Format> = {
   usingDefaultSearchParams?: boolean;
 };
 
-const createSearchParamsContext = once(<T extends Format>() => createContext<ContextProps<T>>(null));
-export const useSearchParams = <T extends Format>(): ContextProps<T> => useContext(createSearchParamsContext<T>());
+const createSearchParamsContext = once(<T extends Params>() => createContext<ContextProps<T>>(null));
+export const useSearchParams = <T extends Params>(): ContextProps<T> => useContext(createSearchParamsContext<T>());
 
-export const SearchParamsProvider = <T extends Format>({
+export const SearchParamsProvider = <T extends Params>({
   children,
   defaultValue = null,
   format = null,
@@ -89,13 +82,13 @@ export const SearchParamsProvider = <T extends Format>({
 }: Props<T>) => {
   const navigate = useNavigate();
   const location = useLocation();
-
   const defaultContext = useDefaultParams();
-
   const SearchParamsContext = createSearchParamsContext<T>();
 
   const [hiddenParams, setHiddenParams] = useState<URLSearchParams>(new URLSearchParams());
 
+  const searchParamsRef = useRef<URLSearchParams>();
+  const searchObjRef = useRef<T>();
   const prevHidden = useRef<string>(null);
   const prevSearch = useRef<string>(null);
 
@@ -128,7 +121,7 @@ export const SearchParamsProvider = <T extends Format>({
     [selectors]
   );
 
-  const searchParams = useMemo<URLSearchParams>(
+  const searchParams = useMemo<ContextProps<T>['searchParams']>(
     () =>
       new URLSearchParams(
         Object.entries(format).reduce((current: string[][], [k, t]) => {
@@ -153,7 +146,7 @@ export const SearchParamsProvider = <T extends Format>({
     [defaultParams, enforced, format, hidden, hiddenParams, locationParams, parseMultipleParams]
   );
 
-  const searchObj = useMemo<SearchObj<T>>(
+  const searchObj = useMemo<ContextProps<T>['searchObj']>(
     () =>
       Object.entries(format).reduce((current, [k, t]) => {
         const value = searchParams.has(k) && searchParams.get(k);
@@ -163,18 +156,61 @@ export const SearchParamsProvider = <T extends Format>({
         else if (t === 'number') return { ...current, [k]: Number(value) };
         else if (t === 'string') return { ...current, [k]: String(value) };
         else return current;
-      }, {}) as SearchObj<T>,
+      }, {}) as T,
     [format, searchParams]
   );
 
-  const getSearchObj = useCallback(({ strip = [], groupByAsFilter = false }: GetSearchObjProps<T>): SearchObj<T> => {
-    const test = strip;
-    return null;
-  }, []);
+  const getSearchParams = useCallback<ContextProps<T>['getSearchParams']>(
+    (props = { keys: [], strip: [], transforms: [] }) => {
+      const { keys = [], strip = [], transforms = [] } = props;
+      let q = new URLSearchParams(searchParams);
 
-  const setSearchParams = useCallback(
-    (input: URLSearchParams | ((params: URLSearchParams) => URLSearchParams)) => {
-      const values = typeof input === 'function' ? input(searchParams) : input;
+      transforms.forEach(transform => {
+        q = transform(q);
+      });
+
+      q.forEach(([v, k]) => {
+        if (strip.some(([k2, v2 = null]) => (k === k2 && v2 ? `${v}`.startsWith(v2) : true))) q.delete(k, v);
+        else if (!keys.includes(k)) q.delete(k, v);
+      });
+
+      q.sort();
+
+      return q;
+    },
+    [searchParams]
+  );
+
+  const getSearchObj = useCallback<ContextProps<T>['getSearchObj']>(
+    (props = { keys: [], strip: [], transforms: [] }) => {
+      const { keys = [], strip = [], transforms = [] } = props;
+      let q = Object.assign({}, searchObj) as Partial<T>;
+
+      transforms.forEach(transform => {
+        q = transform(q);
+      });
+
+      q = Object.entries(q).reduce((current, [k, v]) => {
+        if (keys.includes(k)) {
+          if (Array.isArray(v)) {
+            return {
+              ...current,
+              [k]: v.filter(f => !strip.some(([k2, v2 = null]) => (k === k2 && v2 ? `${f}`.startsWith(v2) : true)))
+            };
+          } else if (!strip.some(([k2, v2 = null]) => (k === k2 && v2 ? `${v}`.startsWith(v2) : true))) {
+            return { ...current, [k]: v as unknown };
+          }
+        }
+      }, {});
+
+      return q;
+    },
+    [searchObj]
+  );
+
+  const setSearchParams = useCallback<ContextProps<T>['setSearchParams']>(
+    input => {
+      const values = typeof input === 'function' ? input(searchParamsRef.current) : input;
       const nextHidden = new URLSearchParams();
       const nextSearch = new URLSearchParams();
 
@@ -203,14 +239,14 @@ export const SearchParamsProvider = <T extends Format>({
       prevSearch.current = nextSearch.toString();
 
       setHiddenParams(nextHidden);
-      navigate(`${location.pathname}?${nextSearch.toString()}${location.hash}`);
+      navigate(`${window.location.pathname}?${nextSearch.toString()}${window.location.hash}`);
     },
-    [defaultParams, enforced, format, hidden, location.hash, location.pathname, navigate, searchParams]
+    [defaultParams, enforced, format, hidden, navigate]
   );
 
-  const setSearchObj = useCallback(
-    (input: SearchObj<T> | ((params: SearchObj<T>) => SearchObj<T>)) => {
-      const values = typeof input === 'function' ? input(searchObj) : input;
+  const setSearchObj = useCallback<ContextProps<T>['setSearchObj']>(
+    input => {
+      const values = typeof input === 'function' ? input(searchObjRef.current) : input;
       const nextHidden = new URLSearchParams();
       const nextSearch = new URLSearchParams();
 
@@ -239,18 +275,28 @@ export const SearchParamsProvider = <T extends Format>({
       prevSearch.current = nextSearch.toString();
 
       setHiddenParams(nextHidden);
-      navigate(`${location.pathname}?${nextSearch.toString()}${location.hash}`);
+      navigate(`${window.location.pathname}?${nextSearch.toString()}${window.location.hash}`);
     },
-    [defaultParams, enforced, format, hidden, location.hash, location.pathname, navigate, searchObj]
+    [defaultParams, enforced, format, hidden, navigate]
   );
 
   useEffect(() => {
-    setSearchParams(searchParams);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultParams, format, hidden, enforced]);
+    searchParamsRef.current = new URLSearchParams(searchParams);
+  }, [searchParams]);
+
+  useEffect(() => {
+    searchObjRef.current = Object.assign({}, searchObj);
+  }, [searchObj]);
+
+  // useEffect(() => {
+  //   setSearchParams(searchParams);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [defaultParams, format, hidden, enforced]);
 
   return (
-    <SearchParamsContext.Provider value={{ searchParams, searchObj, getSearchObj, setSearchParams, setSearchObj }}>
+    <SearchParamsContext.Provider
+      value={{ searchParams, searchObj, getSearchParams, getSearchObj, setSearchParams, setSearchObj }}
+    >
       {!searchParams ? null : children}
     </SearchParamsContext.Provider>
   );

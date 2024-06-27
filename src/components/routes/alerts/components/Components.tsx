@@ -7,6 +7,7 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import SlowMotionVideoIcon from '@mui/icons-material/SlowMotionVideo';
+import type { TableRowProps } from '@mui/material';
 import {
   Box,
   Dialog,
@@ -15,26 +16,27 @@ import {
   IconButton,
   Skeleton,
   TableContainer,
-  TableRowProps,
   Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import type { AlertItem, DetailedItem } from 'components/routes/alerts/models/Alert';
+import { detailedItemCompare } from 'components/routes/alerts/utils/alertUtils';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
-import { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
+import type { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
 import { ChipList } from 'components/visual/ChipList';
-import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
+import type { CustomChipProps } from 'components/visual/CustomChip';
+import CustomChip from 'components/visual/CustomChip';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
 import Moment from 'components/visual/Moment';
 import { verdictToColor } from 'helpers/utils';
-import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import { To } from 'react-router';
-import { AlertItem, DetailedItem } from '../models/Alert';
-import { detailedItemCompare } from '../utils/alertUtils';
+import type { To } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
   extended: {
@@ -78,15 +80,14 @@ export const AlertExtendedScan: React.FC<AlertExtendedScanProps> = React.memo(
     const classes = useStyles();
 
     const data = useMemo<{ color: PossibleColors; arrow: ReactNode }>(() => {
-      const dataMap = {
+      const dataMap: Record<string, { color: PossibleColors; arrow: ReactNode }> = {
         submitted: { color: 'info', arrow: <SlowMotionVideoIcon fontSize="small" color="inherit" /> },
         skipped: { color: 'default', arrow: <RemoveCircleOutlineIcon fontSize="small" color="inherit" /> },
         incomplete: { color: 'error', arrow: <BlockIcon fontSize="small" color="inherit" /> },
         completed: { color: 'success', arrow: <CheckCircleOutlineIcon fontSize="small" color="inherit" /> }
       };
 
-      if (!name || !(name in dataMap)) return null;
-      else return dataMap[name];
+      return name && name in dataMap ? dataMap[name] : null;
     }, [name]);
 
     return !data ? null : withChip ? (
@@ -121,7 +122,7 @@ export const AlertPriority: React.FC<AlertPriorityProps> = React.memo(
     const classes = useStyles();
 
     const data = useMemo<{ color: PossibleColors; arrow: ReactNode }>(() => {
-      const dataMap = {
+      const dataMap: Record<string, { color: PossibleColors; arrow: ReactNode }> = {
         CRITICAL: { color: 'error', arrow: <ArrowUpwardIcon fontSize="small" color="inherit" /> },
         HIGH: { color: 'warning', arrow: <ArrowUpwardIcon fontSize="small" color="inherit" /> },
         MEDIUM: { color: 'warning', arrow: <ArrowDownwardIcon fontSize="small" color="inherit" /> },
@@ -130,8 +131,7 @@ export const AlertPriority: React.FC<AlertPriorityProps> = React.memo(
         null: { color: 'default', arrow: <RemoveOutlinedIcon fontSize="small" color="inherit" /> }
       };
 
-      if (!name || !(name in dataMap)) return null;
-      else return dataMap[name];
+      return name && name in dataMap ? dataMap[name] : null;
     }, [name]);
 
     return !data ? null : withChip ? (
@@ -162,15 +162,14 @@ export const AlertStatus: React.FC<AlertStatusProps> = React.memo(({ name, size 
   const { t } = useTranslation('alerts');
 
   const data = useMemo<PossibleColors>(() => {
-    const dataMap = {
+    const dataMap: Record<string, PossibleColors> = {
       TRIAGE: 'default',
       MALICIOUS: 'error',
       'NON-MALICIOUS': 'success',
       ASSESS: 'primary'
     };
 
-    if (!name || !(name in dataMap)) return null;
-    else return dataMap[name];
+    return name && name in dataMap ? dataMap[name] : null;
   }, [name]);
 
   return !name ? null : (
@@ -329,7 +328,7 @@ type AlertEventsTableProps = {
 
 export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
   ({ alert, viewHistory, setViewHistory }: AlertEventsTableProps) => {
-    const { t, i18n } = useTranslation('alerts');
+    const { t } = useTranslation('alerts');
     const theme = useTheme();
 
     const Row = useCallback<React.FC<WrapperTableRowProps>>(
@@ -348,7 +347,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
       viewHistory && (
         <Dialog
           open={viewHistory}
-          onClose={(event, reason) => {
+          onClose={(_event, reason) => {
             if (reason === 'backdropClick') {
               setViewHistory(false);
             }
