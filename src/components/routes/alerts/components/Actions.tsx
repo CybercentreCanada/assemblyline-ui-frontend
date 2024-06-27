@@ -33,7 +33,6 @@ import type { CustomUser } from 'components/hooks/useMyUser';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import type { AlertItem } from 'components/routes/alerts/models/Alert';
-import { buildSearchQuery, getGroupBy } from 'components/routes/alerts/utils/alertUtils';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { getValueFromPath } from 'helpers/utils';
 import type { To } from 'history';
@@ -42,6 +41,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
+import { useDefaultParams } from '../contexts/DefaultParamsContext';
 import { AlertEventsTable } from './Components';
 import AlertFiltersSelected from './FiltersSelected';
 import { AlertWorkflowDrawer } from './Workflows';
@@ -453,27 +453,22 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
   }: AlertWorkflowProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
-    const location = useLocation();
     const { user: currentUser } = useAppUser<CustomUser>();
+    const { searchObj, getSearchParams } = useSearchParams<AlertSearchParams>();
 
     const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
 
     const groupBy = useMemo<string>(
-      () => (speedDial || inDrawer ? getGroupBy(location.search, defaultParams) : null),
-      [defaultParams, inDrawer, location.search, speedDial]
+      () => (speedDial || inDrawer ? searchObj.group_by : null),
+      [inDrawer, searchObj.group_by, speedDial]
     );
 
     const query = useMemo<URLSearchParams>(() => {
       if (!alert) return null;
-      else {
-        const q = buildSearchQuery({
-          search: location.search,
-          ...(speedDial || inDrawer ? { singles: ['tc_start', 'tc'], multiples: ['fq'] } : null)
-        });
-        q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy) as string}` : `alert_id:${alert.alert_id}`);
-        return q;
-      }
-    }, [alert, groupBy, inDrawer, location.search, speedDial]);
+      const q = getSearchParams({ keys: speedDial || inDrawer ? ['tc', 'tc_start', 'fq'] : [] });
+      q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy) as string}` : `alert_id:${alert.alert_id}`);
+      return q;
+    }, [alert, getSearchParams, groupBy, inDrawer, speedDial]);
 
     return (
       <>
@@ -683,6 +678,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
   const classes = useStyles();
   const location = useLocation();
   const { user: currentUser } = useAppUser<CustomUser>();
+  const { defaultObj } = useDefaultParams<AlertSearchParams>();
 
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
@@ -803,7 +799,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
                   speedDial
                   vertical={vertical}
                   permanent={permanent}
-                  defaultGroupBy={defaultParams}
+                  defaultGroupBy={defaultObj.group_by}
                   onClick={() => setOpen(false)}
                 />,
                 <AlertGroup
