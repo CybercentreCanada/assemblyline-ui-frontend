@@ -29,8 +29,6 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   drawerInner: {
@@ -363,8 +361,6 @@ const WrappedAlertFavorites = () => {
   const { t } = useTranslation('favorites');
   const classes = useStyles();
   const theme = useTheme();
-  const navigate = useNavigate();
-  const location = useLocation();
   const { c12nDef } = useALContext();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));

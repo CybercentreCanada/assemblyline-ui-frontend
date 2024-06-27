@@ -22,14 +22,14 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { CustomUser } from 'components/hooks/useMyUser';
-import { AlertSearchParams } from 'components/routes/alerts';
+import type { AlertSearchParams } from 'components/routes/alerts';
+import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import type { AlertItem } from 'components/routes/alerts/models/Alert';
 import CustomChip from 'components/visual/CustomChip';
 import type { SyntheticEvent } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { useSearchParams } from '../contexts/SearchParamsContext';
 import AlertFiltersSelected from './FiltersSelected';
 
 const useStyles = makeStyles(theme => ({
@@ -75,7 +75,6 @@ type AlertWorkflowDrawerProps = {
   alerts: AlertItem[];
   query: URLSearchParams;
   open: boolean;
-  hideTC?: boolean;
   initialBody?: WorkflowBody;
   onClose?: () => void;
 };
@@ -85,7 +84,6 @@ export const AlertWorkflowDrawer = React.memo(
     alerts = [],
     query: queryProp = new URLSearchParams(''),
     open = false,
-    hideTC = false,
     initialBody = { priority: null, status: null, labels: [], removed_labels: [] },
     onClose = () => null
   }: AlertWorkflowDrawerProps) => {
@@ -248,7 +246,7 @@ export const AlertWorkflowDrawer = React.memo(
                   multiple={false}
                   options={STATUSES}
                   value={body.status}
-                  onChange={(event: SyntheticEvent<Element, Event>, value: Status) =>
+                  onChange={(_event: SyntheticEvent<Element, Event>, value: Status) =>
                     setBody(b => ({ ...b, status: value }))
                   }
                   renderInput={props => <TextField {...props} label={t('status')} variant="outlined" />}
@@ -261,7 +259,7 @@ export const AlertWorkflowDrawer = React.memo(
                   multiple={false}
                   options={PRIORITIES}
                   value={body.priority}
-                  onChange={(event: SyntheticEvent<Element, Event>, value: Priority) =>
+                  onChange={(_event: SyntheticEvent<Element, Event>, value: Priority) =>
                     setBody(b => ({ ...b, priority: value }))
                   }
                   renderInput={props => <TextField {...props} label={t('priority')} variant="outlined" />}
@@ -278,7 +276,7 @@ export const AlertWorkflowDrawer = React.memo(
                   isOptionEqualToValue={(option, value) => option.toUpperCase() === value.toUpperCase()}
                   options={possibleLabels}
                   value={[...body.labels, ...body.removed_labels].sort()}
-                  onChange={(event, values: Label[], reason: AutocompleteChangeReason) => {
+                  onChange={(_event, values: Label[], reason: AutocompleteChangeReason) => {
                     if (reason === 'clear') setBody(b => ({ ...b, labels: [], removed_labels: [] }));
                     else
                       setBody(b => ({
@@ -300,7 +298,7 @@ export const AlertWorkflowDrawer = React.memo(
                       </li>
                     );
                   }}
-                  renderTags={(values, getTagProps, ownerState) =>
+                  renderTags={(values, getTagProps) =>
                     values.map((value: Label, index) =>
                       body.labels.includes(value) ? (
                         <CustomChip

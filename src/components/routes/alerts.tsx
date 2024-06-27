@@ -106,14 +106,12 @@ const WrappedAlertsContent = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
 
-  const queryRef = useRef<string>(null);
   const prevSearch = useRef<string>(null);
   const prevOffset = useRef<number>(null);
   const executionTime = useRef<string>(null);
   const loadingRef = useRef<boolean>(null);
 
   const isLGDown = useMediaQuery(theme.breakpoints.down('lg'));
-  const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
   const { searchParams, setSearchParams, setSearchObj } = useSearchParams<AlertSearchParams>();
 

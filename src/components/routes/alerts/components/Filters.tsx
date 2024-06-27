@@ -120,7 +120,7 @@ const AlertSort: React.FC<AlertSortProps> = React.memo(({ value = null, onChange
 
   const [open, setOpen] = useState<boolean>(false);
 
-  const menuRef = useRef(null);
+  const menuRef = useRef<HTMLUListElement>(null);
 
   const [field, dir] = useMemo<[string, string]>(() => {
     const defaults = ALERT_DEFAULT_PARAMS.sort.toString().split(' ');
@@ -134,10 +134,9 @@ const AlertSort: React.FC<AlertSortProps> = React.memo(({ value = null, onChange
     }
   }, [value]);
 
-  const handleClose = useCallback(
-    (event: any) => (event?.code === 'Escape' || !menuRef.current.contains(event.target) ? setOpen(false) : null),
-    []
-  );
+  const handleClose = useCallback((event: any) => {
+    return event?.code === 'Escape' || !menuRef.current.contains(event.target) ? setOpen(false) : null;
+  }, []);
 
   return (
     <div style={{ marginBottom: theme.spacing(2) }}>
@@ -147,7 +146,7 @@ const AlertSort: React.FC<AlertSortProps> = React.memo(({ value = null, onChange
           open={open}
           value={field}
           onOpen={() => setOpen(true)}
-          onClose={handleClose}
+          onClose={(e: any) => handleClose(e)}
           MenuProps={{ className: classes.selectMenu, MenuListProps: { ref: menuRef } }}
           renderValue={() => (
             <div style={{ display: 'flex', columnGap: theme.spacing(1) }}>
@@ -160,7 +159,7 @@ const AlertSort: React.FC<AlertSortProps> = React.memo(({ value = null, onChange
             <MenuItem
               key={`${option.value}-${i}`}
               value={option.value}
-              onClick={(event: any) =>
+              onClick={() =>
                 onChange(field === option.value && dir === 'desc' ? `${option.value} asc` : `${option.value} desc`)
               }
             >
@@ -248,12 +247,12 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
         <Autocomplete
           classes={{ listbox: classes.listbox, option: classes.option }}
           value={filters}
-          onChange={(event, items) =>
+          onChange={(_event, items) =>
             onChange(items.map(item => (typeof item !== 'string' ? item : { label: item, value: item, not: false })))
           }
           onOpen={onOpen}
           inputValue={inputValue}
-          onInputChange={(event, item) => setInputValue(item)}
+          onInputChange={(_event, item) => setInputValue(item)}
           fullWidth
           multiple
           size="small"
@@ -326,7 +325,7 @@ const Favorites: React.FC<FavoritesProps> = React.memo(
     const alertValues = useAlerts();
 
     const options = useMemo<(Filter & Favorite)[]>(
-      () => (!alertValues ? [] : [...alertValues?.userFavorites, ...alertValues?.globalFavorites]),
+      () => (!alertValues ? [] : [...alertValues.userFavorites, ...alertValues.globalFavorites]),
       [alertValues]
     );
 
@@ -336,7 +335,7 @@ const Favorites: React.FC<FavoritesProps> = React.memo(
         <Autocomplete
           classes={{ listbox: classes.listbox, option: classes.option }}
           value={favorites}
-          onChange={(event, items) =>
+          onChange={(_event, items) =>
             onChange(items.map(item => ({ ...item, label: item.query, value: item.query, not: false })))
           }
           fullWidth
@@ -605,7 +604,7 @@ const WrappedAlertFilters = () => {
     []
   );
 
-  const handleOthersChange = useCallback((data: Record<string, Record<string, number>>, asTotal: boolean = false) => {
+  const handleOthersChange = useCallback((data: Record<string, Record<string, number>>) => {
     setOptions(v => ({
       ...v,
       other: Object.fromEntries(

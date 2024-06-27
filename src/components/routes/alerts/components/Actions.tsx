@@ -41,7 +41,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
-import { useDefaultParams } from '../contexts/DefaultParamsContext';
 import { AlertEventsTable } from './Components';
 import AlertFiltersSelected from './FiltersSelected';
 import { AlertWorkflowDrawer } from './Workflows';
@@ -187,7 +186,7 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
   }
 );
 
-type AlertActionProps<T = {}> = T & {
+type AlertActionProps<T = object> = T & {
   alert: AlertItem;
   speedDial?: boolean;
   open?: boolean;
@@ -283,24 +282,18 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
   }
 );
 
-type AlertOwnershipProps = AlertActionProps & {
-  defaultGroupBy: string;
-};
-
-export const AlertOwnership: React.FC<AlertOwnershipProps> = React.memo(
+export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
   ({
     alert,
     open = false,
     speedDial = false,
     vertical = false,
     permanent = false,
-    defaultGroupBy = null,
     onClick = () => null
-  }: AlertOwnershipProps) => {
+  }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const classes = useStyles();
-    const location = useLocation();
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
@@ -678,7 +671,6 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
   const classes = useStyles();
   const location = useLocation();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { defaultObj } = useDefaultParams<AlertSearchParams>();
 
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
@@ -799,7 +791,6 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
                   speedDial
                   vertical={vertical}
                   permanent={permanent}
-                  defaultGroupBy={defaultObj.group_by}
                   onClick={() => setOpen(false)}
                 />,
                 <AlertGroup

@@ -4,6 +4,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Grid, Tooltip, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
+import type { Alert, DetailedItem } from 'components/routes/alerts/models/Alert';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import Moment from 'components/visual/Moment';
@@ -11,7 +12,6 @@ import Verdict from 'components/visual/Verdict';
 import { verdictRank, verdictToColor } from 'helpers/utils';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DetailedItem } from '../models/Alert';
 import { AlertExtendedScan, AlertListChip, AlertListChipDetailed, AlertPriority, AlertStatus } from './Components';
 
 type Props = {
@@ -20,13 +20,13 @@ type Props = {
 
 const WrappedAlertListItem = ({ item }: Props) => {
   const theme = useTheme();
-  const { t, i18n } = useTranslation('alerts');
+  const { t } = useTranslation('alerts');
   const { configuration } = useALContext();
 
   const subject = useMemo<string>(() => {
     let data = '';
-    for (let subItem of configuration.ui.alerting_meta.subject) {
-      let metaVal = item.metadata[subItem];
+    for (const subItem of configuration.ui.alerting_meta.subject) {
+      const metaVal = item.metadata[subItem];
       if (metaVal !== undefined && metaVal !== null) {
         data = metaVal;
         break;
@@ -37,8 +37,8 @@ const WrappedAlertListItem = ({ item }: Props) => {
 
   const url = useMemo<string>(() => {
     let data = '';
-    for (let subItem of configuration.ui.alerting_meta.url) {
-      let metaVal = item.metadata[subItem];
+    for (const subItem of configuration.ui.alerting_meta.url) {
+      const metaVal = item.metadata[subItem];
       if (metaVal !== undefined && metaVal !== null) {
         data = metaVal;
         break;
@@ -137,7 +137,7 @@ const WrappedAlertListItem = ({ item }: Props) => {
               <CustomChip size="tiny" variant="outlined" label={item.type} style={{ cursor: 'inherit' }} />
             </Grid>
             <Grid item>
-              <AlertStatus name={item.status} size={'tiny' as 'tiny'} />
+              <AlertStatus name={item.status} size={'tiny' as const} />
             </Grid>
           </Grid>
         </Grid>
@@ -147,23 +147,23 @@ const WrappedAlertListItem = ({ item }: Props) => {
               .sort()
               .map(label => ({
                 label,
-                size: 'tiny' as 'tiny',
-                variant: 'outlined' as 'outlined',
+                size: 'tiny' as const,
+                variant: 'outlined' as const,
                 style: { cursor: 'inherit' }
               }))
               .concat(
                 item.al.detailed
                   ? item.al.detailed.attrib.sort(detailedItemCompare).map(attrib_item => ({
                       label: attrib_item.subtype ? `${attrib_item.value} - ${attrib_item.subtype}` : attrib_item.value,
-                      size: 'tiny' as 'tiny',
+                      size: 'tiny' as const,
                       color: verdictToColor(attrib_item.verdict),
-                      variant: 'outlined' as 'outlined',
+                      variant: 'outlined' as const,
                       style: { cursor: 'inherit' }
                     }))
                   : item.al.attrib.map(label => ({
                       label,
-                      size: 'tiny' as 'tiny',
-                      variant: 'outlined' as 'outlined',
+                      size: 'tiny' as const,
+                      variant: 'outlined' as const,
                       style: { cursor: 'inherit' }
                     }))
               )}

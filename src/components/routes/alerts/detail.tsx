@@ -195,7 +195,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
               <Grid item style={{ display: 'flex', flexDirection: 'row', textAlign: 'right', flexGrow: 0 }}>
                 <AlertHistory alert={alert} />
                 <AlertGroup alert={alert} />
-                <AlertOwnership alert={alert} defaultGroupBy="group_by=" />
+                <AlertOwnership alert={alert} />
                 <AlertSubmission alert={alert} />
                 <AlertWorkflow alert={alert} />
                 <AlertSafelist alert={alert} />
