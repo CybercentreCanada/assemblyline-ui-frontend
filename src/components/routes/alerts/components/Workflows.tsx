@@ -92,6 +92,7 @@ export const AlertWorkflowDrawer = React.memo(
     const classes = useStyles();
     const { apiCall } = useMyAPI();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
+    const { toSearchObject } = useSearchParams<AlertSearchParams>();
 
     const [body, setBody] = useState<WorkflowBody>(initialBody);
     const [waiting, setWaiting] = useState<boolean>(false);
@@ -230,9 +231,9 @@ export const AlertWorkflowDrawer = React.memo(
                   }}
                 >
                   <AlertFiltersSelected
-                    query={query}
-                    hidden={isSingleAlert ? ['tc_start', 'sort'] : ['tc_start', 'sort', 'tc']}
-                    disableActions
+                    params={toSearchObject(query)}
+                    visible={isSingleAlert ? ['fq', 'group_by', 'q'] : ['fq', 'group_by', 'q', 'tc']}
+                    disabled
                   />
                 </div>
               </div>

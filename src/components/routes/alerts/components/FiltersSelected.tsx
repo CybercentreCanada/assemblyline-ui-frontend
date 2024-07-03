@@ -10,7 +10,6 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
-import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import CustomChip from 'components/visual/CustomChip';
 import Moment from 'components/visual/Moment';
 import type { ReactNode } from 'react';
@@ -61,7 +60,7 @@ type Filters = {
 
 type MenuFilterProps = {
   param: string;
-  hide: boolean;
+  visible: boolean;
   disabled: boolean;
   classes?: ChipProps['classes'];
   variant?: ChipProps['variant'];
@@ -86,7 +85,7 @@ type MenuFilterProps = {
 const MenuFilter: React.FC<MenuFilterProps> = React.memo(
   ({
     param = null,
-    hide = false,
+    visible = true,
     disabled = false,
     classes = null,
     variant = 'outlined',
@@ -110,7 +109,7 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
 
     const ref = useRef<HTMLDivElement>(null);
 
-    return hide || param === null || param === undefined ? null : (
+    return !visible || param === null || param === undefined ? null : (
       <div ref={ref}>
         <CustomChip
           classes={classes}
@@ -152,17 +151,17 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
 );
 
 type Props = {
-  query: URLSearchParams;
-  hidden?: (keyof AlertSearchParams)[];
-  disableActions?: boolean;
+  params: AlertSearchParams;
+  onChange?: (value: AlertSearchParams) => void;
+  visible?: (keyof AlertSearchParams)[];
+  disabled?: boolean;
 };
 
-const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [], disableActions = false }: Props) => {
+const WrappedAlertFiltersSelected = ({ params = null, onChange = null, visible = [], disabled = false }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const classes = useStyles();
   const alertValues = useAlerts();
-  const { setSearchParams, setSearchObj } = useSearchParams<AlertSearchParams>();
 
   const allFavorites = useMemo<Favorite[]>(
     () => (!alertValues ? [] : [...alertValues.userFavorites, ...alertValues.globalFavorites]),
@@ -171,9 +170,9 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
 
   const filters = useMemo<Filters>(() => {
     const defaults = { status: [], priority: [], labels: [], favorites: [], others: [] };
-    if (!query) return defaults;
+    if (!params) return defaults;
 
-    query.getAll('fq').forEach(filter => {
+    params.fq.forEach(filter => {
       const not = filter.startsWith('NOT(') && filter.endsWith(')');
       const value = not ? filter.substring(4, filter.length - 1) : filter;
 
@@ -186,11 +185,20 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
       else defaults.others.push({ filter, not, value });
     });
     return defaults;
-  }, [allFavorites, query]);
+  }, [allFavorites, params]);
+
+  const handleChange = useCallback(
+    (input: AlertSearchParams | ((params: AlertSearchParams) => AlertSearchParams)) => {
+      if (disabled) return;
+      onChange(typeof input === 'function' ? input(params) : params);
+    },
+    [disabled, onChange, params]
+  );
 
   const handleQueryChange = useCallback(
     (filter: Filter) => {
-      setSearchObj(v => ({
+      if (disabled) return;
+      handleChange(v => ({
         ...v,
         fq: v.fq.map(f =>
           filter.filter !== f
@@ -201,14 +209,15 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
         )
       }));
     },
-    [setSearchObj]
+    [disabled, handleChange]
   );
 
   const handleQueryRemove = useCallback(
     (filter: Filter) => {
-      setSearchObj(v => ({ ...v, fq: v.fq.filter(f => f !== filter.filter) }));
+      if (disabled) return;
+      handleChange(v => ({ ...v, fq: v.fq.filter(f => f !== filter.filter) }));
     },
-    [setSearchObj]
+    [disabled, handleChange]
   );
 
   return (
@@ -221,26 +230,23 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
         rowGap: theme.spacing(1)
       }}
     >
-      {!hidden.includes('q') && query.get('q') && (
+      {visible.includes('q') && params.q && (
         <CustomChip
           icon={<SearchOutlinedIcon fontSize="small" />}
           label={
             <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
-              <span>{`${t('query')}: ${query.get('q')}`}</span>
+              <span>{`${t('query')}: ${params.q}`}</span>
             </div>
           }
           size="small"
           style={{ minHeight: '25px' }}
           variant="outlined"
           wrap
-          onDelete={
-            disableActions
-              ? null
-              : () =>
-                  setSearchParams(v => {
-                    v.delete('q');
-                    return v;
-                  })
+          onDelete={() =>
+            handleChange(v => {
+              delete v.q;
+              return v;
+            })
           }
         />
       )}
@@ -248,30 +254,26 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
       <MenuFilter
         classes={{
           icon: classes.icon,
-          deleteIcon: clsx(
-            classes.deleteIcon,
-            classes.desc,
-            query.get('sort') && query.get('sort').endsWith('asc') && classes.asc
-          )
+          deleteIcon: clsx(classes.deleteIcon, classes.desc, params.sort && params.sort.endsWith('asc') && classes.asc)
         }}
         getLabel={item => (
           <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
             <span>{`${t('sorts.title')}: ${t(item.substring(0, item.indexOf(' ')))}`}</span>
-            {disableActions && <ArrowDownwardIcon fontSize="small" />}
+            {disabled && <ArrowDownwardIcon fontSize="small" />}
           </div>
         )}
         getListItemIcon={option =>
-          query.get('sort').startsWith(option.value) && (
+          params.sort.startsWith(option.value) && (
             <ArrowDownwardIcon
-              className={clsx(classes.desc, query.get('sort').endsWith('asc') && classes.asc)}
+              className={clsx(classes.desc, params.sort.endsWith('asc') && classes.asc)}
               fontSize="small"
             />
           )
         }
-        param={query.get('sort')}
-        hide={hidden.includes('sort')}
-        disabled={disableActions}
-        getSelected={option => query.get('sort').startsWith(option.value)}
+        param={params.sort}
+        visible={visible.includes('sort')}
+        disabled={disabled}
+        getSelected={option => params.sort.startsWith(option.value)}
         icon={<SortIcon fontSize="small" />}
         deleteIcon={<ArrowDownwardIcon />}
         title={t('sorts.title')}
@@ -279,7 +281,7 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
         disableCloseOnSelect
         style={{ minHeight: '25px' }}
         onClick={(_, option) =>
-          setSearchObj(v => ({
+          handleChange(v => ({
             ...v,
             sort:
               v.sort.startsWith(option.value) && v.sort.endsWith('desc')
@@ -288,7 +290,7 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
           }))
         }
         onDelete={() =>
-          setSearchObj(v => ({
+          handleChange(v => ({
             ...v,
             sort: v.sort.endsWith('desc') ? v.sort.replace('desc', 'asc') : v.sort.replace('asc', 'desc')
           }))
@@ -298,40 +300,40 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
       <MenuFilter
         classes={{ icon: classes.icon }}
         getLabel={() => {
-          const option = GROUPBY_OPTIONS.find(o => o.value === query.get('group_by'));
+          const option = GROUPBY_OPTIONS.find(o => o.value === params.group_by);
           return option && option.value !== ''
             ? `${t('groupBy')}: ${t(option.label)}`
             : `${t('groupBy')}: ${t('none')}`;
         }}
-        param={query.get('group_by')}
-        hide={hidden.includes('group_by')}
-        disabled={disableActions}
-        getSelected={option => query.get('group_by') === option.value}
+        param={params.group_by}
+        visible={visible.includes('group_by')}
+        disabled={disabled}
+        getSelected={option => params.group_by === option.value}
         icon={<SourceIcon fontSize="small" />}
         title={t('groupBy')}
         options={GROUPBY_OPTIONS}
         style={{ minHeight: '25px' }}
-        onClick={(_, option) => setSearchObj(v => ({ ...v, group_by: option.value }))}
+        onClick={(_, option) => handleChange(v => ({ ...v, group_by: option.value }))}
       />
 
       <MenuFilter
         classes={{ icon: classes.icon }}
         getLabel={() => {
-          const option = TC_OPTIONS.find(o => o.value === query.get('tc'));
+          const option = TC_OPTIONS.find(o => o.value === params.tc);
           return option && option.value !== '' ? `${t('tc')}: ${t(option.label)}` : `${t('tc')}: ${t('none')}`;
         }}
-        param={query.get('tc')}
-        hide={hidden.includes('tc')}
-        disabled={disableActions}
-        getSelected={option => query.get('tc') === option.value}
+        param={params.tc}
+        visible={visible.includes('tc')}
+        disabled={disabled}
+        getSelected={option => params.tc === option.value}
         icon={<DateRangeIcon fontSize="small" />}
         title={t('tc')}
         options={TC_OPTIONS}
         style={{ minHeight: '25px' }}
-        onClick={(_, option) => setSearchObj(v => ({ ...v, tc: option.value }))}
+        onClick={(_, option) => handleChange(v => ({ ...v, tc: option.value }))}
       />
 
-      {!hidden.includes('tc_start') && query.get('tc_start') && (
+      {visible.includes('tc_start') && params.tc_start && (
         <CustomChip
           classes={{ icon: classes.icon }}
           variant="outlined"
@@ -342,17 +344,14 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
           label={
             <div>
               <span>{t('tc_start')}: </span>
-              <Moment variant="localeDateTime">{query.get('tc_start')}</Moment>
+              <Moment variant="localeDateTime">{params.tc_start}</Moment>
             </div>
           }
-          onDelete={
-            disableActions
-              ? null
-              : () =>
-                  setSearchParams(v => {
-                    v.delete('tc_start');
-                    return v;
-                  })
+          onDelete={() =>
+            handleChange(v => {
+              delete v.tc_start;
+              return v;
+            })
           }
         />
       )}
@@ -384,8 +383,8 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
               >{`(${favorite.created_by})`}</div>
             </div>
           }
-          onClick={disableActions ? null : () => handleQueryChange(favorite)}
-          onDelete={disableActions ? null : () => handleQueryRemove(favorite)}
+          onClick={() => handleQueryChange(favorite)}
+          onDelete={() => handleQueryRemove(favorite)}
         />
       ))}
 
@@ -398,8 +397,8 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
           style={{ minHeight: '25px' }}
           color={status.not ? 'error' : 'default'}
           label={status.value}
-          onClick={disableActions ? null : () => handleQueryChange(status)}
-          onDelete={disableActions ? null : () => handleQueryRemove(status)}
+          onClick={() => handleQueryChange(status)}
+          onDelete={() => handleQueryRemove(status)}
         />
       ))}
 
@@ -412,8 +411,8 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
           style={{ minHeight: '25px' }}
           color={priority.not ? 'error' : 'default'}
           label={priority.value}
-          onClick={disableActions ? null : () => handleQueryChange(priority)}
-          onDelete={disableActions ? null : () => handleQueryRemove(priority)}
+          onClick={() => handleQueryChange(priority)}
+          onDelete={() => handleQueryRemove(priority)}
         />
       ))}
 
@@ -426,8 +425,8 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
           style={{ minHeight: '25px' }}
           color={label.not ? 'error' : 'default'}
           label={label.value}
-          onClick={disableActions ? null : () => handleQueryChange(label)}
-          onDelete={disableActions ? null : () => handleQueryRemove(label)}
+          onClick={() => handleQueryChange(label)}
+          onDelete={() => handleQueryRemove(label)}
         />
       ))}
 
@@ -441,8 +440,8 @@ const WrappedAlertFiltersSelected = ({ query = new URLSearchParams(), hidden = [
           style={{ minHeight: '25px' }}
           color={other.not ? 'error' : 'default'}
           label={other.value}
-          onClick={disableActions ? null : () => handleQueryChange(other)}
-          onDelete={disableActions ? null : () => handleQueryRemove(other)}
+          onClick={() => handleQueryChange(other)}
+          onDelete={() => handleQueryRemove(other)}
         />
       ))}
     </div>

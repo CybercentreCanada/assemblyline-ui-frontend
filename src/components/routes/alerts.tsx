@@ -56,6 +56,12 @@ export type AlertSearchParams = {
   tc: string;
 };
 
+export const PAGE_SIZE = 25;
+
+export const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist';
+
+export const ALERT_STORAGE_KEY = 'alert.search';
+
 export const ALERT_SEARCH_FORMAT: SearchFormat<AlertSearchParams> = {
   fq: 'string[]',
   group_by: 'string',
@@ -67,12 +73,6 @@ export const ALERT_SEARCH_FORMAT: SearchFormat<AlertSearchParams> = {
   tc_start: 'string',
   tc: 'string'
 };
-
-export const PAGE_SIZE = 25;
-
-export const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist';
-
-export const ALERT_STORAGE_KEY = 'alert.search';
 
 export const ALERT_DEFAULT_PARAMS: AlertSearchParams = {
   fq: [],
@@ -99,6 +99,7 @@ const WrappedAlertsContent = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
+  const { searchParams, setSearchParams, setSearchObj } = useSearchParams<AlertSearchParams>();
 
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [countedTotal, setCountedTotal] = useState<number>(0);
@@ -107,13 +108,9 @@ const WrappedAlertsContent = () => {
   const [scrollReset, setScrollReset] = useState<boolean>(false);
 
   const prevSearch = useRef<string>(null);
-  const prevOffset = useRef<number>(null);
-  const executionTime = useRef<string>(null);
   const loadingRef = useRef<boolean>(null);
 
   const isLGDown = useMediaQuery(theme.breakpoints.down('lg'));
-
-  const { searchParams, setSearchParams, setSearchObj } = useSearchParams<AlertSearchParams>();
 
   const suggestions = useMemo<string[]>(
     () =>
@@ -125,6 +122,8 @@ const WrappedAlertsContent = () => {
 
   const handleFetch = useCallback(
     (search: URLSearchParams) => {
+      const tcStart = search.get('tc_start');
+      search.delete('tc_start');
       search.sort();
 
       if (loadingRef.current || search.toString() === prevSearch.current) return;
@@ -132,13 +131,12 @@ const WrappedAlertsContent = () => {
       loadingRef.current = true;
 
       const groupBy = search.get('group_by');
-      const pathname = groupBy ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
+      const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
 
       if (Number(search.get('offset') || 0) === 0) {
         setScrollReset(true);
-        executionTime.current = null;
-        search.delete('tc_start');
-        // setSearchParams(search);
+      } else {
+        search.set('tc_start', tcStart);
       }
 
       apiCall({
@@ -146,13 +144,9 @@ const WrappedAlertsContent = () => {
         method: 'GET',
         onSuccess: ({ api_response }: { api_response: ListResponse | GroupedResponse }) => {
           if ('tc_start' in api_response) {
-            executionTime.current = api_response.tc_start;
-            search.set('tc_start', executionTime.current);
-            // setSearchParams(search);
-          } else if (!executionTime.current && api_response.items.length > 0) {
-            executionTime.current = api_response.items[0].reporting_ts;
-            search.set('tc_start', executionTime.current);
-            // setSearchParams(search);
+            search.set('tc_start', api_response.tc_start);
+          } else if (!search.get('tc_start') && api_response.items.length > 0) {
+            search.set('tc_start', api_response.items[0].reporting_ts);
           }
 
           const max = api_response.offset + api_response.rows;
@@ -162,6 +156,7 @@ const WrappedAlertsContent = () => {
           ]);
           setCountedTotal('counted_total' in api_response ? api_response.counted_total : api_response.items.length);
           setTotal(api_response.total);
+          setSearchParams(search);
         },
 
         onEnter: () => {
@@ -227,7 +222,6 @@ const WrappedAlertsContent = () => {
     const refresh = () => {
       setTimeout(() => {
         prevSearch.current = null;
-        prevOffset.current = null;
         loadingRef.current = null;
         handleFetch(searchParams);
       }, 1000);
@@ -313,7 +307,7 @@ const WrappedAlertsPage = () => (
     format={ALERT_SEARCH_FORMAT}
     storageKey={ALERT_STORAGE_KEY}
     enforced={['offset', 'rows']}
-    ignored={['tc_start']}
+    ignored={['no_delay', 'tc_start']}
   >
     <SearchParamsProvider
       format={ALERT_SEARCH_FORMAT}

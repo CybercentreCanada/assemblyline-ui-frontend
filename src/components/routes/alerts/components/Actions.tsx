@@ -297,7 +297,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
-    const { searchParams, getSearchParams } = useSearchParams<AlertSearchParams>();
+    const { searchParams, toSearchObject, getSearchParams } = useSearchParams<AlertSearchParams>();
 
     const [confirmation, setConfirmation] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
@@ -378,7 +378,11 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
                       {!query || query.toString() === '' ? (
                         <div>{t('none')}</div>
                       ) : (
-                        <AlertFiltersSelected query={query} hidden={['group_by', 'tc_start']} disableActions />
+                        <AlertFiltersSelected
+                          params={toSearchObject(query)}
+                          visible={['fq', 'q', 'sort', 'tc']}
+                          disabled
+                        />
                       )}
                     </Paper>
                   </Grid>
@@ -484,7 +488,7 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
           alerts={[alert]}
           query={query}
           open={openWorkflow}
-          hideTC
+          // hideTC
           // initialBody={{
           //   status: alert.status as Status,
           //   priority: alert.priority as Priority,

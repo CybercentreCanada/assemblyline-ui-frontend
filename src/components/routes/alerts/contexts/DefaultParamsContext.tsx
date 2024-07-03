@@ -1,6 +1,14 @@
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
+type Input = string | URLSearchParams | string[][] | Record<string, string>;
+
+type ChangeOptions<T extends Params> = {
+  keys?: (keyof T)[];
+  strip?: [keyof T, string?][];
+  transforms?: ((value: T) => T)[];
+};
+
 export type Params = Record<string, boolean | number | string | string[]>;
 
 export type SearchFormat<T extends Params> = {
@@ -39,17 +47,9 @@ type ContextProps<T extends Params> = {
    */
   onDefaultClear: () => void;
 
-  getDefaultParams: (props?: {
-    keys?: (keyof T)[];
-    strip?: [keyof T, string?][];
-    transforms?: ((value: URLSearchParams) => URLSearchParams)[];
-  }) => URLSearchParams;
+  getDefaultParams: (options?: ChangeOptions<T>) => URLSearchParams;
 
-  getDefaultObj: (props?: {
-    keys?: (keyof T)[];
-    strip?: [keyof T, string?][];
-    transforms?: ((value: Partial<T>) => Partial<T>)[];
-  }) => Partial<T>;
+  getDefaultObj: (options?: ChangeOptions<T>) => Partial<T>;
 };
 
 type Props<T extends Params> = {
@@ -176,8 +176,8 @@ export const DefaultParamsProvider = <T extends Params>({
   );
 
   const getDefaultParams = useCallback<ContextProps<T>['getDefaultParams']>(
-    (props = { keys: [], strip: [], transforms: [] }) => {
-      const { keys = [], strip = [], transforms = [] } = props;
+    (props = { keys: null, strip: [], transforms: [] }) => {
+      const { keys = null, strip = [], transforms = [] } = props;
       let q = new URLSearchParams(defaultParams);
 
       transforms.forEach(transform => {
