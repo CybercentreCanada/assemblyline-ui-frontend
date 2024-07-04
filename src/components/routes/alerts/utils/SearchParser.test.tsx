@@ -1,6 +1,6 @@
-import { describe, test } from 'vitest';
-import type { SearchFormat } from './SearchParamsParser';
-import { SearchFormatter } from './SearchParamsParser';
+import { describe, expect, test } from 'vitest';
+import type { SearchFormat } from './SearchParser';
+import { SearchFormatter } from './SearchParser';
 
 type Format = {
   query: string;

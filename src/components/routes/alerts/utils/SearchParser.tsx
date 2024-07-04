@@ -1,5 +1,3 @@
-// export type Params = Record<string, boolean | number | string | string[]>;
-
 export type Params = {
   [param: string]: boolean | number | string | string[];
 };
@@ -58,6 +56,54 @@ export class SearchFormatter<T extends Params> {
     return key in this.format ? this.format[key] : null;
   }
 
+  public getParam<K extends keyof T>(
+    key: K,
+    input: URLSearchParams,
+    base: URLSearchParams = new URLSearchParams()
+  ): T[K] {
+    let value: unknown = input.get(key as string);
+    if (!(key in this.format)) return null;
+
+
+    switch (this.format[key]) {
+      case 'string[]':
+        value = input.getAll(key as string).toSorted();
+        break;
+      case 'boolean':
+        value = value === 'true' ? true : value === 'false' ? false : base.get(key as string);
+        break;
+      case 'number':
+        value =
+        return Number(p);
+        break;
+      case 'string':
+        return String(p);
+        break;
+      default:
+        return base.get(key as string);
+        break;
+    }
+
+    return value as T[K];
+  }
+
+  public parseParam<K extends keyof T>(key: K, value: unknown, base: unknown = null): T[K] {
+    if (value === null || value === undefined || !(key in this.format)) return base as T[K];
+
+    switch (this.format[key]) {
+      case 'string[]':
+        return Array.isArray(value) ? value.map(v => String(v)).toSorted() : String(value);
+      case 'boolean':
+        return value === 'true' ? true : value === 'false' ? false : base;
+      case 'number':
+        return Number(value);
+      case 'string':
+        return String(value);
+      default:
+        return base;
+    }
+  }
+
   public mergeArray(origin: string[], defaults: string[]) {
     let values: [string, string][] = [];
     values = [...defaults, ...origin].reduceRight((prev, current) => {
@@ -84,27 +130,6 @@ export class SearchFormatter<T extends Params> {
     }, values);
 
     return values.map(([prefix, value]) => (prefix !== '' ? `${prefix}(${value})` : value));
-  }
-
-  public parseParam(
-    key: keyof T,
-    value: boolean | number | string | string[],
-    base: boolean | number | string | string[] = null
-  ) {
-    if (value === null || value === undefined || !(key in this.format)) return base;
-
-    switch (this.format[key]) {
-      case 'string[]':
-        return Array.isArray(value) ? value.map(v => String(v)).toSorted() : String(value);
-      case 'boolean':
-        return value === 'true' ? true : value === 'false' ? false : base;
-      case 'number':
-        return Number(value);
-      case 'string':
-        return String(value);
-      default:
-        return base;
-    }
   }
 
   public parseObj(input: T): T {
@@ -179,7 +204,7 @@ export class SearchParams<T extends Params> {
    * Modify the elements in the search parameters that meet the condition specified in a callback function.
    * @param predicate — A function that accepts up to two arguments. The filter method calls the predicate function one time for each element in the search parameters.
    */
-  public toFiltered(predicate: (key: keyof T, value: boolean | number | string | string[]) => boolean) {
+  public toFiltered(predicate: <K extends keyof T>(key: K, value: T[K]) => boolean) {
     const next = new URLSearchParams();
 
     this.search.forEach((value, key) => {
@@ -194,7 +219,7 @@ export class SearchParams<T extends Params> {
     return new SearchParams<T>(entries, this.format);
   }
 
-  public get(key: keyof T) {
+  public get<K extends keyof T>(key: K): T[K] {
     const t = this.formatter.get(key);
     return this.formatter.parseParam(
       key,
@@ -323,7 +348,7 @@ export class SearchParser<T extends Params> {
   public mergeParams(
     first: SearchInput,
     second: SearchInput,
-    predicate: (key: keyof T, values?: [unknown, unknown]) => boolean
+    predicate: <K extends keyof T>(key: K, values?: [T[K], T[K]]) => boolean
   ) {
     const left = new URLSearchParams(first);
     const right = new URLSearchParams(second);

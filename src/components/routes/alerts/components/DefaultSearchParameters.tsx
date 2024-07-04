@@ -19,7 +19,6 @@ import { useDefaultParams } from 'components/routes/alerts/contexts/DefaultParam
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
 import AlertFiltersSelected from './FiltersSelected';
 
 const useStyles = makeStyles(theme => ({
@@ -56,11 +55,9 @@ const WrappedAlertDefaultSearchParameters = () => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const classes = useStyles();
-  const location = useLocation();
   const { showSuccessMessage } = useMySnackbar();
-
-  const { searchParams } = useSearchParams<AlertSearchParams>();
-  const { defaultParams, hasStorageParams, onDefaultChange, onDefaultClear } = useDefaultParams<AlertSearchParams>();
+  const { search } = useSearchParams<AlertSearchParams>();
+  const { defaults, fromStorage, onDefaultChange, onDefaultClear } = useDefaultParams<AlertSearchParams>();
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -68,9 +65,9 @@ const WrappedAlertDefaultSearchParameters = () => {
     () =>
       !open
         ? false
-        : searchParams.toFiltered(k => !['offset', 'rows', 'tc_start'].includes(k)).toString() ===
-          defaultParams.toFiltered(k => !['offset', 'rows', 'tc_start'].includes(k)).toString(),
-    [defaultParams, open, searchParams]
+        : search.toFiltered(k => !['offset', 'rows', 'tc_start'].includes(k)).toString() ===
+          defaults.toFiltered(k => !['offset', 'rows', 'tc_start'].includes(k)).toString(),
+    [defaults, open, search]
   );
 
   return (
@@ -97,14 +94,10 @@ const WrappedAlertDefaultSearchParameters = () => {
                 backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
               }}
             >
-              {!defaultParams.toObject() ? (
+              {defaults.toString() === '' ? (
                 <div>{t('none')}</div>
               ) : (
-                <AlertFiltersSelected
-                  params={defaultParams.toObject()}
-                  visible={['fq', 'group_by', 'q', 'sort', 'tc']}
-                  disabled
-                />
+                <AlertFiltersSelected value={defaults} visible={['fq', 'group_by', 'q', 'sort', 'tc']} disabled />
               )}
             </Paper>
           </Grid>
@@ -119,32 +112,28 @@ const WrappedAlertDefaultSearchParameters = () => {
                 backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
               }}
             >
-              {!searchParams.toObject() ? (
+              {search.toString() === '' ? (
                 <div>{t('none')}</div>
               ) : (
-                <AlertFiltersSelected
-                  params={searchParams.toObject()}
-                  visible={['fq', 'group_by', 'q', 'sort', 'tc']}
-                  disabled
-                />
+                <AlertFiltersSelected value={search} visible={['fq', 'group_by', 'q', 'sort', 'tc']} disabled />
               )}
             </Paper>
           </Grid>
 
-          <div>{hasStorageParams ? t('session.clear.confirm') : t('session.clear.none')}</div>
+          <div>{fromStorage ? t('session.clear.confirm') : t('session.clear.none')}</div>
 
           <div>
             {isSameParams
               ? t('session.save.same')
-              : searchParams.toObject()
-              ? t('session.save.confirm')
-              : t('session.save.none')}
+              : search.toString() === ''
+              ? t('session.save.none')
+              : t('session.save.confirm')}
           </div>
         </DialogContent>
         <DialogActions>
           <Button
             color="primary"
-            disabled={!hasStorageParams}
+            disabled={!fromStorage}
             children={t('session.clear')}
             onClick={() => {
               onDefaultClear();
@@ -156,10 +145,10 @@ const WrappedAlertDefaultSearchParameters = () => {
           <Button autoFocus color="secondary" children={t('session.cancel')} onClick={() => setOpen(false)} />
           <Button
             color="primary"
-            disabled={!searchParams.toObject() || isSameParams}
+            disabled={search.toString() === '' || isSameParams}
             children={t('session.save')}
             onClick={() => {
-              onDefaultChange(location.search);
+              onDefaultChange(search.toParams());
               showSuccessMessage(t('session.save.success'));
               setOpen(false);
             }}

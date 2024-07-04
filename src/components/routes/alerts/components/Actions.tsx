@@ -41,6 +41,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
+import { SearchParams } from '../utils/SearchParser';
 import { AlertEventsTable } from './Components';
 import AlertFiltersSelected from './FiltersSelected';
 import { AlertWorkflowDrawer } from './Workflows';
@@ -250,32 +251,24 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
     const theme = useTheme();
     const location = useLocation();
 
-    const { searchParams } = useSearchParams<AlertSearchParams>();
+    const { search } = useSearchParams<AlertSearchParams>();
 
-    const search = useMemo<string>(() => {
+    const query = useMemo<string>(() => {
       if (!alert || !alert.group_count) return '';
 
-      return searchParams
+      return search
         .toCopy(p => ({
           ...p,
           group_by: '',
           fq: [...p.fq, `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`]
         }))
         .toString();
-
-      // const query = searchParams.toParams();
-      // const groupBy = !query.has('group_by') ? '' : query.get('group_by');
-
-      // query.set('group_by', '');
-      // query.append('fq', `${groupBy}:${getValueFromPath(alert, groupBy) as string}`);
-
-      // return query.toString();
-    }, [alert, searchParams]);
+    }, [alert, search]);
 
     return (
       <AlertActionButton
         tooltipTitle={t('focus')}
-        to={`${location.pathname}?${search}${location.hash}`}
+        to={`${location.pathname}?${query}${location.hash}`}
         open={open}
         vertical={vertical}
         permanent={permanent}
@@ -305,24 +298,23 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
-    const { searchParams } = useSearchParams<AlertSearchParams>();
+    const { search } = useSearchParams<AlertSearchParams>();
 
     const [confirmation, setConfirmation] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
 
-    const query = useMemo<URLSearchParams>(() => {
+    const query = useMemo<SearchParams<AlertSearchParams>>(() => {
       if (!alert) return null;
 
-      return searchParams
+      return search
         .toCopy(p => ({
           ...p,
           q: p.group_by
             ? `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`
             : `alert_id:${alert.alert_id}`
         }))
-        .toFiltered(k => ['tc', 'tc_start', 'fq', 'q'].includes(k))
-        .toParams();
-    }, [alert, searchParams]);
+        .toFiltered(k => ['tc', 'tc_start', 'fq', 'q'].includes(k));
+    }, [alert, search]);
 
     const handleTakeOwnership = useCallback(
       (prevAlert: AlertItem, q: string) => {
@@ -379,7 +371,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
             acceptText={t('actions.ok')}
             waiting={waiting}
             children={
-              searchParams.get('group_by') ? (
+              search.get('group_by') ? (
                 <Grid container rowGap={2}>
                   <Grid>{t('actions.takeownershipdiag.content.grouped')}</Grid>
                   <Grid item style={{ width: '100%' }}>
@@ -388,11 +380,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
                       {!query || query.toString() === '' ? (
                         <div>{t('none')}</div>
                       ) : (
-                        <AlertFiltersSelected
-                          params={searchParams.toObject()}
-                          visible={['fq', 'q', 'sort', 'tc']}
-                          disabled
-                        />
+                        <AlertFiltersSelected search={query} visible={['fq', 'q', 'sort', 'tc']} disabled />
                       )}
                     </Paper>
                   </Grid>
@@ -461,13 +449,13 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const { user: currentUser } = useAppUser<CustomUser>();
-    const { searchParams } = useSearchParams<AlertSearchParams>();
+    const { search } = useSearchParams<AlertSearchParams>();
 
     const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
 
     const query = useMemo<URLSearchParams>(() => {
       if (!alert) return null;
-      return searchParams
+      return search
         .toCopy(p => ({
           ...p,
           q:
@@ -476,7 +464,7 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
               : `alert_id:${alert.alert_id}`
         }))
         .toParams();
-    }, [alert, inDrawer, searchParams, speedDial]);
+    }, [alert, inDrawer, search, speedDial]);
 
     return (
       <>

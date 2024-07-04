@@ -15,6 +15,7 @@ import Moment from 'components/visual/Moment';
 import type { ReactNode } from 'react';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SearchParams } from '../utils/SearchParser';
 import type { Favorite } from './Favorites';
 import type { Option } from './Filters';
 import { GROUPBY_OPTIONS, SORT_OPTIONS, TC_OPTIONS } from './Filters';
@@ -151,13 +152,18 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
 );
 
 type Props = {
-  params: AlertSearchParams;
-  onChange?: (value: AlertSearchParams) => void;
+  value: SearchParams<AlertSearchParams>;
+  onChange?: (value: SearchParams<AlertSearchParams>) => void;
   visible?: (keyof AlertSearchParams)[];
   disabled?: boolean;
 };
 
-const WrappedAlertFiltersSelected = ({ params = null, onChange = null, visible = [], disabled = false }: Props) => {
+const WrappedAlertFiltersSelected = ({
+  value: search = null,
+  onChange = null,
+  visible = [],
+  disabled = false
+}: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const classes = useStyles();
@@ -170,9 +176,9 @@ const WrappedAlertFiltersSelected = ({ params = null, onChange = null, visible =
 
   const filters = useMemo<Filters>(() => {
     const defaults = { status: [], priority: [], labels: [], favorites: [], others: [] };
-    if (!params) return defaults;
+    if (search.toString() === '') return defaults;
 
-    params.fq.forEach(filter => {
+    search.get('fq').forEach(filter => {
       const not = filter.startsWith('NOT(') && filter.endsWith(')');
       const value = not ? filter.substring(4, filter.length - 1) : filter;
 

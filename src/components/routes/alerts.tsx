@@ -26,7 +26,7 @@ import { DefaultParamsProvider } from './alerts/contexts/DefaultParamsContext';
 import { SearchParamsProvider, useSearchParams } from './alerts/contexts/SearchParamsContext';
 import AlertDetail from './alerts/detail';
 import type { Alert, AlertItem } from './alerts/models/Alert';
-import type { SearchFormat } from './alerts/utils/SearchParamsParser';
+import type { SearchFormat } from './alerts/utils/SearchParser';
 
 type ListResponse = {
   items: AlertItem[];
@@ -99,7 +99,7 @@ const WrappedAlertsContent = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
-  const { searchParams, setSearchParams, setSearchObj } = useSearchParams<AlertSearchParams>();
+  const { search, setSearchParams, setSearchObj } = useSearchParams<AlertSearchParams>();
 
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [countedTotal, setCountedTotal] = useState<number>(0);
@@ -121,32 +121,32 @@ const WrappedAlertsContent = () => {
   );
 
   const handleFetch = useCallback(
-    (search: URLSearchParams) => {
-      const tcStart = search.get('tc_start');
-      search.delete('tc_start');
-      search.sort();
+    (query: URLSearchParams) => {
+      const tcStart = query.get('tc_start');
+      query.delete('tc_start');
+      query.sort();
 
-      if (loadingRef.current || search.toString() === prevSearch.current) return;
-      prevSearch.current = search.toString();
+      if (loadingRef.current || query.toString() === prevSearch.current) return;
+      prevSearch.current = query.toString();
       loadingRef.current = true;
 
-      const groupBy = search.get('group_by');
+      const groupBy = query.get('group_by');
       const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
 
-      if (Number(search.get('offset') || 0) === 0) {
+      if (Number(query.get('offset') || 0) === 0) {
         setScrollReset(true);
       } else {
-        search.set('tc_start', tcStart);
+        query.set('tc_start', tcStart);
       }
 
       apiCall({
-        url: `${pathname}?${search.toString()}`,
+        url: `${pathname}?${query.toString()}`,
         method: 'GET',
         onSuccess: ({ api_response }: { api_response: ListResponse | GroupedResponse }) => {
           if ('tc_start' in api_response) {
-            search.set('tc_start', api_response.tc_start);
-          } else if (!search.get('tc_start') && api_response.items.length > 0) {
-            search.set('tc_start', api_response.items[0].reporting_ts);
+            query.set('tc_start', api_response.tc_start);
+          } else if (!query.get('tc_start') && api_response.items.length > 0) {
+            query.set('tc_start', api_response.items[0].reporting_ts);
           }
 
           const max = api_response.offset + api_response.rows;
@@ -156,7 +156,7 @@ const WrappedAlertsContent = () => {
           ]);
           setCountedTotal('counted_total' in api_response ? api_response.counted_total : api_response.items.length);
           setTotal(api_response.total);
-          setSearchParams(search);
+          setSearchParams(query);
         },
 
         onEnter: () => {
@@ -183,8 +183,8 @@ const WrappedAlertsContent = () => {
   );
 
   useEffect(() => {
-    handleFetch(searchParams.toParams());
-  }, [handleFetch, searchParams]);
+    handleFetch(search.toParams());
+  }, [handleFetch, search]);
 
   useEffect(() => {
     if (!globalDrawerOpened && location.hash && location.hash !== '') {
@@ -223,7 +223,7 @@ const WrappedAlertsContent = () => {
       setTimeout(() => {
         prevSearch.current = null;
         loadingRef.current = null;
-        handleFetch(searchParams.toParams());
+        handleFetch(search.toParams());
       }, 1000);
     };
 
@@ -231,7 +231,7 @@ const WrappedAlertsContent = () => {
     return () => {
       window.removeEventListener('alertRefresh', refresh);
     };
-  }, [handleFetch, searchParams]);
+  }, [handleFetch, search]);
 
   if (!currentUser.roles.includes('alert_view')) return <ForbiddenPage />;
   else
@@ -248,7 +248,7 @@ const WrappedAlertsContent = () => {
         </Grid>
 
         <SearchHeader
-          value={searchParams.toParams()}
+          value={search.toParams()}
           loading={loading}
           suggestions={suggestions}
           pageSize={PAGE_SIZE}

@@ -1,12 +1,12 @@
-import type { Params, SearchFormat, SearchParams } from 'components/routes/alerts/utils/SearchParamsParser';
-import { SearchParser } from 'components/routes/alerts/utils/SearchParamsParser';
+import type { Params, SearchFormat, SearchParams } from 'components/routes/alerts/utils/SearchParser';
+import { SearchParser } from 'components/routes/alerts/utils/SearchParser';
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useDefaultParams } from './DefaultParamsContext';
 
 type ContextProps<T extends Params> = {
-  searchParams: SearchParams<T>;
+  search: SearchParams<T>;
   setSearchParams: (value: URLSearchParams | ((params: URLSearchParams) => URLSearchParams)) => void;
   setSearchObj: (value: T | ((params: T) => T)) => void;
 };
@@ -73,11 +73,11 @@ export const SearchParamsProvider = <T extends Params>({
   const SearchParamsContext = createSearchParamsContext<T>();
   const navigate = useNavigate();
   const location = useLocation();
-  const defaultContext = useDefaultParams();
+  const { defaults = null } = useDefaultParams<T>() || {};
 
   const [hiddenParams, setHiddenParams] = useState<URLSearchParams>(new URLSearchParams());
 
-  const searchParamsRef = useRef<URLSearchParams>();
+  const searchRef = useRef<URLSearchParams>();
   const prevSearch = useRef<string>(null);
   const prevHidden = useRef<string>(null);
 
@@ -85,24 +85,17 @@ export const SearchParamsProvider = <T extends Params>({
 
   const parser = useMemo<SearchParser<T>>(() => {
     const p = new SearchParser<T>(format, { enforced, prefixes });
+    return p.setDefaultObject(usingDefaultContext && defaults ? defaults.toObject() : defaultValue);
+  }, [defaultValue, defaults, enforced, format, prefixes, usingDefaultContext]);
 
-    if (usingDefaultContext && defaultContext?.defaultParams) {
-      p.setDefaultParams(defaultContext.defaultParams.toParams());
-    } else {
-      p.setDefaultObject(defaultValue);
-    }
-
-    return p;
-  }, [defaultContext.defaultParams, defaultValue, enforced, format, prefixes, usingDefaultContext]);
-
-  const searchParams = useMemo<ContextProps<T>['searchParams']>(
+  const search = useMemo<ContextProps<T>['search']>(
     () => parser.mergeParams(locationParams, hiddenParams, key => !hidden.includes(key)),
     [hidden, hiddenParams, locationParams, parser]
   );
 
   const setSearchParams = useCallback<ContextProps<T>['setSearchParams']>(
     input => {
-      const values = typeof input === 'function' ? input(searchParamsRef.current) : input;
+      const values = typeof input === 'function' ? input(searchRef.current) : input;
 
       const [nextSearch, nextHidden] = parser
         .fromDeltaParams(values)
@@ -121,7 +114,7 @@ export const SearchParamsProvider = <T extends Params>({
 
   const setSearchObj = useCallback<ContextProps<T>['setSearchObj']>(
     input => {
-      const searchObj = parser.fromParams(searchParamsRef.current).toObject();
+      const searchObj = parser.fromParams(searchRef.current).toObject();
       const result = typeof input === 'function' ? input(searchObj) : input;
       setSearchParams(parser.fromObject(result).toParams());
     },
@@ -129,17 +122,12 @@ export const SearchParamsProvider = <T extends Params>({
   );
 
   useEffect(() => {
-    searchParamsRef.current = searchParams.toParams();
-  }, [searchParams]);
-
-  // useEffect(() => {
-  //   setSearchParams(searchParams);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [defaultParams, format, hidden, enforced]);
+    searchRef.current = search.toParams();
+  }, [search]);
 
   return (
-    <SearchParamsContext.Provider value={{ searchParams, setSearchParams, setSearchObj }}>
-      {!searchParams ? null : children}
+    <SearchParamsContext.Provider value={{ search, setSearchParams, setSearchObj }}>
+      {!search ? null : children}
     </SearchParamsContext.Provider>
   );
 };

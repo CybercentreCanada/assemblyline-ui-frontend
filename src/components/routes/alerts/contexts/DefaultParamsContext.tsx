@@ -1,5 +1,5 @@
-import type { Params, SearchFormat, SearchParams } from 'components/routes/alerts/utils/SearchParamsParser';
-import { SearchParser } from 'components/routes/alerts/utils/SearchParamsParser';
+import type { Params, SearchFormat, SearchParams } from 'components/routes/alerts/utils/SearchParser';
+import { SearchParser } from 'components/routes/alerts/utils/SearchParser';
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
@@ -7,12 +7,12 @@ type ContextProps<T extends Params> = {
   /**
    * Default search params as a formatted URLSearchParams
    */
-  defaultParams: SearchParams<T>;
+  defaults: SearchParams<T>;
 
   /**
    * Is there a search params stored in the local storage
    */
-  hasStorageParams: boolean;
+  fromStorage: boolean;
 
   /**
    * Change the default search params in the local storage
@@ -89,7 +89,7 @@ export const DefaultParamsProvider = <T extends Params>({
   const [storageParams, setStorageParams] = useState<URLSearchParams>(() => {
     return new URLSearchParams(!storageKey ? null : localStorage.getItem(storageKey));
   });
-  const [hasStorageParams, setHasStorageParams] = useState<boolean>(() => {
+  const [fromStorage, seFromStorage] = useState<boolean>(() => {
     return !!storageKey && !!localStorage.getItem(storageKey);
   });
 
@@ -98,7 +98,7 @@ export const DefaultParamsProvider = <T extends Params>({
     [defaultValue, enforced, format, prefixes]
   );
 
-  const defaultParams = useMemo<ContextProps<T>['defaultParams']>(
+  const defaults = useMemo<ContextProps<T>['defaults']>(
     () => parser.fromParams(storageParams),
     [parser, storageParams]
   );
@@ -108,7 +108,7 @@ export const DefaultParamsProvider = <T extends Params>({
       const params = parser.fromDeltaParams(value).toFiltered(k => !ignored.includes(k));
       localStorage.setItem(storageKey, params.toString());
       setStorageParams(params.toParams());
-      setHasStorageParams(true);
+      seFromStorage(true);
     },
     [ignored, parser, storageKey]
   );
@@ -116,24 +116,24 @@ export const DefaultParamsProvider = <T extends Params>({
   const onDefaultClear = useCallback<ContextProps<T>['onDefaultClear']>(() => {
     localStorage.removeItem(storageKey);
     setStorageParams(new URLSearchParams());
-    setHasStorageParams(false);
+    seFromStorage(false);
   }, [storageKey]);
 
   useEffect(() => {
     setStorageParams(new URLSearchParams(!storageKey ? null : localStorage.getItem(storageKey)));
-    setHasStorageParams(!!storageKey && !!localStorage.getItem(storageKey));
+    seFromStorage(!!storageKey && !!localStorage.getItem(storageKey));
   }, [storageKey]);
 
   return (
     <DefaultParamsContext.Provider
       value={{
-        defaultParams,
-        hasStorageParams,
+        defaults,
+        fromStorage,
         onDefaultChange,
         onDefaultClear
       }}
     >
-      {!defaultParams ? null : children}
+      {!defaults ? null : children}
     </DefaultParamsContext.Provider>
   );
 };
