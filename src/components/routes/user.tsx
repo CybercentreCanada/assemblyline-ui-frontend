@@ -243,6 +243,11 @@ function User({ username = null }: UserProps) {
     setUser({ ...user, submission_quota: value });
   }
 
+  function setAsyncSubmissionQuota(value) {
+    setModified(true);
+    setUser({ ...user, submission_async_quota: value });
+  }
+
   function setDailyAPIQuota(value) {
     setModified(true);
     setUser({ ...user, api_daily_quota: value });
@@ -426,7 +431,7 @@ function User({ username = null }: UserProps) {
                             <Chip key={index} variant="outlined" label={option} {...getTagProps({ index })} />
                           ))
                         }
-                        onChange={(event, value) => setGroups([...new Set(value.map(x => x.toUpperCase()))])}
+                        onChange={(_, value) => setGroups([...new Set(value.map(x => x.toUpperCase()))])}
                       />
                     </>
                   ),
@@ -459,6 +464,23 @@ function User({ username = null }: UserProps) {
                         InputProps={{ inputProps: { min: 0 } }}
                         onChange={event => setSubmissionQuota(event.target.value)}
                         value={user.submission_quota}
+                      />
+                    </>
+                  ),
+                  submission_async_quota: (
+                    <>
+                      <Typography variant="h4">{t('submission_async_quota')}</Typography>
+                      <Typography variant="caption" color="textSecondary" gutterBottom>
+                        {t('submission_async_quota_edit_title')}
+                      </Typography>
+                      <TextField
+                        autoFocus
+                        type="number"
+                        margin="normal"
+                        variant="outlined"
+                        InputProps={{ inputProps: { min: 0 } }}
+                        onChange={event => setAsyncSubmissionQuota(event.target.value)}
+                        value={user.submission_async_quota}
                       />
                     </>
                   ),
@@ -542,7 +564,7 @@ function User({ username = null }: UserProps) {
                   />
                   <label htmlFor="contained-button-file">
                     <IconButton
-                      onClick={e => {
+                      onClick={() => {
                         inputRef.current.click();
                       }}
                       disabled={!editable}
@@ -726,7 +748,7 @@ function User({ username = null }: UserProps) {
                   className={classes.row}
                   hover={currentUser.is_admin}
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
-                  onClick={currentUser.is_admin ? event => toggleDrawer('api_quota') : null}
+                  onClick={currentUser.is_admin ? () => toggleDrawer('api_quota') : null}
                 >
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_quota')}</TableCell>}
                   <TableCell width="100%">
@@ -750,7 +772,7 @@ function User({ username = null }: UserProps) {
                   className={classes.row}
                   hover={currentUser.is_admin}
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
-                  onClick={currentUser.is_admin ? event => toggleDrawer('api_daily_quota') : null}
+                  onClick={currentUser.is_admin ? () => toggleDrawer('api_daily_quota') : null}
                 >
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_daily_quota')}</TableCell>}
                   <TableCell width="100%">
@@ -787,7 +809,7 @@ function User({ username = null }: UserProps) {
                   className={classes.row}
                   hover={currentUser.is_admin}
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
-                  onClick={currentUser.is_admin ? event => toggleDrawer('submission_quota') : null}
+                  onClick={currentUser.is_admin ? () => toggleDrawer('submission_quota') : null}
                 >
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>}
                   <TableCell width="100%">
@@ -815,7 +837,35 @@ function User({ username = null }: UserProps) {
                   className={classes.row}
                   hover={currentUser.is_admin}
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
-                  onClick={currentUser.is_admin ? event => toggleDrawer('submission_daily_quota') : null}
+                  onClick={currentUser.is_admin ? () => toggleDrawer('submission_async_quota') : null}
+                >
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_async_quota')}</TableCell>}
+                  <TableCell width="100%">
+                    {!isXS ? null : <Typography variant="caption">{t('submission_async_quota')}</Typography>}
+                    {user ? (
+                      <div
+                        style={{
+                          color:
+                            user.submission_async_quota === 0 || user.submission_async_quota === '0'
+                              ? theme.palette.action.disabled
+                              : 'inherit'
+                        }}
+                      >
+                        {user.submission_async_quota === 0 || user.submission_async_quota === '0'
+                          ? t('no_quota')
+                          : user.submission_async_quota}
+                      </div>
+                    ) : (
+                      <Skeleton />
+                    )}
+                  </TableCell>
+                  <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
+                </TableRow>
+                <TableRow
+                  className={classes.row}
+                  hover={currentUser.is_admin}
+                  style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
+                  onClick={currentUser.is_admin ? () => toggleDrawer('submission_daily_quota') : null}
                 >
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_daily_quota')}</TableCell>}
                   <TableCell width="100%">
