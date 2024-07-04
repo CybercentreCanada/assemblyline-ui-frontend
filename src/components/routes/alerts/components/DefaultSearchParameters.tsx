@@ -59,9 +59,8 @@ const WrappedAlertDefaultSearchParameters = () => {
   const location = useLocation();
   const { showSuccessMessage } = useMySnackbar();
 
-  const { searchObj, getSearchParams } = useSearchParams<AlertSearchParams>();
-  const { defaultObj, hasStorageParams, getDefaultParams, onDefaultChange, onDefaultClear } =
-    useDefaultParams<AlertSearchParams>();
+  const { searchParams } = useSearchParams<AlertSearchParams>();
+  const { defaultParams, hasStorageParams, onDefaultChange, onDefaultClear } = useDefaultParams<AlertSearchParams>();
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -69,9 +68,9 @@ const WrappedAlertDefaultSearchParameters = () => {
     () =>
       !open
         ? false
-        : getDefaultParams({ strip: [['offset'], ['rows'], ['tc_start']] }).toString() ===
-          getSearchParams({ strip: [['offset'], ['rows'], ['tc_start']] }).toString(),
-    [getDefaultParams, getSearchParams, open]
+        : searchParams.toFiltered(k => !['offset', 'rows', 'tc_start'].includes(k)).toString() ===
+          defaultParams.toFiltered(k => !['offset', 'rows', 'tc_start'].includes(k)).toString(),
+    [defaultParams, open, searchParams]
   );
 
   return (
@@ -98,10 +97,14 @@ const WrappedAlertDefaultSearchParameters = () => {
                 backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
               }}
             >
-              {!defaultObj ? (
+              {!defaultParams.toObject() ? (
                 <div>{t('none')}</div>
               ) : (
-                <AlertFiltersSelected params={defaultObj} visible={['fq', 'group_by', 'q', 'sort', 'tc']} disabled />
+                <AlertFiltersSelected
+                  params={defaultParams.toObject()}
+                  visible={['fq', 'group_by', 'q', 'sort', 'tc']}
+                  disabled
+                />
               )}
             </Paper>
           </Grid>
@@ -116,10 +119,14 @@ const WrappedAlertDefaultSearchParameters = () => {
                 backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
               }}
             >
-              {!searchObj ? (
+              {!searchParams.toObject() ? (
                 <div>{t('none')}</div>
               ) : (
-                <AlertFiltersSelected params={searchObj} visible={['fq', 'group_by', 'q', 'sort', 'tc']} disabled />
+                <AlertFiltersSelected
+                  params={searchParams.toObject()}
+                  visible={['fq', 'group_by', 'q', 'sort', 'tc']}
+                  disabled
+                />
               )}
             </Paper>
           </Grid>
@@ -127,7 +134,11 @@ const WrappedAlertDefaultSearchParameters = () => {
           <div>{hasStorageParams ? t('session.clear.confirm') : t('session.clear.none')}</div>
 
           <div>
-            {isSameParams ? t('session.save.same') : searchObj ? t('session.save.confirm') : t('session.save.none')}
+            {isSameParams
+              ? t('session.save.same')
+              : searchParams.toObject()
+              ? t('session.save.confirm')
+              : t('session.save.none')}
           </div>
         </DialogContent>
         <DialogActions>
@@ -145,7 +156,7 @@ const WrappedAlertDefaultSearchParameters = () => {
           <Button autoFocus color="secondary" children={t('session.cancel')} onClick={() => setOpen(false)} />
           <Button
             color="primary"
-            disabled={!searchObj || isSameParams}
+            disabled={!searchParams.toObject() || isSameParams}
             children={t('session.save')}
             onClick={() => {
               onDefaultChange(location.search);

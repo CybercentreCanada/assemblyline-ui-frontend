@@ -92,7 +92,7 @@ export const AlertWorkflowDrawer = React.memo(
     const classes = useStyles();
     const { apiCall } = useMyAPI();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
-    const { toSearchObject } = useSearchParams<AlertSearchParams>();
+    // const { toSearchObject } = useSearchParams<AlertSearchParams>();
 
     const [body, setBody] = useState<WorkflowBody>(initialBody);
     const [waiting, setWaiting] = useState<boolean>(false);
@@ -111,6 +111,9 @@ export const AlertWorkflowDrawer = React.memo(
       [queryProp]
     );
 
+    /**
+     * TODO
+     */
     const query = useMemo<URLSearchParams>(() => {
       if (!queryProp) return new URLSearchParams('');
 
@@ -231,7 +234,8 @@ export const AlertWorkflowDrawer = React.memo(
                   }}
                 >
                   <AlertFiltersSelected
-                    params={toSearchObject(query)}
+                    /** to add */
+                    params={null}
                     visible={isSingleAlert ? ['fq', 'group_by', 'q'] : ['fq', 'group_by', 'q', 'tc']}
                     disabled
                   />
@@ -375,15 +379,15 @@ const WrappedAlertWorkflows = ({ alerts = [] }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { getSearchParams } = useSearchParams<AlertSearchParams>();
+  const { searchParams } = useSearchParams<AlertSearchParams>();
 
   const [open, setOpen] = useState<boolean>(false);
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const query = useMemo<URLSearchParams>(
-    () => getSearchParams({ keys: ['q', 'tc_start', 'tc', 'fq'] }),
-    [getSearchParams]
+    () => searchParams.toFiltered(k => ['q', 'tc_start', 'tc', 'fq'].includes(k)).toParams(),
+    [searchParams]
   );
 
   if (!currentUser.roles.includes('alert_manage')) return null;

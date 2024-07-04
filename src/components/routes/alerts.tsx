@@ -22,11 +22,11 @@ import { AlertSearchResults } from './alerts/components/Results';
 import SearchHeader from './alerts/components/SearchHeader';
 import AlertWorkflows from './alerts/components/Workflows';
 import { AlertsProvider } from './alerts/contexts/AlertsContext';
-import type { SearchFormat } from './alerts/contexts/DefaultParamsContext';
 import { DefaultParamsProvider } from './alerts/contexts/DefaultParamsContext';
 import { SearchParamsProvider, useSearchParams } from './alerts/contexts/SearchParamsContext';
 import AlertDetail from './alerts/detail';
 import type { Alert, AlertItem } from './alerts/models/Alert';
+import type { SearchFormat } from './alerts/utils/SearchParamsParser';
 
 type ListResponse = {
   items: AlertItem[];
@@ -183,7 +183,7 @@ const WrappedAlertsContent = () => {
   );
 
   useEffect(() => {
-    handleFetch(searchParams);
+    handleFetch(searchParams.toParams());
   }, [handleFetch, searchParams]);
 
   useEffect(() => {
@@ -223,7 +223,7 @@ const WrappedAlertsContent = () => {
       setTimeout(() => {
         prevSearch.current = null;
         loadingRef.current = null;
-        handleFetch(searchParams);
+        handleFetch(searchParams.toParams());
       }, 1000);
     };
 
@@ -248,7 +248,7 @@ const WrappedAlertsContent = () => {
         </Grid>
 
         <SearchHeader
-          value={searchParams}
+          value={searchParams.toParams()}
           loading={loading}
           suggestions={suggestions}
           pageSize={PAGE_SIZE}
@@ -303,7 +303,7 @@ export const AlertsContent = React.memo(WrappedAlertsContent);
 
 const WrappedAlertsPage = () => (
   <DefaultParamsProvider
-    defaultValue={ALERT_DEFAULT_QUERY}
+    defaultValue={ALERT_DEFAULT_PARAMS}
     format={ALERT_SEARCH_FORMAT}
     storageKey={ALERT_STORAGE_KEY}
     enforced={['offset', 'rows']}
@@ -313,7 +313,7 @@ const WrappedAlertsPage = () => (
       format={ALERT_SEARCH_FORMAT}
       hidden={['rows', 'offset', 'tc_start']}
       enforced={['rows']}
-      usingDefaultSearchParams
+      usingDefaultContext
     >
       <AlertsProvider>
         <AlertsContent />

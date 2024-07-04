@@ -250,19 +250,27 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
     const theme = useTheme();
     const location = useLocation();
 
-    const { getSearchParams } = useSearchParams<AlertSearchParams>();
+    const { searchParams } = useSearchParams<AlertSearchParams>();
 
     const search = useMemo<string>(() => {
       if (!alert || !alert.group_count) return '';
 
-      const query = getSearchParams();
-      const groupBy = !query.has('group_by') ? '' : query.get('group_by');
+      return searchParams
+        .toCopy(p => ({
+          ...p,
+          group_by: '',
+          fq: [...p.fq, `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`]
+        }))
+        .toString();
 
-      query.set('group_by', '');
-      query.append('fq', `${groupBy}:${getValueFromPath(alert, groupBy) as string}`);
+      // const query = searchParams.toParams();
+      // const groupBy = !query.has('group_by') ? '' : query.get('group_by');
 
-      return query.toString();
-    }, [alert, getSearchParams]);
+      // query.set('group_by', '');
+      // query.append('fq', `${groupBy}:${getValueFromPath(alert, groupBy) as string}`);
+
+      // return query.toString();
+    }, [alert, searchParams]);
 
     return (
       <AlertActionButton
@@ -297,22 +305,24 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
-    const { searchParams, toSearchObject, getSearchParams } = useSearchParams<AlertSearchParams>();
+    const { searchParams } = useSearchParams<AlertSearchParams>();
 
     const [confirmation, setConfirmation] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
 
-    const groupBy = useMemo<string>(
-      () => (!searchParams.has('group_by') ? '' : searchParams.get('group_by')),
-      [searchParams]
-    );
-
     const query = useMemo<URLSearchParams>(() => {
       if (!alert) return null;
-      const q = getSearchParams({ keys: ['tc', 'tc_start', 'fq'] });
-      q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy) as string}` : `alert_id:${alert.alert_id}`);
-      return q;
-    }, [alert, getSearchParams, groupBy]);
+
+      return searchParams
+        .toCopy(p => ({
+          ...p,
+          q: p.group_by
+            ? `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`
+            : `alert_id:${alert.alert_id}`
+        }))
+        .toFiltered(k => ['tc', 'tc_start', 'fq', 'q'].includes(k))
+        .toParams();
+    }, [alert, searchParams]);
 
     const handleTakeOwnership = useCallback(
       (prevAlert: AlertItem, q: string) => {
@@ -369,7 +379,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
             acceptText={t('actions.ok')}
             waiting={waiting}
             children={
-              groupBy ? (
+              searchParams.get('group_by') ? (
                 <Grid container rowGap={2}>
                   <Grid>{t('actions.takeownershipdiag.content.grouped')}</Grid>
                   <Grid item style={{ width: '100%' }}>
@@ -379,7 +389,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
                         <div>{t('none')}</div>
                       ) : (
                         <AlertFiltersSelected
-                          params={toSearchObject(query)}
+                          params={searchParams.toObject()}
                           visible={['fq', 'q', 'sort', 'tc']}
                           disabled
                         />
@@ -451,21 +461,22 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const { user: currentUser } = useAppUser<CustomUser>();
-    const { searchObj, getSearchParams } = useSearchParams<AlertSearchParams>();
+    const { searchParams } = useSearchParams<AlertSearchParams>();
 
     const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
 
-    const groupBy = useMemo<string>(
-      () => (speedDial || inDrawer ? searchObj.group_by : null),
-      [inDrawer, searchObj.group_by, speedDial]
-    );
-
     const query = useMemo<URLSearchParams>(() => {
       if (!alert) return null;
-      const q = getSearchParams({ keys: speedDial || inDrawer ? ['tc', 'tc_start', 'fq'] : [] });
-      q.set('q', groupBy ? `${groupBy}:${getValueFromPath(alert, groupBy) as string}` : `alert_id:${alert.alert_id}`);
-      return q;
-    }, [alert, getSearchParams, groupBy, inDrawer, speedDial]);
+      return searchParams
+        .toCopy(p => ({
+          ...p,
+          q:
+            (speedDial || inDrawer) && p.group_by
+              ? `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`
+              : `alert_id:${alert.alert_id}`
+        }))
+        .toParams();
+    }, [alert, inDrawer, searchParams, speedDial]);
 
     return (
       <>

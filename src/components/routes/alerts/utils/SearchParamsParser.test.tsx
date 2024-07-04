@@ -1,29 +1,31 @@
 import { describe, test } from 'vitest';
-import type { SearchParamsFormat } from './SearchParamsParser';
-import SearchParamsParser from './SearchParamsParser';
+import type { SearchFormat } from './SearchParamsParser';
+import { SearchFormatter } from './SearchParamsParser';
 
 type Format = {
   query: string;
 };
 
-const format: SearchParamsFormat<Format> = {
+const format: SearchFormat<Format> = {
   query: 'string'
 };
 
 const options = {};
 
-describe('describe', () => {
-  test('test', () => {
-    const parser = new SearchParamsParser(format, options);
+describe('class SearchFormatter', () => {
+  const formatter = new SearchFormatter<Format>(format);
 
-    parser
-      .fromParams('')
-      .filterObj((key, value) => true)
-      .toObject({});
+  test('testing the mergeArray', () => {
+    expect(formatter.mergeArray([], []).toSorted()).toStrictEqual([].toSorted());
+    expect(formatter.mergeArray(['apple', 'banana', 'orange'], ['banana', 'orange', 'grape']).toSorted()).toStrictEqual(
+      ['apple', 'banana', 'orange', 'grape'].toSorted()
+    );
+  });
 
-    // const test = parser.fromObject({}).
-    const test2 = parser.fromParams(new URLSearchParams()).toObject();
-
-    // expect(parser.toObject(null)).toBe(null);
+  test('testing the diffArray', () => {
+    expect(formatter.diffArray([], []).toSorted()).toStrictEqual([].toSorted());
+    expect(formatter.diffArray(['apple', 'banana', 'orange'], ['banana', 'orange', 'grape']).toSorted()).toStrictEqual(
+      ['apple', '!(grape)'].toSorted()
+    );
   });
 });

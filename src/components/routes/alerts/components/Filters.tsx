@@ -441,7 +441,7 @@ const WrappedAlertFilters = () => {
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
-  const [query, setQuery] = useState<URLSearchParams>(searchParams);
+  const [query, setQuery] = useState<URLSearchParams>(searchParams.toParams());
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
   const [options, setOptions] = useState<Record<FilterType, Record<string, { count: number; total: number }>>>({
@@ -549,7 +549,7 @@ const WrappedAlertFilters = () => {
     []
   );
 
-  const handleClear = useCallback(() => setQuery(defaultParams), [defaultParams]);
+  const handleClear = useCallback(() => setQuery(defaultParams.toParams()), [defaultParams]);
 
   const handleApply = useCallback(() => {
     setSearchParams(query);
@@ -634,7 +634,7 @@ const WrappedAlertFilters = () => {
   }, []);
 
   useEffect(() => {
-    if (open) setQuery(searchParams);
+    if (open) setQuery(searchParams.toParams());
   }, [open, searchParams]);
 
   useEffect(() => {
