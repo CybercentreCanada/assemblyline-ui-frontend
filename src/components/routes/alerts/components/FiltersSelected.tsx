@@ -15,7 +15,6 @@ import Moment from 'components/visual/Moment';
 import type { ReactNode } from 'react';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SearchParams } from '../utils/SearchParser';
 import type { Favorite } from './Favorites';
 import type { Option } from './Filters';
 import { GROUPBY_OPTIONS, SORT_OPTIONS, TC_OPTIONS } from './Filters';
@@ -152,8 +151,8 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
 );
 
 type Props = {
-  value: SearchParams<AlertSearchParams>;
-  onChange?: (value: SearchParams<AlertSearchParams>) => void;
+  value: AlertSearchParams;
+  onChange?: (value: AlertSearchParams) => void;
   visible?: (keyof AlertSearchParams)[];
   disabled?: boolean;
 };
@@ -176,9 +175,9 @@ const WrappedAlertFiltersSelected = ({
 
   const filters = useMemo<Filters>(() => {
     const defaults = { status: [], priority: [], labels: [], favorites: [], others: [] };
-    if (search.toString() === '') return defaults;
+    if (!search) return defaults;
 
-    search.get('fq').forEach(filter => {
+    search.fq.forEach(filter => {
       const not = filter.startsWith('NOT(') && filter.endsWith(')');
       const value = not ? filter.substring(4, filter.length - 1) : filter;
 
@@ -191,14 +190,14 @@ const WrappedAlertFiltersSelected = ({
       else defaults.others.push({ filter, not, value });
     });
     return defaults;
-  }, [allFavorites, params]);
+  }, [allFavorites, search]);
 
   const handleChange = useCallback(
     (input: AlertSearchParams | ((params: AlertSearchParams) => AlertSearchParams)) => {
       if (disabled) return;
-      onChange(typeof input === 'function' ? input(params) : params);
+      onChange(typeof input === 'function' ? input(search) : search);
     },
-    [disabled, onChange, params]
+    [disabled, onChange, search]
   );
 
   const handleQueryChange = useCallback(
@@ -236,12 +235,12 @@ const WrappedAlertFiltersSelected = ({
         rowGap: theme.spacing(1)
       }}
     >
-      {visible.includes('q') && params.q && (
+      {visible.includes('q') && search.q && (
         <CustomChip
           icon={<SearchOutlinedIcon fontSize="small" />}
           label={
             <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
-              <span>{`${t('query')}: ${params.q}`}</span>
+              <span>{`${t('query')}: ${search.q}`}</span>
             </div>
           }
           size="small"
@@ -260,7 +259,7 @@ const WrappedAlertFiltersSelected = ({
       <MenuFilter
         classes={{
           icon: classes.icon,
-          deleteIcon: clsx(classes.deleteIcon, classes.desc, params.sort && params.sort.endsWith('asc') && classes.asc)
+          deleteIcon: clsx(classes.deleteIcon, classes.desc, search.sort && search.sort.endsWith('asc') && classes.asc)
         }}
         getLabel={item => (
           <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
@@ -269,17 +268,17 @@ const WrappedAlertFiltersSelected = ({
           </div>
         )}
         getListItemIcon={option =>
-          params.sort.startsWith(option.value) && (
+          search.sort.startsWith(option.value) && (
             <ArrowDownwardIcon
-              className={clsx(classes.desc, params.sort.endsWith('asc') && classes.asc)}
+              className={clsx(classes.desc, search.sort.endsWith('asc') && classes.asc)}
               fontSize="small"
             />
           )
         }
-        param={params.sort}
+        param={search.sort}
         visible={visible.includes('sort')}
         disabled={disabled}
-        getSelected={option => params.sort.startsWith(option.value)}
+        getSelected={option => search.sort.startsWith(option.value)}
         icon={<SortIcon fontSize="small" />}
         deleteIcon={<ArrowDownwardIcon />}
         title={t('sorts.title')}
@@ -306,15 +305,15 @@ const WrappedAlertFiltersSelected = ({
       <MenuFilter
         classes={{ icon: classes.icon }}
         getLabel={() => {
-          const option = GROUPBY_OPTIONS.find(o => o.value === params.group_by);
+          const option = GROUPBY_OPTIONS.find(o => o.value === search.group_by);
           return option && option.value !== ''
             ? `${t('groupBy')}: ${t(option.label)}`
             : `${t('groupBy')}: ${t('none')}`;
         }}
-        param={params.group_by}
+        param={search.group_by}
         visible={visible.includes('group_by')}
         disabled={disabled}
-        getSelected={option => params.group_by === option.value}
+        getSelected={option => search.group_by === option.value}
         icon={<SourceIcon fontSize="small" />}
         title={t('groupBy')}
         options={GROUPBY_OPTIONS}
@@ -325,13 +324,13 @@ const WrappedAlertFiltersSelected = ({
       <MenuFilter
         classes={{ icon: classes.icon }}
         getLabel={() => {
-          const option = TC_OPTIONS.find(o => o.value === params.tc);
+          const option = TC_OPTIONS.find(o => o.value === search.tc);
           return option && option.value !== '' ? `${t('tc')}: ${t(option.label)}` : `${t('tc')}: ${t('none')}`;
         }}
-        param={params.tc}
+        param={search.tc}
         visible={visible.includes('tc')}
         disabled={disabled}
-        getSelected={option => params.tc === option.value}
+        getSelected={option => search.tc === option.value}
         icon={<DateRangeIcon fontSize="small" />}
         title={t('tc')}
         options={TC_OPTIONS}
@@ -339,7 +338,7 @@ const WrappedAlertFiltersSelected = ({
         onClick={(_, option) => handleChange(v => ({ ...v, tc: option.value }))}
       />
 
-      {visible.includes('tc_start') && params.tc_start && (
+      {visible.includes('tc_start') && search.tc_start && (
         <CustomChip
           classes={{ icon: classes.icon }}
           variant="outlined"
@@ -350,7 +349,7 @@ const WrappedAlertFiltersSelected = ({
           label={
             <div>
               <span>{t('tc_start')}: </span>
-              <Moment variant="localeDateTime">{params.tc_start}</Moment>
+              <Moment variant="localeDateTime">{search.tc_start}</Moment>
             </div>
           }
           onDelete={() =>

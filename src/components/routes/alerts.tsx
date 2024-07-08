@@ -15,10 +15,14 @@ import { useLocation } from 'react-router-dom';
 import ForbiddenPage from './403';
 import AlertActions from './alerts/components/Actions';
 import AlertDefaultSearchParameters from './alerts/components/DefaultSearchParameters';
+import AlertFavorites from './alerts/components/Favorites';
+import AlertFilters from './alerts/components/Filters';
 import AlertListItem from './alerts/components/ListItem';
+import { AlertSearchResults } from './alerts/components/Results';
 import SearchHeader from './alerts/components/SearchHeader';
+import AlertWorkflows from './alerts/components/Workflows';
 import { AlertsProvider } from './alerts/contexts/AlertsContext';
-import { DefaultParamsProvider, useDefaultParams } from './alerts/contexts/DefaultParamsContext';
+import { DefaultParamsProvider } from './alerts/contexts/DefaultParamsContext';
 import { SearchParamsProvider, useSearchParams } from './alerts/contexts/SearchParamsContext';
 import AlertDetail from './alerts/detail';
 import type { Alert, AlertItem } from './alerts/models/Alert';
@@ -69,7 +73,6 @@ const WrappedAlertsContent = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
-  const { defaults } = useDefaultParams();
   const { search, setSearchParams, setSearchObj } = useSearchParams<AlertSearchParams>();
 
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -90,8 +93,6 @@ const WrappedAlertsContent = () => {
         : DEFAULT_SUGGESTION,
     [indexes]
   );
-
-  console.log(defaults.toObject(), search.toObject());
 
   const handleFetch = useCallback(
     (query: URLSearchParams) => {
@@ -235,13 +236,13 @@ const WrappedAlertsContent = () => {
           disableTotalResults
           endAdornment={
             <>
-              {/* <AlertFavorites />
+              <AlertFavorites />
               <AlertFilters />
-              <AlertWorkflows alerts={alerts} /> */}
+              <AlertWorkflows alerts={alerts} />
             </>
           }
         >
-          {/* <AlertSearchResults searching={loading} total={total} /> */}
+          <AlertSearchResults searching={loading} total={total} />
         </SearchHeader>
 
         <SimpleList
@@ -279,7 +280,7 @@ const WrappedAlertsPage = () => (
     defaultValue={ALERT_DEFAULT_PARAMS}
     storageKey={ALERT_STORAGE_KEY}
     enforced={['offset', 'rows']}
-    ignored={['no_delay', 'tc_start']}
+    ignored={['q', 'no_delay', 'tc_start']}
   >
     <SearchParamsProvider hidden={['rows', 'offset', 'tc_start']} enforced={['rows']} usingDefaultContext>
       <AlertsProvider>

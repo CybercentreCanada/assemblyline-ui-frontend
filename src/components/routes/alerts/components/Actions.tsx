@@ -33,6 +33,7 @@ import type { CustomUser } from 'components/hooks/useMyUser';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import type { AlertItem } from 'components/routes/alerts/models/Alert';
+import type { SearchParams } from 'components/routes/alerts/utils/SearchParser2';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { getValueFromPath } from 'helpers/utils';
 import type { To } from 'history';
@@ -41,7 +42,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
-import { SearchParams } from '../utils/SearchParser';
 import { AlertEventsTable } from './Components';
 import AlertFiltersSelected from './FiltersSelected';
 import { AlertWorkflowDrawer } from './Workflows';
@@ -380,7 +380,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
                       {!query || query.toString() === '' ? (
                         <div>{t('none')}</div>
                       ) : (
-                        <AlertFiltersSelected search={query} visible={['fq', 'q', 'sort', 'tc']} disabled />
+                        <AlertFiltersSelected value={query.toObject()} visible={['fq', 'q', 'sort', 'tc']} disabled />
                       )}
                     </Paper>
                   </Grid>

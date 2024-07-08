@@ -48,6 +48,10 @@ export class BaseParam<T extends Params> {
     return value;
   }
 
+  public get(value: URLSearchParams): Types {
+    return this.parse(value.get(this.key));
+  }
+
   public fromParams(prev: URLSearchParams, base: URLSearchParams): void {
     const value = base.get(this.key);
     if (!this.enforced && this.valid(value)) prev.set(this.key, value);
@@ -89,36 +93,12 @@ export class BaseParam<T extends Params> {
     const value = current.get(this.key);
     return this.valid(value) ? { ...prev, [this.key]: this.parse(value) } : prev;
   }
-
-  // OTHER
-
-  // public coerce(value: Types, defaults: Types = null): Types {
-  //   return this.valid(value) ? value : this.valid(defaults) ? defaults : this.defaults;
-  // }
-
-  // public join(current: URLSearchParams, data: Types) {
-  //   const value = String(!this.enforced && this.valid(data) ? data : this.defaults);
-  //   current.set(this.key, value);
-  // }
-
-  // public delta(current: URLSearchParams, data: Types) {
-  //   if (!this.enforced && this.valid(data) && data !== String(this.defaults)) {
-  //     current.set(this.key, String(data));
-  //   }
-  // }
-
-  // public object(prev: T, current: URLSearchParams): T {
-  //   const value = current.get(this.key);
-  //   return this.valid(value) ? { ...prev, [this.key]: this.coerce(value) } : prev;
-  // }
 }
 
 /**
  * Boolean Parameter
  */
 export class BooleanParam<T extends Params> extends BaseParam<T> {
-  // protected override defaults: boolean = null;
-
   public static override is(value: Types): value is boolean {
     return typeof value === 'boolean';
   }
@@ -134,22 +114,12 @@ export class BooleanParam<T extends Params> extends BaseParam<T> {
   public override parse(value: string | string[]) {
     return this.valid(value) ? Boolean(value) : value;
   }
-
-  // protected override valid2(value: Types): boolean {
-  //   return super.valid(value) && (BooleanParam.check(value) || value === 'true' || value === 'false');
-  // }
-
-  // public override coerce(value: Types, defaults: Types = null): boolean {
-  //   return this.valid(value) ? Boolean(value) : this.valid(defaults) ? Boolean(defaults) : this.defaults;
-  // }
 }
 
 /**
  * Number Parameter
  */
 export class NumberParam<T extends Params> extends BaseParam<T> {
-  // protected override defaults: number = null;
-
   public static override is(value: Types): boolean {
     return typeof value === 'number';
   }
@@ -165,26 +135,12 @@ export class NumberParam<T extends Params> extends BaseParam<T> {
   public override parse(value: Types) {
     return this.valid(value) ? Number(value) : value;
   }
-
-  // public static override check(value: Types): boolean {
-  //   return typeof value === 'number';
-  // }
-
-  // protected override valid(value: Types): boolean {
-  //   return super.valid(value) && (NumberParam.check(value) || !isNaN(Number(value)));
-  // }
-
-  // public override coerce(value: Types, defaults: Types = null): number {
-  //   return this.valid(value) ? Number(value) : this.valid(defaults) ? Number(defaults) : this.defaults;
-  // }
 }
 
 /**
  * String Parameter
  */
 export class StringParam<T extends Params> extends BaseParam<T> {
-  // protected override defaults: string = null;
-
   public static override is(value: Types): boolean {
     return typeof value === 'string';
   }
@@ -200,26 +156,12 @@ export class StringParam<T extends Params> extends BaseParam<T> {
   public override parse(value: Types) {
     return this.valid(value) ? String(value) : value;
   }
-
-  // public static override check(value: Types): boolean {
-  //   return typeof value === 'string';
-  // }
-
-  // protected override valid(value: Types): boolean {
-  //   return super.valid(value) && StringParam.check(value);
-  // }
-
-  // public override coerce(value: Types, defaults: Types = null): string {
-  //   return this.valid(value) ? String(value) : this.valid(defaults) ? String(defaults) : this.defaults;
-  // }
 }
 
 /**
  * Array Parameter
  */
 export class ArrayParam<T extends Params> extends BaseParam<T> {
-  // protected override defaults: string[] = [];
-
   private not = 'NOT';
 
   private ignore = '!';
@@ -252,9 +194,9 @@ export class ArrayParam<T extends Params> extends BaseParam<T> {
     return this.valid(value) ? value : super.valid(value) ? String(value) : value;
   }
 
-  // public static override check(value): boolean {
-  //   return Array.isArray(value);
-  // }
+  public get(value: URLSearchParams): Types {
+    return this.parse(value.getAll(this.key));
+  }
 
   private toPrefix(value: string, current: string[] = []): string[] {
     if (value.startsWith(`${this.ignore}(`) && value.endsWith(')')) {
@@ -344,51 +286,4 @@ export class ArrayParam<T extends Params> extends BaseParam<T> {
     const value = current.getAll(this.key);
     return this.valid(value) ? { ...prev, [this.key]: value } : prev;
   }
-
-  /**
-   * TODO
-   */
-
-  // public override coerce(values: string[], defaults: string[] = null): string[] {
-  //   return this.uniques(this.valid(values) ? values : this.valid(defaults) ? defaults : this.defaults)
-  //     .filter(value => !value.some(v => v === this.ignore))
-  //     .map(value => this.fromPrefix(value));
-  // }
-
-  // public override join(current: URLSearchParams, data: Types) {
-  //   const values = !this.enforced && this.valid(data) ? [...this.defaults, ...(data as string[])] : this.defaults;
-  //   this.uniques(values)
-  //     .filter(value => !value.some(v => v === this.ignore))
-  //     .map(value => this.fromPrefix(value))
-  //     .forEach(v => {
-  //       current.set(this.key, v);
-  //     });
-  // }
-
-  // public override delta(current: URLSearchParams, data: Types) {
-  //   if (this.enforced || !this.valid(data)) return;
-
-  //   const left = this.uniques(data as string[]);
-  //   const right = this.uniques(this.defaults);
-  //   let values: string[][] = [];
-
-  //   values = left.reduceRight((prev, l) => {
-  //     return right.some(r => l.at(-1) === r.at(-1)) ? prev : [...prev, l];
-  //   }, values);
-
-  //   values = right.reduceRight((prev, r) => {
-  //     return left.some(l => l.at(-1) === r.at(-1)) ? prev : [...prev, [this.ignore, ...r]];
-  //   }, values);
-
-  //   return values
-  //     .map(value => this.fromPrefix(value))
-  //     .forEach(v => {
-  //       current.append(this.key, v);
-  //     });
-  // }
-
-  // public override object(prev: T, current: URLSearchParams) {
-  //   const value = current.getAll(this.key);
-  //   return this.valid(value) ? { ...prev, [this.key]: this.coerce(value) } : prev;
-  // }
 }

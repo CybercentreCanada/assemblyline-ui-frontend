@@ -31,18 +31,25 @@ export class SearchParams<T extends Params> {
     return new SearchParams<T>(next, this.params);
   }
 
-  // public toCopy(predicate: (value: T) => T) {
-  //   const entries = this.formatter.convertObj(predicate(this.formatter.convertParams(this.search)));
-  //   return new SearchParams<T>(entries, this.format);
-  // }
+  public toCopy(predicate: (value: T) => T) {
+    let obj = Object.values(this.params).reduce((prev, param) => param.toObject(prev, this.search), {} as T);
+    obj = predicate(obj);
 
-  // public get<K extends keyof T>(key: K): T[K] {
-  //   const t = this.formatter.get(key);
-  //   return this.formatter.parseParam(
-  //     key,
-  //     t === 'string[]' ? this.search.getAll(key as string) : this.search.get(key as string)
-  //   );
-  // }
+    const output = new URLSearchParams();
+    Object.values(this.params).forEach(param => param.fromObject(output, obj));
+    return new SearchParams<T>(output, this.params);
+  }
+
+  public fromParams(input: SearchInput) {
+    const search = new URLSearchParams(input);
+    const output = new URLSearchParams();
+    Object.values(this.params).forEach(param => param.fromParams(output, search));
+    return new SearchParams<T>(output, this.params);
+  }
+
+  public get<K extends keyof T>(key: K) {
+    return this.params?.[key]?.get(this.search);
+  }
 
   public toString() {
     return this.search.toString();
@@ -73,10 +80,6 @@ export class SearchParams<T extends Params> {
 export class SearchParser<T extends Params> {
   private params: Record<keyof T, BaseParam<T>> = null;
 
-  // private defaults: URLSearchParams = new URLSearchParams();
-
-  // private enforced: (keyof T)[] = [];
-
   constructor(defaults: T = null, options?: Options<T>) {
     this.params = Object.entries(defaults).reduce((prev, [k, v]) => {
       const e = options?.enforced?.includes(k);
@@ -89,7 +92,6 @@ export class SearchParser<T extends Params> {
   }
 
   public fromParams(input: SearchInput) {
-    console.log(this.params);
     const search = new URLSearchParams(input);
     const output = new URLSearchParams();
     Object.values(this.params).forEach(param => param.fromParams(output, search));
@@ -126,99 +128,4 @@ export class SearchParser<T extends Params> {
     Object.values(this.params).forEach(param => param.fromMergeParams(output, left, right, predicate));
     return new SearchParams<T>(output, this.params);
   }
-
-  // public setDefaultParams(value: SearchInput) {
-  //   this.defaults = this.formatter.parseParams(value);
-  //   return this;
-  // }
-
-  // public setDefaultObject(value: T) {
-  //   this.defaults = this.formatter.convertObj(value);
-  //   return this;
-  // }
-
-  // public fromParams(input: SearchInput) {
-  //   const search = new URLSearchParams(input);
-
-  //   const entries = Object.entries(this.format).reduce((current: string[][], [k, t]) => {
-  //     if (t === 'string[]') {
-  //       let next = this.enforced.includes(k) ? [] : search.getAll(k);
-  //       next = this.formatter.mergeArray(this.defaults.getAll(k), next);
-  //       return [...current, ...next.map(v => [k, v])];
-  //     } else {
-  //       if (!this.enforced.includes(k) && search.has(k)) return [...current, [k, search.get(k)]];
-  //       else if (this.defaults.has(k)) return [...current, [k, this.defaults.get(k)]];
-  //     }
-  //     return current;
-  //   }, []);
-
-  //   return new SearchParams<T>(entries, this.format);
-  // }
-
-  // public fromObject(input: T) {
-  //   const entries = Object.entries(this.format).reduce((current: string[][], [k, t]) => {
-  //     if (t === 'string[]') {
-  //       let next = this.enforced.includes(k) ? [] : Array.isArray(input?.[k]) ? (input[k] as string[]) : [];
-  //       next = this.formatter.mergeArray(this.defaults.getAll(k), next);
-  //       return [...current, ...next.map(v => [k, v])];
-  //     } else {
-  //       if (!this.enforced.includes(k) && k in input) return [...current, [k, String(input[k])]];
-  //       else if (this.defaults.has(k)) return [...current, [k, this.defaults.get(k)]];
-  //     }
-  //     return current;
-  //   }, []);
-
-  //   return new SearchParams<T>(entries, this.format);
-  // }
-
-  // public fromDeltaParams(input: SearchInput) {
-  //   const search = new URLSearchParams(input);
-
-  //   const entries = Object.entries(this.format).reduce((current: string[][], [k, t]) => {
-  //     if (this.enforced.includes(k)) {
-  //       return current;
-  //     } else if (t === 'string[]') {
-  //       const next = this.formatter.diffArray(search.getAll(k), this.defaults.getAll(k));
-  //       return [...current, ...next.map(v => [k, v])];
-  //     } else {
-  //       if (search.has(k) && search.get(k) !== this.defaults.get(k)) return [...current, [k, search.get(k)]];
-  //     }
-  //     return current;
-  //   }, []);
-
-  //   return new SearchParams<T>(entries, this.format);
-  // }
-
-  // public mergeParams(
-  //   first: SearchInput,
-  //   second: SearchInput,
-  //   predicate: <K extends keyof T>(key: K, values?: [any, any]) => boolean
-  // ) {
-  //   const left = new URLSearchParams(first);
-  //   const right = new URLSearchParams(second);
-
-  //   const entries = Object.entries(this.format).reduce((current: string[][], [k, t]) => {
-  //     if (t === 'string[]') {
-  //       const res = predicate(k, [left.getAll(k), right.getAll(k)]);
-  //       let next: string[] = [];
-  //       next = res === true ? this.formatter.mergeArray(left.getAll(k), next) : next;
-  //       next = res === false ? this.formatter.mergeArray(right.getAll(k), next) : next;
-  //       next = this.formatter.mergeArray(this.defaults.getAll(k), next);
-  //       return [...current, ...next.map(v => [k, v])];
-  //     } else {
-  //       const enf = this.enforced.includes(k);
-  //       const res = predicate(k, [
-  //         this.formatter.parseParam(k, left.get(k)),
-  //         this.formatter.parseParam(k, right.get(k))
-  //       ]);
-
-  //       if (!enf && res === true && left.has(k)) return [...current, [k, left.get(k)]];
-  //       else if (!enf && res === false && right.has(k)) return [...current, [k, right.get(k)]];
-  //       else if (this.defaults.has(k)) return [...current, [k, this.defaults.get(k)]];
-  //       else return current;
-  //     }
-  //   }, []);
-
-  //   return new SearchParams<T>(entries, this.format);
-  // }
 }

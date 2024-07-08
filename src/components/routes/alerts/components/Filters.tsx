@@ -436,12 +436,12 @@ const WrappedAlertFilters = () => {
   const { apiCall } = useMyAPI();
 
   const alertValues = useAlerts();
-  const { defaultParams } = useDefaultParams<AlertSearchParams>();
-  const { searchParams, setSearchParams } = useSearchParams<AlertSearchParams>();
+  const { defaults } = useDefaultParams<AlertSearchParams>();
+  const { search, setSearchParams } = useSearchParams<AlertSearchParams>();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
-  const [query, setQuery] = useState<URLSearchParams>(searchParams.toParams());
+  const [query, setQuery] = useState<URLSearchParams>(search.toParams());
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
   const [options, setOptions] = useState<Record<FilterType, Record<string, { count: number; total: number }>>>({
@@ -465,7 +465,7 @@ const WrappedAlertFilters = () => {
   );
 
   const filters = useMemo<Filters>(() => {
-    const defaults: Filters = { status: [], priority: [], labels: [], favorites: [], others: [] };
+    const values: Filters = { status: [], priority: [], labels: [], favorites: [], others: [] };
 
     const statuses = Object.fromEntries(Object.keys(options.status).map(v => [`status:${v}`, v]));
     const priorities = Object.fromEntries(Object.keys(options.priority).map(v => [`priority:${v}`, v]));
@@ -476,18 +476,18 @@ const WrappedAlertFilters = () => {
       const value = not ? fq.substring(4, fq.length - 1) : fq;
 
       if (value in statuses) {
-        defaults.status = [{ not, value, label: statuses[value] }];
+        values.status = [{ not, value, label: statuses[value] }];
       } else if (value in priorities) {
-        defaults.priority = [{ not, value, label: priorities[value] }];
+        values.priority = [{ not, value, label: priorities[value] }];
       } else if (value in labels) {
-        defaults.labels.push({ not, value, label: labels[value] });
+        values.labels.push({ not, value, label: labels[value] });
       } else {
         const favorite = allFavorites.find(f => f.query === value);
-        if (favorite) defaults.favorites.push({ ...favorite, not, value, label: value });
-        else defaults.others.push({ not, value, label: value });
+        if (favorite) values.favorites.push({ ...favorite, not, value, label: value });
+        else values.others.push({ not, value, label: value });
       }
     });
-    return defaults;
+    return values;
   }, [allFavorites, options.label, options.priority, options.status, query]);
 
   const urls = useMemo<Record<FilterType, string>>(
@@ -549,7 +549,7 @@ const WrappedAlertFilters = () => {
     []
   );
 
-  const handleClear = useCallback(() => setQuery(defaultParams.toParams()), [defaultParams]);
+  const handleClear = useCallback(() => setQuery(defaults.toParams()), [defaults]);
 
   const handleApply = useCallback(() => {
     setSearchParams(query);
@@ -634,8 +634,8 @@ const WrappedAlertFilters = () => {
   }, []);
 
   useEffect(() => {
-    if (open) setQuery(searchParams.toParams());
-  }, [open, searchParams]);
+    if (open) setQuery(search.toParams());
+  }, [open, search]);
 
   useEffect(() => {
     if (render) {

@@ -234,8 +234,8 @@ export const AlertWorkflowDrawer = React.memo(
                   }}
                 >
                   <AlertFiltersSelected
-                    /** to add */
-                    params={null}
+                    /** TODO */
+                    value={null}
                     visible={isSingleAlert ? ['fq', 'group_by', 'q'] : ['fq', 'group_by', 'q', 'tc']}
                     disabled
                   />
@@ -379,15 +379,15 @@ const WrappedAlertWorkflows = ({ alerts = [] }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { searchParams } = useSearchParams<AlertSearchParams>();
+  const { search } = useSearchParams<AlertSearchParams>();
 
   const [open, setOpen] = useState<boolean>(false);
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const query = useMemo<URLSearchParams>(
-    () => searchParams.toFiltered(k => ['q', 'tc_start', 'tc', 'fq'].includes(k)).toParams(),
-    [searchParams]
+    () => search.toFiltered(k => ['q', 'tc_start', 'tc', 'fq'].includes(k)).toParams(),
+    [search]
   );
 
   if (!currentUser.roles.includes('alert_manage')) return null;

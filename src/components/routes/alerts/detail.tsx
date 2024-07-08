@@ -1010,12 +1010,7 @@ const WrappedAlertDetail = (props: Props) => (
     enforced={['offset', 'rows']}
     ignored={['tc_start']}
   >
-    <SearchParamsProvider
-      defaultValue={ALERT_DEFAULT_PARAMS}
-      hidden={['rows', 'offset', 'tc_start']}
-      enforced={['rows']}
-      usingDefaultSearchParams
-    >
+    <SearchParamsProvider hidden={['rows', 'offset', 'tc_start']} enforced={['rows']} usingDefaultContext>
       <AlertDetailContent {...props} />
     </SearchParamsProvider>
   </DefaultParamsProvider>

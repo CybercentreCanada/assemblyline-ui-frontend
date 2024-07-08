@@ -96,8 +96,6 @@ export const DefaultParamsProvider = <T extends Params>({
     [parser, storageParams]
   );
 
-  console.log(storageParams.toString(), defaults.toObject());
-
   const onDefaultChange = useCallback<ContextProps<T>['onDefaultChange']>(
     value => {
       const params = parser.fromDeltaParams(value).toFiltered(k => !ignored.includes(k));

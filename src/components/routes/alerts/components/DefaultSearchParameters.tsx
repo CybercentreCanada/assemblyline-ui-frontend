@@ -17,7 +17,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { useDefaultParams } from 'components/routes/alerts/contexts/DefaultParamsContext';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AlertFiltersSelected from './FiltersSelected';
 
@@ -60,15 +60,16 @@ const WrappedAlertDefaultSearchParameters = () => {
   const { defaults, fromStorage, onDefaultChange, onDefaultClear } = useDefaultParams<AlertSearchParams>();
 
   const [open, setOpen] = useState<boolean>(false);
+  const [isSameParams, setIsSameParams] = useState<boolean>(false);
 
-  const isSameParams = useMemo<boolean>(
-    () =>
-      !open
-        ? false
-        : search.toFiltered(k => !['offset', 'rows', 'tc_start'].includes(k)).toString() ===
-          defaults.toFiltered(k => !['offset', 'rows', 'tc_start'].includes(k)).toString(),
-    [defaults, open, search]
-  );
+  useEffect(() => {
+    if (!open) return;
+
+    setIsSameParams(
+      search.toFiltered(k => !['no_delay', 'offset', 'q', 'rows', 'tc_start'].includes(k)).toString() ===
+        defaults.toFiltered(k => !['no_delay', 'offset', 'q', 'rows', 'tc_start'].includes(k)).toString()
+    );
+  }, [defaults, open, search]);
 
   return (
     <>
@@ -97,7 +98,11 @@ const WrappedAlertDefaultSearchParameters = () => {
               {defaults.toString() === '' ? (
                 <div>{t('none')}</div>
               ) : (
-                <AlertFiltersSelected value={defaults} visible={['fq', 'group_by', 'q', 'sort', 'tc']} disabled />
+                <AlertFiltersSelected
+                  value={defaults.toObject()}
+                  visible={['fq', 'group_by', 'q', 'sort', 'tc']}
+                  disabled
+                />
               )}
             </Paper>
           </Grid>
@@ -115,7 +120,11 @@ const WrappedAlertDefaultSearchParameters = () => {
               {search.toString() === '' ? (
                 <div>{t('none')}</div>
               ) : (
-                <AlertFiltersSelected value={search} visible={['fq', 'group_by', 'q', 'sort', 'tc']} disabled />
+                <AlertFiltersSelected
+                  value={search.toObject()}
+                  visible={['fq', 'group_by', 'q', 'sort', 'tc']}
+                  disabled
+                />
               )}
             </Paper>
           </Grid>

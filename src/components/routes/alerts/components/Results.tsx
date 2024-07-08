@@ -15,7 +15,7 @@ type Props = {
 const WrappedAlertSearchResults: React.FC<Props> = ({ searching = false, total = 0 }: Props) => {
   const { t } = useTranslation(['alerts']);
   const theme = useTheme();
-  const { searchParams, setSearchObj } = useSearchParams<AlertSearchParams>();
+  const { search, setSearchObj } = useSearchParams<AlertSearchParams>();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -26,6 +26,8 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ searching = false, total =
     },
     [setSearchObj]
   );
+
+  console.log(search);
 
   if (isMDUp)
     return (
@@ -40,7 +42,7 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ searching = false, total =
         }}
       >
         <AlertsFiltersSelected
-          params={searchParams.toObject()}
+          value={search.toObject()}
           onChange={handleChange}
           visible={['fq', 'group_by', 'sort', 'tc']}
         />
@@ -67,7 +69,7 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ searching = false, total =
           ''
         ) : (
           <>
-            {searchParams.toObject().fq.length > 0 && <FiFilter />}
+            {search.toObject().fq.length > 0 && <FiFilter />}
             <Typography variant="subtitle1" color="primary" fontStyle="italic">
               <SearchResultCount count={total} />
               <span>{total > 1 ? t('results') : t('result')}</span>
