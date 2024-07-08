@@ -13,12 +13,7 @@ import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
-import {
-  ALERT_DEFAULT_QUERY,
-  ALERT_SEARCH_FORMAT,
-  ALERT_SIMPLELIST_ID,
-  ALERT_STORAGE_KEY
-} from 'components/routes/alerts';
+import { ALERT_DEFAULT_PARAMS, ALERT_SIMPLELIST_ID, ALERT_STORAGE_KEY } from 'components/routes/alerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import ActionableText from 'components/visual/ActionableText';
 import { ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
@@ -1010,14 +1005,13 @@ const AlertDetailContent = React.memo(WrappedAlertDetailContent);
 
 const WrappedAlertDetail = (props: Props) => (
   <DefaultParamsProvider
-    defaultValue={ALERT_DEFAULT_QUERY}
-    format={ALERT_SEARCH_FORMAT}
+    defaultValue={ALERT_DEFAULT_PARAMS}
     storageKey={ALERT_STORAGE_KEY}
     enforced={['offset', 'rows']}
     ignored={['tc_start']}
   >
     <SearchParamsProvider
-      format={ALERT_SEARCH_FORMAT}
+      defaultValue={ALERT_DEFAULT_PARAMS}
       hidden={['rows', 'offset', 'tc_start']}
       enforced={['rows']}
       usingDefaultSearchParams

@@ -15,18 +15,14 @@ import { useLocation } from 'react-router-dom';
 import ForbiddenPage from './403';
 import AlertActions from './alerts/components/Actions';
 import AlertDefaultSearchParameters from './alerts/components/DefaultSearchParameters';
-import AlertFavorites from './alerts/components/Favorites';
-import AlertFilters from './alerts/components/Filters';
 import AlertListItem from './alerts/components/ListItem';
-import { AlertSearchResults } from './alerts/components/Results';
 import SearchHeader from './alerts/components/SearchHeader';
-import AlertWorkflows from './alerts/components/Workflows';
 import { AlertsProvider } from './alerts/contexts/AlertsContext';
-import { DefaultParamsProvider } from './alerts/contexts/DefaultParamsContext';
+import { DefaultParamsProvider, useDefaultParams } from './alerts/contexts/DefaultParamsContext';
 import { SearchParamsProvider, useSearchParams } from './alerts/contexts/SearchParamsContext';
 import AlertDetail from './alerts/detail';
 import type { Alert, AlertItem } from './alerts/models/Alert';
-import type { SearchFormat } from './alerts/utils/SearchParser';
+import { Infer } from './alerts/utils/SearchSchema';
 
 type ListResponse = {
   items: AlertItem[];
@@ -44,37 +40,13 @@ type GroupedResponse = {
   total: number;
 };
 
-export type AlertSearchParams = {
-  fq: string[];
-  group_by: string;
-  no_delay: boolean;
-  offset: number;
-  q: string;
-  rows: number;
-  sort: string;
-  tc_start: string;
-  tc: string;
-};
-
 export const PAGE_SIZE = 25;
 
 export const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist';
 
 export const ALERT_STORAGE_KEY = 'alert.search';
 
-export const ALERT_SEARCH_FORMAT: SearchFormat<AlertSearchParams> = {
-  fq: 'string[]',
-  group_by: 'string',
-  no_delay: 'boolean',
-  offset: 'number',
-  q: 'string',
-  rows: 'number',
-  sort: 'string',
-  tc_start: 'string',
-  tc: 'string'
-};
-
-export const ALERT_DEFAULT_PARAMS: AlertSearchParams = {
+export const ALERT_DEFAULT_PARAMS = {
   fq: [],
   group_by: 'file.sha256',
   no_delay: false,
@@ -86,9 +58,7 @@ export const ALERT_DEFAULT_PARAMS: AlertSearchParams = {
   tc: '4d'
 };
 
-export const ALERT_DEFAULT_QUERY: string = Object.keys(ALERT_DEFAULT_PARAMS)
-  .map(k => `${k}=${ALERT_DEFAULT_PARAMS[k]}`)
-  .join('&');
+export type AlertSearchParams = Infer<typeof ALERT_DEFAULT_PARAMS>;
 
 const WrappedAlertsContent = () => {
   const { t } = useTranslation('alerts');
@@ -99,6 +69,7 @@ const WrappedAlertsContent = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
+  const { defaults } = useDefaultParams();
   const { search, setSearchParams, setSearchObj } = useSearchParams<AlertSearchParams>();
 
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -119,6 +90,8 @@ const WrappedAlertsContent = () => {
         : DEFAULT_SUGGESTION,
     [indexes]
   );
+
+  console.log(defaults.toObject(), search.toObject());
 
   const handleFetch = useCallback(
     (query: URLSearchParams) => {
@@ -262,13 +235,13 @@ const WrappedAlertsContent = () => {
           disableTotalResults
           endAdornment={
             <>
-              <AlertFavorites />
+              {/* <AlertFavorites />
               <AlertFilters />
-              <AlertWorkflows alerts={alerts} />
+              <AlertWorkflows alerts={alerts} /> */}
             </>
           }
         >
-          <AlertSearchResults searching={loading} total={total} />
+          {/* <AlertSearchResults searching={loading} total={total} /> */}
         </SearchHeader>
 
         <SimpleList
@@ -304,17 +277,11 @@ export const AlertsContent = React.memo(WrappedAlertsContent);
 const WrappedAlertsPage = () => (
   <DefaultParamsProvider
     defaultValue={ALERT_DEFAULT_PARAMS}
-    format={ALERT_SEARCH_FORMAT}
     storageKey={ALERT_STORAGE_KEY}
     enforced={['offset', 'rows']}
     ignored={['no_delay', 'tc_start']}
   >
-    <SearchParamsProvider
-      format={ALERT_SEARCH_FORMAT}
-      hidden={['rows', 'offset', 'tc_start']}
-      enforced={['rows']}
-      usingDefaultContext
-    >
+    <SearchParamsProvider hidden={['rows', 'offset', 'tc_start']} enforced={['rows']} usingDefaultContext>
       <AlertsProvider>
         <AlertsContent />
       </AlertsProvider>

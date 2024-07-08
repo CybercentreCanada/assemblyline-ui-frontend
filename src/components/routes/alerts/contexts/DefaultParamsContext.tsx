@@ -1,5 +1,6 @@
-import type { Params, SearchFormat, SearchParams } from 'components/routes/alerts/utils/SearchParser';
-import { SearchParser } from 'components/routes/alerts/utils/SearchParser';
+import type { SearchParams } from 'components/routes/alerts/utils/SearchParser2';
+import { SearchParser } from 'components/routes/alerts/utils/SearchParser2';
+import type { Params } from 'components/routes/alerts/utils/SearchSchema';
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
@@ -32,11 +33,6 @@ type Props<T extends Params> = {
    * Default search parameters including null values.
    */
   defaultValue: T;
-
-  /**
-   * Format of the search parameters
-   */
-  format: SearchFormat<T>;
 
   /**
    * key of where the search parameters will be stored in the Local Storage
@@ -75,7 +71,6 @@ export const useDefaultParams = <T extends Params>(): ContextProps<T> => useCont
 export const DefaultParamsProvider = <T extends Params>({
   children,
   defaultValue = null,
-  format = null,
   storageKey = null,
   enforced = [],
   ignored = [],
@@ -86,22 +81,22 @@ export const DefaultParamsProvider = <T extends Params>({
 }: Props<T>) => {
   const DefaultParamsContext = createCurrentContext<T>();
 
-  const [storageParams, setStorageParams] = useState<URLSearchParams>(() => {
-    return new URLSearchParams(!storageKey ? null : localStorage.getItem(storageKey));
-  });
-  const [fromStorage, seFromStorage] = useState<boolean>(() => {
-    return !!storageKey && !!localStorage.getItem(storageKey);
-  });
+  const [storageParams, setStorageParams] = useState<URLSearchParams>(
+    () => new URLSearchParams(localStorage.getItem(storageKey) || '')
+  );
+  const [fromStorage, seFromStorage] = useState<boolean>(() => !!localStorage.getItem(storageKey));
 
   const parser = useMemo<SearchParser<T>>(
-    () => new SearchParser<T>(format, { enforced, prefixes }).setDefaultObject(defaultValue),
-    [defaultValue, enforced, format, prefixes]
+    () => new SearchParser<T>(defaultValue, { enforced, prefixes }),
+    [defaultValue, enforced, prefixes]
   );
 
   const defaults = useMemo<ContextProps<T>['defaults']>(
     () => parser.fromParams(storageParams),
     [parser, storageParams]
   );
+
+  console.log(storageParams.toString(), defaults.toObject());
 
   const onDefaultChange = useCallback<ContextProps<T>['onDefaultChange']>(
     value => {
@@ -120,8 +115,8 @@ export const DefaultParamsProvider = <T extends Params>({
   }, [storageKey]);
 
   useEffect(() => {
-    setStorageParams(new URLSearchParams(!storageKey ? null : localStorage.getItem(storageKey)));
-    seFromStorage(!!storageKey && !!localStorage.getItem(storageKey));
+    setStorageParams(new URLSearchParams(localStorage.getItem(storageKey) || ''));
+    seFromStorage(!!localStorage.getItem(storageKey));
   }, [storageKey]);
 
   return (

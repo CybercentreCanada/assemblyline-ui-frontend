@@ -1,5 +1,6 @@
-import type { Params, SearchFormat, SearchParams } from 'components/routes/alerts/utils/SearchParser';
-import { SearchParser } from 'components/routes/alerts/utils/SearchParser';
+import type { SearchParams } from 'components/routes/alerts/utils/SearchParser2';
+import { SearchParser } from 'components/routes/alerts/utils/SearchParser2';
+import type { Params } from 'components/routes/alerts/utils/SearchSchema';
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
@@ -18,11 +19,6 @@ type Props<T extends Params> = {
    * Default search parameters including null values.
    */
   defaultValue?: T;
-
-  /**
-   *
-   */
-  format: SearchFormat<T>;
 
   /**
    * Hidden search parameters will not be shown in the URL
@@ -61,7 +57,6 @@ export const useSearchParams = <T extends Params>(): ContextProps<T> => useConte
 export const SearchParamsProvider = <T extends Params>({
   children,
   defaultValue = null,
-  format = null,
   hidden = [],
   enforced = [],
   usingDefaultContext = false,
@@ -83,13 +78,14 @@ export const SearchParamsProvider = <T extends Params>({
 
   const locationParams = useMemo<URLSearchParams>(() => new URLSearchParams(location.search), [location.search]);
 
-  const parser = useMemo<SearchParser<T>>(() => {
-    const p = new SearchParser<T>(format, { enforced, prefixes });
-    return p.setDefaultObject(usingDefaultContext && defaults ? defaults.toObject() : defaultValue);
-  }, [defaultValue, defaults, enforced, format, prefixes, usingDefaultContext]);
+  const parser = useMemo<SearchParser<T>>(
+    () =>
+      new SearchParser<T>(usingDefaultContext && defaults ? defaults.toObject() : defaultValue, { enforced, prefixes }),
+    [defaultValue, defaults, enforced, prefixes, usingDefaultContext]
+  );
 
   const search = useMemo<ContextProps<T>['search']>(
-    () => parser.mergeParams(locationParams, hiddenParams, key => !hidden.includes(key)),
+    () => parser.fromMergeParams(locationParams, hiddenParams, key => !hidden.includes(key)),
     [hidden, hiddenParams, locationParams, parser]
   );
 

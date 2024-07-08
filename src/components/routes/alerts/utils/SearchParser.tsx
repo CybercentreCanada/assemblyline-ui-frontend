@@ -56,38 +56,25 @@ export class SearchFormatter<T extends Params> {
     return key in this.format ? this.format[key] : null;
   }
 
-  public getParam<K extends keyof T>(
-    key: K,
-    input: URLSearchParams,
-    base: URLSearchParams = new URLSearchParams()
-  ): T[K] {
-    let value: unknown = input.get(key as string);
+  public getParam<K extends keyof T>(key: K, input: URLSearchParams, base: URLSearchParams = new URLSearchParams()) {
+    const value: unknown = input.get(key as string);
     if (!(key in this.format)) return null;
-
 
     switch (this.format[key]) {
       case 'string[]':
-        value = input.getAll(key as string).toSorted();
-        break;
+        return input.getAll(key as string).toSorted();
       case 'boolean':
-        value = value === 'true' ? true : value === 'false' ? false : base.get(key as string);
-        break;
+        return value === 'true' ? true : value === 'false' ? false : base.get(key as string);
       case 'number':
-        value =
-        return Number(p);
-        break;
+        return Number(value);
       case 'string':
-        return String(p);
-        break;
+        return String(value);
       default:
         return base.get(key as string);
-        break;
     }
-
-    return value as T[K];
   }
 
-  public parseParam<K extends keyof T>(key: K, value: unknown, base: unknown = null): T[K] {
+  public parseParam<K extends keyof T>(key: K, value: unknown, base: unknown = null): any {
     if (value === null || value === undefined || !(key in this.format)) return base as T[K];
 
     switch (this.format[key]) {
@@ -348,7 +335,7 @@ export class SearchParser<T extends Params> {
   public mergeParams(
     first: SearchInput,
     second: SearchInput,
-    predicate: <K extends keyof T>(key: K, values?: [T[K], T[K]]) => boolean
+    predicate: <K extends keyof T>(key: K, values?: [any, any]) => boolean
   ) {
     const left = new URLSearchParams(first);
     const right = new URLSearchParams(second);
