@@ -79,7 +79,7 @@ const UserProfile = () => {
         <div>
           <Divider />
           <List dense subheader={<ListSubheader disableSticky>{t('quotas')}</ListSubheader>}>
-            {user.api_daily_quota !== 0 && apiQuotaRemaining && (
+            {user.api_daily_quota !== 0 && apiQuotaRemaining !== null && (
               <Tooltip title={`${apiQuotaRemaining} ${t('quotas.api.remaining')}`}>
                 <ListItem>
                   <span style={{ whiteSpace: 'nowrap' }}>{t('quotas.api')}</span>
@@ -92,7 +92,7 @@ const UserProfile = () => {
                 </ListItem>
               </Tooltip>
             )}
-            {user.submission_daily_quota !== 0 && submissionQuotaRemaining && (
+            {user.submission_daily_quota !== 0 && submissionQuotaRemaining !== null && (
               <Tooltip title={`${submissionQuotaRemaining} ${t('quotas.submission.remaining')}`}>
                 <ListItem>
                   <span style={{ whiteSpace: 'nowrap' }}>{t('quotas.submission')}</span>
