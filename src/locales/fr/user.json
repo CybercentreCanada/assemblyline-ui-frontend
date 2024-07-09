@@ -108,6 +108,8 @@
   "submission_daily_quota_edit_title": "Nombre maximum de soumissions que l'utilisateur est autorisé à émettre par jour.",
   "submission_quota": "Quota de soumissions",
   "submission_quota_edit_title": "Nombre maximum de soumission en traitement sous votre compte. Seule les soumissions exécutée via l'API de soumission et l'interface utilisateur sont comptées, les soumissions a commencé à l'aide de l'API d'ingestion ne compte pas envers le quota.",
+  "submission_async_quota": "Quota de soumissions d'ingestion",
+  "submission_async_quota_edit_title": "Le nombre maximum de soumissions ingérées en cours ou en attente de traitement sous votre compte. Seules les soumissions exécutées via l'API d'ingestion comptent pour ce quota, les soumissions démarrées à l'aide de l'API de soumission et l'interface utilisateur ne compte pas.",
   "success_save": "Les changements à votre compte on été enregistrés avec succès.",
   "token": "Gérer les jetons de sécurité",
   "token.add": "Ajouter",
