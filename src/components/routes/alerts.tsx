@@ -22,7 +22,7 @@ import { AlertSearchResults } from './alerts/components/Results';
 import SearchHeader from './alerts/components/SearchHeader';
 import AlertWorkflows from './alerts/components/Workflows';
 import { AlertsProvider } from './alerts/contexts/AlertsContext';
-import { DefaultParamsProvider } from './alerts/contexts/DefaultParamsContext';
+import { DefaultParamsProvider, useDefaultParams } from './alerts/contexts/DefaultParamsContext';
 import { SearchParamsProvider, useSearchParams } from './alerts/contexts/SearchParamsContext';
 import AlertDetail from './alerts/detail';
 import type { Alert, AlertItem } from './alerts/models/Alert';
@@ -73,6 +73,7 @@ const WrappedAlertsContent = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
+  const { defaults } = useDefaultParams<AlertSearchParams>();
   const { search, setSearchParams, setSearchObject } = useSearchParams<AlertSearchParams>();
 
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -171,7 +172,10 @@ const WrappedAlertsContent = () => {
     if (location.hash && location.hash !== '') {
       const id = location.hash.substr(1);
       const alert = alerts.find(item => item.alert_id === id);
-      setGlobalDrawer(<AlertDetail id={id} alert={alert} inDrawer />, { hasMaximize: true });
+      setGlobalDrawer(
+        <AlertDetail id={id} alert={alert} inDrawer defaults={defaults.toString()} search={search.toString()} />,
+        { hasMaximize: true }
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash, setGlobalDrawer]);

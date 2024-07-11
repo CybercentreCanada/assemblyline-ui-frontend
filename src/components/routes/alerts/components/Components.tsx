@@ -26,7 +26,6 @@ import type { AlertItem, DetailedItem } from 'components/routes/alerts/models/Al
 import { detailedItemCompare } from 'components/routes/alerts/utils/alertUtils';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import type { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
-import { ChipList } from 'components/visual/ChipList';
 import type { CustomChipProps } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
@@ -413,17 +412,28 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                               {event.priority ? <AlertPriority name={event.priority} withChip /> : null}
                             </DivTableCell>
                             <DivTableCell>{event.status ? <AlertStatus name={event.status} /> : null}</DivTableCell>
-                            <DivTableCell width="40%">
-                              {event.labels || event.labels_removed ? (
-                                <ChipList
-                                  nowrap
-                                  items={[...event.labels, ...event.labels_removed].map(label => ({
-                                    label,
-                                    variant: 'outlined',
-                                    color: [...event.labels].includes(label) ? 'success' : 'error'
-                                  }))}
-                                />
-                              ) : null}
+                            <DivTableCell
+                              width="40%"
+                              style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                rowGap: theme.spacing(1),
+                                columnGap: theme.spacing(0.5)
+                              }}
+                            >
+                              {event.labels || event.labels_removed
+                                ? [...event.labels, ...event.labels_removed].map((label, j) => (
+                                    <CustomChip
+                                      key={`labels-${j}`}
+                                      wrap={false}
+                                      size="small"
+                                      variant="outlined"
+                                      color={[...event.labels].includes(label) ? 'success' : 'error'}
+                                      label={t(`status_${label}`)}
+                                      style={{ cursor: 'inherit' }}
+                                    />
+                                  ))
+                                : null}
                             </DivTableCell>
                             <DivTableCell>
                               {event.entity_type === 'workflow' && event.entity_id !== 'DEFAULT' ? (

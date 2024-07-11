@@ -60,10 +60,7 @@ export const SearchParamsProvider = <T extends Params>({
   hidden = [],
   enforced = [],
   usingDefaultContext = false,
-  prefixes = {
-    not: 'NOT',
-    ignore: '!'
-  }
+  prefixes = null
 }: Props<T>) => {
   const SearchParamsContext = createSearchParamsContext<T>();
   const navigate = useNavigate();
@@ -92,18 +89,19 @@ export const SearchParamsProvider = <T extends Params>({
 
   const handleNavigate = useCallback(
     (value: SearchResult<T>) => {
-      const [nextSearch, nextHidden] = value
-        .filter(key => !enforced.includes(key))
-        .toSplitParams(key => !hidden.includes(key));
+      const [nextSearch, nextHidden] = value.toSplitParams(key => !hidden.includes(key));
 
-      if (prevHidden.current === nextHidden.toString() && prevSearch.current === nextSearch.toString()) return;
-      prevHidden.current = nextHidden.toString();
-      prevSearch.current = nextSearch.toString();
+      if (prevHidden.current !== nextHidden.toString()) {
+        setHiddenParams(nextHidden);
+        prevHidden.current = nextHidden.toString();
+      }
 
-      setHiddenParams(nextHidden);
-      navigate(`${window.location.pathname}?${nextSearch.toString()}${window.location.hash}`);
+      if (prevSearch.current !== nextSearch.toString() && window.location.search.slice(1) !== nextSearch.toString()) {
+        navigate(`${window.location.pathname}?${nextSearch.toString()}${window.location.hash}`);
+        prevSearch.current = nextSearch.toString();
+      }
     },
-    [enforced, hidden, navigate]
+    [hidden, navigate]
   );
 
   const setSearchParams = useCallback<ContextProps<T>['setSearchParams']>(

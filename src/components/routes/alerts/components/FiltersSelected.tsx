@@ -247,11 +247,14 @@ const WrappedAlertFiltersSelected = ({
           style={{ minHeight: '25px' }}
           variant="outlined"
           wrap
-          onDelete={() =>
-            handleChange(v => {
-              delete v.q;
-              return v;
-            })
+          onDelete={
+            disabled
+              ? null
+              : () =>
+                  handleChange(v => {
+                    delete v.q;
+                    return v;
+                  })
           }
         />
       )}

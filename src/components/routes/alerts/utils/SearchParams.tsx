@@ -50,6 +50,12 @@ export class BaseParam<T extends Params> {
     return value;
   }
 
+  public has(search: T | URLSearchParams): boolean {
+    if (search instanceof URLSearchParams) return search.has(this.key);
+    else if (typeof search === 'object') return this.key in search;
+    else return false;
+  }
+
   public get(search: T | URLSearchParams): Types {
     return this.parse(this.at(search));
   }
@@ -104,7 +110,7 @@ export class BooleanParam<T extends Params> extends BaseParam<T> {
   }
 
   public override parse(value: string): boolean {
-    return this.valid(value) ? Boolean(value) : value;
+    return (value === 'true' ? true : value === 'false' ? false : value) as boolean;
   }
 }
 
@@ -183,6 +189,12 @@ export class ArrayParam<T extends Params> extends BaseParam<T> {
 
   public override parse(value: string | string[]): string | string[] {
     return this.validArray(value) ? value : super.valid(String(value)) ? String(value) : value;
+  }
+
+  public has(search: T | URLSearchParams): boolean {
+    if (search instanceof URLSearchParams) return search.has(this.key);
+    else if (typeof search === 'object') return (search?.[this.key] as string[])?.length > 0;
+    else return false;
   }
 
   public get(search: T | URLSearchParams): Types {

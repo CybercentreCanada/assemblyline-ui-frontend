@@ -453,17 +453,15 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
 
     const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
 
-    const query = useMemo<URLSearchParams>(() => {
+    const filteredSearch = useMemo<SearchResult<AlertSearchParams>>(() => {
       if (!alert) return null;
-      return search
-        .set(p => ({
-          ...p,
-          q:
-            (speedDial || inDrawer) && p.group_by
-              ? `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`
-              : `alert_id:${alert.alert_id}`
-        }))
-        .toParams();
+      return search.set(p => ({
+        ...p,
+        q:
+          (speedDial || inDrawer) && p.group_by
+            ? `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`
+            : `alert_id:${alert.alert_id}`
+      }));
     }, [alert, inDrawer, search, speedDial]);
 
     return (
@@ -474,7 +472,7 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
           vertical={vertical}
           permanent={permanent}
           speedDial={speedDial}
-          showSkeleton={!query}
+          showSkeleton={!filteredSearch}
           authorized={currentUser.roles.includes('alert_manage')}
           color={theme.palette.action.active}
           icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
@@ -485,15 +483,8 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
         />
         <AlertWorkflowDrawer
           alerts={[alert]}
-          query={query}
+          search={filteredSearch}
           open={openWorkflow}
-          // hideTC
-          // initialBody={{
-          //   status: alert.status as Status,
-          //   priority: alert.priority as Priority,
-          //   labels: alert.label,
-          //   removed_labels: []
-          // }}
           onClose={() => setOpenWorkflow(false)}
         />
       </>

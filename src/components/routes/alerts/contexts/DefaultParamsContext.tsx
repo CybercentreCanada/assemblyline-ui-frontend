@@ -74,10 +74,7 @@ export const DefaultParamsProvider = <T extends Params>({
   storageKey = null,
   enforced = [],
   ignored = [],
-  prefixes = {
-    not: 'NOT',
-    ignore: '!'
-  }
+  prefixes = null
 }: Props<T>) => {
   const DefaultParamsContext = createCurrentContext<T>();
 

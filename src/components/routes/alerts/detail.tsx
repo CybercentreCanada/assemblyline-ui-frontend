@@ -13,7 +13,12 @@ import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
-import { ALERT_DEFAULT_PARAMS, ALERT_SIMPLELIST_ID, ALERT_STORAGE_KEY } from 'components/routes/alerts';
+import {
+  ALERT_DEFAULT_PARAMS,
+  ALERT_SIMPLELIST_ID,
+  ALERT_STORAGE_KEY,
+  AlertSearchParams
+} from 'components/routes/alerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import ActionableText from 'components/visual/ActionableText';
 import { ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
@@ -42,8 +47,8 @@ import {
   AutoHideChipList,
   SkeletonInline
 } from './components/Components';
-import { DefaultParamsProvider } from './contexts/DefaultParamsContext';
-import { SearchParamsProvider } from './contexts/SearchParamsContext';
+import { DefaultParamsProvider, useDefaultParams } from './contexts/DefaultParamsContext';
+import { SearchParamsProvider, useSearchParams } from './contexts/SearchParamsContext';
 import type { AlertItem } from './models/Alert';
 
 const useStyles = makeStyles(theme => ({
@@ -73,9 +78,17 @@ type Props = {
   id?: string;
   alert?: AlertItem;
   inDrawer?: boolean;
+  defaults?: string;
+  search?: string;
 };
 
-const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null, inDrawer = false }: Props) => {
+const WrappedAlertDetailContent = ({
+  id: propId = null,
+  alert: propAlert = null,
+  inDrawer = false,
+  defaults: defaultsProps = null,
+  search: searchProp = null
+}: Props) => {
   const { t } = useTranslation(['alerts']);
   const theme = useTheme();
   const classes = useStyles();
@@ -85,11 +98,21 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
   const { c12nDef, configuration } = useALContext();
   const { id: paramId } = useParams<Params>();
   const { user: currentUser } = useAppUser<CustomUser>();
+  const { defaults, onDefaultChange } = useDefaultParams<AlertSearchParams>();
+  const { search, setSearchParams } = useSearchParams<AlertSearchParams>();
 
   const [alert, setAlert] = useState<AlertItem>(null);
   const [metaOpen, setMetaOpen] = useState<boolean>(false);
 
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
+
+  useEffect(() => {
+    if (defaultsProps && defaultsProps !== defaults.toString()) onDefaultChange(defaultsProps);
+  }, [defaults, defaultsProps, onDefaultChange]);
+
+  useEffect(() => {
+    if (searchProp && searchProp !== search.toString()) setSearchParams(new URLSearchParams(searchProp));
+  }, [search, searchProp, setSearchParams]);
 
   useEffect(() => {
     if (!currentUser.roles.includes('alert_view')) {

@@ -41,6 +41,10 @@ export class SearchResult<T extends Params> {
     return new SearchResult<T>(output, this.params);
   }
 
+  public has<K extends keyof T>(key: K): boolean {
+    return this.params?.[key]?.has(this.search);
+  }
+
   public get<K extends keyof T>(key: K): T[K] {
     return this.params?.[key]?.get(this.search) as T[K];
   }
