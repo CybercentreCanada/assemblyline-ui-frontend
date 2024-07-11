@@ -15,16 +15,16 @@ type Props = {
 const WrappedAlertSearchResults: React.FC<Props> = ({ searching = false, total = 0 }: Props) => {
   const { t } = useTranslation(['alerts']);
   const theme = useTheme();
-  const { search, setSearchObj } = useSearchParams<AlertSearchParams>();
+  const { search, setSearchObject } = useSearchParams<AlertSearchParams>();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const handleChange = useCallback(
     (value: AlertSearchParams) => {
       value.offset = 0;
-      setSearchObj(value);
+      setSearchObject(value);
     },
-    [setSearchObj]
+    [setSearchObject]
   );
 
   console.log(search);

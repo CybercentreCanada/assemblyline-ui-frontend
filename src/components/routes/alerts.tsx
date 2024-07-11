@@ -26,7 +26,7 @@ import { DefaultParamsProvider } from './alerts/contexts/DefaultParamsContext';
 import { SearchParamsProvider, useSearchParams } from './alerts/contexts/SearchParamsContext';
 import AlertDetail from './alerts/detail';
 import type { Alert, AlertItem } from './alerts/models/Alert';
-import { Infer } from './alerts/utils/SearchSchema';
+import type { SearchParams } from './alerts/utils/SearchSchema';
 
 type ListResponse = {
   items: AlertItem[];
@@ -62,7 +62,7 @@ export const ALERT_DEFAULT_PARAMS = {
   tc: '4d'
 };
 
-export type AlertSearchParams = Infer<typeof ALERT_DEFAULT_PARAMS>;
+export type AlertSearchParams = SearchParams<typeof ALERT_DEFAULT_PARAMS>;
 
 const WrappedAlertsContent = () => {
   const { t } = useTranslation('alerts');
@@ -73,7 +73,7 @@ const WrappedAlertsContent = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObj } = useSearchParams<AlertSearchParams>();
+  const { search, setSearchParams, setSearchObject } = useSearchParams<AlertSearchParams>();
 
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [countedTotal, setCountedTotal] = useState<number>(0);
@@ -262,7 +262,7 @@ const WrappedAlertsContent = () => {
               </InformativeAlert>
             </div>
           }
-          onLoadNext={() => setSearchObj(v => ({ ...v, offset: v.offset + v.rows }))}
+          onLoadNext={() => setSearchObject(v => ({ ...v, offset: v.offset + v.rows }))}
           onCursorChange={handleSelectedItemChange}
           onItemSelected={handleSelectedItemChange}
           onRenderActions={(item: Alert) => <AlertActions alert={item} />}

@@ -32,23 +32,23 @@ export class SearchParams<T extends Params> {
   }
 
   public toCopy(predicate: (value: T) => T) {
-    let obj = Object.values(this.params).reduce((prev, param) => param.toObject(prev, this.search), {} as T);
+    let obj = Object.values(this.params).reduce((prev, param) => param.object(prev, this.search), {} as T);
     obj = predicate(obj);
 
     const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.fromObject(output, obj));
+    Object.values(this.params).forEach(param => param.from(output, obj));
     return new SearchParams<T>(output, this.params);
   }
 
   public fromParams(input: SearchInput) {
     const search = new URLSearchParams(input);
     const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.fromParams(output, search));
+    Object.values(this.params).forEach(param => param.from(output, search));
     return new SearchParams<T>(output, this.params);
   }
 
-  public get<K extends keyof T>(key: K) {
-    return this.params?.[key]?.get(this.search);
+  public get<K extends keyof T>(key: K): T[K] {
+    return this.params?.[key]?.get(this.search) as T[K];
   }
 
   public toString() {
@@ -60,7 +60,7 @@ export class SearchParams<T extends Params> {
   }
 
   public toObject(): T {
-    return Object.values(this.params).reduce((prev, param) => param.toObject(prev, this.search), {} as T);
+    return Object.values(this.params).reduce((prev, param) => param.object(prev, this.search), {} as T);
   }
 
   public toSplitParams(predicate: (key: string, value: unknown) => boolean) {
@@ -94,26 +94,26 @@ export class SearchParser<T extends Params> {
   public fromParams(input: SearchInput) {
     const search = new URLSearchParams(input);
     const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.fromParams(output, search));
+    Object.values(this.params).forEach(param => param.from(output, search));
     return new SearchParams<T>(output, this.params);
   }
 
   public fromObject(input: T) {
     const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.fromObject(output, input));
+    Object.values(this.params).forEach(param => param.from(output, input));
     return new SearchParams<T>(output, this.params);
   }
 
   public fromDeltaParams(input: SearchInput) {
     const search = new URLSearchParams(input);
     const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.fromDeltaParams(output, search));
+    Object.values(this.params).forEach(param => param.delta(output, search));
     return new SearchParams<T>(output, this.params);
   }
 
   public fromDeltaObject(input: T) {
     const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.fromDeltaObject(output, input));
+    Object.values(this.params).forEach(param => param.delta(output, input));
     return new SearchParams<T>(output, this.params);
   }
 
@@ -125,7 +125,7 @@ export class SearchParser<T extends Params> {
     const left = new URLSearchParams(first);
     const right = new URLSearchParams(second);
     const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.fromMergeParams(output, left, right, predicate));
+    Object.values(this.params).forEach(param => param.merge(output, left, right, predicate));
     return new SearchParams<T>(output, this.params);
   }
 }

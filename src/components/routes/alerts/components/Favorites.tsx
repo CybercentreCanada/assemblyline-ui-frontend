@@ -366,7 +366,7 @@ const WrappedAlertFavorites = () => {
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const { userFavorites, globalFavorites, defaultFavorite, updateFavorite, deleteFavorite } = useAlerts();
-  const { setSearchObj } = useSearchParams<AlertSearchParams>();
+  const { setSearchObject } = useSearchParams<AlertSearchParams>();
 
   const [currentFavorite, setCurrentFavorite] = useState<Favorite>(defaultFavorite);
   const [currentGlobal, setCurrentGlobal] = useState<boolean>(false);
@@ -391,28 +391,28 @@ const WrappedAlertFavorites = () => {
 
   const handleUpdateFavorites = useCallback(
     (nextFavorite: Favorite, prevFavorite: Favorite, global: boolean) => {
-      setSearchObj(v => ({ ...v, fq: v.fq.map(f => (f !== prevFavorite.query ? f : nextFavorite.query)) }));
+      setSearchObject(v => ({ ...v, fq: v.fq.map(f => (f !== prevFavorite.query ? f : nextFavorite.query)) }));
       updateFavorite(nextFavorite, global);
       setCurrentFavorite(defaultFavorite);
     },
-    [defaultFavorite, setSearchObj, updateFavorite]
+    [defaultFavorite, setSearchObject, updateFavorite]
   );
 
   const handleDeleteFavorites = useCallback(
     (favorite: Favorite, global: boolean) => {
-      setSearchObj(v => ({ ...v, fq: v.fq.filter(f => f !== favorite.query) }));
+      setSearchObject(v => ({ ...v, fq: v.fq.filter(f => f !== favorite.query) }));
       deleteFavorite(favorite, global);
       setCurrentFavorite(defaultFavorite);
     },
-    [defaultFavorite, deleteFavorite, setSearchObj]
+    [defaultFavorite, deleteFavorite, setSearchObject]
   );
 
   const handleFavoriteClick = useCallback(
     (favorite: Favorite) => {
-      setSearchObj(v => ({ ...v, fq: [...v.fq, favorite.query] }));
+      setSearchObject(v => ({ ...v, fq: [...v.fq, favorite.query] }));
       setOpen(false);
     },
-    [setSearchObj]
+    [setSearchObject]
   );
 
   const handleEditClick = useCallback(

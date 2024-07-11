@@ -9,7 +9,7 @@ import { useDefaultParams } from './DefaultParamsContext';
 type ContextProps<T extends Params> = {
   search: SearchParams<T>;
   setSearchParams: (value: URLSearchParams | ((params: URLSearchParams) => URLSearchParams)) => void;
-  setSearchObj: (value: T | ((params: T) => T)) => void;
+  setSearchObject: (value: T | ((params: T) => T)) => void;
 };
 
 type Props<T extends Params> = {
@@ -72,7 +72,8 @@ export const SearchParamsProvider = <T extends Params>({
 
   const [hiddenParams, setHiddenParams] = useState<URLSearchParams>(new URLSearchParams());
 
-  const searchRef = useRef<URLSearchParams>();
+  const searchParamsRef = useRef<URLSearchParams>();
+  const searchObjectRef = useRef<T>();
   const prevSearch = useRef<string>(null);
   const prevHidden = useRef<string>(null);
 
@@ -89,12 +90,9 @@ export const SearchParamsProvider = <T extends Params>({
     [hidden, hiddenParams, locationParams, parser]
   );
 
-  const setSearchParams = useCallback<ContextProps<T>['setSearchParams']>(
-    input => {
-      const values = typeof input === 'function' ? input(searchRef.current) : input;
-
-      const [nextSearch, nextHidden] = parser
-        .fromDeltaParams(values)
+  const handleNavigate = useCallback(
+    (value: SearchParams<T>) => {
+      const [nextSearch, nextHidden] = value
         .toFiltered(key => !enforced.includes(key))
         .toSplitParams(key => !hidden.includes(key));
 
@@ -105,24 +103,36 @@ export const SearchParamsProvider = <T extends Params>({
       setHiddenParams(nextHidden);
       navigate(`${window.location.pathname}?${nextSearch.toString()}${window.location.hash}`);
     },
-    [enforced, hidden, navigate, parser]
+    [enforced, hidden, navigate]
   );
 
-  const setSearchObj = useCallback<ContextProps<T>['setSearchObj']>(
+  const setSearchParams = useCallback<ContextProps<T>['setSearchParams']>(
     input => {
-      const searchObj = parser.fromParams(searchRef.current).toObject();
-      const result = typeof input === 'function' ? input(searchObj) : input;
-      setSearchParams(parser.fromObject(result).toParams());
+      const values = typeof input === 'function' ? input(searchParamsRef.current) : input;
+      handleNavigate(parser.fromDeltaParams(values));
     },
-    [parser, setSearchParams]
+    [handleNavigate, parser]
+  );
+
+  const setSearchObject = useCallback<ContextProps<T>['setSearchObject']>(
+    input => {
+      const values = typeof input === 'function' ? input(searchObjectRef.current) : input;
+      handleNavigate(parser.fromDeltaObject(values));
+    },
+    [handleNavigate, parser]
   );
 
   useEffect(() => {
-    searchRef.current = search.toParams();
+    searchParamsRef.current = search.toParams();
+    searchObjectRef.current = search.toObject();
   }, [search]);
 
+  useEffect(() => {
+    setSearchParams(searchParamsRef.current);
+  }, [setSearchParams]);
+
   return (
-    <SearchParamsContext.Provider value={{ search, setSearchParams, setSearchObj }}>
+    <SearchParamsContext.Provider value={{ search, setSearchParams, setSearchObject }}>
       {!search ? null : children}
     </SearchParamsContext.Provider>
   );

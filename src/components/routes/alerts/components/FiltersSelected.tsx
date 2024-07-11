@@ -352,11 +352,14 @@ const WrappedAlertFiltersSelected = ({
               <Moment variant="localeDateTime">{search.tc_start}</Moment>
             </div>
           }
-          onDelete={() =>
-            handleChange(v => {
-              delete v.tc_start;
-              return v;
-            })
+          onDelete={
+            disabled
+              ? null
+              : () =>
+                  handleChange(v => {
+                    delete v.tc_start;
+                    return v;
+                  })
           }
         />
       )}
@@ -388,8 +391,8 @@ const WrappedAlertFiltersSelected = ({
               >{`(${favorite.created_by})`}</div>
             </div>
           }
-          onClick={() => handleQueryChange(favorite)}
-          onDelete={() => handleQueryRemove(favorite)}
+          onClick={disabled ? null : () => handleQueryChange(favorite)}
+          onDelete={disabled ? null : () => handleQueryRemove(favorite)}
         />
       ))}
 
@@ -402,8 +405,8 @@ const WrappedAlertFiltersSelected = ({
           style={{ minHeight: '25px' }}
           color={status.not ? 'error' : 'default'}
           label={status.value}
-          onClick={() => handleQueryChange(status)}
-          onDelete={() => handleQueryRemove(status)}
+          onClick={disabled ? null : () => handleQueryChange(status)}
+          onDelete={disabled ? null : () => handleQueryRemove(status)}
         />
       ))}
 
@@ -416,8 +419,8 @@ const WrappedAlertFiltersSelected = ({
           style={{ minHeight: '25px' }}
           color={priority.not ? 'error' : 'default'}
           label={priority.value}
-          onClick={() => handleQueryChange(priority)}
-          onDelete={() => handleQueryRemove(priority)}
+          onClick={disabled ? null : () => handleQueryChange(priority)}
+          onDelete={disabled ? null : () => handleQueryRemove(priority)}
         />
       ))}
 
@@ -430,8 +433,8 @@ const WrappedAlertFiltersSelected = ({
           style={{ minHeight: '25px' }}
           color={label.not ? 'error' : 'default'}
           label={label.value}
-          onClick={() => handleQueryChange(label)}
-          onDelete={() => handleQueryRemove(label)}
+          onClick={disabled ? null : () => handleQueryChange(label)}
+          onDelete={disabled ? null : () => handleQueryRemove(label)}
         />
       ))}
 
@@ -445,8 +448,8 @@ const WrappedAlertFiltersSelected = ({
           style={{ minHeight: '25px' }}
           color={other.not ? 'error' : 'default'}
           label={other.value}
-          onClick={() => handleQueryChange(other)}
-          onDelete={() => handleQueryRemove(other)}
+          onClick={disabled ? null : () => handleQueryChange(other)}
+          onDelete={disabled ? null : () => handleQueryRemove(other)}
         />
       ))}
     </div>
