@@ -25,12 +25,12 @@ import type { CustomUser } from 'components/hooks/useMyUser';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import type { AlertItem } from 'components/routes/alerts/models/Alert';
+import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import CustomChip from 'components/visual/CustomChip';
 import type { SyntheticEvent } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { SearchResult } from '../utils/SearchParser';
 import AlertFiltersSelected from './FiltersSelected';
 
 const useStyles = makeStyles(theme => ({

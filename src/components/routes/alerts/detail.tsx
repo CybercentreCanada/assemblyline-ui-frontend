@@ -13,12 +13,8 @@ import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
-import {
-  ALERT_DEFAULT_PARAMS,
-  ALERT_SIMPLELIST_ID,
-  ALERT_STORAGE_KEY,
-  AlertSearchParams
-} from 'components/routes/alerts';
+import type { AlertSearchParams } from 'components/routes/alerts';
+import { ALERT_DEFAULT_PARAMS, ALERT_SIMPLELIST_ID, ALERT_STORAGE_KEY } from 'components/routes/alerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import ActionableText from 'components/visual/ActionableText';
 import { ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';

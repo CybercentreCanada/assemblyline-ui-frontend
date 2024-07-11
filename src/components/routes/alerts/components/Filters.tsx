@@ -549,7 +549,14 @@ const WrappedAlertFilters = () => {
     []
   );
 
-  const handleClear = useCallback(() => setQuery(defaults.toParams()), [defaults]);
+  const handleClear = useCallback(() => {
+    const entries = Object.entries(ALERT_DEFAULT_PARAMS).reduce((prev, [key, value]) => {
+      if (!value) return prev;
+      else if (Array.isArray(value)) return [...prev, ...(value as string[]).map(v => [key, v])];
+      else return [...prev, [key, String(value)]];
+    }, [] as string[][]);
+    setQuery(new URLSearchParams(entries));
+  }, []);
 
   const handleApply = useCallback(() => {
     setSearchParams(query);
@@ -689,7 +696,7 @@ const WrappedAlertFilters = () => {
                 <AlertSelect
                   label="tc"
                   value={query.has('tc') ? query.get('tc') : ALERT_DEFAULT_PARAMS.tc.toString()}
-                  defaultValue={ALERT_DEFAULT_PARAMS.tc}
+                  defaultValue={ALERT_DEFAULT_PARAMS.tc.toString()}
                   options={TC_OPTIONS}
                   onChange={value => handleQueryChange('tc', value)}
                 />
@@ -697,7 +704,7 @@ const WrappedAlertFilters = () => {
                 <AlertSelect
                   label="groupBy"
                   value={query.has('group_by') ? query.get('group_by') : ALERT_DEFAULT_PARAMS.group_by.toString()}
-                  defaultValue={ALERT_DEFAULT_PARAMS.group_by}
+                  defaultValue={ALERT_DEFAULT_PARAMS.group_by.toString()}
                   options={GROUPBY_OPTIONS}
                   onChange={value => handleQueryChange('group_by', value)}
                 />
