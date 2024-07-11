@@ -27,8 +27,6 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ searching = false, total =
     [setSearchObject]
   );
 
-  console.log(search);
-
   if (isMDUp)
     return (
       <div

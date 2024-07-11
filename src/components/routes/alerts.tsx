@@ -26,7 +26,7 @@ import { DefaultParamsProvider } from './alerts/contexts/DefaultParamsContext';
 import { SearchParamsProvider, useSearchParams } from './alerts/contexts/SearchParamsContext';
 import AlertDetail from './alerts/detail';
 import type { Alert, AlertItem } from './alerts/models/Alert';
-import type { SearchParams } from './alerts/utils/SearchSchema';
+import type { SearchParams } from './alerts/utils/SearchParams';
 
 type ListResponse = {
   items: AlertItem[];

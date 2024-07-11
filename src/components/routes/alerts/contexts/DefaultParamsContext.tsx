@@ -1,6 +1,6 @@
-import type { SearchParams } from 'components/routes/alerts/utils/SearchParser2';
-import { SearchParser } from 'components/routes/alerts/utils/SearchParser2';
-import type { Params } from 'components/routes/alerts/utils/SearchSchema';
+import type { Params } from 'components/routes/alerts/utils/SearchParams';
+import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
+import { SearchParser } from 'components/routes/alerts/utils/SearchParser';
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
@@ -8,7 +8,7 @@ type ContextProps<T extends Params> = {
   /**
    * Default search params as a formatted URLSearchParams
    */
-  defaults: SearchParams<T>;
+  defaults: SearchResult<T>;
 
   /**
    * Is there a search params stored in the local storage

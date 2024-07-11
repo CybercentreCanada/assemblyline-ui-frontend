@@ -1,13 +1,13 @@
-import type { SearchParams } from 'components/routes/alerts/utils/SearchParser2';
-import { SearchParser } from 'components/routes/alerts/utils/SearchParser2';
-import type { Params } from 'components/routes/alerts/utils/SearchSchema';
+import type { Params } from 'components/routes/alerts/utils/SearchParams';
+import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
+import { SearchParser } from 'components/routes/alerts/utils/SearchParser';
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useDefaultParams } from './DefaultParamsContext';
 
 type ContextProps<T extends Params> = {
-  search: SearchParams<T>;
+  search: SearchResult<T>;
   setSearchParams: (value: URLSearchParams | ((params: URLSearchParams) => URLSearchParams)) => void;
   setSearchObject: (value: T | ((params: T) => T)) => void;
 };
@@ -91,7 +91,7 @@ export const SearchParamsProvider = <T extends Params>({
   );
 
   const handleNavigate = useCallback(
-    (value: SearchParams<T>) => {
+    (value: SearchResult<T>) => {
       const [nextSearch, nextHidden] = value
         .filter(key => !enforced.includes(key))
         .toSplitParams(key => !hidden.includes(key));

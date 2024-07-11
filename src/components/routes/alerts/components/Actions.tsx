@@ -33,7 +33,7 @@ import type { CustomUser } from 'components/hooks/useMyUser';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import type { AlertItem } from 'components/routes/alerts/models/Alert';
-import type { SearchParams } from 'components/routes/alerts/utils/SearchParser2';
+import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { getValueFromPath } from 'helpers/utils';
 import type { To } from 'history';
@@ -303,7 +303,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
     const [confirmation, setConfirmation] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
 
-    const query = useMemo<SearchParams<AlertSearchParams>>(() => {
+    const query = useMemo<SearchResult<AlertSearchParams>>(() => {
       if (!alert) return null;
 
       return search

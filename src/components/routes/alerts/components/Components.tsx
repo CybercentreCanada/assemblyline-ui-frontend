@@ -102,7 +102,7 @@ export const AlertExtendedScan: React.FC<AlertExtendedScanProps> = React.memo(
       />
     ) : (
       <Tooltip title={t(`extended_${name}_desc`)}>
-        <Box display="inline-block" className={clsx(classes.extended, classes[data.color])}>
+        <Box display="inline-block" className={clsx(classes.extended, classes[data.color] as unknown)}>
           {data.arrow}
         </Box>
       </Tooltip>
@@ -145,7 +145,7 @@ export const AlertPriority: React.FC<AlertPriorityProps> = React.memo(
       />
     ) : (
       <Tooltip title={name ? `${t('priority')}: ${t(`priority_${name}`)}` : `${t('priority')}: ${t('priority_unset')}`}>
-        <Box display="inline-block" className={clsx(classes.priority, classes[data.color])}>
+        <Box display="inline-block" className={clsx(classes.priority, classes[data.color] as unknown)}>
           {data.arrow}
         </Box>
       </Tooltip>
