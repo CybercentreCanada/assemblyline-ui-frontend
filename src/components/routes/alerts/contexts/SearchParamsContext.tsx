@@ -93,7 +93,7 @@ export const SearchParamsProvider = <T extends Params>({
   const handleNavigate = useCallback(
     (value: SearchParams<T>) => {
       const [nextSearch, nextHidden] = value
-        .toFiltered(key => !enforced.includes(key))
+        .filter(key => !enforced.includes(key))
         .toSplitParams(key => !hidden.includes(key));
 
       if (prevHidden.current === nextHidden.toString() && prevSearch.current === nextSearch.toString()) return;

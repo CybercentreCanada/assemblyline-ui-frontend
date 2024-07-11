@@ -257,7 +257,7 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
       if (!alert || !alert.group_count) return '';
 
       return search
-        .toCopy(p => ({
+        .set(p => ({
           ...p,
           group_by: '',
           fq: [...p.fq, `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`]
@@ -307,13 +307,13 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
       if (!alert) return null;
 
       return search
-        .toCopy(p => ({
+        .set(p => ({
           ...p,
           q: p.group_by
             ? `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`
             : `alert_id:${alert.alert_id}`
         }))
-        .toFiltered(k => ['tc', 'tc_start', 'fq', 'q'].includes(k));
+        .filter(k => ['tc', 'tc_start', 'fq', 'q'].includes(k));
     }, [alert, search]);
 
     const handleTakeOwnership = useCallback(
@@ -456,7 +456,7 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
     const query = useMemo<URLSearchParams>(() => {
       if (!alert) return null;
       return search
-        .toCopy(p => ({
+        .set(p => ({
           ...p,
           q:
             (speedDial || inDrawer) && p.group_by

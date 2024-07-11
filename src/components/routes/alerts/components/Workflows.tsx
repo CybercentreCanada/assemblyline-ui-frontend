@@ -386,7 +386,7 @@ const WrappedAlertWorkflows = ({ alerts = [] }: Props) => {
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const query = useMemo<URLSearchParams>(
-    () => search.toFiltered(k => ['q', 'tc_start', 'tc', 'fq'].includes(k)).toParams(),
+    () => search.filter(k => ['q', 'tc_start', 'tc', 'fq'].includes(k)).toParams(),
     [search]
   );
 

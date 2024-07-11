@@ -21,7 +21,7 @@ export class SearchParams<T extends Params> {
     this.params = params;
   }
 
-  public toFiltered(predicate: (key: keyof T, value: Types) => boolean) {
+  public filter(predicate: (key: keyof T, value: Types) => boolean) {
     const next = new URLSearchParams();
 
     this.search.forEach((value, key) => {
@@ -31,19 +31,13 @@ export class SearchParams<T extends Params> {
     return new SearchParams<T>(next, this.params);
   }
 
-  public toCopy(predicate: (value: T) => T) {
+  public set(input: T | ((value: T) => T)) {
+    const output = new URLSearchParams();
     let obj = Object.values(this.params).reduce((prev, param) => param.object(prev, this.search), {} as T);
-    obj = predicate(obj);
-
-    const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.from(output, obj));
-    return new SearchParams<T>(output, this.params);
-  }
-
-  public fromParams(input: SearchInput) {
-    const search = new URLSearchParams(input);
-    const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.from(output, search));
+    obj = typeof input === 'function' ? input(obj) : input;
+    Object.values(this.params).forEach(param => {
+      param.set(output, obj);
+    });
     return new SearchParams<T>(output, this.params);
   }
 

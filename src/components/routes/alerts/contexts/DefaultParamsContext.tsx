@@ -98,7 +98,7 @@ export const DefaultParamsProvider = <T extends Params>({
 
   const onDefaultChange = useCallback<ContextProps<T>['onDefaultChange']>(
     value => {
-      const params = parser.fromDeltaParams(value).toFiltered(k => !ignored.includes(k));
+      const params = parser.fromDeltaParams(value).filter(k => !ignored.includes(k));
       localStorage.setItem(storageKey, params.toString());
       setStorageParams(params.toParams());
       seFromStorage(true);

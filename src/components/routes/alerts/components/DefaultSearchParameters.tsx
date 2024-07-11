@@ -66,8 +66,8 @@ const WrappedAlertDefaultSearchParameters = () => {
     if (!open) return;
 
     setIsSameParams(
-      search.toFiltered(k => !['no_delay', 'offset', 'q', 'rows', 'tc_start'].includes(k)).toString() ===
-        defaults.toFiltered(k => !['no_delay', 'offset', 'q', 'rows', 'tc_start'].includes(k)).toString()
+      search.filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)).toString() ===
+        defaults.filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)).toString()
     );
   }, [defaults, open, search]);
 
@@ -98,11 +98,7 @@ const WrappedAlertDefaultSearchParameters = () => {
               {defaults.toString() === '' ? (
                 <div>{t('none')}</div>
               ) : (
-                <AlertFiltersSelected
-                  value={defaults.toObject()}
-                  visible={['fq', 'group_by', 'q', 'sort', 'tc']}
-                  disabled
-                />
+                <AlertFiltersSelected value={defaults.toObject()} visible={['fq', 'group_by', 'sort', 'tc']} disabled />
               )}
             </Paper>
           </Grid>
@@ -120,11 +116,7 @@ const WrappedAlertDefaultSearchParameters = () => {
               {search.toString() === '' ? (
                 <div>{t('none')}</div>
               ) : (
-                <AlertFiltersSelected
-                  value={search.toObject()}
-                  visible={['fq', 'group_by', 'q', 'sort', 'tc']}
-                  disabled
-                />
+                <AlertFiltersSelected value={search.toObject()} visible={['fq', 'group_by', 'sort', 'tc']} disabled />
               )}
             </Paper>
           </Grid>

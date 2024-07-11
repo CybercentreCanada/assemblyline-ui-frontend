@@ -54,6 +54,11 @@ export class BaseParam<T extends Params> {
     return this.parse(this.at(search));
   }
 
+  public set(prev: URLSearchParams, search: T | URLSearchParams): void {
+    const value = this.at(search);
+    if (this.valid(value)) prev.set(this.key, value);
+  }
+
   public from(prev: URLSearchParams, search: T | URLSearchParams): void {
     const value = this.at(search);
     if (!this.enforced && this.valid(value)) prev.set(this.key, value);
@@ -173,7 +178,7 @@ export class ArrayParam<T extends Params> extends BaseParam<T> {
   protected override at(search: T | URLSearchParams): string[] {
     if (search instanceof URLSearchParams) return search.getAll(this.key);
     else if (typeof search === 'object' && Array.isArray(search?.[this.key])) return search?.[this.key] as string[];
-    else return null;
+    else return [];
   }
 
   public override parse(value: string | string[]): string | string[] {
@@ -202,21 +207,26 @@ export class ArrayParam<T extends Params> extends BaseParam<T> {
     return values
       .map(v => this.toPrefix(v))
       .reduceRight((prev, cur) => (prev.some(p => cur.at(-1) === p.at(-1)) ? prev : [...prev, cur]), [] as string[][])
-      .filter(value => !value.some(v => v === this.ignore))
-      .toSorted((a, b) => a.at(-1).localeCompare(b.at(-1)));
+      .filter(value => !value.some(v => v === this.ignore));
   }
 
   private append(prev: URLSearchParams, values: string[][]): void {
     values
+      .toSorted((a, b) => a.at(-1).localeCompare(b.at(-1)))
       .map(value => this.fromPrefix(value))
       .forEach(v => {
         prev.append(this.key, v);
       });
   }
 
+  public override set(prev: URLSearchParams, search: T | URLSearchParams): void {
+    const data = this.at(search);
+    return this.append(prev, this.clean([...data]));
+  }
+
   public override from(prev: URLSearchParams, search: T | URLSearchParams): void {
     const data = this.at(search);
-    return this.append(prev, this.clean([...this.defaults, ...(!this.enforced && (data || []))]));
+    return this.append(prev, this.clean([...this.defaults, ...(!this.enforced && data)]));
   }
 
   public override delta(prev: URLSearchParams, search: T | URLSearchParams): void {
