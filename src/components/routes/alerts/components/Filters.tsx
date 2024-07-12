@@ -23,7 +23,6 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { ALERT_DEFAULT_PARAMS } from 'components/routes/alerts';
 import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
-import { useDefaultParams } from 'components/routes/alerts/contexts/DefaultParamsContext';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import CustomChip from 'components/visual/CustomChip';
 import { safeFieldValue } from 'helpers/utils';
@@ -433,13 +432,10 @@ const WrappedAlertFilters = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
-
-  const alertValues = useAlerts();
-  const { defaults } = useDefaultParams<AlertSearchParams>();
-  const { search, setSearchParams } = useSearchParams<AlertSearchParams>();
-
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
+  const { apiCall } = useMyAPI();
+  const alertValues = useAlerts();
+  const { search, setSearchParams } = useSearchParams<AlertSearchParams>();
 
   const [query, setQuery] = useState<URLSearchParams>(search.toParams());
   const [open, setOpen] = useState<boolean>(false);

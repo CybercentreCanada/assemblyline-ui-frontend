@@ -9,15 +9,15 @@ import {
   IconButton,
   Paper,
   Tooltip,
-  Typography,
-  useTheme
+  Typography
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { useDefaultParams } from 'components/routes/alerts/contexts/DefaultParamsContext';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
-import React, { useEffect, useState } from 'react';
+import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AlertFiltersSelected from './FiltersSelected';
 
@@ -53,7 +53,6 @@ const useStyles = makeStyles(theme => ({
 
 const WrappedAlertDefaultSearchParameters = () => {
   const { t } = useTranslation('alerts');
-  const theme = useTheme();
   const classes = useStyles();
   const { showSuccessMessage } = useMySnackbar();
   const { search } = useSearchParams<AlertSearchParams>();
@@ -62,14 +61,20 @@ const WrappedAlertDefaultSearchParameters = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [isSameParams, setIsSameParams] = useState<boolean>(false);
 
+  const filteredDefaults = useMemo<SearchResult<AlertSearchParams>>(
+    () => defaults.filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)),
+    [defaults]
+  );
+
+  const filteredSearch = useMemo<SearchResult<AlertSearchParams>>(
+    () => search.filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)),
+    [search]
+  );
+
   useEffect(() => {
     if (!open) return;
-
-    setIsSameParams(
-      search.filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)).toString() ===
-        defaults.filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)).toString()
-    );
-  }, [defaults, open, search]);
+    setIsSameParams(filteredSearch.toString() === filteredDefaults.toString());
+  }, [filteredDefaults, filteredSearch, open]);
 
   return (
     <>
@@ -87,15 +92,8 @@ const WrappedAlertDefaultSearchParameters = () => {
 
           <Grid item style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.existing')}</Typography>
-            <Paper
-              component="pre"
-              variant="outlined"
-              className={classes.preview}
-              sx={{
-                backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
-              }}
-            >
-              {defaults.toString() === '' ? (
+            <Paper component="pre" variant="outlined" className={classes.preview}>
+              {filteredDefaults.toString() === '' ? (
                 <div>{t('none')}</div>
               ) : (
                 <AlertFiltersSelected value={defaults.toObject()} visible={['fq', 'group_by', 'sort', 'tc']} disabled />
@@ -105,15 +103,8 @@ const WrappedAlertDefaultSearchParameters = () => {
 
           <Grid item style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.current')}</Typography>
-            <Paper
-              component="pre"
-              variant="outlined"
-              className={classes.preview}
-              sx={{
-                backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
-              }}
-            >
-              {search.toString() === '' ? (
+            <Paper component="pre" variant="outlined" className={classes.preview}>
+              {filteredSearch.toString() === '' ? (
                 <div>{t('none')}</div>
               ) : (
                 <AlertFiltersSelected value={search.toObject()} visible={['fq', 'group_by', 'sort', 'tc']} disabled />
@@ -126,7 +117,7 @@ const WrappedAlertDefaultSearchParameters = () => {
           <div>
             {isSameParams
               ? t('session.save.same')
-              : search.toString() === ''
+              : filteredSearch.toString() === ''
               ? t('session.save.none')
               : t('session.save.confirm')}
           </div>
@@ -146,7 +137,7 @@ const WrappedAlertDefaultSearchParameters = () => {
           <Button autoFocus color="secondary" children={t('session.cancel')} onClick={() => setOpen(false)} />
           <Button
             color="primary"
-            disabled={search.toString() === '' || isSameParams}
+            disabled={filteredSearch.toString() === '' || isSameParams}
             children={t('session.save')}
             onClick={() => {
               onDefaultChange(search.toParams());

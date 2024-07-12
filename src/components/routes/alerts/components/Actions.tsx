@@ -250,18 +250,15 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const location = useLocation();
-
     const { search } = useSearchParams<AlertSearchParams>();
 
     const query = useMemo<string>(() => {
       if (!alert || !alert.group_count) return '';
-
       return search
-        .set(p => ({
-          ...p,
-          group_by: '',
-          fq: [...p.fq, `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`]
-        }))
+        .set(p => {
+          const f = `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`;
+          return { ...p, group_by: '', fq: [...p.fq, f] };
+        })
         .toString();
     }, [alert, search]);
 
@@ -305,14 +302,11 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
 
     const query = useMemo<SearchResult<AlertSearchParams>>(() => {
       if (!alert) return null;
-
       return search
-        .set(p => ({
-          ...p,
-          q: p.group_by
-            ? `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`
-            : `alert_id:${alert.alert_id}`
-        }))
+        .set(p => {
+          const f = `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`;
+          return { ...p, q: p.group_by ? f : `alert_id:${alert.alert_id}` };
+        })
         .filter(k => ['tc', 'tc_start', 'fq', 'q'].includes(k));
     }, [alert, search]);
 

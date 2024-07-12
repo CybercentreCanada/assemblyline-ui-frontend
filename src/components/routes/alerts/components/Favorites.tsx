@@ -44,7 +44,8 @@ const useStyles = makeStyles(theme => ({
     margin: 0,
     padding: theme.spacing(0.75, 1),
     whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
+    wordBreak: 'break-word',
+    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
   },
   editIconButton: {
     borderRadius: '50%',
@@ -76,7 +77,6 @@ const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
   ({ favorite, global = false, show = true, onSuccess }: AddFavoriteProps) => {
     const { t } = useTranslation('favorites');
     const classes = useStyles();
-    const theme = useTheme();
     const { apiCall } = useMyAPI();
     const { c12nDef } = useALContext();
     const { user: currentUser } = useAppUser<CustomUser>();
@@ -136,7 +136,7 @@ const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
           acceptText={t('confirmation.ok.add')}
           cancelText={t('cancel')}
           children={
-            <Grid container flexDirection="column" spacing={theme.spacing(2)}>
+            <>
               <Grid item component="span">
                 {t('confirmation.content.add')}
                 <b style={{ wordBreak: 'break-all' }}>{favorite ? favorite.name : null}</b>
@@ -152,7 +152,7 @@ const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
               </Grid>
 
               <Grid item component="span" children={t('confirmation.confirm')} />
-            </Grid>
+            </>
           }
         />
       </>
@@ -173,7 +173,6 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
   ({ favorite, globalFavorites, userFavorites, global = false, show = true, onSuccess }: UpdateFavoriteProps) => {
     const { t } = useTranslation('favorites');
     const classes = useStyles();
-    const theme = useTheme();
     const { apiCall } = useMyAPI();
     const { c12nDef } = useALContext();
     const { user: currentUser } = useAppUser<CustomUser>();
@@ -237,7 +236,7 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
           acceptText={t('confirmation.ok.add')}
           cancelText={t('cancel')}
           children={
-            <Grid container flexDirection="column" spacing={theme.spacing(2)}>
+            <>
               <Grid item component="span">
                 {t('confirmation.content.update')}
                 <b style={{ wordBreak: 'break-all' }}>{favorite ? favorite.name : null}</b>
@@ -262,7 +261,7 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
               </Grid>
 
               <Grid item component="span" children={t('confirmation.confirm')} />
-            </Grid>
+            </>
           }
         />
       </>
@@ -281,7 +280,6 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
   ({ favorite, global = false, show = true, onSuccess }: DeleteFavoriteProps) => {
     const { t } = useTranslation('favorites');
     const classes = useStyles();
-    const theme = useTheme();
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -333,7 +331,7 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
           cancelText={t('cancel')}
           acceptText={t('confirmation.ok.delete')}
           children={
-            <Grid container flexDirection="column" spacing={theme.spacing(2)}>
+            <>
               <Grid item component="span">
                 {t('confirmation.content.delete')}
                 <b style={{ wordBreak: 'break-all' }}>{favorite ? favorite.name : null}</b>
@@ -349,7 +347,7 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
               </Grid>
 
               <Grid item component="span" children={t('confirmation.confirm')} />
-            </Grid>
+            </>
           }
         />
       </>

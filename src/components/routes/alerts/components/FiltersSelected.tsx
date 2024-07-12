@@ -175,7 +175,7 @@ const WrappedAlertFiltersSelected = ({
 
   const filters = useMemo<Filters>(() => {
     const defaults = { status: [], priority: [], labels: [], favorites: [], others: [] };
-    if (!search) return defaults;
+    if (!search || !('fq' in search)) return defaults;
 
     search.fq.forEach(filter => {
       const not = filter.startsWith('NOT(') && filter.endsWith(')');

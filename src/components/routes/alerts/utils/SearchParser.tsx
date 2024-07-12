@@ -92,13 +92,13 @@ export class SearchParser<T extends Params> {
   public fromParams(input: SearchInput) {
     const search = new URLSearchParams(input);
     const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.from(output, search));
+    Object.values(this.params).forEach(param => param.full(output, search));
     return new SearchResult<T>(output, this.params);
   }
 
   public fromObject(input: T) {
     const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.from(output, input));
+    Object.values(this.params).forEach(param => param.full(output, input));
     return new SearchResult<T>(output, this.params);
   }
 
