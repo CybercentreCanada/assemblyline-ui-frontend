@@ -719,7 +719,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
           }
           FabProps={{
             size: vertical ? 'medium' : 'small',
-            color: 'secondary',
+            color: 'primary',
             className: vertical ? classes.verticalSpeedDialFab : permanent ? classes.permanentSpeedDialFab : null
           }}
         >
