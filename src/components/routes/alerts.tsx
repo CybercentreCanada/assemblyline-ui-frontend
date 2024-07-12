@@ -119,9 +119,11 @@ const WrappedAlertsContent = () => {
         method: 'GET',
         onSuccess: ({ api_response }: { api_response: ListResponse | GroupedResponse }) => {
           if ('tc_start' in api_response) {
-            query.set('tc_start', api_response.tc_start);
+            setSearchObject(o => ({ ...o, tc_start: api_response.tc_start }));
           } else if (!query.get('tc_start') && api_response.items.length > 0) {
-            query.set('tc_start', api_response.items[0].reporting_ts);
+            const dates = api_response.items.map(a => new Date(a.reporting_ts));
+            const min = Math.max.apply(null, dates) as string;
+            setSearchObject(o => ({ ...o, tc_start: new Date(min).toISOString() }));
           }
 
           const max = api_response.offset + api_response.rows;
@@ -131,7 +133,6 @@ const WrappedAlertsContent = () => {
           ]);
           setCountedTotal('counted_total' in api_response ? api_response.counted_total : api_response.items.length);
           setTotal(api_response.total);
-          setSearchParams(query);
         },
 
         onEnter: () => {
@@ -145,7 +146,7 @@ const WrappedAlertsContent = () => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setSearchParams]
+    [setSearchObject]
   );
 
   const handleSelectedItemChange = useCallback(

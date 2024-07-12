@@ -50,11 +50,11 @@ export class SearchResult<T extends Params> {
   }
 
   public toString() {
-    return this.search.toString();
+    return this.search?.toString() || '';
   }
 
   public toParams() {
-    return this.search;
+    return new URLSearchParams(this.toString());
   }
 
   public toObject(): T {
