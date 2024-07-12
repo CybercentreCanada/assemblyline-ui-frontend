@@ -102,6 +102,7 @@ type Language =
   | 'yara';
 
 export const LANGUAGE_SELECTOR: Record<string, Language> = {
+  'assemblyline/ontology': 'json',
   'text/json': 'json',
   'text/jsons': 'json',
   'code/vbe': 'vb',

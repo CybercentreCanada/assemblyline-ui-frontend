@@ -67,8 +67,8 @@ const UserProfile = () => {
   );
 
   const renderQuotas = useCallback(() => {
-    const useAPIPercent = ((user.api_daily_quota - apiQuotaRemaining) / user.api_daily_quota) * 100;
-    const useSubmissionPercent =
+    const usedAPIPercent = ((user.api_daily_quota - apiQuotaRemaining) / user.api_daily_quota) * 100;
+    const usedSubmissionPercent =
       ((user.submission_daily_quota - submissionQuotaRemaining) / user.submission_daily_quota) * 100;
 
     if (
@@ -79,27 +79,28 @@ const UserProfile = () => {
         <div>
           <Divider />
           <List dense subheader={<ListSubheader disableSticky>{t('quotas')}</ListSubheader>}>
-            {user.api_daily_quota !== 0 && apiQuotaRemaining && (
-              <Tooltip title={`${apiQuotaRemaining} ${t('quotas.api.remaining')}`}>
+            {user.api_daily_quota !== 0 && apiQuotaRemaining !== null && (
+              <Tooltip title={`${apiQuotaRemaining} ${t('quotas.api.remaining')}`} placement="left">
                 <ListItem>
                   <span style={{ whiteSpace: 'nowrap' }}>{t('quotas.api')}</span>
                   <LinearProgress
                     variant="determinate"
-                    color={useAPIPercent < 65 ? 'success' : useAPIPercent < 90 ? 'warning' : 'error'}
-                    value={useAPIPercent}
+                    color={usedAPIPercent < 65 ? 'success' : usedAPIPercent < 90 ? 'warning' : 'error'}
+                    value={usedAPIPercent}
                     style={{ marginLeft: theme.spacing(2), width: '100%' }}
+                    title="bob"
                   />
                 </ListItem>
               </Tooltip>
             )}
-            {user.submission_daily_quota !== 0 && submissionQuotaRemaining && (
-              <Tooltip title={`${submissionQuotaRemaining} ${t('quotas.submission.remaining')}`}>
+            {user.submission_daily_quota !== 0 && submissionQuotaRemaining !== null && (
+              <Tooltip title={`${submissionQuotaRemaining} ${t('quotas.submission.remaining')}`} placement="left">
                 <ListItem>
                   <span style={{ whiteSpace: 'nowrap' }}>{t('quotas.submission')}</span>
                   <LinearProgress
                     variant="determinate"
-                    color={useSubmissionPercent < 65 ? 'success' : useSubmissionPercent < 90 ? 'warning' : 'error'}
-                    value={useSubmissionPercent}
+                    color={usedSubmissionPercent < 65 ? 'success' : usedSubmissionPercent < 90 ? 'warning' : 'error'}
+                    value={usedSubmissionPercent}
                     style={{ marginLeft: theme.spacing(2), width: '100%' }}
                   />
                 </ListItem>

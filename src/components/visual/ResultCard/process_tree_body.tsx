@@ -4,9 +4,10 @@ import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import SettingsEthernetOutlinedIcon from '@mui/icons-material/SettingsEthernetOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import { TreeItem, TreeView } from '@mui/lab';
 import { Theme, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useSafeResults from 'components/hooks/useSafeResults';
@@ -114,7 +115,7 @@ const ProcessTreeItem = ({ process, force = false }) => {
 
   return process.safelisted && process.children.length === 0 && !showSafeResults && !force ? null : (
     <TreeItem
-      nodeId={process.process_pid.toString()}
+      itemId={process.process_pid.toString()}
       classes={{
         root: classes.root
       }}
@@ -220,13 +221,15 @@ const WrappedProcessTreeBody = ({ body, force = false }) => {
 
     return (
       <div style={{ overflowX: 'auto' }}>
-        <TreeView
-          defaultExpanded={expanded}
-          defaultCollapseIcon={<ExpandMoreIcon />}
-          defaultExpandIcon={<ChevronRightIcon />}
+        <SimpleTreeView
+          defaultExpandedItems={expanded}
+          slots={{
+            collapseIcon: ExpandMoreIcon,
+            expandIcon: ChevronRightIcon
+          }}
         >
           <ProcessTreeItemList processes={body} force={force} />
-        </TreeView>
+        </SimpleTreeView>
       </div>
     );
   } catch (ex) {

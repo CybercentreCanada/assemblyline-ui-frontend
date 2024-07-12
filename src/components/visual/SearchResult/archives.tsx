@@ -125,7 +125,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
   setFileID = null,
   onLabelClick = null
 }) => {
-  const { t, i18n } = useTranslation(['archive']);
+  const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { c12nDef } = useALContext();
@@ -142,7 +142,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
           <DivTableHead>
             <DivTableRow>
               {hasSupplementary && <DivTableCell />}
-              <SortableHeaderCell children={t('header.seen.last')} sortField="seen.last" allowSort={allowSort} />
+              <SortableHeaderCell children={t('header.archive_ts')} sortField="archive_ts" allowSort={allowSort} />
               <SortableHeaderCell children={t('header.sha256')} sortField="sha256" allowSort={allowSort} inverted />
               <SortableHeaderCell children={t('header.type')} sortField="type" allowSort={allowSort} inverted />
               <SortableHeaderCell children={t('header.labels')} sortField="labels" allowSort={allowSort} inverted />
@@ -181,9 +181,9 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                   </DivTableCell>
                 )}
                 <DivTableCell>
-                  <Tooltip title={file.seen.last}>
+                  <Tooltip title={file.archive_ts}>
                     <div>
-                      <Moment variant="fromNow">{file.seen.last}</Moment>
+                      <Moment variant="fromNow">{file.archive_ts}</Moment>
                     </div>
                   </Tooltip>
                 </DivTableCell>
