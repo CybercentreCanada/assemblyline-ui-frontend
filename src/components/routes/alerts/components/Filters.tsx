@@ -266,7 +266,6 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
                 {...getTagProps({ index })}
                 key={index}
                 label={item.label}
-                size="small"
                 variant={item.not ? 'outlined' : 'filled'}
                 color={item.not ? 'error' : 'default'}
                 onClick={() =>
@@ -296,8 +295,8 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
               <CustomChip
                 label={
                   <>
-                    <span style={{ color: theme.palette.text.primary }}>{`${item.count} `}</span>
-                    {item.total && <span style={{ color: theme.palette.text.secondary }}>{`/ ${item.total}`}</span>}
+                    <span style={{ color: theme.palette.common.white }}>{`${item.count} `}</span>
+                    {item.total && <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>{`/ ${item.total}`}</span>}
                   </>
                 }
                 size="small"
@@ -361,11 +360,10 @@ const Favorites: React.FC<FavoritesProps> = React.memo(
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <div style={{ fontStyle: 'normal' }}>{item.query}</div>
                     <div
-                      style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}
+                      style={{ placeSelf: 'flex-end', color: 'rgba(255, 255, 255, 0.7)' }}
                     >{`(${item.created_by})`}</div>
                   </div>
                 }
-                size="small"
                 variant={item.not ? 'outlined' : 'filled'}
                 color={item.not ? 'error' : 'default'}
                 onClick={() =>
