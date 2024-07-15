@@ -133,7 +133,7 @@ export const GridTableRow: FC<GridTableRowProps> = memo(
   }))
 );
 
-interface GridLinkRowProps extends GridTableRowProps {
+export interface GridLinkRowProps extends GridTableRowProps {
   component?: never;
   to: To;
 }

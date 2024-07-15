@@ -7,7 +7,6 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import SlowMotionVideoIcon from '@mui/icons-material/SlowMotionVideo';
-import type { TableRowProps } from '@mui/material';
 import {
   Box,
   Dialog,
@@ -28,6 +27,7 @@ import { ActionableChipList } from 'components/visual/ActionableChipList';
 import type { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
 import type { CustomChipProps } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
+import type { GridLinkRowProps } from 'components/visual/GridTable';
 import {
   GridLinkRow,
   GridTable,
@@ -42,7 +42,6 @@ import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import type { To } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
   extended: {
@@ -322,10 +321,6 @@ export const AutoHideChipList: React.FC<AutoHideChipListProps> = React.memo(
   }
 );
 
-interface WrapperTableRowProps extends TableRowProps {
-  to: To;
-}
-
 type AlertEventsTableProps = {
   alert: AlertItem;
   viewHistory: boolean;
@@ -337,7 +332,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
     const { t } = useTranslation('alerts');
     const theme = useTheme();
 
-    const Row = useCallback<React.FC<WrapperTableRowProps>>(
+    const Row = useCallback<React.FC<GridLinkRowProps>>(
       ({ to, children, ...others }) =>
         to ? (
           <GridLinkRow to={to} onClick={() => setViewHistory(false)} {...others}>
