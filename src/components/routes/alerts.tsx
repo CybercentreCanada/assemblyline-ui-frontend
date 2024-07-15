@@ -59,7 +59,8 @@ export const ALERT_DEFAULT_PARAMS = {
   rows: PAGE_SIZE,
   sort: 'reporting_ts desc',
   tc_start: '',
-  tc: '4d'
+  tc: '4d',
+  track_total_hits: 10000
 };
 
 export type AlertSearchParams = SearchParams<typeof ALERT_DEFAULT_PARAMS>;
@@ -247,7 +248,7 @@ const WrappedAlertsContent = () => {
             </>
           }
         >
-          <AlertSearchResults searching={loading} total={total} />
+          <AlertSearchResults loading={loading} total={total} />
         </SearchHeader>
 
         <SimpleList
@@ -285,9 +286,13 @@ const WrappedAlertsPage = () => (
     defaultValue={ALERT_DEFAULT_PARAMS}
     storageKey={ALERT_STORAGE_KEY}
     enforced={['offset', 'rows']}
-    ignored={['q', 'no_delay', 'tc_start']}
+    ignored={['q', 'no_delay', 'tc_start', 'track_total_hits']}
   >
-    <SearchParamsProvider hidden={['rows', 'offset', 'tc_start']} enforced={['rows']} usingDefaultContext>
+    <SearchParamsProvider
+      hidden={['rows', 'offset', 'tc_start', 'track_total_hits']}
+      enforced={['rows']}
+      usingDefaultContext
+    >
       <AlertsProvider>
         <AlertsContent />
       </AlertsProvider>
