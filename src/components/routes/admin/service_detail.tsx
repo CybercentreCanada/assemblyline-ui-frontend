@@ -35,8 +35,10 @@ import ServiceGeneral from './service_detail/general';
 import ServiceParams from './service_detail/parameters';
 import ServiceUpdater from './service_detail/updater';
 
+
 type ServiceProps = {
   name?: string | null;
+  serviceNames: string[];
   onDeleted?: () => void;
   onUpdated?: () => void;
 };
@@ -147,6 +149,7 @@ export type ServiceDetail = {
   stage: string;
   submission_params: SubmissionParams[];
   timeout: number;
+  recursion_prevention: string[];
   update_channel: 'dev' | 'beta' | 'rc' | 'stable';
   update_config: UpdateConfig;
   version: string;
@@ -167,7 +170,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function Service({ name = null, onDeleted = () => null, onUpdated = () => null }: ServiceProps) {
+function Service({ name = null, onDeleted = () => null, onUpdated = () => null, serviceNames }: ServiceProps) {
   const { svc } = useParams<ParamProps>();
   const { t } = useTranslation(['adminServices']);
   const [service, setService] = useState<ServiceDetail>(null);
@@ -190,6 +193,7 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
   const { apiCall } = useMyAPI();
 
   function saveService() {
+
     apiCall({
       url: `/api/v4/service/${name || svc}/`,
       method: 'POST',
@@ -274,6 +278,8 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
     }
     // eslint-disable-next-line
   }, [serviceVersion]);
+
+
 
   useEffect(() => {
     // Set the global error flag based on each sub-error value
@@ -395,6 +401,7 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
               constants={constants}
               versions={versions}
               setError={setServiceGeneralError}
+              serviceNames={serviceNames}
             />
           </TabPanel>
           <TabPanel value="docker" style={{ paddingLeft: 0, paddingRight: 0 }}>

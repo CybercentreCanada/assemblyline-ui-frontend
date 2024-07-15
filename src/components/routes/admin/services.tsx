@@ -226,7 +226,8 @@ export default function Services() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<Service name={location.hash.slice(1)} onDeleted={onDeleted} onUpdated={onUpdated} />);
+
+      setGlobalDrawer(<Service name={location.hash.slice(1)} serviceNames={serviceFeeds.flatMap(item => item?.summary)} onDeleted={onDeleted} onUpdated={onUpdated} />);
     } else {
       closeGlobalDrawer();
     }
@@ -428,8 +429,8 @@ export default function Services() {
               disableInteractive
               title={
                 availableServices &&
-                availableServices.length > 0 &&
-                availableServices.some(s => !installingServices?.includes(s?.summary))
+                  availableServices.length > 0 &&
+                  availableServices.some(s => !installingServices?.includes(s?.summary))
                   ? t('install_all')
                   : t('install_none')
               }
