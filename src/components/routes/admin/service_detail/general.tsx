@@ -1,3 +1,5 @@
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import {
   FormControlLabel,
   Grid,
@@ -10,10 +12,12 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
+import CustomChip from 'components/visual/CustomChip';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceConstants, ServiceDetail } from '../service_detail';
@@ -24,16 +28,20 @@ type ServiceGeneralProps = {
   defaults: ServiceDetail;
   constants: ServiceConstants;
   versions: string[];
+  serviceNames: string[];
   setService: (value: ServiceDetail) => void;
   setModified: (value: boolean) => void;
   setError: (value: boolean) => void;
 };
+
+
 
 const ServiceGeneral = ({
   service,
   defaults,
   constants,
   versions,
+  serviceNames,
   setService,
   setModified,
   setError
@@ -41,7 +49,10 @@ const ServiceGeneral = ({
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
+
   const [instancesError, setInstancesError] = useState<boolean>(false);
+  const [addedRecursionPrevention, setAddedRecursionPrevention] = useState<string[]>(service.recursion_prevention);
+  const [removedRecursionPrevention, setRemovedRecursionPrevention] = useState<string[]>([]);
 
   const handleDescriptionChange = event => {
     setModified(true);
@@ -72,6 +83,111 @@ const ServiceGeneral = ({
     setModified(true);
     setService({ ...service, rejects: event.target.value });
   };
+
+
+
+
+
+  const onRecursionPreventionChange = (selections: string[], reason: string) => {
+
+    if (reason === 'clear') {
+      // On clear, we'll reset all the label lists to factory values
+      setAddedRecursionPrevention([]);
+      setRemovedRecursionPrevention([]);
+    } else {
+      setAddedRecursionPrevention(selections.filter(serv => {
+        return removedRecursionPrevention.indexOf(serv) === -1;
+      }));
+    }
+  };
+
+  const onRecursionPreventionClick = (name: string) => {
+
+    // Toggle between added and removed labels
+    if (removedRecursionPrevention.indexOf(name) > -1) {
+      // Remove from removed label list only and add to added list
+      setRemovedRecursionPrevention(
+        removedRecursionPrevention.filter(label => {
+          return label !== name;
+        })
+      );
+      setAddedRecursionPrevention([...addedRecursionPrevention, name]);
+    } else {
+      // Remove from added label list only and add to removed list
+      setAddedRecursionPrevention(
+        addedRecursionPrevention.filter(label => {
+          return label !== name;
+        })
+      );
+      setRemovedRecursionPrevention([...removedRecursionPrevention, name]);
+    }
+
+  };
+
+  const onRecursionPreventionDelete = (name: string) => {
+
+    // If we're trying to undo removing an existing label, then we need to revert it's visual state
+    if (removedRecursionPrevention.indexOf(name) > -1) {
+      // Remove from removed label list only
+      setRemovedRecursionPrevention(
+        removedRecursionPrevention.filter(label => {
+          return label !== name;
+        })
+      );
+    }
+    // If the label being deleted was a new label, then we can get rid of it
+    else if (addedRecursionPrevention.indexOf(name) > -1) {
+      // Remove from added label list
+      setAddedRecursionPrevention(
+        addedRecursionPrevention.filter(label => {
+          return label !== name;
+        })
+      );
+    }
+  };
+
+
+
+  const renderRecursionPreventionTags = (values: string[]) => {
+    return values.map((value, i) => (
+      <CustomChip
+        key={i}
+        label={
+          <div style={{ display: 'flex' }}>
+            {removedRecursionPrevention.indexOf(value) > -1 ? (
+              <RemoveIcon fontSize="small" style={{ marginLeft: '-6px', marginRight: '4px' }} />
+            ) : (
+              <AddIcon fontSize="small" style={{ marginLeft: '-6px', marginRight: '4px' }} />
+            )}
+            {value}
+          </div>
+        }
+        // Render adding labels as positive, removed labels as negative
+        style={{ marginRight: theme.spacing(0.5) }}
+        onDelete={() => onRecursionPreventionDelete(value)}
+        onClick={() => onRecursionPreventionClick(value)}
+        color={removedRecursionPrevention.indexOf(value) > -1 ? 'error' : 'success'}
+        variant="outlined"
+      />
+    ));
+  };
+
+
+  const updateRecursionPrevention = () => {
+
+    var recursionPreventionServices = addedRecursionPrevention.filter(serv => {
+      return removedRecursionPrevention.indexOf(serv) === -1;
+    });
+
+    setModified(recursionPreventionServices.length !== service.recursion_prevention.length ||
+      service.recursion_prevention.filter(x => recursionPreventionServices.indexOf(x) === -1).length > 0
+    );
+
+    setService({ ...service, recursion_prevention: recursionPreventionServices });
+
+  };
+
+
 
   const handleTimeoutChange = event => {
     setModified(true);
@@ -113,6 +229,8 @@ const ServiceGeneral = ({
     setService({ ...service, classification });
   };
 
+  useEffect(() => { updateRecursionPrevention(); }, [addedRecursionPrevention, removedRecursionPrevention]);
+
   useEffect(() => {
     // Set global error flag to be communicated back to main page
     setError(instancesError);
@@ -133,6 +251,7 @@ const ServiceGeneral = ({
 
     // eslint-disable-next-line
   }, [service.min_instances, service.licence_count]);
+
 
   return (
     <div>
@@ -376,6 +495,40 @@ const ServiceGeneral = ({
             <Skeleton style={{ height: '2.5rem' }} />
           )}
         </Grid>
+        <Grid item xs={12} sm={6}>
+          <Typography variant="subtitle2">
+            {t('general.recursion_prevention')}
+            <ResetButton
+              service={service}
+              defaults={defaults}
+              field="recursion_prevention"
+              reset={() => {
+                setAddedRecursionPrevention(defaults.recursion_prevention);
+                setRemovedRecursionPrevention([]);
+              }}
+            />
+          </Typography>
+          {service ? (
+            <Autocomplete
+              fullWidth
+              multiple
+              freeSolo
+              options={serviceNames.concat(constants.categories)}
+              filterSelectedOptions={true}
+              value={[...addedRecursionPrevention, ...removedRecursionPrevention].sort()}
+              renderInput={params => <TextField size="small" margin="dense" {...params} variant="outlined" />}
+              onChange={(event, value, reason) => onRecursionPreventionChange(value as string[], reason)}
+              renderTags={(value, getTagProps, ownerState) => renderRecursionPreventionTags(value)}
+              isOptionEqualToValue={(option, value) => {
+                return option.toUpperCase() === value.toUpperCase();
+              }}
+            />
+          ) : (
+            <Skeleton style={{ height: '2.5rem' }} />
+          )}
+        </Grid>
+
+
         <Grid item xs={12} sm={4}>
           <Typography variant="subtitle2" noWrap>
             {t('general.timeout')}

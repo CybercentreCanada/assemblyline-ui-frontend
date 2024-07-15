@@ -26,6 +26,7 @@ export type ServiceResult = {
   rejects: string;
   stage: string;
   version: string;
+  recursion_prevention: string[];
 };
 
 type UpdateData = {
