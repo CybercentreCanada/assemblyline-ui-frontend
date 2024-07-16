@@ -472,7 +472,7 @@ const ServiceGeneral = ({
                       setModified(true);
                       setService(s => ({
                         ...s,
-                        min_instances: e.target.value === '' ? null : Math.min(s.licence_count, value)
+                        min_instances: !e.target.value ? 0 : Math.min(s.licence_count, value)
                       }));
                     }}
                   />
@@ -500,8 +500,8 @@ const ServiceGeneral = ({
                       setModified(true);
                       setService(s => ({
                         ...s,
-                        ...(e.target.value === ''
-                          ? { min_instances: null, licence_count: null }
+                        ...(!e.target.value
+                          ? { min_instances: 0, licence_count: 0 }
                           : { min_instances: Math.min(s.min_instances, value), licence_count: value })
                       }));
                     }}
