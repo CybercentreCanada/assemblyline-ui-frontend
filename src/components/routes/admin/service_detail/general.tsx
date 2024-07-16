@@ -445,8 +445,8 @@ const ServiceGeneral = ({
                   setModified(true);
                   setService(s => ({
                     ...s,
-                    licence_count: defaults.licence_count,
-                    min_instances: defaults.min_instances
+                    licence_count: defaults.licence_count || 0,
+                    min_instances: defaults.min_instances || 0
                   }));
                 }}
               />
