@@ -17,10 +17,9 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/hooks/useMyUser';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
@@ -34,7 +33,6 @@ import ServiceContainer from './service_detail/container';
 import ServiceGeneral from './service_detail/general';
 import ServiceParams from './service_detail/parameters';
 import ServiceUpdater from './service_detail/updater';
-
 
 type ServiceProps = {
   name?: string | null;
@@ -141,15 +139,15 @@ export type ServiceDetail = {
   enabled: boolean;
   is_external: boolean;
   licence_count: number;
-  min_instances?: number;
   max_queue_length: number;
+  min_instances?: number;
   name: string;
   privileged: boolean;
+  recursion_prevention: string[];
   rejects: string;
   stage: string;
   submission_params: SubmissionParams[];
   timeout: number;
-  recursion_prevention: string[];
   update_channel: 'dev' | 'beta' | 'rc' | 'stable';
   update_config: UpdateConfig;
   version: string;
@@ -193,7 +191,6 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null, 
   const { apiCall } = useMyAPI();
 
   function saveService() {
-
     apiCall({
       url: `/api/v4/service/${name || svc}/`,
       method: 'POST',
@@ -244,7 +241,6 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null, 
     // Reset tab because we are using a different service
     setTab('general');
     setVersions(null);
-    setServiceDefault(null);
     setModified(false);
 
     // Load user on start
@@ -267,19 +263,18 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null, 
   }, [name]);
 
   useEffect(() => {
+    // Reset tab because we are using a different service
+    setServiceDefault(null);
+
     // Load user on start
     if (currentUser.is_admin && serviceVersion) {
       apiCall({
         url: `/api/v4/service/${name || svc}/${serviceVersion}/`,
-        onSuccess: api_data => {
-          setServiceDefault(api_data.api_response);
-        }
+        onSuccess: ({ api_response }) => setServiceDefault(api_response)
       });
     }
     // eslint-disable-next-line
   }, [serviceVersion]);
-
-
 
   useEffect(() => {
     // Set the global error flag based on each sub-error value
@@ -288,17 +283,15 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null, 
     // eslint-disable-next-line
   }, [serviceGeneralError]);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     // Load constants on page load
-    if (currentUser.is_admin) {
-      apiCall({
-        url: '/api/v4/service/constants/',
-        onSuccess: api_data => {
-          setConstants(api_data.api_response);
-        }
-      });
-    }
-  });
+    if (!currentUser.is_admin) return;
+    apiCall({
+      url: '/api/v4/service/constants/',
+      onSuccess: ({ api_response }) => setConstants(api_response)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return !currentUser.is_admin ? (
     <Navigate to="/forbidden" replace />
@@ -394,14 +387,14 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null, 
           </Paper>
           <TabPanel value="general" style={{ paddingLeft: 0, paddingRight: 0 }}>
             <ServiceGeneral
-              service={service}
-              defaults={serviceDefault}
-              setService={setService}
-              setModified={setModified}
               constants={constants}
+              defaults={serviceDefault}
+              service={service}
+              serviceNames={serviceNames}
               versions={versions}
               setError={setServiceGeneralError}
-              serviceNames={serviceNames}
+              setModified={setModified}
+              setService={setService}
             />
           </TabPanel>
           <TabPanel value="docker" style={{ paddingLeft: 0, paddingRight: 0 }}>
