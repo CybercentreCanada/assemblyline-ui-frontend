@@ -25,15 +25,17 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/hooks/useMyUser';
 import Service from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDownloader from 'components/visual/FileDownloader';
-import ServiceTable, { ServiceResult } from 'components/visual/SearchResult/service';
+import type { ServiceResult } from 'components/visual/SearchResult/service';
+import ServiceTable from 'components/visual/SearchResult/service';
 import CommunityServiceTable from 'components/visual/ServiceManagement/CommunityServiceTable';
 import NewServiceTable from 'components/visual/ServiceManagement/NewServiceTable';
-import { JSONFeedItem, useNotificationFeed } from 'components/visual/ServiceManagement/useNotificationFeed';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type { JSONFeedItem } from 'components/visual/ServiceManagement/useNotificationFeed';
+import { useNotificationFeed } from 'components/visual/ServiceManagement/useNotificationFeed';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 
@@ -64,6 +66,14 @@ export default function Services() {
   const [installingServices, setInstallingServices] = useState<string[]>([]);
   const lastInstallingServices = useRef<string[]>([]);
   const installingServicesTimeout = useRef<NodeJS.Timeout>(null);
+
+  const serviceNames = useMemo<string[]>(
+    () =>
+      (serviceFeeds || [])
+        .reduce((prev: string[], item) => (item?.summary ? [...prev, item.summary] : prev), [])
+        .toSorted(),
+    [serviceFeeds]
+  );
 
   const handleAddService = () => {
     apiCall({
@@ -226,13 +236,19 @@ export default function Services() {
 
   useEffect(() => {
     if (location.hash) {
-
-      setGlobalDrawer(<Service name={location.hash.slice(1)} serviceNames={serviceFeeds.flatMap(item => item?.summary)} onDeleted={onDeleted} onUpdated={onUpdated} />);
+      setGlobalDrawer(
+        <Service
+          name={location.hash.slice(1)}
+          serviceNames={serviceNames}
+          onDeleted={onDeleted}
+          onUpdated={onUpdated}
+        />
+      );
     } else {
       closeGlobalDrawer();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
+  }, [location.hash, serviceNames]);
 
   const setService = useCallback(
     (service_name: string) => {
@@ -429,8 +445,8 @@ export default function Services() {
               disableInteractive
               title={
                 availableServices &&
-                  availableServices.length > 0 &&
-                  availableServices.some(s => !installingServices?.includes(s?.summary))
+                availableServices.length > 0 &&
+                availableServices.some(s => !installingServices?.includes(s?.summary))
                   ? t('install_all')
                   : t('install_none')
               }
