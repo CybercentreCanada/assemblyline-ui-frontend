@@ -381,8 +381,6 @@ const WrappedAlertFiltersSelected = ({
               {(() => {
                 const from = new Date(search.tc_start);
 
-                console.log(search.tc_start, from.toISOString());
-
                 if (!search.tc)
                   return (
                     <>
