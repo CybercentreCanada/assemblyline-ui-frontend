@@ -94,21 +94,17 @@ const WrappedAlertDetailContent = ({
   const { c12nDef, configuration } = useALContext();
   const { id: paramId } = useParams<Params>();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { defaults, onDefaultChange } = useDefaultParams<AlertSearchParams>();
-  const { search, setSearchParams } = useSearchParams<AlertSearchParams>();
+  const { onDefaultChange } = useDefaultParams<AlertSearchParams>();
+  const { setSearchParams } = useSearchParams<AlertSearchParams>();
 
   const [alert, setAlert] = useState<AlertItem>(null);
   const [metaOpen, setMetaOpen] = useState<boolean>(false);
 
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
 
-  useEffect(() => {
-    if (defaultsProps && defaultsProps !== defaults.toString()) onDefaultChange(defaultsProps);
-  }, [defaults, defaultsProps, onDefaultChange]);
+  useEffect(() => onDefaultChange(defaultsProps), [defaultsProps, onDefaultChange]);
 
-  useEffect(() => {
-    if (searchProp && searchProp !== search.toString()) setSearchParams(new URLSearchParams(searchProp));
-  }, [search, searchProp, setSearchParams]);
+  useEffect(() => setSearchParams(new URLSearchParams(searchProp)), [searchProp, setSearchParams]);
 
   useEffect(() => {
     if (!currentUser.roles.includes('alert_view')) {

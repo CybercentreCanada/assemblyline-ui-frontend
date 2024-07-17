@@ -153,7 +153,7 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
 type Props = {
   value: AlertSearchParams;
   onChange?: (value: AlertSearchParams) => void;
-  visible?: (keyof AlertSearchParams)[];
+  visible?: (keyof AlertSearchParams | 'timerange')[];
   disabled?: boolean;
 };
 
@@ -363,6 +363,58 @@ const WrappedAlertFiltersSelected = ({
                     delete v.tc_start;
                     return v;
                   })
+          }
+        />
+      )}
+
+      {visible.includes('timerange') && search.tc_start && (
+        <CustomChip
+          classes={{ icon: classes.icon }}
+          variant="outlined"
+          size="small"
+          wrap
+          style={{ minHeight: '25px' }}
+          icon={<DateRangeIcon fontSize="small" />}
+          label={
+            <div>
+              <span>{t('timerange')}: </span>
+              {(() => {
+                const from = new Date(search.tc_start);
+
+                console.log(search.tc_start, from.toISOString());
+
+                if (!search.tc)
+                  return (
+                    <>
+                      {`${t('up_to')} `}
+                      <Moment variant="localeDateTime">{from}</Moment>
+                    </>
+                  );
+
+                switch (search.tc) {
+                  case '24h':
+                    from.setDate(from.getDate() - 1);
+                    break;
+                  case '4d':
+                    from.setDate(from.getDate() - 4);
+                    break;
+                  case '1w':
+                    from.setDate(from.getDate() - 7);
+                    break;
+                  case '1M':
+                    from.setMonth(from.getMonth() - 1);
+                    break;
+                }
+
+                return (
+                  <>
+                    <Moment variant="localeDateTime">{from}</Moment>
+                    {' – '}
+                    <Moment variant="localeDateTime">{search.tc_start}</Moment>
+                  </>
+                );
+              })()}
+            </div>
           }
         />
       )}

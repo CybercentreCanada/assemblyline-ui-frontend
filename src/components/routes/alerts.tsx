@@ -73,7 +73,7 @@ const WrappedAlertsContent = () => {
   const { apiCall } = useMyAPI();
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, setGlobalDrawer } = useDrawer();
+  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { defaults } = useDefaultParams<AlertSearchParams>();
   const { search, setSearchParams, setSearchObject } = useSearchParams<AlertSearchParams>();
 
@@ -121,10 +121,6 @@ const WrappedAlertsContent = () => {
         onSuccess: ({ api_response }: { api_response: ListResponse | GroupedResponse }) => {
           if ('tc_start' in api_response) {
             setSearchObject(o => ({ ...o, tc_start: api_response.tc_start }));
-          } else if (!query.get('tc_start') && api_response.items.length > 0) {
-            const dates = api_response.items.map(a => new Date(a.reporting_ts));
-            const min = Math.max.apply(null, dates) as string;
-            setSearchObject(o => ({ ...o, tc_start: new Date(min).toISOString() }));
           }
 
           const max = api_response.offset + api_response.rows;
@@ -171,7 +167,9 @@ const WrappedAlertsContent = () => {
   }, [globalDrawerOpened]);
 
   useEffect(() => {
-    if (location.hash && location.hash !== '') {
+    if (!location.hash) {
+      closeGlobalDrawer();
+    } else {
       const id = location.hash.substr(1);
       const alert = alerts.find(item => item.alert_id === id);
       setGlobalDrawer(
@@ -180,7 +178,18 @@ const WrappedAlertsContent = () => {
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash, setGlobalDrawer]);
+  }, [closeGlobalDrawer, defaults.toString(), location.hash, search.toString(), setGlobalDrawer]);
+
+  useEffect(() => {
+    if (!!search.get('group_by')) return;
+    else if (!alerts || alerts.length === 0) setSearchObject(v => ({ ...v, tc_start: '' }));
+    else {
+      const dates = alerts.map(a => new Date(a.reporting_ts));
+      const min = Math.max.apply(null, dates) as string;
+      setSearchObject(o => ({ ...o, tc_start: new Date(min).toISOString() }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [alerts]);
 
   useEffect(() => {
     const update = ({ detail }: CustomEvent<Alert[]>) => {

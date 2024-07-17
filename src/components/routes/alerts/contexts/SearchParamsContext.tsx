@@ -125,10 +125,6 @@ export const SearchParamsProvider = <T extends Params>({
     searchObjectRef.current = search.toObject();
   }, [search]);
 
-  useEffect(() => {
-    setSearchParams(searchParamsRef.current);
-  }, [setSearchParams]);
-
   return (
     <SearchParamsContext.Provider value={{ search, setSearchParams, setSearchObject }}>
       {!search ? null : children}

@@ -228,7 +228,7 @@ export const AlertWorkflowDrawer = React.memo(
                 >
                   <AlertFiltersSelected
                     value={filteredSearch.toObject()}
-                    visible={isSingleAlert ? ['fq', 'group_by', 'q'] : ['fq', 'group_by', 'q', 'tc']}
+                    visible={isSingleAlert ? ['fq', 'group_by', 'q'] : ['fq', 'group_by', 'q', 'timerange']}
                     disabled
                   />
                 </div>
