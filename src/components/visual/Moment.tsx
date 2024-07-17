@@ -14,7 +14,7 @@ const MOMENT_VARIANTS = [
 type MomentVariant = (typeof MOMENT_VARIANTS)[number];
 
 type MomentProps = {
-  children: string;
+  children: string | number | Date;
   format?: string;
   variant?: MomentVariant;
 };
@@ -22,10 +22,9 @@ type MomentProps = {
 const WrappedMoment = ({ children = null, format = null, variant = null }: MomentProps) => {
   const { i18n } = useTranslation();
 
-  const data = useMemo<string>(() => {
+  const data = useMemo<string | number | Date>(() => {
     try {
-      const input = new Date(children.toString()).toISOString();
-      const time = moment(input).locale(i18n.language);
+      const time = moment(children).locale(i18n.language);
 
       if (format) return time.format(format);
 

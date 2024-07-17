@@ -19,6 +19,7 @@ import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsC
 import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router';
 import AlertFiltersSelected from './FiltersSelected';
 
 const useStyles = makeStyles(theme => ({
@@ -54,6 +55,8 @@ const useStyles = makeStyles(theme => ({
 const WrappedAlertDefaultSearchParameters = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { showSuccessMessage } = useMySnackbar();
   const { search } = useSearchParams<AlertSearchParams>();
   const { defaults, fromStorage, onDefaultChange, onDefaultClear } = useDefaultParams<AlertSearchParams>();
@@ -129,6 +132,7 @@ const WrappedAlertDefaultSearchParameters = () => {
             children={t('session.clear')}
             onClick={() => {
               onDefaultClear();
+              navigate(`${location.pathname}${location.hash}`);
               showSuccessMessage(t('session.clear.success'));
               setOpen(false);
             }}
@@ -141,6 +145,7 @@ const WrappedAlertDefaultSearchParameters = () => {
             children={t('session.save')}
             onClick={() => {
               onDefaultChange(search.toParams());
+              navigate(`${location.pathname}${location.hash}`);
               showSuccessMessage(t('session.save.success'));
               setOpen(false);
             }}

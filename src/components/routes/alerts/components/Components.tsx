@@ -7,7 +7,6 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import SlowMotionVideoIcon from '@mui/icons-material/SlowMotionVideo';
-import type { TableRowProps } from '@mui/material';
 import {
   Box,
   Dialog,
@@ -28,14 +27,21 @@ import { ActionableChipList } from 'components/visual/ActionableChipList';
 import type { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
 import type { CustomChipProps } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
+import type { GridLinkRowProps } from 'components/visual/GridTable';
+import {
+  GridLinkRow,
+  GridTable,
+  GridTableBody,
+  GridTableCell,
+  GridTableHead,
+  GridTableRow
+} from 'components/visual/GridTable';
 import Moment from 'components/visual/Moment';
 import { verdictToColor } from 'helpers/utils';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import type { To } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
   extended: {
@@ -315,10 +321,6 @@ export const AutoHideChipList: React.FC<AutoHideChipListProps> = React.memo(
   }
 );
 
-interface WrapperTableRowProps extends TableRowProps {
-  to: To;
-}
-
 type AlertEventsTableProps = {
   alert: AlertItem;
   viewHistory: boolean;
@@ -330,14 +332,14 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
     const { t } = useTranslation('alerts');
     const theme = useTheme();
 
-    const Row = useCallback<React.FC<WrapperTableRowProps>>(
+    const Row = useCallback<React.FC<GridLinkRowProps>>(
       ({ to, children, ...others }) =>
         to ? (
-          <LinkRow to={to} onClick={() => setViewHistory(false)} {...others}>
+          <GridLinkRow to={to} onClick={() => setViewHistory(false)} {...others}>
             {children}
-          </LinkRow>
+          </GridLinkRow>
         ) : (
-          <DivTableRow {...others}>{children}</DivTableRow>
+          <GridTableRow {...others}>{children}</GridTableRow>
         ),
       [setViewHistory]
     );
@@ -369,25 +371,25 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
             <DialogTitle id="alert-dialog-title">{t('history.events')}</DialogTitle>
             <DialogContent>
               <TableContainer sx={{ borderRadius: theme.spacing(0.5), border: `1px solid ${theme.palette.divider}` }}>
-                <DivTable size="small">
-                  <DivTableHead>
-                    <DivTableRow>
+                <GridTable columns={6} size="small">
+                  <GridTableHead>
+                    <GridTableRow>
                       {['ts', 'workflow_or_user', 'priority', 'status', 'labels'].map(column => (
-                        <DivTableCell key={column}>
+                        <GridTableCell key={column}>
                           <Typography sx={{ fontWeight: 'bold' }}>{t(column)}</Typography>
-                        </DivTableCell>
+                        </GridTableCell>
                       ))}
-                      <DivTableCell />
-                    </DivTableRow>
-                  </DivTableHead>
-                  <DivTableBody>
+                      <GridTableCell />
+                    </GridTableRow>
+                  </GridTableHead>
+                  <GridTableBody>
                     {alert.events
                       .sort((a, b) => a.ts.localeCompare(b.ts) || b.ts.localeCompare(a.ts))
                       .reverse()
                       .map((event, i) => {
                         return (
                           <Row
-                            key={`DivTable-row-${i}`}
+                            key={`GridTable-row-${i}`}
                             hover
                             tabIndex={-1}
                             to={
@@ -396,23 +398,23 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                                 : null
                             }
                           >
-                            <DivTableCell>
+                            <GridTableCell>
                               <Tooltip title={event.ts}>
                                 <span>
                                   <Moment variant="fromNow">{event.ts}</Moment>
                                 </span>
                               </Tooltip>
-                            </DivTableCell>
-                            <DivTableCell>
+                            </GridTableCell>
+                            <GridTableCell>
                               <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
                                 <span>{event.entity_name}</span>
                               </Tooltip>
-                            </DivTableCell>
-                            <DivTableCell>
+                            </GridTableCell>
+                            <GridTableCell>
                               {event.priority ? <AlertPriority name={event.priority} withChip /> : null}
-                            </DivTableCell>
-                            <DivTableCell>{event.status ? <AlertStatus name={event.status} /> : null}</DivTableCell>
-                            <DivTableCell
+                            </GridTableCell>
+                            <GridTableCell>{event.status ? <AlertStatus name={event.status} /> : null}</GridTableCell>
+                            <GridTableCell
                               width="40%"
                               style={{
                                 display: 'flex',
@@ -434,8 +436,8 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                                     />
                                   ))
                                 : null}
-                            </DivTableCell>
-                            <DivTableCell>
+                            </GridTableCell>
+                            <GridTableCell>
                               {event.entity_type === 'workflow' && event.entity_id !== 'DEFAULT' ? (
                                 <Tooltip title={t('workflow')}>
                                   <span>
@@ -449,12 +451,12 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                                   </span>
                                 </Tooltip>
                               ) : null}
-                            </DivTableCell>
+                            </GridTableCell>
                           </Row>
                         );
                       })}
-                  </DivTableBody>
-                </DivTable>
+                  </GridTableBody>
+                </GridTable>
               </TableContainer>
             </DialogContent>
           </div>

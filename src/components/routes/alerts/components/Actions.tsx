@@ -250,22 +250,24 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const location = useLocation();
-    const { search } = useSearchParams<AlertSearchParams>();
+    const { search, setSearchObject } = useSearchParams<AlertSearchParams>();
 
-    const query = useMemo<string>(() => {
-      if (!alert || !alert.group_count) return '';
-      return search
-        .set(p => {
-          const f = `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`;
-          return { ...p, group_by: '', fq: [...p.fq, f] };
-        })
-        .toString();
-    }, [alert, search]);
+    const query = useMemo<URLSearchParams>(() => {
+      const q = new URLSearchParams(location.search);
+      if (!alert || !alert.group_count || search.get('group_by') === '') return q;
+
+      const groupBy = search.get('group_by');
+      const f = `${groupBy}:${getValueFromPath(alert, groupBy) as string}`;
+      q.set('group_by', '');
+      q.append('fq', f);
+
+      return q;
+    }, [alert, location.search, search]);
 
     return (
       <AlertActionButton
         tooltipTitle={t('focus')}
-        to={`${location.pathname}?${query}${location.hash}`}
+        to={`${location.pathname}?${query.toString()}${location.hash}`}
         open={open}
         vertical={vertical}
         permanent={permanent}
@@ -274,7 +276,14 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
         authorized={alert?.group_count > 0}
         color={theme.palette.action.active}
         icon={<CenterFocusStrongOutlinedIcon />}
-        onClick={onClick}
+        onClick={e => {
+          e.preventDefault();
+          setSearchObject(p => {
+            const f = `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`;
+            return { ...p, group_by: '', fq: [...p.fq, f] };
+          });
+          onClick();
+        }}
       />
     );
   }
@@ -374,7 +383,11 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
                       {!query || query.toString() === '' ? (
                         <div>{t('none')}</div>
                       ) : (
-                        <AlertFiltersSelected value={query.toObject()} visible={['fq', 'q', 'sort', 'tc']} disabled />
+                        <AlertFiltersSelected
+                          value={query.toObject()}
+                          visible={['fq', 'q', 'sort', 'timerange']}
+                          disabled
+                        />
                       )}
                     </Paper>
                   </Grid>
