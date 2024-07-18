@@ -2,7 +2,7 @@ import type { Params } from 'components/routes/alerts/utils/SearchParams';
 import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import { SearchParser } from 'components/routes/alerts/utils/SearchParser';
 import { once } from 'lodash';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useDefaultParams } from './DefaultParamsContext';
 
@@ -69,11 +69,6 @@ export const SearchParamsProvider = <T extends Params>({
 
   const [hiddenParams, setHiddenParams] = useState<URLSearchParams>(new URLSearchParams());
 
-  const searchParamsRef = useRef<URLSearchParams>();
-  const searchObjectRef = useRef<T>();
-  const prevSearch = useRef<string>(null);
-  const prevHidden = useRef<string>(null);
-
   const locationParams = useMemo<URLSearchParams>(() => new URLSearchParams(location.search), [location.search]);
 
   const parser = useMemo<SearchParser<T>>(
@@ -83,9 +78,19 @@ export const SearchParamsProvider = <T extends Params>({
   );
 
   const search = useMemo<ContextProps<T>['search']>(
-    () => parser.fromMergeParams(locationParams, hiddenParams, key => !hidden.includes(key)),
+    () => parser.mergeParams(locationParams, hiddenParams, key => !hidden.includes(key)),
     [hidden, hiddenParams, locationParams, parser]
   );
+
+  const prevSearch = useRef<string>(null);
+  const prevHidden = useRef<string>(null);
+  const searchParamsRef = useRef<URLSearchParams>(search.toParams());
+  const searchObjectRef = useRef<T>(search.toObject());
+
+  const handleUpdateRef = useCallback((value: SearchResult<T>) => {
+    searchParamsRef.current = value.toParams();
+    searchObjectRef.current = value.toObject();
+  }, []);
 
   const handleNavigate = useCallback(
     (value: SearchResult<T>) => {
@@ -107,23 +112,20 @@ export const SearchParamsProvider = <T extends Params>({
   const setSearchParams = useCallback<ContextProps<T>['setSearchParams']>(
     input => {
       const values = typeof input === 'function' ? input(searchParamsRef.current) : input;
-      handleNavigate(parser.fromDeltaParams(values));
+      handleUpdateRef(parser.fromParams(values));
+      handleNavigate(parser.deltaParams(values));
     },
-    [handleNavigate, parser]
+    [handleNavigate, handleUpdateRef, parser]
   );
 
   const setSearchObject = useCallback<ContextProps<T>['setSearchObject']>(
     input => {
       const values = typeof input === 'function' ? input(searchObjectRef.current) : input;
-      handleNavigate(parser.fromDeltaObject(values));
+      handleUpdateRef(parser.fromObject(values));
+      handleNavigate(parser.deltaObject(values));
     },
-    [handleNavigate, parser]
+    [handleNavigate, handleUpdateRef, parser]
   );
-
-  useEffect(() => {
-    searchParamsRef.current = search.toParams();
-    searchObjectRef.current = search.toObject();
-  }, [search]);
 
   return (
     <SearchParamsContext.Provider value={{ search, setSearchParams, setSearchObject }}>
