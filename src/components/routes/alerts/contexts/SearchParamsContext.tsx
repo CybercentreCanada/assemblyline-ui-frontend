@@ -2,7 +2,7 @@ import type { Params } from 'components/routes/alerts/utils/SearchParams';
 import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import { SearchParser } from 'components/routes/alerts/utils/SearchParser';
 import { once } from 'lodash';
-import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useDefaultParams } from './DefaultParamsContext';
 
@@ -126,6 +126,10 @@ export const SearchParamsProvider = <T extends Params>({
     },
     [handleNavigate, handleUpdateRef, parser]
   );
+
+  useEffect(() => {
+    handleUpdateRef(search);
+  }, [handleUpdateRef, search]);
 
   return (
     <SearchParamsContext.Provider value={{ search, setSearchParams, setSearchObject }}>

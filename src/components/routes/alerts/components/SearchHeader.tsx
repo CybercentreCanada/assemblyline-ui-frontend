@@ -32,6 +32,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     borderRadius: '4px',
     paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(0.5),
     backgroundColor: alpha(theme.palette.text.primary, 0.04),
     '&:hover': {
       backgroundColor: alpha(theme.palette.text.primary, 0.06)
@@ -244,7 +245,7 @@ const WrappedSearchHeader = ({
     <PageHeader isSticky={isSticky}>
       <div style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1) }}>
         <div ref={rootRef} className={classes.root}>
-          <div className={classes.wrapper} style={{ paddingRight: !endAdornment ? theme.spacing(0.5) : null }}>
+          <div className={classes.wrapper}>
             <div className={classes.container} ref={inputRef}>
               <SearchTextField
                 value={queryValue}

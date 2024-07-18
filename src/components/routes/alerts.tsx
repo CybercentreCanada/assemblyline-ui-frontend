@@ -98,6 +98,8 @@ const WrappedAlertsContent = () => {
 
   const handleFetch = useCallback(
     (query: URLSearchParams) => {
+      if (!currentUser.roles.includes('alert_view')) return;
+
       const tcStart = query.get('tc_start');
       query.delete('tc_start');
       query.sort();
@@ -143,7 +145,7 @@ const WrappedAlertsContent = () => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setSearchObject]
+    [currentUser, setSearchObject]
   );
 
   const handleSelectedItemChange = useCallback(

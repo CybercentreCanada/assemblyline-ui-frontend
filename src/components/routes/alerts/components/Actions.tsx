@@ -250,11 +250,12 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const location = useLocation();
+    const { user: currentUser } = useAppUser<CustomUser>();
     const { search, setSearchObject } = useSearchParams<AlertSearchParams>();
 
     const query = useMemo<URLSearchParams>(() => {
       const q = new URLSearchParams(location.search);
-      if (!alert || !alert.group_count || search.get('group_by') === '') return q;
+      if (!alert || !alert.group_count || !search.get('group_by')) return q;
 
       const groupBy = search.get('group_by');
       const f = `${groupBy}:${getValueFromPath(alert, groupBy) as string}`;
@@ -273,16 +274,18 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
         permanent={permanent}
         speedDial={speedDial}
         showSkeleton={!alert}
-        authorized={alert?.group_count > 0}
+        authorized={currentUser.roles.includes('alert_view') && alert?.group_count > 0}
         color={theme.palette.action.active}
         icon={<CenterFocusStrongOutlinedIcon />}
         onClick={e => {
+          onClick();
           e.preventDefault();
+
           setSearchObject(p => {
+            if (!alert || !alert.group_count || !p.group_by) return p;
             const f = `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`;
             return { ...p, group_by: '', fq: [...p.fq, f] };
           });
-          onClick();
         }}
       />
     );
@@ -321,6 +324,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
 
     const handleTakeOwnership = useCallback(
       (prevAlert: AlertItem, q: string) => {
+        if (!currentUser.roles.includes('alert_manage')) return;
         apiCall({
           url: `/api/v4/alert/ownership/batch/?${q}`,
           method: 'GET',
@@ -344,7 +348,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
         });
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [currentUser.username, onClick, showErrorMessage, showSuccessMessage, t]
+      [currentUser, onClick, showErrorMessage, showSuccessMessage, t]
     );
 
     return (
@@ -523,6 +527,7 @@ export const AlertSafelist: React.FC<AlertActionProps> = React.memo(
 
     const handleNonMaliciousChange = useCallback(
       (prevAlert: AlertItem) => {
+        if (!currentUser.roles.includes('alert_manage')) return;
         apiCall({
           method: 'PUT',
           url: `/api/v4/alert/verdict/${prevAlert.alert_id}/non_malicious/`,
@@ -573,7 +578,7 @@ export const AlertSafelist: React.FC<AlertActionProps> = React.memo(
               : theme.palette.success.dark
             : null
         }
-        icon={<VerifiedUserOutlinedIcon />}
+        icon={<VerifiedUserOutlinedIcon style={{ color: 'white' }} />}
         onClick={hasSetNonMalicious ? null : () => handleNonMaliciousChange(alert)}
       />
     );
@@ -604,6 +609,7 @@ export const AlertBadlist: React.FC<AlertActionProps> = React.memo(
 
     const handleMaliciousChange = useCallback(
       (prevAlert: AlertItem) => {
+        if (!currentUser.roles.includes('alert_manage')) return;
         apiCall({
           method: 'PUT',
           url: `/api/v4/alert/verdict/${prevAlert.alert_id}/malicious/`,
@@ -654,7 +660,7 @@ export const AlertBadlist: React.FC<AlertActionProps> = React.memo(
               : theme.palette.error.dark
             : null
         }
-        icon={<BugReportOutlinedIcon />}
+        icon={<BugReportOutlinedIcon style={{ color: 'white' }} />}
         onClick={hasSetMalicious ? null : () => handleMaliciousChange(alert)}
       />
     );
