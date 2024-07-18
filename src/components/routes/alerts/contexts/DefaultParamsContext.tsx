@@ -89,13 +89,13 @@ export const DefaultParamsProvider = <T extends Params>({
   );
 
   const defaults = useMemo<ContextProps<T>['defaults']>(
-    () => parser.fromParams(storageParams),
+    () => parser.fullParams(storageParams),
     [parser, storageParams]
   );
 
   const onDefaultChange = useCallback<ContextProps<T>['onDefaultChange']>(
     value => {
-      const params = parser.fromDeltaParams(value).filter(k => !ignored.includes(k));
+      const params = parser.deltaParams(value).filter(k => !ignored.includes(k));
       localStorage.setItem(storageKey, params.toString());
       setStorageParams(params.toParams());
       seFromStorage(true);

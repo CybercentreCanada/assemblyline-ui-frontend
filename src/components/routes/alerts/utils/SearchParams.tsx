@@ -65,6 +65,12 @@ export class BaseParam<T extends Params> {
     if (this.valid(value)) prev.set(this.key, value);
   }
 
+  public from(prev: URLSearchParams, search: T | URLSearchParams): void {
+    const value = this.at(search);
+    if (this.valid(value)) prev.set(this.key, value);
+    else if (this.valid(this.defaults)) prev.set(this.key, this.defaults);
+  }
+
   public full(prev: URLSearchParams, search: T | URLSearchParams): void {
     const value = this.at(search);
     if (!this.enforced && this.valid(value)) prev.set(this.key, value);
@@ -232,6 +238,11 @@ export class ArrayParam<T extends Params> extends BaseParam<T> {
   }
 
   public override set(prev: URLSearchParams, search: T | URLSearchParams): void {
+    const data = this.at(search);
+    return this.append(prev, this.clean([...data]));
+  }
+
+  public override from(prev: URLSearchParams, search: T | URLSearchParams): void {
     const data = this.at(search);
     return this.append(prev, this.clean([...data]));
   }

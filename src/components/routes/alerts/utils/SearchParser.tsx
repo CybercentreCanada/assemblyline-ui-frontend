@@ -12,13 +12,13 @@ type Options<T extends Params> = {
 };
 
 export class SearchResult<T extends Params> {
-  private search: URLSearchParams = new URLSearchParams();
-
   private params: Record<keyof T, BaseParam<T>> = null;
 
+  private search: URLSearchParams = new URLSearchParams();
+
   constructor(init: SearchInput = null, params: Record<keyof T, BaseParam<T>> = null) {
-    this.search = new URLSearchParams(init);
     this.params = params;
+    this.search = new URLSearchParams(init);
   }
 
   public filter(predicate: (key: keyof T, value: Types) => boolean) {
@@ -31,6 +31,14 @@ export class SearchResult<T extends Params> {
     return new SearchResult<T>(next, this.params);
   }
 
+  public get<K extends keyof T>(key: K): T[K] {
+    return this.params?.[key]?.get(this.search) as T[K];
+  }
+
+  public has<K extends keyof T>(key: K): boolean {
+    return this.params?.[key]?.has(this.search);
+  }
+
   public set(input: T | ((value: T) => T)) {
     const output = new URLSearchParams();
     let obj = Object.values(this.params).reduce((prev, param) => param.object(prev, this.search), {} as T);
@@ -41,24 +49,12 @@ export class SearchResult<T extends Params> {
     return new SearchResult<T>(output, this.params);
   }
 
-  public has<K extends keyof T>(key: K): boolean {
-    return this.params?.[key]?.has(this.search);
-  }
-
-  public get<K extends keyof T>(key: K): T[K] {
-    return this.params?.[key]?.get(this.search) as T[K];
-  }
-
-  public toString() {
-    return this.search?.toString() || '';
+  public toObject(): T {
+    return Object.values(this.params).reduce((prev, param) => param.object(prev, this.search), {} as T);
   }
 
   public toParams() {
     return new URLSearchParams(this.toString());
-  }
-
-  public toObject(): T {
-    return Object.values(this.params).reduce((prev, param) => param.object(prev, this.search), {} as T);
   }
 
   public toSplitParams(predicate: (key: string, value: unknown) => boolean) {
@@ -72,6 +68,10 @@ export class SearchResult<T extends Params> {
     });
 
     return [first, second];
+  }
+
+  public toString() {
+    return this.search?.toString() || '';
   }
 }
 
@@ -92,30 +92,43 @@ export class SearchParser<T extends Params> {
   public fromParams(input: SearchInput) {
     const search = new URLSearchParams(input);
     const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.full(output, search));
+    Object.values(this.params).forEach(param => param.from(output, search));
     return new SearchResult<T>(output, this.params);
   }
 
   public fromObject(input: T) {
     const output = new URLSearchParams();
+    Object.values(this.params).forEach(param => param.from(output, input));
+    return new SearchResult<T>(output, this.params);
+  }
+
+  public fullParams(input: SearchInput) {
+    const search = new URLSearchParams(input);
+    const output = new URLSearchParams();
+    Object.values(this.params).forEach(param => param.full(output, search));
+    return new SearchResult<T>(output, this.params);
+  }
+
+  public fullObject(input: T) {
+    const output = new URLSearchParams();
     Object.values(this.params).forEach(param => param.full(output, input));
     return new SearchResult<T>(output, this.params);
   }
 
-  public fromDeltaParams(input: SearchInput) {
+  public deltaParams(input: SearchInput) {
     const search = new URLSearchParams(input);
     const output = new URLSearchParams();
     Object.values(this.params).forEach(param => param.delta(output, search));
     return new SearchResult<T>(output, this.params);
   }
 
-  public fromDeltaObject(input: T) {
+  public deltaObject(input: T) {
     const output = new URLSearchParams();
     Object.values(this.params).forEach(param => param.delta(output, input));
     return new SearchResult<T>(output, this.params);
   }
 
-  public fromMergeParams(
+  public mergeParams(
     first: SearchInput,
     second: SearchInput,
     predicate: <K extends keyof T>(key: K, values?: [Types, Types]) => boolean
