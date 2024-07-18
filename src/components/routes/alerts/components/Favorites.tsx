@@ -88,7 +88,7 @@ const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
     const isValid = useMemo(() => !!favorite.name && !!favorite.query, [favorite.name, favorite.query]);
 
     const handleAccept = useCallback(() => {
-      if (!isValid) return;
+      if (!isValid || !(currentUser.roles.includes('self_manage') || currentUser.is_admin)) return;
 
       const data: Favorite = {
         query: favorite.query,
@@ -114,7 +114,7 @@ const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
         }
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [c12nDef.UNRESTRICTED, currentUser.username, favorite, global]);
+    }, [c12nDef.UNRESTRICTED, currentUser, favorite, global]);
 
     return (
       <>
@@ -184,7 +184,7 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
     const isValid = useMemo(() => !!favorite.name && !!favorite.query, [favorite.name, favorite.query]);
 
     const handleAccept = useCallback(() => {
-      if (!isValid) return;
+      if (!isValid || !(currentUser.roles.includes('self_manage') || currentUser.is_admin)) return;
 
       const old = global
         ? globalFavorites.find(f => f.name === favorite.name)
@@ -214,7 +214,7 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
         }
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [c12nDef, currentUser.username, favorite, global, isValid, onSuccess, showErrorMessage, showSuccessMessage, t]);
+    }, [c12nDef, currentUser, favorite, global, isValid, onSuccess, showErrorMessage, showSuccessMessage, t]);
 
     return (
       <>
@@ -290,7 +290,7 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
     const isValid = useMemo(() => !!favorite.name && !!favorite.query, [favorite.name, favorite.query]);
 
     const handleAccept = useCallback(() => {
-      if (!isValid) return;
+      if (!isValid || !(currentUser.roles.includes('self_manage') || currentUser.is_admin)) return;
 
       apiCall({
         url: `/api/v4/user/favorites/${global ? '__global__' : currentUser.username}/alert/`,
@@ -309,7 +309,7 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
         }
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentUser.username, favorite, global, isValid, onSuccess, showErrorMessage, showSuccessMessage, t]);
+    }, [currentUser, favorite, global, isValid, onSuccess, showErrorMessage, showSuccessMessage, t]);
 
     return (
       <>
@@ -360,9 +360,7 @@ const WrappedAlertFavorites = () => {
   const classes = useStyles();
   const theme = useTheme();
   const { c12nDef } = useALContext();
-
-  const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
-
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { userFavorites, globalFavorites, defaultFavorite, updateFavorite, deleteFavorite } = useAlerts();
   const { setSearchObject } = useSearchParams<AlertSearchParams>();
 
@@ -370,6 +368,13 @@ const WrappedAlertFavorites = () => {
   const [currentGlobal, setCurrentGlobal] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
+
+  const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
+
+  const isAuthorized = useMemo<boolean>(
+    () => currentUser.roles.includes('self_manage') || currentUser.is_admin,
+    [currentUser]
+  );
 
   const isExistingFavorite = useMemo<boolean>(
     () =>
@@ -454,79 +459,83 @@ const WrappedAlertFavorites = () => {
               <div style={{ paddingBottom: theme.spacing(2) }}>
                 <Typography variant="h4">{t('title')}</Typography>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <Button
-                  onClick={() => setCurrentGlobal(v => !v)}
-                  size="small"
-                  color="primary"
-                  disableElevation
-                  disableRipple
-                >
-                  <div>{t('private')}</div>
-                  <div style={{ flex: 1 }}>
-                    <Switch
-                      checked={currentGlobal}
-                      onChange={event => setCurrentGlobal(event.target.checked)}
+              {isAuthorized && (
+                <>
+                  <div style={{ textAlign: 'right' }}>
+                    <Button
+                      onClick={() => setCurrentGlobal(v => !v)}
+                      size="small"
                       color="primary"
-                    />
+                      disableElevation
+                      disableRipple
+                    >
+                      <div>{t('private')}</div>
+                      <div style={{ flex: 1 }}>
+                        <Switch
+                          checked={currentGlobal}
+                          onChange={event => setCurrentGlobal(event.target.checked)}
+                          color="primary"
+                        />
+                      </div>
+                      <div>{t('public')}</div>
+                    </Button>
                   </div>
-                  <div>{t('public')}</div>
-                </Button>
-              </div>
-              {currentGlobal && c12nDef.enforce ? (
-                <Classification
-                  type="picker"
-                  c12n={currentFavorite.classification}
-                  setClassification={value => setCurrentFavorite(f => ({ ...f, classification: value }))}
-                />
-              ) : (
-                <div style={{ padding: theme.spacing(2.25) }} />
+                  {currentGlobal && c12nDef.enforce ? (
+                    <Classification
+                      type="picker"
+                      c12n={currentFavorite.classification}
+                      setClassification={value => setCurrentFavorite(f => ({ ...f, classification: value }))}
+                    />
+                  ) : (
+                    <div style={{ padding: theme.spacing(2.25) }} />
+                  )}
+                  <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(2) }}>
+                    <div>
+                      <Typography variant="subtitle2">{t('query')}</Typography>
+                      <TextField
+                        value={currentFavorite.query}
+                        onChange={event => setCurrentFavorite(f => ({ ...f, query: event.target.value }))}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </div>
+                    <div style={{ marginTop: theme.spacing(2) }}>
+                      <Typography variant="subtitle2">{t('name')}</Typography>
+                      <TextField
+                        value={currentFavorite.name}
+                        onChange={event => setCurrentFavorite(f => ({ ...f, name: event.target.value }))}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </div>
+                  </div>
+
+                  <Grid container gap={1} justifyContent="flex-end" paddingTop={2} paddingBottom={4}>
+                    <DeleteFavorite
+                      favorite={currentFavorite}
+                      global={currentGlobal}
+                      show={isExistingFavorite}
+                      onSuccess={handleDeleteFavorites}
+                    />
+
+                    <UpdateFavorite
+                      favorite={currentFavorite}
+                      globalFavorites={globalFavorites}
+                      userFavorites={userFavorites}
+                      global={currentGlobal}
+                      show={isExistingFavorite}
+                      onSuccess={handleUpdateFavorites}
+                    />
+
+                    <AddFavorite
+                      favorite={currentFavorite}
+                      global={currentGlobal}
+                      show={!isExistingFavorite}
+                      onSuccess={handleAddFavorites}
+                    />
+                  </Grid>
+                </>
               )}
-              <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(2) }}>
-                <div>
-                  <Typography variant="subtitle2">{t('query')}</Typography>
-                  <TextField
-                    value={currentFavorite.query}
-                    onChange={event => setCurrentFavorite(f => ({ ...f, query: event.target.value }))}
-                    variant="outlined"
-                    fullWidth
-                  />
-                </div>
-                <div style={{ marginTop: theme.spacing(2) }}>
-                  <Typography variant="subtitle2">{t('name')}</Typography>
-                  <TextField
-                    value={currentFavorite.name}
-                    onChange={event => setCurrentFavorite(f => ({ ...f, name: event.target.value }))}
-                    variant="outlined"
-                    fullWidth
-                  />
-                </div>
-              </div>
-
-              <Grid container gap={1} justifyContent="flex-end" paddingTop={2} paddingBottom={4}>
-                <DeleteFavorite
-                  favorite={currentFavorite}
-                  global={currentGlobal}
-                  show={isExistingFavorite}
-                  onSuccess={handleDeleteFavorites}
-                />
-
-                <UpdateFavorite
-                  favorite={currentFavorite}
-                  globalFavorites={globalFavorites}
-                  userFavorites={userFavorites}
-                  global={currentGlobal}
-                  show={isExistingFavorite}
-                  onSuccess={handleUpdateFavorites}
-                />
-
-                <AddFavorite
-                  favorite={currentFavorite}
-                  global={currentGlobal}
-                  show={!isExistingFavorite}
-                  onSuccess={handleAddFavorites}
-                />
-              </Grid>
 
               <Typography variant="h6">{t('yourfavorites')}</Typography>
               <Divider />
@@ -543,7 +552,7 @@ const WrappedAlertFavorites = () => {
                       </IconButton>
                     ),
                     onClick: () => handleFavoriteClick(f),
-                    onDelete: handleEditClick(f, false)
+                    onDelete: isAuthorized ? handleEditClick(f, false) : null
                   }))}
                 />
               </div>
@@ -570,7 +579,7 @@ const WrappedAlertFavorites = () => {
                       </IconButton>
                     ),
                     onClick: () => handleFavoriteClick(f),
-                    onDelete: handleEditClick(f, true)
+                    onDelete: isAuthorized ? handleEditClick(f, true) : null
                   }))}
                 />
               </div>

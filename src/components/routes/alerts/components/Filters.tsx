@@ -19,7 +19,9 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
+import type { CustomUser } from 'components/hooks/useMyUser';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { ALERT_DEFAULT_PARAMS } from 'components/routes/alerts';
 import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
@@ -432,6 +434,7 @@ const WrappedAlertFilters = () => {
   const theme = useTheme();
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
   const { apiCall } = useMyAPI();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const alertValues = useAlerts();
   const { search, setSearchParams } = useSearchParams<AlertSearchParams>();
 
@@ -619,20 +622,23 @@ const WrappedAlertFilters = () => {
     }));
   }, []);
 
-  const handleFetch = useCallback((type: FilterType, url: string, onChange: (data: any) => void) => {
-    if (!type || !url || prevURLs.current?.[type] === url) return;
-    apiCall({
-      url: url,
-      method: 'GET',
-      onSuccess: ({ api_response }) => {
-        onChange(api_response);
-        prevURLs.current[type] = url;
-      },
-      onEnter: () => setLoadings(v => ({ ...v, [type]: true })),
-      onExit: () => setLoadings(v => ({ ...v, [type]: false }))
-    });
+  const handleFetch = useCallback(
+    (type: FilterType, url: string, onChange: (data: any) => void) => {
+      if (!type || !url || prevURLs.current?.[type] === url || !currentUser.roles.includes('alert_view')) return;
+      apiCall({
+        url: url,
+        method: 'GET',
+        onSuccess: ({ api_response }) => {
+          onChange(api_response);
+          prevURLs.current[type] = url;
+        },
+        onEnter: () => setLoadings(v => ({ ...v, [type]: true })),
+        onExit: () => setLoadings(v => ({ ...v, [type]: false }))
+      });
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [currentUser.roles]
+  );
 
   useEffect(() => {
     if (open) setQuery(search.toParams());

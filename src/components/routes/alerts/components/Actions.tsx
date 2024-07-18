@@ -250,6 +250,7 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const location = useLocation();
+    const { user: currentUser } = useAppUser<CustomUser>();
     const { search, setSearchObject } = useSearchParams<AlertSearchParams>();
 
     const query = useMemo<URLSearchParams>(() => {
@@ -273,7 +274,7 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
         permanent={permanent}
         speedDial={speedDial}
         showSkeleton={!alert}
-        authorized={alert?.group_count > 0}
+        authorized={currentUser.roles.includes('alert_view') && alert?.group_count > 0}
         color={theme.palette.action.active}
         icon={<CenterFocusStrongOutlinedIcon />}
         onClick={e => {
@@ -321,6 +322,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
 
     const handleTakeOwnership = useCallback(
       (prevAlert: AlertItem, q: string) => {
+        if (!currentUser.roles.includes('alert_manage')) return;
         apiCall({
           url: `/api/v4/alert/ownership/batch/?${q}`,
           method: 'GET',
@@ -344,7 +346,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
         });
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [currentUser.username, onClick, showErrorMessage, showSuccessMessage, t]
+      [currentUser, onClick, showErrorMessage, showSuccessMessage, t]
     );
 
     return (
@@ -523,6 +525,7 @@ export const AlertSafelist: React.FC<AlertActionProps> = React.memo(
 
     const handleNonMaliciousChange = useCallback(
       (prevAlert: AlertItem) => {
+        if (!currentUser.roles.includes('alert_manage')) return;
         apiCall({
           method: 'PUT',
           url: `/api/v4/alert/verdict/${prevAlert.alert_id}/non_malicious/`,
@@ -604,6 +607,7 @@ export const AlertBadlist: React.FC<AlertActionProps> = React.memo(
 
     const handleMaliciousChange = useCallback(
       (prevAlert: AlertItem) => {
+        if (!currentUser.roles.includes('alert_manage')) return;
         apiCall({
           method: 'PUT',
           url: `/api/v4/alert/verdict/${prevAlert.alert_id}/malicious/`,

@@ -92,6 +92,7 @@ export const AlertWorkflowDrawer = React.memo(
     const theme = useTheme();
     const classes = useStyles();
     const { apiCall } = useMyAPI();
+    const { user: currentUser } = useAppUser<CustomUser>();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
 
     const [body, setBody] = useState<WorkflowBody>(initialBody);
@@ -133,6 +134,7 @@ export const AlertWorkflowDrawer = React.memo(
 
     const handleWorkflowSubmit = useCallback(
       (_query: URLSearchParams, _body: WorkflowBody, _alerts: AlertItem[], _isSingleAlert: boolean) => {
+        if (!currentUser.roles.includes('alert_manage')) return;
         apiCall({
           url: `/api/v4/alert/all/batch/?${_query.toString()}`,
           method: 'POST',
@@ -165,11 +167,17 @@ export const AlertWorkflowDrawer = React.memo(
         });
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [initialBody, onClose, showErrorMessage, showSuccessMessage, t]
+      [currentUser.roles, initialBody, onClose, showErrorMessage, showSuccessMessage, t]
     );
 
     useEffect(() => {
-      if (!open || !filteredSearch || prevQuery.current === filteredSearch?.toString()) return;
+      if (
+        !open ||
+        !filteredSearch ||
+        prevQuery.current === filteredSearch?.toString() ||
+        !currentUser.roles.includes('alert_view')
+      )
+        return;
       prevQuery.current = filteredSearch?.toString();
 
       apiCall({
@@ -177,7 +185,7 @@ export const AlertWorkflowDrawer = React.memo(
         onSuccess: ({ api_response }) => setLabelFilters(Object.keys(api_response))
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [open]);
+    }, [currentUser.roles, open]);
 
     return (
       <>
