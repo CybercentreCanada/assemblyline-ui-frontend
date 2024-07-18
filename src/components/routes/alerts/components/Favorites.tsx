@@ -457,7 +457,7 @@ const WrappedAlertFavorites = () => {
             </div>
             <div className={classes.drawerInner}>
               <div style={{ paddingBottom: theme.spacing(2) }}>
-                <Typography variant="h4">{t('title')}</Typography>
+                <Typography variant="h4">{t('favorites')}</Typography>
               </div>
               {isAuthorized && (
                 <>
