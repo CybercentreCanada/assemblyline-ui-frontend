@@ -1,5 +1,6 @@
 // TODO: change syntax to "import type {theme}" to avoid potential problems like type-only imports being incorrectly bundled.
 import type { Theme } from '@mui/material/styles';
+import { BorealisProvider, useBorealis } from 'borealis-ui';
 import type { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import AppProvider from 'commons/components/app/AppProvider';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
@@ -40,7 +41,8 @@ const MyAppMain = () => {
 
   const provider = getProvider();
   const { setUser, setConfiguration, user, configuration } = useALContext();
-  const { setReady } = useAppLayout();
+  const { setReady: setAppLayoutReady } = useAppLayout();
+  const { setReady: setBorealisReady } = useBorealis();
   const { setItems } = useAppSwitcher();
   const { bootstrap } = useMyAPI();
 
@@ -51,6 +53,11 @@ const MyAppMain = () => {
     if (renderedApp !== value) {
       setRenderedApp(value);
     }
+  };
+
+  const setReady = (value: boolean) => {
+    setAppLayoutReady(value);
+    setBorealisReady(value);
   };
 
   useEffect(() => {
@@ -95,13 +102,15 @@ export const MyApp: React.FC<any> = () => {
   const myUser: CustomAppUserService = useMyUser();
   return (
     <BrowserRouter basename="/">
-      <SafeResultsProvider>
-        <QuotaProvider>
-          <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
-            <MyAppMain />
-          </AppProvider>
-        </QuotaProvider>
-      </SafeResultsProvider>
+      <BorealisProvider baseURL={location.origin + '/api/v4/proxy/borealis'} getToken={() => null}>
+        <SafeResultsProvider>
+          <QuotaProvider>
+            <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
+              <MyAppMain />
+            </AppProvider>
+          </QuotaProvider>
+        </SafeResultsProvider>
+      </BorealisProvider>
     </BrowserRouter>
   );
 };
