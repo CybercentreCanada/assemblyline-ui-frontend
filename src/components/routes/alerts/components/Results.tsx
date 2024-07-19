@@ -53,6 +53,7 @@ const SearchCount: FC<SearchCountProps> = memo(
               fontStyle="italic"
               textTransform="none"
               variant="subtitle1"
+              whiteSpace="nowrap"
               children={loading ? t('searching') : `${formattedTotal}${isLimited ? '+' : ''} ${suffix}`}
             />
           </Button>
@@ -89,7 +90,7 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ loading = false, total = 0
         style={{
           width: '100%',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           columnGap: theme.spacing(1),
           marginTop: theme.spacing(1),
           minHeight: theme.spacing(3)
@@ -123,7 +124,7 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ loading = false, total = 0
         style={{
           width: '100%',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           columnGap: theme.spacing(1),
           marginTop: theme.spacing(1),
           minHeight: theme.spacing(3)
