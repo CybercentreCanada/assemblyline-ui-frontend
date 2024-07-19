@@ -51,7 +51,7 @@ export type CustomChipProps = ChipProps & {
   wrap?: boolean;
 };
 
-const useStyles = makeStyles(theme => ({
+export const useStyles = makeStyles(theme => ({
   auto_height: {
     height: 'auto'
   },
