@@ -110,6 +110,7 @@
   "session.save.success": "Search parameters were successfully saved.",
   "session.title": "Default Search Parameters",
   "session.tooltip": "Manage Default Search Parameters",
+  "share": "Share the URL",
   "sortBy": "Sorted By",
   "sorts": "Sorts",
   "sorts.apply": "Apply sort",
