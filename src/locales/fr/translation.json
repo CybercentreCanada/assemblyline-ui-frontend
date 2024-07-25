@@ -169,6 +169,7 @@
   "safelist.success": "Le balise a été ajouté avec succès à la liste sûre",
   "safelist.text": "Voulez-vous vraiment que cette balise soit ajouté à la liste sûre?",
   "safelist.title": "Liste sûre",
+  "searching": "Recherche en cours...",
   "show_more": "Afficher plus...",
   "signature.status.DEPLOYED": "DÉPLOYÉE",
   "signature.status.DISABLED": "DÉSACTIVÉE",
