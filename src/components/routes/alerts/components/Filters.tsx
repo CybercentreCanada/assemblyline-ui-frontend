@@ -1,6 +1,7 @@
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import ShareIcon from '@mui/icons-material/Share';
 import StarIcon from '@mui/icons-material/Star';
 import {
   Autocomplete,
@@ -20,6 +21,7 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/hooks/useMyUser';
 import type { AlertSearchParams } from 'components/routes/alerts';
@@ -432,11 +434,12 @@ const WrappedAlertFilters = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
-  const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
   const { apiCall } = useMyAPI();
+  const { copy } = useClipboard();
+  const { search, setSearchParams } = useSearchParams<AlertSearchParams>();
   const { user: currentUser } = useAppUser<CustomUser>();
   const alertValues = useAlerts();
-  const { search, setSearchParams } = useSearchParams<AlertSearchParams>();
+  const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const [query, setQuery] = useState<URLSearchParams>(search.toParams());
   const [open, setOpen] = useState<boolean>(false);
@@ -684,8 +687,32 @@ const WrappedAlertFilters = () => {
               </IconButton>
             </div>
             <div className={classes.drawerInner}>
-              <div style={{ paddingBottom: theme.spacing(2) }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingBottom: theme.spacing(2)
+                }}
+              >
                 <Typography variant="h4">{t('filters')}</Typography>
+                <Tooltip title={t('share')}>
+                  <div>
+                    <IconButton
+                      onClick={() => {
+                        const s = search.filter((k, v) => ['fq', 'group_by', 'q', 'sort', 'tc'].includes(k)).toString();
+                        copy(`${window.location.href}?${s}${window.location.hash}`).catch(e => {
+                          // eslint-disable-next-line no-console
+                          console.error(e);
+                        });
+                      }}
+                      size="large"
+                    >
+                      <ShareIcon />
+                    </IconButton>
+                  </div>
+                </Tooltip>
               </div>
               <div style={{ marginBottom: theme.spacing(2), marginTop: theme.spacing(2) }}>
                 <AlertSort
