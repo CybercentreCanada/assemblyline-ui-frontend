@@ -81,6 +81,32 @@ export type MetadataConfiguration = {
   };
 };
 
+export type SubmissionProfileParams = {
+  auto_archive: boolean;
+  deep_scan: boolean;
+  delete_after_archive: boolean;
+  ignore_cache: boolean;
+  ignore_dynamic_recursion_prevention: boolean;
+  ignore_filtering: boolean;
+  ignore_size: boolean;
+  max_extracted: number;
+  max_supplementary: number;
+  priority: number;
+  service_spec: {
+    [service: string]: {
+      [parameter: string]: any;
+    };
+  };
+  services: {
+    excluded: string[];
+    rescan: string[];
+    resubmit: string[];
+    selected: string[];
+  };
+  ttl: number;
+  use_archive_alternate_dtl: boolean;
+};
+
 export type ConfigurationDefinition = {
   auth: {
     allow_2fa: boolean;
@@ -120,6 +146,9 @@ export type ConfigurationDefinition = {
       submit: {
         [field_name: string]: MetadataConfiguration;
       };
+    };
+    profiles: {
+      [profile_name: string]: SubmissionProfileParams;
     };
     verdicts: {
       info: number;

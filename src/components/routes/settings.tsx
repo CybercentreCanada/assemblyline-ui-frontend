@@ -413,7 +413,6 @@ function Settings() {
           </div>
         </Drawer>
       </React.Fragment>
-
       <TableContainer className={classes.group} component={Paper}>
         <Table aria-label={t('submissions')}>
           <TableHead>
@@ -426,7 +425,10 @@ function Settings() {
             </TableRow>
           </TableHead>
           <TableBody>
-            <ClickRow enabled={editable} onClick={toggleGenerateAlert}>
+            <ClickRow
+              enabled={editable && currentUser.roles.includes('submission_customize')}
+              onClick={toggleGenerateAlert}
+            >
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.generate_alert')}</Typography>
                 <Typography variant="caption">{t('submissions.generate_alert_desc')}</Typography>
@@ -434,14 +436,17 @@ function Settings() {
               <TableCell align="right">
                 <Switch
                   checked={settings ? settings.generate_alert : false}
-                  disabled={settings === null || !editable}
+                  disabled={settings === null || !editable || !currentUser.roles.includes('submission_customize')}
                   onChange={() => toggleGenerateAlert()}
                   color="secondary"
                   name="generate_alert"
                 />
               </TableCell>
             </ClickRow>
-            <ClickRow enabled={editable} onClick={toggleDynamicPrevention}>
+            <ClickRow
+              enabled={editable && currentUser.roles.includes('submission_customize')}
+              onClick={toggleDynamicPrevention}
+            >
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.dynamic_recursion')}</Typography>
                 <Typography variant="caption">{t('submissions.dynamic_recursion_desc')}</Typography>
@@ -449,14 +454,17 @@ function Settings() {
               <TableCell align="right">
                 <Switch
                   checked={settings ? !settings.ignore_dynamic_recursion_prevention : true}
-                  disabled={settings === null || !editable}
+                  disabled={settings === null || !editable || !currentUser.roles.includes('submission_customize')}
                   onChange={() => toggleDynamicPrevention()}
                   color="secondary"
                   name="dynamic_resursion"
                 />
               </TableCell>
             </ClickRow>
-            <ClickRow enabled={editable} onClick={toggleFiltering}>
+            <ClickRow
+              enabled={editable && currentUser.roles.includes('submission_customize')}
+              onClick={toggleFiltering}
+            >
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.filtering')}</Typography>
                 <Typography variant="caption">{t('submissions.filtering_desc')}</Typography>
@@ -464,14 +472,14 @@ function Settings() {
               <TableCell align="right">
                 <Switch
                   checked={settings ? !settings.ignore_filtering : true}
-                  disabled={settings === null || !editable}
+                  disabled={settings === null || !editable || !currentUser.roles.includes('submission_customize')}
                   onChange={() => toggleFiltering()}
                   color="secondary"
                   name="filtering"
                 />
               </TableCell>
             </ClickRow>
-            <ClickRow enabled={editable} onClick={toggleCaching}>
+            <ClickRow enabled={editable && currentUser.roles.includes('submission_customize')} onClick={toggleCaching}>
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.result_caching')}</Typography>
                 <Typography variant="caption">{t('submissions.result_caching_desc')}</Typography>
@@ -479,14 +487,14 @@ function Settings() {
               <TableCell align="right">
                 <Switch
                   checked={settings ? !settings.ignore_cache : true}
-                  disabled={settings === null || !editable}
+                  disabled={settings === null || !editable || !currentUser.roles.includes('submission_customize')}
                   onChange={() => toggleCaching()}
                   color="secondary"
                   name="result_caching"
                 />
               </TableCell>
             </ClickRow>
-            <ClickRow enabled={editable} onClick={toggleDeepScan}>
+            <ClickRow enabled={editable && currentUser.roles.includes('submission_customize')} onClick={toggleDeepScan}>
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.deep_scan')}</Typography>
                 <Typography variant="caption">{t('submissions.deep_scan_desc')}</Typography>
@@ -494,7 +502,7 @@ function Settings() {
               <TableCell align="right">
                 <Switch
                   checked={settings ? settings.deep_scan : true}
-                  disabled={settings === null || !editable}
+                  disabled={settings === null || !editable || !currentUser.roles.includes('submission_customize')}
                   onChange={() => toggleDeepScan()}
                   color="secondary"
                   name="deep_scan"
@@ -587,7 +595,6 @@ function Settings() {
           </TableBody>
         </Table>
       </TableContainer>
-
       <TableContainer className={classes.group} component={Paper}>
         <Table aria-label={t('interface')}>
           <TableHead>
@@ -688,54 +695,55 @@ function Settings() {
           </TableBody>
         </Table>
       </TableContainer>
-
       {fileSources && fileSources.length > 0 && (
         <Paper className={classes.group}>
           <ExternalSources disabled={!editable} settings={settings} onChange={toggleExternalSource} />
         </Paper>
       )}
-
-      <Paper className={classes.group}>
-        <div style={{ padding: sp2, textAlign: 'left' }}>
-          <Typography variant="h6" gutterBottom>
-            {t('service')}
-          </Typography>
-          <ServiceTree
-            disabled={!editable}
-            settings={settings}
-            setSettings={setSettings}
-            setModified={setModified}
-            compressed
-          />
-        </div>
-      </Paper>
-
-      <Paper className={classes.group}>
-        <div style={{ padding: sp2, textAlign: 'left' }}>
-          <Typography variant="h6" gutterBottom>
-            {t('service_spec')}
-          </Typography>
-          {settings ? (
-            <ServiceSpec
-              disabled={!editable}
-              service_spec={settings.service_spec}
-              setParam={setParam}
-              compressed
-              hasResetButton
-            />
-          ) : (
-            <div>
-              <Skel />
-              <Skel />
-              <Skel />
-              <Skel />
+      {currentUser.roles.includes('submission_customize') && (
+        <>
+          <Paper className={classes.group}>
+            <div style={{ padding: sp2, textAlign: 'left' }}>
+              <Typography variant="h6" gutterBottom>
+                {t('service')}
+              </Typography>
+              <ServiceTree
+                disabled={!editable}
+                settings={settings}
+                setSettings={setSettings}
+                setModified={setModified}
+                compressed
+              />
             </div>
-          )}
-        </div>
-      </Paper>
+          </Paper>
+
+          <Paper className={classes.group}>
+            <div style={{ padding: sp2, textAlign: 'left' }}>
+              <Typography variant="h6" gutterBottom>
+                {t('service_spec')}
+              </Typography>
+              {settings ? (
+                <ServiceSpec
+                  disabled={!editable}
+                  service_spec={settings.service_spec}
+                  setParam={setParam}
+                  compressed
+                  hasResetButton
+                />
+              ) : (
+                <div>
+                  <Skel />
+                  <Skel />
+                  <Skel />
+                  <Skel />
+                </div>
+              )}
+            </div>
+          </Paper>
+        </>
+      )}
 
       <RouterPrompt when={modified} />
-
       {settings && modified && (
         <div
           style={{

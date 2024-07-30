@@ -150,6 +150,7 @@ function WrappedParam({ disabled, param, pidx, idx, hasResetButton = false, setP
               </Typography>
             }
             className={!disabled ? classes.item : null}
+            disabled={disabled}
           />
         </div>
       ) : (

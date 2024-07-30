@@ -139,7 +139,7 @@ function ServiceTreeItem({
       <div style={{ paddingLeft: sp3 }}>
         {setParam && (
           <Collapse in={open}>
-            {hasParams(item.name) && !disabled && (
+            {hasParams(item.name) && (
               <Service
                 disabled={disabled}
                 setParam={setParam}

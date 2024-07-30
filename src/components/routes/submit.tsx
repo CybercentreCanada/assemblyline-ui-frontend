@@ -2,6 +2,7 @@ import Flow from '@flowjs/flow.js';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
   Alert,
+  Autocomplete,
   Button,
   Checkbox,
   CircularProgress,
@@ -369,6 +370,73 @@ const Submit: React.FC<any> = () => {
     setStringInput(string);
   }
 
+  function handleProfileChange(profile_name) {
+    const profile = configuration.submission.profiles[profile_name];
+    var newServices = settings.services;
+    var newServiceSpec = settings.service_spec;
+    var enabledServices = [];
+
+    // Disable all services
+    for (const cat of newServices) {
+      cat.selected = false;
+      for (const srv of cat.services) {
+        srv.selected = false;
+      }
+    }
+    for (const srv of newServiceSpec) {
+      // Reset service parameters to their defaults
+      for (const param of srv.params) {
+        param.value = param.default;
+      }
+    }
+
+    // Enable all services that part of the profile, ensure all others are disabled
+    for (const cat of newServices) {
+      if (profile.services.selected.indexOf(cat.name) > -1) {
+        // Category selected, enable all services that are part of the category
+        cat.selected = true;
+        for (const srv of cat.services) {
+          // Enable all services except those in the exclusion list
+          if (profile.services.excluded.indexOf(srv.name) === -1) {
+            srv.selected = true;
+            enabledServices.push(srv.name);
+          }
+        }
+      } else if (profile.services.excluded.indexOf(cat.name) > -1) {
+        // Category excluded, disabled all services that are part of the category
+        cat.selected = false;
+        for (const srv of cat.services) {
+          // Disable all services except those in the selected list
+          if (profile.services.selected.indexOf(srv.name) === -1) {
+            srv.selected = false;
+          }
+        }
+      }
+    }
+
+    // Set parameters of enabled service based on profile
+    for (const srv of newServiceSpec) {
+      if (enabledServices.indexOf(srv.name) > -1 && profile.service_spec[srv.name]) {
+        for (const param of srv.params) {
+          if (param.name in profile.service_spec[srv.name]) {
+            // Set parameter value based on profile configuration
+            param.value = profile.service_spec[srv.name][param.name];
+          }
+        }
+      }
+    }
+
+    var profile_params = {};
+    for (const [key, value] of Object.entries(profile)) {
+      // Assign the other parameters of the profile that don't pertain to service settings
+      if (!key.startsWith('service')) {
+        profile_params[key] = value;
+      }
+    }
+
+    setSettings({ ...settings, services: newServices, ...profile_params });
+  }
+
   useEffect(() => {
     if (settings && !urlAutoselection && stringType === 'url') {
       const newServices = settings.services;
@@ -678,7 +746,33 @@ const Submit: React.FC<any> = () => {
                   <Typography variant="h6" gutterBottom>
                     {t('options.service')}
                   </Typography>
-                  <ServiceTree size="small" settings={settings} setSettings={setSettings} setParam={setParam} />
+                  {!currentUser.roles.includes('submission_customize') && configuration.submission.profiles ? (
+                    <div style={{ textAlign: 'left', marginTop: sp2 }}>
+                      <Typography variant="caption" color="textSecondary" gutterBottom>
+                        {t('options.submission.profile_name')}
+                      </Typography>
+                      <div style={{ paddingBottom: sp1 }}>
+                        {settings ? (
+                          <Autocomplete
+                            options={Object.keys(configuration.submission.profiles)}
+                            size="small"
+                            renderInput={params => <TextField {...params} />}
+                            onChange={(_, value, __) => handleProfileChange(value)}
+                            defaultValue={Object.keys(configuration.submission.profiles)[0]}
+                          />
+                        ) : (
+                          <Skeleton style={{ height: '3rem' }} />
+                        )}
+                      </div>
+                    </div>
+                  ) : null}
+                  <ServiceTree
+                    size="small"
+                    settings={settings}
+                    setSettings={setSettings}
+                    setParam={setParam}
+                    disabled={!currentUser.roles.includes('submission_customize')}
+                  />
                 </div>
               </Grid>
               <Grid item xs={12} md>
@@ -726,6 +820,7 @@ const Submit: React.FC<any> = () => {
                           ]}
                           step={null}
                           onChange={(_, e_value) => setSettingValue('priority', e_value)}
+                          disabled={!currentUser.roles.includes('submission_customize')}
                         ></Slider>
                       </div>
                     ) : (
@@ -757,6 +852,7 @@ const Submit: React.FC<any> = () => {
                             checked={settings.ignore_filtering}
                             name="label"
                             onChange={event => setSettingValue('ignore_filtering', event.target.checked)}
+                            disabled={!currentUser.roles.includes('submission_customize')}
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
@@ -773,6 +869,7 @@ const Submit: React.FC<any> = () => {
                             checked={settings.ignore_cache}
                             name="label"
                             onChange={event => setSettingValue('ignore_cache', event.target.checked)}
+                            disabled={!currentUser.roles.includes('submission_customize')}
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
@@ -791,6 +888,7 @@ const Submit: React.FC<any> = () => {
                             onChange={event =>
                               setSettingValue('ignore_dynamic_recursion_prevention', event.target.checked)
                             }
+                            disabled={!currentUser.roles.includes('submission_customize')}
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
@@ -827,6 +925,7 @@ const Submit: React.FC<any> = () => {
                             checked={settings.deep_scan}
                             name="label"
                             onChange={event => setSettingValue('deep_scan', event.target.checked)}
+                            disabled={!currentUser.roles.includes('submission_customize')}
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
