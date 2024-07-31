@@ -40,7 +40,6 @@ type SettingsDefinition = {
   ignore_dynamic_recursion_prevention: boolean;
   ignore_filtering: boolean;
   priority: number;
-  profile: boolean;
   service_spec: any[];
   services: any[];
   submission_view: string;
@@ -82,29 +81,23 @@ export type MetadataConfiguration = {
 };
 
 export type SubmissionProfileParams = {
-  auto_archive: boolean;
-  deep_scan: boolean;
-  delete_after_archive: boolean;
-  ignore_cache: boolean;
-  ignore_dynamic_recursion_prevention: boolean;
-  ignore_filtering: boolean;
-  ignore_size: boolean;
-  max_extracted: number;
-  max_supplementary: number;
-  priority: number;
+  deep_scan?: boolean;
+  ignore_cache?: boolean;
+  ignore_dynamic_recursion_prevention?: boolean;
+  ignore_filtering?: boolean;
+  priority?: number;
   service_spec: {
     [service: string]: {
       [parameter: string]: any;
     };
   };
   services: {
-    excluded: string[];
-    rescan: string[];
-    resubmit: string[];
-    selected: string[];
+    excluded?: string[];
+    rescan?: string[];
+    resubmit?: string[];
+    selected?: string[];
   };
-  ttl: number;
-  use_archive_alternate_dtl: boolean;
+  ttl?: number;
 };
 
 export type ConfigurationDefinition = {

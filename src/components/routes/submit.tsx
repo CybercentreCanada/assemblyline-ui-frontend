@@ -109,6 +109,7 @@ const Submit: React.FC<any> = () => {
   const stringInputText = stringInputTitle + t('urlHash.input_suffix');
   const [stringInputHasError, setStringInputHasError] = useState(false);
   const [submissionMetadata, setSubmissionMetadata] = useState({});
+  const [submissionProfile, setSubmissionProfile] = useState(null);
   const [urlAutoselection, setUrlAutoselection] = useState(false);
   const [value, setValue] = useState('0');
   const banner = useAppBanner();
@@ -370,8 +371,8 @@ const Submit: React.FC<any> = () => {
     setStringInput(string);
   }
 
-  function handleProfileChange(profile_name) {
-    const profile = configuration.submission.profiles[profile_name];
+  function handleProfileChange(submission_profile) {
+    const profile = configuration.submission.profiles[submission_profile];
     var newServices = settings.services;
     var newServiceSpec = settings.service_spec;
     var enabledServices = [];
@@ -389,6 +390,11 @@ const Submit: React.FC<any> = () => {
         param.value = param.default;
       }
     }
+
+    // Assign default values in case profile doesn't specify
+    profile.services.selected = profile.services.selected || [];
+    profile.services.excluded = profile.services.excluded || [];
+    profile.service_spec = profile.service_spec || {};
 
     // Enable all services that part of the profile, ensure all others are disabled
     for (const cat of newServices) {
@@ -434,7 +440,8 @@ const Submit: React.FC<any> = () => {
       }
     }
 
-    setSettings({ ...settings, services: newServices, ...profile_params });
+    setSettings({ ...settings, services: newServices, ...profile_params, submission_profile });
+    setSubmissionProfile(profile);
   }
 
   useEffect(() => {
@@ -478,7 +485,13 @@ const Submit: React.FC<any> = () => {
     apiCall({
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: api_data => {
-        const tempSettings = { ...api_data.api_response };
+        var tempSettings = { ...api_data.api_response };
+        if (!currentUser.roles.includes('submission_customize')) {
+          // User isn't allowed to use their service preferences, disable all
+          for (const srv of tempSettings.services) {
+            srv.selected = false;
+          }
+        }
 
         if (state) {
           // Get the classification from the state
@@ -500,6 +513,7 @@ const Submit: React.FC<any> = () => {
         }
         tempSettings.default_external_sources = defaultExternalSources;
 
+        console.log(tempSettings);
         setSettings(tempSettings);
       }
     });
@@ -758,7 +772,7 @@ const Submit: React.FC<any> = () => {
                             size="small"
                             renderInput={params => <TextField {...params} />}
                             onChange={(_, value, __) => handleProfileChange(value)}
-                            defaultValue={Object.keys(configuration.submission.profiles)[0]}
+                            //defaultValue={Object.keys(configuration.submission.profiles)[0]}
                           />
                         ) : (
                           <Skeleton style={{ height: '3rem' }} />
@@ -820,7 +834,10 @@ const Submit: React.FC<any> = () => {
                           ]}
                           step={null}
                           onChange={(_, e_value) => setSettingValue('priority', e_value)}
-                          disabled={!currentUser.roles.includes('submission_customize')}
+                          disabled={
+                            !currentUser.roles.includes('submission_customize') &&
+                            submissionProfile?.priority !== undefined
+                          }
                         ></Slider>
                       </div>
                     ) : (
@@ -836,6 +853,10 @@ const Submit: React.FC<any> = () => {
                             checked={settings.generate_alert}
                             name="label"
                             onChange={event => setSettingValue('generate_alert', event.target.checked)}
+                            disabled={
+                              !currentUser.roles.includes('submission_customize') &&
+                              submissionProfile?.generate_alert !== undefined
+                            }
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
@@ -852,7 +873,10 @@ const Submit: React.FC<any> = () => {
                             checked={settings.ignore_filtering}
                             name="label"
                             onChange={event => setSettingValue('ignore_filtering', event.target.checked)}
-                            disabled={!currentUser.roles.includes('submission_customize')}
+                            disabled={
+                              !currentUser.roles.includes('submission_customize') &&
+                              submissionProfile?.ignore_filtering !== undefined
+                            }
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
@@ -869,7 +893,10 @@ const Submit: React.FC<any> = () => {
                             checked={settings.ignore_cache}
                             name="label"
                             onChange={event => setSettingValue('ignore_cache', event.target.checked)}
-                            disabled={!currentUser.roles.includes('submission_customize')}
+                            disabled={
+                              !currentUser.roles.includes('submission_customize') &&
+                              submissionProfile?.ignore_cache !== undefined
+                            }
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
@@ -888,7 +915,10 @@ const Submit: React.FC<any> = () => {
                             onChange={event =>
                               setSettingValue('ignore_dynamic_recursion_prevention', event.target.checked)
                             }
-                            disabled={!currentUser.roles.includes('submission_customize')}
+                            disabled={
+                              !currentUser.roles.includes('submission_customize') &&
+                              submissionProfile?.ignore_dynamic_recursion_prevention !== undefined
+                            }
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
@@ -906,26 +936,13 @@ const Submit: React.FC<any> = () => {
                         settings ? (
                           <Checkbox
                             size="small"
-                            checked={settings.profile}
-                            name="label"
-                            onChange={event => setSettingValue('profile', event.target.checked)}
-                          />
-                        ) : (
-                          <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
-                        )
-                      }
-                      label={<Typography variant="body2">{t('options.submission.profile')}</Typography>}
-                      className={settings ? classes.item : null}
-                    />
-                    <FormControlLabel
-                      control={
-                        settings ? (
-                          <Checkbox
-                            size="small"
                             checked={settings.deep_scan}
                             name="label"
                             onChange={event => setSettingValue('deep_scan', event.target.checked)}
-                            disabled={!currentUser.roles.includes('submission_customize')}
+                            disabled={
+                              !currentUser.roles.includes('submission_customize') &&
+                              submissionProfile?.deep_scan !== undefined
+                            }
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />

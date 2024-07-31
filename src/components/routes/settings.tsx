@@ -198,13 +198,6 @@ function Settings() {
     }
   }
 
-  function toggleProfile() {
-    if (settings) {
-      setModified(true);
-      setSettings({ ...settings, profile: !settings.profile });
-    }
-  }
-
   function handleViewChange(event) {
     if (settings) {
       setModified(true);
@@ -526,21 +519,6 @@ function Settings() {
                 </TableCell>
               </ClickRow>
             )}
-            <ClickRow enabled={editable} onClick={toggleProfile}>
-              <TableCell colSpan={2} width="100%">
-                <Typography variant="body1">{t('submissions.profile')}</Typography>
-                <Typography variant="caption">{t('submissions.profile_desc')}</Typography>
-              </TableCell>
-              <TableCell align="right">
-                <Switch
-                  checked={settings ? settings.profile : true}
-                  disabled={settings === null || !editable}
-                  onChange={() => toggleProfile()}
-                  color="secondary"
-                  name="profile"
-                />
-              </TableCell>
-            </ClickRow>
             <ClickRow enabled={editable} chevron onClick={event => toggleDrawer('ttl')}>
               {isXS ? null : (
                 <TableCell>
