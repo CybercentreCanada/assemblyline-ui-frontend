@@ -39,6 +39,7 @@ type ServiceTreeItemProps = {
   size: 'medium' | 'small';
   service_spec;
   setParam;
+  submissionProfile: any;
 };
 
 function ServiceTreeItem({
@@ -47,7 +48,8 @@ function ServiceTreeItem({
   disabled = false,
   size = 'medium' as 'medium',
   service_spec,
-  setParam
+  setParam,
+  submissionProfile = null
 }: ServiceTreeItemProps) {
   const classes = useStyles();
   const theme = useTheme();
@@ -100,7 +102,12 @@ function ServiceTreeItem({
           control={
             <Checkbox
               size={size}
-              disabled={disabled}
+              disabled={
+                disabled ||
+                (submissionProfile &&
+                  (submissionProfile.services.selected.includes(item.name) ||
+                    submissionProfile.service_spec[item.name] !== undefined))
+              }
               indeterminate={
                 item.services ? !item.services.every(e => e.selected) && !item.services.every(e => !e.selected) : false
               }
@@ -145,6 +152,7 @@ function ServiceTreeItem({
                 setParam={setParam}
                 service={getService(item.name)}
                 idx={getServiceIndex(item.name)}
+                profile_spec={submissionProfile ? submissionProfile.service_spec[item.name] : null}
               />
             )}
           </Collapse>
@@ -159,6 +167,7 @@ function ServiceTreeItem({
                 onChange={onChange}
                 service_spec={service_spec}
                 setParam={setParam}
+                submissionProfile={submissionProfile}
               />
             ))
           : null}
@@ -234,6 +243,7 @@ type ServiceTreeProps = {
   disabled?: boolean;
   size?: 'medium' | 'small';
   setParam?: (service_idx, param_idx, p_value) => void;
+  submissionProfile: any;
 };
 
 const ServiceTree: React.FC<ServiceTreeProps> = ({
@@ -243,7 +253,8 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
   compressed = false,
   disabled = false,
   size = 'medium' as 'medium',
-  setParam
+  setParam,
+  submissionProfile = null
 }) => {
   const theme = useTheme();
   const sp2 = theme.spacing(2);
@@ -324,6 +335,7 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
               onChange={handleServiceChange}
               service_spec={settings.service_spec}
               setParam={setParam}
+              submissionProfile={submissionProfile}
             />
           ))
       ) : (

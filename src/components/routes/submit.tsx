@@ -512,8 +512,6 @@ const Submit: React.FC<any> = () => {
           }
         }
         tempSettings.default_external_sources = defaultExternalSources;
-
-        console.log(tempSettings);
         setSettings(tempSettings);
       }
     });
@@ -785,7 +783,7 @@ const Submit: React.FC<any> = () => {
                     settings={settings}
                     setSettings={setSettings}
                     setParam={setParam}
-                    disabled={!currentUser.roles.includes('submission_customize')}
+                    submissionProfile={submissionProfile}
                   />
                 </div>
               </Grid>
@@ -974,6 +972,9 @@ const Submit: React.FC<any> = () => {
                         onChange={event => setSettingAsyncValue('ttl', event.target.value)}
                         variant="outlined"
                         fullWidth
+                        disabled={
+                          !currentUser.roles.includes('submission_customize') && submissionProfile?.ttl !== undefined
+                        }
                       />
                     ) : (
                       <Skeleton style={{ height: '3rem' }} />

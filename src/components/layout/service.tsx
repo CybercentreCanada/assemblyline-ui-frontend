@@ -60,7 +60,7 @@ const WrappedResetButton = ({ value, defaultValue, hasResetButton = false, reset
 
 const ResetButton = React.memo(WrappedResetButton);
 
-function WrappedService({ disabled, service, idx, hasResetButton = false, setParam }) {
+function WrappedService({ disabled, service, idx, hasResetButton = false, setParam, profile_spec = null }) {
   const theme = useTheme();
   const [showMore, setShowMore] = useState(false);
   const { t } = useTranslation();
@@ -71,7 +71,7 @@ function WrappedService({ disabled, service, idx, hasResetButton = false, setPar
           !param.hide && (
             <Param
               key={pidx}
-              disabled={disabled}
+              disabled={disabled || (profile_spec && profile_spec[param.name] !== undefined)}
               param={param}
               pidx={pidx}
               idx={idx}
