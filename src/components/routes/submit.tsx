@@ -758,7 +758,7 @@ const Submit: React.FC<any> = () => {
                   <Typography variant="h6" gutterBottom>
                     {t('options.service')}
                   </Typography>
-                  {!currentUser.roles.includes('submission_customize') && configuration.submission.profiles ? (
+                  {configuration.submission.profiles ? (
                     <div style={{ textAlign: 'left', marginTop: sp2 }}>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
                         {t('options.submission.profile_name')}
@@ -770,7 +770,6 @@ const Submit: React.FC<any> = () => {
                             size="small"
                             renderInput={params => <TextField {...params} />}
                             onChange={(_, value, __) => handleProfileChange(value)}
-                            //defaultValue={Object.keys(configuration.submission.profiles)[0]}
                           />
                         ) : (
                           <Skeleton style={{ height: '3rem' }} />
@@ -783,7 +782,7 @@ const Submit: React.FC<any> = () => {
                     settings={settings}
                     setSettings={setSettings}
                     setParam={setParam}
-                    submissionProfile={submissionProfile}
+                    submissionProfile={!currentUser.roles.includes('submission_customize') ? submissionProfile : null}
                   />
                 </div>
               </Grid>

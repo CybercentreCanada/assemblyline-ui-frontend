@@ -102,12 +102,7 @@ function ServiceTreeItem({
           control={
             <Checkbox
               size={size}
-              disabled={
-                disabled ||
-                (submissionProfile &&
-                  (submissionProfile.services.selected.includes(item.name) ||
-                    submissionProfile.service_spec[item.name] !== undefined))
-              }
+              disabled={disabled || (submissionProfile && submissionProfile.services.selected.includes(item.name))}
               indeterminate={
                 item.services ? !item.services.every(e => e.selected) && !item.services.every(e => !e.selected) : false
               }

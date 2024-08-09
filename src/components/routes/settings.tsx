@@ -678,48 +678,45 @@ function Settings() {
           <ExternalSources disabled={!editable} settings={settings} onChange={toggleExternalSource} />
         </Paper>
       )}
-      {currentUser.roles.includes('submission_customize') && (
-        <>
-          <Paper className={classes.group}>
-            <div style={{ padding: sp2, textAlign: 'left' }}>
-              <Typography variant="h6" gutterBottom>
-                {t('service')}
-              </Typography>
-              <ServiceTree
-                disabled={!editable}
-                settings={settings}
-                setSettings={setSettings}
-                setModified={setModified}
-                compressed
-              />
-            </div>
-          </Paper>
+      <Paper className={classes.group}>
+        <div style={{ padding: sp2, textAlign: 'left' }}>
+          <Typography variant="h6" gutterBottom>
+            {t('service')}
+          </Typography>
+          <ServiceTree
+            disabled={!editable}
+            settings={settings}
+            setSettings={setSettings}
+            setModified={setModified}
+            compressed
+            submissionProfile={null}
+          />
+        </div>
+      </Paper>
 
-          <Paper className={classes.group}>
-            <div style={{ padding: sp2, textAlign: 'left' }}>
-              <Typography variant="h6" gutterBottom>
-                {t('service_spec')}
-              </Typography>
-              {settings ? (
-                <ServiceSpec
-                  disabled={!editable}
-                  service_spec={settings.service_spec}
-                  setParam={setParam}
-                  compressed
-                  hasResetButton
-                />
-              ) : (
-                <div>
-                  <Skel />
-                  <Skel />
-                  <Skel />
-                  <Skel />
-                </div>
-              )}
+      <Paper className={classes.group}>
+        <div style={{ padding: sp2, textAlign: 'left' }}>
+          <Typography variant="h6" gutterBottom>
+            {t('service_spec')}
+          </Typography>
+          {settings ? (
+            <ServiceSpec
+              disabled={!editable}
+              service_spec={settings.service_spec}
+              setParam={setParam}
+              compressed
+              hasResetButton
+            />
+          ) : (
+            <div>
+              <Skel />
+              <Skel />
+              <Skel />
+              <Skel />
             </div>
-          </Paper>
-        </>
-      )}
+          )}
+        </div>
+      </Paper>
 
       <RouterPrompt when={modified} />
       {settings && modified && (
