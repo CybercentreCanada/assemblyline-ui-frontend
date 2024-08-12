@@ -149,8 +149,8 @@ const Submit: React.FC<any> = () => {
               api_data.api_error_message.includes('API'))
           ) {
             window.location.reload();
-          } else if (data.api_status_code == 500) {
-            // Internal server error occurred, cancel upload and show error message
+          } else {
+            // Unexpected error occurred, cancel upload and show error message
             cancelUpload();
             showErrorMessage(t('submit.file.upload_fail'));
           }
