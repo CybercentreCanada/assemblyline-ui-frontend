@@ -20,7 +20,20 @@ export type EnrichmentCustomChipProps = CustomChipProps & {
   hideLoading?: boolean;
 };
 
-const WrappedCustomChip: React.FC<EnrichmentCustomChipProps> = ({
+export const BOREALIS_TYPE_MAP = {
+  'network.static.ip': 'ip',
+  'network.dynamic.ip': 'ip',
+  'network.static.domain': 'domain',
+  'network.dynamic.domain': 'domain',
+  'network.static.uri': 'url',
+  'network.dynamic.uri': 'url',
+  md5: 'md5',
+  sha1: 'sha1',
+  sha256: 'sha256',
+  'email.address': 'eml_address'
+};
+
+const WrappedEnrichmentCustomChip: React.FC<EnrichmentCustomChipProps> = ({
   dataType,
   dataValue,
   contextIcon = false,
@@ -32,7 +45,7 @@ const WrappedCustomChip: React.FC<EnrichmentCustomChipProps> = ({
   type = 'round',
   size = 'medium',
   color = 'default',
-  variant = 'filled',
+  variant = 'outlined',
   mono = false,
   wrap = false,
   tooltip = null,
@@ -56,7 +69,7 @@ const WrappedCustomChip: React.FC<EnrichmentCustomChipProps> = ({
   };
   const sizeClassMap = {
     tiny: classes.tiny,
-    small: null,
+    small: classes.small,
     medium: null
   };
   const colorClassMap = {
@@ -72,13 +85,10 @@ const WrappedCustomChip: React.FC<EnrichmentCustomChipProps> = ({
     primary: classes.primary,
     secondary: classes.secondary
   };
-  const colorMap = {
-    primary: 'primary',
-    secondary: 'secondary'
-  };
   const sizeMap = {
-    small: 'small',
-    medium: 'medium'
+    tiny: 'small' as 'small',
+    small: 'small' as 'small',
+    medium: 'medium' as 'medium'
   };
 
   // Compute values applied to the original chip component
@@ -106,8 +116,8 @@ const WrappedCustomChip: React.FC<EnrichmentCustomChipProps> = ({
       classes={{ label: labelClassName, icon: variant !== 'outlined' ? classes.icon : null }}
       className={appliedClassName}
       size={sizeMap[size]}
-      color={colorMap[color]}
       variant={variant}
+      sx={{ '& .iconify': { marginLeft: '8px', flexShrink: 0 } }}
       {...otherProps}
     />
   );
@@ -129,5 +139,5 @@ const WrappedCustomChip: React.FC<EnrichmentCustomChipProps> = ({
   );
 };
 
-const CustomChip = React.memo(WrappedCustomChip);
-export default CustomChip;
+const EnrichmentCustomChip = React.memo(WrappedEnrichmentCustomChip);
+export default EnrichmentCustomChip;

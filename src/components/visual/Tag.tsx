@@ -5,6 +5,7 @@ import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import ExternalLinks from 'components/visual/ExternalSearch';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
+import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip';
 
 const STYLE = { height: 'auto', minHeight: '22px' };
 const initialMenuState = {
@@ -23,6 +24,7 @@ type TagProps = {
   fullWidth?: boolean;
   force?: boolean;
   classification?: string | null;
+  label?: string | null;
 };
 
 const WrappedTag: React.FC<TagProps> = ({
@@ -35,7 +37,8 @@ const WrappedTag: React.FC<TagProps> = ({
   safelisted = false,
   fullWidth = false,
   force = false,
-  classification
+  classification,
+  label = null
 }) => {
   const [state, setState] = React.useState(initialMenuState);
   const { scoreToVerdict } = useALContext();
@@ -78,19 +81,37 @@ const WrappedTag: React.FC<TagProps> = ({
           highlight_key={highlight_key}
         />
       )}
-      <CustomChip
-        wrap
-        variant={safelisted ? 'outlined' : 'filled'}
-        size="tiny"
-        type="rounded"
-        color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
-        label={short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
-        style={STYLE}
-        onClick={highlight_key ? handleClick : null}
-        fullWidth={fullWidth}
-        onContextMenu={handleMenuClick}
-        icon={<ExternalLinks category={'tag'} type={type} value={value} />}
-      />
+      {type in BOREALIS_TYPE_MAP && value !== null ? (
+        <EnrichmentCustomChip
+          dataType={BOREALIS_TYPE_MAP[type]}
+          dataValue={value}
+          hidePopper={true}
+          hidePopover={true}
+          wrap
+          label={label ? label : short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
+          size="tiny"
+          type="rounded"
+          color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
+          onClick={highlight_key ? handleClick : null}
+          fullWidth={fullWidth}
+          onContextMenu={handleMenuClick}
+          // icon={<ExternalLinks category={'tag'} type={type} value={value} />}
+        />
+      ) : (
+        <CustomChip
+          wrap
+          variant="outlined"
+          size="tiny"
+          type="rounded"
+          color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
+          label={label ? label : short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
+          style={STYLE}
+          onClick={highlight_key ? handleClick : null}
+          fullWidth={fullWidth}
+          onContextMenu={handleMenuClick}
+          icon={<ExternalLinks category={'tag'} type={type} value={value} />}
+        />
+      )}
     </>
   );
 };
