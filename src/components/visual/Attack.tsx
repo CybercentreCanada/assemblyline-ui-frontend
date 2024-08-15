@@ -117,6 +117,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
         wrap
         size="tiny"
         type="rounded"
+        variant="outlined"
         color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
         label={show_type ? `[ATT&CK] ${text}` : text}
         style={STYLE}
