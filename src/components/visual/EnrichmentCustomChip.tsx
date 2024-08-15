@@ -85,6 +85,10 @@ const WrappedEnrichmentCustomChip: React.FC<EnrichmentCustomChipProps> = ({
     primary: classes.primary,
     secondary: classes.secondary
   };
+  const colorMap = {
+    primary: 'primary',
+    secondary: 'secondary'
+  };
   const sizeMap = {
     tiny: 'small' as 'small',
     small: 'small' as 'small',
@@ -115,6 +119,7 @@ const WrappedEnrichmentCustomChip: React.FC<EnrichmentCustomChipProps> = ({
       hideLoading={hideLoading}
       classes={{ label: labelClassName, icon: variant !== 'outlined' ? classes.icon : null }}
       className={appliedClassName}
+      color={colorMap[color]}
       size={sizeMap[size]}
       variant={variant}
       sx={{ '& .iconify': { marginLeft: '8px', flexShrink: 0 } }}

@@ -91,11 +91,10 @@ const WrappedTag: React.FC<TagProps> = ({
           label={label ? label : short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
           size="tiny"
           type="rounded"
-          color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
+          color={highlight_key && isHighlighted(highlight_key) ? 'primary' : color}
           onClick={highlight_key ? handleClick : null}
           fullWidth={fullWidth}
           onContextMenu={handleMenuClick}
-          // icon={<ExternalLinks category={'tag'} type={type} value={value} />}
         />
       ) : (
         <CustomChip
@@ -103,7 +102,7 @@ const WrappedTag: React.FC<TagProps> = ({
           variant="outlined"
           size="tiny"
           type="rounded"
-          color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
+          color={highlight_key && isHighlighted(highlight_key) ? 'primary' : color}
           label={label ? label : short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
           style={STYLE}
           onClick={highlight_key ? handleClick : null}
