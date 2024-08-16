@@ -41,7 +41,7 @@ const WrappedTag: React.FC<TagProps> = ({
   label = null
 }) => {
   const [state, setState] = React.useState(initialMenuState);
-  const { scoreToVerdict } = useALContext();
+  const { scoreToVerdict, configuration } = useALContext();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { showSafeResults } = useSafeResults();
 
@@ -81,7 +81,7 @@ const WrappedTag: React.FC<TagProps> = ({
           highlight_key={highlight_key}
         />
       )}
-      {type in BOREALIS_TYPE_MAP && value !== null ? (
+      {configuration.ui.api_proxies.includes('borealis') && type in BOREALIS_TYPE_MAP && value !== null ? (
         <EnrichmentCustomChip
           dataType={BOREALIS_TYPE_MAP[type]}
           dataValue={value}
@@ -95,6 +95,7 @@ const WrappedTag: React.FC<TagProps> = ({
           onClick={highlight_key ? handleClick : null}
           fullWidth={fullWidth}
           onContextMenu={handleMenuClick}
+          icon={<ExternalLinks category={'tag'} type={type} value={value} />}
         />
       ) : (
         <CustomChip

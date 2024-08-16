@@ -1,3 +1,4 @@
+import useALContext from 'components/hooks/useALContext';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
@@ -27,6 +28,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
   ...otherProps
 }) => {
   const [state, setState] = React.useState(initialMenuState);
+  const { configuration } = useALContext();
 
   const handleMenuClick = useCallback(event => {
     event.preventDefault();
@@ -52,7 +54,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
           classification={classification}
         />
       )}
-      {data_type in BOREALIS_TYPE_MAP && label !== null ? (
+      {configuration.ui.api_proxies.includes('borealis') && data_type in BOREALIS_TYPE_MAP && label !== null ? (
         <EnrichmentCustomChip
           dataType={BOREALIS_TYPE_MAP[data_type]}
           dataValue={label}

@@ -55,9 +55,9 @@ const MyAppMain = () => {
     }
   };
 
-  const setReady = (value: boolean) => {
-    setAppLayoutReady(value);
-    setBorealisReady(value);
+  const setReady = (layout: boolean, borealis: boolean) => {
+    setAppLayoutReady(layout);
+    setBorealisReady(borealis);
   };
 
   useEffect(() => {
