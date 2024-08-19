@@ -240,7 +240,8 @@ const WrappedAlertFiltersSelected = ({
           icon={<SearchOutlinedIcon fontSize="small" />}
           label={
             <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
-              <span>{`${t('query')}: ${search.q}`}</span>
+              <span style={{ whiteSpace: 'nowrap' }}>{`${t('query')}: `}</span>
+              <span>{search.q}</span>
             </div>
           }
           size="small"
@@ -266,7 +267,8 @@ const WrappedAlertFiltersSelected = ({
         }}
         getLabel={item => (
           <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
-            <span>{`${t('sorts.title')}: ${t(item.substring(0, item.indexOf(' ')))}`}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>{`${t('sorts.title')}: `}</span>
+            <span>{t(item.substring(0, item.indexOf(' ')))}</span>
             {disabled && <ArrowDownwardIcon fontSize="small" />}
           </div>
         )}

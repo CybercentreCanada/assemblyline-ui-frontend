@@ -341,11 +341,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
       viewHistory && (
         <Dialog
           open={viewHistory}
-          onClose={(_event, reason) => {
-            if (reason === 'backdropClick') {
-              setViewHistory(false);
-            }
-          }}
+          onClose={(_event, reason) => setViewHistory(false)}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
           maxWidth="xl"

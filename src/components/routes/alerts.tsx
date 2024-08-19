@@ -244,7 +244,7 @@ const WrappedAlertsContent = () => {
           suggestions={suggestions}
           pageSize={PAGE_SIZE}
           total={total}
-          placeholder={t('filter')}
+          placeholder={t('search.placeholder')}
           defaultValue={{ rows: 25 }}
           paramKeys={{ query: 'q' }}
           onChange={v => setSearchParams(v)}
