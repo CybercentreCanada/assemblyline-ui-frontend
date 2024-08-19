@@ -6,9 +6,11 @@ import ExternalLinks from './ExternalSearch';
 
 export type ActionableCustomChipProps = CustomChipProps & {
   data_type?: string;
+  index?: string;
   category?: 'hash' | 'metadata' | 'tag';
   classification?: string;
   label?: string;
+  value?: string;
 };
 
 const initialMenuState = {
@@ -19,9 +21,11 @@ const initialMenuState = {
 const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
   children,
   data_type = null,
+  index = null,
   category = null,
   classification,
   label,
+  value,
   variant = 'outlined',
   ...otherProps
 }) => {
@@ -36,7 +40,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
   }, []);
 
   const { isActionable } = useExternalLookup();
-  const actionable = isActionable(category, data_type, label);
+  const actionable = index || isActionable(category, data_type, label);
 
   // Do the menu rendering here
   return (
@@ -44,8 +48,9 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
       {actionable && state !== initialMenuState && (
         <ActionMenu
           category={category}
+          index={index}
           type={data_type}
-          value={label}
+          value={value || label}
           state={state}
           setState={setState}
           classification={classification}

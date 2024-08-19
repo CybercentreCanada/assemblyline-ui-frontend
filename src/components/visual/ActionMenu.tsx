@@ -6,7 +6,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Divider, ListSubheader, Link as MaterialLink, Menu, MenuItem, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
@@ -64,6 +64,7 @@ type Coordinates = {
 
 type TagProps = {
   category: 'heuristic' | 'signature' | 'hash' | 'metadata' | 'tag';
+  index: string;
   type: string;
   value: string;
   classification?: string | null;
@@ -90,6 +91,7 @@ const categoryIndex = {
 
 const WrappedActionMenu: React.FC<TagProps> = ({
   category,
+  index,
   type,
   value,
   classification = null,
@@ -317,6 +319,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   return hasExternalLinks ||
     hasExternalQuery ||
     submitType ||
+    index ||
     category === 'heuristic' ||
     category === 'signature' ||
     category === 'tag' ? (
@@ -387,9 +390,13 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           <MenuItem
             dense
             component={Link}
-            to={`/search${categoryIndex[category]}?query=${categoryPrefix[category]}${type}:${safeFieldValueURI(
-              value
-            )}`}
+            to={
+              index
+                ? `/search${index}?query=${type}:${safeFieldValueURI(value)}`
+                : `/search${categoryIndex[category]}?query=${categoryPrefix[category]}${type}:${safeFieldValueURI(
+                    value
+                  )}`
+            }
             onClick={handleClose}
           >
             {SEARCH_ICON}
