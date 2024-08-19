@@ -13,7 +13,6 @@ import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
-import type { AlertSearchParams } from 'components/routes/alerts';
 import { ALERT_DEFAULT_PARAMS, ALERT_SIMPLELIST_ID, ALERT_STORAGE_KEY } from 'components/routes/alerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import ActionableText from 'components/visual/ActionableText';
@@ -23,6 +22,7 @@ import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
 import { ImageInline } from 'components/visual/image_inline';
+import { verdictToColor } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
@@ -43,8 +43,8 @@ import {
   AutoHideChipList,
   SkeletonInline
 } from './components/Components';
-import { DefaultParamsProvider, useDefaultParams } from './contexts/DefaultParamsContext';
-import { SearchParamsProvider, useSearchParams } from './contexts/SearchParamsContext';
+import { DefaultParamsProvider } from './contexts/DefaultParamsContext';
+import { SearchParamsProvider } from './contexts/SearchParamsContext';
 import type { AlertItem } from './models/Alert';
 
 const useStyles = makeStyles(theme => ({
@@ -78,13 +78,7 @@ type Props = {
   search?: string;
 };
 
-const WrappedAlertDetailContent = ({
-  id: propId = null,
-  alert: propAlert = null,
-  inDrawer = false,
-  defaults: defaultsProps = null,
-  search: searchProp = null
-}: Props) => {
+const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null, inDrawer = false }: Props) => {
   const { t } = useTranslation(['alerts']);
   const theme = useTheme();
   const classes = useStyles();
@@ -94,17 +88,11 @@ const WrappedAlertDetailContent = ({
   const { c12nDef, configuration } = useALContext();
   const { id: paramId } = useParams<Params>();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { onDefaultChange } = useDefaultParams<AlertSearchParams>();
-  const { setSearchParams } = useSearchParams<AlertSearchParams>();
 
   const [alert, setAlert] = useState<AlertItem>(null);
   const [metaOpen, setMetaOpen] = useState<boolean>(false);
 
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
-
-  useEffect(() => onDefaultChange(defaultsProps), [defaultsProps, onDefaultChange]);
-
-  useEffect(() => setSearchParams(new URLSearchParams(searchProp)), [searchProp, setSearchParams]);
 
   useEffect(() => {
     if (!currentUser.roles.includes('alert_view')) {
@@ -591,9 +579,27 @@ const WrappedAlertDetailContent = ({
                     <Grid item xs={9} sm={10}>
                       <div className={classes.sectionContent}>
                         {alert && alert.al.detailed ? (
-                          <AutoHideChipList
-                            items={alert.al.detailed.attrib}
-                            defaultClassification={alert.classification}
+                          <ActionableChipList
+                            items={alert.al.detailed.attrib.map(item => {
+                              const dataTypes = {
+                                CFG: 'result.sections.tags.technique.config',
+                                EXP: 'result.sections.tags.attribution.exploit',
+                                IMP: 'result.sections.tags.attribution.implant',
+                                OB: 'result.sections.tags.technique.obfuscation',
+                                TA: 'result.sections.tags.attribution.actor'
+                              };
+
+                              return {
+                                category: null,
+                                classification: alert.classification,
+                                color: verdictToColor(item.verdict),
+                                data_type: item.subtype in dataTypes ? dataTypes[item.subtype] : null,
+                                index: '/result',
+                                label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
+                                value: item.value,
+                                variant: 'outlined'
+                              };
+                            })}
                           />
                         ) : (
                           <ActionableChipList
@@ -860,8 +866,11 @@ const WrappedAlertDetailContent = ({
                       <div className={classes.sectionContent}>
                         {alert && alert.al.detailed ? (
                           <AutoHideChipList
-                            items={alert.al.detailed.heuristic}
+                            category={null}
                             defaultClassification={alert.classification}
+                            index="/result"
+                            items={alert.al.detailed.heuristic}
+                            type="result.sections.heuristic.name"
                           />
                         ) : (
                           <ActionableChipList
@@ -960,8 +969,11 @@ const WrappedAlertDetailContent = ({
                             </Typography>
                             {alert && alert.al.detailed ? (
                               <AutoHideChipList
-                                items={alert.al.detailed.attack_category}
+                                category={null}
                                 defaultClassification={alert.classification}
+                                index="/result"
+                                items={alert.al.detailed.attack_category}
+                                type="result.sections.heuristic.attack.categories"
                               />
                             ) : (
                               <ActionableChipList
@@ -983,8 +995,11 @@ const WrappedAlertDetailContent = ({
                             </Typography>
                             {alert && alert.al.detailed ? (
                               <AutoHideChipList
-                                items={alert.al.detailed.attack_pattern}
+                                category={null}
                                 defaultClassification={alert.classification}
+                                index="/result"
+                                items={alert.al.detailed.attack_pattern}
+                                type="result.sections.heuristic.attack.pattern"
                               />
                             ) : (
                               <ActionableChipList

@@ -39,7 +39,7 @@ import {
 import Moment from 'components/visual/Moment';
 import { verdictToColor } from 'helpers/utils';
 import type { ReactNode } from 'react';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
@@ -263,13 +263,15 @@ export const SkeletonInline = () => <Skeleton style={{ display: 'inline-block', 
 const TARGET_RESULT_COUNT = 10;
 
 type AutoHideChipListProps = {
-  items: DetailedItem[];
+  category?: string;
   defaultClassification: string;
+  index?: string;
+  items: DetailedItem[];
   type?: string;
 };
 
 export const AutoHideChipList: React.FC<AutoHideChipListProps> = React.memo(
-  ({ items, defaultClassification, type = null }: AutoHideChipListProps) => {
+  ({ items, defaultClassification, type = null, index = null, category = 'tag' }: AutoHideChipListProps) => {
     const { t } = useTranslation();
 
     const [showMore, setShowMore] = useState<boolean>(items.length <= TARGET_RESULT_COUNT);
@@ -279,18 +281,23 @@ export const AutoHideChipList: React.FC<AutoHideChipListProps> = React.memo(
         items.sort(detailedItemCompare).map(
           item =>
             ({
-              category: 'tag',
-              data_type: type,
-              label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
-              variant: 'outlined',
+              category: category,
+              classification: defaultClassification,
               color: verdictToColor(item.verdict),
-              classification: defaultClassification
+              data_type: type,
+              index: index,
+              label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
+              variant: 'outlined'
             } as ActionableCustomChipProps)
         ),
-      [defaultClassification, items, type]
+      [category, defaultClassification, index, items, type]
     );
 
     const filteredChips = useMemo(() => (showMore ? chips : chips.slice(0, TARGET_RESULT_COUNT)), [chips, showMore]);
+
+    useEffect(() => {
+      setShowMore(items.length <= TARGET_RESULT_COUNT);
+    }, [type, index, category, items.length]);
 
     return (
       <>
