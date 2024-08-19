@@ -368,11 +368,11 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                   <GridTableHead>
                     <GridTableRow>
                       {['ts', 'workflow_or_user', 'priority', 'status', 'labels'].map(column => (
-                        <GridTableCell key={column}>
+                        <GridTableCell key={column} style={{ borderColor: theme.palette.divider }}>
                           <Typography sx={{ fontWeight: 'bold' }}>{t(column)}</Typography>
                         </GridTableCell>
                       ))}
-                      <GridTableCell />
+                      <GridTableCell style={{ borderColor: theme.palette.divider }} />
                     </GridTableRow>
                   </GridTableHead>
                   <GridTableBody>
@@ -391,46 +391,49 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                                 : null
                             }
                           >
-                            <GridTableCell>
+                            <GridTableCell style={{ borderColor: theme.palette.divider }}>
                               <Tooltip title={event.ts}>
                                 <span>
                                   <Moment variant="fromNow">{event.ts}</Moment>
                                 </span>
                               </Tooltip>
                             </GridTableCell>
-                            <GridTableCell>
+                            <GridTableCell style={{ borderColor: theme.palette.divider }}>
                               <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
                                 <span>{event.entity_name}</span>
                               </Tooltip>
                             </GridTableCell>
-                            <GridTableCell>
+                            <GridTableCell style={{ borderColor: theme.palette.divider }}>
                               {event.priority ? <AlertPriority name={event.priority} withChip /> : null}
                             </GridTableCell>
-                            <GridTableCell>{event.status ? <AlertStatus name={event.status} /> : null}</GridTableCell>
-                            <GridTableCell
-                              width="40%"
-                              style={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                rowGap: theme.spacing(1),
-                                columnGap: theme.spacing(0.5)
-                              }}
-                            >
-                              {event.labels || event.labels_removed
-                                ? [...event.labels, ...event.labels_removed].map((label, j) => (
-                                    <CustomChip
-                                      key={`labels-${j}`}
-                                      wrap={false}
-                                      size="small"
-                                      variant="outlined"
-                                      color={[...event.labels].includes(label) ? 'success' : 'error'}
-                                      label={t(`status_${label}`)}
-                                      style={{ cursor: 'inherit' }}
-                                    />
-                                  ))
-                                : null}
+                            <GridTableCell style={{ borderColor: theme.palette.divider }}>
+                              {event.status ? <AlertStatus name={event.status} /> : null}
                             </GridTableCell>
-                            <GridTableCell>
+                            <GridTableCell width="40%" style={{ borderColor: theme.palette.divider }}>
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  flexWrap: 'wrap',
+                                  rowGap: theme.spacing(1),
+                                  columnGap: theme.spacing(0.5)
+                                }}
+                              >
+                                {event.labels || event.labels_removed
+                                  ? [...event.labels, ...event.labels_removed].map((label, j) => (
+                                      <CustomChip
+                                        key={`labels-${j}`}
+                                        wrap={false}
+                                        size="small"
+                                        variant="outlined"
+                                        color={[...event.labels].includes(label) ? 'success' : 'error'}
+                                        label={t(`status_${label}`)}
+                                        style={{ cursor: 'inherit' }}
+                                      />
+                                    ))
+                                  : null}
+                              </div>
+                            </GridTableCell>
+                            <GridTableCell style={{ borderColor: theme.palette.divider }}>
                               {event.entity_type === 'workflow' && event.entity_id !== 'DEFAULT' ? (
                                 <Tooltip title={t('workflow')}>
                                   <span>
