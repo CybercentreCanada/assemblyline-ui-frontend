@@ -576,7 +576,7 @@ export const AlertSafelist: React.FC<AlertActionProps> = React.memo(
             ? theme.palette.mode === 'dark'
               ? theme.palette.success.light
               : theme.palette.success.dark
-            : 'white'
+            : theme.palette.action.active
         }
         icon={<VerifiedUserOutlinedIcon />}
         onClick={hasSetNonMalicious ? null : () => handleNonMaliciousChange(alert)}
@@ -658,7 +658,7 @@ export const AlertBadlist: React.FC<AlertActionProps> = React.memo(
             ? theme.palette.mode === 'dark'
               ? theme.palette.error.light
               : theme.palette.error.dark
-            : 'white'
+            : theme.palette.action.active
         }
         icon={<BugReportOutlinedIcon />}
         onClick={hasSetMalicious ? null : () => handleMaliciousChange(alert)}
