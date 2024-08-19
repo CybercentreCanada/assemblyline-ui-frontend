@@ -98,12 +98,10 @@ export const SearchParamsProvider = <T extends Params>({
 
       if (prevHidden.current !== nextHidden.toString()) {
         setHiddenParams(nextHidden);
-        prevHidden.current = nextHidden.toString();
       }
 
       if (prevSearch.current !== nextSearch.toString() && window.location.search.slice(1) !== nextSearch.toString()) {
         navigate(`${window.location.pathname}?${nextSearch.toString()}${window.location.hash}`);
-        prevSearch.current = nextSearch.toString();
       }
     },
     [hidden, navigate]
@@ -130,6 +128,14 @@ export const SearchParamsProvider = <T extends Params>({
   useEffect(() => {
     handleUpdateRef(search);
   }, [handleUpdateRef, search]);
+
+  useEffect(() => {
+    prevSearch.current = search.toString();
+  }, [search]);
+
+  useEffect(() => {
+    prevHidden.current = hiddenParams.toString();
+  }, [hiddenParams]);
 
   return (
     <SearchParamsContext.Provider value={{ search, setSearchParams, setSearchObject }}>
