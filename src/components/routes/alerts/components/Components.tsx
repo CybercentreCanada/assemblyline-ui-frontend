@@ -39,7 +39,7 @@ import {
 import Moment from 'components/visual/Moment';
 import { verdictToColor } from 'helpers/utils';
 import type { ReactNode } from 'react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
@@ -260,11 +260,6 @@ export const AlertListChip: React.FC<AlertListChipProps> = React.memo(
 
 export const SkeletonInline = () => <Skeleton style={{ display: 'inline-block', width: '10rem' }} />;
 
-type AutoHideChipListState = {
-  showExtra: boolean;
-  fullChipList: ActionableCustomChipProps[];
-};
-
 const TARGET_RESULT_COUNT = 10;
 
 type AutoHideChipListProps = {
@@ -276,42 +271,33 @@ type AutoHideChipListProps = {
 export const AutoHideChipList: React.FC<AutoHideChipListProps> = React.memo(
   ({ items, defaultClassification, type = null }: AutoHideChipListProps) => {
     const { t } = useTranslation();
-    const [state, setState] = useState<AutoHideChipListState | null>(null);
-    const [shownChips, setShownChips] = useState<ActionableCustomChipProps[]>([]);
 
-    useEffect(() => {
-      const fullChipList = items.sort(detailedItemCompare).map(
-        item =>
-          ({
-            category: 'tag',
-            data_type: type,
-            label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
-            variant: 'outlined',
-            color: verdictToColor(item.verdict),
-            classification: defaultClassification
-          } as ActionableCustomChipProps)
-      );
-      const showExtra = items.length <= TARGET_RESULT_COUNT;
+    const [showMore, setShowMore] = useState<boolean>(items.length <= TARGET_RESULT_COUNT);
 
-      setState({ showExtra, fullChipList });
-    }, [defaultClassification, items, type]);
+    const chips = useMemo<ActionableCustomChipProps[]>(
+      () =>
+        items.sort(detailedItemCompare).map(
+          item =>
+            ({
+              category: 'tag',
+              data_type: type,
+              label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
+              variant: 'outlined',
+              color: verdictToColor(item.verdict),
+              classification: defaultClassification
+            } as ActionableCustomChipProps)
+        ),
+      [defaultClassification, items, type]
+    );
 
-    useEffect(() => {
-      if (state !== null) {
-        if (state.showExtra) {
-          setShownChips(state.fullChipList);
-        } else {
-          setShownChips(state.fullChipList.slice(0, TARGET_RESULT_COUNT));
-        }
-      }
-    }, [state]);
+    const filteredChips = useMemo(() => (showMore ? chips : chips.slice(0, TARGET_RESULT_COUNT)), [chips, showMore]);
 
     return (
       <>
-        <ActionableChipList items={shownChips} />
-        {state && !state.showExtra && (
+        <ActionableChipList items={filteredChips} />
+        {!showMore && (
           <Tooltip title={t('more')}>
-            <IconButton size="small" onClick={() => setState({ ...state, showExtra: true })} style={{ padding: 0 }}>
+            <IconButton size="small" onClick={() => setShowMore(true)} style={{ padding: 0 }}>
               <MoreHorizOutlinedIcon />
             </IconButton>
           </Tooltip>
