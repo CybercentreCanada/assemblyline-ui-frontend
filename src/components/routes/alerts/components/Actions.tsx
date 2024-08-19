@@ -274,7 +274,11 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
         permanent={permanent}
         speedDial={speedDial}
         showSkeleton={!alert}
-        authorized={currentUser.roles.includes('alert_view') && alert?.group_count > 0}
+        authorized={
+          currentUser.roles.includes('alert_view') &&
+          alert?.group_count > 0 &&
+          window.location.pathname.startsWith('/alerts')
+        }
         color={theme.palette.action.active}
         icon={<CenterFocusStrongOutlinedIcon />}
         onClick={e => {
