@@ -84,6 +84,7 @@
   "general.max_queue_length": "Nombre maximum d'éléments en file d'attente",
   "general.max_queue_length.desc": "** À n'utiliser que si le service ne peut pas suivre la charge de travail.",
   "general.name": "Nom du service",
+  "general.recursion_prevention": "Prévention de la récursion",
   "general.result_classification": "Classification par défaut des résultats",
   "general.reject": "Types de fichier rejeté",
   "general.stage": "Étape d'exécution",
