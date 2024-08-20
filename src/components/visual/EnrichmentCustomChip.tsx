@@ -2,7 +2,8 @@ import { Tooltip } from '@mui/material';
 import { EnrichedChip } from 'borealis-ui';
 import clsx from 'clsx';
 import React from 'react';
-import { CustomChipProps, useStyles } from './CustomChip';
+import type { CustomChipProps } from './CustomChip';
+import { useStyles } from './CustomChip';
 
 declare module '@mui/material/Chip' {
   interface ChipPropsSizeOverrides {
@@ -15,9 +16,11 @@ export type EnrichmentCustomChipProps = CustomChipProps & {
   dataValue: string;
   contextIcon?: boolean;
   counters?: boolean;
-  hidePopover?: boolean;
-  hidePopper?: boolean;
+  hideDetails?: boolean;
+  hidePreview?: boolean;
   hideLoading?: boolean;
+  forceDetails?: boolean;
+  setForceDetails?: (value: boolean) => void;
 };
 
 export const BOREALIS_TYPE_MAP = {
@@ -38,9 +41,11 @@ const WrappedEnrichmentCustomChip: React.FC<EnrichmentCustomChipProps> = ({
   dataValue,
   contextIcon = false,
   counters = false,
-  hidePopover = false,
-  hidePopper = true,
+  hideDetails = false,
+  hidePreview = true,
   hideLoading = false,
+  forceDetails = false,
+  setForceDetails = null,
   className = null,
   type = 'round',
   size = 'medium',
@@ -90,9 +95,9 @@ const WrappedEnrichmentCustomChip: React.FC<EnrichmentCustomChipProps> = ({
     secondary: 'secondary'
   };
   const sizeMap = {
-    tiny: 'small' as 'small',
-    small: 'small' as 'small',
-    medium: 'medium' as 'medium'
+    tiny: 'small' as const,
+    small: 'small' as const,
+    medium: 'medium' as const
   };
 
   // Compute values applied to the original chip component
@@ -114,14 +119,16 @@ const WrappedEnrichmentCustomChip: React.FC<EnrichmentCustomChipProps> = ({
       value={dataValue}
       contextIcon={contextIcon}
       counters={counters}
-      hidePopover={hidePopover}
-      hidePopper={hidePopper}
+      hideDetails={hideDetails}
+      hidePreview={hidePreview}
       hideLoading={hideLoading}
       classes={{ label: labelClassName, icon: variant !== 'outlined' ? classes.icon : null }}
       className={appliedClassName}
       color={colorMap[color]}
       size={sizeMap[size]}
       variant={variant}
+      forceDetails={forceDetails}
+      setForceDetails={setForceDetails}
       sx={{ '& .iconify': { marginLeft: '8px', flexShrink: 0 } }}
       {...otherProps}
     />
