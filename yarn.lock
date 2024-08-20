@@ -3299,10 +3299,10 @@ bidi-js@^1.0.3:
   dependencies:
     require-from-string "^2.0.2"
 
-borealis-ui@^0.1.12-dev24472:
-  version "0.1.12-dev24472"
-  resolved "https://registry.yarnpkg.com/borealis-ui/-/borealis-ui-0.1.12-dev24472.tgz#9571461813897c6706be0b4fc072ecc0048e2a66"
-  integrity sha512-NHpzUDFDextOuejwmaaQgrxwEFgCcENjABjmdxrL8ZjRBr46/4RpSfe7z96tl7cJmbeJqqbizbh+X/73WpSojA==
+borealis-ui@^0.1.12-dev24498:
+  version "0.1.12-dev24498"
+  resolved "https://registry.yarnpkg.com/borealis-ui/-/borealis-ui-0.1.12-dev24498.tgz#c228c02569c714122e69f5efd69c6f572e5cbcc5"
+  integrity sha512-y0tCxToTJxvmwaxDY2/dCwW8Gl7HA7wbEifAvEgnNFOB6dSTuR7/zXYHCFe4uEXRPEKEsDIZT+ZwL4H7nGzCdw==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
