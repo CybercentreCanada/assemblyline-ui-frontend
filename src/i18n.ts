@@ -1,3 +1,5 @@
+import borealisEN from 'borealis-ui/dist/en/translation.json';
+import borealisFR from 'borealis-ui/dist/fr/translation.json';
 import { default as i18n } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
@@ -164,7 +166,7 @@ const resources = {
     submissionDetail: submissionDetailEN,
     submissionReport: submissionReportEN,
     submit: submitEN,
-    translation: translationEN,
+    translation: { ...translationEN, ...borealisEN },
     tos: tosEN,
     user: userEN,
     alerts: alertsEN,
@@ -221,7 +223,7 @@ const resources = {
     submissionDetail: submissionDetailFR,
     submissionReport: submissionReportFR,
     submit: submitFR,
-    translation: translationFR,
+    translation: { ...translationFR, ...borealisFR },
     tos: tosFR,
     user: userFR,
     alerts: alertsFR,
@@ -229,7 +231,7 @@ const resources = {
   }
 };
 
-i18n
+void i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
