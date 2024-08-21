@@ -88,6 +88,7 @@ const WrappedTag: React.FC<TagProps> = ({
         <EnrichmentCustomChip
           dataType={BOREALIS_TYPE_MAP[type]}
           dataValue={value}
+          dataClassification={classification}
           hidePreview={true}
           hideDetails={true}
           wrap

@@ -2,7 +2,8 @@ import useALContext from 'components/hooks/useALContext';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
-import CustomChip, { CustomChipProps } from './CustomChip';
+import type { CustomChipProps } from './CustomChip';
+import CustomChip from './CustomChip';
 import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip';
 import ExternalLinks from './ExternalSearch';
 
@@ -63,6 +64,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
         <EnrichmentCustomChip
           dataType={BOREALIS_TYPE_MAP[data_type]}
           dataValue={label}
+          dataClassification={classification}
           icon={<ExternalLinks category={category} type={data_type} value={label} round={variant === 'outlined'} />}
           label={label}
           variant={variant}
