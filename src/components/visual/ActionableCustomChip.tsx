@@ -58,6 +58,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
         <EnrichmentCustomChip
           dataType={BOREALIS_TYPE_MAP[data_type]}
           dataValue={label}
+          dataClassification={classification}
           icon={<ExternalLinks category={category} type={data_type} value={label} round={variant === 'outlined'} />}
           label={label}
           variant={variant}

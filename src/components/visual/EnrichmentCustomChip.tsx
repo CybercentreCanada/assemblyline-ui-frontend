@@ -14,6 +14,7 @@ declare module '@mui/material/Chip' {
 export type EnrichmentCustomChipProps = CustomChipProps & {
   dataType: string;
   dataValue: string;
+  dataClassification?: string;
   contextIcon?: boolean;
   counters?: boolean;
   hideDetails?: boolean;
@@ -39,6 +40,7 @@ export const BOREALIS_TYPE_MAP = {
 const WrappedEnrichmentCustomChip: React.FC<EnrichmentCustomChipProps> = ({
   dataType,
   dataValue,
+  dataClassification,
   contextIcon = false,
   counters = false,
   hideDetails = false,
@@ -117,6 +119,7 @@ const WrappedEnrichmentCustomChip: React.FC<EnrichmentCustomChipProps> = ({
     <EnrichedChip
       type={dataType}
       value={dataValue}
+      classification={dataClassification}
       contextIcon={contextIcon}
       counters={counters}
       hideDetails={hideDetails}
