@@ -7,10 +7,10 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import SearchHeader from 'components/visual/SearchHeader';
 import type { SubmissionResult } from 'components/visual/SearchResult/submissions';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import { safeFieldValue } from 'helpers/utils';
@@ -30,7 +30,8 @@ const SUBMISSION_PARAMS = {
   rows: 25,
   offset: 0,
   sort: 'times.submitted desc',
-  filters: ['NOT(to_be_deleted:true)']
+  filters: ['NOT(to_be_deleted:true)'],
+  track_total_hits: 10000
 };
 
 type SubmissionParams = SearchParams<typeof SUBMISSION_PARAMS>;
@@ -84,10 +85,10 @@ const SubmissionPage = () => {
             defaultValue={{ query: '*', rows: 25 }}
             paramKeys={{ query: 'query', filters: 'filters' }}
             onChange={v => setSearchParams(v)}
-            renderTotalResults={() =>
+            totalHitsTitle={
               search.get('query')
-                ? t(`filtered${submissionResults.total === 1 ? '' : 's'}`)
-                : t(`total${submissionResults.total === 1 ? '' : 's'}`)
+                ? t(`filtered${submissionResults?.total === 1 ? '' : 's'}`)
+                : t(`total${submissionResults?.total === 1 ? '' : 's'}`)
             }
             buttonProps={[
               {
@@ -110,6 +111,13 @@ const SubmissionPage = () => {
                 onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'max_score:>=1000'] }))
               }
             ]}
+            renderExtraFilters={() => [
+              // {
+              //   label: 'asd',
+              //   onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'max_score:>=1000'] }))
+              // }
+            ]}
+            hideFilters={filter => ['max_score:>=1000'].includes(filter)}
           />
         </div>
       </PageHeader>
