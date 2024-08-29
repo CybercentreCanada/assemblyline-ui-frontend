@@ -6,19 +6,19 @@ import {
   LinearProgress,
   Pagination,
   Tooltip,
-  Typography,
   alpha,
   useMediaQuery,
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import clsx from 'clsx';
 import PageHeader from 'commons/components/pages/PageHeader';
-import { ChipList } from 'components/visual/ChipList';
 import SearchTextField from 'components/visual/SearchBar/search-textfield';
-import SearchResultCount from 'components/visual/SearchResultCount';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import CustomChip, { CustomChipProps } from '../CustomChip';
+import SearchCount from './SearchCount';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -77,6 +77,19 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.up('md')]: {
       margin: `0 ${theme.spacing(0.75)}`
     }
+  },
+
+  chiplist: {
+    display: 'inline-flex',
+    flexWrap: 'wrap',
+    listStyle: 'none',
+    boxShadow: 'inherit',
+    margin: 0
+  },
+
+  chip: {
+    marginBottom: theme.spacing(0.5),
+    marginRight: theme.spacing(1)
   }
 }));
 
@@ -87,6 +100,7 @@ type SearchParam = {
   offset: number;
   rows: number;
   filters: string[];
+  trackTotalHits: number;
 };
 
 interface StyledPaperProps extends IconButtonProps {
@@ -106,6 +120,7 @@ type Props = {
   pageSize?: number;
   paramKeys?: Partial<Record<keyof SearchParam, string>>;
   total?: number;
+  max?: number;
   isSticky?: boolean;
   results?: {
     items: unknown[];
@@ -113,15 +128,22 @@ type Props = {
     rows: number;
     total: number;
   };
+  disableCount?: boolean;
   disableTotalResults?: boolean;
   disablePagination?: boolean;
   disableFilterList?: boolean;
   onChange?: (value: URLSearchParams) => void;
   onValueChange?: (filterValue: string) => void;
 
+  totalHitsTitle?: ReactNode;
+
   renderTotalResults?: () => ReactNode;
-  renderFilterList?: () => ReactNode;
   renderPagination?: () => ReactNode;
+  renderFilterList?: () => ReactNode;
+  renderFilter?: (filter: string) => CustomChipProps;
+  renderExtraFilters?: () => CustomChipProps[];
+  renderPopoverFilter?: () => CustomChipProps[];
+  hideFilters?: (filter: string) => boolean;
 
   endAdornment?: ReactNode;
   buttonProps?: StyledPaperProps[];
@@ -137,25 +159,34 @@ const WrappedSearchHeader = ({
     query: queryDefaultValue = '*',
     offset: offsetDefaultValue = 0,
     rows: rowsDefaultValue = 25,
-    filters: filtersDefaultValue = []
+    filters: filtersDefaultValue = [],
+    trackTotalHits: trackTotalHitsValue = 10000
   },
   paramKeys: {
     query: queryKey = 'query',
     offset: offsetKey = 'offset',
     rows: rowsKey = 'rows',
-    filters: filtersKey = 'filters'
+    filters: filtersKey = 'filters',
+    trackTotalHits: trackTotalHitsKey = 'track_total_hits'
   },
   total = null,
   isSticky = true,
+  disableCount = false,
   disableTotalResults = false,
   disablePagination = false,
   disableFilterList = false,
   onChange = () => null,
   onValueChange = () => null,
 
+  totalHitsTitle = null,
+
   renderTotalResults = null,
-  renderFilterList = null,
   renderPagination = null,
+  renderFilterList = null,
+  renderFilter = null,
+  renderExtraFilters = null,
+  hideFilters = () => false,
+  renderPopoverFilter = null,
 
   endAdornment = null,
   buttonProps = []
@@ -215,6 +246,11 @@ const WrappedSearchHeader = ({
     },
     [params, queryKey, offsetKey, onChange]
   );
+
+  const handleCountClick = useCallback(() => {
+    params.set(trackTotalHitsKey, Number(1000000000).toString());
+    onChange(params);
+  }, [onChange, params, trackTotalHitsKey]);
 
   const handlePageChange = useCallback(
     (_event: React.ChangeEvent<unknown>, p: number) => {
@@ -278,9 +314,9 @@ const WrappedSearchHeader = ({
             {(endAdornment || buttonProps.length !== 0) && (
               <Divider className={classes.divider} orientation="vertical" flexItem />
             )}
-            {buttonProps.map((b, i) =>
-              b?.tooltipTitle ? (
-                <Tooltip key={`searchbar-button-${i}`} title={b.tooltipTitle} placement={b.tooltipPlacement}>
+            {buttonProps.map(({ tooltipTitle, tooltipPlacement, ...b }, i) =>
+              tooltipTitle ? (
+                <Tooltip key={`searchbar-button-${i}`} title={tooltipTitle} placement={tooltipPlacement}>
                   <div>
                     <IconButton size={!upMD ? 'small' : 'large'} disabled={loading} {...b} />
                   </div>
@@ -297,16 +333,20 @@ const WrappedSearchHeader = ({
 
         {/** Result Count */}
         <div className={classes.container} style={{ justifyContent: 'flex-end', fontStyle: 'italic' }}>
-          {disableTotalResults ? null : loading ? (
-            <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }} children={t('loading')} />
-          ) : (
-            total > 0 && (
-              <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                <SearchResultCount count={total} />
-                {renderTotalResults && renderTotalResults()}
-              </Typography>
-            )
-          )}
+          <div style={{ flexGrow: 1 }}>
+            {disableCount ? null : (
+              <SearchCount
+                loading={loading}
+                max={(() => {
+                  const val = Number(params.get(trackTotalHitsKey));
+                  return isNaN(val) ? trackTotalHitsValue : val;
+                })()}
+                suffix={totalHitsTitle}
+                total={total}
+                onClick={() => handleCountClick()}
+              />
+            )}
+          </div>
 
           {/** Pagination */}
           {disablePagination
@@ -330,11 +370,40 @@ const WrappedSearchHeader = ({
         {/** Filters */}
         {disableFilterList
           ? null
-          : renderFilterList
-          ? renderFilterList()
           : params && (
-              <div className={classes.container}>
-                <ChipList
+              <ul className={clsx(classes.container, classes.chiplist)}>
+                {renderPopoverFilter &&
+                  renderPopoverFilter().map((cp, i) => (
+                    <li key={`chiplistextra-${i}`}>
+                      <CustomChip className={classes.chip} size="small" variant="outlined" wrap {...cp} />
+                    </li>
+                  ))}
+
+                {renderExtraFilters &&
+                  renderExtraFilters().map((cp, i) => (
+                    <li key={`chiplistextra-${i}`}>
+                      <CustomChip className={classes.chip} size="small" variant="outlined" wrap {...cp} />
+                    </li>
+                  ))}
+
+                {params
+                  .getAll(filtersKey)
+                  .filter(f => !hideFilters(f))
+                  .map((f, i) => (
+                    <li key={`chiplist-${i}`}>
+                      <CustomChip
+                        className={classes.chip}
+                        label={f.startsWith('NOT(') && f.endsWith(')') ? f.substring(4, f.length - 1) : f}
+                        color={f.startsWith('NOT(') && f.endsWith(')') ? 'error' : null}
+                        size="small"
+                        variant="outlined"
+                        wrap
+                        onClick={() => handleFilterClick(f)}
+                        onDelete={() => handleFilterDelete(f)}
+                      />
+                    </li>
+                  ))}
+                {/* <ChipList
                   items={params.getAll(filtersKey).map(v => ({
                     variant: 'outlined',
                     label: v.startsWith('NOT(') && v.endsWith(')') ? v.substring(4, v.length - 1) : v,
@@ -342,8 +411,8 @@ const WrappedSearchHeader = ({
                     onClick: () => handleFilterClick(v),
                     onDelete: () => handleFilterDelete(v)
                   }))}
-                />
-              </div>
+                /> */}
+              </ul>
             )}
 
         {/** Other Components */}
