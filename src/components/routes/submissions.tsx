@@ -117,6 +117,7 @@ const SubmissionPage = () => {
               //   onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'max_score:>=1000'] }))
               // }
             ]}
+            renderPopoverFilters={() => [{ chip: { label: 'asd' } }]}
             hideFilters={filter => ['max_score:>=1000'].includes(filter)}
           />
         </div>

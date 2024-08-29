@@ -1,10 +1,11 @@
 import BackspaceIcon from '@mui/icons-material/Backspace';
-import type { IconButtonProps, TooltipProps } from '@mui/material';
+import type { IconButtonProps, PopoverProps, TooltipProps } from '@mui/material';
 import {
   Divider,
   IconButton,
   LinearProgress,
   Pagination,
+  Popover,
   Tooltip,
   alpha,
   useMediaQuery,
@@ -13,11 +14,12 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import PageHeader from 'commons/components/pages/PageHeader';
+import type { CustomChipProps } from 'components/visual/CustomChip';
+import CustomChip from 'components/visual/CustomChip';
 import SearchTextField from 'components/visual/SearchBar/search-textfield';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import CustomChip, { CustomChipProps } from '../CustomChip';
 import SearchCount from './SearchCount';
 
 const useStyles = makeStyles(theme => ({
@@ -108,6 +110,67 @@ interface StyledPaperProps extends IconButtonProps {
   tooltipPlacement?: TooltipProps['placement'];
 }
 
+type PopoverChipProps = {
+  chip?: CustomChipProps;
+  popover?: PopoverProps;
+  children?: ReactNode;
+};
+
+const WrappedPopoverChip = ({ chip, popover, children }: PopoverChipProps) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const classes = useStyles();
+  const upMD = useMediaQuery(theme.breakpoints.up('md'));
+
+  const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
+
+  const ref = useRef();
+
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  // const handleClick = () => {
+  //   setAnchorEl(ref.current);
+  //   // setAnchorEl(event.);
+  // };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
+  return (
+    <>
+      <CustomChip
+        className={classes.chip}
+        ref={ref}
+        size="small"
+        variant="outlined"
+        wrap
+        {...chip}
+        onClick={handleClick}
+      />
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left'
+        }}
+      >
+        {children}
+      </Popover>
+    </>
+  );
+};
+
+const PopoverChip = React.memo(WrappedPopoverChip);
+
 type Props = {
   children?: ReactNode;
   value: string | string[][] | Record<string, string> | URLSearchParams;
@@ -135,18 +198,18 @@ type Props = {
   onChange?: (value: URLSearchParams) => void;
   onValueChange?: (filterValue: string) => void;
 
-  totalHitsTitle?: ReactNode;
+  totalHitsTitle?: ReactNode; // result types
 
   renderTotalResults?: () => ReactNode;
   renderPagination?: () => ReactNode;
   renderFilterList?: () => ReactNode;
   renderFilter?: (filter: string) => CustomChipProps;
   renderExtraFilters?: () => CustomChipProps[];
-  renderPopoverFilter?: () => CustomChipProps[];
+  renderPopoverFilters?: () => PopoverChipProps[];
   hideFilters?: (filter: string) => boolean;
 
   endAdornment?: ReactNode;
-  buttonProps?: StyledPaperProps[];
+  buttonProps?: StyledPaperProps[]; // endButtonProps
 };
 
 const WrappedSearchHeader = ({
@@ -186,7 +249,7 @@ const WrappedSearchHeader = ({
   renderFilter = null,
   renderExtraFilters = null,
   hideFilters = () => false,
-  renderPopoverFilter = null,
+  renderPopoverFilters = null,
 
   endAdornment = null,
   buttonProps = []
@@ -372,10 +435,10 @@ const WrappedSearchHeader = ({
           ? null
           : params && (
               <ul className={clsx(classes.container, classes.chiplist)}>
-                {renderPopoverFilter &&
-                  renderPopoverFilter().map((cp, i) => (
-                    <li key={`chiplistextra-${i}`}>
-                      <CustomChip className={classes.chip} size="small" variant="outlined" wrap {...cp} />
+                {renderPopoverFilters &&
+                  renderPopoverFilters().map((props, i) => (
+                    <li key={`popoverchiplist-${i}`}>
+                      <PopoverChip {...props} />
                     </li>
                   ))}
 
