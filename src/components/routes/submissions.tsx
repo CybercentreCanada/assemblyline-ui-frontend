@@ -58,7 +58,7 @@ const SubmissionPage = () => {
       method: 'POST',
       url: '/api/v4/search/submission/',
       body: search.set(o => ({ ...o, query: o.query || '*' })).toObject(),
-      onSuccess: ({ api_response }) => setSubmissionResults(api_response),
+      onSuccess: ({ api_response }) => setSubmissionResults(api_response as SearchResults),
       onEnter: () => setSearching(true),
       onExit: () => setSearching(false)
     });
