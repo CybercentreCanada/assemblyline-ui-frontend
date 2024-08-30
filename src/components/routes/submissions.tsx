@@ -36,7 +36,7 @@ const SUBMISSION_PARAMS = {
 
 type SubmissionParams = SearchParams<typeof SUBMISSION_PARAMS>;
 
-const SubmissionPage = () => {
+const SubmissionSearch = () => {
   const { t } = useTranslation(['submissions']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -55,8 +55,8 @@ const SubmissionPage = () => {
     if (!search || !currentUser.roles.includes('submission_view')) return;
 
     apiCall({
-      method: 'POST',
       url: '/api/v4/search/submission/',
+      method: 'POST',
       body: search.set(o => ({ ...o, query: o.query || '*' })).toObject(),
       onSuccess: ({ api_response }) => setSubmissionResults(api_response as SearchResults),
       onEnter: () => setSearching(true),
@@ -125,11 +125,11 @@ const SubmissionPage = () => {
   );
 };
 
-const WrappedSubmission = () => (
+const WrappedSubmissionPage = () => (
   <SearchParamsProvider defaultValue={SUBMISSION_PARAMS} hidden={['rows', 'offset']} enforced={['rows']}>
-    <SubmissionPage />
+    <SubmissionSearch />
   </SearchParamsProvider>
 );
 
-export const Submission = React.memo(WrappedSubmission);
-export default Submission;
+export const SubmissionPage = React.memo(WrappedSubmissionPage);
+export default SubmissionPage;
