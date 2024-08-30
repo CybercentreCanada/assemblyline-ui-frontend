@@ -380,32 +380,38 @@ const WrappedSearchHeader = ({
         </div>
 
         {/** Result Count */}
-        <div className={classes.container} style={{ justifyContent: 'flex-end', fontStyle: 'italic' }}>
-          <div style={{ flexGrow: 1 }}>
-            {!disableCount && (
-              <SearchCount
-                loading={loading}
-                max={trackTotalHits}
-                suffix={resultLabel}
-                total={results?.total}
-                onClick={() => handleCountClick()}
-              />
-            )}
-          </div>
+        {count > 1 ? (
+          <>
+            <div className={classes.container} style={{ justifyContent: 'flex-end', fontStyle: 'italic' }}>
+              <div style={{ flexGrow: 1 }}>
+                {!disableCount && (
+                  <SearchCount
+                    loading={loading}
+                    max={trackTotalHits}
+                    suffix={resultLabel}
+                    total={results?.total}
+                    onClick={() => handleCountClick()}
+                  />
+                )}
+              </div>
 
-          {/** Pagination */}
-          {!disablePagination && count > 1 && page && (
-            <Pagination
-              disabled={loading}
-              shape="rounded"
-              size="small"
-              {...paginationProps}
-              count={count}
-              page={page}
-              onChange={handlePageChange}
-            />
-          )}
-        </div>
+              {/** Pagination */}
+              {!disablePagination && page && (
+                <Pagination
+                  disabled={loading}
+                  shape="rounded"
+                  size="small"
+                  {...paginationProps}
+                  count={count}
+                  page={page}
+                  onChange={handlePageChange}
+                />
+              )}
+            </div>
+          </>
+        ) : (
+          <div />
+        )}
 
         {/** Filters */}
         {!disableFilters && params && (
