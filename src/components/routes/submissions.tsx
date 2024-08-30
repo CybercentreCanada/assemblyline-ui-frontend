@@ -90,13 +90,11 @@ const SubmissionPage = () => {
                 tooltip: { title: t('my_submission') },
                 icon: { children: <PersonIcon /> },
                 button: {
-                  onClick: () => {
-                    console.log('asd');
+                  onClick: () =>
                     setSearchObject(o => {
                       const filters = [...o.filters, `params.submitter:${safeFieldValue(currentUser.username)}`];
                       return { ...o, filters };
-                    });
-                  }
+                    })
                 }
               },
               {
