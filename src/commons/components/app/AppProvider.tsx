@@ -1,7 +1,9 @@
 import type { PaletteMode } from '@mui/material';
 import { CssBaseline, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
+import { BorealisProvider } from 'borealis-ui';
 import type { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
+import useThemeBuilder from 'commons/components/utils/hooks/useThemeBuilder';
 import AssistantProvider from 'components/providers/AssistantProvider';
 import CarouselProvider from 'components/providers/CarouselProvider';
 import DrawerProvider from 'components/providers/DrawerProvider';
@@ -10,7 +12,6 @@ import HighlightProvider from 'components/providers/HighlightProvider';
 import i18n from 'i18n';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useMemo } from 'react';
-import useThemeBuilder from '../utils/hooks/useThemeBuilder';
 import { AppStorageKeys } from './AppConstants';
 import type { AppContextType } from './AppContexts';
 import { AppDefaultsPreferencesConfigs } from './AppDefaults';
@@ -81,23 +82,25 @@ export default function AppProvider<U extends AppUser>({
           <CssBaseline />
           <AppErrorProvider>
             <AppSnackbarProvider>
-              <AppUserProvider service={user}>
-                <AssistantProvider>
-                  <HighlightProvider>
-                    <ExternalLookupProvider>
-                      <CarouselProvider>
-                        <DrawerProvider>
-                          <AppBarProvider search={search}>
-                            <AppLeftNavProvider>
-                              <AppLayoutProvider>{children}</AppLayoutProvider>
-                            </AppLeftNavProvider>
-                          </AppBarProvider>
-                        </DrawerProvider>
-                      </CarouselProvider>
-                    </ExternalLookupProvider>
-                  </HighlightProvider>
-                </AssistantProvider>
-              </AppUserProvider>
+              <BorealisProvider baseURL={location.origin + '/api/v4/proxy/borealis'} getToken={() => null}>
+                <AppUserProvider service={user}>
+                  <AssistantProvider>
+                    <HighlightProvider>
+                      <ExternalLookupProvider>
+                        <CarouselProvider>
+                          <DrawerProvider>
+                            <AppBarProvider search={search}>
+                              <AppLeftNavProvider>
+                                <AppLayoutProvider>{children}</AppLayoutProvider>
+                              </AppLeftNavProvider>
+                            </AppBarProvider>
+                          </DrawerProvider>
+                        </CarouselProvider>
+                      </ExternalLookupProvider>
+                    </HighlightProvider>
+                  </AssistantProvider>
+                </AppUserProvider>
+              </BorealisProvider>
             </AppSnackbarProvider>
           </AppErrorProvider>
         </ThemeProvider>

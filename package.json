@@ -25,7 +25,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autosuggest-highlight": "^3.3.4",
-    "borealis-ui": "^0.1.12-dev24720",
+    "borealis-ui": "^0.1.12-dev24968",
     "browser-detect": "^0.2.28",
     "buffer": "^6.0.3",
     "chart.js": "^4.4.1",

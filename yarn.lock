@@ -3299,10 +3299,13 @@ bidi-js@^1.0.3:
   dependencies:
     require-from-string "^2.0.2"
 
-borealis-ui@^0.1.12-dev24575:
-  version "0.1.12-dev24575"
-  resolved "https://registry.yarnpkg.com/borealis-ui/-/borealis-ui-0.1.12-dev24575.tgz#c32e766055959ebfaf22874b00d3244346fab4fb"
-  integrity sha512-fcmBargVMu+imX6L8scSdHUqvTsrcv4lQ/NjdJRFfCqhCTQgGBZPx5RBw6XAX056qtH3uSLGS7xmLIz6ywofbA==
+borealis-ui@^0.1.12-dev24968:
+  version "0.1.12-dev24968"
+  resolved "https://registry.yarnpkg.com/borealis-ui/-/borealis-ui-0.1.12-dev24968.tgz#c79fd2202762ff76b57be6d66dd34697c1bd5653"
+  integrity sha512-IgvAWIBl+8TGbA0D8CyheiRQQuqQ1Pn8NUgf4GJ0Tk3503+C4muzVP3e2Nej4RHY8pTf8x1VOCABuu/6nw49yg==
+  dependencies:
+    scheduler "^0.23.2"
+    use-context-selector "^2.0.0"
 
 brace-expansion@^1.1.7:
   version "1.1.11"
@@ -7516,6 +7519,11 @@ use-composed-ref@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/use-composed-ref/-/use-composed-ref-1.3.0.tgz#3d8104db34b7b264030a9d916c5e94fbe280dbda"
   integrity sha512-GLMG0Jc/jiKov/3Ulid1wbv3r54K9HlMW29IWcDFPEqFkSO2nS0MuefWgMJpeHQ9YJeXDL3ZUF+P3jdXlZX/cQ==
+
+use-context-selector@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/use-context-selector/-/use-context-selector-2.0.0.tgz#3b5dafec7aa947c152d4f0aa7f250e99a205df3d"
+  integrity sha512-owfuSmUNd3eNp3J9CdDl0kMgfidV+MkDvHPpvthN5ThqM+ibMccNE0k+Iq7TWC6JPFvGZqanqiGCuQx6DyV24g==
 
 use-isomorphic-layout-effect@^1.1.1:
   version "1.1.2"
