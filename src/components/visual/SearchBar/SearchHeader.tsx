@@ -107,11 +107,6 @@ type SearchParam = {
   trackTotalHits: number;
 };
 
-interface StyledPaperProps extends IconButtonProps {
-  tooltipTitle?: TooltipProps['title'];
-  tooltipPlacement?: TooltipProps['placement'];
-}
-
 type PopoverChipProps = {
   chip?: CustomChipProps;
   popover?: PopoverProps;
@@ -119,30 +114,21 @@ type PopoverChipProps = {
 };
 
 const WrappedPopoverChip = ({ chip, popover, children }: PopoverChipProps) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
   const classes = useStyles();
-  const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 
   const ref = useRef();
 
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);
-  };
+  }, []);
 
-  // const handleClick = () => {
-  //   setAnchorEl(ref.current);
-  //   // setAnchorEl(event.);
-  // };
-
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
   const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
 
   return (
     <>
@@ -156,7 +142,6 @@ const WrappedPopoverChip = ({ chip, popover, children }: PopoverChipProps) => {
         onClick={handleClick}
       />
       <Popover
-        id={id}
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
@@ -164,6 +149,7 @@ const WrappedPopoverChip = ({ chip, popover, children }: PopoverChipProps) => {
           vertical: 'bottom',
           horizontal: 'left'
         }}
+        {...popover}
       >
         {children}
       </Popover>
