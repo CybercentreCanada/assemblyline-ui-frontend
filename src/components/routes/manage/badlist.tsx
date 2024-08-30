@@ -83,9 +83,7 @@ const BadlistSearch = () => {
   );
 
   const setBadlistID = useCallback(
-    (wf_id: string) => {
-      navigate(`${location.pathname}${location.search || ''}#${wf_id}`);
-    },
+    (wf_id: string) => navigate(`${location.pathname}${location.search || ''}#${wf_id}`),
     [location.pathname, location.search, navigate]
   );
 
@@ -116,7 +114,7 @@ const BadlistSearch = () => {
     return () => {
       window.removeEventListener('reloadBadlist', reload);
     };
-  }, [badlistResults, handleReload, search]);
+  }, [handleReload, search]);
 
   return currentUser.roles.includes('badlist_view') ? (
     <PageFullWidth margin={4}>
