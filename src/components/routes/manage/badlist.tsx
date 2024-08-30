@@ -13,7 +13,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
-import { SearchParams } from 'components/visual/SearchBar/SearchParams';
+import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import BadlistTable from 'components/visual/SearchResult/badlist';
@@ -22,7 +22,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import BadlistNew from './badlist_add';
-import BadlistDetail, { Badlist } from './badlist_detail';
+import type { Badlist } from './badlist_detail';
+import BadlistDetail from './badlist_detail';
 
 type SearchResults = {
   items: Badlist[];
@@ -98,7 +99,8 @@ const BadlistSearch = () => {
     if (!location.hash) closeGlobalDrawer();
     else if (location.hash === '#new') setGlobalDrawer(<BadlistNew close={closeGlobalDrawer} />);
     else setGlobalDrawer(<BadlistDetail badlist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
-  }, [closeGlobalDrawer, location.hash, setGlobalDrawer]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.hash]);
 
   useEffect(() => {
     handleReload(search.set(o => ({ ...o, query: o.query || '*' })).toObject());
@@ -131,7 +133,7 @@ const BadlistSearch = () => {
                   style={{
                     color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                   }}
-                  onClick={() => navigate(`${location.pathname}${location.search ? location.search : ''}#new`)}
+                  onClick={() => navigate(`${location.pathname}${location.search || ''}#new`)}
                   size="large"
                 >
                   <AddCircleOutlineOutlinedIcon />
