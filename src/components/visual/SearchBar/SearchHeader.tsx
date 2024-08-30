@@ -1,11 +1,12 @@
 import BackspaceIcon from '@mui/icons-material/Backspace';
-import type { IconButtonProps, PopoverProps, TooltipProps } from '@mui/material';
+import type { IconButtonProps, PaginationProps, PopoverProps, SvgIconProps, TooltipProps } from '@mui/material';
 import {
   Divider,
   IconButton,
   LinearProgress,
   Pagination,
   Popover,
+  SvgIcon,
   Tooltip,
   alpha,
   useMediaQuery,
@@ -16,6 +17,7 @@ import clsx from 'clsx';
 import PageHeader from 'commons/components/pages/PageHeader';
 import type { CustomChipProps } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
+import type { SearchTextFieldProps } from 'components/visual/SearchBar/search-textfield';
 import SearchTextField from 'components/visual/SearchBar/search-textfield';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -173,116 +175,113 @@ const PopoverChip = React.memo(WrappedPopoverChip);
 
 type Props = {
   children?: ReactNode;
-  value: string | string[][] | Record<string, string> | URLSearchParams;
-  defaultValue?: Partial<SearchParam>;
-  placeholder?: string;
-  searchResultContent?: string;
-  loading?: boolean;
-  extras?: ReactNode;
-  suggestions?: string[];
-  pageSize?: number;
+
+  params: string | string[][] | Record<string, string> | URLSearchParams;
   paramKeys?: Partial<Record<keyof SearchParam, string>>;
-  total?: number;
-  max?: number;
-  isSticky?: boolean;
-  results?: {
+  paramDefaults?: Partial<SearchParam>;
+  loading?: boolean;
+  resultLabel?: ReactNode;
+  results: {
     items: unknown[];
     offset: number;
     rows: number;
     total: number;
   };
-  disableCount?: boolean;
-  disableTotalResults?: boolean;
-  disablePagination?: boolean;
-  disableFilterList?: boolean;
+
+  disable?: {
+    count?: boolean;
+    pagination?: boolean;
+    filters?: boolean;
+  };
+  isSticky?: boolean;
+
   onChange?: (value: URLSearchParams) => void;
   onValueChange?: (filterValue: string) => void;
-
-  totalHitsTitle?: ReactNode; // result types
-
-  renderTotalResults?: () => ReactNode;
-  renderPagination?: () => ReactNode;
-  renderFilterList?: () => ReactNode;
-  renderFilter?: (filter: string) => CustomChipProps;
-  renderExtraFilters?: () => CustomChipProps[];
-  renderPopoverFilters?: () => PopoverChipProps[];
   hideFilters?: (filter: string) => boolean;
 
+  searchInputProps?: Partial<SearchTextFieldProps>;
+  actionProps?: { tooltip?: Omit<TooltipProps, 'children'>; button?: IconButtonProps; icon: SvgIconProps }[];
+  paginationProps?: PaginationProps;
+  popoverFilterProps?: PopoverChipProps[];
+  extraFilterProps?: CustomChipProps[];
   endAdornment?: ReactNode;
-  buttonProps?: StyledPaperProps[]; // endButtonProps
 };
 
 const WrappedSearchHeader = ({
-  children,
-  value = '',
-  placeholder,
-  loading = false,
-  suggestions = [],
-  defaultValue: {
-    query: queryDefaultValue = '*',
-    offset: offsetDefaultValue = 0,
-    rows: rowsDefaultValue = 25,
-    filters: filtersDefaultValue = [],
-    trackTotalHits: trackTotalHitsValue = 10000
-  },
+  children = null,
+  params: paramsInit = '',
   paramKeys: {
     query: queryKey = 'query',
     offset: offsetKey = 'offset',
     rows: rowsKey = 'rows',
     filters: filtersKey = 'filters',
     trackTotalHits: trackTotalHitsKey = 'track_total_hits'
+  } = { query: 'query', offset: 'offset', rows: 'rows', filters: 'filters', trackTotalHits: 'track_total_hits' },
+  paramDefaults: {
+    query: defaultQuery = '',
+    offset: defaultOffset = 0,
+    rows: defaultRows = 25,
+    filters: defaultFilters = [],
+    trackTotalHits: defaultTrackTotalHits = 10000
+  } = { query: '', offset: 0, rows: 25, filters: [], trackTotalHits: 10000 },
+  loading = false,
+  resultLabel = '',
+  results = null,
+  isSticky = false,
+  disable: { count: disableCount = false, pagination: disablePagination = false, filters: disableFilters = false } = {
+    count: false,
+    pagination: false,
+    filters: false
   },
-  total = null,
-  isSticky = true,
-  disableCount = false,
-  disableTotalResults = false,
-  disablePagination = false,
-  disableFilterList = false,
-  onChange = () => null,
+
+  onChange = null,
   onValueChange = () => null,
-
-  totalHitsTitle = null,
-
-  renderTotalResults = null,
-  renderPagination = null,
-  renderFilterList = null,
-  renderFilter = null,
-  renderExtraFilters = null,
   hideFilters = () => false,
-  renderPopoverFilters = null,
 
-  endAdornment = null,
-  buttonProps = []
+  searchInputProps = null,
+  actionProps = [],
+  paginationProps = null,
+  popoverFilterProps = [],
+  extraFilterProps = [],
+  endAdornment = null
 }: Props) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const classes = useStyles();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
-  const params = useMemo<URLSearchParams>(() => new URLSearchParams(value), [value]);
+  const params = useMemo<URLSearchParams>(() => new URLSearchParams(paramsInit), [paramsInit]);
 
-  const [queryValue, setQueryValue] = useState<string>(
-    !params.has(queryKey) ? queryDefaultValue : params.get(queryKey)
-  );
+  const [queryValue, setQueryValue] = useState<string>(!params.has(queryKey) ? defaultQuery : params.get(queryKey));
 
   const rootRef = useRef<HTMLInputElement>();
   const inputRef = useRef<HTMLInputElement>();
 
+  const filters = useMemo(() => params.getAll(filtersKey) || defaultFilters, [defaultFilters, filtersKey, params]);
+
+  const offset = useMemo(() => {
+    const val = Number(params.get(offsetKey));
+    return isNaN(val) ? defaultOffset : val;
+  }, [defaultOffset, offsetKey, params]);
+
+  const rows = useMemo(() => {
+    const val = Number(params.get(rowsKey));
+    return isNaN(val) ? defaultRows : val;
+  }, [defaultRows, params, rowsKey]);
+
+  const trackTotalHits = useMemo(() => {
+    const val = Number(params.get(trackTotalHitsKey));
+    return isNaN(val) ? defaultTrackTotalHits : val;
+  }, [defaultTrackTotalHits, params, trackTotalHitsKey]);
+
   const page = useMemo<number>(
-    () =>
-      !params
-        ? null
-        : Math.ceil(
-            Math.min(Number(params.get(offsetKey) || offsetDefaultValue), MAX_TRACKED_RECORDS) /
-              Number(params.get(rowsKey) || rowsDefaultValue)
-          ) + 1,
-    [offsetDefaultValue, offsetKey, params, rowsDefaultValue, rowsKey]
+    () => (!params ? null : Math.ceil(Math.min(offset, MAX_TRACKED_RECORDS) / rows) + 1),
+    [offset, params, rows]
   );
 
   const count = useMemo<number>(
-    () =>
-      !total ? null : Math.ceil(Math.min(total, MAX_TRACKED_RECORDS) / Number(params.get(rowsKey) || rowsDefaultValue)),
-    [params, rowsDefaultValue, rowsKey, total]
+    () => (!results?.total ? null : Math.ceil(Math.min(results?.total, MAX_TRACKED_RECORDS) / rows)),
+    [results?.total, rows]
   );
 
   const getInputEl = useCallback(() => inputRef.current.querySelector('input'), []);
@@ -296,14 +295,14 @@ const WrappedSearchHeader = ({
   );
 
   const handleQueryClear = useCallback(() => {
-    setQueryValue('');
+    setQueryValue(defaultQuery);
     params.delete(queryKey);
     onChange(params);
-  }, [onChange, queryKey, params]);
+  }, [defaultQuery, onChange, params, queryKey]);
 
   const handleQuerySubmit = useCallback(
-    (v: string) => {
-      params.set(queryKey, v);
+    (value: string) => {
+      params.set(queryKey, value);
       params.set(offsetKey, '0');
       onChange(params);
     },
@@ -317,10 +316,10 @@ const WrappedSearchHeader = ({
 
   const handlePageChange = useCallback(
     (_event: React.ChangeEvent<unknown>, p: number) => {
-      params.set(offsetKey, ((p - 1) * (Number(params.get(rowsKey)) || rowsDefaultValue)).toString());
+      params.set(offsetKey, ((p - 1) * rows).toString());
       onChange(params);
     },
-    [offsetKey, onChange, params, rowsDefaultValue, rowsKey]
+    [offsetKey, onChange, params, rows]
   );
 
   const handleFilterClick = useCallback(
@@ -344,8 +343,8 @@ const WrappedSearchHeader = ({
   );
 
   useEffect(() => {
-    setQueryValue(!params.has(queryKey) ? queryDefaultValue : params.get(queryKey));
-  }, [params, queryDefaultValue, queryKey]);
+    setQueryValue(params.get(queryKey));
+  }, [params, queryKey]);
 
   useEffect(() => {
     if (!loading) getInputEl().focus();
@@ -358,9 +357,9 @@ const WrappedSearchHeader = ({
           <div className={classes.searchContainer}>
             <div ref={inputRef} style={{ flex: 1 }}>
               <SearchTextField
+                options={[]}
+                {...searchInputProps}
                 value={queryValue}
-                placeholder={placeholder}
-                options={suggestions}
                 disabled={loading}
                 onChange={v => handleQueryChange(v)}
                 onSearch={() => handleQuerySubmit(queryValue)}
@@ -374,18 +373,18 @@ const WrappedSearchHeader = ({
                 </IconButton>
               </div>
             </Tooltip>
-            {(endAdornment || buttonProps.length !== 0) && (
-              <Divider className={classes.divider} orientation="vertical" flexItem />
-            )}
-            {buttonProps.map(({ tooltipTitle, tooltipPlacement, ...b }, i) =>
-              tooltipTitle ? (
-                <Tooltip key={`searchbar-button-${i}`} title={tooltipTitle} placement={tooltipPlacement}>
+            {actionProps.length > 0 && <Divider className={classes.divider} orientation="vertical" flexItem />}
+            {actionProps.map(({ tooltip, button, icon }, i) =>
+              tooltip ? (
+                <Tooltip key={`action-${i}`} {...tooltip}>
                   <div>
-                    <IconButton size={!upMD ? 'small' : 'large'} disabled={loading} {...b} />
+                    <IconButton size={!upMD ? 'small' : 'large'} disabled={loading}>
+                      <SvgIcon fontSize={upMD ? 'medium' : 'small'} {...icon} />
+                    </IconButton>
                   </div>
                 </Tooltip>
               ) : (
-                <IconButton key={`searchbar-button-${i}`} size={!upMD ? 'small' : 'large'} disabled={loading} {...b} />
+                <IconButton key={`action-${i}`} size={!upMD ? 'small' : 'large'} disabled={loading} {...button} />
               )
             )}
             {endAdornment}
@@ -397,86 +396,63 @@ const WrappedSearchHeader = ({
         {/** Result Count */}
         <div className={classes.container} style={{ justifyContent: 'flex-end', fontStyle: 'italic' }}>
           <div style={{ flexGrow: 1 }}>
-            {disableCount ? null : (
+            {!disableCount && (
               <SearchCount
                 loading={loading}
-                max={(() => {
-                  const val = Number(params.get(trackTotalHitsKey));
-                  return isNaN(val) ? trackTotalHitsValue : val;
-                })()}
-                suffix={totalHitsTitle}
-                total={total}
+                max={trackTotalHits}
+                suffix={resultLabel}
+                total={results?.total}
                 onClick={() => handleCountClick()}
               />
             )}
           </div>
 
           {/** Pagination */}
-          {disablePagination
-            ? null
-            : renderPagination
-            ? renderPagination()
-            : count &&
-              count > 1 &&
-              page && (
-                <Pagination
-                  count={count}
-                  page={page}
-                  disabled={loading}
-                  size="small"
-                  shape="rounded"
-                  onChange={handlePageChange}
-                />
-              )}
+          {!disablePagination && count > 1 && page && (
+            <Pagination
+              disabled={loading}
+              shape="rounded"
+              size="small"
+              {...paginationProps}
+              count={count}
+              page={page}
+              onChange={handlePageChange}
+            />
+          )}
         </div>
 
         {/** Filters */}
-        {disableFilterList
-          ? null
-          : params && (
-              <ul className={clsx(classes.container, classes.chiplist)}>
-                {renderPopoverFilters &&
-                  renderPopoverFilters().map((props, i) => (
-                    <li key={`popoverchiplist-${i}`}>
-                      <PopoverChip {...props} />
-                    </li>
-                  ))}
+        {disableFilters && params && (
+          <ul className={clsx(classes.container, classes.chiplist)}>
+            {popoverFilterProps.map((props, i) => (
+              <li key={`chip-${i}`} children={<PopoverChip {...props} />} />
+            ))}
 
-                {renderExtraFilters &&
-                  renderExtraFilters().map((cp, i) => (
-                    <li key={`chiplistextra-${i}`}>
-                      <CustomChip className={classes.chip} size="small" variant="outlined" wrap {...cp} />
-                    </li>
-                  ))}
+            {extraFilterProps.map((props, i) => (
+              <li
+                key={`chip-${i}`}
+                children={<CustomChip className={classes.chip} size="small" variant="outlined" wrap {...props} />}
+              />
+            ))}
 
-                {params
-                  .getAll(filtersKey)
-                  .filter(f => !hideFilters(f))
-                  .map((f, i) => (
-                    <li key={`chiplist-${i}`}>
-                      <CustomChip
-                        className={classes.chip}
-                        label={f.startsWith('NOT(') && f.endsWith(')') ? f.substring(4, f.length - 1) : f}
-                        color={f.startsWith('NOT(') && f.endsWith(')') ? 'error' : null}
-                        size="small"
-                        variant="outlined"
-                        wrap
-                        onClick={() => handleFilterClick(f)}
-                        onDelete={() => handleFilterDelete(f)}
-                      />
-                    </li>
-                  ))}
-                {/* <ChipList
-                  items={params.getAll(filtersKey).map(v => ({
-                    variant: 'outlined',
-                    label: v.startsWith('NOT(') && v.endsWith(')') ? v.substring(4, v.length - 1) : v,
-                    color: v.startsWith('NOT(') && v.endsWith(')') ? 'error' : null,
-                    onClick: () => handleFilterClick(v),
-                    onDelete: () => handleFilterDelete(v)
-                  }))}
-                /> */}
-              </ul>
-            )}
+            {filters
+              .filter(f => !hideFilters(f))
+              .map((f, i) => (
+                <li key={`chiplist-${i}`}>
+                  <CustomChip
+                    className={classes.chip}
+                    label={f.startsWith('NOT(') && f.endsWith(')') ? f.substring(4, f.length - 1) : f}
+                    color={f.startsWith('NOT(') && f.endsWith(')') ? 'error' : null}
+                    size="small"
+                    variant="outlined"
+                    wrap
+                    onClick={() => handleFilterClick(f)}
+                    onDelete={() => handleFilterDelete(f)}
+                  />
+                </li>
+              ))}
+          </ul>
+        )}
 
         {/** Other Components */}
         {children && <div className={classes.container}>{children}</div>}

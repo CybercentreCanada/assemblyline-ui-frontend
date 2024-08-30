@@ -1,7 +1,7 @@
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import PersonIcon from '@mui/icons-material/Person';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
@@ -39,7 +39,6 @@ type SubmissionParams = SearchParams<typeof SUBMISSION_PARAMS>;
 const SubmissionPage = () => {
   const { t } = useTranslation(['submissions']);
   const theme = useTheme();
-  const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const { apiCall } = useMyAPI();
   const { user: currentUser, indexes } = useALContext();
   const { search, setSearchParams, setSearchObject } = useSearchParams<SubmissionParams>();
@@ -76,49 +75,43 @@ const SubmissionPage = () => {
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
-            value={search.toParams()}
+            params={search.toParams()}
             loading={searching}
-            suggestions={suggestions}
-            pageSize={SUBMISSION_PARAMS.rows}
-            total={submissionResults?.total}
-            placeholder={t('filter')}
-            defaultValue={{ query: '*', rows: 25 }}
-            paramKeys={{ query: 'query', filters: 'filters' }}
-            onChange={v => setSearchParams(v)}
-            totalHitsTitle={
+            results={submissionResults}
+            resultLabel={
               search.get('query')
                 ? t(`filtered${submissionResults?.total === 1 ? '' : 's'}`)
                 : t(`total${submissionResults?.total === 1 ? '' : 's'}`)
             }
-            buttonProps={[
+            onChange={v => setSearchParams(v)}
+            searchInputProps={{ placeholder: t('filter'), options: suggestions }}
+            actionProps={[
               {
-                tooltipTitle: t('my_submission'),
-                children: <PersonIcon fontSize={upMD ? 'medium' : 'small'} />,
-                onClick: () =>
-                  setSearchObject(o => {
-                    const filters = [...o.filters, `params.submitter:${safeFieldValue(currentUser.username)}`];
-                    return { ...o, filters };
-                  })
+                tooltip: { title: t('my_submission') },
+                icon: { children: <PersonIcon /> },
+                button: {
+                  onClick: () =>
+                    setSearchObject(o => {
+                      const filters = [...o.filters, `params.submitter:${safeFieldValue(currentUser.username)}`];
+                      return { ...o, filters };
+                    })
+                }
               },
               {
-                tooltipTitle: t('completed_submissions'),
-                children: <AssignmentTurnedInIcon fontSize={upMD ? 'medium' : 'small'} />,
-                onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'state:completed'] }))
+                tooltip: { title: t('completed_submissions') },
+                icon: { children: <AssignmentTurnedInIcon /> },
+                button: {
+                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'state:completed'] }))
+                }
               },
               {
-                tooltipTitle: t('malicious_submissions'),
-                children: <BugReportOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'max_score:>=1000'] }))
+                tooltip: { title: t('malicious_submissions') },
+                icon: { children: <BugReportOutlinedIcon /> },
+                button: {
+                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'max_score:>=1000'] }))
+                }
               }
             ]}
-            renderExtraFilters={() => [
-              // {
-              //   label: 'asd',
-              //   onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'max_score:>=1000'] }))
-              // }
-            ]}
-            renderPopoverFilters={() => [{ chip: { label: 'asd' } }]}
-            hideFilters={filter => ['max_score:>=1000'].includes(filter)}
           />
         </div>
       </PageHeader>
