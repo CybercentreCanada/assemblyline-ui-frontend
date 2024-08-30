@@ -378,7 +378,7 @@ const WrappedSearchHeader = ({
               tooltip ? (
                 <Tooltip key={`action-${i}`} {...tooltip}>
                   <div>
-                    <IconButton size={!upMD ? 'small' : 'large'} disabled={loading}>
+                    <IconButton size={!upMD ? 'small' : 'large'} {...button} disabled={loading}>
                       <SvgIcon fontSize={upMD ? 'medium' : 'small'} {...icon} />
                     </IconButton>
                   </div>
@@ -422,7 +422,7 @@ const WrappedSearchHeader = ({
         </div>
 
         {/** Filters */}
-        {disableFilters && params && (
+        {!disableFilters && params && (
           <ul className={clsx(classes.container, classes.chiplist)}>
             {popoverFilterProps.map((props, i) => (
               <li key={`chip-${i}`} children={<PopoverChip {...props} />} />

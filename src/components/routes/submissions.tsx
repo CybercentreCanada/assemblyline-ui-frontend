@@ -57,7 +57,7 @@ const SubmissionPage = () => {
     apiCall({
       method: 'POST',
       url: '/api/v4/search/submission/',
-      body: search.set(o => ({ ...o, query: o.query ? o.query : '*' })).toObject(),
+      body: search.set(o => ({ ...o, query: o.query || '*' })).toObject(),
       onSuccess: ({ api_response }) => setSubmissionResults(api_response),
       onEnter: () => setSearching(true),
       onExit: () => setSearching(false)
@@ -90,11 +90,13 @@ const SubmissionPage = () => {
                 tooltip: { title: t('my_submission') },
                 icon: { children: <PersonIcon /> },
                 button: {
-                  onClick: () =>
+                  onClick: () => {
+                    console.log('asd');
                     setSearchObject(o => {
                       const filters = [...o.filters, `params.submitter:${safeFieldValue(currentUser.username)}`];
                       return { ...o, filters };
-                    })
+                    });
+                  }
                 }
               },
               {
