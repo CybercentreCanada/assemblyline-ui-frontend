@@ -68,6 +68,15 @@ export type ExternalSource = {
   name: string;
 };
 
+export type Alias = {
+  name: string;
+  short_name: string;
+};
+
+export type ClassificationAliases = {
+  [key: string]: Alias;
+};
+
 export type MetadataConfiguration = {
   required: boolean;
   validator_type: string;
@@ -147,6 +156,7 @@ export type ConfigurationDefinition = {
     allow_replay: boolean;
     allow_url_submissions: boolean;
     allow_zip_downloads: boolean;
+    api_proxies: string[];
     apps: AppSwitcherItem[];
     banner: {
       [lang: string]: string;
@@ -202,10 +212,12 @@ export interface CustomUser extends AppUser {
 
 export interface CustomAppUserService extends AppUserService<CustomUser> {
   c12nDef: ClassificationDefinition;
+  classificationAliases: ClassificationAliases;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;
   settings: SettingsDefinition;
   systemMessage: SystemMessageDefinition;
+  setClassificationAliases: (aliases: ClassificationAliases) => void;
   setConfiguration: (cfg: ConfigurationDefinition) => void;
   setSystemMessage: (msg: SystemMessageDefinition) => void;
   scoreToVerdict: (score: number) => string;
@@ -213,6 +225,7 @@ export interface CustomAppUserService extends AppUserService<CustomUser> {
 
 export interface WhoAmIProps extends CustomUser {
   c12nDef: ClassificationDefinition;
+  classification_aliases: ClassificationAliases;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;
   system_message: SystemMessageDefinition;
@@ -223,6 +236,7 @@ export interface WhoAmIProps extends CustomUser {
 export default function useMyUser(): CustomAppUserService {
   const [user, setState] = useState<CustomUser>(null);
   const [c12nDef, setC12nDef] = useState<ClassificationDefinition>(null);
+  const [classificationAliases, setClassificationAliases] = useState<ClassificationAliases>(null);
   const [configuration, setConfiguration] = useState<ConfigurationDefinition>(null);
   const [indexes, setIndexes] = useState<IndexDefinitionMap>(null);
   const [systemMessage, setSystemMessage] = useState<SystemMessageDefinition>(null);
@@ -252,6 +266,7 @@ export default function useMyUser(): CustomAppUserService {
   const setUser = (whoAmIData: WhoAmIProps) => {
     const {
       configuration: cfg,
+      classification_aliases: c12nAliases,
       c12nDef: c12n,
       indexes: idx,
       system_message: msg,
@@ -289,6 +304,7 @@ export default function useMyUser(): CustomAppUserService {
       }
     };
     setC12nDef(upperC12n);
+    setClassificationAliases(c12nAliases);
     setConfiguration(cfg);
     setIndexes(idx);
     setSystemMessage(msg);
@@ -298,7 +314,14 @@ export default function useMyUser(): CustomAppUserService {
     });
     setSettings(userSettings);
     setFlattenedProps(
-      flatten({ user: curUser, c12nDef: upperC12n, configuration: cfg, indexes: idx, settings: userSettings })
+      flatten({
+        user: curUser,
+        classificationAliases: c12nAliases,
+        c12nDef: upperC12n,
+        configuration: cfg,
+        indexes: idx,
+        settings: userSettings
+      })
     );
   };
 
@@ -353,12 +376,14 @@ export default function useMyUser(): CustomAppUserService {
 
   return {
     c12nDef,
+    classificationAliases,
     configuration,
     indexes,
     systemMessage,
     settings,
     user,
     setUser,
+    setClassificationAliases,
     setConfiguration,
     setSystemMessage,
     isReady,

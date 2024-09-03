@@ -505,7 +505,7 @@ const Alerts: React.FC = () => {
         <DialogContent className={classes.dialogContent}>
           <div className={classes.dialogDescription}>{t('session.description')}</div>
 
-          <Grid item>
+          <Grid item style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.existing')}</Typography>
             <Paper component="pre" variant="outlined" className={classes.preview}>
               {!session.existing ? (
@@ -521,7 +521,7 @@ const Alerts: React.FC = () => {
             </Paper>
           </Grid>
 
-          <Grid item>
+          <Grid item style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.current')}</Typography>
             <Paper component="pre" variant="outlined" className={classes.preview}>
               {!session.current ? (

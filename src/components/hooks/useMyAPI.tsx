@@ -58,7 +58,7 @@ export default function useMyAPI() {
     setConfiguration: (cfg: ConfigurationDefinition) => void;
     setLoginParams: (params: LoginParamsProps) => void;
     setUser: (user: WhoAmIProps) => void;
-    setReady: (isReady: boolean) => void;
+    setReady: (layout: boolean, borealis: boolean) => void;
     retryAfter?: number;
   };
 
@@ -151,7 +151,7 @@ export default function useMyAPI() {
           setUser(api_data.api_response);
 
           // Mark the interface ready
-          setReady(true);
+          setReady(true, api_data.api_response.configuration.ui.api_proxies.includes('borealis'));
 
           // Render appropriate page
           if (!api_data.api_response.agrees_with_tos && api_data.api_response.configuration.ui.tos) {

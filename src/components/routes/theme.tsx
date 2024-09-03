@@ -9,39 +9,38 @@ import AssemblylineIcon from 'components/visual/Icons';
 import Priority from 'components/visual/Priority';
 import SignatureStatus from 'components/visual/SignatureStatus';
 import SubmissionState from 'components/visual/SubmissionState';
+import Tag from 'components/visual/Tag';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
-import AlertExtendedScan from './alerts/alert-extended_scan';
-import AlertPriority from './alerts/alert-priority';
-import AlertStatus from './alerts/alert-status';
+import { AlertExtendedScan, AlertPriority, AlertStatus } from './alerts/components/Components';
 
 const Theme = () => {
   const theme = useTheme();
   return (
     <PageCenter width="65%" margin={4}>
       <Stack alignItems="center" spacing={2}>
-        <Typography variant="h4">Icons</Typography>
+        <Typography variant="h4">{'Icons'}</Typography>
         <AssemblylineIcon sx={{ width: '192px', height: '192px' }} />
 
-        <Typography variant="h4">Text</Typography>
+        <Typography variant="h4">{'Text'}</Typography>
         <Stack direction="row" spacing={1}>
-          <Typography color="textPrimary">This is what the default text will look like</Typography>
-          <Typography color="textSecondary">Alternate text will look like that</Typography>
-          <Typography color={theme.palette.action.disabled}>Disabled text will look like this</Typography>
-          <Typography color="primary">Text in primary color will look like this</Typography>
-          <Typography color="secondary">Text in secondary color like that</Typography>
-          <Typography color="error">Text in error will look like this</Typography>
+          <Typography color="textPrimary">{'This is what the default text will look like'}</Typography>
+          <Typography color="textSecondary">{'Alternate text will look like that'}</Typography>
+          <Typography color={theme.palette.action.disabled}>{'Disabled text will look like this'}</Typography>
+          <Typography color="primary">{'Text in primary color will look like this'}</Typography>
+          <Typography color="secondary">{'Text in secondary color like that'}</Typography>
+          <Typography color="error">{'Text in error will look like this'}</Typography>
         </Stack>
 
-        <Typography variant="h4">Buttons</Typography>
+        <Typography variant="h4">{'Buttons'}</Typography>
         <Stack direction="row" spacing={1}>
           {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
+            'primary' as const,
+            'secondary' as const,
+            'error' as const,
+            'info' as const,
+            'success' as const,
+            'warning' as const
           ].map((val, i) => (
             <Button key={i} variant="contained" color={val}>
               {val}
@@ -50,12 +49,12 @@ const Theme = () => {
         </Stack>
         <Stack direction="row" spacing={1}>
           {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
+            'primary' as const,
+            'secondary' as const,
+            'error' as const,
+            'info' as const,
+            'success' as const,
+            'warning' as const
           ].map((val, i) => (
             <Button key={i} variant="outlined" color={val}>
               {val}
@@ -64,12 +63,12 @@ const Theme = () => {
         </Stack>
         <Stack direction="row" spacing={1}>
           {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
+            'primary' as const,
+            'secondary' as const,
+            'error' as const,
+            'info' as const,
+            'success' as const,
+            'warning' as const
           ].map((val, i) => (
             <Button key={i} variant="text" color={val}>
               {val}
@@ -77,16 +76,16 @@ const Theme = () => {
           ))}
         </Stack>
 
-        <Typography variant="h4">Icon Buttons</Typography>
+        <Typography variant="h4">{'Icon Buttons'}</Typography>
         <Stack direction="row" spacing={1}>
           {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'default' as 'default',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
+            'primary' as const,
+            'secondary' as const,
+            'default' as const,
+            'error' as const,
+            'info' as const,
+            'success' as const,
+            'warning' as const
           ].map((val, i) => (
             <IconButton key={i} color={val}>
               <FileOpenIcon />
@@ -95,13 +94,13 @@ const Theme = () => {
         </Stack>
         <Stack direction="row" spacing={1}>
           {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'default' as 'default',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
+            'primary' as const,
+            'secondary' as const,
+            'default' as const,
+            'error' as const,
+            'info' as const,
+            'success' as const,
+            'warning' as const
           ].map((val, i) => (
             <IconButton key={i} color={val}>
               <AddPhotoAlternateOutlinedIcon />
@@ -109,16 +108,16 @@ const Theme = () => {
           ))}
         </Stack>
 
-        <Typography variant="h4">Switches</Typography>
+        <Typography variant="h4">{'Switches'}</Typography>
         <Stack direction="row" spacing={1}>
           {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'default' as 'default',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
+            'primary' as const,
+            'secondary' as const,
+            'default' as const,
+            'error' as const,
+            'info' as const,
+            'success' as const,
+            'warning' as const
           ].map((val, i) => (
             <Switch key={i} color={val} defaultChecked />
           ))}
@@ -126,61 +125,94 @@ const Theme = () => {
         </Stack>
         <Stack direction="row" spacing={1}>
           {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'default' as 'default',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
+            'primary' as const,
+            'secondary' as const,
+            'default' as const,
+            'error' as const,
+            'info' as const,
+            'success' as const,
+            'warning' as const
           ].map((val, i) => (
             <Switch key={i} color={val} defaultChecked disabled />
           ))}
           <Switch disabled />
         </Stack>
 
-        <Typography variant="h4">Custom Chips</Typography>
+        <Typography variant="h4">Tags</Typography>
+        <Stack direction="row" spacing={1}>
+          {[0, 500, 1200, -1000].map((val, i) => (
+            <Tag key={i} score={val} type="network.static.ip" value="45.15.156.182" />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {[0, 500, 1200, -1000].map((val, i) => (
+            <Tag key={i} score={val} type="attribution.actor" value="A tag!" />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {[0, 500, 1200, -1000].map((val, i) => (
+            <Tag
+              key={i}
+              score={val}
+              type="attribution.actor"
+              value="A tag with a very long name that spans over multiple lines. I guess this was not long enough so lets add some text..."
+            />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {[0, 500, 1200, -1000].map((val, i) => (
+            <Tag
+              key={i}
+              score={val}
+              type="network.static.ip"
+              value="116.14.55.109"
+              label="Did you know that the label of the tag does not have to match the tag value?"
+            />
+          ))}
+        </Stack>
+
+        <Typography variant="h4">{'Custom Chips'}</Typography>
         <Stack direction="row" spacing={1}>
           {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'default' as 'default',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
+            'primary' as const,
+            'secondary' as const,
+            'default' as const,
+            'error' as const,
+            'info' as const,
+            'success' as const,
+            'warning' as const
           ].map((val, i) => (
             <CustomChip key={i} color={val} label={val} />
           ))}
         </Stack>
         <Stack direction="row" spacing={1}>
           {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'default' as 'default',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
+            'primary' as const,
+            'secondary' as const,
+            'default' as const,
+            'error' as const,
+            'info' as const,
+            'success' as const,
+            'warning' as const
           ].map((val, i) => (
             <CustomChip key={i} color={val} label={val} onClick={() => null} />
           ))}
         </Stack>
         <Stack direction="row" spacing={1}>
           {[
-            'primary' as 'primary',
-            'secondary' as 'secondary',
-            'default' as 'default',
-            'error' as 'error',
-            'info' as 'info',
-            'success' as 'success',
-            'warning' as 'warning'
+            'primary' as const,
+            'secondary' as const,
+            'default' as const,
+            'error' as const,
+            'info' as const,
+            'success' as const,
+            'warning' as const
           ].map((val, i) => (
             <CustomChip key={i} variant="outlined" color={val} label={val} />
           ))}
         </Stack>
 
-        <Typography variant="h4">Classifications</Typography>
+        <Typography variant="h4">{'Classifications'}</Typography>
         <Stack direction="row" spacing={1}>
           {['TLP:C', 'TLP:G', 'TLP:A'].map((val, i) => (
             <Classification key={i} type="outlined" format="long" c12n={val} />
@@ -202,14 +234,14 @@ const Theme = () => {
           ))}
         </Stack>
 
-        <Typography variant="h4">Verdicts</Typography>
+        <Typography variant="h4">{'Verdicts'}</Typography>
         <Stack direction="row" spacing={1}>
           {[
-            'info' as 'info',
-            'safe' as 'safe',
-            'suspicious' as 'suspicious',
-            'highly_suspicious' as 'highly_suspicious',
-            'malicious' as 'malicious'
+            'info' as const,
+            'safe' as const,
+            'suspicious' as const,
+            'highly_suspicious' as const,
+            'malicious' as const
           ].map((val, i) => (
             <div key={i} style={{ display: 'contents' }}>
               <Verdict verdict={val} />
@@ -218,33 +250,33 @@ const Theme = () => {
           ))}
         </Stack>
 
-        <Typography variant="h4">Submission Priority</Typography>
+        <Typography variant="h4">{'Submission Priority'}</Typography>
         <Stack direction="row" spacing={1}>
           {[0, 100, 200, 300, 500, 1000, 1500].map((val, i) => (
             <Priority key={i} priority={val} />
           ))}
         </Stack>
 
-        <Typography variant="h4">Submission State</Typography>
+        <Typography variant="h4">{'Submission State'}</Typography>
         <Stack direction="row" spacing={1}>
           {['error', 'completed', 'submitted'].map((val, i) => (
             <SubmissionState key={i} state={val} />
           ))}
         </Stack>
 
-        <Typography variant="h4">Signature Status</Typography>
+        <Typography variant="h4">{'Signature Status'}</Typography>
         <Stack direction="row" spacing={1}>
-          {['DEPLOYED' as 'DEPLOYED', 'NOISY' as 'NOISY', 'DISABLED' as 'DISABLED'].map((val, i) => (
+          {['DEPLOYED' as const, 'NOISY' as const, 'DISABLED' as const].map((val, i) => (
             <SignatureStatus key={i} status={val} />
           ))}
         </Stack>
         <Stack direction="row" spacing={1}>
-          {['DEPLOYED' as 'DEPLOYED', 'NOISY' as 'NOISY', 'DISABLED' as 'DISABLED'].map((val, i) => (
+          {['DEPLOYED' as const, 'NOISY' as const, 'DISABLED' as const].map((val, i) => (
             <SignatureStatus key={i} status={val} variant="outlined" />
           ))}
         </Stack>
 
-        <Typography variant="h4">Alert Extended Scans</Typography>
+        <Typography variant="h4">{'Alert Extended Scans'}</Typography>
         <Stack direction="row" spacing={1}>
           {['incomplete', 'completed', 'submitted', 'skipped'].map((val, i) => (
             <AlertExtendedScan key={i} name={val} />
@@ -256,7 +288,7 @@ const Theme = () => {
           ))}
         </Stack>
 
-        <Typography variant="h4">Alert Priority</Typography>
+        <Typography variant="h4">{'Alert Priority'}</Typography>
         <Stack direction="row" spacing={1}>
           {['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].map((val, i) => (
             <AlertPriority key={i} name={val} />
@@ -268,7 +300,7 @@ const Theme = () => {
           ))}
         </Stack>
 
-        <Typography variant="h4">Alert Status</Typography>
+        <Typography variant="h4">{'Alert Status'}</Typography>
         <Stack direction="row" spacing={1}>
           {['TRIAGE', 'MALICIOUS', 'ASSESS'].map((val, i) => (
             <AlertStatus key={i} name={val} />

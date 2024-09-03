@@ -1,3 +1,5 @@
+import borealisEN from 'borealis-ui/dist/en/translation.json';
+import borealisFR from 'borealis-ui/dist/fr/translation.json';
 import { default as i18n } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
@@ -126,6 +128,7 @@ const resources = {
     archive: archiveEN,
     assistant: assistantEN,
     authorize: authorizeEN,
+    borealis: borealisEN,
     carousel: carouselEN,
     dashboard: dashboardEN,
     error403: error403EN,
@@ -183,6 +186,7 @@ const resources = {
     archive: archiveFR,
     assistant: assistantFR,
     authorize: authorizeFR,
+    borealis: borealisFR,
     carousel: carouselFR,
     dashboard: dashboardFR,
     error403: error403FR,
@@ -229,7 +233,7 @@ const resources = {
   }
 };
 
-i18n
+void i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
