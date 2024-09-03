@@ -277,7 +277,7 @@ function WrappedClassification({
                     <List disablePadding style={{ borderRadius: '6px' }}>
                       {c12nDef.original_definition.levels.map(
                         (lvl, idx) =>
-                          (isUser || lvl.lvl <= uParts.lvlIdx) && (
+                          (isUser || (lvl.lvl <= uParts.lvlIdx && !lvl.is_hidden)) && (
                             <ListItem
                               key={idx}
                               button
@@ -301,7 +301,8 @@ function WrappedClassification({
                       <List disablePadding>
                         {c12nDef.original_definition.required.map(
                           (req, idx) =>
-                            (isUser || [req.name, req.short_name].some(r => uParts.req.includes(r))) && (
+                            (isUser ||
+                              ([req.name, req.short_name].some(r => uParts.req.includes(r)) && !req.is_hidden)) && (
                               <ListItem
                                 key={idx}
                                 button
@@ -329,26 +330,28 @@ function WrappedClassification({
                       <div style={{ paddingBottom: sp2 }}>
                         <Card variant="outlined">
                           <List disablePadding>
-                            {c12nDef.original_definition.groups.map((grp, idx) => (
-                              <ListItem
-                                key={idx}
-                                button
-                                disabled={
-                                  validated.disabled.groups.includes(grp.name) ||
-                                  validated.disabled.groups.includes(grp.short_name)
-                                }
-                                selected={
-                                  validated.parts.groups.includes(grp.name) ||
-                                  validated.parts.groups.includes(grp.short_name)
-                                }
-                                onClick={() => toggleGroups(grp)}
-                              >
-                                <ListItemText
-                                  style={{ textAlign: 'center' }}
-                                  primary={applyAliases(grp.name, classificationAliases)}
-                                />
-                              </ListItem>
-                            ))}
+                            {c12nDef.original_definition.groups
+                              .filter(grp => isUser || !grp.is_hidden)
+                              .map((grp, idx) => (
+                                <ListItem
+                                  key={idx}
+                                  button
+                                  disabled={
+                                    validated.disabled.groups.includes(grp.name) ||
+                                    validated.disabled.groups.includes(grp.short_name)
+                                  }
+                                  selected={
+                                    validated.parts.groups.includes(grp.name) ||
+                                    validated.parts.groups.includes(grp.short_name)
+                                  }
+                                  onClick={() => toggleGroups(grp)}
+                                >
+                                  <ListItemText
+                                    style={{ textAlign: 'center' }}
+                                    primary={applyAliases(grp.name, classificationAliases)}
+                                  />
+                                </ListItem>
+                              ))}
                             {c12nDef.dynamic_groups &&
                               ['email', 'all'].includes(c12nDef.dynamic_groups_type) &&
                               currentUser.email && (
@@ -408,19 +411,21 @@ function WrappedClassification({
                       uParts.subgroups.length !== 0) && (
                       <Card variant="outlined">
                         <List disablePadding>
-                          {c12nDef.original_definition.subgroups.map((sgrp, idx) => (
-                            <ListItem
-                              key={idx}
-                              button
-                              selected={
-                                validated.parts.subgroups.includes(sgrp.name) ||
-                                validated.parts.subgroups.includes(sgrp.short_name)
-                              }
-                              onClick={() => toggleSubGroups(sgrp)}
-                            >
-                              <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
-                            </ListItem>
-                          ))}
+                          {c12nDef.original_definition.subgroups
+                            .filter(sgrp => isUser || !sgrp.is_hidden)
+                            .map((sgrp, idx) => (
+                              <ListItem
+                                key={idx}
+                                button
+                                selected={
+                                  validated.parts.subgroups.includes(sgrp.name) ||
+                                  validated.parts.subgroups.includes(sgrp.short_name)
+                                }
+                                onClick={() => toggleSubGroups(sgrp)}
+                              >
+                                <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
+                              </ListItem>
+                            ))}
                         </List>
                       </Card>
                     )}
