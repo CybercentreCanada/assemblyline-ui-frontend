@@ -23,6 +23,7 @@ type ClassificationLevel = {
   lvl: number;
   name: string;
   short_name: string;
+  is_hidden?: boolean;
 };
 
 type ClassificationRequired = {
@@ -32,6 +33,7 @@ type ClassificationRequired = {
   is_required_group?: boolean;
   require_lvl?: number;
   short_name: string;
+  is_hidden?: boolean;
 };
 
 type ClassificationGroup = {
@@ -41,6 +43,7 @@ type ClassificationGroup = {
   name: string;
   short_name: string;
   solitary_display_name?: string;
+  is_hidden?: boolean;
 };
 
 type ClassificationSubGroup = {
@@ -52,6 +55,7 @@ type ClassificationSubGroup = {
   require_group?: string;
   short_name: string;
   solitary_display_name?: string;
+  is_hidden?: boolean;
 };
 
 type ClassificationYAMLDefinition = {
@@ -85,6 +89,7 @@ type ParamsMap = {
     require_lvl?: number;
     require_group?: string;
     limited_to_group?: string;
+    is_hidden?: boolean;
   };
 };
 
