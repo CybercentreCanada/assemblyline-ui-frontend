@@ -15,9 +15,10 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
-import CustomChip, { ColorMap, PossibleColors } from 'components/visual/CustomChip';
+import type { PossibleColors } from 'components/visual/CustomChip';
+import CustomChip, { ColorMap } from 'components/visual/CustomChip';
+import type { FormatProp } from 'helpers/classificationParser';
 import {
-  FormatProp,
   applyClassificationRules,
   defaultClassificationValidator,
   defaultDisabled,
@@ -190,9 +191,9 @@ function WrappedClassification({
   const computeColor = (): PossibleColors => {
     const levelStyles = c12nDef.levels_styles_map[validated.parts.lvl];
     if (!levelStyles) {
-      return 'default' as 'default';
+      return 'default' as const;
     }
-    return ColorMap[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as 'default');
+    return ColorMap[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
   };
 
   const skelheight = {
@@ -279,7 +280,9 @@ function WrappedClassification({
                     </List>
                   </Card>
                 </Grid>
-                {((isUser && c12nDef.original_definition.required.length !== 0) || uParts.req.length !== 0) && (
+                {((isUser && c12nDef.original_definition.required.length !== 0) ||
+                  (uParts.req.length !== 0 &&
+                    c12nDef.original_definition.required.filter(r => !r.is_hidden).length !== 0)) && (
                   <Grid item xs={12} md>
                     <Card variant="outlined">
                       <List disablePadding>
@@ -306,11 +309,14 @@ function WrappedClassification({
                 {((isUser &&
                   (c12nDef.original_definition.groups.length !== 0 ||
                     c12nDef.original_definition.subgroups.length !== 0)) ||
-                  uParts.groups.length !== 0 ||
-                  uParts.subgroups.length !== 0) && (
+                  (uParts.groups.length !== 0 &&
+                    c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0) ||
+                  (uParts.subgroups.length !== 0 &&
+                    c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
                   <Grid item xs={12} md>
                     {((isUser && (c12nDef.original_definition.groups.length !== 0 || c12nDef.dynamic_groups)) ||
-                      uParts.groups.length !== 0) && (
+                      (uParts.groups.length !== 0 &&
+                        c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0)) && (
                       <div style={{ paddingBottom: sp2 }}>
                         <Card variant="outlined">
                           <List disablePadding>
@@ -386,7 +392,8 @@ function WrappedClassification({
                       </div>
                     )}
                     {((isUser && c12nDef.original_definition.subgroups.length !== 0) ||
-                      uParts.subgroups.length !== 0) && (
+                      (uParts.subgroups.length !== 0 &&
+                        c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
                       <Card variant="outlined">
                         <List disablePadding>
                           {c12nDef.original_definition.subgroups
