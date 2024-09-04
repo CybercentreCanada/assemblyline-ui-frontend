@@ -1,3 +1,5 @@
+import type { ClassificationAliases } from 'components/hooks/useMyUser';
+
 /**
  * Classification related utils.
  *
@@ -452,6 +454,17 @@ export function canSeeGroups(user_groups: string[], groups: string[]) {
   return false;
 }
 
+export function applyAliases(c12n: string, classificationAliases: ClassificationAliases) {
+  let out = c12n;
+  for (const alias in classificationAliases) {
+    if ({}.hasOwnProperty.call(classificationAliases, alias)) {
+      const aliasData = classificationAliases[alias];
+      out = out.replaceAll(alias, aliasData.short_name);
+    }
+  }
+  return out;
+}
+
 /**
  * Normalize a given classification by applying the rules defined in the classification definition.
  * This function will remove any invalid parts and add missing parts to the classification.
@@ -463,6 +476,8 @@ export function canSeeGroups(user_groups: string[], groups: string[]) {
  * @param c12nDef - ClassificationDefinition returned by the API server
  * @param format - return results in `long` or `short` format
  * @param isMobile - `true`/`false` if the results should be returned for display on a mobile device
+ * @param skipAutoSelect - `true`/`false` skip auto selecting required groups
+ * @param classificationAliases - `ClassificationAliases` object altering the classification display
  *
  * @returns A normalized version of the original classification
  *
@@ -472,7 +487,8 @@ export function normalizedClassification(
   c12nDef: ClassificationDefinition,
   format: FormatProp,
   isMobile: boolean,
-  skipAutoSelect: boolean = false
+  skipAutoSelect: boolean = false,
+  classificationAliases: ClassificationAliases = {}
 ): string {
   if (!c12nDef.enforce || !!c12nDef.invalid_mode) return c12nDef.UNRESTRICTED;
 
@@ -606,8 +622,7 @@ export function normalizedClassification(
     }
     out += tempSubGroups.sort().join('/');
   }
-
-  return out;
+  return applyAliases(out, classificationAliases);
 }
 
 function levelList(c12nDef: ClassificationDefinition) {
