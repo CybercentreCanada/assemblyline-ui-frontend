@@ -165,7 +165,7 @@ export function getLevelText(
   format: FormatProp,
   isMobile: boolean
 ): string {
-  let text = null;
+  let text: string = null;
   if (c12nDef != null && lvl != null) {
     text = c12nDef.levels_map[lvl.toString()];
   }
@@ -190,7 +190,7 @@ export function getLevelText(
 function getLevelIndex(c12n: string, c12nDef: ClassificationDefinition): [number, string] {
   // assumes c12nDef is coming from the Assemblyline API and all values will be in UPPER case
   let retIndex = null;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   const [level, unused, _x] = c12n.split(/\/\/(.*)/);
   const c12nLvl = level.toUpperCase();
 
@@ -219,8 +219,8 @@ function getRequired(
   format: FormatProp,
   isMobile: boolean
 ): [string[], string[]] {
-  const returnSet = [];
-  const unused = [];
+  const returnSet: string[] = [];
+  const unused: string[] = [];
   if (!c12n) {
     return [returnSet.sort(), unused];
   }
@@ -240,7 +240,7 @@ function getRequired(
   }
 
   if (format === 'long' && !isMobile) {
-    const out = [];
+    const out: string[] = [];
     for (const r of returnSet) {
       out.push(c12nDef.access_req_map_stl[r]);
     }
@@ -264,8 +264,8 @@ function getGroups(
   let g2Set = new Set<string>();
   let others = new Set<string>();
 
-  let groups = [];
-  const subgroups = [];
+  const groups: string[] = [];
+  const subgroups: string[] = [];
 
   for (const grpPart of groupParts) {
     if (!grpPart) {
@@ -382,12 +382,12 @@ function getGroups(
 
   // swap to long format if required
   if (format === 'long' && !isMobile) {
-    const g1Out = [];
+    const g1Out: string[] = [];
     for (const gr of g1Set) {
       g1Out.push(gr in c12nDef.groups_map_stl ? c12nDef.groups_map_stl[gr] : gr);
     }
 
-    const g2Out = [];
+    const g2Out: string[] = [];
     for (const sgr of g2Set) {
       g2Out.push(c12nDef.subgroups_map_stl[sgr]);
     }
@@ -424,7 +424,7 @@ export function getParts(
   };
 }
 
-export function canSeeRequired(user_req, req) {
+export function canSeeRequired(user_req: string[], req: string[]) {
   // user's require values must be a superset of given require values
   // (ie. user must have all of the required values)
   if (req.length <= 0) return true;
@@ -439,7 +439,7 @@ export function canSeeRequired(user_req, req) {
   return true;
 }
 
-export function canSeeGroups(user_groups, groups) {
+export function canSeeGroups(user_groups: string[], groups: string[]) {
   // user's groups must have an intersection between required groups
   // (ie. user must have at least one of the given groups)
   if (groups.length === 0) return true;
@@ -533,7 +533,7 @@ export function normalizedClassification(
       reqGrp.add(r);
     }
   }
-  let tempReq = Array.from(new Set([...req].filter(x => !reqGrp.has(x))));
+  const tempReq = Array.from(new Set([...req].filter(x => !reqGrp.has(x))));
   if (tempReq.length > 0) {
     out += '//' + tempReq.sort().join('/');
   }
@@ -554,7 +554,7 @@ export function normalizedClassification(
   }
 
   // 4. For every subgroup, check if the subgroup requires or is limited to a specific group
-  let tempGroups = [];
+  let tempGroups: string[] = [];
   for (const sg of tempSubGroups) {
     const rGrp = c12nDef.params_map[sg]?.require_group;
     if (!!rGrp) {
@@ -626,7 +626,7 @@ export function normalizedClassification(
 }
 
 function levelList(c12nDef: ClassificationDefinition) {
-  const out = [];
+  const out: string[] = [];
   for (const i in c12nDef.levels_map) {
     if (!isNaN(parseInt(i))) {
       out.push(c12nDef.levels_map[i]);
