@@ -12,36 +12,18 @@ import type { CustomUser } from 'components/hooks/useMyUser';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
-import type { SearchParams } from 'components/visual/SearchBar/SearchParams2';
-import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext2';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import ErrorsTable, { ErrorResult } from 'components/visual/SearchResult/errors';
+import type { SearchParams } from 'components/visual/SearchParams/SearchParams';
+import { createSearchParams } from 'components/visual/SearchParams/SearchParams';
+import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchParams/SearchParamsContext';
+import type { ErrorResult } from 'components/visual/SearchResult/errors';
+import ErrorsTable from 'components/visual/SearchResult/errors';
 import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import { ErrorDetail } from './error_detail';
-
-// const PAGE_SIZE = 25;
-
-// const useStyles = makeStyles(theme => ({
-//   searchresult: {
-//     fontStyle: 'italic',
-//     paddingTop: theme.spacing(0.5),
-//     paddingBottom: theme.spacing(0.5),
-//     display: 'flex',
-//     flexWrap: 'wrap',
-//     justifyContent: 'flex-end'
-//   },
-//   drawerPaper: {
-//     width: '80%',
-//     maxWidth: '800px',
-//     [theme.breakpoints.down('xl')]: {
-//       width: '100%'
-//     }
-//   }
-// }));
 
 type SearchResults = {
   items: ErrorResult[];
@@ -78,20 +60,19 @@ const GAP_MAP: Record<TimeContraint, string> = {
   '1y': '15d'
 };
 
-// const DEFAULT_TC: TimeContraint = '4d';
-
-const ERROR_VIEWER_PARAMS = {
-  query: '',
-  offset: 0,
-  rows: 25,
-  sort: 'created desc',
-  tc: '4d',
-  filters: [],
-  track_total_hits: 10000,
-  mincount: 0,
-  use_archive: false,
-  archive_only: false
-};
+const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
+  query: p.string(''),
+  offset: p.number(0).min(0).hidden().ignored(),
+  rows: p.number(25).enforced().hidden().ignored(),
+  sort: p.string('created desc').ignored(),
+  tc: p.enum('4d', TIME_CONTRAINTS),
+  filters: p.filters([]),
+  track_total_hits: p.number(10000).nullable().ignored(),
+  mincount: p.number(0).min(0).hidden().ignored(),
+  use_archive: p.boolean(false),
+  archive_only: p.boolean(false),
+  timeout: p.string('').hidden().ignored()
+}));
 
 type ErrorViewerParams = SearchParams<typeof ERROR_VIEWER_PARAMS>;
 
@@ -118,224 +99,57 @@ const ErrorViewer = () => {
     [location.search]
   );
 
-  // const handleReload = useCallback(
-  //   (params: string) => {
-  //     if (!params || !currentUser.is_admin) return;
-
-  //     apiCall({
-  //       url: `/api/v4/error/list/?${params}`,
-  //       method: 'GET',
-  //       onSuccess: ({ api_response }) => setErrorResults(api_response as SearchResults),
-  //       onEnter: () => setSearching(true),
-  //       onExit: () => setSearching(false)
-  //     });
-
-  //     apiCall({
-  //       url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
-  //         'rows',
-  //         'offset',
-  //         'sort',
-  //         'track_total_hits'
-  //       ])}`,
-  //       onSuccess: api_data => {
-  //         setNames(api_data.api_response);
-  //       }
-  //     });
-
-  //     apiCall({
-  //       url: `/api/v4/search/facet/error/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-  //       onSuccess: api_data => {
-  //         setTypes(api_data.api_response);
-  //       }
-  //     });
-
-  //     apiCall({
-  //       url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
-  //         GAP_MAP[tc]
-  //       }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-  //       onSuccess: api_data => {
-  //         setHistogram(api_data.api_response);
-  //       }
-  //     });
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [currentUser.is_admin]
-  // );
-
   useEffect(() => {
     if (!search || !currentUser.is_admin) return;
 
-    const body = search.set(o => ({ ...o, query: o.query || '*', tc:  }));
+    const body = search.set(o => ({ ...o, query: o.query || '*' }));
 
     apiCall({
-      url: `/api/v4/error/list/?${body.toString()}`,
+      url: `/api/v4/error/list/?${body
+        .pick(['query', 'filters', 'offset', 'rows', 'sort', 'track_total_hits'])
+        .toString()}`,
       onSuccess: ({ api_response }) => setErrorResults(api_response as SearchResults),
       onEnter: () => setSearching(true),
       onExit: () => setSearching(false)
     });
 
     apiCall({
-      url: '/api/v4/search/facet/error/type/',
+      url: '/api/v4/search/facet/error/response.service_name/',
       method: 'POST',
       body: body
-        .filter(key => ['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'].includes(key))
+        .set(o => ({ ...o, filters: o.tc in TC_MAP && o.tc !== '1y' ? [...o.filters, TC_MAP[o.tc]] : o.filters }))
+        .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'])
         .toObject(),
-      onSuccess: ({ api_response }) => setTypes(api_response as { [s: string]: number })
+      onSuccess: ({ api_response }) => setNames(api_response as { [s: string]: number })
     });
 
-    // const tc = (curQuery.pop('tc') as TimeContraint) || DEFAULT_TC;
-    // if (tc in GAP_MAP && tc !== '1y') curQuery.add('filters', TC_MAP[tc]);
-    // apiCall({
-    //   url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
-    //     'rows',
-    //     'offset',
-    //     'sort',
-    //     'track_total_hits'
-    //   ])}`,
-    //   onSuccess: api_data => {
-    //     setNames(api_data.api_response);
-    //   }
-    // });
+    apiCall({
+      url: '/api/v4/search/histogram/error/created/',
+      method: 'POST',
+      body: {
+        ...body.pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only']).toObject(),
+        start: START_MAP[body.get('tc')],
+        end: 'now',
+        gap: GAP_MAP[body.get('tc')]
+      },
+      onSuccess: ({ api_response }) => setHistogram(api_response as { [s: string]: number })
+    });
 
-    // apiCall({
-    //   url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
-    //     GAP_MAP[tc]
-    //   }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-    //   onSuccess: api_data => {
-    //     setHistogram(api_data.api_response);
-    //   }
-    // });
+    apiCall({
+      url: '/api/v4/search/facet/error/type/',
+      method: 'POST',
+      body: body.pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only']).toObject(),
+      onSuccess: ({ api_response }) => setTypes(api_response as { [s: string]: number })
+    });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser.is_admin, search]);
 
-  // const parsedQuery = useMemo<SimpleSearchQuery>(() => {
-  //   if (!query || !currentUser.is_admin) return null;
-
-  //   const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
-  //   curQuery.set('rows', pageSize);
-  //   curQuery.set('offset', 0);
-  //   const tc = (curQuery.pop('tc') as TimeContraint) || DEFAULT_TC;
-  //   if (tc in GAP_MAP && tc !== '1y') curQuery.add('filters', TC_MAP[tc]);
-
-  //   return curQuery;
-  // }, [currentUser.is_admin, pageSize, query]);
-
-  // useEffect(() => {
-  //   setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`));
-  // }, [location.pathname, location.search, pageSize]);
-
-  // useEffect(() => {
-  //   if (errorResults !== null && !globalDrawerOpened && location.hash) {
-  //     navigate(`${location.pathname}${location.search ? location.search : ''}`);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [globalDrawerOpened]);
-
-  // useEffect(() => {
-  //   if (location.hash) {
-  //     setGlobalDrawer(<ErrorDetail error_key={location.hash.substr(1)} />);
-  //   } else {
-  //     closeGlobalDrawer();
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [location.hash]);
-
-  // useEffect(() => {
-  //   if (!parsedQuery) return;
-  //   apiCall({
-  //     url: `/api/v4/error/list/?${parsedQuery.toString()}`,
-  //     onSuccess: api_data => setErrorResults(api_data.api_response),
-  //     onEnter: () => setSearching(true),
-  //     onExit: () => setSearching(false)
-  //   });
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [parsedQuery]);
-
-  // useEffect(() => {
-  //   if (!query) return;
-  //   const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
-  //   curQuery.set('rows', pageSize);
-  //   curQuery.set('offset', 0);
-
-  //   const tc = (curQuery.pop('tc') as TimeContraint) || DEFAULT_TC;
-  //   if (tc in GAP_MAP && tc !== '1y') curQuery.add('filters', TC_MAP[tc]);
-  //   apiCall({
-  //     url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
-  //       'rows',
-  //       'offset',
-  //       'sort',
-  //       'track_total_hits'
-  //     ])}`,
-  //     onSuccess: api_data => {
-  //       setNames(api_data.api_response);
-  //     }
-  //   });
-  //   apiCall({
-  //     url: `/api/v4/search/facet/error/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-  //     onSuccess: api_data => {
-  //       setTypes(api_data.api_response);
-  //     }
-  //   });
-  //   apiCall({
-  //     url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
-  //       GAP_MAP[tc]
-  //     }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-  //     onSuccess: api_data => {
-  //       setHistogram(api_data.api_response);
-  //     }
-  //   });
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [pageSize, query]);
-
-  // useEffect(() => {
-  //   apiCall({
-  //     url: '/api/v4/search/fields/error/',
-  //     onSuccess: api_data => {
-  //       setSuggestions([
-  //         ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
-  //         ...DEFAULT_SUGGESTION
-  //       ]);
-  //     }
-  //   });
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
-  // const onClear = useCallback(
-  //   () => {
-  //     if (query.getAll('filters').length !== 0) {
-  //       query.delete('query');
-  //       navigate(`${location.pathname}?${query.getDeltaString()}`);
-  //     } else {
-  //       navigate(location.pathname);
-  //     }
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [location.pathname, query]
-  // );
-
-  // const onSearch = useCallback(
-  //   () => {
-  //     if (filterValue.current !== '') {
-  //       query.set('query', filterValue.current);
-  //       navigate(`${location.pathname}?${query.getDeltaString()}`);
-  //     } else {
-  //       onClear();
-  //     }
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [query, location.pathname, onClear]
-  // );
-
-  // const onFilterValueChange = useCallback((inputValue: string) => {
-  //   filterValue.current = inputValue;
-  // }, []);
-
   useEffect(() => {
     apiCall({
       url: '/api/v4/search/fields/error/',
-      onSuccess: api_data => {
-        const values = Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed);
+      onSuccess: ({ api_response }) => {
+        const values = Object.keys(api_response).filter(name => api_response[name].indexed);
         setSuggestions([...values, ...DEFAULT_SUGGESTION]);
       }
     });
@@ -354,10 +168,6 @@ const ErrorViewer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash]);
 
-  // useEffect(() => {
-  //   handleReload(search.set(o => ({ ...o, query: o.query || '*' })).toString());
-  // }, [handleReload, search]);
-
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
       <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
@@ -368,10 +178,9 @@ const ErrorViewer = () => {
           <FormControl size="small" fullWidth>
             <Select
               disabled={searching}
-              // value={query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}
               value={search.get('tc')}
               variant="outlined"
-              onChange={event => setSearchObject(o => ({ ...o, tc: event.target.value }))}
+              onChange={event => setSearchObject(o => ({ ...o, tc: event.target.value as TimeContraint }))}
               fullWidth
             >
               {TIME_CONTRAINTS.map((time, i) => (
@@ -423,113 +232,12 @@ const ErrorViewer = () => {
         </div>
       </PageHeader>
 
-      {/* <PageHeader isSticky>
-        <div style={{ paddingTop: theme.spacing(1) }}>
-          <SearchBar
-            initValue={query ? query.get('query', '') : ''}
-            placeholder={t('filter')}
-            searching={searching}
-            suggestions={suggestions}
-            onValueChange={onFilterValueChange}
-            onClear={onClear}
-            onSearch={onSearch}
-            buttons={[
-              {
-                icon: <ReportProblemOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                tooltip: t('exception'),
-                props: {
-                  onClick: () => {
-                    query.set('query', 'type:(EXCEPTION OR UNKNOWN)');
-                    navigate(`${location.pathname}?${query.getDeltaString()}`);
-                  }
-                }
-              },
-              {
-                icon: <CancelOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                tooltip: t('canceled'),
-                props: {
-                  onClick: () => {
-                    query.set('query', 'type:(SERVICE* OR TASK*)');
-                    navigate(`${location.pathname}?${query.getDeltaString()}`);
-                  }
-                }
-              },
-              {
-                icon: <PanToolOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                tooltip: t('maxed'),
-                props: {
-                  onClick: () => {
-                    query.set('query', 'type:MAX*');
-                    navigate(`${location.pathname}?${query.getDeltaString()}`);
-                  }
-                }
-              }
-            ]}
-          >
-            {errorResults !== null && (
-              <div className={classes.searchresult}>
-                {errorResults.total !== 0 && (
-                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                    {searching ? (
-                      <span>{t('searching')}</span>
-                    ) : (
-                      <span>
-                        <SearchResultCount count={errorResults.total} />
-                        {query.get('query')
-                          ? t(`filtered${errorResults.total === 1 ? '' : 's'}`)
-                          : t(`total${errorResults.total === 1 ? '' : 's'}`)}
-                      </span>
-                    )}
-                  </Typography>
-                )}
-
-                <SearchPager
-                  query={parsedQuery}
-                  pageSize={pageSize}
-                  total={errorResults.total}
-                  index={null}
-                  url="/api/v4/error/list/"
-                  method="GET"
-                  setResults={setErrorResults}
-                  setSearching={setSearching}
-                />
-              </div>
-            )}
-
-            {query && (
-              <div>
-                <ChipList
-                  items={query.getAll('filters', []).map(v => ({
-                    variant: 'outlined',
-                    label: `${v}`,
-                    color: v.indexOf('NOT ') === 0 ? 'error' : null,
-                    onClick: () => {
-                      query.replace(
-                        'filters',
-                        v,
-                        v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
-                      );
-                      navigate(`${location.pathname}?${query.getDeltaString()}`);
-                    },
-                    onDelete: () => {
-                      query.remove('filters', v);
-                      navigate(`${location.pathname}?${query.getDeltaString()}`);
-                    }
-                  }))}
-                />
-              </div>
-            )}
-          </SearchBar>
-        </div>
-      </PageHeader> */}
-
       {errorResults !== null && errorResults.total !== 0 && (
         <Grid container spacing={2}>
           <Grid item xs={12} lg={4}>
             <Histogram
               dataset={histogram}
               height="200px"
-              // title={t(`graph.histogram.title.${query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}`)}
               title={t(`graph.histogram.title.${search.get('tc')}`)}
               datatype={t('graph.datatype')}
               isDate
@@ -577,7 +285,7 @@ const ErrorViewer = () => {
 };
 
 const WrappedErrorViewerPage = () => (
-  <SearchParamsProvider defaultValue={ERROR_VIEWER_PARAMS} hidden={['rows', 'offset']} enforced={['rows']}>
+  <SearchParamsProvider params={ERROR_VIEWER_PARAMS}>
     <ErrorViewer />
   </SearchParamsProvider>
 );
