@@ -3,98 +3,66 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { useLocation, useNavigate } from 'react-router';
 import { useDefaultParams } from './DefaultParamsContext';
 import type { Params } from './SearchParams';
-import type { SearchResult } from './SearchParser';
+import type { GetParams, SearchResult } from './SearchParser';
 import { SearchParser } from './SearchParser';
 
-type ContextProps<T extends Params> = {
-  search: SearchResult<T>;
+type ContextProps<P extends Params> = {
+  search: SearchResult<P>;
   setSearchParams: (value: URLSearchParams | ((params: URLSearchParams) => URLSearchParams)) => void;
-  setSearchObject: (value: T | ((params: T) => T)) => void;
+  setSearchObject: (value: P | ((params: P) => P)) => void;
 };
 
-type Props<T extends Params> = {
+type Props<P extends Params> = {
   children: React.ReactNode;
 
-  /**
-   * Default search parameters including null values.
-   */
-  defaultValue?: T;
+  params: GetParams<P>;
 
-  /**
-   * Hidden search parameters will not be shown in the URL
-   */
-  hidden?: (keyof T)[];
-
-  /**
-   * Enforced search parameters will always be its default value
-   */
-  enforced?: (keyof T)[];
-
-  /**
-   * modifiers for the multiple search parameters
-   */
-  prefixes?: {
-    /**
-     * negated search parameters
-     */
-    not: string;
-
-    /**
-     * ignored search parameters
-     */
-    ignore: string;
-  };
-
-  /**
-   * Using the DefaultSearchParamsProvider
-   */
   usingDefaultContext?: boolean;
 };
 
-const createSearchParamsContext = once(<T extends Params>() => createContext<ContextProps<T>>(null));
-export const useSearchParams = <T extends Params>(): ContextProps<T> => useContext(createSearchParamsContext<T>());
+const createSearchParamsContext = once(<P extends Params>() => createContext<ContextProps<P>>(null));
+export const useSearchParams = <P extends Params>(): ContextProps<P> => useContext(createSearchParamsContext<P>());
 
-export const SearchParamsProvider = <T extends Params>({
+export const SearchParamsProvider = <P extends Params>({
   children,
-  defaultValue = null,
-  hidden = [],
-  enforced = [],
-  usingDefaultContext = false,
-  prefixes = null
-}: Props<T>) => {
-  const SearchParamsContext = createSearchParamsContext<T>();
+  params = null,
+  usingDefaultContext = false
+}: Props<P>) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { defaults = null } = useDefaultParams<T>() || {};
+  const { defaults = null } = useDefaultParams<P>() || {};
+  const SearchParamsContext = createSearchParamsContext<P>();
 
   const [hiddenParams, setHiddenParams] = useState<URLSearchParams>(new URLSearchParams());
 
   const locationParams = useMemo<URLSearchParams>(() => new URLSearchParams(location.search), [location.search]);
 
-  const parser = useMemo<SearchParser<T>>(
-    () =>
-      new SearchParser<T>(usingDefaultContext && defaults ? defaults.toObject() : defaultValue, { enforced, prefixes }),
-    [defaultValue, defaults, enforced, prefixes, usingDefaultContext]
+  const parser = useMemo<SearchParser<P>>(
+    () => new SearchParser<P>(params).setDefaults(usingDefaultContext ? defaults?.toObject() : null),
+    [defaults, params, usingDefaultContext]
   );
 
-  const search = useMemo<ContextProps<T>['search']>(
-    () => parser.mergeParams(locationParams, hiddenParams, key => !hidden.includes(key)),
-    [hidden, hiddenParams, locationParams, parser]
+  const hiddenKeys = useMemo<Array<keyof P>>(() => parser.getHiddenKeys(), [parser]);
+
+  const search = useMemo<ContextProps<P>['search']>(
+    () => parser.mergeParams(locationParams, hiddenParams, hiddenKeys),
+    [hiddenKeys, hiddenParams, locationParams, parser]
   );
 
   const prevSearch = useRef<string>(null);
   const prevHidden = useRef<string>(null);
   const searchParamsRef = useRef<URLSearchParams>(search.toParams());
-  const searchObjectRef = useRef<T>(search.toObject());
+  const searchObjectRef = useRef<P>(search.toObject());
 
-  const handleUpdateRef = useCallback((value: SearchResult<T>) => {
+  const handleUpdateRef = useCallback((value: SearchResult<P>) => {
     searchParamsRef.current = value.toParams();
     searchObjectRef.current = value.toObject();
   }, []);
 
   const handleNavigate = useCallback(
-    (value: SearchResult<T>) => {
-      const [nextSearch, nextHidden] = value.toSplitParams(key => !hidden.includes(key));
+    (value: SearchResult<P>) => {
+      const nextSearch = value.omit(hiddenKeys).toParams();
+      const nextHidden = value.pick(hiddenKeys).toParams();
 
       if (prevHidden.current !== nextHidden.toString()) {
         setHiddenParams(nextHidden);
@@ -104,10 +72,10 @@ export const SearchParamsProvider = <T extends Params>({
         navigate(`${window.location.pathname}?${nextSearch.toString()}${window.location.hash}`);
       }
     },
-    [hidden, navigate]
+    [hiddenKeys, navigate]
   );
 
-  const setSearchParams = useCallback<ContextProps<T>['setSearchParams']>(
+  const setSearchParams = useCallback<ContextProps<P>['setSearchParams']>(
     input => {
       const values = typeof input === 'function' ? input(searchParamsRef.current) : input;
       handleUpdateRef(parser.fromParams(values));
@@ -116,7 +84,7 @@ export const SearchParamsProvider = <T extends Params>({
     [handleNavigate, handleUpdateRef, parser]
   );
 
-  const setSearchObject = useCallback<ContextProps<T>['setSearchObject']>(
+  const setSearchObject = useCallback<ContextProps<P>['setSearchObject']>(
     input => {
       const values = typeof input === 'function' ? input(searchObjectRef.current) : input;
       handleUpdateRef(parser.fromObject(values));

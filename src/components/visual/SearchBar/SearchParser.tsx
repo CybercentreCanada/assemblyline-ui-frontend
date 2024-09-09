@@ -1,142 +1,158 @@
-import type { Params, Types } from './SearchParams';
-import { ArrayParam, BaseParam, BooleanParam, NumberParam, StringParam } from './SearchParams';
+import _ from 'lodash';
+import type { Formatters, MIxinFormat, Params } from './SearchParams';
+import { BooleanParam, EnumParam, FiltersParam, NumberParam, StringParam, formatters } from './SearchParams';
 
-type SearchInput = string | string[][] | Record<string, string> | URLSearchParams;
+/**
+ * Search Utils
+ */
+type Input = string | string[][] | Record<string, string> | URLSearchParams;
 
-type Options<T extends Params> = {
-  enforced?: (keyof T)[];
-  prefixes?: {
-    not?: string;
-    ignore?: string;
-  };
+export type GetParams<P extends Params> = {
+  [K in keyof P]: P[K] extends boolean
+    ? BooleanParam
+    : P[K] extends number
+    ? NumberParam
+    : P[K] extends string
+    ? StringParam
+    : unknown;
 };
 
-export class SearchResult<T extends Params> {
-  private params: Record<keyof T, BaseParam<T>> = null;
+/**
+ * Search Result
+ */
+export class SearchResult<P extends Params> {
+  private formats: Formatters = null;
 
-  private search: URLSearchParams = new URLSearchParams();
+  private values: P = null;
 
-  constructor(init: SearchInput = null, params: Record<keyof T, BaseParam<T>> = null) {
-    this.params = params;
-    this.search = new URLSearchParams(init);
+  constructor(formats: Formatters, values: P) {
+    this.formats = formats;
+    this.values = values;
   }
 
-  public filter(predicate: (key: keyof T, value: Types) => boolean) {
-    const next = new URLSearchParams();
-
-    this.search.forEach((value, key) => {
-      if (predicate(key, this.params[key].parse(value))) next.append(key, value);
-    });
-
-    return new SearchResult<T>(next, this.params);
+  public has<K extends keyof P>(key: K): boolean {
+    return key in this.values;
   }
 
-  public get<K extends keyof T>(key: K): T[K] {
-    return this.params?.[key]?.get(this.search) as T[K];
+  public get<K extends keyof P>(key: K): P[K] {
+    return this.has(key) ? this.values[key] : null;
   }
 
-  public has<K extends keyof T>(key: K): boolean {
-    return this.params?.[key]?.has(this.search);
+  public pick<K extends keyof P>(keys: K[]) {
+    const values = Object.entries(this.values).reduce(
+      (prev, [key, value]) => (keys.includes(key as K) ? { ...prev, [key]: value } : prev),
+      {} as P
+    );
+    return new SearchResult<P>(this.formats, values);
   }
 
-  public set(input: T | ((value: T) => T)) {
-    const output = new URLSearchParams();
-    let obj = Object.values(this.params).reduce((prev, param) => param.object(prev, this.search), {} as T);
-    obj = typeof input === 'function' ? input(obj) : input;
-    Object.values(this.params).forEach(param => {
-      param.set(output, obj);
-    });
-    return new SearchResult<T>(output, this.params);
+  public omit<K extends keyof P>(keys: K[]) {
+    const values = Object.entries(this.values).reduce(
+      (prev, [key, value]) => (!keys.includes(key as K) ? { ...prev, [key]: value } : prev),
+      {} as P
+    );
+    return new SearchResult<P>(this.formats, values);
   }
 
-  public toObject(): T {
-    return Object.values(this.params).reduce((prev, param) => param.object(prev, this.search), {} as T);
+  public set(input: P | ((value: P) => P)) {
+    const values = _.cloneDeep(typeof input === 'function' ? input(this.values) : input);
+    return new SearchResult<P>(this.formats, values);
   }
 
-  public toParams() {
-    return new URLSearchParams(this.toString());
+  public toObject(): P {
+    return _.cloneDeep(this.values);
   }
 
-  public toSplitParams(predicate: (key: string, value: unknown) => boolean) {
-    const first = new URLSearchParams();
-    const second = new URLSearchParams();
-
-    this.search.forEach((value, key) => {
-      const res = predicate(key, this.params[key].parse(value));
-      if (res === true) first.append(key, value);
-      else if (res === false) second.append(key, value);
-    });
-
-    return [first, second];
+  public toParams(): URLSearchParams {
+    return new URLSearchParams(
+      Object.values(this.formats).reduce<string[][]>((prev, format) => format.toParams(prev, this.values), [])
+    );
   }
 
-  public toString() {
-    return this.search?.toString() || '';
+  public toString(): string {
+    return this.toParams().toString();
   }
 }
 
-export class SearchParser<T extends Params> {
-  private params: Record<keyof T, BaseParam<T>> = null;
+/**
+ * Search Parser
+ */
+export class SearchParser<P extends Params> {
+  private formats: Formatters = null;
 
-  constructor(defaults: T = null, options?: Options<T>) {
-    this.params = Object.entries(defaults).reduce((prev, [k, v]) => {
-      const e = options?.enforced?.includes(k);
-      if (ArrayParam.is(v)) return { ...prev, [k]: new ArrayParam<T>(k, v, e, options?.prefixes) };
-      else if (BooleanParam.is(v)) return { ...prev, [k]: new BooleanParam<T>(k, v, e) };
-      else if (NumberParam.is(v)) return { ...prev, [k]: new NumberParam<T>(k, v, e) };
-      else if (StringParam.is(v)) return { ...prev, [k]: new StringParam<T>(k, v, e) };
-      else return { ...prev, [k]: new BaseParam<T>(k, v, e) };
-    }, {}) as Record<keyof T, BaseParam<T>>;
+  constructor(params: GetParams<P>) {
+    this.formats = Object.entries(params).reduce((prev, [key, format]) => {
+      if (format instanceof BooleanParam) return { ...prev, [key]: new formatters.boolean(key, format) };
+      else if (format instanceof NumberParam) return { ...prev, [key]: new formatters.number(key, format) };
+      else if (format instanceof StringParam) return { ...prev, [key]: new formatters.string(key, format) };
+      else if (format instanceof FiltersParam) return { ...prev, [key]: new formatters.filters(key, format) };
+      else if (format instanceof EnumParam) return { ...prev, [key]: new formatters.enum(key, format) };
+      else return { ...prev };
+    }, {}) as Formatters;
   }
 
-  public fromParams(input: SearchInput) {
+  private reduce<T>(callbackfn: (previousValue: T, current: [string, MIxinFormat]) => T, init: T): T {
+    return Object.entries(this.formats).reduce(callbackfn, init);
+  }
+
+  public setDefaults(values: P) {
+    if (!values) return this;
+    Object.keys(this.formats).forEach(key => this.formats[key].default(values?.[key]));
+    return this;
+  }
+
+  public getDefaults() {
+    return this.reduce((prev, [key, format]) => ({ ...prev, [key]: format.getDefault() }), {});
+  }
+
+  public getIgnoredKeys() {
+    return this.reduce<Array<keyof P>>((prev, [key, format]) => (format.isIgnored() ? [...prev, key] : prev), []);
+  }
+
+  public getHiddenKeys() {
+    return this.reduce<Array<keyof P>>((prev, [key, format]) => (format.isHidden() ? [...prev, key] : prev), []);
+  }
+
+  public fromParams(input: Input) {
     const search = new URLSearchParams(input);
-    const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.from(output, search));
-    return new SearchResult<T>(output, this.params);
+    const output = this.reduce<P>((prev, [, param]) => param.from(prev, search), {} as P);
+    return new SearchResult<P>(this.formats, output);
   }
 
-  public fromObject(input: T) {
-    const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.from(output, input));
-    return new SearchResult<T>(output, this.params);
+  public fromObject(input: P) {
+    const output = this.reduce<P>((prev, [, param]) => param.from(prev, input), {} as P);
+    return new SearchResult<P>(this.formats, output);
   }
 
-  public fullParams(input: SearchInput) {
+  public fullParams(input: Input) {
     const search = new URLSearchParams(input);
-    const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.full(output, search));
-    return new SearchResult<T>(output, this.params);
+    const output = this.reduce<P>((prev, [, param]) => param.full(prev, search), {} as P);
+    return new SearchResult<P>(this.formats, output);
   }
 
-  public fullObject(input: T) {
-    const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.full(output, input));
-    return new SearchResult<T>(output, this.params);
+  public fullObject(input: P) {
+    const output = this.reduce<P>((prev, [, param]) => param.full(prev, input), {} as P);
+    return new SearchResult<P>(this.formats, output);
   }
 
-  public deltaParams(input: SearchInput) {
+  public deltaParams(input: Input) {
     const search = new URLSearchParams(input);
-    const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.delta(output, search));
-    return new SearchResult<T>(output, this.params);
+    const output = this.reduce<P>((prev, [, param]) => param.delta(prev, search), {} as P);
+    return new SearchResult<P>(this.formats, output);
   }
 
-  public deltaObject(input: T) {
-    const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.delta(output, input));
-    return new SearchResult<T>(output, this.params);
+  public deltaObject(input: P) {
+    const output = this.reduce<P>((prev, [, param]) => param.delta(prev, input), {} as P);
+    return new SearchResult<P>(this.formats, output);
   }
 
-  public mergeParams(
-    first: SearchInput,
-    second: SearchInput,
-    predicate: <K extends keyof T>(key: K, values?: [Types, Types]) => boolean
-  ) {
+  public mergeParams(first: Input, second: Input, keys: Array<keyof P>) {
     const left = new URLSearchParams(first);
     const right = new URLSearchParams(second);
-    const output = new URLSearchParams();
-    Object.values(this.params).forEach(param => param.merge(output, left, right, predicate));
-    return new SearchResult<T>(output, this.params);
+    const output = this.reduce<P>(
+      (prev, [key, param]) => (keys.includes(key) ? param.from(prev, right) : param.from(prev, left)),
+      {} as P
+    );
+    return new SearchResult<P>(this.formats, output);
   }
 }

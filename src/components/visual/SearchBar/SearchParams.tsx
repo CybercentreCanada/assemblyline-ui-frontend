@@ -1,217 +1,298 @@
-export type SearchInput = string | string[][] | Record<string, string> | URLSearchParams;
+type ValueTypes = null | boolean | number | string | object | string[];
 
-export type Types = boolean | number | string | string[];
+type ExtractEnumType<C> = C extends EnumParam<infer T> ? T[number] : never;
 
-export type Params = { [param: string]: Types };
+export type ParamTypes = BooleanParam | NumberParam | StringParam | FiltersParam | EnumParam<readonly string[]>;
 
-export type SearchParams<T extends Params> = {
-  -readonly [K in keyof T]: T[K] extends boolean
+export type ParamObject = Record<string, ParamTypes>;
+
+export type Params = Record<string, ValueTypes>;
+
+export type SearchParams<P extends ParamObject> = {
+  [K in keyof P]: P[K] extends BooleanParam
     ? boolean
-    : T[K] extends number
+    : P[K] extends NumberParam
     ? number
-    : T[K] extends string
+    : P[K] extends StringParam
     ? string
-    : T[K] extends Array<string>
+    : P[K] extends FiltersParam
     ? string[]
+    : P[K] extends EnumParam<readonly string[]>
+    ? ExtractEnumType<P[K]>
     : unknown;
 };
 
 /**
- * Base Parameter
+ * Base Param
  */
-export class BaseParam<T extends Params> {
-  protected key: string = '';
+export abstract class BaseParam<T extends ValueTypes> {
+  protected _key: string = null;
 
-  protected defaults: string | string[] = '';
+  protected _default: T = null;
 
-  protected enforced: boolean = false;
+  protected _enforced: boolean = false;
 
-  constructor(key: string, defaults: Types = '', enforced: boolean = false) {
-    this.key = key;
-    this.defaults = this.valid(String(defaults)) ? String(defaults) : this.defaults;
-    this.enforced = enforced;
+  protected _hidden: boolean = false;
+
+  protected _ignored: boolean = false;
+
+  protected _nullable: boolean = false;
+
+  constructor(key: string = null, param: BaseParam<T> = null) {
+    this._key = key;
+    if (!param) return;
+    this._default = param._default;
+    this._enforced = param._enforced;
+    this._hidden = param._hidden;
+    this._ignored = param._ignored;
+    this._nullable = param._nullable;
   }
 
-  public static is(value: unknown): value is Types {
-    return value !== null && value !== undefined && value !== 'null' && value !== 'undefined';
+  public default(value: T) {
+    this._default = value;
+    return this;
   }
 
-  protected valid(value: unknown): value is string {
-    return typeof value === 'string';
+  public enforced(value: boolean = true) {
+    this._enforced = value;
+    return this;
   }
 
-  protected at(search: T | URLSearchParams): string | string[] {
-    if (search instanceof URLSearchParams) return search.get(this.key);
-    else if (typeof search === 'object' && this.key in search) return String(search?.[this.key]);
-    else return null;
+  public hidden(value: boolean = true) {
+    this._hidden = value;
+    return this;
   }
 
-  public parse(value: string | string[]): Types {
-    return value;
+  public ignored(value: boolean = true) {
+    this._ignored = value;
+    return this;
   }
 
-  public has(search: T | URLSearchParams): boolean {
-    if (search instanceof URLSearchParams) return search.has(this.key);
-    else if (typeof search === 'object') return this.key in search;
-    else return false;
+  public nullable(value: boolean = true) {
+    this._nullable = value;
+    return this;
   }
 
-  public get(search: T | URLSearchParams): Types {
-    return this.parse(this.at(search));
+  protected getDefault() {
+    return this._default;
   }
 
-  public set(prev: URLSearchParams, search: T | URLSearchParams): void {
-    const value = this.at(search);
-    if (this.valid(value)) prev.set(this.key, value);
+  protected isIgnored() {
+    return this._ignored;
   }
 
-  public from(prev: URLSearchParams, search: T | URLSearchParams): void {
-    const value = this.at(search);
-    if (this.valid(value)) prev.set(this.key, value);
-    else if (this.valid(this.defaults)) prev.set(this.key, this.defaults);
+  protected isHidden() {
+    return this._hidden;
   }
 
-  public full(prev: URLSearchParams, search: T | URLSearchParams): void {
-    const value = this.at(search);
-    if (!this.enforced && this.valid(value)) prev.set(this.key, value);
-    else if (this.valid(this.defaults)) prev.set(this.key, this.defaults);
+  protected parse(value: unknown): T {
+    return value === 'null' ? null : value === 'undefined' ? undefined : undefined;
   }
 
-  public delta(prev: URLSearchParams, search: T | URLSearchParams): void {
-    const value = this.at(search);
-    if (!this.enforced && this.valid(value) && value !== this.defaults) prev.set(this.key, value);
+  protected valid(value: unknown): value is T {
+    return this._nullable && value === null ? true : !!value;
   }
 
-  public merge(
-    prev: URLSearchParams,
-    left: T | URLSearchParams,
-    right: T | URLSearchParams,
-    predicate: <K extends keyof T>(key: K, values?: [Types, Types]) => boolean
-  ): void {
-    const value1 = this.at(left);
-    const value2 = this.at(right);
-    const res = predicate(this.key, [this.parse(value1), this.parse(value2)]);
-
-    if (!this.enforced && res === true && this.valid(value1)) prev.set(this.key, value1);
-    else if (!this.enforced && res === false && this.valid(value2)) prev.set(this.key, value2);
-    else if (this.valid(this.defaults)) prev.set(this.key, this.defaults);
+  protected get<P extends Params>(search: P | URLSearchParams): T {
+    if (search instanceof URLSearchParams) {
+      const value = this.parse(search.get(this._key));
+      if (this.valid(value)) return value;
+    } else if (typeof search === 'object' && this._key in search) {
+      const value = search?.[this._key];
+      if (this.valid(value)) return value;
+    }
+    return undefined;
   }
 
-  public object(prev: T, search: T | URLSearchParams): T {
-    const value = this.at(search);
-    return this.valid(value) ? { ...prev, [this.key]: this.parse(value) } : prev;
+  protected from<P extends Params>(prev: P, search: P | URLSearchParams): P {
+    const value = this.get(search);
+    if (this.valid(value)) return { ...prev, [this._key]: value };
+    else if (this.valid(this._default)) return { ...prev, [this._key]: this._default };
+    else return prev;
+  }
+
+  protected full<P extends Params>(prev: P, search: P | URLSearchParams): P {
+    const value = this.get(search);
+    if (!this._enforced && this.valid(value)) return { ...prev, [this._key]: value };
+    else if (this.valid(this._default)) return { ...prev, [this._key]: this._default };
+    else return prev;
+  }
+
+  protected delta<P extends Params>(prev: P, search: P | URLSearchParams): P {
+    const value = this.get(search);
+    if (!this._enforced && this.valid(value) && value !== this._default) return { ...prev, [this._key]: value };
+    else return prev;
+  }
+
+  protected merge<P extends Params>(
+    prev: P,
+    left: P | URLSearchParams,
+    right: P | URLSearchParams,
+    keys: (keyof P)[]
+  ): P {
+    const value1 = this.get(left);
+    const value2 = this.get(right);
+
+    if (!this._enforced && !keys.includes(this._key) && this.valid(value1)) return { ...prev, [this._key]: value1 };
+    else if (!this._enforced && keys.includes(this._key) && this.valid(value2)) return { ...prev, [this._key]: value2 };
+    else if (this.valid(this._default)) return { ...prev, [this._key]: this._default };
+    return prev;
+  }
+
+  protected toParams<P extends Params>(prev: string[][], search: P): string[][] {
+    return this._key in search ? [...prev, [this._key, String(search?.[this._key])]] : prev;
   }
 }
 
 /**
- * Boolean Parameter
+ * Boolean Param
  */
-export class BooleanParam<T extends Params> extends BaseParam<T> {
-  public static override is(value: unknown): value is boolean {
-    return typeof value === 'boolean';
+export class BooleanParam extends BaseParam<boolean> {
+  protected override parse(value: unknown): boolean {
+    return value === 'true' ? true : value === 'false' ? false : super.parse(value);
+  }
+
+  protected override valid(value: unknown): value is boolean {
+    return typeof value === 'boolean' || super.valid(value);
+  }
+}
+
+/**
+ * Number Param
+ */
+export class NumberParam extends BaseParam<number> {
+  private _min: null | number = null;
+
+  private _max: null | number = null;
+
+  constructor(key: string = null, param: NumberParam = null) {
+    super(key, param);
+    if (!param) return;
+    this._min = param._min;
+    this._max = param._max;
+  }
+
+  public min(value: number) {
+    this._min = value;
+    this._default = Math.max(this._default, this._min);
+    return this;
+  }
+
+  public max(value: number) {
+    this._max = value;
+    this._default = Math.min(this._default, this._max);
+    return this;
+  }
+
+  private clamp(value: number): number {
+    let num = value;
+    if (this._min !== null) num = Math.max(num, this._min);
+    if (this._max !== null) num = Math.min(num, this._max);
+    return num;
+  }
+
+  protected override get<P extends Params>(search: P | URLSearchParams): number {
+    if (search instanceof URLSearchParams) {
+      const value = this.parse(search.get(this._key));
+      if (this.valid(value)) return this.clamp(value);
+    } else if (typeof search === 'object' && this._key in search) {
+      const value = search?.[this._key];
+      if (this.valid(value)) return this.clamp(value);
+    }
+    return undefined;
+  }
+
+  protected override parse(value: unknown): number {
+    return value !== null && !isNaN(Number(value)) ? Number(value) : super.parse(value);
+  }
+
+  protected override valid(value: unknown): value is number {
+    return typeof value === 'number' || value === 0 || super.valid(value);
+  }
+}
+
+/**
+ * String Param
+ */
+export class StringParam extends BaseParam<string> {
+  protected override parse(value: unknown): string {
+    return typeof value === 'string' ? String(value) : super.parse(value);
   }
 
   protected override valid(value: unknown): value is string {
-    return super.valid(value) && (value === 'true' || value === 'false');
-  }
-
-  public override parse(value: string): boolean {
-    return (value === 'true' ? true : value === 'false' ? false : value) as boolean;
+    return typeof value === 'string' || super.valid(value);
   }
 }
 
 /**
- * Number Parameter
+ * Enum Param
  */
-export class NumberParam<T extends Params> extends BaseParam<T> {
-  public static override is(value: unknown): value is number {
-    return typeof value === 'number';
+export class EnumParam<O extends readonly string[]> extends BaseParam<O[number]> {
+  private _options: O;
+
+  constructor(key: string = null, param: EnumParam<O> = null) {
+    super(key, param);
+    if (!param) return;
+    this._options = param._options;
   }
 
-  protected override valid(value: Types): value is string {
-    return super.valid(value) && !isNaN(Number(value));
+  public default(value: O[number]) {
+    this._default = value;
+    return this;
   }
 
-  public override parse(value: string): number {
-    return this.valid(value) ? Number(value) : value;
+  public options(value: O) {
+    this._options = value;
+    return this;
+  }
+
+  private check(value: unknown): value is O[number] {
+    return Array.isArray(this._options) && this._options.some(v => v === value);
+  }
+
+  protected override parse(value: unknown): O[number] {
+    return this.check(value) ? value : super.parse(value);
+  }
+
+  protected override valid(value: unknown): value is O[number] {
+    return this.check(value) || super.valid(value);
   }
 }
 
 /**
- * String Parameter
+ * Filter Param
  */
-export class StringParam<T extends Params> extends BaseParam<T> {
-  public static override is(value: unknown): value is string {
-    return typeof value === 'string';
+export class FiltersParam extends BaseParam<string[]> {
+  private _not: string = 'NOT';
+
+  private _omit: string = '!';
+
+  constructor(key: string = null, param: FiltersParam = null) {
+    super(key, param);
+    if (!param) return;
+    this._not = param._not;
+    this._omit = param._omit;
   }
 
-  protected override valid(value: Types): value is string {
-    return super.valid(value);
+  public not(value: string = 'NOT') {
+    this._not = value;
+    return this;
   }
 
-  public override parse(value: string): string {
-    return this.valid(value) ? String(value) : value;
-  }
-}
-
-/**
- * Array Parameter
- */
-export class ArrayParam<T extends Params> extends BaseParam<T> {
-  protected override defaults: string[] = [];
-
-  private not = 'NOT';
-
-  private ignore = '!';
-
-  constructor(
-    key: string,
-    defaultValue: Types,
-    enforced: boolean = false,
-    prefixes?: { not?: string; ignore?: string }
-  ) {
-    super(key);
-    this.key = key;
-    this.enforced = enforced;
-    this.not = prefixes?.not || 'NOT';
-    this.ignore = prefixes?.ignore || '!';
-
-    this.defaults = !this.validArray(defaultValue) ? this.defaults : defaultValue;
+  public omit(value: string = '!') {
+    this._omit = value;
+    return this;
   }
 
-  public static override is(value: unknown): value is string[] {
-    return Array.isArray(value);
-  }
-
-  private validArray(value: unknown): value is string[] {
-    return ArrayParam.is(value);
-  }
-
-  protected override at(search: T | URLSearchParams): string[] {
-    if (search instanceof URLSearchParams) return search.getAll(this.key);
-    else if (typeof search === 'object' && Array.isArray(search?.[this.key])) return search?.[this.key] as string[];
-    else return [];
-  }
-
-  public override parse(value: string | string[]): string | string[] {
-    return this.validArray(value) ? value : super.valid(String(value)) ? String(value) : value;
-  }
-
-  public has(search: T | URLSearchParams): boolean {
-    if (search instanceof URLSearchParams) return search.has(this.key);
-    else if (typeof search === 'object') return (search?.[this.key] as string[])?.length > 0;
-    else return false;
-  }
-
-  public get(search: T | URLSearchParams): Types {
-    return this.parse(this.at(search));
+  private check(value: unknown): value is string[] {
+    return Array.isArray(value) && value.every(v => typeof v === 'string');
   }
 
   private toPrefix(value: string, prev: string[] = []): string[] {
-    if (value.startsWith(`${this.ignore}(`) && value.endsWith(')')) {
-      return this.toPrefix(value.substring(this.ignore.length + 1, value.length - 1), [...prev, this.ignore]);
-    } else if (value.startsWith(`${this.not}(`) && value.endsWith(')')) {
-      return this.toPrefix(value.substring(this.not.length + 1, value.length - 1), [...prev, this.not]);
+    if (value.startsWith(`${this._omit}(`) && value.endsWith(')')) {
+      return this.toPrefix(value.substring(this._omit.length + 1, value.length - 1), [...prev, this._omit]);
+    } else if (value.startsWith(`${this._not}(`) && value.endsWith(')')) {
+      return this.toPrefix(value.substring(this._not.length + 1, value.length - 1), [...prev, this._not]);
     } else {
       return [...prev, value];
     }
@@ -225,39 +306,49 @@ export class ArrayParam<T extends Params> extends BaseParam<T> {
     return values
       .map(v => this.toPrefix(v))
       .reduceRight((prev, cur) => (prev.some(p => cur.at(-1) === p.at(-1)) ? prev : [...prev, cur]), [] as string[][])
-      .filter(value => !value.some(v => v === this.ignore));
+      .filter(value => !value.some(v => v === this._omit));
   }
 
-  private append(prev: URLSearchParams, values: string[][]): void {
-    values
-      .toSorted((a, b) => a.at(-1).localeCompare(b.at(-1)))
-      .map(value => this.fromPrefix(value))
-      .forEach(v => {
-        prev.append(this.key, v);
-      });
+  private append<P extends Params>(prev: P, values: string[][]): P {
+    const res = values.toSorted((a, b) => a.at(-1).localeCompare(b.at(-1))).map(value => this.fromPrefix(value));
+    return { ...prev, [this._key]: res };
   }
 
-  public override set(prev: URLSearchParams, search: T | URLSearchParams): void {
-    const data = this.at(search);
-    return this.append(prev, this.clean([...data]));
+  protected override parse(value: unknown): string[] {
+    return this.check(value) ? value : super.parse(value);
   }
 
-  public override from(prev: URLSearchParams, search: T | URLSearchParams): void {
-    const data = this.at(search);
-    return this.append(prev, this.clean([...data]));
+  protected override valid(value: unknown): value is string[] {
+    return this.check(value) || super.valid(value);
   }
 
-  public override full(prev: URLSearchParams, search: T | URLSearchParams): void {
-    const data = this.at(search);
-    return this.append(prev, this.clean([...this.defaults, ...(!this.enforced && data)]));
+  protected override get<P extends Params>(search: P | URLSearchParams): string[] {
+    if (search instanceof URLSearchParams) {
+      const value = this.parse(search.getAll(this._key));
+      if (this.valid(value)) return value;
+    } else if (typeof search === 'object' && this._key in search) {
+      const value = search?.[this._key];
+      if (this.valid(value)) return value;
+    }
+    return [];
   }
 
-  public override delta(prev: URLSearchParams, search: T | URLSearchParams): void {
-    const data = this.at(search);
-    if (this.enforced || !this.validArray(data)) return;
+  protected override from<P extends Params>(prev: P, search: P | URLSearchParams): P {
+    const value = this.get(search);
+    return this.append(prev, this.clean(value));
+  }
+
+  protected override full<P extends Params>(prev: P, search: P | URLSearchParams): P {
+    const data = this.get(search);
+    return this.append(prev, this.clean([...this._default, ...(!this._enforced && data)]));
+  }
+
+  protected override delta<P extends Params>(prev: P, search: P | URLSearchParams): P {
+    const data = this.get(search);
+    if (this._enforced || !Array.isArray(data)) return prev;
 
     const left = this.clean(data);
-    const right = this.clean(this.defaults);
+    const right = this.clean(this._default);
     let values: string[][] = [];
 
     values = left.reduceRight(
@@ -266,28 +357,98 @@ export class ArrayParam<T extends Params> extends BaseParam<T> {
     );
 
     values = right.reduceRight(
-      (p, r) => (left.some(l => l.at(-1) === r.at(-1)) ? p : [...p, [this.ignore, ...r]]),
+      (p, r) => (left.some(l => l.at(-1) === r.at(-1)) ? p : [...p, [this._omit, ...r]]),
       values
     );
 
-    this.append(prev, values);
+    return this.append(prev, values);
   }
 
-  public override merge(
-    prev: URLSearchParams,
-    left: T | URLSearchParams,
-    right: T | URLSearchParams,
-    predicate: <K extends keyof T>(key: K, values?: [Types, Types]) => boolean
-  ): void {
-    const value1 = this.at(left);
-    const value2 = this.at(right);
-    const res = predicate(this.key, [this.parse(value1), this.parse(value2)]);
+  protected override merge<P extends Params>(
+    prev: P,
+    left: P | URLSearchParams,
+    right: P | URLSearchParams,
+    keys: (keyof P)[]
+  ): P {
+    const value1 = this.get(left);
+    const value2 = this.get(right);
+    const res = !keys.includes(this._key);
     const data = res === true ? value1 : res === false ? value2 : [];
-    this.append(prev, this.clean([...this.defaults, ...(!this.enforced && data)]));
+    return this.append(prev, this.clean([...this._default, ...(!this._enforced && data)]));
   }
 
-  public object(prev: T, search: T | URLSearchParams): T {
-    const value = this.at(search);
-    return this.validArray(value) ? { ...prev, [this.key]: value } : prev;
+  protected override toParams<P extends Params>(prev: string[][], search: P): string[][] {
+    if (!(this._key in search) || !this.check(search?.[this._key])) return prev;
+    return (search[this._key] as string[]).reduce((p, f) => [...p, [this._key, String(f)]], prev);
   }
 }
+
+/**
+ * Param Mixin
+ */
+type AnyFunction<A = any> = (...input: any[]) => A;
+
+type Mixin<T extends AnyFunction> = InstanceType<ReturnType<T>>;
+
+export type MIxinFormat = Mixin<typeof Format>;
+
+export type Formatters = Record<string, MIxinFormat>;
+
+export type Constructor = new (...args: any[]) => {};
+
+// export function Format<TBase extends Constructor>(Base: TBase) {
+function Format<T extends ValueTypes, B extends new (...args: any[]) => BaseParam<T>>(Base: B) {
+  return class Accessor extends Base {
+    public default = (value: T) => {
+      super.default(value);
+      return this;
+    };
+
+    public getDefault = () => super.getDefault();
+
+    public parse = (value: unknown): T => super.parse(value);
+
+    public valid = (value: unknown): value is T => super.valid(value);
+
+    public isIgnored = (): boolean => this._ignored;
+
+    public isHidden = (): boolean => this._hidden;
+
+    public from = <P extends Params>(prev: P, search: P | URLSearchParams): P => super.from(prev, search);
+
+    public full = <P extends Params>(prev: P, search: P | URLSearchParams): P => super.full(prev, search);
+
+    public delta = <P extends Params>(prev: P, search: P | URLSearchParams): P => super.delta(prev, search);
+
+    public merge = <P extends Params>(
+      prev: P,
+      left: P | URLSearchParams,
+      right: P | URLSearchParams,
+      keys: (keyof P)[]
+    ): P => super.merge(prev, left, right, keys);
+
+    public toParams = <P extends Params>(prev: string[][], search: P): string[][] => super.toParams(prev, search);
+  };
+}
+
+export const formatters = {
+  boolean: Format(BooleanParam),
+  number: Format(NumberParam),
+  string: Format(StringParam),
+  filters: Format(FiltersParam),
+  enum: Format(EnumParam)
+} as const;
+
+const params = {
+  boolean: (value: boolean) => new BooleanParam().default(value),
+  number: (value: number) => new NumberParam().default(value),
+  string: (value: string) => new StringParam().default(value),
+  enum: <O extends readonly string[]>(value: O[number], options: O) =>
+    new EnumParam<O>().default(value).options(options),
+  filters: (value: string[], not: string = 'NOT', omit: string = '!') =>
+    new FiltersParam().default(value).not(not).omit(omit)
+} as const;
+
+export const createSearchParams = <P extends ParamObject>(input: (p: typeof params) => P) => input(params);
+
+export default createSearchParams;

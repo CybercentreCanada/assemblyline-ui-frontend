@@ -1,14 +1,14 @@
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { Params } from './SearchParams';
-import type { SearchResult } from './SearchParser';
+import type { GetParams, SearchResult } from './SearchParser';
 import { SearchParser } from './SearchParser';
 
-type ContextProps<T extends Params> = {
+type ContextProps<P extends Params> = {
   /**
    * Default search params as a formatted URLSearchParams
    */
-  defaults: SearchResult<T>;
+  defaults: SearchResult<P>;
 
   /**
    * Is there a search params stored in the local storage
@@ -26,84 +26,51 @@ type ContextProps<T extends Params> = {
   onDefaultClear: () => void;
 };
 
-type Props<T extends Params> = {
+type Props<P extends Params> = {
   children: React.ReactNode;
 
   /**
    * Default search parameters including null values.
    */
-  defaultValue: T;
+  params: GetParams<P>;
 
   /**
    * key of where the search parameters will be stored in the Local Storage
    */
   storageKey: string;
-
-  /**
-   * Enforced search parameters will always be its default value
-   */
-  enforced?: (keyof T)[];
-
-  /**
-   * Ignored search parameters will not be stored in the local storage
-   */
-  ignored?: (keyof T)[];
-
-  /**
-   * modifiers for the multiple search parameters
-   */
-  prefixes?: {
-    /**
-     * negated search parameters
-     */
-    not: string;
-
-    /**
-     * ignored search parameters
-     */
-    ignore: string;
-  };
 };
 
-const createCurrentContext = once(<T extends Params>() => createContext<ContextProps<T>>(null));
-export const useDefaultParams = <T extends Params>(): ContextProps<T> => useContext(createCurrentContext<T>());
+const createCurrentContext = once(<P extends Params>() => createContext<ContextProps<P>>(null));
+export const useDefaultParams = <P extends Params>(): ContextProps<P> => useContext(createCurrentContext<P>());
 
-export const DefaultParamsProvider = <T extends Params>({
-  children,
-  defaultValue = null,
-  storageKey = null,
-  enforced = [],
-  ignored = [],
-  prefixes = null
-}: Props<T>) => {
-  const DefaultParamsContext = createCurrentContext<T>();
+export const DefaultParamsProvider = <P extends Params>({ children, params = null, storageKey = null }: Props<P>) => {
+  const DefaultParamsContext = createCurrentContext<P>();
 
   const [storageParams, setStorageParams] = useState<URLSearchParams>(
     () => new URLSearchParams(localStorage.getItem(storageKey) || '')
   );
   const [fromStorage, seFromStorage] = useState<boolean>(() => !!localStorage.getItem(storageKey));
 
-  const parser = useMemo<SearchParser<T>>(
-    () => new SearchParser<T>(defaultValue, { enforced, prefixes }),
-    [defaultValue, enforced, prefixes]
-  );
+  const parser = useMemo<SearchParser<P>>(() => new SearchParser<P>(params), [params]);
 
-  const defaults = useMemo<ContextProps<T>['defaults']>(
+  const ignoredKeys = useMemo<Array<keyof P>>(() => parser.getIgnoredKeys(), [parser]);
+
+  const defaults = useMemo<ContextProps<P>['defaults']>(
     () => parser.fullParams(storageParams),
     [parser, storageParams]
   );
 
-  const onDefaultChange = useCallback<ContextProps<T>['onDefaultChange']>(
+  const onDefaultChange = useCallback<ContextProps<P>['onDefaultChange']>(
     value => {
-      const params = parser.deltaParams(value).filter(k => !ignored.includes(k));
-      localStorage.setItem(storageKey, params.toString());
-      setStorageParams(params.toParams());
+      const search = parser.deltaParams(value).omit(ignoredKeys).toParams();
+      localStorage.setItem(storageKey, search.toString());
+      setStorageParams(search);
       seFromStorage(true);
     },
-    [ignored, parser, storageKey]
+    [ignoredKeys, parser, storageKey]
   );
 
-  const onDefaultClear = useCallback<ContextProps<T>['onDefaultClear']>(() => {
+  const onDefaultClear = useCallback<ContextProps<P>['onDefaultClear']>(() => {
     localStorage.removeItem(storageKey);
     setStorageParams(new URLSearchParams());
     seFromStorage(false);
@@ -115,14 +82,7 @@ export const DefaultParamsProvider = <T extends Params>({
   }, [storageKey]);
 
   return (
-    <DefaultParamsContext.Provider
-      value={{
-        defaults,
-        fromStorage,
-        onDefaultChange,
-        onDefaultClear
-      }}
-    >
+    <DefaultParamsContext.Provider value={{ defaults, fromStorage, onDefaultChange, onDefaultClear }}>
       {!defaults ? null : children}
     </DefaultParamsContext.Provider>
   );
