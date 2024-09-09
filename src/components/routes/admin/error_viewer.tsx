@@ -102,7 +102,11 @@ const ErrorViewer = () => {
   useEffect(() => {
     if (!search || !currentUser.is_admin) return;
 
-    const body = search.set(o => ({ ...o, query: o.query || '*' }));
+    const body = search.set(o => ({
+      ...o,
+      query: o.query || '*',
+      filters: o.tc in TC_MAP && o.tc !== '1y' ? [...o.filters, TC_MAP[o.tc]] : o.filters
+    }));
 
     apiCall({
       url: `/api/v4/error/list/?${body
@@ -116,10 +120,7 @@ const ErrorViewer = () => {
     apiCall({
       url: '/api/v4/search/facet/error/response.service_name/',
       method: 'POST',
-      body: body
-        .set(o => ({ ...o, filters: o.tc in TC_MAP && o.tc !== '1y' ? [...o.filters, TC_MAP[o.tc]] : o.filters }))
-        .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'])
-        .toObject(),
+      body: body.pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only']).toObject(),
       onSuccess: ({ api_response }) => setNames(api_response as { [s: string]: number })
     });
 
