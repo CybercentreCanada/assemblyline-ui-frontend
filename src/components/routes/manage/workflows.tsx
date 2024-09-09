@@ -13,6 +13,7 @@ import type { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
+import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import type { WorkflowResult } from 'components/visual/SearchResult/workflow';
@@ -30,14 +31,14 @@ type SearchResults = {
   total: number;
 };
 
-const WORKFLOWS_PARAMS = {
-  query: '',
-  rows: 25,
-  offset: 0,
-  sort: 'last_seen desc',
-  filters: [],
-  track_total_hits: 10000
-};
+const WORKFLOWS_PARAMS = createSearchParams(p => ({
+  query: p.string(''),
+  offset: p.number(0).min(0).hidden().ignored(),
+  rows: p.number(25).enforced().hidden().ignored(),
+  sort: p.string('last_seen desc').ignored(),
+  filters: p.filters([]),
+  track_total_hits: p.number(10000).nullable().ignored()
+}));
 
 type WorkflowsParams = SearchParams<typeof WORKFLOWS_PARAMS>;
 
@@ -187,7 +188,7 @@ const WorkflowsSearch = () => {
 };
 
 const WrappedWorkflowsPage = () => (
-  <SearchParamsProvider defaultValue={WORKFLOWS_PARAMS} hidden={['rows', 'offset']} enforced={['rows']}>
+  <SearchParamsProvider params={WORKFLOWS_PARAMS}>
     <WorkflowsSearch />
   </SearchParamsProvider>
 );

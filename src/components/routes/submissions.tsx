@@ -9,6 +9,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
+import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import type { SubmissionResult } from 'components/visual/SearchResult/submissions';
@@ -25,14 +26,14 @@ type SearchResults = {
   total: number;
 };
 
-const SUBMISSION_PARAMS = {
-  query: '',
-  rows: 25,
-  offset: 0,
-  sort: 'times.submitted desc',
-  filters: ['NOT(to_be_deleted:true)'],
-  track_total_hits: 10000
-};
+const SUBMISSION_PARAMS = createSearchParams(p => ({
+  query: p.string(''),
+  offset: p.number(0).min(0).hidden().ignored(),
+  rows: p.number(25).enforced().hidden().ignored(),
+  sort: p.string('times.submitted desc').ignored(),
+  filters: p.filters(['NOT(to_be_deleted:true)']),
+  track_total_hits: p.number(10000).nullable().ignored()
+}));
 
 type SubmissionParams = SearchParams<typeof SUBMISSION_PARAMS>;
 
@@ -126,7 +127,7 @@ const SubmissionSearch = () => {
 };
 
 const WrappedSubmissionPage = () => (
-  <SearchParamsProvider defaultValue={SUBMISSION_PARAMS} hidden={['rows', 'offset']} enforced={['rows']}>
+  <SearchParamsProvider params={SUBMISSION_PARAMS}>
     <SubmissionSearch />
   </SearchParamsProvider>
 );
