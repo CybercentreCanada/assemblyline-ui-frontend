@@ -140,7 +140,9 @@ export abstract class BaseParam<T extends ValueTypes> {
   }
 
   protected toParams<P extends Params>(prev: string[][], search: P): string[][] {
-    return this._key in search ? [...prev, [this._key, String(search?.[this._key])]] : prev;
+    return this._key in search && search?.[this._key] !== null && search?.[this._key] !== undefined
+      ? [...prev, [this._key, String(search?.[this._key])]]
+      : prev;
   }
 }
 
