@@ -88,6 +88,12 @@ const WrappedAddUserPage = () => {
   const [drawer, setDrawer] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
+  const parseNum = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): number => {
+    let num = parseInt(event.target.value);
+    num = isNaN(num) ? 0 : num;
+    return Math.max(0, num);
+  }, []);
+
   const handleTypeChange = useCallback(
     userType => {
       const newRoles = configuration.user.role_dependencies[userType];
@@ -134,9 +140,23 @@ const WrappedAddUserPage = () => {
           <PersonAddIcon />
         </IconButton>
       </Tooltip>
-      <Drawer anchor="right" classes={{ paper: classes.drawerPaper }} open={drawer} onClose={() => setDrawer(false)}>
+      <Drawer
+        anchor="right"
+        classes={{ paper: classes.drawerPaper }}
+        open={drawer}
+        onClose={() => {
+          setNewUser(defaultUser);
+          setDrawer(false);
+        }}
+      >
         <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
-          <IconButton onClick={() => setDrawer(false)} size="large">
+          <IconButton
+            onClick={() => {
+              setNewUser(defaultUser);
+              setDrawer(false);
+            }}
+            size="large"
+          >
             <CloseOutlinedIcon />
           </IconButton>
         </div>
@@ -245,8 +265,8 @@ const WrappedAddUserPage = () => {
                 margin="dense"
                 size="small"
                 variant="outlined"
-                onChange={event => setNewUser(u => ({ ...u, api_quota: Math.max(0, Number(event.target.value)) }))}
-                value={newUser.api_quota}
+                onChange={event => setNewUser(u => ({ ...u, api_quota: parseNum(event) }))}
+                value={String(newUser.api_quota)}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -257,10 +277,8 @@ const WrappedAddUserPage = () => {
                 margin="dense"
                 size="small"
                 variant="outlined"
-                onChange={event =>
-                  setNewUser(u => ({ ...u, api_daily_quota: Math.max(0, Number(event.target.value)) }))
-                }
-                value={newUser.api_daily_quota}
+                onChange={event => setNewUser(u => ({ ...u, api_daily_quota: parseNum(event) }))}
+                value={String(newUser.api_daily_quota)}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -271,10 +289,8 @@ const WrappedAddUserPage = () => {
                 margin="dense"
                 size="small"
                 variant="outlined"
-                onChange={event =>
-                  setNewUser(u => ({ ...u, submission_quota: Math.max(0, Number(event.target.value)) }))
-                }
-                value={newUser.submission_quota}
+                onChange={event => setNewUser(u => ({ ...u, submission_quota: parseNum(event) }))}
+                value={String(newUser.submission_quota)}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -285,10 +301,8 @@ const WrappedAddUserPage = () => {
                 margin="dense"
                 size="small"
                 variant="outlined"
-                onChange={event =>
-                  setNewUser(u => ({ ...u, submission_daily_quota: Math.max(0, Number(event.target.value)) }))
-                }
-                value={newUser.submission_daily_quota}
+                onChange={event => setNewUser(u => ({ ...u, submission_daily_quota: parseNum(event) }))}
+                value={String(newUser.submission_daily_quota)}
               />
             </Grid>
           </Grid>
