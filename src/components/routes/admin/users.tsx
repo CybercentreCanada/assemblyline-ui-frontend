@@ -31,7 +31,8 @@ const USERS_PARAMS = createSearchParams(p => ({
   offset: p.number(0).min(0).hidden().ignored(),
   rows: p.number(25).enforced().hidden().ignored(),
   sort: p.string(null).nullable().ignored(),
-  filters: p.filters([''])
+  filters: p.filters(['']),
+  refresh: p.boolean(false).hidden().ignored()
 }));
 
 type UsersParams = SearchParams<typeof USERS_PARAMS>;
@@ -53,7 +54,7 @@ const UsersSearch = () => {
 
       const param = body
         .set(o => ({ ...o, query: [o.query || '*', ...o.filters].join(' && ') }))
-        .omit(['filters'])
+        .omit(['filters', 'refresh'])
         .toString();
 
       apiCall({
@@ -83,14 +84,14 @@ const UsersSearch = () => {
 
   useEffect(() => {
     function reload() {
-      handleReload(search.set(o => ({ ...o, offset: 0 })));
+      setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
     }
 
     window.addEventListener('reloadUsers', reload);
     return () => {
       window.removeEventListener('reloadUsers', reload);
     };
-  }, [handleReload, search]);
+  }, [setSearchObject]);
 
   return !currentUser.is_admin ? (
     <Navigate to="/forbidden" replace />

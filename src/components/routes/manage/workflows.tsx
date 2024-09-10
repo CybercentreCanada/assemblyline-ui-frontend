@@ -15,6 +15,7 @@ import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
 import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
+import type { SearchResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import type { WorkflowResult } from 'components/visual/SearchResult/workflow';
 import WorkflowTable from 'components/visual/SearchResult/workflow';
@@ -37,7 +38,8 @@ const WORKFLOWS_PARAMS = createSearchParams(p => ({
   rows: p.number(25).enforced().hidden().ignored(),
   sort: p.string('last_seen desc').ignored(),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ignored()
+  track_total_hits: p.number(10000).nullable().ignored(),
+  refresh: p.boolean(false).hidden().ignored()
 }));
 
 type WorkflowsParams = SearchParams<typeof WORKFLOWS_PARAMS>;
@@ -62,20 +64,23 @@ const WorkflowsSearch = () => {
   );
 
   const handleReload = useCallback(
-    (body: WorkflowsParams) => {
-      if (!search || !currentUser.roles.includes('workflow_view')) return;
+    (body: SearchResult<WorkflowsParams>) => {
+      if (!currentUser.roles.includes('workflow_view')) return;
 
       apiCall({
         url: '/api/v4/search/workflow/',
         method: 'POST',
-        body: body,
+        body: body
+          .set(o => ({ ...o, query: o.query || '*' }))
+          .omit(['refresh'])
+          .toObject(),
         onSuccess: ({ api_response }) => setWorkflowResults(api_response as SearchResults),
         onEnter: () => setSearching(true),
         onExit: () => setSearching(false)
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.roles, search]
+    [currentUser.roles]
   );
 
   const setWorkflowID = useCallback(
@@ -105,20 +110,19 @@ const WorkflowsSearch = () => {
   }, [location.hash]);
 
   useEffect(() => {
-    handleReload(search.set(o => ({ ...o, query: o.query || '*' })).toObject());
+    handleReload(search);
   }, [handleReload, search]);
 
   useEffect(() => {
     function reload() {
-      handleReload(search.set(o => ({ ...o, query: o.query || '*' })).toObject());
+      setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
     }
 
     window.addEventListener('reloadWorkflows', reload);
-
     return () => {
       window.removeEventListener('reloadWorkflows', reload);
     };
-  }, [handleReload, search]);
+  }, [setSearchObject]);
 
   return currentUser.roles.includes('workflow_view') ? (
     <PageFullWidth margin={4}>

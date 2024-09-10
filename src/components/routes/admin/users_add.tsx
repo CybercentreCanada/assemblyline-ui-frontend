@@ -117,7 +117,7 @@ const WrappedAddUserPage = () => {
           setNewUser(defaultUser);
           setDrawer(false);
           showSuccessMessage(t('newuser.success'));
-          window.dispatchEvent(new CustomEvent('reloadBadlist'));
+          window.dispatchEvent(new CustomEvent('reloadUsers'));
         },
         onEnter: () => setLoading(true),
         onExit: () => setLoading(false)
