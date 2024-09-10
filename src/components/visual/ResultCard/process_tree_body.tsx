@@ -102,7 +102,7 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const ProcessTreeItem = ({ process, force = false }) => {
+const ProcessTreeItem = ({ process, index = 0, depth = 0, force = false }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useTreeItemStyles();
   const { showSafeResults } = useSafeResults();
@@ -115,7 +115,7 @@ const ProcessTreeItem = ({ process, force = false }) => {
 
   return process.safelisted && process.children.length === 0 && !showSafeResults && !force ? null : (
     <TreeItem
-      itemId={process.process_pid.toString()}
+      itemId={`${process.process_pid}-${index}-${depth}`}
       classes={{
         root: classes.root
       }}
@@ -193,13 +193,13 @@ const ProcessTreeItem = ({ process, force = false }) => {
         </div>
       }
     >
-      {process.children.length !== 0 && <ProcessTreeItemList processes={process.children} />}
+      {process.children.length !== 0 && <ProcessTreeItemList processes={process.children} depth={depth + 1} />}
     </TreeItem>
   );
 };
 
-const ProcessTreeItemList = ({ processes, force = false }) =>
-  processes.map((process, id) => <ProcessTreeItem key={id} process={process} force={force} />);
+const ProcessTreeItemList = ({ processes, depth = 0, force = false }) =>
+  processes.map((process, id) => <ProcessTreeItem key={id} process={process} index={id} depth={depth} force={force} />);
 
 const WrappedProcessTreeBody = ({ body, force = false }) => {
   try {
