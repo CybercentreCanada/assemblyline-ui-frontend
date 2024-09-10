@@ -30,6 +30,14 @@ export class SearchResult<P extends Params> {
     this.values = values;
   }
 
+  public defaults() {
+    const values = Object.entries(this.formats).reduce(
+      (prev, [key, param]) => ({ ...prev, [key]: param.getDefault() }),
+      {} as P
+    );
+    return new SearchResult<P>(this.formats, values);
+  }
+
   public has<K extends keyof P>(key: K): boolean {
     return key in this.values;
   }

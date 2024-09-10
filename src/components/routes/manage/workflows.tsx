@@ -161,6 +161,7 @@ const WorkflowsSearch = () => {
                 : t(`total${workflowResults?.total === 1 ? '' : 's'}`)
             }
             onChange={v => setSearchParams(v)}
+            paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {

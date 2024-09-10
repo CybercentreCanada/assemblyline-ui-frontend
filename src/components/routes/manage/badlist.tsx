@@ -159,6 +159,7 @@ const BadlistSearch = () => {
                 : t(`total${badlistResults?.total === 1 ? '' : 's'}`)
             }
             onChange={v => setSearchParams(v)}
+            paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {

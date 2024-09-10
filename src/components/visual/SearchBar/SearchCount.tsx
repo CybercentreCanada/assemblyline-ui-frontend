@@ -3,17 +3,28 @@ import type { FC, ReactNode } from 'react';
 import React, { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+export const TOTAL_TRACKED_RECORDS = 10000;
+
 type SearchCountProps = {
   children?: ReactNode;
   loading?: boolean;
-  max?: number;
+  currentMax?: number;
+  defaultMax?: number;
   suffix?: ReactNode;
   total?: number;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 const WrappedSearchCount: FC<SearchCountProps> = memo(
-  ({ children = null, loading = false, max = 10000, suffix = '', total = 0, onClick }: SearchCountProps) => {
+  ({
+    children = null,
+    loading = false,
+    currentMax = TOTAL_TRACKED_RECORDS,
+    defaultMax = TOTAL_TRACKED_RECORDS,
+    suffix = '',
+    total = 0,
+    onClick
+  }: SearchCountProps) => {
     const { t } = useTranslation();
 
     const [open, setOpen] = useState<boolean>(false);
@@ -23,9 +34,9 @@ const WrappedSearchCount: FC<SearchCountProps> = memo(
       [total]
     );
 
-    const isLimited = useMemo<boolean>(() => total >= max, [max, total]);
+    const isLimited = useMemo<boolean>(() => total >= currentMax, [currentMax, total]);
 
-    const disabled = useMemo<boolean>(() => loading || !isLimited, [isLimited, loading]);
+    const disabled = useMemo<boolean>(() => loading || total < defaultMax, [defaultMax, loading, total]);
 
     return (
       <Tooltip
