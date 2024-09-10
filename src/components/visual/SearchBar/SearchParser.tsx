@@ -149,10 +149,7 @@ export class SearchParser<P extends Params> {
   public mergeParams(first: Input, second: Input, keys: Array<keyof P>) {
     const left = new URLSearchParams(first);
     const right = new URLSearchParams(second);
-    const output = this.reduce<P>(
-      (prev, [key, param]) => (keys.includes(key) ? param.from(prev, right) : param.from(prev, left)),
-      {} as P
-    );
+    const output = this.reduce<P>((prev, [, param]) => param.merge(prev, left, right, keys), {} as P);
     return new SearchResult<P>(this.formats, output);
   }
 }
