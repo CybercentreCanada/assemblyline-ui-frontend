@@ -2,179 +2,124 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import { Grid, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
+import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
-import SearchBar from 'components/visual/SearchBar/search-bar';
+import type { CustomUser } from 'components/hooks/useMyUser';
+import ForbiddenPage from 'components/routes/403';
+import SearchHeader from 'components/visual/SearchBar/SearchHeader';
+import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
+import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
+import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
+import type { SearchResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import SearchPager from 'components/visual/SearchPager';
 import BadlistTable from 'components/visual/SearchResult/badlist';
-import SearchResultCount from 'components/visual/SearchResultCount';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import ForbiddenPage from '../403';
 import BadlistNew from './badlist_add';
+import type { Badlist } from './badlist_detail';
 import BadlistDetail from './badlist_detail';
 
-const PAGE_SIZE = 25;
-
-const useStyles = makeStyles(theme => ({
-  searchresult: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end'
-  },
-  drawerPaper: {
-    width: '80%',
-    maxWidth: '800px',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  }
-}));
-
 type SearchResults = {
-  items: any[];
+  items: Badlist[];
   offset: number;
   rows: number;
   total: number;
 };
 
-export default function Badlist() {
+const BADLIST_PARAMS = createSearchParams(p => ({
+  query: p.string(''),
+  offset: p.number(0).min(0).hidden().ignored(),
+  rows: p.number(25).enforced().hidden().ignored(),
+  sort: p.string('added desc').ignored(),
+  filters: p.filters([]),
+  track_total_hits: p.number(10000).nullable().ignored(),
+  refresh: p.boolean(false).hidden().ignored()
+}));
+
+type BadlistParams = SearchParams<typeof BADLIST_PARAMS>;
+
+const BadlistSearch = () => {
   const { t } = useTranslation(['manageBadlist']);
-  const [pageSize] = useState(PAGE_SIZE);
-  const [searching, setSearching] = useState(false);
+  const theme = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
+  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
+  const { search, setSearchParams, setSearchObject } = useSearchParams<BadlistParams>();
+
   const [badlistResults, setBadlistResults] = useState<SearchResults>(null);
-  const location = useLocation();
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const navigate = useNavigate();
-  const theme = useTheme();
-  const upMD = useMediaQuery(theme.breakpoints.up('md'));
-  const { apiCall } = useMyAPI();
-  const classes = useStyles();
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
-  const [suggestions] = useState(
-    indexes.badlist
-      ? [...Object.keys(indexes.badlist).filter(name => indexes.badlist[name].indexed), ...DEFAULT_SUGGESTION]
-      : [...DEFAULT_SUGGESTION]
+  const [searching, setSearching] = useState<boolean>(false);
+
+  const suggestions = useMemo<string[]>(
+    () =>
+      indexes.badlist
+        ? [...Object.keys(indexes.badlist).filter(name => indexes.badlist[name].indexed), ...DEFAULT_SUGGESTION]
+        : [...DEFAULT_SUGGESTION],
+    [indexes.badlist]
   );
-  const filterValue = useRef<string>('');
+
+  const handleReload = useCallback(
+    (body: SearchResult<BadlistParams>) => {
+      if (!currentUser.roles.includes('badlist_view')) return;
+
+      apiCall({
+        url: '/api/v4/search/badlist/',
+        method: 'POST',
+        body: body
+          .set(o => ({ ...o, query: o.query || '*' }))
+          .omit(['refresh'])
+          .toObject(),
+        onSuccess: ({ api_response }) => setBadlistResults(api_response as SearchResults),
+        onEnter: () => setSearching(true),
+        onExit: () => setSearching(false)
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentUser.roles]
+  );
+
+  const setBadlistID = useCallback(
+    (wf_id: string) => navigate(`${location.pathname}${location.search || ''}#${wf_id}`),
+    [location.pathname, location.search, navigate]
+  );
 
   useEffect(() => {
-    setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
-  }, [location.pathname, location.search, pageSize]);
-
-  useEffect(() => {
-    if (badlistResults !== null && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search ? location.search : ''}`);
-    }
+    if (!location.hash || globalDrawerOpened || !badlistResults) return;
+    navigate(`${location.pathname}${location.search || ''}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalDrawerOpened]);
 
   useEffect(() => {
-    if (location.hash) {
-      if (location.hash === '#new') {
-        setGlobalDrawer(<BadlistNew close={closeGlobalDrawer} />);
-      } else {
-        setGlobalDrawer(<BadlistDetail badlist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
-      }
-    } else {
-      closeGlobalDrawer();
-    }
+    if (!location.hash) closeGlobalDrawer();
+    else if (location.hash === '#new') setGlobalDrawer(<BadlistNew close={closeGlobalDrawer} />);
+    else setGlobalDrawer(<BadlistDetail badlist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash]);
 
   useEffect(() => {
-    if (query && currentUser.roles.includes('badlist_view')) {
-      reload(0);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
+    handleReload(search);
+  }, [handleReload, search]);
 
   useEffect(() => {
-    function handleReload() {
-      reload(badlistResults ? badlistResults.offset : 0);
+    function reload() {
+      setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
     }
 
-    window.addEventListener('reloadBadlist', handleReload);
-
+    window.addEventListener('reloadBadlist', reload);
     return () => {
-      window.removeEventListener('reloadBadlist', handleReload);
+      window.removeEventListener('reloadBadlist', reload);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, badlistResults]);
-
-  const reload = offset => {
-    query.set('rows', PAGE_SIZE);
-    query.set('offset', offset);
-    apiCall({
-      method: 'POST',
-      url: '/api/v4/search/badlist/',
-      body: query.getParams(),
-      onSuccess: api_data => {
-        if (
-          api_data.api_response.items.length === 0 &&
-          api_data.api_response.offset !== 0 &&
-          api_data.api_response.offset >= api_data.api_response.total
-        ) {
-          reload(Math.max(0, api_data.api_response.offset - api_data.api_response.rows));
-        } else {
-          setBadlistResults(api_data.api_response);
-        }
-      },
-      onEnter: () => setSearching(true),
-      onExit: () => setSearching(false)
-    });
-  };
-
-  const onClear = useCallback(
-    () => {
-      navigate(location.pathname);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.pathname]
-  );
-
-  const onSearch = useCallback(
-    () => {
-      if (filterValue.current !== '') {
-        query.set('query', filterValue.current);
-        // navigate(`${location.pathname}?${query.toString()}`);
-        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
-      } else {
-        onClear();
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query, location.pathname, onClear]
-  );
-
-  const onFilterValueChange = (inputValue: string) => {
-    filterValue.current = inputValue;
-  };
-
-  const setBadlistID = useCallback(
-    (wf_id: string) => {
-      navigate(`${location.pathname}${location.search ? location.search : ''}#${wf_id}`);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.search]
-  );
+  }, [setSearchObject]);
 
   return currentUser.roles.includes('badlist_view') ? (
     <PageFullWidth margin={4}>
@@ -183,6 +128,7 @@ export default function Badlist() {
           <Grid item xs>
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
+
           {currentUser.roles.includes('badlist_manage') && (
             <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
               <Tooltip title={t('add_badlist')}>
@@ -190,7 +136,7 @@ export default function Badlist() {
                   style={{
                     color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                   }}
-                  onClick={() => navigate(`${location.pathname}${location.search ? location.search : ''}#new`)}
+                  onClick={() => navigate(`${location.pathname}${location.search || ''}#new`)}
                   size="large"
                 >
                   <AddCircleOutlineOutlinedIcon />
@@ -203,75 +149,41 @@ export default function Badlist() {
 
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
-          <SearchBar
-            initValue={query ? query.get('query', '') : ''}
-            placeholder={t('filter')}
-            searching={searching}
-            suggestions={suggestions}
-            onValueChange={onFilterValueChange}
-            onClear={onClear}
-            onSearch={onSearch}
-            buttons={[
+          <SearchHeader
+            params={search.toParams()}
+            loading={searching}
+            results={badlistResults}
+            resultLabel={
+              search.get('query')
+                ? t(`filtered${badlistResults?.total === 1 ? '' : 's'}`)
+                : t(`total${badlistResults?.total === 1 ? '' : 's'}`)
+            }
+            onChange={v => setSearchParams(v)}
+            searchInputProps={{ placeholder: t('filter'), options: suggestions }}
+            actionProps={[
               {
-                icon: <PersonOutlineOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                tooltip: t('user'),
-                props: {
-                  onClick: () => {
-                    query.set('query', 'sources.type:user');
-                    navigate(`${location.pathname}?${query.getDeltaString()}`);
-                  }
+                tooltip: { title: t('user') },
+                icon: { children: <PersonOutlineOutlinedIcon /> },
+                button: {
+                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'sources.type:user'] }))
                 }
               },
               {
-                icon: <LabelOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                tooltip: t('tag'),
-                props: {
-                  onClick: () => {
-                    query.set('query', 'type:tag');
-                    navigate(`${location.pathname}?${query.getDeltaString()}`);
-                  }
+                tooltip: { title: t('tag') },
+                icon: { children: <LabelOutlinedIcon /> },
+                button: {
+                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'type:tag'] }))
                 }
               },
               {
-                icon: <BlockOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                tooltip: t('disabled'),
-                props: {
-                  onClick: () => {
-                    query.set('query', 'enabled:false');
-                    navigate(`${location.pathname}?${query.getDeltaString()}`);
-                  }
+                tooltip: { title: t('disabled') },
+                icon: { children: <BlockOutlinedIcon /> },
+                button: {
+                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'enabled:false'] }))
                 }
               }
             ]}
-          >
-            {badlistResults !== null && (
-              <div className={classes.searchresult}>
-                {badlistResults.total !== 0 && (
-                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                    {searching ? (
-                      <span>{t('searching')}</span>
-                    ) : (
-                      <span>
-                        <SearchResultCount count={badlistResults.total} />
-                        {query.get('query')
-                          ? t(`filtered${badlistResults.total === 1 ? '' : 's'}`)
-                          : t(`total${badlistResults.total === 1 ? '' : 's'}`)}
-                      </span>
-                    )}
-                  </Typography>
-                )}
-
-                <SearchPager
-                  total={badlistResults.total}
-                  setResults={setBadlistResults}
-                  pageSize={pageSize}
-                  index="badlist"
-                  query={query}
-                  setSearching={setSearching}
-                />
-              </div>
-            )}
-          </SearchBar>
+          />
         </div>
       </PageHeader>
 
@@ -282,4 +194,13 @@ export default function Badlist() {
   ) : (
     <ForbiddenPage />
   );
-}
+};
+
+const WrappedBadlistPage = () => (
+  <SearchParamsProvider params={BADLIST_PARAMS}>
+    <BadlistSearch />
+  </SearchParamsProvider>
+);
+
+export const BadlistPage = React.memo(WrappedBadlistPage);
+export default BadlistPage;

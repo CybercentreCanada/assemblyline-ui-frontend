@@ -1,59 +1,40 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
-import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Grid, MenuItem, Select, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/hooks/useMyUser';
-import { ChipList } from 'components/visual/ChipList';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
-import SearchBar from 'components/visual/SearchBar/search-bar';
+import SearchHeader from 'components/visual/SearchBar/SearchHeader';
+import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
+import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
+import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import SearchPager from 'components/visual/SearchPager';
+import type { ErrorResult } from 'components/visual/SearchResult/errors';
 import ErrorsTable from 'components/visual/SearchResult/errors';
-import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import { ErrorDetail } from './error_detail';
 
-const PAGE_SIZE = 25;
-
-const useStyles = makeStyles(theme => ({
-  searchresult: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    paddingBottom: theme.spacing(0.5),
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end'
-  },
-  drawerPaper: {
-    width: '80%',
-    maxWidth: '800px',
-    [theme.breakpoints.down('xl')]: {
-      width: '100%'
-    }
-  }
-}));
-
-type ErrorResults = {
-  items: any[];
+type SearchResults = {
+  items: ErrorResult[];
   offset: number;
   rows: number;
   total: number;
 };
 
-type TimeContraint = '24h' | '4d' | '7d' | '1m' | '1y';
+const TIME_CONTRAINTS = ['24h', '4d', '7d', '1m', '1y'] as const;
+
+type TimeContraint = (typeof TIME_CONTRAINTS)[number];
 
 const TC_MAP: Record<TimeContraint, string> = {
   '24h': 'created:[now-24h TO now]',
@@ -79,157 +60,114 @@ const GAP_MAP: Record<TimeContraint, string> = {
   '1y': '15d'
 };
 
-const DEFAULT_TC: TimeContraint = '4d';
+const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
+  query: p.string(''),
+  offset: p.number(0).min(0).hidden().ignored(),
+  rows: p.number(25).enforced().hidden().ignored(),
+  sort: p.string('created desc').ignored(),
+  tc: p.enum('4d', TIME_CONTRAINTS),
+  filters: p.filters([]),
+  track_total_hits: p.number(10000).nullable().ignored(),
+  mincount: p.number(0).min(0).hidden().ignored(),
+  use_archive: p.boolean(false),
+  archive_only: p.boolean(false),
+  timeout: p.string('').hidden().ignored()
+}));
 
-export default function ErrorViewer() {
+type ErrorViewerParams = SearchParams<typeof ERROR_VIEWER_PARAMS>;
+
+const ErrorViewer = () => {
   const { t } = useTranslation(['adminErrorViewer']);
-  const [pageSize] = useState(PAGE_SIZE);
-  const [searching, setSearching] = useState(false);
-  const [errorResults, setErrorResults] = useState<ErrorResults>(null);
-  const classes = useStyles();
-  const navigate = useNavigate();
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const theme = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTION);
-  const location = useLocation();
-  const upMD = useMediaQuery(theme.breakpoints.up('md'));
-  const filterValue = useRef<string>('');
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
-  const [histogram, setHistogram] = useState(null);
-  const [types, setTypes] = useState(null);
-  const [names, setNames] = useState(null);
+  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
+  const { search, setSearchParams, setSearchObject } = useSearchParams<ErrorViewerParams>();
 
-  const parsedQuery = useMemo<SimpleSearchQuery>(() => {
-    if (!query || !currentUser.is_admin) return null;
+  const [errorResults, setErrorResults] = useState<SearchResults>(null);
+  const [histogram, setHistogram] = useState<{ [s: string]: number }>(null);
+  const [types, setTypes] = useState<{ [s: string]: number }>(null);
+  const [names, setNames] = useState<{ [s: string]: number }>(null);
+  const [searching, setSearching] = useState<boolean>(false);
+  const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
 
-    const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
-    curQuery.set('rows', pageSize);
-    curQuery.set('offset', 0);
-    const tc = (curQuery.pop('tc') as TimeContraint) || DEFAULT_TC;
-    if (tc in GAP_MAP && tc !== '1y') curQuery.add('filters', TC_MAP[tc]);
-
-    return curQuery;
-  }, [currentUser.is_admin, pageSize, query]);
-
-  useEffect(() => {
-    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`));
-  }, [location.pathname, location.search, pageSize]);
-
-  useEffect(() => {
-    if (errorResults !== null && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search ? location.search : ''}`);
-    }
+  const setErrorKey = useCallback(
+    (error_key: string) => navigate(`${location.pathname}${location.search || ''}#${error_key}`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
+    [location.search]
+  );
 
   useEffect(() => {
-    if (location.hash) {
-      setGlobalDrawer(<ErrorDetail error_key={location.hash.substr(1)} />);
-    } else {
-      closeGlobalDrawer();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
+    if (!search || !currentUser.is_admin) return;
 
-  useEffect(() => {
-    if (!parsedQuery) return;
+    const body = search.set(o => ({
+      ...o,
+      query: o.query || '*',
+      filters: o.tc in TC_MAP && o.tc !== '1y' ? [...o.filters, TC_MAP[o.tc]] : o.filters
+    }));
+
     apiCall({
-      url: `/api/v4/error/list/?${parsedQuery.toString()}`,
-      onSuccess: api_data => setErrorResults(api_data.api_response),
+      url: `/api/v4/error/list/?${body
+        .pick(['query', 'filters', 'offset', 'rows', 'sort', 'track_total_hits'])
+        .toString()}`,
+      onSuccess: ({ api_response }) => setErrorResults(api_response as SearchResults),
       onEnter: () => setSearching(true),
       onExit: () => setSearching(false)
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parsedQuery]);
 
-  useEffect(() => {
-    if (!query) return;
-    const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`);
-    curQuery.set('rows', pageSize);
-    curQuery.set('offset', 0);
+    apiCall({
+      url: '/api/v4/search/facet/error/response.service_name/',
+      method: 'POST',
+      body: body.pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only']).toObject(),
+      onSuccess: ({ api_response }) => setNames(api_response as { [s: string]: number })
+    });
 
-    const tc = (curQuery.pop('tc') as TimeContraint) || DEFAULT_TC;
-    if (tc in GAP_MAP && tc !== '1y') curQuery.add('filters', TC_MAP[tc]);
     apiCall({
-      url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
-        'rows',
-        'offset',
-        'sort',
-        'track_total_hits'
-      ])}`,
-      onSuccess: api_data => {
-        setNames(api_data.api_response);
-      }
+      url: '/api/v4/search/histogram/error/created/',
+      method: 'POST',
+      body: {
+        ...body.pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only']).toObject(),
+        start: START_MAP[body.get('tc')],
+        end: 'now',
+        gap: GAP_MAP[body.get('tc')]
+      },
+      onSuccess: ({ api_response }) => setHistogram(api_response as { [s: string]: number })
     });
+
     apiCall({
-      url: `/api/v4/search/facet/error/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-      onSuccess: api_data => {
-        setTypes(api_data.api_response);
-      }
+      url: '/api/v4/search/facet/error/type/',
+      method: 'POST',
+      body: body.pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only']).toObject(),
+      onSuccess: ({ api_response }) => setTypes(api_response as { [s: string]: number })
     });
-    apiCall({
-      url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
-        GAP_MAP[tc]
-      }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-      onSuccess: api_data => {
-        setHistogram(api_data.api_response);
-      }
-    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, query]);
+  }, [currentUser.is_admin, search]);
 
   useEffect(() => {
     apiCall({
       url: '/api/v4/search/fields/error/',
-      onSuccess: api_data => {
-        setSuggestions([
-          ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
-          ...DEFAULT_SUGGESTION
-        ]);
+      onSuccess: ({ api_response }) => {
+        const values = Object.keys(api_response).filter(name => api_response[name].indexed);
+        setSuggestions([...values, ...DEFAULT_SUGGESTION]);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onClear = useCallback(
-    () => {
-      if (query.getAll('filters').length !== 0) {
-        query.delete('query');
-        navigate(`${location.pathname}?${query.getDeltaString()}`);
-      } else {
-        navigate(location.pathname);
-      }
-    },
+  useEffect(() => {
+    if (!location.hash || globalDrawerOpened || !errorResults) return;
+    navigate(`${location.pathname}${location.search || ''}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.pathname, query]
-  );
+  }, [globalDrawerOpened]);
 
-  const onSearch = useCallback(
-    () => {
-      if (filterValue.current !== '') {
-        query.set('query', filterValue.current);
-        navigate(`${location.pathname}?${query.getDeltaString()}`);
-      } else {
-        onClear();
-      }
-    },
+  useEffect(() => {
+    if (location.hash) setGlobalDrawer(<ErrorDetail error_key={location.hash.substr(1)} />);
+    else closeGlobalDrawer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query, location.pathname, onClear]
-  );
-
-  const onFilterValueChange = useCallback((inputValue: string) => {
-    filterValue.current = inputValue;
-  }, []);
-
-  const setErrorKey = useCallback(
-    (error_key: string) => {
-      navigate(`${location.pathname}${location.search ? location.search : ''}#${error_key}`);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.search]
-  );
+  }, [location.hash]);
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
@@ -241,19 +179,14 @@ export default function ErrorViewer() {
           <FormControl size="small" fullWidth>
             <Select
               disabled={searching}
-              value={query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}
+              value={search.get('tc')}
               variant="outlined"
-              onChange={event => {
-                query.set('tc', event.target.value);
-                navigate(`${location.pathname}?${query.getDeltaString()}`);
-              }}
+              onChange={event => setSearchObject(o => ({ ...o, tc: event.target.value as TimeContraint }))}
               fullWidth
             >
-              <MenuItem value="24h">{t('tc.24h')}</MenuItem>
-              <MenuItem value="4d">{t('tc.4d')}</MenuItem>
-              <MenuItem value="7d">{t('tc.7d')}</MenuItem>
-              <MenuItem value="1m">{t('tc.1m')}</MenuItem>
-              <MenuItem value="1y">{t('tc.1y')}</MenuItem>
+              {TIME_CONTRAINTS.map((time, i) => (
+                <MenuItem key={i} value={time} children={t(`tc.${time}`)} />
+              ))}
             </Select>
           </FormControl>
         </Grid>
@@ -261,101 +194,42 @@ export default function ErrorViewer() {
 
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
-          <SearchBar
-            initValue={query ? query.get('query', '') : ''}
-            placeholder={t('filter')}
-            searching={searching}
-            suggestions={suggestions}
-            onValueChange={onFilterValueChange}
-            onClear={onClear}
-            onSearch={onSearch}
-            buttons={[
+          <SearchHeader
+            params={search.toParams()}
+            loading={searching}
+            results={errorResults}
+            resultLabel={
+              search.get('query')
+                ? t(`filtered${errorResults?.total === 1 ? '' : 's'}`)
+                : t(`total${errorResults?.total === 1 ? '' : 's'}`)
+            }
+            onChange={v => setSearchParams(v)}
+            searchInputProps={{ placeholder: t('filter'), options: suggestions }}
+            actionProps={[
               {
-                icon: <ReportProblemOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                tooltip: t('exception'),
-                props: {
-                  onClick: () => {
-                    query.set('query', 'type:(EXCEPTION OR UNKNOWN)');
-                    navigate(`${location.pathname}?${query.getDeltaString()}`);
-                  }
+                tooltip: { title: t('exception') },
+                icon: { children: <ReportProblemOutlinedIcon /> },
+                button: {
+                  onClick: () =>
+                    setSearchObject(o => ({ ...o, filters: [...o.filters, 'type:(EXCEPTION OR UNKNOWN)'] }))
                 }
               },
               {
-                icon: <CancelOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                tooltip: t('canceled'),
-                props: {
-                  onClick: () => {
-                    query.set('query', 'type:(SERVICE* OR TASK*)');
-                    navigate(`${location.pathname}?${query.getDeltaString()}`);
-                  }
+                tooltip: { title: t('canceled') },
+                icon: { children: <CancelOutlinedIcon /> },
+                button: {
+                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'type:(SERVICE* OR TASK*)'] }))
                 }
               },
               {
-                icon: <PanToolOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                tooltip: t('maxed'),
-                props: {
-                  onClick: () => {
-                    query.set('query', 'type:MAX*');
-                    navigate(`${location.pathname}?${query.getDeltaString()}`);
-                  }
+                tooltip: { title: t('maxed') },
+                icon: { children: <PanToolOutlinedIcon /> },
+                button: {
+                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'type:MAX*'] }))
                 }
               }
             ]}
-          >
-            {errorResults !== null && (
-              <div className={classes.searchresult}>
-                {errorResults.total !== 0 && (
-                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                    {searching ? (
-                      <span>{t('searching')}</span>
-                    ) : (
-                      <span>
-                        <SearchResultCount count={errorResults.total} />
-                        {query.get('query')
-                          ? t(`filtered${errorResults.total === 1 ? '' : 's'}`)
-                          : t(`total${errorResults.total === 1 ? '' : 's'}`)}
-                      </span>
-                    )}
-                  </Typography>
-                )}
-
-                <SearchPager
-                  query={parsedQuery}
-                  pageSize={pageSize}
-                  total={errorResults.total}
-                  index={null}
-                  url="/api/v4/error/list/"
-                  method="GET"
-                  setResults={setErrorResults}
-                  setSearching={setSearching}
-                />
-              </div>
-            )}
-
-            {query && (
-              <div>
-                <ChipList
-                  items={query.getAll('filters', []).map(v => ({
-                    variant: 'outlined',
-                    label: `${v}`,
-                    color: v.indexOf('NOT ') === 0 ? 'error' : null,
-                    onClick: () => {
-                      query.replace(
-                        'filters',
-                        v,
-                        v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
-                      );
-                      navigate(`${location.pathname}?${query.getDeltaString()}`);
-                    },
-                    onDelete: () => {
-                      query.remove('filters', v);
-                      navigate(`${location.pathname}?${query.getDeltaString()}`);
-                    }
-                  }))}
-                />
-              </div>
-            )}
-          </SearchBar>
+          />
         </div>
       </PageHeader>
 
@@ -365,7 +239,7 @@ export default function ErrorViewer() {
             <Histogram
               dataset={histogram}
               height="200px"
-              title={t(`graph.histogram.title.${query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}`)}
+              title={t(`graph.histogram.title.${search.get('tc')}`)}
               datatype={t('graph.datatype')}
               isDate
               verticalLine
@@ -379,9 +253,8 @@ export default function ErrorViewer() {
               datatype={t('graph.datatype')}
               onClick={(evt, element) => {
                 if (!searching && element.length > 0) {
-                  var ind = element[0].index;
-                  query.add('filters', `response.service_name:${Object.keys(names)[ind]}`);
-                  navigate(`${location.pathname}?${query.getDeltaString()}`);
+                  const filter = `response.service_name:${Object.keys(names)[element[0].index]}`;
+                  setSearchObject(o => ({ ...o, filters: [...o.filters, filter] }));
                 }
               }}
             />
@@ -394,9 +267,8 @@ export default function ErrorViewer() {
               datatype={t('graph.datatype')}
               onClick={(evt, element) => {
                 if (!searching && element.length > 0) {
-                  var ind = element[0].index;
-                  query.add('filters', `type:${safeFieldValue(Object.keys(types)[ind])}`);
-                  navigate(`${location.pathname}?${query.getDeltaString()}`);
+                  const filter = `type:${safeFieldValue(Object.keys(types)[element[0].index])}`;
+                  setSearchObject(o => ({ ...o, filters: [...o.filters, filter] }));
                 }
               }}
             />
@@ -411,4 +283,13 @@ export default function ErrorViewer() {
   ) : (
     <Navigate to="/forbidden" replace />
   );
-}
+};
+
+const WrappedErrorViewerPage = () => (
+  <SearchParamsProvider params={ERROR_VIEWER_PARAMS}>
+    <ErrorViewer />
+  </SearchParamsProvider>
+);
+
+export const ErrorViewerPage = React.memo(WrappedErrorViewerPage);
+export default ErrorViewerPage;
