@@ -1,5 +1,4 @@
-import type { ChipProps } from '@mui/material';
-import { Chip, Tooltip } from '@mui/material';
+import { Chip, ChipProps, Tooltip, TooltipProps } from '@mui/material';
 import { darken } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
@@ -33,20 +32,8 @@ export type CustomChipProps = ChipProps & {
   component?: React.ElementType;
   fullWidth?: boolean;
   mono?: boolean;
-  tooltip?: string;
-  tooltipPlacement?:
-    | 'bottom-end'
-    | 'bottom-start'
-    | 'bottom'
-    | 'left-end'
-    | 'left-start'
-    | 'left'
-    | 'right-end'
-    | 'right-start'
-    | 'right'
-    | 'top-end'
-    | 'top-start'
-    | 'top';
+  tooltip?: TooltipProps['title'];
+  tooltipPlacement?: TooltipProps['placement'];
   type?: 'round' | 'square' | 'rounded';
   wrap?: boolean;
 };
