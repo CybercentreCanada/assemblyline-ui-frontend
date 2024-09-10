@@ -51,10 +51,7 @@ export type CustomChipProps = ChipProps & {
   wrap?: boolean;
 };
 
-const useStyles = makeStyles(theme => ({
-  auto_height: {
-    height: 'auto'
-  },
+export const useStyles = makeStyles(theme => ({
   wrap: {
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word',
@@ -74,7 +71,10 @@ const useStyles = makeStyles(theme => ({
   },
   tiny: {
     height: '20px',
-    fontSize: '0.725rem'
+    fontSize: '0.775rem'
+  },
+  small: {
+    height: '32px'
   },
   label_tiny: {
     paddingLeft: '6px',
@@ -151,7 +151,10 @@ const useStyles = makeStyles(theme => ({
     borderColor: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light,
     color: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
   },
-  icon: { color: theme.palette.common.white }
+  icon: { color: theme.palette.common.white },
+  auto_height: {
+    height: 'auto'
+  }
 }));
 
 const WrappedCustomChip: React.FC<CustomChipProps> = ({

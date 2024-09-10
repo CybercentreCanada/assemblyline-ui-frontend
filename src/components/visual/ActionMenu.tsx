@@ -1,12 +1,13 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import LandscapeOutlinedIcon from '@mui/icons-material/LandscapeOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Divider, ListSubheader, Link as MaterialLink, Menu, MenuItem, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
@@ -32,6 +33,7 @@ const SAFELIST_ICON = <VerifiedUserOutlinedIcon style={{ marginRight: '16px' }} 
 const SUBMIT_ICON = <PublishOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
+const BORELIS_ICON = <LandscapeOutlinedIcon style={{ marginRight: '16px' }} />;
 
 const EXTERNAL_ICON = <HiOutlineExternalLink style={{ marginRight: '16px', fontSize: '22px' }} />;
 const initialMenuState = {
@@ -70,6 +72,7 @@ type TagProps = {
   state: Coordinates;
   setState: (Coordinates) => void;
   highlight_key?: string;
+  setBorealisDetails?: (value: boolean) => void;
 };
 
 const categoryPrefix = {
@@ -95,7 +98,8 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   classification = null,
   state,
   setState,
-  highlight_key = null
+  highlight_key = null,
+  setBorealisDetails = null
 }) => {
   const { t } = useTranslation();
   const { user: currentUser, configuration: currentUserConfig, c12nDef } = useALContext();
@@ -262,6 +266,11 @@ const WrappedActionMenu: React.FC<TagProps> = ({
     handleClose();
   }, [setBadlistDialog, handleClose]);
 
+  const handleBorealisDetails = useCallback(() => {
+    setBorealisDetails(true);
+    handleClose();
+  }, [setBorealisDetails, handleClose]);
+
   const addToBadlist = useCallback(() => {
     const data = {
       tag: {
@@ -366,9 +375,16 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
+        {setBorealisDetails && (
+          <MenuItem id="borealisID" dense onClick={handleBorealisDetails}>
+            {BORELIS_ICON}
+            {t('borealis')}
+          </MenuItem>
+        )}
+
         {category === 'tag' && type.startsWith('file.rule.') && currentUser.roles.includes('signature_view') && (
           <MenuItem
-            id="clipID"
+            id="sigID"
             dense
             component={Link}
             to={`/manage/signature/${type.substring(10)}/${value.substring(0, value.indexOf('.'))}/${value.substring(

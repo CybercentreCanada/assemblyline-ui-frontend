@@ -156,6 +156,7 @@ export type ConfigurationDefinition = {
     allow_replay: boolean;
     allow_url_submissions: boolean;
     allow_zip_downloads: boolean;
+    api_proxies: string[];
     apps: AppSwitcherItem[];
     banner: {
       [lang: string]: string;
