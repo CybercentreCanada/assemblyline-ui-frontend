@@ -40,7 +40,6 @@ type SettingsDefinition = {
   ignore_dynamic_recursion_prevention: boolean;
   ignore_filtering: boolean;
   priority: number;
-  profile: boolean;
   service_spec: any[];
   services: any[];
   submission_view: string;
@@ -79,6 +78,26 @@ export type MetadataConfiguration = {
     max?: number;
     min?: number;
   };
+};
+
+export type SubmissionProfileParams = {
+  deep_scan?: boolean;
+  ignore_cache?: boolean;
+  ignore_dynamic_recursion_prevention?: boolean;
+  ignore_filtering?: boolean;
+  priority?: number;
+  service_spec: {
+    [service: string]: {
+      [parameter: string]: any;
+    };
+  };
+  services: {
+    excluded?: string[];
+    rescan?: string[];
+    resubmit?: string[];
+    selected?: string[];
+  };
+  ttl?: number;
 };
 
 export type ConfigurationDefinition = {
@@ -120,6 +139,9 @@ export type ConfigurationDefinition = {
       submit: {
         [field_name: string]: MetadataConfiguration;
       };
+    };
+    profiles: {
+      [profile_name: string]: SubmissionProfileParams;
     };
     verdicts: {
       info: number;
