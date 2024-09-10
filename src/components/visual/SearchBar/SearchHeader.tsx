@@ -411,6 +411,11 @@ const WrappedSearchHeader = ({
                   disabled={loading}
                   shape="rounded"
                   size="small"
+                  sx={{
+                    '.MuiPagination-ul': {
+                      gap: theme.spacing(1)
+                    }
+                  }}
                   {...paginationProps}
                   count={count}
                   page={page}
