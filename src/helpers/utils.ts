@@ -417,7 +417,7 @@ export function getSubmitType(input: string, configuration: ConfigurationDefinit
 
   // If we're trying to auto-detect the input type, iterate over file sources
   const detectedHashType = Object.entries(configuration.submission.file_sources).find(
-    ([_, hashProps]) => hashProps && input.match(new RegExp(hashProps?.pattern))
+    ([_, hashProps]) => hashProps && String(input).match(new RegExp(hashProps?.pattern))
   )?.[0];
 
   if (detectedHashType) return detectedHashType;

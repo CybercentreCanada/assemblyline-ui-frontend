@@ -9,6 +9,7 @@ import AssemblylineIcon from 'components/visual/Icons';
 import Priority from 'components/visual/Priority';
 import SignatureStatus from 'components/visual/SignatureStatus';
 import SubmissionState from 'components/visual/SubmissionState';
+import Tag from 'components/visual/Tag';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import { AlertExtendedScan, AlertPriority, AlertStatus } from './alerts/components/Components';
@@ -137,7 +138,40 @@ const Theme = () => {
           <Switch disabled />
         </Stack>
 
-        <Typography variant="h4">{'Custom Chips'}</Typography>
+        <Typography variant="h4">Tags</Typography>
+        <Stack direction="row" spacing={1}>
+          {[0, 500, 1200, -1000].map((val, i) => (
+            <Tag key={i} score={val} type="network.static.ip" value="45.15.156.182" />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {[0, 500, 1200, -1000].map((val, i) => (
+            <Tag key={i} score={val} type="attribution.actor" value="A tag!" />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {[0, 500, 1200, -1000].map((val, i) => (
+            <Tag
+              key={i}
+              score={val}
+              type="attribution.actor"
+              value="A tag with a very long name that spans over multiple lines. I guess this was not long enough so lets add some text..."
+            />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {[0, 500, 1200, -1000].map((val, i) => (
+            <Tag
+              key={i}
+              score={val}
+              type="network.static.ip"
+              value="116.14.55.109"
+              label="Did you know that the label of the tag does not have to match the tag value?"
+            />
+          ))}
+        </Stack>
+
+        <Typography variant="h4">Custom Chips</Typography>
         <Stack direction="row" spacing={1}>
           {[
             'primary' as const,

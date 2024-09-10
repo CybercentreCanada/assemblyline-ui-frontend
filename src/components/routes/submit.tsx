@@ -149,6 +149,10 @@ const Submit: React.FC<any> = () => {
               api_data.api_error_message.includes('API'))
           ) {
             window.location.reload();
+          } else {
+            // Unexpected error occurred, cancel upload and show error message
+            cancelUpload();
+            showErrorMessage(t('submit.file.upload_fail'));
           }
         }
       } catch (ex) {

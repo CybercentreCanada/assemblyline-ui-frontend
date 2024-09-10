@@ -1,6 +1,9 @@
+import type { SnackbarEvents } from 'borealis-ui/dist/data/event';
+import { SNACKBAR_EVENT_ID } from 'borealis-ui/dist/data/event';
 import RedirectSubmission from 'commons/components/utils/RedirectSubmission';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import { resetFavicon } from 'helpers/utils';
 import { lazy, memo, Suspense, useEffect, useState } from 'react';
 import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router';
@@ -88,6 +91,29 @@ function RouteActions() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+  const { showSuccessMessage, showErrorMessage, showInfoMessage, showWarningMessage } = useMySnackbar();
+
+  useEffect(() => {
+    const handleMessage = (event: CustomEvent<SnackbarEvents>) => {
+      const { detail } = event;
+      if (detail.level === 'success') {
+        showSuccessMessage(detail.message);
+      } else if (detail.level === 'error') {
+        showErrorMessage(detail.message);
+      } else if (detail.level === 'info') {
+        showInfoMessage(detail.message);
+      } else if (detail.level === 'warning') {
+        showWarningMessage(detail.message);
+      }
+    };
+
+    window.addEventListener(SNACKBAR_EVENT_ID, handleMessage);
+
+    return () => {
+      window.removeEventListener(SNACKBAR_EVENT_ID, handleMessage);
+    };
+  }, [showErrorMessage, showInfoMessage, showSuccessMessage, showWarningMessage]);
 
   return null;
 }
