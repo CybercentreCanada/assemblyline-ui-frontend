@@ -32,6 +32,7 @@ const USERS_PARAMS = createSearchParams(p => ({
   rows: p.number(25).enforced().hidden().ignored(),
   sort: p.string(null).nullable().ignored(),
   filters: p.filters(['']),
+  track_total_hits: p.number(10000).nullable().ignored(),
   refresh: p.boolean(false).hidden().ignored()
 }));
 
@@ -120,6 +121,7 @@ const UsersSearch = () => {
                 : t(`total${userResults?.total === 1 ? '' : 's'}`)
             }
             onChange={v => setSearchParams(v)}
+            paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {

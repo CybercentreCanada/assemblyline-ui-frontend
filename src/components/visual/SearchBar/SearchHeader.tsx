@@ -22,7 +22,7 @@ import SearchTextField from 'components/visual/SearchBar/search-textfield';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import SearchCount from './SearchCount';
+import { SearchCount, TOTAL_TRACKED_RECORDS } from './SearchCount';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -97,14 +97,14 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const MAX_TRACKED_RECORDS = 10000;
+const MAX_TRACKED_RECORDS = 1000000000;
 
 type SearchParam = {
   query: string;
   offset: number;
   rows: number;
   filters: string[];
-  trackTotalHits: number;
+  track_total_hits: number;
 };
 
 type PopoverChipProps = {
@@ -201,15 +201,15 @@ const WrappedSearchHeader = ({
     offset: offsetKey = 'offset',
     rows: rowsKey = 'rows',
     filters: filtersKey = 'filters',
-    trackTotalHits: trackTotalHitsKey = 'track_total_hits'
-  } = { query: 'query', offset: 'offset', rows: 'rows', filters: 'filters', trackTotalHits: 'track_total_hits' },
+    track_total_hits: trackTotalHitsKey = 'track_total_hits'
+  } = { query: 'query', offset: 'offset', rows: 'rows', filters: 'filters', track_total_hits: 'track_total_hits' },
   paramDefaults: {
     query: defaultQuery = '',
     offset: defaultOffset = 0,
     rows: defaultRows = 25,
     filters: defaultFilters = [],
-    trackTotalHits: defaultTrackTotalHits = 10000
-  } = { query: '', offset: 0, rows: 25, filters: [], trackTotalHits: 10000 },
+    track_total_hits: defaultTrackTotalHits = TOTAL_TRACKED_RECORDS
+  } = { query: '', offset: 0, rows: 25, filters: [], track_total_hits: TOTAL_TRACKED_RECORDS },
   loading = false,
   resultLabel = '',
   results = null,
@@ -261,12 +261,12 @@ const WrappedSearchHeader = ({
   }, [defaultTrackTotalHits, params, trackTotalHitsKey]);
 
   const page = useMemo<number>(
-    () => (!params ? null : Math.ceil(Math.min(offset, MAX_TRACKED_RECORDS) / rows) + 1),
+    () => (!params ? null : Math.ceil(Math.min(offset, TOTAL_TRACKED_RECORDS) / rows) + 1),
     [offset, params, rows]
   );
 
   const count = useMemo<number>(
-    () => (!results?.total ? null : Math.ceil(Math.min(results?.total, MAX_TRACKED_RECORDS) / rows)),
+    () => (!results?.total ? null : Math.ceil(Math.min(results?.total, TOTAL_TRACKED_RECORDS) / rows)),
     [results?.total, rows]
   );
 
@@ -295,10 +295,13 @@ const WrappedSearchHeader = ({
     [params, queryKey, offsetKey, onChange]
   );
 
-  const handleCountClick = useCallback(() => {
-    params.set(trackTotalHitsKey, Number(1000000000).toString());
-    onChange(params);
-  }, [onChange, params, trackTotalHitsKey]);
+  const handleCountClick = useCallback(
+    (value: number) => {
+      params.set(trackTotalHitsKey, value.toString());
+      onChange(params);
+    },
+    [onChange, params, trackTotalHitsKey]
+  );
 
   const handlePageChange = useCallback(
     (_event: React.ChangeEvent<unknown>, p: number) => {
@@ -383,17 +386,24 @@ const WrappedSearchHeader = ({
         {count > 1 ? (
           <>
             <div className={classes.container} style={{ justifyContent: 'flex-end', fontStyle: 'italic' }}>
-              <div style={{ flexGrow: 1 }}>
+              <div>
                 {!disableCount && (
                   <SearchCount
                     loading={loading}
-                    max={trackTotalHits}
+                    currentMax={trackTotalHits}
+                    defaultMax={defaultTrackTotalHits}
                     suffix={resultLabel}
                     total={results?.total}
-                    onClick={() => handleCountClick()}
+                    onClick={() =>
+                      handleCountClick(
+                        trackTotalHits !== MAX_TRACKED_RECORDS ? MAX_TRACKED_RECORDS : defaultTrackTotalHits
+                      )
+                    }
                   />
                 )}
               </div>
+
+              <div style={{ flexGrow: 1 }} />
 
               {/** Pagination */}
               {!disablePagination && page && (
@@ -401,6 +411,11 @@ const WrappedSearchHeader = ({
                   disabled={loading}
                   shape="rounded"
                   size="small"
+                  sx={{
+                    '.MuiPagination-ul': {
+                      gap: theme.spacing(1)
+                    }
+                  }}
                   {...paginationProps}
                   count={count}
                   page={page}

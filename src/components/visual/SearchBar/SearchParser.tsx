@@ -30,6 +30,14 @@ export class SearchResult<P extends Params> {
     this.values = values;
   }
 
+  public defaults() {
+    const values = Object.entries(this.formats).reduce(
+      (prev, [key, param]) => ({ ...prev, [key]: param.getDefault() }),
+      {} as P
+    );
+    return new SearchResult<P>(this.formats, values);
+  }
+
   public has<K extends keyof P>(key: K): boolean {
     return key in this.values;
   }
@@ -149,10 +157,7 @@ export class SearchParser<P extends Params> {
   public mergeParams(first: Input, second: Input, keys: Array<keyof P>) {
     const left = new URLSearchParams(first);
     const right = new URLSearchParams(second);
-    const output = this.reduce<P>(
-      (prev, [key, param]) => (keys.includes(key) ? param.from(prev, right) : param.from(prev, left)),
-      {} as P
-    );
+    const output = this.reduce<P>((prev, [, param]) => param.merge(prev, left, right, keys), {} as P);
     return new SearchResult<P>(this.formats, output);
   }
 }
