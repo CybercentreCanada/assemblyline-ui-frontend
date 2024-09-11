@@ -366,11 +366,11 @@ const Submit: React.FC<any> = () => {
     }
   }
 
-  function handleStringChange(string) {
+  function handleStringChange(data: string) {
     closeSnackbar();
-    setStringType(getSubmitType(string, configuration));
+    setStringType(getSubmitType(data.trim(), configuration));
     setStringInputHasError(false);
-    setStringInput(string);
+    setStringInput(data.trim());
   }
 
   useEffect(() => {
@@ -582,7 +582,7 @@ const Submit: React.FC<any> = () => {
                     type="stringInput"
                     variant="outlined"
                     value={stringInput}
-                    onChange={event => handleStringChange(event.target.value as String)}
+                    onChange={event => handleStringChange(event.target.value as string)}
                     style={{ flexGrow: 1, marginRight: '1rem' }}
                   />
                   <Button
