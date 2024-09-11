@@ -153,7 +153,7 @@ export const AlertWorkflowDrawer = React.memo(
                   .sort()
               }));
               window.dispatchEvent(new CustomEvent<Partial<AlertItem>[]>('alertUpdate', { detail }));
-              !_isSingleAlert && window.dispatchEvent(new CustomEvent('alertRefresh', null));
+              !_isSingleAlert && setTimeout(() => window.dispatchEvent(new CustomEvent('alertRefresh', null)), 1500);
               showSuccessMessage(t('workflow.success'));
             }
           },

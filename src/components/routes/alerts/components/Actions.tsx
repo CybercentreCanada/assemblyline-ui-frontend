@@ -249,26 +249,18 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
   }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
-    const location = useLocation();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { search, setSearchObject } = useSearchParams<AlertSearchParams>();
 
-    const query = useMemo<URLSearchParams>(() => {
-      const q = new URLSearchParams(location.search);
-      if (!alert || !alert.group_count || !search.get('group_by')) return q;
-
-      const groupBy = search.get('group_by');
-      const f = `${groupBy}:${getValueFromPath(alert, groupBy) as string}`;
-      q.set('group_by', '');
-      q.append('fq', f);
-
-      return q;
-    }, [alert, location.search, search]);
+    const groupBy = useMemo<string>(() => {
+      const g = search.get('group_by');
+      if (!alert || !alert.group_count || !g) return null;
+      else return `${g}:${getValueFromPath(alert, g) as string}`;
+    }, [alert, search]);
 
     return (
       <AlertActionButton
         tooltipTitle={t('focus')}
-        to={`${location.pathname}?${query.toString()}${location.hash}`}
         open={open}
         vertical={vertical}
         permanent={permanent}
@@ -284,12 +276,12 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
         onClick={e => {
           onClick();
           e.preventDefault();
+          if (!groupBy) return;
 
-          setSearchObject(p => {
-            if (!alert || !alert.group_count || !p.group_by) return p;
-            const f = `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`;
-            return { ...p, group_by: '', fq: [...p.fq, f] };
-          });
+          window.dispatchEvent(
+            new CustomEvent<Partial<AlertSearchParams>>('alertRefresh', { detail: { group_by: '', fq: [groupBy] } })
+          );
+          setSearchObject(p => ({ ...p, group_by: '', fq: [...p.fq, groupBy] }));
         }}
       />
     );
