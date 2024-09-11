@@ -214,8 +214,6 @@ const WrappedAlertsContent = () => {
     };
   }, [setSearchObject]);
 
-  console.log(search.toObject());
-
   if (!currentUser.roles.includes('alert_view')) return <ForbiddenPage />;
   else
     return (
