@@ -29,7 +29,7 @@ import { ALERT_DEFAULT_PARAMS } from 'components/routes/alerts';
 import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import CustomChip from 'components/visual/CustomChip';
-import { safeFieldValue } from 'helpers/utils';
+import { humanReadableNumber, safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Favorite } from './Favorites';
@@ -299,8 +299,12 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
               <CustomChip
                 label={
                   <>
-                    <span style={{ color: theme.palette.common.white }}>{`${item.count} `}</span>
-                    {item.total && <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>{`/ ${item.total}`}</span>}
+                    <span style={{ color: theme.palette.common.white }}>{`${humanReadableNumber(item.count)} `}</span>
+                    {item.total && item.total > 0 ? (
+                      <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>{`/ ${humanReadableNumber(
+                        item.total
+                      )}`}</span>
+                    ) : null}
                   </>
                 }
                 size="small"
