@@ -77,10 +77,7 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ loading = false, total = 0
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const handleChange = useCallback(
-    (value: AlertSearchParams) => {
-      value.offset = 0;
-      setSearchObject(value);
-    },
+    (value: AlertSearchParams) => setSearchObject({ ...value, offset: 0 }),
     [setSearchObject]
   );
 

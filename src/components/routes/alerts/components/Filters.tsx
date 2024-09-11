@@ -563,6 +563,7 @@ const WrappedAlertFilters = () => {
   }, []);
 
   const handleApply = useCallback(() => {
+    query.set('offset', '0');
     setSearchParams(query);
     setOpen(false);
   }, [query, setSearchParams]);
