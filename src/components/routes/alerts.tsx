@@ -171,10 +171,7 @@ const WrappedAlertsContent = () => {
     } else {
       const id = location.hash.substr(1);
       const alert = alerts.find(item => item.alert_id === id);
-      setGlobalDrawer(
-        <AlertDetail id={id} alert={alert} inDrawer defaults={defaults.toString()} search={search.toString()} />,
-        { hasMaximize: true }
-      );
+      setGlobalDrawer(<AlertDetail id={id} alert={alert} inDrawer />, { hasMaximize: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closeGlobalDrawer, defaults.toString(), location.hash, search.toString(), setGlobalDrawer]);
@@ -207,10 +204,8 @@ const WrappedAlertsContent = () => {
   }, []);
 
   useEffect(() => {
-    const refresh = () => {
-      setTimeout(() => {
-        setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
-      }, 1000);
+    const refresh = ({ detail = null }: CustomEvent<AlertSearchParams>) => {
+      setSearchObject(o => ({ ...o, ...detail, offset: 0, refresh: !o.refresh, fq: [...detail.fq, ...o.fq] }));
     };
 
     window.addEventListener('alertRefresh', refresh);
@@ -218,6 +213,8 @@ const WrappedAlertsContent = () => {
       window.removeEventListener('alertRefresh', refresh);
     };
   }, [setSearchObject]);
+
+  console.log(search.toObject());
 
   if (!currentUser.roles.includes('alert_view')) return <ForbiddenPage />;
   else
