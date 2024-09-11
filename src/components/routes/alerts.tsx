@@ -27,6 +27,7 @@ import { SearchParamsProvider, useSearchParams } from './alerts/contexts/SearchP
 import AlertDetail from './alerts/detail';
 import type { Alert, AlertItem } from './alerts/models/Alert';
 import type { SearchParams } from './alerts/utils/SearchParams';
+import type { SearchResult } from './alerts/utils/SearchParser';
 
 type ListResponse = {
   items: AlertItem[];
@@ -60,7 +61,8 @@ export const ALERT_DEFAULT_PARAMS = {
   sort: 'reporting_ts desc',
   tc_start: '',
   tc: '4d',
-  track_total_hits: 10000
+  track_total_hits: 10000,
+  refresh: false
 };
 
 export type AlertSearchParams = SearchParams<typeof ALERT_DEFAULT_PARAMS>;
@@ -84,7 +86,6 @@ const WrappedAlertsContent = () => {
   const [scrollReset, setScrollReset] = useState<boolean>(false);
 
   const prevSearch = useRef<string>(null);
-  const loadingRef = useRef<boolean>(null);
 
   const isLGDown = useMediaQuery(theme.breakpoints.down('lg'));
 
@@ -97,28 +98,25 @@ const WrappedAlertsContent = () => {
   );
 
   const handleFetch = useCallback(
-    (query: URLSearchParams) => {
+    (body: SearchResult<AlertSearchParams>) => {
       if (!currentUser.roles.includes('alert_view')) return;
 
-      const tcStart = query.get('tc_start');
-      query.delete('tc_start');
+      const query = body.filter((k, v) => !['tc_start'].includes(k)).toParams();
       query.sort();
-
-      if (loadingRef.current || query.toString() === prevSearch.current) return;
+      if (query.toString() === prevSearch.current) return;
       prevSearch.current = query.toString();
-      loadingRef.current = true;
 
       const groupBy = query.get('group_by');
       const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
 
-      if (Number(query.get('offset') || 0) === 0) {
+      let query2 = body.filter((k, v) => !['refresh'].includes(k));
+      if (Number(query2.get('offset') || 0) === 0) {
+        query2 = query2.set(o => ({ ...o, tc_start: '' }));
         setScrollReset(true);
-      } else {
-        query.set('tc_start', tcStart);
       }
 
       apiCall({
-        url: `${pathname}?${query.toString()}`,
+        url: `${pathname}?${query2.toString()}`,
         method: 'GET',
         onSuccess: ({ api_response }: { api_response: ListResponse | GroupedResponse }) => {
           if ('tc_start' in api_response) {
@@ -140,12 +138,11 @@ const WrappedAlertsContent = () => {
         onExit: () => {
           setLoading(false);
           setScrollReset(false);
-          loadingRef.current = false;
         }
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser, setSearchObject]
+    [currentUser.roles, setSearchObject]
   );
 
   const handleSelectedItemChange = useCallback(
@@ -158,7 +155,7 @@ const WrappedAlertsContent = () => {
   );
 
   useEffect(() => {
-    handleFetch(search.toParams());
+    handleFetch(search);
   }, [handleFetch, search]);
 
   useEffect(() => {
@@ -212,9 +209,7 @@ const WrappedAlertsContent = () => {
   useEffect(() => {
     const refresh = () => {
       setTimeout(() => {
-        prevSearch.current = null;
-        loadingRef.current = null;
-        handleFetch(search.toParams());
+        setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
       }, 1000);
     };
 
@@ -222,7 +217,7 @@ const WrappedAlertsContent = () => {
     return () => {
       window.removeEventListener('alertRefresh', refresh);
     };
-  }, [handleFetch, search]);
+  }, [setSearchObject]);
 
   if (!currentUser.roles.includes('alert_view')) return <ForbiddenPage />;
   else
