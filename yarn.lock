@@ -3299,10 +3299,10 @@ bidi-js@^1.0.3:
   dependencies:
     require-from-string "^2.0.2"
 
-borealis-ui@^0.1.12-dev24968:
-  version "0.1.12-dev24968"
-  resolved "https://registry.yarnpkg.com/borealis-ui/-/borealis-ui-0.1.12-dev24968.tgz#c79fd2202762ff76b57be6d66dd34697c1bd5653"
-  integrity sha512-IgvAWIBl+8TGbA0D8CyheiRQQuqQ1Pn8NUgf4GJ0Tk3503+C4muzVP3e2Nej4RHY8pTf8x1VOCABuu/6nw49yg==
+borealis-ui@^0.1.13:
+  version "0.1.13"
+  resolved "https://registry.yarnpkg.com/borealis-ui/-/borealis-ui-0.1.13.tgz#11970364fd38c9eb3c0e80f6be6e09cc74ea0800"
+  integrity sha512-k/K2m6A0ULw6g9nDwSQqAETh8OtcVuVxIPEjHjZJuOR2mUv1IIepD+CW6X954zqsTQCzTWZVbkgvW0J0cRL4DA==
   dependencies:
     scheduler "^0.23.2"
     use-context-selector "^2.0.0"

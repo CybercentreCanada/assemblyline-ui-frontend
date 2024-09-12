@@ -18,7 +18,7 @@ export type EnrichmentCustomChipProps = CustomChipProps & {
   contextIcon?: boolean;
   counters?: boolean;
   hideDetails?: boolean;
-  hidePreview?: boolean;
+  showPreview?: boolean;
   hideLoading?: boolean;
   forceDetails?: boolean;
   setForceDetails?: (value: boolean) => void;
@@ -44,7 +44,7 @@ const WrappedEnrichmentCustomChip: React.FC<EnrichmentCustomChipProps> = ({
   contextIcon = false,
   counters = false,
   hideDetails = false,
-  hidePreview = true,
+  showPreview = false,
   hideLoading = false,
   forceDetails = false,
   setForceDetails = null,
@@ -123,7 +123,7 @@ const WrappedEnrichmentCustomChip: React.FC<EnrichmentCustomChipProps> = ({
       contextIcon={contextIcon}
       counters={counters}
       hideDetails={hideDetails}
-      hidePreview={hidePreview}
+      showPreview={showPreview}
       hideLoading={hideLoading}
       classes={{ label: labelClassName, icon: variant !== 'outlined' ? classes.icon : null }}
       className={appliedClassName}

@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import ClassificationMismatchDialog from './ClassificationMismatchDialog';
+import { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip';
 import InputDialog from './InputDialog';
 import SafeBadItem from './SafeBadItem';
 
@@ -112,9 +113,9 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const [currentAllowBypass, setCurrentAllowBypass] = React.useState(false);
   const [currentLinkClassification, setCurrentLinkClassification] = React.useState('');
   const [safelistDialog, setSafelistDialog] = React.useState(false);
-  const [safelistReason, setSafelistReason] = React.useState(null);
+  const [safelistReason, setSafelistReason] = React.useState<string>(null);
   const [badlistDialog, setBadlistDialog] = React.useState(false);
-  const [badlistReason, setBadlistReason] = React.useState(null);
+  const [badlistReason, setBadlistReason] = React.useState<string>(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
   const [badlisted, setBadlisted] = React.useState(null);
   const [safelisted, setSafelisted] = React.useState(null);
@@ -378,12 +379,15 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
-        {setBorealisDetails && (
-          <MenuItem id="borealisID" dense onClick={handleBorealisDetails}>
-            {BORELIS_ICON}
-            {t('borealis')}
-          </MenuItem>
-        )}
+        {currentUserConfig.ui.api_proxies.includes('borealis') &&
+          type in BOREALIS_TYPE_MAP &&
+          value !== null &&
+          setBorealisDetails && (
+            <MenuItem id="borealisID" dense onClick={handleBorealisDetails}>
+              {BORELIS_ICON}
+              {t('borealis')}
+            </MenuItem>
+          )}
 
         {category === 'tag' && type.startsWith('file.rule.') && currentUser.roles.includes('signature_view') && (
           <MenuItem
