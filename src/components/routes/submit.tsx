@@ -367,10 +367,11 @@ const Submit: React.FC<any> = () => {
   }
 
   function handleStringChange(data: string) {
-    closeSnackbar();
-    setStringType(getSubmitType(data.trim(), configuration));
+    const [type, input] = getSubmitType(data, configuration);
+    setStringType(type);
+    setStringInput(input);
     setStringInputHasError(false);
-    setStringInput(data.trim());
+    closeSnackbar();
   }
 
   useEffect(() => {
