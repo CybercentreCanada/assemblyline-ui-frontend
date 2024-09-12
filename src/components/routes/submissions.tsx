@@ -31,7 +31,7 @@ const SUBMISSION_PARAMS = createSearchParams(p => ({
   offset: p.number(0).min(0).hidden().ignored(),
   rows: p.number(25).enforced().hidden().ignored(),
   sort: p.string('times.submitted desc').ignored(),
-  filters: p.filters(['NOT(to_be_deleted:true)']),
+  filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ignored()
 }));
 
@@ -58,7 +58,9 @@ const SubmissionSearch = () => {
     apiCall({
       url: '/api/v4/search/submission/',
       method: 'POST',
-      body: search.set(o => ({ ...o, query: o.query || '*' })).toObject(),
+      body: search
+        .set(o => ({ ...o, query: o.query || '*', filters: [...o.filters, 'NOT(to_be_deleted:true)'] }))
+        .toObject(),
       onSuccess: ({ api_response }) => setSubmissionResults(api_response as SearchResults),
       onEnter: () => setSearching(true),
       onExit: () => setSearching(false)
