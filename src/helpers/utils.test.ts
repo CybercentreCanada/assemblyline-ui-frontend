@@ -562,8 +562,8 @@ describe('Test `matchURL`', () => {
 
 describe('Test `getSubmitType`', () => {
   it('Should return null', () => {
-    expect(getSubmitType(undefined, undefined)).toBe(null);
-    expect(getSubmitType(null, null)).toBe(null);
+    expect(getSubmitType(undefined, undefined)[0]).toBe(null);
+    expect(getSubmitType(null, null)[0]).toBe(null);
   });
 
   const configuration: ConfigurationDefinition = {
@@ -657,19 +657,21 @@ describe('Test `getSubmitType`', () => {
   };
 
   it('Should not match the input string with any type', () => {
-    expect(getSubmitType('', configuration)).toBe(null);
-    expect(getSubmitType('test', configuration)).toBe(null);
-    expect(getSubmitType('qwerty1234567890qwerty1234567890', configuration)).toBe(null);
-    expect(getSubmitType('qwerty1234567890qwerty1234567890qwerty12', configuration)).toBe(null);
-    expect(getSubmitType('qwerty1234567890qwerty1234567890qwerty1234567890qwerty1234567890', configuration)).toBe(null);
+    expect(getSubmitType('', configuration)[0]).toBe(null);
+    expect(getSubmitType('test', configuration)[0]).toBe(null);
+    expect(getSubmitType('qwerty1234567890qwerty1234567890', configuration)[0]).toBe(null);
+    expect(getSubmitType('qwerty1234567890qwerty1234567890qwerty12', configuration)[0]).toBe(null);
+    expect(getSubmitType('qwerty1234567890qwerty1234567890qwerty1234567890qwerty1234567890', configuration)[0]).toBe(
+      null
+    );
   });
 
   it('Should match the input string with its corresponding type', () => {
-    expect(getSubmitType('abcdef1234567890abcdef1234567890', configuration)).toBe('md5');
-    expect(getSubmitType('abcdef1234567890abcdef1234567890abcdef12', configuration)).toBe('sha1');
-    expect(getSubmitType('abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', configuration)).toBe(
+    expect(getSubmitType('abcdef1234567890abcdef1234567890', configuration)[0]).toBe('md5');
+    expect(getSubmitType('abcdef1234567890abcdef1234567890abcdef12', configuration)[0]).toBe('sha1');
+    expect(getSubmitType('abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', configuration)[0]).toBe(
       'sha256'
     );
-    expect(getSubmitType('http://blah.com', configuration)).toBe('url');
+    expect(getSubmitType('http://blah.com', configuration)[0]).toBe('url');
   });
 });
