@@ -66,21 +66,14 @@ const WrappedAlertDefaultSearchParameters = () => {
   const { showSuccessMessage } = useMySnackbar();
   const { search } = useSearchParams<AlertSearchParams>();
 
+  const [storageData, setStorageData] = useState<string>(null);
   const [open, setOpen] = useState<boolean>(false);
-  const [isSameParams, setIsSameParams] = useState<boolean>(false);
   const [fromStorage, seFromStorage] = useState<boolean>(() => !!localStorage.getItem(ALERT_STORAGE_KEY));
 
   const parser = useMemo(() => new SearchParser<AlertSearchParams>(ALERT_DEFAULT_PARAMS, { enforced: ['rows'] }), []);
 
-  const storageData = useMemo(() => new URLSearchParams(localStorage.getItem(ALERT_STORAGE_KEY) || ''), []);
-
   const defaults = useMemo<SearchResult<AlertSearchParams>>(
-    () => parser.fullParams(storageData),
-    [parser, storageData]
-  );
-
-  const filteredDefaults = useMemo<SearchResult<AlertSearchParams>>(
-    () => parser.deltaParams(storageData).filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)),
+    () => parser.fullParams(storageData).filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)),
     [parser, storageData]
   );
 
@@ -89,24 +82,29 @@ const WrappedAlertDefaultSearchParameters = () => {
     [search]
   );
 
+  const isSameParams = useMemo<boolean>(
+    () => filteredSearch.toString() === defaults.toString(),
+    [defaults, filteredSearch]
+  );
+
   const onDefaultChange = useCallback(
     (value: URLSearchParams) => {
       const params = parser.deltaParams(value).filter(k => !IGNORED_PARAMETERS.includes(k));
       localStorage.setItem(ALERT_STORAGE_KEY, params.toString());
-      seFromStorage(true);
     },
     [parser]
   );
 
   const onDefaultClear = useCallback(() => {
     localStorage.removeItem(ALERT_STORAGE_KEY);
-    seFromStorage(false);
   }, []);
 
   useEffect(() => {
     if (!open) return;
-    setIsSameParams(filteredSearch.toString() === filteredDefaults.toString());
-  }, [filteredDefaults, filteredSearch, open]);
+    const value = localStorage.getItem(ALERT_STORAGE_KEY);
+    setStorageData(value || '');
+    seFromStorage(!!value);
+  }, [defaults, filteredSearch, open]);
 
   return (
     <>
@@ -125,7 +123,7 @@ const WrappedAlertDefaultSearchParameters = () => {
           <Grid item style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.existing')}</Typography>
             <Paper component="pre" variant="outlined" className={classes.preview}>
-              {filteredDefaults.toString() === '' ? (
+              {defaults.toString() === '' ? (
                 <div>{t('none')}</div>
               ) : (
                 <AlertFiltersSelected value={defaults.toObject()} visible={['fq', 'group_by', 'sort', 'tc']} disabled />
