@@ -80,7 +80,7 @@ const WrappedAlertsContent = () => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [countedTotal, setCountedTotal] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
 
   const prevSearch = useRef<string>(null);
