@@ -112,9 +112,9 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const [currentAllowBypass, setCurrentAllowBypass] = React.useState(false);
   const [currentLinkClassification, setCurrentLinkClassification] = React.useState('');
   const [safelistDialog, setSafelistDialog] = React.useState(false);
-  const [safelistReason, setSafelistReason] = React.useState(null);
+  const [safelistReason, setSafelistReason] = React.useState<string>(null);
   const [badlistDialog, setBadlistDialog] = React.useState(false);
-  const [badlistReason, setBadlistReason] = React.useState(null);
+  const [badlistReason, setBadlistReason] = React.useState<string>(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
   const [badlisted, setBadlisted] = React.useState(null);
   const [safelisted, setSafelisted] = React.useState(null);
@@ -378,7 +378,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
-        {setBorealisDetails && (
+        {currentUserConfig.ui.api_proxies.includes('borealis') && setBorealisDetails && (
           <MenuItem id="borealisID" dense onClick={handleBorealisDetails}>
             {BORELIS_ICON}
             {t('borealis')}
