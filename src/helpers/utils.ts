@@ -408,21 +408,22 @@ export function filterObject(obj: Object, callback) {
  *
  * @param input - value to check
  *
- * @returns type as string or NULL
+ * @param configuration - the Assemblyline context configuration
  *
+ * @returns [type, input]: A tuple where the type is a string of the detected type of the input provided and the input string is parsed where hashes have their start and ending spaces removed.
  */
-export function getSubmitType(input: string, configuration: ConfigurationDefinition): string | null {
+export function getSubmitType(input: string, configuration: ConfigurationDefinition): [string, string] {
   // Return null if the parameters are invalid
-  if (!input || !configuration?.submission?.file_sources) return null;
+  if (!input || !configuration?.submission?.file_sources) return [null, input];
 
   // If we're trying to auto-detect the input type, iterate over file sources
   const detectedHashType = Object.entries(configuration.submission.file_sources).find(
-    ([_, hashProps]) => hashProps && String(input).match(new RegExp(hashProps?.pattern))
+    ([_, hashProps]) => hashProps && String(input).trim().match(new RegExp(hashProps?.pattern))
   )?.[0];
 
-  if (detectedHashType) return detectedHashType;
-  else if (!detectedHashType && matchURL(input)) return 'url';
-  else return null;
+  if (detectedHashType) return [detectedHashType, String(input).trim()];
+  else if (!detectedHashType && matchURL(input)) return ['url', input];
+  else return [null, input];
 }
 
 /**
