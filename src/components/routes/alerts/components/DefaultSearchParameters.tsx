@@ -13,14 +13,22 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { AlertSearchParams } from 'components/routes/alerts';
-import { useDefaultParams } from 'components/routes/alerts/contexts/DefaultParamsContext';
+import { ALERT_DEFAULT_PARAMS, ALERT_STORAGE_KEY, type AlertSearchParams } from 'components/routes/alerts';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
-import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
-import React, { useEffect, useMemo, useState } from 'react';
+import { SearchParser, type SearchResult } from 'components/routes/alerts/utils/SearchParser';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
 import AlertFiltersSelected from './FiltersSelected';
+
+const IGNORED_PARAMETERS: (keyof AlertSearchParams)[] = [
+  'q',
+  'no_delay',
+  'tc_start',
+  'track_total_hits',
+  'refresh',
+  'offset',
+  'rows'
+];
 
 const useStyles = makeStyles(theme => ({
   preview: {
@@ -55,24 +63,45 @@ const useStyles = makeStyles(theme => ({
 const WrappedAlertDefaultSearchParameters = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
-  const navigate = useNavigate();
-  const location = useLocation();
   const { showSuccessMessage } = useMySnackbar();
   const { search } = useSearchParams<AlertSearchParams>();
-  const { defaults, fromStorage, onDefaultChange, onDefaultClear } = useDefaultParams<AlertSearchParams>();
 
   const [open, setOpen] = useState<boolean>(false);
   const [isSameParams, setIsSameParams] = useState<boolean>(false);
+  const [fromStorage, seFromStorage] = useState<boolean>(() => !!localStorage.getItem(ALERT_STORAGE_KEY));
+
+  const parser = useMemo(() => new SearchParser<AlertSearchParams>(ALERT_DEFAULT_PARAMS, { enforced: ['rows'] }), []);
+
+  const storageData = useMemo(() => new URLSearchParams(localStorage.getItem(ALERT_STORAGE_KEY) || ''), []);
+
+  const defaults = useMemo<SearchResult<AlertSearchParams>>(
+    () => parser.fullParams(storageData),
+    [parser, storageData]
+  );
 
   const filteredDefaults = useMemo<SearchResult<AlertSearchParams>>(
-    () => defaults.filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)),
-    [defaults]
+    () => parser.deltaParams(storageData).filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)),
+    [parser, storageData]
   );
 
   const filteredSearch = useMemo<SearchResult<AlertSearchParams>>(
     () => search.filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)),
     [search]
   );
+
+  const onDefaultChange = useCallback(
+    (value: URLSearchParams) => {
+      const params = parser.deltaParams(value).filter(k => !IGNORED_PARAMETERS.includes(k));
+      localStorage.setItem(ALERT_STORAGE_KEY, params.toString());
+      seFromStorage(true);
+    },
+    [parser]
+  );
+
+  const onDefaultClear = useCallback(() => {
+    localStorage.removeItem(ALERT_STORAGE_KEY);
+    seFromStorage(false);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -132,7 +161,6 @@ const WrappedAlertDefaultSearchParameters = () => {
             children={t('session.clear')}
             onClick={() => {
               onDefaultClear();
-              navigate(`${location.pathname}${location.hash}`);
               showSuccessMessage(t('session.clear.success'));
               setOpen(false);
             }}
@@ -145,7 +173,6 @@ const WrappedAlertDefaultSearchParameters = () => {
             children={t('session.save')}
             onClick={() => {
               onDefaultChange(search.toParams());
-              navigate(`${location.pathname}${location.hash}`);
               showSuccessMessage(t('session.save.success'));
               setOpen(false);
             }}

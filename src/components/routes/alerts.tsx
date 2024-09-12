@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import ForbiddenPage from './403';
 import AlertActions from './alerts/components/Actions';
-import AlertDefaultSearchParameters from './alerts/components/DefaultSearchParameters';
+import { AlertDefaultSearchParameters } from './alerts/components/DefaultSearchParameters';
 import AlertFavorites from './alerts/components/Favorites';
 import AlertFilters from './alerts/components/Filters';
 import AlertListItem from './alerts/components/ListItem';
@@ -22,7 +22,6 @@ import { AlertSearchResults } from './alerts/components/Results';
 import SearchHeader from './alerts/components/SearchHeader';
 import AlertWorkflows from './alerts/components/Workflows';
 import { AlertsProvider } from './alerts/contexts/AlertsContext';
-import { DefaultParamsProvider, useDefaultParams } from './alerts/contexts/DefaultParamsContext';
 import { SearchParamsProvider, useSearchParams } from './alerts/contexts/SearchParamsContext';
 import AlertDetail from './alerts/detail';
 import type { Alert, AlertItem } from './alerts/models/Alert';
@@ -76,7 +75,6 @@ const WrappedAlertsContent = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { defaults } = useDefaultParams<AlertSearchParams>();
   const { search, setSearchParams, setSearchObject } = useSearchParams<AlertSearchParams>();
 
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -174,7 +172,7 @@ const WrappedAlertsContent = () => {
       setGlobalDrawer(<AlertDetail id={id} alert={alert} inDrawer />, { hasMaximize: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [closeGlobalDrawer, defaults.toString(), location.hash, search.toString(), setGlobalDrawer]);
+  }, [alerts, closeGlobalDrawer, location.hash, setGlobalDrawer]);
 
   useEffect(() => {
     if (!!search.get('group_by')) return;
@@ -283,22 +281,15 @@ const WrappedAlertsContent = () => {
 export const AlertsContent = React.memo(WrappedAlertsContent);
 
 const WrappedAlertsPage = () => (
-  <DefaultParamsProvider
+  <SearchParamsProvider
     defaultValue={ALERT_DEFAULT_PARAMS}
-    storageKey={ALERT_STORAGE_KEY}
-    enforced={['offset', 'rows']}
-    ignored={['q', 'no_delay', 'tc_start', 'track_total_hits']}
+    hidden={['rows', 'offset', 'tc_start', 'track_total_hits']}
+    enforced={['rows']}
   >
-    <SearchParamsProvider
-      hidden={['rows', 'offset', 'tc_start', 'track_total_hits']}
-      enforced={['rows']}
-      usingDefaultContext
-    >
-      <AlertsProvider>
-        <AlertsContent />
-      </AlertsProvider>
-    </SearchParamsProvider>
-  </DefaultParamsProvider>
+    <AlertsProvider>
+      <AlertsContent />
+    </AlertsProvider>
+  </SearchParamsProvider>
 );
 
 export const AlertsPage = React.memo(WrappedAlertsPage);
