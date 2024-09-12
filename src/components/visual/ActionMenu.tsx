@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import ClassificationMismatchDialog from './ClassificationMismatchDialog';
+import { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip';
 import InputDialog from './InputDialog';
 import SafeBadItem from './SafeBadItem';
 
@@ -378,12 +379,15 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
-        {currentUserConfig.ui.api_proxies.includes('borealis') && setBorealisDetails && (
-          <MenuItem id="borealisID" dense onClick={handleBorealisDetails}>
-            {BORELIS_ICON}
-            {t('borealis')}
-          </MenuItem>
-        )}
+        {currentUserConfig.ui.api_proxies.includes('borealis') &&
+          type in BOREALIS_TYPE_MAP &&
+          value !== null &&
+          setBorealisDetails && (
+            <MenuItem id="borealisID" dense onClick={handleBorealisDetails}>
+              {BORELIS_ICON}
+              {t('borealis')}
+            </MenuItem>
+          )}
 
         {category === 'tag' && type.startsWith('file.rule.') && currentUser.roles.includes('signature_view') && (
           <MenuItem
