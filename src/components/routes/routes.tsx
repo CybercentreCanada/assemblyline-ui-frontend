@@ -26,6 +26,7 @@ const AdminTagSafelist = lazy(() => import('components/routes/admin/tag_safelist
 const AdminUsers = lazy(() => import('components/routes/admin/users'));
 const AlertDetails = lazy(() => import('components/routes/alerts/detail'));
 const Alerts = lazy(() => import('components/routes/alerts'));
+const AlertsRedirect = lazy(() => import('components/routes/alerts/redirect'));
 const AppRegistration = lazy(() => import('components/routes/authorize'));
 const ArchiveDetail = lazy(() => import('components/routes/archive/detail'));
 const CrashTest = lazy(() => import('components/routes/crash'));
@@ -128,6 +129,7 @@ const WrappedRoutes = () => {
         <Route path="/" element={<Submit />} />
         <Route path="/account" element={<Account />} />
         <Route path="/alerts" element={<Alerts />} />
+        <Route path="/alerts_redirect" element={<AlertsRedirect />} />
         <Route path="/alerts/:id" element={<AlertDetails />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/actions" element={<AdminActions />} />

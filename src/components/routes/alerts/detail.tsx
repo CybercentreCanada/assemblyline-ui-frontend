@@ -13,7 +13,7 @@ import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
-import { ALERT_DEFAULT_PARAMS, ALERT_SIMPLELIST_ID, ALERT_STORAGE_KEY } from 'components/routes/alerts';
+import { ALERT_DEFAULT_PARAMS, ALERT_SIMPLELIST_ID } from 'components/routes/alerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import ActionableText from 'components/visual/ActionableText';
 import { ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
@@ -43,7 +43,6 @@ import {
   AutoHideChipList,
   SkeletonInline
 } from './components/Components';
-import { DefaultParamsProvider } from './contexts/DefaultParamsContext';
 import { SearchParamsProvider } from './contexts/SearchParamsContext';
 import type { AlertItem } from './models/Alert';
 
@@ -1034,20 +1033,13 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
 const AlertDetailContent = React.memo(WrappedAlertDetailContent);
 
 const WrappedAlertDetail = (props: Props) => (
-  <DefaultParamsProvider
+  <SearchParamsProvider
     defaultValue={ALERT_DEFAULT_PARAMS}
-    storageKey={ALERT_STORAGE_KEY}
-    enforced={['offset', 'rows']}
-    ignored={['q', 'no_delay', 'tc_start', 'track_total_hits']}
+    hidden={['rows', 'offset', 'tc_start', 'track_total_hits']}
+    enforced={['rows']}
   >
-    <SearchParamsProvider
-      hidden={['rows', 'offset', 'tc_start', 'track_total_hits']}
-      enforced={['rows']}
-      usingDefaultContext
-    >
-      <AlertDetailContent {...props} />
-    </SearchParamsProvider>
-  </DefaultParamsProvider>
+    <AlertDetailContent {...props} />
+  </SearchParamsProvider>
 );
 
 export const AlertDetail = React.memo(WrappedAlertDetail);

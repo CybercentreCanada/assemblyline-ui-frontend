@@ -1,6 +1,5 @@
 import { Button, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import type { AlertSearchParams } from 'components/routes/alerts';
-import { useDefaultParams } from 'components/routes/alerts/contexts/DefaultParamsContext';
+import { ALERT_DEFAULT_PARAMS, type AlertSearchParams } from 'components/routes/alerts';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import type { FC, ReactNode } from 'react';
 import React, { memo, useCallback, useMemo, useState } from 'react';
@@ -71,7 +70,6 @@ type Props = {
 const WrappedAlertSearchResults: React.FC<Props> = ({ loading = false, total = 0 }: Props) => {
   const { t } = useTranslation(['alerts']);
   const theme = useTheme();
-  const { defaults } = useDefaultParams<AlertSearchParams>();
   const { search, setSearchObject } = useSearchParams<AlertSearchParams>();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -109,7 +107,9 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ loading = false, total = 0
               ...v,
               offset: 0,
               track_total_hits:
-                v.track_total_hits === defaults.get('track_total_hits') ? 10000000 : defaults.get('track_total_hits')
+                v.track_total_hits === ALERT_DEFAULT_PARAMS.track_total_hits
+                  ? 10000000
+                  : ALERT_DEFAULT_PARAMS.track_total_hits
             }))
           }
         />
@@ -137,7 +137,9 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ loading = false, total = 0
               ...v,
               offset: 0,
               track_total_hits:
-                v.track_total_hits === defaults.get('track_total_hits') ? 10000000 : defaults.get('track_total_hits')
+                v.track_total_hits === ALERT_DEFAULT_PARAMS.track_total_hits
+                  ? 10000000
+                  : ALERT_DEFAULT_PARAMS.track_total_hits
             }))
           }
         >

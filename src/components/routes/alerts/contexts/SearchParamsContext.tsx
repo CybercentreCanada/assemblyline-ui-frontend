@@ -4,7 +4,6 @@ import { SearchParser } from 'components/routes/alerts/utils/SearchParser';
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { useDefaultParams } from './DefaultParamsContext';
 
 type ContextProps<T extends Params> = {
   search: SearchResult<T>;
@@ -44,11 +43,6 @@ type Props<T extends Params> = {
      */
     ignore: string;
   };
-
-  /**
-   * Using the DefaultSearchParamsProvider
-   */
-  usingDefaultContext?: boolean;
 };
 
 const createSearchParamsContext = once(<T extends Params>() => createContext<ContextProps<T>>(null));
@@ -59,22 +53,19 @@ export const SearchParamsProvider = <T extends Params>({
   defaultValue = null,
   hidden = [],
   enforced = [],
-  usingDefaultContext = false,
   prefixes = null
 }: Props<T>) => {
   const SearchParamsContext = createSearchParamsContext<T>();
   const navigate = useNavigate();
   const location = useLocation();
-  const { defaults = null } = useDefaultParams<T>() || {};
 
   const [hiddenParams, setHiddenParams] = useState<URLSearchParams>(new URLSearchParams());
 
   const locationParams = useMemo<URLSearchParams>(() => new URLSearchParams(location.search), [location.search]);
 
   const parser = useMemo<SearchParser<T>>(
-    () =>
-      new SearchParser<T>(usingDefaultContext && defaults ? defaults.toObject() : defaultValue, { enforced, prefixes }),
-    [defaultValue, defaults, enforced, prefixes, usingDefaultContext]
+    () => new SearchParser<T>(defaultValue, { enforced, prefixes }),
+    [defaultValue, enforced, prefixes]
   );
 
   const search = useMemo<ContextProps<T>['search']>(
