@@ -11,7 +11,7 @@
   "details": "Item Details",
   "expiry.title": "Expiry date",
   "file": "File",
-  "file.hashes": "File Hashes (One of MD5, SHA1 or SHA256 is required) *",
+  "file.hashes": "File Hashes (One of the following hashes is required) *",
   "file.prop": "File Properties (Optional)",
   "file.name": "Name",
   "file.size": "Size",

@@ -203,7 +203,7 @@ const BadlistNew = ({}: Props) => {
     //File specific checks
     else if (badlist?.type === 'file') {
       // There is not at least one hash
-      if (!badlist?.hashes?.md5 && !badlist?.hashes?.sha1 && !badlist?.hashes?.sha256) {
+      if (!badlist?.hashes) {
         setReady(false);
         return;
       }
