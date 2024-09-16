@@ -860,6 +860,10 @@ function WrappedSubmissionDetail() {
   }, [fid, location.hash, setGlobalDrawer]);
 
   useEffect(() => {
+    if (!fid && !location.hash) setGlobalDrawer(null);
+  }, [fid, location.hash, setGlobalDrawer]);
+
+  useEffect(() => {
     if (!fid && !globalDrawerOpened && location.hash) {
       navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
