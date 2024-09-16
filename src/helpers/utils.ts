@@ -422,7 +422,7 @@ export function getSubmitType(input: string, configuration: ConfigurationDefinit
   )?.[0];
 
   if (detectedHashType) return [detectedHashType, String(input).trim()];
-  else if (!detectedHashType && matchURL(input)) return ['url', input];
+  else if (!detectedHashType && matchURL(input.trimStart())) return ['url', input.trimStart()];
   else return [null, input];
 }
 
