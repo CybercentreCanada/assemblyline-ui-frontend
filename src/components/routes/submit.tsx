@@ -392,8 +392,9 @@ const Submit: React.FC<any> = () => {
 
   useEffect(() => {
     if (state) {
-      setStringInput(state.hash);
-      setStringType(getSubmitType(state.hash, configuration));
+      const [type, input] = getSubmitType(state.hash, configuration);
+      setStringType(type);
+      setStringInput(input);
       setSubmissionMetadata(state.metadata);
       setValue(state.tabContext);
     }
