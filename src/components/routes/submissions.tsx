@@ -35,7 +35,7 @@ const SUBMISSION_PARAMS = createSearchParams(p => ({
   track_total_hits: p.number(10000).nullable().ignored()
 }));
 
-type SubmissionParams = SearchParams<typeof SUBMISSION_PARAMS>;
+export type SubmissionParams = SearchParams<typeof SUBMISSION_PARAMS>;
 
 const SubmissionSearch = () => {
   const { t } = useTranslation(['submissions']);
