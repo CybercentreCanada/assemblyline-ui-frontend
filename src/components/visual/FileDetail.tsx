@@ -209,6 +209,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         }, 500);
       }
     });
+    setResubmitAnchor(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256]);
 

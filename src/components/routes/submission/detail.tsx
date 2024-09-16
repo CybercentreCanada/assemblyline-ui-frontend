@@ -43,6 +43,8 @@ import useDrawer from 'components/hooks/useDrawer';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import ForbiddenPage from 'components/routes/403';
+import HeuristicDetail from 'components/routes/manage/heuristic_detail';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
@@ -58,8 +60,6 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
-import ForbiddenPage from '../403';
-import HeuristicDetail from '../manage/heuristic_detail';
 import AISummarySection from './detail/ai_summary';
 import AttackSection from './detail/attack';
 import ErrorSection from './detail/errors';
@@ -104,23 +104,27 @@ const incrementReducer = (old: number, increment: number) => {
 
 function WrappedSubmissionDetail() {
   const { t, i18n } = useTranslation(['submissionDetail']);
-  const { id, fid } = useParams<ParamProps>();
   const theme = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { addInsight, removeInsight } = useAssistant();
+  const { apiCall } = useMyAPI();
+  const { id, fid } = useParams<ParamProps>();
+  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
+  const { setHighlightMap } = useHighlighter();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+  const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
+
   const [submission, setSubmission] = useState(null);
   const [summary, setSummary] = useState(null);
   const [tree, setTree] = useState(null);
   const [filtered, setFiltered] = useState(false);
   const [partial, setPartial] = useState(false);
   const [watchQueue, setWatchQueue] = useState(null);
-  const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
-  const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
-  const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
-  const [liveResults, setLiveResults] = useReducer(resultReducer, null);
   const [configuration, setConfiguration] = useState(null);
   const [liveErrors, setLiveErrors] = useState(null);
   const [liveTagMap, setLiveTagMap] = useState(null);
   const [outstanding, setOutstanding] = useState(null);
-  const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
   const [liveStatus, setLiveStatus] = useState<'queued' | 'processing' | 'rescheduled'>('queued');
   const [socket, setSocket] = useState(null);
   const [loadInterval, setLoadInterval] = useState(null);
@@ -129,18 +133,17 @@ function WrappedSubmissionDetail() {
   const [archiveDialog, setArchiveDialog] = useState(false);
   const [waitingDialog, setWaitingDialog] = useState(false);
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
-  const { apiCall } = useMyAPI();
-  const { addInsight, removeInsight } = useAssistant();
-  const sp4 = theme.spacing(4);
-  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
-  const { setHighlightMap } = useHighlighter();
-  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [baseFiles, setBaseFiles] = useState([]);
   const [archivingMetadata, setArchivingMetadata] = useState({});
   const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState('false');
+
+  const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
+  const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
+  const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
+  const [liveResults, setLiveResults] = useReducer(resultReducer, null);
+  const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
+
+  const sp4 = theme.spacing(4);
 
   const popoverOpen = Boolean(resubmitAnchor);
 
@@ -643,6 +646,29 @@ function WrappedSubmissionDetail() {
         }
       });
     }
+    return () => {
+      setSubmission(null);
+      setSummary(null);
+      setTree(null);
+      setFiltered(false);
+      setPartial(false);
+      setWatchQueue(null);
+      setConfiguration(null);
+      setLiveErrors(null);
+      setLiveTagMap(null);
+      setOutstanding(null);
+      setLiveStatus('queued');
+      setSocket(null);
+      setLoadInterval(null);
+      setLastSuccessfulTrigger(0);
+      setDeleteDialog(false);
+      setArchiveDialog(false);
+      setWaitingDialog(false);
+      setResubmitAnchor(null);
+      setBaseFiles([]);
+      setArchivingMetadata({});
+      setArchivingUseAlternateDtl('false');
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -860,6 +886,10 @@ function WrappedSubmissionDetail() {
   }, [fid, location.hash, setGlobalDrawer]);
 
   useEffect(() => {
+    if (!fid && !location.hash) setGlobalDrawer(null);
+  }, [fid, location.hash, setGlobalDrawer]);
+
+  useEffect(() => {
     if (!fid && !globalDrawerOpened && location.hash) {
       navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
@@ -900,12 +930,12 @@ function WrappedSubmissionDetail() {
       apiCall({
         url: `/api/v4/live/outstanding_services/${id}/`,
         onSuccess: api_data => {
-          let newLiveStatus: 'processing' | 'rescheduled' | 'queued' = 'processing' as 'processing';
+          let newLiveStatus: 'processing' | 'rescheduled' | 'queued' = 'processing' as const;
           // Set live status based on outstanding services output
           if (api_data.api_response === null) {
-            newLiveStatus = 'rescheduled' as 'rescheduled';
+            newLiveStatus = 'rescheduled' as const;
           } else if (Object.keys(api_data.api_response).length === 0) {
-            newLiveStatus = 'queued' as 'queued';
+            newLiveStatus = 'queued' as const;
           }
 
           setOutstanding(api_data.api_response);
@@ -1009,7 +1039,7 @@ function WrappedSubmissionDetail() {
                       configuration={field_cfg}
                       value={archivingMetadata[field_name]}
                       onChange={v => {
-                        var cleanMetadata = archivingMetadata;
+                        const cleanMetadata = archivingMetadata;
                         if (v === undefined || v === null || v === '') {
                           // Remove field from metadata if value is null
                           delete cleanMetadata[field_name];
@@ -1020,7 +1050,7 @@ function WrappedSubmissionDetail() {
                         setArchivingMetadata({ ...cleanMetadata });
                       }}
                       onReset={() => {
-                        var cleanMetadata = archivingMetadata;
+                        const cleanMetadata = archivingMetadata;
                         delete cleanMetadata[field_name];
                         setArchivingMetadata({ ...cleanMetadata });
                       }}
@@ -1397,7 +1427,7 @@ function WrappedSubmissionDetail() {
           classification={submission ? submission.classification : null}
         />
         {systemConfig.ui.ai.enabled && settings.executive_summary && submission && submission.state === 'completed' && (
-          <AISummarySection type={'submission' as 'submission'} id={submission.sid} />
+          <AISummarySection type={'submission' as const} id={submission.sid} />
         )}
         <Detection
           section_map={summary ? summary.heuristic_sections : null}
