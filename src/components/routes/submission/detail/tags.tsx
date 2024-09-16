@@ -4,6 +4,7 @@ import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useSafeResults from 'components/hooks/useSafeResults';
 import AutoHideTagList from 'components/visual/AutoHideTagList';
+import { TooltipGrid } from 'components/visual/FileDetail/tags';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -64,9 +65,10 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, force =
           {Object.keys(tags).map((tag_type, i) =>
             tagUnsafeMap[tag_type] || showSafeResults || force ? (
               <Grid container key={i}>
-                <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                <TooltipGrid title={tag_type}>
                   <span style={{ fontWeight: 500 }}>{tag_type}</span>
-                </Grid>
+                </TooltipGrid>
+
                 <Grid item xs={12} sm={9} lg={10}>
                   <AutoHideTagList
                     tag_type={tag_type}
