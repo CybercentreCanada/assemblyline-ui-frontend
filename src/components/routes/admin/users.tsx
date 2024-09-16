@@ -31,7 +31,7 @@ const USERS_PARAMS = createSearchParams(p => ({
   offset: p.number(0).min(0).hidden().ignored(),
   rows: p.number(25).enforced().hidden().ignored(),
   sort: p.string(null).nullable().ignored(),
-  filters: p.filters(['']),
+  filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ignored(),
   refresh: p.boolean(false).hidden().ignored()
 }));
