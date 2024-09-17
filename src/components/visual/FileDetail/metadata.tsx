@@ -17,7 +17,7 @@ const WrappedMetadataSection: React.FC<MetadataSectionProps> = ({ metadata, noco
       {metadata
         ? Object.keys(metadata).map((meta, i) => (
             <Grid container key={i}>
-              <Grid item xs={12} sm={3} lg={2}>
+              <Grid item xs={12} sm={3} lg={2} paddingTop={0.375}>
                 <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{meta}</span>
               </Grid>
               <Grid item xs={12} sm={9} lg={10}>

@@ -50,7 +50,7 @@ const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attack_matrix, for
           {attack_matrix
             ? Object.keys(attack_matrix).map((cat, i) => (
                 <Grid container key={i}>
-                  <Grid item xs={12} sm={3} lg={2}>
+                  <Grid item xs={12} sm={3} lg={2} paddingTop={0.375}>
                     <span style={{ fontWeight: 500, textTransform: 'capitalize' }}>{cat.replace(/-/g, ' ')}</span>
                   </Grid>
                   <Grid item xs={12} sm={9} lg={10}>
