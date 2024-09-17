@@ -6,7 +6,6 @@ import type { PossibleColors } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
 import ExternalLinks from 'components/visual/ExternalSearch';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router';
 import ActionMenu from './ActionMenu';
 import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip';
 
@@ -43,7 +42,6 @@ const WrappedTag: React.FC<TagProps> = ({
   classification,
   label = null
 }) => {
-  const { pathname } = useLocation();
   const { scoreToVerdict, configuration } = useALContext();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { showSafeResults } = useSafeResults();
@@ -80,9 +78,20 @@ const WrappedTag: React.FC<TagProps> = ({
   }, []);
 
   useEffect(() => {
-    setShowBorealisDetails(false);
-    window.dispatchEvent(new CustomEvent(HIDE_EVENT_ID));
-  }, [pathname]);
+    return () => {
+      setShowBorealisDetails(false);
+      setState(initialMenuState);
+      window.dispatchEvent(
+        new CustomEvent(HIDE_EVENT_ID, {
+          detail: {
+            type: 'details',
+            value: { type: BOREALIS_TYPE_MAP[type], value: value },
+            classification
+          }
+        })
+      );
+    };
+  }, [classification, type, value]);
 
   return maliciousness === 'safe' && !showSafeResults && !force ? null : (
     <>
