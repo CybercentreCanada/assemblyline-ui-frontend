@@ -1,3 +1,4 @@
+import { HIDE_EVENT_ID } from 'borealis-ui/dist/data/event';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
@@ -48,7 +49,7 @@ const WrappedTag: React.FC<TagProps> = ({
   const { showSafeResults } = useSafeResults();
 
   const [state, setState] = useState<typeof initialMenuState>(initialMenuState);
-  const [showBorealisDetails, setShowBorealisDetails] = useState<boolean>(true);
+  const [showBorealisDetails, setShowBorealisDetails] = useState<boolean>(false);
 
   const maliciousness = useMemo<string>(() => {
     let v = lvl || scoreToVerdict(score);
@@ -80,6 +81,7 @@ const WrappedTag: React.FC<TagProps> = ({
 
   useEffect(() => {
     setShowBorealisDetails(false);
+    window.dispatchEvent(new CustomEvent(HIDE_EVENT_ID));
   }, [pathname]);
 
   return maliciousness === 'safe' && !showSafeResults && !force ? null : (
