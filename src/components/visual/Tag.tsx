@@ -1,10 +1,12 @@
+import { HIDE_EVENT_ID } from 'borealis-ui/dist/data/event';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import type { PossibleColors } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
 import ExternalLinks from 'components/visual/ExternalSearch';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import ActionMenu from './ActionMenu';
 import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip';
 
@@ -41,34 +43,46 @@ const WrappedTag: React.FC<TagProps> = ({
   classification,
   label = null
 }) => {
-  const [state, setState] = React.useState(initialMenuState);
+  const { pathname } = useLocation();
   const { scoreToVerdict, configuration } = useALContext();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { showSafeResults } = useSafeResults();
-  const [showBorealisDetails, setShowBorealisDetails] = React.useState(false);
+
+  const [state, setState] = useState<typeof initialMenuState>(initialMenuState);
+  const [showBorealisDetails, setShowBorealisDetails] = useState<boolean>(false);
+
+  const maliciousness = useMemo<string>(() => {
+    let v = lvl || scoreToVerdict(score);
+    if (safelisted) v = 'safe';
+    return v;
+  }, [lvl, safelisted, score, scoreToVerdict]);
+
+  const color = useMemo<PossibleColors>(
+    () =>
+      ({
+        suspicious: 'warning' as const,
+        malicious: 'error' as const,
+        safe: 'success' as const,
+        info: 'default' as const,
+        highly_suspicious: 'warning' as const
+      }[maliciousness]),
+    [maliciousness]
+  );
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
-  let maliciousness = lvl || scoreToVerdict(score);
-  if (safelisted) {
-    maliciousness = 'safe';
-  }
-
-  const color: PossibleColors = {
-    suspicious: 'warning' as const,
-    malicious: 'error' as const,
-    safe: 'success' as const,
-    info: 'default' as const,
-    highly_suspicious: 'warning' as const
-  }[maliciousness];
-
-  const handleMenuClick = useCallback(event => {
+  const handleMenuClick = useCallback<React.MouseEventHandler<HTMLDivElement>>(event => {
     event.preventDefault();
     setState({
       mouseX: event.clientX - 2,
       mouseY: event.clientY - 4
     });
   }, []);
+
+  useEffect(() => {
+    setShowBorealisDetails(false);
+    window.dispatchEvent(new CustomEvent(HIDE_EVENT_ID));
+  }, [pathname]);
 
   return maliciousness === 'safe' && !showSafeResults && !force ? null : (
     <>
