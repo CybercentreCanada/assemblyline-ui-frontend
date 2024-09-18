@@ -11,7 +11,7 @@
   "details": "Détails de l'élément",
   "expiry.title": "Date d'expiration",
   "file": "Fichier",
-  "file.hashes": "Hachages de fichiers (Au moins un des MD5, SHA1 ou SHA256 est requis) *",
+  "file.hashes": "Hachages de fichiers (Au moins un des hachages suivants est requis) *",
   "file.prop": "Propriétés du fichier (facultatif)",
   "file.name": "Nom",
   "file.size": "Taille",
