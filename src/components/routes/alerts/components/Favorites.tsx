@@ -394,7 +394,11 @@ const WrappedAlertFavorites = () => {
 
   const handleUpdateFavorites = useCallback(
     (nextFavorite: Favorite, prevFavorite: Favorite, global: boolean) => {
-      setSearchObject(v => ({ ...v, fq: v.fq.map(f => (f !== prevFavorite.query ? f : nextFavorite.query)) }));
+      setSearchObject(v => ({
+        ...v,
+        offset: 0,
+        fq: v.fq.map(f => (f !== prevFavorite.query ? f : nextFavorite.query))
+      }));
       updateFavorite(nextFavorite, global);
       setCurrentFavorite(defaultFavorite);
     },
@@ -403,7 +407,7 @@ const WrappedAlertFavorites = () => {
 
   const handleDeleteFavorites = useCallback(
     (favorite: Favorite, global: boolean) => {
-      setSearchObject(v => ({ ...v, fq: v.fq.filter(f => f !== favorite.query) }));
+      setSearchObject(v => ({ ...v, offset: 0, fq: v.fq.filter(f => f !== favorite.query) }));
       deleteFavorite(favorite, global);
       setCurrentFavorite(defaultFavorite);
     },
@@ -412,7 +416,7 @@ const WrappedAlertFavorites = () => {
 
   const handleFavoriteClick = useCallback(
     (favorite: Favorite) => {
-      setSearchObject(v => ({ ...v, fq: [...v.fq, favorite.query] }));
+      setSearchObject(v => ({ ...v, offset: 0, fq: [...v.fq, favorite.query] }));
       setOpen(false);
     },
     [setSearchObject]
