@@ -56,7 +56,7 @@ type SubmissionsTableProps = {
 const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionResults, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
-  const { setSearchObject } = useSearchParams<SubmissionParams>();
+  const searchParams = useSearchParams<SubmissionParams>();
 
   return submissionResults ? (
     submissionResults.total !== 0 ? (
@@ -113,21 +113,26 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
                 </DivTableCell>
                 <DivTableCell breakable>{maxLenStr(submission.params.description, 150)}</DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  <CustomChip
-                    label={submission.params.submitter}
-                    variant="outlined"
-                    size="small"
-                    type="rounded"
-                    onClick={event => {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      setSearchObject(o => ({
-                        ...o,
-                        filters: [...o.filters, `params.submitter:"${submission.params.submitter}"`]
-                      }));
-                    }}
-                  />
+                  {!searchParams ? (
+                    submission.params.submitter
+                  ) : (
+                    <CustomChip
+                      label={submission.params.submitter}
+                      variant="outlined"
+                      size="small"
+                      type="rounded"
+                      onClick={event => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        searchParams.setSearchObject(o => ({
+                          ...o,
+                          filters: [...o.filters, `params.submitter:"${submission.params.submitter}"`]
+                        }));
+                      }}
+                    />
+                  )}
                 </DivTableCell>
+                <DivTableCell style={{ whiteSpace: 'nowrap' }}>{submission.params.submitter}</DivTableCell>
                 <DivTableCell>{submission.file_count}</DivTableCell>
                 {c12nDef && c12nDef.enforce && (
                   <DivTableCell>
