@@ -366,11 +366,12 @@ const Submit: React.FC<any> = () => {
     }
   }
 
-  function handleStringChange(string) {
-    closeSnackbar();
-    setStringType(getSubmitType(string, configuration));
+  function handleStringChange(data: string) {
+    const [type, input] = getSubmitType(data, configuration);
+    setStringType(type);
+    setStringInput(input);
     setStringInputHasError(false);
-    setStringInput(string);
+    closeSnackbar();
   }
 
   useEffect(() => {
@@ -391,8 +392,9 @@ const Submit: React.FC<any> = () => {
 
   useEffect(() => {
     if (state) {
-      setStringInput(state.hash);
-      setStringType(getSubmitType(state.hash, configuration));
+      const [type, input] = getSubmitType(state.hash, configuration);
+      setStringType(type);
+      setStringInput(input);
       setSubmissionMetadata(state.metadata);
       setValue(state.tabContext);
     }
@@ -582,7 +584,7 @@ const Submit: React.FC<any> = () => {
                     type="stringInput"
                     variant="outlined"
                     value={stringInput}
-                    onChange={event => handleStringChange(event.target.value as String)}
+                    onChange={event => handleStringChange(event.target.value as string)}
                     style={{ flexGrow: 1, marginRight: '1rem' }}
                   />
                   <Button
