@@ -667,11 +667,20 @@ describe('Test `getSubmitType`', () => {
   });
 
   it('Should match the input string with its corresponding type', () => {
-    expect(getSubmitType('abcdef1234567890abcdef1234567890', configuration)[0]).toBe('md5');
-    expect(getSubmitType('abcdef1234567890abcdef1234567890abcdef12', configuration)[0]).toBe('sha1');
-    expect(getSubmitType('abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', configuration)[0]).toBe(
-      'sha256'
-    );
-    expect(getSubmitType('http://blah.com', configuration)[0]).toBe('url');
+    const md5 = 'abcdef1234567890abcdef1234567890';
+    expect(getSubmitType(md5, configuration)).toStrictEqual(['md5', md5]);
+    expect(getSubmitType(`   ${md5}   `, configuration)).toStrictEqual(['md5', md5]);
+
+    const sha1 = 'abcdef1234567890abcdef1234567890abcdef12';
+    expect(getSubmitType(sha1, configuration)).toStrictEqual(['sha1', sha1]);
+    expect(getSubmitType(`   ${sha1}   `, configuration)).toStrictEqual(['sha1', sha1]);
+
+    const sha256 = 'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+    expect(getSubmitType(sha256, configuration)).toStrictEqual(['sha256', sha256]);
+    expect(getSubmitType(`   ${sha256}   `, configuration)).toStrictEqual(['sha256', sha256]);
+
+    const url = 'http://blah.com';
+    expect(getSubmitType(url, configuration)).toStrictEqual(['url', url]);
+    expect(getSubmitType(`   ${url}`, configuration)).toStrictEqual(['url', url]);
   });
 });
