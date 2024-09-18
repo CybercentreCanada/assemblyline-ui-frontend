@@ -124,7 +124,7 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
                       onClick={event => {
                         event.preventDefault();
                         event.stopPropagation();
-                        searchParams.setSearchObject(o => ({
+                        searchParams?.setSearchObject(o => ({
                           ...o,
                           filters: [...o.filters, `params.submitter:"${submission.params.submitter}"`]
                         }));
@@ -132,7 +132,6 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
                     />
                   )}
                 </DivTableCell>
-                <DivTableCell style={{ whiteSpace: 'nowrap' }}>{submission.params.submitter}</DivTableCell>
                 <DivTableCell>{submission.file_count}</DivTableCell>
                 {c12nDef && c12nDef.enforce && (
                   <DivTableCell>
