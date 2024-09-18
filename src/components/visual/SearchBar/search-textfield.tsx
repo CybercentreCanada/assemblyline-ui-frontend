@@ -40,7 +40,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-interface SearchTextFieldProps {
+export interface SearchTextFieldProps {
   value: string;
   options: string[];
   placeholder?: string;
