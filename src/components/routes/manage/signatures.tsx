@@ -186,14 +186,14 @@ const SignaturesSearch = () => {
                 tooltip: { title: t('noisy') },
                 icon: { children: <RecordVoiceOverOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'status:NOISY'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'status:NOISY'] }))
                 }
               },
               {
                 tooltip: { title: t('disabled') },
                 icon: { children: <BlockIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'status:DISABLED'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'status:DISABLED'] }))
                 }
               }
             ]}

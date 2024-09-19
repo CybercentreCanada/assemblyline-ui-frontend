@@ -128,14 +128,14 @@ const UsersSearch = () => {
                 tooltip: { title: t('admins') },
                 icon: { children: <SupervisorAccountIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'type:admin'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:admin'] }))
                 }
               },
               {
                 tooltip: { title: t('disabled') },
                 icon: { children: <BlockIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'is_active:false'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'is_active:false'] }))
                 }
               }
             ]}
