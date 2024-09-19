@@ -18,5 +18,5 @@ export default function getXSRFCookie() {
       // Ignore... we will return null
     }
   }
-  return xsrfToken;
+  return xsrfToken as string;
 }

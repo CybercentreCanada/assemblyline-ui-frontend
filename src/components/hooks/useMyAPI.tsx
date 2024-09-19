@@ -8,16 +8,16 @@ import useQuota from './useQuota';
 
 const DEFAULT_RETRY_MS = 32;
 
-export type APIResponseProps = {
+export type APIResponseProps<APIResponse> = {
   api_error_message: string;
-  api_response: any;
+  api_response: APIResponse;
   api_server_version: string;
   api_status_code: number;
 };
 
-export type DownloadResponseProps = {
+export type DownloadResponseProps<APIResponse> = {
   api_error_message: string;
-  api_response: any;
+  api_response: APIResponse;
   api_server_version: string;
   api_status_code: number;
   filename?: string;
@@ -32,72 +32,70 @@ export type LoginParamsProps = {
   allow_saml_login: boolean;
 };
 
-export default function useMyAPI() {
+type APICallProps<SuccessData, FailureData> = {
+  url: string;
+  contentType?: string;
+  method?: string;
+  body?: object;
+  reloadOnUnauthorize?: boolean;
+  allowCache?: boolean;
+  onSuccess?: (api_data: APIResponseProps<SuccessData>) => void;
+  onFailure?: (api_data: APIResponseProps<FailureData>) => void;
+  onEnter?: () => void;
+  onExit?: () => void;
+  onFinalize?: (api_data: APIResponseProps<unknown>) => void;
+  retryAfter?: number;
+};
+
+type BootstrapProps = {
+  switchRenderedApp: (value: string) => void;
+  setConfiguration: (cfg: ConfigurationDefinition) => void;
+  setLoginParams: (params: LoginParamsProps) => void;
+  setUser: (user: WhoAmIProps) => void;
+  setReady: (layout: boolean, borealis: boolean) => void;
+  retryAfter?: number;
+};
+
+type DownloadBlobProps<SuccessData, FailureData> = {
+  url: string;
+  onSuccess?: (blob: DownloadResponseProps<SuccessData>) => void;
+  onFailure?: (api_data: DownloadResponseProps<FailureData>) => void;
+  onEnter?: () => void;
+  onExit?: () => void;
+  retryAfter?: number;
+};
+
+type UseMyAPIReturn = {
+  apiCall: <SuccessData = any, FailureData = any>(props: APICallProps<SuccessData, FailureData>) => void;
+  bootstrap: (props: BootstrapProps) => void;
+  downloadBlob: <SuccessData = any, FailureData = any>(props: DownloadBlobProps<SuccessData, FailureData>) => void;
+};
+
+const isAPIData = (value: object): boolean =>
+  value !== undefined &&
+  value !== null &&
+  !!Object.prototype.hasOwnProperty.call(value, 'api_response') &&
+  !!Object.prototype.hasOwnProperty.call(value, 'api_error_message') &&
+  !!Object.prototype.hasOwnProperty.call(value, 'api_server_version') &&
+  !!Object.prototype.hasOwnProperty.call(value, 'api_status_code');
+
+const useMyAPI = (): UseMyAPIReturn => {
   const { t } = useTranslation();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { configuration: systemConfig } = useALContext();
   const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
 
-  type APICallProps = {
-    url: string;
-    contentType?: string;
-    method?: string;
-    body?: any;
-    reloadOnUnauthorize?: boolean;
-    allowCache?: boolean;
-    onSuccess?: (api_data: APIResponseProps) => void;
-    onFailure?: (api_data: APIResponseProps) => void;
-    onEnter?: () => void;
-    onExit?: () => void;
-    onFinalize?: (api_data: APIResponseProps) => void;
-    retryAfter?: number;
-  };
-
-  type BootstrapProps = {
-    switchRenderedApp: (value: string) => void;
-    setConfiguration: (cfg: ConfigurationDefinition) => void;
-    setLoginParams: (params: LoginParamsProps) => void;
-    setUser: (user: WhoAmIProps) => void;
-    setReady: (layout: boolean, borealis: boolean) => void;
-    retryAfter?: number;
-  };
-
-  type DownloadBlobProps = {
-    url: string;
-    onSuccess?: (blob: DownloadResponseProps) => void;
-    onFailure?: (api_data: DownloadResponseProps) => void;
-    onEnter?: () => void;
-    onExit?: () => void;
-    retryAfter?: number;
-  };
-
-  function isAPIData(value: any) {
-    if (
-      value !== undefined &&
-      value !== null &&
-      value.hasOwnProperty('api_response') &&
-      value.hasOwnProperty('api_error_message') &&
-      value.hasOwnProperty('api_server_version') &&
-      value.hasOwnProperty('api_status_code')
-    ) {
-      return true;
-    }
-    return false;
-  }
-
-  function bootstrap({
+  const bootstrap = ({
     switchRenderedApp,
     setConfiguration,
     setLoginParams,
     setUser,
     setReady,
     retryAfter = DEFAULT_RETRY_MS
-  }: BootstrapProps) {
+  }: BootstrapProps) => {
     const requestOptions: RequestInit = {
       method: 'GET',
-      headers: {
-        'X-XSRF-TOKEN': getXSRFCookie()
-      },
+      headers: { 'X-XSRF-TOKEN': getXSRFCookie() },
       credentials: 'same-origin'
     };
 
@@ -127,7 +125,7 @@ export default function useMyAPI() {
         api_server_version: '4.5.0.0',
         api_status_code: 400
       }))
-      .then(api_data => {
+      .then((api_data: APIResponseProps<WhoAmIProps>) => {
         // eslint-disable-next-line no-prototype-builtins
         if (!isAPIData(api_data)) {
           // We got no response
@@ -136,14 +134,14 @@ export default function useMyAPI() {
         } else if (api_data.api_status_code === 403) {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
           // User account is locked
-          setConfiguration(api_data.api_response);
+          setConfiguration(api_data.api_response as unknown as ConfigurationDefinition);
           switchRenderedApp('locked');
         } else if (api_data.api_status_code === 401) {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
           // User is not logged in
           localStorage.setItem('loginParams', JSON.stringify(api_data.api_response));
           sessionStorage.clear();
-          setLoginParams(api_data.api_response);
+          setLoginParams(api_data.api_response as unknown as LoginParamsProps);
           switchRenderedApp('login');
         } else if (api_data.api_status_code === 200) {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
@@ -188,10 +186,11 @@ export default function useMyAPI() {
             switchRenderedApp('load');
           }
         }
-      });
-  }
+      })
+      .catch(() => null);
+  };
 
-  function apiCall({
+  const apiCall = <SuccessData, FailureData>({
     url,
     contentType = 'application/json',
     method = 'GET',
@@ -204,7 +203,7 @@ export default function useMyAPI() {
     onExit,
     onFinalize,
     retryAfter = DEFAULT_RETRY_MS
-  }: APICallProps) {
+  }: APICallProps<SuccessData, FailureData>) => {
     const requestOptions: RequestInit = {
       method,
       credentials: 'same-origin',
@@ -212,7 +211,7 @@ export default function useMyAPI() {
         'Content-Type': contentType,
         'X-XSRF-TOKEN': getXSRFCookie()
       },
-      body: body !== null ? (contentType === 'application/json' ? JSON.stringify(body) : body) : null
+      body: body === null ? null : contentType === 'application/json' ? JSON.stringify(body) : (body as BodyInit)
     };
 
     // Run enter callback
@@ -255,7 +254,7 @@ export default function useMyAPI() {
         api_server_version: systemConfig.system.version,
         api_status_code: 400
       }))
-      .then(api_data => {
+      .then((api_data: APIResponseProps<unknown>) => {
         // Run finished Callback
         if (onExit) onExit();
 
@@ -308,7 +307,7 @@ export default function useMyAPI() {
           // Handle errors
           // Run failure callback
           if (onFailure) {
-            onFailure(api_data);
+            onFailure(api_data as APIResponseProps<FailureData>);
           } else {
             // Default failure handler, show toast error
             showErrorMessage(api_data.api_error_message);
@@ -330,28 +329,27 @@ export default function useMyAPI() {
 
           // Handle success
           // Run success callback
-          onSuccess(api_data);
+          onSuccess(api_data as APIResponseProps<SuccessData>);
         } else {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
         }
         if (onFinalize) onFinalize(api_data);
-      });
-  }
+      })
+      .catch(() => null);
+  };
 
-  function downloadBlob({
+  const downloadBlob = <SuccessData, FailureData>({
     url,
     onSuccess,
     onFailure,
     onEnter,
     onExit,
     retryAfter = DEFAULT_RETRY_MS
-  }: DownloadBlobProps) {
+  }: DownloadBlobProps<SuccessData, FailureData>) => {
     const requestOptions: RequestInit = {
       method: 'GET',
       credentials: 'same-origin',
-      headers: {
-        'X-XSRF-TOKEN': getXSRFCookie()
-      }
+      headers: { 'X-XSRF-TOKEN': getXSRFCookie() }
     };
 
     // Run enter callback
@@ -396,7 +394,7 @@ export default function useMyAPI() {
         api_server_version: systemConfig.system.version,
         api_status_code: 400
       }))
-      .then(api_data => {
+      .then((api_data: DownloadResponseProps<unknown>) => {
         // Run finished Callback
         if (onExit) onExit();
 
@@ -443,7 +441,7 @@ export default function useMyAPI() {
           // Handle errors
           // Run failure callback
           if (onFailure) {
-            onFailure(api_data);
+            onFailure(api_data as DownloadResponseProps<FailureData>);
           } else {
             // Default failure handler, show toast error
             showErrorMessage(api_data.api_error_message);
@@ -454,12 +452,15 @@ export default function useMyAPI() {
 
           // Handle success
           // Run success callback
-          onSuccess(api_data);
+          onSuccess(api_data as DownloadResponseProps<SuccessData>);
         } else {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
         }
-      });
-  }
+      })
+      .catch(() => null);
+  };
 
   return { apiCall, bootstrap, downloadBlob };
-}
+};
+
+export default useMyAPI;
