@@ -167,21 +167,22 @@ const SafelistSearch = () => {
                 tooltip: { title: t('user') },
                 icon: { children: <PersonOutlineOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'sources.type:user'] }))
+                  onClick: () =>
+                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'sources.type:user'] }))
                 }
               },
               {
                 tooltip: { title: t('tag') },
                 icon: { children: <LabelOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'type:tag'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:tag'] }))
                 }
               },
               {
                 tooltip: { title: t('disabled') },
                 icon: { children: <BlockOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'enabled:false'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'enabled:false'] }))
                 }
               }
             ]}

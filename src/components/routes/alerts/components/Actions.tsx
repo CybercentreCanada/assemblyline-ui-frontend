@@ -281,7 +281,7 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
           window.dispatchEvent(
             new CustomEvent<Partial<AlertSearchParams>>('alertRefresh', { detail: { group_by: '', fq: [groupBy] } })
           );
-          setSearchObject(p => ({ ...p, group_by: '', fq: [...p.fq, groupBy] }));
+          setSearchObject(p => ({ ...p, offset: 0, group_by: '', fq: [...p.fq, groupBy] }));
         }}
       />
     );
