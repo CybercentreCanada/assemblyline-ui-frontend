@@ -27,8 +27,9 @@ import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Error } from 'components/models/base/error';
+import type { Submission } from 'components/models/base/submission';
 import type { File } from 'components/models/ui/file';
-import { CustomUser } from 'components/models/ui/user';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import AISummarySection from 'components/routes/submission/detail/ai_summary';
@@ -135,7 +136,7 @@ const WrappedFileDetail: React.FC<Props> = ({
   };
 
   const resubmit = useCallback(() => {
-    apiCall({
+    apiCall<Submission>({
       url: `/api/v4/submit/dynamic/${sha256}/${sid ? `?copy_sid=${sid}` : ''}`,
       onSuccess: api_data => {
         showSuccessMessage(t('resubmit.success'));
@@ -144,6 +145,7 @@ const WrappedFileDetail: React.FC<Props> = ({
         }, 500);
       }
     });
+    setResubmitAnchor(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256]);
 
@@ -256,7 +258,7 @@ const WrappedFileDetail: React.FC<Props> = ({
     setFile(null);
 
     if (sid && sha256) {
-      apiCall({
+      apiCall<File>({
         method: liveResultKeys ? 'POST' : 'GET',
         url: `/api/v4/submission/${sid}/file/${sha256}/`,
         body: liveResultKeys ? { extra_result_keys: liveResultKeys } : null,
@@ -266,7 +268,7 @@ const WrappedFileDetail: React.FC<Props> = ({
         }
       });
     } else if (sha256) {
-      apiCall({
+      apiCall<File>({
         url: `/api/v4/file/result/${sha256}/`,
         onSuccess: api_data => {
           scrollToTop('fileDetailTop');

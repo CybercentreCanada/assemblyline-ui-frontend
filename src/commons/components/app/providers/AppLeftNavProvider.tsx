@@ -1,9 +1,10 @@
 import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
-import { createContext, ReactNode, useCallback, useMemo, useState } from 'react';
-import { AppLeftNavElement } from '../AppConfigs';
+import type { ReactNode } from 'react';
+import { createContext, useCallback, useMemo, useState } from 'react';
+import type { AppLeftNavElement } from '../AppConfigs';
 import { AppStorageKeys } from '../AppConstants';
-import { AppLeftNavContextType } from '../AppContexts';
+import type { AppLeftNavContextType } from '../AppContexts';
 
 const { LS_KEY_LEFTNAV_OPEN } = AppStorageKeys;
 

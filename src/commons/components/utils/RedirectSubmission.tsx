@@ -1,4 +1,5 @@
 import useALContext from 'components/hooks/useALContext';
+import React from 'react';
 import { Navigate, useParams } from 'react-router';
 
 type ParamProps = {

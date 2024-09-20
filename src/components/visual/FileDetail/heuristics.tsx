@@ -52,7 +52,7 @@ const WrappedHeuristicSection: React.FC<HeuristicSectionProps> = ({ heuristics }
               {heuristics
                 ? Object.keys(heuristics).map((lvl, i) => (
                     <Grid container key={i}>
-                      <Grid item xs={12} sm={3} lg={2}>
+                      <Grid item xs={12} sm={3} lg={2} paddingTop={0.375}>
                         <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{t(`verdict.${lvl}`)}</span>
                       </Grid>
                       <Grid item xs={12} sm={9} lg={10}>

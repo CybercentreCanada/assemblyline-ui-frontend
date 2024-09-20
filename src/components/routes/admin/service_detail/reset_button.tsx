@@ -1,12 +1,11 @@
 import { Button, Tooltip, useTheme } from '@mui/material';
-import { DockerConfig, Service, UpdateConfig } from 'components/models/base/service';
-import 'moment/locale/fr';
+import type { DockerConfig, Service, UpdateConfig, UpdateSource } from 'components/models/base/service';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
-  service: DockerConfig | Service | UpdateConfig;
-  defaults: DockerConfig | Service | UpdateConfig;
+  service: DockerConfig | Service | UpdateConfig | UpdateSource;
+  defaults: DockerConfig | Service | UpdateConfig | UpdateSource;
   field: string | string[];
   reset: () => void;
 };
@@ -15,7 +14,7 @@ const WrappedResetButton = ({ service, defaults, field, reset }: Props) => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
 
-  const getValue = useCallback((obj, fieldname) => {
+  const getValue = useCallback((obj: object, fieldname: string): unknown => {
     const val = obj[fieldname] || null;
     return Array.isArray(val) ? JSON.stringify(val) : val;
   }, []);
@@ -31,15 +30,15 @@ const WrappedResetButton = ({ service, defaults, field, reset }: Props) => {
   return service && defaults && hasChanges() ? (
     <Tooltip title={t('reset.tooltip')}>
       <Button
+        color="secondary"
+        size="small"
         style={{ marginLeft: theme.spacing(1), padding: 0, lineHeight: '1rem' }}
+        variant="outlined"
         onClick={event => {
           event.stopPropagation();
           event.preventDefault();
           reset();
         }}
-        size="small"
-        color="secondary"
-        variant="outlined"
       >
         {t('reset')}
       </Button>

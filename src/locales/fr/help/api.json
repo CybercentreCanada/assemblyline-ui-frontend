@@ -8,6 +8,7 @@
   "priv.R": "Lecture",
   "priv.W": "Écriture",
   "protected": "Nécessite une authentification",
+  "quota": "Compte pour le quota",
   "require_role": "Rôles d'utilisateur requis",
   "role.administration": "Administration",
   "role.alert_manage": "Gestion d'Alertes",

@@ -1,5 +1,7 @@
-import { memo, ReactNode } from 'react';
-import usePageProps, { PageProps } from './hooks/usePageProps';
+import type { ReactNode } from 'react';
+import { memo } from 'react';
+import type { PageProps } from './hooks/usePageProps';
+import usePageProps from './hooks/usePageProps';
 
 type PageContentProps = PageProps & {
   children?: ReactNode;

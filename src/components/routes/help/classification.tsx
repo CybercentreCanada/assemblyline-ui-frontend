@@ -163,7 +163,7 @@ export default function HelpClassification() {
                 </li>
               ))
             : [...Array(2)].map((_, i) => (
-                <li>
+                <li key={i}>
                   <Skeleton />
                 </li>
               ))}
@@ -195,7 +195,7 @@ export default function HelpClassification() {
             )
           ) : (
             [...Array(2)].map((_, i) => (
-              <li>
+              <li key={i}>
                 <Skeleton />
               </li>
             ))
@@ -228,7 +228,7 @@ export default function HelpClassification() {
             )
           ) : (
             [...Array(2)].map((_, i) => (
-              <li>
+              <li key={i}>
                 <Skeleton />
               </li>
             ))
@@ -264,7 +264,7 @@ export default function HelpClassification() {
             )
           ) : (
             [...Array(2)].map((_, i) => (
-              <li>
+              <li key={i}>
                 <Skeleton />
               </li>
             ))

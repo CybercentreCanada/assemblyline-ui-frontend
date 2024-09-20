@@ -19,6 +19,8 @@ export type AppPreferenceConfigs = {
   appIconLight: ReactElement<any>; // Small light mode logo of your app used in drawer and top nav bar
   bannerDark?: ReactElement<any>; // Your dark mode app banner, will be use in the loading screen, login and logout pages
   bannerLight?: ReactElement<any>; // Your dark mode app banner, will be use in the loading screen, login and logout pages
+  bannerVertDark?: ReactElement<any>; // Your dark mode app banner, will be use in the loading screen, login and logout pages
+  bannerVertLight?: ReactElement<any>; // Your dark mode app banner, will be use in the loading screen, login and logout pages
   allowAutoHideTopbar?: boolean; // Allow the user to toggle on/off the topbar autohide feature
   allowBreadcrumbs?: boolean; // Allow the user to toggle on/off the breadcrumb
   allowGravatar?: boolean; // Will use gravatar to populate the UserProfile avatar picture (using the user's email).

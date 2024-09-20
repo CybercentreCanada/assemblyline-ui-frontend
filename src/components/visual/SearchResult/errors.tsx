@@ -15,13 +15,13 @@ import {
   LinkRow,
   SortableHeaderCell
 } from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import Moment from 'components/visual/Moment';
 import { bytesToSize } from 'helpers/utils';
-import 'moment/locale/fr';
-import React, { ReactElement } from 'react';
+import type { ReactElement } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
-import InformativeAlert from '../InformativeAlert';
 
 const MAX_MESSAGE_SIZE = 2500;
 
@@ -80,11 +80,9 @@ const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null,
               >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                   <Tooltip title={error.created}>
-                    <>
-                      <Moment fromNow locale={i18n.language}>
-                        {error.created}
-                      </Moment>
-                    </>
+                    <div>
+                      <Moment variant="fromNow">{error.created}</Moment>
+                    </div>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>{error.response.service_name}</DivTableCell>

@@ -3,8 +3,7 @@ import { Typography } from '@mui/material';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-// eslint-disable-next-line import/extensions
-import CBOR from 'helpers/cbor.js';
+import { decode, encode } from 'helpers/cbor';
 import toArrayBuffer from 'helpers/toArrayBuffer';
 import { useTranslation } from 'react-i18next';
 
@@ -24,14 +23,14 @@ export function SecurityTokenLogin({ username, setShownControls, setWebAuthNResp
       url: `/api/v4/webauthn/authenticate/begin/${username}/`,
       onSuccess: api_data => {
         const arrayData = toArrayBuffer(api_data.api_response);
-        const options = CBOR.decode(arrayData.buffer);
+        const options = decode(arrayData.buffer);
         const credentialHelper = navigator.credentials;
         if (credentialHelper !== undefined) {
           credentialHelper
             .get(options)
             .then((assertion: PublicKeyCredential) => {
               const response = assertion.response as AuthenticatorAssertionResponse;
-              const assertionData = CBOR.encode({
+              const assertionData = encode({
                 credentialId: new Uint8Array(assertion.rawId),
                 authenticatorData: new Uint8Array(response.authenticatorData),
                 clientDataJSON: new Uint8Array(response.clientDataJSON),

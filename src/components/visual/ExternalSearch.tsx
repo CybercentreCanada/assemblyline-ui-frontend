@@ -1,10 +1,10 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Tooltip from '@mui/material/Tooltip';
-import React from 'react';
-
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LaunchOutlinedIcon from '@mui/icons-material/LaunchOutlined';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import type { Theme } from '@mui/material';
 import {
   Box,
   Button,
@@ -15,27 +15,26 @@ import {
   IconButton,
   Tab,
   Tabs,
-  Theme,
   Typography,
   useTheme
 } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Tooltip from '@mui/material/Tooltip';
 import makeStyles from '@mui/styles/makeStyles';
-import useExternalLookup from 'components/hooks/useExternalLookup';
-import { useTranslation } from 'react-i18next';
-
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import LaunchOutlinedIcon from '@mui/icons-material/LaunchOutlined';
-import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import useALContext from 'components/hooks/useALContext';
-import { DetailedItem } from 'components/models/base/alert';
-import { ExternalEnrichmentResult } from 'components/providers/ExternalLookupProvider';
+import useExternalLookup from 'components/hooks/useExternalLookup';
+import type { DetailedItem } from 'components/models/base/alert';
+import type { ExternalEnrichmentResult } from 'components/providers/ExternalLookupProvider';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
-import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
+import type { CustomChipProps } from 'components/visual/CustomChip';
+import CustomChip from 'components/visual/CustomChip';
 import { getMaxClassification } from 'helpers/classificationParser';
 import { toTitleCase, verdictToColor } from 'helpers/utils';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const TARGET_RESULT_COUNT = 10;
 
@@ -121,7 +120,7 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
     const fullChipList = items.map(item => ({
       category: 'tag',
       label: item[0] !== null && item[0] !== undefined ? item[0].toString() : '',
-      variant: 'outlined' as 'outlined',
+      variant: 'outlined' as const,
       // type: 'rounded' as 'rounded',
       tooltip: item[1] !== null && item[1] !== undefined ? item[1].toString() : ''
     }));
@@ -234,10 +233,10 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
   //   vLookup -> {group: {name: [[value, desc], ...]}}
   //   nLookup -> {group: [name, ...]}
   //   ndLookup -> {name: desc, ...}
-  let vLookup = {};
-  let nLookup = {};
-  let ndLookup = {};
-  let gOrder = [];
+  const vLookup = {};
+  const nLookup = {};
+  const ndLookup = {};
+  const gOrder = [];
   enrichmentResult.enrichment.forEach(enrichmentItem => {
     //  values map
     if (!(enrichmentItem.group in vLookup)) {

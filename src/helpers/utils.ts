@@ -1,4 +1,4 @@
-import { ConfigurationDefinition } from 'components/hooks/useMyUser';
+import { Configuration, HashPatternMap } from 'components/models/base/config';
 import { PossibleColors } from 'components/visual/CustomChip';
 
 /**
@@ -129,7 +129,7 @@ export function humanReadableNumber(num: number | null) {
  */
 export function resetFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
-  favicon.href = `${process.env.PUBLIC_URL}/favicon.ico`;
+  favicon.href = `/favicon.ico`;
 }
 
 /**
@@ -141,7 +141,7 @@ export function resetFavicon() {
  */
 export function setNotifyFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
-  favicon.href = `${process.env.PUBLIC_URL}/favicon_done.ico`;
+  favicon.href = `/favicon_done.ico`;
 }
 
 /**
@@ -239,7 +239,7 @@ export function priorityText(priority: number | null) {
  * @returns value from path
  *
  */
-export function getValueFromPath(obj: object, path: string) {
+export function getValueFromPath(obj: object, path: string): undefined | string | object {
   if (path === undefined || path === null) {
     return undefined;
   }
@@ -264,11 +264,30 @@ export function getValueFromPath(obj: object, path: string) {
  *
  */
 export function getProvider() {
-  if (window.location.pathname.indexOf(`${process.env.PUBLIC_URL}/oauth/`) !== -1) {
-    return window.location.pathname.split(`${process.env.PUBLIC_URL}/oauth/`).pop().slice(0, -1);
+  if (window.location.pathname.indexOf(`/oauth/`) !== -1) {
+    return window.location.pathname.split(`/oauth/`).pop().slice(0, -1);
   }
   const params = new URLSearchParams(window.location.search);
   return params.get('provider');
+}
+
+/**
+ *
+ * Check if we are receiving a SAML sign-in message
+ *
+ * @returns oauth provider
+ *
+ */
+export function getSAMLData() {
+  if (window.location.pathname.indexOf('/saml/') !== -1) {
+    const params = new URLSearchParams(window.location.search);
+    const data = params.get('data');
+    if (data !== null || data !== undefined) {
+      return JSON.parse(atob(data).toString());
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -389,21 +408,34 @@ export function filterObject(obj: Object, callback) {
  *
  * @param input - value to check
  *
- * @returns type as string or NULL
+ * @param configuration - the Assemblyline context configuration
  *
+ * @returns [type, input]: A tuple where the type is a string of the detected type of the input provided and the input string is parsed where hashes have their start and ending spaces removed.
  */
-export function getSubmitType(input: string, configuration: ConfigurationDefinition): string | null {
-  // If we're trying to auto-detect the input type, iterate over file sources
-  if (!input || input === undefined) return null;
-  if (!configuration?.submission?.file_sources) return null;
+export function getSubmitType(input: string, configuration: Configuration): [HashPatternMap, string] {
+  // Return null if the parameters are invalid
+  if (!input || !configuration?.submission?.file_sources) return [null, input];
 
-  let detectedHashType = Object.entries(configuration.submission.file_sources).find(
-    ([_, hashProps]) => hashProps && input.match(new RegExp(hashProps?.pattern))
+  // If we're trying to auto-detect the input type, iterate over file sources
+  const detectedHashType = Object.entries(configuration.submission.file_sources).find(
+    ([_, hashProps]) => hashProps && String(input).trim().match(new RegExp(hashProps?.pattern))
   )?.[0];
 
-  if (!detectedHashType && matchURL(input)) {
-    // Check to see if the input is a valid URL
-    detectedHashType = 'url';
-  }
-  return detectedHashType;
+  if (detectedHashType) return [detectedHashType, String(input).trim()];
+  else if (!detectedHashType && matchURL(input.trimStart())) return ['url', input.trimStart()];
+  else return [null, input];
 }
+
+/**
+ *
+ * Sum all the values of an object
+ *
+ * @param obj an object of values to be added together
+ *
+ * @returns type as number
+ *
+ */
+type ObjectOfInts = {
+  [name: string]: number;
+};
+export const sumValues = (obj: ObjectOfInts) => Object.values(obj).reduce((a, b) => a + b, 0);

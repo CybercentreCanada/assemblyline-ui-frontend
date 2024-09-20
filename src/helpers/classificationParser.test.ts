@@ -1,14 +1,14 @@
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+/* eslint-disable no-console */
+import type { ClassificationDefinition, ClassificationParts } from 'helpers/classificationParser';
 import {
   applyClassificationRules,
-  ClassificationDefinition,
-  ClassificationParts,
   getLevelText,
   getMaxClassification,
   getParts,
   isAccessible,
   normalizedClassification
 } from 'helpers/classificationParser';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // if you make changes to this definition, please ensure they are reflected in the assemblyline-base tests as well.
 const c12nDef: ClassificationDefinition = {
@@ -141,7 +141,7 @@ const c12nDef: ClassificationDefinition = {
 
 describe('`GetLevelText` identifies invalid input', () => {
   it('Should raise errors on an invalid levelIdx', () => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(getLevelText(12, c12nDef, 'short', false)).toBe('INVALID');
     console.error.mockRestore();
   });
@@ -309,7 +309,7 @@ describe('`getParts` correctly extracts all components', () => {
 
 describe('`GetParts` identifies invalid input', () => {
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -373,7 +373,7 @@ describe('`GetParts` identifies invalid input with dynamic_groups turned on', ()
   c12nDefCopy.dynamic_groups = true;
 
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -446,7 +446,7 @@ describe('Multi group aliases should work', () => {
   });
 
   it('Should default to the first group in the case of unclear aliases', () => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(getParts('L0//ALPHABET GANG', c12nDefCopy, 'short', false)).toEqual({
       groups: ['A'],
       lvl: 'L0',
@@ -762,7 +762,7 @@ describe('`getMaxClassification` correctly identifies the maximum', () => {
   });
 
   it('Should return all combined groups on invalid group combinations', () => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'short', false)).toBe('L0//REL A, B');
     expect(getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'long', false)).toBe(
       'LEVEL 0//REL TO GROUP A, GROUP B'

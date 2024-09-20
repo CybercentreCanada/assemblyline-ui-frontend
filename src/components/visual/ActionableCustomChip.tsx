@@ -1,15 +1,20 @@
+import useALContext from 'components/hooks/useALContext';
 import useExternalLookup from 'components/hooks/useExternalLookup';
-import { ExternalLinkType } from 'components/models/base/config';
+import type { ExternalLinkType } from 'components/models/base/config';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
-import CustomChip, { CustomChipProps } from './CustomChip';
+import type { CustomChipProps } from './CustomChip';
+import CustomChip from './CustomChip';
+import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip';
 import ExternalLinks from './ExternalSearch';
 
 export type ActionableCustomChipProps = CustomChipProps & {
   data_type?: string;
   category?: ExternalLinkType;
+  index?: string;
   classification?: string;
   label?: string;
+  value?: string;
 };
 
 const initialMenuState = {
@@ -20,13 +25,16 @@ const initialMenuState = {
 const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
   children,
   data_type = null,
+  index = null,
   category = null,
   classification,
   label,
+  value,
   variant = 'outlined',
   ...otherProps
 }) => {
   const [state, setState] = React.useState(initialMenuState);
+  const { configuration } = useALContext();
 
   const handleMenuClick = useCallback(event => {
     event.preventDefault();
@@ -37,7 +45,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
   }, []);
 
   const { isActionable } = useExternalLookup();
-  const actionable = isActionable(category, data_type, label);
+  const actionable = index || isActionable(category, data_type, label);
 
   // Do the menu rendering here
   return (
@@ -45,21 +53,34 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
       {actionable && state !== initialMenuState && (
         <ActionMenu
           category={category}
+          index={index}
           type={data_type}
-          value={label}
+          value={value || label}
           state={state}
           setState={setState}
           classification={classification}
         />
       )}
-      <CustomChip
-        icon={<ExternalLinks category={category} type={data_type} value={label} round={variant === 'outlined'} />}
-        label={label}
-        variant={variant}
-        {...otherProps}
-        onClick={actionable ? handleMenuClick : null}
-        onContextMenu={actionable ? handleMenuClick : null}
-      />
+      {configuration.ui.api_proxies.includes('borealis') && data_type in BOREALIS_TYPE_MAP && label !== null ? (
+        <EnrichmentCustomChip
+          dataType={BOREALIS_TYPE_MAP[data_type]}
+          dataValue={label}
+          dataClassification={classification}
+          icon={<ExternalLinks category={category} type={data_type} value={label} round={variant === 'outlined'} />}
+          label={label}
+          variant={variant}
+          {...otherProps}
+          onContextMenu={actionable ? handleMenuClick : null}
+        />
+      ) : (
+        <CustomChip
+          icon={<ExternalLinks category={category} type={data_type} value={label} round={variant === 'outlined'} />}
+          label={label}
+          variant={variant}
+          {...otherProps}
+          onContextMenu={actionable ? handleMenuClick : null}
+        />
+      )}
     </>
   );
 };

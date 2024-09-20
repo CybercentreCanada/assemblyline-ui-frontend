@@ -1,23 +1,17 @@
-import {
-  Paper,
+import type {
   PaperProps,
-  styled,
-  Table,
-  TableBody,
   TableBodyProps,
-  TableCell,
   TableCellProps,
-  TableHead,
   TableHeadProps,
   TableProps,
-  TableRow,
-  TableRowProps,
-  TableSortLabel
+  TableRowProps
 } from '@mui/material';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import 'moment/locale/fr';
-import React, { FC, forwardRef, memo } from 'react';
-import { To, useNavigate } from 'react-router';
+import { Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, styled } from '@mui/material';
+import type SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
+import type { FC } from 'react';
+import React, { forwardRef, memo } from 'react';
+import type { To } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 
 interface StyledPaperProps extends PaperProps {
@@ -137,8 +131,7 @@ export const GridTableRow: FC<GridTableRowProps> = memo(
   }))
 );
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface GridLinkRowProps extends GridTableRowProps {
+export interface GridLinkRowProps extends GridTableRowProps {
   component?: never;
   to: To;
 }

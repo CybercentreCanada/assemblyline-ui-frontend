@@ -82,6 +82,7 @@
   "general.max_queue_length": "Maximum queued items",
   "general.max_queue_length.desc": "** Only use if service can't keep up with workload.",
   "general.name": "Service name",
+  "general.recursion_prevention": "Recursion prevention",
   "general.reject": "Rejected file types",
   "general.result_classification": "Default result's classification",
   "general.stage": "Execution stage",

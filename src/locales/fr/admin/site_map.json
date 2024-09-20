@@ -6,6 +6,7 @@
   "header.function": "Fonction",
   "header.methods": "Méthodes",
   "header.protected": "Protégé",
+  "header.quota": "Quota",
   "header.roles": "Rôles d'utilisateur requis",
   "header.url": "URL",
   "role.administration": "Administration",

@@ -1,146 +1,97 @@
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/models/ui/user';
-import SearchBar from 'components/visual/SearchBar/search-bar';
+import type { Heuristic } from 'components/models/base/heuristic';
+import type { SearchResult } from 'components/models/ui/search';
+import type { CustomUser } from 'components/models/ui/user';
+import ForbiddenPage from 'components/routes/403';
+import SearchHeader from 'components/visual/SearchBar/SearchHeader';
+import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
+import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
+import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
+import type { SearchResult as SearchParamsResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import SearchPager from 'components/visual/SearchPager';
 import HeuristicsTable from 'components/visual/SearchResult/heuristics';
-import SearchResultCount from 'components/visual/SearchResultCount';
-import 'moment/locale/fr';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import ForbiddenPage from '../403';
 import HeuristicDetail from './heuristic_detail';
 
-const PAGE_SIZE = 25;
-
-const useStyles = makeStyles(theme => ({
-  searchresult: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end'
-  },
-  drawerPaper: {
-    width: '80%',
-    maxWidth: '800px',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  }
+const HEURISTICS_PARAMS = createSearchParams(p => ({
+  query: p.string(''),
+  offset: p.number(0).min(0).hidden().ignored(),
+  rows: p.number(25).enforced().hidden().ignored(),
+  sort: p.string('heur_id asc').ignored(),
+  filters: p.filters([]),
+  track_total_hits: p.number(10000).nullable().ignored()
 }));
 
-type SearchResults = {
-  items: any[];
-  offset: number;
-  rows: number;
-  total: number;
-};
+type HeuristicsParams = SearchParams<typeof HEURISTICS_PARAMS>;
 
-export default function Heuristics() {
+const HeuristicsSearch = () => {
   const { t } = useTranslation(['manageHeuristics']);
-  const [pageSize] = useState(PAGE_SIZE);
-  const [searching, setSearching] = useState(false);
+  const theme = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const [heuristicResults, setHeuristicResults] = useState<SearchResults>(null);
-  const location = useLocation();
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const navigate = useNavigate();
-  const theme = useTheme();
-  const { apiCall } = useMyAPI();
-  const classes = useStyles();
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
-  const [suggestions] = useState([
-    ...Object.keys(indexes.heuristic).filter(name => indexes.heuristic[name].indexed),
-    ...DEFAULT_SUGGESTION
-  ]);
-  const filterValue = useRef<string>('');
+  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
+  const { search, setSearchParams } = useSearchParams<HeuristicsParams>();
+
+  const [heuristicResults, setHeuristicResults] = useState<SearchResult<Heuristic>>(null);
+  const [searching, setSearching] = useState<boolean>(false);
+
+  const suggestions = useMemo<string[]>(
+    () => [...Object.keys(indexes.heuristic).filter(name => indexes.heuristic[name].indexed), ...DEFAULT_SUGGESTION],
+    [indexes.heuristic]
+  );
+
+  const handleReload = useCallback(
+    (body: SearchParamsResult<HeuristicsParams>) => {
+      if (!currentUser.roles.includes('heuristic_view')) return;
+
+      apiCall<SearchResult<Heuristic>>({
+        url: '/api/v4/search/heuristic/',
+        method: 'POST',
+        body: body.set(o => ({ ...o, query: o.query || '*' })).toObject(),
+        onSuccess: ({ api_response }) => setHeuristicResults(api_response),
+        onEnter: () => setSearching(true),
+        onExit: () => setSearching(false)
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentUser.roles]
+  );
+
+  const setHeuristicID = useCallback(
+    (heur_id: string) => {
+      navigate(`${location.pathname}${location.search || ''}#${heur_id}`);
+    },
+    [location.pathname, location.search, navigate]
+  );
 
   useEffect(() => {
-    setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
-  }, [location.pathname, location.search, pageSize]);
-
-  useEffect(() => {
-    if (heuristicResults !== null && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search ? location.search : ''}`);
-    }
+    if (!location.hash || globalDrawerOpened || !heuristicResults) return;
+    navigate(`${location.pathname}${location.search ? location.search : ''}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalDrawerOpened]);
 
   useEffect(() => {
-    if (location.hash) {
-      setGlobalDrawer(<HeuristicDetail heur_id={location.hash.substr(1)} />);
-    } else {
-      closeGlobalDrawer();
-    }
+    if (location.hash) setGlobalDrawer(<HeuristicDetail heur_id={location.hash.substr(1)} />);
+    else closeGlobalDrawer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash]);
 
   useEffect(() => {
-    if (query && currentUser.roles.includes('heuristic_view')) {
-      query.set('rows', PAGE_SIZE);
-      query.set('offset', 0);
-      setSearching(true);
-      apiCall({
-        method: 'POST',
-        url: '/api/v4/search/heuristic/',
-        body: query.getParams(),
-        onSuccess: api_data => {
-          setHeuristicResults(api_data.api_response);
-        },
-        onFinalize: () => {
-          setSearching(false);
-        }
-      });
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
-
-  const onClear = useCallback(
-    () => {
-      navigate(location.pathname);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.pathname]
-  );
-
-  const onSearch = useCallback(
-    () => {
-      if (filterValue.current !== '') {
-        query.set('query', filterValue.current);
-        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
-      } else {
-        onClear();
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query, location.pathname, onClear]
-  );
-
-  const onFilterValueChange = (inputValue: string) => {
-    filterValue.current = inputValue;
-  };
-
-  const setHeuristicID = useCallback(
-    (heur_id: string) => {
-      navigate(`${location.pathname}${location.search ? location.search : ''}#${heur_id}`);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.search]
-  );
+    handleReload(search);
+  }, [handleReload, search]);
 
   return currentUser.roles.includes('heuristic_view') ? (
     <PageFullWidth margin={4}>
@@ -150,43 +101,19 @@ export default function Heuristics() {
 
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
-          <SearchBar
-            initValue={query ? query.get('query', '') : ''}
-            placeholder={t('filter')}
-            searching={searching}
-            suggestions={suggestions}
-            onValueChange={onFilterValueChange}
-            onClear={onClear}
-            onSearch={onSearch}
-          >
-            {heuristicResults !== null && (
-              <div className={classes.searchresult}>
-                {heuristicResults.total !== 0 && (
-                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                    {searching ? (
-                      <span>{t('searching')}</span>
-                    ) : (
-                      <span>
-                        <SearchResultCount count={heuristicResults.total} />
-                        {query.get('query')
-                          ? t(`filtered${heuristicResults.total === 1 ? '' : 's'}`)
-                          : t(`total${heuristicResults.total === 1 ? '' : 's'}`)}
-                      </span>
-                    )}
-                  </Typography>
-                )}
-
-                <SearchPager
-                  total={heuristicResults.total}
-                  setResults={setHeuristicResults}
-                  pageSize={pageSize}
-                  index="heuristic"
-                  query={query}
-                  setSearching={setSearching}
-                />
-              </div>
-            )}
-          </SearchBar>
+          <SearchHeader
+            params={search.toParams()}
+            loading={searching}
+            results={heuristicResults}
+            resultLabel={
+              search.get('query')
+                ? t(`filtered${heuristicResults?.total === 1 ? '' : 's'}`)
+                : t(`total${heuristicResults?.total === 1 ? '' : 's'}`)
+            }
+            onChange={v => setSearchParams(v)}
+            paramDefaults={search.defaults().toObject()}
+            searchInputProps={{ placeholder: t('filter'), options: suggestions }}
+          />
         </div>
       </PageHeader>
 
@@ -197,4 +124,13 @@ export default function Heuristics() {
   ) : (
     <ForbiddenPage />
   );
-}
+};
+
+const WrappedHeuristicsPage = () => (
+  <SearchParamsProvider params={HEURISTICS_PARAMS}>
+    <HeuristicsSearch />
+  </SearchParamsProvider>
+);
+
+export const HeuristicsPage = React.memo(WrappedHeuristicsPage);
+export default HeuristicsPage;

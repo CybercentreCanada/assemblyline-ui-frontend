@@ -25,6 +25,9 @@ export type UserSettings = {
   /** Default download encoding when downloading files */
   download_encoding: Encoding;
 
+  /** Should executive summary sections be shown? */
+  executive_summary: boolean;
+
   /** Auto-expand section when score bigger then this */
   expand_min_score: number;
 

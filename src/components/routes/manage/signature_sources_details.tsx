@@ -3,12 +3,12 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import { Checkbox, FormControlLabel, Grid, IconButton, TextField, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
-import { EnvironmentVariable } from 'components/models/base/service';
+import type { EnvironmentVariable, UpdateSource } from 'components/models/base/service';
+import ResetButton from 'components/routes/admin/service_detail/reset_button';
 import Classification from 'components/visual/Classification';
+import Moment from 'components/visual/Moment';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
-import ResetButton from '../admin/service_detail/reset_button';
 
 const useStyles = makeStyles(theme => ({
   checkbox: {
@@ -28,6 +28,15 @@ const DEFAULT_HEADER: EnvironmentVariable = {
   value: ''
 };
 
+type Props = {
+  source: UpdateSource;
+  defaults: UpdateSource;
+  addMode: boolean;
+  showDetails: boolean;
+  setSource: (value: UpdateSource) => void;
+  setModified: (value: boolean) => void;
+};
+
 const WrappedSourceDetail = ({
   source,
   defaults,
@@ -35,7 +44,7 @@ const WrappedSourceDetail = ({
   addMode = false,
   setModified = null,
   showDetails = true
-}) => {
+}: Props) => {
   const { t, i18n } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -454,9 +463,7 @@ const WrappedSourceDetail = ({
           <div style={{ textAlign: 'center', paddingTop: theme.spacing(3), flexGrow: 1 }}>
             <Typography variant="subtitle2" color="textSecondary">
               {`${t('update.label.last_successful')}: `}
-              <Moment fromNow locale={i18n.language}>
-                {source.status.last_successful_update}
-              </Moment>
+              <Moment variant="fromNow">{source.status.last_successful_update}</Moment>
             </Typography>
             <Typography variant="subtitle2" color="textSecondary">
               {`${t('update.label.status')}: ${source.status.message}`}

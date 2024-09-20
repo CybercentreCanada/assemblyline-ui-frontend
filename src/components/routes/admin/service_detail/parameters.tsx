@@ -1,6 +1,5 @@
 import { Grid, Typography, useTheme } from '@mui/material';
-import { Service } from 'components/models/base/service';
-import 'moment/locale/fr';
+import type { Service } from 'components/models/base/service';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import MultiTypeConfig from './multi_type_config';

@@ -6,6 +6,7 @@ export type Method = (typeof METHODS)[number];
 
 export type Page = {
   audit: boolean;
+  count_towards_quota: boolean;
   function: string;
   methods: Method[];
   protected: boolean;

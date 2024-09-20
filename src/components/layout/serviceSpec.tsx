@@ -255,9 +255,9 @@ type ServiceSpecProps = {
 function WrappedServiceSpec({
   service_spec,
   setParam,
-  isSelected,
-  disabled,
-  compressed,
+  isSelected = () => true,
+  disabled = false,
+  compressed = false,
   hasResetButton = false
 }: ServiceSpecProps) {
   const theme = useTheme();
@@ -293,12 +293,6 @@ function WrappedServiceSpec({
     </div>
   );
 }
-
-WrappedServiceSpec.defaultProps = {
-  isSelected: (name: string) => true,
-  disabled: false,
-  compressed: false
-};
 
 const ServiceSpec = React.memo(WrappedServiceSpec);
 export default ServiceSpec;

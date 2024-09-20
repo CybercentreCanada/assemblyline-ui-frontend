@@ -10,6 +10,7 @@ import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsAc
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import type { SelectChangeEvent } from '@mui/material';
 import {
   Badge,
   Button,
@@ -23,15 +24,14 @@ import {
   IconButton,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Skeleton,
   TextField,
   Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
-import { blue } from '@mui/material/colors';
 import FormControl from '@mui/material/FormControl';
+import { blue } from '@mui/material/colors';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
@@ -41,7 +41,6 @@ import { Configuration } from 'components/models/base/config';
 import { ServiceIndexed } from 'components/models/base/service';
 import { SystemMessage } from 'components/models/ui/user';
 import 'moment-timezone';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { JSONFeedItem, NotificationItem, useNotificationFeed } from '.';
@@ -385,6 +384,7 @@ const WrappedNotificationArea = () => {
 
               newNots = newNots.map(n => {
                 const _isNew = setIsNew(n);
+                // eslint-disable-next-line no-unsafe-optional-chaining
                 let tags = [...n?.tags];
                 if (isAdmin) {
                   const isNewService = getNewService(n, services2);

@@ -39,6 +39,49 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+export interface TooltipGridProps extends Omit<GridProps, 'title'> {
+  title?: React.ReactNode;
+}
+
+export const TooltipGrid: React.FC<TooltipGridProps> = ({ title = '', ...props }) => {
+  const theme = useTheme();
+  const classes = useStyles();
+
+  const [disabled, setDisabled] = useState<boolean>(true);
+
+  const ref = useRef<any>(null);
+
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
+
+  const resize = useCallback(() => {
+    ref.current && setDisabled(() => ref.current.scrollWidth <= ref.current.clientWidth);
+  }, []);
+
+  useEffect(() => {
+    resize();
+    window.addEventListener('resize', resize);
+    return () => {
+      window.removeEventListener('resize', resize);
+    };
+  }, [resize]);
+
+  return (
+    <Tooltip
+      title={title}
+      classes={{
+        tooltip: classes.tooltip
+      }}
+      placement={isXS ? 'bottom-start' : 'right-start'}
+      disableFocusListener={disabled}
+      disableHoverListener={disabled}
+      disableInteractive={disabled}
+      disableTouchListener={disabled}
+    >
+      <Grid ref={ref} className={classes.meta_key} item xs={12} sm={3} lg={2} paddingTop={0.375} {...props} />
+    </Tooltip>
+  );
+};
+
 type TagSectionProps = {
   signatures: Signature[];
   tags: Tags;
@@ -55,6 +98,11 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
   const { showSafeResults } = useSafeResults();
   const [tagUnsafeMap, setTagUnsafeMap] = React.useState({});
 
+  const someSigNotSafe = signatures && signatures.some(i => i[1] !== 'safe' && !i[2]);
+  const forceShowSig = signatures && signatures.length !== 0 && (showSafeResults || force);
+  const someTagNotSafe = Object.values(tagUnsafeMap).some(Boolean);
+  const forceShowTag = Object.keys(tagUnsafeMap).length !== 0 && (showSafeResults || force);
+
   useEffect(() => {
     if (tags) {
       const newTagUnsafeMap = {};
@@ -64,44 +112,6 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
       setTagUnsafeMap(newTagUnsafeMap);
     }
   }, [tags]);
-
-  const someSigNotSafe = signatures && signatures.some(i => i[1] !== 'safe' && !i[2]);
-  const forceShowSig = signatures && signatures.length !== 0 && (showSafeResults || force);
-  const someTagNotSafe = Object.values(tagUnsafeMap).some(Boolean);
-  const forceShowTag = Object.keys(tagUnsafeMap).length !== 0 && (showSafeResults || force);
-
-  const TooltipGrid: React.FC<GridProps & { title?: React.ReactNode }> = ({ title = '', ...props }) => {
-    const [disabled, setDisabled] = useState<boolean>(true);
-    const ref = useRef<any>(null);
-
-    const resize = useCallback(() => {
-      ref.current && setDisabled(ref.current.scrollWidth <= ref.current.clientWidth);
-    }, []);
-
-    useEffect(() => {
-      resize();
-      window.addEventListener('resize', resize);
-      return () => {
-        window.removeEventListener('resize', resize);
-      };
-    }, [resize]);
-
-    return (
-      <Tooltip
-        title={title}
-        classes={{
-          tooltip: classes.tooltip
-        }}
-        placement={isXS ? 'bottom-start' : 'right-start'}
-        disableFocusListener={disabled}
-        disableHoverListener={disabled}
-        disableInteractive={disabled}
-        disableTouchListener={disabled}
-      >
-        <Grid ref={ref} className={classes.meta_key} item xs={12} sm={3} lg={2} {...props} />
-      </Tooltip>
-    );
-  };
 
   return (!signatures && !tags) || someTagNotSafe || forceShowTag || someSigNotSafe || forceShowSig ? (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>

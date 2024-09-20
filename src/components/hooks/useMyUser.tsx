@@ -1,16 +1,27 @@
-import { AppUserService, AppUserValidatedProp } from 'commons/components/app/AppUserService';
-import { Configuration } from 'components/models/base/config';
-import { UserSettings } from 'components/models/base/user_settings';
-import { CustomUser, Indexes, SystemMessage } from 'components/models/ui/user';
-import { ClassificationDefinition } from 'helpers/classificationParser';
+import type { AppUserService, AppUserValidatedProp } from 'commons/components/app/AppUserService';
+import type { Configuration } from 'components/models/base/config';
+import type { UserSettings } from 'components/models/base/user_settings';
+import type { CustomUser, Indexes, SystemMessage } from 'components/models/ui/user';
+import type { ClassificationDefinition } from 'helpers/classificationParser';
 import { useState } from 'react';
+
+export type Alias = {
+  name: string;
+  short_name: string;
+};
+
+export type ClassificationAliases = {
+  [key: string]: Alias;
+};
 
 export interface CustomAppUserService extends AppUserService<CustomUser> {
   c12nDef: ClassificationDefinition;
+  classificationAliases: ClassificationAliases;
   configuration: Configuration;
   indexes: Indexes;
   settings: UserSettings;
   systemMessage: SystemMessage;
+  setClassificationAliases: (aliases: ClassificationAliases) => void;
   setConfiguration: (cfg: Configuration) => void;
   setSystemMessage: (msg: SystemMessage) => void;
   scoreToVerdict: (score: number) => string;
@@ -18,6 +29,7 @@ export interface CustomAppUserService extends AppUserService<CustomUser> {
 
 export interface WhoAmIProps extends CustomUser {
   c12nDef: ClassificationDefinition;
+  classification_aliases: ClassificationAliases;
   configuration: Configuration;
   indexes: Indexes;
   system_message: SystemMessage;
@@ -32,6 +44,7 @@ export default function useMyUser(): CustomAppUserService {
   const [indexes, setIndexes] = useState<Indexes>(null);
   const [systemMessage, setSystemMessage] = useState<SystemMessage>(null);
   const [settings, setSettings] = useState<UserSettings>(null);
+  const [classificationAliases, setClassificationAliases] = useState<ClassificationAliases>(null);
   const [flattenedProps, setFlattenedProps] = useState(null);
 
   function flatten(ob) {
@@ -57,6 +70,7 @@ export default function useMyUser(): CustomAppUserService {
   const setUser = (whoAmIData: WhoAmIProps) => {
     const {
       configuration: cfg,
+      classification_aliases: c12nAliases,
       c12nDef: c12n,
       indexes: idx,
       system_message: msg,
@@ -94,6 +108,7 @@ export default function useMyUser(): CustomAppUserService {
       }
     };
     setC12nDef(upperC12n);
+    setClassificationAliases(c12nAliases);
     setConfiguration(cfg);
     setIndexes(idx);
     setSystemMessage(msg);
@@ -103,7 +118,14 @@ export default function useMyUser(): CustomAppUserService {
     });
     setSettings(userSettings);
     setFlattenedProps(
-      flatten({ user: curUser, c12nDef: upperC12n, configuration: cfg, indexes: idx, settings: userSettings })
+      flatten({
+        user: curUser,
+        classificationAliases: c12nAliases,
+        c12nDef: upperC12n,
+        configuration: cfg,
+        indexes: idx,
+        settings: userSettings
+      })
     );
   };
 
@@ -118,8 +140,8 @@ export default function useMyUser(): CustomAppUserService {
   const validateProps = (props: AppUserValidatedProp[]) => {
     if (props === undefined || !Array.isArray(props)) return true;
 
-    let enforcedProps: AppUserValidatedProp[] = [];
-    let unEnforcedProps: AppUserValidatedProp[] = [];
+    const enforcedProps: AppUserValidatedProp[] = [];
+    const unEnforcedProps: AppUserValidatedProp[] = [];
     props.forEach(prop => (prop?.enforce ? enforcedProps.push(prop) : unEnforcedProps.push(prop)));
 
     const enforcedValidated = enforcedProps.length > 0 ? enforcedProps.every(validateProp) : true;
@@ -158,12 +180,14 @@ export default function useMyUser(): CustomAppUserService {
 
   return {
     c12nDef,
+    classificationAliases,
     configuration,
     indexes,
     systemMessage,
     settings,
     user,
     setUser,
+    setClassificationAliases,
     setConfiguration,
     setSystemMessage,
     isReady,

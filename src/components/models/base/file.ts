@@ -179,6 +179,7 @@ export type File = {
 
 export type FileIndexed = Pick<
   File,
+  | 'archive_ts'
   | 'classification'
   | 'comments'
   | 'entropy'

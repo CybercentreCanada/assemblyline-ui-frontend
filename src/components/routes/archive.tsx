@@ -11,8 +11,8 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { FileIndexed } from 'components/models/base/file';
-import { FacetResult, FieldsResult, HistogramResult, SearchResult } from 'components/models/ui/search';
+import type { FileIndexed } from 'components/models/base/file';
+import type { FacetResult, FieldsResult, HistogramResult, SearchResult } from 'components/models/ui/search';
 import ArchiveDetail from 'components/routes/archive/detail';
 import { ChipList } from 'components/visual/ChipList';
 import Histogram from 'components/visual/Histogram';
@@ -24,7 +24,6 @@ import SearchPager from 'components/visual/SearchPager';
 import ArchivesTable from 'components/visual/SearchResult/archives';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
-import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
@@ -53,22 +52,15 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-// type FileResults = {
-//   items: FileInfo[];
-//   offset: number;
-//   rows: number;
-//   total: number;
-// };
-
 const PAGE_SIZE = 25;
 
 const DEFAULT_TC = '1m';
 
 const TC_MAP = {
-  '24h': 'seen.last:[now-24h TO now]',
-  '4d': 'seen.last:[now-4d TO now]',
-  '7d': 'seen.last:[now-7d TO now]',
-  '1m': 'seen.last:[now-1M TO now]'
+  '24h': '(archive_ts:* AND archive_ts:[now-24h TO now]) OR (NOT archive_ts:* AND seen.last:[now-24h TO now])',
+  '4d': '(archive_ts:* AND archive_ts:[now-4d TO now]) OR (NOT archive_ts:* AND seen.last:[now-4d TO now])',
+  '7d': '(archive_ts:* AND archive_ts:[now-7d TO now]) OR (NOT archive_ts:* AND seen.last:[now-7d TO now])',
+  '1m': '(archive_ts:* AND archive_ts:[now-1M TO now]) OR (NOT archive_ts:* AND seen.last:[now-1M TO now])'
 };
 
 const START_MAP = {
@@ -93,7 +85,8 @@ const DEFAULT_PARAMS: object = {
   rows: PAGE_SIZE,
   archive_only: true,
   is_supplementary: false,
-  tc: DEFAULT_TC
+  tc: DEFAULT_TC,
+  sort: 'archive_ts desc'
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -155,7 +148,7 @@ export default function MalwareArchive() {
   );
 
   const handleLabelClick = useCallback(
-    (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => {
+    (_event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => {
       if (!searching) {
         query.add('filters', `labels:${safeFieldValue(label)}`);
         navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
@@ -234,11 +227,6 @@ export default function MalwareArchive() {
     const supp = curQuery.pop('supplementary') || false;
     if (!supp) {
       curQuery.add('filters', 'NOT is_supplementary:true');
-    }
-
-    const tc = curQuery.pop('tc') || DEFAULT_TC;
-    if (tc !== '1y') {
-      curQuery.add('filters', TC_MAP[tc]);
     }
 
     setParsedQuery(new SimpleSearchQuery(curQuery.toString()));
@@ -403,7 +391,7 @@ export default function MalwareArchive() {
                     pageSize={PAGE_SIZE}
                     query={parsedQuery}
                     total={fileResults.total}
-                    setResults={setFileResults}
+                    setResults={data => setFileResults(data as SearchResult<FileIndexed>)}
                     setSearching={setSearching}
                   />
                 </div>
@@ -446,13 +434,13 @@ export default function MalwareArchive() {
                 datatype={t('graph.datatype')}
                 isDate
                 verticalLine
-                onClick={(evt, element) => {
+                onClick={(_evt, element) => {
                   if (!searching && element.length > 0) {
                     const ind = element[0].index;
                     const keys = Object.keys(histogram);
                     query.add(
                       'filters',
-                      `seen.last:[${keys[ind]} TO ${keys.length - 1 === ind ? 'now' : keys[ind + 1]}]`
+                      `archive_ts:[${keys[ind]} TO ${keys.length - 1 === ind ? 'now' : keys[ind + 1]}]`
                     );
                     navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                   }
@@ -465,9 +453,9 @@ export default function MalwareArchive() {
                 height="200px"
                 title={t('graph.labels.title')}
                 datatype={t('graph.datatype')}
-                onClick={(evt, element) => {
+                onClick={(_evt, element) => {
                   if (!searching && element.length > 0) {
-                    var ind = element[0].index;
+                    const ind = element[0].index;
                     query.add('filters', `labels:${safeFieldValue(Object.keys(labels)[ind])}`);
                     navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                   }
@@ -480,9 +468,9 @@ export default function MalwareArchive() {
                 height="200px"
                 title={t('graph.type.title')}
                 datatype={t('graph.datatype')}
-                onClick={(evt, element) => {
+                onClick={(_evt, element) => {
                   if (!searching && element.length > 0) {
-                    var ind = element[0].index;
+                    const ind = element[0].index;
                     query.add('filters', `type:${safeFieldValue(Object.keys(types)[ind])}`);
                     navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                   }

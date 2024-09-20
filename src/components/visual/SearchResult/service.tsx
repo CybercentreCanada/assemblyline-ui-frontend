@@ -6,15 +6,14 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'components/models/base/service';
-import 'moment/locale/fr';
+import Classification from 'components/visual/Classification';
+import CustomChip from 'components/visual/CustomChip';
+import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
-import Classification from '../Classification';
-import CustomChip from '../CustomChip';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
-import InformativeAlert from '../InformativeAlert';
 
 type Props = {
   serviceResults: ServiceIndexed[];

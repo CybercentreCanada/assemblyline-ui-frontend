@@ -25,17 +25,17 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { ServiceIndexed, ServiceUpdates } from 'components/models/base/service';
-import { CustomUser } from 'components/models/ui/user';
+import type { ServiceIndexed, ServiceUpdates } from 'components/models/base/service';
+import type { CustomUser } from 'components/models/ui/user';
 import ServiceDetail from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDownloader from 'components/visual/FileDownloader';
-import { JSONFeedItem, useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
+import type { JSONFeedItem } from 'components/visual/Notification/useNotificationFeed';
+import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
 import ServiceTable from 'components/visual/SearchResult/service';
 import CommunityServiceTable from 'components/visual/ServiceManagement/CommunityServiceTable';
 import NewServiceTable from 'components/visual/ServiceManagement/NewServiceTable';
-import 'moment/locale/fr';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 
@@ -69,6 +69,14 @@ export default function Services() {
   const installingServicesTimeout = useRef<NodeJS.Timeout>(null);
 
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
+
+  const serviceNames = useMemo<string[]>(
+    () =>
+      (serviceFeeds || [])
+        .reduce((prev: string[], item) => (item?.summary ? [...prev, item.summary] : prev), [])
+        .toSorted(),
+    [serviceFeeds]
+  );
 
   const handleAddService = () => {
     apiCall({
@@ -231,12 +239,19 @@ export default function Services() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<ServiceDetail name={location.hash.slice(1)} onDeleted={onDeleted} onUpdated={onUpdated} />);
+      setGlobalDrawer(
+        <ServiceDetail
+          name={location.hash.slice(1)}
+          serviceNames={serviceNames}
+          onDeleted={onDeleted}
+          onUpdated={onUpdated}
+        />
+      );
     } else {
       closeGlobalDrawer();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
+  }, [location.hash, serviceNames]);
 
   const setService = useCallback(
     (service_name: string) => {

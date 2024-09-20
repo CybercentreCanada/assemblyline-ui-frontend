@@ -1,29 +1,21 @@
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
-import {
-  Grid,
-  IconButton,
-  MenuItem,
-  Select,
-  Skeleton,
-  Tooltip,
-  Typography,
-  TypographyProps,
-  useTheme
-} from '@mui/material';
+import type { TypographyProps } from '@mui/material';
+import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { Service as ServiceData } from 'components/models/base/service';
-import { ServiceStats as ServiceStatsData } from 'components/models/ui/service';
-import { CustomUser } from 'components/models/ui/user';
+import type { Service as ServiceData } from 'components/models/base/service';
+import type { ServiceStats as ServiceStatsData } from 'components/models/ui/service';
+import type { CustomUser } from 'components/models/ui/user';
 import LineGraph from 'components/visual/LineGraph';
 import { getVersionQuery } from 'helpers/utils';
 import 'moment/locale/fr';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
@@ -34,7 +26,7 @@ type ServiceStats = ServiceStatsData & { version: string };
 function getDescendantProp(obj, desc) {
   if (obj == null) return null;
 
-  var arr = desc.split('.');
+  const arr = desc.split('.');
   while (arr.length && (obj = obj[arr.shift()]));
   return obj;
 }
@@ -46,7 +38,7 @@ type DiffNumberProps = {
   variant?: TypographyProps['variant'];
 };
 
-function DiffNumber({ stats, comp, field, variant = 'h4' as 'h4' }: DiffNumberProps) {
+function DiffNumber({ stats, comp, field, variant = 'h4' as const }: DiffNumberProps) {
   const prop1 = getDescendantProp(stats, field);
   const prop2 = getDescendantProp(comp, field);
   const v1 = Math.round(prop1);
@@ -74,7 +66,7 @@ type CounterProps = {
   numberVariant?: TypographyProps['variant'];
 };
 
-function Counter({ stats, comp, field, titleVariant = 'h6' as 'h6', numberVariant = 'h4' as 'h4' }: CounterProps) {
+function Counter({ stats, comp, field, titleVariant = 'h6' as const, numberVariant = 'h4' as const }: CounterProps) {
   const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
   return (

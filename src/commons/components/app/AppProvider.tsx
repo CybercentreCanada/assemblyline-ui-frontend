@@ -1,19 +1,22 @@
-import { CssBaseline, PaletteMode, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
-import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
+import type { PaletteMode } from '@mui/material';
+import { CssBaseline, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
+import { BorealisProvider } from 'borealis-ui';
+import type { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
+import useThemeBuilder from 'commons/components/utils/hooks/useThemeBuilder';
 import AssistantProvider from 'components/providers/AssistantProvider';
 import CarouselProvider from 'components/providers/CarouselProvider';
 import DrawerProvider from 'components/providers/DrawerProvider';
 import { ExternalLookupProvider } from 'components/providers/ExternalLookupProvider';
 import HighlightProvider from 'components/providers/HighlightProvider';
 import i18n from 'i18n';
-import { createContext, ReactNode, useCallback, useMemo } from 'react';
-import useThemeBuilder from '../utils/hooks/useThemeBuilder';
+import type { ReactNode } from 'react';
+import { createContext, useCallback, useMemo } from 'react';
 import { AppStorageKeys } from './AppConstants';
-import { AppContextType } from './AppContexts';
+import type { AppContextType } from './AppContexts';
 import { AppDefaultsPreferencesConfigs } from './AppDefaults';
-import { AppSearchService } from './AppSearchService';
-import { AppUser, AppUserService } from './AppUserService';
+import type { AppSearchService } from './AppSearchService';
+import type { AppUser, AppUserService } from './AppUserService';
 import AppBarProvider from './providers/AppBarProvider';
 import { AppErrorProvider } from './providers/AppErrorProvider';
 import AppLayoutProvider from './providers/AppLayoutProvider';
@@ -79,23 +82,25 @@ export default function AppProvider<U extends AppUser>({
           <CssBaseline />
           <AppErrorProvider>
             <AppSnackbarProvider>
-              <AppUserProvider service={user}>
-                <AssistantProvider>
-                  <HighlightProvider>
-                    <ExternalLookupProvider>
-                      <CarouselProvider>
-                        <DrawerProvider>
-                          <AppBarProvider search={search}>
-                            <AppLeftNavProvider>
-                              <AppLayoutProvider>{children}</AppLayoutProvider>
-                            </AppLeftNavProvider>
-                          </AppBarProvider>
-                        </DrawerProvider>
-                      </CarouselProvider>
-                    </ExternalLookupProvider>
-                  </HighlightProvider>
-                </AssistantProvider>
-              </AppUserProvider>
+              <BorealisProvider baseURL={location.origin + '/api/v4/proxy/borealis'} getToken={() => null}>
+                <AppUserProvider service={user}>
+                  <AssistantProvider>
+                    <HighlightProvider>
+                      <ExternalLookupProvider>
+                        <CarouselProvider>
+                          <DrawerProvider>
+                            <AppBarProvider search={search}>
+                              <AppLeftNavProvider>
+                                <AppLayoutProvider>{children}</AppLayoutProvider>
+                              </AppLeftNavProvider>
+                            </AppBarProvider>
+                          </DrawerProvider>
+                        </CarouselProvider>
+                      </ExternalLookupProvider>
+                    </HighlightProvider>
+                  </AssistantProvider>
+                </AppUserProvider>
+              </BorealisProvider>
             </AppSnackbarProvider>
           </AppErrorProvider>
         </ThemeProvider>

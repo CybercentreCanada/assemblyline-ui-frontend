@@ -1,6 +1,7 @@
-import { createContext, ReactNode, useMemo, useState } from 'react';
-import { AppSwitcherItem } from '../AppConfigs';
-import { AppSwitcherContextType } from '../AppContexts';
+import type { ReactNode } from 'react';
+import { createContext, useMemo, useState } from 'react';
+import type { AppSwitcherItem } from '../AppConfigs';
+import type { AppSwitcherContextType } from '../AppContexts';
 import useAppConfigs from '../hooks/useAppConfigs';
 
 type AppSwitcherProviderProps = {

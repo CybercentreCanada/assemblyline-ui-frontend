@@ -17,11 +17,10 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { Service as ServiceData, ServiceConstants } from 'components/models/base/service';
-import { CustomUser } from 'components/models/ui/user';
+import type { ServiceConstants, Service as ServiceData } from 'components/models/base/service';
+import type { CustomUser } from 'components/models/ui/user';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
@@ -57,9 +56,10 @@ type ServiceProps = {
   name?: string | null;
   onDeleted?: () => void;
   onUpdated?: () => void;
+  serviceNames?: string[];
 };
 
-function Service({ name, onDeleted, onUpdated }: ServiceProps) {
+function Service({ name = null, onDeleted = () => null, onUpdated = () => null, serviceNames }: ServiceProps) {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
   const navigate = useNavigate();
@@ -132,19 +132,18 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
     // Reset tab because we are using a different service
     setTab('general');
     setVersions(null);
-    setServiceDefault(null);
     setModified(false);
 
     // Load user on start
     if (currentUser.is_admin) {
-      apiCall({
+      apiCall<ServiceData>({
         url: `/api/v4/service/${name || svc}/`,
         onSuccess: api_data => {
           setService(api_data.api_response);
           setServiceVersion(api_data.api_response.version);
         }
       });
-      apiCall({
+      apiCall<string[]>({
         url: `/api/v4/service/versions/${name || svc}/`,
         onSuccess: api_data => {
           setVersions(api_data.api_response);
@@ -155,13 +154,14 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
   }, [name]);
 
   useEffect(() => {
+    // Reset tab because we are using a different service
+    setServiceDefault(null);
+
     // Load user on start
     if (currentUser.is_admin && serviceVersion) {
-      apiCall({
+      apiCall<ServiceData>({
         url: `/api/v4/service/${name || svc}/${serviceVersion}/`,
-        onSuccess: api_data => {
-          setServiceDefault(api_data.api_response);
-        }
+        onSuccess: ({ api_response }) => setServiceDefault(api_response)
       });
     }
     // eslint-disable-next-line
@@ -174,17 +174,15 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
     // eslint-disable-next-line
   }, [serviceGeneralError]);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     // Load constants on page load
-    if (currentUser.is_admin) {
-      apiCall({
-        url: '/api/v4/service/constants/',
-        onSuccess: api_data => {
-          setConstants(api_data.api_response);
-        }
-      });
-    }
-  });
+    if (!currentUser.is_admin) return;
+    apiCall<ServiceConstants>({
+      url: '/api/v4/service/constants/',
+      onSuccess: ({ api_response }) => setConstants(api_response)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return !currentUser.is_admin ? (
     <Navigate to="/forbidden" replace />
@@ -280,13 +278,14 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
           </Paper>
           <TabPanel value="general" style={{ paddingLeft: 0, paddingRight: 0 }}>
             <ServiceGeneral
-              service={service}
-              defaults={serviceDefault}
-              setService={setService}
-              setModified={setModified}
               constants={constants}
+              defaults={serviceDefault}
+              service={service}
+              serviceNames={serviceNames}
               versions={versions}
               setError={setServiceGeneralError}
+              setModified={setModified}
+              setService={setService}
             />
           </TabPanel>
           <TabPanel value="docker" style={{ paddingLeft: 0, paddingRight: 0 }}>
@@ -346,11 +345,5 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
     </PageCenter>
   );
 }
-
-Service.defaultProps = {
-  name: null,
-  onDeleted: () => null,
-  onUpdated: () => null
-};
 
 export default Service;

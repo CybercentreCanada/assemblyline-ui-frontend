@@ -14,8 +14,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { Service } from 'components/models/base/service';
-import 'moment/locale/fr';
+import type { Service } from 'components/models/base/service';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ContainerCard from './container_card';

@@ -20,7 +20,6 @@ import {
 import FormControl from '@mui/material/FormControl';
 import { Service, UpdateSource } from 'components/models/base/service';
 import { SourceCard } from 'components/routes/manage/signature_sources';
-import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ResetButton from './reset_button';

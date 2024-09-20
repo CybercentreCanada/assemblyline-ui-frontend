@@ -1,21 +1,22 @@
-import { Configuration } from 'components/models/base/config';
+import type { Configuration } from 'components/models/base/config';
 import { getFileName } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
 import useALContext from './useALContext';
 import useMySnackbar from './useMySnackbar';
-import { WhoAmIProps } from './useMyUser';
+import type { WhoAmIProps } from './useMyUser';
+import useQuota from './useQuota';
 
 const DEFAULT_RETRY_MS = 32;
 
-export type APIResponseProps<APIResponse extends any> = {
+export type APIResponseProps<APIResponse> = {
   api_error_message: string;
   api_response: APIResponse;
   api_server_version: string;
   api_status_code: number;
 };
 
-export type DownloadResponseProps<APIResponse extends any> = {
+export type DownloadResponseProps<APIResponse> = {
   api_error_message: string;
   api_response: APIResponse;
   api_server_version: string;
@@ -29,21 +30,21 @@ export type LoginParamsProps = {
   oauth_providers: string[];
   allow_userpass_login: boolean;
   allow_signup: boolean;
-  allow_pw_rest: boolean;
+  allow_saml_login: boolean;
 };
 
-type APICallProps<SuccessData extends any, FailureData extends any> = {
+type APICallProps<SuccessData, FailureData> = {
   url: string;
   contentType?: string;
   method?: string;
-  body?: any;
+  body?: string | object;
   reloadOnUnauthorize?: boolean;
   allowCache?: boolean;
   onSuccess?: (api_data: APIResponseProps<SuccessData>) => void;
   onFailure?: (api_data: APIResponseProps<FailureData>) => void;
   onEnter?: () => void;
   onExit?: () => void;
-  onFinalize?: (api_data: APIResponseProps<any>) => void;
+  onFinalize?: (api_data: APIResponseProps<unknown>) => void;
   retryAfter?: number;
 };
 
@@ -52,11 +53,11 @@ type BootstrapProps = {
   setConfiguration: (cfg: Configuration) => void;
   setLoginParams: (params: LoginParamsProps) => void;
   setUser: (user: WhoAmIProps) => void;
-  setReady: (isReady: boolean) => void;
+  setReady: (layout: boolean, borealis: boolean) => void;
   retryAfter?: number;
 };
 
-type DownloadBlobProps<SuccessData extends any, FailureData extends any> = {
+type DownloadBlobProps<SuccessData, FailureData> = {
   url: string;
   onSuccess?: (blob: DownloadResponseProps<SuccessData>) => void;
   onFailure?: (api_data: DownloadResponseProps<FailureData>) => void;
@@ -66,29 +67,26 @@ type DownloadBlobProps<SuccessData extends any, FailureData extends any> = {
 };
 
 type UseMyAPIReturn = {
-  apiCall: <SuccessData = any, FailureData = any>(props: APICallProps<SuccessData, FailureData>) => void;
+  apiCall: <SuccessData = unknown, FailureData = unknown>(props: APICallProps<SuccessData, FailureData>) => void;
   bootstrap: (props: BootstrapProps) => void;
-  downloadBlob: <SuccessData = any, FailureData = any>(props: DownloadBlobProps<SuccessData, FailureData>) => void;
+  downloadBlob: <SuccessData = unknown, FailureData = unknown>(
+    props: DownloadBlobProps<SuccessData, FailureData>
+  ) => void;
 };
+
+const isAPIData = (value: unknown): boolean =>
+  value !== undefined &&
+  value !== null &&
+  value.hasOwnProperty('api_response') &&
+  value.hasOwnProperty('api_error_message') &&
+  value.hasOwnProperty('api_server_version') &&
+  value.hasOwnProperty('api_status_code');
 
 const useMyAPI = (): UseMyAPIReturn => {
   const { t } = useTranslation();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { configuration: systemConfig } = useALContext();
-
-  const isAPIData = (value: any): boolean => {
-    if (
-      value !== undefined &&
-      value !== null &&
-      value.hasOwnProperty('api_response') &&
-      value.hasOwnProperty('api_error_message') &&
-      value.hasOwnProperty('api_server_version') &&
-      value.hasOwnProperty('api_status_code')
-    ) {
-      return true;
-    }
-    return false;
-  };
+  const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
 
   const bootstrap = ({
     switchRenderedApp,
@@ -106,11 +104,19 @@ const useMyAPI = (): UseMyAPIReturn => {
 
     fetch('/api/v4/user/whoami/', requestOptions)
       .then(res => {
+        const apiQuota = res.headers.get('X-Remaining-Quota-Api');
+        if (apiQuota) {
+          setApiQuotaremaining(parseInt(apiQuota));
+        }
+        const submissionQuota = res.headers.get('X-Remaining-Quota-Submission');
+        if (submissionQuota) {
+          setSubmissionQuotaremaining(parseInt(submissionQuota));
+        }
         if (res.status === 502) {
           return {
             api_error_message: t('api.unreachable'),
             api_response: '',
-            api_server_version: '4.3.0.0',
+            api_server_version: '4.5.0.0',
             api_status_code: 502
           };
         }
@@ -119,10 +125,10 @@ const useMyAPI = (): UseMyAPIReturn => {
       .catch(() => ({
         api_error_message: t('api.invalid'),
         api_response: '',
-        api_server_version: '4.3.0.0',
+        api_server_version: '4.5.0.0',
         api_status_code: 400
       }))
-      .then(api_data => {
+      .then((api_data: APIResponseProps<unknown>) => {
         // eslint-disable-next-line no-prototype-builtins
         if (!isAPIData(api_data)) {
           // We got no response
@@ -131,25 +137,28 @@ const useMyAPI = (): UseMyAPIReturn => {
         } else if (api_data.api_status_code === 403) {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
           // User account is locked
-          setConfiguration(api_data.api_response);
+          setConfiguration(api_data.api_response as Configuration);
           switchRenderedApp('locked');
         } else if (api_data.api_status_code === 401) {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
           // User is not logged in
           localStorage.setItem('loginParams', JSON.stringify(api_data.api_response));
           sessionStorage.clear();
-          setLoginParams(api_data.api_response);
+          setLoginParams(api_data.api_response as LoginParamsProps);
           switchRenderedApp('login');
         } else if (api_data.api_status_code === 200) {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
+
+          const user = api_data.api_response as WhoAmIProps;
+
           // Set the current user
-          setUser(api_data.api_response);
+          setUser(user);
 
           // Mark the interface ready
-          setReady(true);
+          setReady(true, user.configuration.ui.api_proxies.includes('borealis'));
 
           // Render appropriate page
-          if (!api_data.api_response.agrees_with_tos && api_data.api_response.configuration.ui.tos) {
+          if (!user.agrees_with_tos && user.configuration.ui.tos) {
             switchRenderedApp('tos');
           } else {
             switchRenderedApp('routes');
@@ -159,19 +168,32 @@ const useMyAPI = (): UseMyAPIReturn => {
           if (api_data.api_status_code !== 503) {
             showErrorMessage(api_data.api_error_message, 30000);
           }
-          setTimeout(() => {
-            bootstrap({
-              switchRenderedApp,
-              setConfiguration,
-              setLoginParams,
-              setUser,
-              setReady,
-              retryAfter: Math.min(retryAfter * 2, 10000)
-            });
-          }, retryAfter);
-          switchRenderedApp('load');
+
+          if (
+            api_data.api_status_code === 503 &&
+            api_data.api_error_message.includes('quota') &&
+            api_data.api_error_message.includes('daily') &&
+            api_data.api_error_message.includes('API')
+          ) {
+            // Daily quota error, stop everything!
+            switchRenderedApp('quota');
+          } else {
+            // Concurent quota error ... retry
+            setTimeout(() => {
+              bootstrap({
+                switchRenderedApp,
+                setConfiguration,
+                setLoginParams,
+                setUser,
+                setReady,
+                retryAfter: Math.min(retryAfter * 2, 10000)
+              });
+            }, retryAfter);
+            switchRenderedApp('load');
+          }
         }
-      });
+      })
+      .catch(() => null);
   };
 
   const apiCall = <SuccessData, FailureData>({
@@ -195,7 +217,7 @@ const useMyAPI = (): UseMyAPIReturn => {
         'Content-Type': contentType,
         'X-XSRF-TOKEN': getXSRFCookie()
       },
-      body: body !== null ? (contentType === 'application/json' ? JSON.stringify(body) : body) : null
+      body: (!body ? null : contentType === 'application/json' ? JSON.stringify(body) : body) as BodyInit
     };
 
     // Run enter callback
@@ -204,7 +226,7 @@ const useMyAPI = (): UseMyAPIReturn => {
     // Check the cache
     const cachedURL = sessionStorage.getItem(url);
     if (allowCache && cachedURL) {
-      const apiData = JSON.parse(cachedURL);
+      const apiData = JSON.parse(cachedURL) as APIResponseProps<SuccessData>;
       if (onExit) onExit();
       onSuccess(apiData);
       if (onFinalize) onFinalize(apiData);
@@ -214,6 +236,14 @@ const useMyAPI = (): UseMyAPIReturn => {
     // Fetch the URL
     fetch(url, requestOptions)
       .then(res => {
+        const apiQuota = res.headers.get('X-Remaining-Quota-Api');
+        if (apiQuota) {
+          setApiQuotaremaining(parseInt(apiQuota));
+        }
+        const submissionQuota = res.headers.get('X-Remaining-Quota-Submission');
+        if (submissionQuota) {
+          setSubmissionQuotaremaining(parseInt(submissionQuota));
+        }
         if (res.status === 502) {
           return {
             api_error_message: t('api.unreachable'),
@@ -230,7 +260,7 @@ const useMyAPI = (): UseMyAPIReturn => {
         api_server_version: systemConfig.system.version,
         api_status_code: 400
       }))
-      .then(api_data => {
+      .then((api_data: APIResponseProps<SuccessData | FailureData>) => {
         // Run finished Callback
         if (onExit) onExit();
 
@@ -239,7 +269,13 @@ const useMyAPI = (): UseMyAPIReturn => {
         if (!isAPIData(api_data)) {
           showErrorMessage(t('api.invalid'));
           return;
-        } else if (api_data.api_status_code === 401 && reloadOnUnauthorize) {
+        } else if (
+          (api_data.api_status_code === 401 && reloadOnUnauthorize) ||
+          (api_data.api_status_code === 503 &&
+            api_data.api_error_message.includes('quota') &&
+            api_data.api_error_message.includes('daily') &&
+            api_data.api_error_message.includes('API'))
+        ) {
           // Detect login request
           // Do nothing... we are reloading the page
           window.location.reload();
@@ -277,7 +313,7 @@ const useMyAPI = (): UseMyAPIReturn => {
           // Handle errors
           // Run failure callback
           if (onFailure) {
-            onFailure(api_data);
+            onFailure(api_data as APIResponseProps<FailureData>);
           } else {
             // Default failure handler, show toast error
             showErrorMessage(api_data.api_error_message);
@@ -299,12 +335,13 @@ const useMyAPI = (): UseMyAPIReturn => {
 
           // Handle success
           // Run success callback
-          onSuccess(api_data);
+          onSuccess(api_data as APIResponseProps<SuccessData>);
         } else {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
         }
         if (onFinalize) onFinalize(api_data);
-      });
+      })
+      .catch(() => null);
   };
 
   const downloadBlob = <SuccessData, FailureData>({
@@ -327,6 +364,14 @@ const useMyAPI = (): UseMyAPIReturn => {
     // Fetch the URL
     fetch(url, requestOptions)
       .then(res => {
+        const apiQuota = res.headers.get('X-Remaining-Quota-Api');
+        if (apiQuota) {
+          setApiQuotaremaining(parseInt(apiQuota));
+        }
+        const submissionQuota = res.headers.get('X-Remaining-Quota-Submission');
+        if (submissionQuota) {
+          setSubmissionQuotaremaining(parseInt(submissionQuota));
+        }
         if (res.status === 502) {
           return {
             api_error_message: t('api.unreachable'),
@@ -355,7 +400,7 @@ const useMyAPI = (): UseMyAPIReturn => {
         api_server_version: systemConfig.system.version,
         api_status_code: 400
       }))
-      .then(api_data => {
+      .then((api_data: APIResponseProps<SuccessData | FailureData>) => {
         // Run finished Callback
         if (onExit) onExit();
 
@@ -364,7 +409,13 @@ const useMyAPI = (): UseMyAPIReturn => {
         if (!isAPIData(api_data)) {
           showErrorMessage(t('api.invalid'));
           return;
-        } else if (api_data.api_status_code === 401) {
+        } else if (
+          api_data.api_status_code === 401 ||
+          (api_data.api_status_code === 503 &&
+            api_data.api_error_message.includes('quota') &&
+            api_data.api_error_message.includes('daily') &&
+            api_data.api_error_message.includes('API'))
+        ) {
           // Detect login request
           // Do nothing... we are reloading the page
           window.location.reload();
@@ -396,7 +447,7 @@ const useMyAPI = (): UseMyAPIReturn => {
           // Handle errors
           // Run failure callback
           if (onFailure) {
-            onFailure(api_data);
+            onFailure(api_data as APIResponseProps<FailureData>);
           } else {
             // Default failure handler, show toast error
             showErrorMessage(api_data.api_error_message);
@@ -407,11 +458,12 @@ const useMyAPI = (): UseMyAPIReturn => {
 
           // Handle success
           // Run success callback
-          onSuccess(api_data);
+          onSuccess(api_data as APIResponseProps<SuccessData>);
         } else {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
         }
-      });
+      })
+      .catch(() => null);
   };
 
   return { apiCall, bootstrap, downloadBlob };

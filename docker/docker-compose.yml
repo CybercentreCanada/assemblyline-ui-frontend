@@ -14,7 +14,10 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
     environment:
-      - xpack.security.enabled=true
+      - node.name=elasticsearch
+      - cluster.name=es-docker-cluster
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
       - discovery.type=single-node
       - logger.level=WARN
       - 'ELASTIC_PASSWORD=devpass'
@@ -54,7 +57,7 @@ services:
 
   # Create test data
   create_test_data:
-    image: cccs/assemblyline-core:4.3.stable
+    image: cccs/assemblyline-core:4.5.stable
     environment:
       DEV_ADMIN_PASS: $DEV_ADMIN_PASS
       DEV_USER_PASS: $DEV_USER_PASS
@@ -68,7 +71,7 @@ services:
 
   # UI
   al_ui:
-    image: cccs/assemblyline-ui:4.3.stable
+    image: cccs/assemblyline-ui:4.5.stable
     ports:
       - '5000:5000'
     volumes:
@@ -81,7 +84,7 @@ services:
 
   # SocketIO Server
   al_socketio:
-    image: cccs/assemblyline-socketio:4.3.stable
+    image: cccs/assemblyline-socketio:4.5.stable
     ports:
       - '5002:5002'
     volumes:
@@ -93,6 +96,27 @@ services:
         condition: service_healthy
 
   # # #####################################
+  # # Elasticsearch Components
+  # # #####################################
+
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.10.2
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
+  #   ports:
+  #     - 5601:5601
+  #   environment:
+  #     - node.name=kibana
+  #     - cluster.name=es-docker-cluster
+  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  #   healthcheck:
+  #     test: ['CMD-SHELL', "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'"]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 120
+
+  # # #####################################
   # # Test Components
   # # (Only to receive heartbeat
   # #  message for the dashboard)
@@ -100,7 +124,7 @@ services:
 
   # Hearbeat manager
   # al_heartbeat:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -110,7 +134,7 @@ services:
   #       condition: service_healthy
 
   # al_alerter:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -121,7 +145,7 @@ services:
 
   # # Expiry
   # al_expiry:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -131,7 +155,7 @@ services:
   #       condition: service_healthy
 
   # al_dispatcher_files:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -141,7 +165,7 @@ services:
   #       condition: service_healthy
 
   # al_dispatcher_submissions:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -152,7 +176,7 @@ services:
 
   # # Ingester Processes
   # al_ingester_ingest:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -162,7 +186,7 @@ services:
   #       condition: service_healthy
 
   # al_ingester_internal:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -172,7 +196,7 @@ services:
   #       condition: service_healthy
 
   # al_ingester_submit:
-  #   image: cccs/assemblyline-core:4.3.stable
+  #   image: cccs/assemblyline-core:4.5.stable
   #   volumes:
   #     - ./config.yml:/etc/assemblyline/config.yml:ro
   #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
@@ -180,6 +204,10 @@ services:
   #   depends_on:
   #     elasticsearch:
   #       condition: service_healthy
+
+volumes:
+  data:
+    driver: local
 
 networks:
   default:

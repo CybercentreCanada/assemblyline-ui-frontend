@@ -7,10 +7,9 @@ import useALContext from 'components/hooks/useALContext';
 import { WorkflowIndexed } from 'components/models/base/workflow';
 import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
-import 'moment/locale/fr';
+import Moment from 'components/visual/Moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import {
   DivTable,
@@ -65,16 +64,10 @@ const WrappedWorflowTable: React.FC<Props> = ({ workflowResults, setWorkflowID =
                 hover
               >
                 <DivTableCell>
-                  <Moment fromNow locale={i18n.language}>
-                    {workflow.creation_date}
-                  </Moment>
+                  <Moment variant="fromNow">{workflow.creation_date}</Moment>
                 </DivTableCell>
                 <DivTableCell>
-                  {workflow.last_seen && (
-                    <Moment fromNow locale={i18n.language}>
-                      {workflow.last_seen}
-                    </Moment>
-                  )}
+                  {workflow.last_seen && <Moment variant="fromNow">{workflow.last_seen}</Moment>}
                 </DivTableCell>
                 <DivTableCell>{workflow.name}</DivTableCell>
                 <DivTableCell>{workflow.priority}</DivTableCell>

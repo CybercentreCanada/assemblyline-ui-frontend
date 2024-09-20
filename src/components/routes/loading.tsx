@@ -1,9 +1,9 @@
 import { CircularProgress } from '@mui/material';
-import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import useAppBannerVert from 'commons/components/app/hooks/useAppBannerVert';
 import { memo } from 'react';
 
 const WrappedLoadingScreen = ({ showImage = true }) => {
-  const banner = useAppBanner();
+  const banner = useAppBannerVert();
   return (
     <div
       style={{

@@ -34,6 +34,7 @@ import {
 import FileDetail from 'components/visual/FileDetail';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import LineGraph from 'components/visual/LineGraph';
+import Moment from 'components/visual/Moment';
 import MonacoEditor from 'components/visual/MonacoEditor';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -42,10 +43,8 @@ import SearchResultCount from 'components/visual/SearchResultCount';
 import SteppedProgress from 'components/visual/SteppedProgress';
 import { TabContainer } from 'components/visual/TabContainer';
 import { safeFieldValue } from 'helpers/utils';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { RetrohuntRepeat } from './repeat';
@@ -446,27 +445,31 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                           {retrohunt ? retrohunt.description : <Skeleton />}
                         </Grid>
 
-                        <Grid item xs={4} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{t('details.search')}</span>
-                        </Grid>
-                        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                          {retrohunt ? (
-                            (() => {
-                              switch (retrohunt?.indices) {
-                                case 'hot':
-                                  return t('details.hot');
-                                case 'archive':
-                                  return t('details.archive');
-                                case 'hot_and_archive':
-                                  return t('details.hot_and_archive');
-                                default:
-                                  return null;
-                              }
-                            })()
-                          ) : (
-                            <Skeleton />
-                          )}
-                        </Grid>
+                        {configuration?.datastore?.archive?.enabled && (
+                          <>
+                            <Grid item xs={4} sm={3} lg={2}>
+                              <span style={{ fontWeight: 500 }}>{t('details.search')}</span>
+                            </Grid>
+                            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                              {retrohunt ? (
+                                (() => {
+                                  switch (retrohunt?.indices) {
+                                    case 'hot':
+                                      return t('details.hot');
+                                    case 'archive':
+                                      return t('details.archive');
+                                    case 'hot_and_archive':
+                                      return t('details.hot_and_archive');
+                                    default:
+                                      return null;
+                                  }
+                                })()
+                              ) : (
+                                <Skeleton />
+                              )}
+                            </Grid>
+                          </>
+                        )}
 
                         <Grid item xs={4} sm={3} lg={2}>
                           <span style={{ fontWeight: 500 }}>{t('details.creator')}</span>
@@ -481,22 +484,9 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                         <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
                           {retrohunt ? (
                             <>
-                              <Moment
-                                format={
-                                  i18n.language === 'en'
-                                    ? 'MMMM Do YYYY'
-                                    : i18n.language === 'fr'
-                                    ? 'Do MMMM YYYY'
-                                    : 'MMMM Do YYYY'
-                                }
-                                locale={i18n.language}
-                              >
-                                {retrohunt.created_time}
-                              </Moment>
+                              <Moment variant="localeDate">{retrohunt.created_time}</Moment>
                               {' ('}
-                              <Moment fromNow locale={i18n.language}>
-                                {retrohunt.created_time}
-                              </Moment>
+                              <Moment variant="fromNow">{retrohunt.created_time}</Moment>
                               {')'}
                             </>
                           ) : (
@@ -510,22 +500,9 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                         <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
                           {retrohunt ? (
                             <>
-                              <Moment
-                                format={
-                                  i18n.language === 'en'
-                                    ? 'MMMM Do YYYY'
-                                    : i18n.language === 'fr'
-                                    ? 'Do MMMM YYYY'
-                                    : 'MMMM Do YYYY'
-                                }
-                                locale={i18n.language}
-                              >
-                                {retrohunt.expiry_ts}
-                              </Moment>
+                              <Moment variant="localeDate">{retrohunt.expiry_ts}</Moment>
                               {' ('}
-                              <Moment fromNow locale={i18n.language}>
-                                {retrohunt.expiry_ts}
-                              </Moment>
+                              <Moment variant="fromNow">{retrohunt.expiry_ts}</Moment>
                               {')'}
                             </>
                           ) : (
@@ -601,7 +578,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                           'tags' in retrohunt &&
                           Object.keys(retrohunt.tags).length > 0 &&
                           Object.keys(retrohunt.tags).map((key, i) => (
-                            <Grid item>
+                            <Grid key={i} item>
                               <CustomChip
                                 key={'tag-' + i}
                                 type="round"
@@ -804,11 +781,9 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                                     >
                                       <DivTableCell>
                                         <Tooltip title={file.seen.last}>
-                                          <>
-                                            <Moment fromNow locale={i18n.language}>
-                                              {file.seen.last}
-                                            </Moment>
-                                          </>
+                                          <div>
+                                            <Moment variant="fromNow">{file.seen.last}</Moment>
+                                          </div>
                                         </Tooltip>
                                       </DivTableCell>
                                       <DivTableCell>{file.seen.count}</DivTableCell>

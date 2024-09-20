@@ -7,6 +7,7 @@ import Skeleton from '@mui/material/Skeleton';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
 import { useEffect, useState } from 'react';
@@ -52,6 +53,7 @@ export default function ApiDoc() {
   const [apiList, setApiList] = useState(null);
   const [apiSelected, setApiSelected] = useState(null);
   const [apiDefinition, setApiDefinition] = useState(null);
+  const { configuration } = useALContext();
   const classes = useStyles();
   const [expandMap, setExpandMap] = useState({});
   const theme = useTheme();
@@ -305,6 +307,20 @@ export default function ApiDoc() {
                                   )}
                                 </Grid>
                               </>
+                              {configuration.ui.enforce_quota && (
+                                <>
+                                  <Grid item xs={12} sm={4} md={3} lg={2}>
+                                    <div style={{ fontWeight: 500 }}>{t('quota')}:</div>
+                                  </Grid>
+                                  <Grid item xs={12} sm={8} md={9} lg={4}>
+                                    {api.count_towards_quota ? (
+                                      <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
+                                    ) : (
+                                      <ClearOutlinedIcon htmlColor={theme.palette.error.main} />
+                                    )}
+                                  </Grid>
+                                </>
+                              )}
                               <>
                                 <Grid item xs={12} sm={4} md={3} lg={2}>
                                   <div style={{ fontWeight: 500 }}>{t('require_role')}:</div>

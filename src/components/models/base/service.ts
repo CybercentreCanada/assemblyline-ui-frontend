@@ -39,8 +39,8 @@ export type SignatureDelimiter = keyof typeof SIGNATURE_DELIMITERS;
  * @param type Type of parameter
  * @param value Default value (must match value in `default` field)
  */
-export type ServiceParameter =
-  | {
+export type ServiceParameter<T extends 'bool' | 'int' | 'str' | 'list'> = T extends 'bool'
+  ? {
       type: 'bool';
       hide: boolean | 'true' | 'false';
       name: string;
@@ -48,7 +48,8 @@ export type ServiceParameter =
       default: boolean | 'true' | 'false';
       list?: string[];
     }
-  | {
+  : T extends 'int'
+  ? {
       type: 'int';
       hide: boolean | 'true' | 'false';
       name: string;
@@ -56,7 +57,8 @@ export type ServiceParameter =
       default: number;
       list?: string[];
     }
-  | {
+  : T extends 'str'
+  ? {
       type: 'str';
       hide: boolean | 'true' | 'false';
       name: string;
@@ -64,24 +66,26 @@ export type ServiceParameter =
       default: string;
       list?: string[];
     }
-  | {
+  : T extends 'list'
+  ? {
       type: 'list';
       hide: boolean | 'true' | 'false';
       name: string;
       value: string;
       default: string;
-      list: string[];
-    };
+      list?: string[];
+    }
+  : unknown;
 
 // TODO check the default value
-export const DEFAULT_SERVICE_PARAMETER: ServiceParameter = {
+export const DEFAULT_SERVICE_PARAMETER: ServiceParameter<'bool'> = {
   name: '',
   type: 'bool',
   default: 'false',
   value: 'false',
   list: [],
   hide: 'false'
-} as any;
+};
 
 /** Default service specific settings */
 export type ServiceSpecification = {
@@ -89,13 +93,16 @@ export type ServiceSpecification = {
   name: string;
 
   /** Service parameters */
-  params: ServiceParameter[];
+  params: ServiceParameter<any>[];
 };
 
 /** Selected services */
 export type SelectedService = {
   /** Which category does this service belong to? */
   category?: DefaultServiceSelected;
+
+  /** Description of service */
+  description: string;
 
   /** Does this service perform analysis outside of Assemblyline? */
   is_external?: boolean;
@@ -137,6 +144,9 @@ export type DockerConfig = {
 
   /** Complete name of the Docker image with tag, may include registry */
   image: string;
+
+  /** Additional container labels. */
+  labels: EnvironmentVariable[];
 
   /** What operating system does this container run under? */
   operating_system?: OperatingSystem;
@@ -340,6 +350,9 @@ export type Service = {
 
   /** Should the service be able to talk to core infrastructure or just service-server for tasking? */
   privileged: boolean;
+
+  /** List of service names/categories where recursion is prevented. */
+  recursion_prevention?: string[];
 
   /** Regex to reject files as identified by Assemblyline */
   rejects?: string;

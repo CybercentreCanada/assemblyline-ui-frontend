@@ -1,8 +1,9 @@
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
-import { createContext, ReactElement, useMemo } from 'react';
+import type { ReactElement } from 'react';
+import { createContext, useMemo } from 'react';
 import { AppStorageKeys } from '../AppConstants';
-import { AppQuickSearchContextType } from '../AppContexts';
-import { AppSearchService } from '../AppSearchService';
+import type { AppQuickSearchContextType } from '../AppContexts';
+import type { AppSearchService } from '../AppSearchService';
 import useAppConfigs from '../hooks/useAppConfigs';
 import AppSearchServiceProvider from './AppSearchServiceProvider';
 

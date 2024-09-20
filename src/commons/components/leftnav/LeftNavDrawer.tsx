@@ -20,7 +20,7 @@ import LeftNavGroup from 'commons/components/leftnav/LeftNavGroup';
 import LeftNavItem from 'commons/components/leftnav/LeftNavItem';
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AppLeftNavGroup, AppLeftNavItem } from '../app/AppConfigs';
+import type { AppLeftNavGroup, AppLeftNavItem } from '../app/AppConfigs';
 import AppName from '../topnav/AppName';
 
 const StyledDrawer = styled(Drawer, { shouldForwardProp: prop => prop !== 'open' && prop !== 'width' })<{

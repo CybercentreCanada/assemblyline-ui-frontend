@@ -4,7 +4,7 @@ import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
-import { UserIndexed } from 'components/models/base/user';
+import type { UserIndexed } from 'components/models/base/user';
 import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import {
@@ -16,10 +16,9 @@ import {
   LinkRow,
   SortableHeaderCell
 } from 'components/visual/DivTable';
-import 'moment/locale/fr';
+import InformativeAlert from 'components/visual/InformativeAlert';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import InformativeAlert from '../InformativeAlert';
 
 type Props = {
   userResults: SearchResult<UserIndexed>;

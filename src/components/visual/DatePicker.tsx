@@ -14,6 +14,10 @@ interface DatePickerProps {
   tooltip?: string;
   type?: 'button' | 'input';
   defaultDateOffset?: number | null;
+  textFieldProps?: any;
+  minDateTomorrow?: boolean;
+  maxDateToday?: boolean;
+  disabled?: boolean;
 }
 
 function WrappedDatePicker({
@@ -21,10 +25,15 @@ function WrappedDatePicker({
   setDate,
   tooltip = null,
   type = 'button',
-  defaultDateOffset = null
+  defaultDateOffset = null,
+  textFieldProps = {},
+  minDateTomorrow = false,
+  maxDateToday = false,
+  disabled = false
 }: DatePickerProps) {
   const [tempDate, setTempDate] = React.useState(null);
   const [tomorrow, setTomorrow] = React.useState(null);
+  const [today, setToday] = React.useState(null);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -32,10 +41,15 @@ function WrappedDatePicker({
   const { t } = useTranslation();
 
   useEffectOnce(() => {
-    const temp = new Date();
-    temp.setDate(temp.getDate() + 1);
-    temp.setHours(0, 0, 0, 0);
-    setTomorrow(moment(temp));
+    const tempTomorrow = new Date();
+    tempTomorrow.setDate(tempTomorrow.getDate() + 1);
+    tempTomorrow.setHours(0, 0, 0, 0);
+    setTomorrow(moment(tempTomorrow));
+
+    const tempToday = new Date();
+    tempToday.setDate(tempToday.getDate() + 1);
+    tempToday.setHours(0, 0, 0, 0);
+    setToday(moment(tempToday));
   });
 
   useEffect(() => {
@@ -44,8 +58,10 @@ function WrappedDatePicker({
       defaultDate.setDate(defaultDate.getDate() + defaultDateOffset);
       defaultDate.setHours(0, 0, 0, 0);
       setTempDate(moment(defaultDate));
-    } else {
+    } else if (date) {
       setTempDate(moment(date));
+    } else if (date === undefined || date === null) {
+      setTempDate(null);
     }
   }, [date, defaultDateOffset]);
 
@@ -72,7 +88,8 @@ function WrappedDatePicker({
                 setTempDate(newValue);
               }}
               renderInput={params => <TextField {...params} />}
-              minDate={tomorrow}
+              minDate={minDateTomorrow ? tomorrow : null}
+              maxDate={maxDateToday ? today : null}
             />
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
               <Button
@@ -116,7 +133,6 @@ function WrappedDatePicker({
             setTempDate(newValue);
             setDate(newValue && newValue.isValid() ? `${newValue.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null);
           }}
-          // renderInput={params => <TextField {...params} />}
           renderInput={({ inputRef, inputProps, InputProps }) => (
             <TextField
               size="small"
@@ -124,9 +140,12 @@ function WrappedDatePicker({
               ref={inputRef}
               inputProps={{ ...inputProps }}
               InputProps={{ ...InputProps }}
+              {...textFieldProps}
             />
           )}
-          minDate={tomorrow}
+          minDate={minDateTomorrow ? tomorrow : null}
+          maxDate={maxDateToday ? today : null}
+          disabled={disabled}
         />
       )}
     </LocalizationProvider>

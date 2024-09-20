@@ -22,7 +22,6 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import { Author, Comment, DEFAULT_COMMENT } from 'components/models/base/file';
 import CommentCard from 'components/visual/CommentCard';
 import SectionContainer from 'components/visual/SectionContainer';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { io } from 'socket.io-client';

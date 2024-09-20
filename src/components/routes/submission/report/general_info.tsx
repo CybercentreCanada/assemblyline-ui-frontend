@@ -1,12 +1,13 @@
 import { Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { BodyFormat, SectionBody } from 'components/models/base/result_body';
-import { TSubmissionReport } from 'components/models/ui/submission_report';
-import { ImageInlineBody } from 'components/visual/image_inline';
+import type { BodyFormat, SectionBody } from 'components/models/base/result_body';
+import type { TSubmissionReport } from 'components/models/ui/submission_report';
+import Moment from 'components/visual/Moment';
 import { GraphBody } from 'components/visual/ResultCard/graph_body';
-import React, { ReactNode } from 'react';
+import { ImageInlineBody } from 'components/visual/image_inline';
+import type { ReactNode } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 
 const useStyles = makeStyles(theme => ({
   divider: {
@@ -140,7 +141,7 @@ function WrappedGeneralInformation({ report }: Props) {
             <span style={{ fontWeight: 500 }}>{t('submission.date')}</span>
           </Grid>
           <Grid item xs={8} sm={9} lg={10}>
-            {report ? <Moment date={report.times.submitted} /> : <Skeleton />}
+            {report ? <Moment>{report.times.submitted}</Moment> : <Skeleton />}
           </Grid>
 
           <Grid item xs={4} sm={3} lg={2}>

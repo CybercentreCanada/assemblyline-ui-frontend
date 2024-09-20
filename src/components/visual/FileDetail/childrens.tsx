@@ -4,7 +4,6 @@ import makeStyles from '@mui/styles/makeStyles';
 import { Childrens } from 'components/models/ui/file';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SectionContainer from 'components/visual/SectionContainer';
-import 'moment/locale/fr';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';

@@ -5,15 +5,9 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import type { SubmissionIndexed } from 'components/models/base/submission';
 import type { SearchResult } from 'components/models/ui/search';
+import type { SubmissionParams } from 'components/routes/submissions';
 import Classification from 'components/visual/Classification';
-import SubmissionState from 'components/visual/SubmissionState';
-import Verdict from 'components/visual/Verdict';
-import { maxLenStr } from 'helpers/utils';
-import 'moment/locale/fr';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
-import { Link } from 'react-router-dom';
+import CustomChip from 'components/visual/CustomChip';
 import {
   DivTable,
   DivTableBody,
@@ -22,8 +16,16 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from '../DivTable';
-import InformativeAlert from '../InformativeAlert';
+} from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import Moment from 'components/visual/Moment';
+import { useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
+import SubmissionState from 'components/visual/SubmissionState';
+import Verdict from 'components/visual/Verdict';
+import { maxLenStr } from 'helpers/utils';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 type Props = {
   submissionResults: SearchResult<SubmissionIndexed>;
@@ -33,6 +35,7 @@ type Props = {
 const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
+  const searchParams = useSearchParams<SubmissionParams>();
 
   return submissionResults ? (
     submissionResults.total !== 0 ? (
@@ -79,16 +82,35 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
               >
                 <DivTableCell>
                   <Tooltip title={submission.times.submitted}>
-                    <>
-                      <Moment fromNow locale={i18n.language} date={submission.times.submitted} />
-                    </>
+                    <div>
+                      <Moment variant="fromNow">{submission.times.submitted}</Moment>
+                    </div>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>
                   <Verdict score={submission.max_score} fullWidth />
                 </DivTableCell>
                 <DivTableCell breakable>{maxLenStr(submission.params.description, 150)}</DivTableCell>
-                <DivTableCell style={{ whiteSpace: 'nowrap' }}>{submission.params.submitter}</DivTableCell>
+                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
+                  {!searchParams ? (
+                    submission.params.submitter
+                  ) : (
+                    <CustomChip
+                      label={submission.params.submitter}
+                      variant="outlined"
+                      size="small"
+                      type="rounded"
+                      onClick={event => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        searchParams?.setSearchObject(o => ({
+                          ...o,
+                          filters: [...o.filters, `params.submitter:"${submission.params.submitter}"`]
+                        }));
+                      }}
+                    />
+                  )}
+                </DivTableCell>
                 <DivTableCell>{submission.file_count}</DivTableCell>
                 {c12nDef && c12nDef.enforce && (
                   <DivTableCell>

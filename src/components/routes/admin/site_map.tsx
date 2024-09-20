@@ -1,5 +1,7 @@
+import DataUsageOutlinedIcon from '@mui/icons-material/DataUsageOutlined';
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
 import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
+import type { Theme } from '@mui/material';
 import {
   Paper,
   Skeleton,
@@ -9,7 +11,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Theme,
   Typography,
   useTheme
 } from '@mui/material';
@@ -17,14 +18,14 @@ import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { Role } from 'components/models/base/user';
-import { SiteMap as TSiteMap } from 'components/models/ui';
-import { CustomUser } from 'components/models/ui/user';
-import { PossibleColor } from 'components/models/utils/color';
+import type { Role } from 'components/models/base/user';
+import type { SiteMap } from 'components/models/ui';
+import type { CustomUser } from 'components/models/ui/user';
+import type { PossibleColor } from 'components/models/utils/color';
 import CustomChip from 'components/visual/CustomChip';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 
@@ -44,13 +45,14 @@ const StyledTableCell = withStyles((theme: Theme) =>
   })
 )(TableCell);
 
-export default function SiteMap() {
+export default function SiteMapPage() {
   const { t } = useTranslation(['adminSiteMap']);
   const theme = useTheme();
+  const { configuration } = useALContext();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [siteMap, setSiteMap] = useState<TSiteMap>(null);
+  const [siteMap, setSiteMap] = useState<SiteMap>(null);
 
   const reqMapColor: Record<Role, PossibleColor> = {
     signature_import: 'success',
@@ -90,17 +92,16 @@ export default function SiteMap() {
     retrohunt_view: 'default'
   };
 
-  useEffectOnce(() => {
+  useEffect(() => {
     if (currentUser.is_admin) {
-      apiCall({
+      apiCall<SiteMap>({
         method: 'GET',
         url: '/api/site_map/',
-        onSuccess: api_data => {
-          setSiteMap(api_data.api_response);
-        }
+        onSuccess: api_data => setSiteMap(api_data.api_response)
       });
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser.is_admin]);
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
@@ -121,6 +122,7 @@ export default function SiteMap() {
                 <StyledTableCell>{t('header.function')}</StyledTableCell>
                 <StyledTableCell>{t('header.methods')}</StyledTableCell>
                 <StyledTableCell>{t('header.protected')}</StyledTableCell>
+                {configuration.ui.enforce_quota && <StyledTableCell>{t('header.quota')}</StyledTableCell>}
                 <StyledTableCell>{t('header.roles')}</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -139,6 +141,11 @@ export default function SiteMap() {
                       <NoEncryptionOutlinedIcon color="error" />
                     )}
                   </StyledTableCell>
+                  {configuration.ui.enforce_quota && (
+                    <StyledTableCell>
+                      {path.count_towards_quota && <DataUsageOutlinedIcon color="primary" />}
+                    </StyledTableCell>
+                  )}
                   <StyledTableCell>
                     {path.required_type &&
                       path.required_type.map((req, rid) => (

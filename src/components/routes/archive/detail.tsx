@@ -5,8 +5,11 @@ import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { Section } from 'components/models/base/result';
+import type { Section } from 'components/models/base/result';
 import type { File } from 'components/models/ui/file';
+import ForbiddenPage from 'components/routes/403';
+import NotFoundPage from 'components/routes/404';
+import AISummarySection from 'components/routes/submission/detail/ai_summary';
 import {
   ArchiveBanner,
   ArchivedTagSection,
@@ -35,9 +38,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation, useParams } from 'react-router-dom';
-import ForbiddenPage from '../403';
-import NotFoundPage from '../404';
-import AISummarySection from '../submission/detail/ai_summary';
 
 type Params = {
   id?: string;

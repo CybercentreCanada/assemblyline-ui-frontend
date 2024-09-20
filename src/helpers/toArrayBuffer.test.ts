@@ -1,5 +1,5 @@
-import { describe, expect, it } from '@jest/globals';
 import toArrayBuffer from 'helpers/toArrayBuffer';
+import { describe, expect, it } from 'vitest';
 
 describe('Test `toArrayBuffer`', () => {
   it('Should return a uint8array', () => {

@@ -1,5 +1,5 @@
-import { ErrorType } from '../base/error';
-import { StatResult } from './search';
+import type { ErrorType } from 'components/models/base/error';
+import type { StatResult } from './search';
 
 /** Get statistics for a service */
 export type ServiceStats = {

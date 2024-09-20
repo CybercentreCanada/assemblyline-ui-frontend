@@ -1,8 +1,10 @@
 export const INDEX_CATAGORIES = ['hot', 'archive', 'hot_and_archive'] as const;
 export const PHASE = ['filtering', 'yara', 'finished'] as const;
+export const STEP = ['Starting', 'Filtering', 'Yara', 'Finished'] as const;
 
 export type IndexCategory = (typeof INDEX_CATAGORIES)[number];
 export type Phase = (typeof PHASE)[number];
+export type Step = (typeof STEP)[number];
 
 /** A search run on stored files. */
 export type Retrohunt = {
@@ -115,7 +117,11 @@ export type RetrohuntIndexed = Pick<
   | 'start_group'
   | 'started_time'
   | 'truncated'
->;
+> & {
+  step?: Step;
+  total_hits?: number;
+  progress?: number;
+};
 
 export const DEFAULT_RETROHUNT: Partial<Retrohunt> = {
   archive_only: false,

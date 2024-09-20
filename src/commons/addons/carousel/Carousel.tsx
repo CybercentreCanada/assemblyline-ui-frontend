@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react';
 
 // TODO: Add in the commons
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   container: {
     outline: 'none'
   }

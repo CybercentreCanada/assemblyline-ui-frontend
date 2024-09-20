@@ -1,5 +1,6 @@
 import { Info } from '@mui/icons-material';
-import { Box, Stack, StackProps, Typography } from '@mui/material';
+import type { StackProps } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 export default function AppListEmpty(props: StackProps) {

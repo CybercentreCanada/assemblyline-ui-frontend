@@ -20,10 +20,10 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useSafeResults from 'components/hooks/useSafeResults';
 import { AlternateResult, FileResult } from 'components/models/base/result';
 import Classification from 'components/visual/Classification';
+import Moment from 'components/visual/Moment';
 import Verdict from 'components/visual/Verdict';
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import ExtractedSection from './ResultCard/extracted';
 import ResultSection from './ResultCard/result_section';
 import SupplementarySection from './ResultCard/supplementary';
@@ -206,7 +206,7 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
                 onClick={handlePopperClick}
                 style={{ fontSize: 'smaller' }}
               >
-                <Moment fromNow>{displayedResult.created}</Moment>
+                <Moment variant="fromNow">{displayedResult.created}</Moment>
               </Button>
             ) : (
               <Typography
@@ -214,7 +214,7 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
                 variant="button"
                 style={{ fontSize: 'smaller', paddingRight: theme.spacing(1.4) }}
               >
-                <Moment fromNow>{displayedResult.created}</Moment>
+                <Moment variant="fromNow">{displayedResult.created}</Moment>
               </Typography>
             )}
           </div>

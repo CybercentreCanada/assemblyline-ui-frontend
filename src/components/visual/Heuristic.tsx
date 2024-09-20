@@ -76,10 +76,10 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
       )}
       <CustomChip
         wrap
-        variant={safe ? 'outlined' : 'filled'}
+        variant="outlined"
         size="tiny"
         type="rounded"
-        color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
+        color={highlight_key && isHighlighted(highlight_key) ? 'primary' : color}
         label={show_type ? (signature ? `[SIGNATURE] ${text}` : `[HEURISTIC] ${text}`) : text}
         style={STYLE}
         onClick={highlight_key ? handleClick : null}

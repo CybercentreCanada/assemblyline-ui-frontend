@@ -2,10 +2,10 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Box, Collapse, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { Error } from 'components/models/base/error';
+import type { Error } from 'components/models/base/error';
+import Moment from 'components/visual/Moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -71,10 +71,8 @@ const ErrorCard: React.FC<Props> = ({ error }) => {
         ) : (
           <small style={{ flexGrow: 1 }}></small>
         )}
-        <small>
-          <Moment className={classes.muted} fromNow>
-            {error.created}
-          </Moment>
+        <small className={classes.muted}>
+          <Moment variant="fromNow">{error.created}</Moment>
         </small>
         {open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />}
       </Box>

@@ -1,12 +1,27 @@
-import { AppSwitcherItem } from 'commons/components/app/AppConfigs';
-import { ACL, Role, Type } from './user';
+import type { AppSwitcherItem } from 'commons/components/app/AppConfigs';
+import type { ACL, Role, Type } from './user';
 
 export const API_PRIV = ['READ', 'READ_WRITE', 'WRITE', 'CUSTOM', 'EXTENDED'] as const;
 export const AUTO_PROPERTY_TYPES = ['access', 'classification', 'type', 'role', 'remove_role', 'group'];
 export const BANNER_LEVELS = ['info', 'warning', 'success', 'error'] as const;
 export const DOWNLOAD_ENCODINGS = ['raw', 'cart'] as const;
 export const EXTERNAL_LINK_TYPES = ['hash', 'metadata', 'tag'] as const;
+export const HASH_PATTERN_MAP = ['sha256', 'sha1', 'md5', 'tlsh', 'ssdeep', 'url'] as const;
 export const KUBERNETES_LABEL_OPS = ['In', 'NotIn', 'Exists', 'DoesNotExist'] as const;
+export const METADATA_FIELDTYPE_MAP = [
+  'boolean',
+  'date',
+  'domain',
+  'email',
+  'enum',
+  'integer',
+  'ip',
+  'keyword',
+  'list',
+  'regex',
+  'text',
+  'uri'
+] as const;
 export const REGISTRY_TYPES = ['docker', 'harbor'] as const;
 export const SAFELIST_HASH_TYPES = ['sha1', 'sha256', 'md5'] as const;
 export const SERVICE_CATEGORIES = [
@@ -28,7 +43,9 @@ export type AutoPropertyType = (typeof AUTO_PROPERTY_TYPES)[number];
 export type BannerLevel = (typeof BANNER_LEVELS)[number];
 export type DownloadEncoding = (typeof DOWNLOAD_ENCODINGS)[number];
 export type ExternalLinkType = (typeof EXTERNAL_LINK_TYPES)[number];
+export type HashPatternMap = (typeof HASH_PATTERN_MAP)[number];
 export type KubernetesLabelOps = (typeof KUBERNETES_LABEL_OPS)[number];
+export type MetadataFieldTypeMap = (typeof METADATA_FIELDTYPE_MAP)[number];
 export type RegistryType = (typeof REGISTRY_TYPES)[number];
 export type SafelistHashType = (typeof SAFELIST_HASH_TYPES)[number];
 export type ServiceCategory = (typeof SERVICE_CATEGORIES)[number];
@@ -49,6 +66,78 @@ export type Auth = {
 
   /** Allow security tokens? */
   allow_security_tokens: boolean;
+};
+
+/** Malware Archive Configuration */
+export type ArchiverMetadata = {
+  /** Default value for the metadata */
+  default?: string;
+
+  /** Can the user provide a custom value */
+  editable: boolean;
+
+  /** List of possible values to pick from */
+  values: string[];
+};
+
+/** Named Value */
+export type NamedValue = {
+  /** Name */
+  name: string;
+
+  /** Value */
+  value: string;
+};
+
+/** Webhook Configuration */
+export type Webhook = {
+  /** CA cert for source */
+  ca_cert?: string;
+
+  /** Headers */
+  headers: NamedValue[];
+
+  /** HTTP method used to access webhook */
+  method: string;
+
+  /** Password used to authenticate with source */
+  password?: string;
+
+  /** Proxy server for source */
+  proxy?: string;
+
+  /** Number of retries */
+  retries: number;
+
+  /** Ignore SSL errors when reaching out to source? */
+  ssl_ignore_errors: boolean;
+
+  /** URI to source */
+  uri: string;
+
+  /** Username used to authenticate with source */
+  username?: string;
+};
+
+/** Malware Archive Configuration */
+export type Archiver = {
+  /** Alternate number of days to keep the data in the malware archive. (0: Disabled, will keep data forever)*/
+  alternate_dtl: number;
+
+  /** Proxy configuration that is passed to Python Requests */
+  metadata: Record<string, ArchiverMetadata>;
+
+  /** List of minimum required service before archiving takes place */
+  minimum_required_services: string[];
+
+  /** Should the UI ask form metadata to be filed out when archiving */
+  use_metadata: boolean;
+
+  /** Should the archiving go through the webhook prior to actually trigger the archiving function */
+  use_webhook?: boolean;
+
+  /** Webhook to call before triggering the archiving process */
+  webhook?: unknown;
 };
 
 /** Ingester Configuration */
@@ -74,6 +163,9 @@ export type Scaler = {
 
 /** Core Component Configuration */
 export type Core = {
+  /** Configuration for the permanent submission archive */
+  archiver: Archiver;
+
   /** Configuration for Ingester */
   ingester: Ingester;
 
@@ -205,6 +297,9 @@ export type UI = {
   /** Allow user to download files as password protected ZIPs? */
   allow_zip_downloads: boolean;
 
+  /** Proxy requests to the configured API target and add headers */
+  api_proxies: string[];
+
   /** Hogwarts App data */
   apps: AppSwitcherItem[];
 
@@ -216,6 +311,9 @@ export type UI = {
 
   /** Banner message level */
   banner_level: BannerLevel;
+
+  /** Feed of all the services built by the Assemblyline community. */
+  community_feed: string;
 
   /** Which encoding will be used for downloads? */
   download_encoding: DownloadEncoding;
@@ -260,6 +358,69 @@ export type UI = {
   url_submission_auto_service_selection: string[];
 };
 
+/** A file source entry for remote fetching via string */
+export type FileSource = {
+  /** Should we force the source to be auto-selected for the user ? */
+  auto_selected: string[];
+
+  /** Custom types to regex pattern definition for input detection/validation */
+  pattern: string;
+
+  /** File Source */
+  sources: string[];
+};
+
+/** Metadata configuration */
+export type Metadata = {
+  /** Field name aliases that map over to the field. */
+  aliases: string[];
+
+  /** Default value for the field */
+  default?: any;
+
+  /** Is this field required? */
+  required: boolean;
+
+  /** Key in redis where to get the suggestions from */
+  suggestion_key?: string;
+
+  /** List of suggestions for this field */
+  suggestions: string[];
+
+  /** Configuration parameters to apply to validator */
+  validator_params: Record<string, any>;
+
+  /** Type of validation to apply to metadata value */
+  validator_type: MetadataFieldTypeMap;
+};
+
+/** Configuration for metadata compliance with APIs */
+export type MetadataConfig = {
+  /** Metadata specification for archiving */
+  archive: Record<string, Metadata>;
+
+  /** Metadata specification for certain ingestion based on ingest_type */
+  ingest: Record<string, Metadata>;
+
+  /** A list of metadata schemes with strict rules (ie. no extra/unknown metadata). ""Values can be: `archive`, `submit`, or one of the schemes under `ingest`. */
+  strict_schemes: string[];
+
+  /** Metadata specification for submission */
+  submit: Record<string, Metadata>;
+};
+
+/** Options regarding all submissions, regardless of their input method */
+export type TagTypes = {
+  /** Attribution tags */
+  attribution: string[];
+
+  /** Behaviour tags */
+  behavior: string[];
+
+  /** IOC tags */
+  ioc: string[];
+};
+
 /** Minimum score value to get the specified verdict, otherwise the file is considered safe. */
 export type Verdicts = {
   /** Minimum score for the verdict to be Informational. */
@@ -275,18 +436,6 @@ export type Verdicts = {
   malicious: number;
 };
 
-/** Options regarding all submissions, regardless of their input method */
-export type TagTypes = {
-  /** Attribution tags */
-  attribution: string[];
-
-  /** Behaviour tags */
-  behavior: string[];
-
-  /** IOC tags */
-  ioc: string[];
-};
-
 /** Default values for parameters for submissions that may be overridden on a per submission basis */
 export type Submission = {
   /** How many extracted files may be added to a submission? */
@@ -297,6 +446,9 @@ export type Submission = {
 
   /** Number of days submissions will remain in the system by default */
   dtl: number;
+
+  /** List of external source to fetch file */
+  file_sources: Record<HashPatternMap, FileSource>;
 
   /** Maximum number of days submissions will remain in the system */
   max_dtl: number;
@@ -309,6 +461,9 @@ export type Submission = {
 
   /** Maximum length for each metadata values */
   max_metadata_length: number;
+
+  /** Metadata compliance rules */
+  metadata: MetadataConfig;
 
   /** List of external source to fetch file via their SHA256 hashes */
   sha256_sources: string[];
@@ -342,6 +497,9 @@ export type User = {
 export type Configuration = {
   /** Authentication module configuration */
   auth: Auth;
+
+  /** Core component configuration */
+  core: Core;
 
   /** Datastore configuration */
   datastore: Datastore;

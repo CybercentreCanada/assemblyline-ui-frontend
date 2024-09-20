@@ -5,11 +5,6 @@ import useALContext from 'components/hooks/useALContext';
 import type { Heuristic } from 'components/models/base/heuristic';
 import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
-import 'moment/locale/fr';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
-import { Link } from 'react-router-dom';
 import {
   DivTable,
   DivTableBody,
@@ -18,8 +13,12 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from '../DivTable';
-import InformativeAlert from '../InformativeAlert';
+} from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import Moment from 'components/visual/Moment';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 type Props = {
   heuristicResults: SearchResult<Heuristic>;
@@ -83,9 +82,7 @@ const WrappedHeuristicsTable: React.FC<Props> = ({ heuristicResults, setHeuristi
                 <DivTableCell>{heuristic.stats ? heuristic.stats.count || 0 : 0}</DivTableCell>
                 <DivTableCell>
                   {heuristic.stats && heuristic.stats.last_hit ? (
-                    <Moment fromNow locale={i18n.language}>
-                      {heuristic.stats.last_hit}
-                    </Moment>
+                    <Moment variant="fromNow">{heuristic.stats.last_hit}</Moment>
                   ) : (
                     t('never')
                   )}

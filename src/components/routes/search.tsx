@@ -1,7 +1,8 @@
 import ArchiveIcon from '@mui/icons-material/Archive';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
-import { IconButton, Paper, Tab, Tabs, Theme, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import type { Theme } from '@mui/material';
+import { IconButton, Paper, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -15,9 +16,9 @@ import type { ResultIndexed } from 'components/models/base/result';
 import type { RetrohuntIndexed } from 'components/models/base/retrohunt';
 import type { SignatureIndexed } from 'components/models/base/signature';
 import type { SubmissionIndexed } from 'components/models/base/submission';
-import { Role } from 'components/models/base/user';
+import type { Role } from 'components/models/base/user';
 import type { SearchResult } from 'components/models/ui/search';
-import { Indexes } from 'components/models/ui/user';
+import type { Indexes } from 'components/models/ui/user';
 import Empty from 'components/visual/Empty';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -31,7 +32,8 @@ import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { searchResultsDisplay } from 'helpers/utils';
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useLocation, useParams } from 'react-router-dom';
@@ -78,7 +80,7 @@ type Params = {
   id: string;
 };
 
-function Search({ index }: Props) {
+function Search({ index = null }: Props) {
   const { id } = useParams<Params>();
   const { t } = useTranslation(['search']);
   const [pageSize] = useState<number>(PAGE_SIZE);
@@ -425,9 +427,5 @@ function Search({ index }: Props) {
     </PageFullWidth>
   );
 }
-
-Search.defaultProps = {
-  index: null
-};
 
 export default Search;

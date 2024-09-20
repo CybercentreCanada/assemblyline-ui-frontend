@@ -5,13 +5,7 @@ import useALContext from 'components/hooks/useALContext';
 import type { Safelist } from 'components/models/base/safelist';
 import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
-import { maxLenStr } from 'helpers/utils';
-import 'moment/locale/fr';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
-import { Link } from 'react-router-dom';
-import CustomChip from '../CustomChip';
+import CustomChip from 'components/visual/CustomChip';
 import {
   DivTable,
   DivTableBody,
@@ -20,8 +14,13 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from '../DivTable';
-import InformativeAlert from '../InformativeAlert';
+} from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import Moment from 'components/visual/Moment';
+import { maxLenStr } from 'helpers/utils';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 type Props = {
   safelistResults: SearchResult<Safelist>;
@@ -75,11 +74,9 @@ const WrappedSafelistTable: React.FC<Props> = ({ safelistResults, setSafelistID 
               >
                 <DivTableCell>
                   <Tooltip title={sl_item.added}>
-                    <>
-                      <Moment fromNow locale={i18n.language}>
-                        {sl_item.added}
-                      </Moment>
-                    </>
+                    <div>
+                      <Moment variant="fromNow">{sl_item.added}</Moment>
+                    </div>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>{sl_item.type}</DivTableCell>

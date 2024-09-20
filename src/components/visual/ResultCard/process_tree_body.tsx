@@ -4,9 +4,10 @@ import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import SettingsEthernetOutlinedIcon from '@mui/icons-material/SettingsEthernetOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import { TreeItem, TreeView } from '@mui/lab';
 import { Theme, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useSafeResults from 'components/hooks/useSafeResults';
@@ -105,9 +106,11 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
 type ProcessTreeItemProps = {
   process: ProcessTreeData;
   force?: boolean;
+  index?: number;
+  depth?: number;
 };
 
-const ProcessTreeItem = ({ process, force = false }: ProcessTreeItemProps) => {
+const ProcessTreeItem = ({ process, index = 0, depth = 0, force = false }: ProcessTreeItemProps) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useTreeItemStyles();
   const { showSafeResults } = useSafeResults();
@@ -120,7 +123,7 @@ const ProcessTreeItem = ({ process, force = false }: ProcessTreeItemProps) => {
 
   return process.safelisted && process.children.length === 0 && !showSafeResults && !force ? null : (
     <TreeItem
-      nodeId={process.process_pid.toString()}
+      itemId={`${process.process_pid}-${index}-${depth}`}
       classes={{
         root: classes.root
       }}
@@ -198,7 +201,7 @@ const ProcessTreeItem = ({ process, force = false }: ProcessTreeItemProps) => {
         </div>
       }
     >
-      {process.children.length !== 0 && <ProcessTreeItemList processes={process.children} />}
+      {process.children.length !== 0 && <ProcessTreeItemList processes={process.children} depth={depth + 1} />}
     </TreeItem>
   );
 };
@@ -206,12 +209,13 @@ const ProcessTreeItem = ({ process, force = false }: ProcessTreeItemProps) => {
 type ProcessTreeItemListProps = {
   processes: ProcessTreeData[];
   force?: boolean;
+  depth?: number;
 };
 
-const ProcessTreeItemList = ({ processes, force = false }: ProcessTreeItemListProps) => (
+const ProcessTreeItemList = ({ processes, depth = 0, force = false }: ProcessTreeItemListProps) => (
   <>
     {processes.map((process, id) => (
-      <ProcessTreeItem key={id} process={process} force={force} />
+      <ProcessTreeItem key={id} process={process} index={id} depth={depth} force={force} />
     ))}
   </>
 );
@@ -241,13 +245,15 @@ const WrappedProcessTreeBody = ({ body, force = false }: Props) => {
 
     return (
       <div style={{ overflowX: 'auto' }}>
-        <TreeView
-          defaultExpanded={expanded}
-          defaultCollapseIcon={<ExpandMoreIcon />}
-          defaultExpandIcon={<ChevronRightIcon />}
+        <SimpleTreeView
+          defaultExpandedItems={expanded}
+          slots={{
+            collapseIcon: ExpandMoreIcon,
+            expandIcon: ChevronRightIcon
+          }}
         >
           <ProcessTreeItemList processes={body} force={force} />
-        </TreeView>
+        </SimpleTreeView>
       </div>
     );
   } catch (ex) {

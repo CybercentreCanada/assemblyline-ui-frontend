@@ -17,23 +17,29 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import { DEFAULT_SERVICE_PARAMETER, ServiceParameter } from 'components/models/base/service';
+import type { ServiceParameter } from 'components/models/base/service';
+import { DEFAULT_SERVICE_PARAMETER } from 'components/models/base/service';
 import CustomChip from 'components/visual/CustomChip';
-import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type MultiTypeParamProps = {
-  param?: ServiceParameter;
+type MultiTypeParamProps<T extends 'bool' | 'int' | 'str' | 'list'> = {
+  param?: ServiceParameter<T>;
   id?: number;
-  onAdd?: (param: ServiceParameter) => void;
-  onUpdate?: (param: ServiceParameter, id: number) => void;
+  onAdd?: (param: ServiceParameter<T>) => void;
+  onUpdate?: (param: ServiceParameter<T>, id: number) => void;
   onDelete?: (id: number) => void;
 };
 
-const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTypeParamProps) => {
+const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
+  param = null,
+  id = null,
+  onAdd = () => null,
+  onUpdate = () => null,
+  onDelete = () => null
+}: MultiTypeParamProps<T>) => {
   const { t } = useTranslation(['adminServices']);
-  const [tempUserParams, setTempUserParams] = useState<ServiceParameter>(DEFAULT_SERVICE_PARAMETER);
+  const [tempUserParams, setTempUserParams] = useState<ServiceParameter<T>>(DEFAULT_SERVICE_PARAMETER);
   const theme = useTheme();
 
   const handleSubmissionParamUpdate = event => {
@@ -118,8 +124,9 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
   };
 
   const renderParamLabelTags = (values: string[]) => {
-    return values.map(value => (
+    return values.map((value, i) => (
       <CustomChip
+        key={i}
         label={
           <div style={{ display: 'flex' }}>
             {value === param.default ? (
@@ -144,8 +151,9 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
   };
 
   const renderSPLabelTags = (values: string[]) => {
-    return values.map(value => (
+    return values.map((value, i) => (
       <CustomChip
+        key={i}
         label={
           <div style={{ display: 'flex' }}>
             {value === tempUserParams.default ? (
@@ -332,14 +340,6 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
       </Grid>
     </Grid>
   );
-};
-
-WrappedMultiTypeParam.defaultProps = {
-  param: null,
-  id: null,
-  onAdd: () => null,
-  onUpdate: () => null,
-  onDelete: () => null
 };
 
 const MultiTypeParam = React.memo(WrappedMultiTypeParam);

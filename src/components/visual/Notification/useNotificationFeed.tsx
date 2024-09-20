@@ -30,8 +30,8 @@ export type JSONFeedItem = {
   summary?: string;
   image?: string;
   banner_image?: string;
-  date_published?: Date;
-  date_modified?: Date;
+  date_published?: string;
+  date_modified?: string;
   authors?: Array<JSONFeedAuthor>;
   tags?: Array<'new' | 'current' | 'dev' | 'service' | 'blog' | 'community'>;
   language?: string;
@@ -99,8 +99,8 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
       summary: null,
       image: null,
       banner_image: null,
-      date_published: new Date(0),
-      date_modified: new Date(0),
+      date_published: null,
+      date_modified: null,
       authors: [],
       tags: [],
       language: null,
@@ -192,7 +192,7 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
         }
 
         const textResponse: string = await response.text();
-        const jsonFeed = JSON.parse(textResponse);
+        const jsonFeed = JSON.parse(textResponse) as unknown;
         resolve(parseJSONFeed(jsonFeed));
         return;
       }),

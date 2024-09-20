@@ -16,11 +16,9 @@ import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import {
   Alert,
-  Autocomplete,
   DialogContentText,
   FormControl,
   FormControlLabel,
-  FormLabel,
   Grid,
   IconButton,
   LinearProgress,
@@ -34,7 +32,6 @@ import {
   Skeleton,
   Snackbar,
   Stack,
-  TextField,
   Tooltip,
   Typography,
   useTheme
@@ -46,28 +43,31 @@ import useDrawer from 'components/hooks/useDrawer';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { ArchiverMetadata } from 'components/models/base/config';
-import { ParsedErrors } from 'components/models/base/error';
-import { ParsedSubmission, Submission } from 'components/models/base/submission';
-import { Configuration } from 'components/models/ui/help';
-import { LiveStatus, OutstandingServices, WatchQueue } from 'components/models/ui/live';
-import { SubmissionSummary, SubmissionTags, SubmissionTree } from 'components/models/ui/submission';
+import type { ArchiverMetadata } from 'components/models/base/config';
+import type { ParsedErrors } from 'components/models/base/error';
+import type { ParsedSubmission, Submission } from 'components/models/base/submission';
+import type { Configuration } from 'components/models/ui/help';
+import type { LiveStatus, OutstandingServices, WatchQueue } from 'components/models/ui/live';
+import type { MultipleKeys } from 'components/models/ui/result';
+import type { SubmissionSummary, SubmissionTags, SubmissionTree } from 'components/models/ui/submission';
+import ForbiddenPage from 'components/routes/403';
+import HeuristicDetail from 'components/routes/manage/heuristic_detail';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
 import Detection from 'components/visual/FileDetail/detection';
 import FileDownloader from 'components/visual/FileDownloader';
+import MetadataInputField from 'components/visual/MetadataInputField';
 import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
-import { setNotifyFavicon, toTitleCase } from 'helpers/utils';
+import { setNotifyFavicon } from 'helpers/utils';
 import moment from 'moment';
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
-import io, { Socket } from 'socket.io-client';
-import ForbiddenPage from '../403';
-import HeuristicDetail from '../manage/heuristic_detail';
+import type { Socket } from 'socket.io-client';
+import io from 'socket.io-client';
 import AISummarySection from './detail/ai_summary';
 import AttackSection from './detail/attack';
 import ErrorSection from './detail/errors';
@@ -76,9 +76,9 @@ import InfoSection from './detail/info';
 import MetaSection from './detail/meta';
 import TagSection from './detail/tags';
 
-const NAMESPACE = '/live_submission' as const;
-const MESSAGE_TIMEOUT = 5000 as const;
-const OUTSTANDING_TRIGGER_COUNT = 4 as const;
+const NAMESPACE = '/live_submission';
+const MESSAGE_TIMEOUT = 5000;
+const OUTSTANDING_TRIGGER_COUNT = 4;
 
 type ParamProps = {
   id: string;
@@ -111,7 +111,7 @@ const incrementReducer = (old: number, increment: number) => {
 };
 
 function WrappedSubmissionDetail() {
-  const { t } = useTranslation(['submissionDetail']);
+  const { t, i18n } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -145,6 +145,40 @@ function WrappedSubmissionDetail() {
   const [archivingMetadata, setArchivingMetadata] = useState<Record<string, ArchiverMetadata>>(
     systemConfig.core.archiver.metadata
   );
+
+  // const { t, i18n } = useTranslation(['submissionDetail']);
+  // const theme = useTheme();
+  // const location = useLocation();
+  // const navigate = useNavigate();
+  // const { addInsight, removeInsight } = useAssistant();
+  // const { apiCall } = useMyAPI();
+  // const { id, fid } = useParams<ParamProps>();
+  // const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
+  // const { setHighlightMap } = useHighlighter();
+  // const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+  // const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
+
+  // const [submission, setSubmission] = useState(null);
+  // const [summary, setSummary] = useState(null);
+  // const [tree, setTree] = useState(null);
+  // const [filtered, setFiltered] = useState(false);
+  // const [partial, setPartial] = useState(false);
+  // const [watchQueue, setWatchQueue] = useState(null);
+  // const [configuration, setConfiguration] = useState(null);
+  // const [liveErrors, setLiveErrors] = useState(null);
+  // const [liveTagMap, setLiveTagMap] = useState(null);
+  // const [outstanding, setOutstanding] = useState(null);
+  // const [liveStatus, setLiveStatus] = useState<'queued' | 'processing' | 'rescheduled'>('queued');
+  // const [socket, setSocket] = useState(null);
+  // const [loadInterval, setLoadInterval] = useState(null);
+  // const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState(0);
+  // const [deleteDialog, setDeleteDialog] = useState(false);
+  // const [archiveDialog, setArchiveDialog] = useState(false);
+  // const [waitingDialog, setWaitingDialog] = useState(false);
+  // const [resubmitAnchor, setResubmitAnchor] = useState(null);
+  // const [baseFiles, setBaseFiles] = useState([]);
+  // const [archivingMetadata, setArchivingMetadata] = useState({});
+
   const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState('false');
 
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
@@ -154,6 +188,7 @@ function WrappedSubmissionDetail() {
   const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
 
   const sp4 = theme.spacing(4);
+
   const popoverOpen = Boolean(resubmitAnchor);
 
   const updateLiveSumary = (results: object) => {
@@ -300,7 +335,7 @@ function WrappedSubmissionDetail() {
     });
     setLiveTagMap(tempTagMap as any);
     setHighlightMap(tempTagMap as any);
-    setSummary(tempSummary as any);
+    setSummary(tempSummary);
   };
 
   const updateLiveFileTree = (results: object) => {
@@ -492,11 +527,10 @@ function WrappedSubmissionDetail() {
 
   const archive = useCallback(() => {
     if (submission != null) {
-      const data = Object.fromEntries(Object.entries(archivingMetadata).map(([k, v]) => [k, v.default]));
-      apiCall({
+      apiCall<{ success: boolean; action: 'archive' | 'resubmit'; sid: string }>({
         method: 'PUT',
         url: `/api/v4/archive/${submission.sid}/${archivingUseAlternateDtl === 'true' ? '?use_alternate_dtl' : ''}`,
-        body: data,
+        body: archivingMetadata,
         onSuccess: api_data => {
           if (api_data.api_response.success) {
             showSuccessMessage(
@@ -521,7 +555,7 @@ function WrappedSubmissionDetail() {
 
   const resubmit = useCallback(() => {
     if (submission != null) {
-      apiCall({
+      apiCall<Submission>({
         url: `/api/v4/submit/resubmit/${submission.sid}/`,
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
@@ -541,7 +575,7 @@ function WrappedSubmissionDetail() {
 
   const resubmitDynamic = useCallback(() => {
     if (submission != null) {
-      apiCall({
+      apiCall<Submission>({
         url: `/api/v4/submit/dynamic/${submission.files[0].sha256}/?copy_sid=${submission.sid}`,
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
@@ -594,7 +628,7 @@ function WrappedSubmissionDetail() {
   const setVerdict = useCallback(
     verdict => {
       if (submission != null && submission.verdict[verdict].indexOf(currentUser.username) === -1) {
-        apiCall({
+        apiCall<{ success: boolean }>({
           method: 'PUT',
           url: `/api/v4/submission/verdict/${submission.sid}/${verdict}/`,
           onSuccess: api_data => {
@@ -629,6 +663,22 @@ function WrappedSubmissionDetail() {
     [currentUser.username, submission]
   );
 
+  const loadDefaultArchivingMetadata = () => {
+    // Load the default archiving metadata
+    if (systemConfig.submission.metadata && systemConfig.submission.metadata.archive) {
+      const tempMeta = {};
+      for (const metaKey in systemConfig.submission.metadata.archive) {
+        const metaConfig = systemConfig.submission.metadata.archive[metaKey];
+        if (metaConfig.default !== null) {
+          tempMeta[metaKey] = metaConfig.default;
+        }
+      }
+      if (tempMeta) {
+        setArchivingMetadata(submission ? { ...tempMeta, ...submission.metadata } : tempMeta);
+      }
+    }
+  };
+
   useEffect(() => {
     if (currentUser.roles.includes('submission_view')) {
       apiCall<Configuration>({
@@ -644,6 +694,29 @@ function WrappedSubmissionDetail() {
         }
       });
     }
+    return () => {
+      setSubmission(null);
+      setSummary(null);
+      setTree(null);
+      setFiltered(false);
+      setPartial(false);
+      setWatchQueue(null);
+      setConfiguration(null);
+      setLiveErrors(null);
+      setLiveTagMap(null);
+      setOutstanding(null);
+      setLiveStatus('queued');
+      setSocket(null);
+      setLoadInterval(null);
+      setLastSuccessfulTrigger(0);
+      setDeleteDialog(false);
+      setArchiveDialog(false);
+      setWaitingDialog(false);
+      setResubmitAnchor(null);
+      setBaseFiles([]);
+      setArchivingMetadata({});
+      setArchivingUseAlternateDtl('false');
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -677,6 +750,9 @@ function WrappedSubmissionDetail() {
             }
           }
         });
+
+        // Load the default values for the archiving metadata
+        loadDefaultArchivingMetadata();
       } else {
         if (!socket) {
           // eslint-disable-next-line no-console
@@ -719,7 +795,7 @@ function WrappedSubmissionDetail() {
     data => {
       // eslint-disable-next-line no-console
       console.debug(`SocketIO :: onError => ${data.msg}`);
-      apiCall({
+      apiCall<{ wq_id: string }>({
         url: `/api/v4/live/setup_watch_queue/${id}/`,
         onSuccess: summ_data => {
           setWatchQueue(summ_data.api_response.wq_id);
@@ -749,7 +825,7 @@ function WrappedSubmissionDetail() {
         setLoadInterval(null);
         setOutstanding(null);
         // Loading final submission
-        apiCall({
+        apiCall<Submission>({
           url: `/api/v4/submission/${id}/`,
           onSuccess: api_data => {
             setSubmission(parseSubmissionErrors(api_data.api_response));
@@ -858,6 +934,10 @@ function WrappedSubmissionDetail() {
   }, [fid, location.hash, setGlobalDrawer]);
 
   useEffect(() => {
+    if (!fid && !location.hash) setGlobalDrawer(null);
+  }, [fid, location.hash, setGlobalDrawer]);
+
+  useEffect(() => {
     if (!fid && !globalDrawerOpened && location.hash) {
       navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
@@ -876,7 +956,7 @@ function WrappedSubmissionDetail() {
       console.debug(`LIVE :: New Results: ${newResults.join(' | ')} - New Errors: ${newErrors.join(' | ')}`);
       setLiveErrors(getParsedErrors(liveErrorKeys));
 
-      apiCall({
+      apiCall<MultipleKeys>({
         method: 'POST',
         url: '/api/v4/result/multiple_keys/',
         body: { error: newErrors, result: newResults },
@@ -898,12 +978,12 @@ function WrappedSubmissionDetail() {
       apiCall<OutstandingServices>({
         url: `/api/v4/live/outstanding_services/${id}/`,
         onSuccess: api_data => {
-          let newLiveStatus: 'processing' | 'rescheduled' | 'queued' = 'processing' as 'processing';
+          let newLiveStatus: 'processing' | 'rescheduled' | 'queued' = 'processing' as const;
           // Set live status based on outstanding services output
           if (api_data.api_response === null) {
-            newLiveStatus = 'rescheduled' as 'rescheduled';
+            newLiveStatus = 'rescheduled' as const;
           } else if (Object.keys(api_data.api_response).length === 0) {
-            newLiveStatus = 'queued' as 'queued';
+            newLiveStatus = 'queued' as const;
           }
 
           setOutstanding(api_data.api_response);
@@ -959,7 +1039,7 @@ function WrappedSubmissionDetail() {
         open={archiveDialog}
         handleClose={() => {
           setArchiveDialog(false);
-          setTimeout(() => setArchivingMetadata(systemConfig.core.archiver.metadata), 250);
+          setTimeout(() => loadDefaultArchivingMetadata(), 250);
         }}
         handleAccept={archive}
         title={t('archive.title')}
@@ -987,37 +1067,43 @@ function WrappedSubmissionDetail() {
                       <FormControlLabel
                         value={'true'}
                         control={<Radio />}
-                        label={moment().from(
-                          new Date().getTime() - systemConfig.core.archiver.alternate_dtl * 24 * 60 * 60 * 1000
-                        )}
+                        label={moment()
+                          .locale(i18n.language)
+                          .from(new Date().getTime() - systemConfig.core.archiver.alternate_dtl * 24 * 60 * 60 * 1000)}
                       />
                     </RadioGroup>
                   </FormControl>
                 </Stack>
               </>
             )}
-            {Object.keys(archivingMetadata).length !== 0 && systemConfig.core.archiver.use_metadata && (
+            {Object.keys(systemConfig.submission.metadata.archive).length !== 0 && (
               <>
                 <DialogContentText>{t('archive.metadata')}</DialogContentText>
                 <Stack spacing={1}>
-                  {Object.keys(archivingMetadata).map(metakey => (
-                    <FormControl key={metakey} size="small" fullWidth>
-                      <FormLabel>{toTitleCase(metakey)}</FormLabel>
-                      <Autocomplete
-                        value={archivingMetadata[metakey].default}
-                        freeSolo={archivingMetadata[metakey].editable}
-                        onChange={(event, newValue) =>
-                          setArchivingMetadata({
-                            ...archivingMetadata,
-                            [metakey]: { ...archivingMetadata[metakey], default: newValue }
-                          })
+                  {Object.entries(systemConfig.submission.metadata.archive).map(([field_name, field_cfg]) => (
+                    <MetadataInputField
+                      key={field_name}
+                      name={field_name}
+                      configuration={field_cfg}
+                      value={archivingMetadata[field_name]}
+                      onChange={v => {
+                        const cleanMetadata = archivingMetadata;
+                        if (v === undefined || v === null || v === '') {
+                          // Remove field from metadata if value is null
+                          delete cleanMetadata[field_name];
+                        } else {
+                          // Otherwise add/overwrite value
+                          cleanMetadata[field_name] = v;
                         }
-                        size="small"
-                        fullWidth
-                        options={archivingMetadata[metakey].values}
-                        renderInput={params => <TextField {...params} />}
-                      />
-                    </FormControl>
+                        setArchivingMetadata({ ...cleanMetadata });
+                      }}
+                      onReset={() => {
+                        const cleanMetadata = archivingMetadata;
+                        delete cleanMetadata[field_name];
+                        setArchivingMetadata({ ...cleanMetadata });
+                      }}
+                      disabled={submission ? Object.keys(submission.metadata).includes(field_name) : false}
+                    />
                   ))}
                 </Stack>
               </>
@@ -1025,7 +1111,9 @@ function WrappedSubmissionDetail() {
           </>
         }
         waiting={waitingDialog}
-        unacceptable={Object.keys(archivingMetadata).some(metakey => !archivingMetadata[metakey].default)}
+        unacceptable={Object.keys(systemConfig.submission.metadata.archive)
+          .filter(metakey => systemConfig.submission.metadata.archive[metakey].required)
+          .some(metakey => !Object.keys(archivingMetadata).includes(metakey))}
       />
       {outstanding && Object.keys(outstanding).length > 0 && (
         <Snackbar
@@ -1387,7 +1475,7 @@ function WrappedSubmissionDetail() {
           classification={submission ? submission.classification : null}
         />
         {systemConfig.ui.ai.enabled && settings.executive_summary && submission && submission.state === 'completed' && (
-          <AISummarySection type={'submission' as 'submission'} id={submission.sid} />
+          <AISummarySection type={'submission' as const} id={submission.sid} />
         )}
         <Detection
           section_map={summary ? summary.heuristic_sections : null}

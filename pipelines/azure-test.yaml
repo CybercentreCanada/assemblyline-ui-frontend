@@ -35,10 +35,15 @@ jobs:
 
       - script: |
           set -xv  # Echo commands before they are run
-          npm run ci
+          npm run ci-test
         displayName: Test
 
-      - task: PublishCodeCoverageResults@1
+      - script: |
+          set -xv  # Echo commands before they are run
+          npm run ci-lint
+        displayName: ESLint
+
+      - task: PublishCodeCoverageResults@2
         inputs:
           codeCoverageTool: Cobertura
           summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml

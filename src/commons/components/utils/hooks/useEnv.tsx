@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-const APP_ENV = process.env;
+const APP_ENV = import.meta.env;
 
 export default function useAppEnv(key?: string) {
   return useMemo(() => {

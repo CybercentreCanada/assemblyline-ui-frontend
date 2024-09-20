@@ -1,4 +1,4 @@
-import {
+import type {
   AppLeftNavConfigs,
   AppPreferenceConfigs,
   AppSiteMapConfigs,
@@ -14,6 +14,8 @@ export const AppDefaultsPreferencesConfigs: AppPreferenceConfigs = {
   appIconLight: null,
   bannerDark: null,
   bannerLight: null,
+  bannerVertDark: null,
+  bannerVertLight: null,
   defaultLayout: 'side',
   defaultTheme: 'dark',
   defaultShowBreadcrumbs: true,

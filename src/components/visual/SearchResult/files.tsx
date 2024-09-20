@@ -6,10 +6,9 @@ import useALContext from 'components/hooks/useALContext';
 import type { FileIndexed } from 'components/models/base/file';
 import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
-import 'moment/locale/fr';
+import Moment from 'components/visual/Moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import {
   DivTable,
@@ -71,11 +70,9 @@ const WrappedFilesTable: React.FC<Props> = ({ fileResults, allowSort = true }) =
               >
                 <DivTableCell>
                   <Tooltip title={file.seen.last}>
-                    <>
-                      <Moment fromNow locale={i18n.language}>
-                        {file.seen.last}
-                      </Moment>
-                    </>
+                    <div>
+                      <Moment variant="fromNow">{file.seen.last}</Moment>
+                    </div>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>{file.seen.count}</DivTableCell>

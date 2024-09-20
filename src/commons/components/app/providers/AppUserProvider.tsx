@@ -1,5 +1,6 @@
-import { createContext, ReactNode } from 'react';
-import { AppUser, AppUserService } from '../AppUserService';
+import type { ReactNode } from 'react';
+import { createContext } from 'react';
+import type { AppUser, AppUserService } from '../AppUserService';
 
 type AppUserProviderProps<U extends AppUser> = {
   service: AppUserService<U>;

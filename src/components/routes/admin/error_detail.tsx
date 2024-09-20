@@ -11,15 +11,14 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { Error } from 'components/models/base/error';
-import { CustomUser } from 'components/models/ui/user';
+import type { Error as ErrorModel } from 'components/models/base/error';
+import type { CustomUser } from 'components/models/ui/user';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import FileDownloader from 'components/visual/FileDownloader';
-import 'moment/locale/fr';
+import Moment from 'components/visual/Moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import Moment from 'react-moment';
 import { Navigate } from 'react-router';
 import { Link, useLocation, useParams } from 'react-router-dom';
 
@@ -33,6 +32,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+interface Error extends ErrorModel {
+  key: string;
+}
+
 type ParamProps = {
   key?: string;
   type?: string;
@@ -44,8 +47,8 @@ type ErrorDetailProps = {
   error_key?: string;
 };
 
-export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
-  const { t, i18n } = useTranslation(['adminErrorViewer']);
+export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
+  const { t } = useTranslation(['adminErrorViewer']);
   const classes = useStyles();
   const theme = useTheme();
   const { copy } = useClipboard();
@@ -76,7 +79,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
 
   useEffect(() => {
     if ((error_key || key) && currentUser.is_admin) {
-      apiCall({
+      apiCall<Error>({
         url: `/api/v4/error/${error_key || key}/`,
         onSuccess: api_data => {
           setError({ key: error_key || key, ...api_data.api_response });
@@ -109,9 +112,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
             <Grid item xs={12} sm={4}>
               <div style={{ display: 'inline-block', textAlign: 'start' }}>
                 <Typography component="div" variant="body1">
-                  <Moment fromNow locale={i18n.language}>
-                    {error.created}
-                  </Moment>
+                  <Moment variant="fromNow">{error.created}</Moment>
                 </Typography>
                 <Typography component="div" variant="caption">
                   <Moment format="YYYY-MM-DD HH:mm:ss">{error.created}</Moment>
@@ -202,10 +203,6 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
   ) : (
     <Navigate to="/forbidden" replace />
   );
-};
-
-ErrorDetail.defaultProps = {
-  error_key: null
 };
 
 export default ErrorDetail;

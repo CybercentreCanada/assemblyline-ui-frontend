@@ -28,17 +28,17 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { UpdateSource } from 'components/models/base/service';
-import { CustomUser } from 'components/models/ui/user';
+import type { UpdateSource } from 'components/models/base/service';
+import type { CustomUser } from 'components/models/ui/user';
+import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiGitBranch } from 'react-icons/di';
-import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
-import ForbiddenPage from '../403';
 import { SourceDetail } from './signature_sources_details';
 
 const useStyles = makeStyles(theme => ({
@@ -415,11 +415,9 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
               <div>
                 <span className={classes.card_caption}>{t('update.label.last_successful')}:&nbsp;</span>
                 <Tooltip title={source.status.last_successful_update}>
-                  <>
-                    <Moment className={classes.card_caption} fromNow locale={i18n.language}>
-                      {source.status.last_successful_update}
-                    </Moment>
-                  </>
+                  <div className={classes.card_caption}>
+                    <Moment variant="fromNow">{source.status.last_successful_update}</Moment>
+                  </div>
                 </Tooltip>
               </div>
               <Tooltip title={`${source.status.message} @ ${source.status.ts}`}>

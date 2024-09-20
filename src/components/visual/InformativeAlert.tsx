@@ -1,7 +1,6 @@
 import { Alert, alpha, Theme } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
-import 'moment/locale/fr';
 
 const StyledAlert = withStyles((theme: Theme) =>
   createStyles({
