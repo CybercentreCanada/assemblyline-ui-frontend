@@ -5,7 +5,10 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import type { Heuristic } from 'components/models/base/heuristic';
+import { DEFAULT_STATS, type Statistic } from 'components/models/base/statistic';
 import type { CustomUser } from 'components/models/ui/user';
+import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import Histogram from 'components/visual/Histogram';
 import Moment from 'components/visual/Moment';
@@ -14,44 +17,6 @@ import { safeFieldValueURI } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
-import ForbiddenPage from '../403';
-
-export type Heuristic = {
-  attack_id: string[];
-  avg: number;
-  classification: string;
-  count: number;
-  description: string;
-  filetype: string;
-  heur_id: string;
-  max: number;
-  max_score: number;
-  min: number;
-  name: string;
-  score: number;
-  signature_score_map: {
-    [key: string]: number;
-  };
-  stats: Statistics;
-};
-
-export type Statistics = {
-  avg: number;
-  min: number;
-  max: number;
-  count: number;
-  sum: number;
-  last_hit: string;
-  first_hit: string;
-};
-
-type ParamProps = {
-  id: string;
-};
-
-type HeuristicDetailProps = {
-  heur_id?: string;
-};
 
 const useStyles = makeStyles(theme => ({
   preview: {
@@ -75,14 +40,12 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const defaultStats = {
-  count: 0,
-  first_hit: null,
-  last_hit: null,
-  min: 0,
-  avg: 0,
-  max: 0,
-  sum: 0
+type ParamProps = {
+  id: string;
+};
+
+type HeuristicDetailProps = {
+  heur_id?: string;
 };
 
 const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
@@ -90,7 +53,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [heuristic, setHeuristic] = useState<Heuristic>(null);
-  const [stats, setStats] = useState<Statistics>(defaultStats);
+  const [stats, setStats] = useState<Statistic>(DEFAULT_STATS);
   const [histogram, setHistogram] = useState<any>(null);
   const [results, setResults] = useState<any>(null);
   const { apiCall } = useMyAPI();

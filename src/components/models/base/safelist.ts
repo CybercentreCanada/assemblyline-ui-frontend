@@ -14,6 +14,12 @@ export type Hashes = {
 
   /** SHA256 */
   sha256?: string;
+
+  /** SSDEEP */
+  ssdeep?: string;
+
+  /** TLSH */
+  tlsh?: string;
 };
 
 /** File Details */
@@ -70,7 +76,7 @@ export type Safelist = {
   enabled: boolean;
 
   /** When does this item expire from the list? */
-  expiry_ts?: string & Date;
+  expiry_ts?: string;
 
   /** Information about the file */
   file?: File;
@@ -95,4 +101,51 @@ export type Safelist = {
 
   /** Last date when sources were added to the safe hash */
   updated: string & Date;
+};
+
+export const DEFAULT_SAFELIST: Safelist = {
+  expiry_ts: null,
+  sources: [{ type: 'user', name: '', reason: [''], classification: null }],
+  type: null,
+  added: undefined,
+  classification: '',
+  enabled: false,
+  hashes: {
+    md5: '',
+    sha1: '',
+    sha256: ''
+  },
+  id: '',
+  signature: {
+    name: ''
+  },
+  updated: undefined
+};
+
+export const DEFAULT_SAFELIST_SIGNATURE = {
+  signature: {
+    name: ''
+  }
+};
+
+export const DEFAULT_SAFELIST_TAG = {
+  tag: {
+    type: '',
+    value: ''
+  }
+};
+
+export const DEFAULT_SAFELIST_FILE = {
+  hashes: {
+    sha256: '',
+    md5: '',
+    sha1: '',
+    ssdeep: '',
+    tlsh: ''
+  },
+  file: {
+    name: [''],
+    size: 0,
+    type: ''
+  }
 };

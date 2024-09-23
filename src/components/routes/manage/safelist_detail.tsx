@@ -8,6 +8,8 @@ import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { Safelist } from 'components/models/base/safelist';
+import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import DatePicker from 'components/visual/DatePicker';
@@ -18,40 +20,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
-import ForbiddenPage from '../403';
-
-export type Safelist = {
-  added: string;
-  classification: string;
-  enabled: boolean;
-  expiry_ts?: string;
-  hashes: {
-    md5: string;
-    sha1: string;
-    sha256: string;
-  };
-  file: {
-    name: string[];
-    size: number;
-    type: string;
-  };
-  id: string;
-  sources: {
-    classification: string;
-    name: string;
-    reason: string[];
-    type: string;
-  }[];
-  signature: {
-    name: string;
-  };
-  tag: {
-    type: string;
-    value: string;
-  };
-  type: string;
-  updated: string;
-};
 
 type ParamProps = {
   id: string;

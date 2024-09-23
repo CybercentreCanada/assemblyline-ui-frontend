@@ -28,7 +28,7 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { UpdateSource } from 'components/models/base/service';
+import { DEFAULT_SOURCE, type UpdateSource } from 'components/models/base/service';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
@@ -114,28 +114,6 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
-
-const DEFAULT_SOURCE: UpdateSource = {
-  ca_cert: '',
-  default_classification: '',
-  headers: [],
-  name: '',
-  password: '',
-  pattern: '',
-  private_key: '',
-  proxy: '',
-  ssl_ignore_errors: false,
-  uri: '',
-  username: '',
-  git_branch: '',
-  status: {
-    last_successful_update: '',
-    message: '',
-    state: '',
-    ts: ''
-  },
-  sync: false
-};
 
 const isSourceUpdating = (source: UpdateSource) => source.status.state === 'UPDATING';
 const queueSourceUpdate = (source: UpdateSource) => ({

@@ -18,103 +18,40 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { HASHES } from 'components/models/base/badlist';
+import type { Safelist } from 'components/models/base/safelist';
+import {
+  DEFAULT_SAFELIST,
+  DEFAULT_SAFELIST_FILE,
+  DEFAULT_SAFELIST_SIGNATURE,
+  DEFAULT_SAFELIST_TAG
+} from 'components/models/base/safelist';
+import {
+  HASH_MAP,
+  MD5_REGEX,
+  SHA1_REGEX,
+  SHA256_REGEX,
+  SSDEEP_REGEX,
+  TLSH_REGEX
+} from 'components/models/utils/constants';
+import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import DatePicker from 'components/visual/DatePicker';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useParams } from 'react-router-dom';
-import ForbiddenPage from '../403';
-
-type ParamProps = {
-  id: string;
-};
-
-export type SafelistAddUpdate = {
-  expiry_ts: string;
-  hashes?: {
-    md5: string | null;
-    sha1: string | null;
-    sha256: string | null;
-    ssdeep: string | null;
-    tlsh: string | null;
-  };
-  file?: {
-    name: string[];
-    size: number | null;
-    type: string | null;
-  };
-  signature?: {
-    name: string;
-  };
-  sources: {
-    classification: string;
-    name: string;
-    reason: string[];
-    type: string;
-  }[];
-  tag?: {
-    type: string;
-    value: string;
-  };
-  type: string | null;
-};
-
-const DEFAULT_SAFELIST = {
-  expiry_ts: null,
-  sources: [{ type: 'user', name: '', reason: [''], classification: null }],
-  type: null
-};
-
-const DEFAULT_SAFELIST_SIGNATURE = {
-  signature: {
-    name: ''
-  }
-};
-
-const DEFAULT_SAFELIST_TAG = {
-  tag: {
-    type: '',
-    value: ''
-  }
-};
-
-const DEFAULT_SAFELIST_FILE = {
-  hashes: {
-    sha256: '',
-    md5: '',
-    sha1: '',
-    ssdeep: '',
-    tlsh: ''
-  },
-  file: {
-    name: [''],
-    size: 0,
-    type: ''
-  }
-};
-
-const HASHES = ['md5', 'sha1', 'sha256', 'ssdeep', 'tlsh'];
-const MD5_REGEX = /^[a-f0-9]{32}$/i;
-const SHA1_REGEX = /^[a-f0-9]{40}$/i;
-const SHA256_REGEX = /^[a-f0-9]{64}$/i;
-const SSDEEP_REGEX = /^[0-9]{1,18}:[a-zA-Z0-9/+]{0,64}:[a-zA-Z0-9/+]{0,64}$/;
-const TLSH_REGEX = /^((?:T1)?[0-9a-fA-F]{70})$/;
-const HASH_MAP = {
-  md5: MD5_REGEX,
-  sha1: SHA1_REGEX,
-  sha256: SHA256_REGEX,
-  ssdeep: SSDEEP_REGEX,
-  tlsh: TLSH_REGEX
-};
 
 const useStyles = makeStyles(theme => ({
   endAdornment: {
     paddingRight: theme.spacing(0.5)
   }
 }));
+
+type ParamProps = {
+  id: string;
+};
 
 type Props = {
   safelist_id?: string;
@@ -126,7 +63,7 @@ const SafelistNew = ({}: Props) => {
   const { t } = useTranslation(['manageSafelistAdd']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
-  const [safelist, setSafelist] = useState<SafelistAddUpdate>(DEFAULT_SAFELIST);
+  const [safelist, setSafelist] = useState<Safelist>(DEFAULT_SAFELIST);
   const [waiting, setWaiting] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);
   const [modified, setModified] = useState<boolean>(false);

@@ -18,9 +18,9 @@ export type GetParams<P extends Params> = {
 };
 
 /**
- * Search Result
+ * Search Params Result
  */
-export class SearchResult<P extends Params> {
+export class SearchParamsResult<P extends Params> {
   private formats: Formatters = null;
 
   private values: P = null;
@@ -35,7 +35,7 @@ export class SearchResult<P extends Params> {
       (prev, [key, param]) => ({ ...prev, [key]: param.getDefault() }),
       {} as P
     );
-    return new SearchResult<P>(this.formats, values);
+    return new SearchParamsResult<P>(this.formats, values);
   }
 
   public has<K extends keyof P>(key: K): boolean {
@@ -51,7 +51,7 @@ export class SearchResult<P extends Params> {
       (prev, [key, value]) => (keys.includes(key as K) ? { ...prev, [key]: value } : prev),
       {} as P
     );
-    return new SearchResult<P>(this.formats, values);
+    return new SearchParamsResult<P>(this.formats, values);
   }
 
   public omit<K extends keyof P>(keys: K[]) {
@@ -59,12 +59,12 @@ export class SearchResult<P extends Params> {
       (prev, [key, value]) => (!keys.includes(key as K) ? { ...prev, [key]: value } : prev),
       {} as P
     );
-    return new SearchResult<P>(this.formats, values);
+    return new SearchParamsResult<P>(this.formats, values);
   }
 
   public set(input: P | ((value: P) => P)) {
     const values = _.cloneDeep(typeof input === 'function' ? input(this.values) : input);
-    return new SearchResult<P>(this.formats, values);
+    return new SearchParamsResult<P>(this.formats, values);
   }
 
   public toObject(): P {
@@ -124,40 +124,40 @@ export class SearchParser<P extends Params> {
   public fromParams(input: Input) {
     const search = new URLSearchParams(input);
     const output = this.reduce<P>((prev, [, param]) => param.from(prev, search), {} as P);
-    return new SearchResult<P>(this.formats, output);
+    return new SearchParamsResult<P>(this.formats, output);
   }
 
   public fromObject(input: P) {
     const output = this.reduce<P>((prev, [, param]) => param.from(prev, input), {} as P);
-    return new SearchResult<P>(this.formats, output);
+    return new SearchParamsResult<P>(this.formats, output);
   }
 
   public fullParams(input: Input) {
     const search = new URLSearchParams(input);
     const output = this.reduce<P>((prev, [, param]) => param.full(prev, search), {} as P);
-    return new SearchResult<P>(this.formats, output);
+    return new SearchParamsResult<P>(this.formats, output);
   }
 
   public fullObject(input: P) {
     const output = this.reduce<P>((prev, [, param]) => param.full(prev, input), {} as P);
-    return new SearchResult<P>(this.formats, output);
+    return new SearchParamsResult<P>(this.formats, output);
   }
 
   public deltaParams(input: Input) {
     const search = new URLSearchParams(input);
     const output = this.reduce<P>((prev, [, param]) => param.delta(prev, search), {} as P);
-    return new SearchResult<P>(this.formats, output);
+    return new SearchParamsResult<P>(this.formats, output);
   }
 
   public deltaObject(input: P) {
     const output = this.reduce<P>((prev, [, param]) => param.delta(prev, input), {} as P);
-    return new SearchResult<P>(this.formats, output);
+    return new SearchParamsResult<P>(this.formats, output);
   }
 
   public mergeParams(first: Input, second: Input, keys: Array<keyof P>) {
     const left = new URLSearchParams(first);
     const right = new URLSearchParams(second);
     const output = this.reduce<P>((prev, [, param]) => param.merge(prev, left, right, keys), {} as P);
-    return new SearchResult<P>(this.formats, output);
+    return new SearchParamsResult<P>(this.formats, output);
   }
 }

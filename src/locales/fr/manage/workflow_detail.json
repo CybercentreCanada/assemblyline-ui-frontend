@@ -54,6 +54,7 @@
   "status.ASSESS": "ÉVALUER",
   "status.MALICIOUS": "MALICIEUX",
   "status.NON-MALICIOUS": "NON-MALICIEUX",
+  "status.TRIAGE": "TRIAGE",
   "status.null": "",
   "title": "Détails du flux de travail",
   "usage": "Afficher les alertes associées"

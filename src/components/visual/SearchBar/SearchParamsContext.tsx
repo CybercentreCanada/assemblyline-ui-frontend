@@ -3,11 +3,11 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { useLocation, useNavigate } from 'react-router';
 import { useDefaultParams } from './DefaultParamsContext';
 import type { Params } from './SearchParams';
-import type { GetParams, SearchResult } from './SearchParser';
+import type { GetParams, SearchParamsResult } from './SearchParser';
 import { SearchParser } from './SearchParser';
 
 type ContextProps<P extends Params> = {
-  search: SearchResult<P>;
+  search: SearchParamsResult<P>;
   setSearchParams: (value: URLSearchParams | ((params: URLSearchParams) => URLSearchParams)) => void;
   setSearchObject: (value: P | ((params: P) => P)) => void;
 };
@@ -54,13 +54,13 @@ export const SearchParamsProvider = <P extends Params>({
   const searchParamsRef = useRef<URLSearchParams>(search.toParams());
   const searchObjectRef = useRef<P>(search.toObject());
 
-  const handleUpdateRef = useCallback((value: SearchResult<P>) => {
+  const handleUpdateRef = useCallback((value: SearchParamsResult<P>) => {
     searchParamsRef.current = value.toParams();
     searchObjectRef.current = value.toObject();
   }, []);
 
   const handleNavigate = useCallback(
-    (value: SearchResult<P>) => {
+    (value: SearchParamsResult<P>) => {
       const nextSearch = value.omit(hiddenKeys).toParams();
       const nextHidden = value.pick(hiddenKeys).toParams();
 
