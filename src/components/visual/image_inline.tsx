@@ -179,7 +179,7 @@ const WrappedImageItem = ({
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    apiCall({
+    apiCall<string>({
       url: `/api/v4/file/image/${src}/`,
       allowCache: true,
       onSuccess: api_data => setImage(api_data.api_response),

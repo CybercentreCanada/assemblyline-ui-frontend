@@ -4,11 +4,9 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import type { FileIndexed, LabelCategories } from 'components/models/base/file';
 import type { SearchResult } from 'components/models/ui/search';
-import { CustomUser } from 'components/models/ui/user';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import {
@@ -121,8 +119,7 @@ const WrappedArchivesTable: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const { c12nDef } = useALContext();
+  const { c12nDef, user: currentUser } = useALContext();
 
   const hasSupplementary = useMemo<boolean>(
     () => fileResults && fileResults?.total > 0 && fileResults?.items.some(item => item.is_supplementary),

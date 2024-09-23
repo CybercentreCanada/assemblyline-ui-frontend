@@ -54,7 +54,7 @@ export default function AdminTagSafelist() {
   });
 
   const reload = defValue => {
-    apiCall({
+    apiCall<string>({
       method: 'GET',
       url: `/api/v4/system/tag_safelist/${defValue ? '?default' : ''}`,
       onSuccess: api_data => {

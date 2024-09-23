@@ -1,4 +1,4 @@
-import type { Core, Services, Submission, UI } from '../base/config';
+import type { Core, Services, Submission, UI } from 'components/models/base/config';
 
 export type Configuration = {
   'core.scaler.service_defaults.min_instances': Core['scaler']['service_defaults']['min_instances'];

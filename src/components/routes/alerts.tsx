@@ -5,8 +5,8 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import type { AlertIndexed } from 'components/models/base/alert';
-import { CustomUser } from 'components/models/ui/user';
+import type { Alert, AlertIndexed, AlertItem } from 'components/models/base/alert';
+import type { CustomUser } from 'components/models/ui/user';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -77,7 +77,7 @@ const WrappedAlertsContent = () => {
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { search, setSearchParams, setSearchObject } = useSearchParams<AlertSearchParams>();
 
-  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [countedTotal, setCountedTotal] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
@@ -113,7 +113,7 @@ const WrappedAlertsContent = () => {
         setScrollReset(true);
       }
 
-      apiCall({
+      apiCall<AlertItem[]>({
         url: `${pathname}?${query2.toString()}`,
         method: 'GET',
         onSuccess: ({ api_response }: { api_response: ListResponse | GroupedResponse }) => {
@@ -122,10 +122,13 @@ const WrappedAlertsContent = () => {
           }
 
           const max = api_response.offset + api_response.rows;
-          setAlerts(values => [
-            ...values.filter(value => value.index < max),
-            ...api_response.items.map((item, i) => ({ ...item, id: item.alert_id, index: max + i }))
-          ]);
+          setAlerts(
+            values =>
+              [
+                ...values.filter(value => value.index < max),
+                ...api_response.items.map((item, i) => ({ ...item, id: item.alert_id, index: max + i }))
+              ] as AlertItem[]
+          );
           setCountedTotal('counted_total' in api_response ? api_response.counted_total : api_response.items.length);
           setTotal(api_response.total);
         },
@@ -270,7 +273,7 @@ const WrappedAlertsContent = () => {
           onLoadNext={() => setSearchObject(v => ({ ...v, offset: v.offset + v.rows }))}
           onCursorChange={handleSelectedItemChange}
           onItemSelected={handleSelectedItemChange}
-          onRenderActions={(item: Alert) => <AlertActions alert={item} />}
+          onRenderActions={(item: AlertItem) => <AlertActions alert={item} />}
         >
           {(item: Alert) => <AlertListItem item={item} />}
         </SimpleList>

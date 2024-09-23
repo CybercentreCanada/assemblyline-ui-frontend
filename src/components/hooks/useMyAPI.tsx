@@ -11,14 +11,14 @@ const DEFAULT_RETRY_MS = 32;
 
 export type APIResponseProps<APIResponse> = {
   api_error_message: string;
-  api_response: APIResponse;
+  api_response: APIResponse | any;
   api_server_version: string;
   api_status_code: number;
 };
 
 export type DownloadResponseProps<APIResponse> = {
   api_error_message: string;
-  api_response: APIResponse;
+  api_response: APIResponse | any;
   api_server_version: string;
   api_status_code: number;
   filename?: string;
@@ -37,7 +37,7 @@ type APICallProps<SuccessData, FailureData> = {
   url: string;
   contentType?: string;
   method?: string;
-  body?: string | object;
+  body?: boolean | string | object;
   reloadOnUnauthorize?: boolean;
   allowCache?: boolean;
   onSuccess?: (api_data: APIResponseProps<SuccessData>) => void;

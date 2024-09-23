@@ -18,9 +18,9 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/models/ui/user';
+import type { Retrohunt, RetrohuntIndex } from 'components/models/base/retrohunt';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
-import { RetrohuntIndex, RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { MonacoEditor } from 'components/visual/MonacoEditor';
@@ -40,13 +40,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type RetrohuntData = Pick<
-  RetrohuntResult,
+  Retrohunt,
   'classification' | 'search_classification' | 'description' | 'yara_signature' | 'indices' | 'key' | 'ttl'
 >;
 
 type Props = {
   isDrawer?: boolean;
-  onCreateRetrohunt?: (retrohunt: Partial<RetrohuntResult>) => void;
+  onCreateRetrohunt?: (retrohunt: Partial<Retrohunt>) => void;
 };
 
 function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => null }: Props) {

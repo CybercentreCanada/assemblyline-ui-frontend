@@ -1,5 +1,5 @@
-import { Configuration, HashPatternMap } from 'components/models/base/config';
-import { PossibleColors } from 'components/visual/CustomChip';
+import type { Configuration, HashPatternMap } from 'components/models/base/config';
+import type { PossibleColors } from 'components/visual/CustomChip';
 
 /**
  *
@@ -419,7 +419,7 @@ export function getSubmitType(input: string, configuration: Configuration): [Has
   // If we're trying to auto-detect the input type, iterate over file sources
   const detectedHashType = Object.entries(configuration.submission.file_sources).find(
     ([_, hashProps]) => hashProps && String(input).trim().match(new RegExp(hashProps?.pattern))
-  )?.[0];
+  )?.[0] as HashPatternMap;
 
   if (detectedHashType) return [detectedHashType, String(input).trim()];
   else if (!detectedHashType && matchURL(input.trimStart())) return ['url', input.trimStart()];

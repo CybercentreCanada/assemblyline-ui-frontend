@@ -1,4 +1,4 @@
-import { Statistic } from './statistic';
+import type { Statistic } from './statistic';
 
 export const DEPLOYED_STATUSES = ['DEPLOYED', 'NOISY', 'DISABLED'] as const;
 export const DRAFT_STATUSES = ['STAGING', 'TESTING'] as const;

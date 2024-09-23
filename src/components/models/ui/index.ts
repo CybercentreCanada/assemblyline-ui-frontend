@@ -1,4 +1,4 @@
-import { Role } from '../base/user';
+import type { Role } from 'components/models/base/user';
 
 export const METHODS = ['GET', 'POST', 'DELETE', 'PUT'] as const;
 

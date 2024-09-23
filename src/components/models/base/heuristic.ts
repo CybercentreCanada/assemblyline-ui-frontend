@@ -1,4 +1,4 @@
-import { Statistic } from './statistic';
+import type { Statistic } from './statistic';
 
 export const HEURISTIC_LEVELS = ['malicious', 'suspicious', 'info', 'safe'] as const;
 

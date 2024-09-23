@@ -1,5 +1,5 @@
-import { UserIndexed } from './user';
-import { UserAvatar } from './user_avatar';
+import type { UserIndexed } from './user';
+import type { UserAvatar } from './user_avatar';
 
 export const REACTIONS_TYPES = {
   thumbs_up: '👍',

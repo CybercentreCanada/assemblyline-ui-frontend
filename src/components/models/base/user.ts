@@ -1,4 +1,4 @@
-import { AppUser } from 'commons/components/app/AppUserService';
+import type { AppUser } from 'commons/components/app/AppUserService';
 
 export const TYPES = [
   'admin',
@@ -20,6 +20,7 @@ export const ROLES = [
   'archive_manage',
   'archive_trigger',
   'archive_view',
+  'assistant_use',
   'badlist_manage',
   'badlist_view',
   'bundle_download',
@@ -91,6 +92,9 @@ export type User = AppUser & {
   /** Date the user agree with terms of service */
   agrees_with_tos?: string & Date;
 
+  /** Maximum number of API calls a user can do daily (0: No Quota) */
+  api_daily_quota?: number;
+
   /** Maximum number of concurrent API requests */
   api_quota: number;
 
@@ -129,6 +133,12 @@ export type User = AppUser & {
 
   /** BCrypt hash of the user's password */
   password: string;
+
+  /** Maximum number of concurrent async submission (0: No Quota) */
+  submission_async_quota?: number;
+
+  /** Maximum number of submissions a user can do daily (0: No Quota) */
+  submission_daily_quota?: number;
 
   /** Maximum number of concurrent submissions */
   submission_quota: number;

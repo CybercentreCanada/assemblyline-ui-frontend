@@ -1,7 +1,8 @@
-import { ClassificationDefinition } from 'helpers/classificationParser';
-import { Configuration } from '../base/config';
-import { Role, Type, User } from '../base/user';
-import { UserSettings } from '../base/user_settings';
+import type { AppUser } from 'commons/components/app/AppUserService';
+import type { Configuration } from 'components/models/base/config';
+import type { Role, Type, User } from 'components/models/base/user';
+import type { UserSettings } from 'components/models/base/user_settings';
+import type { ClassificationDefinition } from 'helpers/classificationParser';
 
 export type Field = {
   name: string;
@@ -14,7 +15,6 @@ export type Field = {
 
 export type IndexDefinition = { [field: string]: Field };
 
-/** Search indexes definitions */
 export type Indexes = {
   alert: IndexDefinition;
   badlist: IndexDefinition;
@@ -35,23 +35,18 @@ export type SystemMessage = {
   message: string;
 };
 
-export interface CustomUser extends User {
-  // Al specific props
-  // agrees_with_tos: boolean;
-  // classification: string;
-  default_view?: string;
-  dynamic_group: string | null;
-  // groups: string[];
-  // is_active: boolean;
-  // roles: string[];
-}
+export type CustomUser = AppUser &
+  User & {
+    default_view?: string;
+    dynamic_group: string | null;
+  };
 
 /**
  * User information and System Configuration
  * @summary Response of the /whoami/ route
  * @description Return the currently logged in user as well as the system configuration
  * */
-export type WhoAmI = {
+export type WhoAmIProps = {
   /** Date the user agreed with TOS */
   agrees_with_tos: string;
 
@@ -96,4 +91,24 @@ export type WhoAmI = {
 
   /** Username of the current user */
   username: string;
+};
+
+export type WhoAmI = CustomUser & {
+  /** Classification definition block */
+  c12nDef: ClassificationDefinition;
+
+  /** Classificaiton Aliases block */
+  classification_aliases: Record<string, { name: string; short_name: string }>;
+
+  /** Configuration block */
+  configuration: Configuration;
+
+  /** Search indexes definitions */
+  indexes: Indexes;
+
+  /** System Message block */
+  system_message: SystemMessage;
+
+  /** User Settings configuration */
+  settings: UserSettings;
 };

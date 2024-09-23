@@ -1,7 +1,7 @@
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/models/ui/user';
 import type { Favorite } from 'components/routes/alerts/components/Favorites';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 

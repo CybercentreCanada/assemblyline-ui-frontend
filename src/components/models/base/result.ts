@@ -1,4 +1,4 @@
-import { SectionBody } from './result_body';
+import type { SectionBody } from './result_body';
 
 export const PROMOTE_TO = ['SCREENSHOT', 'ENTROPY', 'URI_PARAMS'] as const;
 

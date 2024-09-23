@@ -20,7 +20,7 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/models/ui/user';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';

@@ -1,4 +1,4 @@
-import { SelectedService, ServiceSpecification } from './service';
+import type { SelectedService, ServiceSpecification } from './service';
 
 export const ENCODINGS = ['cart', 'raw', 'zip'] as const;
 export const VIEWS = ['report', 'details'] as const;

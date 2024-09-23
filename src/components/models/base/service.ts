@@ -39,8 +39,8 @@ export type SignatureDelimiter = keyof typeof SIGNATURE_DELIMITERS;
  * @param type Type of parameter
  * @param value Default value (must match value in `default` field)
  */
-export type ServiceParameter<T extends 'bool' | 'int' | 'str' | 'list'> = T extends 'bool'
-  ? {
+export type ServiceParameter =
+  | {
       type: 'bool';
       hide: boolean | 'true' | 'false';
       name: string;
@@ -48,8 +48,7 @@ export type ServiceParameter<T extends 'bool' | 'int' | 'str' | 'list'> = T exte
       default: boolean | 'true' | 'false';
       list?: string[];
     }
-  : T extends 'int'
-  ? {
+  | {
       type: 'int';
       hide: boolean | 'true' | 'false';
       name: string;
@@ -57,8 +56,7 @@ export type ServiceParameter<T extends 'bool' | 'int' | 'str' | 'list'> = T exte
       default: number;
       list?: string[];
     }
-  : T extends 'str'
-  ? {
+  | {
       type: 'str';
       hide: boolean | 'true' | 'false';
       name: string;
@@ -66,19 +64,17 @@ export type ServiceParameter<T extends 'bool' | 'int' | 'str' | 'list'> = T exte
       default: string;
       list?: string[];
     }
-  : T extends 'list'
-  ? {
+  | {
       type: 'list';
       hide: boolean | 'true' | 'false';
       name: string;
       value: string;
       default: string;
-      list?: string[];
-    }
-  : unknown;
+      list: string[];
+    };
 
 // TODO check the default value
-export const DEFAULT_SERVICE_PARAMETER: ServiceParameter<'bool'> = {
+export const DEFAULT_SERVICE_PARAMETER: ServiceParameter = {
   name: '',
   type: 'bool',
   default: 'false',
@@ -93,7 +89,7 @@ export type ServiceSpecification = {
   name: string;
 
   /** Service parameters */
-  params: ServiceParameter<any>[];
+  params: ServiceParameter[];
 };
 
 /** Selected services */
@@ -179,6 +175,7 @@ export const DEFAULT_DOCKER_CONFIG: DockerConfig = {
   cpu_cores: 1,
   environment: [],
   image: '',
+  labels: [],
   ports: [],
   ram_mb_min: 128,
   ram_mb: 512,

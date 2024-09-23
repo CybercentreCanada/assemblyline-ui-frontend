@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { DetailedItem } from 'components/models/base/alert';
+import type { AlertItem, DetailedItem } from 'components/models/base/alert';
 import { detailedItemCompare } from 'components/routes/alerts/utils/alertUtils';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import type { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
@@ -42,7 +42,6 @@ import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import { AlertItem } from '../models/Alert';
 
 const useStyles = makeStyles(theme => ({
   extended: {

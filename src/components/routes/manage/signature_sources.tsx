@@ -284,7 +284,14 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
             )}
           </Grid>
         </div>
-        <SourceDetail source={source} defaults={null} addMode={!base} setSource={setSource} setModified={setModified} />
+        <SourceDetail
+          source={source}
+          defaults={null}
+          addMode={!base}
+          setSource={setSource}
+          setModified={setModified}
+          showDetails={false}
+        />
 
         <RouterPrompt when={modified} />
 

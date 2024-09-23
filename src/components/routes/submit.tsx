@@ -29,7 +29,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceTree from 'components/layout/serviceTree';
 import SubmissionMetadata from 'components/layout/submissionMetadata';
 import type { HashPatternMap } from 'components/models/base/config';
-import { Submission } from 'components/models/base/submission';
+import type { Submission } from 'components/models/base/submission';
 import type { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';

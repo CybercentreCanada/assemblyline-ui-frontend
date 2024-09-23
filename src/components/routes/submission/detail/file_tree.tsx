@@ -6,7 +6,7 @@ import { Box, Collapse, Divider, IconButton, Skeleton, Tooltip, Typography, useT
 import makeStyles from '@mui/styles/makeStyles';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
-import { SubmissionTree } from 'components/models/ui/submission';
+import { SubmissionTree, Tree } from 'components/models/ui/submission';
 import Verdict from 'components/visual/Verdict';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -117,7 +117,7 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
   return (
     <>
       {Object.entries(tree)
-        .sort((a: [string, FileItemProps], b: [string, FileItemProps]) => {
+        .sort((a: [string, Tree], b: [string, Tree]) => {
           return a[1].name.join() > b[1].name.join() ? 1 : -1;
         })
         .map(([sha256, item], i) => {

@@ -1,5 +1,5 @@
-import { Section } from '../base/result';
-import { AttackMatrix, Heuristics, Tags } from './file';
+import type { Section } from 'components/models/base/result';
+import type { AttackMatrix, Heuristics, Tags } from './file';
 
 export type HeuristicNameMap = { [name: string]: string[] };
 export type HeuristicSection = { [heuristic: string]: Section[] };

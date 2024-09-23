@@ -1,4 +1,4 @@
-import { Verdict } from './alert';
+import type { Verdict } from './alert';
 
 /**
  * Attack Matrix Model

@@ -13,7 +13,6 @@ import type { ServiceStats as ServiceStatsData } from 'components/models/ui/serv
 import type { CustomUser } from 'components/models/ui/user';
 import LineGraph from 'components/visual/LineGraph';
 import { getVersionQuery } from 'helpers/utils';
-import 'moment/locale/fr';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -8,9 +8,9 @@ export type ActionsConfig<AS extends ActionStruct> = {
   [A in AS as A['type']]: {
     type: `${Capitalize<A['type']>}_Action`;
     payload: A['payload'];
-    guard: A['guard'];
-    tracked: A['tracked'] & boolean;
-    repeat: A['repeat'] & boolean;
+    guard?: A['guard'];
+    tracked?: A['tracked'] & boolean;
+    repeat?: A['repeat'] & boolean;
   };
 };
 

@@ -24,10 +24,10 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type MultiTypeParamProps<T extends 'bool' | 'int' | 'str' | 'list'> = {
-  param?: ServiceParameter<T>;
+  param?: ServiceParameter;
   id?: number;
-  onAdd?: (param: ServiceParameter<T>) => void;
-  onUpdate?: (param: ServiceParameter<T>, id: number) => void;
+  onAdd?: (param: ServiceParameter) => void;
+  onUpdate?: (param: ServiceParameter, id: number) => void;
   onDelete?: (id: number) => void;
 };
 
@@ -39,7 +39,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
   onDelete = () => null
 }: MultiTypeParamProps<T>) => {
   const { t } = useTranslation(['adminServices']);
-  const [tempUserParams, setTempUserParams] = useState<ServiceParameter<T>>(DEFAULT_SERVICE_PARAMETER);
+  const [tempUserParams, setTempUserParams] = useState<ServiceParameter>(DEFAULT_SERVICE_PARAMETER as ServiceParameter);
   const theme = useTheme();
 
   const handleSubmissionParamUpdate = event => {
@@ -49,7 +49,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
     } else if (param.type === 'str') {
       onUpdate({ ...param, default: value, value }, id);
     } else {
-      onUpdate({ ...param, default: parseInt(value) || 0, value: parseInt(value) || 0 }, id);
+      onUpdate({ ...param, default: parseInt(value) || 0, value: parseInt(value) || 0 } as ServiceParameter, id);
     }
   };
 
@@ -89,7 +89,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
       });
     }
 
-    setTempUserParams(DEFAULT_SERVICE_PARAMETER);
+    setTempUserParams(DEFAULT_SERVICE_PARAMETER as ServiceParameter);
   };
 
   const handleSPNameChange = event => {
@@ -137,7 +137,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
         }
         // Render labels to show what are options to the user and what is selected by default
         style={{ marginRight: theme.spacing(0.5) }}
-        onClick={() => onUpdate({ ...param, default: value, value }, id)}
+        onClick={() => onUpdate({ ...param, default: value, value } as ServiceParameter, id)}
         onDelete={() =>
           handleSubmissionParamListUpdate(
             param.list.filter(v => {
@@ -164,7 +164,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
         }
         // Render labels to show what are options to the user and what is selected by default
         style={{ marginRight: theme.spacing(0.5) }}
-        onClick={() => setTempUserParams({ ...tempUserParams, default: value, value })}
+        onClick={() => setTempUserParams({ ...tempUserParams, default: value, value } as ServiceParameter)}
         onDelete={() =>
           handleSPListChange(
             tempUserParams.list.filter(v => {

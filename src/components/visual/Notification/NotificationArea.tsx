@@ -37,14 +37,15 @@ import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { Configuration } from 'components/models/base/config';
-import { ServiceIndexed } from 'components/models/base/service';
-import { SystemMessage } from 'components/models/ui/user';
+import type { Configuration } from 'components/models/base/config';
+import type { ServiceIndexed } from 'components/models/base/service';
+import type { SystemMessage } from 'components/models/ui/user';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import 'moment-timezone';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { JSONFeedItem, NotificationItem, useNotificationFeed } from '.';
-import ConfirmationDialog from '../ConfirmationDialog';
+import type { JSONFeedItem } from '.';
+import { NotificationItem, useNotificationFeed } from '.';
 
 const useStyles = makeStyles(theme => ({
   drawer: {
@@ -224,7 +225,10 @@ const WrappedNotificationArea = () => {
 
     localStorage.setItem(storageKey, JSON.stringify(lastTimeOpen.current.valueOf()));
     setNotifications(nots =>
-      nots.map((n: JSONFeedItem) => ({ ...n, _isNew: n.date_published.valueOf() > lastTimeOpen.current.valueOf() }))
+      nots.map((n: JSONFeedItem) => ({
+        ...n,
+        _isNew: new Date(n.date_published).valueOf() > lastTimeOpen.current.valueOf()
+      }))
     );
   }, [storageKey]);
 
@@ -249,7 +253,7 @@ const WrappedNotificationArea = () => {
   }, [currentUser.username, systemMessage]);
 
   const handleSeverityChange = useCallback((event: SelectChangeEvent) => {
-    if (!['error', 'warning', 'info', 'success'].includes(event.target.value as string)) return;
+    if (!['error', 'warning', 'info', 'success'].includes(event.target.value)) return;
     setNewSystemMessage(sm => ({ ...sm, severity: event.target.value as 'error' | 'warning' | 'info' | 'success' }));
   }, []);
 
@@ -345,7 +349,8 @@ const WrappedNotificationArea = () => {
   );
 
   const setIsNew = useCallback(
-    (notification: JSONFeedItem): boolean => notification.date_published.valueOf() > lastTimeOpen.current.valueOf(),
+    (notification: JSONFeedItem): boolean =>
+      new Date(notification.date_published).valueOf() > lastTimeOpen.current.valueOf(),
     []
   );
 
@@ -369,7 +374,7 @@ const WrappedNotificationArea = () => {
             setNotifications(_n => {
               const isAdmin = currentUser?.is_admin;
               let newNots = feedItems.filter(n => {
-                if (n.date_published < new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)) return false;
+                if (new Date(n.date_published) < new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)) return false;
 
                 if (!isAdmin) {
                   const isNewService = getNewService(n, services2);
@@ -399,7 +404,9 @@ const WrappedNotificationArea = () => {
                 return { ...n, _isNew, tags };
               });
 
-              newNots = newNots.sort((a, b) => b.date_published.valueOf() - a.date_published.valueOf());
+              newNots = newNots.sort(
+                (a, b) => new Date(b.date_published).valueOf() - new Date(a.date_published).valueOf()
+              );
               return newNots;
             })
         });

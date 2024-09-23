@@ -1,15 +1,19 @@
-export const INDEX_CATAGORIES = ['hot', 'archive', 'hot_and_archive'] as const;
-export const PHASE = ['filtering', 'yara', 'finished'] as const;
-export const STEP = ['Starting', 'Filtering', 'Yara', 'Finished'] as const;
+export const RETROHUNT_INDICES = ['hot', 'archive', 'hot_and_archive'] as const;
+export const RETROHUNT_PHASES = ['Starting', 'Filtering', 'Yara', 'Finished'] as const;
 
-export type IndexCategory = (typeof INDEX_CATAGORIES)[number];
-export type Phase = (typeof PHASE)[number];
-export type Step = (typeof STEP)[number];
+export type RetrohuntIndex = (typeof RETROHUNT_INDICES)[number];
+export type RetrohuntPhase = (typeof RETROHUNT_PHASES)[number];
+
+export type RetrohuntProgress =
+  | { type: 'Starting'; key: string }
+  | { type: 'Filtering'; key: string; progress: number }
+  | { type: 'Yara'; key: string; progress: number }
+  | { type: 'Finished'; key: string; search: Retrohunt };
 
 /** A search run on stored files. */
 export type Retrohunt = {
   /** Defines the indices used for this retrohunt job */
-  indices: IndexCategory;
+  indices: RetrohuntIndex;
 
   /** Classification for the retrohunt job */
   classification: string;
@@ -65,20 +69,17 @@ export type Retrohunt = {
   /** Indicates if the list of hits been truncated at some limit */
   truncated: boolean;
 
-  // these are deprecated
-  archive_only: boolean;
-  code: string;
-  created: string | Date;
-  hits: string[];
-  pending_candidates: number;
-  pending_indices: number;
-  phase: Phase;
-  progress: [number, number];
-  percentage: number;
-  tags: Record<string, any>;
-  total_errors: number;
-  total_hits: number;
-  total_indices: number;
+  /** Total number of warnings */
+  total_warnings?: number;
+
+  /** Total number of errors */
+  total_errors?: number;
+
+  step?: RetrohuntProgress['type'];
+
+  ttl?: number;
+
+  progress?: number;
 };
 
 /** A hit encountered during a retrohunt search. */
@@ -118,31 +119,7 @@ export type RetrohuntIndexed = Pick<
   | 'started_time'
   | 'truncated'
 > & {
-  step?: Step;
+  step?: RetrohuntProgress['type'];
   total_hits?: number;
   progress?: number;
-};
-
-export const DEFAULT_RETROHUNT: Partial<Retrohunt> = {
-  archive_only: false,
-  classification: null,
-  code: null,
-  created: '2020-01-01T00:00:00.000000Z',
-  creator: null,
-  description: '',
-  errors: [],
-  expiry_ts: null,
-  finished: false,
-  hits: [],
-  pending_candidates: 0,
-  pending_indices: 0,
-  phase: 'finished',
-  progress: [1, 1],
-  raw_query: null,
-  tags: {},
-  total_errors: 0,
-  total_hits: 0,
-  total_indices: 0,
-  truncated: false,
-  yara_signature: ''
 };

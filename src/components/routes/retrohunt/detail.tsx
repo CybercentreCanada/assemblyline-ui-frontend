@@ -11,17 +11,17 @@ import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { FileIndexed } from 'components/models/base/file';
-import { Retrohunt } from 'components/models/base/retrohunt';
-import { RetrohuntDetail, RetrohuntProgress } from 'components/models/ui/retrohunt';
-import { SearchResult } from 'components/models/ui/search';
-import { CustomUser } from 'components/models/ui/user';
+import type { FileIndexed } from 'components/models/base/file';
+import type { Retrohunt, RetrohuntProgress } from 'components/models/base/retrohunt';
+import type { SearchResult } from 'components/models/ui/search';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
 import RetrohuntErrors from 'components/routes/retrohunt/errors';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
-import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
+import type { CustomChipProps } from 'components/visual/CustomChip';
+import CustomChip from 'components/visual/CustomChip';
 import {
   DivTable,
   DivTableBody,
@@ -112,7 +112,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
   const { key: paramKey } = useParams<Params>();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [retrohunt, setRetrohunt] = useState<RetrohuntDetail>(null);
+  const [retrohunt, setRetrohunt] = useState<Retrohunt>(null);
   const [hitResults, setHitResults] = useState<SearchResult<FileIndexed>>(null);
   const [typeDataSet, setTypeDataSet] = useState<{ [k: string]: number }>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
@@ -429,7 +429,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
             tabs={{
               details: {
                 label: t('details'),
-                content: (
+                inner: (
                   <>
                     <Grid item>
                       <Typography variant="h6">{t('header.information')}</Typography>
@@ -681,7 +681,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                             datatype={t('graph.type.datatype')}
                             onClick={(evt, element) => {
                               if (!isReloading && element.length > 0) {
-                                var ind = element[0].index;
+                                const ind = element[0].index;
                                 query.add('filters', `type:${safeFieldValue(Object.keys(typeDataSet)[ind])}`);
                                 handleNavigate(query);
                               }
@@ -823,7 +823,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
               },
               yara: {
                 label: t('yara_rule'),
-                content: (
+                inner: (
                   <>
                     {!retrohunt ? (
                       <Grid item>
@@ -846,7 +846,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                   (retrohunt.total_warnings > 0 || retrohunt.total_errors > 0) &&
                   currentUser.is_admin
                 ),
-                content: <RetrohuntErrors retrohunt={retrohunt} isDrawer={isDrawer} />
+                inner: <RetrohuntErrors retrohunt={retrohunt} isDrawer={isDrawer} />
               }
             }}
           />

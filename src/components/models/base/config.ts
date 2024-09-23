@@ -6,7 +6,8 @@ export const AUTO_PROPERTY_TYPES = ['access', 'classification', 'type', 'role', 
 export const BANNER_LEVELS = ['info', 'warning', 'success', 'error'] as const;
 export const DOWNLOAD_ENCODINGS = ['raw', 'cart'] as const;
 export const EXTERNAL_LINK_TYPES = ['hash', 'metadata', 'tag'] as const;
-export const HASH_PATTERN_MAP = ['sha256', 'sha1', 'md5', 'tlsh', 'ssdeep', 'url'] as const;
+export const FILE_HASH_PATTERN_MAP = ['sha256', 'sha1', 'md5'] as const;
+export const HASH_PATTERN_MAP = [...FILE_HASH_PATTERN_MAP, 'tlsh', 'ssdeep', 'url'] as const;
 export const KUBERNETES_LABEL_OPS = ['In', 'NotIn', 'Exists', 'DoesNotExist'] as const;
 export const METADATA_FIELDTYPE_MAP = [
   'boolean',
@@ -43,6 +44,7 @@ export type AutoPropertyType = (typeof AUTO_PROPERTY_TYPES)[number];
 export type BannerLevel = (typeof BANNER_LEVELS)[number];
 export type DownloadEncoding = (typeof DOWNLOAD_ENCODINGS)[number];
 export type ExternalLinkType = (typeof EXTERNAL_LINK_TYPES)[number];
+export type FileHashPatternMap = (typeof FILE_HASH_PATTERN_MAP)[number];
 export type HashPatternMap = (typeof HASH_PATTERN_MAP)[number];
 export type KubernetesLabelOps = (typeof KUBERNETES_LABEL_OPS)[number];
 export type MetadataFieldTypeMap = (typeof METADATA_FIELDTYPE_MAP)[number];
@@ -448,7 +450,7 @@ export type Submission = {
   dtl: number;
 
   /** List of external source to fetch file */
-  file_sources: Record<HashPatternMap, FileSource>;
+  file_sources: Record<FileHashPatternMap, FileSource>;
 
   /** Maximum number of days submissions will remain in the system */
   max_dtl: number;
@@ -478,13 +480,13 @@ export type Submission = {
 /** Configuration for all users */
 export type User = {
   /** API_PRIV_MAP */
-  api_priv_map: Record<APIPriv, ACL[]>;
+  api_priv_map: Record<APIPriv, ACL[]> | Record<string, never>;
 
   /** ACL_MAP */
-  priv_role_dependencies: Record<ACL, Role[]>;
+  priv_role_dependencies: Record<ACL, Role[]> | Record<string, never>;
 
   /** the relation between types and roles */
-  role_dependencies: Record<Type, Role[]>;
+  role_dependencies: Record<Type, Role[]> | Record<string, never>;
 
   /** All user roles */
   roles: Role[];
@@ -519,3 +521,124 @@ export type Configuration = {
   /** User configuration */
   user: User;
 };
+
+export const CONFIGURATION: Configuration = {
+  auth: {
+    allow_2fa: false,
+    allow_apikeys: false,
+    allow_extended_apikeys: false,
+    allow_security_tokens: false
+  },
+  core: {
+    archiver: {
+      alternate_dtl: 0,
+      metadata: undefined,
+      minimum_required_services: [],
+      use_metadata: false,
+      use_webhook: false,
+      webhook: undefined
+    },
+    ingester: {
+      default_max_extracted: 0,
+      default_max_supplementary: 0
+    },
+    scaler: {
+      service_defaults: {
+        min_instances: 0
+      }
+    }
+  },
+  datastore: {
+    archive: {
+      enabled: false
+    }
+  },
+  retrohunt: {
+    enabled: false,
+    dtl: 0,
+    max_dtl: 0
+  },
+  submission: {
+    default_max_extracted: 0,
+    default_max_supplementary: 0,
+    dtl: 0,
+    file_sources: {
+      md5: { pattern: '^[a-f0-9]{32}$', sources: [], auto_selected: [] },
+      sha1: { pattern: '^[a-f0-9]{40}$', sources: [], auto_selected: [] },
+      sha256: { pattern: '^[a-f0-9]{64}$', sources: [], auto_selected: [] }
+    },
+    max_dtl: 0,
+    max_extraction_depth: 0,
+    max_file_size: 0,
+    max_metadata_length: 0,
+    metadata: {
+      archive: {},
+      ingest: {},
+      strict_schemes: [],
+      submit: {}
+    },
+    sha256_sources: [],
+    tag_types: {
+      attribution: [],
+      behavior: [],
+      ioc: []
+    },
+    verdicts: {
+      info: 0,
+      suspicious: 0,
+      highly_suspicious: 0,
+      malicious: 0
+    }
+  },
+  system: {
+    organisation: '',
+    type: 'development',
+    version: ''
+  },
+  ui: {
+    ai: {
+      enabled: false
+    },
+    alerting_meta: {
+      important: [],
+      subject: [],
+      url: []
+    },
+    allow_malicious_hinting: false,
+    allow_raw_downloads: false,
+    allow_replay: false,
+    allow_url_submissions: false,
+    allow_zip_downloads: false,
+    api_proxies: [],
+    apps: [],
+    audit: false,
+    banner: {},
+    banner_level: 'info',
+    community_feed: '',
+    download_encoding: 'raw',
+    enforce_quota: false,
+    external_links: {
+      hash: {},
+      metadata: {},
+      tag: {}
+    },
+    external_source_tags: {},
+    external_sources: [],
+    fqdn: '',
+    ingest_max_priority: 0,
+    read_only: false,
+    rss_feeds: [],
+    services_feed: '',
+    tos_lockout_notify: false,
+    tos_lockout: false,
+    tos: false,
+    url_submission_auto_service_selection: []
+  },
+  user: {
+    api_priv_map: {},
+    priv_role_dependencies: {},
+    role_dependencies: {},
+    roles: [],
+    types: []
+  }
+} as const;

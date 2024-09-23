@@ -1,4 +1,4 @@
-import { Priority, Status } from './workflow';
+import type { Priority, Status } from './workflow';
 
 export const ES_SUBMITTED = 'submitted';
 export const ES_SKIPPED = 'skipped';
@@ -190,7 +190,10 @@ export type Event = {
   entity_type: (typeof ENTITY_TYPE)[number];
 
   /** Labels added during event */
-  labels?: string[];
+  labels: string[];
+
+  /** Labels removed during event */
+  labels_removed: string[];
 
   /** Priority applied during event */
   priority?: Priority;
@@ -314,3 +317,8 @@ export type AlertIndexed = Pick<
 >;
 
 export type AlertUpdate = Partial<Pick<Alert, 'label' | 'owner' | 'priority' | 'status' | 'verdict'>>;
+
+export type AlertItem = Alert & {
+  id: string;
+  index: number;
+};

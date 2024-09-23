@@ -21,13 +21,19 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
-import 'moment/locale/fr';
+import {
+  DivTable,
+  DivTableBody,
+  DivTableCell,
+  DivTableHead,
+  DivTableRow,
+  ExternalLinkRow
+} from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import type { JSONFeedItem } from 'components/visual/Notification/useNotificationFeed';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { JSONFeedItem } from '.';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, ExternalLinkRow } from '../DivTable';
-import InformativeAlert from '../InformativeAlert';
 
 export type ServiceResult = {
   accepts: string;

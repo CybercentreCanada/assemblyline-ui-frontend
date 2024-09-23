@@ -1,4 +1,4 @@
-import { ParsedErrors } from './error';
+import type { ParsedErrors } from './error';
 
 export const SUBMISSION_STATES = ['failed', 'submitted', 'completed'] as const;
 

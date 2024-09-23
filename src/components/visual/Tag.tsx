@@ -112,7 +112,6 @@ const WrappedTag: React.FC<TagProps> = ({
           dataType={BOREALIS_TYPE_MAP[type]}
           dataValue={value}
           dataClassification={classification}
-          hidePreview={true}
           hideDetails={true}
           wrap
           label={label ? label : short_type ? `[${short_type.toUpperCase()}] ${value}` : value}

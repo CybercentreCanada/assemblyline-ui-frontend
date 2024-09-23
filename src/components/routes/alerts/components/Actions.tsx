@@ -29,7 +29,8 @@ import clsx from 'clsx';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/models/ui/user';
+import type { AlertItem } from 'components/models/base/alert';
+import type { CustomUser } from 'components/models/ui/user';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
@@ -41,7 +42,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
-import { AlertItem } from '../models/Alert';
 import { AlertEventsTable } from './Components';
 import AlertFiltersSelected from './FiltersSelected';
 import { AlertWorkflowDrawer } from './Workflows';
