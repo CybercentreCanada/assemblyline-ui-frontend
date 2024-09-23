@@ -141,10 +141,8 @@ function WrappedSubmissionDetail() {
   const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [resubmitAnchor, setResubmitAnchor] = useState<Element>(null);
-  const [baseFiles, setBaseFiles] = useState([]);
-  const [archivingMetadata, setArchivingMetadata] = useState<Record<string, ArchiverMetadata>>(
-    systemConfig.core.archiver.metadata
-  );
+  const [baseFiles, setBaseFiles] = useState<string[]>([]);
+  const [archivingMetadata, setArchivingMetadata] = useState<Record<string, ArchiverMetadata>>({});
   const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState<string>('false');
 
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
@@ -1053,7 +1051,7 @@ function WrappedSubmissionDetail() {
                       configuration={field_cfg}
                       value={archivingMetadata[field_name]}
                       onChange={v => {
-                        const cleanMetadata = archivingMetadata;
+                        let cleanMetadata = archivingMetadata;
                         if (v === undefined || v === null || v === '') {
                           // Remove field from metadata if value is null
                           delete cleanMetadata[field_name];
@@ -1064,7 +1062,7 @@ function WrappedSubmissionDetail() {
                         setArchivingMetadata({ ...cleanMetadata });
                       }}
                       onReset={() => {
-                        const cleanMetadata = archivingMetadata;
+                        let cleanMetadata = archivingMetadata;
                         delete cleanMetadata[field_name];
                         setArchivingMetadata({ ...cleanMetadata });
                       }}

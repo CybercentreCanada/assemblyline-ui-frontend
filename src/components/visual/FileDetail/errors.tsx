@@ -1,4 +1,4 @@
-import { Error } from 'components/models/base/error';
+import type { Error } from 'components/models/base/error';
 import ErrorCard from 'components/visual/ErrorCard';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';
