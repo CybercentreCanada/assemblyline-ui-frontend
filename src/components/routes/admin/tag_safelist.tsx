@@ -16,7 +16,7 @@ import PageFullSize from 'commons/components/pages/PageFullSize';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/models/ui/user';
+import type { CustomUser } from 'components/models/ui/user';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -29,7 +29,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceTree from 'components/layout/serviceTree';
 import SubmissionMetadata from 'components/layout/submissionMetadata';
 import type { HashPatternMap } from 'components/models/base/config';
-import type { Submission } from 'components/models/base/submission';
+import type { Metadata, Submission } from 'components/models/base/submission';
 import type { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -46,7 +46,7 @@ type SubmitState = {
   hash: string;
   tabContext: string;
   c12n: string;
-  metadata?: any;
+  metadata?: Metadata;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -94,15 +94,15 @@ const Submit = () => {
 
   const [allowClick, setAllowClick] = useState<boolean>(true);
   const [file, setFile] = useState(null);
-  const [flow, setFlow] = useState(null);
+  const [flow, setFlow] = useState<Flow>(null);
   const [settings, setSettings] = useState<UserSettings>(null);
-  const [submissionMetadata, setSubmissionMetadata] = useState({});
-  const [uploadProgress, setUploadProgress] = useState(null);
+  const [submissionMetadata, setSubmissionMetadata] = useState<Metadata>({});
+  const [uploadProgress, setUploadProgress] = useState<number>(null);
   const [urlAutoselection, setUrlAutoselection] = useState<boolean>(false);
-  const [uuid, setUUID] = useState(null);
+  const [uuid, setUUID] = useState<string>(null);
   const [validate, setValidate] = useState<boolean>(false);
-  const [validateCB, setValidateCB] = useState(null);
-  const [value, setValue] = useState('0');
+  const [validateCB, setValidateCB] = useState<string>(null);
+  const [value, setValue] = useState<string>('0');
   const [stringInput, setStringInput] = useState<string>('');
   const [stringType, setStringType] = useState<HashPatternMap>(undefined);
   const [stringInputHasError, setStringInputHasError] = useState<boolean>(false);

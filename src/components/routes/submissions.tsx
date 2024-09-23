@@ -97,7 +97,7 @@ const SubmissionSearch = () => {
                   onClick: () =>
                     setSearchObject(o => {
                       const filters = [...o.filters, `params.submitter:${safeFieldValue(currentUser.username)}`];
-                      return { ...o, filters };
+                      return { ...o, offset: 0, filters };
                     })
                 }
               },
@@ -105,14 +105,15 @@ const SubmissionSearch = () => {
                 tooltip: { title: t('completed_submissions') },
                 icon: { children: <AssignmentTurnedInIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'state:completed'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'state:completed'] }))
                 }
               },
               {
                 tooltip: { title: t('malicious_submissions') },
                 icon: { children: <BugReportOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'max_score:>=1000'] }))
+                  onClick: () =>
+                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'max_score:>=1000'] }))
                 }
               }
             ]}

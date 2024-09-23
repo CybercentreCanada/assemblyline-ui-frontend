@@ -1,6 +1,6 @@
 import { Divider, Skeleton, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { TSubmissionReport } from 'components/models/ui/submission_report';
+import type { SubmissionReport } from 'components/models/ui/submission_report';
 import Verdict from 'components/visual/Verdict';
 import { bytesToSize } from 'helpers/utils';
 import React from 'react';
@@ -38,8 +38,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
-  tree: TSubmissionReport['file_tree'];
-  important_files: TSubmissionReport['important_files'];
+  tree: SubmissionReport['file_tree'];
+  important_files: SubmissionReport['important_files'];
 };
 
 function FileTree({ tree, important_files }: Props) {

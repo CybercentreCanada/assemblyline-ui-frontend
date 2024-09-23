@@ -9,10 +9,10 @@ import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip'
 import ExternalLinks from './ExternalSearch';
 
 export type ActionableCustomChipProps = CustomChipProps & {
-  data_type?: string;
   category?: ExternalLinkType;
-  index?: string;
   classification?: string;
+  data_type?: string;
+  index?: string;
   label?: string;
   value?: string;
 };

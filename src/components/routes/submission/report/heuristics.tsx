@@ -1,8 +1,8 @@
 import { Divider, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { Verdict } from 'components/models/base/alert';
-import { TSubmissionReport } from 'components/models/ui/submission_report';
+import type { Verdict } from 'components/models/base/alert';
+import type { SubmissionReport } from 'components/models/ui/submission_report';
 import ResultSection from 'components/visual/ResultCard/result_section';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -62,9 +62,9 @@ const useStyles = makeStyles(theme => ({
 
 type HeuristicsListProps = {
   verdict: Verdict;
-  items: TSubmissionReport['heuristics'][Verdict];
-  sections: TSubmissionReport['heuristic_sections'];
-  name_map: TSubmissionReport['heuristic_name_map'];
+  items: SubmissionReport['heuristics'][Verdict];
+  sections: SubmissionReport['heuristic_sections'];
+  name_map: SubmissionReport['heuristic_name_map'];
   force?: boolean;
 };
 
@@ -131,7 +131,7 @@ function HeuristicsListSkel() {
 }
 
 type Props = {
-  report: TSubmissionReport;
+  report: SubmissionReport;
 };
 
 function WrappedHeuristics({ report }: Props) {

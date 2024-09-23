@@ -105,6 +105,7 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
                         event.stopPropagation();
                         searchParams?.setSearchObject(o => ({
                           ...o,
+                          offset: 0,
                           filters: [...o.filters, `params.submitter:"${submission.params.submitter}"`]
                         }));
                       }}

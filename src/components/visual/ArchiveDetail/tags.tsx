@@ -3,6 +3,7 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import type { SelectChangeEvent } from '@mui/material';
 import {
   AlertTitle,
   CircularProgress,
@@ -12,7 +13,6 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
-  SelectChangeEvent,
   Skeleton,
   TableContainer,
   Tooltip,
@@ -25,8 +25,8 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
-import { ResultIndexed } from 'components/models/base/result';
-import { SearchResult } from 'components/models/ui/search';
+import type { ResultIndexed } from 'components/models/base/result';
+import type { SearchResult } from 'components/models/ui/search';
 import ActionMenu from 'components/visual/ActionMenu';
 import Classification from 'components/visual/Classification';
 import {
@@ -47,10 +47,6 @@ import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import AutoSizer from 'react-virtualized-auto-sizer';
-
-export type Signature = [string, string, boolean]; // [name, h_type, safelisted]
-
-export type Tag = [string, string, boolean, string]; // [value, h_type, safelisted, classification]
 
 type Result = {
   tag_type: string;
@@ -164,9 +160,7 @@ const WrappedArchivedTagSection: React.FC<Props> = ({
       );
     else
       return newResults.toSorted((a, b) =>
-        dir === 'asc'
-          ? (a[field] as any).localeCompare(b[field] as any)
-          : (b[field] as any).localeCompare(a[field] as any)
+        dir === 'asc' ? a[field].localeCompare(b[field]) : b[field].localeCompare(a[field])
       );
   }, [filteredResults, query]);
 

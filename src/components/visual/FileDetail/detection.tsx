@@ -6,7 +6,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
-import { HeuristicLevel, HEURISTIC_LEVELS } from 'components/models/base/heuristic';
+import { HEURISTIC_LEVELS, HeuristicLevel } from 'components/models/base/heuristic';
 import { Section } from 'components/models/base/result';
 import type { File } from 'components/models/ui/file';
 import ResultSection from 'components/visual/ResultCard/result_section';
@@ -188,7 +188,7 @@ const WrappedDetection: React.FC<DetectionProps> = ({
   const { t } = useTranslation(['fileDetail']);
   const { showSafeResults } = useSafeResults();
 
-  const [sectionMap, setSectionMap] = useState({});
+  const [sectionMap, setSectionMap] = useState<{ [heur_id: string]: Section[] }>({});
   const [maxScore, setMaxScore] = useState<number>(DEFAULT_SEC_SCORE);
 
   useEffect(() => {

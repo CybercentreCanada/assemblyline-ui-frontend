@@ -136,8 +136,10 @@ export interface GridLinkRowProps extends GridTableRowProps {
   to: To;
 }
 
-export const GridLinkRow: FC<any> = memo(
-  styled(({ to, ...other }: any) => <GridTableRow {...(other as any)} component={Link} to={to} />)<any>(() => ({
+export const GridLinkRow: FC<GridLinkRowProps> = memo(
+  styled(({ to, ...other }: GridLinkRowProps) => (
+    <GridTableRow {...(other as any)} component={Link} to={to} />
+  ))<GridLinkRowProps>(() => ({
     cursor: 'pointer',
     textDecoration: 'none'
   }))

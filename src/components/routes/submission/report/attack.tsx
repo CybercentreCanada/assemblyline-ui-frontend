@@ -1,6 +1,6 @@
 import { Divider, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { TAttackMatrix, TSubmissionReport } from 'components/models/ui/submission_report';
+import type { SubmissionReport, TAttackMatrix } from 'components/models/ui/submission_report';
 import TextVerdict from 'components/visual/TextVerdict';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -80,7 +80,7 @@ function AttackMatrixSkel() {
 }
 
 type AttackProps = {
-  report: TSubmissionReport;
+  report: SubmissionReport;
 };
 
 function WrappedAttack({ report }: AttackProps) {

@@ -35,7 +35,7 @@ export type TSubmissionTags = {
 /**
  * Create a report for a submission based on its ID.
  */
-export type TSubmissionReport = Pick<
+export type SubmissionReport = Pick<
   Submission,
   | 'archive_ts'
   | 'archived'

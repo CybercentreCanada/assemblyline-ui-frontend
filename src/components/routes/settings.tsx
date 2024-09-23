@@ -205,7 +205,7 @@ function Settings() {
   function toggleExecutiveSummary() {
     if (settings) {
       setModified(true);
-      setSettings(() => ({ ...settings, executive_summary: !settings.executive_summary }));
+      setSettings({ ...settings, executive_summary: !settings.executive_summary });
     }
   }
 

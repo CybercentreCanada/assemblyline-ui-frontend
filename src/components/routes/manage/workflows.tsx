@@ -168,14 +168,15 @@ const WorkflowsSearch = () => {
                 tooltip: { title: t('never_used') },
                 icon: { children: <EventBusyOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'hit_count:0'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'hit_count:0'] }))
                 }
               },
               {
                 tooltip: { title: t('old') },
                 icon: { children: <EventOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'last_seen:[* TO now-3m]'] }))
+                  onClick: () =>
+                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'last_seen:[* TO now-3m]'] }))
                 }
               }
             ]}

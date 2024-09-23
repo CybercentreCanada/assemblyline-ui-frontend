@@ -1,7 +1,9 @@
-import { Skeleton, Theme, useTheme } from '@mui/material';
+import type { Theme } from '@mui/material';
+import { Skeleton, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
-import ActionableCustomChip, { ActionableCustomChipProps } from './ActionableCustomChip';
+import type { ActionableCustomChipProps } from './ActionableCustomChip';
+import ActionableCustomChip from './ActionableCustomChip';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chiplist: {

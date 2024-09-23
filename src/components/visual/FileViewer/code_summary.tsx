@@ -2,11 +2,11 @@ import { Alert, CircularProgress, Tooltip, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/models/ui/user';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import AIMarkdown from 'components/visual/AiMarkdown';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import AIMarkdown from '../AiMarkdown';
 
 const useStyles = makeStyles(theme => ({
   spinner: {

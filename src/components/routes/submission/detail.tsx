@@ -145,41 +145,7 @@ function WrappedSubmissionDetail() {
   const [archivingMetadata, setArchivingMetadata] = useState<Record<string, ArchiverMetadata>>(
     systemConfig.core.archiver.metadata
   );
-
-  // const { t, i18n } = useTranslation(['submissionDetail']);
-  // const theme = useTheme();
-  // const location = useLocation();
-  // const navigate = useNavigate();
-  // const { addInsight, removeInsight } = useAssistant();
-  // const { apiCall } = useMyAPI();
-  // const { id, fid } = useParams<ParamProps>();
-  // const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
-  // const { setHighlightMap } = useHighlighter();
-  // const { showSuccessMessage, showErrorMessage } = useMySnackbar();
-  // const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
-
-  // const [submission, setSubmission] = useState(null);
-  // const [summary, setSummary] = useState(null);
-  // const [tree, setTree] = useState(null);
-  // const [filtered, setFiltered] = useState(false);
-  // const [partial, setPartial] = useState(false);
-  // const [watchQueue, setWatchQueue] = useState(null);
-  // const [configuration, setConfiguration] = useState(null);
-  // const [liveErrors, setLiveErrors] = useState(null);
-  // const [liveTagMap, setLiveTagMap] = useState(null);
-  // const [outstanding, setOutstanding] = useState(null);
-  // const [liveStatus, setLiveStatus] = useState<'queued' | 'processing' | 'rescheduled'>('queued');
-  // const [socket, setSocket] = useState(null);
-  // const [loadInterval, setLoadInterval] = useState(null);
-  // const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState(0);
-  // const [deleteDialog, setDeleteDialog] = useState(false);
-  // const [archiveDialog, setArchiveDialog] = useState(false);
-  // const [waitingDialog, setWaitingDialog] = useState(false);
-  // const [resubmitAnchor, setResubmitAnchor] = useState(null);
-  // const [baseFiles, setBaseFiles] = useState([]);
-  // const [archivingMetadata, setArchivingMetadata] = useState({});
-
-  const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState('false');
+  const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState<string>('false');
 
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);

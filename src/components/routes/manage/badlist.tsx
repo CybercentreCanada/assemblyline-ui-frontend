@@ -12,7 +12,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Badlist } from 'components/models/base/badlist';
 import type { SearchResult } from 'components/models/ui/search';
-import { CustomUser } from 'components/models/ui/user';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
@@ -160,21 +160,22 @@ const BadlistSearch = () => {
                 tooltip: { title: t('user') },
                 icon: { children: <PersonOutlineOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'sources.type:user'] }))
+                  onClick: () =>
+                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'sources.type:user'] }))
                 }
               },
               {
                 tooltip: { title: t('tag') },
                 icon: { children: <LabelOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'type:tag'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:tag'] }))
                 }
               },
               {
                 tooltip: { title: t('disabled') },
                 icon: { children: <BlockOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'enabled:false'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'enabled:false'] }))
                 }
               }
             ]}

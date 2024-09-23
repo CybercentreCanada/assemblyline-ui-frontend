@@ -1,10 +1,10 @@
 import { Alert, LinearProgress } from '@mui/material';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/models/ui/user';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import MonacoEditor, { LANGUAGE_SELECTOR } from 'components/visual/MonacoEditor';
 import React, { useEffect, useMemo, useState } from 'react';
-import MonacoEditor, { LANGUAGE_SELECTOR } from '../MonacoEditor';
 
 type Props = {
   sha256: string;

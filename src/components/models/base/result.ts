@@ -2,11 +2,6 @@ import type { SectionBody } from './result_body';
 
 export const PROMOTE_TO = ['SCREENSHOT', 'ENTROPY', 'URI_PARAMS'] as const;
 
-/**
- * This is a "keys-only" representation of the PROMOTE_TO StringTable in
- * assemblyline-v4-service/assemblyline_v4_service/common/result.py.
- * Any updates here need to go in that StringTable also.
- */
 export type PromoteTo = (typeof PROMOTE_TO)[number];
 
 export type Tagging = {

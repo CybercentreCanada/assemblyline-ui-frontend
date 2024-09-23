@@ -1,6 +1,6 @@
 import { Divider, Grid, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { TSubmissionReport } from 'components/models/ui/submission_report';
+import type { SubmissionReport } from 'components/models/ui/submission_report';
 import TextVerdict from 'components/visual/TextVerdict';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -100,7 +100,7 @@ function TagTable({ group, items }: TagTableProps) {
 }
 
 type Props = {
-  report: TSubmissionReport;
+  report: SubmissionReport;
 };
 
 function WrappedTags({ report }: Props) {

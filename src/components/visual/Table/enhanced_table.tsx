@@ -5,22 +5,22 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import { Grid, IconButton, InputBase, TablePagination, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
-import { alpha, Theme } from '@mui/material/styles';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableSortLabel from '@mui/material/TableSortLabel';
+import type { Theme } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Throttler from 'commons/addons/utils/throttler';
 import PageHeader from 'commons/components/pages/PageHeader';
+import Classification from 'components/visual/Classification';
+import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import Classification from '../Classification';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 
-// TODO: what is this and is this used?
 const throttler = new Throttler(250);
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {

@@ -1,7 +1,7 @@
 import { Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import type { BodyFormat, SectionBody } from 'components/models/base/result_body';
-import type { TSubmissionReport } from 'components/models/ui/submission_report';
+import type { SubmissionReport } from 'components/models/ui/submission_report';
 import Moment from 'components/visual/Moment';
 import { GraphBody } from 'components/visual/ResultCard/graph_body';
 import { ImageInlineBody } from 'components/visual/image_inline';
@@ -92,7 +92,7 @@ const WrappedKVExtra = ({ body }: KVExtraProps) => (
 const KVExtra = React.memo(WrappedKVExtra);
 
 type Props = {
-  report: TSubmissionReport;
+  report: SubmissionReport;
 };
 
 function WrappedGeneralInformation({ report }: Props) {

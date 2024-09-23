@@ -1,5 +1,5 @@
 import { Grid, Skeleton } from '@mui/material';
-import { Metadata } from 'components/models/ui/file';
+import type { Metadata } from 'components/models/ui/file';
 import CustomChip from 'components/visual/CustomChip';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';

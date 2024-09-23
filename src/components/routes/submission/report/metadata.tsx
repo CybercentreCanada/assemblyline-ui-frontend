@@ -3,7 +3,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Button, Collapse, Divider, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
-import { TSubmissionReport } from 'components/models/ui/submission_report';
+import type { SubmissionReport } from 'components/models/ui/submission_report';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
-  report: TSubmissionReport;
+  report: SubmissionReport;
 };
 
 function WrappedMetadata({ report }: Props) {
