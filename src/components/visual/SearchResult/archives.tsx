@@ -5,7 +5,7 @@ import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/materi
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
-import type { FileIndexed, LabelCategories } from 'components/models/base/file';
+import { LABELS_COLOR_MAP, type FileIndexed, type LabelCategories } from 'components/models/base/file';
 import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
@@ -24,12 +24,6 @@ import Moment from 'components/visual/Moment';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-
-const LABELS_COLOR_MAP = {
-  info: 'default',
-  technique: 'secondary',
-  attribution: 'primary'
-} as const;
 
 type LabelCellProps = {
   label_categories?: LabelCategories;
