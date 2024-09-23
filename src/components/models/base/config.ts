@@ -6,8 +6,7 @@ export const AUTO_PROPERTY_TYPES = ['access', 'classification', 'type', 'role', 
 export const BANNER_LEVELS = ['info', 'warning', 'success', 'error'] as const;
 export const DOWNLOAD_ENCODINGS = ['raw', 'cart'] as const;
 export const EXTERNAL_LINK_TYPES = ['hash', 'metadata', 'tag'] as const;
-export const FILE_HASH_PATTERN_MAP = ['sha256', 'sha1', 'md5'] as const;
-export const HASH_PATTERN_MAP = [...FILE_HASH_PATTERN_MAP, 'tlsh', 'ssdeep', 'url'] as const;
+export const HASH_PATTERN_MAP = ['sha256', 'sha1', 'md5', 'tlsh', 'ssdeep', 'url'] as const;
 export const KUBERNETES_LABEL_OPS = ['In', 'NotIn', 'Exists', 'DoesNotExist'] as const;
 export const METADATA_FIELDTYPE_MAP = [
   'boolean',
@@ -44,7 +43,6 @@ export type AutoPropertyType = (typeof AUTO_PROPERTY_TYPES)[number];
 export type BannerLevel = (typeof BANNER_LEVELS)[number];
 export type DownloadEncoding = (typeof DOWNLOAD_ENCODINGS)[number];
 export type ExternalLinkType = (typeof EXTERNAL_LINK_TYPES)[number];
-export type FileHashPatternMap = (typeof FILE_HASH_PATTERN_MAP)[number];
 export type HashPatternMap = (typeof HASH_PATTERN_MAP)[number];
 export type KubernetesLabelOps = (typeof KUBERNETES_LABEL_OPS)[number];
 export type MetadataFieldTypeMap = (typeof METADATA_FIELDTYPE_MAP)[number];
@@ -450,7 +448,7 @@ export type Submission = {
   dtl: number;
 
   /** List of external source to fetch file */
-  file_sources: Record<FileHashPatternMap, FileSource>;
+  file_sources: Record<HashPatternMap, FileSource>;
 
   /** Maximum number of days submissions will remain in the system */
   max_dtl: number;
@@ -565,7 +563,10 @@ export const CONFIGURATION: Configuration = {
     file_sources: {
       md5: { pattern: '^[a-f0-9]{32}$', sources: [], auto_selected: [] },
       sha1: { pattern: '^[a-f0-9]{40}$', sources: [], auto_selected: [] },
-      sha256: { pattern: '^[a-f0-9]{64}$', sources: [], auto_selected: [] }
+      sha256: { pattern: '^[a-f0-9]{64}$', sources: [], auto_selected: [] },
+      tlsh: { pattern: '^((?:T1)?[0-9a-fA-F]{70})$', sources: [], auto_selected: [] },
+      ssdeep: { pattern: '^[0-9]{1,18}:[a-zA-Z0-9/+]{0,64}:[a-zA-Z0-9/+]{0,64}$', sources: [], auto_selected: [] },
+      url: { pattern: '([/?#]S*)', sources: [], auto_selected: [] }
     },
     max_dtl: 0,
     max_extraction_depth: 0,
