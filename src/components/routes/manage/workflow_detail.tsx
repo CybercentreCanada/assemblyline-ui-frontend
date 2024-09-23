@@ -574,9 +574,7 @@ const WrappedWorkflowDetail = ({ workflow_id = null, close = () => null, mode = 
                 value={workflow.labels}
                 renderInput={params => <TextField {...params} variant="outlined" />}
                 renderTags={(value, getTagProps) =>
-                  value.map((option, index) => (
-                    <Chip variant="outlined" label={option} {...getTagProps({ index })} key={index} />
-                  ))
+                  value.map((option, index) => <Chip label={option} {...getTagProps({ index })} key={index} />)
                 }
                 onChange={(event, value) => handleLabelsChange(value.map(v => v.toUpperCase()))}
                 disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
