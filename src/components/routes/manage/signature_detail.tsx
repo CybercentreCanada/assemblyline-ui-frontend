@@ -25,6 +25,10 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { Signature } from 'components/models/base/signature';
+import type { Statistic } from 'components/models/base/statistic';
+import { DEFAULT_STATS } from 'components/models/base/statistic';
+import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
@@ -39,7 +43,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
-import ForbiddenPage from '../403';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
@@ -49,46 +52,6 @@ const LANG_SELECTOR = {
   configextractor: 'python',
   sigma: 'yaml',
   tagcheck: 'yara'
-};
-
-export type Signature = {
-  classification: string;
-  data: string;
-  id: string;
-  last_modified: string;
-  name: string;
-  order: number;
-  revision: string;
-  signature_id: string;
-  source: string;
-  state_change_data: string;
-  state_change_user: string;
-  stats: Statistics;
-  status: 'DEPLOYED' | 'NOISY' | 'DISABLED';
-  type: string;
-};
-
-export type Statistics = {
-  avg: number;
-  min: number;
-  max: number;
-  count: number;
-  sum: number;
-  last_hit: string;
-  first_hit: string;
-};
-
-type ParamProps = {
-  id?: string;
-  type?: string;
-  source?: string;
-  name?: string;
-};
-
-type SignatureDetailProps = {
-  signature_id?: string;
-  onUpdated?: () => void;
-  onDeleted?: () => void;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -111,14 +74,17 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const defaultStats = {
-  count: 0,
-  first_hit: null,
-  last_hit: null,
-  min: 0,
-  avg: 0,
-  max: 0,
-  sum: 0
+type ParamProps = {
+  id?: string;
+  type?: string;
+  source?: string;
+  name?: string;
+};
+
+type SignatureDetailProps = {
+  signature_id?: string;
+  onUpdated?: () => void;
+  onDeleted?: () => void;
 };
 
 const SignatureDetail = ({
@@ -130,7 +96,7 @@ const SignatureDetail = ({
   const { id, type, source, name } = useParams<ParamProps>();
   const theme = useTheme();
   const [signature, setSignature] = useState<Signature>(null);
-  const [stats, setStats] = useState<Statistics>(defaultStats);
+  const [stats, setStats] = useState<Statistic>(DEFAULT_STATS);
   const [histogram, setHistogram] = useState<any>(null);
   const [results, setResults] = useState<any>(null);
   const [open, setOpen] = useState(false);

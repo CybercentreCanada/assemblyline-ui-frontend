@@ -21,3 +21,13 @@ export type Statistic = {
   /** Sum of all stastical hits */
   sum: number;
 };
+
+export const DEFAULT_STATS: Statistic = {
+  avg: 0,
+  count: 0,
+  first_hit: null,
+  last_hit: null,
+  max: 0,
+  min: 0,
+  sum: 0
+};

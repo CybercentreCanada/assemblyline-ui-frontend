@@ -1,4 +1,6 @@
+export const ATTRIBUTION_TYPES = ['actor', 'campaign', 'category', 'exploit', 'implant', 'family', 'network'];
 export const BADHASH_TYPES = ['file', 'tag', 'signature'] as const;
+export const HASHES = ['md5', 'sha1', 'sha256', 'ssdeep', 'tlsh'];
 export const SOURCE_TYPES = ['user', 'external'] as const;
 
 export type BadHashType = (typeof BADHASH_TYPES)[number];
@@ -103,7 +105,7 @@ export type Badlist = {
   enabled: boolean;
 
   /** When does this item expire from the list? */
-  expiry_ts?: string & Date;
+  expiry_ts?: string;
 
   /** Information about the file */
   file?: File;
@@ -128,4 +130,58 @@ export type Badlist = {
 
   /** Last date when sources were added to the bad hash */
   updated: string & Date;
+};
+
+export const DEFAULT_BADLIST_TAG: { tag: Tag } = {
+  tag: {
+    type: '',
+    value: ''
+  }
+};
+
+export const DEFAULT_BADLIST_FILE: { hashes: Hashes; file: File } = {
+  hashes: {
+    sha256: '',
+    md5: '',
+    sha1: '',
+    ssdeep: '',
+    tlsh: ''
+  },
+  file: {
+    name: [''],
+    size: 0,
+    type: ''
+  }
+};
+
+export const DEFAULT_TEMP_ATTRIBUTION = { type: 'actor', value: '' };
+
+export const DEFAULT_BADLIST: Badlist = {
+  attribution: {
+    actor: [],
+    campaign: [],
+    category: [],
+    exploit: [],
+    implant: [],
+    family: [],
+    network: []
+  },
+  expiry_ts: null,
+  sources: [{ type: 'user', name: '', reason: [''], classification: null }],
+  type: null,
+  added: undefined,
+  classification: '',
+  enabled: false,
+  hashes: {
+    md5: '',
+    sha1: '',
+    sha256: '',
+    ssdeep: '',
+    tlsh: ''
+  },
+  id: '',
+  signature: {
+    name: ''
+  },
+  updated: undefined
 };

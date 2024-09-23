@@ -5,6 +5,7 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
+import type { Theme } from '@mui/material';
 import {
   Autocomplete,
   Button,
@@ -17,7 +18,6 @@ import {
   Select,
   Skeleton,
   TextField,
-  Theme,
   Tooltip,
   Typography,
   useTheme
@@ -32,7 +32,10 @@ import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { Workflow } from 'components/models/base/workflow';
+import { LABELS } from 'components/models/base/workflow';
 import type { CustomUser } from 'components/models/ui/user';
+import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
@@ -43,37 +46,16 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
-import ForbiddenPage from '../403';
 
-const DEFAULT_LABELS = [
-  'PHISHING',
-  'CRIME',
-  'ATTRIBUTED',
-  'WHITELISTED',
-  'FALSE_POSITIVE',
-  'REPORTED',
-  'MITIGATED',
-  'PENDING'
-];
-
-export type Workflow = {
-  classification: string;
-  creation_date?: number;
-  creator?: string;
-  edited_by?: string;
-  enabled: boolean;
-  first_seen?: string;
-  hit_count: number;
-  labels: string[];
-  last_edit?: string;
-  last_seen?: string;
-  name: string;
-  origin: string;
-  priority: string;
-  query: string;
-  status: string;
-  workflow_id?: string;
-};
+const useStyles = makeStyles(theme => ({
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
+  }
+}));
 
 type ParamProps = {
   id: string;
@@ -92,16 +74,6 @@ const MyMenuItem = withStyles((theme: Theme) =>
     }
   })
 )(MenuItem);
-
-const useStyles = makeStyles(theme => ({
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
 
 const THROTTLER = new Throttler(250);
 
@@ -131,16 +103,22 @@ const WrappedWorkflowDetail = ({ workflow_id = null, close = () => null, mode = 
   const navigate = useNavigate();
   const inputRef = React.useRef(null);
 
-  const DEFAULT_WORKFLOW = {
+  const DEFAULT_WORKFLOW: Workflow = {
     classification: c12nDef.UNRESTRICTED,
+    creation_date: undefined,
+    creator: '',
+    description: '',
+    edited_by: '',
     enabled: true,
     hit_count: 0,
+    id: '',
     labels: [],
+    last_edit: undefined,
     name: '',
-    priority: '',
+    origin: configuration.ui.fqdn,
+    priority: null,
     query: '',
-    status: '',
-    origin: configuration.ui.fqdn
+    status: null
   };
 
   useEffect(() => {
@@ -313,8 +291,8 @@ const WrappedWorkflowDetail = ({ workflow_id = null, close = () => null, mode = 
       method: workflowID ? 'POST' : 'PUT',
       body: {
         ...workflow,
-        priority: workflow.priority === '' ? null : workflow.priority,
-        status: workflow.status === '' ? null : workflow.status
+        priority: !workflow.priority ? null : workflow.priority,
+        status: !workflow.status ? null : workflow.status
       },
       onSuccess: () => {
         showSuccessMessage(t(workflowID ? 'save.success' : 'add.success'));
@@ -427,7 +405,7 @@ const WrappedWorkflowDetail = ({ workflow_id = null, close = () => null, mode = 
                           }, 250);
 
                           // Keep properties of workflow that are important
-                          var keptProperties = {
+                          const keptProperties = {
                             classification: workflow.classification,
                             enabled: workflow.enabled,
                             labels: workflow.labels,
@@ -591,10 +569,10 @@ const WrappedWorkflowDetail = ({ workflow_id = null, close = () => null, mode = 
                 fullWidth
                 multiple
                 freeSolo
-                options={DEFAULT_LABELS}
+                options={LABELS}
                 value={workflow.labels}
                 renderInput={params => <TextField {...params} variant="outlined" />}
-                onChange={(event, value) => handleLabelsChange(value.map(v => v.toUpperCase()) as string[])}
+                onChange={(event, value) => handleLabelsChange(value.map(v => v.toUpperCase()))}
                 disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
                 isOptionEqualToValue={(option, value) => {
                   return option.toUpperCase() === value.toUpperCase();

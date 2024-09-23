@@ -16,7 +16,7 @@ import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
 import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
-import type { SearchResult } from 'components/visual/SearchBar/SearchParser';
+import type { SearchParamsResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import WorkflowTable from 'components/visual/SearchResult/workflow';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -64,7 +64,7 @@ const WorkflowsSearch = () => {
   );
 
   const handleReload = useCallback(
-    (body: SearchResult<WorkflowsParams>) => {
+    (body: SearchParamsResult<WorkflowsParams>) => {
       if (!currentUser.roles.includes('workflow_view')) return;
 
       apiCall({

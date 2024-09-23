@@ -1,14 +1,14 @@
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { Params } from './SearchParams';
-import type { GetParams, SearchResult } from './SearchParser';
+import type { GetParams, SearchParamsResult } from './SearchParser';
 import { SearchParser } from './SearchParser';
 
 type ContextProps<P extends Params> = {
   /**
    * Default search params as a formatted URLSearchParams
    */
-  defaults: SearchResult<P>;
+  defaults: SearchParamsResult<P>;
 
   /**
    * Is there a search params stored in the local storage

@@ -1,3 +1,4 @@
+import { PossibleColor } from '../utils/color';
 import type { UserIndexed } from './user';
 import type { UserAvatar } from './user_avatar';
 
@@ -218,4 +219,10 @@ export const DEFAULT_LABELS: LabelCategories = {
   attribution: [],
   technique: [],
   info: []
+};
+
+export const LABELS_COLOR_MAP: Record<keyof LabelCategories, PossibleColor> = {
+  info: 'default',
+  technique: 'secondary',
+  attribution: 'primary'
 };

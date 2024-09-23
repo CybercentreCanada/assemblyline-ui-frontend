@@ -22,6 +22,7 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { AlertItem } from 'components/models/base/alert';
+import { LABELS, PRIORITIES, STATUSES, type Label, type Priority, type Status } from 'components/models/base/workflow';
 import type { CustomUser } from 'components/models/ui/user';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
@@ -47,23 +48,6 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.default
   }
 }));
-
-const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] as const;
-const STATUSES = ['ASSESS', 'MALICIOUS', 'NON-MALICIOUS'] as const;
-const LABELS = [
-  'PHISHING',
-  'CRIME',
-  'ATTRIBUTED',
-  'WHITELISTED',
-  'FALSE_POSITIVE',
-  'REPORTED',
-  'MITIGATED',
-  'PENDING'
-] as const;
-
-export type Priority = (typeof PRIORITIES)[number];
-export type Status = (typeof STATUSES)[number];
-export type Label = (typeof LABELS)[number];
 
 type WorkflowBody = {
   priority: Priority;
