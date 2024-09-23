@@ -8,8 +8,8 @@ export const LABELS = [
   'REPORTED',
   'WHITELISTED'
 ] as const;
-export const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] as const;
-export const STATUSES = ['MALICIOUS', 'NON-MALICIOUS', 'ASSESS', 'TRIAGE'] as const;
+export const PRIORITIES = ['', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] as const;
+export const STATUSES = ['', 'MALICIOUS', 'NON-MALICIOUS', 'ASSESS', 'TRIAGE'] as const;
 
 export type Label = (typeof LABELS)[number];
 export type Priority = (typeof PRIORITIES)[number];

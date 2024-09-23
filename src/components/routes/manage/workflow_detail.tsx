@@ -10,6 +10,7 @@ import {
   Autocomplete,
   Button,
   Checkbox,
+  Chip,
   CircularProgress,
   FormControlLabel,
   Grid,
@@ -116,9 +117,9 @@ const WrappedWorkflowDetail = ({ workflow_id = null, close = () => null, mode = 
     last_edit: undefined,
     name: '',
     origin: configuration.ui.fqdn,
-    priority: null,
+    priority: '',
     query: '',
-    status: null
+    status: ''
   };
 
   useEffect(() => {
@@ -572,6 +573,11 @@ const WrappedWorkflowDetail = ({ workflow_id = null, close = () => null, mode = 
                 options={LABELS}
                 value={workflow.labels}
                 renderInput={params => <TextField {...params} variant="outlined" />}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip variant="outlined" label={option} {...getTagProps({ index })} key={index} />
+                  ))
+                }
                 onChange={(event, value) => handleLabelsChange(value.map(v => v.toUpperCase()))}
                 disabled={!currentUser.roles.includes('workflow_manage') || viewMode === 'read'}
                 isOptionEqualToValue={(option, value) => {
@@ -621,6 +627,7 @@ const WrappedWorkflowDetail = ({ workflow_id = null, close = () => null, mode = 
                   <MyMenuItem value="MALICIOUS">{t('status.MALICIOUS')}</MyMenuItem>
                   <MyMenuItem value="NON-MALICIOUS">{t('status.NON-MALICIOUS')}</MyMenuItem>
                   <MyMenuItem value="ASSESS">{t('status.ASSESS')}</MyMenuItem>
+                  <MyMenuItem value="TRIAGE">{t('status.TRIAGE')}</MyMenuItem>
                 </Select>
               </FormControl>
             ) : (
