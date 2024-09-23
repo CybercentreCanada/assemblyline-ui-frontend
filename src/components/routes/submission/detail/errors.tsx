@@ -2,6 +2,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Button, Collapse, Divider, Link as MaterialLink, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { ParsedErrors } from 'components/models/base/error';
 import { getErrorTypeFromKey, getHashFromKey, getServiceFromKey } from 'helpers/errors';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,20 +16,7 @@ const useStyles = makeStyles(theme => ({
 
 type ErrorSectionProps = {
   sid: string;
-  parsed_errors: {
-    aggregated: {
-      depth: string[];
-      files: string[];
-      retry: string[];
-      down: string[];
-      busy: string[];
-      preempted: string[];
-      exception: string[];
-      unknown: string[];
-    };
-    listed: string[];
-    services: string[];
-  };
+  parsed_errors: ParsedErrors;
 };
 
 const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }) => {

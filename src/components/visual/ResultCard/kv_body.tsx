@@ -1,7 +1,12 @@
+import type { KeyValueBody as KeyValueData } from 'components/models/base/result_body';
 import TitleKey from 'components/visual/TitleKey';
 import { default as React } from 'react';
 
-const WrappedKVBody = ({ body }) => (
+type Props = {
+  body: KeyValueData;
+};
+
+const WrappedKVBody = ({ body }: Props) => (
   <table cellSpacing={0}>
     <tbody>
       {Object.keys(body).map((key, id) => {

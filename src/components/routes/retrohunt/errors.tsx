@@ -7,8 +7,9 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
-import { RetrohuntResult } from 'components/routes/retrohunt';
+import type { Retrohunt } from 'components/models/base/retrohunt';
+import type { SearchResult } from 'components/models/ui/search';
+import type { CustomUser } from 'components/models/ui/user';
 import {
   DivTable,
   DivTableBody,
@@ -67,15 +68,8 @@ type Error = {
   message: string;
 };
 
-type RetrohuntErrorResult = {
-  items: Error[];
-  offset: number;
-  rows: number;
-  total: number;
-};
-
 type Props = {
-  retrohunt: RetrohuntResult;
+  retrohunt: Retrohunt;
   isDrawer: boolean;
 };
 
@@ -91,7 +85,7 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
   const { configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [errorResults, setErrorResults] = useState<RetrohuntErrorResult>(null);
+  const [errorResults, setErrorResults] = useState<SearchResult<Error>>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(DEFAULT_QUERY));
   const [isReloading, setIsReloading] = useState<boolean>(true);
 

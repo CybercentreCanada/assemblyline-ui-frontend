@@ -2,19 +2,20 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { Autocomplete, Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
+import type { Service } from 'components/models/base/service';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactJson from 'react-json-view';
 
 type ServiceConfig = {
-  name: string;
-  value: any;
+  name: keyof Service['config'];
+  value: Service['config'][any];
 };
 
 type ExtendedServiceConfig = {
-  name: string;
+  name: keyof Service['config'];
   type: 'bool' | 'int' | 'list' | 'str' | 'json';
-  value: any;
+  value: Service['config'][any];
 };
 
 type MultiTypeConfigProps = {

@@ -19,7 +19,8 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import type { ServiceConstants, Service as ServiceData } from 'components/models/base/service';
+import type { CustomUser } from 'components/models/ui/user';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
@@ -34,130 +35,6 @@ import ServiceGeneral from './service_detail/general';
 import ServiceParams from './service_detail/parameters';
 import ServiceUpdater from './service_detail/updater';
 
-type ServiceProps = {
-  name?: string | null;
-  serviceNames: string[];
-  onDeleted?: () => void;
-  onUpdated?: () => void;
-};
-
-type ParamProps = {
-  svc: string;
-};
-
-export type Volume = {
-  capacity: string;
-  mount_path: string;
-  storage_class: string;
-  access_mode: 'ReadWriteOnce' | 'ReadWriteMany';
-};
-
-export type Environment = {
-  name: string;
-  value: string;
-};
-
-export type Container = {
-  allow_internet_access: boolean;
-  command: string[];
-  cpu_cores: number;
-  environment: Environment[];
-  labels?: Environment[];
-  image: string;
-  ports: string[];
-  ram_mb: number;
-  ram_mb_min: number;
-  registry_password: string;
-  registry_username: string;
-  registry_type: 'docker' | 'harbor';
-  service_account?: string;
-};
-
-export type SubmissionParams = {
-  default: string | boolean | number;
-  name: string;
-  type: 'int' | 'bool' | 'str' | 'list';
-  value: string | boolean | number;
-  list?: string[];
-  hide?: boolean;
-};
-
-export type SourceStatus = {
-  last_successful_update: string;
-  state: string;
-  message: string;
-  ts: string;
-};
-
-export type Source = {
-  ca_cert: string;
-  default_classification: string;
-  headers: Environment[];
-  name: string;
-  password: string;
-  pattern: string;
-  private_key: string;
-  proxy: string;
-  ssl_ignore_errors: boolean;
-  uri: string;
-  username: string;
-  git_branch: string;
-  status: SourceStatus;
-  sync: boolean;
-};
-
-type UpdateConfig = {
-  generates_signatures: boolean;
-  method: 'run' | 'build';
-  run_options: Container;
-  sources: Source[];
-  update_interval_seconds: number;
-  wait_for_update: boolean;
-  signature_delimiter: 'new_line' | 'double_new_line' | 'pipe' | 'comma' | 'space' | 'none' | 'file' | 'custom';
-  custom_delimiter: string;
-};
-
-export type ServiceDetail = {
-  accepts: string;
-  category: string;
-  classification: string;
-  config: {
-    [name: string]: string;
-  };
-  default_result_classification: string;
-  dependencies: {
-    [name: string]: {
-      container: Container;
-      volumes: {
-        [name: string]: Volume;
-      };
-    };
-  };
-  description: string;
-  disable_cache: boolean;
-  docker_config: Container;
-  enabled: boolean;
-  is_external: boolean;
-  licence_count: number;
-  max_queue_length: number;
-  min_instances?: number;
-  name: string;
-  privileged: boolean;
-  recursion_prevention: string[];
-  rejects: string;
-  stage: string;
-  submission_params: SubmissionParams[];
-  timeout: number;
-  update_channel: 'dev' | 'beta' | 'rc' | 'stable';
-  update_config: UpdateConfig;
-  version: string;
-};
-
-export type ServiceConstants = {
-  categories: string[];
-  stages: string[];
-};
-
 const useStyles = makeStyles(() => ({
   buttonProgress: {
     position: 'absolute',
@@ -168,27 +45,41 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
+const TAB_TYPES = ['general', 'docker', 'updater', 'params'] as const;
+type TabType = (typeof TAB_TYPES)[number];
+
+type ParamProps = {
+  svc: string;
+};
+
+type ServiceProps = {
+  name?: string | null;
+  onDeleted?: () => void;
+  onUpdated?: () => void;
+  serviceNames?: string[];
+};
+
 function Service({ name = null, onDeleted = () => null, onUpdated = () => null, serviceNames }: ServiceProps) {
-  const { svc } = useParams<ParamProps>();
   const { t } = useTranslation(['adminServices']);
-  const [service, setService] = useState<ServiceDetail>(null);
-  const [serviceDefault, setServiceDefault] = useState<ServiceDetail>(null);
+  const theme = useTheme();
+  const navigate = useNavigate();
+  const classes = useStyles();
+  const { svc } = useParams<ParamProps>();
+  const { apiCall } = useMyAPI();
+  const { user: currentUser } = useAppUser<CustomUser>();
+  const { showSuccessMessage } = useMySnackbar();
+
+  const [service, setService] = useState<ServiceData>(null);
+  const [serviceDefault, setServiceDefault] = useState<ServiceData>(null);
   const [serviceVersion, setServiceVersion] = useState<string>(null);
   const [serviceGeneralError, setServiceGeneralError] = useState<boolean>(false);
   const [overallError, setOverallError] = useState<boolean>(false);
   const [constants, setConstants] = useState<ServiceConstants>(null);
   const [versions, setVersions] = useState<string[]>(null);
-  const [tab, setTab] = useState('general');
-  const [modified, setModified] = useState(false);
-  const [buttonLoading, setButtonLoading] = useState(false);
-  const theme = useTheme();
-  const [deleteDialog, setDeleteDialog] = useState(false);
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const { showSuccessMessage } = useMySnackbar();
-  const navigate = useNavigate();
-  const classes = useStyles();
-
-  const { apiCall } = useMyAPI();
+  const [tab, setTab] = useState<TabType>('general');
+  const [modified, setModified] = useState<boolean>(false);
+  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
+  const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
 
   function saveService() {
     apiCall({
@@ -245,14 +136,14 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null, 
 
     // Load user on start
     if (currentUser.is_admin) {
-      apiCall({
+      apiCall<ServiceData>({
         url: `/api/v4/service/${name || svc}/`,
         onSuccess: api_data => {
           setService(api_data.api_response);
           setServiceVersion(api_data.api_response.version);
         }
       });
-      apiCall({
+      apiCall<string[]>({
         url: `/api/v4/service/versions/${name || svc}/`,
         onSuccess: api_data => {
           setVersions(api_data.api_response);
@@ -268,7 +159,7 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null, 
 
     // Load user on start
     if (currentUser.is_admin && serviceVersion) {
-      apiCall({
+      apiCall<ServiceData>({
         url: `/api/v4/service/${name || svc}/${serviceVersion}/`,
         onSuccess: ({ api_response }) => setServiceDefault(api_response)
       });
@@ -286,7 +177,7 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null, 
   useEffect(() => {
     // Load constants on page load
     if (!currentUser.is_admin) return;
-    apiCall({
+    apiCall<ServiceConstants>({
       url: '/api/v4/service/constants/',
       onSuccess: ({ api_response }) => setConstants(api_response)
     });

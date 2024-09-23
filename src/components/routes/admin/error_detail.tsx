@@ -11,7 +11,8 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { Error as ErrorModel } from 'components/models/base/error';
+import type { CustomUser } from 'components/models/ui/user';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import FileDownloader from 'components/visual/FileDownloader';
 import Moment from 'components/visual/Moment';
@@ -21,20 +22,19 @@ import { BsClipboard } from 'react-icons/bs';
 import { Navigate } from 'react-router';
 import { Link, useLocation, useParams } from 'react-router-dom';
 
-export type Error = {
-  created: string;
-  id: string;
-  response: {
-    message: string;
-    service_debug_info: string;
-    service_name: string;
-    service_tool_version: string;
-    service_version: number | string;
-    status: string;
-  };
-  sha256: string;
-  type: string;
-};
+const useStyles = makeStyles(theme => ({
+  clipboardIcon: {
+    marginRight: theme.spacing(1),
+    '&:hover': {
+      cursor: 'pointer',
+      transform: 'scale(1.1)'
+    }
+  }
+}));
+
+interface Error extends ErrorModel {
+  key: string;
+}
 
 type ParamProps = {
   key?: string;
@@ -46,16 +46,6 @@ type ParamProps = {
 type ErrorDetailProps = {
   error_key?: string;
 };
-
-const useStyles = makeStyles(theme => ({
-  clipboardIcon: {
-    marginRight: theme.spacing(1),
-    '&:hover': {
-      cursor: 'pointer',
-      transform: 'scale(1.1)'
-    }
-  }
-}));
 
 export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
   const { t } = useTranslation(['adminErrorViewer']);
@@ -89,7 +79,7 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
 
   useEffect(() => {
     if ((error_key || key) && currentUser.is_admin) {
-      apiCall({
+      apiCall<Error>({
         url: `/api/v4/error/${error_key || key}/`,
         onSuccess: api_data => {
           setError({ key: error_key || key, ...api_data.api_response });

@@ -10,13 +10,15 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import type { Safelist } from 'components/models/base/safelist';
+import type { SearchResult } from 'components/models/ui/search';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
 import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
-import type { SearchResult } from 'components/visual/SearchBar/SearchParser';
+import type { SearchResult as SearchParamsResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SafelistTable from 'components/visual/SearchResult/safelist';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -24,15 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import SafelistNew from './safelist_add';
-import type { Safelist } from './safelist_detail';
 import SafelistDetail from './safelist_detail';
-
-type SearchResults = {
-  items: Safelist[];
-  offset: number;
-  rows: number;
-  total: number;
-};
 
 const SAFELIST_PARAMS = createSearchParams(p => ({
   query: p.string(''),
@@ -57,7 +51,7 @@ const SafelistSearch = () => {
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { search, setSearchParams, setSearchObject } = useSearchParams<SafelistParams>();
 
-  const [safelistResults, setSafelistResults] = useState<SearchResults>(null);
+  const [safelistResults, setSafelistResults] = useState<SearchResult<Safelist>>(null);
   const [searching, setSearching] = useState<boolean>(false);
 
   const suggestions = useMemo<string[]>(
@@ -69,17 +63,17 @@ const SafelistSearch = () => {
   );
 
   const handleReload = useCallback(
-    (body: SearchResult<SafelistParams>) => {
+    (body: SearchParamsResult<SafelistParams>) => {
       if (!currentUser.roles.includes('safelist_view')) return;
 
-      apiCall({
+      apiCall<SearchResult<Safelist>>({
         url: '/api/v4/search/safelist/',
         method: 'POST',
         body: body
           .set(o => ({ ...o, query: o.query || '*' }))
           .omit(['refresh'])
           .toObject(),
-        onSuccess: ({ api_response }) => setSafelistResults(api_response as SearchResults),
+        onSuccess: ({ api_response }) => setSafelistResults(api_response),
         onEnter: () => setSearching(true),
         onExit: () => setSearching(false)
       });

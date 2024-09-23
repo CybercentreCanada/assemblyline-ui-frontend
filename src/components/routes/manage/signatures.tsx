@@ -9,7 +9,7 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import FileDownloader from 'components/visual/FileDownloader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';

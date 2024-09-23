@@ -9,7 +9,8 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import type { WorkflowIndexed } from 'components/models/base/workflow';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
@@ -17,7 +18,6 @@ import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import type { SearchResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import type { WorkflowResult } from 'components/visual/SearchResult/workflow';
 import WorkflowTable from 'components/visual/SearchResult/workflow';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +26,7 @@ import { useLocation } from 'react-router-dom';
 import WorkflowDetail from './workflow_detail';
 
 type SearchResults = {
-  items: WorkflowResult[];
+  items: WorkflowIndexed[];
   offset: number;
   rows: number;
   total: number;

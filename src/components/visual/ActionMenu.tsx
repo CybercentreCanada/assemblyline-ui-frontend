@@ -67,7 +67,7 @@ type Coordinates = {
 
 type TagProps = {
   category: 'heuristic' | 'signature' | 'hash' | 'metadata' | 'tag';
-  index: string;
+  index?: string;
   type: string;
   value: string;
   classification?: string | null;
@@ -95,7 +95,7 @@ const categoryIndex = {
 
 const WrappedActionMenu: React.FC<TagProps> = ({
   category,
-  index,
+  index = null,
   type,
   value,
   classification = null,

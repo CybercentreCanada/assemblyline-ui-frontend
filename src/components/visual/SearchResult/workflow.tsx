@@ -4,6 +4,8 @@ import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
+import { WorkflowIndexed } from 'components/models/base/workflow';
+import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import Moment from 'components/visual/Moment';
 import React from 'react';
@@ -20,36 +22,12 @@ import {
 } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
-export type WorkflowResult = {
-  classification: string;
-  creation_date: string;
-  creator: string;
-  edited_by: string;
-  enabled: boolean;
-  hit_count: string;
-  id: string;
-  last_edit: string;
-  last_seen: string;
-  name: string;
-  priority: string;
-  query: string;
-  status: string;
-  workflow_id: string;
-};
-
-type SearchResults = {
-  items: WorkflowResult[];
-  rows: number;
-  offset: number;
-  total: number;
-};
-
-type WorkflowTableProps = {
-  workflowResults: SearchResults;
+type Props = {
+  workflowResults: SearchResult<WorkflowIndexed>;
   setWorkflowID?: (id: string) => void;
 };
 
-const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults, setWorkflowID = null }) => {
+const WrappedWorflowTable: React.FC<Props> = ({ workflowResults, setWorkflowID = null }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 

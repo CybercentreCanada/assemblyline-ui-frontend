@@ -7,12 +7,12 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import type { SubmissionIndexed } from 'components/models/base/submission';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
 import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import type { SubmissionResult } from 'components/visual/SearchResult/submissions';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import { safeFieldValue } from 'helpers/utils';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import ForbiddenPage from './403';
 
 type SearchResults = {
-  items: SubmissionResult[];
+  items: SubmissionIndexed[];
   offset: number;
   rows: number;
   total: number;

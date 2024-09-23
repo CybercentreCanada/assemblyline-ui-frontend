@@ -3,12 +3,12 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import { Checkbox, FormControlLabel, Grid, IconButton, TextField, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
+import type { EnvironmentVariable, UpdateSource } from 'components/models/base/service';
+import ResetButton from 'components/routes/admin/service_detail/reset_button';
 import Classification from 'components/visual/Classification';
 import Moment from 'components/visual/Moment';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Environment } from '../admin/service_detail';
-import ResetButton from '../admin/service_detail/reset_button';
 
 const useStyles = makeStyles(theme => ({
   checkbox: {
@@ -23,9 +23,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const DEFAULT_HEADER: Environment = {
+const DEFAULT_HEADER: EnvironmentVariable = {
   name: '',
   value: ''
+};
+
+type Props = {
+  source: UpdateSource;
+  defaults: UpdateSource;
+  addMode: boolean;
+  showDetails: boolean;
+  setSource: (value: UpdateSource) => void;
+  setModified: (value: boolean) => void;
 };
 
 const WrappedSourceDetail = ({
@@ -35,11 +44,11 @@ const WrappedSourceDetail = ({
   addMode = false,
   setModified = null,
   showDetails = true
-}) => {
+}: Props) => {
   const { t, i18n } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
-  const [tempHeader, setTempHeader] = useState({ ...DEFAULT_HEADER });
+  const [tempHeader, setTempHeader] = useState<EnvironmentVariable>({ ...DEFAULT_HEADER });
   const classes = useStyles();
 
   const handleURIChange = event => {

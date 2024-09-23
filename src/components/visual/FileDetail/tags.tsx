@@ -13,6 +13,8 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useSafeResults from 'components/hooks/useSafeResults';
+import { Signature } from 'components/models/base/tagging';
+import { Tags } from 'components/models/ui/file';
 import AutoHideTagList from 'components/visual/AutoHideTagList';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -81,8 +83,8 @@ export const TooltipGrid: React.FC<TooltipGridProps> = ({ title = '', ...props }
 };
 
 type TagSectionProps = {
-  signatures: any;
-  tags: any;
+  signatures: Signature[];
+  tags: Tags;
   force?: boolean;
 };
 

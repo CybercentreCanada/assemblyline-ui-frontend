@@ -6,25 +6,19 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import type { UserIndexed } from 'components/models/base/user';
+import type { SearchResult } from 'components/models/ui/search';
 import { SearchHeader } from 'components/visual/SearchBar/SearchHeader';
 import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
 import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
-import type { SearchResult } from 'components/visual/SearchBar/SearchParser';
+import type { SearchResult as SearchParamsResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import type { UserResult } from 'components/visual/SearchResult/users';
 import UsersTable from 'components/visual/SearchResult/users';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 import { AddUserPage } from './users_add';
-
-type SearchResults = {
-  items: UserResult[];
-  offset: number;
-  rows: number;
-  total: number;
-};
 
 const USERS_PARAMS = createSearchParams(p => ({
   query: p.string(''),
@@ -45,12 +39,12 @@ const UsersSearch = () => {
   const { user: currentUser } = useALContext();
   const { search, setSearchParams, setSearchObject } = useSearchParams<UsersParams>();
 
-  const [userResults, setUserResults] = useState<SearchResults>(null);
+  const [userResults, setUserResults] = useState<SearchResult<UserIndexed>>(null);
   const [searching, setSearching] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
 
   const handleReload = useCallback(
-    (body: SearchResult<UsersParams>) => {
+    (body: SearchParamsResult<UsersParams>) => {
       if (!currentUser.is_admin) return;
 
       const param = body
@@ -58,9 +52,9 @@ const UsersSearch = () => {
         .omit(['filters', 'refresh'])
         .toString();
 
-      apiCall({
+      apiCall<SearchResult<UserIndexed>>({
         url: `/api/v4/user/list/?${param}`,
-        onSuccess: ({ api_response }) => setUserResults(api_response as SearchResults),
+        onSuccess: ({ api_response }) => setUserResults(api_response),
         onEnter: () => setSearching(true),
         onFinalize: () => setSearching(false)
       });

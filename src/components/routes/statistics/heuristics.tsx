@@ -4,10 +4,11 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import EnhancedTable, { Cell } from 'components/visual/Table/enhanced_table';
+import HeuristicDetail from 'components/routes/manage/heuristic_detail';
+import type { Cell } from 'components/visual/Table/enhanced_table';
+import EnhancedTable from 'components/visual/Table/enhanced_table';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import HeuristicDetail from '../manage/heuristic_detail';
 
 export default function StatisticsSignatures() {
   const { t } = useTranslation(['statisticsHeuristics']);

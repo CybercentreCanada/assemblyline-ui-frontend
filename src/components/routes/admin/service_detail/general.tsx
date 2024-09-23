@@ -17,7 +17,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
 import useALContext from 'components/hooks/useALContext';
-import type { ServiceConstants, ServiceDetail } from 'components/routes/admin/service_detail';
+import type { Service, ServiceConstants } from 'components/models/base/service';
 import Classification from 'components/visual/Classification';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
@@ -25,14 +25,14 @@ import { useTranslation } from 'react-i18next';
 import ResetButton from './reset_button';
 
 type ServiceGeneralProps = {
+  service: Service;
+  defaults: Service;
   constants: ServiceConstants;
-  defaults: ServiceDetail;
-  service: ServiceDetail;
   serviceNames: string[];
   versions: string[];
   setError: Dispatch<SetStateAction<boolean>>;
   setModified: Dispatch<SetStateAction<boolean>>;
-  setService: Dispatch<SetStateAction<ServiceDetail>>;
+  setService: Dispatch<SetStateAction<Service>>;
 };
 
 const ServiceGeneral = ({

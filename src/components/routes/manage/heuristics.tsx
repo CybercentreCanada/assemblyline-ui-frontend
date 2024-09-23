@@ -6,28 +6,22 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import type { Heuristic } from 'components/models/base/heuristic';
+import type { SearchResult } from 'components/models/ui/search';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
 import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
-import type { SearchResult } from 'components/visual/SearchBar/SearchParser';
+import type { SearchResult as SearchParamsResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import type { HeuristicResult } from 'components/visual/SearchResult/heuristics';
 import HeuristicsTable from 'components/visual/SearchResult/heuristics';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import HeuristicDetail from './heuristic_detail';
-
-type SearchResults = {
-  items: HeuristicResult[];
-  offset: number;
-  rows: number;
-  total: number;
-};
 
 const HEURISTICS_PARAMS = createSearchParams(p => ({
   query: p.string(''),
@@ -51,7 +45,7 @@ const HeuristicsSearch = () => {
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { search, setSearchParams } = useSearchParams<HeuristicsParams>();
 
-  const [heuristicResults, setHeuristicResults] = useState<SearchResults>(null);
+  const [heuristicResults, setHeuristicResults] = useState<SearchResult<Heuristic>>(null);
   const [searching, setSearching] = useState<boolean>(false);
 
   const suggestions = useMemo<string[]>(
@@ -60,14 +54,14 @@ const HeuristicsSearch = () => {
   );
 
   const handleReload = useCallback(
-    (body: SearchResult<HeuristicsParams>) => {
+    (body: SearchParamsResult<HeuristicsParams>) => {
       if (!currentUser.roles.includes('heuristic_view')) return;
 
-      apiCall({
+      apiCall<SearchResult<Heuristic>>({
         url: '/api/v4/search/heuristic/',
         method: 'POST',
         body: body.set(o => ({ ...o, query: o.query || '*' })).toObject(),
-        onSuccess: ({ api_response }) => setHeuristicResults(api_response as SearchResults),
+        onSuccess: ({ api_response }) => setHeuristicResults(api_response),
         onEnter: () => setSearching(true),
         onExit: () => setSearching(false)
       });

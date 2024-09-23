@@ -8,7 +8,8 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import type { Error } from 'components/models/base/error';
+import type { CustomUser } from 'components/models/ui/user';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
@@ -16,7 +17,6 @@ import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
 import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import type { ErrorResult } from 'components/visual/SearchResult/errors';
 import ErrorsTable from 'components/visual/SearchResult/errors';
 import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -26,7 +26,7 @@ import { useLocation } from 'react-router-dom';
 import { ErrorDetail } from './error_detail';
 
 type SearchResults = {
-  items: ErrorResult[];
+  items: Error[];
   offset: number;
   rows: number;
   total: number;

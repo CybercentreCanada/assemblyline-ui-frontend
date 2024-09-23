@@ -1,5 +1,6 @@
 import useALContext from 'components/hooks/useALContext';
 import useExternalLookup from 'components/hooks/useExternalLookup';
+import type { ExternalLinkType } from 'components/models/base/config';
 import React, { useCallback } from 'react';
 import ActionMenu from './ActionMenu';
 import type { CustomChipProps } from './CustomChip';
@@ -8,10 +9,10 @@ import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip'
 import ExternalLinks from './ExternalSearch';
 
 export type ActionableCustomChipProps = CustomChipProps & {
+  category?: ExternalLinkType;
+  classification?: string;
   data_type?: string;
   index?: string;
-  category?: 'hash' | 'metadata' | 'tag';
-  classification?: string;
   label?: string;
   value?: string;
 };

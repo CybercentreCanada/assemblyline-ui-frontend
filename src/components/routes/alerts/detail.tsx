@@ -11,7 +11,8 @@ import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import type { AlertItem } from 'components/models/base/alert';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import { ALERT_DEFAULT_PARAMS, ALERT_SIMPLELIST_ID } from 'components/routes/alerts';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
@@ -44,7 +45,6 @@ import {
   SkeletonInline
 } from './components/Components';
 import { SearchParamsProvider } from './contexts/SearchParamsContext';
-import type { AlertItem } from './models/Alert';
 
 const useStyles = makeStyles(theme => ({
   section: {

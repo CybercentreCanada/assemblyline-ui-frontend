@@ -4,10 +4,9 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
-import { CustomUser } from 'components/hooks/useMyUser';
-import { FileInfo } from 'components/routes/archive/detail';
+import type { FileIndexed, LabelCategories } from 'components/models/base/file';
+import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import {
@@ -26,21 +25,14 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-type SearchResults = {
-  items: FileInfo[];
-  rows: number;
-  offset: number;
-  total: number;
-};
-
 const LABELS_COLOR_MAP = {
   info: 'default',
   technique: 'secondary',
   attribution: 'primary'
-};
+} as const;
 
 type LabelCellProps = {
-  label_categories?: FileInfo['label_categories'];
+  label_categories?: LabelCategories;
   onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
 };
 
@@ -112,14 +104,14 @@ const WrappedLabelCell = ({ label_categories = null, onLabelClick = null }: Labe
 
 const LabelCell = React.memo(WrappedLabelCell);
 
-type ArchivesTableProps = {
-  fileResults: SearchResults;
+type Props = {
+  fileResults: SearchResult<FileIndexed>;
   allowSort?: boolean;
   setFileID?: (id: string) => void;
   onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
 };
 
-const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
+const WrappedArchivesTable: React.FC<Props> = ({
   fileResults,
   allowSort = true,
   setFileID = null,
@@ -127,8 +119,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
 }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const { c12nDef } = useALContext();
+  const { c12nDef, user: currentUser } = useALContext();
 
   const hasSupplementary = useMemo<boolean>(
     () => fileResults && fileResults?.total > 0 && fileResults?.items.some(item => item.is_supplementary),

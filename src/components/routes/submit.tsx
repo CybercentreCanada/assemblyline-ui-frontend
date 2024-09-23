@@ -28,13 +28,16 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceTree from 'components/layout/serviceTree';
 import SubmissionMetadata from 'components/layout/submissionMetadata';
+import type { HashPatternMap } from 'components/models/base/config';
+import type { Metadata, Submission } from 'components/models/base/submission';
+import type { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
 import MetadataInputField from 'components/visual/MetadataInputField';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import React, { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -43,7 +46,7 @@ type SubmitState = {
   hash: string;
   tabContext: string;
   c12n: string;
-  metadata?: any;
+  metadata?: Metadata;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -78,39 +81,43 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Submit: React.FC<any> = () => {
-  const { apiCall } = useMyAPI();
+const Submit = () => {
   const { t, i18n } = useTranslation(['submit']);
+  const { apiCall } = useMyAPI();
   const theme = useTheme();
   const classes = useStyles();
-  const { user: currentUser, c12nDef, configuration } = useALContext();
-  const [uuid, setUUID] = useState(null);
-  const [flow, setFlow] = useState(null);
-  const [settings, setSettings] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(null);
-  const [validate, setValidate] = useState(false);
-  const [validateCB, setValidateCB] = useState(null);
-  const [allowClick, setAllowClick] = useState(true);
-  const [file, setFile] = useState(null);
-  const downSM = useMediaQuery(theme.breakpoints.down('md'));
-  const md = useMediaQuery(theme.breakpoints.only('md'));
-  const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
   const navigate = useNavigate();
   const location = useLocation();
+  const banner = useAppBanner();
+  const { user: currentUser, c12nDef, configuration } = useALContext();
+  const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
+
+  const [allowClick, setAllowClick] = useState<boolean>(true);
+  const [file, setFile] = useState(null);
+  const [flow, setFlow] = useState<Flow>(null);
+  const [settings, setSettings] = useState<UserSettings>(null);
+  const [submissionMetadata, setSubmissionMetadata] = useState<Metadata>({});
+  const [uploadProgress, setUploadProgress] = useState<number>(null);
+  const [urlAutoselection, setUrlAutoselection] = useState<boolean>(false);
+  const [uuid, setUUID] = useState<string>(null);
+  const [validate, setValidate] = useState<boolean>(false);
+  const [validateCB, setValidateCB] = useState<string>(null);
+  const [value, setValue] = useState<string>('0');
+  const [stringInput, setStringInput] = useState<string>('');
+  const [stringType, setStringType] = useState<HashPatternMap>(undefined);
+  const [stringInputHasError, setStringInputHasError] = useState<boolean>(false);
+
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
+
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
+  const md = useMediaQuery(theme.breakpoints.only('md'));
+
   const state: SubmitState = location.state as SubmitState;
   const params = new URLSearchParams(location.search);
-  const [stringInput, setStringInput] = useState('');
-  const [stringType, setStringType] = useState(undefined);
   const stringInputTitle = t('urlHash.input_title');
   const stringInputText = stringInputTitle + t('urlHash.input_suffix');
-  const [stringInputHasError, setStringInputHasError] = useState(false);
-  const [submissionMetadata, setSubmissionMetadata] = useState({});
-  const [urlAutoselection, setUrlAutoselection] = useState(false);
-  const [value, setValue] = useState('0');
-  const banner = useAppBanner();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -173,7 +180,7 @@ const Submit: React.FC<any> = () => {
           return;
         }
       }
-      apiCall({
+      apiCall<{ started: boolean; sid: string }>({
         url: `/api/v4/ui/start/${uuid}/`,
         method: 'POST',
         body: { ...settings, filename: file.path, metadata: submissionMetadata },
@@ -222,7 +229,7 @@ const Submit: React.FC<any> = () => {
     data = { ui_params: settings, [stringType]: stringInput, metadata: submissionMetadata };
 
     setStringInputHasError(false);
-    apiCall({
+    apiCall<Submission>({
       url: '/api/v4/submit/',
       method: 'POST',
       body: data,
@@ -413,7 +420,7 @@ const Submit: React.FC<any> = () => {
     );
 
     // Load user on start
-    apiCall({
+    apiCall<UserSettings>({
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: api_data => {
         const tempSettings = { ...api_data.api_response };
@@ -428,9 +435,9 @@ const Submit: React.FC<any> = () => {
 
         // Check if some file sources should auto-select and do so
         const defaultExternalSources = [...tempSettings.default_external_sources];
-        for (let srcType in configuration.submission.file_sources) {
-          let sourceDef = configuration.submission.file_sources[srcType];
-          for (let source of sourceDef.auto_selected) {
+        for (const srcType in configuration.submission.file_sources) {
+          const sourceDef = configuration.submission.file_sources[srcType];
+          for (const source of sourceDef.auto_selected) {
             if (!defaultExternalSources.includes(source)) {
               defaultExternalSources.push(source);
             }
@@ -444,7 +451,7 @@ const Submit: React.FC<any> = () => {
     setUUID(generateUUID());
 
     // Handle if we've been given input via param
-    var inputParam = params.get('input') || '';
+    const inputParam = params.get('input') || '';
     if (inputParam) {
       handleStringChange(inputParam);
       setValue('1');
@@ -584,7 +591,7 @@ const Submit: React.FC<any> = () => {
                     type="stringInput"
                     variant="outlined"
                     value={stringInput}
-                    onChange={event => handleStringChange(event.target.value as string)}
+                    onChange={event => handleStringChange(event.target.value)}
                     style={{ flexGrow: 1, marginRight: '1rem' }}
                   />
                   <Button
@@ -884,7 +891,7 @@ const Submit: React.FC<any> = () => {
                               configuration={field_cfg}
                               value={submissionMetadata[field_name]}
                               onChange={v => {
-                                var cleanMetadata = submissionMetadata;
+                                const cleanMetadata = submissionMetadata;
                                 if (v === undefined || v === null || v === '') {
                                   // Remove field from metadata if value is null
                                   delete cleanMetadata[field_name];
@@ -895,7 +902,7 @@ const Submit: React.FC<any> = () => {
                                 setSubmissionMetadata({ ...cleanMetadata });
                               }}
                               onReset={() => {
-                                var cleanMetadata = submissionMetadata;
+                                const cleanMetadata = submissionMetadata;
                                 delete cleanMetadata[field_name];
                                 setSubmissionMetadata({ ...cleanMetadata });
                               }}

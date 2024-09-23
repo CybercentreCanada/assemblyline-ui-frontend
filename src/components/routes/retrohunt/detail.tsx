@@ -11,14 +11,17 @@ import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { FileIndexed } from 'components/models/base/file';
+import type { Retrohunt, RetrohuntProgress } from 'components/models/base/retrohunt';
+import type { SearchResult } from 'components/models/ui/search';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
-import { RetrohuntProgress, RetrohuntResult } from 'components/routes/retrohunt';
 import RetrohuntErrors from 'components/routes/retrohunt/errors';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
-import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
+import type { CustomChipProps } from 'components/visual/CustomChip';
+import CustomChip from 'components/visual/CustomChip';
 import {
   DivTable,
   DivTableBody,
@@ -36,7 +39,6 @@ import MonacoEditor from 'components/visual/MonacoEditor';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import { FileResult } from 'components/visual/SearchResult/files';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import SteppedProgress from 'components/visual/SteppedProgress';
 import { TabContainer } from 'components/visual/TabContainer';
@@ -71,13 +73,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type RetrohuntHitResult = {
-  items: FileResult[];
-  offset: number;
-  rows: number;
-  total: number;
-};
-
 type Params = {
   key: string;
 };
@@ -104,7 +99,7 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
   .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
   .join('&');
 
-function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }: Props) {
+function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = false }: Props) {
   const { t, i18n } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const classes = useStyles();
@@ -113,20 +108,19 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   const { apiCall } = useMyAPI();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer, subscribeCloseDrawer } = useDrawer();
   const { indexes } = useALContext();
-
   const { c12nDef, configuration } = useALContext();
   const { key: paramKey } = useParams<Params>();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [retrohunt, setRetrohunt] = useState<RetrohuntResult>(null);
-  const [hitResults, setHitResults] = useState<RetrohuntHitResult>(null);
+  const [retrohunt, setRetrohunt] = useState<Retrohunt>(null);
+  const [hitResults, setHitResults] = useState<SearchResult<FileIndexed>>(null);
   const [typeDataSet, setTypeDataSet] = useState<{ [k: string]: number }>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
 
   const filterValue = useRef<string>('');
 
-  const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
+  const DEFAULT_RETROHUNT = useMemo<Partial<Retrohunt>>(
     () => ({
       classification: c12nDef.UNRESTRICTED,
       completed_time: null,
@@ -272,7 +266,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   );
 
   const handleHitRowClick = useCallback(
-    (file: FileResult) => {
+    (file: FileIndexed) => {
       if (isDrawer) navigate(`/file/detail/${file.sha256}${location.hash}`);
       else navigate(`${location.pathname}${location.search}#${file.sha256}`);
     },
@@ -280,7 +274,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
   );
 
   const handleRepeat = useCallback(
-    (value: RetrohuntResult) => {
+    (value: Retrohunt) => {
       setRetrohunt(r => ({ ...DEFAULT_RETROHUNT, ...value }));
     },
     [DEFAULT_RETROHUNT]
@@ -435,7 +429,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
             tabs={{
               details: {
                 label: t('details'),
-                content: (
+                inner: (
                   <>
                     <Grid item>
                       <Typography variant="h6">{t('header.information')}</Typography>
@@ -687,7 +681,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                             datatype={t('graph.type.datatype')}
                             onClick={(evt, element) => {
                               if (!isReloading && element.length > 0) {
-                                var ind = element[0].index;
+                                const ind = element[0].index;
                                 query.add('filters', `type:${safeFieldValue(Object.keys(typeDataSet)[ind])}`);
                                 handleNavigate(query);
                               }
@@ -829,7 +823,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
               },
               yara: {
                 label: t('yara_rule'),
-                content: (
+                inner: (
                   <>
                     {!retrohunt ? (
                       <Grid item>
@@ -852,7 +846,7 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
                   (retrohunt.total_warnings > 0 || retrohunt.total_errors > 0) &&
                   currentUser.is_admin
                 ),
-                content: <RetrohuntErrors retrohunt={retrohunt} isDrawer={isDrawer} />
+                inner: <RetrohuntErrors retrohunt={retrohunt} isDrawer={isDrawer} />
               }
             }}
           />
@@ -861,5 +855,5 @@ function WrappedRetrohuntDetail({ search_key: propKey = null, isDrawer = false }
     );
 }
 
-export const RetrohuntDetail = React.memo(WrappedRetrohuntDetail);
-export default WrappedRetrohuntDetail;
+export const RetrohuntDetailPage = React.memo(WrappedRetrohuntDetailPage);
+export default WrappedRetrohuntDetailPage;

@@ -1,5 +1,6 @@
 import { Divider, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import type { MultiBody as MultiData } from 'components/models/base/result_body';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { GraphBody } from './graph_body';
@@ -21,7 +22,12 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const WrappedMultiBody = ({ body, printable = false }) => {
+type Props = {
+  body: MultiData;
+  printable?: boolean;
+};
+
+const WrappedMultiBody = ({ body, printable = false }: Props) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();

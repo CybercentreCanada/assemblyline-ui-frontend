@@ -4,6 +4,8 @@ import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined
 import { AlertTitle, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
+import type { Error, ErrorType } from 'components/models/base/error';
+import type { SearchResult } from 'components/models/ui/search';
 import {
   DivTable,
   DivTableBody,
@@ -13,48 +15,27 @@ import {
   LinkRow,
   SortableHeaderCell
 } from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
 import Moment from 'components/visual/Moment';
 import { bytesToSize } from 'helpers/utils';
+import type { ReactElement } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import InformativeAlert from '../InformativeAlert';
 
-export type ErrorResult = {
-  created: string;
-  id: string;
-  response: {
-    message: string;
-    service_debug_info: string;
-    service_name: string;
-    service_tool_version: string;
-    service_version: string;
-    status: string;
-  };
-  sha256: string;
-  type: string;
-};
+const MAX_MESSAGE_SIZE = 2500;
 
-type SearchResults = {
-  items: ErrorResult[];
-  rows: number;
-  offset: number;
-  total: number;
-};
-
-type ErrorsTableProps = {
-  errorResults: SearchResults;
+type Props = {
+  errorResults: SearchResult<Error>;
   setErrorKey?: (key: string) => void;
   allowSort?: boolean;
 };
 
-const MAX_MESSAGE_SIZE = 2500;
-
-const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, setErrorKey = null, allowSort = true }) => {
+const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null, allowSort = true }) => {
   const { t, i18n } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
 
-  const errorMap = {
+  const errorMap: Record<ErrorType, ReactElement> = {
     'MAX DEPTH REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
     'MAX RETRY REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
     EXCEPTION: <ReportProblemOutlinedIcon style={{ color: theme.palette.action.active }} />,

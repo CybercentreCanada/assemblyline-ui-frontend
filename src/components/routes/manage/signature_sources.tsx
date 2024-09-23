@@ -28,7 +28,9 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { UpdateSource } from 'components/models/base/service';
+import type { CustomUser } from 'components/models/ui/user';
+import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Moment from 'components/visual/Moment';
@@ -37,8 +39,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiGitBranch } from 'react-icons/di';
 import { Link } from 'react-router-dom';
-import ForbiddenPage from '../403';
-import { Source } from '../admin/service_detail';
 import { SourceDetail } from './signature_sources_details';
 
 const useStyles = makeStyles(theme => ({
@@ -115,7 +115,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const DEFAULT_SOURCE: Source = {
+const DEFAULT_SOURCE: UpdateSource = {
   ca_cert: '',
   default_classification: '',
   headers: [],
@@ -137,8 +137,8 @@ const DEFAULT_SOURCE: Source = {
   sync: false
 };
 
-const isSourceUpdating = (source: Source) => source.status.state === 'UPDATING';
-const queueSourceUpdate = (source: Source) => ({
+const isSourceUpdating = (source: UpdateSource) => source.status.state === 'UPDATING';
+const queueSourceUpdate = (source: UpdateSource) => ({
   ...source,
   status: { ...source.status, state: 'UPDATING', message: 'Queued for update..' }
 });
@@ -284,7 +284,14 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
             )}
           </Grid>
         </div>
-        <SourceDetail source={source} defaults={null} addMode={!base} setSource={setSource} setModified={setModified} />
+        <SourceDetail
+          source={source}
+          defaults={null}
+          addMode={!base}
+          setSource={setSource}
+          setModified={setModified}
+          showDetails={false}
+        />
 
         <RouterPrompt when={modified} />
 

@@ -26,13 +26,15 @@ import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { Error } from 'components/models/base/error';
+import type { Submission } from 'components/models/base/submission';
+import type { File } from 'components/models/ui/file';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import AISummarySection from 'components/routes/submission/detail/ai_summary';
 import Classification from 'components/visual/Classification';
-import type { Error } from 'components/visual/ErrorCard';
-import { AlternateResult, Result, emptyResult } from 'components/visual/ResultCard';
+import { emptyResult } from 'components/visual/ResultCard';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -52,76 +54,7 @@ import URIIdentificationSection from './FileDetail/uriIdent';
 import FileDownloader from './FileDownloader';
 import InputDialog from './InputDialog';
 
-type URIInfo = {
-  uri: string;
-  scheme: string;
-  netloc: string;
-  path: string;
-  params: string;
-  query: string;
-  fragment: string;
-  username: string;
-  password: string;
-  hostname: string;
-  port: number;
-};
-
-type FileInfo = {
-  archive_ts: string;
-  ascii: string;
-  classification: string;
-  entropy: number;
-  expiry_ts: string | null;
-  hex: string;
-  magic: string;
-  md5: string;
-  mime: string;
-  seen: {
-    count: number;
-    first: string;
-    last: string;
-  };
-  sha1: string;
-  sha256: string;
-  size: number;
-  ssdeep: string;
-  tlsh: string;
-  type: string;
-  uri_info: URIInfo;
-};
-
-type File = {
-  alternates: {
-    [serviceName: string]: AlternateResult[];
-  };
-  attack_matrix: {
-    [category: string]: string[][];
-  };
-  classification: string;
-  childrens: {
-    name: string;
-    sha256: string;
-  }[];
-  emptys: Result[];
-  errors: Error[];
-  file_info: FileInfo;
-  heuristics: {
-    [category: string]: string[][];
-  };
-  metadata: {
-    [level: string]: {
-      [key: string]: any;
-    };
-  };
-  parents: string[];
-  results: Result[];
-  signatures: string[][];
-  tags: {
-    [type: string]: string[][];
-  };
-};
-
-type FileDetailProps = {
+type Props = {
   sha256: string;
   sid?: string;
   liveResultKeys?: string[];
@@ -129,7 +62,7 @@ type FileDetailProps = {
   force?: boolean;
 };
 
-const WrappedFileDetail: React.FC<FileDetailProps> = ({
+const WrappedFileDetail: React.FC<Props> = ({
   sha256,
   sid = null,
   liveResultKeys = null,
@@ -137,26 +70,29 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   force = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
+  const theme = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const { c12nDef, configuration, settings } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
+  const { showSuccessMessage } = useMySnackbar();
+  const { addInsight, removeInsight } = useAssistant();
+
   const [file, setFile] = useState<File | null>(null);
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
   const [safelistReason, setSafelistReason] = useState<string>('');
   const [badlistDialog, setBadlistDialog] = useState<boolean>(false);
   const [badlistReason, setBadlistReason] = useState<string>('');
-  const [waitingDialog, setWaitingDialog] = useState(false);
-  const { apiCall } = useMyAPI();
-  const { c12nDef, configuration, settings } = useALContext();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const theme = useTheme();
-  const navigate = useNavigate();
-  const { showSuccessMessage } = useMySnackbar();
+  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const [promotedSections, setPromotedSections] = useState([]);
-  const popoverOpen = Boolean(resubmitAnchor);
+
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
-  const { addInsight, removeInsight } = useAssistant();
 
-  const location = useLocation();
+  const popoverOpen = Boolean(resubmitAnchor);
+
   const params = new URLSearchParams(location.search);
   const fileName = file ? params.get('name') || sha256 : null;
 
@@ -200,7 +136,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   };
 
   const resubmit = useCallback(() => {
-    apiCall({
+    apiCall<Submission>({
       url: `/api/v4/submit/dynamic/${sha256}/${sid ? `?copy_sid=${sid}` : ''}`,
       onSuccess: api_data => {
         showSuccessMessage(t('resubmit.success'));
@@ -322,7 +258,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
     setFile(null);
 
     if (sid && sha256) {
-      apiCall({
+      apiCall<File>({
         method: liveResultKeys ? 'POST' : 'GET',
         url: `/api/v4/submission/${sid}/file/${sha256}/`,
         body: liveResultKeys ? { extra_result_keys: liveResultKeys } : null,
@@ -332,7 +268,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         }
       });
     } else if (sha256) {
-      apiCall({
+      apiCall<File>({
         url: `/api/v4/file/result/${sha256}/`,
         onSuccess: api_data => {
           scrollToTop('fileDetailTop');

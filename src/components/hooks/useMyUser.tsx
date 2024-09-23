@@ -1,72 +1,9 @@
-import { AppSwitcherItem } from 'commons/components/app/AppConfigs';
-import { AppUser, AppUserService, AppUserValidatedProp } from 'commons/components/app/AppUserService';
-import { ClassificationDefinition } from 'helpers/classificationParser';
+import type { AppUserService, AppUserValidatedProp } from 'commons/components/app/AppUserService';
+import type { Configuration } from 'components/models/base/config';
+import type { UserSettings } from 'components/models/base/user_settings';
+import type { CustomUser, Indexes, SystemMessage } from 'components/models/ui/user';
+import type { ClassificationDefinition } from 'helpers/classificationParser';
 import { useState } from 'react';
-
-export type ALField = {
-  name: string;
-  indexed: boolean;
-  stored: boolean;
-  type: string;
-  default: boolean;
-  list: boolean;
-};
-
-type IndexDefinition = {
-  [propName: string]: ALField;
-};
-
-type IndexDefinitionMap = {
-  alert: IndexDefinition;
-  badlist: IndexDefinition;
-  file: IndexDefinition;
-  heuristic: IndexDefinition;
-  result: IndexDefinition;
-  retrohunt: IndexDefinition;
-  safelist: IndexDefinition;
-  signature: IndexDefinition;
-  submission: IndexDefinition;
-  workflow: IndexDefinition;
-};
-
-type SettingsDefinition = {
-  classification: string;
-  deep_scan: boolean;
-  description: string;
-  download_encoding: string;
-  executive_summary: boolean;
-  expand_min_score: number;
-  ignore_cache: boolean;
-  ignore_dynamic_recursion_prevention: boolean;
-  ignore_filtering: boolean;
-  priority: number;
-  profile: boolean;
-  service_spec: any[];
-  services: any[];
-  submission_view: string;
-  ttl: number;
-};
-
-export type SystemMessageDefinition = {
-  user: string;
-  title: string;
-  severity: 'success' | 'info' | 'warning' | 'error';
-  message: string;
-};
-
-export type ExternalLink = {
-  allow_bypass: boolean;
-  double_encode: boolean;
-  max_classification: string;
-  name: string;
-  replace_pattern: string;
-  url: string;
-};
-
-export type ExternalSource = {
-  max_classification: string;
-  name: string;
-};
 
 export type Alias = {
   name: string;
@@ -77,170 +14,37 @@ export type ClassificationAliases = {
   [key: string]: Alias;
 };
 
-export type MetadataConfiguration = {
-  required: boolean;
-  validator_type: string;
-  default: string;
-  suggestions: string[];
-  validator_params: {
-    validation_regex?: string;
-    values?: string[];
-    max?: number;
-    min?: number;
-  };
-};
-
-export type ConfigurationDefinition = {
-  auth: {
-    allow_2fa: boolean;
-    allow_apikeys: boolean;
-    allow_extended_apikeys: boolean;
-    allow_security_tokens: boolean;
-  };
-  core: {
-    archiver: {
-      alternate_dtl: number;
-    };
-  };
-  datastore: {
-    archive: {
-      enabled: boolean;
-    };
-  };
-  retrohunt: {
-    enabled: boolean;
-    dtl: number;
-    max_dtl: number;
-  };
-  submission: {
-    dtl: number;
-    max_dtl: number;
-    file_sources: {
-      [hash_type: string]: {
-        pattern: string;
-        sources: string[];
-        auto_selected: string[];
-      };
-    };
-    metadata: {
-      archive: {
-        [field_name: string]: MetadataConfiguration;
-      };
-      submit: {
-        [field_name: string]: MetadataConfiguration;
-      };
-    };
-    verdicts: {
-      info: number;
-      suspicious: number;
-      highly_suspicious: number;
-      malicious: number;
-    };
-  };
-  system: {
-    organisation: string;
-    type: string;
-    version: string;
-  };
-  ui: {
-    ai: {
-      enabled: boolean;
-    };
-    alerting_meta: {
-      important: string[];
-      subject: string[];
-      url: string[];
-    };
-    allow_malicious_hinting: boolean;
-    allow_raw_downloads: boolean;
-    allow_replay: boolean;
-    allow_url_submissions: boolean;
-    allow_zip_downloads: boolean;
-    api_proxies: string[];
-    apps: AppSwitcherItem[];
-    banner: {
-      [lang: string]: string;
-    };
-    banner_level: 'info' | 'warning' | 'error' | 'success';
-    enforce_quota: boolean;
-    external_links: {
-      tag: { [key: string]: ExternalLink[] };
-      hash: { [key: string]: ExternalLink[] };
-      metadata: { [key: string]: ExternalLink[] };
-    };
-    external_sources: ExternalSource[];
-    external_source_tags: {
-      [tag_name: string]: string[];
-    };
-    fqdn: string;
-    read_only: boolean;
-    rss_feeds: string[];
-    services_feed: string;
-    community_feed: string;
-    tos: boolean;
-    tos_lockout: boolean;
-    tos_lockout_notify: boolean;
-    url_submission_auto_service_selection: string[];
-  };
-  user: {
-    api_priv_map: {
-      [api_priv: string]: string[];
-    };
-    priv_role_dependencies: {
-      [priv: string]: string[];
-    };
-    roles: string[];
-    role_dependencies: {
-      [role: string]: string[];
-    };
-    types: string[];
-  };
-};
-
-export interface CustomUser extends AppUser {
-  // Al specific props
-  agrees_with_tos: boolean;
-  classification: string;
-  default_view?: string;
-  dynamic_group: string | null;
-  groups: string[];
-  is_active: boolean;
-  roles: string[];
-  api_daily_quota: number;
-  submission_daily_quota: number;
-}
-
 export interface CustomAppUserService extends AppUserService<CustomUser> {
   c12nDef: ClassificationDefinition;
   classificationAliases: ClassificationAliases;
-  configuration: ConfigurationDefinition;
-  indexes: IndexDefinitionMap;
-  settings: SettingsDefinition;
-  systemMessage: SystemMessageDefinition;
+  configuration: Configuration;
+  indexes: Indexes;
+  settings: UserSettings;
+  systemMessage: SystemMessage;
   setClassificationAliases: (aliases: ClassificationAliases) => void;
-  setConfiguration: (cfg: ConfigurationDefinition) => void;
-  setSystemMessage: (msg: SystemMessageDefinition) => void;
+  setConfiguration: (cfg: Configuration) => void;
+  setSystemMessage: (msg: SystemMessage) => void;
   scoreToVerdict: (score: number) => string;
 }
 
 export interface WhoAmIProps extends CustomUser {
   c12nDef: ClassificationDefinition;
   classification_aliases: ClassificationAliases;
-  configuration: ConfigurationDefinition;
-  indexes: IndexDefinitionMap;
-  system_message: SystemMessageDefinition;
-  settings: SettingsDefinition;
+  configuration: Configuration;
+  indexes: Indexes;
+  system_message: SystemMessage;
+  settings: UserSettings;
 }
 
 // Application specific hook that will provide configuration to commons [useUser] hook.
 export default function useMyUser(): CustomAppUserService {
   const [user, setState] = useState<CustomUser>(null);
   const [c12nDef, setC12nDef] = useState<ClassificationDefinition>(null);
+  const [configuration, setConfiguration] = useState<Configuration>(null);
+  const [indexes, setIndexes] = useState<Indexes>(null);
+  const [systemMessage, setSystemMessage] = useState<SystemMessage>(null);
+  const [settings, setSettings] = useState<UserSettings>(null);
   const [classificationAliases, setClassificationAliases] = useState<ClassificationAliases>(null);
-  const [configuration, setConfiguration] = useState<ConfigurationDefinition>(null);
-  const [indexes, setIndexes] = useState<IndexDefinitionMap>(null);
-  const [systemMessage, setSystemMessage] = useState<SystemMessageDefinition>(null);
-  const [settings, setSettings] = useState<SettingsDefinition>(null);
   const [flattenedProps, setFlattenedProps] = useState(null);
 
   function flatten(ob) {
@@ -336,8 +140,8 @@ export default function useMyUser(): CustomAppUserService {
   const validateProps = (props: AppUserValidatedProp[]) => {
     if (props === undefined || !Array.isArray(props)) return true;
 
-    let enforcedProps: AppUserValidatedProp[] = [];
-    let unEnforcedProps: AppUserValidatedProp[] = [];
+    const enforcedProps: AppUserValidatedProp[] = [];
+    const unEnforcedProps: AppUserValidatedProp[] = [];
     props.forEach(prop => (prop?.enforce ? enforcedProps.push(prop) : unEnforcedProps.push(prop)));
 
     const enforcedValidated = enforcedProps.length > 0 ? enforcedProps.every(validateProp) : true;

@@ -1,5 +1,6 @@
 import { Tooltip, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { SubmissionVerdict } from 'components/models/base/alert';
 import { scaleLinear } from 'd3-scale';
 import { arc } from 'd3-shape';
 import React from 'react';
@@ -42,22 +43,14 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type VerdictGaugeProps = {
-  verdicts: {
-    malicious: any[];
-    non_malicious: any[];
-  };
+type Props = {
+  verdicts: SubmissionVerdict;
   max?: number;
   colorBack?: string;
   autoHide?: boolean;
 };
 
-const VerdictGauge: React.FC<VerdictGaugeProps> = ({
-  verdicts,
-  max = 20,
-  colorBack = '#68686815',
-  autoHide = false
-}) => {
+const VerdictGauge: React.FC<Props> = ({ verdicts, max = 20, colorBack = '#68686815', autoHide = false }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   const theme = useTheme();

@@ -24,9 +24,7 @@ export const StyledPaper: FC<StyledPaperProps> = memo(
     forwardRef(({ component, ...other }: StyledPaperProps, ref) => (
       <Paper component={component} {...other} ref={ref} />
     )),
-    {
-      shouldForwardProp: prop => prop !== 'paper'
-    }
+    { shouldForwardProp: prop => prop !== 'paper' }
   )<StyledPaperProps>(({ theme, paper = false }) => ({
     // backgroundColor: theme.palette.mode === 'dark' ? '#0000001A' : '#FFFFFF1A',
     backgroundColor: paper

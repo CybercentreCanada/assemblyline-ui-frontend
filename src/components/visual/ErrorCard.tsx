@@ -2,29 +2,10 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Box, Collapse, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import type { Error } from 'components/models/base/error';
 import Moment from 'components/visual/Moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
-export type Error = {
-  archive_ts: string;
-  created: string;
-  expiry_ts: string | null;
-  response: {
-    message: string;
-    service_debug_info: string;
-    service_name: string;
-    service_tool_version: string;
-    service_version: string;
-    status: string;
-  };
-  sha256: string;
-  type: string;
-};
-
-type ErrorCardProps = {
-  error: Error;
-};
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -55,7 +36,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const ErrorCard: React.FC<ErrorCardProps> = ({ error }) => {
+type Props = {
+  error: Error;
+};
+
+const ErrorCard: React.FC<Props> = ({ error }) => {
   const classes = useStyles();
   const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();

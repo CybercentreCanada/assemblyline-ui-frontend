@@ -1,5 +1,5 @@
-import { ConfigurationDefinition } from 'components/hooks/useMyUser';
-import { PossibleColors } from 'components/visual/CustomChip';
+import type { Configuration, HashPatternMap } from 'components/models/base/config';
+import type { PossibleColors } from 'components/visual/CustomChip';
 
 /**
  *
@@ -412,14 +412,14 @@ export function filterObject(obj: Object, callback) {
  *
  * @returns [type, input]: A tuple where the type is a string of the detected type of the input provided and the input string is parsed where hashes have their start and ending spaces removed.
  */
-export function getSubmitType(input: string, configuration: ConfigurationDefinition): [string, string] {
+export function getSubmitType(input: string, configuration: Configuration): [HashPatternMap, string] {
   // Return null if the parameters are invalid
   if (!input || !configuration?.submission?.file_sources) return [null, input];
 
   // If we're trying to auto-detect the input type, iterate over file sources
   const detectedHashType = Object.entries(configuration.submission.file_sources).find(
     ([_, hashProps]) => hashProps && String(input).trim().match(new RegExp(hashProps?.pattern))
-  )?.[0];
+  )?.[0] as HashPatternMap;
 
   if (detectedHashType) return [detectedHashType, String(input).trim()];
   else if (!detectedHashType && matchURL(input.trimStart())) return ['url', input.trimStart()];
