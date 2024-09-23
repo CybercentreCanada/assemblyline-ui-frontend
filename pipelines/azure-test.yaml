@@ -40,6 +40,11 @@ jobs:
 
       - script: |
           set -xv  # Echo commands before they are run
+          npm run tsc
+        displayName: TypeScript
+
+      - script: |
+          set -xv  # Echo commands before they are run
           npm run ci-lint
         displayName: ESLint
 
