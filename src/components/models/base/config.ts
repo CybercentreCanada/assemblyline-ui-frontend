@@ -564,9 +564,9 @@ export const CONFIGURATION: Configuration = {
       md5: { pattern: '^[a-f0-9]{32}$', sources: [], auto_selected: [] },
       sha1: { pattern: '^[a-f0-9]{40}$', sources: [], auto_selected: [] },
       sha256: { pattern: '^[a-f0-9]{64}$', sources: [], auto_selected: [] },
-      tlsh: { auto_selected: [], pattern: '', sources: [] },
-      ssdeep: { auto_selected: [], pattern: '', sources: [] },
-      url: { auto_selected: [], pattern: '', sources: [] }
+      tlsh: { pattern: '^((?:T1)?[0-9a-fA-F]{70})$', sources: [], auto_selected: [] },
+      ssdeep: { pattern: '^[0-9]{1,18}:[a-zA-Z0-9/+]{0,64}:[a-zA-Z0-9/+]{0,64}$', sources: [], auto_selected: [] },
+      url: { pattern: '([/?#]S*)', sources: [], auto_selected: [] }
     },
     max_dtl: 0,
     max_extraction_depth: 0,
