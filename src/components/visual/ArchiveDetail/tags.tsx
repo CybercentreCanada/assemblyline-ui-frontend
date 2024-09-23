@@ -26,6 +26,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
 import type { ResultIndexed } from 'components/models/base/result';
+import type { Signature, Tag } from 'components/models/base/tagging';
 import type { SearchResult } from 'components/models/ui/search';
 import ActionMenu from 'components/visual/ActionMenu';
 import Classification from 'components/visual/Classification';
