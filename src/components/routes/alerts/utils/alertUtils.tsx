@@ -1,4 +1,4 @@
-import type { DetailedItem } from 'components/routes/alerts/models/Alert';
+import type { DetailedItem } from 'components/models/base/alert';
 import { verdictRank } from 'helpers/utils';
 
 export const detailedItemCompare = (a: DetailedItem, b: DetailedItem) => {

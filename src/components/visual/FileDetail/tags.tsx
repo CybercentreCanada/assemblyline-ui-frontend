@@ -1,18 +1,11 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import {
-  Collapse,
-  Divider,
-  Grid,
-  GridProps,
-  Skeleton,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
+import type { GridProps } from '@mui/material';
+import { Collapse, Divider, Grid, Skeleton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useSafeResults from 'components/hooks/useSafeResults';
+import type { Signature } from 'components/models/base/tagging';
+import type { Tags } from 'components/models/ui/file';
 import AutoHideTagList from 'components/visual/AutoHideTagList';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -81,8 +74,8 @@ export const TooltipGrid: React.FC<TooltipGridProps> = ({ title = '', ...props }
 };
 
 type TagSectionProps = {
-  signatures: any;
-  tags: any;
+  signatures: Signature[];
+  tags: Tags;
   force?: boolean;
 };
 

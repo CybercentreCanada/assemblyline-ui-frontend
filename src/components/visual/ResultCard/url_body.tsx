@@ -1,7 +1,12 @@
 import { Link } from '@mui/material';
+import type { URLBody as URLData } from 'components/models/base/result_body';
 import { default as React } from 'react';
 
-const WrappedURLBody = ({ body }) => {
+type Props = {
+  body: URLData;
+};
+
+const WrappedURLBody = ({ body }: Props) => {
   const arr = [];
   if (!(body instanceof Array)) {
     arr.push(body);

@@ -1,8 +1,11 @@
 import { Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import type { BodyFormat, SectionBody } from 'components/models/base/result_body';
+import type { SubmissionReport } from 'components/models/ui/submission_report';
 import Moment from 'components/visual/Moment';
 import { GraphBody } from 'components/visual/ResultCard/graph_body';
 import { ImageInlineBody } from 'components/visual/image_inline';
+import type { ReactNode } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +31,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const parseValue = value => {
+const parseValue = (value: any): ReactNode => {
   if (value instanceof Array) {
     return value.join(' | ');
   } else if (value === true) {
@@ -41,7 +44,12 @@ const parseValue = value => {
   return value;
 };
 
-const KVItem = ({ name, value }) => (
+type KVItemProps = {
+  name: BodyFormat | string;
+  value: SectionBody['body'];
+};
+
+const WrappedKVItem = ({ name, value }: KVItemProps) => (
   <>
     <Grid item xs={4} sm={3} lg={2}>
       <span style={{ fontWeight: 500, marginRight: '4px', display: 'flex', textTransform: 'capitalize' }}>{name}</span>
@@ -52,7 +60,13 @@ const KVItem = ({ name, value }) => (
   </>
 );
 
-const WrappedOrderedKVExtra = ({ body }) => (
+const KVItem = React.memo(WrappedKVItem);
+
+type OrderedKVExtraProps = {
+  body: SectionBody['body'];
+};
+
+const WrappedOrderedKVExtra = ({ body }: OrderedKVExtraProps) => (
   <>
     {Object.keys(body).map(id => {
       const item = body[id];
@@ -63,7 +77,11 @@ const WrappedOrderedKVExtra = ({ body }) => (
 
 const OrderedKVExtra = React.memo(WrappedOrderedKVExtra);
 
-const WrappedKVExtra = ({ body }) => (
+type KVExtraProps = {
+  body: SectionBody['body'];
+};
+
+const WrappedKVExtra = ({ body }: KVExtraProps) => (
   <>
     {Object.keys(body).map((key, id) => {
       return <KVItem key={id} name={key} value={body[key]} />;
@@ -73,7 +91,11 @@ const WrappedKVExtra = ({ body }) => (
 
 const KVExtra = React.memo(WrappedKVExtra);
 
-function WrappedGeneralInformation({ report }) {
+type Props = {
+  report: SubmissionReport;
+};
+
+function WrappedGeneralInformation({ report }: Props) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
   const classes = useStyles();

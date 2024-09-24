@@ -8,7 +8,8 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import type { Error } from 'components/models/base/error';
+import type { CustomUser } from 'components/models/ui/user';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
@@ -16,7 +17,6 @@ import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
 import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import type { ErrorResult } from 'components/visual/SearchResult/errors';
 import ErrorsTable from 'components/visual/SearchResult/errors';
 import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -26,7 +26,7 @@ import { useLocation } from 'react-router-dom';
 import { ErrorDetail } from './error_detail';
 
 type SearchResults = {
-  items: ErrorResult[];
+  items: Error[];
   offset: number;
   rows: number;
   total: number;
@@ -181,7 +181,7 @@ const ErrorViewer = () => {
               disabled={searching}
               value={search.get('tc')}
               variant="outlined"
-              onChange={event => setSearchObject(o => ({ ...o, tc: event.target.value as TimeContraint }))}
+              onChange={event => setSearchObject(o => ({ ...o, offset: 0, tc: event.target.value as TimeContraint }))}
               fullWidth
             >
               {TIME_CONTRAINTS.map((time, i) => (
@@ -211,21 +211,22 @@ const ErrorViewer = () => {
                 icon: { children: <ReportProblemOutlinedIcon /> },
                 button: {
                   onClick: () =>
-                    setSearchObject(o => ({ ...o, filters: [...o.filters, 'type:(EXCEPTION OR UNKNOWN)'] }))
+                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:(EXCEPTION OR UNKNOWN)'] }))
                 }
               },
               {
                 tooltip: { title: t('canceled') },
                 icon: { children: <CancelOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'type:(SERVICE* OR TASK*)'] }))
+                  onClick: () =>
+                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:(SERVICE* OR TASK*)'] }))
                 }
               },
               {
                 tooltip: { title: t('maxed') },
                 icon: { children: <PanToolOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'type:MAX*'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:MAX*'] }))
                 }
               }
             ]}
@@ -254,7 +255,7 @@ const ErrorViewer = () => {
               onClick={(evt, element) => {
                 if (!searching && element.length > 0) {
                   const filter = `response.service_name:${Object.keys(names)[element[0].index]}`;
-                  setSearchObject(o => ({ ...o, filters: [...o.filters, filter] }));
+                  setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, filter] }));
                 }
               }}
             />
@@ -268,7 +269,7 @@ const ErrorViewer = () => {
               onClick={(evt, element) => {
                 if (!searching && element.length > 0) {
                   const filter = `type:${safeFieldValue(Object.keys(types)[element[0].index])}`;
-                  setSearchObject(o => ({ ...o, filters: [...o.filters, filter] }));
+                  setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, filter] }));
                 }
               }}
             />

@@ -13,13 +13,14 @@ import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { SubmissionReport } from 'components/models/ui/submission_report';
+import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import { filterObject } from 'helpers/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
-import ForbiddenPage from '../403';
 import AISummarySection from './detail/ai_summary';
 import Attack from './report/attack';
 import AttributionBanner from './report/attribution_banner';
@@ -55,7 +56,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function SubmissionReport() {
+export default function SubmissionReportPage() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
   const { user: currentUser, c12nDef, configuration, settings } = useALContext();
@@ -64,11 +65,12 @@ export default function SubmissionReport() {
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const theme = useTheme();
-  const [report, setReport] = useState(null);
-  const [originalReport, setOriginalReport] = useState(null);
-  const [showInfoContent, setShowInfoContent] = useState(false);
-  const [useAIReport, setUseAIReport] = useState(false);
   const { addInsight, removeInsight } = useAssistant();
+
+  const [report, setReport] = useState<SubmissionReport>(null);
+  const [originalReport, setOriginalReport] = useState<SubmissionReport>(null);
+  const [showInfoContent, setShowInfoContent] = useState<boolean>(false);
+  const [useAIReport, setUseAIReport] = useState<boolean>(false);
 
   const cleanupReport = useCallback(() => {
     const recursiveFileTreeCleanup = (tree, impFiles) => {
@@ -136,7 +138,7 @@ export default function SubmissionReport() {
       setReport({
         ...originalReport,
         attack_matrix: tempMatrix,
-        heuristics: tempHeur,
+        heuristics: tempHeur as any,
         heuristic_sections: tempHeurSec,
         important_files: tempImpFiles,
         tags: tempTags
@@ -307,7 +309,7 @@ export default function SubmissionReport() {
         )}
         <Metadata report={report} />
         {useAIReport && (
-          <AISummarySection type={'submission' as 'submission'} id={report ? report.sid : null} noTitle detailed />
+          <AISummarySection type={'submission' as const} id={report ? report.sid : null} noTitle detailed />
         )}
         {!useAIReport && <Heuristics report={report} />}
         {!useAIReport && <Attack report={report} />}

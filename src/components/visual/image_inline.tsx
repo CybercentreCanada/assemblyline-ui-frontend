@@ -4,7 +4,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { Image } from 'components/visual/Carousel/Container';
+import type { Image, ImageBody } from 'components/models/base/result_body';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -101,39 +101,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-export type ImageBodyData = Array<{
-  img: {
-    name: string;
-    description: string;
-    sha256: string;
-  };
-  thumb: {
-    name: string;
-    description: string;
-    sha256: string;
-  };
-}>;
-
 type ImageInlineBodyProps = {
-  body: ImageBodyData;
+  body: ImageBody;
   printable?: boolean;
   size?: 'small' | 'medium' | 'large';
-};
-
-type ImageInlineProps = {
-  data: Image[];
-  printable?: boolean;
-  size?: 'small' | 'medium' | 'large';
-};
-
-type ImageItemProps = {
-  src: string;
-  alt: string;
-  index: number;
-  to?: string;
-  count?: number;
-  size?: 'small' | 'medium' | 'large';
-  onImageClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, index: number) => void;
 };
 
 const WrappedImageInlineBody = ({ body, printable = false, size = 'medium' }: ImageInlineBodyProps) => {
@@ -157,6 +128,12 @@ const WrappedImageInlineBody = ({ body, printable = false, size = 'medium' }: Im
   return body && Array.isArray(body) ? <ImageInline data={data} printable={printable} size={size} /> : null;
 };
 
+type ImageInlineProps = {
+  data: Image[];
+  printable?: boolean;
+  size?: 'small' | 'medium' | 'large';
+};
+
 const WrappedImageInline = ({ data, printable = false, size = 'medium' }: ImageInlineProps) => {
   const classes = useStyles();
   const { openCarousel } = useCarousel();
@@ -176,6 +153,16 @@ const WrappedImageInline = ({ data, printable = false, size = 'medium' }: ImageI
   ) : null;
 };
 
+type ImageItemProps = {
+  src: string;
+  alt: string;
+  index: number;
+  to?: string;
+  count?: number;
+  size?: 'small' | 'medium' | 'large';
+  onImageClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, index: number) => void;
+};
+
 const WrappedImageItem = ({
   src,
   alt,
@@ -185,13 +172,14 @@ const WrappedImageItem = ({
   size = 'medium',
   onImageClick = () => null
 }: ImageItemProps) => {
-  const [image, setImage] = useState<string>(null);
-  const [loading, setLoading] = useState<boolean>(true);
   const classes = useStyles();
   const { apiCall } = useMyAPI();
 
+  const [image, setImage] = useState<string>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
   useEffect(() => {
-    apiCall({
+    apiCall<string>({
       url: `/api/v4/file/image/${src}/`,
       allowCache: true,
       onSuccess: api_data => setImage(api_data.api_response),

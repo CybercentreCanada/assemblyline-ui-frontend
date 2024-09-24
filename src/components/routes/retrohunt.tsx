@@ -8,8 +8,10 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
+import type { Retrohunt, RetrohuntIndexed, RetrohuntProgress } from 'components/models/base/retrohunt';
+import type { SearchResult } from 'components/models/ui/search';
 import { RetrohuntCreate } from 'components/routes/retrohunt/create';
-import { RetrohuntDetail } from 'components/routes/retrohunt/detail';
+import RetrohuntDetail from 'components/routes/retrohunt/detail';
 import { ChipList } from 'components/visual/ChipList';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -20,7 +22,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import { io, Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -53,66 +56,6 @@ const useStyles = makeStyles(theme => ({
 const PAGE_SIZE = 25;
 const MAX_TRACKED_RECORDS = 10000;
 const SOCKETIO_NAMESPACE = '/retrohunt';
-export const RETROHUNT_INDICES = ['hot', 'archive', 'hot_and_archive'] as const;
-export const RETROHUNT_PHASES = ['Starting', 'Filtering', 'Yara', 'Finished'] as const;
-
-export type RetrohuntIndex = (typeof RETROHUNT_INDICES)[number];
-export type RetrohuntPhase = (typeof RETROHUNT_PHASES)[number];
-
-export type RetrohuntHit = {
-  key: string;
-  classification?: string;
-  sha256: string;
-  expiry_ts?: string;
-  search: string;
-};
-
-export type RetrohuntProgress =
-  | { type: 'Starting'; key: string }
-  | { type: 'Filtering'; key: string; progress: number }
-  | { type: 'Yara'; key: string; progress: number }
-  | { type: 'Finished'; key: string; search: RetrohuntResult };
-
-export type RetrohuntResult = {
-  indices: RetrohuntIndex;
-  classification?: string;
-  search_classification?: string;
-  creator: string;
-  description: string;
-  expiry_ts?: string;
-
-  start_group?: number;
-  end_group?: number;
-
-  created_time: string;
-  started_time: string;
-  completed_time: string;
-
-  key: string;
-  raw_query?: string;
-  yara_signature?: string;
-
-  errors?: string[];
-  warnings?: string[];
-  finished: boolean;
-  truncated: boolean;
-
-  total_hits?: number;
-  total_errors?: number;
-  total_warnings?: number;
-
-  ttl?: number;
-
-  step?: RetrohuntProgress['type'];
-  progress?: number;
-};
-
-export type SearchResults = {
-  items: RetrohuntResult[];
-  offset: number;
-  rows: number;
-  total: number;
-};
 
 const DEFAULT_PARAMS: object = {
   query: '*',
@@ -137,7 +80,7 @@ export default function RetrohuntPage() {
   const { user: currentUser, indexes, configuration } = useALContext();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
-  const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
+  const [retrohuntResults, setRetrohuntResults] = useState<SearchResult<RetrohuntIndexed>>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [searching, setSearching] = useState<boolean>(false);
 
@@ -203,7 +146,7 @@ export default function RetrohuntPage() {
   );
 
   const handleCreateRetrohunt = useCallback(
-    (retrohunt: RetrohuntResult) => {
+    (retrohunt: Partial<Retrohunt>) => {
       navigate(`${location.pathname}${location.search}#${retrohunt?.key}`);
     },
     [location.pathname, location.search, navigate]
@@ -225,7 +168,7 @@ export default function RetrohuntPage() {
   ]);
 
   const handleRowClick = useCallback(
-    (item: RetrohuntResult) => {
+    (item: RetrohuntIndexed) => {
       const hashSearch = new URL(`${window.location.origin}/${location.hash.slice(1)}`);
       navigate(`${location.pathname}${location.search}#${item?.key}${hashSearch.search}`);
     },

@@ -9,29 +9,23 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import { Signature } from 'components/models/base/signature';
+import { SearchResult } from 'components/models/ui/search';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import FileDownloader from 'components/visual/FileDownloader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
 import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
-import type { SearchResult } from 'components/visual/SearchBar/SearchParser';
+import { SearchParamsResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import type { Signature } from './signature_detail';
 import SignatureDetail from './signature_detail';
-
-type SearchResults = {
-  items: Signature[];
-  offset: number;
-  rows: number;
-  total: number;
-};
 
 const SIGNATURES_PARAMS = createSearchParams(p => ({
   query: p.string(''),
@@ -57,7 +51,7 @@ const SignaturesSearch = () => {
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { search, setSearchParams, setSearchObject } = useSearchParams<SignaturesParams>();
 
-  const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
+  const [signatureResults, setSignatureResults] = useState<SearchResult<Signature>>(null);
   const [searching, setSearching] = useState<boolean>(false);
 
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
@@ -67,7 +61,7 @@ const SignaturesSearch = () => {
     [indexes.signature]
   );
 
-  const downloadLink = useMemo(
+  const downloadLink = useMemo<string>(
     () =>
       search
         .set(o => ({ ...o, query: [o.query || '*', ...o.filters].join(' && ') }))
@@ -77,17 +71,17 @@ const SignaturesSearch = () => {
   );
 
   const handleReload = useCallback(
-    (body: SearchResult<SignaturesParams>) => {
+    (body: SearchParamsResult<SignaturesParams>) => {
       if (!currentUser.roles.includes('signature_view')) return;
 
-      apiCall({
+      apiCall<SearchResult<Signature>>({
         url: '/api/v4/search/signature/',
         method: 'POST',
         body: body
           .set(o => ({ ...o, query: o.query || '*' }))
           .omit(['refresh'])
           .toObject(),
-        onSuccess: ({ api_response }) => setSignatureResults(api_response as SearchResults),
+        onSuccess: ({ api_response }) => setSignatureResults(api_response),
         onEnter: () => setSearching(true),
         onExit: () => setSearching(false)
       });
@@ -186,14 +180,14 @@ const SignaturesSearch = () => {
                 tooltip: { title: t('noisy') },
                 icon: { children: <RecordVoiceOverOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'status:NOISY'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'status:NOISY'] }))
                 }
               },
               {
                 tooltip: { title: t('disabled') },
                 icon: { children: <BlockIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, filters: [...o.filters, 'status:DISABLED'] }))
+                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'status:DISABLED'] }))
                 }
               }
             ]}

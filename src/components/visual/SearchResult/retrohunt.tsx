@@ -2,13 +2,10 @@ import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
-import { RetrohuntResult } from 'components/routes/retrohunt';
+import type { RetrohuntIndexed } from 'components/models/base/retrohunt';
+import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
-import Moment from 'components/visual/Moment';
-import React, { useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
 import {
   DivTable,
   DivTableBody,
@@ -17,18 +14,17 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from '../DivTable';
-import InformativeAlert from '../InformativeAlert';
-
-type SearchResults = {
-  items: RetrohuntResult[];
-  total: number;
-};
+} from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import Moment from 'components/visual/Moment';
+import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link, useLocation } from 'react-router-dom';
 
 type Props = {
-  retrohuntResults: SearchResults;
+  retrohuntResults: SearchResult<RetrohuntIndexed>;
   allowSort?: boolean;
-  onRowClick?: (retrohunt: RetrohuntResult) => void;
+  onRowClick?: (retrohunt: RetrohuntIndexed) => void;
   onSort?: (value: { name: string; field: string }) => void;
 };
 
@@ -47,7 +43,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
     [retrohuntResults]
   );
 
-  const RetrohuntStatus = useCallback<React.FC<{ result: RetrohuntResult }>>(
+  const RetrohuntStatus = useCallback<React.FC<{ result: RetrohuntIndexed }>>(
     ({ result }) => {
       const { finished = false, step, progress } = result;
       let label = '';

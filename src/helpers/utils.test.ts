@@ -1,4 +1,4 @@
-import { ConfigurationDefinition } from 'components/hooks/useMyUser';
+import { CONFIGURATION } from 'components/models/base/config';
 import {
   bytesToSize,
   getFileName,
@@ -566,121 +566,31 @@ describe('Test `getSubmitType`', () => {
     expect(getSubmitType(null, null)[0]).toBe(null);
   });
 
-  const configuration: ConfigurationDefinition = {
-    auth: {
-      allow_2fa: false,
-      allow_apikeys: false,
-      allow_extended_apikeys: false,
-      allow_security_tokens: false
-    },
-    core: {
-      archiver: {
-        alternate_dtl: 0
-      }
-    },
-    datastore: {
-      archive: {
-        enabled: false
-      }
-    },
-    retrohunt: {
-      enabled: false,
-      dtl: 0,
-      max_dtl: 0
-    },
-    submission: {
-      file_sources: {
-        md5: { pattern: '^[a-f0-9]{32}$', sources: [], auto_selected: [] },
-        sha1: { pattern: '^[a-f0-9]{40}$', sources: [], auto_selected: [] },
-        sha256: { pattern: '^[a-f0-9]{64}$', sources: [], auto_selected: [] }
-      },
-      dtl: 0,
-      max_dtl: 0,
-      metadata: {
-        archive: {},
-        submit: {}
-      },
-      verdicts: {
-        info: 0,
-        suspicious: 0,
-        highly_suspicious: 0,
-        malicious: 0
-      }
-    },
-    system: {
-      organisation: '',
-      type: '',
-      version: ''
-    },
-    ui: {
-      ai: {
-        enabled: false
-      },
-      alerting_meta: {
-        important: [],
-        subject: [],
-        url: []
-      },
-      allow_malicious_hinting: false,
-      allow_raw_downloads: false,
-      allow_replay: false,
-      allow_url_submissions: false,
-      allow_zip_downloads: false,
-      apps: [],
-      banner: {},
-      banner_level: 'info',
-      enforce_quota: false,
-      external_links: {
-        tag: {},
-        hash: {},
-        metadata: {}
-      },
-      external_sources: [],
-      external_source_tags: {},
-      fqdn: '',
-      read_only: false,
-      rss_feeds: [],
-      services_feed: '',
-      community_feed: '',
-      tos: false,
-      tos_lockout: false,
-      tos_lockout_notify: false,
-      url_submission_auto_service_selection: []
-    },
-    user: {
-      api_priv_map: {},
-      priv_role_dependencies: {},
-      roles: [],
-      role_dependencies: {},
-      types: []
-    }
-  };
-
   it('Should not match the input string with any type', () => {
-    expect(getSubmitType('', configuration)[0]).toBe(null);
-    expect(getSubmitType('test', configuration)[0]).toBe(null);
-    expect(getSubmitType('qwerty1234567890qwerty1234567890', configuration)[0]).toBe(null);
-    expect(getSubmitType('qwerty1234567890qwerty1234567890qwerty12', configuration)[0]).toBe(null);
-    expect(getSubmitType('qwerty1234567890qwerty1234567890qwerty1234567890qwerty1234567890', configuration)[0]).toBe(
+    expect(getSubmitType('', CONFIGURATION)[0]).toBe(null);
+    expect(getSubmitType('test', CONFIGURATION)[0]).toBe(null);
+    expect(getSubmitType('qwerty1234567890qwerty1234567890', CONFIGURATION)[0]).toBe(null);
+    expect(getSubmitType('qwerty1234567890qwerty1234567890qwerty12', CONFIGURATION)[0]).toBe(null);
+    expect(getSubmitType('qwerty1234567890qwerty1234567890qwerty1234567890qwerty1234567890', CONFIGURATION)[0]).toBe(
       null
     );
   });
 
   it('Should match the input string with its corresponding type', () => {
     const md5 = 'abcdef1234567890abcdef1234567890';
-    expect(getSubmitType(md5, configuration)).toStrictEqual(['md5', md5]);
-    expect(getSubmitType(`   ${md5}   `, configuration)).toStrictEqual(['md5', md5]);
+    expect(getSubmitType(md5, CONFIGURATION)).toStrictEqual(['md5', md5]);
+    expect(getSubmitType(`   ${md5}   `, CONFIGURATION)).toStrictEqual(['md5', md5]);
 
     const sha1 = 'abcdef1234567890abcdef1234567890abcdef12';
-    expect(getSubmitType(sha1, configuration)).toStrictEqual(['sha1', sha1]);
-    expect(getSubmitType(`   ${sha1}   `, configuration)).toStrictEqual(['sha1', sha1]);
+    expect(getSubmitType(sha1, CONFIGURATION)).toStrictEqual(['sha1', sha1]);
+    expect(getSubmitType(`   ${sha1}   `, CONFIGURATION)).toStrictEqual(['sha1', sha1]);
 
     const sha256 = 'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
-    expect(getSubmitType(sha256, configuration)).toStrictEqual(['sha256', sha256]);
-    expect(getSubmitType(`   ${sha256}   `, configuration)).toStrictEqual(['sha256', sha256]);
+    expect(getSubmitType(sha256, CONFIGURATION)).toStrictEqual(['sha256', sha256]);
+    expect(getSubmitType(`   ${sha256}   `, CONFIGURATION)).toStrictEqual(['sha256', sha256]);
 
     const url = 'http://blah.com';
-    expect(getSubmitType(url, configuration)).toStrictEqual(['url', url]);
-    expect(getSubmitType(`   ${url}`, configuration)).toStrictEqual(['url', url]);
+    expect(getSubmitType(url, CONFIGURATION)).toStrictEqual(['url', url]);
+    expect(getSubmitType(`   ${url}`, CONFIGURATION)).toStrictEqual(['url', url]);
   });
 });

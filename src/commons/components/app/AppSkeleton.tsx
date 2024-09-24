@@ -2,6 +2,7 @@ import AppsIcon from '@mui/icons-material/Apps';
 import { Divider, List, styled, Toolbar, useMediaQuery, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
+import { DetailedHTMLProps, HTMLAttributes } from 'react';
 import { AppBarBase } from '../topnav/AppBar';
 import { AppUserAvatar } from '../topnav/UserProfile';
 import { AppLeftNavElement } from './AppConfigs';
@@ -288,12 +289,10 @@ const LeftNavElementsSkeleton = ({ elements, withText }: LeftNavElementsSkeleton
   );
 };
 
-interface ButtonSkeletonProps {
-  style: { [styleAttr: string]: any };
-  // eslint-disable-next-line react/require-default-props
+interface ButtonSkeletonProps extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   withText?: boolean;
-  [propName: string]: any;
 }
+
 const ButtonSkeleton = ({ style, withText, ...boxProps }: ButtonSkeletonProps) => {
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));

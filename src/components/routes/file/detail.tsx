@@ -1,9 +1,9 @@
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/models/ui/user';
+import ForbiddenPage from 'components/routes/403';
 import FileDetail from 'components/visual/FileDetail';
 import { useParams } from 'react-router-dom';
-import ForbiddenPage from '../403';
 
 type ParamProps = {
   id: string;

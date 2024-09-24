@@ -143,7 +143,7 @@ describe('`GetLevelText` identifies invalid input', () => {
   it('Should raise errors on an invalid levelIdx', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(getLevelText(12, c12nDef, 'short', false)).toBe('INVALID');
-    console.error.mockRestore();
+    (console.error as any).mockRestore();
   });
 });
 
@@ -313,7 +313,7 @@ describe('`GetParts` identifies invalid input', () => {
   });
 
   afterEach(() => {
-    console.error.mockRestore();
+    (console.error as any).mockRestore();
   });
 
   it('Should still add unknown groups', () => {
@@ -377,7 +377,7 @@ describe('`GetParts` identifies invalid input with dynamic_groups turned on', ()
   });
 
   afterEach(() => {
-    console.error.mockRestore();
+    (console.error as any).mockRestore();
   });
 
   it('Should still add unknown groups', () => {
@@ -454,7 +454,7 @@ describe('Multi group aliases should work', () => {
       req: [],
       subgroups: []
     });
-    console.error.mockRestore();
+    (console.error as any).mockRestore();
   });
 });
 
@@ -767,7 +767,7 @@ describe('`getMaxClassification` correctly identifies the maximum', () => {
     expect(getMaxClassification('L0//REL B', 'L0//REL A', c12nDef, 'long', false)).toBe(
       'LEVEL 0//REL TO GROUP A, GROUP B'
     );
-    console.error.mockRestore();
+    (console.error as any).mockRestore();
   });
 });
 

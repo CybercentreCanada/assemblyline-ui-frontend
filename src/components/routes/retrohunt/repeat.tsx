@@ -20,14 +20,13 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { Retrohunt } from 'components/models/base/retrohunt';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
 import Classification from 'components/visual/Classification';
-import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RetrohuntResult } from '../retrohunt';
 
 const useStyles = makeStyles(theme => ({
   circularProgress: {
@@ -39,11 +38,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type Retrohunt = Pick<RetrohuntResult, 'key' | 'search_classification' | 'ttl'>;
+type RetrohuntData = Pick<Retrohunt, 'key' | 'search_classification' | 'ttl'>;
 
 type Props = {
-  retrohunt: RetrohuntResult;
-  onRepeat: (value: RetrohuntResult) => void;
+  retrohunt: Retrohunt;
+  onRepeat: (value: Retrohunt) => void;
 };
 
 function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Props) {
@@ -55,7 +54,7 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
   const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
-  const [data, setData] = useState<Retrohunt>(null);
+  const [data, setData] = useState<RetrohuntData>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 

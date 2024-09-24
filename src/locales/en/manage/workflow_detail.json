@@ -54,6 +54,7 @@
   "status.ASSESS": "ASSESS",
   "status.MALICIOUS": "MALICIOUS",
   "status.NON-MALICIOUS": "NON-MALICIOUS",
+  "status.TRIAGE": "TRIAGE",
   "status.null": "",
   "title": "Workflow Details",
   "usage": "Show related alerts"

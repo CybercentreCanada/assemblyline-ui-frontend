@@ -23,7 +23,7 @@ import clsx from 'clsx';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useMyAPI from 'components/hooks/useMyAPI';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/models/ui/user';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { ALERT_DEFAULT_PARAMS } from 'components/routes/alerts';
 import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';

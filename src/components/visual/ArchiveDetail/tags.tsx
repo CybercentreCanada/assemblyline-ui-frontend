@@ -3,6 +3,7 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import type { SelectChangeEvent } from '@mui/material';
 import {
   AlertTitle,
   CircularProgress,
@@ -12,7 +13,6 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
-  SelectChangeEvent,
   Skeleton,
   TableContainer,
   Tooltip,
@@ -25,6 +25,9 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
+import type { ResultIndexed } from 'components/models/base/result';
+import type { Signature, Tag } from 'components/models/base/tagging';
+import type { SearchResult } from 'components/models/ui/search';
 import ActionMenu from 'components/visual/ActionMenu';
 import Classification from 'components/visual/Classification';
 import {
@@ -38,7 +41,7 @@ import {
 } from 'components/visual/GridTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import ResultsTable, { ResultResult } from 'components/visual/SearchResult/results';
+import ResultsTable from 'components/visual/SearchResult/results';
 import SectionContainer from 'components/visual/SectionContainer';
 import Verdict from 'components/visual/Verdict';
 import { safeFieldValue } from 'helpers/utils';
@@ -46,25 +49,12 @@ import React, { useCallback, useEffect, useMemo, useState, useTransition } from 
 import { useTranslation } from 'react-i18next';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
-export type Signature = [string, string, boolean]; // [name, h_type, safelisted]
-
-export type Tag = [string, string, boolean, string]; // [value, h_type, safelisted, classification]
-
 type Result = {
   tag_type: string;
   value: string;
   h_type: string;
   safelisted: boolean;
   classification: string;
-};
-
-type ArchivedTagSectionProps = {
-  sha256: string;
-  signatures: Signature[];
-  tags: Record<string, Tag[]>;
-  force?: boolean;
-  drawer?: boolean;
-  nocollapse?: boolean;
 };
 
 const VERDICT_MAP = {
@@ -75,7 +65,16 @@ const VERDICT_MAP = {
   safe: 0
 };
 
-const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
+type Props = {
+  sha256: string;
+  signatures: Signature[];
+  tags: Record<string, Tag[]>;
+  force?: boolean;
+  drawer?: boolean;
+  nocollapse?: boolean;
+};
+
+const WrappedArchivedTagSection: React.FC<Props> = ({
   sha256,
   signatures,
   tags,
@@ -162,9 +161,7 @@ const WrappedArchivedTagSection: React.FC<ArchivedTagSectionProps> = ({
       );
     else
       return newResults.toSorted((a, b) =>
-        dir === 'asc'
-          ? (a[field] as any).localeCompare(b[field] as any)
-          : (b[field] as any).localeCompare(a[field] as any)
+        dir === 'asc' ? a[field].localeCompare(b[field]) : b[field].localeCompare(a[field])
       );
   }, [filteredResults, query]);
 
@@ -457,12 +454,7 @@ const WrappedRow: React.FC<RowProps> = ({
   const { c12nDef } = useALContext();
   const { showErrorMessage } = useMySnackbar();
 
-  const [resultResults, setResultResults] = useState<{
-    items: ResultResult[];
-    offset: number;
-    rows: number;
-    total: number;
-  }>(null);
+  const [resultResults, setResultResults] = useState<SearchResult<ResultIndexed>>(null);
   const [error, setError] = useState<string>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [render, setRender] = useState<boolean>(false);
@@ -471,7 +463,7 @@ const WrappedRow: React.FC<RowProps> = ({
 
   useEffect(() => {
     if (!sha256 || !tag_type || !value || !open || !!resultResults) return;
-    apiCall({
+    apiCall<SearchResult<ResultIndexed>>({
       method: 'POST',
       url: `/api/v4/search/result/`,
       body: {

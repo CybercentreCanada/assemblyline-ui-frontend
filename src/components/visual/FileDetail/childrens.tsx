@@ -1,6 +1,7 @@
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { AlertTitle, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { Childrens } from 'components/models/ui/file';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SectionContainer from 'components/visual/SectionContainer';
 import React, { useMemo, useState } from 'react';
@@ -20,7 +21,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type ChildrenSectionProps = {
-  childrens: any;
+  childrens: Childrens;
   show?: boolean;
   title?: string;
   nocollapse?: boolean;

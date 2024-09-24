@@ -1,9 +1,9 @@
 import { Card, Grid, Tooltip, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import type { DockerConfig, PersistentVolume } from 'components/models/base/service';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CgSmartphoneChip, CgSmartphoneRam } from 'react-icons/cg';
-import { Container, Volume } from '../service_detail';
 import ContainerDialog from './container_dialog';
 
 const useStyles = makeStyles(theme => ({
@@ -32,11 +32,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type ContainerCardProps = {
-  container: Container;
-  defaults: Container;
+  container: DockerConfig;
+  defaults: DockerConfig;
   name?: string;
-  volumes?: { [name: string]: Volume };
-  onChange: (newContainer: Container, name?: string, newVolumes?: { [name: string]: Volume }) => void;
+  volumes?: { [name: string]: PersistentVolume };
+  onChange: (newContainer: DockerConfig, name?: string, newVolumes?: { [name: string]: PersistentVolume }) => void;
 };
 
 const WrappedContainerCard = ({ container, defaults, name = null, volumes = null, onChange }: ContainerCardProps) => {

@@ -3,6 +3,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useHighlighter from 'components/hooks/useHighlighter';
+import { Heuristics } from 'components/models/ui/file';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Heuristic from '../Heuristic';
@@ -20,7 +21,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type HeuristicSectionProps = {
-  heuristics: any;
+  heuristics: Heuristics;
 };
 
 const WrappedHeuristicSection: React.FC<HeuristicSectionProps> = ({ heuristics }) => {

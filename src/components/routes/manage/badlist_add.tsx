@@ -19,113 +19,40 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { Badlist } from 'components/models/base/badlist';
+import {
+  ATTRIBUTION_TYPES,
+  DEFAULT_BADLIST,
+  DEFAULT_BADLIST_FILE,
+  DEFAULT_BADLIST_TAG,
+  HASHES
+} from 'components/models/base/badlist';
+import {
+  HASH_MAP,
+  MD5_REGEX,
+  SHA1_REGEX,
+  SHA256_REGEX,
+  SSDEEP_REGEX,
+  TLSH_REGEX
+} from 'components/models/utils/constants';
+import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import DatePicker from 'components/visual/DatePicker';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useParams } from 'react-router-dom';
-import ForbiddenPage from '../403';
-
-type ParamProps = {
-  id: string;
-};
-
-export type BadlistAddUpdate = {
-  expiry_ts: string;
-  attribution: {
-    actor: string[];
-    campaign: string[];
-    category: string[];
-    exploit: string[];
-    implant: string[];
-    family: string[];
-    network: string[];
-  };
-  hashes?: {
-    md5: string | null;
-    sha1: string | null;
-    sha256: string | null;
-    ssdeep: string | null;
-    tlsh: string | null;
-  };
-  file?: {
-    name: string[];
-    size: number | null;
-    type: string | null;
-  };
-  sources: {
-    classification: string;
-    name: string;
-    reason: string[];
-    type: string;
-  }[];
-  tag?: {
-    type: string;
-    value: string;
-  };
-  type: string | null;
-};
-
-const DEFAULT_BADLIST = {
-  attribution: {
-    actor: [],
-    campaign: [],
-    category: [],
-    exploit: [],
-    implant: [],
-    family: [],
-    network: []
-  },
-  expiry_ts: null,
-  sources: [{ type: 'user', name: '', reason: [''], classification: null }],
-  type: null
-};
-
-const DEFAULT_BADLIST_TAG = {
-  tag: {
-    type: '',
-    value: ''
-  }
-};
-
-const DEFAULT_BADLIST_FILE = {
-  hashes: {
-    sha256: '',
-    md5: '',
-    sha1: '',
-    ssdeep: '',
-    tlsh: ''
-  },
-  file: {
-    name: [''],
-    size: 0,
-    type: ''
-  }
-};
-
-const ATTRIBUTION_TYPES = ['actor', 'campaign', 'category', 'exploit', 'implant', 'family', 'network'];
-const HASHES = ['md5', 'sha1', 'sha256', 'ssdeep', 'tlsh'];
-const MD5_REGEX = /^[a-f0-9]{32}$/i;
-const SHA1_REGEX = /^[a-f0-9]{40}$/i;
-const SHA256_REGEX = /^[a-f0-9]{64}$/i;
-const SSDEEP_REGEX = /^[0-9]{1,18}:[a-zA-Z0-9/+]{0,64}:[a-zA-Z0-9/+]{0,64}$/;
-const TLSH_REGEX = /^((?:T1)?[0-9a-fA-F]{70})$/;
-const HASH_MAP = {
-  md5: MD5_REGEX,
-  sha1: SHA1_REGEX,
-  sha256: SHA256_REGEX,
-  ssdeep: SSDEEP_REGEX,
-  tlsh: TLSH_REGEX
-};
 
 const useStyles = makeStyles(theme => ({
   endAdornment: {
     paddingRight: theme.spacing(0.5)
   }
 }));
+
+type ParamProps = {
+  id: string;
+};
 
 type Props = {
   badlist_id?: string;
@@ -137,7 +64,7 @@ const BadlistNew = ({}: Props) => {
   const { t } = useTranslation(['manageBadlistAdd']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
-  const [badlist, setBadlist] = useState<BadlistAddUpdate>(DEFAULT_BADLIST);
+  const [badlist, setBadlist] = useState<Badlist>(DEFAULT_BADLIST);
   const [waiting, setWaiting] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);
   const [modified, setModified] = useState<boolean>(false);

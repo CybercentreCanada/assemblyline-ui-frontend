@@ -29,10 +29,10 @@ import clsx from 'clsx';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { CustomUser } from 'components/hooks/useMyUser';
+import type { AlertItem } from 'components/models/base/alert';
+import type { CustomUser } from 'components/models/ui/user';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
-import type { AlertItem } from 'components/routes/alerts/models/Alert';
 import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { getValueFromPath } from 'helpers/utils';
@@ -281,7 +281,7 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
           window.dispatchEvent(
             new CustomEvent<Partial<AlertSearchParams>>('alertRefresh', { detail: { group_by: '', fq: [groupBy] } })
           );
-          setSearchObject(p => ({ ...p, group_by: '', fq: [...p.fq, groupBy] }));
+          setSearchObject(p => ({ ...p, offset: 0, group_by: '', fq: [...p.fq, groupBy] }));
         }}
       />
     );

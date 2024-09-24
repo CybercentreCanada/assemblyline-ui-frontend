@@ -1,32 +1,26 @@
 import type { PaginationProps } from '@mui/material';
 import { Pagination } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
+import type { SearchResult } from 'components/models/ui/search';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 const MAX_TRACKED_RECORDS = 10000;
 
-type SearchResults = {
-  items: any[];
-  offset: number;
-  rows: number;
-  total: number;
-};
-
-export interface SearchPagerProps extends Omit<PaginationProps, 'children'> {
+interface Props extends PaginationProps {
   total: number;
   pageSize: number;
   index: string;
   method?: 'POST' | 'GET';
   query: SimpleSearchQuery;
-  setResults: (data: SearchResults) => void;
   scrollToTop?: boolean;
   size?: 'small' | 'large' | null;
-  setSearching?: (value: boolean) => void | null;
   url?: string;
+  setSearching?: (value: boolean) => void | null;
+  setResults: (data: SearchResult<unknown>) => void;
 }
 
-const WrappedSearchPager: React.FC<SearchPagerProps> = ({
+const WrappedSearchPager: React.FC<Props> = ({
   total,
   pageSize,
   index,

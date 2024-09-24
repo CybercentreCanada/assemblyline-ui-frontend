@@ -11,6 +11,7 @@ import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useSafeResults from 'components/hooks/useSafeResults';
+import type { ProcessTreeBody as ProcessTreeData } from 'components/models/base/result_body';
 import { humanReadableNumber } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -102,7 +103,14 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const ProcessTreeItem = ({ process, index = 0, depth = 0, force = false }) => {
+type ProcessTreeItemProps = {
+  process: ProcessTreeData;
+  force?: boolean;
+  index?: number;
+  depth?: number;
+};
+
+const ProcessTreeItem = ({ process, index = 0, depth = 0, force = false }: ProcessTreeItemProps) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useTreeItemStyles();
   const { showSafeResults } = useSafeResults();
@@ -198,10 +206,26 @@ const ProcessTreeItem = ({ process, index = 0, depth = 0, force = false }) => {
   );
 };
 
-const ProcessTreeItemList = ({ processes, depth = 0, force = false }) =>
-  processes.map((process, id) => <ProcessTreeItem key={id} process={process} index={id} depth={depth} force={force} />);
+type ProcessTreeItemListProps = {
+  processes: ProcessTreeData[];
+  force?: boolean;
+  depth?: number;
+};
 
-const WrappedProcessTreeBody = ({ body, force = false }) => {
+const ProcessTreeItemList = ({ processes, depth = 0, force = false }: ProcessTreeItemListProps) => (
+  <>
+    {processes.map((process, id) => (
+      <ProcessTreeItem key={id} process={process} index={id} depth={depth} force={force} />
+    ))}
+  </>
+);
+
+type Props = {
+  body: ProcessTreeData[];
+  force?: boolean;
+};
+
+const WrappedProcessTreeBody = ({ body, force = false }: Props) => {
   try {
     const expanded = [];
 

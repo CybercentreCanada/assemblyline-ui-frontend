@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import type { AlertItem, DetailedItem } from 'components/routes/alerts/models/Alert';
+import type { AlertItem, DetailedItem } from 'components/models/base/alert';
 import { detailedItemCompare } from 'components/routes/alerts/utils/alertUtils';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import type { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';

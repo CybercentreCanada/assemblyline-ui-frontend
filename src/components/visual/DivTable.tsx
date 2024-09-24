@@ -2,9 +2,12 @@ import {
   Link as MaterialLink,
   Table,
   TableBody,
+  TableBodyProps,
   TableCell,
   TableCellProps,
   TableHead,
+  TableHeadProps,
+  TableProps,
   TableRow,
   TableSortLabel,
   Theme
@@ -45,11 +48,10 @@ const BreakableTableCell = withStyles((theme: Theme) =>
   })
 )(TableCell);
 
-type CellProps = {
+interface CellProps extends TableCellProps {
   children?: React.ReactNode;
   breakable?: boolean;
-  [key: string]: any;
-};
+}
 
 export const DivTableCell = ({ children = null, breakable = false, ...other }: CellProps) =>
   breakable ? (
@@ -141,19 +143,19 @@ export const DivTableRow = ({ children, ...other }) => (
   </TableRow>
 );
 
-export const DivTableHead = ({ children, ...other }) => (
+export const DivTableHead = ({ children, ...other }: TableHeadProps) => (
   <TableHead {...other} component="div">
     {children}
   </TableHead>
 );
 
-export const DivTableBody = ({ children, ...other }) => (
+export const DivTableBody = ({ children, ...other }: TableBodyProps) => (
   <TableBody {...other} component="div">
     {children}
   </TableBody>
 );
 
-export const DivTable = ({ children, size = 'small' as 'small', ...other }) => (
+export const DivTable = ({ children, size = 'small' as 'small', ...other }: TableProps) => (
   <Table size={size} {...other} component="div">
     {children}
   </Table>
