@@ -18,6 +18,7 @@ import {
   DuplicateWorkflowAction,
   EditWorkflowAction,
   EnableWorkflowAction,
+  RunWorkflowAction,
   ShowRelatedAlertsAction
 } from './components/Actions';
 import { AlertHistogram, AlertResults } from './components/Data';
@@ -108,6 +109,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = () => null }: Prop
                 <Typography variant="caption">{workflow ? id : <Skeleton style={{ width: '10rem' }} />}</Typography>
               </Grid>
               <Grid item xs={12} sm style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <RunWorkflowAction id={id} workflow={workflow} />
                 <ShowRelatedAlertsAction id={id} workflow={workflow} />
                 <DuplicateWorkflowAction id={id} workflow={workflow} />
                 <EditWorkflowAction id={id} workflow={workflow} />

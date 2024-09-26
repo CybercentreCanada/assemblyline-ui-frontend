@@ -1,10 +1,12 @@
 import ControlPointDuplicateOutlinedIcon from '@mui/icons-material/ControlPointDuplicateOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import PlayCircleFilledWhiteOutlinedIcon from '@mui/icons-material/PlayCircleFilledWhiteOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
+import { Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -13,6 +15,81 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+
+type RunWorkflowActionProps = {
+  id: string;
+  workflow: Workflow;
+};
+
+export const RunWorkflowAction: React.FC<RunWorkflowActionProps> = React.memo(({ id = null, workflow = null }) => {
+  const { t } = useTranslation(['manageWorkflowDetail']);
+  const theme = useTheme();
+  const { apiCall } = useMyAPI();
+  const { user: currentUser } = useALContext();
+  const { showSuccessMessage } = useMySnackbar();
+
+  const [dialog, setDialog] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleWorkflowRun = useCallback(() => {
+    if (!currentUser.roles.includes('workflow_manage')) return;
+    apiCall({
+      url: `/api/v4/workflow/${id}/run/`,
+      method: 'PUT',
+      body: { enabled: true },
+      onSuccess: () => {
+        setDialog(false);
+        showSuccessMessage(t('run.success'));
+      },
+      onEnter: () => setLoading(true),
+      onExit: () => setLoading(false)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser.roles, id]);
+
+  if (!id || !currentUser.roles.includes('workflow_manage')) return null;
+  else if (!workflow)
+    return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
+  else
+    return (
+      <>
+        <Tooltip title={t('run.tooltip')}>
+          <div>
+            <IconButton style={{ color: theme.palette.primary.main }} onClick={() => setDialog(v => !v)} size="large">
+              <PlayCircleFilledWhiteOutlinedIcon />
+            </IconButton>
+          </div>
+        </Tooltip>
+        <ConfirmationDialog
+          open={dialog}
+          handleClose={() => setDialog(false)}
+          handleAccept={handleWorkflowRun}
+          title={t('run.title')}
+          cancelText={t('run.cancelText')}
+          acceptText={t('run.acceptText')}
+          waiting={loading}
+          children={
+            <Grid container flexDirection="column" rowGap={2} flexWrap="nowrap">
+              <div style={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'center', columnGap: theme.spacing(1) }}>
+                <ErrorOutlineOutlinedIcon color="warning" />
+                <Typography variant="body1" color="textSecondary" fontStyle="italic">
+                  {t('run.text1')}
+                </Typography>
+              </div>
+
+              <Typography variant="body1" color="textSecondary">
+                {t('run.text2')}
+              </Typography>
+
+              <Typography variant="body1" color="textSecondary">
+                {t('run.text3')}
+              </Typography>
+            </Grid>
+          }
+        />
+      </>
+    );
+});
 
 type ShowRelatedAlertsActionProps = {
   id: string;
@@ -81,14 +158,7 @@ export const DuplicateWorkflowAction: React.FC<DuplicateWorkflowActionProps> = R
       return (
         <Tooltip title={t('duplicate')}>
           <div>
-            <IconButton
-              style={{
-                color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
-              }}
-              component={Link}
-              to={to}
-              size="large"
-            >
+            <IconButton style={{ color: theme.palette.success.main }} component={Link} to={to} size="large">
               <ControlPointDuplicateOutlinedIcon />
             </IconButton>
           </div>
@@ -115,7 +185,7 @@ export const EditWorkflowAction: React.FC<EditWorkflowActionProps> = React.memo(
       <Tooltip title={t('edit')}>
         <div>
           <IconButton
-            style={{ color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark }}
+            style={{ color: theme.palette.primary.main }}
             component={Link}
             to={`${location.pathname}${location.search}#/create/${id}`}
             size="large"
@@ -267,7 +337,7 @@ export const DeleteWorkflowAction: React.FC<DeleteWorkflowActionProps> = React.m
           <Tooltip title={t('remove')}>
             <div>
               <IconButton
-                style={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
+                style={{ color: theme.palette.error.main }}
                 onClick={() => setDeleteDialog(true)}
                 size="large"
               >
