@@ -10,6 +10,7 @@ import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOutlined';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
+import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -171,7 +172,13 @@ export default function useMySitemap() {
         breadcrumbs: ['/manage']
       },
       {
-        path: '/manage/workflow/:id',
+        path: '/manage/workflow/create/:id',
+        title: t('breadcrumb.workflow.create'),
+        icon: <CreateOutlinedIcon />,
+        breadcrumbs: ['/manage', '/manage/workflows']
+      },
+      {
+        path: '/manage/workflow/detail/:id',
         title: t('breadcrumb.workflow.detail'),
         icon: <ListOutlinedIcon />,
         breadcrumbs: ['/manage', '/manage/workflows']
