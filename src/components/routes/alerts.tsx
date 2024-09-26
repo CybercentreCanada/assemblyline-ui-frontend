@@ -1,4 +1,4 @@
-import { AlertTitle, Grid, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { AlertTitle, Grid, IconButton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import SimpleList from 'commons/addons/lists/simplelist/SimpleList';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -11,6 +11,7 @@ import InformativeAlert from 'components/visual/InformativeAlert';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BiNetworkChart } from 'react-icons/bi';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import ForbiddenPage from './403';
@@ -27,6 +28,7 @@ import { SearchParamsProvider, useSearchParams } from './alerts/contexts/SearchP
 import AlertDetail from './alerts/detail';
 import type { SearchParams } from './alerts/utils/SearchParams';
 import type { SearchResult } from './alerts/utils/SearchParser';
+import { WorkflowCreate } from './manage/workflows/create';
 
 type ListResponse = {
   items: AlertIndexed[];
@@ -150,10 +152,15 @@ const WrappedAlertsContent = () => {
     (item: Alert) => {
       if (!item) return;
       if (isLGDown) document.getElementById(ALERT_SIMPLELIST_ID).blur();
-      navigate(`${location.pathname}${location.search}#${item.alert_id}`);
+      navigate(`${location.pathname}${location.search}#/alert/${item.alert_id}`);
     },
     [isLGDown, location.pathname, location.search, navigate]
   );
+
+  const handleCreateWorkflow = useCallback(() => {
+    const q: string = [...search.get('q'), ...search.get('fq')].join(' AND ');
+    navigate(`${location.pathname}${location.search}#/workflow/?query=${q}`);
+  }, [location.pathname, location.search, navigate, search]);
 
   useEffect(() => {
     handleFetch(search);
@@ -167,12 +174,21 @@ const WrappedAlertsContent = () => {
   }, [globalDrawerOpened]);
 
   useEffect(() => {
-    if (!location.hash) {
-      closeGlobalDrawer();
-    } else {
-      const id = location.hash.substr(1);
+    const url = new URL(`${window.location.origin}${location.hash.slice(1)}`);
+    if (url.pathname.startsWith('/alert/')) {
+      const id = url.pathname.slice('/alert/'.length);
       const alert = alerts.find(item => item.alert_id === id);
       setGlobalDrawer(<AlertDetail id={id} alert={alert} inDrawer />, { hasMaximize: true });
+    } else if (url.pathname.startsWith('/workflow/')) {
+      setGlobalDrawer(
+        <WorkflowCreate
+          id={url.pathname.slice('/workflow/'.length)}
+          search={url.search.slice(1)}
+          onClose={closeGlobalDrawer}
+        />
+      );
+    } else {
+      closeGlobalDrawer();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alerts, closeGlobalDrawer, location.hash, setGlobalDrawer]);
@@ -224,8 +240,15 @@ const WrappedAlertsContent = () => {
             <Typography variant="h4">{t('alerts')}</Typography>
           </Grid>
 
-          <Grid item xs style={{ textAlign: 'right', flex: 0 }}>
+          <Grid item xs style={{ display: 'flex', textAlign: 'right', flex: 0 }}>
             <AlertDefaultSearchParameters />
+            <Tooltip title={t('workflow.tooltip')}>
+              <div>
+                <IconButton size="large" onClick={handleCreateWorkflow}>
+                  <BiNetworkChart fontSize="x-large" />
+                </IconButton>
+              </div>
+            </Tooltip>
           </Grid>
         </Grid>
 

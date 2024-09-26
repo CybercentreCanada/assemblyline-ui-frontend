@@ -29,7 +29,6 @@ import { LABELS, PRIORITIES, STATUSES } from 'components/models/base/workflow';
 import type { SearchResult } from 'components/models/ui/search';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
-import { RouterPrompt } from 'components/visual/RouterPrompt';
 import AlertsTable from 'components/visual/SearchResult/alerts';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -237,7 +236,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
   else
     return (
       <PageCenter margin={2} width="100%">
-        <RouterPrompt when={modified && !loading} />
+        {/* <RouterPrompt when={modified && !loading} /> */}
 
         {c12nDef.enforce && (
           <div style={{ paddingBottom: theme.spacing(2) }}>
@@ -263,7 +262,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
               >
                 {id ? (
                   <>
-                    <Button variant="outlined" color="secondary" disabled={loading} onClick={() => handleCancel()}>
+                    <Button variant="outlined" color="primary" disabled={loading} onClick={() => handleCancel()}>
                       {t('cancel.button')}
                       {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
                     </Button>
@@ -424,5 +423,5 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
     );
 };
 
-const WorkflowCreate = React.memo(WrappedWorkflowCreate);
+export const WorkflowCreate = React.memo(WrappedWorkflowCreate);
 export default WorkflowCreate;
