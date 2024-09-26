@@ -294,5 +294,5 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = () => null }: Prop
     );
 };
 
-const WorkflowDetail = React.memo(WrappedWorkflowDetail);
+export const WorkflowDetail = React.memo(WrappedWorkflowDetail);
 export default WorkflowDetail;
