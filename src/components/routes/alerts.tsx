@@ -113,10 +113,10 @@ const WrappedAlertsContent = () => {
         setScrollReset(true);
       }
 
-      apiCall<AlertItem[]>({
+      apiCall<ListResponse | GroupedResponse>({
         url: `${pathname}?${query2.toString()}`,
         method: 'GET',
-        onSuccess: ({ api_response }: { api_response: ListResponse | GroupedResponse }) => {
+        onSuccess: ({ api_response }) => {
           if ('tc_start' in api_response) {
             setSearchObject(o => ({ ...o, tc_start: api_response.tc_start }));
           }

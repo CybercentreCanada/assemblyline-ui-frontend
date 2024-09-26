@@ -23,7 +23,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import WorkflowDetail from './workflow_detail';
+import WorkflowCreate from './create';
+import WorkflowDetail from './detail';
 
 type SearchResults = {
   items: WorkflowIndexed[];
@@ -84,7 +85,7 @@ const WorkflowsSearch = () => {
   );
 
   const setWorkflowID = useCallback(
-    (wf_id: string) => navigate(`${location.pathname}${location.search || ''}#${wf_id}`),
+    (wf_id: string) => navigate(`${location.pathname}${location.search}#/detail/${wf_id}`),
     [location.pathname, location.search, navigate]
   );
 
@@ -95,12 +96,16 @@ const WorkflowsSearch = () => {
   }, [globalDrawerOpened]);
 
   useEffect(() => {
-    if (location.hash) {
+    const url = new URL(`${window.location.origin}${location.hash.slice(1)}`);
+
+    if (url.pathname.startsWith('/detail/')) {
+      setGlobalDrawer(<WorkflowDetail id={url.pathname.slice('/detail/'.length)} onClose={closeGlobalDrawer} />);
+    } else if (url.pathname.startsWith('/create/')) {
       setGlobalDrawer(
-        <WorkflowDetail
-          workflow_id={location.hash === '#new' ? null : location.hash.slice(1)}
-          close={closeGlobalDrawer}
-          mode={location.hash === '#new' ? 'write' : 'read'}
+        <WorkflowCreate
+          id={url.pathname.slice('/create/'.length)}
+          search={url.search.slice(1)}
+          onClose={closeGlobalDrawer}
         />
       );
     } else {
@@ -138,7 +143,7 @@ const WorkflowsSearch = () => {
                   style={{
                     color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                   }}
-                  onClick={() => navigate(`${location.pathname}${location.search ? location.search : ''}#new`)}
+                  onClick={() => navigate(`${location.pathname}${location.search}#/create/`)}
                   size="large"
                 >
                   <AddCircleOutlineOutlinedIcon />
