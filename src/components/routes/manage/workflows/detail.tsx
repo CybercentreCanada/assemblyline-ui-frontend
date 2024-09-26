@@ -1,6 +1,4 @@
 import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import Throttler from 'commons/addons/utils/throttler';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -23,16 +21,6 @@ import {
 } from './components/Actions';
 import { AlertHistogram, AlertResults } from './components/Data';
 
-const useStyles = makeStyles(theme => ({
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
-
 const CUSTOMCHIP_STYLES = {
   borderRadius: '4px',
   height: 'auto',
@@ -44,8 +32,6 @@ const CUSTOMCHIP_STYLES = {
   textOverflow: 'initial',
   whiteSpace: 'wrap'
 };
-
-const THROTTLER = new Throttler(250);
 
 type Params = {
   id: string;
@@ -61,7 +47,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = () => null }: Prop
   const { id: paramID } = useParams<Params>();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useALContext();
+  const { c12nDef, user: currentUser } = useALContext();
   const { showErrorMessage } = useMySnackbar();
 
   const [workflow, setWorkflow] = useState<Workflow>(null);
@@ -97,9 +83,11 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = () => null }: Prop
   else
     return (
       <PageCenter margin={2} width="100%">
-        <div style={{ paddingBottom: theme.spacing(2) }}>
-          <Classification type={'outlined'} c12n={!workflow ? null : workflow.classification} />
-        </div>
+        {c12nDef.enforce && (
+          <div style={{ paddingBottom: theme.spacing(2) }}>
+            <Classification type="outlined" c12n={!workflow ? null : workflow.classification} />
+          </div>
+        )}
 
         <div style={{ textAlign: 'left' }}>
           <div style={{ paddingBottom: theme.spacing(2) }}>

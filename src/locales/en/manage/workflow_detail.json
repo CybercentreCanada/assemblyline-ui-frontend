@@ -5,6 +5,7 @@
   "backport_workflow_matching": "matching alerts",
   "backport_workflow_prompt": "Apply workflow to all existing alerts?",
   "cancel": "Cancel changes",
+  "cancel.button": "Cancel",
   "chart.title": "Number of hits in the last 30 days",
   "created_by": "Created by",
   "delete.acceptText": "Yes, remove it!",
@@ -22,6 +23,7 @@
   "duplicate": "Create a duplicate of this workflow",
   "edit": "Edit this workflow",
   "edit.disabled": "You cannot edit a workflow from another system...",
+  "edit.title": "Editing a workflow",
   "edited_by": "Edited by",
   "enable.acceptText": "Yes, enable it!",
   "enable.cancelText": "Cancel",
@@ -56,7 +58,6 @@
   "run.title": "Execute the workflow?",
   "run.tooltip": "Execute this workflow",
   "save": "Save Changes",
-  "save.success": "Workflow was successfully saved.",
   "statistics": "Statistics",
   "status": "Status",
   "status.ASSESS": "ASSESS",
@@ -65,5 +66,7 @@
   "status.TRIAGE": "TRIAGE",
   "status.null": "",
   "title": "Workflow Details",
+  "update.button": "Update",
+  "update.success": "Workflow was successfully updated.",
   "usage": "Show related alerts"
 }

@@ -5,6 +5,7 @@
   "backport_workflow_matching": "alertes correspondantes",
   "backport_workflow_prompt": "Appliquer le flux de travail à toutes les alertes existantes ?",
   "cancel": "Annuler les modifications",
+  "cancel.button": "Annuler",
   "chart.title": "Nombre de fois utilisé dans les derniers 30 jours",
   "created_by": "Créé par",
   "delete.acceptText": "Oui, supprimez-le !",
@@ -22,6 +23,7 @@
   "duplicate": "Créer un double de ce flux de travail",
   "edit": "Modifier ce flux de travail",
   "edit.disabled": "Vous ne pouvez pas modifier un flux de travail d'un autre système...",
+  "edit.title": "Modifier un flux de travail",
   "edited_by": "Édité par",
   "enable.acceptText": "Oui, activez-le !",
   "enable.cancelText": "Annuler",
@@ -56,7 +58,6 @@
   "run.title": "Exécuter le flux de travail ?",
   "run.tooltip": "Exécuter ce flux de travail",
   "save": "Sauvegarder les modifications",
-  "save.success": "Le flux de travail a été enregistré avec succès.",
   "statistics": "Statistiques",
   "status": "Statut",
   "status.ASSESS": "ÉVALUER",
@@ -65,5 +66,7 @@
   "status.TRIAGE": "TRIAGE",
   "status.null": "",
   "title": "Détails du flux de travail",
-  "usage": "Afficher les alertes associées"
+  "usage": "Afficher les alertes associées",
+  "update.button": "Modifier",
+  "update.success": "Le flux de travail a été enregistré avec succès."
 }

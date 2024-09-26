@@ -30,6 +30,7 @@ import type { SearchResult } from 'components/models/ui/search';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
+import AlertsTable from 'components/visual/SearchResult/alerts';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +47,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const THROTTLER = new Throttler(250);
+const THROTTLER = new Throttler(1000);
 
 const MyMenuItem = withStyles((theme: Theme) =>
   createStyles({
@@ -67,7 +68,7 @@ type Props = {
 };
 
 const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () => null }: Props) => {
-  const { t, i18n } = useTranslation(['manageWorkflowDetail']);
+  const { t } = useTranslation(['manageWorkflowDetail']);
   const { id: paramID } = useParams<Params>();
   const theme = useTheme();
   const classes = useStyles();
@@ -80,8 +81,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
   const [workflow, setWorkflow] = useState<Workflow>(null);
   const [originalWorkflow, setOriginalWorkflow] = useState<Workflow>(null);
   const [badQuery, setBadQuery] = useState<boolean>(false);
-  const [hits, setHits] = useState<number>(0);
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<SearchResult<Alert>>(null);
   const [runWorkflow, setRunWorkflow] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -112,22 +112,56 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
 
   const modified = useMemo<boolean>(() => !_.isEqual(workflow, originalWorkflow), [originalWorkflow, workflow]);
 
-  const handleSave = useCallback(
+  const disabled = useMemo<boolean>(
+    () => loading || !modified || badQuery || workflow?.query === '' || workflow?.name === '',
+    [badQuery, loading, modified, workflow?.name, workflow?.query]
+  );
+
+  const handleCancel = useCallback(() => {
+    navigate(`${location.pathname}${location.search}#/detail/${id}`);
+  }, [id, location.pathname, location.search, navigate]);
+
+  const handleAdd = useCallback(
     (wf: Workflow, run: boolean) => {
       if (!currentUser.roles.includes('workflow_manage')) return;
 
       apiCall<{ success: boolean; workflow_id: string }>({
-        url: id ? `/api/v4/workflow/${id}/?run_workflow=${run}` : `/api/v4/workflow/?run_workflow=${run}`,
-        method: id ? 'POST' : 'PUT',
+        url: `/api/v4/workflow/?run_workflow=${run}`,
+        method: 'PUT',
         body: {
           ...wf,
           priority: !wf.priority ? null : wf.priority,
           status: !wf.status ? null : wf.status
         },
         onSuccess: ({ api_response }) => {
-          showSuccessMessage(t(id ? 'save.success' : 'add.success'));
+          showSuccessMessage(t('add.success'));
           setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
           navigate(`${location.pathname}${location.search}#/detail/${api_response.workflow_id}`);
+        },
+        onEnter: () => setLoading(true),
+        onExit: () => setLoading(false)
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentUser.roles, id, location, navigate, t]
+  );
+
+  const handleUpdate = useCallback(
+    (wf: Workflow, run: boolean) => {
+      if (!currentUser.roles.includes('workflow_manage')) return;
+
+      apiCall<{ success: boolean; workflow_id: string }>({
+        url: `/api/v4/workflow/${id}/?run_workflow=${run}`,
+        method: 'POST',
+        body: {
+          ...wf,
+          priority: !wf.priority ? null : wf.priority,
+          status: !wf.status ? null : wf.status
+        },
+        onSuccess: () => {
+          showSuccessMessage(t('update.success'));
+          setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
+          navigate(`${location.pathname}${location.search}#/detail/${id}`);
         },
         onEnter: () => setLoading(true),
         onExit: () => setLoading(false)
@@ -181,18 +215,18 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
       if (!!workflow?.query && currentUser.roles.includes('alert_view')) {
         apiCall<SearchResult<Alert>>({
           method: 'GET',
-          url: `/api/v4/search/alert/?query=${encodeURI(workflow?.query)}&rows=0&track_total_hits=true`,
+          url: `/api/v4/search/alert/?query=${encodeURI(workflow?.query)}&rows=10&track_total_hits=true`,
           onSuccess: ({ api_response }) => {
-            setHits(api_response.total || 0);
+            setResults(api_response);
             setBadQuery(false);
           },
           onFailure: () => {
-            setResults(0);
+            setResults({ items: [], offset: 0, rows: 10, total: 0 });
             setBadQuery(true);
           }
         });
       } else {
-        setResults(0);
+        setResults({ items: [], offset: 0, rows: 10, total: 0 });
         setBadQuery(false);
       }
     });
@@ -205,9 +239,11 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
       <PageCenter margin={2} width="100%">
         <RouterPrompt when={modified && !loading} />
 
-        <div style={{ paddingBottom: theme.spacing(2) }}>
-          <Classification type="picker" c12n={!workflow ? null : workflow.classification} />
-        </div>
+        {c12nDef.enforce && (
+          <div style={{ paddingBottom: theme.spacing(2) }}>
+            <Classification type="picker" c12n={!workflow ? null : workflow.classification} />
+          </div>
+        )}
 
         <div style={{ textAlign: 'left' }}>
           <div style={{ paddingBottom: theme.spacing(2) }}>
@@ -219,16 +255,39 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
                 </Typography>
               </Grid>
 
-              <Grid item xs={12} sm style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={loading || !modified || badQuery || workflow?.query === '' || workflow?.name === ''}
-                  onClick={() => handleSave(workflow, runWorkflow)}
-                >
-                  {t(id ? 'save' : 'add.button')}
-                  {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                </Button>
+              <Grid
+                item
+                xs={12}
+                sm
+                style={{ display: 'flex', justifyContent: 'flex-end', columnGap: theme.spacing(1) }}
+              >
+                {id ? (
+                  <>
+                    <Button variant="outlined" color="secondary" disabled={loading} onClick={() => handleCancel()}>
+                      {t('cancel.button')}
+                      {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      disabled={disabled}
+                      onClick={() => handleUpdate(workflow, runWorkflow)}
+                    >
+                      {t('update.button')}
+                      {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    disabled={disabled}
+                    onClick={() => handleAdd(workflow, runWorkflow)}
+                  >
+                    {t('add.button')}
+                    {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                  </Button>
+                )}
               </Grid>
             </Grid>
           </div>
@@ -333,20 +392,33 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
             )}
           </Grid>
 
-          <Grid item xs={12}>
-            {!workflow ? (
-              <Skeleton style={{ height: '2.5rem' }} />
-            ) : (
-              <FormControlLabel
-                control={<Checkbox onChange={() => setRunWorkflow(o => !o)} checked={runWorkflow}></Checkbox>}
-                label={
-                  <Typography variant="body2">
-                    {t('backport_workflow_prompt')} ({hits} {t('backport_workflow_matching')})
-                  </Typography>
-                }
-              />
-            )}
-          </Grid>
+          {!id && (
+            <Grid item xs={12}>
+              {!workflow ? (
+                <Skeleton style={{ height: '2.5rem' }} />
+              ) : (
+                <FormControlLabel
+                  control={<Checkbox onChange={() => setRunWorkflow(o => !o)} checked={runWorkflow}></Checkbox>}
+                  label={
+                    <Typography variant="body2">
+                      {t('backport_workflow_prompt')} ({results?.total || 0} {t('backport_workflow_matching')})
+                    </Typography>
+                  }
+                />
+              )}
+            </Grid>
+          )}
+
+          {!currentUser.roles.includes('alert_view') ? null : (
+            <>
+              <Grid item xs={12} style={{ paddingTop: '30px', paddingBottom: '10px' }}>
+                <Typography variant="h6">{t('last10')}</Typography>
+              </Grid>
+              <Grid item xs={12} style={{ paddingTop: '10px' }}>
+                <AlertsTable alertResults={results} allowSort={false} />
+              </Grid>
+            </>
+          )}
         </Grid>
       </PageCenter>
     );
