@@ -11,14 +11,14 @@ const DEFAULT_RETRY_MS = 32;
 
 export type APIResponseProps<APIResponse> = {
   api_error_message: string;
-  api_response: APIResponse | any;
+  api_response: APIResponse;
   api_server_version: string;
   api_status_code: number;
 };
 
 export type DownloadResponseProps<APIResponse> = {
   api_error_message: string;
-  api_response: APIResponse | any;
+  api_response: APIResponse;
   api_server_version: string;
   api_status_code: number;
   filename?: string;
@@ -67,7 +67,7 @@ type DownloadBlobProps<SuccessData, FailureData> = {
 };
 
 type UseMyAPIReturn = {
-  apiCall: <SuccessData = unknown, FailureData = unknown>(props: APICallProps<SuccessData, FailureData>) => void;
+  apiCall: <SuccessData = any, FailureData = any>(props: APICallProps<SuccessData, FailureData>) => void;
   bootstrap: (props: BootstrapProps) => void;
   downloadBlob: <SuccessData = unknown, FailureData = unknown>(
     props: DownloadBlobProps<SuccessData, FailureData>
