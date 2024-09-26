@@ -92,3 +92,20 @@ export type WorkflowIndexed = Pick<
   | 'status'
   | 'workflow_id'
 >;
+
+export const DEFAULT_WORKFLOW: Workflow = {
+  classification: '',
+  creation_date: undefined,
+  creator: '',
+  description: '',
+  edited_by: '',
+  enabled: false,
+  hit_count: 0,
+  id: '',
+  labels: [],
+  last_edit: undefined,
+  name: '',
+  priority: '',
+  query: '',
+  status: ''
+};
