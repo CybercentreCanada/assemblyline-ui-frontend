@@ -69,7 +69,7 @@ type DownloadBlobProps<SuccessData, FailureData> = {
 type UseMyAPIReturn = {
   apiCall: <SuccessData = any, FailureData = any>(props: APICallProps<SuccessData, FailureData>) => void;
   bootstrap: (props: BootstrapProps) => void;
-  downloadBlob: <SuccessData = unknown, FailureData = unknown>(
+  downloadBlob: <SuccessData = ReadableStream, FailureData = ReadableStream>(
     props: DownloadBlobProps<SuccessData, FailureData>
   ) => void;
 };
