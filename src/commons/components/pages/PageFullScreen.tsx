@@ -1,11 +1,12 @@
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { IconButton, Tooltip, useTheme } from '@mui/material';
+import browser from 'browser-detect';
 import useAppBar from 'commons/components/app/hooks/useAppBar';
 import useAppBarHeight from 'commons/components/app/hooks/useAppBarHeight';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useFullscreenStatus from 'commons/components/utils/hooks/useFullscreenStatus';
-import { memo, useCallback, useRef } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageContent from './PageContent';
 
@@ -30,6 +31,8 @@ const PageFullscreen = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 
   let fullscreenSupported: boolean;
 
   const barWillHide = layout.current !== 'top' && appbar.autoHide;
+
+  const isFirefox = useMemo(() => browser().name === 'firefox', []);
 
   try {
     [isFullscreen, setIsFullscreen] = useFullscreenStatus(maximizableElement);
@@ -63,7 +66,20 @@ const PageFullscreen = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 
             paddingTop: theme.spacing(2),
             right: theme.spacing(2),
             zIndex: theme.zIndex.appBar + 1,
-            top: barWillHide || isFullscreen ? 0 : appBarHeight
+            top: barWillHide || isFullscreen ? 0 : appBarHeight,
+            ...(!isFirefox
+              ? null
+              : !isFullscreen
+              ? {
+                  position: 'fixed',
+                  top: '96px',
+                  right: '32px'
+                }
+              : {
+                  position: 'fixed',
+                  top: '32px',
+                  right: '32px'
+                })
           }}
         >
           {fullscreenSupported ? null : (
