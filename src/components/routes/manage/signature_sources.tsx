@@ -28,6 +28,7 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { UpdateConfig } from 'components/models/base/service';
 import { DEFAULT_SOURCE, type UpdateSource } from 'components/models/base/service';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
@@ -121,18 +122,27 @@ const queueSourceUpdate = (source: UpdateSource) => ({
   status: { ...source.status, state: 'UPDATING', message: 'Queued for update..' }
 });
 
-const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }) => {
+type SourceDetailDrawerProps = {
+  service: string;
+  base: UpdateSource;
+  generatesSignatures: UpdateConfig['generates_signatures'];
+  onClose?: () => void;
+};
+
+const WrappedSourceDetailDrawer = ({ service, base, onClose, generatesSignatures }: SourceDetailDrawerProps) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
+  const classes = useStyles();
+  const { apiCall } = useMyAPI();
   const { c12nDef } = useALContext();
+  const { showSuccessMessage } = useMySnackbar();
+
+  const [source, setSource] = useState<UpdateSource>(null);
   const [modified, setModified] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const { apiCall } = useMyAPI();
-  const { showSuccessMessage } = useMySnackbar();
-  const [source, setSource] = useState(null);
+
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
-  const classes = useStyles();
 
   useEffect(() => {
     if (base) {
@@ -153,7 +163,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
       onSuccess: () => {
         showSuccessMessage(t(base ? 'change.success' : 'add.success'));
         setModified(false);
-        if (!base || !isXL) close();
+        if (!base || !isXL) onClose();
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadUpdateSources')), 1000);
       },
       onEnter: () => setButtonLoading(true),
@@ -164,7 +174,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
   const deleteSource = () => setDeleteDialog(true);
 
   const executeDeleteSource = () => {
-    close();
+    onClose();
     apiCall({
       url: `/api/v4/signature/sources/${service}/${encodeURIComponent(source.name)}/`,
       method: 'DELETE',
@@ -291,7 +301,15 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
 
 export const SourceDetailDrawer = React.memo(WrappedSourceDetailDrawer);
 
-export const SourceCard = ({ source, onClick, service, generatesSignatures, showDetails = true }) => {
+type SourceCardProps = {
+  service: string;
+  source: UpdateSource;
+  generatesSignatures: UpdateConfig['generates_signatures'];
+  showDetails?: boolean;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+};
+
+export const SourceCard = ({ source, onClick, service, generatesSignatures, showDetails = true }: SourceCardProps) => {
   const { t, i18n } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -463,7 +481,13 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
   );
 };
 
-const ServiceDetail = ({ service, sources, generatesSignatures }) => {
+type ServiceDetailProps = {
+  service: string;
+  sources: UpdateConfig['sources'];
+  generatesSignatures: UpdateConfig['generates_signatures'];
+};
+
+const ServiceDetail = ({ service, sources, generatesSignatures }: ServiceDetailProps) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -489,8 +513,8 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
       <SourceDetailDrawer
         service={currentService}
         base={source}
-        close={closeGlobalDrawer}
         generatesSignatures={generatesSignatures}
+        onClose={closeGlobalDrawer}
       />
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -587,17 +611,16 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
 export default function SignatureSources() {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const [sources, setSources] = useState(null);
   const { apiCall } = useMyAPI();
+  const { user: currentUser } = useAppUser<CustomUser>();
+
+  const [sources, setSources] = useState<{ [service: string]: UpdateConfig }>(null);
 
   const reload = useCallback(() => {
     if (currentUser.roles.includes('signature_manage')) {
-      apiCall({
+      apiCall<{ [service: string]: UpdateConfig }>({
         url: '/api/v4/signature/sources/',
-        onSuccess: api_data => {
-          setSources(api_data.api_response);
-        }
+        onSuccess: ({ api_response }) => setSources(api_response)
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
