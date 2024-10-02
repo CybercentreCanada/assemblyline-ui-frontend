@@ -214,7 +214,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
       if (!!workflow?.query && currentUser.roles.includes('alert_view')) {
         apiCall<SearchResult<Alert>>({
           method: 'GET',
-          url: `/api/v4/search/alert/?query=${encodeURI(workflow?.query)}&rows=10&track_total_hits=true`,
+          url: `/api/v4/search/alert/?query=${encodeURIComponent(workflow?.query)}&rows=10&track_total_hits=true`,
           onSuccess: ({ api_response }) => {
             setResults(api_response);
             setBadQuery(false);
