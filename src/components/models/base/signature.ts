@@ -38,7 +38,7 @@ export type Signature = {
   source: string;
 
   /**  */
-  state_change_date?: string | Date;
+  state_change_date?: string;
 
   /**  */
   state_change_user?: string;

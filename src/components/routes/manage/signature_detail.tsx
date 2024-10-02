@@ -39,8 +39,10 @@ import SignatureStatus from 'components/visual/SignatureStatus';
 import { suricataConfig, suricataDef } from 'helpers/suricata';
 import { safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import { yaraConfig, yaraDef } from 'helpers/yara';
-import { useEffect, useState } from 'react';
+import moment from 'moment';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TbUserX } from 'react-icons/tb';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 
@@ -73,6 +75,101 @@ const useStyles = makeStyles(theme => ({
     marginLeft: -12
   }
 }));
+
+type ResetSignatureToSourceProps = {
+  signature: Signature;
+  onSignatureChange?: (signature: Partial<Signature>) => void;
+};
+
+const ResetSignatureToSource: React.FC<ResetSignatureToSourceProps> = React.memo(
+  ({ signature = null, onSignatureChange = () => null }) => {
+    const { t, i18n } = useTranslation(['manageSignatureDetail']);
+    const theme = useTheme();
+    const { apiCall } = useMyAPI();
+    const { user: currentUser } = useALContext();
+    const { showSuccessMessage } = useMySnackbar();
+
+    const [open, setOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const handleResetSignatureToSource = useCallback(() => {
+      if (!currentUser.roles.includes('signature_manage')) return;
+      apiCall({
+        url: `/api/v4/signature/clear_status/${signature.id}/`,
+        onSuccess: () => {
+          showSuccessMessage(t('clear.success'));
+          onSignatureChange({ state_change_date: null, state_change_user: null });
+          setOpen(false);
+        },
+        onEnter: () => setLoading(true),
+        onExit: () => setLoading(false)
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentUser.roles, onSignatureChange, signature.id, t]);
+
+    if (
+      !currentUser.roles.includes('signature_manage') ||
+      !signature?.state_change_date ||
+      !signature?.state_change_user
+    )
+      return null;
+    else
+      return (
+        <>
+          <Tooltip title={t('clear.tooltip')}>
+            <IconButton
+              size="large"
+              onClick={() => setOpen(true)}
+              style={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
+            >
+              <TbUserX fontSize="smaller" />
+            </IconButton>
+          </Tooltip>
+          <Dialog open={open} onClose={() => setOpen(false)}>
+            <DialogTitle>{t('clear.title')}</DialogTitle>
+            <DialogContent>
+              <p>
+                <span>{`${t('clear.text1')} `}</span>
+                <span style={{ fontWeight: 'bold' }}>{signature.state_change_user}</span>
+                <span>{` ${t('on')} `}</span>
+                <span>
+                  {moment(signature.state_change_date)
+                    .locale(i18n.language)
+                    .format(i18n.language === 'fr' ? 'Do MMMM YYYY' : 'MMMM Do YYYY')
+                    .toString()}
+                  {'. '}
+                </span>
+                <span>{`${t('clear.text2')} `}</span>
+              </p>
+              <p>
+                <span>{`${t('clear.text3')} `}</span>
+              </p>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpen(false)} color="secondary" disabled={loading}>
+                {t('clear.cancelText')}
+                {loading && (
+                  <CircularProgress
+                    size={24}
+                    style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -12, marginLeft: -12 }}
+                  />
+                )}
+              </Button>
+              <Button onClick={handleResetSignatureToSource} color="primary" disabled={loading}>
+                {t('clear.acceptText')}
+                {loading && (
+                  <CircularProgress
+                    size={24}
+                    style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -12, marginLeft: -12 }}
+                  />
+                )}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      );
+  }
+);
 
 type ParamProps = {
   id?: string;
@@ -241,6 +338,11 @@ const SignatureDetail = ({
         showSuccessMessage(t('change.success'));
         setModified(false);
         onUpdated();
+        setSignature(s => ({
+          ...s,
+          state_change_user: currentUser.username,
+          state_change_date: new Date(Date.now()).toISOString()
+        }));
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
@@ -311,6 +413,7 @@ const SignatureDetail = ({
           </Button>
         </DialogActions>
       </Dialog>
+
       {c12nDef.enforce && (
         <div style={{ paddingBottom: theme.spacing(3) }}>
           <Classification size="tiny" c12n={signature ? signature.classification : null} />
@@ -346,6 +449,10 @@ const SignatureDetail = ({
                       </IconButton>
                     </Tooltip>
                   )}
+                  <ResetSignatureToSource
+                    signature={signature}
+                    onSignatureChange={value => setSignature(old => ({ ...old, ...value }))}
+                  />
                   {currentUser.roles.includes('signature_manage') && (
                     <Tooltip title={t('remove')}>
                       <IconButton
@@ -384,6 +491,16 @@ const SignatureDetail = ({
               </>
             )}
           </Grid>
+
+          {signature?.state_change_user && signature?.state_change_date && (
+            <Grid item xs={12} textAlign="center">
+              <Typography color="secondary">
+                {`${t('status_modified')} ${signature?.state_change_user} ${t('on')} `}
+                <Moment variant="localeDate">{signature?.state_change_date}</Moment>
+              </Typography>
+            </Grid>
+          )}
+
           <Grid item xs={12}>
             {signature ? (
               <div
