@@ -158,8 +158,15 @@ const WrappedAlertsContent = () => {
   );
 
   const handleCreateWorkflow = useCallback(() => {
-    const q: string = [`(${search.get('q')})`, ...search.get('fq').map(fq => `(${fq})`)].join(' AND ');
-    navigate(`${location.pathname}${location.search}#/workflow/?query=${encodeURIComponent(q)}`);
+    const q = search.get('q');
+    const fq = search.get('fq');
+
+    const values = (!q && !fq.length ? ['*'] : q ? [q] : []).concat(fq);
+    const query = values
+      .map(v => ([' or ', ' and '].some(a => v.toLowerCase().includes(a)) ? `(${v})` : v))
+      .join(' AND ');
+
+    navigate(`${location.pathname}${location.search}#/workflow/?query=${encodeURIComponent(query)}`);
   }, [location.pathname, location.search, navigate, search]);
 
   useEffect(() => {
@@ -167,7 +174,7 @@ const WrappedAlertsContent = () => {
   }, [handleFetch, search]);
 
   useEffect(() => {
-    if (!globalDrawerOpened && location.hash && location.hash !== '') {
+    if (alerts.length && !globalDrawerOpened && location.hash) {
       navigate(`${location.pathname}${location.search}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
