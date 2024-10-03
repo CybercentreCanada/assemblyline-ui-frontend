@@ -34,9 +34,8 @@ export const RunWorkflowAction: React.FC<RunWorkflowActionProps> = React.memo(({
   const handleWorkflowRun = useCallback(() => {
     if (!currentUser.roles.includes('workflow_manage')) return;
     apiCall({
-      url: `/api/v4/workflow/${id}/run/`,
+      url: `/api/v4/workflow/${id}/run`,
       method: 'GET',
-      body: { enabled: true },
       onSuccess: () => {
         setDialog(false);
         showSuccessMessage(t('run.success'));
