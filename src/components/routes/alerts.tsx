@@ -158,8 +158,8 @@ const WrappedAlertsContent = () => {
   );
 
   const handleCreateWorkflow = useCallback(() => {
-    const q: string = [...search.get('q'), ...search.get('fq')].join(' AND ');
-    navigate(`${location.pathname}${location.search}#/workflow/?query=${q}`);
+    const q: string = [`(${search.get('q')})`, ...search.get('fq').map(fq => `(${fq})`)].join(' AND ');
+    navigate(`${location.pathname}${location.search}#/workflow/?query=${encodeURIComponent(q)}`);
   }, [location.pathname, location.search, navigate, search]);
 
   useEffect(() => {
