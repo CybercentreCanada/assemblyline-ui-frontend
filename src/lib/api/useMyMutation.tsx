@@ -1,23 +1,29 @@
 import type { UseMutationOptions } from '@tanstack/react-query';
-import { useMutation } from '@tanstack/react-query';
-import { queryClient } from './APIProvider';
-import type { APIResponseProps } from './utils';
-import { DEFAULT_RETRY_MS, useQueryFn } from './utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { APIQueryKey, APIResponseProps } from './utils';
+import { DEFAULT_INVALIDATE_DELAY, DEFAULT_RETRY_MS, getAPIResponse, useAPICall } from './utils';
 
-interface Props<TData = unknown, TError = Error, TVariables = void, TContext = unknown>
+interface Props<TData, TError, TVariables, TContext, Body extends object>
   extends Omit<UseMutationOptions<TData, TError, TVariables, TContext>, 'mutationKey' | 'mutationFn'> {
   url: string;
   contentType?: string;
   method?: string;
-  body?: TVariables;
+  body?: Body;
   reloadOnUnauthorize?: boolean;
   allowCache?: boolean;
   retryAfter?: number;
   enabled?: boolean;
-  invalidateFn?: () => void;
+  invalidateProps?: {
+    delay?: number;
+    filter: (key: APIQueryKey) => boolean;
+  };
+  queryDataProps?: {
+    filter: (key: APIQueryKey) => boolean;
+    update: (old: TData) => TData;
+  };
 }
 
-export const useMyMutation = <Response extends unknown, Params extends object = object>({
+export const useMyMutation = <Response, Body extends object = object>({
   url,
   contentType = 'application/json',
   method = 'GET',
@@ -27,36 +33,38 @@ export const useMyMutation = <Response extends unknown, Params extends object = 
   retryAfter = DEFAULT_RETRY_MS,
   enabled = true,
   onSuccess = () => null,
-  invalidateFn = () => null,
+  invalidateProps = { delay: null, filter: null },
+  queryDataProps = { filter: null, update: () => null },
   ...options
-}: Props<APIResponseProps<Response>, APIResponseProps<Error>, Params>) => {
-  const queryFn = useQueryFn<Response, Params>();
+}: Props<APIResponseProps<Response>, APIResponseProps<Error>, null, unknown, Body>) => {
+  const queryClient = useQueryClient();
+  const apiCall = useAPICall<Response, Body>();
 
-  const mutation = useMutation<APIResponseProps<Response>, APIResponseProps<Error>, Params>({
+  const mutation = useMutation<APIResponseProps<Response>, APIResponseProps<Error>, unknown>({
     ...options,
     mutationKey: [{ url, allowCache, method, contentType, body, reloadOnUnauthorize, retryAfter, enabled }],
-    mutationFn: async () =>
-      queryFn({ url, contentType, method, body, allowCache, reloadOnUnauthorize, retryAfter, enabled }),
+    mutationFn: async () => apiCall({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled }),
 
-    onSuccess: async (data, variable, context) => {
+    onSuccess: async (data, variable: null, context) => {
       onSuccess(data, variable, context);
 
-      await queryClient.invalidateQueries({
-        predicate: q => {
-          const d = JSON.parse(q.queryHash);
-          console.log(q);
-          console.log(JSON.parse(q.queryHash));
-          return d[0] === q.queryKey[0];
-        }
-      });
+      if (queryDataProps?.filter && queryDataProps?.update) {
+        queryClient.setQueriesData(
+          {
+            predicate: q => queryDataProps?.filter((JSON.parse(q.queryHash) as [APIQueryKey])[0])
+          },
+          queryDataProps.update
+        );
+      }
+
+      if (invalidateProps?.filter) {
+        await new Promise(resolve => setTimeout(resolve, invalidateProps?.delay || DEFAULT_INVALIDATE_DELAY));
+        await queryClient.invalidateQueries({
+          predicate: q => invalidateProps.filter((JSON.parse(q.queryHash) as [APIQueryKey])[0])
+        });
+      }
     }
   });
 
-  return {
-    ...mutation,
-    statusCode: mutation?.data?.api_status_code || mutation?.error?.api_status_code || null,
-    serverVersion: mutation?.data?.api_server_version || mutation?.error?.api_server_version || null,
-    data: mutation?.data?.api_response || null,
-    error: mutation?.data?.api_error_message || null
-  };
+  return { ...mutation, ...getAPIResponse(mutation?.data, mutation?.error, mutation?.failureReason) };
 };
