@@ -3,10 +3,10 @@ import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-quer
 import Throttler from 'commons/addons/utils/throttler';
 import { useEffect, useMemo, useState } from 'react';
 import { DEFAULT_GC_TIME, DEFAULT_RETRY_MS, DEFAULT_STALE_TIME } from './constants';
-import type { APIQueryKey, APIResponse, BlobResponse } from './models';
-import { getAPIResponse, useDownloadBlobFn } from './utils';
+import type { APIQueryKey, APIResponse } from './models';
+import { getAPIResponse, useApiCallFn } from './utils';
 
-interface Props<TQueryFnData, TError, TData, TQueryKey extends QueryKey>
+interface Props<TQueryFnData, TError, TData, TQueryKey extends QueryKey, Body extends object>
   extends Omit<
     DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>,
     'queryKey' | 'initialData' | 'enabled'
@@ -23,7 +23,7 @@ interface Props<TQueryFnData, TError, TData, TQueryKey extends QueryKey>
   enabled?: boolean;
 }
 
-export const useMyQuery = ({
+export const useBootstrap = <Response, Body extends object = object>({
   url,
   contentType = 'application/json',
   method = 'GET',
@@ -35,23 +35,23 @@ export const useMyQuery = ({
   throttleTime = null,
   enabled,
   ...options
-}: Props<BlobResponse, APIResponse<Error>, BlobResponse, QueryKey>) => {
+}: Props<APIResponse<Response>, APIResponse<Error>, APIResponse<Response>, QueryKey, Body>) => {
   const queryClient = useQueryClient();
-  const blobDownloadFn = useDownloadBlobFn();
+  const apiCallFn = useApiCallFn<Response, Body>();
 
   const [queryKey, setQueryKey] = useState<APIQueryKey>(null);
   const [isThrottling, setIsThrottling] = useState<boolean>(!!throttleTime);
 
   const throttler = useMemo(() => (!throttleTime ? null : new Throttler(throttleTime)), [throttleTime]);
 
-  const query = useQuery<BlobResponse, APIResponse<Error>, APIResponse<Response>>(
+  const query = useQuery<APIResponse<Response>, APIResponse<Error>, APIResponse<Response>>(
     {
       ...options,
       queryKey: [queryKey],
       staleTime,
       gcTime,
       enabled: enabled && !!queryKey && !isThrottling,
-      queryFn: async () => blobDownloadFn({ url, reloadOnUnauthorize, retryAfter }),
+      queryFn: async () => apiCallFn({ url, contentType, method, body, reloadOnUnauthorize, retryAfter }),
       placeholderData: keepPreviousData,
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
       retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000))
