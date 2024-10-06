@@ -1,7 +1,7 @@
 import type { UseMutationOptions } from '@tanstack/react-query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { APIQueryKey, APIResponseProps } from './utils';
-import { DEFAULT_INVALIDATE_DELAY, DEFAULT_RETRY_MS, getAPIResponse, useAPICall } from './utils';
+import { DEFAULT_INVALIDATE_DELAY, DEFAULT_RETRY_MS, getAPIResponse, useDefaultQueryFn } from './utils';
 
 interface Props<TData, TError, TVariables, TContext, Body extends object>
   extends Omit<UseMutationOptions<TData, TError, TVariables, TContext>, 'mutationKey' | 'mutationFn'> {
@@ -36,23 +36,21 @@ export const useMyMutation = <Response, Body extends object = object>({
   invalidateProps = { delay: null, filter: null },
   queryDataProps = { filter: null, update: () => null },
   ...options
-}: Props<APIResponseProps<Response>, APIResponseProps<Error>, null, unknown, Body>) => {
+}: Props<APIResponseProps<Response>, APIResponseProps<Error>, void, unknown, Body>) => {
   const queryClient = useQueryClient();
-  const apiCall = useAPICall<Response, Body>();
+  const queryFn = useDefaultQueryFn<Response, Body>();
 
-  const mutation = useMutation<APIResponseProps<Response>, APIResponseProps<Error>, unknown>({
+  const mutation = useMutation<APIResponseProps<Response>, APIResponseProps<Error>, void, unknown>({
     ...options,
     mutationKey: [{ url, allowCache, method, contentType, body, reloadOnUnauthorize, retryAfter, enabled }],
-    mutationFn: async () => apiCall({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled }),
+    mutationFn: async () => queryFn({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled }),
 
-    onSuccess: async (data, variable: null, context) => {
+    onSuccess: async (data, variable, context) => {
       onSuccess(data, variable, context);
 
       if (queryDataProps?.filter && queryDataProps?.update) {
         queryClient.setQueriesData(
-          {
-            predicate: q => queryDataProps?.filter((JSON.parse(q.queryHash) as [APIQueryKey])[0])
-          },
+          { predicate: q => queryDataProps?.filter((JSON.parse(q.queryHash) as [APIQueryKey])[0]) },
           queryDataProps.update
         );
       }

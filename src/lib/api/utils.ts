@@ -29,13 +29,14 @@ export type APIReturn<Response> = {
   error: string;
 };
 
-export type APIQueryKey = {
+export type APIQueryKey<Body extends object = object> = {
   url: string;
   contentType: string;
   method: string;
   body: Body;
   reloadOnUnauthorize: boolean;
   enabled: boolean;
+  [key: string]: unknown;
 };
 
 export const isAPIData = (value: object): value is APIResponseProps =>
@@ -72,7 +73,7 @@ type ApiCallProps<Body> = {
   enabled?: boolean;
 };
 
-export const useAPICall = <Response, Body extends object = object>() => {
+export const useDefaultQueryFn = <Response, Body extends object = object>() => {
   const { t } = useTranslation();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { configuration: systemConfig } = useALContext();
