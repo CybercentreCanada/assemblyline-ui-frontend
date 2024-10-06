@@ -1,7 +1,8 @@
 import type { UseMutationOptions } from '@tanstack/react-query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { APIQueryKey, APIResponseProps } from './utils';
-import { DEFAULT_INVALIDATE_DELAY, DEFAULT_RETRY_MS, getAPIResponse, useDefaultQueryFn } from './utils';
+import { DEFAULT_INVALIDATE_DELAY, DEFAULT_RETRY_MS } from './constants';
+import type { APIQueryKey, APIResponse } from './models';
+import { getAPIResponse, useApiCallFn } from './utils';
 
 interface Props<TData, TError, TVariables, TContext, Body extends object>
   extends Omit<UseMutationOptions<TData, TError, TVariables, TContext>, 'mutationKey' | 'mutationFn'> {
@@ -36,15 +37,14 @@ export const useMyMutation = <Response, Body extends object = object>({
   invalidateProps = { delay: null, filter: null },
   queryDataProps = { filter: null, update: () => null },
   ...options
-}: Props<APIResponseProps<Response>, APIResponseProps<Error>, void, unknown, Body>) => {
+}: Props<APIResponse<Response>, APIResponse<Error>, void, unknown, Body>) => {
   const queryClient = useQueryClient();
-  const queryFn = useDefaultQueryFn<Response, Body>();
+  const apiCallFn = useApiCallFn<Response, Body>();
 
-  const mutation = useMutation<APIResponseProps<Response>, APIResponseProps<Error>, void, unknown>({
+  const mutation = useMutation<APIResponse<Response>, APIResponse<Error>, void, unknown>({
     ...options,
     mutationKey: [{ url, allowCache, method, contentType, body, reloadOnUnauthorize, retryAfter, enabled }],
-    mutationFn: async () => queryFn({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled }),
-
+    mutationFn: async () => apiCallFn({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled }),
     onSuccess: async (data, variable, context) => {
       onSuccess(data, variable, context);
 

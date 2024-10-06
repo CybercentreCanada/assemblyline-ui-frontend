@@ -4,42 +4,10 @@ import useQuota from 'components/hooks/useQuota';
 import getXSRFCookie from 'helpers/xsrf';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { DEFAULT_RETRY_MS } from './constants';
+import type { APIResponse, ApiCallProps } from './models';
 
-export const DEFAULT_RETRY_MS = 10 * 1000;
-
-/** The time in milliseconds after data is considered stale. If set to Infinity, the data will never be considered stale. If set to a function, the function will be executed with the query to compute a staleTime. */
-export const DEFAULT_STALE_TIME = 1 * 60 * 1000;
-
-/** The time in milliseconds that unused/inactive cache data remains in memory. When a query's cache becomes unused or inactive, that cache data will be garbage collected after this duration. When different garbage collection times are specified, the longest one will be used. Setting it to Infinity will disable garbage collection. */
-export const DEFAULT_GC_TIME = 5 * 60 * 1000;
-
-export const DEFAULT_INVALIDATE_DELAY = 1 * 1000;
-
-export type APIResponseProps<T = any> = {
-  api_error_message: string;
-  api_response: T;
-  api_server_version: string;
-  api_status_code: number;
-};
-
-export type APIReturn<Response> = {
-  statusCode: number;
-  serverVersion: string;
-  data: Response;
-  error: string;
-};
-
-export type APIQueryKey<Body extends object = object> = {
-  url: string;
-  contentType: string;
-  method: string;
-  body: Body;
-  reloadOnUnauthorize: boolean;
-  enabled: boolean;
-  [key: string]: unknown;
-};
-
-export const isAPIData = (value: object): value is APIResponseProps =>
+export const isAPIData = (value: object): value is APIResponse =>
   value !== undefined &&
   value !== null &&
   'api_response' in value &&
@@ -47,33 +15,19 @@ export const isAPIData = (value: object): value is APIResponseProps =>
   'api_server_version' in value &&
   'api_status_code' in value;
 
-const getValue = <K extends keyof APIResponseProps<unknown>>(
+const getValue = <K extends keyof APIResponse<unknown>>(
   key: K,
-  ...responses: APIResponseProps<unknown>[]
-): APIResponseProps<unknown>[K] => responses?.find(r => !!r?.[key])?.[key] || null;
+  ...responses: APIResponse<unknown>[]
+): APIResponse<unknown>[K] => responses?.find(r => !!r?.[key])?.[key] || null;
 
-export const getAPIResponse = <R, E>(
-  data: APIResponseProps<R>,
-  error: APIResponseProps<E>,
-  failureReason: APIResponseProps<E>
-) => ({
+export const getAPIResponse = <R, E>(data: APIResponse<R>, error: APIResponse<E>, failureReason: APIResponse<E>) => ({
   statusCode: getValue('api_status_code', data, error, failureReason),
   serverVersion: getValue('api_server_version', data, error, failureReason),
   data: getValue('api_response', data, error, failureReason) as R,
   error: getValue('api_error_message', data, error, failureReason) as E
 });
 
-type ApiCallProps<Body> = {
-  url: string;
-  contentType?: string;
-  method?: string;
-  body?: Body;
-  reloadOnUnauthorize?: boolean;
-  retryAfter?: number;
-  enabled?: boolean;
-};
-
-export const useDefaultQueryFn = <Response, Body extends object = object>() => {
+export const useApiCallFn = <Response, Body extends object = object>() => {
   const { t } = useTranslation();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { configuration: systemConfig } = useALContext();
@@ -95,7 +49,7 @@ export const useDefaultQueryFn = <Response, Body extends object = object>() => {
       // // Check the cache
       // const cachedURL = sessionStorage.getItem(url);
       // if (allowCache && cachedURL) {
-      //   const apiData = JSON.parse(cachedURL) as APIResponseProps<Response>;
+      //   const apiData = JSON.parse(cachedURL) as APIResponse<Response>;
       //   return Promise.resolve(apiData);
       // }
 
@@ -126,7 +80,7 @@ export const useDefaultQueryFn = <Response, Body extends object = object>() => {
         });
       }
 
-      const json = (await res.json()) as APIResponseProps<Response>;
+      const json = (await res.json()) as APIResponse<Response>;
 
       // Check for an invalid json format
       if (!isAPIData(json)) {

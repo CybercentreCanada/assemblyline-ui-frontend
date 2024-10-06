@@ -2,8 +2,9 @@ import type { DefinedInitialDataOptions, QueryKey } from '@tanstack/react-query'
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import Throttler from 'commons/addons/utils/throttler';
 import { useEffect, useMemo, useState } from 'react';
-import type { APIQueryKey, APIResponseProps } from './utils';
-import { DEFAULT_GC_TIME, DEFAULT_RETRY_MS, DEFAULT_STALE_TIME, getAPIResponse, useDefaultQueryFn } from './utils';
+import { DEFAULT_GC_TIME, DEFAULT_RETRY_MS, DEFAULT_STALE_TIME } from './constants';
+import type { APIQueryKey, APIResponse } from './models';
+import { getAPIResponse, useApiCallFn } from './utils';
 
 interface Props<TQueryFnData, TError, TData, TQueryKey extends QueryKey, Body extends object>
   extends Omit<
@@ -34,23 +35,23 @@ export const useMyQuery = <Response, Body extends object = object>({
   throttleTime = null,
   enabled,
   ...options
-}: Props<APIResponseProps<Response>, APIResponseProps<Error>, APIResponseProps<Response>, QueryKey, Body>) => {
+}: Props<APIResponse<Response>, APIResponse<Error>, APIResponse<Response>, QueryKey, Body>) => {
   const queryClient = useQueryClient();
-  const queryFn = useDefaultQueryFn<Response, Body>();
+  const apiCallFn = useApiCallFn<Response, Body>();
 
   const [queryKey, setQueryKey] = useState<APIQueryKey>(null);
   const [isThrottling, setIsThrottling] = useState<boolean>(!!throttleTime);
 
   const throttler = useMemo(() => (!throttleTime ? null : new Throttler(throttleTime)), [throttleTime]);
 
-  const query = useQuery<APIResponseProps<Response>, APIResponseProps<Error>, APIResponseProps<Response>>(
+  const query = useQuery<APIResponse<Response>, APIResponse<Error>, APIResponse<Response>>(
     {
       ...options,
       queryKey: [queryKey],
       staleTime,
       gcTime,
       enabled: enabled && !!queryKey && !isThrottling,
-      queryFn: async () => queryFn({ url, contentType, method, body, reloadOnUnauthorize, retryAfter }),
+      queryFn: async () => apiCallFn({ url, contentType, method, body, reloadOnUnauthorize, retryAfter }),
       placeholderData: keepPreviousData,
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
       retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000))
