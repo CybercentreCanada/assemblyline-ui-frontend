@@ -29,7 +29,6 @@ import { LABELS, PRIORITIES, STATUSES } from 'components/models/base/workflow';
 import type { SearchResult } from 'components/models/ui/search';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
-import AlertsTable from 'components/visual/SearchResult/alerts';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -293,7 +292,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
 
         <Grid container spacing={2} textAlign="start">
           <Grid item xs={12}>
-            <Typography variant="subtitle2">{t('name')}</Typography>
+            <Typography variant="subtitle2">{`${t('name')} ${t('required')}`}</Typography>
             {!workflow ? (
               <Skeleton style={{ height: '2.5rem' }} />
             ) : (
@@ -309,7 +308,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
             )}
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="subtitle2">{t('query')}</Typography>
+            <Typography variant="subtitle2">{`${t('query')} ${t('required')}`}</Typography>
             {!workflow ? (
               <Skeleton style={{ height: '2.5rem' }} />
             ) : (
@@ -405,17 +404,6 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
                 />
               )}
             </Grid>
-          )}
-
-          {!currentUser.roles.includes('alert_view') ? null : (
-            <>
-              <Grid item xs={12} style={{ paddingTop: '30px', paddingBottom: '10px' }}>
-                <Typography variant="h6">{t('last10')}</Typography>
-              </Grid>
-              <Grid item xs={12} style={{ paddingTop: '10px' }}>
-                <AlertsTable alertResults={results} allowSort={false} />
-              </Grid>
-            </>
           )}
         </Grid>
       </PageCenter>
