@@ -382,7 +382,7 @@ const WrappedAlertWorkflows = ({ alerts = [] }: Props) => {
                   margin: theme.spacing(0.25)
                 }}
               />
-              <PlayArrowIcon style={{ position: 'absolute', bottom: '10px', right: '10px', fontSize: 'small' }} />
+              <PlayArrowIcon style={{ position: 'absolute', bottom: '10px', right: '6px', fontSize: 'small' }} />
             </IconButton>
           </span>
         </Tooltip>

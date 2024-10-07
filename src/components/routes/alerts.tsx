@@ -252,7 +252,7 @@ const WrappedAlertsContent = () => {
                 <div>
                   <IconButton size="large" onClick={handleCreateWorkflow}>
                     <BiNetworkChart fontSize="x-large" />
-                    <AddIcon style={{ position: 'absolute', bottom: '10px', right: '10px', fontSize: 'small' }} />
+                    <AddIcon style={{ position: 'absolute', bottom: '10px', right: '6px', fontSize: 'small' }} />
                   </IconButton>
                 </div>
               </Tooltip>
