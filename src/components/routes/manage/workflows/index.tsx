@@ -99,13 +99,21 @@ const WorkflowsSearch = () => {
     const url = new URL(`${window.location.origin}${location.hash.slice(1)}`);
 
     if (url.pathname.startsWith('/detail/')) {
-      setGlobalDrawer(<WorkflowDetail id={url.pathname.slice('/detail/'.length)} onClose={closeGlobalDrawer} />);
+      setGlobalDrawer(
+        <WorkflowDetail
+          id={url.pathname.slice('/detail/'.length)}
+          onClose={() => navigate(`${location.pathname}${location.search}`)}
+        />
+      );
     } else if (url.pathname.startsWith('/create/')) {
       setGlobalDrawer(
         <WorkflowCreate
           id={url.pathname.slice('/create/'.length)}
-          search={url.search.slice(1)}
-          onClose={closeGlobalDrawer}
+          onClose={id =>
+            id
+              ? navigate(`${location.pathname}${location.search}#/detail/${id}`)
+              : navigate(`${location.pathname}${location.search}`)
+          }
         />
       );
     } else {

@@ -33,7 +33,7 @@ import AlertsTable from 'components/visual/SearchResult/alerts';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
 import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles(() => ({
@@ -62,17 +62,15 @@ type Params = {
 
 type Props = {
   id?: string;
-  search?: string;
-  onClose?: () => void;
+  onClose?: (id?: string) => void;
 };
 
-const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () => null }: Props) => {
+const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Props) => {
   const { t } = useTranslation(['manageWorkflowDetail']);
   const { id: paramID } = useParams<Params>();
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
-  const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { c12nDef, configuration, user: currentUser } = useALContext();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -116,10 +114,6 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
     [badQuery, loading, modified, workflow?.name, workflow?.query]
   );
 
-  const handleCancel = useCallback(() => {
-    navigate(`${location.pathname}${location.search}#/detail/${id}`);
-  }, [id, location.pathname, location.search, navigate]);
-
   const handleAdd = useCallback(
     (wf: Workflow, run: boolean) => {
       if (!currentUser.roles.includes('workflow_manage')) return;
@@ -135,14 +129,15 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
         onSuccess: ({ api_response }) => {
           showSuccessMessage(t('add.success'));
           setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
-          navigate(`${location.pathname}${location.search}#/detail/${api_response.workflow_id}`);
+          setTimeout(() => window.dispatchEvent(new CustomEvent('alertRefresh', null)), 1500);
+          onClose(api_response.workflow_id);
         },
         onEnter: () => setLoading(true),
         onExit: () => setLoading(false)
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.roles, id, location, navigate, t]
+    [currentUser.roles, t]
   );
 
   const handleUpdate = useCallback(
@@ -160,14 +155,14 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
         onSuccess: () => {
           showSuccessMessage(t('update.success'));
           setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
-          navigate(`${location.pathname}${location.search}#/detail/${id}`);
+          onClose(id);
         },
         onEnter: () => setLoading(true),
         onExit: () => setLoading(false)
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.roles, id, location, navigate, t]
+    [currentUser.roles, id, t]
   );
 
   useEffect(() => {
@@ -194,20 +189,24 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
   }, [currentUser.roles, id, onClose]);
 
   useEffect(() => {
-    if (id) return;
-    const params = new URLSearchParams(search);
     setOriginalWorkflow(defaultWorkflow);
-    setWorkflow({
-      ...defaultWorkflow,
-      ...(params.get('classification') && { classification: params.get('classification') }),
-      ...(params.get('name') && { name: params.get('name') }),
-      ...(params.get('query') && { query: params.get('query') }),
-      ...{ labels: params.getAll('labels') },
-      ...(PRIORITIES.includes(params.get('priority') as Priority) && { priority: params.get('priority') as Priority }),
-      ...(STATUSES.includes(params.get('status') as Status) && { status: params.get('status') as Status }),
-      ...(params.get('enabled') && { enabled: params.get('enabled') === 'false' ? false : true })
-    });
-  }, [defaultWorkflow, id, search]);
+    setWorkflow(defaultWorkflow);
+  }, [defaultWorkflow]);
+
+  useEffect(() => {
+    const state = location?.state as Workflow;
+    if (!state) return;
+    setWorkflow(wf => ({
+      ...wf,
+      ...(state?.classification && { classification: state.classification }),
+      ...(state?.name && { name: state.name }),
+      ...(state?.query && { query: state.query }),
+      ...(Array.isArray(state?.labels) && { labels: state.labels }),
+      ...(PRIORITIES.includes(state?.priority) && { priority: state.priority }),
+      ...(STATUSES.includes(state?.status) && { status: state.status }),
+      ...(state?.enabled && { enabled: state.enabled })
+    }));
+  }, [location?.state]);
 
   useEffect(() => {
     THROTTLER.delay(() => {
@@ -262,7 +261,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, search = null, onClose = () 
               >
                 {id ? (
                   <>
-                    <Button variant="outlined" color="primary" disabled={loading} onClick={() => handleCancel()}>
+                    <Button variant="outlined" color="primary" disabled={loading} onClick={() => onClose(id)}>
                       {t('cancel.button')}
                       {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
                     </Button>
