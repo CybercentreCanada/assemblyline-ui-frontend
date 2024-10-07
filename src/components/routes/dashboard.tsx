@@ -400,9 +400,9 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
           {dispatcher.initialized ? (
             <div>
               {up.length === 0 && down.length === 0 && <span className={classes.muted}>{t('no_services')}</span>}
-              {up.length !== 0 && <span>{up.join(' | ')}</span>}
+              {up.length !== 0 && <span>{up.toSorted().join(' | ')}</span>}
               {up.length !== 0 && down.length !== 0 && <span> :: </span>}
-              {down.length !== 0 && <span>{down.join(' | ')}</span>}
+              {down.length !== 0 && <span>{down.toSorted().join(' | ')}</span>}
             </div>
           ) : (
             <div>
