@@ -2,8 +2,8 @@ import Editor, { loader } from '@monaco-editor/react';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import {
+  Alert,
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -39,7 +39,6 @@ import SignatureStatus from 'components/visual/SignatureStatus';
 import { suricataConfig, suricataDef } from 'helpers/suricata';
 import { safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import { yaraConfig, yaraDef } from 'helpers/yara';
-import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TbUserX } from 'react-icons/tb';
@@ -76,6 +75,75 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+type SaveSignatureProps = {
+  signature: Signature;
+  modified: boolean;
+  handleSuccess: () => void;
+};
+
+const SaveSignature: React.FC<SaveSignatureProps> = React.memo(
+  ({ signature = null, modified = false, handleSuccess = () => null }) => {
+    const { t } = useTranslation(['manageSignatureDetail']);
+    const { id, type, source, name } = useParams<ParamProps>();
+    const theme = useTheme();
+    const { apiCall } = useMyAPI();
+    const { user: currentUser } = useALContext();
+    const { showSuccessMessage } = useMySnackbar();
+
+    const [open, setOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const handleStateSaveButtonClick = useCallback(() => {
+      apiCall({
+        url: `/api/v4/signature/change_status/${signature.id}/${signature.status}/`,
+        onSuccess: () => {
+          showSuccessMessage(t('change.success'));
+          handleSuccess();
+        },
+        onEnter: () => setLoading(true),
+        onExit: () => setLoading(false)
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [handleSuccess, signature?.id, signature?.status, t]);
+
+    if (!currentUser.roles.includes('signature_manage') || !signature || !modified) return null;
+    else
+      return (
+        <>
+          <div
+            style={{
+              paddingTop: id || (type && source && name) ? theme.spacing(1) : theme.spacing(2),
+              paddingBottom: id || (type && source && name) ? theme.spacing(1) : theme.spacing(2),
+              position: id || (type && source && name) ? 'fixed' : 'inherit',
+              bottom: id || (type && source && name) ? 0 : 'inherit',
+              left: id || (type && source && name) ? 0 : 'inherit',
+              width: id || (type && source && name) ? '100%' : 'inherit',
+              textAlign: id || (type && source && name) ? 'center' : 'right',
+              zIndex: id || (type && source && name) ? theme.zIndex.drawer - 1 : 'auto',
+              backgroundColor: id || (type && source && name) ? theme.palette.background.default : 'inherit',
+              boxShadow: id || (type && source && name) ? theme.shadows[4] : 'inherit'
+            }}
+          >
+            <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+              {t('change.save')}
+            </Button>
+          </div>
+          <ConfirmationDialog
+            open={open}
+            waiting={loading}
+            handleClose={() => setOpen(false)}
+            handleCancel={() => setOpen(false)}
+            handleAccept={handleStateSaveButtonClick}
+            title={t('save.title')}
+            cancelText={t('cancel')}
+            acceptText={t('save.acceptText')}
+            text={t('save.text')}
+          />
+        </>
+      );
+  }
+);
+
 type ResetSignatureToSourceProps = {
   signature: Signature;
   onSignatureChange?: (signature: Partial<Signature>) => void;
@@ -83,7 +151,7 @@ type ResetSignatureToSourceProps = {
 
 const ResetSignatureToSource: React.FC<ResetSignatureToSourceProps> = React.memo(
   ({ signature = null, onSignatureChange = () => null }) => {
-    const { t, i18n } = useTranslation(['manageSignatureDetail']);
+    const { t } = useTranslation(['manageSignatureDetail']);
     const theme = useTheme();
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useALContext();
@@ -116,7 +184,7 @@ const ResetSignatureToSource: React.FC<ResetSignatureToSourceProps> = React.memo
     else
       return (
         <>
-          <Tooltip title={t('clear.tooltip')}>
+          <Tooltip title={t('restore.tooltip')}>
             <IconButton
               size="large"
               onClick={() => setOpen(true)}
@@ -125,25 +193,21 @@ const ResetSignatureToSource: React.FC<ResetSignatureToSourceProps> = React.memo
               <TbUserX fontSize="smaller" />
             </IconButton>
           </Tooltip>
-          <Dialog open={open} onClose={() => setOpen(false)}>
+          <ConfirmationDialog
+            open={open}
+            waiting={loading}
+            handleClose={() => setOpen(false)}
+            handleCancel={() => setOpen(false)}
+            handleAccept={handleResetSignatureToSource}
+            title={t('restore.title')}
+            cancelText={t('cancel')}
+            acceptText={t('restore.acceptText')}
+            text={t('restore.text')}
+          />
+          {/* <Dialog open={open} onClose={() => setOpen(false)}>
             <DialogTitle>{t('clear.title')}</DialogTitle>
             <DialogContent>
-              <p>
-                <span>{`${t('clear.text1')} `}</span>
-                <span style={{ fontWeight: 'bold' }}>{signature.state_change_user}</span>
-                <span>{` ${t('on')} `}</span>
-                <span>
-                  {moment(signature.state_change_date)
-                    .locale(i18n.language)
-                    .format(i18n.language === 'fr' ? 'Do MMMM YYYY' : 'MMMM Do YYYY')
-                    .toString()}
-                  {'. '}
-                </span>
-                <span>{`${t('clear.text2')} `}</span>
-              </p>
-              <p>
-                <span>{`${t('clear.text3')} `}</span>
-              </p>
+              <p>{t('clear.text2')}</p>
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setOpen(false)} color="secondary" disabled={loading}>
@@ -165,7 +229,7 @@ const ResetSignatureToSource: React.FC<ResetSignatureToSourceProps> = React.memo
                 )}
               </Button>
             </DialogActions>
-          </Dialog>
+          </Dialog> */}
         </>
       );
   }
@@ -494,10 +558,13 @@ const SignatureDetail = ({
 
           {signature?.state_change_user && signature?.state_change_date && (
             <Grid item xs={12} textAlign="center">
-              <Typography color="secondary">
-                {`${t('status_modified')} ${signature?.state_change_user} ${t('on')} `}
-                <Moment variant="localeDate">{signature?.state_change_date}</Moment>
-              </Typography>
+              <Alert severity="info">
+                <Typography color="secondary" variant="body2">
+                  <b> {signature?.state_change_user}</b>
+                  {t('status_modified')}
+                  <Moment variant="localeDate">{signature?.state_change_date}</Moment>
+                </Typography>
+              </Alert>
             </Grid>
           )}
 
@@ -623,27 +690,19 @@ const SignatureDetail = ({
 
         <RouterPrompt when={modified} />
 
-        {signature && modified ? (
-          <div
-            style={{
-              paddingTop: id || (type && source && name) ? theme.spacing(1) : theme.spacing(2),
-              paddingBottom: id || (type && source && name) ? theme.spacing(1) : theme.spacing(2),
-              position: id || (type && source && name) ? 'fixed' : 'inherit',
-              bottom: id || (type && source && name) ? 0 : 'inherit',
-              left: id || (type && source && name) ? 0 : 'inherit',
-              width: id || (type && source && name) ? '100%' : 'inherit',
-              textAlign: id || (type && source && name) ? 'center' : 'right',
-              zIndex: id || (type && source && name) ? theme.zIndex.drawer - 1 : 'auto',
-              backgroundColor: id || (type && source && name) ? theme.palette.background.default : 'inherit',
-              boxShadow: id || (type && source && name) ? theme.shadows[4] : 'inherit'
-            }}
-          >
-            <Button variant="contained" color="primary" disabled={buttonLoading} onClick={handleStateSaveButtonClick}>
-              {t('change.save')}
-              {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-            </Button>
-          </div>
-        ) : null}
+        <SaveSignature
+          signature={signature}
+          modified={modified}
+          handleSuccess={() => {
+            setModified(false);
+            onUpdated();
+            setSignature({
+              ...signature,
+              state_change_user: currentUser.username,
+              state_change_date: new Date(Date.now()).toISOString()
+            });
+          }}
+        />
       </div>
     </PageCenter>
   ) : (
