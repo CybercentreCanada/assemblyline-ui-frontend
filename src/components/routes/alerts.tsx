@@ -1,3 +1,4 @@
+import AddIcon from '@mui/icons-material/Add';
 import { AlertTitle, Grid, IconButton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import SimpleList from 'commons/addons/lists/simplelist/SimpleList';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -251,6 +252,7 @@ const WrappedAlertsContent = () => {
                 <div>
                   <IconButton size="large" onClick={handleCreateWorkflow}>
                     <BiNetworkChart fontSize="x-large" />
+                    <AddIcon style={{ position: 'absolute', bottom: '10px', right: '10px', fontSize: 'small' }} />
                   </IconButton>
                 </div>
               </Tooltip>
