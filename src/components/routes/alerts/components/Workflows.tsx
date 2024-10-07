@@ -1,5 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RemoveIcon from '@mui/icons-material/Remove';
 import {
   Alert,
@@ -381,6 +382,7 @@ const WrappedAlertWorkflows = ({ alerts = [] }: Props) => {
                   margin: theme.spacing(0.25)
                 }}
               />
+              <PlayArrowIcon style={{ position: 'absolute', bottom: '10px', right: '6px', fontSize: 'small' }} />
             </IconButton>
           </span>
         </Tooltip>

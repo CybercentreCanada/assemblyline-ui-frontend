@@ -38,7 +38,7 @@
   "hits": "Utilisation",
   "labels": "Étiquettes",
   "last10": "10 dernières utilisations",
-  "name": "Nom (Requis)",
+  "name": "Nom",
   "on": "le",
   "origin": "Origine",
   "priority": "Priorité",
@@ -47,8 +47,9 @@
   "priority.LOW": "BASSE",
   "priority.MEDIUM": "MOYENNE",
   "priority.null": "",
-  "query": "Requête (Requis)",
+  "query": "Requête",
   "remove": "Supprimer ce flux de travail",
+  "required": "(Requis)",
   "run.acceptText": "Oui, exécutez-le !",
   "run.cancelText": "Annuler",
   "run.success": "Le flux de travail a été exécuté avec succès",
@@ -66,7 +67,7 @@
   "status.TRIAGE": "TRIAGE",
   "status.null": "",
   "title": "Détails du flux de travail",
-  "usage": "Afficher les alertes associées",
   "update.button": "Modifier",
-  "update.success": "Le flux de travail a été enregistré avec succès."
+  "update.success": "Le flux de travail a été enregistré avec succès.",
+  "usage": "Afficher les alertes associées"
 }

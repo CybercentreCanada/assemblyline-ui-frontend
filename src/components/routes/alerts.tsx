@@ -1,3 +1,4 @@
+import AddIcon from '@mui/icons-material/Add';
 import { AlertTitle, Grid, IconButton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import SimpleList from 'commons/addons/lists/simplelist/SimpleList';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -159,6 +160,7 @@ const WrappedAlertsContent = () => {
   );
 
   const handleCreateWorkflow = useCallback(() => {
+    if (!currentUser.roles.includes('workflow_manage')) return;
     const q = search.get('q');
     const fq = search.get('fq');
 
@@ -169,7 +171,7 @@ const WrappedAlertsContent = () => {
 
     const state: Partial<Workflow> = { query };
     navigate(`${location.pathname}${location.search}#/workflow/`, { state });
-  }, [location.pathname, location.search, navigate, search]);
+  }, [currentUser.roles, location.pathname, location.search, navigate, search]);
 
   useEffect(() => {
     handleFetch(search);
@@ -245,13 +247,16 @@ const WrappedAlertsContent = () => {
 
           <Grid item xs style={{ display: 'flex', textAlign: 'right', flex: 0 }}>
             <AlertDefaultSearchParameters />
-            <Tooltip title={t('workflow.tooltip')}>
-              <div>
-                <IconButton size="large" onClick={handleCreateWorkflow}>
-                  <BiNetworkChart fontSize="x-large" />
-                </IconButton>
-              </div>
-            </Tooltip>
+            {currentUser.roles.includes('workflow_manage') && (
+              <Tooltip title={t('workflow.tooltip')}>
+                <div>
+                  <IconButton size="large" onClick={handleCreateWorkflow}>
+                    <BiNetworkChart fontSize="x-large" />
+                    <AddIcon style={{ position: 'absolute', bottom: '10px', right: '6px', fontSize: 'small' }} />
+                  </IconButton>
+                </div>
+              </Tooltip>
+            )}
           </Grid>
         </Grid>
 
