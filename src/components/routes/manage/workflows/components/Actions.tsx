@@ -131,24 +131,21 @@ export const DuplicateWorkflowAction: React.FC<DuplicateWorkflowActionProps> = R
   ({ id = null, workflow = null }) => {
     const { t } = useTranslation(['manageWorkflowDetail']);
     const theme = useTheme();
+    const navigate = useNavigate();
     const { user: currentUser } = useALContext();
 
-    const to = useMemo<string>(() => {
-      const query = new URLSearchParams(
-        !workflow
-          ? ''
-          : [
-              ['classification', `${workflow.classification}`],
-              ['enabled', `${workflow.enabled}`],
-              ...workflow.labels.map(label => ['labels', `${label}`]),
-              ['name', `${workflow.name}`],
-              ['priority', `${workflow.priority}`],
-              ['query', `${workflow.query}`],
-              ['status', `${workflow.status}`]
-            ]
-      );
-      return `${location.pathname}${location.search}#/create/?${query.toString()}`;
-    }, [workflow]);
+    const state = useMemo<Partial<Workflow>>(
+      () => ({
+        classification: workflow?.classification || '',
+        name: workflow?.name || '',
+        query: workflow?.query || '',
+        labels: workflow?.labels || [],
+        priority: workflow?.priority || '',
+        status: workflow?.status || '',
+        enabled: workflow?.enabled || true
+      }),
+      [workflow]
+    );
 
     if (!id || !currentUser.roles.includes('workflow_manage')) return null;
     else if (!workflow)
@@ -157,7 +154,13 @@ export const DuplicateWorkflowAction: React.FC<DuplicateWorkflowActionProps> = R
       return (
         <Tooltip title={t('duplicate')}>
           <div>
-            <IconButton style={{ color: theme.palette.success.main }} component={Link} to={to} size="large">
+            <IconButton
+              style={{ color: theme.palette.success.main }}
+              size="large"
+              onClick={() => {
+                navigate(`${location.pathname}${location.search}#/create/`, { state });
+              }}
+            >
               <ControlPointDuplicateOutlinedIcon />
             </IconButton>
           </div>

@@ -6,6 +6,7 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Alert, AlertIndexed, AlertItem } from 'components/models/base/alert';
+import type { Workflow } from 'components/models/base/workflow';
 import type { CustomUser } from 'components/models/ui/user';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -166,7 +167,8 @@ const WrappedAlertsContent = () => {
       .map(v => ([' or ', ' and '].some(a => v.toLowerCase().includes(a)) ? `(${v})` : v))
       .join(' AND ');
 
-    navigate(`${location.pathname}${location.search}#/workflow/?query=${encodeURIComponent(query)}`);
+    const state: Partial<Workflow> = { query };
+    navigate(`${location.pathname}${location.search}#/workflow/`, { state });
   }, [location.pathname, location.search, navigate, search]);
 
   useEffect(() => {
@@ -187,13 +189,7 @@ const WrappedAlertsContent = () => {
       const alert = alerts.find(item => item.alert_id === id);
       setGlobalDrawer(<AlertDetail id={id} alert={alert} inDrawer />, { hasMaximize: true });
     } else if (url.pathname.startsWith('/workflow/')) {
-      setGlobalDrawer(
-        <WorkflowCreate
-          id={url.pathname.slice('/workflow/'.length)}
-          search={url.search.slice(1)}
-          onClose={closeGlobalDrawer}
-        />
-      );
+      setGlobalDrawer(<WorkflowCreate id={url.pathname.slice('/workflow/'.length)} onClose={closeGlobalDrawer} />);
     } else {
       closeGlobalDrawer();
     }
@@ -229,7 +225,7 @@ const WrappedAlertsContent = () => {
 
   useEffect(() => {
     const refresh = ({ detail = null }: CustomEvent<AlertSearchParams>) => {
-      setSearchObject(o => ({ ...o, ...detail, offset: 0, refresh: !o.refresh, fq: [...detail.fq, ...o.fq] }));
+      setSearchObject(o => ({ ...o, ...detail, offset: 0, refresh: !o.refresh, fq: [...(detail?.fq || []), ...o.fq] }));
     };
 
     window.addEventListener('alertRefresh', refresh);
