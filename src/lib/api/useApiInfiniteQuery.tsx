@@ -24,7 +24,7 @@ interface Props<TQueryFnData, TError, TData, TQueryKey extends QueryKey, TPagePa
   allowCache?: boolean;
 }
 
-export const useMyInfiniteQuery = <Response, Body extends object = object>({
+export const useApiInfiniteQuery = <Response, Body extends object = object>({
   url,
   contentType = 'application/json',
   method = 'GET',

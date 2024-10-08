@@ -4,8 +4,10 @@ import { DEFAULT_INVALIDATE_DELAY, DEFAULT_RETRY_MS } from './constants';
 import type { APIQueryKey, APIResponse } from './models';
 import { getAPIResponse, useApiCallFn } from './utils';
 
-interface Props<TData, TError, TVariables, TContext, Body extends object>
-  extends Omit<UseMutationOptions<TData, TError, TVariables, TContext>, 'mutationKey' | 'mutationFn'> {
+type Props<TData, TError, TVariables, TContext, Body extends object> = Omit<
+  UseMutationOptions<APIResponse<TData>, APIResponse<TError>, TVariables, TContext>,
+  'mutationKey' | 'mutationFn'
+> & {
   url: string;
   contentType?: string;
   method?: string;
@@ -20,11 +22,16 @@ interface Props<TData, TError, TVariables, TContext, Body extends object>
   };
   queryDataProps?: {
     filter: (key: APIQueryKey) => boolean;
-    update: (old: TData) => TData;
+    update: (old: TData, response: TData) => TData;
   };
-}
+};
 
-export const useMyMutation = <Response, Body extends object = object>({
+// export const test = (({}) => void, ...options) => {
+
+//   return null
+// }
+
+export const useApiMutation = <Response, Body extends object = object>({
   url,
   contentType = 'application/json',
   method = 'GET',
@@ -35,9 +42,9 @@ export const useMyMutation = <Response, Body extends object = object>({
   enabled = true,
   onSuccess = () => null,
   invalidateProps = { delay: null, filter: null },
-  queryDataProps = { filter: null, update: () => null },
+  queryDataProps = { filter: null, update: null },
   ...options
-}: Props<APIResponse<Response>, APIResponse<Error>, void, unknown, Body>) => {
+}: Props<Response, Error, void, unknown, Body>) => {
   const queryClient = useQueryClient();
   const apiCallFn = useApiCallFn<Response, Body>();
 
@@ -49,9 +56,10 @@ export const useMyMutation = <Response, Body extends object = object>({
       onSuccess(data, variable, context);
 
       if (queryDataProps?.filter && queryDataProps?.update) {
-        queryClient.setQueriesData(
+        queryClient.setQueriesData<APIResponse<Response>>(
           { predicate: q => queryDataProps?.filter((JSON.parse(q.queryHash) as [APIQueryKey])[0]) },
-          queryDataProps.update
+          prev =>
+            !queryDataProps.update ? prev : { ...prev, api_response: queryDataProps.update(prev?.api_response, data) }
         );
       }
 
