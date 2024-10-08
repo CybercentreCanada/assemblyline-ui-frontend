@@ -1,9 +1,9 @@
 import type { DefinedInitialDataOptions, QueryKey } from '@tanstack/react-query';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
-import Throttler from 'commons/addons/utils/throttler';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { DEFAULT_GC_TIME, DEFAULT_RETRY_MS, DEFAULT_STALE_TIME } from './constants';
 import type { APIQueryKey, APIResponse } from './models';
+import { useThrottledState } from './useThrottledState';
 import { getAPIResponse, useApiCallFn } from './utils';
 
 interface Props<TQueryFnData, TError, TData, TQueryKey extends QueryKey, Body extends object>
@@ -21,6 +21,7 @@ interface Props<TQueryFnData, TError, TData, TQueryKey extends QueryKey, Body ex
   disableClearData?: boolean;
   throttleTime?: number;
   enabled?: boolean;
+  allowCache?: boolean;
 }
 
 export const useMyQuery = <Response, Body extends object = object>({
@@ -34,43 +35,35 @@ export const useMyQuery = <Response, Body extends object = object>({
   gcTime = DEFAULT_GC_TIME,
   throttleTime = null,
   enabled,
+  allowCache = false,
   ...options
 }: Props<APIResponse<Response>, APIResponse<Error>, APIResponse<Response>, QueryKey, Body>) => {
   const queryClient = useQueryClient();
   const apiCallFn = useApiCallFn<Response, Body>();
 
-  const [queryKey, setQueryKey] = useState<APIQueryKey>(null);
-  const [isThrottling, setIsThrottling] = useState<boolean>(!!throttleTime);
+  const queryKey = useMemo<APIQueryKey>(
+    () => ({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled, allowCache }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [allowCache, JSON.stringify(body), contentType, enabled, method, reloadOnUnauthorize, retryAfter, url]
+  );
 
-  const throttler = useMemo(() => (!throttleTime ? null : new Throttler(throttleTime)), [throttleTime]);
+  const [throttledKey, isThrottling] = useThrottledState(queryKey, throttleTime);
 
   const query = useQuery<APIResponse<Response>, APIResponse<Error>, APIResponse<Response>>(
     {
       ...options,
-      queryKey: [queryKey],
+      queryKey: [throttledKey],
       staleTime,
       gcTime,
-      enabled: enabled && !!queryKey && !isThrottling,
-      queryFn: async () => apiCallFn({ url, contentType, method, body, reloadOnUnauthorize, retryAfter }),
+      enabled: enabled && !!throttledKey && !isThrottling,
+      queryFn: async ({ signal }) =>
+        apiCallFn({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, signal }),
       placeholderData: keepPreviousData,
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
       retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000))
     },
     queryClient
   );
-
-  useEffect(() => {
-    if (!throttler) {
-      setQueryKey({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled });
-    } else {
-      setIsThrottling(true);
-      throttler.delay(() => {
-        setIsThrottling(false);
-        setQueryKey({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled });
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(body), contentType, enabled, method, reloadOnUnauthorize, retryAfter, throttler, url]);
 
   return { ...query, ...getAPIResponse(query?.data, query?.error, query?.failureReason), isThrottling };
 };

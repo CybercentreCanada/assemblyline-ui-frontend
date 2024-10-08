@@ -21,6 +21,7 @@ interface Props<TQueryFnData, TError, TData, TQueryKey extends QueryKey, TPagePa
   disableClearData?: boolean;
   throttleTime?: number;
   enabled?: boolean;
+  allowCache?: boolean;
 }
 
 export const useMyInfiniteQuery = <Response, Body extends object = object>({
@@ -34,6 +35,7 @@ export const useMyInfiniteQuery = <Response, Body extends object = object>({
   gcTime = DEFAULT_GC_TIME,
   throttleTime = null,
   enabled,
+  allowCache = false,
   ...options
 }: Props<
   APIResponse<Response>,
@@ -73,16 +75,16 @@ export const useMyInfiniteQuery = <Response, Body extends object = object>({
 
   useEffect(() => {
     if (!throttler) {
-      setQueryKey({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled });
+      setQueryKey({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled, allowCache });
     } else {
       setIsThrottling(true);
       throttler.delay(() => {
         setIsThrottling(false);
-        setQueryKey({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled });
+        setQueryKey({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled, allowCache });
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(body), contentType, enabled, method, reloadOnUnauthorize, retryAfter, throttler, url]);
+  }, [JSON.stringify(body), contentType, enabled, method, reloadOnUnauthorize, retryAfter, throttler, url, allowCache]);
 
   return { ...query };
   // return { ...query, ...getAPIResponse(query?.data, query?.error, query?.failureReason) };

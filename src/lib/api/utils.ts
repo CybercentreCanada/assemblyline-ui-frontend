@@ -19,16 +19,23 @@ export const isAPIData = (value: object): value is APIResponse =>
   'api_server_version' in value &&
   'api_status_code' in value;
 
-const getValue = <K extends keyof APIResponse<unknown>>(
-  key: K,
-  ...responses: APIResponse<unknown>[]
-): APIResponse<unknown>[K] => responses?.find(r => !!r?.[key])?.[key] || null;
+const getValue = (key, ...responses) => responses?.find(r => !!r?.[key])?.[key] || null;
 
 export const getAPIResponse = <R, E>(data: APIResponse<R>, error: APIResponse<E>, failureReason: APIResponse<E>) => ({
-  statusCode: getValue('api_status_code', data, error, failureReason),
-  serverVersion: getValue('api_server_version', data, error, failureReason),
+  statusCode: getValue('api_status_code', data, error, failureReason) as number,
+  serverVersion: getValue('api_server_version', data, error, failureReason) as string,
   data: getValue('api_response', data, error, failureReason) as R,
   error: getValue('api_error_message', data, error, failureReason) as E
+});
+
+export const getBlobResponse = <R, E>(data: BlobResponse, error: APIResponse<E>, failureReason: APIResponse<E>) => ({
+  statusCode: getValue('api_status_code', data, error, failureReason) as number,
+  serverVersion: getValue('api_server_version', data, error, failureReason) as string,
+  data: getValue('api_response', data, error, failureReason) as R,
+  error: getValue('api_error_message', data, error, failureReason) as E,
+  filename: getValue('filename', data, error, failureReason) as string,
+  size: getValue('size', data, error, failureReason) as number,
+  type: getValue('type', data, error, failureReason) as string
 });
 
 type BootstrapProps = {
@@ -38,6 +45,7 @@ type BootstrapProps = {
   setUser: (user: WhoAmIProps) => void;
   setReady: (layout: boolean, borealis: boolean) => void;
   retryAfter?: number;
+  signal?: AbortSignal;
 };
 
 export const useBootstrapFn = () => {
@@ -53,13 +61,15 @@ export const useBootstrapFn = () => {
       setLoginParams,
       setUser,
       setReady,
-      retryAfter = DEFAULT_RETRY_MS
+      retryAfter = DEFAULT_RETRY_MS,
+      signal = null
     }: BootstrapProps) => {
       // fetching the API's data
       const res = await fetch('/api/v4/user/whoami/', {
         method: 'GET',
         credentials: 'same-origin',
-        headers: { 'X-XSRF-TOKEN': getXSRFCookie() }
+        headers: { 'X-XSRF-TOKEN': getXSRFCookie() },
+        signal
       });
 
       // Setting the API quota
@@ -161,6 +171,7 @@ type ApiCallProps<Body extends object = object> = {
   reloadOnUnauthorize?: boolean;
   retryAfter?: number;
   enabled?: boolean;
+  signal?: AbortSignal;
 };
 
 export const useApiCallFn = <Response, Body extends object = object>() => {
@@ -177,7 +188,8 @@ export const useApiCallFn = <Response, Body extends object = object>() => {
       body = null,
       reloadOnUnauthorize = true,
       retryAfter = DEFAULT_RETRY_MS,
-      enabled = true
+      enabled = true,
+      signal = null
     }: ApiCallProps<Body>) => {
       // Reject if the query is not enabled
       if (!enabled) return Promise.reject(null);
@@ -187,7 +199,8 @@ export const useApiCallFn = <Response, Body extends object = object>() => {
         method,
         credentials: 'same-origin',
         headers: { 'Content-Type': contentType, 'X-XSRF-TOKEN': getXSRFCookie() },
-        body: (!body ? null : contentType === 'application/json' ? JSON.stringify(body) : body) as BodyInit
+        body: (!body ? null : contentType === 'application/json' ? JSON.stringify(body) : body) as BodyInit,
+        signal
       });
 
       // Setting the API quota
@@ -222,28 +235,27 @@ export const useApiCallFn = <Response, Body extends object = object>() => {
         });
       }
 
-      const statusCode = res.status;
       const { api_error_message: error } = json;
 
       // Reload when the user has exceeded their daily API call quota.
-      if (statusCode === 503 && ['API', 'quota', 'daily'].every(v => error.includes(v))) {
+      if (res.status === 503 && ['API', 'quota', 'daily'].every(v => error.includes(v))) {
         window.location.reload();
         return Promise.reject(json);
       }
 
       // Reject if the user has exceeded their daily submissions quota.
-      if (statusCode === 503 && ['quota', 'submission'].every(v => error.includes(v))) {
+      if (res.status === 503 && ['quota', 'submission'].every(v => error.includes(v))) {
         return Promise.reject(json);
       }
 
       // Reload when the user is not logged in
-      if (statusCode === 401 && reloadOnUnauthorize) {
+      if (res.status === 401 && reloadOnUnauthorize) {
         window.location.reload();
         return Promise.reject(json);
       }
 
       // Reject if API Server is unavailable and should attempt to retry
-      if (statusCode === 502) {
+      if (res.status === 502) {
         showErrorMessage(json.api_error_message, 30000);
         return Promise.reject(json);
       }
@@ -252,7 +264,7 @@ export const useApiCallFn = <Response, Body extends object = object>() => {
       if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
 
       // Handle all non-successful request
-      if (statusCode !== 200) {
+      if (res.status !== 200) {
         showErrorMessage(json.api_error_message);
         return Promise.reject(json);
       }
@@ -269,16 +281,17 @@ type DownloadBlobProps = {
   reloadOnUnauthorize?: boolean;
   retryAfter?: number;
   enabled?: boolean;
+  signal?: AbortSignal;
 };
 
-export const useDownloadBlobFn = <Response extends BlobResponse>() => {
+export const useDownloadBlobFn = () => {
   const { t } = useTranslation();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { configuration: systemConfig } = useALContext();
   const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
 
   return useCallback(
-    async ({ url, enabled, reloadOnUnauthorize, retryAfter }: DownloadBlobProps) => {
+    async ({ url, enabled, reloadOnUnauthorize, retryAfter, signal = null }: DownloadBlobProps) => {
       // Reject if the query is not enabled
       if (!enabled) return Promise.reject(null);
 
@@ -286,7 +299,8 @@ export const useDownloadBlobFn = <Response extends BlobResponse>() => {
       const res = await fetch(url, {
         method: 'GET',
         credentials: 'same-origin',
-        headers: { 'X-XSRF-TOKEN': getXSRFCookie() }
+        headers: { 'X-XSRF-TOKEN': getXSRFCookie() },
+        signal
       });
 
       // Setting the API quota
@@ -321,27 +335,27 @@ export const useDownloadBlobFn = <Response extends BlobResponse>() => {
         });
       }
 
-      const { api_status_code: statusCode, api_error_message: error } = json;
+      const { api_error_message: error } = json;
 
       // Reload when the user has exceeded their daily API call quota.
-      if (statusCode === 503 && ['API', 'quota', 'daily'].every(v => error.includes(v))) {
+      if (res.status === 503 && ['API', 'quota', 'daily'].every(v => error.includes(v))) {
         window.location.reload();
         return Promise.reject(json);
       }
 
       // Reject if the user has exceeded their daily submissions quota.
-      if (statusCode === 503 && ['quota', 'submission'].every(v => error.includes(v))) {
+      if (res.status === 503 && ['quota', 'submission'].every(v => error.includes(v))) {
         return Promise.reject(json);
       }
 
       // Reload when the user is not logged in
-      if (statusCode === 401 && reloadOnUnauthorize) {
+      if (res.status === 401 && reloadOnUnauthorize) {
         window.location.reload();
         return Promise.reject(json);
       }
 
       // Reject if API Server is unavailable and should attempt to retry
-      if (statusCode === 502) {
+      if (res.status === 502) {
         showErrorMessage(json.api_error_message, 30000);
         return Promise.reject(json);
       }
@@ -350,7 +364,7 @@ export const useDownloadBlobFn = <Response extends BlobResponse>() => {
       if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
 
       // Handle all non-successful request
-      if (statusCode !== 200) {
+      if (res.status !== 200) {
         showErrorMessage(json.api_error_message);
         return Promise.reject(json);
       }

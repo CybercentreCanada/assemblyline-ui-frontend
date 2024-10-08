@@ -1,10 +1,8 @@
 import type { DefinedInitialDataOptions, QueryKey } from '@tanstack/react-query';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
-import Throttler from 'commons/addons/utils/throttler';
-import { useEffect, useMemo, useState } from 'react';
 import { DEFAULT_GC_TIME, DEFAULT_RETRY_MS, DEFAULT_STALE_TIME } from './constants';
-import type { APIQueryKey, APIResponse, BlobResponse } from './models';
-import { getAPIResponse, useDownloadBlobFn } from './utils';
+import type { APIResponse, BlobResponse } from './models';
+import { getBlobResponse, useDownloadBlobFn } from './utils';
 
 interface Props<TQueryFnData, TError, TData, TQueryKey extends QueryKey>
   extends Omit<
@@ -21,36 +19,27 @@ interface Props<TQueryFnData, TError, TData, TQueryKey extends QueryKey>
   disableClearData?: boolean;
   throttleTime?: number;
   enabled?: boolean;
+  allowCache?: boolean;
 }
 
 export const useMyQuery = ({
   url,
-  contentType = 'application/json',
-  method = 'GET',
-  body = null,
   reloadOnUnauthorize = true,
   retryAfter = DEFAULT_RETRY_MS,
   staleTime = DEFAULT_STALE_TIME,
   gcTime = DEFAULT_GC_TIME,
-  throttleTime = null,
-  enabled,
+  allowCache = false,
   ...options
 }: Props<BlobResponse, APIResponse<Error>, BlobResponse, QueryKey>) => {
   const queryClient = useQueryClient();
   const blobDownloadFn = useDownloadBlobFn();
 
-  const [queryKey, setQueryKey] = useState<APIQueryKey>(null);
-  const [isThrottling, setIsThrottling] = useState<boolean>(!!throttleTime);
-
-  const throttler = useMemo(() => (!throttleTime ? null : new Throttler(throttleTime)), [throttleTime]);
-
-  const query = useQuery<BlobResponse, APIResponse<Error>, APIResponse<Response>>(
+  const query = useQuery<BlobResponse, APIResponse<Error>, BlobResponse>(
     {
       ...options,
-      queryKey: [queryKey],
+      queryKey: [{ url, reloadOnUnauthorize, retryAfter, allowCache }],
       staleTime,
       gcTime,
-      enabled: enabled && !!queryKey && !isThrottling,
       queryFn: async () => blobDownloadFn({ url, reloadOnUnauthorize, retryAfter }),
       placeholderData: keepPreviousData,
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
@@ -59,18 +48,5 @@ export const useMyQuery = ({
     queryClient
   );
 
-  useEffect(() => {
-    if (!throttler) {
-      setQueryKey({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled });
-    } else {
-      setIsThrottling(true);
-      throttler.delay(() => {
-        setIsThrottling(false);
-        setQueryKey({ url, contentType, method, body, reloadOnUnauthorize, retryAfter, enabled });
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(body), contentType, enabled, method, reloadOnUnauthorize, retryAfter, throttler, url]);
-
-  return { ...query, ...getAPIResponse(query?.data, query?.error, query?.failureReason), isThrottling };
+  return { ...query, ...getBlobResponse(query?.data, query?.error, query?.failureReason) };
 };
