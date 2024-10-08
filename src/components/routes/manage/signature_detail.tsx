@@ -165,7 +165,7 @@ const ResetSignatureToSource: React.FC<ResetSignatureToSourceProps> = React.memo
       apiCall({
         url: `/api/v4/signature/clear_status/${signature.id}/`,
         onSuccess: () => {
-          showSuccessMessage(t('clear.success'));
+          showSuccessMessage(t('restore.success'));
           onSignatureChange({ state_change_date: null, state_change_user: null });
           setOpen(false);
         },
@@ -204,32 +204,6 @@ const ResetSignatureToSource: React.FC<ResetSignatureToSourceProps> = React.memo
             acceptText={t('restore.acceptText')}
             text={t('restore.text')}
           />
-          {/* <Dialog open={open} onClose={() => setOpen(false)}>
-            <DialogTitle>{t('clear.title')}</DialogTitle>
-            <DialogContent>
-              <p>{t('clear.text2')}</p>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpen(false)} color="secondary" disabled={loading}>
-                {t('clear.cancelText')}
-                {loading && (
-                  <CircularProgress
-                    size={24}
-                    style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -12, marginLeft: -12 }}
-                  />
-                )}
-              </Button>
-              <Button onClick={handleResetSignatureToSource} color="primary" disabled={loading}>
-                {t('clear.acceptText')}
-                {loading && (
-                  <CircularProgress
-                    size={24}
-                    style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -12, marginLeft: -12 }}
-                  />
-                )}
-              </Button>
-            </DialogActions>
-          </Dialog> */}
         </>
       );
   }
