@@ -51,8 +51,9 @@ const BadlistDetail = lazy(() => import('components/routes/manage/badlist_detail
 const ManageSignatures = lazy(() => import('components/routes/manage/signatures'));
 const SignatureDetail = lazy(() => import('components/routes/manage/signature_detail'));
 const ManageSignatureSources = lazy(() => import('components/routes/manage/signature_sources'));
-const ManageWorkflows = lazy(() => import('components/routes/manage/workflows'));
-const WorkflowDetail = lazy(() => import('components/routes/manage/workflow_detail'));
+const ManageWorkflows = lazy(() => import('components/routes/manage/workflows/index'));
+const WorkflowCreate = lazy(() => import('components/routes/manage/workflows/create'));
+const WorkflowDetail = lazy(() => import('components/routes/manage/workflows/detail'));
 const RetroHunt = lazy(() => import('components/routes/retrohunt'));
 const RetroHuntDetail = lazy(() => import('components/routes/retrohunt/detail'));
 const Search = lazy(() => import('components/routes/search'));
@@ -165,7 +166,8 @@ const WrappedRoutes = () => {
         <Route path="/manage/signature/:id" element={<SignatureDetail />} />
         <Route path="/manage/signature/:type/:source/:name" element={<SignatureDetail />} />
         <Route path="/manage/sources" element={<ManageSignatureSources />} />
-        <Route path="/manage/workflow/:id" element={<WorkflowDetail />} />
+        <Route path="/manage/workflow/create/:id" element={<WorkflowCreate />} />
+        <Route path="/manage/workflow/detail/:id" element={<WorkflowDetail />} />
         <Route path="/manage/workflows" element={<ManageWorkflows />} />
         <Route path="/manage/safelist/:id" element={<SafelistDetail />} />
         <Route path="/manage/safelist" element={<ManageSafelist />} />

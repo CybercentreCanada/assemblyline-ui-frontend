@@ -37,6 +37,7 @@
   "extended_completed_desc": "L'analyse étendue s'est terminée avec succès.",
   "extended_incomplete": "Incomplète",
   "extended_incomplete_desc": "Échec de l'analyse étendue.",
+  "workflow.tooltip": "Créer un nouveau flux de travail",
   "extended_skipped": "Ignoré",
   "extended_skipped_desc": "L'analyse étendue a été ignorée.",
   "extended_submitted": "Soumise",

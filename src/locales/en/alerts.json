@@ -166,6 +166,7 @@
   "workflow.impact.low": "The workflow action will only affect the currently selected alert which matches the following filters:",
   "workflow.success": "Successfully performed the workflow action to the alerts.",
   "workflow.title": "Perform a workflow action",
+  "workflow.tooltip": "Create a new workflow",
   "workflow_action": "Perform a workflow action",
   "workflow_or_user": "Workflow/User",
   "workflows": "Workflow actions",
