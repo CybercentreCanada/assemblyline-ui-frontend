@@ -91,7 +91,8 @@ export const SORT_OPTIONS: Option[] = [
   { value: 'reporting_ts', label: 'alerted_ts' },
   { value: 'owner', label: 'owner' },
   { value: 'priority', label: 'priority' },
-  { value: 'status', label: 'status' }
+  { value: 'status', label: 'status' },
+  { value: 'al.score', label: 'score' }
 ];
 
 export const TC_OPTIONS: Option[] = [
