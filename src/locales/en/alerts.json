@@ -6,7 +6,7 @@
   "actions.takeownershipdiag.content.single": "You are about to take ownership of this single alert with an ID of ",
   "actions.takeownershipdiag.header": "Take Ownership",
   "actions.takeownershipdiag.properties": "Search Properties",
-  "al.score": "System's verdict",
+  "al.score": "Score",
   "al_results": "Submission Results",
   "alert_id": "Alert ID",
   "alert_info": "Alert info",
