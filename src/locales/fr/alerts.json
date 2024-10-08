@@ -7,6 +7,7 @@
   "actions.takeownershipdiag.content.single": "Vous êtes sur le point de de devenir le propriétaire de cette alerte unique avec l'identifiant ",
   "actions.takeownershipdiag.header": "Prendre possession",
   "actions.takeownershipdiag.properties": "Paramètres de recherche",
+  "al.score": "Score",
   "al_results": "Résultats de soumission",
   "alert_id": "ID de l'alerte",
   "alert_info": "Informations sur l'alerte",
