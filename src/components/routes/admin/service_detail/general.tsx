@@ -373,7 +373,13 @@ const ServiceGeneral = ({
                 isOptionEqualToValue={(option, value) => option.toUpperCase() === value.toUpperCase()}
                 onChange={(_e, values) => {
                   setModified(true);
-                  setService(s => ({ ...s, recursion_prevention: values.toSorted() }));
+                  setService(s => ({
+                    ...s,
+                    recursion_prevention: (() => {
+                      values.sort();
+                      return values;
+                    })()
+                  }));
                 }}
                 renderInput={params => <TextField size="small" margin="dense" {...params} variant="outlined" />}
                 renderOption={(props, option, state) => (
