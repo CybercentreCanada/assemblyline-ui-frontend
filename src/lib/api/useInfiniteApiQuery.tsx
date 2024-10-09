@@ -8,7 +8,7 @@ import type { ApiCallProps } from './utils';
 import { useApiCallFn } from './utils';
 
 type Types<TBody = any, TError = Error, TResponse = any> = {
-  body?: TBody;
+  body?: TBody & { offset: number };
   error?: TError;
   response?: TResponse;
 };
@@ -17,14 +17,14 @@ type Props<T extends Types, TQueryKey extends QueryKey = QueryKey> = Omit<
   DefinedInitialDataInfiniteOptions<
     APIResponse<T['response']>,
     APIResponse<T['error']>,
-    APIResponse<T['response']>,
+    InfiniteData<APIResponse<T['response']>, unknown>,
     TQueryKey
   >,
   'queryKey' | 'initialData' | 'enabled'
 > &
   ApiCallProps<T['body']>;
 
-export const useInfiniteApiQuery = <T extends Types>({
+export const useApiInfiniteQuery = <T extends Types>({
   url,
   contentType = 'application/json',
   method = 'GET',
@@ -65,5 +65,4 @@ export const useInfiniteApiQuery = <T extends Types>({
   );
 
   return { ...query };
-  // return { ...query, ...getAPIResponse(query?.data, query?.error, query?.failureReason) };
 };
