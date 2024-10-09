@@ -229,8 +229,8 @@ export class ArrayParam<T extends Params> extends BaseParam<T> {
   }
 
   private append(prev: URLSearchParams, values: string[][]): void {
-    values.sort((a, b) => a.at(-1).localeCompare(b.at(-1)));
     values
+      .sort((a, b) => a.at(-1).localeCompare(b.at(-1)))
       .map(value => this.fromPrefix(value))
       .forEach(v => {
         prev.append(this.key, v);
