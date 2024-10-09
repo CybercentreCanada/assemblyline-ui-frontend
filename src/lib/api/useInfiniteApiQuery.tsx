@@ -24,7 +24,7 @@ type Props<T extends Types, TQueryKey extends QueryKey = QueryKey> = Omit<
 > &
   ApiCallProps<T['body']>;
 
-export const useApiInfiniteQuery = <T extends Types>({
+export const useInfiniteApiQuery = <T extends Types>({
   url,
   contentType = 'application/json',
   method = 'GET',

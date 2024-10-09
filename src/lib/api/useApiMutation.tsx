@@ -2,7 +2,8 @@ import type { Query, UseMutationOptions } from '@tanstack/react-query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_INVALIDATE_DELAY, DEFAULT_RETRY_MS } from './constants';
 import type { APIResponse } from './models';
-import { ApiCallProps, getAPIResponse, useApiCallFn } from './utils';
+import type { ApiCallProps } from './utils';
+import { getAPIResponse, useApiCallFn } from './utils';
 
 type Input<Body> = {
   url: string;
