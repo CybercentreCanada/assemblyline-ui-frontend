@@ -35,6 +35,11 @@ jobs:
 
       - script: |
           set -xv  # Echo commands before they are run
+          npm run tsc
+        displayName: TypeScript
+
+      - script: |
+          set -xv  # Echo commands before they are run
           npm run ci-test
         displayName: Test
 
@@ -42,11 +47,6 @@ jobs:
           set -xv  # Echo commands before they are run
           npm run ci-lint
         displayName: ESLint
-
-      - script: |
-          set -xv  # Echo commands before they are run
-          npm run tsc
-        displayName: TypeScript
 
       - task: PublishCodeCoverageResults@2
         inputs:
