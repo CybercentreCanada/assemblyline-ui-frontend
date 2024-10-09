@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 
-const MAX_FILE_COUNT = 500 as const;
+const MAX_FILE_COUNT = 500;
 
 const useStyles = makeStyles(theme => ({
   file_item: {
