@@ -70,14 +70,13 @@ export default function Services() {
 
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
-  const serviceNames = useMemo<string[]>(() => {
-    const values = (serviceFeeds || []).reduce(
-      (prev: string[], item) => (item?.summary ? [...prev, item.summary] : prev),
-      []
-    );
-    values.sort();
-    return values;
-  }, [serviceFeeds]);
+  const serviceNames = useMemo<string[]>(
+    () =>
+      (serviceFeeds || [])
+        .reduce((prev: string[], item) => (item?.summary ? [...prev, item.summary] : prev), [])
+        .sort(),
+    [serviceFeeds]
+  );
 
   const handleAddService = () => {
     apiCall({
