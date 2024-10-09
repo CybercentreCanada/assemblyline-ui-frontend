@@ -217,7 +217,7 @@ const useMyAPI = (): UseMyAPIReturn => {
         'Content-Type': contentType,
         'X-XSRF-TOKEN': getXSRFCookie()
       },
-      body: (!body ? null : contentType === 'application/json' ? JSON.stringify(body) : body) as BodyInit
+      body: (body !== null ? (contentType === 'application/json' ? JSON.stringify(body) : body) : null) as BodyInit
     };
 
     // Run enter callback
