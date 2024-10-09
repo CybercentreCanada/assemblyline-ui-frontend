@@ -7,13 +7,19 @@ import { useThrottledState } from './useThrottledState';
 import type { ApiCallProps } from './utils';
 import { getAPIResponse, useApiCallFn } from './utils';
 
-type Props<TQueryFnData, TError, TData, TQueryKey extends QueryKey, Body extends object> = Omit<
-  DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>,
+type Types<TBody = any, TError = Error, TResponse = any> = {
+  body?: TBody;
+  error?: TError;
+  response?: TResponse;
+};
+
+type Props<T extends Types, TQueryKey extends QueryKey = QueryKey> = Omit<
+  DefinedInitialDataOptions<APIResponse<T['response']>, APIResponse<T['error']>, APIResponse<T['response']>, TQueryKey>,
   'queryKey' | 'initialData' | 'enabled'
 > &
-  ApiCallProps<Body>;
+  ApiCallProps<T['body']>;
 
-export const useApiQuery = <Response, Body extends object = object>({
+export const useApiQuery = <T extends Types>({
   url,
   contentType = 'application/json',
   method = 'GET',
@@ -24,9 +30,9 @@ export const useApiQuery = <Response, Body extends object = object>({
   retryAfter = DEFAULT_RETRY_MS,
   throttleTime = null,
   ...options
-}: Props<APIResponse<Response>, APIResponse<Error>, APIResponse<Response>, QueryKey, Body>) => {
+}: Props<T>) => {
   const queryClient = useQueryClient();
-  const apiCallFn = useApiCallFn<Response, Body>();
+  const apiCallFn = useApiCallFn<T['response'], T['body']>();
 
   const queryKey = useMemo<ApiCallProps<Body>>(
     () => ({ url, contentType, method, body, allowCache, enabled, reloadOnUnauthorize, retryAfter, throttleTime }),
@@ -36,7 +42,7 @@ export const useApiQuery = <Response, Body extends object = object>({
 
   const [throttledKey, isThrottling] = useThrottledState(queryKey, throttleTime);
 
-  const query = useQuery<APIResponse<Response>, APIResponse<Error>, APIResponse<Response>>(
+  const query = useQuery<APIResponse<T['response']>, APIResponse<T['error']>, APIResponse<T['response']>, QueryKey>(
     {
       ...options,
       queryKey: [throttledKey],

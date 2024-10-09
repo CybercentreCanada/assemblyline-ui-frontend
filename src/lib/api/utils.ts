@@ -34,7 +34,7 @@ export const getBlobResponse = <R, E>(data: BlobResponse, error: APIResponse<E>,
   type: getValue('type', data, error, failureReason) as string
 });
 
-export type ApiCallProps<Body extends object = object> = {
+export type ApiCallProps<Body = object> = {
   url: string;
   contentType?: string;
   method?: string;
@@ -47,7 +47,7 @@ export type ApiCallProps<Body extends object = object> = {
   throttleTime?: number;
 };
 
-export const useApiCallFn = <Response, Body extends object = object>() => {
+export const useApiCallFn = <Response, Body = object>() => {
   const { t } = useTranslation();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { configuration: systemConfig } = useALContext();
@@ -72,7 +72,7 @@ export const useApiCallFn = <Response, Body extends object = object>() => {
         method,
         credentials: 'same-origin',
         headers: { 'Content-Type': contentType, 'X-XSRF-TOKEN': getXSRFCookie() },
-        body: (!body ? null : contentType === 'application/json' ? JSON.stringify(body) : body) as BodyInit,
+        body: (body === null ? null : contentType === 'application/json' ? JSON.stringify(body) : body) as BodyInit,
         signal
       });
 
