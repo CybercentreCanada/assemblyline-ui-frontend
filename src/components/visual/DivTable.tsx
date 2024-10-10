@@ -1,21 +1,10 @@
-import {
-  Link as MaterialLink,
-  Table,
-  TableBody,
-  TableBodyProps,
-  TableCell,
-  TableCellProps,
-  TableHead,
-  TableHeadProps,
-  TableProps,
-  TableRow,
-  TableSortLabel,
-  Theme
-} from '@mui/material';
+import type { TableBodyProps, TableCellProps, TableHeadProps, TableProps, TableRowProps, Theme } from '@mui/material';
+import { Link as MaterialLink, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
+import type SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React from 'react';
+import type { To } from 'react-router';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -119,7 +108,11 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   );
 };
 
-export const LinkRow = ({ children, to, ...other }) => (
+interface LinkRowProps extends TableRowProps {
+  to: To;
+}
+
+export const LinkRow = ({ children, to, ...other }: LinkRowProps) => (
   <TableRow component={Link} {...other} to={to} style={{ cursor: 'pointer', textDecoration: 'none' }}>
     {children}
   </TableRow>
@@ -155,7 +148,7 @@ export const DivTableBody = ({ children, ...other }: TableBodyProps) => (
   </TableBody>
 );
 
-export const DivTable = ({ children, size = 'small' as 'small', ...other }: TableProps) => (
+export const DivTable = ({ children, size = 'small' as const, ...other }: TableProps) => (
   <Table size={size} {...other} component="div">
     {children}
   </Table>
