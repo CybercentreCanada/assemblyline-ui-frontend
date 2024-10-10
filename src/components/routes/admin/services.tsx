@@ -74,7 +74,7 @@ export default function Services() {
     () =>
       (serviceFeeds || [])
         .reduce((prev: string[], item) => (item?.summary ? [...prev, item.summary] : prev), [])
-        .toSorted(),
+        .sort(),
     [serviceFeeds]
   );
 
