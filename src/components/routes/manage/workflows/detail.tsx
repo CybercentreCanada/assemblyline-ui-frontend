@@ -42,7 +42,7 @@ type Props = {
   onClose?: () => void;
 };
 
-const WrappedWorkflowDetail = ({ id: propID = null, onClose = () => null }: Props) => {
+const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => {
   const { t } = useTranslation(['manageWorkflowDetail']);
   const { id: paramID } = useParams<Params>();
   const theme = useTheme();
@@ -69,7 +69,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = () => null }: Prop
       },
       onFailure: api_data => {
         showErrorMessage(api_data.api_error_message);
-        onClose();
+        !onClose ? null : onClose();
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
