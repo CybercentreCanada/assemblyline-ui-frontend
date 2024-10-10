@@ -164,7 +164,7 @@ const WrappedAlertsContent = () => {
     const q = search.get('q');
     const fq = search.get('fq');
 
-    const values = (!q && !fq.length ? ['*'] : q ? [q] : []).concat(fq);
+    const values = (!q && !fq.length ? [''] : q ? [q] : []).concat(fq);
     const query = values
       .map(v => ([' or ', ' and '].some(a => v.toLowerCase().includes(a)) ? `(${v})` : v))
       .join(' AND ');
