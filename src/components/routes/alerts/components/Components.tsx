@@ -383,7 +383,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                             tabIndex={-1}
                             to={
                               event.entity_type === 'workflow' && event.entity_id !== 'DEFAULT'
-                                ? `/manage/workflow/${event.entity_id}`
+                                ? `/manage/workflow/detail/${event.entity_id}`
                                 : null
                             }
                           >
