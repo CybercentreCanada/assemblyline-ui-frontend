@@ -51,6 +51,7 @@
     }
   },
   "rules": {
+    "@tanstack/query/exhaustive-deps": "warn",
     "@typescript-eslint/ban-types": "warn",
     "@typescript-eslint/no-base-to-string": "warn",
     "@typescript-eslint/consistent-type-imports": "warn",

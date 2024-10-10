@@ -1,8 +1,7 @@
-import type { Query, UseMutationOptions } from '@tanstack/react-query';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { DEFAULT_INVALIDATE_DELAY, DEFAULT_RETRY_MS } from './constants';
+import type { UseMutationOptions } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { DEFAULT_RETRY_MS } from './constants';
 import type { APIResponse } from './models';
-import type { ApiCallProps } from './utils';
 import { getAPIResponse, useApiCallFn } from './utils';
 
 type Input<Body> = {
@@ -25,26 +24,40 @@ type Types<TBody = any, TError = Error, TResponse = any, TVariables = any, TCont
 
 type Props<T extends Types> = Omit<
   UseMutationOptions<APIResponse<T['response']>, APIResponse<T['error']>, T['input'], T['context']>,
-  'mutationKey' | 'mutationFn' | 'onSuccess'
+  'mutationKey' | 'mutationFn' | 'onSuccess' | 'onMutate' | 'onSettled'
 > & {
   input: Input<T['body']> | ((input: T['input']) => Input<T['body']>);
   reloadOnUnauthorize?: boolean;
   retryAfter?: number;
-  invalidateDelay?: number;
-  onInvalidate?: (key: ApiCallProps) => boolean;
-  onSuccess?: (props?: { data?: APIResponse<T['response']>; input?: T['input']; context?: T['context'] }) => void;
+  onSuccess?: (props?: {
+    data: APIResponse<T['response']>;
+    input: T['input'];
+    context: T['context'];
+  }) => Promise<unknown> | unknown;
+  onFailure?: (props?: {
+    error: APIResponse<T['error']>;
+    input: T['input'];
+    context: T['context'];
+  }) => Promise<unknown> | unknown;
+  onEnter?: (props?: { input: T['input'] }) => unknown;
+  onExit?: (props?: {
+    data: APIResponse<T['response']>;
+    error: APIResponse<T['error']>;
+    input: T['input'];
+    context: T['context'];
+  }) => Promise<unknown> | unknown;
 };
 
 export const useApiMutation = <T extends Types>({
   input = null,
   reloadOnUnauthorize = true,
   retryAfter = DEFAULT_RETRY_MS,
-  invalidateDelay = DEFAULT_INVALIDATE_DELAY,
-  onInvalidate = null,
   onSuccess = () => null,
+  onFailure = () => null,
+  onEnter = () => null,
+  onExit = () => null,
   ...options
 }: Props<T>) => {
-  const queryClient = useQueryClient();
   const apiCallFn = useApiCallFn<APIResponse<T['response']>, T['body']>();
 
   const mutation = useMutation<APIResponse<T['response']>, APIResponse<T['error']>, T['input'], unknown>({
@@ -56,22 +69,10 @@ export const useApiMutation = <T extends Types>({
         reloadOnUnauthorize,
         retryAfter
       }),
-    onSuccess: async (data, variable, context) => {
-      void new Promise(() => onSuccess({ data, input: variable, context }));
-
-      if (typeof onInvalidate === 'function') {
-        await new Promise(resolve => setTimeout(resolve, invalidateDelay));
-        await queryClient.invalidateQueries({
-          predicate: ({ queryKey }: Query<unknown, Error, unknown, [ApiCallProps]>) => {
-            try {
-              return typeof queryKey[0] === 'object' && queryKey[0] && onInvalidate(queryKey[0]);
-            } catch (err) {
-              return false;
-            }
-          }
-        });
-      }
-    }
+    onSuccess: (data, variables, context) => onSuccess({ data, input: variables, context }),
+    onError: (error, variables, context) => onFailure({ error, input: variables, context }),
+    onMutate: variables => onEnter({ input: variables }),
+    onSettled: (data, error, variables, context) => onExit({ data, error, input: variables, context })
   });
 
   return { ...mutation, ...getAPIResponse(mutation?.data, mutation?.error, mutation?.failureReason) };
