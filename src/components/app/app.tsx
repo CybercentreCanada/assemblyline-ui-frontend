@@ -24,6 +24,7 @@ import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
 import setMomentFRLocale from 'helpers/moment-fr-locale';
 import { getProvider } from 'helpers/utils';
+import { APIProvider } from 'lib/api/APIProvider';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -102,13 +103,15 @@ export const MyApp: React.FC<any> = () => {
   const myUser: CustomAppUserService = useMyUser();
   return (
     <BrowserRouter basename="/">
-      <SafeResultsProvider>
-        <QuotaProvider>
-          <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
-            <MyAppMain />
-          </AppProvider>
-        </QuotaProvider>
-      </SafeResultsProvider>
+      <APIProvider>
+        <SafeResultsProvider>
+          <QuotaProvider>
+            <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
+              <MyAppMain />
+            </AppProvider>
+          </QuotaProvider>
+        </SafeResultsProvider>
+      </APIProvider>
     </BrowserRouter>
   );
 };
