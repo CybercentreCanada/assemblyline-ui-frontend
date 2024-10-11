@@ -2,13 +2,14 @@ import Flow from '@flowjs/flow.js';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
   Alert,
-  Autocomplete,
   Button,
   Checkbox,
   CircularProgress,
   FormControlLabel,
   Grid,
+  MenuItem,
   Paper,
+  Select,
   Skeleton,
   Slider,
   Stack,
@@ -373,6 +374,9 @@ const Submit: React.FC<any> = () => {
 
   function handleProfileChange(submission_profile) {
     const profile = configuration.submission.profiles[submission_profile];
+    if (!profile) {
+      return;
+    }
     var newServices = settings.services;
     var newServiceSpec = settings.service_spec;
     var enabledServices = [];
@@ -395,6 +399,7 @@ const Submit: React.FC<any> = () => {
     profile.services.selected = profile.services.selected || [];
     profile.services.excluded = profile.services.excluded || [];
     profile.service_spec = profile.service_spec || {};
+    profile.editable_params = profile.editable_params || {};
 
     // Enable all services that part of the profile, ensure all others are disabled
     for (const cat of newServices) {
@@ -460,6 +465,8 @@ const Submit: React.FC<any> = () => {
     }
   }, [settings, stringType, urlAutoselection, configuration.ui.url_submission_auto_service_selection]);
 
+  useEffect(() => handleProfileChange(submissionProfile), [submissionProfile]);
+
   useEffect(() => {
     if (state) {
       setStringInput(state.hash);
@@ -486,13 +493,6 @@ const Submit: React.FC<any> = () => {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: api_data => {
         var tempSettings = { ...api_data.api_response };
-        if (!currentUser.roles.includes('submission_customize')) {
-          // User isn't allowed to use their service preferences, disable all
-          for (const srv of tempSettings.services) {
-            srv.selected = false;
-          }
-        }
-
         if (state) {
           // Get the classification from the state
           tempSettings.classification = state.c12n;
@@ -513,6 +513,12 @@ const Submit: React.FC<any> = () => {
         }
         tempSettings.default_external_sources = defaultExternalSources;
         setSettings(tempSettings);
+
+        if (!currentUser.roles.includes('submission_customize')) {
+          // User isn't allowed to use their service preferences, disable all
+          console.log(tempSettings.preferred_submission_profile);
+          setSubmissionProfile(tempSettings.preferred_submission_profile);
+        }
       }
     });
     setUUID(generateUUID());
@@ -752,31 +758,34 @@ const Submit: React.FC<any> = () => {
             ) : null}
           </TabPanel>
           <TabPanel value="2" className={classes.no_pad}>
+            {configuration.submission.profiles ? (
+              <div style={{ textAlign: 'left', marginTop: sp2, paddingLeft: sp2 }}>
+                <Typography variant="h6" gutterBottom>
+                  {t('options.submission.profile_name')}
+                </Typography>
+                <div style={{ paddingBottom: sp1 }}>
+                  {settings ? (
+                    <Select
+                      children={Object.keys(configuration.submission.profiles).map(profile_name => (
+                        <MenuItem value={profile_name}>{profile_name}</MenuItem>
+                      ))}
+                      size="small"
+                      onChange={event => handleProfileChange(event.target.value)}
+                      fullWidth
+                    />
+                  ) : (
+                    <Skeleton style={{ height: '3rem' }} />
+                  )}
+                </div>
+              </div>
+            ) : null}
             <Grid container spacing={1}>
               <Grid item xs={12} md>
                 <div style={{ paddingLeft: sp2, textAlign: 'left', marginTop: sp2 }}>
                   <Typography variant="h6" gutterBottom>
                     {t('options.service')}
                   </Typography>
-                  {configuration.submission.profiles ? (
-                    <div style={{ textAlign: 'left', marginTop: sp2 }}>
-                      <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('options.submission.profile_name')}
-                      </Typography>
-                      <div style={{ paddingBottom: sp1 }}>
-                        {settings ? (
-                          <Autocomplete
-                            options={Object.keys(configuration.submission.profiles)}
-                            size="small"
-                            renderInput={params => <TextField {...params} />}
-                            onChange={(_, value, __) => handleProfileChange(value)}
-                          />
-                        ) : (
-                          <Skeleton style={{ height: '3rem' }} />
-                        )}
-                      </div>
-                    </div>
-                  ) : null}
+
                   <ServiceTree
                     size="small"
                     settings={settings}
@@ -968,6 +977,7 @@ const Submit: React.FC<any> = () => {
                           max: configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365
                         }}
                         defaultValue={settings.ttl}
+                        value={submissionProfile?.ttl}
                         onChange={event => setSettingAsyncValue('ttl', event.target.value)}
                         variant="outlined"
                         fullWidth

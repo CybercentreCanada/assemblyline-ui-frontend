@@ -86,18 +86,21 @@ export type SubmissionProfileParams = {
   ignore_dynamic_recursion_prevention?: boolean;
   ignore_filtering?: boolean;
   priority?: number;
-  service_spec: {
+  service_spec?: {
     [service: string]: {
       [parameter: string]: any;
     };
   };
-  services: {
+  services?: {
     excluded?: string[];
     rescan?: string[];
     resubmit?: string[];
     selected?: string[];
   };
   ttl?: number;
+  editable_params?: {
+    [service: string]: string[];
+  };
 };
 
 export type ConfigurationDefinition = {

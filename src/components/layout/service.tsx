@@ -60,30 +60,35 @@ const WrappedResetButton = ({ value, defaultValue, hasResetButton = false, reset
 
 const ResetButton = React.memo(WrappedResetButton);
 
-function WrappedService({ disabled, service, idx, hasResetButton = false, setParam, profile_spec = null }) {
+function WrappedService({ disabled, service, idx, hasResetButton = false, setParam, submissionProfile = null }) {
   const theme = useTheme();
   const [showMore, setShowMore] = useState(false);
   const { t } = useTranslation();
+  const profile_spec = submissionProfile ? submissionProfile.service_spec[service] : null;
   return (
     <div key={idx} style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1), pageBreakInside: 'avoid' }}>
-      {service.params.map(
-        (param, pidx) =>
-          !param.hide && (
-            <Param
-              key={pidx}
-              disabled={disabled || (profile_spec && profile_spec[param.name] !== undefined)}
-              param={param}
-              pidx={pidx}
-              idx={idx}
-              hasResetButton={hasResetButton}
-              setParam={setParam}
-            />
-          )
-      )}
-      {showMore
-        ? service.params.map(
+      {submissionProfile ? (
+        // We're going to only show parameters that are allowed to be edited (whether if they're meant to be hidden or not)
+        <>
+          {service.params
+            .filter(param => (submissionProfile.editable_params[service.name] || []).includes(param.name))
+            .map((param, pidx) => (
+              <Param
+                key={pidx}
+                disabled={disabled || (profile_spec && profile_spec[param.name] !== undefined)}
+                param={param}
+                pidx={pidx}
+                idx={idx}
+                hasResetButton={hasResetButton}
+                setParam={setParam}
+              />
+            ))}
+        </>
+      ) : (
+        <>
+          {service.params.map(
             (param, pidx) =>
-              param.hide && (
+              !param.hide && (
                 <Param
                   key={pidx}
                   disabled={disabled}
@@ -94,14 +99,31 @@ function WrappedService({ disabled, service, idx, hasResetButton = false, setPar
                   setParam={setParam}
                 />
               )
-          )
-        : service.params.filter(param => param.hide).length !== 0 && (
-            <Tooltip title={t('show_more')}>
-              <Button size="small" onClick={() => setShowMore(true)} style={{ padding: 0 }}>
-                <MoreHorizIcon />
-              </Button>
-            </Tooltip>
           )}
+          {showMore
+            ? service.params.map(
+                (param, pidx) =>
+                  param.hide && (
+                    <Param
+                      key={pidx}
+                      disabled={disabled}
+                      param={param}
+                      pidx={pidx}
+                      idx={idx}
+                      hasResetButton={hasResetButton}
+                      setParam={setParam}
+                    />
+                  )
+              )
+            : service.params.filter(param => param.hide).length !== 0 && (
+                <Tooltip title={t('show_more')}>
+                  <Button size="small" onClick={() => setShowMore(true)} style={{ padding: 0 }}>
+                    <MoreHorizIcon />
+                  </Button>
+                </Tooltip>
+              )}
+        </>
+      )}
     </div>
   );
 }
