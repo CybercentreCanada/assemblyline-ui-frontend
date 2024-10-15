@@ -1,5 +1,7 @@
-import { Tab, TabProps, Tabs, TabsProps, useTheme } from '@mui/material';
-import React, { FC, ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import type { TabProps, TabsProps } from '@mui/material';
+import { Tab, Tabs, useTheme } from '@mui/material';
+import type { FC, ReactElement, ReactNode } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 interface TabElement extends TabProps {
   inner?: ReactNode;
@@ -26,7 +28,7 @@ export interface TabProviderProps {
 const TabContext = React.createContext<TabContextProps>(null);
 
 export function useTab(): TabContextProps {
-  return useContext(TabContext) as TabContextProps;
+  return useContext(TabContext);
 }
 
 const WrappedTabContainer = <T extends TabElements>({
@@ -106,7 +108,18 @@ const WrappedTabContainer = <T extends TabElements>({
           {...props}
         >
           {Object.entries(tabs).map(([value, { label = '', disabled = false }], i) =>
-            disabled ? null : <Tab key={i} label={label} value={value} sx={{ minWidth: '120px' }} />
+            disabled ? null : (
+              <Tab
+                key={i}
+                tabIndex={0}
+                label={label}
+                value={value}
+                sx={{ minWidth: '120px' }}
+                onClick={(event: any) => {
+                  event?.target?.blur();
+                }}
+              />
+            )
           )}
         </Tabs>
       </div>
