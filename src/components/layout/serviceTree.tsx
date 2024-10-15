@@ -5,7 +5,7 @@ import Skeleton from '@mui/material/Skeleton';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import Service from 'components/layout/service';
-import type { SubmissionProfile } from 'components/models/base/config';
+import type { SubmissionProfileParams } from 'components/models/base/config';
 import type { SelectedService } from 'components/models/base/service';
 import type { UserSettings } from 'components/models/base/user_settings';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -42,7 +42,7 @@ type ServiceTreeItemProps = {
   size: 'medium' | 'small';
   service_spec;
   setParam;
-  submissionProfile: SubmissionProfile;
+  submissionProfile: SubmissionProfileParams;
 };
 
 function ServiceTreeItem({

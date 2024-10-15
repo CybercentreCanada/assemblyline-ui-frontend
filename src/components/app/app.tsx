@@ -76,6 +76,8 @@ const MyAppMain = () => {
 
   setMomentFRLocale();
 
+  console.log(loginParams, renderedApp, user, configuration);
+
   return {
     load: <LoadingScreen />,
     locked: <LockedPage />,

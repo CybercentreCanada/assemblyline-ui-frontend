@@ -385,7 +385,7 @@ const Submit = () => {
   }
 
   const handleProfileChange = useCallback(
-    (submission_profile: string) => {
+    submission_profile => {
       const profile = configuration.submission.profiles[submission_profile];
       if (!profile) {
         return;
@@ -411,7 +411,7 @@ const Submit = () => {
       // Assign default values in case profile doesn't specify
       profile.services.selected = profile.services.selected || [];
       profile.services.excluded = profile.services.excluded || [];
-      profile.service_spec = profile.service_spec || {};
+      profile.service_spec = profile.service_spec || [];
       profile.editable_params = profile.editable_params || {};
 
       // Enable all services that part of the profile, ensure all others are disabled
@@ -451,14 +451,15 @@ const Submit = () => {
       }
 
       const profileParams: Record<string, SubmissionProfileParams> = {};
-      for (const [k, v] of Object.entries(profile)) {
-        // Assign the other parameters of the profile that don't pertain to service settings
-        if (!k.startsWith('service')) {
-          profileParams[k] = v;
-        }
-      }
+      // for (const [k, v] of Object.entries(profile)) {
+      //   // Assign the other parameters of the profile that don't pertain to service settings
+      //   if (!k.startsWith('service')) {
+      //     profileParams[k] = v;
+      //   }
+      // }
 
-      setSettings({ ...settings, services: newServices, ...profileParams, submission_profile });
+      // setSettings({ ...settings, services: newServices, ...profileParams, submission_profile });
+      setSettings({ ...settings, services: newServices, ...profileParams });
       setSubmissionProfile(profile);
     },
     [configuration.submission.profiles, settings]
@@ -533,7 +534,7 @@ const Submit = () => {
         if (!currentUser.roles.includes('submission_customize')) {
           // User isn't allowed to use their service preferences, disable all
           console.log(tempSettings.preferred_submission_profile);
-          setSubmissionProfile(tempSettings.preferred_submission_profile);
+          setSubmissionProfile(tempSettings.preferred_submission_profile as unknown as SubmissionProfileParams);
         }
       }
     });

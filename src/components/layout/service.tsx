@@ -12,6 +12,8 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
+import type { SubmissionProfileParams } from 'components/models/base/config';
+import type { ServiceSpecification } from 'components/models/base/service';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -35,102 +37,43 @@ type ResetButtonProps = {
   reset?: () => void;
 };
 
-const WrappedResetButton = ({ value, defaultValue, hasResetButton = false, reset }: ResetButtonProps) => {
-  const { t } = useTranslation(['adminServices']);
-  const theme = useTheme();
+const ResetButton: React.FC<ResetButtonProps> = React.memo(
+  ({ value, defaultValue, hasResetButton = false, reset }: ResetButtonProps) => {
+    const { t } = useTranslation(['adminServices']);
+    const theme = useTheme();
 
-  return hasResetButton && value !== defaultValue ? (
-    <Tooltip title={t('reset.tooltip')} placement="right">
-      <Button
-        style={{ marginLeft: theme.spacing(1), padding: 0, lineHeight: '1rem' }}
-        onClick={event => {
-          event.stopPropagation();
-          event.preventDefault();
-          reset();
-        }}
-        size="small"
-        color="secondary"
-        variant="outlined"
-      >
-        {t('reset')}
-      </Button>
-    </Tooltip>
-  ) : null;
+    return hasResetButton && value !== defaultValue ? (
+      <Tooltip title={t('reset.tooltip')} placement="right">
+        <Button
+          style={{ marginLeft: theme.spacing(1), padding: 0, lineHeight: '1rem' }}
+          onClick={event => {
+            event.stopPropagation();
+            event.preventDefault();
+            reset();
+          }}
+          size="small"
+          color="secondary"
+          variant="outlined"
+        >
+          {t('reset')}
+        </Button>
+      </Tooltip>
+    ) : null;
+  }
+);
+
+type ParamProps = {
+  disabled: boolean;
+  hasResetButton: boolean;
+  idx: any;
+  param: any;
+  pidx: any;
+  service?: string;
+  setParam: any;
+  submissionProfile?: SubmissionProfileParams;
 };
 
-const ResetButton = React.memo(WrappedResetButton);
-
-function WrappedService({ disabled, service, idx, hasResetButton = false, setParam, submissionProfile = null }) {
-  const theme = useTheme();
-  const [showMore, setShowMore] = useState(false);
-  const { t } = useTranslation();
-  const profile_spec = submissionProfile ? submissionProfile.service_spec[service] : null;
-  return (
-    <div key={idx} style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1), pageBreakInside: 'avoid' }}>
-      {submissionProfile ? (
-        // We're going to only show parameters that are allowed to be edited (whether if they're meant to be hidden or not)
-        <>
-          {service.params
-            .filter(param => (submissionProfile.editable_params[service.name] || []).includes(param.name))
-            .map((param, pidx) => (
-              <Param
-                key={pidx}
-                disabled={disabled || (profile_spec && profile_spec[param.name] !== undefined)}
-                param={param}
-                pidx={pidx}
-                idx={idx}
-                hasResetButton={hasResetButton}
-                setParam={setParam}
-              />
-            ))}
-        </>
-      ) : (
-        <>
-          {service.params.map(
-            (param, pidx) =>
-              !param.hide && (
-                <Param
-                  key={pidx}
-                  disabled={disabled}
-                  param={param}
-                  pidx={pidx}
-                  idx={idx}
-                  hasResetButton={hasResetButton}
-                  setParam={setParam}
-                />
-              )
-          )}
-          {showMore
-            ? service.params.map(
-                (param, pidx) =>
-                  param.hide && (
-                    <Param
-                      key={pidx}
-                      disabled={disabled}
-                      param={param}
-                      pidx={pidx}
-                      idx={idx}
-                      hasResetButton={hasResetButton}
-                      setParam={setParam}
-                    />
-                  )
-              )
-            : service.params.filter(param => param.hide).length !== 0 && (
-                <Tooltip title={t('show_more')}>
-                  <Button size="small" onClick={() => setShowMore(true)} style={{ padding: 0 }}>
-                    <MoreHorizIcon />
-                  </Button>
-                </Tooltip>
-              )}
-        </>
-      )}
-    </div>
-  );
-}
-
-const Service = React.memo(WrappedService);
-
-function WrappedParam({ disabled, param, pidx, idx, hasResetButton = false, setParam }) {
+const Param: React.FC<ParamProps> = React.memo(({ disabled, param, pidx, idx, hasResetButton = false, setParam }) => {
   const classes = useStyles();
   const theme = useTheme();
 
@@ -236,7 +179,88 @@ function WrappedParam({ disabled, param, pidx, idx, hasResetButton = false, setP
       )}
     </div>
   );
-}
+});
 
-const Param = React.memo(WrappedParam);
+type ServiceProps = {
+  idx: any;
+  setParam: any;
+  service: ServiceSpecification;
+  submissionProfile: SubmissionProfileParams;
+  disabled: boolean;
+  hasResetButton?: boolean;
+};
+
+export const Service: React.FC<ServiceProps> = React.memo(
+  ({ disabled, service, idx, hasResetButton = false, setParam, submissionProfile = null }) => {
+    const theme = useTheme();
+    const [showMore, setShowMore] = useState(false);
+    const { t } = useTranslation();
+    const profileSpec = submissionProfile ? submissionProfile.service_spec[service as unknown as string] : null;
+    return (
+      <div
+        key={idx}
+        style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1), pageBreakInside: 'avoid' }}
+      >
+        {submissionProfile ? (
+          // We're going to only show parameters that are allowed to be edited (whether if they're meant to be hidden or not)
+          <>
+            {service.params
+              .filter(param => (submissionProfile.editable_params[service.name] || []).includes(param.name))
+              .map((param, pidx) => (
+                <Param
+                  key={pidx}
+                  disabled={disabled || (profileSpec && profileSpec[param.name] !== undefined)}
+                  param={param}
+                  pidx={pidx}
+                  idx={idx}
+                  hasResetButton={hasResetButton}
+                  setParam={setParam}
+                />
+              ))}
+          </>
+        ) : (
+          <>
+            {service.params.map(
+              (param, pidx) =>
+                !param.hide && (
+                  <Param
+                    key={pidx}
+                    disabled={disabled}
+                    param={param}
+                    pidx={pidx}
+                    idx={idx}
+                    hasResetButton={hasResetButton}
+                    setParam={setParam}
+                  />
+                )
+            )}
+            {showMore
+              ? service.params.map(
+                  (param, pidx) =>
+                    param.hide && (
+                      <Param
+                        key={pidx}
+                        disabled={disabled}
+                        param={param}
+                        pidx={pidx}
+                        idx={idx}
+                        hasResetButton={hasResetButton}
+                        setParam={setParam}
+                      />
+                    )
+                )
+              : service.params.filter(param => param.hide).length !== 0 && (
+                  <Tooltip title={t('show_more')}>
+                    <Button size="small" onClick={() => setShowMore(true)} style={{ padding: 0 }}>
+                      <MoreHorizIcon />
+                    </Button>
+                  </Tooltip>
+                )}
+          </>
+        )}
+      </div>
+    );
+  }
+);
+
 export default Service;

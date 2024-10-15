@@ -1,4 +1,6 @@
 import type { AppSwitcherItem } from 'commons/components/app/AppConfigs';
+import { ServiceSpecification } from './service';
+import { ServiceSelection } from './submission';
 import type { ACL, Role, Type } from './user';
 
 export const API_PRIV = ['READ', 'READ_WRITE', 'WRITE', 'CUSTOM', 'EXTENDED'] as const;
@@ -409,6 +411,75 @@ export type MetadataConfig = {
   submit: Record<string, Metadata>;
 };
 
+/** Submission Parameters for profile */
+export type SubmissionProfileParams = {
+  /** Does the submission automatically goes into the archive when completed? */
+  auto_archive: boolean;
+
+  /** Should a deep scan be performed? */
+  deep_scan?: boolean;
+
+  /** When the submission is archived, should we delete it from hot storage right away? */
+  delete_after_archive?: boolean;
+
+  /** A list of service-specific parameters that can be configured */
+  editable_params: { [service: string]: string[] };
+
+  /** Should this submission generate an alert? */
+  generate_alert?: boolean;
+
+  /** Ignore the cached service results? */
+  ignore_cache?: boolean;
+
+  /** Should we ignore dynamic recursion prevention? */
+  ignore_dynamic_recursion_prevention?: boolean;
+
+  /** Should we ignore filtering services? */
+  ignore_filtering?: boolean;
+
+  /** Ignore the file size limits? */
+  ignore_size?: boolean;
+
+  /** Max number of extracted files */
+  max_extracted?: number;
+
+  /** Max number of supplementary files */
+  max_supplementary?: number;
+
+  /** Priority of the scan */
+  priority?: number;
+
+  /** Submission profiles */
+  profiles?: SubmissionProfile;
+
+  /** Service-specific parameters */
+  service_spec?: ServiceSpecification[];
+
+  /** Service selection */
+  services?: ServiceSelection;
+
+  /** Time, in days, to live for this submission */
+  ttl?: number;
+
+  /** Should we use the alternate dtl while archiving? */
+  use_archive_alternate_dtl?: boolean;
+};
+
+/** Configuration for defining submission profiles for basic users */
+export type SubmissionProfile = {
+  /** Submission profile classification */
+  classification: string;
+
+  /** A list of service-specific parameters that can be configured */
+  editable_params: { [service: string]: string[] };
+
+  /** Submission profile name */
+  name: string;
+
+  /** Default submission parameters for profile */
+  params: SubmissionProfileParams;
+};
+
 /** Options regarding all submissions, regardless of their input method */
 export type TagTypes = {
   /** Attribution tags */
@@ -464,6 +535,9 @@ export type Submission = {
 
   /** Metadata compliance rules */
   metadata: MetadataConfig;
+
+  /** Submission profiles with preset submission parameters */
+  profiles: { [profile_name: string]: SubmissionProfileParams };
 
   /** List of external source to fetch file via their SHA256 hashes */
   sha256_sources: string[];
@@ -577,6 +651,38 @@ export const CONFIGURATION: Configuration = {
       ingest: {},
       strict_schemes: [],
       submit: {}
+    },
+    profiles: {
+      'Dynamic Analysis': {
+        auto_archive: false,
+        editable_params: {},
+        services: {
+          excluded: [],
+          rescan: [],
+          resubmit: [],
+          selected: []
+        }
+      },
+      'Static Analysis': {
+        auto_archive: false,
+        editable_params: {},
+        services: {
+          excluded: [],
+          rescan: [],
+          resubmit: [],
+          selected: []
+        }
+      },
+      'Static Analysis with Internet': {
+        auto_archive: false,
+        editable_params: {},
+        services: {
+          excluded: [],
+          rescan: [],
+          resubmit: [],
+          selected: []
+        }
+      }
     },
     sha256_sources: [],
     tag_types: {

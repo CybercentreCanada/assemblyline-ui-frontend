@@ -35,7 +35,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import ExternalSources from 'components/layout/externalSources';
 import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
-import { SubmissionProfileParams } from 'components/models/base/config';
+import type { SubmissionProfileParams } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import { RouterPrompt } from 'components/visual/RouterPrompt';

@@ -27,9 +27,6 @@ export type ServiceSelection = {
   /** Add to service selection when resubmitting */
   resubmit: string[];
 
-  /** List of runtime excluded services */
-  runtime_excluded: string[];
-
   /** List of selected services */
   selected: string[];
 };
@@ -86,9 +83,6 @@ export type SubmissionParams = {
 
   /** Priority of the scan */
   priority: number;
-
-  /** Should the submission do extra profiling? */
-  profile: boolean;
 
   /** Parent submission ID */
   psid?: string;
