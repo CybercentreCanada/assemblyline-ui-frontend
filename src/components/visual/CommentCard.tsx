@@ -19,6 +19,8 @@ import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { AppUserAvatar } from 'commons/components/topnav/UserProfile';
 import useALContext from 'components/hooks/useALContext';
+import type { Author, Comment, ReactionType } from 'components/models/base/file';
+import { REACTIONS_TYPES } from 'components/models/base/file';
 import Moment from 'components/visual/Moment';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -174,59 +176,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export const REACTIONS = {
-  thumbs_up: '👍',
-  thumbs_down: '👎',
-  love: '🧡',
-  smile: '😀',
-  surprised: '😲',
-  party: '🎉'
-};
-
-export type Reaction = {
-  uname: string;
-  icon: keyof typeof REACTIONS;
-};
-
-export type Comment = {
-  cid?: string;
-  date?: string;
-  text?: string;
-  uname?: string;
-  reactions?: Reaction[];
-};
-
-export type Author = {
-  uname?: string;
-  name?: string;
-  avatar?: string;
-  email?: string;
-};
-
-export type Comments = Comment[];
-
-export type Authors = Record<string, Author>;
-
-export const DEFAULT_COMMENT: Comment = {
-  cid: null,
-  date: null,
-  text: '',
-  uname: null,
-  reactions: []
-};
-
-export const DEFAULT_AUTHOR: Author = {
-  uname: null,
-  name: null,
-  avatar: null,
-  email: null
-};
-
 type Props = {
   currentComment?: Comment;
   previousComment?: Comment;
   nextComment?: Comment;
-  authors?: Authors;
+  authors?: Author[];
   onEditClick?: (comment: Comment) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDeleteClick?: (comment: Comment) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onReactionClick?: (
@@ -249,12 +203,12 @@ const WrappedCommentCard: React.FC<Props> = ({
   const classes = useStyles();
   const { user: currentUser } = useALContext();
 
-  const reactions = useMemo<Record<keyof typeof REACTIONS, string[]> | object>(
+  const reactions = useMemo<Record<ReactionType, string[]> | object>(
     () =>
       !currentComment || !('reactions' in currentComment)
         ? {}
-        : (Object.fromEntries(
-            Object.keys(REACTIONS).map(reaction => [
+        : Object.fromEntries(
+            Object.keys(REACTIONS_TYPES).map(reaction => [
               reaction,
               currentComment?.reactions
                 ?.filter((v, i, a) => v?.icon === reaction)
@@ -262,7 +216,7 @@ const WrappedCommentCard: React.FC<Props> = ({
                 .filter((v, i, a) => a.findIndex(e => e === v) === i)
                 .sort((n1, n2) => n1.localeCompare(n2))
             ])
-          ) as Record<keyof typeof REACTIONS, string[]>),
+          ),
     [currentComment]
   );
 
@@ -367,7 +321,7 @@ const WrappedCommentCard: React.FC<Props> = ({
             title={
               currentUser.roles.includes('archive_comment') && (
                 <Stack className={classes.actions} direction="row">
-                  {Object.entries(REACTIONS).map(([icon, emoji]: [keyof typeof REACTIONS, string], i) => (
+                  {Object.entries(REACTIONS_TYPES).map(([icon, emoji], i) => (
                     <Tooltip
                       key={i}
                       classes={{ tooltip: classes.tooltip }}
@@ -471,7 +425,7 @@ const WrappedCommentCard: React.FC<Props> = ({
                     <Chip
                       label={
                         <>
-                          <span style={{ fontSize: 'medium' }}>{REACTIONS[reaction]}</span>
+                          <span style={{ fontSize: 'medium' }}>{REACTIONS_TYPES[reaction]}</span>
                           <span>{names.length}</span>
                         </>
                       }

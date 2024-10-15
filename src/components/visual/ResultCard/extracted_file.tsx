@@ -1,24 +1,11 @@
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import { IconButton, Link, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { File } from 'components/models/base/result';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-
-export type ExtractedFiles = {
-  classification: string;
-  description: string;
-  name: string;
-  sha256: string;
-  is_section_image?: boolean;
-};
-
-type ExtractedFileProps = {
-  file: ExtractedFiles;
-  download?: boolean;
-  sid?: string;
-};
 
 const useStyles = makeStyles(theme => ({
   file: {
@@ -46,7 +33,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const WrappedExtractedFile: React.FC<ExtractedFileProps> = ({ file, download = false, sid = null }) => {
+type Props = {
+  file: File;
+  download?: boolean;
+  sid?: string;
+};
+
+const WrappedExtractedFile: React.FC<Props> = ({ file, download = false, sid = null }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const location = useLocation();

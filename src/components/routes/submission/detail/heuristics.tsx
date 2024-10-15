@@ -3,6 +3,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useHighlighter from 'components/hooks/useHighlighter';
+import { Heuristics } from 'components/models/ui/file';
 import Heuristic from 'components/visual/Heuristic';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,11 +20,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type HeuristicSectionProps = {
-  heuristics: any;
+type Props = {
+  heuristics: Heuristics;
 };
 
-const WrappedHeuristicSection: React.FC<HeuristicSectionProps> = ({ heuristics }) => {
+const WrappedHeuristicSection: React.FC<Props> = ({ heuristics }) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -51,7 +52,7 @@ const WrappedHeuristicSection: React.FC<HeuristicSectionProps> = ({ heuristics }
               {heuristics
                 ? Object.keys(heuristics).map((lvl, i) => (
                     <Grid container key={i}>
-                      <Grid item xs={12} sm={3} lg={2}>
+                      <Grid item xs={12} sm={3} lg={2} paddingTop={0.375}>
                         <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{t(`verdict.${lvl}`)}</span>
                       </Grid>
                       <Grid item xs={12} sm={9} lg={10}>

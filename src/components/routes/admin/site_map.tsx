@@ -1,6 +1,7 @@
 import DataUsageOutlinedIcon from '@mui/icons-material/DataUsageOutlined';
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
 import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
+import type { Theme } from '@mui/material';
 import {
   Paper,
   Skeleton,
@@ -10,7 +11,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Theme,
   Typography,
   useTheme
 } from '@mui/material';
@@ -18,12 +18,14 @@ import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { Role } from 'components/models/base/user';
+import type { SiteMap } from 'components/models/ui';
+import type { CustomUser } from 'components/models/ui/user';
+import type { PossibleColor } from 'components/models/utils/color';
 import CustomChip from 'components/visual/CustomChip';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 
@@ -43,57 +45,64 @@ const StyledTableCell = withStyles((theme: Theme) =>
   })
 )(TableCell);
 
-export default function SiteMap() {
+export default function SiteMapPage() {
   const { t } = useTranslation(['adminSiteMap']);
   const theme = useTheme();
-  const [siteMap, setSiteMap] = useState(null);
   const { configuration } = useALContext();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const reqMapColor = {
+  const [siteMap, setSiteMap] = useState<SiteMap>(null);
+
+  const reqMapColor: Record<Role, PossibleColor> = {
+    administration: 'error',
+    alert_manage: 'info',
+    alert_view: 'default',
+    apikey_access: 'default',
+    archive_comment: 'default',
+    archive_download: 'warning',
+    archive_manage: 'info',
+    archive_trigger: 'warning',
+    archive_view: 'default',
+    assistant_use: 'info',
+    badlist_manage: 'info',
+    badlist_view: 'default',
+    bundle_download: 'warning',
+    external_query: 'default',
+    file_detail: 'default',
+    file_download: 'warning',
+    file_purge: 'default',
+    heuristic_view: 'default',
+    obo_access: 'default',
+    replay_system: 'warning',
+    replay_trigger: 'warning',
+    retrohunt_run: 'default',
+    retrohunt_view: 'default',
+    safelist_manage: 'info',
+    safelist_view: 'default',
+    self_manage: 'info',
+    signature_download: 'warning',
     signature_import: 'success',
     signature_manage: 'info',
     signature_view: 'default',
-    signature_download: 'warning',
-    administration: 'error',
-    alert_view: 'default',
-    alert_manage: 'info',
-    archive_view: 'default',
-    archive_trigger: 'warning',
-    archive_download: 'warning',
-    archive_manage: 'info',
-    self_manage: 'info',
-    safelist_view: 'default',
-    safelist_manage: 'info',
-    badlist_view: 'default',
-    badlist_manage: 'info',
-    workflow_view: 'default',
-    workflow_manage: 'info',
-    apikey_access: 'default',
-    obo_access: 'default',
-    bundle_download: 'warning',
     submission_create: 'success',
-    submission_view: 'default',
     submission_delete: 'error',
     submission_manage: 'info',
-    file_detail: 'default',
-    file_download: 'warning',
-    replay_trigger: 'warning',
-    replay_system: 'info'
+    submission_view: 'default',
+    workflow_manage: 'info',
+    workflow_view: 'default'
   };
 
-  useEffectOnce(() => {
+  useEffect(() => {
     if (currentUser.is_admin) {
-      apiCall({
+      apiCall<SiteMap>({
         method: 'GET',
         url: '/api/site_map/',
-        onSuccess: api_data => {
-          setSiteMap(api_data.api_response);
-        }
+        onSuccess: api_data => setSiteMap(api_data.api_response)
       });
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser.is_admin]);
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>

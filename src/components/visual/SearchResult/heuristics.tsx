@@ -2,12 +2,9 @@ import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
-import { Statistics } from 'components/routes/manage/heuristic_detail';
+import type { Heuristic } from 'components/models/base/heuristic';
+import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
-import Moment from 'components/visual/Moment';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import {
   DivTable,
   DivTableBody,
@@ -16,40 +13,20 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from '../DivTable';
-import InformativeAlert from '../InformativeAlert';
+} from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import Moment from 'components/visual/Moment';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
-export type HeuristicResult = {
-  attack_id: string[];
-  classification: string;
-  description: string;
-  filetype: string;
-  heur_id: string;
-  id: string;
-  max_score: number;
-  name: string;
-  score: number;
-  stats: Statistics;
-};
-
-type SearchResults = {
-  items: HeuristicResult[];
-  rows: number;
-  offset: number;
-  total: number;
-};
-
-type HeuristicsTableProps = {
-  heuristicResults: SearchResults;
+type Props = {
+  heuristicResults: SearchResult<Heuristic>;
   setHeuristicID?: (id: string) => void;
   allowSort?: boolean;
 };
 
-const WrappedHeuristicsTable: React.FC<HeuristicsTableProps> = ({
-  heuristicResults,
-  setHeuristicID = null,
-  allowSort = true
-}) => {
+const WrappedHeuristicsTable: React.FC<Props> = ({ heuristicResults, setHeuristicID = null, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 

@@ -15,9 +15,11 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
-import CustomChip, { ColorMap, PossibleColors } from 'components/visual/CustomChip';
+import type { PossibleColors } from 'components/visual/CustomChip';
+import CustomChip, { ColorMap } from 'components/visual/CustomChip';
+import type { FormatProp } from 'helpers/classificationParser';
 import {
-  FormatProp,
+  applyAliases,
   applyClassificationRules,
   defaultClassificationValidator,
   defaultDisabled,
@@ -97,7 +99,7 @@ function WrappedClassification({
   const classes = useStyles();
   const { t } = useTranslation();
   const theme = useTheme();
-  const { user: currentUser, c12nDef } = useALContext();
+  const { user: currentUser, c12nDef, classificationAliases } = useALContext();
   const isPhone = useMediaQuery(theme.breakpoints.only('xs'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [showPicker, setShowPicker] = useState(false);
@@ -190,9 +192,9 @@ function WrappedClassification({
   const computeColor = (): PossibleColors => {
     const levelStyles = c12nDef.levels_styles_map[validated.parts.lvl];
     if (!levelStyles) {
-      return 'default' as 'default';
+      return 'default' as const;
     }
-    return ColorMap[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as 'default');
+    return ColorMap[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
   };
 
   const skelheight = {
@@ -218,7 +220,7 @@ function WrappedClassification({
       <>
         {type === 'text' ? (
           <span className={classes[computeColor()]}>
-            {normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser)}
+            {normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser, classificationAliases)}
           </span>
         ) : (
           <div style={{ display: inline ? 'inline-block' : null }}>
@@ -228,7 +230,14 @@ function WrappedClassification({
               size={size}
               color={computeColor()}
               className={classes.classification}
-              label={normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser)}
+              label={normalizedClassification(
+                validated.parts,
+                c12nDef,
+                format,
+                isMobile,
+                isUser,
+                classificationAliases
+              )}
               onClick={type === 'picker' ? () => setShowPicker(true) : null}
               fullWidth={fullWidth}
               disabled={disabled}
@@ -250,7 +259,14 @@ function WrappedClassification({
                 size={size}
                 color={computeColor()}
                 className={classes.classification}
-                label={normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser)}
+                label={normalizedClassification(
+                  validated.parts,
+                  c12nDef,
+                  format,
+                  isMobile,
+                  isUser,
+                  classificationAliases
+                )}
                 fullWidth={fullWidth}
               />
             </DialogTitle>
@@ -261,7 +277,7 @@ function WrappedClassification({
                     <List disablePadding style={{ borderRadius: '6px' }}>
                       {c12nDef.original_definition.levels.map(
                         (lvl, idx) =>
-                          (isUser || lvl.lvl <= uParts.lvlIdx) && (
+                          (isUser || (lvl.lvl <= uParts.lvlIdx && !lvl.is_hidden)) && (
                             <ListItem
                               key={idx}
                               button
@@ -279,13 +295,16 @@ function WrappedClassification({
                     </List>
                   </Card>
                 </Grid>
-                {((isUser && c12nDef.original_definition.required.length !== 0) || uParts.req.length !== 0) && (
+                {((isUser && c12nDef.original_definition.required.length !== 0) ||
+                  (uParts.req.length !== 0 &&
+                    c12nDef.original_definition.required.filter(r => !r.is_hidden).length !== 0)) && (
                   <Grid item xs={12} md>
                     <Card variant="outlined">
                       <List disablePadding>
                         {c12nDef.original_definition.required.map(
                           (req, idx) =>
-                            (isUser || [req.name, req.short_name].some(r => uParts.req.includes(r))) && (
+                            (isUser ||
+                              ([req.name, req.short_name].some(r => uParts.req.includes(r)) && !req.is_hidden)) && (
                               <ListItem
                                 key={idx}
                                 button
@@ -305,31 +324,39 @@ function WrappedClassification({
                 {((isUser &&
                   (c12nDef.original_definition.groups.length !== 0 ||
                     c12nDef.original_definition.subgroups.length !== 0)) ||
-                  uParts.groups.length !== 0 ||
-                  uParts.subgroups.length !== 0) && (
+                  (uParts.groups.length !== 0 &&
+                    c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0) ||
+                  (uParts.subgroups.length !== 0 &&
+                    c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
                   <Grid item xs={12} md>
                     {((isUser && (c12nDef.original_definition.groups.length !== 0 || c12nDef.dynamic_groups)) ||
-                      uParts.groups.length !== 0) && (
+                      (uParts.groups.length !== 0 &&
+                        c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0)) && (
                       <div style={{ paddingBottom: sp2 }}>
                         <Card variant="outlined">
                           <List disablePadding>
-                            {c12nDef.original_definition.groups.map((grp, idx) => (
-                              <ListItem
-                                key={idx}
-                                button
-                                disabled={
-                                  validated.disabled.groups.includes(grp.name) ||
-                                  validated.disabled.groups.includes(grp.short_name)
-                                }
-                                selected={
-                                  validated.parts.groups.includes(grp.name) ||
-                                  validated.parts.groups.includes(grp.short_name)
-                                }
-                                onClick={() => toggleGroups(grp)}
-                              >
-                                <ListItemText style={{ textAlign: 'center' }} primary={grp.name} />
-                              </ListItem>
-                            ))}
+                            {c12nDef.original_definition.groups
+                              .filter(grp => isUser || !grp.is_hidden)
+                              .map((grp, idx) => (
+                                <ListItem
+                                  key={idx}
+                                  button
+                                  disabled={
+                                    validated.disabled.groups.includes(grp.name) ||
+                                    validated.disabled.groups.includes(grp.short_name)
+                                  }
+                                  selected={
+                                    validated.parts.groups.includes(grp.name) ||
+                                    validated.parts.groups.includes(grp.short_name)
+                                  }
+                                  onClick={() => toggleGroups(grp)}
+                                >
+                                  <ListItemText 
+                                    style={{ textAlign: 'center' }} 
+                                    primary={applyAliases(grp.name, classificationAliases)} 
+                                  />
+                                </ListItem>
+                              ))}
                             {c12nDef.dynamic_groups &&
                               ['email', 'all'].includes(c12nDef.dynamic_groups_type) &&
                               currentUser.email && (
@@ -346,7 +373,7 @@ function WrappedClassification({
                                 >
                                   <ListItemText
                                     style={{ textAlign: 'center' }}
-                                    primary={dynGroup || currentUser.dynamic_group}
+                                    primary={applyAliases(dynGroup || currentUser.dynamic_group, classificationAliases)}
                                   />
                                 </ListItem>
                               )}
@@ -375,7 +402,10 @@ function WrappedClassification({
                                       })
                                     }
                                   >
-                                    <ListItemText style={{ textAlign: 'center' }} primary={group} />
+                                    <ListItemText
+                                      style={{ textAlign: 'center' }}
+                                      primary={applyAliases(group, classificationAliases)}
+                                    />
                                   </ListItem>
                                 ))}
                           </List>
@@ -383,22 +413,25 @@ function WrappedClassification({
                       </div>
                     )}
                     {((isUser && c12nDef.original_definition.subgroups.length !== 0) ||
-                      uParts.subgroups.length !== 0) && (
+                      (uParts.subgroups.length !== 0 &&
+                        c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
                       <Card variant="outlined">
                         <List disablePadding>
-                          {c12nDef.original_definition.subgroups.map((sgrp, idx) => (
-                            <ListItem
-                              key={idx}
-                              button
-                              selected={
-                                validated.parts.subgroups.includes(sgrp.name) ||
-                                validated.parts.subgroups.includes(sgrp.short_name)
-                              }
-                              onClick={() => toggleSubGroups(sgrp)}
-                            >
-                              <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
-                            </ListItem>
-                          ))}
+                          {c12nDef.original_definition.subgroups
+                            .filter(sgrp => isUser || !sgrp.is_hidden)
+                            .map((sgrp, idx) => (
+                              <ListItem
+                                key={idx}
+                                button
+                                selected={
+                                  validated.parts.subgroups.includes(sgrp.name) ||
+                                  validated.parts.subgroups.includes(sgrp.short_name)
+                                }
+                                onClick={() => toggleSubGroups(sgrp)}
+                              >
+                                <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
+                              </ListItem>
+                            ))}
                         </List>
                       </Card>
                     )}

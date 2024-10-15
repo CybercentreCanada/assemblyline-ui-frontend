@@ -27,7 +27,8 @@ import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { File } from 'components/routes/archive/detail';
+import { LabelCategories } from 'components/models/base/file';
+import type { File } from 'components/models/ui/file';
 import CustomChip from 'components/visual/CustomChip';
 import Moment from 'components/visual/Moment';
 import { bytesToSize } from 'helpers/utils';
@@ -39,21 +40,11 @@ import FileDownloader from '../FileDownloader';
 import InputDialog from '../InputDialog';
 
 const VERDICTS = {
-  malicious: {
-    className: 'malicious'
-  },
-  highly_suspicious: {
-    className: 'highly_suspicious'
-  },
-  suspicious: {
-    className: 'suspicious'
-  },
-  safe: {
-    className: 'safe'
-  },
-  info: {
-    className: 'info'
-  }
+  malicious: { className: 'malicious' },
+  highly_suspicious: { className: 'highly_suspicious' },
+  suspicious: { className: 'suspicious' },
+  safe: { className: 'safe' },
+  info: { className: 'info' }
 };
 
 const useStyles = makeStyles(theme => ({
@@ -180,26 +171,20 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type Props = {
-  sha256: string;
-  file: File;
-  sid?: string;
-  force?: boolean;
-};
-
-const DEFAULT_LABELS = {
-  attribution: [],
-  technique: [],
-  info: []
-};
-
 const LABELS: Record<
-  keyof typeof DEFAULT_LABELS,
+  keyof LabelCategories,
   { color: 'default' | 'primary' | 'error' | 'info' | 'success' | 'warning' | 'secondary' }
 > = {
   attribution: { color: 'primary' },
   technique: { color: 'secondary' },
   info: { color: 'default' }
+};
+
+type Props = {
+  sha256: string;
+  file: File;
+  sid?: string;
+  force?: boolean;
 };
 
 const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid = null, force = false }) => {

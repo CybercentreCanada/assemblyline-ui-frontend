@@ -1,13 +1,13 @@
 {
-  "add_safelist": "Add an item to the badlist",
+  "add_badlist": "Add an item to the badlist",
+  "disabled": "Disabled hashes",
   "filter": "Filter badlisted hashes...",
   "filtered": "hash matching filter",
   "filtereds": "hashes matching filter",
   "searching": "Searching...",
+  "tag": "Tag based hashes",
   "title": "Badlist",
   "total": "hash in badlist",
   "totals": "hashes in badlist",
-  "user": "Hashes added by users",
-  "disabled": "Disabled hashes",
-  "tag": "Tag based hashes"
+  "user": "Hashes added by users"
 }

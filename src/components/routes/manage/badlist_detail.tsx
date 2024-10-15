@@ -9,6 +9,8 @@ import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { Badlist } from 'components/models/base/badlist';
+import { ATTRIBUTION_TYPES, DEFAULT_TEMP_ATTRIBUTION } from 'components/models/base/badlist';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
@@ -21,54 +23,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
-import ForbiddenPage from '../403';
-
-export type Badlist = {
-  added: string;
-  classification: string;
-  enabled: boolean;
-  expiry_ts?: string;
-  attribution: {
-    actor: string[];
-    campaign: string[];
-    category: string[];
-    exploit: string[];
-    implant: string[];
-    family: string[];
-    network: string[];
-  };
-  hashes: {
-    md5: string;
-    sha1: string;
-    sha256: string;
-    ssdeep: string;
-    tlsh: string;
-  };
-  file: {
-    name: string[];
-    size: number;
-    type: string;
-  };
-  id: string;
-  sources: {
-    classification: string;
-    name: string;
-    reason: string[];
-    type: string;
-  }[];
-  signature: {
-    name: string;
-  };
-  tag: {
-    type: string;
-    value: string;
-  };
-  type: string;
-  updated: string;
-};
-
-const DEFAULT_TEMP_ATTRIBUTION = { type: 'actor', value: '' };
-const ATTRIBUTION_TYPES = ['actor', 'campaign', 'category', 'exploit', 'implant', 'family', 'network'];
+import ForbiddenPage from 'components/routes/403';
 
 type ParamProps = {
   id: string;

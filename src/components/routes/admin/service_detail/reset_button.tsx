@@ -1,21 +1,21 @@
 import { Button, Tooltip, useTheme } from '@mui/material';
-import type { ServiceDetail } from 'components/routes/admin/service_detail';
+import type { DockerConfig, Service, UpdateConfig, UpdateSource } from 'components/models/base/service';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type ResetButtonProps = {
-  defaults: ServiceDetail;
-  service: ServiceDetail;
+type Props = {
+  service: DockerConfig | Service | UpdateConfig | UpdateSource;
+  defaults: DockerConfig | Service | UpdateConfig | UpdateSource;
   field: string | string[];
   reset: () => void;
 };
 
-const WrappedResetButton = ({ service, defaults, field, reset }: ResetButtonProps) => {
+const WrappedResetButton = ({ service, defaults, field, reset }: Props) => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
 
   const getValue = useCallback((obj: object, fieldname: string): unknown => {
-    const val = obj?.[fieldname] || null;
+    const val = obj[fieldname] || null;
     return Array.isArray(val) ? JSON.stringify(val) : val;
   }, []);
 

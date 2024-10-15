@@ -12,17 +12,18 @@ import {
 } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { User } from 'components/models/base/user';
 import { decode, encode } from 'helpers/cbor';
 import toArrayBuffer from 'helpers/toArrayBuffer';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type SecurityTokenProps = {
-  user: any;
+type Props = {
+  user: User;
   toggleToken: (token: string) => void;
 };
 
-export default function SecurityToken({ user, toggleToken }: SecurityTokenProps) {
+export default function SecurityToken({ user, toggleToken }: Props) {
   const { t } = useTranslation(['user']);
   const [selectedToken, setSelectedToken] = useState(null);
   const [tempToken, setTempToken] = useState('');

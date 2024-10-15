@@ -1,5 +1,4 @@
-import type { ChipProps } from '@mui/material';
-import { Chip, Tooltip } from '@mui/material';
+import { Chip, ChipProps, Tooltip, TooltipProps } from '@mui/material';
 import { darken } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
@@ -33,28 +32,13 @@ export type CustomChipProps = ChipProps & {
   component?: React.ElementType;
   fullWidth?: boolean;
   mono?: boolean;
-  tooltip?: string;
-  tooltipPlacement?:
-    | 'bottom-end'
-    | 'bottom-start'
-    | 'bottom'
-    | 'left-end'
-    | 'left-start'
-    | 'left'
-    | 'right-end'
-    | 'right-start'
-    | 'right'
-    | 'top-end'
-    | 'top-start'
-    | 'top';
+  tooltip?: TooltipProps['title'];
+  tooltipPlacement?: TooltipProps['placement'];
   type?: 'round' | 'square' | 'rounded';
   wrap?: boolean;
 };
 
-const useStyles = makeStyles(theme => ({
-  auto_height: {
-    height: 'auto'
-  },
+export const useStyles = makeStyles(theme => ({
   wrap: {
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word',
@@ -74,7 +58,10 @@ const useStyles = makeStyles(theme => ({
   },
   tiny: {
     height: '20px',
-    fontSize: '0.725rem'
+    fontSize: '0.775rem'
+  },
+  small: {
+    height: '32px'
   },
   label_tiny: {
     paddingLeft: '6px',
@@ -151,7 +138,10 @@ const useStyles = makeStyles(theme => ({
     borderColor: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light,
     color: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
   },
-  icon: { color: theme.palette.common.white }
+  icon: { color: theme.palette.common.white },
+  auto_height: {
+    height: 'auto'
+  }
 }));
 
 const WrappedCustomChip: React.FC<CustomChipProps> = ({

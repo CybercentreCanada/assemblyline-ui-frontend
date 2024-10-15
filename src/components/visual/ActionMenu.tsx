@@ -1,12 +1,13 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import LandscapeOutlinedIcon from '@mui/icons-material/LandscapeOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { Divider, Link as MaterialLink, ListSubheader, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Divider, ListSubheader, Link as MaterialLink, Menu, MenuItem, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
@@ -21,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import ClassificationMismatchDialog from './ClassificationMismatchDialog';
+import { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip';
 import InputDialog from './InputDialog';
 import SafeBadItem from './SafeBadItem';
 
@@ -32,6 +34,7 @@ const SAFELIST_ICON = <VerifiedUserOutlinedIcon style={{ marginRight: '16px' }} 
 const SUBMIT_ICON = <PublishOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
+const BORELIS_ICON = <LandscapeOutlinedIcon style={{ marginRight: '16px' }} />;
 
 const EXTERNAL_ICON = <HiOutlineExternalLink style={{ marginRight: '16px', fontSize: '22px' }} />;
 const initialMenuState = {
@@ -64,12 +67,14 @@ type Coordinates = {
 
 type TagProps = {
   category: 'heuristic' | 'signature' | 'hash' | 'metadata' | 'tag';
+  index?: string;
   type: string;
   value: string;
   classification?: string | null;
   state: Coordinates;
   setState: (Coordinates) => void;
   highlight_key?: string;
+  setBorealisDetails?: (value: boolean) => void;
 };
 
 const categoryPrefix = {
@@ -90,12 +95,14 @@ const categoryIndex = {
 
 const WrappedActionMenu: React.FC<TagProps> = ({
   category,
+  index = null,
   type,
   value,
   classification = null,
   state,
   setState,
-  highlight_key = null
+  highlight_key = null,
+  setBorealisDetails = null
 }) => {
   const { t } = useTranslation();
   const { user: currentUser, configuration: currentUserConfig, c12nDef } = useALContext();
@@ -106,9 +113,9 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const [currentAllowBypass, setCurrentAllowBypass] = React.useState(false);
   const [currentLinkClassification, setCurrentLinkClassification] = React.useState('');
   const [safelistDialog, setSafelistDialog] = React.useState(false);
-  const [safelistReason, setSafelistReason] = React.useState(null);
+  const [safelistReason, setSafelistReason] = React.useState<string>(null);
   const [badlistDialog, setBadlistDialog] = React.useState(false);
-  const [badlistReason, setBadlistReason] = React.useState(null);
+  const [badlistReason, setBadlistReason] = React.useState<string>(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
   const [badlisted, setBadlisted] = React.useState(null);
   const [safelisted, setSafelisted] = React.useState(null);
@@ -119,7 +126,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { enrichTagExternal, enrichmentState, getKey } = useExternalLookup();
   const externalLookupResults = enrichmentState[getKey(type, value)];
   const [allInProgress, setAllInProgress] = React.useState(false);
-  const submitType = category === 'tag' && type.endsWith('.uri') ? 'url' : getSubmitType(value, currentUserConfig);
+  const submitType = category === 'tag' && type.endsWith('.uri') ? 'url' : getSubmitType(value, currentUserConfig)[0];
 
   useEffect(() => {
     if (state.mouseY !== null) {
@@ -262,6 +269,11 @@ const WrappedActionMenu: React.FC<TagProps> = ({
     handleClose();
   }, [setBadlistDialog, handleClose]);
 
+  const handleBorealisDetails = useCallback(() => {
+    setBorealisDetails(true);
+    handleClose();
+  }, [setBorealisDetails, handleClose]);
+
   const addToBadlist = useCallback(() => {
     const data = {
       tag: {
@@ -317,6 +329,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   return hasExternalLinks ||
     hasExternalQuery ||
     submitType ||
+    index ||
     category === 'heuristic' ||
     category === 'signature' ||
     category === 'tag' ? (
@@ -366,9 +379,19 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
+        {currentUserConfig.ui.api_proxies.includes('borealis') &&
+          type in BOREALIS_TYPE_MAP &&
+          value !== null &&
+          setBorealisDetails && (
+            <MenuItem id="borealisID" dense onClick={handleBorealisDetails}>
+              {BORELIS_ICON}
+              {t('borealis')}
+            </MenuItem>
+          )}
+
         {category === 'tag' && type.startsWith('file.rule.') && currentUser.roles.includes('signature_view') && (
           <MenuItem
-            id="clipID"
+            id="sigID"
             dense
             component={Link}
             to={`/manage/signature/${type.substring(10)}/${value.substring(0, value.indexOf('.'))}/${value.substring(
@@ -387,9 +410,13 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           <MenuItem
             dense
             component={Link}
-            to={`/search${categoryIndex[category]}?query=${categoryPrefix[category]}${type}:${safeFieldValueURI(
-              value
-            )}`}
+            to={
+              index
+                ? `/search${index}?query=${type}:${safeFieldValueURI(value)}`
+                : `/search${categoryIndex[category]}?query=${categoryPrefix[category]}${type}:${safeFieldValueURI(
+                    value
+                  )}`
+            }
             onClick={handleClose}
           >
             {SEARCH_ICON}

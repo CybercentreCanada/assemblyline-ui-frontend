@@ -30,7 +30,9 @@ import parse from 'autosuggest-highlight/parse';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { FileInfo } from 'components/routes/archive/detail';
+import type { LabelCategories } from 'components/models/base/file';
+import { DEFAULT_LABELS, LABELS_COLOR_MAP } from 'components/models/base/file';
+import type { PossibleColor } from 'components/models/utils/color';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import { useDebounce } from 'components/visual/HexViewer';
@@ -60,33 +62,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const DEFAULT_LABELS = {
-  attribution: [],
-  technique: [],
-  info: []
-};
-
-const LABELS_COLOR_MAP = {
-  info: 'default',
-  technique: 'secondary',
-  attribution: 'primary'
-};
-
-const LABELS: Record<
-  keyof typeof DEFAULT_LABELS,
-  { color: 'default' | 'primary' | 'error' | 'info' | 'success' | 'warning' | 'secondary' }
-> = {
+const LABELS: Record<keyof LabelCategories, { color: PossibleColor }> = {
   attribution: { color: 'primary' },
   technique: { color: 'secondary' },
   info: { color: 'default' }
 };
 
-type Labels = Partial<Record<keyof typeof DEFAULT_LABELS, string[]>>;
+type Labels = Partial<Record<keyof LabelCategories, string[]>>;
 
 type NewLabel = Record<'value' | 'category', string>;
 
 type Option = {
-  category: keyof typeof DEFAULT_LABELS;
+  category: keyof LabelCategories;
   count: number;
   label: string;
 };
@@ -433,7 +420,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
 };
 
 type LabelCellProps = {
-  label_categories?: FileInfo['label_categories'];
+  label_categories?: LabelCategories;
   onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
 };
 

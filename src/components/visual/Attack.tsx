@@ -6,9 +6,10 @@ import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
-import { CustomUser } from 'components/hooks/useMyUser';
 import useSafeResults from 'components/hooks/useSafeResults';
-import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
+import type { CustomUser } from 'components/models/ui/user';
+import type { PossibleColors } from 'components/visual/CustomChip';
+import CustomChip from 'components/visual/CustomChip';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -54,11 +55,11 @@ const WrappedAttack: React.FC<AttackProps> = ({
 
   const maliciousness = lvl || scoreToVerdict(score);
   const color: PossibleColors = {
-    suspicious: 'warning' as 'warning',
-    malicious: 'error' as 'error',
-    safe: 'success' as 'success',
-    info: 'default' as 'default',
-    highly_suspicious: 'warning' as 'warning'
+    suspicious: 'warning' as const,
+    malicious: 'error' as const,
+    safe: 'success' as const,
+    info: 'default' as const,
+    highly_suspicious: 'warning' as const
   }[maliciousness];
 
   const handleMenuClick = useCallback(event => {
@@ -117,7 +118,8 @@ const WrappedAttack: React.FC<AttackProps> = ({
         wrap
         size="tiny"
         type="rounded"
-        color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
+        variant="outlined"
+        color={highlight_key && isHighlighted(highlight_key) ? 'primary' : color}
         label={show_type ? `[ATT&CK] ${text}` : text}
         style={STYLE}
         onClick={highlight_key ? handleClick : null}

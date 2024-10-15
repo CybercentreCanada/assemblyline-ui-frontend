@@ -1,11 +1,12 @@
 import { Grid, Skeleton } from '@mui/material';
+import type { Metadata } from 'components/models/ui/file';
 import CustomChip from 'components/visual/CustomChip';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type MetadataSectionProps = {
-  metadata: any;
+  metadata: Metadata;
   nocollapse?: boolean;
 };
 
@@ -17,7 +18,7 @@ const WrappedMetadataSection: React.FC<MetadataSectionProps> = ({ metadata, noco
       {metadata
         ? Object.keys(metadata).map((meta, i) => (
             <Grid container key={i}>
-              <Grid item xs={12} sm={3} lg={2}>
+              <Grid item xs={12} sm={3} lg={2} paddingTop={0.375}>
                 <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{meta}</span>
               </Grid>
               <Grid item xs={12} sm={9} lg={10}>

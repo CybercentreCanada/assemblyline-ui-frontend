@@ -1,12 +1,13 @@
 import { Grid, Skeleton } from '@mui/material';
 import useHighlighter from 'components/hooks/useHighlighter';
+import { AttackMatrix } from 'components/models/ui/file';
 import Attack from 'components/visual/Attack';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type AttackSectionProps = {
-  attacks: any;
+  attacks: AttackMatrix;
   force?: boolean;
   nocollapse?: boolean;
 };
@@ -20,7 +21,7 @@ const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attacks, force = f
       {attacks
         ? Object.keys(attacks).map((cat, i) => (
             <Grid container key={i}>
-              <Grid item xs={12} sm={3} lg={2}>
+              <Grid item xs={12} sm={3} lg={2} paddingTop={0.375}>
                 <span style={{ fontWeight: 500, textTransform: 'capitalize' }}>{cat.replace(/-/g, ' ')}</span>
               </Grid>
               <Grid item xs={12} sm={9} lg={10}>

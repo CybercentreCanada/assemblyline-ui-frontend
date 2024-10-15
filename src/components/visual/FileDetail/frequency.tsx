@@ -1,15 +1,12 @@
 import { Grid, Skeleton } from '@mui/material';
+import type { Seen } from 'components/models/base/file';
 import Moment from 'components/visual/Moment';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
-  seen: {
-    count: number;
-    first: string;
-    last: string;
-  };
+  seen: Seen;
   nocollapse?: boolean;
 };
 

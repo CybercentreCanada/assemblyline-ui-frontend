@@ -1,27 +1,32 @@
+import type { ChipProps } from '@mui/material';
+import type { RuleStatus } from 'components/models/base/signature';
+import type { PossibleColor } from 'components/models/utils/color';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import CustomChip from './CustomChip';
 
-const COLOR_MAP = {
-  DEPLOYED: 'success' as 'success',
-  NOISY: 'info' as 'info',
-  DISABLED: 'error' as 'error'
-};
+const COLOR_MAP: Record<RuleStatus, PossibleColor> = {
+  DEPLOYED: 'success',
+  NOISY: 'info',
+  DISABLED: 'error',
+  STAGING: 'default',
+  TESTING: 'default',
+  INVALID: 'default'
+} as const;
 
-type SignatureStatusProps = {
-  status: 'DEPLOYED' | 'NOISY' | 'DISABLED';
+interface Props extends Omit<ChipProps, 'size'> {
   fullWidth?: boolean;
   size?: 'tiny' | 'small' | 'medium';
-  variant?: 'outlined' | 'filled';
-  onClick?: () => void;
-};
+  status: RuleStatus;
+}
 
-const WrappedSignatureStatus: React.FC<SignatureStatusProps> = ({
+const WrappedSignatureStatus: React.FC<Props> = ({
   status,
   fullWidth = true,
   onClick = null,
   size = 'small',
-  variant = 'filled'
+  variant = 'filled',
+  ...props
 }) => {
   const { t } = useTranslation();
 
@@ -33,6 +38,7 @@ const WrappedSignatureStatus: React.FC<SignatureStatusProps> = ({
       variant={variant}
       label={t(`signature.status.${status}`)}
       onClick={onClick}
+      {...props}
     />
   );
 };

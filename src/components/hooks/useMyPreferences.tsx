@@ -127,7 +127,7 @@ const useMyPreferences = () => {
           i18nKey: 'drawer.alerts',
           userPropValidators: [{ prop: 'user.roles', value: 'alert_view' }],
           icon: <NotificationImportantOutlinedIcon />,
-          route: '/alerts',
+          route: '/alerts_redirect',
           nested: false
         }
       },

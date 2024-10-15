@@ -3,14 +3,11 @@ import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
+import type { SubmissionIndexed } from 'components/models/base/submission';
+import type { SearchResult } from 'components/models/ui/search';
+import type { SubmissionParams } from 'components/routes/submissions';
 import Classification from 'components/visual/Classification';
-import Moment from 'components/visual/Moment';
-import SubmissionState from 'components/visual/SubmissionState';
-import Verdict from 'components/visual/Verdict';
-import { maxLenStr } from 'helpers/utils';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import CustomChip from 'components/visual/CustomChip';
 import {
   DivTable,
   DivTableBody,
@@ -19,40 +16,26 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from '../DivTable';
-import InformativeAlert from '../InformativeAlert';
+} from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import Moment from 'components/visual/Moment';
+import { useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
+import SubmissionState from 'components/visual/SubmissionState';
+import Verdict from 'components/visual/Verdict';
+import { maxLenStr } from 'helpers/utils';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
-export type SubmissionResult = {
-  classification: string;
-  error_count: number;
-  file_count: number;
-  from_archive: boolean;
-  id: string;
-  max_score: number;
-  params: {
-    description: string;
-    submitter: string;
-  };
-  sid: string;
-  state: string;
-  times: {
-    submitted: string;
-  };
-};
-
-type SearchResults = {
-  items: SubmissionResult[];
-  total: number;
-};
-
-type SubmissionsTableProps = {
-  submissionResults: SearchResults;
+type Props = {
+  submissionResults: SearchResult<SubmissionIndexed>;
   allowSort?: boolean;
 };
 
-const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionResults, allowSort = true }) => {
+const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
+  const searchParams = useSearchParams<SubmissionParams>();
 
   return submissionResults ? (
     submissionResults.total !== 0 ? (
@@ -108,7 +91,27 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
                   <Verdict score={submission.max_score} fullWidth />
                 </DivTableCell>
                 <DivTableCell breakable>{maxLenStr(submission.params.description, 150)}</DivTableCell>
-                <DivTableCell style={{ whiteSpace: 'nowrap' }}>{submission.params.submitter}</DivTableCell>
+                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
+                  {!searchParams ? (
+                    submission.params.submitter
+                  ) : (
+                    <CustomChip
+                      label={submission.params.submitter}
+                      variant="outlined"
+                      size="small"
+                      type="rounded"
+                      onClick={event => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        searchParams?.setSearchObject(o => ({
+                          ...o,
+                          offset: 0,
+                          filters: [...o.filters, `params.submitter:"${submission.params.submitter}"`]
+                        }));
+                      }}
+                    />
+                  )}
+                </DivTableCell>
                 <DivTableCell>{submission.file_count}</DivTableCell>
                 {c12nDef && c12nDef.enforce && (
                   <DivTableCell>

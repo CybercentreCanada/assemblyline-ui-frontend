@@ -1,5 +1,5 @@
 {
-  "change.close": "Annuler",
+  "cancel": "Annuler",
   "change.save": "Enregistrer les modifications",
   "change.success": "L'état de la signature a été modifié avec succès",
   "change.title": "Changer le statut d'une signature",
@@ -22,6 +22,16 @@
   "last10": "Dernière 10 utilisations",
   "not_found": "La signature est introuvable dans la base de données.",
   "remove": "Supprimer la signature",
+  "restore.acceptText": "Oui, restaurez-le !",
+  "restore.success": "Le statut d'utilisateur de la signature a été restauré avec succès",
+  "restore.text": "Voulez-vous restaurer le statut de cette signature envers le système ?",
+  "restore.title": "Restaurer le statut de la signature",
+  "restore.tooltip": "Restaurer le statut de la signature",
+  "save.acceptText": "Oui, enregistrez-les !",
+  "save.success": "Les modifications de la signature ont été effectué avec succès",
+  "save.text": "Les modifications effectuées par les utilisateurs ont priorité sur les modifications apportées par le système. Êtes-vous sûr de vouloir enregistrer les modifications apportées à cette signature ?",
+  "save.title": "Enregistrer la signature",
+  "save.tooltip": "Enregistrer les modifications apportées à cette signature",
   "score.avg": "Moyen",
   "score.max": "Maximum",
   "score.min": "Minimum",
@@ -29,6 +39,7 @@
   "status.DEPLOYED": "Déployée",
   "status.DISABLED": "Désactivée",
   "status.NOISY": "Bruyante",
+  "status_modified": " a modifié le statut de cette signature le ",
   "title": "Détails de la signature",
   "usage": "Afficher l'utilisation de la signature"
 }

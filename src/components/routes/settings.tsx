@@ -35,9 +35,11 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import ExternalSources from 'components/layout/externalSources';
 import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
+import { SubmissionProfileParams } from 'components/models/base/config';
+import type { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import React, { memo, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -69,6 +71,10 @@ const useStyles = makeStyles(theme => ({
     marginLeft: -12
   }
 }));
+
+const DRAWER_TYPES = ['ttl', 'view', 'encoding', 'score', 'preferred_submission_profile'] as const;
+
+type DrawerType = (typeof DRAWER_TYPES)[number];
 
 function Skel() {
   return (
@@ -102,27 +108,33 @@ const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => 
 function Settings() {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
-  const [drawerType, setDrawerType] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [settings, setSettings] = useState(null);
-  const [modified, setModified] = useState(false);
-  const [editable, setEditable] = useState(false);
-  const [buttonLoading, setButtonLoading] = useState(false);
+  const classes = useStyles();
+  const { apiCall } = useMyAPI();
   const { user: currentUser, c12nDef, configuration } = useALContext();
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
+
+  const [settings, setSettings] = useState<UserSettings>(null);
+  const [drawerType, setDrawerType] = useState<DrawerType>(null);
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [modified, setModified] = useState<boolean>(false);
+  const [editable, setEditable] = useState<boolean>(false);
+  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
+  const [submissionProfileTab, setSubmissionProfileTab] = useState<string>(settings?.preferred_submission_profile);
+
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
-  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
-  const [submissionProfileTab, setSubmissionProfileTab] = useState(settings?.preferred_submission_profile);
-  var fileSources = [];
-  for (const v of Object.values(configuration.submission.file_sources || [])) {
-    v.sources.forEach(i => (fileSources.indexOf(i) === -1 ? fileSources.push(i) : null));
-  }
-  const { apiCall } = useMyAPI();
 
-  const classes = useStyles();
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
+
+  const fileSources = useMemo<string[]>(
+    () =>
+      Object.values(configuration?.submission?.file_sources || {})
+        .flatMap(file => file?.sources)
+        .filter((value, index, array) => value && array.indexOf(value) === index),
+    [configuration]
+  );
 
   const setParam = (service_idx, param_idx, p_value) => {
     if (settings) {
@@ -267,7 +279,7 @@ function Settings() {
     }
   }
 
-  function toggleDrawer(type) {
+  function toggleDrawer(type: DrawerType) {
     if (settings) {
       setDrawerType(type);
       setDrawerOpen(true);
@@ -279,7 +291,7 @@ function Settings() {
     setEditable(currentUser.is_admin || currentUser.roles.includes('self_manage'));
 
     // Load user on start
-    apiCall({
+    apiCall<UserSettings>({
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: api_data => {
         setSettings(api_data.api_response);
@@ -410,8 +422,10 @@ function Settings() {
                       fullWidth
                       onChange={handlePreferredSubmissionProfileChange}
                     >
-                      {Object.keys(settings.submission_profiles).map(profile => (
-                        <MenuItem value={profile}>{profile}</MenuItem>
+                      {Object.keys(settings.submission_profiles).map((profile, i) => (
+                        <MenuItem key={i} value={profile}>
+                          {profile}
+                        </MenuItem>
                       ))}
                     </Select>
                   </>
@@ -781,14 +795,14 @@ function Settings() {
               >
                 {Object.keys(settings.submission_profiles)
                   .filter(name => settings.submission_profiles[name].service_spec.length)
-                  .map(profile_name => (
-                    <Tab label={profile_name} value={profile_name} />
+                  .map((profile_name, i) => (
+                    <Tab key={i} label={profile_name} value={profile_name} />
                   ))}
               </TabList>
               {Object.entries(settings.submission_profiles)
                 .filter(([_, config]) => config.service_spec)
-                .map(([profile_name, profile_config]) => (
-                  <TabPanel value={profile_name}>
+                .map(([profile_name, profile_config]: [string, SubmissionProfileParams], i) => (
+                  <TabPanel key={i} value={profile_name}>
                     <ServiceSpec service_spec={profile_config.service_spec} setParam={setSubmissionProfileParam} />
                   </TabPanel>
                 ))}

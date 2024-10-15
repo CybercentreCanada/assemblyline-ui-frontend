@@ -9,7 +9,7 @@ import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import FileDownloader from 'components/visual/FileDownloader';
 import { ASCIISection, HexSection, ImageSection, StringsSection } from 'components/visual/FileViewer';
@@ -164,7 +164,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
             tabs={{
               ascii: {
                 label: t('ascii'),
-                content: (
+                inner: (
                   <div className={classes.tab}>
                     <ASCIISection sha256={sha256} type={type} codeAllowed={codeAllowed} />
                   </div>
@@ -172,7 +172,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
               },
               code: {
                 label: t('code'),
-                content: (
+                inner: (
                   <div className={classes.tab}>
                     <CodeSection sha256={sha256} />
                   </div>
@@ -181,7 +181,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
               },
               strings: {
                 label: t('strings'),
-                content: (
+                inner: (
                   <div className={classes.tab}>
                     <StringsSection sha256={sha256} type={type} />
                   </div>
@@ -189,7 +189,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
               },
               hex: {
                 label: t('hex'),
-                content: (
+                inner: (
                   <div className={classes.tab}>
                     <HexSection sha256={sha256} />
                   </div>
@@ -198,7 +198,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
               image: {
                 label: t('image'),
                 disabled: !imageAllowed,
-                content: (
+                inner: (
                   <div className={classes.tab}>
                     <ImageSection sha256={sha256} name={sha256} />
                   </div>

@@ -23,7 +23,7 @@ import {
 import MuiPopper from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
-import { AppUser } from 'commons/components/app/AppUserService';
+import type { AppUser } from 'commons/components/app/AppUserService';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import AppAvatar from 'commons/components/display/AppAvatar';
 import { isEnter } from 'commons/components/utils/keyboard';

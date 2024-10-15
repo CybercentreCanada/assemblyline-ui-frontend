@@ -9,7 +9,7 @@ import PageFullScreen from 'commons/components/pages/PageFullScreen';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/models/ui/user';
 import ArcGauge from 'components/visual/ArcGauge';
 import CustomChip from 'components/visual/CustomChip';
 import { bytesToSize, humanSeconds, sumValues } from 'helpers/utils';
@@ -400,9 +400,9 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
           {dispatcher.initialized ? (
             <div>
               {up.length === 0 && down.length === 0 && <span className={classes.muted}>{t('no_services')}</span>}
-              {up.length !== 0 && <span>{up.join(' | ')}</span>}
+              {up.length !== 0 && <span>{up.sort().join(' | ')}</span>}
               {up.length !== 0 && down.length !== 0 && <span> :: </span>}
-              {down.length !== 0 && <span>{down.join(' | ')}</span>}
+              {down.length !== 0 && <span>{down.sort().join(' | ')}</span>}
             </div>
           ) : (
             <div>

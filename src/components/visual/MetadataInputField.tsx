@@ -11,14 +11,14 @@ import {
 } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { MetadataConfiguration } from 'components/hooks/useMyUser';
+import type { Metadata } from 'components/models/base/config';
 import DatePicker from 'components/visual/DatePicker';
 import { matchURL } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 
 interface MetadataInputFieldProps {
   name: string;
-  configuration: MetadataConfiguration;
+  configuration: Metadata;
   value: any;
   onChange: (value: any) => void;
   onReset?: () => void;
@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const isValid = (input: string, field_cfg: MetadataConfiguration) => {
+const isValid = (input: string, field_cfg: Metadata) => {
   if (!input) {
     // No input provided or is unset at the moment
     // Validity depends on whether or not the field is required

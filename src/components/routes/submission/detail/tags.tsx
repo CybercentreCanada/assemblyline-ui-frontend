@@ -3,8 +3,10 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useSafeResults from 'components/hooks/useSafeResults';
+import type { Tags } from 'components/models/ui/file';
 import AutoHideTagList from 'components/visual/AutoHideTagList';
-import React, { useEffect } from 'react';
+import { TooltipGrid } from 'components/visual/FileDetail/tags';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -24,20 +26,22 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type TagSectionProps = {
+type Props = {
   tag_group: string;
-  tags: any;
+  tags: Tags;
   force?: boolean;
 };
 
-const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, force = false }) => {
+const WrappedTagSection: React.FC<Props> = ({ tag_group, tags, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
-  const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
-  const sp2 = theme.spacing(2);
   const { showSafeResults } = useSafeResults();
-  const [tagUnsafeMap, setTagUnsafeMap] = React.useState({});
+
+  const [tagUnsafeMap, setTagUnsafeMap] = useState<Tags>({});
+  const [open, setOpen] = useState<boolean>(true);
+
+  const sp2 = theme.spacing(2);
 
   useEffect(() => {
     if (tags) {
@@ -64,9 +68,10 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, force =
           {Object.keys(tags).map((tag_type, i) =>
             tagUnsafeMap[tag_type] || showSafeResults || force ? (
               <Grid container key={i}>
-                <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                <TooltipGrid title={tag_type}>
                   <span style={{ fontWeight: 500 }}>{tag_type}</span>
-                </Grid>
+                </TooltipGrid>
+
                 <Grid item xs={12} sm={9} lg={10}>
                   <AutoHideTagList
                     tag_type={tag_type}

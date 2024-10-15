@@ -2,8 +2,8 @@ import Editor, { loader } from '@monaco-editor/react';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import {
+  Alert,
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -25,6 +25,10 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { Signature } from 'components/models/base/signature';
+import type { Statistic } from 'components/models/base/statistic';
+import { DEFAULT_STATS } from 'components/models/base/statistic';
+import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
@@ -35,11 +39,11 @@ import SignatureStatus from 'components/visual/SignatureStatus';
 import { suricataConfig, suricataDef } from 'helpers/suricata';
 import { safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import { yaraConfig, yaraDef } from 'helpers/yara';
-import { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TbUserX } from 'react-icons/tb';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
-import ForbiddenPage from '../403';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
@@ -49,46 +53,6 @@ const LANG_SELECTOR = {
   configextractor: 'python',
   sigma: 'yaml',
   tagcheck: 'yara'
-};
-
-export type Signature = {
-  classification: string;
-  data: string;
-  id: string;
-  last_modified: string;
-  name: string;
-  order: number;
-  revision: string;
-  signature_id: string;
-  source: string;
-  state_change_data: string;
-  state_change_user: string;
-  stats: Statistics;
-  status: 'DEPLOYED' | 'NOISY' | 'DISABLED';
-  type: string;
-};
-
-export type Statistics = {
-  avg: number;
-  min: number;
-  max: number;
-  count: number;
-  sum: number;
-  last_hit: string;
-  first_hit: string;
-};
-
-type ParamProps = {
-  id?: string;
-  type?: string;
-  source?: string;
-  name?: string;
-};
-
-type SignatureDetailProps = {
-  signature_id?: string;
-  onUpdated?: () => void;
-  onDeleted?: () => void;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -111,14 +75,151 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const defaultStats = {
-  count: 0,
-  first_hit: null,
-  last_hit: null,
-  min: 0,
-  avg: 0,
-  max: 0,
-  sum: 0
+type SaveSignatureProps = {
+  signature: Signature;
+  modified: boolean;
+  handleSuccess: () => void;
+};
+
+const SaveSignature: React.FC<SaveSignatureProps> = React.memo(
+  ({ signature = null, modified = false, handleSuccess = () => null }) => {
+    const { t } = useTranslation(['manageSignatureDetail']);
+    const { id, type, source, name } = useParams<ParamProps>();
+    const theme = useTheme();
+    const { apiCall } = useMyAPI();
+    const { user: currentUser } = useALContext();
+    const { showSuccessMessage } = useMySnackbar();
+
+    const [open, setOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const handleStateSaveButtonClick = useCallback(() => {
+      apiCall({
+        url: `/api/v4/signature/change_status/${signature.id}/${signature.status}/`,
+        onSuccess: () => {
+          showSuccessMessage(t('change.success'));
+          handleSuccess();
+        },
+        onEnter: () => setLoading(true),
+        onExit: () => setLoading(false)
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [handleSuccess, signature?.id, signature?.status, t]);
+
+    if (!currentUser.roles.includes('signature_manage') || !signature || !modified) return null;
+    else
+      return (
+        <>
+          <div
+            style={{
+              paddingTop: id || (type && source && name) ? theme.spacing(1) : theme.spacing(2),
+              paddingBottom: id || (type && source && name) ? theme.spacing(1) : theme.spacing(2),
+              position: id || (type && source && name) ? 'fixed' : 'inherit',
+              bottom: id || (type && source && name) ? 0 : 'inherit',
+              left: id || (type && source && name) ? 0 : 'inherit',
+              width: id || (type && source && name) ? '100%' : 'inherit',
+              textAlign: id || (type && source && name) ? 'center' : 'right',
+              zIndex: id || (type && source && name) ? theme.zIndex.drawer - 1 : 'auto',
+              backgroundColor: id || (type && source && name) ? theme.palette.background.default : 'inherit',
+              boxShadow: id || (type && source && name) ? theme.shadows[4] : 'inherit'
+            }}
+          >
+            <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+              {t('change.save')}
+            </Button>
+          </div>
+          <ConfirmationDialog
+            open={open}
+            waiting={loading}
+            handleClose={() => setOpen(false)}
+            handleCancel={() => setOpen(false)}
+            handleAccept={handleStateSaveButtonClick}
+            title={t('save.title')}
+            cancelText={t('cancel')}
+            acceptText={t('save.acceptText')}
+            text={t('save.text')}
+          />
+        </>
+      );
+  }
+);
+
+type ResetSignatureToSourceProps = {
+  signature: Signature;
+  onSignatureChange?: (signature: Partial<Signature>) => void;
+};
+
+const ResetSignatureToSource: React.FC<ResetSignatureToSourceProps> = React.memo(
+  ({ signature = null, onSignatureChange = () => null }) => {
+    const { t } = useTranslation(['manageSignatureDetail']);
+    const theme = useTheme();
+    const { apiCall } = useMyAPI();
+    const { user: currentUser } = useALContext();
+    const { showSuccessMessage } = useMySnackbar();
+
+    const [open, setOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const handleResetSignatureToSource = useCallback(() => {
+      if (!currentUser.roles.includes('signature_manage')) return;
+      apiCall({
+        url: `/api/v4/signature/clear_status/${signature.id}/`,
+        onSuccess: () => {
+          showSuccessMessage(t('restore.success'));
+          onSignatureChange({ state_change_date: null, state_change_user: null });
+          setOpen(false);
+        },
+        onEnter: () => setLoading(true),
+        onExit: () => setLoading(false)
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentUser.roles, onSignatureChange, signature.id, t]);
+
+    if (
+      !currentUser.roles.includes('signature_manage') ||
+      !signature?.state_change_date ||
+      !signature?.state_change_user
+    )
+      return null;
+    else
+      return (
+        <>
+          <Tooltip title={t('restore.tooltip')}>
+            <IconButton
+              size="large"
+              onClick={() => setOpen(true)}
+              style={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
+            >
+              <TbUserX fontSize="smaller" />
+            </IconButton>
+          </Tooltip>
+          <ConfirmationDialog
+            open={open}
+            waiting={loading}
+            handleClose={() => setOpen(false)}
+            handleCancel={() => setOpen(false)}
+            handleAccept={handleResetSignatureToSource}
+            title={t('restore.title')}
+            cancelText={t('cancel')}
+            acceptText={t('restore.acceptText')}
+            text={t('restore.text')}
+          />
+        </>
+      );
+  }
+);
+
+type ParamProps = {
+  id?: string;
+  type?: string;
+  source?: string;
+  name?: string;
+};
+
+type SignatureDetailProps = {
+  signature_id?: string;
+  onUpdated?: () => void;
+  onDeleted?: () => void;
 };
 
 const SignatureDetail = ({
@@ -130,7 +231,7 @@ const SignatureDetail = ({
   const { id, type, source, name } = useParams<ParamProps>();
   const theme = useTheme();
   const [signature, setSignature] = useState<Signature>(null);
-  const [stats, setStats] = useState<Statistics>(defaultStats);
+  const [stats, setStats] = useState<Statistic>(DEFAULT_STATS);
   const [histogram, setHistogram] = useState<any>(null);
   const [results, setResults] = useState<any>(null);
   const [open, setOpen] = useState(false);
@@ -275,6 +376,11 @@ const SignatureDetail = ({
         showSuccessMessage(t('change.success'));
         setModified(false);
         onUpdated();
+        setSignature(s => ({
+          ...s,
+          state_change_user: currentUser.username,
+          state_change_date: new Date(Date.now()).toISOString()
+        }));
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
@@ -345,6 +451,7 @@ const SignatureDetail = ({
           </Button>
         </DialogActions>
       </Dialog>
+
       {c12nDef.enforce && (
         <div style={{ paddingBottom: theme.spacing(3) }}>
           <Classification size="tiny" c12n={signature ? signature.classification : null} />
@@ -380,6 +487,10 @@ const SignatureDetail = ({
                       </IconButton>
                     </Tooltip>
                   )}
+                  <ResetSignatureToSource
+                    signature={signature}
+                    onSignatureChange={value => setSignature(old => ({ ...old, ...value }))}
+                  />
                   {currentUser.roles.includes('signature_manage') && (
                     <Tooltip title={t('remove')}>
                       <IconButton
@@ -418,6 +529,19 @@ const SignatureDetail = ({
               </>
             )}
           </Grid>
+
+          {signature?.state_change_user && signature?.state_change_date && (
+            <Grid item xs={12} textAlign="center">
+              <Alert severity="info">
+                <Typography color="secondary" variant="body2">
+                  <b> {signature?.state_change_user}</b>
+                  {t('status_modified')}
+                  <Moment variant="localeDate">{signature?.state_change_date}</Moment>
+                </Typography>
+              </Alert>
+            </Grid>
+          )}
+
           <Grid item xs={12}>
             {signature ? (
               <div
@@ -540,27 +664,19 @@ const SignatureDetail = ({
 
         <RouterPrompt when={modified} />
 
-        {signature && modified ? (
-          <div
-            style={{
-              paddingTop: id || (type && source && name) ? theme.spacing(1) : theme.spacing(2),
-              paddingBottom: id || (type && source && name) ? theme.spacing(1) : theme.spacing(2),
-              position: id || (type && source && name) ? 'fixed' : 'inherit',
-              bottom: id || (type && source && name) ? 0 : 'inherit',
-              left: id || (type && source && name) ? 0 : 'inherit',
-              width: id || (type && source && name) ? '100%' : 'inherit',
-              textAlign: id || (type && source && name) ? 'center' : 'right',
-              zIndex: id || (type && source && name) ? theme.zIndex.drawer - 1 : 'auto',
-              backgroundColor: id || (type && source && name) ? theme.palette.background.default : 'inherit',
-              boxShadow: id || (type && source && name) ? theme.shadows[4] : 'inherit'
-            }}
-          >
-            <Button variant="contained" color="primary" disabled={buttonLoading} onClick={handleStateSaveButtonClick}>
-              {t('change.save')}
-              {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-            </Button>
-          </div>
-        ) : null}
+        <SaveSignature
+          signature={signature}
+          modified={modified}
+          handleSuccess={() => {
+            setModified(false);
+            onUpdated();
+            setSignature({
+              ...signature,
+              state_change_user: currentUser.username,
+              state_change_date: new Date(Date.now()).toISOString()
+            });
+          }}
+        />
       </div>
     </PageCenter>
   ) : (

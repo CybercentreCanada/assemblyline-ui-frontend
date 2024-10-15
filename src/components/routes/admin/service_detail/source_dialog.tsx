@@ -1,46 +1,26 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
+import type { UpdateSource } from 'components/models/base/service';
+import { DEFAULT_SOURCE } from 'components/models/base/service';
 import { SourceDetail } from 'components/routes/manage/signature_sources_details';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Source } from '../service_detail';
 
-const DEFAULT_SOURCE: Source = {
-  ca_cert: '',
-  default_classification: '',
-  headers: [],
-  name: '',
-  password: '',
-  pattern: '',
-  private_key: '',
-  proxy: '',
-  ssl_ignore_errors: false,
-  uri: '',
-  username: '',
-  git_branch: '',
-  status: {
-    last_successful_update: '',
-    message: '',
-    state: '',
-    ts: ''
-  },
-  sync: false
-};
-
-type SourceDialogProps = {
+type Props = {
   open: boolean;
+  source?: UpdateSource;
+  defaults?: UpdateSource;
   setOpen: (value: boolean) => void;
-  source?: Source;
-  defaults?: Source;
-  onSave: (newSource: Source) => void;
+  onSave: (newSource: UpdateSource) => void;
 };
 
-const WrappedSourceDialog = ({ open, setOpen, source = null, defaults, onSave }: SourceDialogProps) => {
+const WrappedSourceDialog = ({ open, setOpen, source = null, defaults, onSave }: Props) => {
   const { t } = useTranslation(['adminServices']);
-  const [modified, setModified] = useState(false);
-  const { c12nDef } = useALContext();
-  const [tempSource, setTempSource] = useState(null);
   const theme = useTheme();
+  const { c12nDef } = useALContext();
+
+  const [tempSource, setTempSource] = useState<UpdateSource>(null);
+  const [modified, setModified] = useState<boolean>(false);
 
   const handleSave = () => {
     setModified(false);

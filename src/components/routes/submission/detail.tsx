@@ -43,6 +43,15 @@ import useDrawer from 'components/hooks/useDrawer';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { ArchiverMetadata } from 'components/models/base/config';
+import type { ParsedErrors } from 'components/models/base/error';
+import type { ParsedSubmission, Submission } from 'components/models/base/submission';
+import type { Configuration } from 'components/models/ui/help';
+import type { LiveStatus, OutstandingServices, WatchQueue } from 'components/models/ui/live';
+import type { MultipleKeys } from 'components/models/ui/result';
+import type { SubmissionSummary, SubmissionTags, SubmissionTree } from 'components/models/ui/submission';
+import ForbiddenPage from 'components/routes/403';
+import HeuristicDetail from 'components/routes/manage/heuristic_detail';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
@@ -57,9 +66,8 @@ import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
+import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
-import ForbiddenPage from '../403';
-import HeuristicDetail from '../manage/heuristic_detail';
 import AISummarySection from './detail/ai_summary';
 import AttackSection from './detail/attack';
 import ErrorSection from './detail/errors';
@@ -104,48 +112,51 @@ const incrementReducer = (old: number, increment: number) => {
 
 function WrappedSubmissionDetail() {
   const { t, i18n } = useTranslation(['submissionDetail']);
-  const { id, fid } = useParams<ParamProps>();
   const theme = useTheme();
-  const [submission, setSubmission] = useState(null);
-  const [summary, setSummary] = useState(null);
-  const [tree, setTree] = useState(null);
-  const [filtered, setFiltered] = useState(false);
-  const [partial, setPartial] = useState(false);
-  const [watchQueue, setWatchQueue] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const { addInsight, removeInsight } = useAssistant();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+  const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
+  const { setHighlightMap } = useHighlighter();
+  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
+  const { id, fid } = useParams<ParamProps>();
+
+  const [submission, setSubmission] = useState<ParsedSubmission>(null);
+  const [summary, setSummary] = useState<SubmissionSummary>(null);
+  const [tree, setTree] = useState<SubmissionTree['tree']>(null);
+  const [filtered, setFiltered] = useState<boolean>(false);
+  const [partial, setPartial] = useState<boolean>(false);
+  const [watchQueue, setWatchQueue] = useState<string>(null);
+  const [configuration, setConfiguration] = useState<Configuration>(null);
+  const [liveErrors, setLiveErrors] = useState<ParsedErrors>(null);
+  const [liveTagMap, setLiveTagMap] = useState<SubmissionTags>(null);
+  const [outstanding, setOutstanding] = useState<OutstandingServices>(null);
+  const [liveStatus, setLiveStatus] = useState<LiveStatus>('queued');
+  const [socket, setSocket] = useState<Socket>(null);
+  const [loadInterval, setLoadInterval] = useState<any>(null);
+  const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState<number>(0);
+  const [archiveDialog, setArchiveDialog] = useState<boolean>(false);
+  const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
+  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
+  const [resubmitAnchor, setResubmitAnchor] = useState<Element>(null);
+  const [baseFiles, setBaseFiles] = useState<string[]>([]);
+  const [archivingMetadata, setArchivingMetadata] = useState<Record<string, ArchiverMetadata>>({});
+  const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState<string>('false');
+
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
   const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
   const [liveResults, setLiveResults] = useReducer(resultReducer, null);
-  const [configuration, setConfiguration] = useState(null);
-  const [liveErrors, setLiveErrors] = useState(null);
-  const [liveTagMap, setLiveTagMap] = useState(null);
-  const [outstanding, setOutstanding] = useState(null);
   const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
-  const [liveStatus, setLiveStatus] = useState<'queued' | 'processing' | 'rescheduled'>('queued');
-  const [socket, setSocket] = useState(null);
-  const [loadInterval, setLoadInterval] = useState(null);
-  const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState(0);
-  const [deleteDialog, setDeleteDialog] = useState(false);
-  const [archiveDialog, setArchiveDialog] = useState(false);
-  const [waitingDialog, setWaitingDialog] = useState(false);
-  const [resubmitAnchor, setResubmitAnchor] = useState(null);
-  const { apiCall } = useMyAPI();
-  const { addInsight, removeInsight } = useAssistant();
+
   const sp4 = theme.spacing(4);
-  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
-  const { setHighlightMap } = useHighlighter();
-  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
-  const [baseFiles, setBaseFiles] = useState([]);
-  const [archivingMetadata, setArchivingMetadata] = useState({});
-  const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState('false');
 
   const popoverOpen = Boolean(resubmitAnchor);
 
   const updateLiveSumary = (results: object) => {
-    const tempSummary = summary !== null ? { ...summary } : { tags: {}, heuristics: {}, attack_matrix: {} };
+    const tempSummary: any = summary !== null ? { ...summary } : { tags: {}, heuristics: {}, attack_matrix: {} };
     const tempTagMap = liveTagMap !== null ? { ...liveTagMap } : {};
 
     Object.entries(results).forEach(([resultKey, result]) => {
@@ -286,8 +297,8 @@ function WrappedSubmissionDetail() {
         }
       }
     });
-    setLiveTagMap(tempTagMap);
-    setHighlightMap(tempTagMap);
+    setLiveTagMap(tempTagMap as any);
+    setHighlightMap(tempTagMap as any);
     setSummary(tempSummary);
   };
 
@@ -380,7 +391,7 @@ function WrappedSubmissionDetail() {
     setTree(tempTree);
   };
 
-  const getParsedErrors = errorList => {
+  const getParsedErrors = useCallback((errorList: string[]): ParsedErrors => {
     const aggregated = errors => {
       const out = {
         depth: [],
@@ -445,14 +456,18 @@ function WrappedSubmissionDetail() {
 
     return {
       aggregated: aggregated(errorList),
-      listed: errorList
+      listed: errorList,
+      services: []
     };
-  };
+  }, []);
 
-  const parseSubmissionErrors = currentSubmission => ({
-    ...currentSubmission,
-    parsed_errors: getParsedErrors(currentSubmission.errors)
-  });
+  const parseSubmissionErrors = useCallback(
+    (current: Submission): ParsedSubmission => ({
+      ...current,
+      parsed_errors: getParsedErrors(current.errors)
+    }),
+    [getParsedErrors]
+  );
 
   const resetLiveMode = useCallback(() => {
     if (socket) {
@@ -476,7 +491,7 @@ function WrappedSubmissionDetail() {
 
   const archive = useCallback(() => {
     if (submission != null) {
-      apiCall({
+      apiCall<{ success: boolean; action: 'archive' | 'resubmit'; sid: string }>({
         method: 'PUT',
         url: `/api/v4/archive/${submission.sid}/${archivingUseAlternateDtl === 'true' ? '?use_alternate_dtl' : ''}`,
         body: archivingMetadata,
@@ -504,7 +519,7 @@ function WrappedSubmissionDetail() {
 
   const resubmit = useCallback(() => {
     if (submission != null) {
-      apiCall({
+      apiCall<Submission>({
         url: `/api/v4/submit/resubmit/${submission.sid}/`,
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
@@ -524,7 +539,7 @@ function WrappedSubmissionDetail() {
 
   const resubmitDynamic = useCallback(() => {
     if (submission != null) {
-      apiCall({
+      apiCall<Submission>({
         url: `/api/v4/submit/dynamic/${submission.files[0].sha256}/?copy_sid=${submission.sid}`,
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
@@ -577,7 +592,7 @@ function WrappedSubmissionDetail() {
   const setVerdict = useCallback(
     verdict => {
       if (submission != null && submission.verdict[verdict].indexOf(currentUser.username) === -1) {
-        apiCall({
+        apiCall<{ success: boolean }>({
           method: 'PUT',
           url: `/api/v4/submission/verdict/${submission.sid}/${verdict}/`,
           onSuccess: api_data => {
@@ -630,19 +645,42 @@ function WrappedSubmissionDetail() {
 
   useEffect(() => {
     if (currentUser.roles.includes('submission_view')) {
-      apiCall({
+      apiCall<Configuration>({
         url: '/api/v4/help/configuration/',
         onSuccess: api_data => {
           setConfiguration(api_data.api_response);
         }
       });
-      apiCall({
+      apiCall<Submission>({
         url: `/api/v4/submission/${id}/`,
         onSuccess: api_data => {
           setSubmission(parseSubmissionErrors(api_data.api_response));
         }
       });
     }
+    return () => {
+      setSubmission(null);
+      setSummary(null);
+      setTree(null);
+      setFiltered(false);
+      setPartial(false);
+      setWatchQueue(null);
+      setConfiguration(null);
+      setLiveErrors(null);
+      setLiveTagMap(null);
+      setOutstanding(null);
+      setLiveStatus('queued');
+      setSocket(null);
+      setLoadInterval(null);
+      setLastSuccessfulTrigger(0);
+      setDeleteDialog(false);
+      setArchiveDialog(false);
+      setWaitingDialog(false);
+      setResubmitAnchor(null);
+      setBaseFiles([]);
+      setArchivingMetadata({});
+      setArchivingUseAlternateDtl('false');
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -651,7 +689,7 @@ function WrappedSubmissionDetail() {
       if (submission.state === 'completed') {
         if (socket) setNotifyFavicon();
         resetLiveMode();
-        apiCall({
+        apiCall<SubmissionSummary>({
           url: `/api/v4/submission/summary/${id}/`,
           onSuccess: summ_data => {
             setHighlightMap(summ_data.api_response.map);
@@ -664,7 +702,7 @@ function WrappedSubmissionDetail() {
             }
           }
         });
-        apiCall({
+        apiCall<SubmissionTree>({
           url: `/api/v4/submission/tree/${id}/`,
           onSuccess: tree_data => {
             setTree(tree_data.api_response.tree);
@@ -704,10 +742,10 @@ function WrappedSubmissionDetail() {
 
   useEffect(() => {
     if (liveStatus === 'processing') {
-      apiCall({
+      apiCall<WatchQueue>({
         url: `/api/v4/live/setup_watch_queue/${id}/`,
-        onSuccess: summ_data => {
-          setWatchQueue(summ_data.api_response.wq_id);
+        onSuccess: api_data => {
+          setWatchQueue(api_data.api_response.wq_id);
         },
         onFailure: () => {
           setLiveStatus('queued');
@@ -721,7 +759,7 @@ function WrappedSubmissionDetail() {
     data => {
       // eslint-disable-next-line no-console
       console.debug(`SocketIO :: onError => ${data.msg}`);
-      apiCall({
+      apiCall<{ wq_id: string }>({
         url: `/api/v4/live/setup_watch_queue/${id}/`,
         onSuccess: summ_data => {
           setWatchQueue(summ_data.api_response.wq_id);
@@ -751,7 +789,7 @@ function WrappedSubmissionDetail() {
         setLoadInterval(null);
         setOutstanding(null);
         // Loading final submission
-        apiCall({
+        apiCall<Submission>({
           url: `/api/v4/submission/${id}/`,
           onSuccess: api_data => {
             setSubmission(parseSubmissionErrors(api_data.api_response));
@@ -860,6 +898,10 @@ function WrappedSubmissionDetail() {
   }, [fid, location.hash, setGlobalDrawer]);
 
   useEffect(() => {
+    if (!fid && !location.hash) setGlobalDrawer(null);
+  }, [fid, location.hash, setGlobalDrawer]);
+
+  useEffect(() => {
     if (!fid && !globalDrawerOpened && location.hash) {
       navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
@@ -878,7 +920,7 @@ function WrappedSubmissionDetail() {
       console.debug(`LIVE :: New Results: ${newResults.join(' | ')} - New Errors: ${newErrors.join(' | ')}`);
       setLiveErrors(getParsedErrors(liveErrorKeys));
 
-      apiCall({
+      apiCall<MultipleKeys>({
         method: 'POST',
         url: '/api/v4/result/multiple_keys/',
         body: { error: newErrors, result: newResults },
@@ -897,15 +939,15 @@ function WrappedSubmissionDetail() {
       // eslint-disable-next-line no-console
       console.debug('LIVE :: Finding out oustanding services...');
 
-      apiCall({
+      apiCall<OutstandingServices>({
         url: `/api/v4/live/outstanding_services/${id}/`,
         onSuccess: api_data => {
-          let newLiveStatus: 'processing' | 'rescheduled' | 'queued' = 'processing' as 'processing';
+          let newLiveStatus: 'processing' | 'rescheduled' | 'queued' = 'processing' as const;
           // Set live status based on outstanding services output
           if (api_data.api_response === null) {
-            newLiveStatus = 'rescheduled' as 'rescheduled';
+            newLiveStatus = 'rescheduled' as const;
           } else if (Object.keys(api_data.api_response).length === 0) {
-            newLiveStatus = 'queued' as 'queued';
+            newLiveStatus = 'queued' as const;
           }
 
           setOutstanding(api_data.api_response);
@@ -915,7 +957,7 @@ function WrappedSubmissionDetail() {
           if (liveStatus !== 'processing' && newLiveStatus !== 'processing') {
             // eslint-disable-next-line no-console
             console.debug('LIVE :: Checking if the submission is completed...');
-            apiCall({
+            apiCall<Submission>({
               url: `/api/v4/submission/${id}/`,
               onSuccess: submission_api_data => {
                 if (submission_api_data.api_response.state === 'completed') {
@@ -1009,7 +1051,7 @@ function WrappedSubmissionDetail() {
                       configuration={field_cfg}
                       value={archivingMetadata[field_name]}
                       onChange={v => {
-                        var cleanMetadata = archivingMetadata;
+                        let cleanMetadata = archivingMetadata;
                         if (v === undefined || v === null || v === '') {
                           // Remove field from metadata if value is null
                           delete cleanMetadata[field_name];
@@ -1020,7 +1062,7 @@ function WrappedSubmissionDetail() {
                         setArchivingMetadata({ ...cleanMetadata });
                       }}
                       onReset={() => {
-                        var cleanMetadata = archivingMetadata;
+                        let cleanMetadata = archivingMetadata;
                         delete cleanMetadata[field_name];
                         setArchivingMetadata({ ...cleanMetadata });
                       }}
@@ -1248,7 +1290,7 @@ function WrappedSubmissionDetail() {
                       )}
                       {systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger') && (
                         <Tooltip title={t('replay')}>
-                          <IconButton onClick={replay} disabled={submission.metadata.replay} size="large">
+                          <IconButton onClick={replay} disabled={!!submission.metadata.replay} size="large">
                             <PublishOutlinedIcon />
                           </IconButton>
                         </Tooltip>
@@ -1397,7 +1439,7 @@ function WrappedSubmissionDetail() {
           classification={submission ? submission.classification : null}
         />
         {systemConfig.ui.ai.enabled && settings.executive_summary && submission && submission.state === 'completed' && (
-          <AISummarySection type={'submission' as 'submission'} id={submission.sid} />
+          <AISummarySection type={'submission' as const} id={submission.sid} />
         )}
         <Detection
           section_map={summary ? summary.heuristic_sections : null}

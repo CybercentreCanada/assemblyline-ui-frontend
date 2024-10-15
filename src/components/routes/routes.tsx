@@ -1,6 +1,9 @@
+import type { SnackbarEvents } from 'borealis-ui/dist/data/event';
+import { SNACKBAR_EVENT_ID } from 'borealis-ui/dist/data/event';
 import RedirectSubmission from 'commons/components/utils/RedirectSubmission';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import { resetFavicon } from 'helpers/utils';
 import { lazy, memo, Suspense, useEffect, useState } from 'react';
 import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router';
@@ -21,8 +24,9 @@ const ServiceReview = lazy(() => import('components/routes/admin/service_review'
 const AdminSiteMap = lazy(() => import('components/routes/admin/site_map'));
 const AdminTagSafelist = lazy(() => import('components/routes/admin/tag_safelist'));
 const AdminUsers = lazy(() => import('components/routes/admin/users'));
-const AlertDetails = lazy(() => import('components/routes/alerts/alert-details'));
-const Alerts = lazy(() => import('components/routes/alerts/alerts'));
+const AlertDetails = lazy(() => import('components/routes/alerts/detail'));
+const Alerts = lazy(() => import('components/routes/alerts'));
+const AlertsRedirect = lazy(() => import('components/routes/alerts/redirect'));
 const AppRegistration = lazy(() => import('components/routes/authorize'));
 const ArchiveDetail = lazy(() => import('components/routes/archive/detail'));
 const CrashTest = lazy(() => import('components/routes/crash'));
@@ -47,8 +51,9 @@ const BadlistDetail = lazy(() => import('components/routes/manage/badlist_detail
 const ManageSignatures = lazy(() => import('components/routes/manage/signatures'));
 const SignatureDetail = lazy(() => import('components/routes/manage/signature_detail'));
 const ManageSignatureSources = lazy(() => import('components/routes/manage/signature_sources'));
-const ManageWorkflows = lazy(() => import('components/routes/manage/workflows'));
-const WorkflowDetail = lazy(() => import('components/routes/manage/workflow_detail'));
+const ManageWorkflows = lazy(() => import('components/routes/manage/workflows/index'));
+const WorkflowCreate = lazy(() => import('components/routes/manage/workflows/create'));
+const WorkflowDetail = lazy(() => import('components/routes/manage/workflows/detail'));
 const RetroHunt = lazy(() => import('components/routes/retrohunt'));
 const RetroHuntDetail = lazy(() => import('components/routes/retrohunt/detail'));
 const Search = lazy(() => import('components/routes/search'));
@@ -89,6 +94,29 @@ function RouteActions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
+  const { showSuccessMessage, showErrorMessage, showInfoMessage, showWarningMessage } = useMySnackbar();
+
+  useEffect(() => {
+    const handleMessage = (event: CustomEvent<SnackbarEvents>) => {
+      const { detail } = event;
+      if (detail.level === 'success') {
+        showSuccessMessage(detail.message);
+      } else if (detail.level === 'error') {
+        showErrorMessage(detail.message);
+      } else if (detail.level === 'info') {
+        showInfoMessage(detail.message);
+      } else if (detail.level === 'warning') {
+        showWarningMessage(detail.message);
+      }
+    };
+
+    window.addEventListener(SNACKBAR_EVENT_ID, handleMessage);
+
+    return () => {
+      window.removeEventListener(SNACKBAR_EVENT_ID, handleMessage);
+    };
+  }, [showErrorMessage, showInfoMessage, showSuccessMessage, showWarningMessage]);
+
   return null;
 }
 
@@ -102,6 +130,7 @@ const WrappedRoutes = () => {
         <Route path="/" element={<Submit />} />
         <Route path="/account" element={<Account />} />
         <Route path="/alerts" element={<Alerts />} />
+        <Route path="/alerts_redirect" element={<AlertsRedirect />} />
         <Route path="/alerts/:id" element={<AlertDetails />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/actions" element={<AdminActions />} />
@@ -137,7 +166,8 @@ const WrappedRoutes = () => {
         <Route path="/manage/signature/:id" element={<SignatureDetail />} />
         <Route path="/manage/signature/:type/:source/:name" element={<SignatureDetail />} />
         <Route path="/manage/sources" element={<ManageSignatureSources />} />
-        <Route path="/manage/workflow/:id" element={<WorkflowDetail />} />
+        <Route path="/manage/workflow/create/:id" element={<WorkflowCreate />} />
+        <Route path="/manage/workflow/detail/:id" element={<WorkflowDetail />} />
         <Route path="/manage/workflows" element={<ManageWorkflows />} />
         <Route path="/manage/safelist/:id" element={<SafelistDetail />} />
         <Route path="/manage/safelist" element={<ManageSafelist />} />

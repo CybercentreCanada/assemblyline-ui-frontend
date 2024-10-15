@@ -5,7 +5,10 @@ import Skeleton from '@mui/material/Skeleton';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import Service from 'components/layout/service';
-import React, { useEffect, useState } from 'react';
+import type { SubmissionProfile } from 'components/models/base/config';
+import type { SelectedService } from 'components/models/base/service';
+import type { UserSettings } from 'components/models/base/user_settings';
+import React, { useEffect, useMemo, useState } from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
 const useStyles = makeStyles(theme =>
@@ -33,20 +36,20 @@ function ServiceTreeItemSkel({ size = 'medium' }: ServiceTreeItemSkelProps) {
 }
 
 type ServiceTreeItemProps = {
-  item: any;
+  item: SelectedService;
   onChange: (name: string, category: string) => void;
   disabled?: boolean;
   size: 'medium' | 'small';
   service_spec;
   setParam;
-  submissionProfile: any;
+  submissionProfile: SubmissionProfile;
 };
 
 function ServiceTreeItem({
   item,
   onChange,
   disabled = false,
-  size = 'medium' as 'medium',
+  size = 'medium' as const,
   service_spec,
   setParam,
   submissionProfile = null
@@ -56,7 +59,11 @@ function ServiceTreeItem({
   const sp1 = theme.spacing(1);
   const sp3 = theme.spacing(3);
   const [open, setOpen] = useState(false);
-  const params_editable = submissionProfile ? submissionProfile.editable_params[item.name] : true;
+
+  const paramsEditable = useMemo<boolean>(
+    () => (submissionProfile ? !!submissionProfile.editable_params[item.name] : true),
+    [item.name, submissionProfile]
+  );
 
   function hasParams(name) {
     for (const svc of service_spec) {
@@ -103,7 +110,7 @@ function ServiceTreeItem({
           control={
             <Checkbox
               size={size}
-              disabled={disabled || submissionProfile}
+              disabled={disabled || !!submissionProfile}
               indeterminate={
                 item.services ? !item.services.every(e => e.selected) && !item.services.every(e => !e.selected) : false
               }
@@ -122,7 +129,7 @@ function ServiceTreeItem({
               {item.is_external && (
                 <HiOutlineExternalLink style={{ fontSize: 'large', marginLeft: theme.spacing(2) }} />
               )}
-              {setParam && hasParams(item.name) && item.selected && params_editable && (
+              {setParam && hasParams(item.name) && item.selected && paramsEditable && (
                 <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
                   <IconButton
                     onClick={e => {
@@ -232,8 +239,8 @@ function SkelItems({ size, spacing }: SkelItemsProps) {
 }
 
 type ServiceTreeProps = {
-  settings: any;
-  setSettings: (settings: any) => void;
+  settings: UserSettings;
+  setSettings: (settings: UserSettings) => void;
   setModified?: (isModified: boolean) => void;
   compressed?: boolean;
   disabled?: boolean;
@@ -248,7 +255,7 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
   setModified = null,
   compressed = false,
   disabled = false,
-  size = 'medium' as 'medium',
+  size = 'medium' as const,
   setParam,
   submissionProfile = null
 }) => {
