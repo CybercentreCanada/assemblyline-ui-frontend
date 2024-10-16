@@ -4,7 +4,7 @@ import type { ACL, Role, Type } from './user';
 export const API_PRIV = ['READ', 'READ_WRITE', 'WRITE', 'CUSTOM', 'EXTENDED'] as const;
 export const AUTO_PROPERTY_TYPES = ['access', 'classification', 'type', 'role', 'remove_role', 'group'];
 export const BANNER_LEVELS = ['info', 'warning', 'success', 'error'] as const;
-export const DOWNLOAD_ENCODINGS = ['raw', 'cart'] as const;
+export const DOWNLOAD_ENCODINGS = ['raw', 'cart', 'zip'] as const;
 export const EXTERNAL_LINK_TYPES = ['hash', 'metadata', 'tag'] as const;
 export const HASH_PATTERN_MAP = ['sha256', 'sha1', 'md5', 'tlsh', 'ssdeep', 'url'] as const;
 export const KUBERNETES_LABEL_OPS = ['In', 'NotIn', 'Exists', 'DoesNotExist'] as const;
@@ -315,6 +315,10 @@ export type UI = {
   /** Feed of all the services built by the Assemblyline community. */
   community_feed: string;
 
+
+  /** Default user-defined password for creating password protected ZIPs when downloading files */
+  default_zip_password: string;
+
   /** Which encoding will be used for downloads? */
   download_encoding: DownloadEncoding;
 
@@ -356,6 +360,7 @@ export type UI = {
 
   /** List of services auto-selected by the UI when submitting URLs */
   url_submission_auto_service_selection: string[];
+
 };
 
 /** A file source entry for remote fetching via string */
@@ -617,6 +622,7 @@ export const CONFIGURATION: Configuration = {
     banner_level: 'info',
     community_feed: '',
     download_encoding: 'raw',
+    default_zip_password: 'zippy',
     enforce_quota: false,
     external_links: {
       hash: {},
