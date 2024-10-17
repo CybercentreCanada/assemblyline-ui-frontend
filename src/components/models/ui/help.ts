@@ -24,6 +24,7 @@ export type Configuration = {
   'ui.allow_raw_downloads': UI['allow_raw_downloads'];
   'ui.allow_zip_downloads': UI['allow_zip_downloads'];
   'ui.audit': UI['audit'];
+  'ui.default_zip_password': UI['default_zip_password'];
   'ui.download_encoding': UI['download_encoding'];
   'ui.enforce_quota': UI['enforce_quota'];
   'ui.ingest_max_priority': UI['ingest_max_priority'];
