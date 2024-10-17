@@ -1,16 +1,8 @@
-import {
-  getValueFromPath,
-  setValueFromPath,
-  type NestedTypeUsingTuplesAgain2,
-  type ValidPathTuples
-} from 'components/routes/submit2/utils/JSONPath';
 import React, { createContext, useCallback, useContext, useRef, useSyncExternalStore } from 'react';
 
 type UseStoreDataReturn<Store extends object> = {
   get: () => Store;
-  set: <Path extends ValidPathTuples<Store>, Value extends NestedTypeUsingTuplesAgain2<Store, Path>>(
-    path: Path
-  ) => (input: Value | ((prev: Value) => Value)) => void;
+  set: (input: Store | ((prev: Store) => Store)) => void;
   subscribe: (callback: () => void) => () => void;
 };
 
@@ -26,23 +18,10 @@ export const createStoreContext = <Store extends object>(initialState: Store) =>
 
     const subscribers = useRef(new Set<() => void>());
 
-    const is = useCallback(
-      <Path extends ValidPathTuples<Store>, Value extends NestedTypeUsingTuplesAgain2<Store, Path>>(
-        input: Value | ((prev: Value) => Value)
-      ): input is (prev: Value) => Value => typeof input === 'function',
-      []
-    );
-
-    const set = useCallback(
-      <Path extends ValidPathTuples<Store>, Value extends NestedTypeUsingTuplesAgain2<Store, Path>>(path: Path) =>
-        (input: Value | ((prev: Value) => Value)) => {
-          const prev = getValueFromPath(store.current, path) as Value;
-          const next = is(input) ? input(prev) : input;
-          store.current = setValueFromPath(store.current, path, next);
-          subscribers.current.forEach(callback => callback());
-        },
-      []
-    );
+    const set = useCallback((input: Store | ((prev: Store) => Store)) => {
+      store.current = typeof input === 'function' ? input(store.current) : input;
+      subscribers.current.forEach(callback => callback());
+    }, []);
 
     const subscribe = useCallback((callback: () => void) => {
       subscribers.current.add(callback);
@@ -62,9 +41,9 @@ export const createStoreContext = <Store extends object>(initialState: Store) =>
     <StoreContext.Provider value={useStoreData()}>{children}</StoreContext.Provider>
   );
 
-  const useStore = <Path extends ValidPathTuples<Store>, Value extends NestedTypeUsingTuplesAgain2<Store, Path>>(
-    path: Path
-  ): [Value, (input: Value | ((prev: Value) => Value)) => void] => {
+  const useStore = <SelectorOutput extends unknown>(
+    selector: (store: Store) => SelectorOutput
+  ): [SelectorOutput, (input: Store | ((prev: Store) => Store)) => void] => {
     const store = useContext(StoreContext);
     if (!store) {
       throw new Error('Store not found');
@@ -72,11 +51,11 @@ export const createStoreContext = <Store extends object>(initialState: Store) =>
 
     const state = useSyncExternalStore(
       store.subscribe,
-      () => getValueFromPath(store.get(), path),
-      () => getValueFromPath(initialState, path)
+      () => selector(store.get()),
+      () => selector(initialState)
     );
 
-    return [state, store.set(path)] as [Value, (input: Value | ((prev: Value) => Value)) => void];
+    return [state, store.set];
   };
 
   return { Provider, useStore };
