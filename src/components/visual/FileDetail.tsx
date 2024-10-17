@@ -325,6 +325,13 @@ const WrappedFileDetail: React.FC<Props> = ({
         inputLabel={t('safelist.input')}
         text={t('safelist.text')}
         waiting={waitingDialog}
+        extra={
+          <Classification
+            size="tiny"
+            type="outlined"
+            c12n={file?.file_info?.classification ? file.file_info.classification : null}
+          />
+        }
       />
       <InputDialog
         open={badlistDialog}
@@ -338,6 +345,13 @@ const WrappedFileDetail: React.FC<Props> = ({
         inputLabel={t('badlist.input')}
         text={t('badlist.text')}
         waiting={waitingDialog}
+        extra={
+          <Classification
+            size="tiny"
+            type="outlined"
+            c12n={file?.file_info?.classification ? file.file_info.classification : null}
+          />
+        }
       />
       {c12nDef.enforce && (
         <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
