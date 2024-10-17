@@ -36,6 +36,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
+import Classification from '../Classification';
 import FileDownloader from '../FileDownloader';
 import InputDialog from '../InputDialog';
 
@@ -423,6 +424,13 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
         inputLabel={t('safelist.input')}
         text={t('safelist.text')}
         waiting={waitingDialog}
+        extra={
+          <Classification
+            size="tiny"
+            type="outlined"
+            c12n={file?.file_info?.classification ? file.file_info.classification : null}
+          />
+        }
       />
       <InputDialog
         open={badlistDialog}
@@ -436,6 +444,13 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
         inputLabel={t('badlist.input')}
         text={t('badlist.text')}
         waiting={waitingDialog}
+        extra={
+          <Classification
+            size="tiny"
+            type="outlined"
+            c12n={file?.file_info?.classification ? file.file_info.classification : null}
+          />
+        }
       />
       {file ? (
         <Icon variant={currentVerdict} />
