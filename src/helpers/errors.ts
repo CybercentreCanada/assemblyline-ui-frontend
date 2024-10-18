@@ -30,7 +30,7 @@ export const getErrorTypeFromKey = key => {
   return 'unknown';
 };
 
-export const getServiceFromKey = key => {
+export const getServiceFromKey = (key: string): string => {
   let srv = key.substr(65, key.length);
 
   if (srv.indexOf('.') !== -1) {
@@ -40,7 +40,7 @@ export const getServiceFromKey = key => {
   return srv;
 };
 
-export const getErrorIDFromKey = key => {
+export const getErrorIDFromKey = (key: string): string => {
   let eID = key.substr(65, key.length);
 
   if (eID.indexOf('.e') !== -1) {
@@ -50,4 +50,4 @@ export const getErrorIDFromKey = key => {
   return eID;
 };
 
-export const getHashFromKey = key => key.substr(0, 64);
+export const getHashFromKey = (key: string): string => key.substr(0, 64);
