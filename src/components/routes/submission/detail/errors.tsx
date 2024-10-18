@@ -48,7 +48,7 @@ interface ExpandMoreProps extends SvgIconProps {
   expand: boolean;
 }
 
-const ExpandMore = styled(({ ...other }: ExpandMoreProps) => {
+const ExpandMore = styled(({ expand, ...other }: ExpandMoreProps) => {
   return <KeyboardArrowDownIcon {...other} />;
 })(({ theme }) => ({
   marginLeft: 'auto',
@@ -138,7 +138,7 @@ const Errors = ({ sid = null, service = null, errors = [], initialOpen = false }
   const theme = useTheme();
 
   const [open, setOpen] = useState<boolean>(initialOpen || errors.length <= 1);
-  const [render, setRender] = useState<boolean>(false);
+  const [render, setRender] = useState<boolean>(open);
   const [maxErrors, setMaxErrors] = useState<number>(MAX_ERROR_COUNT);
 
   if (errors.length <= 1)
@@ -290,7 +290,7 @@ type Props = {
   errors: Submission['errors'];
 };
 
-const WrappedErrorSection3: React.FC<Props> = ({ sid, errors }) => {
+const WrappedErrorSection: React.FC<Props> = ({ sid, errors }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const classes = useStyles();
@@ -320,6 +320,6 @@ const WrappedErrorSection3: React.FC<Props> = ({ sid, errors }) => {
     </div>
   );
 };
-const ErrorSection3 = React.memo(WrappedErrorSection3);
+const ErrorSection = React.memo(WrappedErrorSection);
 
-export default ErrorSection3;
+export default ErrorSection;
