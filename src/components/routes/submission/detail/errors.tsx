@@ -28,6 +28,15 @@ const useStyles = makeStyles(theme => ({
   },
   startIcon: {
     marginRight: theme.spacing(1)
+  },
+  content: {
+    '& *': {
+      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+    },
+    '& *:not(strong, a, svg, path)': {
+      fontSize: '14px',
+      fontWeight: 400
+    }
   }
 }));
 
@@ -130,15 +139,14 @@ type ErrorsProps = {
   sid: string;
   service: string;
   errors: string[];
-  initialOpen?: boolean;
 };
 
-const Errors = ({ sid = null, service = null, errors = [], initialOpen = false }: ErrorsProps) => {
+const Errors = ({ sid = null, service = null, errors = [] }: ErrorsProps) => {
   const { t, i18n } = useTranslation(['submissionDetail']);
   const theme = useTheme();
 
-  const [open, setOpen] = useState<boolean>(initialOpen || errors.length <= 1);
-  const [render, setRender] = useState<boolean>(open);
+  const [open, setOpen] = useState<boolean>(false);
+  const [render, setRender] = useState<boolean>(false);
   const [maxErrors, setMaxErrors] = useState<number>(MAX_ERROR_COUNT);
 
   if (errors.length <= 1)
@@ -151,11 +159,10 @@ const Errors = ({ sid = null, service = null, errors = [], initialOpen = false }
           disableRipple
           disableTouchRipple
           hideIcon
-          size="small"
           style={{
             cursor: 'auto',
-            backgroundColor: 'transparent',
-            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+            userSelect: 'text',
+            backgroundColor: 'transparent'
           }}
         >
           <span>{getServiceFromKey(errors[0])}</span>
@@ -178,14 +185,7 @@ const Errors = ({ sid = null, service = null, errors = [], initialOpen = false }
   else
     return (
       <div style={{ marginLeft: theme.spacing(0) }}>
-        <ExpandButton
-          expand={open}
-          size="small"
-          style={{
-            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-          }}
-          onClick={() => setOpen(o => !o)}
-        >
+        <ExpandButton expand={open} size="small" onClick={() => setOpen(o => !o)}>
           <div>
             <span>{service}</span>
             <span>{' :: '}</span>
@@ -196,17 +196,19 @@ const Errors = ({ sid = null, service = null, errors = [], initialOpen = false }
 
         <Collapse in={open} timeout="auto" onEnter={() => setRender(true)}>
           {render && (
-            <ul style={{ marginTop: 0, marginBottom: theme.spacing(1), marginLeft: theme.spacing(0.5) }}>
+            <ul
+              style={{
+                marginTop: 0,
+                listStyleType: 'none',
+                marginBottom: theme.spacing(1),
+                marginLeft: theme.spacing(0.5)
+              }}
+            >
               {errors
                 .filter((e, i) => i <= maxErrors)
                 .map((error, i) => (
-                  <li
-                    key={i}
-                    style={{
-                      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                    }}
-                  >
-                    <span>{getServiceFromKey(error)}</span>
+                  <li key={i}>
+                    <span style={{ fontSize: 'smaller' }}>{getServiceFromKey(error)}</span>
                     &nbsp;::&nbsp;
                     <strong>
                       <MaterialLink
@@ -230,11 +232,7 @@ const Errors = ({ sid = null, service = null, errors = [], initialOpen = false }
                     style={{ padding: 0 }}
                     onClick={() => setMaxErrors(v => v + MAX_ERROR_COUNT)}
                   >
-                    <MoreHorizIcon
-                      style={{
-                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                      }}
-                    />
+                    <MoreHorizIcon />
                   </IconButton>
                 </Tooltip>
               )}
@@ -259,14 +257,7 @@ const ErrorTypes = ({ sid = null, type = null, services = {} }: ErrorTypesProps)
 
   return (
     <div style={{ marginLeft: theme.spacing(0), ...(open && { marginBottom: theme.spacing(1) }) }}>
-      <ExpandButton
-        expand={open}
-        size="small"
-        style={{
-          color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-        }}
-        onClick={() => setOpen(o => !o)}
-      >
+      <ExpandButton expand={open} onClick={() => setOpen(o => !o)}>
         {`${t('errors.aggregated').replace('{errorType}', t(`errors.type.${type}`))}: ${
           open ? '' : Object.keys(services).sort().join(' | ')
         }`}
@@ -277,7 +268,7 @@ const ErrorTypes = ({ sid = null, type = null, services = {} }: ErrorTypesProps)
           {Object.entries(services)
             .sort()
             .map(([service, errors], i) => (
-              <Errors key={i} sid={sid} service={service} errors={errors} initialOpen={open} />
+              <Errors key={i} sid={sid} service={service} errors={errors} />
             ))}
         </div>
       </Collapse>
@@ -301,18 +292,12 @@ const WrappedErrorSection: React.FC<Props> = ({ sid, errors }) => {
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-        <Typography
-          className={classes.title}
-          variant="h6"
-          style={{
-            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-          }}
-        >
+        <Typography className={classes.title} variant="h6">
           <span>{t('errors')}</span>
         </Typography>
       </div>
       <Divider />
-      <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+      <div className={classes.content} style={{ paddingBottom: sp2, paddingTop: sp2 }}>
         {Object.entries(parsed).map(([type, services]: [ErrorTypeValues, Record<string, string[]>], i) => (
           <ErrorTypes key={i} sid={sid} type={type} services={services} />
         ))}
