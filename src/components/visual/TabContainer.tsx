@@ -3,20 +3,6 @@ import { Tab, Tabs, useTheme } from '@mui/material';
 import type { FC, ReactElement, ReactNode } from 'react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-interface TabElement extends TabProps {
-  inner?: ReactNode;
-}
-
-type TabElements = Record<string, TabElement>;
-
-interface Props<T extends TabElements> extends TabsProps {
-  defaultTab?: keyof T;
-  paper?: boolean;
-  value?: keyof T;
-  tabs: T;
-  stickyTop?: null | number;
-}
-
 type TabContextProps = {
   onTabChange: (value: string) => void;
 };
@@ -29,6 +15,40 @@ const TabContext = React.createContext<TabContextProps>(null);
 
 export function useTab(): TabContextProps {
   return useContext(TabContext);
+}
+
+interface TabContentProps extends React.HTMLProps<HTMLDivElement> {
+  children?: React.ReactNode;
+  open?: boolean;
+}
+
+const WrappedTabContent: FC<TabContentProps> = ({ children, name = '', style, open = false, ...other }) => {
+  const [render, setRender] = useState<boolean>(open);
+  useEffect(() => {
+    if (open === true) setRender(true);
+  }, [open]);
+
+  return (
+    <div {...other} style={{ display: open ? 'contents' : 'none', ...style }}>
+      {render && children}
+    </div>
+  );
+};
+
+export const TabContent = React.memo(WrappedTabContent);
+
+interface TabElement extends TabProps {
+  inner?: ReactNode;
+}
+
+type TabElements = Record<string, TabElement>;
+
+interface Props<T extends TabElements> extends TabsProps {
+  defaultTab?: keyof T;
+  paper?: boolean;
+  value?: keyof T;
+  tabs: T;
+  stickyTop?: null | number;
 }
 
 const WrappedTabContainer = <T extends TabElements>({
@@ -109,16 +129,7 @@ const WrappedTabContainer = <T extends TabElements>({
         >
           {Object.entries(tabs).map(([value, { label = '', disabled = false }], i) =>
             disabled ? null : (
-              <Tab
-                key={i}
-                tabIndex={0}
-                label={label}
-                value={value}
-                sx={{ minWidth: '120px' }}
-                onClick={(event: any) => {
-                  event?.target?.blur();
-                }}
-              />
+              <Tab key={i} tabIndex={-1} role={null} label={label} value={value} sx={{ minWidth: '120px' }} />
             )
           )}
         </Tabs>
@@ -132,22 +143,3 @@ const WrappedTabContainer = <T extends TabElements>({
 };
 
 export const TabContainer = React.memo(WrappedTabContainer);
-
-interface TabContentProps extends React.HTMLProps<HTMLDivElement> {
-  children?: React.ReactNode;
-  open?: boolean;
-}
-
-const WrappedTabContent: FC<TabContentProps> = ({ children, name = '', style, open = false, ...other }) => {
-  const [render, setRender] = useState<boolean>(open);
-  useEffect(() => {
-    if (open === true) setRender(true);
-  }, [open]);
-  return (
-    <div {...other} style={{ display: open ? 'contents' : 'none', ...style }}>
-      {render && children}
-    </div>
-  );
-};
-
-export const TabContent = React.memo(WrappedTabContent);
