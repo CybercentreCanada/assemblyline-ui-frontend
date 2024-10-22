@@ -1,6 +1,6 @@
 // TODO: change syntax to "import type {theme}" to avoid potential problems like type-only imports being incorrectly bundled.
 import type { Theme } from '@mui/material/styles';
-import { BorealisProvider, useBorealis } from 'borealis-ui';
+import { BorealisProvider } from 'borealis-ui';
 import type { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import AppProvider from 'commons/components/app/AppProvider';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
@@ -34,16 +34,6 @@ declare module '@mui/styles/defaultTheme' {
 }
 
 type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos';
-
-const AppBorealis = ({ children, ready = false }) => {
-  const { setReady: setBorealisReady } = useBorealis();
-
-  useEffect(() => {
-    if (ready) setBorealisReady(ready);
-  }, [ready, setBorealisReady]);
-
-  return <>{children}</>;
-};
 
 const MyAppMain = () => {
   const storedLoginParams = localStorage.getItem('loginParams');
@@ -86,36 +76,33 @@ const MyAppMain = () => {
 
   setMomentFRLocale();
 
-  return (
-    <BorealisProvider
-      baseURL={location.origin + '/api/v4/proxy/borealis'}
-      getToken={() => null}
-      publicIconify={configuration?.ui?.api_proxies?.borealis?.public_iconify ?? true}
-      customIconify={configuration?.ui?.api_proxies?.borealis?.custom_iconify ?? null}
-    >
-      <AppBorealis ready={isBorealisReady}>
-        {
-          {
-            load: <LoadingScreen />,
-            locked: <LockedPage />,
-            login: loginParams ? (
-              <LoginScreen
-                oAuthProviders={loginParams.oauth_providers}
-                allowUserPass={loginParams.allow_userpass_login}
-                allowSignup={loginParams.allow_signup}
-                allowSAML={loginParams.allow_saml_login}
-              />
-            ) : (
-              <LoadingScreen />
-            ),
-            routes: <Routes />,
-            tos: <Tos />,
-            quota: <QuotaExceeded />
-          }[renderedApp]
-        }
-      </AppBorealis>
-    </BorealisProvider>
-  );
+  return {
+    load: <LoadingScreen />,
+    locked: <LockedPage />,
+    login: loginParams ? (
+      <LoginScreen
+        oAuthProviders={loginParams.oauth_providers}
+        allowUserPass={loginParams.allow_userpass_login}
+        allowSignup={loginParams.allow_signup}
+        allowSAML={loginParams.allow_saml_login}
+      />
+    ) : (
+      <LoadingScreen />
+    ),
+    routes: (
+      <BorealisProvider
+        ready={isBorealisReady}
+        baseURL={location.origin + '/api/v4/proxy/borealis'}
+        getToken={() => null}
+        publicIconify={configuration?.ui?.api_proxies?.borealis?.public_iconify ?? true}
+        customIconify={configuration?.ui?.api_proxies?.borealis?.custom_iconify ?? null}
+      >
+        <Routes />
+      </BorealisProvider>
+    ),
+    tos: <Tos />,
+    quota: <QuotaExceeded />
+  }[renderedApp];
 };
 
 export const MyApp: React.FC<any> = () => {
