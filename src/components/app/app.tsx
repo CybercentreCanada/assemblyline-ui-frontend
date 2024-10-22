@@ -35,11 +35,11 @@ declare module '@mui/styles/defaultTheme' {
 
 type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos';
 
-const AppBorealis = ({ children, ready }) => {
+const AppBorealis = ({ children, ready = false }) => {
   const { setReady: setBorealisReady } = useBorealis();
 
   useEffect(() => {
-    setBorealisReady(ready);
+    if (ready) setBorealisReady(ready);
   }, [ready, setBorealisReady]);
 
   return <>{children}</>;
