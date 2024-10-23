@@ -157,7 +157,6 @@ const WrappedFileViewer: React.FC<Props> = () => {
             value={paramTab}
             defaultTab={DEFAULT_TAB}
             paper
-            selectionFollowsFocus
             onChange={(_event, value) =>
               navigate(`/file/viewer/${sha256}/${value}/${location.search}${location.hash}`, { replace: true })
             }
