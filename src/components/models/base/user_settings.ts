@@ -1,4 +1,3 @@
-import type { SubmissionProfileParams } from './config';
 import type { SelectedService, ServiceSpecification } from './service';
 
 export const ENCODINGS = ['cart', 'raw', 'zip'] as const;
@@ -54,7 +53,7 @@ export type UserSettings = {
   preferred_submission_profile?: string;
 
   /** Default submission profile settings */
-  submission_profiles?: Record<string, SubmissionProfileParams>;
+  submission_profiles?: string;
 
   /** Default service specific settings */
   service_spec: ServiceSpecification[];
