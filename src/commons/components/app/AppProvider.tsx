@@ -1,5 +1,6 @@
 import type { PaletteMode } from '@mui/material';
 import { CssBaseline, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
+import { BorealisProvider } from 'borealis-ui';
 import type { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
 import useThemeBuilder from 'commons/components/utils/hooks/useThemeBuilder';
@@ -81,23 +82,30 @@ export default function AppProvider<U extends AppUser>({
           <CssBaseline />
           <AppErrorProvider>
             <AppSnackbarProvider>
-              <AppUserProvider service={user}>
-                <AssistantProvider>
-                  <HighlightProvider>
-                    <ExternalLookupProvider>
-                      <CarouselProvider>
-                        <DrawerProvider>
-                          <AppBarProvider search={search}>
-                            <AppLeftNavProvider>
-                              <AppLayoutProvider>{children}</AppLayoutProvider>
-                            </AppLeftNavProvider>
-                          </AppBarProvider>
-                        </DrawerProvider>
-                      </CarouselProvider>
-                    </ExternalLookupProvider>
-                  </HighlightProvider>
-                </AssistantProvider>
-              </AppUserProvider>
+              <BorealisProvider
+                baseURL={location.origin + '/api/v4/proxy/borealis'}
+                getToken={() => null}
+                // publicIconify={configuration?.ui?.api_proxies?.borealis?.public_iconify ?? true}
+                // customIconify={configuration?.ui?.api_proxies?.borealis?.custom_iconify ?? null}
+              >
+                <AppUserProvider service={user}>
+                  <AssistantProvider>
+                    <HighlightProvider>
+                      <ExternalLookupProvider>
+                        <CarouselProvider>
+                          <DrawerProvider>
+                            <AppBarProvider search={search}>
+                              <AppLeftNavProvider>
+                                <AppLayoutProvider>{children}</AppLayoutProvider>
+                              </AppLeftNavProvider>
+                            </AppBarProvider>
+                          </DrawerProvider>
+                        </CarouselProvider>
+                      </ExternalLookupProvider>
+                    </HighlightProvider>
+                  </AssistantProvider>
+                </AppUserProvider>
+              </BorealisProvider>
             </AppSnackbarProvider>
           </AppErrorProvider>
         </ThemeProvider>

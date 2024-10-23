@@ -1,6 +1,6 @@
 // TODO: change syntax to "import type {theme}" to avoid potential problems like type-only imports being incorrectly bundled.
 import type { Theme } from '@mui/material/styles';
-import { BorealisProvider } from 'borealis-ui';
+import { useBorealis } from 'borealis-ui';
 import type { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import AppProvider from 'commons/components/app/AppProvider';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
@@ -42,12 +42,12 @@ const MyAppMain = () => {
   const provider = getProvider();
   const { setUser, setConfiguration, user, configuration } = useALContext();
   const { setReady: setAppLayoutReady } = useAppLayout();
+  const { setReady: setBorealisReady } = useBorealis();
   const { setItems } = useAppSwitcher();
   const { bootstrap } = useMyAPI();
 
   const [renderedApp, setRenderedApp] = useState<PossibleApps>(user ? 'routes' : provider ? 'login' : 'load');
   const [loginParams, setLoginParams] = useState<LoginParamsProps | null>(defaultLoginParams);
-  const [isBorealisReady, setIsBorealisReady] = useState<boolean>(false);
 
   const switchRenderedApp = (value: PossibleApps) => {
     if (renderedApp !== value) {
@@ -57,7 +57,7 @@ const MyAppMain = () => {
 
   const setReady = (layout: boolean, borealis: boolean) => {
     setAppLayoutReady(layout);
-    setIsBorealisReady(borealis);
+    setBorealisReady(borealis);
   };
 
   useEffect(() => {
@@ -89,17 +89,7 @@ const MyAppMain = () => {
     ) : (
       <LoadingScreen />
     ),
-    routes: (
-      <BorealisProvider
-        ready={isBorealisReady}
-        baseURL={location.origin + '/api/v4/proxy/borealis'}
-        getToken={() => null}
-        publicIconify={configuration?.ui?.api_proxies?.borealis?.public_iconify ?? true}
-        customIconify={configuration?.ui?.api_proxies?.borealis?.custom_iconify ?? null}
-      >
-        <Routes />
-      </BorealisProvider>
-    ),
+    routes: <Routes />,
     tos: <Tos />,
     quota: <QuotaExceeded />
   }[renderedApp];
