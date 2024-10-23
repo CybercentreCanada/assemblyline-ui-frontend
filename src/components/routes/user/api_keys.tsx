@@ -19,6 +19,7 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -26,6 +27,7 @@ import { ApiKey, User } from 'components/models/base/user';
 import CustomChip from 'components/visual/CustomChip';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BsClipboard } from 'react-icons/bs';
 
 type APIKeyCardProps = {
   name: string;
@@ -74,17 +76,20 @@ type APIKeysProps = {
 
 export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   const { t } = useTranslation(['user']);
-  const [selectedAPIKey, setSelectedAPIKey] = useState(null);
-  const [addApikey, setAddApikey] = useState(false);
+  const theme = useTheme();
+  const { apiCall } = useMyAPI();
   const { configuration, user: currentUser } = useALContext();
+  const { copy } = useClipboard();
+  const { showSuccessMessage } = useMySnackbar();
+
+  const [addApikey, setAddApikey] = useState(false);
+  const [selectedAPIKey, setSelectedAPIKey] = useState(null);
   const [tempAPIKey, setTempAPIKey] = useState(null);
   const [tempKeyName, setTempKeyName] = useState('');
   const [tempKeyPriv, setTempKeyPriv] = useState('READ');
   const [tempKeyRoles, setTempKeyRoles] = useState(configuration.user.priv_role_dependencies.R);
-  const { apiCall } = useMyAPI();
-  const theme = useTheme();
+
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-  const { showSuccessMessage } = useMySnackbar();
   const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_]*$');
 
   function handleDelete() {
@@ -203,15 +208,28 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
         onClose={() => handleNew()}
         aria-labelledby="new-dialog-title"
         aria-describedby="new-dialog-description"
+        PaperProps={{ style: { minWidth: '650px' } }}
       >
         <DialogTitle id="new-dialog-title">{t('apikeys.new_title')}</DialogTitle>
         <DialogContent>
           <DialogContentText id="new-dialog-description" component="div">
             <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(4) }}>
-              <Card variant="outlined" style={{ backgroundColor: theme.palette.background.default }}>
-                <div style={{ padding: theme.spacing(2) }}>
-                  <Typography style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{tempAPIKey}</Typography>
-                </div>
+              <Card
+                variant="outlined"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  backgroundColor: theme.palette.background.default,
+                  padding: `${theme.spacing(1)} ${theme.spacing(2)}`
+                }}
+              >
+                <Typography component="span" style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                  {tempAPIKey}
+                </Typography>
+                <IconButton color="primary" size="large" onClick={() => copy(tempAPIKey, 'drawerTop')}>
+                  <BsClipboard fontSize="large" />
+                </IconButton>
               </Card>
             </div>
           </DialogContentText>
