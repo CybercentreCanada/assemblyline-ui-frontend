@@ -155,7 +155,7 @@ const useMyAPI = (): UseMyAPIReturn => {
           setUser(user);
 
           // Mark the interface ready
-          setReady(true, user.configuration.ui.api_proxies.includes('borealis'));
+          setReady(true, 'borealis' in user.configuration.ui.api_proxies);
 
           // Render appropriate page
           if (!user.agrees_with_tos && user.configuration.ui.tos) {

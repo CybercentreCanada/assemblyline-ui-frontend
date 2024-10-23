@@ -298,7 +298,7 @@ export type UI = {
   allow_zip_downloads: boolean;
 
   /** Proxy requests to the configured API target and add headers */
-  api_proxies: string[];
+  api_proxies: { [proxy: string]: any };
 
   /** Hogwarts App data */
   apps: AppSwitcherItem[];

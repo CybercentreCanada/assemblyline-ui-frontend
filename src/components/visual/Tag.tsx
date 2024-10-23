@@ -107,7 +107,7 @@ const WrappedTag: React.FC<TagProps> = ({
           setBorealisDetails={setShowBorealisDetails}
         />
       )}
-      {configuration.ui.api_proxies.includes('borealis') && type in BOREALIS_TYPE_MAP && value !== null ? (
+      {'borealis' in configuration.ui.api_proxies && type in BOREALIS_TYPE_MAP && value !== null ? (
         <EnrichmentCustomChip
           dataType={BOREALIS_TYPE_MAP[type]}
           dataValue={value}
