@@ -3,11 +3,9 @@ import { Alert, useMediaQuery, useTheme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
-import { createFormContext } from 'components/core/form/createFormContext';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { HashPatternMap } from 'components/models/base/config';
 import type { Metadata } from 'components/models/base/submission';
 import type { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
@@ -19,8 +17,9 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { FileSubmit } from './file';
+import { FormProvider, useForm } from './form';
 import { HashSubmit } from './hash';
-import { SubmitOptions } from './options';
+import { SubmitOptions2 } from './options2';
 
 const useStyles = makeStyles(theme => ({
   no_pad: {
@@ -53,55 +52,6 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
-
-export type FormData = {
-  allowClick: boolean;
-  file: File;
-  input: { type: HashPatternMap; value: string; hasError: boolean };
-  metadata: Metadata;
-  settings: Omit<UserSettings, 'services'>;
-  submissionProfile: string;
-  submissionMetadata: Metadata;
-  uploadProgress: number;
-  uuid: string;
-  validate: boolean;
-  validateCB: string;
-};
-
-export const { FormProvider, useForm } = createFormContext({
-  defaultValues: {
-    allowClick: true,
-    file: null,
-    input: { type: undefined, value: '', hasError: false },
-    metadata: {},
-    settings: {
-      classification: '',
-      deep_scan: false,
-      default_external_sources: [],
-      default_zip_password: '',
-      description: '',
-      download_encoding: 'cart',
-      executive_summary: false,
-      expand_min_score: 0,
-      generate_alert: false,
-      ignore_cache: false,
-      ignore_dynamic_recursion_prevention: false,
-      ignore_filtering: false,
-      malicious: false,
-      priority: 0,
-      services: [],
-      service_spec: [],
-      submission_view: 'report',
-      ttl: 0
-    },
-    submissionMetadata: {},
-    submissionProfile: null,
-    uploadProgress: null,
-    uuid: generateUUID(),
-    validate: false,
-    validateCB: null
-  }
-});
 
 // eslint-disable-next-line  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 const FLOW = new Flow({
@@ -323,7 +273,7 @@ const WrappedSubmitContent = () => {
           options: {
             label: t('options'),
             inner: (
-              <SubmitOptions
+              <SubmitOptions2
                 onValidateServiceSelection={handleValidateServiceSelection}
                 onCancelUpload={handleCancelUpload}
               />

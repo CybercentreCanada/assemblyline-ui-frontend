@@ -9,7 +9,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
-import { useForm } from '.';
+import { useForm } from './form';
 
 type Props = {
   onValidateServiceSelection: (cbType: string) => void;

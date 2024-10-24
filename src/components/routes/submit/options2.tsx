@@ -23,6 +23,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { ServiceAccordion } from './components/ServiceAccordion';
+import { ServiceNavigation } from './components/ServiceNavigation';
 import { useForm } from './form';
 
 const useStyles = makeStyles(theme => ({
@@ -62,7 +63,7 @@ type Props = {
   onCancelUpload: () => void;
 };
 
-const WrappedSubmitOptions = ({ onValidateServiceSelection, onCancelUpload }: Props) => {
+const WrappedSubmitOptions2 = ({ onValidateServiceSelection, onCancelUpload }: Props) => {
   const { t, i18n } = useTranslation(['submit']);
   const { apiCall } = useMyAPI();
   const theme = useTheme();
@@ -160,6 +161,13 @@ const WrappedSubmitOptions = ({ onValidateServiceSelection, onCancelUpload }: Pr
       });
     },
     [configuration.submission.profiles, form]
+  );
+
+  return (
+    <form.Field
+      field={store => store.settings.toPath()}
+      children={({ state, handleBlur, handleChange }) => <ServiceNavigation />}
+    />
   );
 
   return (
@@ -536,4 +544,4 @@ const WrappedSubmitOptions = ({ onValidateServiceSelection, onCancelUpload }: Pr
   );
 };
 
-export const SubmitOptions = React.memo(WrappedSubmitOptions);
+export const SubmitOptions2 = React.memo(WrappedSubmitOptions2);
