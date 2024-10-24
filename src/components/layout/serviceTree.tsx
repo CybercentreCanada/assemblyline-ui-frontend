@@ -5,9 +5,10 @@ import Skeleton from '@mui/material/Skeleton';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import Service from 'components/layout/service';
+import type { SubmissionProfileParams } from 'components/models/base/config';
 import type { SelectedService } from 'components/models/base/service';
 import type { UserSettings } from 'components/models/base/user_settings';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
 const useStyles = makeStyles(theme =>
@@ -41,6 +42,7 @@ type ServiceTreeItemProps = {
   size: 'medium' | 'small';
   service_spec;
   setParam;
+  submissionProfile: SubmissionProfileParams;
 };
 
 function ServiceTreeItem({
@@ -49,13 +51,19 @@ function ServiceTreeItem({
   disabled = false,
   size = 'medium' as const,
   service_spec,
-  setParam
+  setParam,
+  submissionProfile = null
 }: ServiceTreeItemProps) {
   const classes = useStyles();
   const theme = useTheme();
   const sp1 = theme.spacing(1);
   const sp3 = theme.spacing(3);
   const [open, setOpen] = useState(false);
+
+  const paramsEditable = useMemo<boolean>(
+    () => (submissionProfile ? !!submissionProfile.editable_params[item.name] : true),
+    [item.name, submissionProfile]
+  );
 
   function hasParams(name) {
     for (const svc of service_spec) {
@@ -102,7 +110,7 @@ function ServiceTreeItem({
           control={
             <Checkbox
               size={size}
-              disabled={disabled}
+              disabled={disabled || !!submissionProfile}
               indeterminate={
                 item.services ? !item.services.every(e => e.selected) && !item.services.every(e => !e.selected) : false
               }
@@ -121,7 +129,7 @@ function ServiceTreeItem({
               {item.is_external && (
                 <HiOutlineExternalLink style={{ fontSize: 'large', marginLeft: theme.spacing(2) }} />
               )}
-              {setParam && hasParams(item.name) && item.selected && (
+              {setParam && hasParams(item.name) && item.selected && paramsEditable && (
                 <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
                   <IconButton
                     onClick={e => {
@@ -141,12 +149,13 @@ function ServiceTreeItem({
       <div style={{ paddingLeft: sp3 }}>
         {setParam && (
           <Collapse in={open}>
-            {hasParams(item.name) && !disabled && (
+            {hasParams(item.name) && (
               <Service
                 disabled={disabled}
                 setParam={setParam}
                 service={getService(item.name)}
                 idx={getServiceIndex(item.name)}
+                submissionProfile={submissionProfile}
               />
             )}
           </Collapse>
@@ -161,6 +170,7 @@ function ServiceTreeItem({
                 onChange={onChange}
                 service_spec={service_spec}
                 setParam={setParam}
+                submissionProfile={submissionProfile}
               />
             ))
           : null}
@@ -236,6 +246,7 @@ type ServiceTreeProps = {
   disabled?: boolean;
   size?: 'medium' | 'small';
   setParam?: (service_idx, param_idx, p_value) => void;
+  submissionProfile: any;
 };
 
 const ServiceTree: React.FC<ServiceTreeProps> = ({
@@ -245,13 +256,14 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
   compressed = false,
   disabled = false,
   size = 'medium' as const,
-  setParam
+  setParam,
+  submissionProfile = null
 }) => {
   const theme = useTheme();
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   function handleServiceChange(name, category) {
-    if (settings) {
+    if (settings && !submissionProfile) {
       const newServices = settings.services;
       if (category) {
         for (const cat of newServices) {
@@ -317,6 +329,7 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
       {settings ? (
         settings.services
           .sort(sortFunc)
+          .filter(category => (submissionProfile ? submissionProfile.services.selected.includes(category.name) : true))
           .map((category, cat_id) => (
             <ServiceTreeItem
               disabled={disabled}
@@ -326,6 +339,7 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
               onChange={handleServiceChange}
               service_spec={settings.service_spec}
               setParam={setParam}
+              submissionProfile={submissionProfile}
             />
           ))
       ) : (

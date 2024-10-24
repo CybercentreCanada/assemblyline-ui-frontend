@@ -49,8 +49,11 @@ export type UserSettings = {
   /** Default priority for the submissions */
   priority: number;
 
-  /** Should the submission do extra profiling? */
-  profile: boolean;
+  /** Preferred submission profile */
+  preferred_submission_profile?: string;
+
+  /** Default submission profile settings */
+  submission_profiles?: string;
 
   /** Default service specific settings */
   service_spec: ServiceSpecification[];

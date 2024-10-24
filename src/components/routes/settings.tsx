@@ -1,6 +1,8 @@
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
+
 import {
   Button,
   CircularProgress,
@@ -10,6 +12,7 @@ import {
   Paper,
   Select,
   Switch,
+  Tab,
   Table,
   TableBody,
   TableCell,
@@ -32,7 +35,8 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import ExternalSources from 'components/layout/externalSources';
 import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
-import { UserSettings } from 'components/models/base/user_settings';
+import type { SubmissionProfileParams } from 'components/models/base/config';
+import type { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { memo, useMemo, useState } from 'react';
@@ -68,7 +72,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const DRAWER_TYPES = ['ttl', 'view', 'encoding', 'score'] as const;
+const DRAWER_TYPES = ['ttl', 'view', 'encoding', 'score', 'preferred_submission_profile'] as const;
 
 type DrawerType = (typeof DRAWER_TYPES)[number];
 
@@ -115,6 +119,7 @@ function Settings() {
   const [modified, setModified] = useState<boolean>(false);
   const [editable, setEditable] = useState<boolean>(false);
   const [buttonLoading, setButtonLoading] = useState<boolean>(false);
+  const [submissionProfileTab, setSubmissionProfileTab] = useState<string>(settings?.preferred_submission_profile);
 
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
@@ -135,6 +140,15 @@ function Settings() {
     if (settings) {
       const newSettings = { ...settings };
       newSettings.service_spec[service_idx].params[param_idx].value = p_value;
+      setSettings(newSettings);
+      setModified(true);
+    }
+  };
+
+  const setSubmissionProfileParam = (service_idx, param_idx, p_value) => {
+    if (settings) {
+      const newSettings = { ...settings };
+      newSettings.submission_profiles[submissionProfileTab].service_spec[service_idx].params[param_idx].value = p_value;
       setSettings(newSettings);
       setModified(true);
     }
@@ -209,13 +223,6 @@ function Settings() {
     }
   }
 
-  function toggleProfile() {
-    if (settings) {
-      setModified(true);
-      setSettings({ ...settings, profile: !settings.profile });
-    }
-  }
-
   function handleViewChange(event) {
     if (settings) {
       setModified(true);
@@ -241,6 +248,13 @@ function Settings() {
     if (settings) {
       setModified(true);
       setSettings({ ...settings, expand_min_score: event.target.value });
+    }
+  }
+
+  function handlePreferredSubmissionProfileChange(event) {
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, preferred_submission_profile: event.target.value });
     }
   }
 
@@ -281,6 +295,9 @@ function Settings() {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: api_data => {
         setSettings(api_data.api_response);
+
+        // Set submission profile preference
+        setSubmissionProfileTab(api_data.api_response.preferred_submission_profile);
       }
     });
   });
@@ -394,6 +411,25 @@ function Settings() {
                     )}
                   </>
                 ),
+                preferred_submission_profile: (
+                  <>
+                    <Typography variant="h4">{t('submissions.submission_profile')}</Typography>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('submissions.submission_profile_desc')}
+                    </Typography>
+                    <Select
+                      value={settings.preferred_submission_profile}
+                      fullWidth
+                      onChange={handlePreferredSubmissionProfileChange}
+                    >
+                      {Object.keys(settings.submission_profiles).map((profile, i) => (
+                        <MenuItem key={i} value={profile}>
+                          {profile}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </>
+                ),
                 score: (
                   <>
                     <Typography variant="h4">{t('interface.score')}</Typography>
@@ -437,81 +473,129 @@ function Settings() {
             </TableRow>
           </TableHead>
           <TableBody>
-            <ClickRow enabled={editable} onClick={toggleGenerateAlert}>
-              <TableCell colSpan={2} width="100%">
-                <Typography variant="body1">{t('submissions.generate_alert')}</Typography>
-                <Typography variant="caption">{t('submissions.generate_alert_desc')}</Typography>
-              </TableCell>
-              <TableCell align="right">
-                <Switch
-                  checked={settings ? settings.generate_alert : false}
-                  disabled={settings === null || !editable}
-                  onChange={() => toggleGenerateAlert()}
-                  color="secondary"
-                  name="generate_alert"
-                />
-              </TableCell>
-            </ClickRow>
-            <ClickRow enabled={editable} onClick={toggleDynamicPrevention}>
-              <TableCell colSpan={2} width="100%">
-                <Typography variant="body1">{t('submissions.dynamic_recursion')}</Typography>
-                <Typography variant="caption">{t('submissions.dynamic_recursion_desc')}</Typography>
-              </TableCell>
-              <TableCell align="right">
-                <Switch
-                  checked={settings ? !settings.ignore_dynamic_recursion_prevention : true}
-                  disabled={settings === null || !editable}
-                  onChange={() => toggleDynamicPrevention()}
-                  color="secondary"
-                  name="dynamic_resursion"
-                />
-              </TableCell>
-            </ClickRow>
-            <ClickRow enabled={editable} onClick={toggleFiltering}>
-              <TableCell colSpan={2} width="100%">
-                <Typography variant="body1">{t('submissions.filtering')}</Typography>
-                <Typography variant="caption">{t('submissions.filtering_desc')}</Typography>
-              </TableCell>
-              <TableCell align="right">
-                <Switch
-                  checked={settings ? !settings.ignore_filtering : true}
-                  disabled={settings === null || !editable}
-                  onChange={() => toggleFiltering()}
-                  color="secondary"
-                  name="filtering"
-                />
-              </TableCell>
-            </ClickRow>
-            <ClickRow enabled={editable} onClick={toggleCaching}>
-              <TableCell colSpan={2} width="100%">
-                <Typography variant="body1">{t('submissions.result_caching')}</Typography>
-                <Typography variant="caption">{t('submissions.result_caching_desc')}</Typography>
-              </TableCell>
-              <TableCell align="right">
-                <Switch
-                  checked={settings ? !settings.ignore_cache : true}
-                  disabled={settings === null || !editable}
-                  onChange={() => toggleCaching()}
-                  color="secondary"
-                  name="result_caching"
-                />
-              </TableCell>
-            </ClickRow>
-            <ClickRow enabled={editable} onClick={toggleDeepScan}>
-              <TableCell colSpan={2} width="100%">
-                <Typography variant="body1">{t('submissions.deep_scan')}</Typography>
-                <Typography variant="caption">{t('submissions.deep_scan_desc')}</Typography>
-              </TableCell>
-              <TableCell align="right">
-                <Switch
-                  checked={settings ? settings.deep_scan : true}
-                  disabled={settings === null || !editable}
-                  onChange={() => toggleDeepScan()}
-                  color="secondary"
-                  name="deep_scan"
-                />
-              </TableCell>
-            </ClickRow>
+            {currentUser.roles.includes('submission_customize') && (
+              // Only users with the ability to fully customize submissions can set global defaults
+              <>
+                <ClickRow
+                  enabled={editable && currentUser.roles.includes('submission_customize')}
+                  onClick={toggleGenerateAlert}
+                >
+                  <TableCell colSpan={2} width="100%">
+                    <Typography variant="body1">{t('submissions.generate_alert')}</Typography>
+                    <Typography variant="caption">{t('submissions.generate_alert_desc')}</Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Switch
+                      checked={settings ? settings.generate_alert : false}
+                      disabled={settings === null || !editable}
+                      onChange={() => toggleGenerateAlert()}
+                      color="secondary"
+                      name="generate_alert"
+                    />
+                  </TableCell>
+                </ClickRow>
+
+                <ClickRow
+                  enabled={editable && currentUser.roles.includes('submission_customize')}
+                  onClick={toggleDynamicPrevention}
+                >
+                  <TableCell colSpan={2} width="100%">
+                    <Typography variant="body1">{t('submissions.dynamic_recursion')}</Typography>
+                    <Typography variant="caption">{t('submissions.dynamic_recursion_desc')}</Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Switch
+                      checked={settings ? !settings.ignore_dynamic_recursion_prevention : true}
+                      disabled={settings === null || !editable}
+                      onChange={() => toggleDynamicPrevention()}
+                      color="secondary"
+                      name="dynamic_resursion"
+                    />
+                  </TableCell>
+                </ClickRow>
+                <ClickRow
+                  enabled={editable && currentUser.roles.includes('submission_customize')}
+                  onClick={toggleFiltering}
+                >
+                  <TableCell colSpan={2} width="100%">
+                    <Typography variant="body1">{t('submissions.filtering')}</Typography>
+                    <Typography variant="caption">{t('submissions.filtering_desc')}</Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Switch
+                      checked={settings ? !settings.ignore_filtering : true}
+                      disabled={settings === null || !editable}
+                      onChange={() => toggleFiltering()}
+                      color="secondary"
+                      name="filtering"
+                    />
+                  </TableCell>
+                </ClickRow>
+                <ClickRow
+                  enabled={editable && currentUser.roles.includes('submission_customize')}
+                  onClick={toggleCaching}
+                >
+                  <TableCell colSpan={2} width="100%">
+                    <Typography variant="body1">{t('submissions.result_caching')}</Typography>
+                    <Typography variant="caption">{t('submissions.result_caching_desc')}</Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Switch
+                      checked={settings ? !settings.ignore_cache : true}
+                      disabled={settings === null || !editable}
+                      onChange={() => toggleCaching()}
+                      color="secondary"
+                      name="result_caching"
+                    />
+                  </TableCell>
+                </ClickRow>
+                <ClickRow
+                  enabled={editable && currentUser.roles.includes('submission_customize')}
+                  onClick={toggleDeepScan}
+                >
+                  <TableCell colSpan={2} width="100%">
+                    <Typography variant="body1">{t('submissions.deep_scan')}</Typography>
+                    <Typography variant="caption">{t('submissions.deep_scan_desc')}</Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Switch
+                      checked={settings ? settings.deep_scan : true}
+                      disabled={settings === null || !editable}
+                      onChange={() => toggleDeepScan()}
+                      color="secondary"
+                      name="deep_scan"
+                    />
+                  </TableCell>
+                </ClickRow>
+              </>
+            )}
+            {settings?.submission_profiles && (
+              <ClickRow enabled={editable} chevron onClick={event => toggleDrawer('preferred_submission_profile')}>
+                {isXS ? null : (
+                  <TableCell>
+                    <Typography variant="body1">{t('submissions.submission_profile')}</Typography>
+                    <Typography variant="caption">{t('submissions.submission_profile_desc')}</Typography>
+                  </TableCell>
+                )}
+                <TableCell colSpan={isXS ? 2 : 1}>
+                  {!isXS ? null : (
+                    <>
+                      <Typography variant="body1">{t('submissions.submission_profile')}</Typography>
+                      <Typography variant="caption" gutterBottom>
+                        {t('submissions.submission_profile_desc')}
+                      </Typography>
+                    </>
+                  )}
+                  {settings ? (
+                    <Typography variant="subtitle2" color="primary" textAlign={'right'}>
+                      {settings.preferred_submission_profile}
+                    </Typography>
+                  ) : (
+                    <Skeleton />
+                  )}
+                </TableCell>
+              </ClickRow>
+            )}
             {configuration.ui.ai.enabled && (
               <ClickRow enabled={editable} onClick={toggleExecutiveSummary}>
                 <TableCell colSpan={2} width="100%">
@@ -529,46 +613,36 @@ function Settings() {
                 </TableCell>
               </ClickRow>
             )}
-            <ClickRow enabled={editable} onClick={toggleProfile}>
-              <TableCell colSpan={2} width="100%">
-                <Typography variant="body1">{t('submissions.profile')}</Typography>
-                <Typography variant="caption">{t('submissions.profile_desc')}</Typography>
-              </TableCell>
-              <TableCell align="right">
-                <Switch
-                  checked={settings ? settings.profile : true}
-                  disabled={settings === null || !editable}
-                  onChange={() => toggleProfile()}
-                  color="secondary"
-                  name="profile"
-                />
-              </TableCell>
-            </ClickRow>
-            <ClickRow enabled={editable} chevron onClick={event => toggleDrawer('ttl')}>
-              {isXS ? null : (
-                <TableCell>
-                  <Typography variant="body1">{t('submissions.ttl')}</Typography>
-                  <Typography variant="caption">{t('submissions.ttl_desc')}</Typography>
-                </TableCell>
-              )}
-              <TableCell colSpan={isXS ? 2 : 1}>
-                {!isXS ? null : (
-                  <>
+            {currentUser.roles.includes('submission_customize') && (
+              // Only users with the ability to fully customize submissions can set global defaults
+              <ClickRow enabled={editable} chevron onClick={event => toggleDrawer('ttl')}>
+                {isXS ? null : (
+                  <TableCell>
                     <Typography variant="body1">{t('submissions.ttl')}</Typography>
-                    <Typography variant="caption" gutterBottom>
-                      {t('submissions.ttl_desc')}
+                    <Typography variant="caption">{t('submissions.ttl_desc')}</Typography>
+                  </TableCell>
+                )}
+                <TableCell colSpan={isXS ? 2 : 1}>
+                  {!isXS ? null : (
+                    <>
+                      <Typography variant="body1">{t('submissions.ttl')}</Typography>
+                      <Typography variant="caption" gutterBottom>
+                        {t('submissions.ttl_desc')}
+                      </Typography>
+                    </>
+                  )}
+                  {settings ? (
+                    <Typography variant="subtitle2" color="primary" textAlign={'right'}>
+                      {settings.ttl === 0
+                        ? t('submissions.ttl_forever')
+                        : `${settings.ttl} ${t('submissions.ttl_days')}`}
                     </Typography>
-                  </>
-                )}
-                {settings ? (
-                  <Typography variant="subtitle2" color="primary">
-                    {settings.ttl === 0 ? t('submissions.ttl_forever') : `${settings.ttl} ${t('submissions.ttl_days')}`}
-                  </Typography>
-                ) : (
-                  <Skeleton />
-                )}
-              </TableCell>
-            </ClickRow>
+                  ) : (
+                    <Skeleton />
+                  )}
+                </TableCell>
+              </ClickRow>
+            )}
             {c12nDef.enforce && (
               <TableRow>
                 {isXS ? null : (
@@ -598,7 +672,6 @@ function Settings() {
           </TableBody>
         </Table>
       </TableContainer>
-
       <TableContainer className={classes.group} component={Paper}>
         <Table aria-label={t('interface')}>
           <TableHead>
@@ -699,54 +772,91 @@ function Settings() {
           </TableBody>
         </Table>
       </TableContainer>
-
       {fileSources && fileSources.length > 0 && (
         <Paper className={classes.group}>
           <ExternalSources disabled={!editable} settings={settings} onChange={toggleExternalSource} />
         </Paper>
       )}
 
-      <Paper className={classes.group}>
-        <div style={{ padding: sp2, textAlign: 'left' }}>
-          <Typography variant="h6" gutterBottom>
-            {t('service')}
-          </Typography>
-          <ServiceTree
-            disabled={!editable}
-            settings={settings}
-            setSettings={setSettings}
-            setModified={setModified}
-            compressed
-          />
-        </div>
-      </Paper>
+      {settings && settings.submission_profiles && (
+        // If we have submission profiles, then allow configuration of parameters per profile
+        <Paper className={classes.group}>
+          <div style={{ padding: sp2, textAlign: 'left' }}>
+            <Typography variant="h6" gutterBottom>
+              {t('submission_profile')}
+            </Typography>
+            <TabContext value={submissionProfileTab}>
+              <TabList
+                centered
+                indicatorColor="primary"
+                textColor="primary"
+                scrollButtons
+                onChange={(_, value) => setSubmissionProfileTab(value)}
+              >
+                {Object.keys(settings.submission_profiles)
+                  .filter(name => settings.submission_profiles[name].service_spec.length)
+                  .map((profile_name, i) => (
+                    <Tab key={i} label={profile_name} value={profile_name} />
+                  ))}
+              </TabList>
+              {Object.entries(settings.submission_profiles)
+                .filter(([_, config]) => config.service_spec)
+                .map(([profile_name, profile_config]: [string, SubmissionProfileParams], i) => (
+                  <TabPanel key={i} value={profile_name}>
+                    <ServiceSpec service_spec={profile_config.service_spec} setParam={setSubmissionProfileParam} />
+                  </TabPanel>
+                ))}
+            </TabContext>
+          </div>
+        </Paper>
+      )}
 
-      <Paper className={classes.group}>
-        <div style={{ padding: sp2, textAlign: 'left' }}>
-          <Typography variant="h6" gutterBottom>
-            {t('service_spec')}
-          </Typography>
-          {settings ? (
-            <ServiceSpec
-              disabled={!editable}
-              service_spec={settings.service_spec}
-              setParam={setParam}
-              compressed
-              hasResetButton
-            />
-          ) : (
-            <div>
-              <Skel />
-              <Skel />
-              <Skel />
-              <Skel />
+      {currentUser.roles.includes('submission_customize') && (
+        // Only users with the ability to fully customize submissions can set global defaults
+        <>
+          <Paper className={classes.group}>
+            <div style={{ padding: sp2, textAlign: 'left' }}>
+              <Typography variant="h6" gutterBottom>
+                {t('service')}
+              </Typography>
+              <ServiceTree
+                disabled={!editable}
+                settings={settings}
+                setSettings={setSettings}
+                setModified={setModified}
+                compressed
+                submissionProfile={null}
+              />
             </div>
-          )}
-        </div>
-      </Paper>
+          </Paper>
+
+          <Paper className={classes.group}>
+            <div style={{ padding: sp2, textAlign: 'left' }}>
+              <Typography variant="h6" gutterBottom>
+                {t('service_spec')}
+              </Typography>
+              {settings ? (
+                <ServiceSpec
+                  disabled={!editable}
+                  service_spec={settings.service_spec}
+                  setParam={setParam}
+                  compressed
+                  hasResetButton
+                />
+              ) : (
+                <div>
+                  <Skel />
+                  <Skel />
+                  <Skel />
+                  <Skel />
+                </div>
+              )}
+            </div>
+          </Paper>
+        </>
+      )}
 
       <RouterPrompt when={modified} />
-
       {settings && modified && (
         <div
           style={{

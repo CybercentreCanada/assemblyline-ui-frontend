@@ -86,6 +86,7 @@ export default function SiteMapPage() {
     signature_manage: 'info',
     signature_view: 'default',
     submission_create: 'success',
+    submission_customize: 'info',
     submission_delete: 'error',
     submission_manage: 'info',
     submission_view: 'default',

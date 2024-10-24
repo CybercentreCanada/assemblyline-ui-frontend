@@ -7,7 +7,9 @@ import {
   CircularProgress,
   FormControlLabel,
   Grid,
+  MenuItem,
   Paper,
+  Select,
   Skeleton,
   Slider,
   Stack,
@@ -28,7 +30,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceTree from 'components/layout/serviceTree';
 import SubmissionMetadata from 'components/layout/submissionMetadata';
-import type { HashPatternMap } from 'components/models/base/config';
+import type { HashPatternMap, SubmissionProfileParams } from 'components/models/base/config';
 import type { Metadata, Submission } from 'components/models/base/submission';
 import type { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
@@ -37,7 +39,7 @@ import FileDropper from 'components/visual/FileDropper';
 import MetadataInputField from 'components/visual/MetadataInputField';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import { memo, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -106,6 +108,7 @@ const Submit = () => {
   const [stringInput, setStringInput] = useState<string>('');
   const [stringType, setStringType] = useState<HashPatternMap>(undefined);
   const [stringInputHasError, setStringInputHasError] = useState<boolean>(false);
+  const [submissionProfile, setSubmissionProfile] = useState<SubmissionProfileParams>(null);
 
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
@@ -381,6 +384,87 @@ const Submit = () => {
     closeSnackbar();
   }
 
+  const handleProfileChange = useCallback(
+    submission_profile => {
+      const profile = configuration.submission.profiles[submission_profile];
+      if (!profile) {
+        return;
+      }
+      const newServices = settings.services;
+      const newServiceSpec = settings.service_spec;
+      const enabledServices = [];
+
+      // Disable all services
+      for (const cat of newServices) {
+        cat.selected = false;
+        for (const srv of cat.services) {
+          srv.selected = false;
+        }
+      }
+      for (const srv of newServiceSpec) {
+        // Reset service parameters to their defaults
+        for (const param of srv.params) {
+          param.value = param.default;
+        }
+      }
+
+      // Assign default values in case profile doesn't specify
+      profile.services.selected = profile.services.selected || [];
+      profile.services.excluded = profile.services.excluded || [];
+      profile.service_spec = profile.service_spec || [];
+      profile.editable_params = profile.editable_params || {};
+
+      // Enable all services that part of the profile, ensure all others are disabled
+      for (const cat of newServices) {
+        if (profile.services.selected.indexOf(cat.name) > -1) {
+          // Category selected, enable all services that are part of the category
+          cat.selected = true;
+          for (const srv of cat.services) {
+            // Enable all services except those in the exclusion list
+            if (profile.services.excluded.indexOf(srv.name) === -1) {
+              srv.selected = true;
+              enabledServices.push(srv.name);
+            }
+          }
+        } else if (profile.services.excluded.indexOf(cat.name) > -1) {
+          // Category excluded, disabled all services that are part of the category
+          cat.selected = false;
+          for (const srv of cat.services) {
+            // Disable all services except those in the selected list
+            if (profile.services.selected.indexOf(srv.name) === -1) {
+              srv.selected = false;
+            }
+          }
+        }
+      }
+
+      // Set parameters of enabled service based on profile
+      for (const srv of newServiceSpec) {
+        if (enabledServices.indexOf(srv.name) > -1 && profile.service_spec[srv.name]) {
+          for (const param of srv.params) {
+            if (param.name in profile.service_spec[srv.name]) {
+              // Set parameter value based on profile configuration
+              param.value = profile.service_spec[srv.name][param.name];
+            }
+          }
+        }
+      }
+
+      const profileParams: Record<string, SubmissionProfileParams> = {};
+      // for (const [k, v] of Object.entries(profile)) {
+      //   // Assign the other parameters of the profile that don't pertain to service settings
+      //   if (!k.startsWith('service')) {
+      //     profileParams[k] = v;
+      //   }
+      // }
+
+      // setSettings({ ...settings, services: newServices, ...profileParams, submission_profile });
+      setSettings({ ...settings, services: newServices, ...profileParams });
+      setSubmissionProfile(profile);
+    },
+    [configuration.submission.profiles, settings]
+  );
+
   useEffect(() => {
     if (settings && !urlAutoselection && stringType === 'url') {
       const newServices = settings.services;
@@ -396,6 +480,8 @@ const Submit = () => {
       setUrlAutoselection(true);
     }
   }, [settings, stringType, urlAutoselection, configuration.ui.url_submission_auto_service_selection]);
+
+  useEffect(() => handleProfileChange(submissionProfile), [handleProfileChange, submissionProfile]);
 
   useEffect(() => {
     if (state) {
@@ -424,7 +510,6 @@ const Submit = () => {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: api_data => {
         const tempSettings = { ...api_data.api_response };
-
         if (state) {
           // Get the classification from the state
           tempSettings.classification = state.c12n;
@@ -444,8 +529,13 @@ const Submit = () => {
           }
         }
         tempSettings.default_external_sources = defaultExternalSources;
-
         setSettings(tempSettings);
+
+        if (!currentUser.roles.includes('submission_customize')) {
+          // User isn't allowed to use their service preferences, disable all
+          console.log(tempSettings.preferred_submission_profile);
+          setSubmissionProfile(tempSettings.preferred_submission_profile as unknown as SubmissionProfileParams);
+        }
       }
     });
     setUUID(generateUUID());
@@ -685,13 +775,43 @@ const Submit = () => {
             ) : null}
           </TabPanel>
           <TabPanel value="2" className={classes.no_pad}>
+            {configuration.submission.profiles ? (
+              <div style={{ textAlign: 'left', marginTop: sp2, paddingLeft: sp2 }}>
+                <Typography variant="h6" gutterBottom>
+                  {t('options.submission.profile_name')}
+                </Typography>
+                <div style={{ paddingBottom: sp1 }}>
+                  {settings ? (
+                    <Select
+                      children={Object.keys(configuration.submission.profiles).map((profile_name, i) => (
+                        <MenuItem key={i} value={profile_name}>
+                          {profile_name}
+                        </MenuItem>
+                      ))}
+                      size="small"
+                      onChange={event => handleProfileChange(event.target.value as string)}
+                      fullWidth
+                    />
+                  ) : (
+                    <Skeleton style={{ height: '3rem' }} />
+                  )}
+                </div>
+              </div>
+            ) : null}
             <Grid container spacing={1}>
               <Grid item xs={12} md>
                 <div style={{ paddingLeft: sp2, textAlign: 'left', marginTop: sp2 }}>
                   <Typography variant="h6" gutterBottom>
                     {t('options.service')}
                   </Typography>
-                  <ServiceTree size="small" settings={settings} setSettings={setSettings} setParam={setParam} />
+
+                  <ServiceTree
+                    size="small"
+                    settings={settings}
+                    setSettings={setSettings}
+                    setParam={setParam}
+                    submissionProfile={!currentUser.roles.includes('submission_customize') ? submissionProfile : null}
+                  />
                 </div>
               </Grid>
               <Grid item xs={12} md>
@@ -739,6 +859,10 @@ const Submit = () => {
                           ]}
                           step={null}
                           onChange={(_, e_value) => setSettingValue('priority', e_value)}
+                          disabled={
+                            !currentUser.roles.includes('submission_customize') &&
+                            submissionProfile?.priority !== undefined
+                          }
                         ></Slider>
                       </div>
                     ) : (
@@ -754,6 +878,10 @@ const Submit = () => {
                             checked={settings.generate_alert}
                             name="label"
                             onChange={event => setSettingValue('generate_alert', event.target.checked)}
+                            disabled={
+                              !currentUser.roles.includes('submission_customize') &&
+                              submissionProfile?.generate_alert !== undefined
+                            }
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
@@ -770,6 +898,10 @@ const Submit = () => {
                             checked={settings.ignore_filtering}
                             name="label"
                             onChange={event => setSettingValue('ignore_filtering', event.target.checked)}
+                            disabled={
+                              !currentUser.roles.includes('submission_customize') &&
+                              submissionProfile?.ignore_filtering !== undefined
+                            }
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
@@ -786,6 +918,10 @@ const Submit = () => {
                             checked={settings.ignore_cache}
                             name="label"
                             onChange={event => setSettingValue('ignore_cache', event.target.checked)}
+                            disabled={
+                              !currentUser.roles.includes('submission_customize') &&
+                              submissionProfile?.ignore_cache !== undefined
+                            }
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
@@ -804,6 +940,10 @@ const Submit = () => {
                             onChange={event =>
                               setSettingValue('ignore_dynamic_recursion_prevention', event.target.checked)
                             }
+                            disabled={
+                              !currentUser.roles.includes('submission_customize') &&
+                              submissionProfile?.ignore_dynamic_recursion_prevention !== undefined
+                            }
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
@@ -821,25 +961,13 @@ const Submit = () => {
                         settings ? (
                           <Checkbox
                             size="small"
-                            checked={settings.profile}
-                            name="label"
-                            onChange={event => setSettingValue('profile', event.target.checked)}
-                          />
-                        ) : (
-                          <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
-                        )
-                      }
-                      label={<Typography variant="body2">{t('options.submission.profile')}</Typography>}
-                      className={settings ? classes.item : null}
-                    />
-                    <FormControlLabel
-                      control={
-                        settings ? (
-                          <Checkbox
-                            size="small"
                             checked={settings.deep_scan}
                             name="label"
                             onChange={event => setSettingValue('deep_scan', event.target.checked)}
+                            disabled={
+                              !currentUser.roles.includes('submission_customize') &&
+                              submissionProfile?.deep_scan !== undefined
+                            }
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
@@ -868,9 +996,13 @@ const Submit = () => {
                           max: configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365
                         }}
                         defaultValue={settings.ttl}
+                        value={submissionProfile?.ttl}
                         onChange={event => setSettingAsyncValue('ttl', event.target.value)}
                         variant="outlined"
                         fullWidth
+                        disabled={
+                          !currentUser.roles.includes('submission_customize') && submissionProfile?.ttl !== undefined
+                        }
                       />
                     ) : (
                       <Skeleton style={{ height: '3rem' }} />
