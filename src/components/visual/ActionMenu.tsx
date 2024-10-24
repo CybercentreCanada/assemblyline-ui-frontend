@@ -21,6 +21,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
+import Classification from './Classification';
 import ClassificationMismatchDialog from './ClassificationMismatchDialog';
 import { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip';
 import InputDialog from './InputDialog';
@@ -354,6 +355,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           inputLabel={t('safelist.input')}
           text={t('safelist.text')}
           waiting={waitingDialog}
+          extra={<Classification size="tiny" type="outlined" c12n={classification ? classification : null} />}
         />
       )}
       {category === 'tag' && (
@@ -369,6 +371,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           inputLabel={t('badlist.input')}
           text={t('badlist.text')}
           waiting={waitingDialog}
+          extra={<Classification size="tiny" type="outlined" c12n={classification ? classification : null} />}
         />
       )}
       <Menu
