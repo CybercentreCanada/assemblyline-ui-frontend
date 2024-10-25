@@ -7,7 +7,7 @@
 
 # Assemblyline UI Frontend
 
-This repo is dedicated for the new version off Assemblyline 4 UI. It uses React as the framework and Material UI for the visual components.
+This repo is dedicated for the new version of Assemblyline 4 UI. It uses the React library and Material UI for the visual components.
 
 ## Image variants and tags
 
@@ -34,7 +34,7 @@ For more information about this Assemblyline component, follow this [overview](h
 
 # Front-end de l'interface utilisateur d'Assemblyline
 
-Ce repo est dédié à la nouvelle version d'Assemblyline 4 UI. Elle utilise React comme framework et Material UI pour les composants visuels.
+Ce repo est dédié à la nouvelle version d'Assemblyline 4 UI. Elle utilise la bibliothèque React et Material UI pour les composants visuels.
 
 ## Variantes d'images et balises
 
