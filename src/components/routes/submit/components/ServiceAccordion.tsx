@@ -25,7 +25,7 @@ type ResetButtonProps = {
   reset?: () => void;
 };
 
-const ResetButton: React.FC<ResetButtonProps> = React.memo(
+export const ResetButton: React.FC<ResetButtonProps> = React.memo(
   ({ value, defaultValue, hasResetButton = false, reset }: ResetButtonProps) => {
     const { t } = useTranslation(['adminServices']);
     const theme = useTheme();

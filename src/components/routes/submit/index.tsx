@@ -2,7 +2,7 @@ import Flow from '@flowjs/flow.js';
 import { Alert, useMediaQuery, useTheme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
-import PageCenter from 'commons/components/pages/PageCenter';
+import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -16,6 +16,7 @@ import generateUUID from 'helpers/uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
+import { ServiceList } from './components/ServiceList';
 import { FileSubmit } from './file';
 import { FormProvider, useForm } from './form';
 import { HashSubmit } from './hash';
@@ -103,6 +104,7 @@ const WrappedSubmitContent = () => {
 
   const handleValidateServiceSelection = useCallback(() => {
     // to do
+    console.log(form.store.state.values);
   }, []);
 
   const handleCancelUpload = useCallback(() => {
@@ -203,85 +205,105 @@ const WrappedSubmitContent = () => {
   // }, [configuration.submission.metadata.submit]);
 
   return (
-    <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
-      <form.Subscribe
-        selector={state => [state.canSubmit, state.isSubmitting, state.values.validate]}
-        children={([canSubmit, isSubmitting, validate]) => (
-          <ConfirmationDialog
-            open={validate}
-            // handleClose={event => setValidate(false)}
-            handleClose={() => form.store.setState(s => ({ ...s, validate: false }))}
-            // handleCancel={cleanupServiceSelection}
-            // handleAccept={executeCB}
-            handleAccept={() => {}}
-            title={t('validate.title')}
-            cancelText={t('validate.cancelText')}
-            acceptText={t('validate.acceptText')}
-            text={t('validate.text')}
-          />
-        )}
-      />
-
-      <div style={{ marginBottom: !downSM && !configuration.ui.banner ? '2rem' : null }}>{banner}</div>
-
-      {configuration.ui.banner && (
-        <Alert severity={configuration.ui.banner_level} style={{ marginBottom: '2rem' }}>
-          {configuration.ui.banner[i18n.language] ? configuration.ui.banner[i18n.language] : configuration.ui.banner.en}
-        </Alert>
-      )}
-
-      {c12nDef.enforce ? (
-        <form.Field
-          field={store => store.settings.classification.toPath()}
-          children={({ name, state, handleBlur, handleChange }) => (
-            <div style={{ paddingBottom: sp4 }}>
-              <div style={{ padding: sp1, fontSize: 16 }}>{t('classification')}</div>
-              <Classification
-                format="long"
-                type="picker"
-                c12n={state.value ? state.value : null}
-                setClassification={classification => handleChange(classification)}
-                disabled={!currentUser.roles.includes('submission_create')}
-              />
-            </div>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'nowrap',
+        maxHeight: 'calc(100vh-64px)',
+        overflowY: 'auto'
+      }}
+    >
+      {/* <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%"> */}
+      <PageFullSize
+        styles={{ paper: { width: '100%', alignSelf: 'center', maxWidth: md ? '800px' : downSM ? '100%' : '1024px' } }}
+        margin={4}
+      >
+        <form.Subscribe
+          selector={state => [state.canSubmit, state.isSubmitting, state.values.validate]}
+          children={([canSubmit, isSubmitting, validate]) => (
+            <ConfirmationDialog
+              open={validate}
+              // handleClose={event => setValidate(false)}
+              handleClose={() => form.store.setState(s => ({ ...s, validate: false }))}
+              // handleCancel={cleanupServiceSelection}
+              // handleAccept={executeCB}
+              handleAccept={() => {}}
+              title={t('validate.title')}
+              cancelText={t('validate.cancelText')}
+              acceptText={t('validate.acceptText')}
+              text={t('validate.text')}
+            />
           )}
         />
-      ) : null}
 
-      <TabContainer
-        indicatorColor="primary"
-        textColor="primary"
-        paper
-        centered
-        variant="standard"
-        style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(1) }}
-        tabs={{
-          file: {
-            label: t('file'),
-            inner: (
-              <FileSubmit
-                onValidateServiceSelection={handleValidateServiceSelection}
-                onCancelUpload={handleCancelUpload}
-              />
-            )
-          },
-          hash: {
-            label: `${t('urlHash.input_title')}${t('urlHash.input_suffix')}`,
-            disabled: !currentUser.roles.includes('submission_create'),
-            inner: <HashSubmit onValidateServiceSelection={handleValidateServiceSelection} />
-          },
-          options: {
-            label: t('options'),
-            inner: (
-              <SubmitOptions2
-                onValidateServiceSelection={handleValidateServiceSelection}
-                onCancelUpload={handleCancelUpload}
-              />
-            )
-          }
-        }}
-      />
-    </PageCenter>
+        <div style={{ marginBottom: !downSM && !configuration.ui.banner ? '2rem' : null }}>{banner}</div>
+
+        {configuration.ui.banner && (
+          <Alert severity={configuration.ui.banner_level} style={{ marginBottom: '2rem' }}>
+            {configuration.ui.banner[i18n.language]
+              ? configuration.ui.banner[i18n.language]
+              : configuration.ui.banner.en}
+          </Alert>
+        )}
+
+        {c12nDef.enforce ? (
+          <form.Field
+            field={store => store.settings.classification.toPath()}
+            children={({ name, state, handleBlur, handleChange }) => (
+              <div style={{ paddingBottom: sp4 }}>
+                <div style={{ padding: sp1, fontSize: 16 }}>{t('classification')}</div>
+                <Classification
+                  format="long"
+                  type="picker"
+                  c12n={state.value ? state.value : null}
+                  setClassification={classification => handleChange(classification)}
+                  disabled={!currentUser.roles.includes('submission_create')}
+                />
+              </div>
+            )}
+          />
+        ) : null}
+
+        <TabContainer
+          indicatorColor="primary"
+          textColor="primary"
+          paper
+          centered
+          variant="standard"
+          style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(1) }}
+          tabs={{
+            file: {
+              label: t('file'),
+              inner: (
+                <FileSubmit
+                  onValidateServiceSelection={handleValidateServiceSelection}
+                  onCancelUpload={handleCancelUpload}
+                />
+              )
+            },
+            hash: {
+              label: `${t('urlHash.input_title')}${t('urlHash.input_suffix')}`,
+              disabled: !currentUser.roles.includes('submission_create'),
+              inner: <HashSubmit onValidateServiceSelection={handleValidateServiceSelection} />
+            },
+            options: {
+              label: t('options'),
+              inner: (
+                <SubmitOptions2
+                  onValidateServiceSelection={handleValidateServiceSelection}
+                  onCancelUpload={handleCancelUpload}
+                />
+              )
+            }
+          }}
+        />
+        {/* </PageCenter> */}
+      </PageFullSize>
+      <div style={{ position: 'sticky', top: '0px', overflowY: 'auto' }}>
+        <ServiceList />
+      </div>
+    </div>
   );
 };
 
