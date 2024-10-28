@@ -22,6 +22,7 @@ This repo is dedicated for the new version of Assemblyline 4 UI. It uses the Rea
 ```bash
 docker run --name frontend cccs/assemblyline-ui-frontend
 ```
+
 ## Development
 
 For information on frontend development, follow this [guide](https://cybercentrecanada.github.io/assemblyline4_docs/developer_manual/frontend/frontend/).
@@ -36,19 +37,20 @@ For more information about this Assemblyline component, follow this [overview](h
 
 Ce repo est dédié à la nouvelle version d'Assemblyline 4 UI. Elle utilise la bibliothèque React et Material UI pour les composants visuels.
 
-## Variantes d'images et balises
+## Variantes et étiquettes d'image
 
-| **Type d'étiquette** | **Description**                                                                                                                    |  **Exemple d'étiquette**   |
-| :------------------: | :--------------------------------------------------------------------------------------------------------------------------------- | :------------------------: |
-|       dernière       | La version la plus récente (peut être instable).                                                                                   |          `latest`          |
-|      build_type      | Le type de compilation utilisé. `dev` est la dernière version instable. `stable` est la dernière version stable. `stable` ou `dev` |     `stable` ou `dev`      |
-|        series        | Le type de build utilisé. `dev` est le dernier build unstable : `version.buildType`.                                               | `4.5.stable`, `4.5.1.dev3` |
+| **Type d'étiquette** | **Description**                                                                                                  |  **Exemple d'étiquette**   |
+| :------------------: | :--------------------------------------------------------------------------------------------------------------- | :------------------------: |
+|       dernière       | La version la plus récente (peut être instable).                                                                 |          `latest`          |
+|      build_type      | Le type de compilation utilisé. `dev` est la dernière version instable. `stable` est la dernière version stable. |     `stable` ou `dev`      |
+|        séries        | Le détail de compilation utilisé, incluant la version et le type de compilation : `version.buildType`.           | `4.5.stable`, `4.5.1.dev3` |
 
 #### Exécuter ce composant
 
 ```bash
 docker run --name frontend cccs/assemblyline-ui-frontend
 ```
+
 ## Développement
 
 Pour des informations sur le développement du frontend, suivez ce [guide](https://cybercentrecanada.github.io/assemblyline4_docs/developer_manual/frontend/frontend/).
