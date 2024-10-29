@@ -15,8 +15,8 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { ServiceList } from './components/ServiceList';
-import { FormProvider, useForm } from './contexts/form';
 import { FileSubmit } from './file';
+import { FormProvider, useForm } from './form';
 import { HashSubmit } from './hash';
 import { SubmitOptions2 } from './options2';
 

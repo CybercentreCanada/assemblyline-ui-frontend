@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import useALContext from 'components/hooks/useALContext';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from '../contexts/form';
+import { useForm } from '../form';
 
 const useStyles = makeStyles(theme => ({
   no_pad: {

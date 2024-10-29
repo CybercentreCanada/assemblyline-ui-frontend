@@ -27,7 +27,7 @@ import { ServiceAccordion } from './components/ServiceAccordion';
 import { ServiceParameters } from './components/ServiceParameters';
 import { SubmissionMetadata } from './components/SubmissionMetadata';
 import { SubmissionParameters } from './components/SubmissionParameters';
-import { useForm } from './form';
+import { useForm } from './contexts/form';
 
 const useStyles = makeStyles(theme => ({
   no_pad: {

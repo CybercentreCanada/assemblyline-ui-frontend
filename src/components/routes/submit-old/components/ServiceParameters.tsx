@@ -20,7 +20,7 @@ import useALContext from 'components/hooks/useALContext';
 import type { UserSettings } from 'components/models/base/user_settings';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from '../contexts/form';
+import { useForm } from '../form';
 import { BooleanInput } from '../inputs/BooleanInput';
 import { EnumInput } from '../inputs/EnumInput';
 import { NumberInput } from '../inputs/NumberInput';

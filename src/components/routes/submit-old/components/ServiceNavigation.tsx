@@ -23,7 +23,7 @@ import type { UserSettings } from 'components/models/base/user_settings';
 import MetadataInputField from 'components/visual/MetadataInputField';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from '../contexts/form';
+import { useForm } from '../form';
 import { ResetButton } from './ServiceAccordion';
 
 const useStyles = makeStyles(theme => ({

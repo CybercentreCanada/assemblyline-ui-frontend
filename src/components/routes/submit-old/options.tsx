@@ -23,7 +23,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { ServiceAccordion } from './components/ServiceAccordion';
-import { useForm } from './contexts/form';
+import { useForm } from './form';
 
 const useStyles = makeStyles(theme => ({
   no_pad: {
