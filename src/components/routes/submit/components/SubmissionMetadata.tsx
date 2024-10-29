@@ -5,7 +5,6 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { Metadata } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
 import { useForm } from 'components/routes/submit/form';
-import { DEFAULT_SETTINGS } from 'components/routes/submit/settings';
 import { matchURL } from 'helpers/utils';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -142,7 +141,7 @@ type ServiceAccordionProps = {
   settings?: UserSettings;
 };
 
-const WrappedSubmissionMetadata = ({ settings = DEFAULT_SETTINGS }: ServiceAccordionProps) => {
+const WrappedSubmissionMetadata = ({ settings }: ServiceAccordionProps) => {
   const { t, i18n } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const classes = useStyles();

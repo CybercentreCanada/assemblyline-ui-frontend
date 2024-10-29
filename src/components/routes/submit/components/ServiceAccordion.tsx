@@ -54,7 +54,7 @@ type ServiceAccordionProps = {
   settings?: UserSettings;
 };
 
-const WrappedServiceAccordion = ({ settings = DEFAULT_SETTINGS }: ServiceAccordionProps) => {
+const WrappedServiceAccordion = ({ settings }: ServiceAccordionProps) => {
   const theme = useTheme();
 
   console.log(settings);

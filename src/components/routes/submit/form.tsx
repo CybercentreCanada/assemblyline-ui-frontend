@@ -3,6 +3,7 @@ import type { HashPatternMap } from 'components/models/base/config';
 import type { Metadata } from 'components/models/base/submission';
 import type { UserSettings } from 'components/models/base/user_settings';
 import generateUUID from 'helpers/uuid';
+import { DEFAULT_SETTINGS } from './settings';
 
 export type FormData = {
   allowClick: boolean;
@@ -42,7 +43,8 @@ export const { FormProvider, useForm } = createFormContext({
       services: [],
       service_spec: [],
       submission_view: 'report',
-      ttl: 0
+      ttl: 0,
+      ...DEFAULT_SETTINGS
     },
     submissionMetadata: {},
     submissionProfile: null,

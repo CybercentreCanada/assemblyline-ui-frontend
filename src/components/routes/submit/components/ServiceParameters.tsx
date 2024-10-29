@@ -17,12 +17,13 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useALContext from 'components/hooks/useALContext';
-import { SelectedService } from 'components/models/base/service';
 import type { UserSettings } from 'components/models/base/user_settings';
-import { DEFAULT_SETTINGS } from 'components/routes/submit/settings';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from '../form';
+import { BooleanInput } from '../inputs/BooleanInput';
+import { EnumInput } from '../inputs/EnumInput';
+import { NumberInput } from '../inputs/NumberInput';
 import { TextInput } from '../inputs/TextInput';
 import { ResetButton } from './ServiceAccordion';
 
@@ -59,12 +60,25 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type ServiceProps = {
-  service: SelectedService;
+  cat_id: number;
+  svr_id: number;
+  service: {
+    category: string;
+    description: string;
+    is_external: boolean;
+    name: string;
+    selected: boolean;
+  };
 };
 
-const Service: React.FC<ServiceProps> = React.memo(({ service }) => {
+const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service }) => {
   const theme = useTheme();
   const form = useForm();
+
+  const index = useMemo(
+    () => form.store.state.values.settings.service_spec.findIndex(spec => spec.name === service.name),
+    [form.store.state.values.settings.service_spec, service.name]
+  );
 
   return (
     <List
@@ -76,76 +90,185 @@ const Service: React.FC<ServiceProps> = React.memo(({ service }) => {
         }
       }}
     >
-      <ListItem sx={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+      {/* <ListItem sx={{ flexDirection: 'column', alignItems: 'flex-start' }}>
         <Typography variant="h6">{service.name}</Typography>
         <Typography variant="body2" color="textSecondary">
           {service.description}
         </Typography>
-      </ListItem>
+      </ListItem> */}
 
-      {/* {form.store.state.values.settings.service_spec */}
-      {DEFAULT_SETTINGS.service_spec
-        .find(spec => spec.name === service.name)
-        ?.params.map((param, p_id) => (
-          <form.Field
-            key={`${p_id}`}
-            field={() => `$.submissionMetadata.${name}`}
-            children={({ state, handleBlur }) => {
-              console.log(param);
+      <form.Field
+        field={store => store.settings.services[cat_id].services[svr_id].selected.toPath()}
+        children={({ state, handleBlur, handleChange }) => (
+          <ListItem
+            secondaryAction={
+              <Checkbox
+                edge="end"
+                checked={state.value}
+                // indeterminate={state.value}
+                onBlur={handleBlur}
+                onChange={() => handleChange(!state.value)}
+              />
+            }
+            disablePadding
+            dense
+          >
+            <ListItemButton onClick={() => handleChange(!state.value)}>
+              <ListItemText
+                primary={service.name}
+                primaryTypographyProps={{ variant: 'h6' }}
+                secondary={service.description}
+                secondaryTypographyProps={{ variant: 'body2' }}
+              />
+            </ListItemButton>
+          </ListItem>
+        )}
+      />
 
-              switch (param.type) {
-                case 'str':
-                  return <TextInput primary={param.name.replace('_', ' ')} secondary={`[${param.type}]`} />;
-                default:
-                  return <TextInput primary={param.name.replace('_', ' ')} secondary={`[${param.type}]`} />;
-                // case 'keyword':
-                //   return (
-                //     <TextInput
-                //       primary={name.replace('_', ' ')}
-                //       secondary={`[${metadata.validator_type}]`}
-                //       defaultValue={state.value}
-                //       options={options}
-                //       onBlur={handleBlur}
-                //       onChange={v => handleChange(v)}
-                //     />
-                //   );
-                // case 'enum':
-                //   return (
-                //     <EnumInput
-                //       primary={name.replace('_', ' ')}
-                //       secondary={`[${metadata.validator_type}]`}
-                //       value={state.value}
-                //       items={metadata.validator_params.values}
-                //       onBlur={handleBlur}
-                //       onChange={e => handleChange(e.target.value)}
-                //     />
-                //   );
-              }
-            }}
-          />
-        ))}
+      {index < 0
+        ? null
+        : form.store.state.values.settings?.service_spec?.[index].params
+            // .sort((a, b) => a.name.localeCompare(b.name))
+            .map((param, p_id) => (
+              <form.Field
+                key={`${p_id}`}
+                field={store => store.settings.service_spec[index].params[p_id].value.toPath()}
+                children={({ state, handleBlur, handleChange }) => {
+                  const primary = param.name.replaceAll('_', ' ');
+                  const secondary = `[${param.type}]`;
+
+                  switch (param.type) {
+                    case 'str':
+                      return (
+                        <TextInput
+                          primary={primary}
+                          secondary={secondary}
+                          value={state.value}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                        />
+                      );
+                    case 'int':
+                      return (
+                        <NumberInput
+                          primary={primary}
+                          secondary={secondary}
+                          value={state.value}
+                          onBlur={handleBlur}
+                          onChange={e => handleChange(parseInt(e.target.value))}
+                        />
+                      );
+                    case 'bool':
+                      return (
+                        <BooleanInput
+                          primary={primary}
+                          secondary={secondary}
+                          value={state.value}
+                          onBlur={handleBlur}
+                          onChange={() => handleChange(!state.value)}
+                        />
+                      );
+                    case 'list':
+                      return (
+                        <EnumInput primary={primary} secondary={secondary} items={param.list} value={state.value} />
+                      );
+                    default:
+                      return (
+                        <TextInput
+                          primary={primary}
+                          secondary={secondary}
+                          value={state.value}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                        />
+                      );
+                    // case 'keyword':
+                    //   return (
+                    //     <TextInput
+                    //       primary={name.replace('_', ' ')}
+                    //       secondary={`[${metadata.validator_type}]`}
+                    //       defaultValue={state.value}
+                    //       options={options}
+                    //       onBlur={handleBlur}
+                    //       onChange={v => handleChange(v)}
+                    //     />
+                    //   );
+                    // case 'enum':
+                    //   return (
+                    //     <EnumInput
+                    //       primary={name.replace('_', ' ')}
+                    //       secondary={`[${metadata.validator_type}]`}
+                    //       value={state.value}
+                    //       items={metadata.validator_params.values}
+                    //       onBlur={handleBlur}
+                    //       onChange={e => handleChange(e.target.value)}
+                    //     />
+                    //   );
+                  }
+                }}
+              />
+            ))}
     </List>
   );
 });
 
 type CategoryProps = {
-  category: SelectedService;
+  cat_id: number;
+  category: {
+    name: string;
+    selected: boolean;
+    services: {
+      category: string;
+      description: string;
+      is_external: boolean;
+      name: string;
+      selected: boolean;
+    }[];
+  };
 };
 
-const Category: React.FC<CategoryProps> = React.memo(({ category }) => {
+const Category: React.FC<CategoryProps> = React.memo(({ cat_id, category }) => {
   const theme = useTheme();
+  const form = useForm();
 
   return (
     <>
-      <div style={{ marginBottom: theme.spacing(2) }}>
-        <Typography variant="h5">{category.name}</Typography>
-        <Divider />
-      </div>
+      {/* <div style={{ marginBottom: theme.spacing(2) }}>
+        <div>
+          <Typography variant="h5">{category.name}</Typography>
+          <Divider />
+        </div>
+      </div> */}
+
+      <form.Field
+        field={store => store.settings.services[cat_id].selected.toPath()}
+        children={({ state, handleBlur, handleChange }) => (
+          <ListItem
+            secondaryAction={
+              <Checkbox
+                edge="end"
+                checked={state.value}
+                onBlur={handleBlur}
+                onChange={() => handleChange(!state.value)}
+                // onChange={handleToggle(value)}
+                // checked={checked.includes(value)}
+              />
+            }
+            disablePadding
+            dense
+            sx={{ marginTop: theme.spacing(1), borderBottom: `thin solid ${theme.palette.divider}` }}
+          >
+            <ListItemButton>
+              <ListItemText primary={category.name} primaryTypographyProps={{ variant: 'h5' }} />
+            </ListItemButton>
+          </ListItem>
+        )}
+      />
 
       {category.services
         .sort((a, b) => a.name.localeCompare(b.name))
         .map((service, svr_id) => (
-          <Service key={svr_id} service={service} />
+          <Service key={svr_id} cat_id={cat_id} svr_id={svr_id} service={service} />
         ))}
     </>
   );
@@ -155,7 +278,7 @@ type Props = {
   settings?: UserSettings;
 };
 
-const WrappedServiceParameters = ({ settings = DEFAULT_SETTINGS }: Props) => {
+const WrappedServiceParameters = ({ settings }: Props) => {
   const { t, i18n } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const classes = useStyles();
@@ -170,10 +293,10 @@ const WrappedServiceParameters = ({ settings = DEFAULT_SETTINGS }: Props) => {
 
   return (
     <>
-      {settings?.services
-        .sort((a, b) => a.name.localeCompare(b.name))
+      {form.store.state.values.settings?.services
+        // .sort((a, b) => a.name.localeCompare(b.name))
         .map((category, cat_id) => (
-          <Category key={cat_id} category={category} />
+          <Category key={cat_id} cat_id={cat_id} category={category} />
         ))}
     </>
   );

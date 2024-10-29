@@ -1,9 +1,6 @@
 import { Checkbox, List, ListItem, ListItemButton, ListItemText, useTheme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useALContext from 'components/hooks/useALContext';
-import { SelectedService } from 'components/models/base/service';
-import type { UserSettings } from 'components/models/base/user_settings';
-import { DEFAULT_SETTINGS } from 'components/routes/submit/settings';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from '../form';
@@ -41,80 +38,130 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type ItemProps = {
-  cat_id: string;
-  category: SelectedService;
+  cat_id: number;
+  category: {
+    name: string;
+    selected: boolean;
+    services: {
+      category: string;
+      description: string;
+      is_external: boolean;
+      name: string;
+      selected: boolean;
+    }[];
+  };
 };
 
 const Item: React.FC<ItemProps> = React.memo(({ cat_id, category }) => {
   const theme = useTheme();
+  const form = useForm();
 
   return (
     <>
-      <ListItem
-        key={cat_id}
-        secondaryAction={
-          <Checkbox
-            edge="end"
-            // onChange={handleToggle(value)}
-            // checked={checked.includes(value)}
-
-            inputProps={{ 'aria-labelledby': category.name }}
-          />
-        }
-        disablePadding
-        sx={{ marginTop: theme.spacing(1) }}
-      >
-        <ListItemButton>
-          <ListItemText id={cat_id} primary={category.name} primaryTypographyProps={{ color: 'textSecondary' }} />
-        </ListItemButton>
-      </ListItem>
-
-      {category.services
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((service, svr_id) => (
+      <form.Field
+        field={store => store.settings.services[cat_id].selected.toPath()}
+        children={({ state, handleBlur, handleChange }) => (
           <ListItem
-            key={`${cat_id}-${svr_id}`}
+            key={cat_id}
             secondaryAction={
               <Checkbox
                 edge="end"
-                // onChange={handleToggle(value)}
-                // checked={checked.includes(value)}
-                inputProps={{ 'aria-labelledby': service.name }}
+                inputProps={{ 'aria-labelledby': category.name }}
+                checked={state.value}
+                onBlur={handleBlur}
+                onChange={() =>
+                  form.setStore(s => {
+                    if (state.value) {
+                      s.settings.services[cat_id].selected = false;
+                      s.settings.services[cat_id].services = s.settings.services[cat_id].services.map(srv => ({
+                        ...srv,
+                        selected: false
+                      }));
+                    } else {
+                      s.settings.services[cat_id].selected = true;
+                      s.settings.services[cat_id].services = s.settings.services[cat_id].services.map(srv => ({
+                        ...srv,
+                        selected: true
+                      }));
+                    }
+
+                    console.log(s);
+
+                    return s;
+                  })
+                }
               />
             }
             disablePadding
-            sx={
-              {
-                // borderLeft: `1px solid ${theme.palette.primary.main}`
-              }
-            }
+            sx={{ marginTop: theme.spacing(1) }}
           >
             <ListItemButton>
-              <ListItemText
-                id={`${svr_id}`}
-                primary={service.name}
-                // primaryTypographyProps={{ color: 'primary.main' }}
-                style={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
-              />
+              <ListItemText primary={category.name} primaryTypographyProps={{ color: 'textSecondary' }} />
             </ListItemButton>
           </ListItem>
+        )}
+      />
+
+      {category.services
+        // .sort((a, b) => a.name.localeCompare(b.name))
+        .map((service, svr_id) => (
+          <form.Field
+            key={`${cat_id}-${svr_id}`}
+            field={store => store.settings.services[cat_id].services[svr_id].selected.toPath()}
+            children={({ state, handleBlur, handleChange }) => (
+              <ListItem
+                secondaryAction={
+                  <Checkbox
+                    edge="end"
+                    inputProps={{ 'aria-labelledby': service.name }}
+                    checked={state.value}
+                    onBlur={handleBlur}
+                    onChange={() =>
+                      form.setStore(s => {
+                        if (state.value) {
+                          s.settings.services[cat_id].selected = false;
+                          s.settings.services[cat_id].services[svr_id].selected = false;
+                        } else {
+                          s.settings.services[cat_id].services[svr_id].selected = true;
+                          s.settings.services[cat_id].selected = s.settings.services[cat_id].services.every(
+                            srv => srv.selected
+                          );
+                        }
+
+                        return s;
+                      })
+                    }
+                  />
+                }
+                disablePadding
+                sx={
+                  {
+                    // borderLeft: `1px solid ${theme.palette.primary.main}`
+                  }
+                }
+              >
+                <ListItemButton>
+                  <ListItemText
+                    id={`${svr_id}`}
+                    primary={service.name}
+                    // primaryTypographyProps={{ color: 'primary.main' }}
+                    style={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )}
+          />
         ))}
     </>
   );
 });
 
-type ServiceAccordionProps = {
-  settings?: UserSettings;
-};
-
-const WrappedServiceList = ({ settings = DEFAULT_SETTINGS }: ServiceAccordionProps) => {
+const WrappedServiceList = () => {
   const { t, i18n } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const classes = useStyles();
   const form = useForm();
   const { user: currentUser, c12nDef, configuration } = useALContext();
-
-  console.log(settings);
 
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
@@ -128,10 +175,10 @@ const WrappedServiceList = ({ settings = DEFAULT_SETTINGS }: ServiceAccordionPro
         '& ul': { padding: 0 }
       }}
     >
-      {settings?.services
-        .sort((a, b) => a.name.localeCompare(b.name))
+      {form.store.state.values.settings?.services
+        // .sort((a, b) => a.name.localeCompare(b.name))
         .map((category, cat_id) => (
-          <Item key={cat_id} cat_id={`${cat_id}`} category={category} />
+          <Item key={cat_id} cat_id={cat_id} category={category} />
         ))}
     </List>
   );

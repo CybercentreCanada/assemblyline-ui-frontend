@@ -20,7 +20,6 @@ import {
 import { makeStyles } from '@mui/styles';
 import useALContext from 'components/hooks/useALContext';
 import type { UserSettings } from 'components/models/base/user_settings';
-import { DEFAULT_SETTINGS } from 'components/routes/submit/settings';
 import MetadataInputField from 'components/visual/MetadataInputField';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -63,7 +62,7 @@ type ServiceAccordionProps = {
   settings?: UserSettings;
 };
 
-const WrappedServiceNavigation = ({ settings = DEFAULT_SETTINGS }: ServiceAccordionProps) => {
+const WrappedServiceNavigation = ({ settings }: ServiceAccordionProps) => {
   const { t, i18n } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const classes = useStyles();

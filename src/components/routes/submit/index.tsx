@@ -7,13 +7,11 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Metadata } from 'components/models/base/submission';
-import type { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { TabContainer } from 'components/visual/TabContainer';
-import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { ServiceList } from './components/ServiceList';
@@ -117,70 +115,70 @@ const WrappedSubmitContent = () => {
 
   console.log(form.state.values);
 
-  useEffect(() => {
-    apiCall<UserSettings>({
-      url: `/api/v4/user/settings/${currentUser.username}/`,
-      onSuccess: ({ api_response }) => {
-        console.log(api_response);
-        form.setStore(s => {
-          s.settings = { ...api_response } as any;
+  // useEffect(() => {
+  //   apiCall<UserSettings>({
+  //     url: `/api/v4/user/settings/${currentUser.username}/`,
+  //     onSuccess: ({ api_response }) => {
+  //       console.log(api_response);
+  //       form.setStore(s => {
+  //         s.settings = { ...api_response } as any;
 
-          if (submitState) {
-            s.settings.classification = submitState.c12n;
-          } else if (submitParams.get('classification')) {
-            s.settings.classification = submitParams.get('classification');
-          }
+  //         if (submitState) {
+  //           s.settings.classification = submitState.c12n;
+  //         } else if (submitParams.get('classification')) {
+  //           s.settings.classification = submitParams.get('classification');
+  //         }
 
-          s.settings.default_external_sources = Array.from(
-            new Set(
-              Object.entries(configuration.submission.file_sources).reduce(
-                (prev, [, fileSource]) => [...prev, ...fileSource.auto_selected],
-                api_response?.default_external_sources || []
-              )
-            )
-          );
+  //         s.settings.default_external_sources = Array.from(
+  //           new Set(
+  //             Object.entries(configuration.submission.file_sources).reduce(
+  //               (prev, [, fileSource]) => [...prev, ...fileSource.auto_selected],
+  //               api_response?.default_external_sources || []
+  //             )
+  //           )
+  //         );
 
-          if (!currentUser.roles.includes('submission_customize')) {
-            s.submissionProfile = api_response.preferred_submission_profile;
-          }
+  //         if (!currentUser.roles.includes('submission_customize')) {
+  //           s.submissionProfile = api_response.preferred_submission_profile;
+  //         }
 
-          return s;
-        });
-      }
-    });
+  //         return s;
+  //       });
+  //     }
+  //   });
 
-    form.setStore(s => {
-      s.uuid = generateUUID();
+  //   form.setStore(s => {
+  //     s.uuid = generateUUID();
 
-      // Handle if we've been given input via param
-      const inputParam = submitParams.get('input') || '';
-      if (inputParam) setTab('hash');
-      const [type, value] = getSubmitType(inputParam, configuration);
-      closeSnackbar();
-      s.input = { type, value, hasError: false };
+  //     // Handle if we've been given input via param
+  //     const inputParam = submitParams.get('input') || '';
+  //     if (inputParam) setTab('hash');
+  //     const [type, value] = getSubmitType(inputParam, configuration);
+  //     closeSnackbar();
+  //     s.input = { type, value, hasError: false };
 
-      // Load the default submission metadata
-      if (configuration.submission.metadata && configuration.submission.metadata.submit) {
-        const tempMeta = {};
-        for (const metaKey in configuration.submission.metadata.submit) {
-          const metaConfig = configuration.submission.metadata.submit[metaKey];
-          if (metaConfig.default !== null) {
-            tempMeta[metaKey] = metaConfig.default;
-          }
-        }
-        if (tempMeta) {
-          console.log(tempMeta);
+  //     // Load the default submission metadata
+  //     if (configuration.submission.metadata && configuration.submission.metadata.submit) {
+  //       const tempMeta = {};
+  //       for (const metaKey in configuration.submission.metadata.submit) {
+  //         const metaConfig = configuration.submission.metadata.submit[metaKey];
+  //         if (metaConfig.default !== null) {
+  //           tempMeta[metaKey] = metaConfig.default;
+  //         }
+  //       }
+  //       if (tempMeta) {
+  //         console.log(tempMeta);
 
-          s.submissionMetadata = { ...tempMeta, ...s.submissionMetadata };
-        }
-      }
+  //         s.submissionMetadata = { ...tempMeta, ...s.submissionMetadata };
+  //       }
+  //     }
 
-      console.log(configuration.submission.metadata);
+  //     console.log(configuration.submission.metadata);
 
-      return s;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //     return s;
+  //   });
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   // useEffect(() => {
   //   // Handle if we've been given input via param

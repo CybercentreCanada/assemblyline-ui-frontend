@@ -5,7 +5,6 @@ import type { UserSettings } from 'components/models/base/user_settings';
 import { useForm } from 'components/routes/submit/form';
 import { BooleanInput } from 'components/routes/submit/inputs/BooleanInput';
 import { TextInput } from 'components/routes/submit/inputs/TextInput';
-import { DEFAULT_SETTINGS } from 'components/routes/submit/settings';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumberInput } from '../inputs/NumberInput';
@@ -47,7 +46,7 @@ type ServiceAccordionProps = {
   settings?: UserSettings;
 };
 
-const WrappedSubmissionParameters = ({ settings = DEFAULT_SETTINGS }: ServiceAccordionProps) => {
+const WrappedSubmissionParameters = ({ settings }: ServiceAccordionProps) => {
   const { t, i18n } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const classes = useStyles();
