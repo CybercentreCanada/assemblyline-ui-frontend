@@ -622,7 +622,7 @@ export const CONFIGURATION: Configuration = {
     banner_level: 'info',
     community_feed: '',
     download_encoding: 'raw',
-    default_zip_password: 'zippy',
+    default_zip_password: 'infected',
     enforce_quota: false,
     external_links: {
       hash: {},
