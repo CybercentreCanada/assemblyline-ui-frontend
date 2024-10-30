@@ -11,14 +11,14 @@ import {
   useTheme
 } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
+import { useForm } from 'components/routes/submit/contexts/form';
+import { BooleanInput } from 'components/routes/submit/inputs/BooleanInput';
+import { NumberInput } from 'components/routes/submit/inputs/NumberInput';
+import { SelectInput } from 'components/routes/submit/inputs/SelectInput';
+import { TextInput } from 'components/routes/submit/inputs/TextInput';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import { useForm } from '../contexts/form';
-import { BooleanInput } from '../inputs/BooleanInput';
-import { NumberInput } from '../inputs/NumberInput';
-import { SelectInput } from '../inputs/SelectInput';
-import { TextInput } from '../inputs/TextInput';
 
 type ServiceTreeItemSkelProps = {
   size: 'medium' | 'small';
@@ -318,8 +318,6 @@ const WrappedServiceSelection = ({ size = 'medium' }: Props) => {
   const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const form = useForm();
-
-  console.log(form.store.state.values.settings?.service_spec);
 
   return (
     <div style={{ paddingLeft: theme.spacing(2), textAlign: 'left', marginTop: theme.spacing(2) }}>

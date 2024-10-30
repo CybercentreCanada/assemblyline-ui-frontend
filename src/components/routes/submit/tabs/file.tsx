@@ -29,10 +29,6 @@ const WrappedFileSubmit = ({ onValidateServiceSelection, onCancelUpload }: Props
 
   const form = useForm();
 
-  const sp1 = theme.spacing(1);
-  const sp2 = theme.spacing(2);
-  const sp4 = theme.spacing(4);
-
   return !form.state.values.settings ? (
     <Skeleton style={{ height: '280px' }} />
   ) : (
@@ -52,9 +48,9 @@ const WrappedFileSubmit = ({ onValidateServiceSelection, onCancelUpload }: Props
         selector={state => [state.values.file, configuration.ui.allow_malicious_hinting]}
         children={([file, allow_malicious_hinting]) =>
           !file ? null : !allow_malicious_hinting ? (
-            <div style={{ padding: sp2 }} />
+            <div style={{ padding: theme.spacing(2) }} />
           ) : (
-            <div style={{ padding: sp1 }}>
+            <div style={{ padding: theme.spacing(1) }}>
               <Tooltip title={t('malicious.tooltip')} placement="top">
                 <div>
                   <form.Field
@@ -101,7 +97,12 @@ const WrappedFileSubmit = ({ onValidateServiceSelection, onCancelUpload }: Props
         selector={state => [state.values.file]}
         children={([file]) =>
           !file ? null : (
-            <Button style={{ marginLeft: sp2 }} color="secondary" variant="contained" onClick={onCancelUpload}>
+            <Button
+              style={{ marginLeft: theme.spacing(2) }}
+              color="secondary"
+              variant="contained"
+              onClick={onCancelUpload}
+            >
               {t('file.cancel')}
             </Button>
           )
@@ -118,7 +119,7 @@ const WrappedFileSubmit = ({ onValidateServiceSelection, onCancelUpload }: Props
       <MetadataSummary />
 
       {!configuration.ui.tos ? null : (
-        <div style={{ marginTop: sp4, textAlign: 'center' }}>
+        <div style={{ marginTop: theme.spacing(4), textAlign: 'center' }}>
           <Typography variant="body2">
             {t('terms1')}
             <i>{t('file.button')}</i>

@@ -2,8 +2,8 @@ import { createFormContext } from 'components/core/form/createFormContext';
 import type { HashPatternMap } from 'components/models/base/config';
 import type { Metadata } from 'components/models/base/submission';
 import type { UserSettings } from 'components/models/base/user_settings';
+import { DEFAULT_SETTINGS } from 'components/routes/submit/mock/settings';
 import generateUUID from 'helpers/uuid';
-import { DEFAULT_SETTINGS } from '../mock/settings';
 
 export type FormData = {
   allowClick: boolean;

@@ -170,6 +170,7 @@ const WrappedSubmitContent = () => {
         tabs={{
           file: {
             label: t('file'),
+            disabled: !currentUser.roles.includes('submission_create'),
             inner: (
               <FileSubmit
                 onValidateServiceSelection={handleValidateServiceSelection}
@@ -184,11 +185,11 @@ const WrappedSubmitContent = () => {
           },
           options: {
             label: t('options'),
+            disabled: !currentUser.roles.includes('submission_create'),
             inner: (
               <Grid container columnGap={2}>
                 <Grid item xs={12} md>
                   <ServiceSelection />
-                  {/* <ServiceParameters /> */}
                 </Grid>
                 <Grid item xs={12} md>
                   <SubmissionParameters />
