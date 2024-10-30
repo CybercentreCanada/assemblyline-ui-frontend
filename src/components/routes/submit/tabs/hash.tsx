@@ -13,13 +13,13 @@ import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import SubmissionMetadata from 'components/layout/submissionMetadata';
+import { MetadataSummary } from 'components/routes/submit/components/MetadataSummary';
+import { useForm } from 'components/routes/submit/contexts/form';
 import { getSubmitType } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
-import { useForm } from './contexts/form';
 
 const useStyles = makeStyles(theme => ({
   no_pad: {
@@ -78,7 +78,7 @@ const WrappedHashSubmit = ({ onValidateServiceSelection }: Props) => {
     <>
       <div style={{ display: 'flex', flexDirection: 'row', marginTop: sp2, alignItems: 'flex-start' }}>
         <form.Field
-          field={store => store.input.toPath()}
+          name="input"
           children={({ state, handleBlur, handleChange }) =>
             !form.state.values.settings ? (
               <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
@@ -225,12 +225,7 @@ const WrappedHashSubmit = ({ onValidateServiceSelection }: Props) => {
         }
       />
 
-      <form.Field
-        field={store => store.submissionMetadata.toPath()}
-        children={({ state, handleChange }) => (
-          <SubmissionMetadata submissionMetadata={state.value} setSubmissionMetadata={value => handleChange(value)} />
-        )}
-      />
+      <MetadataSummary />
 
       {!configuration.ui.tos ? null : (
         <div style={{ marginTop: sp4, textAlign: 'center' }}>

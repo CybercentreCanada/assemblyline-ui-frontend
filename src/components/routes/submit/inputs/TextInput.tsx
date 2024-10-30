@@ -1,7 +1,8 @@
-import type { AutocompleteProps, ListItemTextProps } from '@mui/material';
-import { Autocomplete, ListItem, Skeleton, TextField, Typography, useTheme } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
+import type { AutocompleteProps, TypographyProps } from '@mui/material';
+import { Autocomplete, IconButton, Skeleton, TextField, Typography, useTheme } from '@mui/material';
 import type { ElementType } from 'react';
-import React from 'react';
+import React, { useState } from 'react';
 
 type Props<
   Value,
@@ -11,13 +12,15 @@ type Props<
   ChipComponent extends ElementType
 > = Omit<
   AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>,
-  'renderInput' | 'options' | 'onChange'
+  'renderInput' | 'options' | 'onChange' | 'value'
 > & {
-  primary?: ListItemTextProps['primary'];
-  secondary?: ListItemTextProps['secondary'];
+  label?: string;
+  labelProps?: TypographyProps;
   loading?: boolean;
   options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
+  value: string;
   onChange?: (value: string) => void;
+  onReset?: () => void;
 };
 
 const WrappedTextInput = <
@@ -27,29 +30,46 @@ const WrappedTextInput = <
   FreeSolo extends boolean,
   ChipComponent extends ElementType
 >({
-  primary,
-  secondary,
+  label,
+  labelProps,
   loading = false,
   options = [],
   value,
+  disabled,
   onChange,
+  onReset,
   ...other
 }: Props<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
   const theme = useTheme();
 
+  const [_value, setValue] = useState(null);
+
   return (
-    <ListItem sx={{ columnGap: theme.spacing(2) }}>
-      <div>
-        {primary && (
+    <div style={{ margin: `${theme.spacing(1)} 0px` }}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {label && (
           <Typography
-            color="textPrimary"
-            variant="body1"
+            color="textSecondary"
+            variant="caption"
             whiteSpace="nowrap"
             textTransform="capitalize"
-            children={primary}
+            gutterBottom
+            sx={{ flex: 1 }}
+            {...labelProps}
+            children={label.replaceAll('_', ' ')}
           />
         )}
-        {secondary && <Typography color="textSecondary" variant="body2" children={secondary} />}
+        {onReset && !!value && !disabled && (
+          <IconButton
+            size="small"
+            onClick={() => {
+              setValue(null);
+              onReset();
+            }}
+          >
+            <ClearIcon style={{ width: theme.spacing(2.5), height: theme.spacing(2.5) }} />
+          </IconButton>
+        )}
       </div>
 
       {loading ? (
@@ -61,14 +81,19 @@ const WrappedTextInput = <
           disableClearable
           fullWidth
           size="small"
-          value={value || null}
+          value={_value}
+          inputValue={value || ''}
           options={options}
-          onInputChange={(_, v) => onChange(v)}
+          onChange={(e, v: unknown) => setValue(v)}
+          onInputChange={(_, v) => {
+            setValue(null);
+            onChange(v);
+          }}
           renderInput={params => <TextField {...params} />}
           {...other}
         />
       )}
-    </ListItem>
+    </div>
   );
 };
 

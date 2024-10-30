@@ -1,35 +1,34 @@
-import type { ListItemButtonProps, ListItemTextProps } from '@mui/material';
-import { ListItem, ListItemButton, ListItemText, Skeleton, Switch, useTheme } from '@mui/material';
+import type { ListItemButtonProps, TypographyProps } from '@mui/material';
+import { Checkbox, ListItemButton, ListItemIcon, ListItemText, Skeleton, useTheme } from '@mui/material';
 import React from 'react';
 
 type Props = ListItemButtonProps & {
-  primary?: ListItemTextProps['primary'];
-  secondary?: ListItemTextProps['secondary'];
+  label?: string;
+  labelProps?: TypographyProps;
   loading?: boolean;
   value: boolean;
 };
 
-const WrappedBooleanInput = ({ primary, secondary, loading = false, value, ...other }: Props) => {
+const WrappedBooleanInput = ({ label, labelProps, loading = false, value, ...other }: Props) => {
   const theme = useTheme();
 
   return (
-    <ListItem disablePadding>
-      <ListItemButton {...other}>
-        <ListItemText
-          primary={primary}
-          secondary={secondary}
-          style={{ marginRight: theme.spacing(2) }}
-          primaryTypographyProps={{ variant: 'body1', whiteSpace: 'nowrap', textTransform: 'capitalize' }}
-        />
+    <ListItemButton sx={{ padding: '0px 12px' }} {...other}>
+      <ListItemIcon sx={{ minWidth: 0 }}>
         {loading ? (
           <Skeleton
             style={{ height: '2rem', width: '1.5rem', marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
           />
         ) : (
-          <Switch checked={value} edge="end" />
+          <Checkbox checked={value} edge="start" size="small" />
         )}
-      </ListItemButton>
-    </ListItem>
+      </ListItemIcon>
+      <ListItemText
+        primary={label.replaceAll('_', ' ')}
+        style={{ marginRight: theme.spacing(2) }}
+        primaryTypographyProps={{ variant: 'body2', whiteSpace: 'nowrap', textTransform: 'capitalize', ...labelProps }}
+      />
+    </ListItemButton>
   );
 };
 

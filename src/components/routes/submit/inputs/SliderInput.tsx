@@ -1,57 +1,37 @@
-import type { ListItemTextProps, SliderProps } from '@mui/material';
-import { ListItem, Skeleton, Slider, Typography, useTheme } from '@mui/material';
-import type { FieldPath } from 'components/core/form/utils';
-import type { FormData } from 'components/routes/submit-old/form';
-import { useForm } from 'components/routes/submit-old/form';
+import type { SliderProps, TypographyProps } from '@mui/material';
+import { Skeleton, Slider, Typography, useTheme } from '@mui/material';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
-interface Props extends SliderProps {
-  primary?: ListItemTextProps['primary'];
-  secondary?: ListItemTextProps['secondary'];
-  storePath: (data: FieldPath<FormData>) => string;
-}
+type Props = SliderProps & {
+  label?: string;
+  labelProps?: TypographyProps;
+  loading?: boolean;
+};
 
-const WrappedSliderInput = ({ primary, secondary, storePath = null, ...other }: Props) => {
-  const { t, i18n } = useTranslation(['submit', 'settings']);
+const WrappedSliderInput = ({ label, labelProps, loading, ...other }: Props) => {
   const theme = useTheme();
-  const form = useForm();
 
   return (
-    <ListItem sx={{ columnGap: theme.spacing(2) }}>
-      <div>
-        {primary && (
-          <Typography
-            color="textPrimary"
-            variant="body1"
-            whiteSpace="nowrap"
-            textTransform="capitalize"
-            children={primary}
-          />
-        )}
-        {secondary && <Typography color="textSecondary" variant="body2" children={secondary} />}
-      </div>
-
-      <form.Field
-        field={store => store.settings.priority.toPath()}
-        children={({ state, handleBlur, handleChange }) =>
-          !form.state.values.settings ? (
-            <Skeleton style={{ height: '3rem' }} />
-          ) : (
-            <div style={{ width: '100%', marginLeft: '20px', marginRight: '20px' }}>
-              <Slider
-                {...other}
-                valueLabelDisplay={'auto'}
-                size="small"
-                value={state.value}
-                onBlur={handleBlur}
-                onChange={(_, value) => handleChange(value)}
-              />
-            </div>
-          )
-        }
-      />
-    </ListItem>
+    <div style={{ margin: `${theme.spacing(1)} 0px` }}>
+      {label && (
+        <Typography
+          color="textSecondary"
+          variant="caption"
+          whiteSpace="nowrap"
+          textTransform="capitalize"
+          gutterBottom
+          {...labelProps}
+          children={label.replaceAll('_', ' ')}
+        />
+      )}
+      {loading ? (
+        <Skeleton style={{ height: '3rem' }} />
+      ) : (
+        <div style={{ marginLeft: '20px', marginRight: '20px' }}>
+          <Slider valueLabelDisplay={'auto'} size="small" {...other} />
+        </div>
+      )}
+    </div>
   );
 };
 

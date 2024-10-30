@@ -1,6 +1,5 @@
 import {
   Checkbox,
-  Divider,
   FormControlLabel,
   Grid,
   MenuItem,
@@ -23,11 +22,8 @@ import MetadataInputField from 'components/visual/MetadataInputField';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import { ServiceAccordion } from './components/ServiceAccordion';
-import { ServiceParameters } from './components/ServiceParameters';
-import { SubmissionMetadata } from './components/SubmissionMetadata';
-import { SubmissionParameters } from './components/SubmissionParameters';
-import { useForm } from './contexts/form';
+import { ServiceAccordion } from '../components/ServiceAccordion';
+import { useForm } from '../contexts/form';
 
 const useStyles = makeStyles(theme => ({
   no_pad: {
@@ -66,7 +62,7 @@ type Props = {
   onCancelUpload: () => void;
 };
 
-const WrappedSubmitOptions2 = ({ onValidateServiceSelection, onCancelUpload }: Props) => {
+const WrappedSubmitOptionsOld = ({ onValidateServiceSelection, onCancelUpload }: Props) => {
   const { t, i18n } = useTranslation(['submit']);
   const { apiCall } = useMyAPI();
   const theme = useTheme();
@@ -164,33 +160,6 @@ const WrappedSubmitOptions2 = ({ onValidateServiceSelection, onCancelUpload }: P
       });
     },
     [configuration.submission.profiles, form]
-  );
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', columnGap: sp2 }}>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          textAlign: 'start',
-          marginTop: theme.spacing(2),
-          rowGap: theme.spacing(2)
-          // rowGap: sp2
-        }}
-      >
-        <div>
-          <Typography variant="h5">Submission</Typography>
-          <Divider />
-        </div>
-
-        <SubmissionParameters />
-        <SubmissionMetadata />
-        <ServiceParameters />
-      </div>
-      {/* <div style={{ position: 'sticky', top: '500px' }}>
-        <ServiceList />
-      </div> */}
-    </div>
   );
 
   return (
@@ -567,4 +536,4 @@ const WrappedSubmitOptions2 = ({ onValidateServiceSelection, onCancelUpload }: P
   );
 };
 
-export const SubmitOptions2 = React.memo(WrappedSubmitOptions2);
+export const SubmitOptionsOld = React.memo(WrappedSubmitOptionsOld);

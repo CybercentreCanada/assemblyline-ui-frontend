@@ -18,14 +18,12 @@ import {
 import { makeStyles } from '@mui/styles';
 import useALContext from 'components/hooks/useALContext';
 import type { UserSettings } from 'components/models/base/user_settings';
+import { useForm } from 'components/routes/submit/contexts/form';
+import { BooleanInput } from 'components/routes/submit/inputs/BooleanInput';
+import { NumberInput } from 'components/routes/submit/inputs/NumberInput';
+import { TextInput } from 'components/routes/submit/inputs/TextInput';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from '../contexts/form';
-import { BooleanInput } from '../inputs/BooleanInput';
-import { EnumInput } from '../inputs/EnumInput';
-import { NumberInput } from '../inputs/NumberInput';
-import { TextInput } from '../inputs/TextInput';
-import { ResetButton } from './ServiceAccordion';
 
 const useStyles = makeStyles(theme => ({
   no_pad: {
@@ -99,7 +97,8 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, categoryNa
       </ListItem> */}
 
       <form.Field
-        field={store => store.settings.services[cat_id].services[svr_id].selected.toPath()}
+        // field={store => store.settings.services[cat_id].services[svr_id].selected.toPath()}
+        name={`settings.services[${cat_id}].services[${svr_id}].selected`}
         children={({ state, handleBlur, handleChange }) => (
           <ListItem
             id={`${categoryName} - ${service.name}`}
@@ -134,10 +133,13 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, categoryNa
             .map((param, p_id) => (
               <form.Field
                 key={`${p_id}`}
-                field={store => store.settings.service_spec[index].params[p_id].value.toPath()}
+                // field={store => store.settings.service_spec[index].params[p_id].value.toPath()}
+                name={`settings.service_spec[${index}].params[${p_id}].value`}
                 children={({ state, handleBlur, handleChange }) => {
                   const primary = param.name.replaceAll('_', ' ');
                   const secondary = `[${param.type}]`;
+
+                  return null;
 
                   switch (param.type) {
                     case 'str':
@@ -243,7 +245,8 @@ const Category: React.FC<CategoryProps> = React.memo(({ cat_id, category }) => {
       </div> */}
 
       <form.Field
-        field={store => store.settings.services[cat_id].selected.toPath()}
+        // field={store => store.settings.services[cat_id].selected.toPath()}
+        name={`settings.services[${cat_id}].selected`}
         children={({ state, handleBlur, handleChange }) => (
           <ListItem
             id={category.name}
@@ -288,7 +291,7 @@ const WrappedServiceParameters = ({ settings }: Props) => {
   const form = useForm();
   const { user: currentUser, c12nDef, configuration } = useALContext();
 
-  console.log(settings);
+  console.log(form);
 
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);

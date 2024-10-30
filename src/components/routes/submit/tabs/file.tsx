@@ -4,12 +4,13 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import SubmissionMetadata from 'components/layout/submissionMetadata';
+import { MetadataSummary } from 'components/routes/submit/components/MetadataSummary';
+import { useForm } from 'components/routes/submit/contexts/form';
 import FileDropper from 'components/visual/FileDropper';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
-import { useForm } from './contexts/form';
 
 type Props = {
   onValidateServiceSelection: (cbType: string) => void;
@@ -37,7 +38,7 @@ const WrappedFileSubmit = ({ onValidateServiceSelection, onCancelUpload }: Props
   ) : (
     <div style={{ marginTop: theme.spacing(2) }}>
       <form.Field
-        field={() => '$.file'}
+        name="file"
         children={({ state, handleChange }) => (
           <FileDropper
             file={state.value}
@@ -57,7 +58,7 @@ const WrappedFileSubmit = ({ onValidateServiceSelection, onCancelUpload }: Props
               <Tooltip title={t('malicious.tooltip')} placement="top">
                 <div>
                   <form.Field
-                    field={store => store.settings.malicious.toPath()}
+                    name="settings.malicious"
                     children={({ state, handleChange }) => (
                       <FormControlLabel
                         control={
@@ -108,11 +109,13 @@ const WrappedFileSubmit = ({ onValidateServiceSelection, onCancelUpload }: Props
       />
 
       <form.Field
-        field={store => store.submissionMetadata.toPath()}
+        name="submissionMetadata"
         children={({ state, handleChange }) => (
           <SubmissionMetadata submissionMetadata={state.value} setSubmissionMetadata={value => handleChange(value)} />
         )}
       />
+
+      <MetadataSummary />
 
       {!configuration.ui.tos ? null : (
         <div style={{ marginTop: sp4, textAlign: 'center' }}>

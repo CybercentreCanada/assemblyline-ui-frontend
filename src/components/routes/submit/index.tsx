@@ -1,8 +1,8 @@
 import Flow from '@flowjs/flow.js';
-import { Alert, useMediaQuery, useTheme } from '@mui/material';
+import { Alert, Grid, useMediaQuery, useTheme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
-import PageFullSize from 'commons/components/pages/PageFullSize';
+import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -14,11 +14,12 @@ import generateUUID from 'helpers/uuid';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import { ServiceList } from './components/ServiceList';
+import { MetadataParameters } from './components/MetadataParameters';
+import { ServiceSelection } from './components/ServiceSelection';
+import { SubmissionParameters } from './components/SubmissionParameters';
 import { FormProvider, useForm } from './contexts/form';
-import { FileSubmit } from './file';
-import { HashSubmit } from './hash';
-import { SubmitOptions2 } from './options2';
+import { FileSubmit } from './tabs/file';
+import { HashSubmit } from './tabs/hash';
 
 const useStyles = makeStyles(theme => ({
   no_pad: {
@@ -113,201 +114,92 @@ const WrappedSubmitContent = () => {
     FLOW.off('progress');
   }, [form]);
 
-  console.log(form.state.values);
-
-  // useEffect(() => {
-  //   apiCall<UserSettings>({
-  //     url: `/api/v4/user/settings/${currentUser.username}/`,
-  //     onSuccess: ({ api_response }) => {
-  //       console.log(api_response);
-  //       form.setStore(s => {
-  //         s.settings = { ...api_response } as any;
-
-  //         if (submitState) {
-  //           s.settings.classification = submitState.c12n;
-  //         } else if (submitParams.get('classification')) {
-  //           s.settings.classification = submitParams.get('classification');
-  //         }
-
-  //         s.settings.default_external_sources = Array.from(
-  //           new Set(
-  //             Object.entries(configuration.submission.file_sources).reduce(
-  //               (prev, [, fileSource]) => [...prev, ...fileSource.auto_selected],
-  //               api_response?.default_external_sources || []
-  //             )
-  //           )
-  //         );
-
-  //         if (!currentUser.roles.includes('submission_customize')) {
-  //           s.submissionProfile = api_response.preferred_submission_profile;
-  //         }
-
-  //         return s;
-  //       });
-  //     }
-  //   });
-
-  //   form.setStore(s => {
-  //     s.uuid = generateUUID();
-
-  //     // Handle if we've been given input via param
-  //     const inputParam = submitParams.get('input') || '';
-  //     if (inputParam) setTab('hash');
-  //     const [type, value] = getSubmitType(inputParam, configuration);
-  //     closeSnackbar();
-  //     s.input = { type, value, hasError: false };
-
-  //     // Load the default submission metadata
-  //     if (configuration.submission.metadata && configuration.submission.metadata.submit) {
-  //       const tempMeta = {};
-  //       for (const metaKey in configuration.submission.metadata.submit) {
-  //         const metaConfig = configuration.submission.metadata.submit[metaKey];
-  //         if (metaConfig.default !== null) {
-  //           tempMeta[metaKey] = metaConfig.default;
-  //         }
-  //       }
-  //       if (tempMeta) {
-  //         console.log(tempMeta);
-
-  //         s.submissionMetadata = { ...tempMeta, ...s.submissionMetadata };
-  //       }
-  //     }
-
-  //     console.log(configuration.submission.metadata);
-
-  //     return s;
-  //   });
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
-  // useEffect(() => {
-  //   // Handle if we've been given input via param
-  //   const inputParam = submitParams.get('input') || '';
-  //   if (inputParam) {
-  //     handleStringChange(inputParam);
-  //     setTab('url');
-  //   }
-  // }, [handleStringChange, submitParams]);
-
-  // useEffect(() => {
-  //   // Load the default submission metadata
-  //   setSubmissionMetadata(v => ({
-  //     ...(!configuration?.submission?.metadata?.submit
-  //       ? {}
-  //       : Object.entries(configuration.submission.metadata.submit).reduce(
-  //           (prev, [key, metadata]) => (!metadata.default ? prev : { ...prev, [key]: metadata.default }),
-  //           {}
-  //         )),
-  //     ...v
-  //   }));
-  // }, [configuration.submission.metadata.submit]);
-
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'nowrap',
-        maxHeight: 'calc(100vh-64px)',
-        overflowY: 'auto'
-      }}
-    >
-      {/* <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%"> */}
-      <PageFullSize
-        styles={{
-          paper: {
-            width: '100%',
-            alignSelf: 'center',
-            maxWidth: md ? '800px' : downSM ? '100%' : '1024px',
-            padding: theme.spacing(4)
-          }
-        }}
-      >
-        <form.Subscribe
-          selector={state => [state.canSubmit, state.isSubmitting, state.values.validate]}
-          children={([canSubmit, isSubmitting, validate]) => (
-            <ConfirmationDialog
-              open={validate}
-              // handleClose={event => setValidate(false)}
-              handleClose={() => form.store.setState(s => ({ ...s, validate: false }))}
-              // handleCancel={cleanupServiceSelection}
-              // handleAccept={executeCB}
-              handleAccept={() => {}}
-              title={t('validate.title')}
-              cancelText={t('validate.cancelText')}
-              acceptText={t('validate.acceptText')}
-              text={t('validate.text')}
-            />
+    <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
+      <form.Subscribe
+        selector={state => [state.canSubmit, state.isSubmitting, state.values.validate]}
+        children={([canSubmit, isSubmitting, validate]) => (
+          <ConfirmationDialog
+            open={validate}
+            // handleClose={event => setValidate(false)}
+            handleClose={() => form.store.setState(s => ({ ...s, validate: false }))}
+            // handleCancel={cleanupServiceSelection}
+            // handleAccept={executeCB}
+            handleAccept={() => {}}
+            title={t('validate.title')}
+            cancelText={t('validate.cancelText')}
+            acceptText={t('validate.acceptText')}
+            text={t('validate.text')}
+          />
+        )}
+      />
+
+      <div style={{ marginBottom: !downSM && !configuration.ui.banner ? '2rem' : null }}>{banner}</div>
+
+      {configuration.ui.banner && (
+        <Alert severity={configuration.ui.banner_level} style={{ marginBottom: '2rem' }}>
+          {configuration.ui.banner[i18n.language] ? configuration.ui.banner[i18n.language] : configuration.ui.banner.en}
+        </Alert>
+      )}
+
+      {c12nDef.enforce ? (
+        <form.Field
+          name="settings.classification"
+          children={({ state, handleBlur, handleChange }) => (
+            <div style={{ paddingBottom: sp4 }}>
+              <div style={{ padding: sp1, fontSize: 16 }}>{t('classification')}</div>
+              <Classification
+                format="long"
+                type="picker"
+                c12n={state.value ? state.value : null}
+                setClassification={classification => handleChange(classification)}
+                disabled={!currentUser.roles.includes('submission_create')}
+              />
+            </div>
           )}
         />
+      ) : null}
 
-        <div style={{ marginBottom: !downSM && !configuration.ui.banner ? '2rem' : null }}>{banner}</div>
-
-        {configuration.ui.banner && (
-          <Alert severity={configuration.ui.banner_level} style={{ marginBottom: '2rem' }}>
-            {configuration.ui.banner[i18n.language]
-              ? configuration.ui.banner[i18n.language]
-              : configuration.ui.banner.en}
-          </Alert>
-        )}
-
-        {c12nDef.enforce ? (
-          <form.Field
-            field={store => store.settings.classification.toPath()}
-            children={({ name, state, handleBlur, handleChange }) => (
-              <div style={{ paddingBottom: sp4 }}>
-                <div style={{ padding: sp1, fontSize: 16 }}>{t('classification')}</div>
-                <Classification
-                  format="long"
-                  type="picker"
-                  c12n={state.value ? state.value : null}
-                  setClassification={classification => handleChange(classification)}
-                  disabled={!currentUser.roles.includes('submission_create')}
-                />
-              </div>
-            )}
-          />
-        ) : null}
-
-        <TabContainer
-          indicatorColor="primary"
-          textColor="primary"
-          paper
-          centered
-          variant="standard"
-          style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(1) }}
-          tabs={{
-            file: {
-              label: t('file'),
-              inner: (
-                <FileSubmit
-                  onValidateServiceSelection={handleValidateServiceSelection}
-                  onCancelUpload={handleCancelUpload}
-                />
-              )
-            },
-            hash: {
-              label: `${t('urlHash.input_title')}${t('urlHash.input_suffix')}`,
-              disabled: !currentUser.roles.includes('submission_create'),
-              inner: <HashSubmit onValidateServiceSelection={handleValidateServiceSelection} />
-            },
-            options: {
-              label: t('options'),
-              inner: (
-                <SubmitOptions2
-                  onValidateServiceSelection={handleValidateServiceSelection}
-                  onCancelUpload={handleCancelUpload}
-                />
-              )
-            }
-          }}
-        />
-        {/* </PageCenter> */}
-      </PageFullSize>
-      <div style={{ position: 'sticky', top: '0px', overflowY: 'auto' }}>
-        <ServiceList />
-      </div>
-    </div>
+      <TabContainer
+        indicatorColor="primary"
+        textColor="primary"
+        paper
+        centered
+        variant="standard"
+        style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(1) }}
+        tabs={{
+          file: {
+            label: t('file'),
+            inner: (
+              <FileSubmit
+                onValidateServiceSelection={handleValidateServiceSelection}
+                onCancelUpload={handleCancelUpload}
+              />
+            )
+          },
+          hash: {
+            label: `${t('urlHash.input_title')}${t('urlHash.input_suffix')}`,
+            disabled: !currentUser.roles.includes('submission_create'),
+            inner: <HashSubmit onValidateServiceSelection={handleValidateServiceSelection} />
+          },
+          options: {
+            label: t('options'),
+            inner: (
+              <Grid container columnGap={2}>
+                <Grid item xs={12} md>
+                  <ServiceSelection />
+                  {/* <ServiceParameters /> */}
+                </Grid>
+                <Grid item xs={12} md>
+                  <SubmissionParameters />
+                  <MetadataParameters />
+                </Grid>
+              </Grid>
+            )
+          }
+        }}
+      />
+    </PageCenter>
   );
 };
 
