@@ -82,12 +82,7 @@ export default function AppProvider<U extends AppUser>({
           <CssBaseline />
           <AppErrorProvider>
             <AppSnackbarProvider>
-              <BorealisProvider
-                baseURL={location.origin + '/api/v4/proxy/borealis'}
-                getToken={() => null}
-                // publicIconify={configuration?.ui?.api_proxies?.borealis?.public_iconify ?? true}
-                // customIconify={configuration?.ui?.api_proxies?.borealis?.custom_iconify ?? null}
-              >
+              <BorealisProvider baseURL={location.origin + '/api/v4/proxy/borealis'} getToken={() => null}>
                 <AppUserProvider service={user}>
                   <AssistantProvider>
                     <HighlightProvider>
