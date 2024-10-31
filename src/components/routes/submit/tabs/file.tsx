@@ -3,7 +3,6 @@ import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import SubmissionMetadata from 'components/layout/submissionMetadata';
 import { MetadataSummary } from 'components/routes/submit/components/MetadataSummary';
 import { useForm } from 'components/routes/submit/contexts/form';
 import FileDropper from 'components/visual/FileDropper';
@@ -107,13 +106,6 @@ const WrappedFileSubmit = ({ onValidateServiceSelection, onCancelUpload }: Props
             </Button>
           )
         }
-      />
-
-      <form.Field
-        name="submissionMetadata"
-        children={({ state, handleChange }) => (
-          <SubmissionMetadata submissionMetadata={state.value} setSubmissionMetadata={value => handleChange(value)} />
-        )}
       />
 
       <MetadataSummary />

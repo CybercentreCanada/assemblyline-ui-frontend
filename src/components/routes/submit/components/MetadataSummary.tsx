@@ -11,9 +11,9 @@ const WrappedMetadataSummary = () => {
 
   return (
     <form.Subscribe
-      selector={state => [state.values.submissionMetadata]}
+      selector={state => [Object.entries(state.values.submissionMetadata || {})]}
       children={([metadata]) =>
-        Object.keys(metadata || {}).length === 0 ? null : (
+        metadata.length === 0 ? null : (
           <div style={{ textAlign: 'start', marginTop: theme.spacing(3), marginBottom: theme.spacing(3) }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Typography style={{ flexGrow: 1 }} variant="subtitle1">
@@ -26,7 +26,7 @@ const WrappedMetadataSummary = () => {
               </Tooltip>
             </div>
             <div>
-              {Object.entries(metadata).map(([key, value], i) => (
+              {metadata.map(([key, value], i) => (
                 <Grid container key={i}>
                   <Grid
                     item

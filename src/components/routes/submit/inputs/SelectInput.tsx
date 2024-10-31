@@ -52,10 +52,11 @@ const WrappedSelectInput = ({
           variant="outlined"
           size="small"
           fullWidth
-          value={value || ''}
+          value={items.includes(value as string) ? value : ''}
           sx={{ textTransform: 'capitalize' }}
           {...other}
         >
+          <MenuItem value="" sx={{ height: '36px' }}></MenuItem>
           {items.map((item, i) => (
             <MenuItem key={i} value={item} sx={{ textTransform: 'capitalize' }}>
               {item.replaceAll('_', ' ')}

@@ -207,7 +207,7 @@ const Service: React.FC<ServiceProps> = ({ cat_id, svr_id, service }) => {
                         <NumberInput
                           label={param.name}
                           value={state.value}
-                          onChange={event => handleChange(Number(event.target.value))}
+                          onChange={event => handleChange(parseInt(event.target.value))}
                           onBlur={handleBlur}
                         />
                       );

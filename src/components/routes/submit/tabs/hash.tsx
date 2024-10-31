@@ -20,6 +20,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import { BooleanInput } from '../inputs/BooleanInput';
 
 const useStyles = makeStyles(theme => ({
   no_pad: {
@@ -126,54 +127,44 @@ const WrappedHashSubmit = ({ onValidateServiceSelection }: Props) => {
       </div>
 
       <form.Subscribe
-        selector={state => [
-          state.values.settings,
-          state.values.input.type,
-          configuration.ui.url_submission_auto_service_selection
-        ]}
-        children={([settings, type, selection]) =>
-          type === 'url' &&
-          selection &&
-          selection.length > 0 && (
+        selector={state =>
+          [
+            state.values.input.type === 'url',
+            state.values?.settings?.services.reduce((prev: [number, number][], category, i) => {
+              category.services.forEach((service, j) => {
+                if (configuration?.ui?.url_submission_auto_service_selection?.includes(service.name)) prev.push([i, j]);
+              });
+              return prev;
+            }, [])
+          ] as [boolean, [number, number][]]
+        }
+        children={([isURL, services]) =>
+          !isURL || !services?.length ? null : (
             <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
               <Typography variant="subtitle1">
                 {t('options.submission.url_submission_auto_service_selection')}
               </Typography>
-              {selection.map((service_name, i) => (
-                <div key={i}>
-                  <FormControlLabel
-                    control={
-                      settings ? (
-                        <Checkbox
-                          size="small"
-                          checked={settings.services.some(category =>
-                            category.services.some(service => service.name === service_name)
-                          )}
-                          name="label"
-                          onChange={() => {
-                            if (!settings) return;
-                            form.setStore(s => {
-                              let services = settings.services.map(cat => ({
-                                ...cat,
-                                services: cat.services.map(srv => ({
-                                  ...srv,
-                                  selected: srv.name === service_name ? !srv.selected : srv.selected
-                                }))
-                              }));
-
-                              services = services.map(cat => ({ ...cat, selected: cat.every(srv => srv.selected) }));
-                              return { ...s, services };
-                            });
-                          }}
-                        />
-                      ) : (
-                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
-                      )
-                    }
-                    label={<Typography variant="body2">{service_name}</Typography>}
-                    className={settings ? classes.item : null}
-                  />
-                </div>
+              {services.map(([cat, svr], i) => (
+                <form.Field
+                  key={i}
+                  name={`settings.services[${cat}].services[${svr}]` as any}
+                  children={({ state, handleBlur, handleChange }) => (
+                    <BooleanInput
+                      label={state.value.name}
+                      value={state.value.selected}
+                      onClick={() =>
+                        form.setStore(s => {
+                          s.settings.services[cat].services[svr].selected = !state.value.selected;
+                          s.settings.services[cat].selected = s.settings.services[cat].services.every(
+                            val => val.selected
+                          );
+                          return s;
+                        })
+                      }
+                      onBlur={handleBlur}
+                    />
+                  )}
+                />
               ))}
             </div>
           )

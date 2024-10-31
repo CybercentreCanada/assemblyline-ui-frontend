@@ -7,17 +7,20 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Metadata } from 'components/models/base/submission';
+import { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { TabContainer } from 'components/visual/TabContainer';
+import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { MetadataParameters } from './components/MetadataParameters';
 import { ServiceSelection } from './components/ServiceSelection';
 import { SubmissionParameters } from './components/SubmissionParameters';
 import { FormProvider, useForm } from './contexts/form';
+import { DEFAULT_SETTINGS } from './mock/settings';
 import { FileSubmit } from './tabs/file';
 import { HashSubmit } from './tabs/hash';
 
@@ -67,7 +70,7 @@ type Tabs = (typeof TABS)[number];
 
 type SubmitState = {
   hash: string;
-  tabContext: string;
+  tabContext: Tabs; // Ensure this is set correct elsewhere
   c12n: string;
   metadata?: Metadata;
 };
@@ -91,10 +94,6 @@ const WrappedSubmitContent = () => {
 
   const [tab, setTab] = useState<Tabs>('file');
 
-  const sp1 = theme.spacing(1);
-  const sp2 = theme.spacing(2);
-  const sp4 = theme.spacing(4);
-
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
 
@@ -113,6 +112,108 @@ const WrappedSubmitContent = () => {
     FLOW.off('fileError');
     FLOW.off('progress');
   }, [form]);
+
+  useEffect(() => {
+    apiCall<UserSettings>({
+      url: `/api/v4/user/settings/${currentUser.username}/`,
+      onSuccess: ({ api_response }) => {
+        form.setStore(s => {
+          s.settings = { ...api_response } as any;
+
+          // Check if some file sources should auto-select and do so
+          s.settings.default_external_sources = Array.from(
+            new Set(
+              Object.entries(configuration.submission.file_sources).reduce(
+                (prev, [, fileSource]) => [...prev, ...fileSource.auto_selected],
+                api_response?.default_external_sources || []
+              )
+            )
+          );
+
+          s.settings.service_spec.sort((a, b) => a.name.localeCompare(b.name));
+          s.settings.services.sort((a, b) => a.name.localeCompare(b.name));
+
+          Object.keys(s.settings.services).forEach(key => {
+            s.settings.services[key].services.sort((a, b) => a.name.localeCompare(b.name));
+          });
+
+          if (!currentUser.roles.includes('submission_customize')) {
+            s.submissionProfile = api_response.preferred_submission_profile;
+          }
+
+          s.settings = DEFAULT_SETTINGS;
+
+          return s;
+        });
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [configuration, currentUser]);
+
+  useEffect(() => {
+    // Question :  do we want to unselect those services when
+    if (!form.state.values.settings || form.state.values.input.type !== 'url') return;
+    form.setStore(s => {
+      s.settings.services.forEach((category, i) => {
+        category.services.forEach((service, j) => {
+          if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
+            s.settings.services[i].services[j].selected = true;
+          }
+        });
+        s.settings.services[i].selected = s.settings.services[i].services.every(svr => svr.selected);
+      });
+      return s;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [configuration.ui.url_submission_auto_service_selection, form.state.values.input.type]);
+
+  useEffect(() => {
+    const inputParam = submitParams.get('input') || '';
+    if (inputParam) {
+      const [type, value] = getSubmitType(inputParam, configuration);
+      setTab('hash');
+      form.setStore(s => ({ ...s, input: { ...s.input, type, value, hasError: false } }));
+      closeSnackbar();
+    }
+
+    const classification = submitParams.get('classification');
+    if (classification) {
+      form.setStore(s => ({ ...s, settings: { ...s.settings, classification } }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closeSnackbar, configuration, submitParams]);
+
+  useEffect(() => {
+    if (submitState) {
+      const [type, value] = getSubmitType(submitState.hash, configuration);
+      setTab(submitState.tabContext);
+      form.setStore(s => ({
+        ...s,
+        input: { ...s.input, type, value, hasError: false },
+        settings: { ...s.settings, classification: submitState.c12n },
+        submissionMetadata: submitState.metadata
+      }));
+      closeSnackbar();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closeSnackbar, configuration, submitState]);
+
+  useEffect(() => {
+    if (!configuration?.submission?.metadata?.submit) return;
+    form.setStore(s => ({
+      ...s,
+      submissionMetadata: {
+        ...Object.fromEntries(
+          Object.entries(configuration.submission.metadata.submit).reduce((prev: [string, unknown][], [key, value]) => {
+            if (value.default) prev.push([key, value]);
+            return prev;
+          }, [])
+        ),
+        ...s.submissionMetadata
+      }
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [configuration]);
 
   return (
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
@@ -146,8 +247,8 @@ const WrappedSubmitContent = () => {
         <form.Field
           name="settings.classification"
           children={({ state, handleBlur, handleChange }) => (
-            <div style={{ paddingBottom: sp4 }}>
-              <div style={{ padding: sp1, fontSize: 16 }}>{t('classification')}</div>
+            <div style={{ paddingBottom: theme.spacing(4) }}>
+              <div style={{ padding: theme.spacing(1), fontSize: 16 }}>{t('classification')}</div>
               <Classification
                 format="long"
                 type="picker"
@@ -167,6 +268,8 @@ const WrappedSubmitContent = () => {
         centered
         variant="standard"
         style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(1) }}
+        value={tab}
+        onChange={(event, value) => setTab(value)}
         tabs={{
           file: {
             label: t('file'),
