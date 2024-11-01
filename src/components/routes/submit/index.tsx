@@ -4,10 +4,11 @@ import { makeStyles } from '@mui/styles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
+import type { APIResponseProps } from 'components/hooks/useMyAPI';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { Metadata } from 'components/models/base/submission';
-import { UserSettings } from 'components/models/base/user_settings';
+import type { Metadata, Submission } from 'components/models/base/submission';
+import type { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { TabContainer } from 'components/visual/TabContainer';
@@ -56,7 +57,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-// eslint-disable-next-line  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 const FLOW = new Flow({
   target: '/api/v4/ui/FLOWjs/',
   permanentErrors: [412, 500, 501],
@@ -113,12 +113,138 @@ const WrappedSubmitContent = () => {
     FLOW.off('progress');
   }, [form]);
 
+  const handleUploadFile = useCallback(() => {
+    form.setStore(s => ({ ...s, allowClick: false, uploadProgress: 0 }));
+    FLOW.opts.generateUniqueIdentifier = file => {
+      const relativePath = file.relativePath || file.file.webkitRelativePath || file.file.name || file.name;
+      return `${form.state.values.uuid}_${form.state.values.file.size}_${relativePath.replace(
+        /[^0-9a-zA-Z_-]/gim,
+        ''
+      )}`;
+    };
+
+    FLOW.on('fileError', (event, api_data) => {
+      try {
+        const data = JSON.parse(api_data) as APIResponseProps<unknown>;
+        if ('api_status_code' in data) {
+          if (
+            data.api_status_code === 401 ||
+            (data.api_status_code === 503 &&
+              data.api_error_message.includes('quota') &&
+              data.api_error_message.includes('daily') &&
+              data.api_error_message.includes('API'))
+          ) {
+            window.location.reload();
+          } else {
+            // Unexpected error occurred, cancel upload and show error message
+            handleCancelUpload();
+            showErrorMessage(t('submit.file.upload_fail'));
+          }
+        }
+      } catch (ex) {
+        handleCancelUpload();
+        showErrorMessage(t('submit.file.upload_fail'));
+      }
+    });
+
+    FLOW.on('progress', () => {
+      form.setStore(s => ({ ...s, uploadProgress: Math.trunc(FLOW.progress() * 100) }));
+    });
+
+    FLOW.on('complete', () => {
+      if (FLOW.files.length === 0) {
+        return;
+      }
+
+      for (let x = 0; x < FLOW.files.length; x++) {
+        if (FLOW.files[x].error) {
+          return;
+        }
+      }
+      apiCall<{ started: boolean; sid: string }>({
+        url: `/api/v4/ui/start/${form.state.values.uuid}/`,
+        method: 'POST',
+        body: {
+          ...form.state.values.settings,
+          filename: form.state.values.file.path,
+          metadata: form.state.values.submissionMetadata
+        },
+        onSuccess: api_data => {
+          showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
+          setTimeout(() => {
+            navigate(`/submission/detail/${api_data.api_response.sid}`);
+          }, 500);
+        },
+        onFailure: api_data => {
+          if (api_data.api_status_code === 400 && api_data.api_error_message.includes('metadata')) {
+            setTab('options');
+          }
+
+          if (
+            api_data.api_status_code === 503 ||
+            api_data.api_status_code === 403 ||
+            api_data.api_status_code === 404 ||
+            api_data.api_status_code === 400
+          ) {
+            showErrorMessage(api_data.api_error_message);
+          } else {
+            showErrorMessage(t('submit.file.failure'));
+          }
+
+          handleCancelUpload();
+        }
+      });
+    });
+
+    FLOW.addFile(form.state.values.file);
+    FLOW.upload();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, handleCancelUpload, t]);
+
+  const handleUploadUrlHash = useCallback(() => {
+    if (form.state.values.input.hasError) {
+      showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
+      return;
+    }
+
+    apiCall<Submission>({
+      url: '/api/v4/submit/',
+      method: 'POST',
+      body: {
+        ui_params: form.state.values.settings,
+        [form.state.values.input.type]: form.state.values.input.value,
+        metadata: form.state.values.submissionMetadata
+      },
+      onSuccess: ({ api_response }) => {
+        showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
+        setTimeout(() => {
+          navigate(`/submission/detail/${api_response.sid}`);
+        }, 500);
+      },
+      onFailure: ({ api_status_code, api_error_message }) => {
+        showErrorMessage(api_error_message);
+        if (api_status_code === 400 && api_error_message.includes('metadata')) {
+          setTab('options');
+        }
+      },
+      onEnter: () => {
+        form.setStore(s => ({ ...s, uploading: true }));
+      },
+      onExit: () => {
+        form.setStore(s => ({ ...s, uploading: false }));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [configuration.ui.allow_url_submissions, form, t]);
+
   useEffect(() => {
     apiCall<UserSettings>({
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
           s.settings = { ...api_response } as any;
+          s.settings = DEFAULT_SETTINGS;
 
           // Check if some file sources should auto-select and do so
           s.settings.default_external_sources = Array.from(
@@ -140,8 +266,6 @@ const WrappedSubmitContent = () => {
           if (!currentUser.roles.includes('submission_customize')) {
             s.submissionProfile = api_response.preferred_submission_profile;
           }
-
-          s.settings = DEFAULT_SETTINGS;
 
           return s;
         });
@@ -203,12 +327,12 @@ const WrappedSubmitContent = () => {
     form.setStore(s => ({
       ...s,
       submissionMetadata: {
-        ...Object.fromEntries(
+        ...(Object.fromEntries(
           Object.entries(configuration.submission.metadata.submit).reduce((prev: [string, unknown][], [key, value]) => {
             if (value.default) prev.push([key, value]);
             return prev;
           }, [])
-        ),
+        ) as Metadata),
         ...s.submissionMetadata
       }
     }));
@@ -218,15 +342,29 @@ const WrappedSubmitContent = () => {
   return (
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
       <form.Subscribe
-        selector={state => [state.canSubmit, state.isSubmitting, state.values.validate]}
-        children={([canSubmit, isSubmitting, validate]) => (
+        selector={state => [state.values.confirmation.open]}
+        children={([open]) => (
           <ConfirmationDialog
-            open={validate}
-            // handleClose={event => setValidate(false)}
-            handleClose={() => form.store.setState(s => ({ ...s, validate: false }))}
-            // handleCancel={cleanupServiceSelection}
-            // handleAccept={executeCB}
-            handleAccept={() => {}}
+            open={open}
+            handleClose={() => form.setStore(s => ({ ...s, confirmation: { ...s.confirmation, open: false } }))}
+            handleCancel={() => {
+              form.setStore(s => {
+                s.settings.services.forEach((category, i) => {
+                  category.services.forEach((service, j) => {
+                    if (service.selected && service.is_external) {
+                      s.settings.services[i].services[j].selected = false;
+                    }
+                  });
+                  s.settings.services[i].selected = s.settings.services[i].services.every(svr => svr.selected);
+                });
+                return s;
+              });
+            }}
+            handleAccept={() => {
+              const type = form.state.values.confirmation.type;
+              if (type === 'file') handleUploadFile();
+              else if (type === 'urlHash') handleUploadUrlHash();
+            }}
             title={t('validate.title')}
             cancelText={t('validate.cancelText')}
             acceptText={t('validate.acceptText')}
@@ -278,13 +416,14 @@ const WrappedSubmitContent = () => {
               <FileSubmit
                 onValidateServiceSelection={handleValidateServiceSelection}
                 onCancelUpload={handleCancelUpload}
+                onSubmit={() => handleUploadFile()}
               />
             )
           },
           hash: {
             label: `${t('urlHash.input_title')}${t('urlHash.input_suffix')}`,
             disabled: !currentUser.roles.includes('submission_create'),
-            inner: <HashSubmit onValidateServiceSelection={handleValidateServiceSelection} />
+            inner: <HashSubmit onSubmit={() => handleUploadUrlHash()} />
           },
           options: {
             label: t('options'),

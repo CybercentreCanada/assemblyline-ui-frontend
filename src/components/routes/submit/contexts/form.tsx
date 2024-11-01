@@ -5,23 +5,20 @@ import type { UserSettings } from 'components/models/base/user_settings';
 import { DEFAULT_SETTINGS } from 'components/routes/submit/mock/settings';
 import generateUUID from 'helpers/uuid';
 
-export type FormData = {
-  allowClick: boolean;
-  file: File;
+export type SubmitStore = {
+  confirmation: { open: boolean; type: 'urlHash' | 'file' };
+  file: File & { relativePath: string; fileName: string; path: string };
   input: { type: HashPatternMap; value: string; hasError: boolean };
   metadata: Metadata;
-  settings: Omit<UserSettings, 'services'>;
-  submissionProfile: string;
+  settings: UserSettings;
   submissionMetadata: Metadata;
-  uploadProgress: number;
+  submissionProfile: string;
+  upload: { disable: boolean; progress: number };
   uuid: string;
-  validate: boolean;
-  validateCB: string;
 };
 
-export const { FormProvider, useForm } = createFormContext({
+export const { FormProvider, useForm } = createFormContext<SubmitStore>({
   defaultValues: {
-    allowClick: true,
     file: null,
     input: { type: undefined, value: '', hasError: false },
     metadata: {},
@@ -48,9 +45,10 @@ export const { FormProvider, useForm } = createFormContext({
     },
     submissionMetadata: {},
     submissionProfile: null,
-    uploadProgress: null,
     uuid: generateUUID(),
     validate: false,
-    validateCB: null
+    validateCB: null,
+    upload: { disable: false, progress: 0 },
+    confirmation: { open: false, type: null }
   }
 });

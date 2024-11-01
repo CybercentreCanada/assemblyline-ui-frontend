@@ -14,13 +14,13 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { MetadataSummary } from 'components/routes/submit/components/MetadataSummary';
-import { useForm } from 'components/routes/submit/contexts/form';
+import { SubmitStore, useForm } from 'components/routes/submit/contexts/form';
+import { BooleanInput } from 'components/routes/submit/inputs/BooleanInput';
 import { getSubmitType } from 'helpers/utils';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
-import { BooleanInput } from '../inputs/BooleanInput';
 
 const useStyles = makeStyles(theme => ({
   no_pad: {
@@ -55,10 +55,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
-  onValidateServiceSelection: (cbType: string) => void;
+  onSubmit: () => void;
 };
 
-const WrappedHashSubmit = ({ onValidateServiceSelection }: Props) => {
+const WrappedHashSubmit = ({ onSubmit = () => null }: Props) => {
   const { t, i18n } = useTranslation(['submit']);
   const { apiCall } = useMyAPI();
   const theme = useTheme();
@@ -71,55 +71,92 @@ const WrappedHashSubmit = ({ onValidateServiceSelection }: Props) => {
 
   const form = useForm();
 
-  const sp1 = theme.spacing(1);
-  const sp2 = theme.spacing(2);
-  const sp4 = theme.spacing(4);
+  const handleSubmit = useCallback(() => {
+    const showValidate = form.state.values.settings.services.some(cat =>
+      cat.services.some(svr => svr.selected && svr.is_external)
+    );
+
+    if (showValidate) {
+      form.setStore(s => ({ ...s, confirmation: { open: true, type: 'urlHash' } }));
+    } else {
+      onSubmit();
+    }
+  }, [form, onSubmit]);
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'row', marginTop: sp2, alignItems: 'flex-start' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          marginTop: theme.spacing(2),
+          alignItems: 'flex-start',
+          gap: theme.spacing(2)
+        }}
+      >
         <form.Field
           name="input"
           children={({ state, handleBlur, handleChange }) =>
             !form.state.values.settings ? (
               <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
             ) : (
-              <TextField
-                label={`${t('urlHash.input_title')}${t('urlHash.input_suffix')}`}
-                error={state.value.hasError}
-                size="small"
-                type="stringInput"
-                variant="outlined"
-                value={state.value.value}
-                style={{ flexGrow: 1, marginRight: '1rem' }}
-                onBlur={handleBlur}
-                onChange={event =>
-                  handleChange(prev => {
-                    const [type, value] = getSubmitType(event.target.value, configuration);
-                    closeSnackbar();
-                    return { ...prev, type, value, hasError: false };
-                  })
-                }
-              />
+              <div style={{ flex: 1, textAlign: 'start' }}>
+                <TextField
+                  label={`${t('urlHash.input_title')}${t('urlHash.input_suffix')}`}
+                  size="small"
+                  type="stringInput"
+                  variant="outlined"
+                  fullWidth
+                  value={state.value.value}
+                  style={{ flexGrow: 1, marginRight: '1rem' }}
+                  onBlur={handleBlur}
+                  onChange={event =>
+                    handleChange(prev => {
+                      closeSnackbar();
+                      const [type, value] = getSubmitType(event.target.value, configuration);
+                      return {
+                        ...prev,
+                        type,
+                        value,
+                        hasError: !type || (!configuration.ui.allow_url_submissions && type === 'url')
+                      };
+                    })
+                  }
+                />
+                {!state.meta.errors ? null : (
+                  <Typography variant="caption" color="error" children={state.meta.errors.join(', ')} />
+                )}
+              </div>
             )
           }
         />
 
         <form.Subscribe
-          selector={state => [state.values.allowClick, state.values.input.type, state.values.input.value]}
-          children={([allowClick, type, value]) =>
+          selector={state => [state.values.upload.disable, state.values.input.type, state.values.input.hasError]}
+          children={([uploading, type, error]) =>
             !form.state.values.settings ? (
-              <Skeleton style={{ marginLeft: sp2, height: '3rem', width: '5rem' }} />
+              <Skeleton style={{ height: '3rem', width: '5rem' }} />
             ) : (
               <Button
-                disabled={!(type && value) || !allowClick}
+                disabled={Boolean(uploading || error)}
                 color="primary"
                 variant="contained"
-                onClick={() => onValidateServiceSelection('urlHash')}
+                onClick={() => handleSubmit()}
                 style={{ height: '40px' }}
               >
                 {type ? `${t('urlHash.button')} ${type}` : t('urlHash.button')}
-                {!allowClick && <CircularProgress size={24} className={classes.buttonProgress} />}
+                {uploading && (
+                  <CircularProgress
+                    size={24}
+                    sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      marginTop: -12,
+                      marginLeft: -12
+                    }}
+                  />
+                )}
               </Button>
             )
           }
@@ -172,54 +209,67 @@ const WrappedHashSubmit = ({ onValidateServiceSelection }: Props) => {
       />
 
       <form.Subscribe
-        selector={state => [state.values.settings, state.values.input.type, configuration.submission.file_sources]}
-        children={([settings, type, file_sources]) =>
-          type &&
-          file_sources[type] &&
-          file_sources[type].sources &&
-          file_sources[type].sources.length > 0 && (
-            <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
-              <Typography variant="subtitle1">{t('options.submission.default_external_sources')}</Typography>
-              {file_sources[type].sources.map((source, i) => (
-                <div key={i}>
-                  <FormControlLabel
-                    control={
-                      settings ? (
-                        <Checkbox
-                          size="small"
-                          checked={settings.default_external_sources.indexOf(source) !== -1}
-                          name="label"
-                          onChange={() => {
-                            if (!settings) return;
-                            form.setStore(s => {
-                              const newSources = settings.default_external_sources;
-                              if (newSources.indexOf(source) === -1) {
-                                newSources.push(source);
-                              } else {
-                                newSources.splice(newSources.indexOf(source), 1);
-                              }
-                              return { ...s, default_external_sources: newSources };
-                            });
-                          }}
-                        />
-                      ) : (
-                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
-                      )
-                    }
-                    label={<Typography variant="body2">{source}</Typography>}
-                    className={settings ? classes.item : null}
-                  />
-                </div>
-              ))}
-            </div>
-          )
-        }
+        selector={state => [state.values.settings, state.values.input.type]}
+        children={props => {
+          const settings = props[0] as SubmitStore['settings'];
+          const type = props[1] as SubmitStore['input']['type'];
+          const fileSources = configuration.submission.file_sources;
+
+          return (
+            type &&
+            fileSources[type] &&
+            fileSources[type].sources &&
+            fileSources[type].sources.length > 0 && (
+              <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
+                <Typography variant="subtitle1">{t('options.submission.default_external_sources')}</Typography>
+                {fileSources[type].sources.map((source, i) => (
+                  <div key={i}>
+                    <FormControlLabel
+                      control={
+                        settings ? (
+                          <Checkbox
+                            size="small"
+                            checked={settings.default_external_sources.indexOf(source) !== -1}
+                            name="label"
+                            onChange={() => {
+                              if (!settings) return;
+                              form.setStore(s => {
+                                const newSources = settings.default_external_sources;
+                                if (newSources.indexOf(source) === -1) {
+                                  newSources.push(source);
+                                } else {
+                                  newSources.splice(newSources.indexOf(source), 1);
+                                }
+                                return { ...s, default_external_sources: newSources };
+                              });
+                            }}
+                          />
+                        ) : (
+                          <Skeleton
+                            style={{
+                              height: '2rem',
+                              width: '1.5rem',
+                              marginLeft: theme.spacing(2),
+                              marginRight: theme.spacing(2)
+                            }}
+                          />
+                        )
+                      }
+                      label={<Typography variant="body2">{source}</Typography>}
+                      className={settings ? classes.item : null}
+                    />
+                  </div>
+                ))}
+              </div>
+            )
+          );
+        }}
       />
 
       <MetadataSummary />
 
       {!configuration.ui.tos ? null : (
-        <div style={{ marginTop: sp4, textAlign: 'center' }}>
+        <div style={{ marginTop: theme.spacing(4), textAlign: 'center' }}>
           <Typography variant="body2">
             {t('terms1')}
             <i>{t('urlHash.button')}</i>

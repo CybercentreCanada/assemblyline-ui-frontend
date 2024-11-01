@@ -317,7 +317,6 @@ export type UI = {
   /** Feed of all the services built by the Assemblyline community. */
   community_feed: string;
 
-
   /** Default user-defined password for creating password protected ZIPs when downloading files */
   default_zip_password: string;
 
@@ -362,7 +361,6 @@ export type UI = {
 
   /** List of services auto-selected by the UI when submitting URLs */
   url_submission_auto_service_selection: string[];
-
 };
 
 /** A file source entry for remote fetching via string */
