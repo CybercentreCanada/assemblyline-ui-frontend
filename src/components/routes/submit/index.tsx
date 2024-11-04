@@ -14,6 +14,7 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
+import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
@@ -106,6 +107,7 @@ const WrappedSubmitContent = () => {
   }, []);
 
   const handleCancelUpload = useCallback(() => {
+    console.log(_.cloneDeep(form.state.values));
     form.setStore(s => ({ ...s, file: null, allowClick: true, uploadProgress: null, uuid: generateUUID() }));
     FLOW.cancel();
     FLOW.off('complete');
@@ -115,9 +117,16 @@ const WrappedSubmitContent = () => {
 
   const handleUploadFile = useCallback(() => {
     form.setStore(s => ({ ...s, allowClick: false, uploadProgress: 0 }));
-    FLOW.opts.generateUniqueIdentifier = file => {
-      const relativePath = file.relativePath || file.file.webkitRelativePath || file.file.name || file.name;
-      return `${form.state.values.uuid}_${form.state.values.file.size}_${relativePath.replace(
+
+    console.log(_.cloneDeep(form.state.values));
+
+    FLOW.opts.generateUniqueIdentifier = selectedFile => {
+      const relativePath =
+        selectedFile?.relativePath ||
+        selectedFile?.file?.webkitRelativePath ||
+        selectedFile?.file?.name ||
+        selectedFile?.name;
+      return `${form.state.values.submit.uuid}_${form.state.values.file.size}_${relativePath.replace(
         /[^0-9a-zA-Z_-]/gim,
         ''
       )}`;
@@ -162,12 +171,12 @@ const WrappedSubmitContent = () => {
         }
       }
       apiCall<{ started: boolean; sid: string }>({
-        url: `/api/v4/ui/start/${form.state.values.uuid}/`,
+        url: `/api/v4/ui/start/${form.state.values.submit.uuid}/`,
         method: 'POST',
         body: {
           ...form.state.values.settings,
           filename: form.state.values.file.path,
-          metadata: form.state.values.submissionMetadata
+          metadata: form.state.values.metadata
         },
         onSuccess: api_data => {
           showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
@@ -203,7 +212,7 @@ const WrappedSubmitContent = () => {
   }, [form, handleCancelUpload, t]);
 
   const handleUploadUrlHash = useCallback(() => {
-    if (form.state.values.input.hasError) {
+    if (form.state.values.hash.hasError) {
       showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
       return;
     }
@@ -213,8 +222,8 @@ const WrappedSubmitContent = () => {
       method: 'POST',
       body: {
         ui_params: form.state.values.settings,
-        [form.state.values.input.type]: form.state.values.input.value,
-        metadata: form.state.values.submissionMetadata
+        [form.state.values.hash.type]: form.state.values.hash.value,
+        metadata: form.state.values.metadata
       },
       onSuccess: ({ api_response }) => {
         showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
@@ -275,28 +284,11 @@ const WrappedSubmitContent = () => {
   }, [configuration, currentUser]);
 
   useEffect(() => {
-    // Question :  do we want to unselect those services when
-    if (!form.state.values.settings || form.state.values.input.type !== 'url') return;
-    form.setStore(s => {
-      s.settings.services.forEach((category, i) => {
-        category.services.forEach((service, j) => {
-          if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
-            s.settings.services[i].services[j].selected = true;
-          }
-        });
-        s.settings.services[i].selected = s.settings.services[i].services.every(svr => svr.selected);
-      });
-      return s;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration.ui.url_submission_auto_service_selection, form.state.values.input.type]);
-
-  useEffect(() => {
     const inputParam = submitParams.get('input') || '';
     if (inputParam) {
       const [type, value] = getSubmitType(inputParam, configuration);
       setTab('hash');
-      form.setStore(s => ({ ...s, input: { ...s.input, type, value, hasError: false } }));
+      form.setStore(s => ({ ...s, hash: { ...s.hash, type, value, hasError: false } }));
       closeSnackbar();
     }
 
@@ -313,7 +305,7 @@ const WrappedSubmitContent = () => {
       setTab(submitState.tabContext);
       form.setStore(s => ({
         ...s,
-        input: { ...s.input, type, value, hasError: false },
+        hash: { ...s.hash, type, value, hasError: false },
         settings: { ...s.settings, classification: submitState.c12n },
         submissionMetadata: submitState.metadata
       }));
@@ -326,29 +318,35 @@ const WrappedSubmitContent = () => {
     if (!configuration?.submission?.metadata?.submit) return;
     form.setStore(s => ({
       ...s,
-      submissionMetadata: {
+      metadata: {
         ...(Object.fromEntries(
           Object.entries(configuration.submission.metadata.submit).reduce((prev: [string, unknown][], [key, value]) => {
             if (value.default) prev.push([key, value]);
             return prev;
           }, [])
         ) as Metadata),
-        ...s.submissionMetadata
+        ...s.metadata
       }
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configuration]);
 
+  useEffect(() => {
+    console.log('changes');
+  }, [form.state.values.hash.value]);
+
   return (
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
       <form.Subscribe
-        selector={state => [state.values.confirmation.open]}
+        selector={state => [state.values.submit.isConfirmationOpen]}
         children={([open]) => (
           <ConfirmationDialog
             open={open}
-            handleClose={() => form.setStore(s => ({ ...s, confirmation: { ...s.confirmation, open: false } }))}
+            handleClose={() => form.setStore(s => ({ ...s, submit: { ...s.submit, isConfirmationOpen: false } }))}
             handleCancel={() => {
               form.setStore(s => {
+                s.submit.isConfirmationOpen = false;
+
                 s.settings.services.forEach((category, i) => {
                   category.services.forEach((service, j) => {
                     if (service.selected && service.is_external) {
@@ -359,11 +357,15 @@ const WrappedSubmitContent = () => {
                 });
                 return s;
               });
+
+              const type = form.state.values.submit.type;
+              if (type === 'file') handleUploadFile();
+              else if (type === 'hash') handleUploadUrlHash();
             }}
             handleAccept={() => {
-              const type = form.state.values.confirmation.type;
+              const type = form.state.values.submit.type;
               if (type === 'file') handleUploadFile();
-              else if (type === 'urlHash') handleUploadUrlHash();
+              else if (type === 'hash') handleUploadUrlHash();
             }}
             title={t('validate.title')}
             cancelText={t('validate.cancelText')}

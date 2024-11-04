@@ -6,21 +6,31 @@ import { DEFAULT_SETTINGS } from 'components/routes/submit/mock/settings';
 import generateUUID from 'helpers/uuid';
 
 export type SubmitStore = {
-  confirmation: { open: boolean; type: 'urlHash' | 'file' };
+  submit: {
+    uuid: string;
+    type: 'file' | 'hash';
+    isConfirmationOpen: boolean;
+    isUploading: boolean;
+    uploadProgress: number;
+  };
   file: File & { relativePath: string; fileName: string; path: string };
-  input: { type: HashPatternMap; value: string; hasError: boolean };
+  hash: { type: HashPatternMap; value: string; hasError: boolean; urlAutoSelect: boolean };
+  submissionProfile: string;
   metadata: Metadata;
   settings: UserSettings;
-  submissionMetadata: Metadata;
-  submissionProfile: string;
-  upload: { disable: boolean; progress: number };
-  uuid: string;
 };
 
 export const { FormProvider, useForm } = createFormContext<SubmitStore>({
   defaultValues: {
+    submit: {
+      uuid: generateUUID(),
+      type: 'file',
+      isConfirmationOpen: false,
+      isUploading: false,
+      uploadProgress: 0
+    },
     file: null,
-    input: { type: undefined, value: '', hasError: false },
+    hash: { type: null, value: '', hasError: false, urlAutoSelect: true },
     metadata: {},
     settings: {
       classification: '',
@@ -43,12 +53,6 @@ export const { FormProvider, useForm } = createFormContext<SubmitStore>({
       ttl: 0,
       ...DEFAULT_SETTINGS
     },
-    submissionMetadata: {},
-    submissionProfile: null,
-    uuid: generateUUID(),
-    validate: false,
-    validateCB: null,
-    upload: { disable: false, progress: 0 },
-    confirmation: { open: false, type: null }
+    submissionProfile: null
   }
 });

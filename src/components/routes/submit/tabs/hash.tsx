@@ -17,7 +17,7 @@ import { MetadataSummary } from 'components/routes/submit/components/MetadataSum
 import { SubmitStore, useForm } from 'components/routes/submit/contexts/form';
 import { BooleanInput } from 'components/routes/submit/inputs/BooleanInput';
 import { getSubmitType } from 'helpers/utils';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -58,7 +58,7 @@ type Props = {
   onSubmit: () => void;
 };
 
-const WrappedHashSubmit = ({ onSubmit = () => null }: Props) => {
+export const HashSubmit = ({ onSubmit = () => null }: Props) => {
   const { t, i18n } = useTranslation(['submit']);
   const { apiCall } = useMyAPI();
   const theme = useTheme();
@@ -95,7 +95,7 @@ const WrappedHashSubmit = ({ onSubmit = () => null }: Props) => {
         }}
       >
         <form.Field
-          name="input"
+          name="hash"
           children={({ state, handleBlur, handleChange }) =>
             !form.state.values.settings ? (
               <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
@@ -110,18 +110,32 @@ const WrappedHashSubmit = ({ onSubmit = () => null }: Props) => {
                   value={state.value.value}
                   style={{ flexGrow: 1, marginRight: '1rem' }}
                   onBlur={handleBlur}
-                  onChange={event =>
-                    handleChange(prev => {
-                      closeSnackbar();
-                      const [type, value] = getSubmitType(event.target.value, configuration);
-                      return {
-                        ...prev,
-                        type,
-                        value,
-                        hasError: !type || (!configuration.ui.allow_url_submissions && type === 'url')
-                      };
-                    })
-                  }
+                  onChange={event => {
+                    closeSnackbar();
+                    const [type, value] = getSubmitType(event.target.value, configuration);
+
+                    form.setStore(s => {
+                      s.hash.type = type;
+                      s.hash.value = value;
+                      s.hash.hasError = !type || (!configuration.ui.allow_url_submissions && type === 'url');
+
+                      if (type === 'url' && s.hash.urlAutoSelect) {
+                        s.hash.urlAutoSelect = false;
+                        s.settings.services.forEach((category, i) => {
+                          category.services.forEach((service, j) => {
+                            if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
+                              s.settings.services[i].services[j].selected = true;
+                            }
+                          });
+                          s.settings.services[i].selected = s.settings.services[i].services.every(svr => svr.selected);
+                        });
+                      } else if (type !== 'url') {
+                        s.hash.urlAutoSelect = true;
+                      }
+
+                      return s;
+                    });
+                  }}
                 />
                 {!state.meta.errors ? null : (
                   <Typography variant="caption" color="error" children={state.meta.errors.join(', ')} />
@@ -132,20 +146,20 @@ const WrappedHashSubmit = ({ onSubmit = () => null }: Props) => {
         />
 
         <form.Subscribe
-          selector={state => [state.values.upload.disable, state.values.input.type, state.values.input.hasError]}
-          children={([uploading, type, error]) =>
+          selector={state => [state.values.submit.isUploading, state.values.hash.type, state.values.hash.hasError]}
+          children={([isUploading, type, error]) =>
             !form.state.values.settings ? (
               <Skeleton style={{ height: '3rem', width: '5rem' }} />
             ) : (
               <Button
-                disabled={Boolean(uploading || error)}
+                disabled={Boolean(isUploading || error)}
                 color="primary"
                 variant="contained"
                 onClick={() => handleSubmit()}
                 style={{ height: '40px' }}
               >
                 {type ? `${t('urlHash.button')} ${type}` : t('urlHash.button')}
-                {uploading && (
+                {isUploading && (
                   <CircularProgress
                     size={24}
                     sx={{
@@ -166,7 +180,7 @@ const WrappedHashSubmit = ({ onSubmit = () => null }: Props) => {
       <form.Subscribe
         selector={state =>
           [
-            state.values.input.type === 'url',
+            state.values.hash.type === 'url',
             state.values?.settings?.services.reduce((prev: [number, number][], category, i) => {
               category.services.forEach((service, j) => {
                 if (configuration?.ui?.url_submission_auto_service_selection?.includes(service.name)) prev.push([i, j]);
@@ -209,10 +223,10 @@ const WrappedHashSubmit = ({ onSubmit = () => null }: Props) => {
       />
 
       <form.Subscribe
-        selector={state => [state.values.settings, state.values.input.type]}
+        selector={state => [state.values.settings, state.values.hash.type]}
         children={props => {
           const settings = props[0] as SubmitStore['settings'];
-          const type = props[1] as SubmitStore['input']['type'];
+          const type = props[1] as SubmitStore['hash']['type'];
           const fileSources = configuration.submission.file_sources;
 
           return (
@@ -284,5 +298,3 @@ const WrappedHashSubmit = ({ onSubmit = () => null }: Props) => {
     </>
   );
 };
-
-export const HashSubmit = React.memo(WrappedHashSubmit);
