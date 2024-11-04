@@ -4,8 +4,8 @@ import type { UserSettings } from 'components/models/base/user_settings';
 import { DEFAULT_SETTINGS } from 'components/routes/submit/mock/settings';
 import generateUUID from 'helpers/uuid';
 
-const TABS = ['file', 'hash', 'options'] as const;
-type Tabs = (typeof TABS)[number];
+export const TABS = ['file', 'hash', 'options'] as const;
+export type Tabs = (typeof TABS)[number];
 
 export type SubmitStore = {
   tab: Tabs;

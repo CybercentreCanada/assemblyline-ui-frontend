@@ -1,46 +1,22 @@
 import { Button, FormControlLabel, Skeleton, Switch, Tooltip, Typography, useTheme } from '@mui/material';
-import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
 import { MetadataSummary } from 'components/routes/submit/components/MetadataSummary';
 import type { SubmitStore } from 'components/routes/submit/contexts/form';
 import { useForm } from 'components/routes/submit/contexts/form';
 import FileDropper from 'components/visual/FileDropper';
-import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 
 type Props = {
-  onValidateServiceSelection: (cbType: string) => void;
   onCancelUpload: () => void;
-  onSubmit: () => void;
 };
 
-export const FileSubmit = ({ onValidateServiceSelection, onCancelUpload, onSubmit = () => null }: Props) => {
-  const { t, i18n } = useTranslation(['submit']);
-  const { apiCall } = useMyAPI();
+export const FileSubmit = ({ onCancelUpload }: Props) => {
+  const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const banner = useAppBanner();
-  const { user: currentUser, c12nDef, configuration } = useALContext();
-  const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
+  const { user: currentUser, configuration } = useALContext();
 
   const form = useForm();
-
-  const handleSubmit = useCallback(() => {
-    const showValidate = form.state.values.settings.services.some(cat =>
-      cat.services.some(svr => svr.selected && svr.is_external)
-    );
-
-    if (showValidate) {
-      form.setStore(s => ({ ...s, confirmation: { open: true, type: 'file' } }));
-    } else {
-      onSubmit();
-    }
-  }, [form, onSubmit]);
 
   return (
     <form.Subscribe
@@ -106,7 +82,12 @@ export const FileSubmit = ({ onValidateServiceSelection, onCancelUpload, onSubmi
                 const uploadProgress = props[2] as SubmitStore['submit']['uploadProgress'];
 
                 return !file ? null : (
-                  <Button disabled={isUploading} color="primary" variant="contained" onClick={() => handleSubmit()}>
+                  <Button
+                    disabled={isUploading}
+                    color="primary"
+                    variant="contained"
+                    onClick={() => form.handleSubmit()}
+                  >
                     {!isUploading ? t('file.button') : `${uploadProgress}${t('submit.progress')}`}
                   </Button>
                 );

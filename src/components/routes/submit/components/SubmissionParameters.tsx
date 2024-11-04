@@ -12,7 +12,7 @@ const WrappedSubmissionParameters = () => {
   const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const form = useForm();
-  const { user: currentUser, configuration } = useALContext();
+  const { configuration } = useALContext();
 
   return (
     <div style={{ textAlign: 'left', marginTop: theme.spacing(2) }}>

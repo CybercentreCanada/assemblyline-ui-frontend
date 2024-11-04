@@ -11,7 +11,7 @@ import {
   useTheme
 } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import { SelectedService, SelectedServiceCategory } from 'components/models/base/service';
+import type { SelectedService, SelectedServiceCategory } from 'components/models/base/service';
 import { useForm } from 'components/routes/submit/contexts/form';
 import { BooleanInput } from 'components/routes/submit/inputs/BooleanInput';
 import { NumberInput } from 'components/routes/submit/inputs/NumberInput';
@@ -98,7 +98,6 @@ type ServiceProps = {
 };
 
 const Service: React.FC<ServiceProps> = ({ cat_id, svr_id, service }) => {
-  const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const form = useForm();
 

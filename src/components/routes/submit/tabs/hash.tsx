@@ -8,79 +8,23 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { MetadataSummary } from 'components/routes/submit/components/MetadataSummary';
-import { SubmitStore, useForm } from 'components/routes/submit/contexts/form';
+import type { SubmitStore } from 'components/routes/submit/contexts/form';
+import { useForm } from 'components/routes/submit/contexts/form';
 import { BooleanInput } from 'components/routes/submit/inputs/BooleanInput';
 import { getSubmitType } from 'helpers/utils';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 
-const useStyles = makeStyles(theme => ({
-  no_pad: {
-    padding: 0
-  },
-  meta_key: {
-    overflowX: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis'
-  },
-  item: {
-    marginLeft: 0,
-    width: '100%',
-    '&:hover': {
-      background: theme.palette.action.hover
-    }
-  },
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  },
-  tweaked_tabs: {
-    [theme.breakpoints.only('xs')]: {
-      '& [role=tab]': {
-        minWidth: '90px'
-      }
-    }
-  }
-}));
-
-type Props = {
-  onSubmit: () => void;
-};
-
-export const HashSubmit = ({ onSubmit = () => null }: Props) => {
-  const { t, i18n } = useTranslation(['submit']);
-  const { apiCall } = useMyAPI();
+export const HashSubmit = () => {
+  const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const classes = useStyles();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const banner = useAppBanner();
-  const { user: currentUser, c12nDef, configuration } = useALContext();
-  const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
+  const { configuration } = useALContext();
+  const { closeSnackbar } = useMySnackbar();
 
   const form = useForm();
-
-  // const handleSubmit = useCallback(() => {
-  //   const showValidate = form.state.values.settings.services.some(cat =>
-  //     cat.services.some(svr => svr.selected && svr.is_external)
-  //   );
-
-  //   if (showValidate) {
-  //     form.setStore(s => ({ ...s, confirmation: { open: true, type: 'urlHash' } }));
-  //   } else {
-  //     onSubmit();
-  //   }
-  // }, [form, onSubmit]);
 
   return (
     <>
@@ -99,7 +43,7 @@ export const HashSubmit = ({ onSubmit = () => null }: Props) => {
             <>
               <form.Field
                 name="hash"
-                children={({ state, handleBlur, handleChange }) =>
+                children={({ state, handleBlur }) =>
                   fetching ? (
                     <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
                   ) : (
@@ -213,7 +157,7 @@ export const HashSubmit = ({ onSubmit = () => null }: Props) => {
                 <form.Field
                   key={i}
                   name={`settings.services[${cat}].services[${svr}]`}
-                  children={({ state, handleBlur, handleChange }) => (
+                  children={({ state, handleBlur }) => (
                     <BooleanInput
                       label={state.value.name}
                       value={state.value.selected}
@@ -253,7 +197,15 @@ export const HashSubmit = ({ onSubmit = () => null }: Props) => {
                 {fileSources[type].sources.map((source, i) => (
                   <div key={i}>
                     <FormControlLabel
-                      className={settings ? classes.item : null}
+                      style={{
+                        ...(settings && {
+                          marginLeft: 0,
+                          width: '100%',
+                          '&:hover': {
+                            background: theme.palette.action.hover
+                          }
+                        })
+                      }}
                       label={<Typography variant="body2">{source}</Typography>}
                       control={
                         !settings ? (

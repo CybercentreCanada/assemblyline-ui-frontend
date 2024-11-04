@@ -1,7 +1,6 @@
 import Flow from '@flowjs/flow.js';
 import { Alert, Grid, useMediaQuery, useTheme } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import { FormApi, Validator } from '@tanstack/react-form';
+import type { FormApi, Validator } from '@tanstack/react-form';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -15,60 +14,25 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { MetadataParameters } from './components/MetadataParameters';
 import { ServiceSelection } from './components/ServiceSelection';
 import { SubmissionParameters } from './components/SubmissionParameters';
-import { FormProvider, SubmitStore, useForm } from './contexts/form';
+import type { SubmitStore, Tabs } from './contexts/form';
+import { FormProvider, useForm } from './contexts/form';
 import { DEFAULT_SETTINGS } from './mock/settings';
 import { FileSubmit } from './tabs/file';
 import { HashSubmit } from './tabs/hash';
 
-const useStyles = makeStyles(theme => ({
-  no_pad: {
-    padding: 0
-  },
-  meta_key: {
-    overFLOWX: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverFLOW: 'ellipsis'
-  },
-  item: {
-    marginLeft: 0,
-    width: '100%',
-    '&:hover': {
-      background: theme.palette.action.hover
-    }
-  },
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  },
-  tweaked_tabs: {
-    [theme.breakpoints.only('xs')]: {
-      '& [role=tab]': {
-        minWidth: '90px'
-      }
-    }
-  }
-}));
-
 const FLOW = new Flow({
-  target: '/api/v4/ui/FLOWjs/',
+  target: '/api/v4/ui/flowjs/',
   permanentErrors: [412, 500, 501],
   maxChunkRetries: 1,
   chunkRetryInterval: 500,
   simultaneousUploads: 4
 });
-
-const TABS = ['file', 'hash', 'options'] as const;
-type Tabs = (typeof TABS)[number];
 
 type SubmitState = {
   hash: string;
@@ -77,20 +41,14 @@ type SubmitState = {
   metadata?: Metadata;
 };
 
-type SubmitProps = {
-  none: boolean;
-};
-
 const WrappedSubmitContent = () => {
   const { t, i18n } = useTranslation(['submit']);
   const { apiCall } = useMyAPI();
   const theme = useTheme();
-  const classes = useStyles();
-  const navigate = useNavigate();
   const location = useLocation();
   const banner = useAppBanner();
   const { user: currentUser, c12nDef, configuration } = useALContext();
-  const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
+  const { closeSnackbar } = useMySnackbar();
 
   const form = useForm();
 
@@ -100,151 +58,20 @@ const WrappedSubmitContent = () => {
   const submitState = useMemo<SubmitState>(() => location.state as SubmitState, [location.state]);
   const submitParams = useMemo<URLSearchParams>(() => new URLSearchParams(location.search), [location.search]);
 
-  const handleValidateServiceSelection = useCallback(() => {
-    // to do
-    console.log(form.store.state.values);
-  }, []);
-
   const handleCancelUpload = useCallback(() => {
-    console.log(_.cloneDeep(form.state.values));
-    form.setStore(s => ({ ...s, file: null, allowClick: true, uploadProgress: null, uuid: generateUUID() }));
+    form.setStore(s => {
+      s.file = null;
+      s.submit.isUploading = false;
+      s.submit.uploadProgress = null;
+      s.submit.uuid = generateUUID();
+      return s;
+    });
+
     FLOW.cancel();
     FLOW.off('complete');
     FLOW.off('fileError');
     FLOW.off('progress');
   }, [form]);
-
-  const handleUploadFile = useCallback(() => {
-    form.setStore(s => ({ ...s, allowClick: false, uploadProgress: 0 }));
-
-    console.log(_.cloneDeep(form.state.values));
-
-    FLOW.opts.generateUniqueIdentifier = selectedFile => {
-      const relativePath =
-        selectedFile?.relativePath ||
-        selectedFile?.file?.webkitRelativePath ||
-        selectedFile?.file?.name ||
-        selectedFile?.name;
-      return `${form.state.values.submit.uuid}_${form.state.values.file.size}_${relativePath.replace(
-        /[^0-9a-zA-Z_-]/gim,
-        ''
-      )}`;
-    };
-
-    FLOW.on('fileError', (event, api_data) => {
-      try {
-        const data = JSON.parse(api_data) as APIResponseProps<unknown>;
-        if ('api_status_code' in data) {
-          if (
-            data.api_status_code === 401 ||
-            (data.api_status_code === 503 &&
-              data.api_error_message.includes('quota') &&
-              data.api_error_message.includes('daily') &&
-              data.api_error_message.includes('API'))
-          ) {
-            window.location.reload();
-          } else {
-            // Unexpected error occurred, cancel upload and show error message
-            handleCancelUpload();
-            showErrorMessage(t('submit.file.upload_fail'));
-          }
-        }
-      } catch (ex) {
-        handleCancelUpload();
-        showErrorMessage(t('submit.file.upload_fail'));
-      }
-    });
-
-    FLOW.on('progress', () => {
-      form.setStore(s => ({ ...s, uploadProgress: Math.trunc(FLOW.progress() * 100) }));
-    });
-
-    FLOW.on('complete', () => {
-      if (FLOW.files.length === 0) {
-        return;
-      }
-
-      for (let x = 0; x < FLOW.files.length; x++) {
-        if (FLOW.files[x].error) {
-          return;
-        }
-      }
-      apiCall<{ started: boolean; sid: string }>({
-        url: `/api/v4/ui/start/${form.state.values.submit.uuid}/`,
-        method: 'POST',
-        body: {
-          ...form.state.values.settings,
-          filename: form.state.values.file.path,
-          metadata: form.state.values.metadata
-        },
-        onSuccess: api_data => {
-          showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
-          setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
-          }, 500);
-        },
-        onFailure: api_data => {
-          if (api_data.api_status_code === 400 && api_data.api_error_message.includes('metadata')) {
-            form.setStore(s => ({ ...s, tab: 'options' }));
-          }
-
-          if (
-            api_data.api_status_code === 503 ||
-            api_data.api_status_code === 403 ||
-            api_data.api_status_code === 404 ||
-            api_data.api_status_code === 400
-          ) {
-            showErrorMessage(api_data.api_error_message);
-          } else {
-            showErrorMessage(t('submit.file.failure'));
-          }
-
-          handleCancelUpload();
-        }
-      });
-    });
-
-    FLOW.addFile(form.state.values.file);
-    FLOW.upload();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form, handleCancelUpload, t]);
-
-  const handleUploadUrlHash = useCallback(() => {
-    if (form.state.values.hash.hasError) {
-      showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
-      return;
-    }
-
-    apiCall<Submission>({
-      url: '/api/v4/submit/',
-      method: 'POST',
-      body: {
-        ui_params: form.state.values.settings,
-        [form.state.values.hash.type]: form.state.values.hash.value,
-        metadata: form.state.values.metadata
-      },
-      onSuccess: ({ api_response }) => {
-        showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
-        setTimeout(() => {
-          navigate(`/submission/detail/${api_response.sid}`);
-        }, 500);
-      },
-      onFailure: ({ api_status_code, api_error_message }) => {
-        showErrorMessage(api_error_message);
-        if (api_status_code === 400 && api_error_message.includes('metadata')) {
-          form.setStore(s => ({ ...s, tab: 'options' }));
-        }
-      },
-      onEnter: () => {
-        form.setStore(s => ({ ...s, uploading: true }));
-      },
-      onExit: () => {
-        form.setStore(s => ({ ...s, uploading: false }));
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration.ui.allow_url_submissions, form, t]);
 
   useEffect(() => {
     apiCall<UserSettings>({
@@ -348,7 +175,7 @@ const WrappedSubmitContent = () => {
             open={open}
             waiting={isUploading}
             handleClose={() => form.setStore(s => ({ ...s, submit: { ...s.submit, isConfirmationOpen: false } }))}
-            handleCancel={() => {
+            handleCancel={async () => {
               form.setStore(s => {
                 s.submit.isConfirmationOpen = false;
 
@@ -363,16 +190,10 @@ const WrappedSubmitContent = () => {
                 return s;
               });
 
-              form.handleSubmit();
-              // const type = form.state.values.submit.type;
-              // if (type === 'file') handleUploadFile();
-              // else if (type === 'hash') handleUploadUrlHash();
+              await form.handleSubmit();
             }}
-            handleAccept={() => {
-              form.handleSubmit();
-              // const type = form.state.values.submit.type;
-              // if (type === 'file') handleUploadFile();
-              // else if (type === 'hash') handleUploadUrlHash();
+            handleAccept={async () => {
+              await form.handleSubmit();
             }}
             title={t('validate.title')}
             cancelText={t('validate.cancelText')}
@@ -393,7 +214,7 @@ const WrappedSubmitContent = () => {
       {c12nDef.enforce ? (
         <form.Field
           name="settings.classification"
-          children={({ state, handleBlur, handleChange }) => (
+          children={({ state, handleChange }) => (
             <div style={{ paddingBottom: theme.spacing(4) }}>
               <div style={{ padding: theme.spacing(1), fontSize: 16 }}>{t('classification')}</div>
               <Classification
@@ -424,18 +245,12 @@ const WrappedSubmitContent = () => {
               file: {
                 label: t('file'),
                 disabled: !currentUser.roles.includes('submission_create'),
-                inner: (
-                  <FileSubmit
-                    onValidateServiceSelection={handleValidateServiceSelection}
-                    onCancelUpload={handleCancelUpload}
-                    onSubmit={() => handleUploadFile()}
-                  />
-                )
+                inner: <FileSubmit onCancelUpload={handleCancelUpload} />
               },
               hash: {
                 label: `${t('urlHash.input_title')}${t('urlHash.input_suffix')}`,
                 disabled: !currentUser.roles.includes('submission_create'),
-                inner: <HashSubmit onSubmit={() => handleUploadUrlHash()} />
+                inner: <HashSubmit />
               },
               options: {
                 label: t('options'),
@@ -463,123 +278,131 @@ const WrappedSubmitContent = () => {
 const SubmitContent = React.memo(WrappedSubmitContent);
 
 const WrappedSubmitPage = () => {
-  const { t, i18n } = useTranslation(['submit']);
+  const { t } = useTranslation(['submit']);
   const { apiCall } = useMyAPI();
-  const theme = useTheme();
-  const classes = useStyles();
   const navigate = useNavigate();
-  const location = useLocation();
-  const banner = useAppBanner();
-  const { user: currentUser, c12nDef, configuration } = useALContext();
-  const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
+  const { configuration } = useALContext();
+  const { showErrorMessage, showSuccessMessage } = useMySnackbar();
 
-  const downSM = useMediaQuery(theme.breakpoints.down('md'));
-  const md = useMediaQuery(theme.breakpoints.only('md'));
+  const handleCancelUpload = useCallback(
+    ({ formApi }: { value: SubmitStore; formApi: FormApi<SubmitStore, Validator<SubmitStore, string>> }) => {
+      formApi.store.setState(s => {
+        s.values.file = null;
+        s.values.submit.isUploading = false;
+        s.values.submit.uploadProgress = null;
+        s.values.submit.uuid = generateUUID();
+        return s;
+      });
+      FLOW.cancel();
+      FLOW.off('complete');
+      FLOW.off('fileError');
+      FLOW.off('progress');
+    },
+    []
+  );
 
-  // const handleCancelUpload = useCallback(() => {
-  //   console.log(_.cloneDeep(form.state.values));
-  //   form.setStore(s => ({ ...s, file: null, allowClick: true, uploadProgress: null, uuid: generateUUID() }));
-  //   FLOW.cancel();
-  //   FLOW.off('complete');
-  //   FLOW.off('fileError');
-  //   FLOW.off('progress');
-  // }, [form]);
+  const handleUploadFile = useCallback(
+    ({ value, formApi }: { value: SubmitStore; formApi: FormApi<SubmitStore, Validator<SubmitStore, string>> }) => {
+      formApi.store.setState(s => {
+        s.values.submit.isUploading = true;
+        s.values.submit.uploadProgress = 0;
+        return s;
+      });
 
-  // const handleUploadFile = useCallback(() => {
-  //   form.setStore(s => ({ ...s, allowClick: false, uploadProgress: 0 }));
+      FLOW.opts.generateUniqueIdentifier = selectedFile => {
+        const relativePath =
+          selectedFile?.relativePath ||
+          selectedFile?.file?.webkitRelativePath ||
+          selectedFile?.file?.name ||
+          selectedFile?.name;
+        return `${value.submit.uuid}_${value.file.size}_${relativePath.replace(/[^0-9a-zA-Z_-]/gim, '')}`;
+      };
 
-  //   console.log(_.cloneDeep(form.state.values));
+      FLOW.on('fileError', (event, api_data) => {
+        try {
+          const data = JSON.parse(api_data) as APIResponseProps<unknown>;
+          if ('api_status_code' in data) {
+            if (
+              data.api_status_code === 401 ||
+              (data.api_status_code === 503 &&
+                data.api_error_message.includes('quota') &&
+                data.api_error_message.includes('daily') &&
+                data.api_error_message.includes('API'))
+            ) {
+              window.location.reload();
+            } else {
+              // Unexpected error occurred, cancel upload and show error message
+              handleCancelUpload({ value, formApi });
+              showErrorMessage(t('submit.file.upload_fail'));
+            }
+          }
+        } catch (ex) {
+          handleCancelUpload({ value, formApi });
+          showErrorMessage(t('submit.file.upload_fail'));
+        }
+      });
 
-  //   FLOW.opts.generateUniqueIdentifier = selectedFile => {
-  //     const relativePath =
-  //       selectedFile?.relativePath ||
-  //       selectedFile?.file?.webkitRelativePath ||
-  //       selectedFile?.file?.name ||
-  //       selectedFile?.name;
-  //     return `${form.state.values.submit.uuid}_${form.state.values.file.size}_${relativePath.replace(
-  //       /[^0-9a-zA-Z_-]/gim,
-  //       ''
-  //     )}`;
-  //   };
+      FLOW.on('progress', () => {
+        formApi.store.setState(s => {
+          s.values.submit.uploadProgress = Math.trunc(FLOW.progress() * 100);
+          return s;
+        });
+      });
 
-  //   FLOW.on('fileError', (event, api_data) => {
-  //     try {
-  //       const data = JSON.parse(api_data) as APIResponseProps<unknown>;
-  //       if ('api_status_code' in data) {
-  //         if (
-  //           data.api_status_code === 401 ||
-  //           (data.api_status_code === 503 &&
-  //             data.api_error_message.includes('quota') &&
-  //             data.api_error_message.includes('daily') &&
-  //             data.api_error_message.includes('API'))
-  //         ) {
-  //           window.location.reload();
-  //         } else {
-  //           // Unexpected error occurred, cancel upload and show error message
-  //           handleCancelUpload();
-  //           showErrorMessage(t('submit.file.upload_fail'));
-  //         }
-  //       }
-  //     } catch (ex) {
-  //       handleCancelUpload();
-  //       showErrorMessage(t('submit.file.upload_fail'));
-  //     }
-  //   });
+      FLOW.on('complete', () => {
+        if (FLOW.files.length === 0) {
+          return;
+        }
 
-  //   FLOW.on('progress', () => {
-  //     form.setStore(s => ({ ...s, uploadProgress: Math.trunc(FLOW.progress() * 100) }));
-  //   });
+        for (let x = 0; x < FLOW.files.length; x++) {
+          if (FLOW.files[x].error) {
+            return;
+          }
+        }
+        apiCall<{ started: boolean; sid: string }>({
+          url: `/api/v4/ui/start/${value.submit.uuid}/`,
+          method: 'POST',
+          body: {
+            ...value.settings,
+            filename: value.file.path,
+            metadata: value.metadata
+          },
+          onSuccess: api_data => {
+            showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
+            setTimeout(() => {
+              navigate(`/submission/detail/${api_data.api_response.sid}`);
+            }, 500);
+          },
+          onFailure: api_data => {
+            if (api_data.api_status_code === 400 && api_data.api_error_message.includes('metadata')) {
+              formApi.store.setState(s => {
+                s.values.tab = 'options';
+                return s;
+              });
+            }
 
-  //   FLOW.on('complete', () => {
-  //     if (FLOW.files.length === 0) {
-  //       return;
-  //     }
+            if (
+              api_data.api_status_code === 503 ||
+              api_data.api_status_code === 403 ||
+              api_data.api_status_code === 404 ||
+              api_data.api_status_code === 400
+            ) {
+              showErrorMessage(api_data.api_error_message);
+            } else {
+              showErrorMessage(t('submit.file.failure'));
+            }
 
-  //     for (let x = 0; x < FLOW.files.length; x++) {
-  //       if (FLOW.files[x].error) {
-  //         return;
-  //       }
-  //     }
-  //     apiCall<{ started: boolean; sid: string }>({
-  //       url: `/api/v4/ui/start/${form.state.values.submit.uuid}/`,
-  //       method: 'POST',
-  //       body: {
-  //         ...form.state.values.settings,
-  //         filename: form.state.values.file.path,
-  //         metadata: form.state.values.metadata
-  //       },
-  //       onSuccess: api_data => {
-  //         showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
-  //         setTimeout(() => {
-  //           navigate(`/submission/detail/${api_data.api_response.sid}`);
-  //         }, 500);
-  //       },
-  //       onFailure: api_data => {
-  //         if (api_data.api_status_code === 400 && api_data.api_error_message.includes('metadata')) {
-  //           form.setStore(s => ({ ...s, tab: 'options' }));
-  //         }
+            handleCancelUpload({ value, formApi });
+          }
+        });
+      });
 
-  //         if (
-  //           api_data.api_status_code === 503 ||
-  //           api_data.api_status_code === 403 ||
-  //           api_data.api_status_code === 404 ||
-  //           api_data.api_status_code === 400
-  //         ) {
-  //           showErrorMessage(api_data.api_error_message);
-  //         } else {
-  //           showErrorMessage(t('submit.file.failure'));
-  //         }
-
-  //         handleCancelUpload();
-  //       }
-  //     });
-  //   });
-
-  //   FLOW.addFile(form.state.values.file);
-  //   FLOW.upload();
-
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [form, handleCancelUpload, t]);
+      FLOW.addFile(value.file);
+      FLOW.upload();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [handleCancelUpload, t]
+  );
 
   const handleUploadUrlHash = useCallback(
     ({ value, formApi }: { value: SubmitStore; formApi: FormApi<SubmitStore, Validator<SubmitStore, string>> }) => {
@@ -644,13 +467,13 @@ const WrappedSubmitPage = () => {
           return s;
         });
         if (value.tab === 'file') {
-          // onSubmit();
+          handleUploadFile({ value, formApi });
         } else if (value.tab === 'hash') {
           handleUploadUrlHash({ value, formApi });
         }
       }
     },
-    [handleUploadUrlHash]
+    [handleUploadFile, handleUploadUrlHash]
   );
 
   return (
