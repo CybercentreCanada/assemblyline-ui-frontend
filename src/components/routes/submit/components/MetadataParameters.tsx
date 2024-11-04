@@ -82,9 +82,7 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(({ name, metadata
     (value: unknown) => {
       form.setStore(s => ({
         ...s,
-        submissionMetadata: !value
-          ? _.omit(s?.submissionMetadata || {}, name)
-          : { ...(s?.submissionMetadata || {}), [name]: value }
+        metadata: !value ? _.omit(s?.metadata || {}, name) : { ...(s?.metadata || {}), [name]: value }
       }));
     },
     [form, name]
@@ -93,7 +91,7 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(({ name, metadata
   const handleReset = useCallback(() => {
     form.setStore(s => ({
       ...s,
-      submissionMetadata: _.omit(s?.submissionMetadata || {}, name)
+      metadata: _.omit(s?.metadata || {}, name)
     }));
   }, [form, name]);
 
@@ -109,8 +107,11 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(({ name, metadata
 
   return (
     <form.Subscribe
-      selector={state => [state.values.submissionMetadata[name], metadata]}
-      children={([value, meta]) => {
+      selector={state => [state.values.metadata[name], metadata]}
+      children={props => {
+        const value = props[0] as string;
+        const meta = props[1] as Metadata;
+
         switch (meta.validator_type) {
           case 'keyword':
             return (

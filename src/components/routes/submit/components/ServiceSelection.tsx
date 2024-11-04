@@ -11,6 +11,7 @@ import {
   useTheme
 } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
+import { SelectedService, SelectedServiceCategory } from 'components/models/base/service';
 import { useForm } from 'components/routes/submit/contexts/form';
 import { BooleanInput } from 'components/routes/submit/inputs/BooleanInput';
 import { NumberInput } from 'components/routes/submit/inputs/NumberInput';
@@ -93,13 +94,7 @@ const ServiceSkeleton = ({ size, spacing }: SkelItemsProps) => (
 type ServiceProps = {
   cat_id: number;
   svr_id: number;
-  service: {
-    category: string;
-    description: string;
-    is_external: boolean;
-    name: string;
-    selected: boolean;
-  };
+  service: SelectedService;
 };
 
 const Service: React.FC<ServiceProps> = ({ cat_id, svr_id, service }) => {
@@ -244,17 +239,7 @@ const Service: React.FC<ServiceProps> = ({ cat_id, svr_id, service }) => {
 
 type CategoryProps = {
   cat_id: number;
-  category?: {
-    name: string;
-    selected: boolean;
-    services: {
-      category: string;
-      description: string;
-      is_external: boolean;
-      name: string;
-      selected: boolean;
-    }[];
-  };
+  category: SelectedServiceCategory;
 };
 
 const Category = ({ cat_id, category }: CategoryProps) => {

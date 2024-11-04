@@ -1,14 +1,18 @@
 import { createFormContext } from 'components/core/form/createFormContext';
 import type { HashPatternMap } from 'components/models/base/config';
-import type { Metadata } from 'components/models/base/submission';
 import type { UserSettings } from 'components/models/base/user_settings';
 import { DEFAULT_SETTINGS } from 'components/routes/submit/mock/settings';
 import generateUUID from 'helpers/uuid';
 
+const TABS = ['file', 'hash', 'options'] as const;
+type Tabs = (typeof TABS)[number];
+
 export type SubmitStore = {
+  tab: Tabs;
   submit: {
     uuid: string;
     type: 'file' | 'hash';
+    isFetchingSettings: boolean;
     isConfirmationOpen: boolean;
     isUploading: boolean;
     uploadProgress: number;
@@ -16,21 +20,23 @@ export type SubmitStore = {
   file: File & { relativePath: string; fileName: string; path: string };
   hash: { type: HashPatternMap; value: string; hasError: boolean; urlAutoSelect: boolean };
   submissionProfile: string;
-  metadata: Metadata;
+  metadata: Record<string, unknown>;
   settings: UserSettings;
 };
 
 export const { FormProvider, useForm } = createFormContext<SubmitStore>({
   defaultValues: {
+    tab: 'file',
     submit: {
       uuid: generateUUID(),
       type: 'file',
+      isFetchingSettings: false,
       isConfirmationOpen: false,
       isUploading: false,
       uploadProgress: 0
     },
     file: null,
-    hash: { type: null, value: '', hasError: false, urlAutoSelect: true },
+    hash: { type: null, value: '', hasError: true, urlAutoSelect: true },
     metadata: {},
     settings: {
       classification: '',

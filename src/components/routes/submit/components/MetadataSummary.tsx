@@ -11,7 +11,7 @@ const WrappedMetadataSummary = () => {
 
   return (
     <form.Subscribe
-      selector={state => [Object.entries(state.values.submissionMetadata || {})]}
+      selector={state => [Object.entries(state.values.metadata || {})]}
       children={([metadata]) =>
         metadata.length === 0 ? null : (
           <div style={{ textAlign: 'start', marginTop: theme.spacing(3), marginBottom: theme.spacing(3) }}>

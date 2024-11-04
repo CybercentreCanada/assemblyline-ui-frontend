@@ -1,7 +1,7 @@
 import type { FormApi, FormOptions, ReactFormApi, Validator } from '@tanstack/react-form';
 import { useForm as useTanStackForm } from '@tanstack/react-form';
 import _ from 'lodash';
-import { createContext, useCallback, useContext } from 'react';
+import React, { createContext, useCallback, useContext } from 'react';
 
 export function createFormContext<
   TFormData,
@@ -17,8 +17,19 @@ export function createFormContext<
 
   const FormContext = createContext<FormContextProps>(null);
 
-  const FormProvider = ({ children }) => {
-    const form = useTanStackForm(options);
+  type FormProviderProps = {
+    children: React.ReactNode;
+    onSubmit?: FormOptions<TFormData, TFormValidator>['onSubmit'];
+  };
+
+  const FormProvider = ({ children, onSubmit = () => null }: FormProviderProps) => {
+    const form = useTanStackForm({
+      ...options,
+      onSubmit: props => {
+        'onSubmit' in options ? options.onSubmit(props) : null;
+        onSubmit(props);
+      }
+    });
     return <FormContext.Provider value={form}>{children}</FormContext.Provider>;
   };
 
