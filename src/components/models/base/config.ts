@@ -1,6 +1,6 @@
 import type { AppSwitcherItem } from 'commons/components/app/AppConfigs';
-import { ServiceSpecification } from './service';
-import { ServiceSelection } from './submission';
+import type { ServiceSpecification } from './service';
+import type { ServiceSelection } from './submission';
 import type { ACL, Role, Type } from './user';
 
 export const API_PRIV = ['READ', 'READ_WRITE', 'WRITE', 'CUSTOM', 'EXTENDED'] as const;

@@ -1260,7 +1260,7 @@ function WrappedSubmissionDetail() {
                                 to="/submit"
                                 state={{
                                   hash: submission.files[0].sha256,
-                                  tabContext: '1',
+                                  tabContext: 'hash',
                                   c12n: submission.classification,
                                   metadata: submission.metadata
                                 }}

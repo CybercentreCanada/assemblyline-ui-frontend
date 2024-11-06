@@ -434,7 +434,7 @@ const WrappedFileDetail: React.FC<Props> = ({
                           to="/submit"
                           state={{
                             hash: file.file_info.sha256,
-                            tabContext: '1',
+                            tabContext: 'hash',
                             c12n: file.file_info.classification
                           }}
                           dense

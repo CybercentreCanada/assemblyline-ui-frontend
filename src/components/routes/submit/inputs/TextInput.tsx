@@ -1,6 +1,6 @@
 import ClearIcon from '@mui/icons-material/Clear';
-import type { AutocompleteProps, TypographyProps } from '@mui/material';
-import { Autocomplete, IconButton, Skeleton, TextField, Typography, useTheme } from '@mui/material';
+import type { AutocompleteProps, TooltipProps, TypographyProps } from '@mui/material';
+import { Autocomplete, IconButton, Skeleton, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import type { ElementType } from 'react';
 import React, { useState } from 'react';
 
@@ -19,6 +19,8 @@ type Props<
   loading?: boolean;
   options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
   value: string;
+  errors?: (string | false)[];
+  tooltipProps?: Omit<TooltipProps, 'children'>;
   onChange?: (value: string) => void;
   onReset?: () => void;
 };
@@ -36,6 +38,8 @@ const WrappedTextInput = <
   options = [],
   value,
   disabled,
+  errors = [],
+  tooltipProps,
   onChange,
   onReset,
   ...other
@@ -49,6 +53,8 @@ const WrappedTextInput = <
       <div style={{ display: 'flex', alignItems: 'center' }}>
         {label && (
           <Typography
+            component="label"
+            htmlFor={label.replaceAll('_', ' ')}
             color="textSecondary"
             variant="caption"
             whiteSpace="nowrap"
@@ -75,23 +81,40 @@ const WrappedTextInput = <
       {loading ? (
         <Skeleton style={{ height: '3rem' }} />
       ) : (
-        <Autocomplete
-          autoComplete
-          freeSolo
-          disableClearable
-          fullWidth
-          size="small"
-          value={_value}
-          inputValue={value || ''}
-          options={options}
-          onChange={(e, v: unknown) => setValue(v)}
-          onInputChange={(_, v) => {
-            setValue(null);
-            onChange(v);
-          }}
-          renderInput={params => <TextField {...params} />}
-          {...other}
-        />
+        <Tooltip
+          disableFocusListener={!tooltipProps}
+          disableHoverListener={!tooltipProps}
+          disableInteractive={!tooltipProps}
+          disableTouchListener={!tooltipProps}
+          {...tooltipProps}
+        >
+          <div>
+            <Autocomplete
+              id={label.replaceAll('_', ' ')}
+              autoComplete
+              freeSolo
+              disableClearable
+              fullWidth
+              size="small"
+              value={_value}
+              inputValue={value || ''}
+              options={options}
+              onChange={(e, v) => setValue(v)}
+              onInputChange={(_, v) => {
+                setValue(v);
+                onChange(v);
+              }}
+              renderInput={params => (
+                <TextField
+                  error={errors.filter(err => !!err).length > 0}
+                  helperText={errors.filter(err => !!err).join(', ')}
+                  {...params}
+                />
+              )}
+              {...other}
+            />
+          </div>
+        </Tooltip>
       )}
     </div>
   );

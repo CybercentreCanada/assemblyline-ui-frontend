@@ -411,11 +411,6 @@ const WrappedSubmitPage = () => {
         return;
       }
 
-      formApi.store.setState(s => {
-        s.values.submit.isUploading = true;
-        return s;
-      });
-
       apiCall<Submission>({
         url: '/api/v4/submit/',
         method: 'POST',
@@ -440,7 +435,14 @@ const WrappedSubmitPage = () => {
           }
 
           formApi.store.setState(s => {
+            s.values.hash.hasError = true;
             s.values.submit.isUploading = false;
+            return s;
+          });
+        },
+        onEnter: () => {
+          formApi.store.setState(s => {
+            s.values.submit.isUploading = true;
             return s;
           });
         }

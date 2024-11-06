@@ -460,7 +460,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
               to="/submit"
               state={{
                 hash: value,
-                tabContext: '1',
+                tabContext: 'hash',
                 c12n: classification
               }}
             >

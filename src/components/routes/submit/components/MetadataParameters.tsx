@@ -1,70 +1,17 @@
 import { Stack, Typography, useTheme } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Metadata } from 'components/models/base/config';
 import { useForm } from 'components/routes/submit/contexts/form';
+import { BooleanInput } from 'components/routes/submit/inputs/BooleanInput';
+import { DateInput } from 'components/routes/submit/inputs/DateInput';
+import { NumberInput } from 'components/routes/submit/inputs/NumberInput';
 import { SelectInput } from 'components/routes/submit/inputs/SelectInput';
 import { TextInput } from 'components/routes/submit/inputs/TextInput';
 import { matchURL } from 'helpers/utils';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  no_pad: {
-    padding: 0
-  },
-  meta_key: {
-    overflowX: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis'
-  },
-  item: {
-    marginLeft: 0,
-    width: '100%',
-    '&:hover': {
-      background: theme.palette.action.hover
-    }
-  },
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  },
-  tweaked_tabs: {
-    [theme.breakpoints.only('xs')]: {
-      '& [role=tab]': {
-        minWidth: '90px'
-      }
-    }
-  }
-}));
-
-const isValid = (input: string, field_cfg: Metadata) => {
-  if (!input) {
-    // No input provided or is unset at the moment
-    // Validity depends on whether or not the field is required
-    return !field_cfg.required;
-  }
-
-  if (field_cfg.validator_type === 'boolean' || field_cfg.validator_type === 'enum') {
-    // Limited selection so should always be valid
-    return true;
-  }
-
-  if (field_cfg.validator_type === 'uri' && matchURL(input)) {
-    return true;
-  } else if (
-    field_cfg.validator_type !== 'uri' &&
-    input.match(new RegExp(field_cfg.validator_params.validation_regex))
-  ) {
-    return true;
-  }
-  return false;
-};
 
 type MetadataParamParam = {
   name: string;
@@ -73,10 +20,28 @@ type MetadataParamParam = {
 };
 
 const MetadataParam: React.FC<MetadataParamParam> = React.memo(({ name, metadata, disabled = false }) => {
+  const { t } = useTranslation(['submit', 'settings']);
   const form = useForm();
   const { apiCall } = useMyAPI();
 
   const [options, setOptions] = useState([...metadata.suggestions]);
+
+  const handleValid = useCallback(
+    (value: unknown): string => {
+      if (!value) return metadata.required ? t('required') : null;
+
+      if (metadata.validator_type === 'uri' && !matchURL((value || '') as string)) return t('invalid_url');
+
+      if (
+        metadata.validator_type === 'regex' &&
+        !((value || '') as string).match(new RegExp(metadata.validator_params.validation_regex))
+      )
+        return t('invalid_regex');
+
+      return null;
+    },
+    [metadata.required, metadata.validator_params.validation_regex, metadata.validator_type, t]
+  );
 
   const handleChange = useCallback(
     (value: unknown) => {
@@ -97,40 +62,90 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(({ name, metadata
 
   useEffect(() => {
     if (disabled || metadata.validator_type in ['enum', 'boolean', 'integer', 'date']) return;
-
     apiCall({
       url: `/api/v4/search/facet/submission/metadata.${name}/`,
-      onSuccess: api_data => setOptions(o => [...o, ...Object.keys(api_data.api_response)])
+      onSuccess: api_data => setOptions(o => [...o, ...Object.keys(api_data.api_response)]),
+      onFailure: () => null
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [metadata.validator_type, name, disabled]);
 
   return (
-    <form.Subscribe
-      selector={state => [state.values.metadata[name], metadata]}
-      children={props => {
-        const value = props[0] as string;
-        const meta = props[1] as Metadata;
-
-        switch (meta.validator_type) {
-          case 'keyword':
+    <form.Field
+      name={`metadata.${name}` as any}
+      validators={{ onChange: ({ value }) => handleValid(value) }}
+      children={({ state, handleBlur }) => {
+        switch (metadata.validator_type) {
+          case 'boolean':
             return (
-              <TextInput
-                label={`${name.replace('_', ' ')} [ ${meta.validator_type.toUpperCase()} ]`}
-                value={value}
-                options={options}
-                onChange={v => handleChange(v)}
+              <BooleanInput
+                label={name.replace('_', ' ')}
+                value={state.value || false}
+                onClick={() => handleChange(!!!state.value)}
+                onReset={() => handleReset()}
+                onBlur={handleBlur}
+              />
+            );
+          case 'date':
+            return (
+              <DateInput
+                label={`${name} [ ${metadata.validator_type.toUpperCase()} ]`}
+                date={state.value}
+                setDate={value => handleChange(value)}
                 onReset={() => handleReset()}
               />
             );
           case 'enum':
             return (
               <SelectInput
-                label={`${name.replace('_', ' ')} [ ${meta.validator_type.toUpperCase()} ]`}
-                value={value}
-                items={meta.validator_params.values}
+                label={`${name} [ ${metadata.validator_type.toUpperCase()} ]`}
+                value={state.value || ''}
+                items={metadata.validator_params.values}
                 onChange={e => handleChange(e.target.value)}
                 onReset={() => handleReset()}
+                onBlur={handleBlur}
+              />
+            );
+          case 'integer':
+            return (
+              <NumberInput
+                label={`${name} [ ${metadata.validator_type.toUpperCase()} ]`}
+                value={state.value}
+                min={metadata.validator_params.min}
+                max={metadata.validator_params.max}
+                onChange={event => handleChange(parseInt(event.target.value))}
+                onReset={() => handleReset()}
+                onBlur={handleBlur}
+              />
+            );
+          case 'regex':
+            return (
+              <TextInput
+                label={`${name} [ ${metadata.validator_type.toUpperCase()} ]`}
+                value={state.value || ''}
+                options={options}
+                disabled={disabled}
+                errors={state.meta.errors}
+                tooltipProps={{
+                  title: metadata.validator_params?.validation_regex || null,
+                  placement: 'right'
+                }}
+                onChange={v => handleChange(v)}
+                onReset={() => handleReset()}
+                onBlur={handleBlur}
+              />
+            );
+          default:
+            return (
+              <TextInput
+                label={`${name} [ ${metadata.validator_type.toUpperCase()} ]`}
+                value={state.value || ''}
+                options={options}
+                disabled={disabled}
+                errors={state.meta.errors}
+                onChange={v => handleChange(v)}
+                onReset={() => handleReset()}
+                onBlur={handleBlur}
               />
             );
         }
@@ -142,7 +157,6 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(({ name, metadata
 const WrappedMetadataParameters = () => {
   const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
-
   const { configuration } = useALContext();
 
   return (
