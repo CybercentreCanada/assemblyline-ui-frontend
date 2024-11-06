@@ -26,6 +26,7 @@ import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
+import type { APIResponseProps } from 'components/hooks/useMyAPI';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceTree from 'components/layout/serviceTree';
@@ -149,14 +150,14 @@ const Submit = () => {
     setUploadProgress(0);
     flow.on('fileError', (event, api_data) => {
       try {
-        const data = JSON.parse(api_data);
+        const data = JSON.parse(api_data) as APIResponseProps<unknown>;
         if (Object.hasOwnProperty.call(data, 'api_status_code')) {
           if (
             data.api_status_code === 401 ||
             (data.api_status_code === 503 &&
               data.api_error_message.includes('quota') &&
               data.api_error_message.includes('daily') &&
-              api_data.api_error_message.includes('API'))
+              data.api_error_message.includes('API'))
           ) {
             window.location.reload();
           } else {
