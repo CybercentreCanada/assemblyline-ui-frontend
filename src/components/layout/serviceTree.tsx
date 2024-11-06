@@ -6,7 +6,7 @@ import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import Service from 'components/layout/service';
 import type { SubmissionProfileParams } from 'components/models/base/config';
-import type { SelectedService } from 'components/models/base/service';
+import type { SelectedService, SelectedServiceCategory } from 'components/models/base/service';
 import type { UserSettings } from 'components/models/base/user_settings';
 import React, { useEffect, useMemo, useState } from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
@@ -36,7 +36,7 @@ function ServiceTreeItemSkel({ size = 'medium' }: ServiceTreeItemSkelProps) {
 }
 
 type ServiceTreeItemProps = {
-  item: SelectedService;
+  item: SelectedService & SelectedServiceCategory;
   onChange: (name: string, category: string) => void;
   disabled?: boolean;
   size: 'medium' | 'small';
@@ -166,7 +166,7 @@ function ServiceTreeItem({
                 disabled={disabled}
                 size={size}
                 key={service_id}
-                item={service}
+                item={service as SelectedService & SelectedServiceCategory}
                 onChange={onChange}
                 service_spec={service_spec}
                 setParam={setParam}

@@ -35,7 +35,6 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import ExternalSources from 'components/layout/externalSources';
 import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
-import type { SubmissionProfileParams } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
 import Classification from 'components/visual/Classification';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
@@ -801,7 +800,7 @@ function Settings() {
               </TabList>
               {Object.entries(settings.submission_profiles)
                 .filter(([_, config]) => config.service_spec)
-                .map(([profile_name, profile_config]: [string, SubmissionProfileParams], i) => (
+                .map(([profile_name, profile_config], i) => (
                   <TabPanel key={i} value={profile_name}>
                     <ServiceSpec service_spec={profile_config.service_spec} setParam={setSubmissionProfileParam} />
                   </TabPanel>
