@@ -72,7 +72,7 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(({ name, metadata
 
   return (
     <form.Field
-      name={`metadata.${name}` as any}
+      name={`metadata.${name}`}
       validators={{ onChange: ({ value }) => handleValid(value) }}
       children={({ state, handleBlur }) => {
         switch (metadata.validator_type) {

@@ -242,7 +242,6 @@ type CategoryProps = {
 };
 
 const Category = ({ cat_id, category }: CategoryProps) => {
-  const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const form = useForm();
 
@@ -272,12 +271,16 @@ const Category = ({ cat_id, category }: CategoryProps) => {
   return (
     <>
       <form.Subscribe
-        selector={state => [state.values.settings.services[cat_id].selected]}
-        children={([selected]) => (
+        selector={state => {
+          const selected = state.values.settings.services[cat_id].selected;
+          const list = state.values.settings.services[cat_id].services.map(svr => svr.selected);
+          return [selected, !list.every(i => i) && list.some(i => i)];
+        }}
+        children={([selected, indeterminate]) => (
           <ListItem disablePadding dense>
             <ListItemButton sx={{ padding: '0px 12px' }} onClick={() => handleClick(selected)}>
               <ListItemIcon sx={{ minWidth: 0 }}>
-                <Checkbox checked={selected} edge="start" size="small" />
+                <Checkbox checked={selected} indeterminate={indeterminate} edge="start" size="small" />
               </ListItemIcon>
               <ListItemText primary={category.name} primaryTypographyProps={{}} />
             </ListItemButton>
@@ -285,11 +288,17 @@ const Category = ({ cat_id, category }: CategoryProps) => {
         )}
       />
 
-      <div style={{ marginLeft: theme.spacing(3) }}>
-        {category.services.map((service, svr_id) => (
-          <Service key={svr_id} cat_id={cat_id} svr_id={svr_id} service={service} />
-        ))}
-      </div>
+      <form.Field
+        name={`settings.services[${cat_id}].services`}
+        mode="array"
+        children={({ state }: any) => (
+          <div style={{ marginLeft: theme.spacing(3) }}>
+            {state.value.map((service, svr_id) => (
+              <Service key={svr_id} cat_id={cat_id} svr_id={svr_id} service={service} />
+            ))}
+          </div>
+        )}
+      />
     </>
   );
 };
@@ -309,13 +318,22 @@ const WrappedServiceSelection = ({ size = 'medium' }: Props) => {
         {t('options.service')}
       </Typography>
 
-      {!form.store.state.values.settings ? (
-        <ServiceSkeleton size={size} spacing={theme.spacing(4)} />
-      ) : (
-        form.store.state.values.settings?.services.map((category, cat_id) => (
-          <Category key={cat_id} cat_id={cat_id} category={category} />
-        ))
-      )}
+      <form.Subscribe
+        selector={state => state.values.submit.isFetchingSettings}
+        children={fetching =>
+          fetching ? (
+            <ServiceSkeleton size={size} spacing={theme.spacing(4)} />
+          ) : (
+            <form.Field
+              name="settings.services"
+              mode="array"
+              children={({ state }) =>
+                state.value.map((category, cat_id) => <Category key={cat_id} cat_id={cat_id} category={category} />)
+              }
+            />
+          )
+        }
+      />
     </div>
   );
 };
