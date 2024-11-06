@@ -135,12 +135,12 @@ const Service: React.FC<ServiceProps> = ({ cat_id, svr_id, service }) => {
 
   return (
     <>
-      <form.Field
-        name={`settings.services[${cat_id}].services[${svr_id}].selected`}
-        children={({ state, handleBlur, handleChange }) => (
-          <ListItemButton sx={{ padding: '0px 12px' }} onClick={() => handleClick(state.value)}>
+      <form.Subscribe
+        selector={state => [state.values.settings.services[cat_id].services[svr_id].selected]}
+        children={([selected]) => (
+          <ListItemButton sx={{ padding: '0px 12px' }} onClick={() => handleClick(selected)}>
             <ListItemIcon sx={{ minWidth: 0 }}>
-              <Checkbox checked={state.value} edge="start" size="small" />
+              <Checkbox checked={selected} edge="start" size="small" />
             </ListItemIcon>
             <ListItemText
               style={{ marginRight: theme.spacing(2) }}
@@ -271,13 +271,13 @@ const Category = ({ cat_id, category }: CategoryProps) => {
 
   return (
     <>
-      <form.Field
-        name={`settings.services[${cat_id}].selected`}
-        children={({ state, handleBlur, handleChange }) => (
+      <form.Subscribe
+        selector={state => [state.values.settings.services[cat_id].selected]}
+        children={([selected]) => (
           <ListItem disablePadding dense>
-            <ListItemButton sx={{ padding: '0px 12px' }} onClick={() => handleClick(state.value)}>
+            <ListItemButton sx={{ padding: '0px 12px' }} onClick={() => handleClick(selected)}>
               <ListItemIcon sx={{ minWidth: 0 }}>
-                <Checkbox checked={state.value} edge="start" size="small" />
+                <Checkbox checked={selected} edge="start" size="small" />
               </ListItemIcon>
               <ListItemText primary={category.name} primaryTypographyProps={{}} />
             </ListItemButton>

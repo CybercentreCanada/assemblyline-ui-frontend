@@ -123,13 +123,22 @@ const WrappedSubmitContent = () => {
     const inputParam = submitParams.get('input') || '';
     if (inputParam) {
       const [type, value] = getSubmitType(inputParam, configuration);
-      form.setStore(s => ({ ...s, tab: 'hash', hash: { ...s.hash, type, value, hasError: false } }));
+      form.setStore(s => {
+        s.tab = 'hash';
+        s.hash.type = type;
+        s.hash.value = value;
+        s.hash.hasError = false;
+        return s;
+      });
       closeSnackbar();
     }
 
     const classification = submitParams.get('classification');
     if (classification) {
-      form.setStore(s => ({ ...s, settings: { ...s.settings, classification } }));
+      form.setStore(s => {
+        s.settings.classification = classification;
+        return s;
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closeSnackbar, configuration, submitParams]);
@@ -137,13 +146,15 @@ const WrappedSubmitContent = () => {
   useEffect(() => {
     if (submitState) {
       const [type, value] = getSubmitType(submitState.hash, configuration);
-      form.setStore(s => ({
-        ...s,
-        tab: submitState.tabContext,
-        hash: { ...s.hash, type, value, hasError: false },
-        settings: { ...s.settings, classification: submitState.c12n },
-        submissionMetadata: submitState.metadata
-      }));
+      form.setStore(s => {
+        s.tab = submitState.tabContext;
+        s.hash.type = type;
+        s.hash.value = value;
+        s.hash.hasError = false;
+        s.settings.classification = submitState.c12n;
+        s.metadata = submitState.metadata;
+        return s;
+      });
       closeSnackbar();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -174,7 +185,12 @@ const WrappedSubmitContent = () => {
           <ConfirmationDialog
             open={open}
             waiting={isUploading}
-            handleClose={() => form.setStore(s => ({ ...s, submit: { ...s.submit, isConfirmationOpen: false } }))}
+            handleClose={() =>
+              form.setStore(s => {
+                s.submit.isConfirmationOpen = false;
+                return s;
+              })
+            }
             handleCancel={async () => {
               form.setStore(s => {
                 s.submit.isConfirmationOpen = false;

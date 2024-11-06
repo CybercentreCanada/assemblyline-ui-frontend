@@ -20,7 +20,14 @@ const WrappedMetadataSummary = () => {
                 {t('options.submission.metadata')}
               </Typography>
               <Tooltip title={t('options.submission.metadata.clear')}>
-                <IconButton onClick={() => form.setStore(s => ({ ...s, submissionMetadata: {} }))}>
+                <IconButton
+                  onClick={() =>
+                    form.setStore(s => {
+                      s.metadata = {};
+                      return s;
+                    })
+                  }
+                >
                   <ClearIcon />
                 </IconButton>
               </Tooltip>

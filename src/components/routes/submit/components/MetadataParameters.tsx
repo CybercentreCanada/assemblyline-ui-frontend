@@ -45,19 +45,19 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(({ name, metadata
 
   const handleChange = useCallback(
     (value: unknown) => {
-      form.setStore(s => ({
-        ...s,
-        metadata: !value ? _.omit(s?.metadata || {}, name) : { ...(s?.metadata || {}), [name]: value }
-      }));
+      form.setStore(s => {
+        s.metadata = !value ? _.omit(s?.metadata || {}, name) : { ...(s?.metadata || {}), [name]: value };
+        return s;
+      });
     },
     [form, name]
   );
 
   const handleReset = useCallback(() => {
-    form.setStore(s => ({
-      ...s,
-      metadata: _.omit(s?.metadata || {}, name)
-    }));
+    form.setStore(s => {
+      s.metadata = _.omit(s?.metadata || {}, name);
+      return s;
+    });
   }, [form, name]);
 
   useEffect(() => {
