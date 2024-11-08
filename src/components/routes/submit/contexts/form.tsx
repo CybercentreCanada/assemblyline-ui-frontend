@@ -1,5 +1,5 @@
 import { createFormContext } from 'components/core/form/createFormContext';
-import type { HashPatternMap } from 'components/models/base/config';
+import type { HashPatternMap, Submission } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
 import { DEFAULT_SETTINGS } from 'components/routes/submit/mock/settings';
 import generateUUID from 'helpers/uuid';
@@ -19,7 +19,7 @@ export type SubmitStore = {
   };
   file: File & { relativePath: string; fileName: string; path: string };
   hash: { type: HashPatternMap; value: string; hasError: boolean; urlAutoSelect: boolean };
-  submissionProfile: string;
+  profile: keyof Submission['profiles'];
   metadata: Record<string, unknown>;
   settings: UserSettings;
 };
@@ -59,6 +59,6 @@ export const { FormProvider, useForm } = createFormContext<SubmitStore>({
       ttl: 0,
       ...DEFAULT_SETTINGS
     },
-    submissionProfile: null
+    profile: null
   }
 });

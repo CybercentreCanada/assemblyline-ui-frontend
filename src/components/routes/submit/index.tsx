@@ -20,6 +20,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { MetadataParameters } from './components/MetadataParameters';
 import { ServiceSelection } from './components/ServiceSelection';
 import { SubmissionParameters } from './components/SubmissionParameters';
+import { SubmissionProfile } from './components/SubmissionProfile';
 import type { SubmitStore, Tabs } from './contexts/form';
 import { FormProvider, useForm } from './contexts/form';
 import { DEFAULT_SETTINGS } from './mock/settings';
@@ -98,9 +99,7 @@ const WrappedSubmitContent = () => {
             s.settings.services[key].services.sort((a, b) => a.name.localeCompare(b.name));
           });
 
-          if (!currentUser.roles.includes('submission_customize')) {
-            s.submissionProfile = api_response.preferred_submission_profile;
-          }
+          s.profile = api_response.preferred_submission_profile || null;
 
           return s;
         });
@@ -264,7 +263,7 @@ const WrappedSubmitContent = () => {
                 inner: <FileSubmit onCancelUpload={handleCancelUpload} />
               },
               hash: {
-                label: `${t('urlHash.input_title')}${t('urlHash.input_suffix')}`,
+                label: t('urlHash.input_title'),
                 disabled: !currentUser.roles.includes('submission_create'),
                 inner: <HashSubmit />
               },
@@ -273,6 +272,9 @@ const WrappedSubmitContent = () => {
                 disabled: !currentUser.roles.includes('submission_create'),
                 inner: (
                   <Grid container columnGap={2}>
+                    <Grid item xs={12}>
+                      <SubmissionProfile />
+                    </Grid>
                     <Grid item xs={12} md>
                       <ServiceSelection />
                     </Grid>

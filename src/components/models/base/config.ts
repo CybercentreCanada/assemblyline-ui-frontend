@@ -452,6 +452,9 @@ export type SubmissionProfileParams = {
   /** Priority of the scan */
   priority?: number;
 
+  /** Should the submission do extra profiling? */
+  profile?: boolean;
+
   /** Service-specific parameters */
   service_spec?: ServiceSpecification[];
 
