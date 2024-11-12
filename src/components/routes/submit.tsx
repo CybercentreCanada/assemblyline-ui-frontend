@@ -44,6 +44,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import { DEFAULT_SETTINGS } from './submit/mock/settings';
 
 type SubmitState = {
   hash: string;
@@ -510,7 +511,7 @@ const Submit = () => {
     apiCall<UserSettings>({
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: api_data => {
-        const tempSettings = { ...api_data.api_response };
+        const tempSettings = { ...api_data.api_response, ...DEFAULT_SETTINGS };
         if (state) {
           // Get the classification from the state
           tempSettings.classification = state.c12n;

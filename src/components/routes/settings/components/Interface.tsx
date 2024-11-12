@@ -1,0 +1,89 @@
+import { List, ListItem, Typography, useTheme } from '@mui/material';
+import useALContext from 'components/hooks/useALContext';
+import { useForm } from 'components/routes/settings/contexts/form';
+import { SelectInput } from 'components/routes/settings/inputs/SelectInput';
+import { useTranslation } from 'react-i18next';
+
+export const Interface = () => {
+  const { t } = useTranslation(['settings']);
+  const theme = useTheme();
+  const form = useForm();
+  const { configuration } = useALContext();
+
+  return (
+    <>
+      <List
+        disablePadding
+        sx={{
+          bgcolor: 'background.paper',
+          '&>:not(:last-child)': {
+            borderBottom: `thin solid ${theme.palette.divider}`
+          }
+        }}
+      >
+        <ListItem alignItems="flex-start">
+          <Typography variant="h6">{t('interface')}</Typography>
+        </ListItem>
+
+        <form.Field
+          name="settings.submission_view"
+          children={({ state, handleBlur, handleChange }) => (
+            <SelectInput
+              primary={t('interface.view')}
+              secondary={t('interface.view_desc')}
+              value={state.value}
+              loading={!form.state.values.settings}
+              options={[
+                { value: 'report', label: t('interface.view_report') },
+                { value: 'details', label: t('interface.view_details') }
+              ]}
+              onChange={e => handleChange(e.target.value as 'details' | 'report')}
+              onBlur={handleBlur}
+            />
+          )}
+        />
+
+        <form.Field
+          name="settings.download_encoding"
+          children={({ state, handleBlur, handleChange }) => (
+            <SelectInput
+              primary={t('interface.encoding')}
+              secondary={t('interface.encoding_desc')}
+              value={state.value}
+              loading={!form.state.values.settings}
+              options={[
+                ...(configuration.ui.allow_raw_downloads && [{ value: 'raw', label: t('interface.encoding_raw') }]),
+                { value: 'cart', label: t('interface.encoding_cart') },
+                ...(configuration.ui.allow_zip_downloads && [{ value: 'zip', label: t('interface.encoding_zip') }])
+              ]}
+              onChange={e => handleChange(e.target.value as 'raw' | 'cart' | 'zip')}
+              onBlur={handleBlur}
+            />
+          )}
+        />
+
+        <form.Field
+          name="settings.expand_min_score"
+          children={({ state, handleBlur, handleChange }) => (
+            <SelectInput
+              primary={t('interface.score')}
+              secondary={t('interface.score_desc')}
+              value={state.value}
+              loading={!form.state.values.settings}
+              options={[
+                { value: '-1000000', label: t('interface.score_-1000000') },
+                { value: '0', label: t('interface.score_0') },
+                { value: '100', label: t('interface.score_100') },
+                { value: '500', label: t('interface.score_500') },
+                { value: '2000', label: t('interface.score_2000') },
+                { value: '100000000', label: t('interface.score_100000000') }
+              ]}
+              onChange={e => handleChange(e.target.value as number)}
+              onBlur={handleBlur}
+            />
+          )}
+        />
+      </List>
+    </>
+  );
+};

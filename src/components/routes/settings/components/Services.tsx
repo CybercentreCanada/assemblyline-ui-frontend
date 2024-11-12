@@ -1,0 +1,200 @@
+import { Checkbox, List, ListItem, ListItemButton, ListItemText, useTheme } from '@mui/material';
+import type { SelectedService, SelectedServiceCategory } from 'components/models/base/service';
+import { useForm } from 'components/routes/settings/contexts/form';
+import { BooleanInput } from 'components/routes/settings/inputs/BooleanInput';
+import { NumberInput } from 'components/routes/settings/inputs/NumberInput';
+import { SelectInput } from 'components/routes/settings/inputs/SelectInput';
+import { TextInput } from 'components/routes/settings/inputs/TextInput';
+
+export const Services = () => {
+  const theme = useTheme();
+
+  const form = useForm();
+
+  return (
+    <form.Field
+      name="settings.services"
+      mode="array"
+      children={props => {
+        const categories = props.state.value as unknown as SelectedServiceCategory[];
+
+        return categories.map((category, cat_id) => (
+          <div key={`${category.name}-${cat_id}`} style={{ display: 'contents' }}>
+            <form.Subscribe
+              selector={state => state.values.settings.services[cat_id].selected}
+              children={selected => (
+                <ListItem
+                  id={category.name}
+                  secondaryAction={
+                    <Checkbox
+                      edge="end"
+                      checked={selected}
+                      onChange={() => {
+                        form.setStore(s => {
+                          s.settings.services[cat_id].selected = !selected;
+                          return s;
+                        });
+                      }}
+                    />
+                  }
+                  disablePadding
+                  dense
+                  sx={{ marginTop: theme.spacing(1), borderBottom: `thin solid ${theme.palette.divider}` }}
+                >
+                  <ListItemButton
+                    onClick={() => {
+                      form.setStore(s => {
+                        s.settings.services[cat_id].selected = !selected;
+                        return s;
+                      });
+                    }}
+                  >
+                    <ListItemText primary={category.name} primaryTypographyProps={{ variant: 'h5' }} />
+                  </ListItemButton>
+                </ListItem>
+              )}
+            />
+
+            <form.Field
+              name={`settings.services[${cat_id}].services`}
+              mode="array"
+              children={props2 => {
+                const services = props2.state.value as unknown as SelectedService[];
+
+                return services.map((service, svr_id) => (
+                  <List
+                    key={`${service.name}-${svr_id}`}
+                    disablePadding
+                    sx={{
+                      bgcolor: 'background.paper',
+                      '&>:not(:last-child)': {
+                        borderBottom: `thin solid ${theme.palette.divider}`
+                      }
+                    }}
+                  >
+                    <form.Subscribe
+                      selector={state => state.values.settings.services[cat_id].services[svr_id].selected}
+                      children={selected => (
+                        <ListItem
+                          id={`${category.name} - ${service.name}`}
+                          secondaryAction={
+                            <Checkbox
+                              edge="end"
+                              checked={selected}
+                              onChange={() => {
+                                form.setStore(s => {
+                                  s.settings.services[cat_id].services[svr_id].selected = !selected;
+                                  return s;
+                                });
+                              }}
+                            />
+                          }
+                          disablePadding
+                          dense
+                          sx={{ marginTop: theme.spacing(1), borderBottom: `thin solid ${theme.palette.divider}` }}
+                        >
+                          <ListItemButton
+                            onClick={() => {
+                              form.setStore(s => {
+                                s.settings.services[cat_id].services[svr_id].selected = !selected;
+                                return s;
+                              });
+                            }}
+                          >
+                            <ListItemText
+                              primary={service.name}
+                              secondary={service.description}
+                              primaryTypographyProps={{ variant: 'h6' }}
+                            />
+                          </ListItemButton>
+                        </ListItem>
+                      )}
+                    />
+
+                    <form.Subscribe
+                      selector={state =>
+                        state.values.settings.service_spec.findIndex(spec => spec.name === service.name)
+                      }
+                      children={spec_id =>
+                        spec_id < 0 ? null : (
+                          <form.Field
+                            name={`settings.service_spec[${spec_id}].params`}
+                            mode="array"
+                            children={props3 => {
+                              const params = props3.state.value;
+
+                              return params.map((param, param_id) => (
+                                <form.Field
+                                  key={`${param.name}-${param_id}`}
+                                  name={`settings.service_spec[${spec_id}].params[${param_id}].value` as any}
+                                  children={({ state, handleChange, handleBlur }) => {
+                                    const primary = param.name.replaceAll('_', ' ');
+                                    // const secondary = `[${param.type}]`;
+                                    const secondary = null;
+
+                                    switch (param.type) {
+                                      case 'str':
+                                        return (
+                                          <TextInput
+                                            primary={primary}
+                                            secondary={secondary}
+                                            capitalize
+                                            value={state.value}
+                                            onBlur={handleBlur}
+                                            onChange={handleChange}
+                                          />
+                                        );
+                                      case 'int':
+                                        return (
+                                          <NumberInput
+                                            primary={primary}
+                                            secondary={secondary}
+                                            capitalize
+                                            value={state.value}
+                                            onBlur={handleBlur}
+                                            onChange={e => handleChange(parseInt(e.target.value))}
+                                          />
+                                        );
+                                      case 'bool':
+                                        return (
+                                          <BooleanInput
+                                            primary={primary}
+                                            secondary={secondary}
+                                            capitalize
+                                            value={state.value}
+                                            onBlur={handleBlur}
+                                            onClick={() => handleChange(!state.value)}
+                                          />
+                                        );
+                                      case 'list':
+                                        return (
+                                          <SelectInput
+                                            primary={primary}
+                                            secondary={secondary}
+                                            capitalize
+                                            value={state.value}
+                                            options={param.list.map(item => ({
+                                              value: item,
+                                              label: item.replaceAll('_', ' ')
+                                            }))}
+                                          />
+                                        );
+                                    }
+                                  }}
+                                />
+                              ));
+                            }}
+                          />
+                        )
+                      }
+                    />
+                  </List>
+                ));
+              }}
+            />
+          </div>
+        ));
+      }}
+    />
+  );
+};
