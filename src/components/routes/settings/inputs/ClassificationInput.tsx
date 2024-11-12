@@ -1,5 +1,6 @@
+import RefreshIcon from '@mui/icons-material/Refresh';
 import type { ListItemTextProps, TypographyProps } from '@mui/material';
-import { ListItem, Skeleton, Typography, useTheme } from '@mui/material';
+import { IconButton, ListItem, Skeleton, Typography, useTheme } from '@mui/material';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
 import React from 'react';
@@ -10,7 +11,9 @@ type Props = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
   primaryProps?: TypographyProps;
   loading?: boolean;
   value: ClassificationProps['c12n'];
+  defaultValue?: ClassificationProps['c12n'];
   onChange: ClassificationProps['setClassification'];
+  onReset?: ClassificationProps['setClassification'];
 };
 
 const WrappedClassificationInput = ({
@@ -20,7 +23,9 @@ const WrappedClassificationInput = ({
   loading = false,
   disabled = false,
   value,
+  defaultValue = null,
   onChange,
+  onReset = () => null,
   ...other
 }: Props) => {
   const theme = useTheme();
@@ -32,6 +37,18 @@ const WrappedClassificationInput = ({
           <Typography color="textPrimary" variant="body1" whiteSpace="nowrap" children={primary} {...primaryProps} />
         )}
         {secondary && <Typography color="textSecondary" variant="body2" children={secondary} />}
+      </div>
+
+      <div style={{ ...((defaultValue === null || value === defaultValue) && { opacity: 0 }) }}>
+        <IconButton
+          color="primary"
+          children={<RefreshIcon fontSize="small" />}
+          onClick={event => {
+            event.preventDefault();
+            event.stopPropagation();
+            onReset(defaultValue);
+          }}
+        />
       </div>
 
       {loading ? (

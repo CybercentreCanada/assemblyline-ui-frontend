@@ -130,7 +130,7 @@ export const Services = ({ loading = false, disabled = false }: Props) => {
                               return params.map((param, param_id) => (
                                 <form.Field
                                   key={`${param.name}-${param_id}`}
-                                  name={`settings.service_spec[${spec_id}].params[${param_id}].value` as any}
+                                  name={`next.service_spec[${spec_id}].params[${param_id}].value` as any}
                                   children={({ state, handleChange, handleBlur }) => {
                                     const primary = param.name.replaceAll('_', ' ');
                                     // const secondary = `[${param.type}]`;
@@ -145,10 +145,12 @@ export const Services = ({ loading = false, disabled = false }: Props) => {
                                             primaryProps={{ color: 'textSecondary' }}
                                             capitalize
                                             value={state.value}
+                                            defaultValue={param.default}
                                             disabled={disabled}
                                             loading={loading}
                                             onBlur={handleBlur}
                                             onChange={handleChange}
+                                            onReset={() => handleChange(param.default)}
                                           />
                                         );
                                       case 'int':
@@ -159,10 +161,12 @@ export const Services = ({ loading = false, disabled = false }: Props) => {
                                             primaryProps={{ color: 'textSecondary' }}
                                             capitalize
                                             value={state.value}
+                                            defaultValue={param.default}
                                             disabled={disabled}
                                             loading={loading}
                                             onBlur={handleBlur}
                                             onChange={e => handleChange(parseInt(e.target.value))}
+                                            onReset={() => handleChange(param.default)}
                                           />
                                         );
                                       case 'bool':
@@ -173,10 +177,12 @@ export const Services = ({ loading = false, disabled = false }: Props) => {
                                             primaryProps={{ color: 'textSecondary' }}
                                             capitalize
                                             value={state.value}
+                                            defaultValue={param.default as boolean}
                                             disabled={disabled}
                                             loading={loading}
                                             onBlur={handleBlur}
                                             onClick={() => handleChange(!state.value)}
+                                            onReset={() => handleChange(param.default)}
                                           />
                                         );
                                       case 'list':
@@ -187,12 +193,15 @@ export const Services = ({ loading = false, disabled = false }: Props) => {
                                             primaryProps={{ color: 'textSecondary' }}
                                             capitalize
                                             value={state.value}
+                                            defaultValue={param.default}
                                             disabled={disabled}
                                             loading={loading}
                                             options={param.list.map(item => ({
                                               value: item,
                                               label: item.replaceAll('_', ' ')
                                             }))}
+                                            onChange={event => handleChange(event.target.value)}
+                                            onReset={() => handleChange(param.default)}
                                           />
                                         );
                                     }

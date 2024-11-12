@@ -1,34 +1,43 @@
-import type { ListItemTextProps, OutlinedInputProps, TypographyProps } from '@mui/material';
-import { InputAdornment, ListItem, OutlinedInput, Skeleton, Typography } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import type { IconButtonProps, ListItemTextProps, OutlinedInputProps, TypographyProps } from '@mui/material';
+import { IconButton, InputAdornment, ListItem, OutlinedInput, Skeleton, Typography, useTheme } from '@mui/material';
 import type { ReactNode } from 'react';
 import React from 'react';
 
-type Props = Omit<OutlinedInputProps, ''> & {
-  primary?: ListItemTextProps['primary'];
-  secondary?: ListItemTextProps['secondary'];
-  primaryProps?: TypographyProps;
-  min?: number;
-  max?: number;
+type Props = Omit<OutlinedInputProps, 'value'> & {
   capitalize?: boolean;
+  defaultValue?: number;
   endAdornment?: ReactNode;
   loading?: boolean;
+  max?: number;
+  min?: number;
+  primary?: ListItemTextProps['primary'];
+  primaryProps?: TypographyProps;
+  secondary?: ListItemTextProps['secondary'];
+  value: number;
+  onReset?: IconButtonProps['onClick'];
 };
 
 const WrappedNumberInput = ({
-  primary,
-  secondary,
-  primaryProps = null,
-  min,
-  max,
+  capitalize = false,
+  defaultValue = null,
+  disabled = false,
   endAdornment,
   loading = false,
-  disabled = false,
-  capitalize = false,
+  max,
+  min,
+  primary,
+  primaryProps = null,
+  secondary,
+  value = null,
+  onReset = () => null,
   ...other
 }: Props) => {
+  const theme = useTheme();
+
   return (
-    <ListItem disabled={disabled} sx={{ justifyContent: 'space-between' }}>
-      <div>
+    <ListItem disabled={disabled} sx={{ columnGap: theme.spacing(0.5) }}>
+      <div style={{ flex: 1 }}>
         {primary && (
           <Typography
             color="textPrimary"
@@ -42,6 +51,18 @@ const WrappedNumberInput = ({
         {secondary && <Typography color="textSecondary" variant="body2" children={secondary} />}
       </div>
 
+      <div style={{ ...((defaultValue === null || value === defaultValue) && { opacity: 0 }) }}>
+        <IconButton
+          color="primary"
+          children={<RefreshIcon fontSize="small" />}
+          onClick={event => {
+            event.preventDefault();
+            event.stopPropagation();
+            onReset(event);
+          }}
+        />
+      </div>
+
       {loading ? (
         <Skeleton height={40} style={{ width: '100%', maxWidth: '30%' }} />
       ) : (
@@ -50,6 +71,7 @@ const WrappedNumberInput = ({
           margin="dense"
           size="small"
           fullWidth
+          value={value}
           disabled={disabled}
           sx={{ maxWidth: '30%' }}
           inputProps={{ min: min, max: max }}

@@ -11,6 +11,7 @@ export type SettingsStore = {
     profile: keyof Submission['profiles'];
     disabled: boolean;
     loading: boolean;
+    submitting: boolean;
   };
   next: UserSettings;
   prev: UserSettings;
@@ -21,7 +22,8 @@ export const { FormProvider, useForm } = createFormContext<SettingsStore>({
     state: {
       profile: null,
       disabled: false,
-      loading: false
+      loading: false,
+      submitting: false
     },
     next: {
       classification: '',

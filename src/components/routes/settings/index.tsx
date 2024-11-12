@@ -5,9 +5,9 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { UserSettings } from 'components/models/base/user_settings';
+import _ from 'lodash';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 import { ExternalSources } from './components/ExternalSources';
 import { Interface } from './components/Interface';
 import { Navigation } from './components/Navigation';
@@ -67,14 +67,22 @@ const SettingsContent = () => {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
-          s.next = { ...api_response, ...s.next };
-          s.prev = { ...api_response, ...s.prev };
-          s.state.profile = api_response.preferred_submission_profile;
+          const settings = { ...api_response, ...s.next };
 
-          s.next.service_spec.sort((a, b) => a.name.localeCompare(b.name));
-          s.next.services.sort((a, b) => a.name.localeCompare(b.name));
-          s.prev.service_spec.sort((a, b) => a.name.localeCompare(b.name));
-          s.prev.services.sort((a, b) => a.name.localeCompare(b.name));
+          settings.services.sort((a, b) => a.name.localeCompare(b.name));
+          settings.services.forEach((category, i) => {
+            settings.services[i].services.sort((a, b) => a.name.localeCompare(b.name));
+          });
+
+          settings.service_spec.sort((a, b) => a.name.localeCompare(b.name));
+          settings.service_spec.forEach((spec, i) => {
+            settings.service_spec[i].params.sort((a, b) => a.name.localeCompare(b.name));
+          });
+
+          s.next = settings;
+          s.prev = settings;
+
+          s.state.profile = api_response.preferred_submission_profile;
 
           return s;
         });
@@ -126,8 +134,7 @@ const SettingsContent = () => {
 const WrappedSettingsPage = () => {
   const { t } = useTranslation(['settings']);
   const { apiCall } = useMyAPI();
-  const navigate = useNavigate();
-  const { user: currentUser, configuration } = useALContext();
+  const { user: currentUser } = useALContext();
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
 
   const handleSubmit = useCallback(
@@ -138,13 +145,16 @@ const WrappedSettingsPage = () => {
       value: SettingsStore;
       formApi: FormApi<SettingsStore, Validator<SettingsStore, string>>;
     }) => {
-      if (value.settings) {
+      if (value.next) {
         apiCall({
           url: `/api/v4/user/settings/${currentUser.username}/`,
           method: 'POST',
-          body: value.settings,
+          body: value.next,
           onSuccess: () => {
-            setModified(false);
+            formApi.store.setState(s => {
+              s.values.prev = _.cloneDeep(s.values.next);
+              return s;
+            });
             showSuccessMessage(t('success_save'));
           },
           onFailure: api_data => {
@@ -152,12 +162,21 @@ const WrappedSettingsPage = () => {
               showErrorMessage(api_data.api_error_message);
             }
           },
-          onEnter: () => setButtonLoading(true),
-          onExit: () => setButtonLoading(false)
+          onEnter: () =>
+            formApi.store.setState(s => {
+              s.values.state.submitting = true;
+              return s;
+            }),
+          onExit: () =>
+            formApi.store.setState(s => {
+              s.values.state.submitting = false;
+              return s;
+            })
         });
       }
     },
-    [apiCall, showErrorMessage, showSuccessMessage, t]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentUser.username, t]
   );
 
   return (

@@ -1,30 +1,35 @@
-import type { ListItemButtonProps, ListItemTextProps, TypographyProps } from '@mui/material';
-import { ListItem, ListItemButton, ListItemText, Skeleton, Switch, useTheme } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import type { IconButtonProps, ListItemButtonProps, ListItemTextProps, TypographyProps } from '@mui/material';
+import { IconButton, ListItem, ListItemButton, ListItemText, Skeleton, Switch, useTheme } from '@mui/material';
 import React from 'react';
 
-type Props = ListItemButtonProps & {
-  primary?: ListItemTextProps['primary'];
-  secondary?: ListItemTextProps['secondary'];
-  primaryProps?: TypographyProps;
-  loading?: boolean;
-  value: boolean;
+type Props = Omit<ListItemButtonProps, 'defaultValue'> & {
   capitalize?: boolean;
+  defaultValue?: boolean;
+  loading?: boolean;
+  primary?: ListItemTextProps['primary'];
+  primaryProps?: TypographyProps;
+  secondary?: ListItemTextProps['secondary'];
+  value: boolean;
+  onReset?: IconButtonProps['onClick'];
 };
 
 const WrappedBooleanInput = ({
-  primary,
-  secondary,
-  primaryProps = null,
-  loading = false,
-  value,
   capitalize = false,
+  defaultValue = null,
+  loading = false,
+  primary,
+  primaryProps = null,
+  secondary,
+  value,
+  onReset = () => null,
   ...other
 }: Props) => {
   const theme = useTheme();
 
   return (
     <ListItem disablePadding sx={{ margin: `${theme.spacing(1)} 0` }}>
-      <ListItemButton {...other}>
+      <ListItemButton sx={{ gap: theme.spacing(0.5) }} {...other}>
         <ListItemText
           primary={primary}
           secondary={secondary}
@@ -39,7 +44,20 @@ const WrappedBooleanInput = ({
         {loading ? (
           <Skeleton style={{ height: '2rem', width: '2.5rem', marginRight: theme.spacing(0.5) }} />
         ) : (
-          <Switch checked={value} edge="end" />
+          <>
+            <div style={{ ...((defaultValue === null || value === defaultValue) && { opacity: 0 }) }}>
+              <IconButton
+                color="primary"
+                children={<RefreshIcon fontSize="small" />}
+                onClick={event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  onReset(event);
+                }}
+              />
+            </div>
+            <Switch checked={value} edge="end" />
+          </>
         )}
       </ListItemButton>
     </ListItem>

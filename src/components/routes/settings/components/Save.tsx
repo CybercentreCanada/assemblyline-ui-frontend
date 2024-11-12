@@ -1,25 +1,21 @@
 import { Button, CircularProgress, useTheme } from '@mui/material';
-import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/settings/contexts/form';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const SaveSettings = () => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const { configuration } = useALContext();
-
-  const handleSave = useCallback(() => {}, []);
 
   return (
     <form.Subscribe
       selector={state => [
         state.values.state.loading,
+        state.values.state.submitting,
         JSON.stringify(state.values.next) !== JSON.stringify(state.values.prev)
       ]}
-      children={([loading, modified]) => (
+      children={([loading, submitting, modified]) => (
         <>
           <RouterPrompt when={modified} />
           {!loading && modified && (
@@ -41,13 +37,13 @@ export const SaveSettings = () => {
               <Button
                 variant="contained"
                 color="primary"
-                disabled={loading || !modified}
+                disabled={submitting || !modified}
                 onClick={async () => {
                   await form.handleSubmit();
                 }}
               >
                 {t('save')}
-                {loading && (
+                {submitting && (
                   <CircularProgress
                     size={24}
                     style={{
