@@ -5,7 +5,12 @@ import { useForm } from 'components/routes/settings/contexts/form';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const Navigation = () => {
+type Props = {
+  loading?: boolean;
+  disabled?: boolean;
+};
+
+export const Navigation = ({ loading = false, disabled = false }: Props) => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
@@ -81,13 +86,13 @@ export const Navigation = () => {
       ) : null}
 
       <form.Field
-        name="settings.services"
+        name="next.services"
         mode="array"
         children={({ state: categories }) =>
           categories.value.map((category, cat_id) => (
             <div key={cat_id} style={{ display: 'contents' }}>
               <form.Subscribe
-                selector={state => [state.values.settings.services[cat_id].selected]}
+                selector={state => [state.values.next.services[cat_id].selected]}
                 children={([selected]) => (
                   <ListItem
                     key={cat_id}
@@ -98,17 +103,18 @@ export const Navigation = () => {
                         edge="end"
                         inputProps={{ 'aria-labelledby': category.name }}
                         checked={selected}
+                        disabled={disabled}
                         onChange={() =>
                           form.setStore(s => {
                             if (selected) {
-                              s.settings.services[cat_id].selected = false;
-                              s.settings.services[cat_id].services = s.settings.services[cat_id].services.map(srv => ({
+                              s.next.services[cat_id].selected = false;
+                              s.next.services[cat_id].services = s.next.services[cat_id].services.map(srv => ({
                                 ...srv,
                                 selected: false
                               }));
                             } else {
-                              s.settings.services[cat_id].selected = true;
-                              s.settings.services[cat_id].services = s.settings.services[cat_id].services.map(srv => ({
+                              s.next.services[cat_id].selected = true;
+                              s.next.services[cat_id].services = s.next.services[cat_id].services.map(srv => ({
                                 ...srv,
                                 selected: true
                               }));
@@ -133,14 +139,14 @@ export const Navigation = () => {
               />
 
               <form.Field
-                name={`settings.services[${cat_id}].services`}
+                name={`next.services[${cat_id}].services`}
                 mode="array"
                 children={props => {
                   const services = props.state.value as unknown as SelectedService[];
                   return services.map((service, svr_id) => (
                     <form.Field
                       key={`${cat_id}-${svr_id}`}
-                      name={`settings.services[${cat_id}].services[${svr_id}].selected`}
+                      name={`next.services[${cat_id}].services[${svr_id}].selected`}
                       children={svr_props => {
                         const selected = svr_props.state.value as unknown as boolean;
                         return (
@@ -151,14 +157,15 @@ export const Navigation = () => {
                                 edge="end"
                                 inputProps={{ 'aria-labelledby': service.name }}
                                 checked={selected}
+                                disabled={disabled}
                                 onChange={() =>
                                   form.setStore(s => {
                                     if (selected) {
-                                      s.settings.services[cat_id].selected = false;
-                                      s.settings.services[cat_id].services[svr_id].selected = false;
+                                      s.next.services[cat_id].selected = false;
+                                      s.next.services[cat_id].services[svr_id].selected = false;
                                     } else {
-                                      s.settings.services[cat_id].services[svr_id].selected = true;
-                                      s.settings.services[cat_id].selected = s.settings.services[cat_id].services.every(
+                                      s.next.services[cat_id].services[svr_id].selected = true;
+                                      s.next.services[cat_id].selected = s.next.services[cat_id].services.every(
                                         srv => srv.selected
                                       );
                                     }

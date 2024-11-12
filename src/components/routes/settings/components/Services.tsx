@@ -6,14 +6,18 @@ import { NumberInput } from 'components/routes/settings/inputs/NumberInput';
 import { SelectInput } from 'components/routes/settings/inputs/SelectInput';
 import { TextInput } from 'components/routes/settings/inputs/TextInput';
 
-export const Services = () => {
-  const theme = useTheme();
+type Props = {
+  loading?: boolean;
+  disabled?: boolean;
+};
 
+export const Services = ({ loading = false, disabled = false }: Props) => {
+  const theme = useTheme();
   const form = useForm();
 
   return (
     <form.Field
-      name="settings.services"
+      name="next.services"
       mode="array"
       children={props => {
         const categories = props.state.value as unknown as SelectedServiceCategory[];
@@ -21,7 +25,7 @@ export const Services = () => {
         return categories.map((category, cat_id) => (
           <div key={`${category.name}-${cat_id}`} style={{ display: 'contents' }}>
             <form.Subscribe
-              selector={state => state.values.settings.services[cat_id].selected}
+              selector={state => state.values.next.services[cat_id].selected}
               children={selected => (
                 <ListItem
                   id={category.name}
@@ -29,9 +33,10 @@ export const Services = () => {
                     <Checkbox
                       edge="end"
                       checked={selected}
+                      disabled={disabled}
                       onChange={() => {
                         form.setStore(s => {
-                          s.settings.services[cat_id].selected = !selected;
+                          s.next.services[cat_id].selected = !selected;
                           return s;
                         });
                       }}
@@ -44,7 +49,7 @@ export const Services = () => {
                   <ListItemButton
                     onClick={() => {
                       form.setStore(s => {
-                        s.settings.services[cat_id].selected = !selected;
+                        s.next.services[cat_id].selected = !selected;
                         return s;
                       });
                     }}
@@ -56,7 +61,7 @@ export const Services = () => {
             />
 
             <form.Field
-              name={`settings.services[${cat_id}].services`}
+              name={`next.services[${cat_id}].services`}
               mode="array"
               children={props2 => {
                 const services = props2.state.value as unknown as SelectedService[];
@@ -73,7 +78,7 @@ export const Services = () => {
                     }}
                   >
                     <form.Subscribe
-                      selector={state => state.values.settings.services[cat_id].services[svr_id].selected}
+                      selector={state => state.values.next.services[cat_id].services[svr_id].selected}
                       children={selected => (
                         <ListItem
                           id={`${category.name} - ${service.name}`}
@@ -81,9 +86,10 @@ export const Services = () => {
                             <Checkbox
                               edge="end"
                               checked={selected}
+                              disabled={disabled}
                               onChange={() => {
                                 form.setStore(s => {
-                                  s.settings.services[cat_id].services[svr_id].selected = !selected;
+                                  s.next.services[cat_id].services[svr_id].selected = !selected;
                                   return s;
                                 });
                               }}
@@ -96,7 +102,7 @@ export const Services = () => {
                           <ListItemButton
                             onClick={() => {
                               form.setStore(s => {
-                                s.settings.services[cat_id].services[svr_id].selected = !selected;
+                                s.next.services[cat_id].services[svr_id].selected = !selected;
                                 return s;
                               });
                             }}
@@ -112,13 +118,11 @@ export const Services = () => {
                     />
 
                     <form.Subscribe
-                      selector={state =>
-                        state.values.settings.service_spec.findIndex(spec => spec.name === service.name)
-                      }
+                      selector={state => state.values.next.service_spec.findIndex(spec => spec.name === service.name)}
                       children={spec_id =>
                         spec_id < 0 ? null : (
                           <form.Field
-                            name={`settings.service_spec[${spec_id}].params`}
+                            name={`next.service_spec[${spec_id}].params`}
                             mode="array"
                             children={props3 => {
                               const params = props3.state.value;
@@ -138,8 +142,11 @@ export const Services = () => {
                                           <TextInput
                                             primary={primary}
                                             secondary={secondary}
+                                            primaryProps={{ color: 'textSecondary' }}
                                             capitalize
                                             value={state.value}
+                                            disabled={disabled}
+                                            loading={loading}
                                             onBlur={handleBlur}
                                             onChange={handleChange}
                                           />
@@ -149,8 +156,11 @@ export const Services = () => {
                                           <NumberInput
                                             primary={primary}
                                             secondary={secondary}
+                                            primaryProps={{ color: 'textSecondary' }}
                                             capitalize
                                             value={state.value}
+                                            disabled={disabled}
+                                            loading={loading}
                                             onBlur={handleBlur}
                                             onChange={e => handleChange(parseInt(e.target.value))}
                                           />
@@ -160,8 +170,11 @@ export const Services = () => {
                                           <BooleanInput
                                             primary={primary}
                                             secondary={secondary}
+                                            primaryProps={{ color: 'textSecondary' }}
                                             capitalize
                                             value={state.value}
+                                            disabled={disabled}
+                                            loading={loading}
                                             onBlur={handleBlur}
                                             onClick={() => handleChange(!state.value)}
                                           />
@@ -171,8 +184,11 @@ export const Services = () => {
                                           <SelectInput
                                             primary={primary}
                                             secondary={secondary}
+                                            primaryProps={{ color: 'textSecondary' }}
                                             capitalize
                                             value={state.value}
+                                            disabled={disabled}
+                                            loading={loading}
                                             options={param.list.map(item => ({
                                               value: item,
                                               label: item.replaceAll('_', ' ')

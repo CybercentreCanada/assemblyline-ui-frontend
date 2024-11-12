@@ -1,18 +1,20 @@
-import { useMediaQuery, useTheme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import type { FormApi, Validator } from '@tanstack/react-form';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { UserSettings } from 'components/models/base/user_settings';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { ExternalSources } from './components/ExternalSources';
 import { Interface } from './components/Interface';
 import { Navigation } from './components/Navigation';
+import { SaveSettings } from './components/Save';
 import { Services } from './components/Services';
 import { Submission } from './components/Submission';
+import type { SettingsStore } from './contexts/form';
 import { FormProvider, useForm } from './contexts/form';
 
 const useStyles = makeStyles(theme => ({
@@ -48,59 +50,115 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const SettingsContent = () => {
-  const { t, i18n } = useTranslation(['submit']);
   const { apiCall } = useMyAPI();
-  const theme = useTheme();
   const classes = useStyles();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const banner = useAppBanner();
-  const { user: currentUser, c12nDef, configuration } = useALContext();
-  const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
+  const { user: currentUser } = useALContext();
 
   const form = useForm();
 
-  const sp1 = theme.spacing(1);
-  const sp2 = theme.spacing(2);
-  const sp4 = theme.spacing(4);
-
-  const downSM = useMediaQuery(theme.breakpoints.down('md'));
-  const md = useMediaQuery(theme.breakpoints.only('md'));
-
   useEffect(() => {
     form.setStore(s => {
-      s.settings.service_spec.sort((a, b) => a.name.localeCompare(b.name));
-      s.settings.services.sort((a, b) => a.name.localeCompare(b.name));
+      s.state.disabled = !currentUser.is_admin && !currentUser.roles.includes('self_manage');
       return s;
     });
-  }, [form]);
 
-  console.log(form.state.values);
+    // Load user on start
+    apiCall<UserSettings>({
+      url: `/api/v4/user/settings/${currentUser.username}/`,
+      onSuccess: ({ api_response }) => {
+        form.setStore(s => {
+          s.next = { ...api_response, ...s.next };
+          s.prev = { ...api_response, ...s.prev };
+          s.state.profile = api_response.preferred_submission_profile;
+
+          s.next.service_spec.sort((a, b) => a.name.localeCompare(b.name));
+          s.next.services.sort((a, b) => a.name.localeCompare(b.name));
+          s.prev.service_spec.sort((a, b) => a.name.localeCompare(b.name));
+          s.prev.services.sort((a, b) => a.name.localeCompare(b.name));
+
+          return s;
+        });
+      },
+      onEnter: () =>
+        form.setStore(s => {
+          s.state.loading = true;
+          return s;
+        }),
+      onExit: () =>
+        form.setStore(s => {
+          s.state.loading = false;
+          return s;
+        })
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser]);
 
   return (
-    <div className={classes.root}>
-      <div className={classes.wrap}>
-        <PageCenter margin={4} width="100%" textAlign="start">
-          <div className={classes.content}>
-            <Submission />
-            <Interface />
-            <ExternalSources />
-            <Services />
-          </div>
-        </PageCenter>
-      </div>
+    <form.Subscribe
+      selector={state => [state.values.state.loading, state.values.state.disabled]}
+      children={([loading, disabled]) => (
+        <>
+          <div className={classes.root}>
+            <div className={classes.wrap}>
+              <PageCenter margin={4} width="100%" textAlign="start">
+                <div className={classes.content}>
+                  <Submission loading={loading} disabled={disabled} />
+                  <Interface loading={loading} disabled={disabled} />
+                  <ExternalSources loading={loading} disabled={disabled} />
+                  <Services loading={loading} disabled={disabled} />
+                </div>
+                <SaveSettings />
+              </PageCenter>
+            </div>
 
-      <div className={classes.navigation}>
-        <div style={{ height: '2000px' }}>
-          <Navigation />
-        </div>
-      </div>
-    </div>
+            <div className={classes.navigation}>
+              <div style={{ height: '2000px' }}>
+                <Navigation loading={loading} disabled={disabled} />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    />
   );
 };
 
 const WrappedSettingsPage = () => {
-  const handleSubmit = useCallback(() => {}, []);
+  const { t } = useTranslation(['settings']);
+  const { apiCall } = useMyAPI();
+  const navigate = useNavigate();
+  const { user: currentUser, configuration } = useALContext();
+  const { showErrorMessage, showSuccessMessage } = useMySnackbar();
+
+  const handleSubmit = useCallback(
+    ({
+      value,
+      formApi
+    }: {
+      value: SettingsStore;
+      formApi: FormApi<SettingsStore, Validator<SettingsStore, string>>;
+    }) => {
+      if (value.settings) {
+        apiCall({
+          url: `/api/v4/user/settings/${currentUser.username}/`,
+          method: 'POST',
+          body: value.settings,
+          onSuccess: () => {
+            setModified(false);
+            showSuccessMessage(t('success_save'));
+          },
+          onFailure: api_data => {
+            if (api_data.api_status_code === 403) {
+              showErrorMessage(api_data.api_error_message);
+            }
+          },
+          onEnter: () => setButtonLoading(true),
+          onExit: () => setButtonLoading(false)
+        });
+      }
+    },
+    [apiCall, showErrorMessage, showSuccessMessage, t]
+  );
 
   return (
     <FormProvider onSubmit={handleSubmit}>

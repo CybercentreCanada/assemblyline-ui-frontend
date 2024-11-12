@@ -1,16 +1,25 @@
-import type { ListItemButtonProps, ListItemTextProps } from '@mui/material';
+import type { ListItemButtonProps, ListItemTextProps, TypographyProps } from '@mui/material';
 import { ListItem, ListItemButton, ListItemText, Skeleton, Switch, useTheme } from '@mui/material';
 import React from 'react';
 
 type Props = ListItemButtonProps & {
   primary?: ListItemTextProps['primary'];
   secondary?: ListItemTextProps['secondary'];
+  primaryProps?: TypographyProps;
   loading?: boolean;
   value: boolean;
   capitalize?: boolean;
 };
 
-const WrappedBooleanInput = ({ primary, secondary, loading = false, value, capitalize = false, ...other }: Props) => {
+const WrappedBooleanInput = ({
+  primary,
+  secondary,
+  primaryProps = null,
+  loading = false,
+  value,
+  capitalize = false,
+  ...other
+}: Props) => {
   const theme = useTheme();
 
   return (
@@ -23,13 +32,12 @@ const WrappedBooleanInput = ({ primary, secondary, loading = false, value, capit
           primaryTypographyProps={{
             variant: 'body1',
             whiteSpace: 'nowrap',
-            ...(capitalize && { textTransform: 'capitalize' })
+            ...(capitalize && { textTransform: 'capitalize' }),
+            ...primaryProps
           }}
         />
         {loading ? (
-          <Skeleton
-            style={{ height: '2rem', width: '1.5rem', marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
-          />
+          <Skeleton style={{ height: '2rem', width: '2.5rem', marginRight: theme.spacing(0.5) }} />
         ) : (
           <Switch checked={value} edge="end" />
         )}

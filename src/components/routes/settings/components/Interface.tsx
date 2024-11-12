@@ -4,7 +4,12 @@ import { useForm } from 'components/routes/settings/contexts/form';
 import { SelectInput } from 'components/routes/settings/inputs/SelectInput';
 import { useTranslation } from 'react-i18next';
 
-export const Interface = () => {
+type Props = {
+  loading?: boolean;
+  disabled?: boolean;
+};
+
+export const Interface = ({ loading = false, disabled = false }: Props) => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
@@ -26,13 +31,14 @@ export const Interface = () => {
         </ListItem>
 
         <form.Field
-          name="settings.submission_view"
+          name="next.submission_view"
           children={({ state, handleBlur, handleChange }) => (
             <SelectInput
               primary={t('interface.view')}
               secondary={t('interface.view_desc')}
               value={state.value}
-              loading={!form.state.values.settings}
+              loading={loading}
+              disabled={disabled}
               options={[
                 { value: 'report', label: t('interface.view_report') },
                 { value: 'details', label: t('interface.view_details') }
@@ -44,13 +50,14 @@ export const Interface = () => {
         />
 
         <form.Field
-          name="settings.download_encoding"
+          name="next.download_encoding"
           children={({ state, handleBlur, handleChange }) => (
             <SelectInput
               primary={t('interface.encoding')}
               secondary={t('interface.encoding_desc')}
               value={state.value}
-              loading={!form.state.values.settings}
+              loading={loading}
+              disabled={disabled}
               options={[
                 ...(configuration.ui.allow_raw_downloads && [{ value: 'raw', label: t('interface.encoding_raw') }]),
                 { value: 'cart', label: t('interface.encoding_cart') },
@@ -63,13 +70,14 @@ export const Interface = () => {
         />
 
         <form.Field
-          name="settings.expand_min_score"
+          name="next.expand_min_score"
           children={({ state, handleBlur, handleChange }) => (
             <SelectInput
               primary={t('interface.score')}
               secondary={t('interface.score_desc')}
               value={state.value}
-              loading={!form.state.values.settings}
+              loading={false}
+              disabled={disabled}
               options={[
                 { value: '-1000000', label: t('interface.score_-1000000') },
                 { value: '0', label: t('interface.score_0') },

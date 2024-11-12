@@ -1,10 +1,11 @@
-import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
+import type { ListItemTextProps, MenuItemProps, SelectProps, TypographyProps } from '@mui/material';
 import { ListItem, MenuItem, Select, Skeleton, Typography, useTheme } from '@mui/material';
 import React from 'react';
 
 type Props = SelectProps & {
   primary?: ListItemTextProps['primary'];
   secondary?: ListItemTextProps['secondary'];
+  primaryProps?: TypographyProps;
   loading?: boolean;
   capitalize?: boolean;
   options: { label: MenuItemProps['children']; value: MenuItemProps['value'] }[];
@@ -13,16 +14,18 @@ type Props = SelectProps & {
 const WrappedSelectInput = ({
   primary,
   secondary,
+  primaryProps = null,
   loading = false,
   options = [],
   value,
+  disabled = false,
   capitalize = false,
   ...other
 }: Props) => {
   const theme = useTheme();
 
   return (
-    <ListItem sx={{ columnGap: theme.spacing(2), margin: `${theme.spacing(1)} 0` }}>
+    <ListItem disabled={disabled} sx={{ columnGap: theme.spacing(2), margin: `${theme.spacing(1)} 0` }}>
       <div style={{ flex: 1 }}>
         {primary && (
           <Typography
@@ -31,18 +34,20 @@ const WrappedSelectInput = ({
             whiteSpace="nowrap"
             textTransform={capitalize ? 'capitalize' : null}
             children={primary}
+            {...primaryProps}
           />
         )}
         {secondary && <Typography color="textSecondary" variant="body2" children={secondary} />}
       </div>
 
       {loading ? (
-        <Skeleton style={{ height: '3rem' }} />
+        <Skeleton height={40} style={{ width: '100%', maxWidth: '30%' }} />
       ) : (
         <Select
           variant="outlined"
           size="small"
           fullWidth
+          disabled={disabled}
           sx={{ maxWidth: '30%', ...(capitalize && { textTransform: 'capitalize' }) }}
           value={value || ''}
           {...other}

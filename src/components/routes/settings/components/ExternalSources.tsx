@@ -5,7 +5,12 @@ import { BooleanInput } from 'components/routes/settings/inputs/BooleanInput';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const ExternalSources = () => {
+type Props = {
+  loading?: boolean;
+  disabled?: boolean;
+};
+
+export const ExternalSources = ({ loading = false, disabled = false }: Props) => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
@@ -42,17 +47,18 @@ export const ExternalSources = () => {
         {fileSources.map((source, i) => (
           <form.Subscribe
             key={`${source}-${i}`}
-            selector={state => state.values.settings.default_external_sources.includes(source)}
+            selector={state => state.values.next.default_external_sources.includes(source)}
             children={value => (
               <BooleanInput
                 primary={t('interface.view')}
                 secondary={t('interface.view_desc')}
                 value={value}
-                loading={!form.state.values.settings}
+                loading={loading}
+                disabled={disabled}
                 onClick={() => {
                   form.setStore(s => {
-                    if (value) s.settings.default_external_sources.filter(item => item !== source);
-                    else s.settings.default_external_sources.push(source);
+                    if (value) s.next.default_external_sources.filter(item => item !== source);
+                    else s.next.default_external_sources.push(source);
                     return s;
                   });
                 }}

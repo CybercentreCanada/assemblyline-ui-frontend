@@ -1,4 +1,4 @@
-import type { AutocompleteProps, ListItemTextProps } from '@mui/material';
+import type { AutocompleteProps, ListItemTextProps, TypographyProps } from '@mui/material';
 import { Autocomplete, ListItem, Skeleton, TextField, Typography, useTheme } from '@mui/material';
 import type { ElementType } from 'react';
 import React from 'react';
@@ -15,6 +15,7 @@ type Props<
 > & {
   primary?: ListItemTextProps['primary'];
   secondary?: ListItemTextProps['secondary'];
+  primaryProps?: TypographyProps;
   loading?: boolean;
   capitalize?: boolean;
   options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
@@ -30,9 +31,11 @@ const WrappedTextInput = <
 >({
   primary,
   secondary,
+  primaryProps = null,
   loading = false,
   capitalize = false,
   options = [],
+  disabled = false,
   value,
   onChange,
   ...other
@@ -40,7 +43,7 @@ const WrappedTextInput = <
   const theme = useTheme();
 
   return (
-    <ListItem sx={{ justifyContent: 'space-between', columnGap: theme.spacing(2) }}>
+    <ListItem disabled={disabled} sx={{ justifyContent: 'space-between', columnGap: theme.spacing(2) }}>
       <div>
         {primary && (
           <Typography
@@ -49,13 +52,14 @@ const WrappedTextInput = <
             whiteSpace="nowrap"
             textTransform={capitalize ? 'capitalize' : null}
             children={primary}
+            {...primaryProps}
           />
         )}
         {secondary && <Typography color="textSecondary" variant="body2" children={secondary} />}
       </div>
 
       {loading ? (
-        <Skeleton style={{ height: '3rem' }} />
+        <Skeleton height={40} style={{ width: '100%', maxWidth: '30%' }} />
       ) : (
         <Autocomplete
           autoComplete
@@ -65,6 +69,7 @@ const WrappedTextInput = <
           size="small"
           sx={{ maxWidth: '30%' }}
           value={value || null}
+          disabled={disabled}
           options={options}
           onInputChange={(_, v) => onChange(v)}
           renderInput={params => <TextField {...params} />}
