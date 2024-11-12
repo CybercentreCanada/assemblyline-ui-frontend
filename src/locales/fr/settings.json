@@ -1,4 +1,5 @@
 {
+  "content": "Contenu",
   "interface": "Options d'interface",
   "interface.encoding": "Encodage de fichier",
   "interface.encoding_cart": "Format de stérilisation des fichiers CaRT",

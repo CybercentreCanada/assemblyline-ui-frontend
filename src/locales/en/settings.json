@@ -1,4 +1,5 @@
 {
+  "content": "Content",
   "interface": "Interface Options",
   "interface.encoding": "File encoding",
   "interface.encoding_cart": "CaRT file neutering format",

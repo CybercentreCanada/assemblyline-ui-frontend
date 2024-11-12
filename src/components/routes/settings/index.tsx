@@ -8,6 +8,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
+import { ExternalSources } from './components/ExternalSources';
 import { Interface } from './components/Interface';
 import { Navigation } from './components/Navigation';
 import { Services } from './components/Services';
@@ -74,6 +75,8 @@ const SettingsContent = () => {
     });
   }, [form]);
 
+  console.log(form.state.values);
+
   return (
     <div className={classes.root}>
       <div className={classes.wrap}>
@@ -81,6 +84,7 @@ const SettingsContent = () => {
           <div className={classes.content}>
             <Submission />
             <Interface />
+            <ExternalSources />
             <Services />
           </div>
         </PageCenter>

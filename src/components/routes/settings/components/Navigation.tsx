@@ -1,12 +1,24 @@
 import { Checkbox, List, ListItem, ListItemButton, ListItemText, useTheme } from '@mui/material';
+import useALContext from 'components/hooks/useALContext';
 import type { SelectedService } from 'components/models/base/service';
 import { useForm } from 'components/routes/settings/contexts/form';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const Navigation = () => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
+  const { configuration } = useALContext();
+
+  const fileSources = useMemo<string[]>(
+    () =>
+      Object.values(configuration?.submission?.file_sources || {})
+        .flatMap(file => file?.sources)
+        .filter((value, index, array) => value && array.indexOf(value) === index)
+        .sort(),
+    [configuration]
+  );
 
   return (
     <List dense sx={{ '& ul': { padding: 0 } }}>
@@ -18,11 +30,55 @@ export const Navigation = () => {
           }}
         >
           <ListItemText
-            primary={`Content`}
+            primary={t('content')}
             primaryTypographyProps={{ color: 'textSecondary', textTransform: 'uppercase' }}
           />
         </ListItemButton>
       </ListItem>
+
+      <ListItem disablePadding>
+        <ListItemButton
+          onClick={() => {
+            const element = document.getElementById(`submissions`);
+            element.scrollIntoView({ behavior: 'smooth' });
+          }}
+        >
+          <ListItemText
+            primary={t('submissions')}
+            primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
+          />
+        </ListItemButton>
+      </ListItem>
+
+      <ListItem disablePadding>
+        <ListItemButton
+          onClick={() => {
+            const element = document.getElementById(`interface`);
+            element.scrollIntoView({ behavior: 'smooth' });
+          }}
+        >
+          <ListItemText
+            primary={t('interface')}
+            primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
+          />
+        </ListItemButton>
+      </ListItem>
+
+      {fileSources.length > 0 ? (
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => {
+              const element = document.getElementById(`submissions.default_external_sources`);
+              element.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            <ListItemText
+              primary={t('submissions.default_external_sources')}
+              primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
+            />
+          </ListItemButton>
+        </ListItem>
+      ) : null}
 
       <form.Field
         name="settings.services"
