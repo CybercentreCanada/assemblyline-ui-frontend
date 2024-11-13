@@ -29,7 +29,9 @@ export const Submission = ({ loading = false, disabled = false }: Props) => {
       }}
     >
       <ListItem alignItems="flex-start">
-        <Typography variant="h6">{t('submissions')}</Typography>
+        <Typography id="submissions" className="Anchor" variant="h6">
+          {t('submissions')}
+        </Typography>
       </ListItem>
 
       <form.Field

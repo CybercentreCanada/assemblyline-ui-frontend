@@ -12,6 +12,7 @@ export type SettingsStore = {
     disabled: boolean;
     loading: boolean;
     submitting: boolean;
+    activeID: string;
   };
   next: UserSettings;
   prev: UserSettings;
@@ -23,7 +24,8 @@ export const { FormProvider, useForm } = createFormContext<SettingsStore>({
       profile: null,
       disabled: false,
       loading: false,
-      submitting: false
+      submitting: false,
+      activeID: null
     },
     next: {
       classification: '',

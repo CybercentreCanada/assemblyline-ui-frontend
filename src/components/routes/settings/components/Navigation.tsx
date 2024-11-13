@@ -1,18 +1,32 @@
 import { Checkbox, List, ListItem, ListItemButton, ListItemText, useTheme } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import type { SelectedService } from 'components/models/base/service';
 import { useForm } from 'components/routes/settings/contexts/form';
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+
+const useStyles = makeStyles(theme => ({
+  default: {
+    marginLeft: '1px'
+  },
+  active: {
+    borderLeft: `1px solid ${theme.palette.primary.main}`,
+    color: theme.palette.primary.main
+  }
+}));
 
 type Props = {
   loading?: boolean;
   disabled?: boolean;
+  rootElement?: HTMLDivElement;
 };
 
-export const Navigation = ({ loading = false, disabled = false }: Props) => {
+export const Navigation = ({ loading = false, disabled = false, rootElement = null }: Props) => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
+  const classes = useStyles();
   const form = useForm();
   const { configuration } = useALContext();
 
@@ -25,13 +39,46 @@ export const Navigation = ({ loading = false, disabled = false }: Props) => {
     [configuration]
   );
 
+  const isElementInViewport = useCallback(element => {
+    const rect = element.getBoundingClientRect();
+
+    return (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!rootElement) return;
+
+    const handler = () => {
+      const elements = rootElement.getElementsByClassName('Anchor');
+
+      for (let i = 0; i < elements.length; i++) {
+        if (isElementInViewport(elements.item(i))) {
+          form.setStore(s => {
+            s.state.activeID = elements.item(i).id;
+            return s;
+          });
+          break;
+        }
+      }
+    };
+
+    rootElement.addEventListener('scroll', handler, false);
+    return () => {
+      rootElement.removeEventListener('scroll', handler, false);
+    };
+  }, [form, isElementInViewport, rootElement]);
+
   return (
     <List dense sx={{ '& ul': { padding: 0 } }}>
       <ListItem disablePadding sx={{ marginTop: theme.spacing(1) }}>
         <ListItemButton
           onClick={() => {
-            const element = document.getElementById(`content`);
-            element.scrollIntoView({ behavior: 'smooth' });
+            rootElement.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         >
           <ListItemText
@@ -41,49 +88,64 @@ export const Navigation = ({ loading = false, disabled = false }: Props) => {
         </ListItemButton>
       </ListItem>
 
-      <ListItem disablePadding>
-        <ListItemButton
-          onClick={() => {
-            const element = document.getElementById(`submissions`);
-            element.scrollIntoView({ behavior: 'smooth' });
-          }}
-        >
-          <ListItemText
-            primary={t('submissions')}
-            primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
-          />
-        </ListItemButton>
-      </ListItem>
+      <form.Subscribe
+        selector={state => [state.values.state.activeID === 'submissions']}
+        children={([active]) => (
+          <ListItem className={clsx(active ? classes.active : classes.default)} disablePadding>
+            <ListItemButton
+              onClick={() => {
+                const element = document.getElementById(`submissions`);
+                element.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <ListItemText
+                primary={t('submissions')}
+                primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
+              />
+            </ListItemButton>
+          </ListItem>
+        )}
+      />
 
-      <ListItem disablePadding>
-        <ListItemButton
-          onClick={() => {
-            const element = document.getElementById(`interface`);
-            element.scrollIntoView({ behavior: 'smooth' });
-          }}
-        >
-          <ListItemText
-            primary={t('interface')}
-            primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
-          />
-        </ListItemButton>
-      </ListItem>
+      <form.Subscribe
+        selector={state => [state.values.state.activeID === 'interface']}
+        children={([active]) => (
+          <ListItem className={clsx(active ? classes.active : classes.default)} disablePadding>
+            <ListItemButton
+              onClick={() => {
+                const element = document.getElementById(`interface`);
+                element.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <ListItemText
+                primary={t('interface')}
+                primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
+              />
+            </ListItemButton>
+          </ListItem>
+        )}
+      />
 
-      {fileSources.length > 0 ? (
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={() => {
-              const element = document.getElementById(`submissions.default_external_sources`);
-              element.scrollIntoView({ behavior: 'smooth' });
-            }}
-          >
-            <ListItemText
-              primary={t('submissions.default_external_sources')}
-              primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
-            />
-          </ListItemButton>
-        </ListItem>
-      ) : null}
+      <form.Subscribe
+        selector={state => [state.values.state.activeID === 'default_external_sources']}
+        children={([active]) =>
+          fileSources.length > 0 ? (
+            <ListItem className={clsx(active ? classes.active : classes.default)} disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  const element = document.getElementById(`submissions.default_external_sources`);
+                  element.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <ListItemText
+                  primary={t('submissions.default_external_sources')}
+                  primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ) : null
+        }
+      />
 
       <form.Field
         name="next.services"
@@ -92,10 +154,14 @@ export const Navigation = ({ loading = false, disabled = false }: Props) => {
           categories.value.map((category, cat_id) => (
             <div key={cat_id} style={{ display: 'contents' }}>
               <form.Subscribe
-                selector={state => [state.values.next.services[cat_id].selected]}
-                children={([selected]) => (
+                selector={state => [
+                  state.values.next.services[cat_id].selected,
+                  state.values.state.activeID === category.name
+                ]}
+                children={([selected, active]) => (
                   <ListItem
                     key={cat_id}
+                    className={clsx(active ? classes.active : classes.default)}
                     disablePadding
                     sx={{ marginTop: theme.spacing(1) }}
                     secondaryAction={
@@ -132,7 +198,10 @@ export const Navigation = ({ loading = false, disabled = false }: Props) => {
                         element.scrollIntoView({ behavior: 'smooth' });
                       }}
                     >
-                      <ListItemText primary={category.name} primaryTypographyProps={{ color: 'textSecondary' }} />
+                      <ListItemText
+                        primary={category.name}
+                        primaryTypographyProps={{ color: active ? 'primary' : 'textSecondary' }}
+                      />
                     </ListItemButton>
                   </ListItem>
                 )}
@@ -144,13 +213,16 @@ export const Navigation = ({ loading = false, disabled = false }: Props) => {
                 children={props => {
                   const services = props.state.value as unknown as SelectedService[];
                   return services.map((service, svr_id) => (
-                    <form.Field
+                    <form.Subscribe
                       key={`${cat_id}-${svr_id}`}
-                      name={`next.services[${cat_id}].services[${svr_id}].selected`}
-                      children={svr_props => {
-                        const selected = svr_props.state.value as unknown as boolean;
+                      selector={state => [
+                        state.values.next.services[cat_id].services[svr_id].selected,
+                        state.values.state.activeID === `${category.name} - ${service.name}`
+                      ]}
+                      children={([selected, active]) => {
                         return (
                           <ListItem
+                            className={clsx(active ? classes.active : classes.default)}
                             disablePadding
                             secondaryAction={
                               <Checkbox

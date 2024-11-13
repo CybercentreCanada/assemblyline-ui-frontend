@@ -29,6 +29,7 @@ export const Services = ({ loading = false, disabled = false }: Props) => {
               children={selected => (
                 <ListItem
                   id={category.name}
+                  className="Anchor"
                   secondaryAction={
                     <Checkbox
                       edge="end"
@@ -82,6 +83,7 @@ export const Services = ({ loading = false, disabled = false }: Props) => {
                       children={selected => (
                         <ListItem
                           id={`${category.name} - ${service.name}`}
+                          className="Anchor"
                           secondaryAction={
                             <Checkbox
                               edge="end"

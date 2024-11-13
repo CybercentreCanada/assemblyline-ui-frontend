@@ -26,7 +26,7 @@ export const Interface = ({ loading = false, disabled = false }: Props) => {
           }
         }}
       >
-        <ListItem alignItems="flex-start">
+        <ListItem id="interface" className="Anchor" alignItems="flex-start">
           <Typography variant="h6">{t('interface')}</Typography>
         </ListItem>
 

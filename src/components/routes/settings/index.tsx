@@ -6,7 +6,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { UserSettings } from 'components/models/base/user_settings';
 import _ from 'lodash';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExternalSources } from './components/ExternalSources';
 import { Interface } from './components/Interface';
@@ -55,6 +55,8 @@ const SettingsContent = () => {
   const { user: currentUser } = useALContext();
 
   const form = useForm();
+
+  const rootRef = useRef();
 
   useEffect(() => {
     form.setStore(s => {
@@ -106,7 +108,7 @@ const SettingsContent = () => {
       selector={state => [state.values.state.loading, state.values.state.disabled]}
       children={([loading, disabled]) => (
         <>
-          <div className={classes.root}>
+          <div className={classes.root} ref={rootRef}>
             <div className={classes.wrap}>
               <PageCenter margin={4} width="100%" textAlign="start">
                 <div className={classes.content}>
@@ -114,6 +116,7 @@ const SettingsContent = () => {
                   <Interface loading={loading} disabled={disabled} />
                   <ExternalSources loading={loading} disabled={disabled} />
                   <Services loading={loading} disabled={disabled} />
+                  <div style={{ height: window.innerHeight / 2 }} />
                 </div>
                 <SaveSettings />
               </PageCenter>
@@ -121,7 +124,7 @@ const SettingsContent = () => {
 
             <div className={classes.navigation}>
               <div style={{ height: '2000px' }}>
-                <Navigation loading={loading} disabled={disabled} />
+                <Navigation loading={loading} disabled={disabled} rootElement={rootRef.current} />
               </div>
             </div>
           </div>
