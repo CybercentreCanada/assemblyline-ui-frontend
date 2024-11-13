@@ -154,11 +154,16 @@ export const Navigation = ({ loading = false, disabled = false, rootElement = nu
           categories.value.map((category, cat_id) => (
             <div key={cat_id} style={{ display: 'contents' }}>
               <form.Subscribe
-                selector={state => [
-                  state.values.next.services[cat_id].selected,
-                  state.values.state.activeID === category.name
-                ]}
-                children={([selected, active]) => (
+                selector={state => {
+                  const selected = state.values.next.services[cat_id].selected;
+                  const list = state.values.next.services[cat_id].services.map(svr => svr.selected);
+                  return [
+                    selected,
+                    !list.every(i => i) && list.some(i => i),
+                    state.values.state.activeID === category.name
+                  ];
+                }}
+                children={([selected, indeterminate, active]) => (
                   <ListItem
                     key={cat_id}
                     className={clsx(active ? classes.active : classes.default)}
@@ -169,6 +174,7 @@ export const Navigation = ({ loading = false, disabled = false, rootElement = nu
                         edge="end"
                         inputProps={{ 'aria-labelledby': category.name }}
                         checked={selected}
+                        indeterminate={indeterminate}
                         disabled={disabled}
                         onChange={() =>
                           form.setStore(s => {

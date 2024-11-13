@@ -25,8 +25,12 @@ export const Services = ({ loading = false, disabled = false }: Props) => {
         return categories.map((category, cat_id) => (
           <div key={`${category.name}-${cat_id}`} style={{ display: 'contents' }}>
             <form.Subscribe
-              selector={state => state.values.next.services[cat_id].selected}
-              children={selected => (
+              selector={state => {
+                const selected = state.values.next.services[cat_id].selected;
+                const list = state.values.next.services[cat_id].services.map(svr => svr.selected);
+                return [selected, !list.every(i => i) && list.some(i => i)];
+              }}
+              children={([selected, indeterminate]) => (
                 <ListItem
                   id={category.name}
                   className="Anchor"
@@ -34,6 +38,7 @@ export const Services = ({ loading = false, disabled = false }: Props) => {
                     <Checkbox
                       edge="end"
                       checked={selected}
+                      indeterminate={indeterminate}
                       disabled={disabled}
                       onChange={() => {
                         form.setStore(s => {
