@@ -36,7 +36,7 @@ export const ExternalSources = ({ loading = false, disabled = false }: Props) =>
           }
         }}
       >
-        <ListItem alignItems="flex-start">
+        <ListItem id="default_external_sources" alignItems="flex-start">
           <ListItemText
             primary={t('submissions.default_external_sources')}
             secondary={t('submissions.default_external_sources_desc')}
