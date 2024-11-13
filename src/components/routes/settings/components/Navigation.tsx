@@ -1,3 +1,4 @@
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Checkbox, List, ListItem, ListItemButton, ListItemText, useTheme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import clsx from 'clsx';
@@ -223,9 +224,10 @@ export const Navigation = ({ loading = false, disabled = false, rootElement = nu
                       key={`${cat_id}-${svr_id}`}
                       selector={state => [
                         state.values.next.services[cat_id].services[svr_id].selected,
-                        state.values.state.activeID === `${category.name} - ${service.name}`
+                        state.values.state.activeID === `${category.name} - ${service.name}`,
+                        state.values.next.service_spec.some(spec => spec.name === service.name)
                       ]}
-                      children={([selected, active]) => {
+                      children={([selected, active, hasSpecs]) => {
                         return (
                           <ListItem
                             className={clsx(active ? classes.active : classes.default)}
@@ -261,7 +263,12 @@ export const Navigation = ({ loading = false, disabled = false, rootElement = nu
                             >
                               <ListItemText
                                 id={`${svr_id}`}
-                                primary={service.name}
+                                primary={
+                                  <div style={{ display: 'flex' }}>
+                                    {service.name}
+                                    {hasSpecs && <ArrowRightIcon style={{ height: '20px' }} />}
+                                  </div>
+                                }
                                 style={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
                               />
                             </ListItemButton>
