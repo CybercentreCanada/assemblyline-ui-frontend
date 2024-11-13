@@ -81,8 +81,8 @@ const SettingsContent = () => {
             settings.service_spec[i].params.sort((a, b) => a.name.localeCompare(b.name));
           });
 
-          s.next = settings;
-          s.prev = settings;
+          s.next = _.cloneDeep(settings);
+          s.prev = _.cloneDeep(settings);
 
           s.state.profile = api_response.preferred_submission_profile;
 
