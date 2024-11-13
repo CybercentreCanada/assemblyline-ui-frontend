@@ -8,12 +8,13 @@ import type { UserSettings } from 'components/models/base/user_settings';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ExternalSources } from './components/ExternalSources';
-import { Interface } from './components/Interface';
+import { ExternalSourcesSection } from './components/ExternalSources';
+import { InterfaceSection } from './components/Interface';
 import { Navigation } from './components/Navigation';
+import { ProfileSection } from './components/Profile';
 import { SaveSettings } from './components/Save';
-import { Services } from './components/Services';
-import { Submission } from './components/Submission';
+import { ServicesSection } from './components/Services';
+import { SubmissionSection } from './components/Submission';
 import type { SettingsStore } from './contexts/form';
 import { FormProvider, useForm } from './contexts/form';
 
@@ -104,33 +105,29 @@ const SettingsContent = () => {
   }, [currentUser]);
 
   return (
-    <form.Subscribe
-      selector={state => [state.values.state.loading, state.values.state.disabled]}
-      children={([loading, disabled]) => (
-        <>
-          <div className={classes.root} ref={rootRef}>
-            <div className={classes.wrap}>
-              <PageCenter margin={4} width="100%" textAlign="start">
-                <div className={classes.content}>
-                  <Submission loading={loading} disabled={disabled} />
-                  <Interface loading={loading} disabled={disabled} />
-                  <ExternalSources loading={loading} disabled={disabled} />
-                  <Services loading={loading} disabled={disabled} />
-                  <div style={{ height: window.innerHeight / 2 }} />
-                </div>
-                <SaveSettings />
-              </PageCenter>
+    <>
+      <div className={classes.root} ref={rootRef}>
+        <div className={classes.wrap}>
+          <PageCenter margin={4} width="100%" textAlign="start">
+            <div className={classes.content}>
+              <ProfileSection />
+              <SubmissionSection />
+              <InterfaceSection />
+              <ExternalSourcesSection />
+              <ServicesSection />
+              <div style={{ height: window.innerHeight / 2 }} />
             </div>
+            <SaveSettings />
+          </PageCenter>
+        </div>
 
-            <div className={classes.navigation}>
-              <div style={{ height: '2000px' }}>
-                <Navigation loading={loading} disabled={disabled} rootElement={rootRef.current} />
-              </div>
-            </div>
+        <div className={classes.navigation}>
+          <div style={{ height: '2000px' }}>
+            <Navigation rootElement={rootRef.current} />
           </div>
-        </>
-      )}
-    />
+        </div>
+      </div>
+    </>
   );
 };
 

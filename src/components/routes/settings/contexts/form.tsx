@@ -13,6 +13,7 @@ export type SettingsStore = {
     loading: boolean;
     submitting: boolean;
     activeID: string;
+    hide: boolean;
   };
   next: UserSettings;
   prev: UserSettings;
@@ -23,9 +24,10 @@ export const { FormProvider, useForm } = createFormContext<SettingsStore>({
     state: {
       profile: null,
       disabled: false,
-      loading: false,
+      loading: true,
       submitting: false,
-      activeID: null
+      activeID: null,
+      hide: false
     },
     next: {
       classification: '',
