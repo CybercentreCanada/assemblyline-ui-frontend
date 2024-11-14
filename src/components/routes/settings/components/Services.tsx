@@ -17,13 +17,13 @@ export const ServicesSection = () => {
         state.values.state.loading,
         state.values.state.disabled,
         state.values.state.profile,
-        state.values.state.hide
+        state.values.state.hidden
       ]}
       children={props => {
         const loading = props[0] as boolean;
         const disabled = props[1] as boolean;
         const profile = props[2] as keyof Submission['profiles'];
-        const hide = props[3] as boolean;
+        const hidden = props[3] as boolean;
 
         return loading ? null : (
           <form.Field

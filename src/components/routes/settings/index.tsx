@@ -4,6 +4,7 @@ import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { Submission } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useRef } from 'react';
@@ -53,15 +54,28 @@ const useStyles = makeStyles(theme => ({
 const SettingsContent = () => {
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
 
   const form = useForm();
 
   const rootRef = useRef();
 
+  const handleProfileChange = useCallback(
+    (profileKey: keyof Submission['profiles']) => {
+      form.setStore(s => {
+        const profile = configuration.submission.profiles?.[profileKey];
+        if (!profile) return s;
+
+        return s;
+      });
+    },
+    [configuration.submission.profiles, form]
+  );
+
   useEffect(() => {
     form.setStore(s => {
       s.state.disabled = !currentUser.is_admin && !currentUser.roles.includes('self_manage');
+      s.state.customize = currentUser.is_admin || currentUser.roles.includes('submission_customize');
       return s;
     });
 

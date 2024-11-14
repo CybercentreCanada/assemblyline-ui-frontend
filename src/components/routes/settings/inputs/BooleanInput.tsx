@@ -1,14 +1,16 @@
 import RefreshIcon from '@mui/icons-material/Refresh';
 import type { IconButtonProps, ListItemButtonProps, ListItemTextProps, TypographyProps } from '@mui/material';
 import { IconButton, ListItem, ListItemButton, ListItemText, Skeleton, Switch, useTheme } from '@mui/material';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 type Props = Omit<ListItemButtonProps, 'defaultValue'> & {
   capitalize?: boolean;
+  customizable?: boolean;
   defaultValue?: boolean;
   loading?: boolean;
   primary?: ListItemTextProps['primary'];
   primaryProps?: TypographyProps;
+  profileValue?: boolean;
   secondary?: ListItemTextProps['secondary'];
   value: boolean;
   onReset?: IconButtonProps['onClick'];
@@ -16,10 +18,14 @@ type Props = Omit<ListItemButtonProps, 'defaultValue'> & {
 
 const WrappedBooleanInput = ({
   capitalize = false,
+  customizable = true,
   defaultValue = null,
+  disabled: disabledProp = false,
+  hidden: hiddenProp = false,
   loading = false,
   primary,
   primaryProps = null,
+  profileValue = null,
   secondary,
   value,
   onReset = () => null,
@@ -27,9 +33,20 @@ const WrappedBooleanInput = ({
 }: Props) => {
   const theme = useTheme();
 
-  return (
+  const checked = useMemo(() => profileValue ?? value, [profileValue, value]);
+
+  const disabled = useMemo<boolean>(
+    () => disabledProp || (!!profileValue && !customizable),
+    [customizable, disabledProp, profileValue]
+  );
+
+  const showReset = useMemo<boolean>(() => !!defaultValue && value !== defaultValue, [defaultValue, value]);
+
+  const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
+
+  return hidden ? null : (
     <ListItem disablePadding sx={{ margin: `${theme.spacing(1)} 0` }}>
-      <ListItemButton sx={{ gap: theme.spacing(0.5) }} {...other}>
+      <ListItemButton disabled={disabled} sx={{ gap: theme.spacing(0.5) }} {...other}>
         <ListItemText
           primary={primary}
           secondary={secondary}
@@ -45,7 +62,7 @@ const WrappedBooleanInput = ({
           <Skeleton style={{ height: '2rem', width: '2.5rem', marginRight: theme.spacing(0.5) }} />
         ) : (
           <>
-            <div style={{ ...((defaultValue === null || value === defaultValue) && { opacity: 0 }) }}>
+            <div style={{ ...(!showReset && { opacity: 0 }) }}>
               <IconButton
                 color="primary"
                 children={<RefreshIcon fontSize="small" />}
@@ -56,7 +73,7 @@ const WrappedBooleanInput = ({
                 }}
               />
             </div>
-            <Switch checked={value} edge="end" />
+            <Switch checked={checked} edge="end" />
           </>
         )}
       </ListItemButton>

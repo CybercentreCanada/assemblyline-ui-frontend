@@ -2,10 +2,11 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import type { IconButtonProps, ListItemTextProps, OutlinedInputProps, TypographyProps } from '@mui/material';
 import { IconButton, InputAdornment, ListItem, OutlinedInput, Skeleton, Typography, useTheme } from '@mui/material';
 import type { ReactNode } from 'react';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 type Props = Omit<OutlinedInputProps, 'value'> & {
   capitalize?: boolean;
+  customizable?: boolean;
   defaultValue?: number;
   endAdornment?: ReactNode;
   loading?: boolean;
@@ -13,6 +14,7 @@ type Props = Omit<OutlinedInputProps, 'value'> & {
   min?: number;
   primary?: ListItemTextProps['primary'];
   primaryProps?: TypographyProps;
+  profileValue?: number;
   secondary?: ListItemTextProps['secondary'];
   value: number;
   onReset?: IconButtonProps['onClick'];
@@ -20,14 +22,17 @@ type Props = Omit<OutlinedInputProps, 'value'> & {
 
 const WrappedNumberInput = ({
   capitalize = false,
+  customizable = true,
   defaultValue = null,
-  disabled = false,
+  disabled: disabledProp = false,
   endAdornment,
+  hidden: hiddenProp = false,
   loading = false,
   max,
   min,
   primary,
   primaryProps = null,
+  profileValue = null,
   secondary,
   value = null,
   onReset = () => null,
@@ -35,7 +40,18 @@ const WrappedNumberInput = ({
 }: Props) => {
   const theme = useTheme();
 
-  return (
+  const inputValue = useMemo(() => (profileValue ?? value) || '', [profileValue, value]);
+
+  const disabled = useMemo<boolean>(
+    () => disabledProp || (!!profileValue && !customizable),
+    [customizable, disabledProp, profileValue]
+  );
+
+  const showReset = useMemo<boolean>(() => !!defaultValue && value !== defaultValue, [defaultValue, value]);
+
+  const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
+
+  return hidden ? null : (
     <ListItem disabled={disabled} sx={{ columnGap: theme.spacing(0.5) }}>
       <div style={{ flex: 1 }}>
         {primary && (
@@ -51,7 +67,7 @@ const WrappedNumberInput = ({
         {secondary && <Typography color="textSecondary" variant="body2" children={secondary} />}
       </div>
 
-      <div style={{ ...((defaultValue === null || value === defaultValue) && { opacity: 0 }) }}>
+      <div style={{ ...(!showReset && { opacity: 0 }) }}>
         <IconButton
           color="primary"
           children={<RefreshIcon fontSize="small" />}
@@ -71,7 +87,7 @@ const WrappedNumberInput = ({
           margin="dense"
           size="small"
           fullWidth
-          value={value}
+          value={inputValue}
           disabled={disabled}
           sx={{ maxWidth: '30%' }}
           inputProps={{ min: min, max: max }}

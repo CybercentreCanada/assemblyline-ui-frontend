@@ -3,7 +3,7 @@ import { Checkbox, List, ListItem, ListItemButton, ListItemText, useTheme } from
 import { makeStyles } from '@mui/styles';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
-import type { Submission } from 'components/models/base/config';
+import type { SubmissionProfileParams } from 'components/models/base/config';
 import type { SelectedService } from 'components/models/base/service';
 import { useForm } from 'components/routes/settings/contexts/form';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -80,14 +80,16 @@ export const Navigation = ({ rootElement = null }: Props) => {
       selector={state => [
         state.values.state.loading,
         state.values.state.disabled,
-        state.values.state.profile,
-        state.values.state.hide
+        configuration.submission.profiles?.[state.values.state.profile],
+        state.values.state.hidden,
+        state.values.state.customize
       ]}
       children={props => {
         const loading = props[0] as boolean;
         const disabled = props[1] as boolean;
-        const profile = props[2] as keyof Submission['profiles'];
-        const hide = props[3] as boolean;
+        const profile = props[2] as SubmissionProfileParams;
+        const hidden = props[3] as boolean;
+        const customize = props[4] as boolean;
 
         return (
           <List dense sx={{ '& ul': { padding: 0 } }}>
@@ -180,54 +182,67 @@ export const Navigation = ({ rootElement = null }: Props) => {
                             state.values.state.activeID === category.name
                           ];
                         }}
-                        children={([selected, indeterminate, active]) => (
-                          <ListItem
-                            key={cat_id}
-                            className={clsx(active ? classes.active : classes.default)}
-                            disablePadding
-                            sx={{ marginTop: theme.spacing(1) }}
-                            secondaryAction={
-                              <Checkbox
-                                edge="end"
-                                inputProps={{ 'aria-labelledby': category.name }}
-                                checked={selected}
-                                indeterminate={indeterminate}
-                                disabled={disabled}
-                                onChange={() =>
-                                  form.setStore(s => {
-                                    if (selected) {
-                                      s.next.services[cat_id].selected = false;
-                                      s.next.services[cat_id].services = s.next.services[cat_id].services.map(srv => ({
-                                        ...srv,
-                                        selected: false
-                                      }));
-                                    } else {
-                                      s.next.services[cat_id].selected = true;
-                                      s.next.services[cat_id].services = s.next.services[cat_id].services.map(srv => ({
-                                        ...srv,
-                                        selected: true
-                                      }));
-                                    }
+                        children={([selected, indeterminate, active]) => {
+                          const profileValue =
+                            profile?.services?.selected?.some(s => s === category.name) &&
+                            !profile?.services?.excluded?.some(s => s === category.name);
 
-                                    return s;
-                                  })
-                                }
-                              />
-                            }
-                          >
-                            <ListItemButton
-                              onClick={() => {
-                                const element = document.getElementById(`${category.name}`);
-                                element.scrollIntoView({ behavior: 'smooth' });
-                              }}
+                          const value = profileValue ?? selected;
+                          const hideCategory = hidden && !value;
+
+                          return hideCategory ? null : (
+                            <ListItem
+                              key={cat_id}
+                              className={clsx(active ? classes.active : classes.default)}
+                              disablePadding
+                              sx={{ marginTop: theme.spacing(1) }}
+                              secondaryAction={
+                                <Checkbox
+                                  edge="end"
+                                  inputProps={{ 'aria-labelledby': category.name }}
+                                  checked={value}
+                                  indeterminate={indeterminate}
+                                  disabled={disabled || !customize}
+                                  onChange={() =>
+                                    form.setStore(s => {
+                                      if (selected) {
+                                        s.next.services[cat_id].selected = false;
+                                        s.next.services[cat_id].services = s.next.services[cat_id].services.map(
+                                          srv => ({
+                                            ...srv,
+                                            selected: false
+                                          })
+                                        );
+                                      } else {
+                                        s.next.services[cat_id].selected = true;
+                                        s.next.services[cat_id].services = s.next.services[cat_id].services.map(
+                                          srv => ({
+                                            ...srv,
+                                            selected: true
+                                          })
+                                        );
+                                      }
+
+                                      return s;
+                                    })
+                                  }
+                                />
+                              }
                             >
-                              <ListItemText
-                                primary={category.name}
-                                primaryTypographyProps={{ color: active ? 'primary' : 'textSecondary' }}
-                              />
-                            </ListItemButton>
-                          </ListItem>
-                        )}
+                              <ListItemButton
+                                onClick={() => {
+                                  const element = document.getElementById(`${category.name}`);
+                                  element.scrollIntoView({ behavior: 'smooth' });
+                                }}
+                              >
+                                <ListItemText
+                                  primary={category.name}
+                                  primaryTypographyProps={{ color: active ? 'primary' : 'textSecondary' }}
+                                />
+                              </ListItemButton>
+                            </ListItem>
+                          );
+                        }}
                       />
 
                       <form.Field
@@ -245,7 +260,15 @@ export const Navigation = ({ rootElement = null }: Props) => {
                                 state.values.next.service_spec.some(spec => spec.name === service.name)
                               ]}
                               children={([selected, active, hasSpecs]) => {
-                                return (
+                                const profileValue =
+                                  profile?.services?.selected?.some(
+                                    s => s === service.name || s === service.category
+                                  ) &&
+                                  !profile?.services?.excluded?.some(s => s === service.name || s === service.category);
+
+                                const hideService = hidden && !(profileValue ?? selected);
+
+                                return hideService ? null : (
                                   <ListItem
                                     className={clsx(active ? classes.active : classes.default)}
                                     disablePadding
@@ -253,8 +276,8 @@ export const Navigation = ({ rootElement = null }: Props) => {
                                       <Checkbox
                                         edge="end"
                                         inputProps={{ 'aria-labelledby': service.name }}
-                                        checked={selected}
-                                        disabled={disabled}
+                                        checked={profileValue ?? selected}
+                                        disabled={disabled || !customize}
                                         onChange={() =>
                                           form.setStore(s => {
                                             if (selected) {

@@ -1,6 +1,6 @@
 import { List, ListItem, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
-import type { Submission } from 'components/models/base/config';
+import type { SubmissionProfileParams } from 'components/models/base/config';
 import { useForm } from 'components/routes/settings/contexts/form';
 import { BooleanInput } from 'components/routes/settings/inputs/BooleanInput';
 import { ClassificationInput } from 'components/routes/settings/inputs/ClassificationInput';
@@ -19,14 +19,18 @@ export const SubmissionSection = () => {
       selector={state => [
         state.values.state.loading,
         state.values.state.disabled,
-        state.values.state.profile,
-        state.values.state.hide
+        configuration.submission.profiles?.[state.values.state.profile] || null,
+        state.values.state.hidden,
+        state.values.state.customize
       ]}
       children={props => {
         const loading = props[0] as boolean;
         const disabled = props[1] as boolean;
-        const profile = props[2] as keyof Submission['profiles'];
-        const hide = props[3] as boolean;
+        const profile = props[2] as SubmissionProfileParams;
+        const hidden = props[3] as boolean;
+        const customize = props[4] as boolean;
+
+        console.log(profile);
 
         return (
           <List
@@ -53,6 +57,9 @@ export const SubmissionSection = () => {
                   value={state.value}
                   loading={loading}
                   disabled={disabled}
+                  profileValue={profile?.generate_alert}
+                  customizable={customize}
+                  hidden={hidden}
                   onBlur={handleBlur}
                   onClick={() => handleChange(!state.value)}
                 />
@@ -68,6 +75,9 @@ export const SubmissionSection = () => {
                   value={state.value}
                   loading={loading}
                   disabled={disabled}
+                  profileValue={profile?.ignore_dynamic_recursion_prevention}
+                  customizable={customize}
+                  hidden={hidden}
                   onBlur={handleBlur}
                   onClick={() => handleChange(!state.value)}
                 />
@@ -83,6 +93,9 @@ export const SubmissionSection = () => {
                   value={state.value}
                   loading={loading}
                   disabled={disabled}
+                  profileValue={profile?.ignore_filtering}
+                  customizable={customize}
+                  hidden={hidden}
                   onBlur={handleBlur}
                   onClick={() => handleChange(!state.value)}
                 />
@@ -98,6 +111,9 @@ export const SubmissionSection = () => {
                   value={state.value}
                   loading={loading}
                   disabled={disabled}
+                  profileValue={profile?.ignore_cache}
+                  customizable={customize}
+                  hidden={hidden}
                   onBlur={handleBlur}
                   onClick={() => handleChange(!state.value)}
                 />
@@ -113,6 +129,9 @@ export const SubmissionSection = () => {
                   value={state.value}
                   loading={loading}
                   disabled={disabled}
+                  profileValue={profile?.deep_scan}
+                  customizable={customize}
+                  hidden={hidden}
                   onBlur={handleBlur}
                   onClick={() => handleChange(!state.value)}
                 />
@@ -148,6 +167,9 @@ export const SubmissionSection = () => {
                   value={state.value}
                   loading={loading}
                   disabled={disabled}
+                  profileValue={profile?.ttl}
+                  customizable={customize}
+                  hidden={hidden}
                   min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                   max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
                   onChange={e => handleChange(parseInt(e.target.value))}

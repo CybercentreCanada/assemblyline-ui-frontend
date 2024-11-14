@@ -1,27 +1,32 @@
 import RefreshIcon from '@mui/icons-material/Refresh';
 import type { IconButtonProps, ListItemTextProps, MenuItemProps, SelectProps, TypographyProps } from '@mui/material';
 import { IconButton, ListItem, MenuItem, Select, Skeleton, Typography, useTheme } from '@mui/material';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 type Props = Omit<SelectProps, 'defaultValue'> & {
   capitalize?: boolean;
+  customizable?: boolean;
   defaultValue?: string;
   loading?: boolean;
   options: { label: MenuItemProps['children']; value: MenuItemProps['value'] }[];
   primary?: ListItemTextProps['primary'];
   primaryProps?: TypographyProps;
+  profileValue?: string;
   secondary?: ListItemTextProps['secondary'];
   onReset?: IconButtonProps['onClick'];
 };
 
 const WrappedSelectInput = ({
   capitalize = false,
+  customizable = true,
   defaultValue = null,
-  disabled = false,
+  disabled: disabledProp = false,
+  hidden: hiddenProp = false,
   loading = false,
   options = [],
   primary,
   primaryProps = null,
+  profileValue = null,
   secondary,
   value,
   onReset = () => null,
@@ -29,7 +34,18 @@ const WrappedSelectInput = ({
 }: Props) => {
   const theme = useTheme();
 
-  return (
+  const selected = useMemo(() => (profileValue ?? value) || '', [profileValue, value]);
+
+  const disabled = useMemo<boolean>(
+    () => disabledProp || (!!profileValue && !customizable),
+    [customizable, disabledProp, profileValue]
+  );
+
+  const showReset = useMemo<boolean>(() => !!defaultValue && value !== defaultValue, [defaultValue, value]);
+
+  const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
+
+  return hidden ? null : (
     <ListItem disabled={disabled} sx={{ columnGap: theme.spacing(0.5), margin: `${theme.spacing(1)} 0` }}>
       <div style={{ flex: 1 }}>
         {primary && (
@@ -45,7 +61,7 @@ const WrappedSelectInput = ({
         {secondary && <Typography color="textSecondary" variant="body2" children={secondary} />}
       </div>
 
-      <div style={{ ...((defaultValue === null || value === defaultValue) && { opacity: 0 }) }}>
+      <div style={{ ...(!showReset && { opacity: 0 }) }}>
         <IconButton
           color="primary"
           children={<RefreshIcon fontSize="small" />}
@@ -66,7 +82,7 @@ const WrappedSelectInput = ({
           fullWidth
           disabled={disabled}
           sx={{ maxWidth: '30%', ...(capitalize && { textTransform: 'capitalize' }) }}
-          value={value || ''}
+          value={selected}
           {...other}
         >
           {options.map((option, i) => (

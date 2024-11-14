@@ -1,6 +1,5 @@
 import { List, ListItem, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
-import type { Submission } from 'components/models/base/config';
 import { useForm } from 'components/routes/settings/contexts/form';
 import { SelectInput } from 'components/routes/settings/inputs/SelectInput';
 import { useTranslation } from 'react-i18next';
@@ -13,18 +12,8 @@ export const InterfaceSection = () => {
 
   return (
     <form.Subscribe
-      selector={state => [
-        state.values.state.loading,
-        state.values.state.disabled,
-        state.values.state.profile,
-        state.values.state.hide
-      ]}
-      children={props => {
-        const loading = props[0] as boolean;
-        const disabled = props[1] as boolean;
-        const profile = props[2] as keyof Submission['profiles'];
-        const hide = props[3] as boolean;
-
+      selector={state => [state.values.state.loading, state.values.state.disabled]}
+      children={([loading, disabled]) => {
         return (
           <>
             <List

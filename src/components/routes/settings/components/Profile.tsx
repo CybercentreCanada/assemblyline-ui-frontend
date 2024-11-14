@@ -1,12 +1,15 @@
 import { Button, List, ListItem, MenuItem, Select, Skeleton, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/settings/contexts/form';
+import { useCallback } from 'react';
 
 export const ProfileSection = () => {
   const theme = useTheme();
   const { configuration } = useALContext();
 
   const form = useForm();
+
+  const handleProfileChange = useCallback(() => {}, []);
 
   return (
     <form.Subscribe
@@ -54,18 +57,18 @@ export const ProfileSection = () => {
                 <Skeleton height={40} style={{ width: '100%' }} />
               ) : (
                 <form.Subscribe
-                  selector={state => [state.values.state.hide]}
-                  children={([hide]) => (
+                  selector={state => [state.values.state.hidden]}
+                  children={([hidden]) => (
                     <Button
                       variant="outlined"
                       onClick={() => {
                         form.setStore(s => {
-                          s.state.hide = !hide;
+                          s.state.hidden = !hidden;
                           return s;
                         });
                       }}
                     >
-                      {hide ? 'Show' : 'Hide'}
+                      {hidden ? 'Show' : 'Hide'}
                     </Button>
                   )}
                 />

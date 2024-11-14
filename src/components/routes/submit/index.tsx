@@ -14,6 +14,7 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
+import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
@@ -59,6 +60,8 @@ const WrappedSubmitContent = () => {
   const submitState = useMemo<SubmitState>(() => location.state as SubmitState, [location.state]);
   const submitParams = useMemo<URLSearchParams>(() => new URLSearchParams(location.search), [location.search]);
 
+  console.log(submitState);
+
   const handleCancelUpload = useCallback(() => {
     form.setStore(s => {
       s.file = null;
@@ -79,8 +82,8 @@ const WrappedSubmitContent = () => {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
-          s.settings = { ...api_response } as any;
-          s.settings = DEFAULT_SETTINGS;
+          s.settings = { ...s.settings, ..._.omit({ ...api_response }, ['classification']) };
+          s.settings = { ...s.settings, ..._.omit(DEFAULT_SETTINGS, ['classification']) };
 
           // Check if some file sources should auto-select and do so
           s.settings.default_external_sources = Array.from(

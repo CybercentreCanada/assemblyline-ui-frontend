@@ -8,16 +8,37 @@ export type Tabs = (typeof TABS)[number];
 
 export type SettingsStore = {
   state: {
+    /** Key of the selected profile */
     profile: keyof Submission['profiles'];
+
+    /** Disable all the component */
     disabled: boolean;
+
+    /** Fetching the settings values  */
     loading: boolean;
+
+    /** Submitting the new settings values */
     submitting: boolean;
+
+    /** ID of the Anchor element that is in view used by the navigation pane */
     activeID: string;
-    hide: boolean;
+
+    /** Hide all disabled parameters */
+    hidden: boolean;
+
+    /** User is allowed to customize all service-specific parameters. Otherwise, they may only change the parameters that are editable */
+    customize: boolean;
+
+    /** User is allowed to make changes to their settings */
+    selfManage: boolean;
   };
   next: UserSettings;
   prev: UserSettings;
 };
+
+/**
+ * Group -> Section -> Param
+ */
 
 export const { FormProvider, useForm } = createFormContext<SettingsStore>({
   defaultValues: {
@@ -27,7 +48,9 @@ export const { FormProvider, useForm } = createFormContext<SettingsStore>({
       loading: true,
       submitting: false,
       activeID: null,
-      hide: false
+      hidden: false,
+      customize: false,
+      selfManage: false
     },
     next: {
       classification: '',
