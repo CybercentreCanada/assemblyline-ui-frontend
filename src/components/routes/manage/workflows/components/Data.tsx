@@ -23,7 +23,7 @@ export const AlertHistogram: React.FC<AlertHistogramProps> = ({ id }) => {
     if (!id || !currentUser.roles.includes('alert_view')) return;
 
     apiCall<{ [s: string]: number }>({
-      url: '/api/v4/search/histogram/alert/events.ts/',
+      url: '/api/v4/search/histogram/alert/reporting_ts/',
       method: 'POST',
       body: {
         query: `events.entity_id:${id}`,
