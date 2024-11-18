@@ -1,4 +1,4 @@
-import { Grid, Skeleton } from '@mui/material';
+import { Grid, Skeleton, Typography } from '@mui/material';
 import type { Seen } from 'components/models/base/file';
 import Moment from 'components/visual/Moment';
 import SectionContainer from 'components/visual/SectionContainer';
@@ -21,10 +21,16 @@ const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = fa
         </Grid>
         <Grid item xs={8} sm={9} lg={10}>
           {seen ? (
-            <div>
-              <Moment variant="fromNow">{seen?.first}</Moment>(
-              <Moment format="YYYY-MM-DD HH:mm:ss">{seen?.first}</Moment>)
-            </div>
+            <>
+              <Typography component="span" variant="body2">
+                <Moment variant="fromNow">{seen?.first}</Moment>
+              </Typography>
+              <Typography color="textSecondary" component="span" variant="body2">
+                {` (`}
+                <Moment format="YYYY-MM-DD HH:mm:ss">{seen?.first}</Moment>
+                {`)`}
+              </Typography>
+            </>
           ) : (
             <Skeleton />
           )}
@@ -35,10 +41,16 @@ const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = fa
         </Grid>
         <Grid item xs={8} sm={9} lg={10}>
           {seen ? (
-            <div>
-              <Moment variant="fromNow">{seen?.last}</Moment>(<Moment format="YYYY-MM-DD HH:mm:ss">{seen?.last}</Moment>
-              )
-            </div>
+            <>
+              <Typography component="span" variant="body2">
+                <Moment variant="fromNow">{seen?.last}</Moment>
+              </Typography>
+              <Typography color="textSecondary" component="span" variant="body2">
+                {` (`}
+                <Moment format="YYYY-MM-DD HH:mm:ss">{seen?.last}</Moment>
+                {`)`}
+              </Typography>
+            </>
           ) : (
             <Skeleton />
           )}
