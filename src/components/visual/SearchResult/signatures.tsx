@@ -5,10 +5,6 @@ import useALContext from 'components/hooks/useALContext';
 import type { SignatureIndexed } from 'components/models/base/signature';
 import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
-import Moment from 'components/visual/Moment';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import {
   DivTable,
   DivTableBody,
@@ -17,9 +13,13 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from '../DivTable';
-import InformativeAlert from '../InformativeAlert';
-import SignatureStatus from '../SignatureStatus';
+} from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import Moment from 'components/visual/Moment';
+import SignatureStatus from 'components/visual/SignatureStatus';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 type Props = {
   signatureResults: SearchResult<SignatureIndexed>;
@@ -28,7 +28,7 @@ type Props = {
 };
 
 const WrappedSignaturesTable: React.FC<Props> = ({ signatureResults, setSignatureID = null, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
   return signatureResults ? (
@@ -66,9 +66,9 @@ const WrappedSignaturesTable: React.FC<Props> = ({ signatureResults, setSignatur
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {signatureResults.items.map(signature => (
+            {signatureResults.items.map((signature, i) => (
               <LinkRow
-                key={signature.signature_id}
+                key={`${signature.id}-${i}`}
                 component={Link}
                 to={`/manage/signature/${signature.id}`}
                 onClick={event => {

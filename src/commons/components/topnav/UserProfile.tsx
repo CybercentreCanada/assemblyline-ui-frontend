@@ -88,7 +88,6 @@ const UserProfile = () => {
                     color={usedAPIPercent < 65 ? 'success' : usedAPIPercent < 90 ? 'warning' : 'error'}
                     value={usedAPIPercent}
                     style={{ marginLeft: theme.spacing(2), width: '100%' }}
-                    title="bob"
                   />
                 </ListItem>
               </Tooltip>
