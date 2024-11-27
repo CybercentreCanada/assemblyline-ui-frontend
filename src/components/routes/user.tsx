@@ -675,6 +675,14 @@ function User({ username = null }: UserProps) {
                   </TableCell>
                   <TableCell align="right" />
                 </TableRow>
+                <TableRow className={classes.row}>
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('identity_id')}</TableCell>}
+                  <TableCell width="100%">
+                    {!isXS ? null : <Typography variant="caption">{t('identity_id')}</Typography>}
+                    {user ? <div>{user.identity_id}</div> : <Skeleton />}
+                  </TableCell>
+                  <TableCell align="right" />
+                </TableRow>
               </TableBody>
             </Table>
           </TableContainer>
