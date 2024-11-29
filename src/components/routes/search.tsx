@@ -170,10 +170,24 @@ function Search({ index = null }: Props) {
 
   useEffect(() => {
     // On index change we need to update the search suggestion
-    setSearchSuggestion([
-      ...Object.keys(indexes[index || id] || {}).filter(name => indexes[index || id][name].indexed),
-      ...DEFAULT_SUGGESTION
-    ]);
+    var indexFields = [];
+    if (index || id) {
+      // Retrieve the fields specific to the index of interest
+      indexFields = Object.keys(indexes[index || id] || {}).filter(name => indexes[index || id][name].indexed);
+    } else {
+      // Retrieve all fields across indices
+      Object.keys(permissionMap).forEach(searchableIndex => {
+        // Ensure the user has permission to access those indices
+        if (currentUser.roles.includes(permissionMap[searchableIndex])) {
+          indexFields.push(
+            ...Object.keys(indexes[searchableIndex] || {}).filter(name => indexes[searchableIndex][name].indexed)
+          );
+        }
+      });
+      // De-dup fields shared across indices and re-sort them
+      indexFields = Array.from(new Set<String>(indexFields)).sort();
+    }
+    setSearchSuggestion([...indexFields, ...DEFAULT_SUGGESTION]);
   }, [index, id, indexes]);
 
   useEffect(() => {
