@@ -182,6 +182,7 @@ const WrappedRoutes = () => {
         <Route path="/search/:id" element={<Search />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/settings2" element={<Settings2 />} />
+        <Route path="/settings2/:tab" element={<Settings2 />} />
         <Route path="/submit" element={<Submit />} />
         <Route path="/submit2" element={<Submit2 />} />
         <Route path="/submission/detail/:id/:fid" element={<SubmissionDetail />} />

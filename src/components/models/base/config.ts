@@ -1,5 +1,4 @@
 import type { AppSwitcherItem } from 'commons/components/app/AppConfigs';
-import type { ServiceSpecification } from './service';
 import type { ServiceSelection } from './submission';
 import type { ACL, Role, Type } from './user';
 
@@ -456,7 +455,7 @@ export type SubmissionProfileParams = {
   profile?: boolean;
 
   /** Service-specific parameters */
-  service_spec?: ServiceSpecification[];
+  service_spec?: { [category: string]: { [service: string]: any } };
 
   /** Service selection */
   services?: ServiceSelection;

@@ -1,5 +1,6 @@
 {
   "content": "Contenu",
+  "hidden": "Masquer les désactivés",
   "interface": "Options d'interface",
   "interface.encoding": "Encodage de fichier",
   "interface.encoding_cart": "Format de stérilisation des fichiers CaRT",
@@ -19,9 +20,17 @@
   "interface.view_desc": "Vue par défaut affichée lors de l'ouverture des soumissions.",
   "interface.view_details": "Vue de détail",
   "interface.view_report": "Vue de rapport",
-  "save": "Enregistrer les paramètres",
+  "profile.default": "Analyse par défaut",
+  "profile.dynamic": "Analyse dynamique",
+  "profile.static": "Analyse statique",
+  "profile.static_with_internet": "Analyse statique avec Internet",
+  "profiles": "Profils",
+  "reset": "Réinitialiser",
+  "save": "Enregistrer",
   "service": "Sélection de service par défaut",
   "service_spec": "Valeur par défaut des paramètres de service",
+  "services": "Sélection du service par défaut et valeur des paramètres",
+  "services.description": "Sélectionnez les services qui seront activés par défaut et définissez leurs paramètres correspondants pour la soumission.",
   "submissions": "Options de soumission",
   "submissions.classification": "Classification",
   "submissions.classification_desc": "Classification par défaut utilisée pour les nouvelles soumissions.",
@@ -29,6 +38,7 @@
   "submissions.deep_scan_desc": "Effectuez une analyse plus approfondie du fichier en activant davantage de vérifications. Plus lent et non recommandé pour l'analyse en vrac.",
   "submissions.default_external_sources": "Sources de Fichiers par Défaut",
   "submissions.default_external_sources_desc": "Liste des sources qui seront utilisées par défaut lors du démarrage d'une soumission avec un certain hachage ou URL",
+  "submissions.description": "Sélectionnez les valeurs par défaut des options de soumission pour ce profil.",
   "submissions.dynamic_recursion": "Prévention de la récursivité dynamique",
   "submissions.dynamic_recursion_desc": "Garantit que les enfants des services d'analyse dynamique ne sont pas renvoyés ceux-ci pour l'analyse.",
   "submissions.executive_summary": "Sommaire exécutif",
@@ -47,5 +57,6 @@
   "submissions.ttl_days": "jour(s)",
   "submissions.ttl_desc": "Nombre de jours pendant lesquels vos soumissions resteront dans le système.",
   "submissions.ttl_forever": "Pour toujours",
-  "success_save": "Paramètres enregistrés avec succès!"
+  "success_save": "Paramètres enregistrés avec succès!",
+  "title": "Paramètres"
 }

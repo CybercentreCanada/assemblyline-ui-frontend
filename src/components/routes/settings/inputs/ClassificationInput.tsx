@@ -1,25 +1,31 @@
 import RefreshIcon from '@mui/icons-material/Refresh';
-import type { ListItemTextProps, TypographyProps } from '@mui/material';
+import type { ListItemTextProps } from '@mui/material';
 import { IconButton, ListItem, Skeleton, Typography, useTheme } from '@mui/material';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
 import React, { useMemo } from 'react';
+import { InputListItem, InputListItemText, InputResetButton, InputSkeleton } from './Inputs';
 
 type Props = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
+  id: string;
+  capitalize?: boolean;
   customizable?: boolean;
   defaultValue?: ClassificationProps['c12n'];
   hidden?: boolean;
   loading?: boolean;
   primary?: ListItemTextProps['primary'];
-  primaryProps?: TypographyProps;
+  primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
   profileValue?: ClassificationProps['c12n'];
   secondary?: ListItemTextProps['secondary'];
+  secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
   value: ClassificationProps['c12n'];
   onChange: ClassificationProps['setClassification'];
   onReset?: ClassificationProps['setClassification'];
 };
 
 const WrappedClassificationInput = ({
+  id,
+  capitalize = false,
   customizable = true,
   defaultValue = null,
   disabled: disabledProp = false,
@@ -29,6 +35,7 @@ const WrappedClassificationInput = ({
   primaryProps = null,
   profileValue = null,
   secondary,
+  secondaryProps = null,
   value,
   onChange,
   onReset = () => null,
@@ -47,9 +54,36 @@ const WrappedClassificationInput = ({
 
   const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
 
+  return (
+    <InputListItem>
+      <InputListItemText
+        primary={<label htmlFor={id}>{primary}</label>}
+        secondary={secondary}
+        primaryTypographyProps={{ sx: { textTransform: capitalize ? 'capitalize' : null }, ...primaryProps }}
+        secondaryTypographyProps={secondaryProps}
+      />
+      {loading ? (
+        <InputSkeleton />
+      ) : (
+        <>
+          <InputResetButton visible={showReset} onClick={() => onReset(defaultValue)} />
+          <div style={{ maxWidth: '30%', width: '100%' }}>
+            <Classification
+              type={!disabled ? 'picker' : 'pill'}
+              size="small"
+              c12n={c12n}
+              setClassification={onChange}
+              {...other}
+            />
+          </div>
+        </>
+      )}
+    </InputListItem>
+  );
+
   return hidden ? null : (
-    <ListItem disabled={disabled} sx={{ columnGap: theme.spacing(2), margin: `${theme.spacing(1)} 0` }}>
-      <div style={{ flex: 1 }}>
+    <ListItem disabled={disabled} sx={{ columnGap: theme.spacing(2) }}>
+      <div style={{ flex: 1, margin: `${theme.spacing(0.5)} 0` }}>
         {primary && (
           <Typography color="textPrimary" variant="body1" whiteSpace="nowrap" children={primary} {...primaryProps} />
         )}

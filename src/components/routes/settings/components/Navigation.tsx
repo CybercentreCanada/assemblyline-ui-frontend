@@ -3,16 +3,14 @@ import { Checkbox, List, ListItem, ListItemButton, ListItemText, useTheme } from
 import { makeStyles } from '@mui/styles';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
-import type { SubmissionProfileParams } from 'components/models/base/config';
 import type { SelectedService } from 'components/models/base/service';
+import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
-  default: {
-    marginLeft: '1px'
-  },
+  default: {},
   active: {
     borderLeft: `1px solid ${theme.palette.primary.main}`,
     color: theme.palette.primary.main
@@ -21,9 +19,21 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   rootElement?: HTMLDivElement;
+  customize: boolean;
+  disabled: boolean;
+  hidden: boolean;
+  loading: boolean;
+  profile: SettingsStore['state']['tab'];
 };
 
-export const Navigation = ({ rootElement = null }: Props) => {
+export const Navigation = ({
+  rootElement = null,
+  customize = false,
+  disabled = false,
+  hidden = false,
+  loading = false,
+  profile = 'interface'
+}: Props) => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const classes = useStyles();
@@ -39,7 +49,7 @@ export const Navigation = ({ rootElement = null }: Props) => {
     [configuration]
   );
 
-  const isElementInViewport = useCallback(element => {
+  const isElementInViewport = useCallback((element: Element) => {
     const rect = element.getBoundingClientRect();
 
     return (
@@ -75,258 +85,256 @@ export const Navigation = ({ rootElement = null }: Props) => {
     };
   }, [form, isElementInViewport, rootElement]);
 
-  return (
-    <form.Subscribe
-      selector={state => [
-        state.values.state.loading,
-        state.values.state.disabled,
-        configuration.submission.profiles?.[state.values.state.profile],
-        state.values.state.hidden,
-        state.values.state.customize
-      ]}
-      children={props => {
-        const loading = props[0] as boolean;
-        const disabled = props[1] as boolean;
-        const profile = props[2] as SubmissionProfileParams;
-        const hidden = props[3] as boolean;
-        const customize = props[4] as boolean;
-
-        return (
-          <List dense sx={{ '& ul': { padding: 0 } }}>
-            <ListItem disablePadding sx={{ marginTop: theme.spacing(1) }}>
+  return !profile || loading ? null : (
+    <List dense sx={{ '& ul': { padding: 0 } }}>
+      {profile === 'interface' ? (
+        <form.Subscribe
+          selector={state => [state.values.state.activeID === 'interface']}
+          children={([active]) => (
+            <ListItem className={clsx(active ? classes.active : classes.default)} disablePadding>
               <ListItemButton
-                onClick={() => {
-                  rootElement.scrollTo({ top: 0, behavior: 'smooth' });
+                onClick={event => {
+                  event.stopPropagation();
+                  event.preventDefault();
+                  const element = document.getElementById(`interface`);
+                  element.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
                 <ListItemText
-                  primary={t('content')}
-                  primaryTypographyProps={{ color: 'textSecondary', textTransform: 'uppercase' }}
+                  primary={t('interface')}
+                  primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
                 />
               </ListItemButton>
             </ListItem>
-
-            <form.Subscribe
-              selector={state => [state.values.state.activeID === 'submissions']}
-              children={([active]) => (
+          )}
+        />
+      ) : (
+        <>
+          <ListItem disablePadding sx={{ marginTop: theme.spacing(1) }}>
+            <ListItemButton
+              onClick={() => {
+                rootElement.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            >
+              <ListItemText
+                primary={t('content')}
+                primaryTypographyProps={{ color: 'textSecondary', textTransform: 'uppercase' }}
+              />
+            </ListItemButton>
+          </ListItem>
+          <form.Subscribe
+            selector={state => [state.values.state.activeID === 'submissions']}
+            children={([active]) => (
+              <ListItem className={clsx(active ? classes.active : classes.default)} disablePadding>
+                <ListItemButton
+                  onClick={event => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    const element = document.getElementById(`submissions`);
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  <ListItemText
+                    primary={t('submissions')}
+                    primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )}
+          />
+          <form.Subscribe
+            selector={state => [state.values.state.activeID === 'default_external_sources']}
+            children={([active]) =>
+              fileSources.length > 0 ? (
                 <ListItem className={clsx(active ? classes.active : classes.default)} disablePadding>
                   <ListItemButton
-                    onClick={() => {
-                      const element = document.getElementById(`submissions`);
+                    onClick={event => {
+                      event.stopPropagation();
+                      event.preventDefault();
+                      const element = document.getElementById(`submissions.default_external_sources`);
                       element.scrollIntoView({ behavior: 'smooth' });
                     }}
                   >
                     <ListItemText
-                      primary={t('submissions')}
+                      primary={t('submissions.default_external_sources')}
                       primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
                     />
                   </ListItemButton>
                 </ListItem>
-              )}
-            />
-
-            <form.Subscribe
-              selector={state => [state.values.state.activeID === 'interface']}
-              children={([active]) => (
-                <ListItem className={clsx(active ? classes.active : classes.default)} disablePadding>
-                  <ListItemButton
-                    onClick={() => {
-                      const element = document.getElementById(`interface`);
-                      element.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                  >
-                    <ListItemText
-                      primary={t('interface')}
-                      primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              )}
-            />
-
-            <form.Subscribe
-              selector={state => [state.values.state.activeID === 'default_external_sources']}
-              children={([active]) =>
-                fileSources.length > 0 ? (
-                  <ListItem className={clsx(active ? classes.active : classes.default)} disablePadding>
-                    <ListItemButton
-                      onClick={() => {
-                        const element = document.getElementById(`submissions.default_external_sources`);
-                        element.scrollIntoView({ behavior: 'smooth' });
+              ) : null
+            }
+          />
+          {loading ? null : (
+            <form.Field
+              name={`next.profiles[${profile}].services` as 'next.profiles.default.services'}
+              mode="array"
+              children={({ state: categories }) =>
+                categories.value.map((category, cat_id) => (
+                  <div key={cat_id} style={{ display: 'contents' }}>
+                    <form.Subscribe
+                      selector={state => {
+                        const selected = state.values.next.profiles[profile].services[cat_id].selected;
+                        const list = state.values.next.profiles[profile].services[cat_id].services.map(
+                          svr => svr.selected
+                        );
+                        return [
+                          selected,
+                          !list.every(i => i) && list.some(i => i),
+                          state.values.state.activeID === category.name
+                        ];
                       }}
-                    >
-                      <ListItemText
-                        primary={t('submissions.default_external_sources')}
-                        primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                ) : null
+                      children={([selected, indeterminate, active]) => {
+                        const value = selected;
+                        const hideCategory = hidden && !value;
+
+                        return hideCategory ? null : (
+                          <ListItem
+                            key={cat_id}
+                            className={clsx(active ? classes.active : classes.default)}
+                            disablePadding
+                            disabled={!value && !indeterminate}
+                            sx={{ marginTop: theme.spacing(1) }}
+                            secondaryAction={
+                              <Checkbox
+                                edge="end"
+                                inputProps={{ id: `navigation: ${category.name}` }}
+                                checked={value}
+                                indeterminate={indeterminate}
+                                disabled={disabled || !customize}
+                                onChange={() =>
+                                  form.setStore(s => {
+                                    if (selected) {
+                                      s.next.profiles[profile].services[cat_id].selected = false;
+                                      s.next.profiles[profile].services[cat_id].services = s.next.profiles[
+                                        profile
+                                      ].services[cat_id].services.map(srv => ({
+                                        ...srv,
+                                        selected: false
+                                      }));
+                                    } else {
+                                      s.next.profiles[profile].services[cat_id].selected = true;
+                                      s.next.profiles[profile].services[cat_id].services = s.next.profiles[
+                                        profile
+                                      ].services[cat_id].services.map(srv => ({
+                                        ...srv,
+                                        selected: true
+                                      }));
+                                    }
+
+                                    return s;
+                                  })
+                                }
+                              />
+                            }
+                          >
+                            <ListItemButton
+                              onClick={event => {
+                                event.stopPropagation();
+                                event.preventDefault();
+                                const element = document.getElementById(`${category.name}`);
+                                element.scrollIntoView({ behavior: 'smooth' });
+                              }}
+                            >
+                              <ListItemText
+                                primary={category.name}
+                                primaryTypographyProps={{
+                                  color: active ? 'primary' : 'textSecondary',
+                                  component: 'label',
+                                  htmlFor: `navigation: ${category.name}`,
+                                  sx: { '&:hover': { cursor: 'pointer' } }
+                                }}
+                              />
+                            </ListItemButton>
+                          </ListItem>
+                        );
+                      }}
+                    />
+
+                    <form.Field
+                      name={
+                        `next.profiles[${profile}].services[${cat_id}].services` as 'next.profiles.default.services[0].services'
+                      }
+                      mode="array"
+                      children={props2 => {
+                        const services = props2.state.value as unknown as SelectedService[];
+
+                        return services.map((service, svr_id) => (
+                          <form.Subscribe
+                            key={`${cat_id}-${svr_id}`}
+                            selector={state => [
+                              state.values.next.profiles[profile].services[cat_id].services[svr_id].selected,
+                              state.values.state.activeID === `${category.name} - ${service.name}`,
+                              state.values.next.profiles[profile].service_spec.some(spec => spec.name === service.name)
+                            ]}
+                            children={([selected, active, hasSpecs]) => {
+                              const hideService = hidden && !selected;
+
+                              return hideService ? null : (
+                                <ListItem
+                                  className={clsx(active ? classes.active : classes.default)}
+                                  disablePadding
+                                  disabled={!selected}
+                                  secondaryAction={
+                                    <Checkbox
+                                      edge="end"
+                                      inputProps={{ id: `navigation: ${category.name}-${service.name}` }}
+                                      checked={selected}
+                                      disabled={disabled || !customize}
+                                      onChange={() =>
+                                        form.setStore(s => {
+                                          if (selected) {
+                                            s.next.profiles[profile].services[cat_id].selected = false;
+                                            s.next.profiles[profile].services[cat_id].services[svr_id].selected = false;
+                                          } else {
+                                            s.next.profiles[profile].services[cat_id].services[svr_id].selected = true;
+                                            s.next.profiles[profile].services[cat_id].selected = s.next.profiles[
+                                              profile
+                                            ].services[cat_id].services.every(srv => srv.selected);
+                                          }
+                                          return s;
+                                        })
+                                      }
+                                    />
+                                  }
+                                >
+                                  <ListItemButton
+                                    onClick={event => {
+                                      event.stopPropagation();
+                                      event.preventDefault();
+                                      const element = document.getElementById(`${category.name} - ${service.name}`);
+                                      element.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                  >
+                                    <ListItemText
+                                      id={`${svr_id}`}
+                                      primary={
+                                        <div style={{ display: 'flex' }}>
+                                          {service.name}
+                                          {hasSpecs && <ArrowRightIcon style={{ height: '20px' }} />}
+                                        </div>
+                                      }
+                                      primaryTypographyProps={{
+                                        component: 'label',
+                                        htmlFor: `navigation: ${category.name}-${service.name}`,
+                                        sx: { '&:hover': { cursor: 'pointer' } }
+                                      }}
+                                      style={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
+                                    />
+                                  </ListItemButton>
+                                </ListItem>
+                              );
+                            }}
+                          />
+                        ));
+                      }}
+                    />
+                  </div>
+                ))
               }
             />
-
-            {loading ? null : (
-              <form.Field
-                name="next.services"
-                mode="array"
-                children={({ state: categories }) =>
-                  categories.value.map((category, cat_id) => (
-                    <div key={cat_id} style={{ display: 'contents' }}>
-                      <form.Subscribe
-                        selector={state => {
-                          const selected = state.values.next.services[cat_id].selected;
-                          const list = state.values.next.services[cat_id].services.map(svr => svr.selected);
-                          return [
-                            selected,
-                            !list.every(i => i) && list.some(i => i),
-                            state.values.state.activeID === category.name
-                          ];
-                        }}
-                        children={([selected, indeterminate, active]) => {
-                          const profileValue =
-                            profile?.services?.selected?.some(s => s === category.name) &&
-                            !profile?.services?.excluded?.some(s => s === category.name);
-
-                          const value = profileValue ?? selected;
-                          const hideCategory = hidden && !value;
-
-                          return hideCategory ? null : (
-                            <ListItem
-                              key={cat_id}
-                              className={clsx(active ? classes.active : classes.default)}
-                              disablePadding
-                              sx={{ marginTop: theme.spacing(1) }}
-                              secondaryAction={
-                                <Checkbox
-                                  edge="end"
-                                  inputProps={{ 'aria-labelledby': category.name }}
-                                  checked={value}
-                                  indeterminate={indeterminate}
-                                  disabled={disabled || !customize}
-                                  onChange={() =>
-                                    form.setStore(s => {
-                                      if (selected) {
-                                        s.next.services[cat_id].selected = false;
-                                        s.next.services[cat_id].services = s.next.services[cat_id].services.map(
-                                          srv => ({
-                                            ...srv,
-                                            selected: false
-                                          })
-                                        );
-                                      } else {
-                                        s.next.services[cat_id].selected = true;
-                                        s.next.services[cat_id].services = s.next.services[cat_id].services.map(
-                                          srv => ({
-                                            ...srv,
-                                            selected: true
-                                          })
-                                        );
-                                      }
-
-                                      return s;
-                                    })
-                                  }
-                                />
-                              }
-                            >
-                              <ListItemButton
-                                onClick={() => {
-                                  const element = document.getElementById(`${category.name}`);
-                                  element.scrollIntoView({ behavior: 'smooth' });
-                                }}
-                              >
-                                <ListItemText
-                                  primary={category.name}
-                                  primaryTypographyProps={{ color: active ? 'primary' : 'textSecondary' }}
-                                />
-                              </ListItemButton>
-                            </ListItem>
-                          );
-                        }}
-                      />
-
-                      <form.Field
-                        name={`next.services[${cat_id}].services`}
-                        mode="array"
-                        children={props2 => {
-                          const services = props2.state.value as unknown as SelectedService[];
-
-                          return services.map((service, svr_id) => (
-                            <form.Subscribe
-                              key={`${cat_id}-${svr_id}`}
-                              selector={state => [
-                                state.values.next.services[cat_id].services[svr_id].selected,
-                                state.values.state.activeID === `${category.name} - ${service.name}`,
-                                state.values.next.service_spec.some(spec => spec.name === service.name)
-                              ]}
-                              children={([selected, active, hasSpecs]) => {
-                                const profileValue =
-                                  profile?.services?.selected?.some(
-                                    s => s === service.name || s === service.category
-                                  ) &&
-                                  !profile?.services?.excluded?.some(s => s === service.name || s === service.category);
-
-                                const hideService = hidden && !(profileValue ?? selected);
-
-                                return hideService ? null : (
-                                  <ListItem
-                                    className={clsx(active ? classes.active : classes.default)}
-                                    disablePadding
-                                    secondaryAction={
-                                      <Checkbox
-                                        edge="end"
-                                        inputProps={{ 'aria-labelledby': service.name }}
-                                        checked={profileValue ?? selected}
-                                        disabled={disabled || !customize}
-                                        onChange={() =>
-                                          form.setStore(s => {
-                                            if (selected) {
-                                              s.next.services[cat_id].selected = false;
-                                              s.next.services[cat_id].services[svr_id].selected = false;
-                                            } else {
-                                              s.next.services[cat_id].services[svr_id].selected = true;
-                                              s.next.services[cat_id].selected = s.next.services[cat_id].services.every(
-                                                srv => srv.selected
-                                              );
-                                            }
-                                            return s;
-                                          })
-                                        }
-                                      />
-                                    }
-                                  >
-                                    <ListItemButton
-                                      onClick={() => {
-                                        const element = document.getElementById(`${category.name} - ${service.name}`);
-                                        element.scrollIntoView({ behavior: 'smooth' });
-                                      }}
-                                    >
-                                      <ListItemText
-                                        id={`${svr_id}`}
-                                        primary={
-                                          <div style={{ display: 'flex' }}>
-                                            {service.name}
-                                            {hasSpecs && <ArrowRightIcon style={{ height: '20px' }} />}
-                                          </div>
-                                        }
-                                        style={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
-                                      />
-                                    </ListItemButton>
-                                  </ListItem>
-                                );
-                              }}
-                            />
-                          ));
-                        }}
-                      />
-                    </div>
-                  ))
-                }
-              />
-            )}
-          </List>
-        );
-      }}
-    />
+          )}
+        </>
+      )}
+    </List>
   );
 };

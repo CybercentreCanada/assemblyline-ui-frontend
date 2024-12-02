@@ -1,56 +1,68 @@
 import RefreshIcon from '@mui/icons-material/Refresh';
-import type { IconButtonProps, ListItemButtonProps, ListItemTextProps, TypographyProps } from '@mui/material';
+import type { IconButtonProps, ListItemButtonProps, ListItemTextProps } from '@mui/material';
 import { IconButton, ListItem, ListItemButton, ListItemText, Skeleton, Switch, useTheme } from '@mui/material';
 import React, { useMemo } from 'react';
+import { InputListItemButton, InputListItemText, InputResetButton, InputSkeleton } from './Inputs';
 
 type Props = Omit<ListItemButtonProps, 'defaultValue'> & {
   capitalize?: boolean;
-  customizable?: boolean;
   defaultValue?: boolean;
   loading?: boolean;
   primary?: ListItemTextProps['primary'];
-  primaryProps?: TypographyProps;
-  profileValue?: boolean;
+  primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
   secondary?: ListItemTextProps['secondary'];
+  secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
   value: boolean;
   onReset?: IconButtonProps['onClick'];
 };
 
 const WrappedBooleanInput = ({
+  id,
   capitalize = false,
-  customizable = true,
   defaultValue = null,
-  disabled: disabledProp = false,
+  disabled = false,
   hidden: hiddenProp = false,
   loading = false,
   primary,
   primaryProps = null,
-  profileValue = null,
   secondary,
+  secondaryProps = null,
   value,
   onReset = () => null,
   ...other
 }: Props) => {
   const theme = useTheme();
 
-  const checked = useMemo(() => profileValue ?? value, [profileValue, value]);
-
-  const disabled = useMemo<boolean>(
-    () => disabledProp || (!!profileValue && !customizable),
-    [customizable, disabledProp, profileValue]
-  );
-
-  const showReset = useMemo<boolean>(() => !!defaultValue && value !== defaultValue, [defaultValue, value]);
+  const showReset = useMemo<boolean>(() => defaultValue !== null && value !== defaultValue, [defaultValue, value]);
 
   const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
 
+  return (
+    <InputListItemButton disabled={disabled} {...other}>
+      <InputListItemText
+        primary={<label htmlFor={id}>{primary}</label>}
+        secondary={secondary}
+        primaryTypographyProps={{ sx: { textTransform: capitalize ? 'capitalize' : null }, ...primaryProps }}
+        secondaryTypographyProps={secondaryProps}
+      />
+      {loading ? (
+        <InputSkeleton />
+      ) : (
+        <>
+          <InputResetButton visible={showReset} onClick={onReset} />
+          <Switch checked={value} edge="end" inputProps={{ id }} />
+        </>
+      )}
+    </InputListItemButton>
+  );
+
   return hidden ? null : (
-    <ListItem disablePadding sx={{ margin: `${theme.spacing(1)} 0` }}>
+    <ListItem disablePadding>
       <ListItemButton disabled={disabled} sx={{ gap: theme.spacing(0.5) }} {...other}>
         <ListItemText
           primary={primary}
           secondary={secondary}
-          style={{ marginRight: theme.spacing(2), margin: '0' }}
+          style={{ marginRight: theme.spacing(2), margin: `${theme.spacing(0.5)} 0` }}
           primaryTypographyProps={{
             variant: 'body1',
             whiteSpace: 'nowrap',
@@ -73,7 +85,7 @@ const WrappedBooleanInput = ({
                 }}
               />
             </div>
-            <Switch checked={checked} edge="end" />
+            <Switch checked={value} edge="end" />
           </>
         )}
       </ListItemButton>

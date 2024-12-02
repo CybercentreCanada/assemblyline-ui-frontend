@@ -6,18 +6,22 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Submission } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
+import { DEFAULT_SETTINGS } from 'components/routes/submit/mock/settings';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router';
 import { ExternalSourcesSection } from './components/ExternalSources';
+import { HeaderSection } from './components/Header';
 import { InterfaceSection } from './components/Interface';
 import { Navigation } from './components/Navigation';
-import { ProfileSection } from './components/Profile';
 import { SaveSettings } from './components/Save';
 import { ServicesSection } from './components/Services';
 import { SubmissionSection } from './components/Submission';
+import { Tab } from './components/Tab';
 import type { SettingsStore } from './contexts/form';
 import { FormProvider, useForm } from './contexts/form';
+import { decompressSubmissionProfiles } from './utils/utils';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -47,13 +51,19 @@ const useStyles = makeStyles(theme => ({
   content: {
     display: 'flex',
     flexDirection: 'column',
-    rowGap: theme.spacing(2)
+    rowGap: theme.spacing(4)
   }
 }));
 
+type Params = {
+  tab: SettingsStore['state']['tab'];
+};
+
 const SettingsContent = () => {
-  const { apiCall } = useMyAPI();
   const classes = useStyles();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const { tab: tabParam } = useParams<Params>();
   const { user: currentUser, configuration } = useALContext();
 
   const form = useForm();
@@ -85,21 +95,11 @@ const SettingsContent = () => {
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
           const settings = { ...api_response, ...s.next };
+          s.next = _.cloneDeep(decompressSubmissionProfiles({ ...settings, ...DEFAULT_SETTINGS }, currentUser));
+          s.prev = _.cloneDeep(decompressSubmissionProfiles({ ...settings, ...DEFAULT_SETTINGS }, currentUser));
 
-          settings.services.sort((a, b) => a.name.localeCompare(b.name));
-          settings.services.forEach((category, i) => {
-            settings.services[i].services.sort((a, b) => a.name.localeCompare(b.name));
-          });
-
-          settings.service_spec.sort((a, b) => a.name.localeCompare(b.name));
-          settings.service_spec.forEach((spec, i) => {
-            settings.service_spec[i].params.sort((a, b) => a.name.localeCompare(b.name));
-          });
-
-          s.next = _.cloneDeep(settings);
-          s.prev = _.cloneDeep(settings);
-
-          s.state.profile = api_response.preferred_submission_profile;
+          const nextTab = ['interface', ...Object.keys(s.next.profiles)].includes(tabParam) ? tabParam : 'interface';
+          navigate(`/settings2/${nextTab}`);
 
           return s;
         });
@@ -118,29 +118,107 @@ const SettingsContent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
+  useEffect(() => {
+    form.setStore(s => {
+      if (!s.next) return s;
+      s.state.tab = ['interface', ...Object.keys(s.next.profiles)].includes(tabParam) ? tabParam : 'interface';
+      return s;
+    });
+  }, [form, tabParam]);
+
   return (
     <>
-      <div className={classes.root} ref={rootRef}>
-        <div className={classes.wrap}>
-          <PageCenter margin={4} width="100%" textAlign="start">
-            <div className={classes.content}>
-              <ProfileSection />
-              <SubmissionSection />
-              <InterfaceSection />
-              <ExternalSourcesSection />
-              <ServicesSection />
-              <div style={{ height: window.innerHeight / 2 }} />
-            </div>
-            <SaveSettings />
-          </PageCenter>
-        </div>
+      <form.Subscribe
+        selector={state => [
+          state.values.state.loading,
+          state.values.state.disabled,
+          state.values.state.tab,
+          state.values.state.hidden,
+          state.values.state.customize
+        ]}
+        children={props => {
+          const loading = props[0] as boolean;
+          const disabled = props[1] as boolean;
+          const tab = props[2] as SettingsStore['state']['tab'];
+          const hidden = props[3] as boolean;
+          const customize = props[4] as boolean;
 
-        <div className={classes.navigation}>
-          <div style={{ height: '2000px' }}>
-            <Navigation rootElement={rootRef.current} />
-          </div>
-        </div>
-      </div>
+          return (
+            <div className={classes.root} ref={rootRef}>
+              <div className={classes.navigation}>
+                <div style={{ height: '2000px' }}>
+                  <Tab
+                    rootElement={rootRef.current}
+                    loading={loading}
+                    disabled={disabled}
+                    profile={tab}
+                    customize={false}
+                    hidden={false}
+                  />
+                </div>
+              </div>
+
+              <div className={classes.wrap}>
+                <PageCenter margin={4} width="100%" textAlign="start">
+                  <div className={classes.content}>
+                    <HeaderSection
+                      loading={loading}
+                      disabled={disabled}
+                      hidden={hidden}
+                      customize={customize}
+                      profile={tab}
+                    />
+
+                    {!tab ? null : tab === 'interface' ? (
+                      <InterfaceSection loading={loading} disabled={disabled} hidden={hidden} customize={customize} />
+                    ) : (
+                      <>
+                        <SubmissionSection
+                          loading={loading}
+                          disabled={disabled}
+                          hidden={hidden}
+                          customize={customize}
+                          profile={tab}
+                        />
+                        <ExternalSourcesSection
+                          loading={loading}
+                          disabled={disabled}
+                          hidden={hidden}
+                          customize={customize}
+                          profile={tab}
+                        />
+                        <ServicesSection
+                          loading={loading}
+                          disabled={disabled}
+                          hidden={hidden}
+                          customize={customize}
+                          profile={tab}
+                        />
+                      </>
+                    )}
+
+                    <div style={{ height: window.innerHeight / 2 }} />
+                  </div>
+                  <SaveSettings />
+                </PageCenter>
+              </div>
+
+              <div className={classes.navigation}>
+                <div style={{ height: '2000px' }}>
+                  <Navigation
+                    rootElement={rootRef.current}
+                    loading={loading}
+                    disabled={disabled}
+                    hidden={hidden}
+                    customize={customize}
+                    profile={tab}
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        }}
+      />
     </>
   );
 };

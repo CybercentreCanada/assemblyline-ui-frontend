@@ -60,8 +60,6 @@ const WrappedSubmitContent = () => {
   const submitState = useMemo<SubmitState>(() => location.state as SubmitState, [location.state]);
   const submitParams = useMemo<URLSearchParams>(() => new URLSearchParams(location.search), [location.search]);
 
-  console.log(submitState);
-
   const handleCancelUpload = useCallback(() => {
     form.setStore(s => {
       s.file = null;

@@ -1,30 +1,30 @@
 import RefreshIcon from '@mui/icons-material/Refresh';
-import type { IconButtonProps, ListItemTextProps, OutlinedInputProps, TypographyProps } from '@mui/material';
+import type { IconButtonProps, ListItemTextProps, OutlinedInputProps } from '@mui/material';
 import { IconButton, InputAdornment, ListItem, OutlinedInput, Skeleton, Typography, useTheme } from '@mui/material';
 import type { ReactNode } from 'react';
 import React, { useMemo } from 'react';
+import { InputListItem, InputListItemText, InputResetButton, InputSkeleton } from './Inputs';
 
 type Props = Omit<OutlinedInputProps, 'value'> & {
   capitalize?: boolean;
-  customizable?: boolean;
   defaultValue?: number;
   endAdornment?: ReactNode;
   loading?: boolean;
   max?: number;
   min?: number;
   primary?: ListItemTextProps['primary'];
-  primaryProps?: TypographyProps;
-  profileValue?: number;
+  primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
   secondary?: ListItemTextProps['secondary'];
+  secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
   value: number;
   onReset?: IconButtonProps['onClick'];
 };
 
 const WrappedNumberInput = ({
+  id,
   capitalize = false,
-  customizable = true,
   defaultValue = null,
-  disabled: disabledProp = false,
+  disabled = false,
   endAdornment,
   hidden: hiddenProp = false,
   loading = false,
@@ -32,28 +32,51 @@ const WrappedNumberInput = ({
   min,
   primary,
   primaryProps = null,
-  profileValue = null,
   secondary,
+  secondaryProps = null,
   value = null,
   onReset = () => null,
   ...other
 }: Props) => {
   const theme = useTheme();
 
-  const inputValue = useMemo(() => (profileValue ?? value) || '', [profileValue, value]);
-
-  const disabled = useMemo<boolean>(
-    () => disabledProp || (!!profileValue && !customizable),
-    [customizable, disabledProp, profileValue]
-  );
-
-  const showReset = useMemo<boolean>(() => !!defaultValue && value !== defaultValue, [defaultValue, value]);
+  const showReset = useMemo<boolean>(() => defaultValue !== null && value !== defaultValue, [defaultValue, value]);
 
   const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
 
+  return (
+    <InputListItem>
+      <InputListItemText
+        primary={<label htmlFor={id}>{primary}</label>}
+        secondary={secondary}
+        primaryTypographyProps={{ sx: { textTransform: capitalize ? 'capitalize' : null }, ...primaryProps }}
+        secondaryTypographyProps={secondaryProps}
+      />
+      {loading ? (
+        <InputSkeleton />
+      ) : (
+        <>
+          <InputResetButton visible={showReset} onClick={onReset} />
+          <OutlinedInput
+            type="number"
+            margin="dense"
+            size="small"
+            fullWidth
+            value={value}
+            disabled={disabled}
+            sx={{ maxWidth: '30%' }}
+            inputProps={{ id, min, max }}
+            endAdornment={endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
+            {...other}
+          />
+        </>
+      )}
+    </InputListItem>
+  );
+
   return hidden ? null : (
     <ListItem disabled={disabled} sx={{ columnGap: theme.spacing(0.5) }}>
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, margin: `${theme.spacing(0.5)} 0` }}>
         {primary && (
           <Typography
             color="textPrimary"
@@ -87,7 +110,7 @@ const WrappedNumberInput = ({
           margin="dense"
           size="small"
           fullWidth
-          value={inputValue}
+          value={value}
           disabled={disabled}
           sx={{ maxWidth: '30%' }}
           inputProps={{ min: min, max: max }}

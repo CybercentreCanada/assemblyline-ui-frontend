@@ -1,7 +1,8 @@
 import RefreshIcon from '@mui/icons-material/Refresh';
-import type { IconButtonProps, ListItemTextProps, MenuItemProps, SelectProps, TypographyProps } from '@mui/material';
+import type { IconButtonProps, ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
 import { IconButton, ListItem, MenuItem, Select, Skeleton, Typography, useTheme } from '@mui/material';
 import React, { useMemo } from 'react';
+import { InputListItem, InputListItemText, InputResetButton, InputSkeleton } from './Inputs';
 
 type Props = Omit<SelectProps, 'defaultValue'> & {
   capitalize?: boolean;
@@ -10,13 +11,15 @@ type Props = Omit<SelectProps, 'defaultValue'> & {
   loading?: boolean;
   options: { label: MenuItemProps['children']; value: MenuItemProps['value'] }[];
   primary?: ListItemTextProps['primary'];
-  primaryProps?: TypographyProps;
+  primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
   profileValue?: string;
   secondary?: ListItemTextProps['secondary'];
+  secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
   onReset?: IconButtonProps['onClick'];
 };
 
 const WrappedSelectInput = ({
+  id,
   capitalize = false,
   customizable = true,
   defaultValue = null,
@@ -28,6 +31,7 @@ const WrappedSelectInput = ({
   primaryProps = null,
   profileValue = null,
   secondary,
+  secondaryProps = null,
   value,
   onReset = () => null,
   ...other
@@ -44,6 +48,43 @@ const WrappedSelectInput = ({
   const showReset = useMemo<boolean>(() => !!defaultValue && value !== defaultValue, [defaultValue, value]);
 
   const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
+
+  return (
+    <InputListItem>
+      <InputListItemText
+        primary={<label htmlFor={id}>{primary}</label>}
+        secondary={secondary}
+        primaryTypographyProps={{ sx: { textTransform: capitalize ? 'capitalize' : null }, ...primaryProps }}
+        secondaryTypographyProps={secondaryProps}
+      />
+      {loading ? (
+        <InputSkeleton />
+      ) : (
+        <>
+          <InputResetButton visible={showReset} onClick={onReset} />
+          <Select
+            variant="outlined"
+            size="small"
+            fullWidth
+            disabled={disabled}
+            sx={{
+              maxWidth: '30%',
+              ...(capitalize && { textTransform: 'capitalize' })
+            }}
+            value={selected}
+            inputProps={{ id }}
+            {...other}
+          >
+            {options.map((option, i) => (
+              <MenuItem key={i} value={option.value} sx={{ ...(capitalize && { textTransform: 'capitalize' }) }}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </>
+      )}
+    </InputListItem>
+  );
 
   return hidden ? null : (
     <ListItem disabled={disabled} sx={{ columnGap: theme.spacing(0.5), margin: `${theme.spacing(1)} 0` }}>
