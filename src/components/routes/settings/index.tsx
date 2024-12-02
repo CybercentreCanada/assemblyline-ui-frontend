@@ -4,7 +4,6 @@ import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { Submission } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
 import { DEFAULT_SETTINGS } from 'components/routes/submit/mock/settings';
 import _ from 'lodash';
@@ -15,7 +14,6 @@ import { ExternalSourcesSection } from './components/ExternalSources';
 import { HeaderSection } from './components/Header';
 import { InterfaceSection } from './components/Interface';
 import { Navigation } from './components/Navigation';
-import { SaveSettings } from './components/Save';
 import { ServicesSection } from './components/Services';
 import { SubmissionSection } from './components/Submission';
 import { Tab } from './components/Tab';
@@ -69,18 +67,6 @@ const SettingsContent = () => {
   const form = useForm();
 
   const rootRef = useRef();
-
-  const handleProfileChange = useCallback(
-    (profileKey: keyof Submission['profiles']) => {
-      form.setStore(s => {
-        const profile = configuration.submission.profiles?.[profileKey];
-        if (!profile) return s;
-
-        return s;
-      });
-    },
-    [configuration.submission.profiles, form]
-  );
 
   useEffect(() => {
     form.setStore(s => {
@@ -161,16 +147,10 @@ const SettingsContent = () => {
               <div className={classes.wrap}>
                 <PageCenter margin={4} width="100%" textAlign="start">
                   <div className={classes.content}>
-                    <HeaderSection
-                      loading={loading}
-                      disabled={disabled}
-                      hidden={hidden}
-                      customize={customize}
-                      profile={tab}
-                    />
+                    <HeaderSection loading={loading} hidden={hidden} profile={tab} />
 
                     {!tab ? null : tab === 'interface' ? (
-                      <InterfaceSection loading={loading} disabled={disabled} hidden={hidden} customize={customize} />
+                      <InterfaceSection loading={loading} disabled={disabled} />
                     ) : (
                       <>
                         <SubmissionSection
@@ -199,7 +179,6 @@ const SettingsContent = () => {
 
                     <div style={{ height: window.innerHeight / 2 }} />
                   </div>
-                  <SaveSettings />
                 </PageCenter>
               </div>
 

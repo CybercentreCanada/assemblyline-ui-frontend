@@ -6,6 +6,7 @@ import useALContext from 'components/hooks/useALContext';
 import type { SelectedService } from 'components/models/base/service';
 import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
+import type { MouseEvent } from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -60,6 +61,14 @@ export const Navigation = ({
     );
   }, []);
 
+  const handleScroll = useCallback((event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>, id: string) => {
+    event.stopPropagation();
+    event.preventDefault();
+    const element = document.getElementById(id);
+    element.style.scrollMarginTop = '62px';
+    element.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
   useEffect(() => {
     if (!rootElement) return;
 
@@ -87,28 +96,7 @@ export const Navigation = ({
 
   return !profile || loading ? null : (
     <List dense sx={{ '& ul': { padding: 0 } }}>
-      {profile === 'interface' ? (
-        <form.Subscribe
-          selector={state => [state.values.state.activeID === 'interface']}
-          children={([active]) => (
-            <ListItem className={clsx(active ? classes.active : classes.default)} disablePadding>
-              <ListItemButton
-                onClick={event => {
-                  event.stopPropagation();
-                  event.preventDefault();
-                  const element = document.getElementById(`interface`);
-                  element.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                <ListItemText
-                  primary={t('interface')}
-                  primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
-                />
-              </ListItemButton>
-            </ListItem>
-          )}
-        />
-      ) : (
+      {profile === 'interface' ? null : (
         <>
           <ListItem disablePadding sx={{ marginTop: theme.spacing(1) }}>
             <ListItemButton
@@ -126,18 +114,8 @@ export const Navigation = ({
             selector={state => [state.values.state.activeID === 'submissions']}
             children={([active]) => (
               <ListItem className={clsx(active ? classes.active : classes.default)} disablePadding>
-                <ListItemButton
-                  onClick={event => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    const element = document.getElementById(`submissions`);
-                    element.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  <ListItemText
-                    primary={t('submissions')}
-                    primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
-                  />
+                <ListItemButton onClick={e => handleScroll(e, 'submissions')}>
+                  <ListItemText primary={t('submissions')} />
                 </ListItemButton>
               </ListItem>
             )}
@@ -147,14 +125,7 @@ export const Navigation = ({
             children={([active]) =>
               fileSources.length > 0 ? (
                 <ListItem className={clsx(active ? classes.active : classes.default)} disablePadding>
-                  <ListItemButton
-                    onClick={event => {
-                      event.stopPropagation();
-                      event.preventDefault();
-                      const element = document.getElementById(`submissions.default_external_sources`);
-                      element.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                  >
+                  <ListItemButton onClick={e => handleScroll(e, `submissions.default_external_sources`)}>
                     <ListItemText
                       primary={t('submissions.default_external_sources')}
                       primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
@@ -227,14 +198,7 @@ export const Navigation = ({
                               />
                             }
                           >
-                            <ListItemButton
-                              onClick={event => {
-                                event.stopPropagation();
-                                event.preventDefault();
-                                const element = document.getElementById(`${category.name}`);
-                                element.scrollIntoView({ behavior: 'smooth' });
-                              }}
-                            >
+                            <ListItemButton onClick={e => handleScroll(e, category.name)}>
                               <ListItemText
                                 primary={category.name}
                                 primaryTypographyProps={{
@@ -297,14 +261,7 @@ export const Navigation = ({
                                     />
                                   }
                                 >
-                                  <ListItemButton
-                                    onClick={event => {
-                                      event.stopPropagation();
-                                      event.preventDefault();
-                                      const element = document.getElementById(`${category.name} - ${service.name}`);
-                                      element.scrollIntoView({ behavior: 'smooth' });
-                                    }}
-                                  >
+                                  <ListItemButton onClick={e => handleScroll(e, `${category.name} - ${service.name}`)}>
                                     <ListItemText
                                       id={`${svr_id}`}
                                       primary={

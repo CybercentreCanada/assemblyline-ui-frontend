@@ -156,7 +156,7 @@ export const InputContainerTitle: FC<InputContainerTitleProps> = ({
   const theme = useTheme();
 
   return checked !== null ? (
-    <ListItem disableGutters disablePadding {...other}>
+    <ListItem id={id} disableGutters disablePadding {...other}>
       <ListItemButton
         dense
         disableGutters
@@ -176,13 +176,13 @@ export const InputContainerTitle: FC<InputContainerTitleProps> = ({
             checked={checked}
             indeterminate={indeterminate}
             disableRipple
-            inputProps={{ id }}
+            inputProps={{ id: `${id}-input` }}
           />
         </ListItemIcon>
         <ListItemText
           primary={primary?.children}
           primaryTypographyProps={{
-            htmlFor: id,
+            htmlFor: `${id}-input`,
             component: 'label',
             variant: 'body1',
             sx: { '&:hover': { cursor: 'pointer' } },
@@ -195,6 +195,7 @@ export const InputContainerTitle: FC<InputContainerTitleProps> = ({
     </ListItem>
   ) : (
     <ListItem
+      id={id}
       disablePadding
       sx={{
         marginLeft: '56px',
@@ -227,6 +228,7 @@ export const InputHeader: FC<InputHeaderProps> = ({ primary, secondary, underlin
     <ListItem
       disablePadding
       sx={{
+        scrollMarginTop: '62px',
         ...(underlined && { borderBottom: `1px solid ${theme.palette.divider}` })
       }}
     >

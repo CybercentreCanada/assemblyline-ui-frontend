@@ -16,20 +16,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
-  customize: boolean;
-  disabled: boolean;
   hidden: boolean;
   loading: boolean;
   profile: SettingsStore['state']['tab'];
 };
 
-export const HeaderSection = ({
-  customize = false,
-  disabled = false,
-  hidden = false,
-  loading = false,
-  profile = 'interface'
-}: Props) => {
+export const HeaderSection = ({ hidden = false, loading = false, profile = 'interface' }: Props) => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
