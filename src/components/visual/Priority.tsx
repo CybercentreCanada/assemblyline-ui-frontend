@@ -14,39 +14,46 @@ const WrappedPriority: React.FC<PriorityProps> = ({ priority, size = 'tiny' }) =
 
   const PRIORITY_MAP = {
     'user-low': {
-      text: t('priority.userlow'),
+      tooltip: t('priority.userlow'),
+      text: t('priority.low'),
       color: 'default' as 'default'
     },
     'user-medium': {
-      text: t('priority.usermedium'),
+      tooltip: t('priority.usermedium'),
+      text: t('priority.medium'),
       color: 'primary' as 'primary'
     },
     'user-high': {
-      text: t('priority.userhigh'),
+      tooltip: t('priority.userhigh'),
+      text: t('priority.high'),
       color: 'warning' as 'warning'
     },
     critical: {
+      tooltip: t('priority.critical'),
       text: t('priority.critical'),
       color: 'error' as 'error'
     },
     high: {
+      tooltip: t('priority.high'),
       text: t('priority.high'),
       color: 'warning' as 'warning'
     },
     medium: {
+      tooltip: t('priority.medium'),
       text: t('priority.medium'),
       color: 'primary' as 'primary'
     },
     low: {
+      tooltip: t('priority.low'),
       text: t('priority.low'),
       color: 'default' as 'default'
     }
   };
 
-  const { text, color } = PRIORITY_MAP[priorityText(priority)];
+  const { tooltip, text, color } = PRIORITY_MAP[priorityText(priority)];
 
   return (
-    <Tooltip title={`${text} [Priority: ${priority}]`}>
+    <Tooltip title={`${tooltip} [Priority: ${priority}]`}>
       <span>
         <CustomChip variant="outlined" size={size} label={text} color={color} />
       </span>
