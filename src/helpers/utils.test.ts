@@ -294,21 +294,22 @@ describe('Test `priorityText`', () => {
     expect(priorityText(1)).toBe('low');
     expect(priorityText(99)).toBe('low');
 
-    expect(priorityText(100)).toBe('medium');
-    expect(priorityText(199)).toBe('medium');
+    expect(priorityText(101)).toBe('medium');
+    expect(priorityText(200)).toBe('medium');
 
-    expect(priorityText(200)).toBe('high');
-    expect(priorityText(299)).toBe('high');
+    expect(priorityText(201)).toBe('high');
+    expect(priorityText(300)).toBe('high');
 
-    expect(priorityText(300)).toBe('critical');
-    expect(priorityText(499)).toBe('critical');
+    expect(priorityText(301)).toBe('critical');
+    expect(priorityText(400)).toBe('critical');
 
+    expect(priorityText(401)).toBe('user-low');
     expect(priorityText(500)).toBe('user-low');
-    expect(priorityText(999)).toBe('user-low');
 
+    expect(priorityText(501)).toBe('user-medium');
     expect(priorityText(1000)).toBe('user-medium');
-    expect(priorityText(1499)).toBe('user-medium');
 
+    expect(priorityText(1001)).toBe('user-high');
     expect(priorityText(1500)).toBe('user-high');
     expect(priorityText(10000)).toBe('user-high');
   });
