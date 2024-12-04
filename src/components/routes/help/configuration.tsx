@@ -80,17 +80,16 @@ export default function Configuration() {
             <Grid container>
               {constants ? (
                 <>
-                  {Object.keys(constants.priorities).map((priority, id) => (
-                    <Grid key={id} item xs={12} sm={6} md={4} lg={3} xl={2}>
-                      <div style={{ display: 'inline-block', fontWeight: 500 }}>{priority}:&nbsp;&nbsp;</div>
-                      <div style={{ display: 'inline-block', fontWeight: 300 }}>{constants.priorities[priority]}</div>
-                    </Grid>
-                  ))}
-
-                  <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                    <div style={{ display: 'inline-block', fontWeight: 500 }}>{t('priorities.max')}:&nbsp;&nbsp;</div>
-                    <div style={{ display: 'inline-block', fontWeight: 300 }}>{constants.max_priority}</div>
-                  </Grid>
+                  {Object.entries(constants.priorities)
+                    .sort((a: [string, [number, number]], b: [string, [number, number]]) => a[1][0] - b[1][0])
+                    .map((priority: [string, [number, number]], id) => (
+                      <Grid key={id} item xs={12} sm={6} md={4} lg={3} xl={2}>
+                        <div style={{ display: 'inline-block', fontWeight: 500 }}>{priority[0]}:&nbsp;&nbsp;</div>
+                        <div
+                          style={{ display: 'inline-block', fontWeight: 300 }}
+                        >{`${priority[1][0]} - ${priority[1][1]}`}</div>
+                      </Grid>
+                    ))}
                 </>
               ) : (
                 [...Array(8)].map((_, i) => (
@@ -105,6 +104,11 @@ export default function Configuration() {
                 ))
               )}
             </Grid>
+            <div style={{ paddingTop: sp1, paddingBottom: sp2 }}>
+              <Typography variant="body2" gutterBottom style={{ fontWeight: 'bold' }}>
+                {t('priorities.note')}
+              </Typography>
+            </div>
           </div>
 
           <Typography variant="h6" gutterBottom>
