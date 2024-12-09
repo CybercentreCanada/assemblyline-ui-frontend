@@ -319,7 +319,7 @@ const WrappedFileDetail: React.FC<Props> = ({
   }, [file]);
 
   useEffect(() => {
-    setInsideDrawer(document.getElementById('drawerContent')?.contains(ref.current) ?? null);
+    setInsideDrawer(document.getElementById('drawerContent')?.contains(ref.current) || false);
   }, [file]);
 
   useEffect(() => {
