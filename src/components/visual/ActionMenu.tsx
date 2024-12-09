@@ -379,7 +379,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
-        {currentUserConfig.ui.api_proxies.includes('borealis') &&
+        {'borealis' in currentUserConfig.ui.api_proxies &&
           type in BOREALIS_TYPE_MAP &&
           value !== null &&
           setBorealisDetails && (
