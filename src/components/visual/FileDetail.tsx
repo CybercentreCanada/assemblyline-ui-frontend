@@ -91,6 +91,7 @@ const WrappedFileDetail: React.FC<Props> = ({
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const [promotedSections, setPromotedSections] = useState([]);
   const [insideDrawer, setInsideDrawer] = useState<boolean>(null);
+  const [loaded, setLoaded] = useState<boolean>(false);
 
   const ref = useRef();
 
@@ -318,18 +319,19 @@ const WrappedFileDetail: React.FC<Props> = ({
   }, [file]);
 
   useEffect(() => {
-    setInsideDrawer(document.getElementById('drawerContent').contains(ref.current));
-  }, []);
+    setInsideDrawer(document.getElementById('drawerContent')?.contains(ref.current) ?? null);
+  }, [file]);
 
   useEffect(() => {
     if (insideDrawer === false) {
+      setLoaded(true);
       if (location.hash) setGlobalDrawer(<HeuristicDetail heur_id={location.hash.slice(1)} />);
-      else setGlobalDrawer(null);
+      else if (!location.hash) setGlobalDrawer(null);
     }
   }, [insideDrawer, location.hash, setGlobalDrawer]);
 
   useEffect(() => {
-    if (insideDrawer === false && !globalDrawerOpened && location.hash) {
+    if (loaded && insideDrawer === false && !globalDrawerOpened && location.hash) {
       navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
