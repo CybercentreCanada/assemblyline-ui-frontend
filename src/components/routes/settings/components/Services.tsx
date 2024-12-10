@@ -48,7 +48,13 @@ export const ServicesSection = ({
                   <InputContainerTitle
                     key={`${category.name}-${cat_id}`}
                     id={category.name}
-                    primary={{ children: category.name, color: 'primary', id: category.name, className: 'Anchor' }}
+                    data-anchor={category.name}
+                    primary={{
+                      children: category.name,
+                      color: 'primary',
+                      id: category.name,
+                      className: 'Anchor'
+                    }}
                     checked={selected}
                     indeterminate={indeterminate}
                     disabled={!selected && !indeterminate}
@@ -104,6 +110,7 @@ export const ServicesSection = ({
                           return hideService ? null : (
                             <InputContainerTitle
                               id={`${category.name} - ${service.name}`}
+                              data-anchor={`${category.name} - ${service.name}`}
                               primary={{
                                 children: service.name,
                                 id: `${category.name} - ${service.name}`,

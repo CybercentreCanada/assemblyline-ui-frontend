@@ -19,21 +19,11 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   rootElement?: HTMLDivElement;
-  customize: boolean;
-  disabled: boolean;
-  hidden: boolean;
   loading: boolean;
   profile: SettingsStore['state']['tab'];
 };
 
-export const Tab = ({
-  rootElement = null,
-  customize = false,
-  disabled = false,
-  hidden = false,
-  loading = false,
-  profile = 'interface'
-}: Props) => {
+export const Tab = ({ rootElement = null, loading = false, profile = 'interface' }: Props) => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const classes = useStyles();

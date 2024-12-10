@@ -455,7 +455,7 @@ export type SubmissionProfileParams = {
   profile?: boolean;
 
   /** Service-specific parameters */
-  service_spec?: { [category: string]: { [service: string]: any } };
+  service_spec?: { [service: string]: { [param: string]: any } };
 
   /** Service selection */
   services?: ServiceSelection;

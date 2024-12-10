@@ -12,7 +12,7 @@ import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import { useState } from 'react';
+import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -26,116 +26,136 @@ export const HeaderSection = ({ hidden = false, loading = false, profile = 'inte
   const theme = useTheme();
   const form = useForm();
 
-  const [confirm, setConfirm] = useState<boolean>(false);
-
   return (
     <form.Subscribe
       selector={state => [
         state.values.state.submitting,
-        JSON.stringify(state.values.next) !== JSON.stringify(state.values.prev)
+        state.values.state.confirm,
+        !_.isEqual(state.values.next, state.values.prev)
       ]}
-      children={([submitting, modified]) => (
-        <div
-          style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 1000,
-            backgroundColor: theme.palette.background.default
-          }}
-        >
+      children={([submitting, confirm, modified]) => {
+        return (
           <div
             style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              columnGap: theme.spacing(2),
-              paddingBottom: theme.spacing(1)
+              position: 'sticky',
+              top: 0,
+              zIndex: 1000,
+              backgroundColor: theme.palette.background.default
             }}
           >
-            <RouterPrompt when={modified} />
-
-            <ConfirmationDialog
-              open={confirm}
-              handleClose={() => setConfirm(false)}
-              handleAccept={async () => {
-                await form.handleSubmit();
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                columnGap: theme.spacing(2)
               }}
-              title={t('save.title')}
-              cancelText={t('save.cancelText')}
-              acceptText={t('save.acceptText')}
-              text={t('save.text')}
-              waiting={submitting}
-            />
+            >
+              {!modified ? null : (
+                <RouterPrompt
+                  when={modified}
+                  onAccept={() => {
+                    form.setStore(s => {
+                      s.next = structuredClone(s.prev);
+                      return s;
+                    });
+                    return true;
+                  }}
+                />
+              )}
 
-            <div style={{ flex: 1 }}>
-              <Typography variant="h4">{t('title')}</Typography>
-              {loading ? <Skeleton style={{ width: '10rem' }} /> : null}
-              <Typography color="textSecondary" variant="caption">
-                {loading ? <Skeleton style={{ width: '10rem' }} /> : !profile ? null : t(`profile.${profile}`)}
-              </Typography>
+              <ConfirmationDialog
+                open={confirm}
+                handleClose={() => {
+                  form.setStore(s => {
+                    s.state.confirm = false;
+                    return s;
+                  });
+                }}
+                handleAccept={async () => {
+                  await form.handleSubmit();
+                }}
+                title={t('save.title')}
+                cancelText={t('save.cancelText')}
+                acceptText={t('save.acceptText')}
+                text={t('save.text')}
+                waiting={submitting}
+              />
+
+              <div style={{ flex: 1 }}>
+                <Typography variant="h4">{t('title')}</Typography>
+                <Typography color="textSecondary" variant="caption">
+                  {loading ? <Skeleton style={{ width: '10rem' }} /> : !profile ? null : t(`profile.${profile}`)}
+                </Typography>
+              </div>
+
+              <FormControlLabel
+                control={<Switch checked={hidden} />}
+                label={t('hidden')}
+                onClick={() => {
+                  form.setStore(s => {
+                    s.state.hidden = !s.state.hidden;
+                    return s;
+                  });
+                }}
+              />
+
+              <Button
+                variant="outlined"
+                color="primary"
+                disabled={submitting || !modified}
+                onClick={() => {
+                  form.setStore(s => {
+                    s.next = structuredClone(s.prev);
+                    return s;
+                  });
+                }}
+              >
+                {t('reset')}
+                {submitting && (
+                  <CircularProgress
+                    size={24}
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      marginTop: -12,
+                      marginLeft: -12
+                    }}
+                  />
+                )}
+              </Button>
+
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={submitting || !modified}
+                onClick={() => {
+                  form.setStore(s => {
+                    s.state.confirm = true;
+                    return s;
+                  });
+                }}
+              >
+                {t('save')}
+                {submitting && (
+                  <CircularProgress
+                    size={24}
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      marginTop: -12,
+                      marginLeft: -12
+                    }}
+                  />
+                )}
+              </Button>
             </div>
-
-            <FormControlLabel
-              control={<Switch checked={hidden} />}
-              label={t('hidden')}
-              onClick={() => {
-                form.setStore(s => {
-                  s.state.hidden = !s.state.hidden;
-                  return s;
-                });
-              }}
-            />
-
-            <Button
-              variant="outlined"
-              color="primary"
-              disabled={submitting || !modified}
-              onClick={() => {
-                form.setStore(s => {
-                  s.next = structuredClone(s.prev);
-                  return s;
-                });
-              }}
-            >
-              {t('reset')}
-              {submitting && (
-                <CircularProgress
-                  size={24}
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
-            </Button>
-
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={submitting || !modified}
-              onClick={() => setConfirm(true)}
-            >
-              {t('save')}
-              {submitting && (
-                <CircularProgress
-                  size={24}
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
-            </Button>
+            {!loading ? null : <LinearProgress />}
           </div>
-          {!loading ? null : <LinearProgress />}
-        </div>
-      )}
+        );
+      }}
     />
   );
 };

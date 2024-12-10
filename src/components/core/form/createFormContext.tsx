@@ -1,6 +1,5 @@
 import type { FormApi, FormOptions, ReactFormApi, Validator } from '@tanstack/react-form';
 import { useForm as useTanStackForm } from '@tanstack/react-form';
-import _ from 'lodash';
 import React, { createContext, useCallback, useContext } from 'react';
 
 export function createFormContext<
@@ -8,12 +7,6 @@ export function createFormContext<
   TFormValidator extends Validator<TFormData, string> = Validator<TFormData, string>
 >(options: FormOptions<TFormData, TFormValidator>) {
   type FormContextProps = (FormApi<TFormData, TFormValidator> & ReactFormApi<TFormData, TFormValidator>) | null;
-
-  // type FormFieldComponentProps = Parameters<FieldComponent<TFormData, TFormValidator>>[0];
-
-  // type FieldComponentProps<Value> = Omit<FormFieldComponentProps, 'name'> & {
-  //   field: (data: TFormData) => Value;
-  // };
 
   const FormContext = createContext<FormContextProps>(null);
 
@@ -41,25 +34,10 @@ export function createFormContext<
 
     const setStore = useCallback(
       (updater: (data: TFormData) => TFormData) => {
-        form.store.setState(s => ({ ...s, values: _.cloneDeep(updater(s.values)) }));
+        form.store.setState(s => ({ ...s, values: updater(s.values) }));
       },
       [form.store]
     );
-
-    // const FieldComponent = useCallback(
-    //   <Value extends any>({ children, field, ...fieldOptions }: FieldComponentProps<any>) => {
-    //     const data = field(path);
-    //     const name = 'toPath' in data ? data.toPath().slice(2) : null;
-    //     // const name = field(buildPath(options.defaultValues)).slice(2) as FormFieldComponentProps['name'];
-
-    //     return (
-    //       <form.Field name={name as string} {...fieldOptions}>
-    //         {children}
-    //       </form.Field>
-    //     );
-    //   },
-    //   [form, path]
-    // );
 
     return { ...form, setStore };
   };

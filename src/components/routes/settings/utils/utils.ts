@@ -1,6 +1,7 @@
-import type { SubmissionProfile } from 'components/models/base/config';
+import type { SubmissionProfile, SubmissionProfileParams } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
 import type { CustomUser } from 'components/models/ui/user';
+import _ from 'lodash';
 
 export type ProfileParam<T> = {
   default: T;
@@ -95,7 +96,98 @@ export const decompressSubmissionProfiles = (settings: UserSettings, user: Custo
 };
 
 export const compressSubmissionProfiles = (submit: SubmitSettings, user: CustomUser): UserSettings => {
-  let out: any = structuredClone(submit);
+  if (!submit) return null;
+
+  const out = _.omit(submit, ['profiles']) as UserSettings;
+
+  // Applying the submission profile changes
+  Object.entries(submit.profiles)
+    .filter(([name]) => name !== 'default')
+    .forEach(([name, profile]) => {
+      // Submission options
+      Object.entries(profile).forEach(([key, value]) => {
+        if (
+          [
+            'classification',
+            'ttl',
+            'deep_scan',
+            'ignore_dynamic_recursion_prevention',
+            'ignore_filtering',
+            'generate_alert',
+            'ignore_cache'
+          ].includes(key) &&
+          submit.profiles[name][key].value !== submit.profiles.default[key].value
+        ) {
+          out.submission_profiles[name].params[key] = submit.profiles[name][key].value;
+        }
+      });
+
+      // Default Service Selection
+      const selected = [];
+      profile.services.forEach((category, i) => {
+        if (category.selected) {
+          selected.push(category.name);
+        } else {
+          category.services.forEach((service, j) => {
+            if (service.selected) {
+              selected.push(service.name);
+            }
+          });
+        }
+      });
+      out.submission_profiles[name].params.services.selected = selected;
+
+      // Default Service Parameters
+      let serviceSpec = {} as SubmissionProfileParams['service_spec'];
+      profile.service_spec.forEach((service, i) => {
+        service.params.forEach((param, j) => {
+          if (
+            submit.profiles[name].service_spec[i].params[j].value !==
+            submit.profiles.default.service_spec[i].params[j].value
+          ) {
+            serviceSpec = {
+              ...serviceSpec,
+              [service.name]: { ...serviceSpec?.[service.name], [param.name]: param.value }
+            };
+          }
+        });
+      });
+      out.submission_profiles[name].params.service_spec = serviceSpec;
+    });
+
+  // Applying the default param changes
+
+  // Submission options
+  Object.entries(submit.profiles.default).forEach(([key, value]) => {
+    if (
+      [
+        'classification',
+        'ttl',
+        'deep_scan',
+        'ignore_dynamic_recursion_prevention',
+        'ignore_filtering',
+        'generate_alert',
+        'ignore_cache'
+      ].includes(key)
+    ) {
+      out[key] = submit.profiles.default[key].value;
+    }
+  });
+
+  // Default Service Selection
+  out.services.forEach((category, i) => {
+    out.services[i].selected = submit.profiles.default.services[i].selected;
+    category.services.forEach((service, j) => {
+      out.services[i].services[j].selected = submit.profiles.default.services[i].services[j].selected;
+    });
+  });
+
+  // Default Service Parameters
+  out.service_spec.forEach((service, i) => {
+    service.params.forEach((param, j) => {
+      out.service_spec[i].params[j].value = submit.profiles.default.service_spec[i].params[j].value;
+    });
+  });
 
   return out;
 };

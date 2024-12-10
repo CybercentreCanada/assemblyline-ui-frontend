@@ -1,6 +1,5 @@
 import { makeStyles } from '@mui/styles';
 import type { FormApi, Validator } from '@tanstack/react-form';
-import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -26,30 +25,41 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'nowrap',
-    maxHeight: 'calc(100vh-64px)',
+    // maxHeight: 'calc(100vh-64px)',
     overflowY: 'auto'
   },
-  wrap: {
-    display: 'flex',
+  wrapper: {
     flex: 1,
-    justifyContent: 'center'
+    display: 'flex',
+    justifyContent: 'center',
+    height: 'fit-content'
   },
   container: {
-    maxWidth: theme.breakpoints.only('md') ? '800px' : theme.breakpoints.down('md') ? '100%' : '1024px',
-    padding: theme.spacing(4),
-    height: '2000px'
+    display: 'flex',
+    flexDirection: 'column',
+    margin: `0 ${theme.spacing(4)}`,
+    minWidth: `${theme.breakpoints.values.md}px`,
+    maxWidth: '1200px'
   },
   navigation: {
     position: 'sticky',
     top: '0px',
     overflowX: 'hidden',
     overflowY: 'scroll',
-    scrollbarWidth: 'none'
+    scrollbarWidth: 'none',
+    minWidth: 'fit-content'
+  },
+  header: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 1000,
+    backgroundColor: theme.palette.background.default
   },
   content: {
     display: 'flex',
     flexDirection: 'column',
-    rowGap: theme.spacing(4)
+    rowGap: theme.spacing(4),
+    marginTop: theme.spacing(4)
   }
 }));
 
@@ -62,11 +72,54 @@ const SettingsContent = () => {
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { tab: tabParam } = useParams<Params>();
-  const { user: currentUser, configuration } = useALContext();
+  const { user: currentUser } = useALContext();
 
   const form = useForm();
 
-  const rootRef = useRef();
+  const rootRef = useRef<HTMLDivElement>();
+  const headerRef = useRef<HTMLDivElement>();
+
+  const handleScroll = useCallback((event: React.SyntheticEvent, anchorID: string) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const element: HTMLDivElement = rootRef.current.querySelector("[data-anchor='" + anchorID + "']");
+    rootRef.current.scrollTo({
+      top: element.offsetTop - rootRef.current.offsetTop - headerRef.current.getBoundingClientRect().height,
+      behavior: 'smooth'
+    });
+  }, []);
+
+  const isElementInViewport = useCallback((element: Element) => {
+    const rect = element.getBoundingClientRect();
+    const offsetTop = headerRef.current.getBoundingClientRect().bottom;
+    return (
+      rect.top >= offsetTop && rect.bottom <= offsetTop + (window.innerHeight || document.documentElement.clientHeight)
+    );
+  }, []);
+
+  useEffect(() => {
+    const rootElement = rootRef.current;
+    if (!rootElement) return;
+
+    const handler = () => {
+      const elements = rootElement.getElementsByClassName('Anchor');
+      for (let i = 0; i < elements.length; i++) {
+        if (isElementInViewport(elements.item(i))) {
+          form.setStore(s => {
+            s.state.activeID = elements.item(i).id;
+            return s;
+          });
+          break;
+        }
+      }
+    };
+
+    handler();
+    rootElement.addEventListener('scroll', handler, false);
+    return () => {
+      rootElement.removeEventListener('scroll', handler, false);
+    };
+  }, [form, isElementInViewport]);
 
   useEffect(() => {
     form.setStore(s => {
@@ -132,23 +185,16 @@ const SettingsContent = () => {
           return (
             <div className={classes.root} ref={rootRef}>
               <div className={classes.navigation}>
-                <div style={{ height: '2000px' }}>
-                  <Tab
-                    rootElement={rootRef.current}
-                    loading={loading}
-                    disabled={disabled}
-                    profile={tab}
-                    customize={false}
-                    hidden={false}
-                  />
-                </div>
+                <Tab rootElement={rootRef.current} loading={loading} profile={tab} />
               </div>
 
-              <div className={classes.wrap}>
-                <PageCenter margin={4} width="100%" textAlign="start">
-                  <div className={classes.content}>
+              <div className={classes.wrapper}>
+                <div className={classes.container}>
+                  <div className={classes.header} ref={headerRef}>
                     <HeaderSection loading={loading} hidden={hidden} profile={tab} />
+                  </div>
 
+                  <div className={classes.content}>
                     {!tab ? null : tab === 'interface' ? (
                       <InterfaceSection loading={loading} disabled={disabled} />
                     ) : (
@@ -179,20 +225,18 @@ const SettingsContent = () => {
 
                     <div style={{ height: window.innerHeight / 2 }} />
                   </div>
-                </PageCenter>
+                </div>
               </div>
 
               <div className={classes.navigation}>
-                <div style={{ height: '2000px' }}>
-                  <Navigation
-                    rootElement={rootRef.current}
-                    loading={loading}
-                    disabled={disabled}
-                    hidden={hidden}
-                    customize={customize}
-                    profile={tab}
-                  />
-                </div>
+                <Navigation
+                  loading={loading}
+                  disabled={disabled}
+                  hidden={hidden}
+                  customize={customize}
+                  profile={tab}
+                  onScroll={handleScroll}
+                />
               </div>
             </div>
           );
@@ -216,6 +260,15 @@ const WrappedSettingsPage = () => {
       value: SettingsStore;
       formApi: FormApi<SettingsStore, Validator<SettingsStore, string>>;
     }) => {
+      // console.log(compressSubmissionProfiles(value.next, currentUser));
+
+      formApi.store.setState(s => {
+        s.values.state.confirm = false;
+        return s;
+      });
+
+      return null;
+
       if (value.next) {
         apiCall({
           url: `/api/v4/user/settings/${currentUser.username}/`,

@@ -29,6 +29,9 @@ export type SettingsStore = {
 
     /** User is allowed to make changes to their settings */
     selfManage: boolean;
+
+    /** Is the confirmation dialog opened */
+    confirm: boolean;
   };
   next: SubmitSettings;
   prev: SubmitSettings;
@@ -48,51 +51,10 @@ export const { FormProvider, useForm } = createFormContext<SettingsStore>({
       activeID: null,
       hidden: false,
       customize: false,
-      selfManage: false
+      selfManage: false,
+      confirm: false
     },
     prev: null,
     next: null
-    // next: {
-    //   classification: '',
-    //   deep_scan: false,
-    //   default_external_sources: [],
-    //   default_zip_password: '',
-    //   description: '',
-    //   download_encoding: 'cart',
-    //   executive_summary: false,
-    //   expand_min_score: 0,
-    //   generate_alert: false,
-    //   ignore_cache: false,
-    //   ignore_dynamic_recursion_prevention: false,
-    //   ignore_filtering: false,
-    //   malicious: false,
-    //   priority: 0,
-    //   services: [],
-    //   service_spec: [],
-    //   submission_view: 'report',
-    //   ttl: 0,
-    //   ...DEFAULT_SETTINGS
-    // },
-    // prev: {
-    //   classification: '',
-    //   deep_scan: false,
-    //   default_external_sources: [],
-    //   default_zip_password: '',
-    //   description: '',
-    //   download_encoding: 'cart',
-    //   executive_summary: false,
-    //   expand_min_score: 0,
-    //   generate_alert: false,
-    //   ignore_cache: false,
-    //   ignore_dynamic_recursion_prevention: false,
-    //   ignore_filtering: false,
-    //   malicious: false,
-    //   priority: 0,
-    //   services: [],
-    //   service_spec: [],
-    //   submission_view: 'report',
-    //   ttl: 0,
-    //   ...DEFAULT_SETTINGS
-    // }
   }
 });
