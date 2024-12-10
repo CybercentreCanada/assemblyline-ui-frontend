@@ -301,7 +301,7 @@ const WrappedSourceDetail = ({
               </Grid>
               {['ignore_cache', 'override_classification', 'sync'].map(field => {
                 return (
-                  <Grid item xs={6}>
+                  <Grid key={field} item xs={6}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -340,7 +340,11 @@ const WrappedSourceDetail = ({
                   fullWidth
                 >
                   {FETCH_METHODS.map(method => {
-                    return <MenuItem value={method}>{method}</MenuItem>;
+                    return (
+                      <MenuItem key={method} value={method}>
+                        {method}
+                      </MenuItem>
+                    );
                   })}
                 </Select>
               </Grid>
