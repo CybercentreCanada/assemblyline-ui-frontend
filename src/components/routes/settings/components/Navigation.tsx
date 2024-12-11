@@ -6,8 +6,8 @@ import useALContext from 'components/hooks/useALContext';
 import type { SelectedService, SelectedServiceCategory } from 'components/models/base/service';
 import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
-import type { MouseEvent } from 'react';
-import React, { useMemo } from 'react';
+import type { SyntheticEvent } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -25,7 +25,7 @@ type ServiceProps = {
   disabled: boolean;
   hidden: boolean;
   profile: SettingsStore['state']['tab'];
-  onScroll: (event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>, id: string) => void;
+  onScroll: (event: SyntheticEvent, id: string) => void;
 };
 
 const Service: React.FC<ServiceProps> = React.memo(
@@ -42,6 +42,24 @@ const Service: React.FC<ServiceProps> = React.memo(
     const theme = useTheme();
     const classes = useStyles();
     const form = useForm();
+
+    const handleChange = useCallback(
+      (selected: boolean) => {
+        form.setStore(s => {
+          if (selected) {
+            s.next.profiles[profile].services[cat_id].selected = false;
+            s.next.profiles[profile].services[cat_id].services[svr_id].selected = false;
+          } else {
+            s.next.profiles[profile].services[cat_id].services[svr_id].selected = true;
+            s.next.profiles[profile].services[cat_id].selected = s.next.profiles[profile].services[
+              cat_id
+            ].services.every(srv => srv.selected);
+          }
+          return s;
+        });
+      },
+      [cat_id, form, profile, svr_id]
+    );
 
     return (
       <form.Subscribe
@@ -64,20 +82,7 @@ const Service: React.FC<ServiceProps> = React.memo(
                   inputProps={{ id: `navigation: ${service.category}-${service.name}` }}
                   checked={selected}
                   disabled={disabled || !customize}
-                  onChange={() =>
-                    form.setStore(s => {
-                      if (selected) {
-                        s.next.profiles[profile].services[cat_id].selected = false;
-                        s.next.profiles[profile].services[cat_id].services[svr_id].selected = false;
-                      } else {
-                        s.next.profiles[profile].services[cat_id].services[svr_id].selected = true;
-                        s.next.profiles[profile].services[cat_id].selected = s.next.profiles[profile].services[
-                          cat_id
-                        ].services.every(srv => srv.selected);
-                      }
-                      return s;
-                    })
-                  }
+                  onChange={() => handleChange(selected)}
                 />
               }
             >
@@ -113,7 +118,7 @@ type CategoryProps = {
   disabled: boolean;
   hidden: boolean;
   profile: SettingsStore['state']['tab'];
-  onScroll: (event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>, id: string) => void;
+  onScroll: (event: SyntheticEvent, id: string) => void;
 };
 
 const Category: React.FC<CategoryProps> = React.memo(
@@ -129,6 +134,27 @@ const Category: React.FC<CategoryProps> = React.memo(
     const theme = useTheme();
     const classes = useStyles();
     const form = useForm();
+
+    const handleChange = useCallback(
+      (selected: boolean) => {
+        form.setStore(s => {
+          if (selected) {
+            s.next.profiles[profile].services[cat_id].selected = false;
+            s.next.profiles[profile].services[cat_id].services.forEach((svr, i) => {
+              s.next.profiles[profile].services[cat_id].services[i].selected = false;
+            });
+          } else {
+            s.next.profiles[profile].services[cat_id].selected = true;
+            s.next.profiles[profile].services[cat_id].services.forEach((svr, i) => {
+              s.next.profiles[profile].services[cat_id].services[i].selected = true;
+            });
+          }
+
+          return s;
+        });
+      },
+      [cat_id, form, profile]
+    );
 
     return (
       <>
@@ -156,23 +182,7 @@ const Category: React.FC<CategoryProps> = React.memo(
                     checked={value}
                     indeterminate={indeterminate}
                     disabled={disabled || !customize}
-                    onChange={() => {
-                      form.setStore(s => {
-                        if (selected) {
-                          s.next.profiles[profile].services[cat_id].selected = false;
-                          s.next.profiles[profile].services[cat_id].services.forEach((svr, i) => {
-                            s.next.profiles[profile].services[cat_id].services[i].selected = false;
-                          });
-                        } else {
-                          s.next.profiles[profile].services[cat_id].selected = true;
-                          s.next.profiles[profile].services[cat_id].services.forEach((svr, i) => {
-                            s.next.profiles[profile].services[cat_id].services[i].selected = true;
-                          });
-                        }
-
-                        return s;
-                      });
-                    }}
+                    onChange={() => handleChange(selected)}
                   />
                 }
               >
@@ -192,24 +202,19 @@ const Category: React.FC<CategoryProps> = React.memo(
           }}
         />
 
-        <form.Subscribe
-          selector={state => state.values.next.profiles[profile].services[cat_id].services}
-          children={services =>
-            services.map((service, svr_id) => (
-              <Service
-                key={`${cat_id}-${svr_id}`}
-                service={service}
-                cat_id={cat_id}
-                svr_id={svr_id}
-                customize={customize}
-                disabled={disabled}
-                hidden={hidden}
-                profile={profile}
-                onScroll={onScroll}
-              />
-            ))
-          }
-        />
+        {category.services.map((service, svr_id) => (
+          <Service
+            key={`${cat_id}-${svr_id}`}
+            service={service}
+            cat_id={cat_id}
+            svr_id={svr_id}
+            customize={customize}
+            disabled={disabled}
+            hidden={hidden}
+            profile={profile}
+            onScroll={onScroll}
+          />
+        ))}
       </>
     );
   }
@@ -221,7 +226,7 @@ type Props = {
   hidden: boolean;
   loading: boolean;
   profile: SettingsStore['state']['tab'];
-  onScroll: (event: React.SyntheticEvent, id: string) => void;
+  onScroll: (event: SyntheticEvent, id: string) => void;
 };
 
 export const Navigation = ({
