@@ -44,8 +44,8 @@ const WrappedNumberInput = ({
 
   const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
 
-  return (
-    <InputListItem>
+  return hidden ? null : (
+    <InputListItem disabled={disabled}>
       <InputListItemText
         primary={<label htmlFor={id}>{primary}</label>}
         secondary={secondary}

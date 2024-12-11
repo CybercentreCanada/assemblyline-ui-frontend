@@ -49,7 +49,7 @@ const WrappedSelectInput = ({
 
   const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
 
-  return (
+  return hidden ? null : (
     <InputListItem>
       <InputListItemText
         primary={<label htmlFor={id}>{primary}</label>}

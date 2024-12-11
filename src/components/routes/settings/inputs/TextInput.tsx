@@ -56,7 +56,7 @@ const WrappedTextInput = <
 
   const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
 
-  return (
+  return hidden ? null : (
     <InputListItem disabled={disabled} sx={{ columnGap: theme.spacing(0.5) }}>
       <InputListItemText
         primary={<label htmlFor={id}>{primary}</label>}

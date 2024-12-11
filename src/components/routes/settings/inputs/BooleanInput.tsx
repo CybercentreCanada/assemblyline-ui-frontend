@@ -37,7 +37,7 @@ const WrappedBooleanInput = ({
 
   const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
 
-  return (
+  return hidden ? null : (
     <InputListItemButton disabled={disabled} {...other}>
       <InputListItemText
         primary={<label htmlFor={id}>{primary}</label>}
