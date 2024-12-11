@@ -163,7 +163,7 @@ export const InputContainerTitle: FC<InputContainerTitleProps> = ({
   const theme = useTheme();
 
   return button ? (
-    <ListItem id={id} disableGutters disablePadding {...other}>
+    <ListItem id={id} disableGutters disablePadding disabled={disabled} {...other}>
       <ListItemButton
         dense
         disableGutters
@@ -196,6 +196,7 @@ export const InputContainerTitle: FC<InputContainerTitleProps> = ({
       id={id}
       disableGutters
       disablePadding
+      disabled={disabled}
       sx={{ ...(underlined && { borderBottom: `1px solid ${theme.palette.divider}` }) }}
       {...other}
     >

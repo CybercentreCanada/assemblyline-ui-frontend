@@ -55,8 +55,6 @@ const Parameter = React.memo(
           // const secondary = `[${param.type}]`;
           const secondary = null;
 
-          console.log(param.name, state.value);
-
           switch (param.type) {
             case 'str':
               return (
@@ -176,65 +174,63 @@ const Service = React.memo(
     );
 
     return (
-      <InputContainer key={`${service.name}-${svr_id}`} style={{ rowGap: theme.spacing(0.5) }}>
-        <form.Subscribe
-          key={`${cat_id}-${svr_id}`}
-          selector={state => [
-            state.values.next.profiles[profile].services[cat_id].services[svr_id].selected,
-            state.values.next.profiles[profile].service_spec.findIndex(spec => spec.name === service.name)
-          ]}
-          children={([selected, spec_id]) => {
-            const specID = spec_id as number;
-            const spec = specID >= 0 ? form.state.values.next.profiles[profile].service_spec[specID] : null;
+      <form.Subscribe
+        key={`${cat_id}-${svr_id}`}
+        selector={state => [
+          state.values.next.profiles[profile].services[cat_id].services[svr_id].selected,
+          state.values.next.profiles[profile].service_spec.findIndex(spec => spec.name === service.name)
+        ]}
+        children={([selected, spec_id]) => {
+          const specID = spec_id as number;
+          const spec = specID >= 0 ? form.state.values.next.profiles[profile].service_spec[specID] : null;
 
-            return !customize && hidden && !selected ? null : (
-              <>
-                <InputContainerTitle
-                  id={`${service.category} - ${service.name}`}
-                  data-anchor={`${service.category} - ${service.name}`}
-                  button={customize}
-                  primaryProps={{
-                    id: `${service.category} - ${service.name}`,
-                    children: service.name,
-                    className: 'Anchor'
-                  }}
-                  secondaryProps={{
-                    children: service.description
-                  }}
-                  checkboxProps={{
-                    checked: selected as boolean
-                  }}
-                  disabled={!selected}
-                  buttonProps={{
-                    onChange: () => handleChange(selected as boolean)
-                  }}
-                />
+          return !customize && hidden && !selected ? null : (
+            <InputContainer key={`${service.name}-${svr_id}`} style={{ rowGap: theme.spacing(0.5) }}>
+              <InputContainerTitle
+                id={`${service.category} - ${service.name}`}
+                data-anchor={`${service.category} - ${service.name}`}
+                button={customize}
+                primaryProps={{
+                  id: `${service.category} - ${service.name}`,
+                  children: service.name,
+                  className: 'Anchor'
+                }}
+                secondaryProps={{
+                  children: service.description
+                }}
+                checkboxProps={{
+                  checked: selected as boolean
+                }}
+                disabled={!selected}
+                buttonProps={{
+                  onChange: () => handleChange(selected as boolean)
+                }}
+              />
 
-                {specID >= 0 && spec.params.filter(p => !p.editable || customize || !hidden).length > 0 ? (
-                  <InputList sx={{ marginBottom: theme.spacing(1) }}>
-                    {spec.params.map((param, param_id) =>
-                      !param.editable && !customize && hidden ? null : (
-                        <Parameter
-                          key={`${param.name}-${param_id}`}
-                          spec={spec}
-                          spec_id={specID}
-                          param={param}
-                          param_id={param_id}
-                          customize={customize}
-                          disabled={disabled}
-                          hidden={hidden}
-                          profile={profile}
-                          loading={loading}
-                        />
-                      )
-                    )}
-                  </InputList>
-                ) : null}
-              </>
-            );
-          }}
-        />
-      </InputContainer>
+              {specID >= 0 && spec.params.filter(p => p.editable || customize || !hidden).length > 0 ? (
+                <InputList sx={{ marginBottom: theme.spacing(1) }}>
+                  {spec.params.map((param, param_id) =>
+                    !param.editable && !customize && hidden ? null : (
+                      <Parameter
+                        key={`${param.name}-${param_id}`}
+                        spec={spec}
+                        spec_id={specID}
+                        param={param}
+                        param_id={param_id}
+                        customize={customize}
+                        disabled={disabled}
+                        hidden={hidden}
+                        profile={profile}
+                        loading={loading}
+                      />
+                    )
+                  )}
+                </InputList>
+              ) : null}
+            </InputContainer>
+          );
+        }}
+      />
     );
   }
 );
@@ -290,15 +286,15 @@ const Category = React.memo(
     );
 
     return (
-      <InputContainer key={`${category.name}-${cat_id}`} style={{ rowGap: theme.spacing(0.5) }}>
-        <form.Subscribe
-          selector={state => {
-            const selected = state.values.next.profiles[profile].services[cat_id].selected;
-            const list = state.values.next.profiles[profile].services[cat_id].services.map(svr => svr.selected);
-            return [selected, !list.every(i => i) && list.some(i => i)];
-          }}
-          children={([selected, indeterminate]) =>
-            !customize && hidden && !(selected || indeterminate) ? null : (
+      <form.Subscribe
+        selector={state => {
+          const selected = state.values.next.profiles[profile].services[cat_id].selected;
+          const list = state.values.next.profiles[profile].services[cat_id].services.map(svr => svr.selected);
+          return [selected, !list.every(i => i) && list.some(i => i)];
+        }}
+        children={([selected, indeterminate]) =>
+          !customize && hidden && !(selected || indeterminate) ? null : (
+            <InputContainer key={`${category.name}-${cat_id}`} style={{ rowGap: theme.spacing(1) }}>
               <InputContainerTitle
                 key={`${category.name}-${cat_id}`}
                 id={category.name}
@@ -320,24 +316,24 @@ const Category = React.memo(
                   onChange: () => handleChange(selected)
                 }}
               />
-            )
-          }
-        />
 
-        {category.services.map((service, svr_id) => (
-          <Service
-            key={`${cat_id}-${svr_id}`}
-            service={service}
-            svr_id={svr_id}
-            cat_id={cat_id}
-            customize={customize}
-            disabled={disabled}
-            hidden={hidden}
-            profile={profile}
-            loading={loading}
-          />
-        ))}
-      </InputContainer>
+              {category.services.map((service, svr_id) => (
+                <Service
+                  key={`${cat_id}-${svr_id}`}
+                  service={service}
+                  svr_id={svr_id}
+                  cat_id={cat_id}
+                  customize={customize}
+                  disabled={disabled}
+                  hidden={hidden}
+                  profile={profile}
+                  loading={loading}
+                />
+              ))}
+            </InputContainer>
+          )
+        }
+      />
     );
   }
 );
@@ -362,7 +358,7 @@ export const ServicesSection = ({
   const form = useForm();
 
   return (
-    <InputContainer hidden={hidden} style={{ rowGap: theme.spacing(1) }}>
+    <InputContainer style={{ rowGap: theme.spacing(2) }}>
       <InputHeader primary={{ children: t('services') }} secondary={{ children: t('services.description') }} />
 
       <form.Subscribe
