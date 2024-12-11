@@ -1,4 +1,5 @@
-import { Button, Tooltip, useTheme } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { IconButton, Tooltip, useTheme } from '@mui/material';
 import type { DockerConfig, Service, UpdateConfig, UpdateSource } from 'components/models/base/service';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +8,7 @@ type Props = {
   service: DockerConfig | Service | UpdateConfig | UpdateSource;
   defaults: DockerConfig | Service | UpdateConfig | UpdateSource;
   field: string | string[];
-  reset: () => void;
+  reset: (field: string) => void;
 };
 
 const WrappedResetButton = ({ service, defaults, field, reset }: Props) => {
@@ -27,21 +28,20 @@ const WrappedResetButton = ({ service, defaults, field, reset }: Props) => {
     }
   }, [defaults, field, getValue, service]);
 
-  return service && defaults && hasChanges() ? (
+  return service && defaults && hasChanges() && typeof field === 'string' ? (
     <Tooltip title={t('reset.tooltip')}>
-      <Button
+      <IconButton
         color="secondary"
         size="small"
-        style={{ marginLeft: theme.spacing(1), padding: 0, lineHeight: '1rem' }}
-        variant="outlined"
+        style={{ marginLeft: theme.spacing(1), padding: 0 }}
         onClick={event => {
           event.stopPropagation();
           event.preventDefault();
-          reset();
+          reset(field);
         }}
       >
-        {t('reset')}
-      </Button>
+        <RefreshIcon />
+      </IconButton>
     </Tooltip>
   ) : null;
 };
