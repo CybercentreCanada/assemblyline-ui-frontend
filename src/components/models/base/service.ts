@@ -39,6 +39,7 @@ export type ServiceParameter =
       value: boolean | 'true' | 'false';
       default: boolean | 'true' | 'false';
       list?: string[];
+      editable?: boolean;
     }
   | {
       type: 'int';
@@ -47,6 +48,7 @@ export type ServiceParameter =
       value: number;
       default: number;
       list?: string[];
+      editable?: boolean;
     }
   | {
       type: 'str';
@@ -55,6 +57,7 @@ export type ServiceParameter =
       value: string;
       default: string;
       list?: string[];
+      editable?: boolean;
     }
   | {
       type: 'list';
@@ -63,6 +66,7 @@ export type ServiceParameter =
       value: string;
       default: string;
       list: string[];
+      editable?: boolean;
     };
 
 // TODO check the default value

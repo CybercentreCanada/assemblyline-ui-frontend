@@ -120,12 +120,11 @@ export const InputList: FC<InputListProps> = ({ sx, ...other }) => {
 
 interface InputContainerProps extends HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
-  hidden?: boolean;
 }
 
-export const InputContainer: FC<InputContainerProps> = ({ hidden = false, children, style, ...other }) => {
+export const InputContainer: FC<InputContainerProps> = ({ children, style, ...other }) => {
   const theme = useTheme();
-  return hidden ? null : (
+  return (
     <div style={{ display: 'flex', flexDirection: 'column', ...style }} {...other}>
       {children}
     </div>
@@ -133,29 +132,37 @@ export const InputContainer: FC<InputContainerProps> = ({ hidden = false, childr
 };
 
 interface InputContainerTitleProps extends ListItemProps {
-  primary?: ListItemTextProps['primaryTypographyProps'];
-  secondary?: ListItemTextProps['secondaryTypographyProps'];
+  primaryProps?: ListItemTextProps['primaryTypographyProps'];
+  secondaryProps?: ListItemTextProps['secondaryTypographyProps'];
+  checkboxProps?: CheckboxProps;
+
   checked?: CheckboxProps['checked'];
   indeterminate?: CheckboxProps['indeterminate'];
   buttonProps?: ListItemButtonProps;
+
   underlined?: boolean;
   edge?: 'start' | 'end';
+  button?: boolean;
+  disabled?: boolean;
 }
 
 export const InputContainerTitle: FC<InputContainerTitleProps> = ({
   id,
-  primary,
-  secondary,
+  primaryProps,
+  secondaryProps,
+  checkboxProps,
   checked = null,
   indeterminate,
   buttonProps,
   underlined = false,
   edge = 'end',
+  button = false,
+  disabled = false,
   ...other
 }) => {
   const theme = useTheme();
 
-  return checked !== null ? (
+  return button ? (
     <ListItem id={id} disableGutters disablePadding {...other}>
       <ListItemButton
         dense
@@ -163,50 +170,50 @@ export const InputContainerTitle: FC<InputContainerTitleProps> = ({
         {...buttonProps}
         sx={{
           padding: 0,
-          '&.MuiButtonBase-root:hover': {
-            bgcolor: 'transparent'
-          },
+          '&.MuiButtonBase-root:hover': { bgcolor: 'transparent' },
           ...(underlined && { borderBottom: `1px solid ${theme.palette.divider}` })
         }}
       >
         <ListItemIcon>
-          <Checkbox
-            edge={edge}
-            tabIndex={-1}
-            checked={checked}
-            indeterminate={indeterminate}
-            disableRipple
-            inputProps={{ id: `${id}-input` }}
-          />
+          <Checkbox edge={edge} tabIndex={-1} disableRipple inputProps={{ id: `${id}-input` }} {...checkboxProps} />
         </ListItemIcon>
         <ListItemText
-          primary={primary?.children}
+          primary={primaryProps?.children}
           primaryTypographyProps={{
             htmlFor: `${id}-input`,
             component: 'label',
             variant: 'body1',
             sx: { '&:hover': { cursor: 'pointer' } },
-            ...primary
+            ...primaryProps
           }}
-          secondary={secondary?.children}
-          secondaryTypographyProps={secondary}
+          secondary={secondaryProps?.children}
+          secondaryTypographyProps={secondaryProps}
         />
       </ListItemButton>
     </ListItem>
   ) : (
     <ListItem
       id={id}
+      disableGutters
       disablePadding
-      sx={{
-        marginLeft: '56px',
-        ...(underlined && { borderBottom: `1px solid ${theme.palette.divider}` })
-      }}
+      sx={{ ...(underlined && { borderBottom: `1px solid ${theme.palette.divider}` }) }}
+      {...other}
     >
+      <ListItemIcon>
+        <Checkbox
+          edge={edge}
+          tabIndex={-1}
+          disableRipple
+          disabled
+          inputProps={{ id: `${id}-input` }}
+          {...checkboxProps}
+        />
+      </ListItemIcon>
       <ListItemText
-        primary={primary?.children}
-        primaryTypographyProps={{ variant: 'body1', ...primary }}
-        secondary={secondary?.children}
-        secondaryTypographyProps={secondary}
+        primary={primaryProps?.children}
+        primaryTypographyProps={{ variant: 'body1', ...primaryProps }}
+        secondary={secondaryProps?.children}
+        secondaryTypographyProps={secondaryProps}
       />
     </ListItem>
   );
