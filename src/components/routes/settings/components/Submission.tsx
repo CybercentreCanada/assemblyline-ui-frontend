@@ -101,7 +101,7 @@ export const SubmissionSection = ({
                     disabled={disabled || (!customize && !state.value.editable)}
                     hidden={hidden}
                     onBlur={handleBlur}
-                    onChange={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
+                    onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
                     onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
                   />
                 )}
@@ -122,7 +122,7 @@ export const SubmissionSection = ({
                     disabled={disabled || (!customize && !state.value.editable)}
                     hidden={hidden}
                     onBlur={handleBlur}
-                    onChange={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
+                    onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
                     onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
                   />
                 )}
@@ -141,7 +141,7 @@ export const SubmissionSection = ({
                     disabled={disabled || (!customize && !state.value.editable)}
                     hidden={hidden}
                     onBlur={handleBlur}
-                    onChange={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
+                    onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
                     onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
                   />
                 )}
@@ -160,7 +160,7 @@ export const SubmissionSection = ({
                     disabled={disabled || (!customize && !state.value.editable)}
                     hidden={hidden}
                     onBlur={handleBlur}
-                    onChange={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
+                    onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
                     onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
                   />
                 )}
@@ -179,7 +179,7 @@ export const SubmissionSection = ({
                     disabled={disabled || (!customize && !state.value.editable)}
                     hidden={hidden}
                     onBlur={handleBlur}
-                    onChange={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
+                    onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
                     onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
                   />
                 )}
