@@ -38,6 +38,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     margin: `0 ${theme.spacing(4)}`,
+    width: '100%',
     minWidth: `${theme.breakpoints.values.md}px`,
     maxWidth: '1200px'
   },

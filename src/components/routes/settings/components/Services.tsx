@@ -22,9 +22,9 @@ type ParameterProps = {
   param_id: number;
   customize: boolean;
   disabled: boolean;
-  hidden: boolean;
   profile: SettingsStore['state']['tab'];
   loading: boolean;
+  selected: boolean;
 };
 
 const Parameter = React.memo(
@@ -35,9 +35,9 @@ const Parameter = React.memo(
     param_id = null,
     customize = false,
     disabled = false,
-    hidden = false,
     profile = 'interface',
-    loading = false
+    loading = false,
+    selected = false
   }: ParameterProps) => {
     const form = useForm();
 
@@ -65,7 +65,7 @@ const Parameter = React.memo(
                   capitalize
                   value={state.value as string}
                   defaultValue={param.default}
-                  disabled={disabled || (!customize && !param.editable)}
+                  disabled={disabled || (!customize && (!selected || !param.editable))}
                   loading={loading}
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -81,7 +81,7 @@ const Parameter = React.memo(
                   capitalize
                   value={state.value as number}
                   defaultValue={param.default}
-                  disabled={disabled || (!customize && !param.editable)}
+                  disabled={disabled || (!customize && (!selected || !param.editable))}
                   loading={loading}
                   onBlur={handleBlur}
                   onChange={e => handleChange(parseInt(e.target.value))}
@@ -97,7 +97,7 @@ const Parameter = React.memo(
                   capitalize
                   value={state.value as boolean}
                   defaultValue={param.default as boolean}
-                  disabled={disabled || (!customize && !param.editable)}
+                  disabled={disabled || (!customize && (!selected || !param.editable))}
                   loading={loading}
                   onBlur={handleBlur}
                   onClick={() => handleChange(!state.value)}
@@ -113,12 +113,13 @@ const Parameter = React.memo(
                   capitalize
                   value={state.value}
                   defaultValue={param.default}
-                  disabled={disabled || (!customize && !param.editable)}
+                  disabled={disabled || (!customize && (!selected || !param.editable))}
                   loading={loading}
                   options={param.list.map(item => ({
                     value: item,
                     label: item.replaceAll('_', ' ')
                   }))}
+                  onBlur={handleBlur}
                   onChange={event => handleChange(event.target.value as string)}
                   onReset={() => handleChange(param.default)}
                 />
@@ -219,9 +220,9 @@ const Service = React.memo(
                         param_id={param_id}
                         customize={customize}
                         disabled={disabled}
-                        hidden={hidden}
                         profile={profile}
                         loading={loading}
+                        selected={selected as boolean}
                       />
                     )
                   )}
