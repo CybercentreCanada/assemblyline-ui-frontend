@@ -1,7 +1,8 @@
 import { useTheme } from '@mui/material';
 import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import React from 'react';
-import ReactJson, { ReactJsonViewProps } from 'react-json-view';
+import type { ReactJsonViewProps } from 'react-json-view';
+import ReactJson from 'react-json-view';
 
 const WrappedJSONEditor: React.FC<ReactJsonViewProps> = (inputProps: ReactJsonViewProps) => {
   const theme = useTheme();

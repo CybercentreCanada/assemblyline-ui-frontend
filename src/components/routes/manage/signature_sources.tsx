@@ -146,15 +146,14 @@ type SourceDetailDrawerProps = {
 const WrappedSourceDetailDrawer = ({ service, base, onClose, generatesSignatures }: SourceDetailDrawerProps) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
 
   const [source, setSource] = useState<UpdateSource>(null);
-  const [modified, setModified] = useState(false);
-  const [deleteDialog, setDeleteDialog] = useState(false);
-  const [buttonLoading, setButtonLoading] = useState(false);
+  const [modified, setModified] = useState<boolean>(false);
+  const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
+  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
 
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
@@ -508,12 +507,13 @@ type ServiceDetailProps = {
 
 const ServiceDetail = ({ service, sources, generatesSignatures }: ServiceDetailProps) => {
   const { t } = useTranslation(['manageSignatureSources']);
-  const [open, setOpen] = React.useState(true);
   const theme = useTheme();
-  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
+  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const { showSuccessMessage } = useMySnackbar();
+
+  const [open, setOpen] = useState<boolean>(true);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const triggerSourceUpdateAll = () => {
