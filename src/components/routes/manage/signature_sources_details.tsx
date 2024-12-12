@@ -3,7 +3,7 @@ import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Badge from '@mui/material/Badge';
-import ReactJson from 'react-json-view';
+import JSONEditor from 'components/visual/JSONEditor';
 
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
@@ -70,24 +70,6 @@ const WrappedSourceDetail = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showPrivateKey, setShowPrivateKey] = useState(false);
   const gitFetch = source.fetch_method === 'GIT';
-  const jsonTheme = {
-    base00: 'transparent', // Background
-    base01: theme.palette.grey[theme.palette.mode === 'dark' ? 800 : 300], // Add key title + Edit value background
-    base02: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 400], // Borders and DataType Background
-    base03: '#444', // Unused
-    base04: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 400], // Object size and Add key border
-    base05: theme.palette.grey[theme.palette.mode === 'dark' ? 400 : 600], // Undefined and Add key background
-    base06: '#444', // Unused
-    base07: theme.palette.text.primary, // Brace, Key and Borders
-    base08: theme.palette.text.secondary, // NaN
-    base09: theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark, // Strings and Icons
-    base0A: theme.palette.grey[theme.palette.mode === 'dark' ? 300 : 800], // Null, Regex and edit text color
-    base0B: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark, // Float
-    base0C: theme.palette.mode === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark, // Array Key
-    base0D: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Date, function, expand icon
-    base0E: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Boolean
-    base0F: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark // Integer
-  };
 
   const handleFieldChange = event => {
     if (!event.target?.type) {
@@ -277,14 +259,8 @@ const WrappedSourceDetail = ({
               </Grid>
               <Grid item xs={12}>
                 <div className={classes.label}>{t('configuration')}</div>
-                <ReactJson
-                  name={false}
+                <JSONEditor
                   src={source.configuration}
-                  theme={jsonTheme}
-                  enableClipboard={false}
-                  groupArraysAfterLength={10}
-                  displayDataTypes={false}
-                  displayObjectSize={false}
                   onAdd={handleConfigurationChange}
                   onDelete={handleConfigurationChange}
                   onEdit={handleConfigurationChange}
@@ -453,10 +429,9 @@ const WrappedSourceDetail = ({
               </Grid>
               <Grid item xs={12}>
                 <div className={classes.label}>{t('headers')}</div>
-                <ReactJson
+                <JSONEditor
                   name={false}
                   src={Object.fromEntries(source.headers.map(x => [x.name, x.value]))}
-                  theme={jsonTheme}
                   enableClipboard={false}
                   groupArraysAfterLength={10}
                   displayDataTypes={false}
