@@ -3,9 +3,9 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import { Autocomplete, Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import type { Service } from 'components/models/base/service';
+import JSONEditor from 'components/visual/JSONEditor';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactJson from 'react-json-view';
 
 type ServiceConfig = {
   name: keyof Service['config'];
@@ -43,25 +43,6 @@ const WrappedMultiTypeConfig = ({
   const { t } = useTranslation(['adminServices']);
   const [tempConfig, setTempConfig] = useState(DEFAULT_CONFIG);
   const theme = useTheme();
-
-  const jsonTheme = {
-    base00: 'transparent', // Background
-    base01: theme.palette.grey[theme.palette.mode === 'dark' ? 800 : 300], // Add key title + Edit value background
-    base02: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 400], // Borders and DataType Background
-    base03: '#444', // Unused
-    base04: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 400], // Object size and Add key border
-    base05: theme.palette.grey[theme.palette.mode === 'dark' ? 400 : 600], // Undefined and Add key background
-    base06: '#444', // Unused
-    base07: theme.palette.text.primary, // Brace, Key and Borders
-    base08: theme.palette.text.secondary, // NaN
-    base09: theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark, // Strings and Icons
-    base0A: theme.palette.grey[theme.palette.mode === 'dark' ? 300 : 800], // Null, Regex and edit text color
-    base0B: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark, // Float
-    base0C: theme.palette.mode === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark, // Array Key
-    base0D: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Date, function, expand icon
-    base0E: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Boolean
-    base0F: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark // Integer
-  };
 
   const detectConfigType = (cfg: ServiceConfig): ExtendedServiceConfig => {
     if (cfg.value === null || cfg.value === undefined) {
@@ -162,14 +143,8 @@ const WrappedMultiTypeConfig = ({
             </Select>
           </FormControl>
         ) : parsedConfig.type === 'json' ? (
-          <ReactJson
-            name={false}
+          <JSONEditor
             src={parsedConfig.value}
-            theme={jsonTheme}
-            enableClipboard={false}
-            groupArraysAfterLength={10}
-            displayDataTypes={false}
-            displayObjectSize={false}
             onAdd={handleConfigUpdateJSON}
             onDelete={handleConfigUpdateJSON}
             onEdit={handleConfigUpdateJSON}
@@ -265,14 +240,8 @@ const WrappedMultiTypeConfig = ({
             </Select>
           </FormControl>
         ) : tempConfig.type === 'json' ? (
-          <ReactJson
-            name={false}
+          <JSONEditor
             src={tempConfig.value}
-            theme={jsonTheme}
-            enableClipboard={false}
-            groupArraysAfterLength={10}
-            displayDataTypes={false}
-            displayObjectSize={false}
             onAdd={handleConfigChangeJSON}
             onDelete={handleConfigUpdateJSON}
             onEdit={handleConfigChangeJSON}
