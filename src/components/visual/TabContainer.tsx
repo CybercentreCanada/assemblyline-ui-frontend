@@ -127,19 +127,21 @@ const WrappedTabContainer = <T extends TabElements>({
           }}
           {...props}
         >
-          {Object.entries(tabs).map(([value, { label = '', disabled = false, icon = null, iconPosition = 'top' }], i) =>
-            disabled ? null : (
-              <Tab
-                key={i}
-                tabIndex={0}
-                role="button"
-                label={label}
-                value={value}
-                sx={{ minWidth: '120px' }}
-                icon={icon}
-                iconPosition={iconPosition}
-              />
-            )
+          {Object.entries(tabs).map(
+            ([value, { label = '', disabled = false, icon = null, iconPosition = 'top', ...other }], i) =>
+              disabled ? null : (
+                <Tab
+                  key={i}
+                  tabIndex={0}
+                  role="button"
+                  label={label}
+                  value={value}
+                  sx={{ minWidth: '120px' }}
+                  icon={icon}
+                  iconPosition={iconPosition}
+                  {...other}
+                />
+              )
           )}
         </Tabs>
       </div>

@@ -27,7 +27,7 @@ import ResetButton from 'components/routes/admin/service_detail/reset_button';
 import Classification from 'components/visual/Classification';
 import Moment from 'components/visual/Moment';
 import { TabContainer } from 'components/visual/TabContainer';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -60,65 +60,84 @@ const WrappedSourceDetail = ({
   setModified = null,
   showDetails = true
 }: Props) => {
-  const { t, i18n } = useTranslation(['manageSignatureSources']);
+  const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
-  const { c12nDef } = useALContext();
   const classes = useStyles();
-  const [tabContext, setTabContext] = useState('general');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPrivateKey, setShowPrivateKey] = useState(false);
-  const gitFetch = source.fetch_method === 'GIT';
+  const { c12nDef } = useALContext();
 
-  const handleFieldChange = event => {
-    if (!event.target?.type) {
-      // For Select components
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showPrivateKey, setShowPrivateKey] = useState<boolean>(false);
+
+  const gitFetch = useMemo<boolean>(() => source.fetch_method === 'GIT', [source.fetch_method]);
+
+  const handleFieldChange = useCallback(
+    event => {
+      if (!event.target?.type) {
+        // For Select components
+        setSource({
+          ...source,
+          [event.target.name]: event.target.value
+        });
+      } else {
+        // For all other components
+        setSource({
+          ...source,
+          [event.target.id]: event.target?.type === 'checkbox' ? event.target.checked : event.target.value
+        });
+      }
+      setModified(true);
+    },
+    [setModified, setSource, source]
+  );
+
+  const resetField = useCallback(
+    field => {
+      setSource({ ...source, [field]: defaults[field] });
+      setModified(true);
+    },
+    [defaults, setModified, setSource, source]
+  );
+
+  const handleClassificationChange = useCallback(
+    c12n => {
+      setSource({ ...source, default_classification: c12n });
+      setModified(true);
+    },
+    [setModified, setSource, source]
+  );
+
+  const handleHeaderValueChange = useCallback(
+    event => {
       setSource({
         ...source,
-        [event.target.name]: event.target.value
+        headers: Object.entries(event.updated_src).map(header => {
+          return { name: header[0], value: header[1] } as EnvironmentVariable;
+        })
       });
-    } else {
-      // For all other components
-      setSource({
-        ...source,
-        [event.target.id]: event.target?.type === 'checkbox' ? event.target.checked : event.target.value
-      });
-    }
-    setModified(true);
-  };
+      setModified(true);
+    },
+    [setModified, setSource, source]
+  );
 
-  const resetField = useCallback(field => {
-    setSource({ ...source, [field]: defaults[field] });
-    setModified(true);
-  }, []);
+  const handleUpdateIntervalChange = useCallback(
+    event => {
+      if (!event.target.value) {
+        // If the field is cleared or zero, default to the minimum acceptable value
+        event.target.value = 1;
+      }
+      setSource({ ...source, update_interval: event.target.value as number });
+      setModified(true);
+    },
+    [setModified, setSource, source]
+  );
 
-  const handleClassificationChange = useCallback(c12n => {
-    setSource({ ...source, default_classification: c12n });
-    setModified(true);
-  }, []);
-
-  const handleHeaderValueChange = useCallback(event => {
-    setSource({
-      ...source,
-      headers: Object.entries(event.updated_src).map(header => {
-        return { name: header[0], value: header[1] } as EnvironmentVariable;
-      })
-    });
-    setModified(true);
-  }, []);
-
-  const handleUpdateIntervalChange = useCallback(event => {
-    if (!event.target.value) {
-      // If the field is cleared or zero, default to the minimum acceptable value
-      event.target.value = 1;
-    }
-    setSource({ ...source, update_interval: event.target.value as number });
-    setModified(true);
-  }, []);
-
-  const handleConfigurationChange = useCallback(event => {
-    setSource({ ...source, configuration: event.updated_src });
-    setModified(true);
-  }, []);
+  const handleConfigurationChange = useCallback(
+    event => {
+      setSource({ ...source, configuration: event.updated_src });
+      setModified(true);
+    },
+    [setModified, setSource, source]
+  );
 
   return (
     source && (
@@ -137,8 +156,6 @@ const WrappedSourceDetail = ({
           </Grid>
         )}
         <TabContainer
-          value={tabContext}
-          onChange={(_, value) => setTabContext(value)}
           paper
           centered
           variant="standard"
