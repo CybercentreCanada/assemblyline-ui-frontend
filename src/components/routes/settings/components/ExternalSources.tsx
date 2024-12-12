@@ -2,7 +2,7 @@ import { List, ListItem, ListItemText, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
-import { BooleanInput } from 'components/routes/settings/inputs/BooleanInput';
+import { BooleanListInput } from 'components/visual/List/inputs/BooleanListInput';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -59,7 +59,7 @@ export const ExternalSourcesSection = ({
             key={`${source}-${i}`}
             selector={state => state.values.next.default_external_sources.includes(source)}
             children={value => (
-              <BooleanInput
+              <BooleanListInput
                 primary={t('interface.view')}
                 secondary={t('interface.view_desc')}
                 value={value}

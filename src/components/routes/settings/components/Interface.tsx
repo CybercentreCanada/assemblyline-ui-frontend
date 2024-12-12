@@ -1,8 +1,9 @@
 import { useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/settings/contexts/form';
-import { InputContainer, InputHeader, InputList } from 'components/routes/settings/inputs/Inputs';
-import { SelectInput } from 'components/routes/settings/inputs/SelectInput';
+import { SelectListInput } from 'components/visual/List/inputs/SelectListInput';
+import { List } from 'components/visual/List/List';
+import { ListHeader } from 'components/visual/List/ListHeader';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -17,14 +18,17 @@ export const InterfaceSection = ({ disabled = false, loading = false }: Props) =
   const { configuration } = useALContext();
 
   return (
-    <InputContainer style={{ rowGap: theme.spacing(1) }}>
-      <InputHeader primary={{ children: t('interface'), id: 'interface' }} />
+    <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
+      <ListHeader
+        primaryProps={{ children: t('interface'), id: 'interface', variant: 'h6' }}
+        secondaryProps={{ children: t('interface.description') }}
+      />
 
-      <InputList>
+      <List checkboxPadding>
         <form.Field
           name="next.preferred_submission_profile"
           children={({ state, handleBlur, handleChange }) => (
-            <SelectInput
+            <SelectListInput
               primary={t('settings:submissions.submission_profile')}
               secondary={t('settings:submissions.submission_profile_desc')}
               value={state.value}
@@ -43,7 +47,7 @@ export const InterfaceSection = ({ disabled = false, loading = false }: Props) =
         <form.Field
           name="next.submission_view"
           children={({ state, handleBlur, handleChange }) => (
-            <SelectInput
+            <SelectListInput
               primary={t('interface.view')}
               secondary={t('interface.view_desc')}
               value={state.value}
@@ -62,7 +66,7 @@ export const InterfaceSection = ({ disabled = false, loading = false }: Props) =
         <form.Field
           name="next.download_encoding"
           children={({ state, handleBlur, handleChange }) => (
-            <SelectInput
+            <SelectListInput
               primary={t('interface.encoding')}
               secondary={t('interface.encoding_desc')}
               value={state.value}
@@ -82,7 +86,7 @@ export const InterfaceSection = ({ disabled = false, loading = false }: Props) =
         <form.Field
           name="next.expand_min_score"
           children={({ state, handleBlur, handleChange }) => (
-            <SelectInput
+            <SelectListInput
               primary={t('interface.score')}
               secondary={t('interface.score_desc')}
               value={state.value}
@@ -101,7 +105,7 @@ export const InterfaceSection = ({ disabled = false, loading = false }: Props) =
             />
           )}
         />
-      </InputList>
-    </InputContainer>
+      </List>
+    </div>
   );
 };
