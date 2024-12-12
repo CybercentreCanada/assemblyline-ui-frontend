@@ -1,11 +1,11 @@
 {
-  "add.button": "Ajouter",
+  "add.button": "Ajouter un flux de travail",
   "add.success": "Le flux de travail a été ajouté avec succès.",
   "add.title": "Ajouter un flux de travail",
   "backport_workflow_matching": "alertes correspondantes",
   "backport_workflow_prompt": "Appliquer le flux de travail à toutes les alertes existantes ?",
   "cancel": "Annuler les modifications",
-  "cancel.button": "Annuler",
+  "cancel.button": "Annuler les modifications",
   "chart.title": "Nombre de fois utilisé dans les derniers 30 jours",
   "created_by": "Créé par",
   "delete.acceptText": "Oui, supprimez-le !",
@@ -67,7 +67,7 @@
   "status.TRIAGE": "TRIAGE",
   "status.null": "",
   "title": "Détails du flux de travail",
-  "update.button": "Modifier",
+  "update.button": "Mise à jour du flux de travail",
   "update.success": "Le flux de travail a été enregistré avec succès.",
   "usage": "Afficher les alertes associées"
 }
