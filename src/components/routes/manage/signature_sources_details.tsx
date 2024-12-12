@@ -27,7 +27,7 @@ import ResetButton from 'components/routes/admin/service_detail/reset_button';
 import Classification from 'components/visual/Classification';
 import Moment from 'components/visual/Moment';
 import { TabContainer } from 'components/visual/TabContainer';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -86,17 +86,17 @@ const WrappedSourceDetail = ({
     setModified(true);
   };
 
-  const resetField = field => {
+  const resetField = useCallback(field => {
     setSource({ ...source, [field]: defaults[field] });
     setModified(true);
-  };
+  }, []);
 
-  const handleClassificationChange = c12n => {
+  const handleClassificationChange = useCallback(c12n => {
     setSource({ ...source, default_classification: c12n });
     setModified(true);
-  };
+  }, []);
 
-  const handleHeaderValueChange = event => {
+  const handleHeaderValueChange = useCallback(event => {
     setSource({
       ...source,
       headers: Object.entries(event.updated_src).map(header => {
@@ -104,20 +104,21 @@ const WrappedSourceDetail = ({
       })
     });
     setModified(true);
-  };
+  }, []);
 
-  const handleUpdateIntervalChange = event => {
+  const handleUpdateIntervalChange = useCallback(event => {
     if (!event.target.value) {
       // If the field is cleared or zero, default to the minimum acceptable value
       event.target.value = 1;
     }
     setSource({ ...source, update_interval: event.target.value as number });
     setModified(true);
-  };
-  const handleConfigurationChange = event => {
+  }, []);
+
+  const handleConfigurationChange = useCallback(event => {
     setSource({ ...source, configuration: event.updated_src });
     setModified(true);
-  };
+  }, []);
 
   return (
     source && (
