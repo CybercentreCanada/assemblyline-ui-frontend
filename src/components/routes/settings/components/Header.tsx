@@ -8,11 +8,16 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import useALContext from 'components/hooks/useALContext';
+import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
+import { compressSubmissionProfiles } from 'components/routes/settings/utils/utils';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import _ from 'lodash';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -25,6 +30,48 @@ export const HeaderSection = ({ hidden = false, loading = false, profile = 'inte
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
+  const { apiCall } = useMyAPI();
+  const { user: currentUser } = useALContext();
+  const { showErrorMessage, showSuccessMessage } = useMySnackbar();
+
+  const handleSubmit = useCallback(
+    () => {
+      if (!form.state.values.next) return;
+      apiCall({
+        url: `/api/v4/user/settings/${currentUser.username}/`,
+        method: 'POST',
+        body: compressSubmissionProfiles(form.state.values.next, currentUser),
+        onSuccess: () => {
+          showSuccessMessage(t('success_save'));
+          form.setStore(s => {
+            s.prev = _.cloneDeep(s.next);
+            return s;
+          });
+        },
+        onFailure: api_data => {
+          if (api_data.api_status_code === 403) {
+            showErrorMessage(api_data.api_error_message);
+          }
+        },
+        onEnter: () => {
+          form.setStore(s => {
+            s.state.confirm = true;
+            s.state.submitting = true;
+            return s;
+          });
+        },
+        onExit: () => {
+          form.setStore(s => {
+            s.state.confirm = false;
+            s.state.submitting = false;
+            return s;
+          });
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentUser.username, t]
+  );
 
   return (
     <form.Subscribe
@@ -72,9 +119,7 @@ export const HeaderSection = ({ hidden = false, loading = false, profile = 'inte
                     return s;
                   });
                 }}
-                handleAccept={async () => {
-                  await form.handleSubmit();
-                }}
+                handleAccept={() => handleSubmit()}
                 title={t('save.title')}
                 cancelText={t('save.cancelText')}
                 acceptText={t('save.acceptText')}

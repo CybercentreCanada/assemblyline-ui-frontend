@@ -1,13 +1,9 @@
 import { makeStyles } from '@mui/styles';
-import type { FormApi, Validator } from '@tanstack/react-form';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { UserSettings } from 'components/models/base/user_settings';
-import { DEFAULT_SETTINGS } from 'components/routes/submit/mock/settings';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 import { ExternalSourcesSection } from './components/ExternalSources';
 import { HeaderSection } from './components/Header';
@@ -135,8 +131,10 @@ const SettingsContent = () => {
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
           const settings = { ...api_response, ...s.next };
-          s.next = _.cloneDeep(decompressSubmissionProfiles({ ...settings, ...DEFAULT_SETTINGS }, currentUser));
-          s.prev = _.cloneDeep(decompressSubmissionProfiles({ ...settings, ...DEFAULT_SETTINGS }, currentUser));
+          const decompress = decompressSubmissionProfiles(settings, currentUser);
+
+          s.next = _.cloneDeep(decompress);
+          s.prev = _.cloneDeep(decompress);
 
           const nextTab = ['interface', ...Object.keys(s.next.profiles)].includes(tabParam) ? tabParam : 'interface';
           navigate(`/settings2/${nextTab}`);
@@ -247,69 +245,11 @@ const SettingsContent = () => {
   );
 };
 
-const WrappedSettingsPage = () => {
-  const { t } = useTranslation(['settings']);
-  const { apiCall } = useMyAPI();
-  const { user: currentUser } = useALContext();
-  const { showErrorMessage, showSuccessMessage } = useMySnackbar();
-
-  const handleSubmit = useCallback(
-    ({
-      value,
-      formApi
-    }: {
-      value: SettingsStore;
-      formApi: FormApi<SettingsStore, Validator<SettingsStore, string>>;
-    }) => {
-      // console.log(compressSubmissionProfiles(value.next, currentUser));
-
-      formApi.store.setState(s => {
-        s.values.state.confirm = false;
-        return s;
-      });
-
-      return null;
-
-      if (value.next) {
-        apiCall({
-          url: `/api/v4/user/settings/${currentUser.username}/`,
-          method: 'POST',
-          body: value.next,
-          onSuccess: () => {
-            formApi.store.setState(s => {
-              s.values.prev = _.cloneDeep(s.values.next);
-              return s;
-            });
-            showSuccessMessage(t('success_save'));
-          },
-          onFailure: api_data => {
-            if (api_data.api_status_code === 403) {
-              showErrorMessage(api_data.api_error_message);
-            }
-          },
-          onEnter: () =>
-            formApi.store.setState(s => {
-              s.values.state.submitting = true;
-              return s;
-            }),
-          onExit: () =>
-            formApi.store.setState(s => {
-              s.values.state.submitting = false;
-              return s;
-            })
-        });
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.username, t]
-  );
-
-  return (
-    <FormProvider onSubmit={handleSubmit}>
-      <SettingsContent />
-    </FormProvider>
-  );
-};
+const WrappedSettingsPage = () => (
+  <FormProvider>
+    <SettingsContent />
+  </FormProvider>
+);
 
 export const SettingsPage = React.memo(WrappedSettingsPage);
 export default SettingsPage;
