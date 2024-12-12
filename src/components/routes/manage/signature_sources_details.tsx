@@ -392,6 +392,7 @@ const WrappedSourceDetail = ({
                         <ResetButton service={source} defaults={defaults} field="password" reset={resetField} />
                       </div>
                       <TextField
+                        autoComplete="new-password"
                         id="password"
                         size="small"
                         value={source.password}
