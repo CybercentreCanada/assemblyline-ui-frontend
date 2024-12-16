@@ -43,7 +43,7 @@ const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null 
 
   if (!currentUser.roles.includes('file_detail')) return <ForbiddenPage />;
   else if (error) return <Alert severity="error">{error}</Alert>;
-  else if (!data) return <LinearProgress />;
+  else if (data === null) return <LinearProgress />;
   else
     return <MonacoEditor value={data} language={LANGUAGE_SELECTOR[type]} options={{ links: false, readOnly: true }} />;
 };

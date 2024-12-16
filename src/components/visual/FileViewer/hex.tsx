@@ -53,7 +53,7 @@ const WrappedHexSection: React.FC<Props> = ({ sha256 }) => {
 
   if (!currentUser.roles.includes('file_detail')) return <ForbiddenPage />;
   else if (error) return <Alert severity="error">{error}</Alert>;
-  else if (!data) return <LinearProgress />;
+  else if (data === null) return <LinearProgress />;
   else
     return (
       <div className={classes.wrapper}>
