@@ -191,7 +191,7 @@ const Service = React.memo(
           const specID = spec_id as number;
           const spec = specID >= 0 ? form.state.values.next.profiles[profile].service_spec[specID] : null;
 
-          return !spec ? null : !customize && hidden && !selected ? null : (
+          return !customize && hidden && !selected ? null : (
             <List
               key={`${service.name}-${svr_id}`}
               id={`${service.category} - ${service.name}`}
@@ -208,7 +208,7 @@ const Service = React.memo(
               button={customize}
               disabled={!selected}
             >
-              {spec.params.map((param, param_id) =>
+              {(spec?.params || []).map((param, param_id) =>
                 !param.editable && !customize && hidden ? null : (
                   <Parameter
                     key={`${param.name}-${param_id}`}
