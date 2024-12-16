@@ -191,7 +191,7 @@ const Service = React.memo(
           const specID = spec_id as number;
           const spec = specID >= 0 ? form.state.values.next.profiles[profile].service_spec[specID] : null;
 
-          return !customize && hidden && !selected ? null : (
+          return !spec ? null : !customize && hidden && !selected ? null : (
             <List
               key={`${service.name}-${svr_id}`}
               id={`${service.category} - ${service.name}`}
