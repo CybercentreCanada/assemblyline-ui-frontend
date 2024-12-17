@@ -180,9 +180,9 @@ const WrappedRoutes = () => {
         <Route path="/retrohunt/:key" element={<RetroHuntDetail />} />
         <Route path="/search" element={<Search />} />
         <Route path="/search/:id" element={<Search />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/settings2" element={<Settings2 />} />
-        <Route path="/settings2/:tab" element={<Settings2 />} />
+        <Route path="/settings2" element={<Settings />} />
+        <Route path="/settings" element={<Settings2 />} />
+        <Route path="/settings/:tab" element={<Settings2 />} />
         <Route path="/submit" element={<Submit />} />
         <Route path="/submit2" element={<Submit2 />} />
         <Route path="/submission/detail/:id/:fid" element={<SubmissionDetail />} />

@@ -2,6 +2,7 @@ import { makeStyles } from '@mui/styles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { UserSettings } from 'components/models/base/user_settings';
+import ForbiddenPage from 'components/routes/403';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router';
@@ -130,14 +131,13 @@ const SettingsContent = () => {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
-          const settings = { ...api_response, ...s.next };
-          const decompress = loadSubmissionProfiles(settings, currentUser);
+          const decompress = loadSubmissionProfiles(api_response, currentUser);
 
           s.next = _.cloneDeep(decompress);
           s.prev = _.cloneDeep(decompress);
 
           const nextTab = ['interface', ...Object.keys(s.next.profiles)].includes(tabParam) ? tabParam : 'interface';
-          navigate(`/settings2/${nextTab}`);
+          navigate(`/settings/${nextTab}`);
 
           return s;
         });
@@ -164,85 +164,87 @@ const SettingsContent = () => {
     });
   }, [form, tabParam]);
 
-  return (
-    <>
-      <form.Subscribe
-        selector={state => [
-          state.values.state.loading,
-          state.values.state.disabled,
-          state.values.state.tab,
-          state.values.state.hidden,
-          state.values.state.customize
-        ]}
-        children={props => {
-          const loading = props[0] as boolean;
-          const disabled = props[1] as boolean;
-          const tab = props[2] as SettingsStore['state']['tab'];
-          const hidden = props[3] as boolean;
-          const customize = props[4] as boolean;
+  if (!currentUser.is_admin && !currentUser.roles.includes('self_manage')) return <ForbiddenPage />;
+  else
+    return (
+      <>
+        <form.Subscribe
+          selector={state => [
+            state.values.state.loading,
+            state.values.state.disabled,
+            state.values.state.tab,
+            state.values.state.hidden,
+            state.values.state.customize
+          ]}
+          children={props => {
+            const loading = props[0] as boolean;
+            const disabled = props[1] as boolean;
+            const tab = props[2] as SettingsStore['state']['tab'];
+            const hidden = props[3] as boolean;
+            const customize = props[4] as boolean;
 
-          return (
-            <div className={classes.root} ref={rootRef}>
-              <div className={classes.navigation}>
-                <Tab rootElement={rootRef.current} loading={loading} profile={tab} />
-              </div>
+            return (
+              <div className={classes.root} ref={rootRef}>
+                <div className={classes.navigation}>
+                  <Tab rootElement={rootRef.current} loading={loading} profile={tab} />
+                </div>
 
-              <div className={classes.wrapper}>
-                <div className={classes.container}>
-                  <div className={classes.header} ref={headerRef}>
-                    <HeaderSection loading={loading} hidden={hidden} profile={tab} />
-                  </div>
+                <div className={classes.wrapper}>
+                  <div className={classes.container}>
+                    <div className={classes.header} ref={headerRef}>
+                      <HeaderSection loading={loading} hidden={hidden} profile={tab} />
+                    </div>
 
-                  <div className={classes.content}>
-                    {!tab ? null : tab === 'interface' ? (
-                      <InterfaceSection loading={loading} disabled={disabled} />
-                    ) : (
-                      <>
-                        <SubmissionSection
-                          loading={loading}
-                          disabled={disabled}
-                          hidden={hidden}
-                          customize={customize}
-                          profile={tab}
-                        />
-                        <ExternalSourcesSection
-                          loading={loading}
-                          disabled={disabled}
-                          hidden={hidden}
-                          customize={customize}
-                          profile={tab}
-                        />
-                        <ServicesSection
-                          loading={loading}
-                          disabled={disabled}
-                          hidden={hidden}
-                          customize={customize}
-                          profile={tab}
-                        />
-                      </>
-                    )}
+                    <div className={classes.content}>
+                      {!tab ? null : tab === 'interface' ? (
+                        <InterfaceSection loading={loading} disabled={disabled} />
+                      ) : (
+                        <>
+                          <SubmissionSection
+                            loading={loading}
+                            disabled={disabled}
+                            hidden={hidden}
+                            customize={customize}
+                            profile={tab}
+                          />
+                          <ExternalSourcesSection
+                            loading={loading}
+                            disabled={disabled}
+                            hidden={hidden}
+                            customize={customize}
+                            profile={tab}
+                          />
+                          <ServicesSection
+                            loading={loading}
+                            disabled={disabled}
+                            hidden={hidden}
+                            customize={customize}
+                            profile={tab}
+                          />
+                        </>
+                      )}
 
-                    <div style={{ height: window.innerHeight / 2 }} />
+                      <div style={{ height: window.innerHeight / 2 }} />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className={classes.navigation}>
-                <Navigation
-                  loading={loading}
-                  disabled={disabled}
-                  hidden={hidden}
-                  customize={customize}
-                  profile={tab}
-                  onScroll={handleScroll}
-                />
+                <div className={classes.navigation}>
+                  <Navigation
+                    loading={loading}
+                    disabled={disabled}
+                    hidden={hidden}
+                    customize={customize}
+                    profile={tab}
+                    onScroll={handleScroll}
+                  />
+                </div>
               </div>
-            </div>
-          );
-        }}
-      />
-    </>
-  );
+            );
+          }}
+        />
+      </>
+    );
 };
 
 const WrappedSettingsPage = () => (

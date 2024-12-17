@@ -148,8 +148,6 @@ export const loadSubmissionProfiles = (settings: UserSettings, user: CustomUser)
     out.profiles = { ...out.profiles, [name]: loadProfile(settings, profile) };
   });
 
-  console.log(out);
-
   return out;
 };
 
@@ -242,8 +240,6 @@ export const parseSubmissionProfiles = (submit: SubmitSettings, user: CustomUser
         });
       });
     });
-
-  console.log(out);
 
   return out;
 };
