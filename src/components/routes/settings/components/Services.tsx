@@ -203,10 +203,10 @@ const Service = React.memo(
               }}
               secondaryProps={{ children: service.description }}
               checkboxProps={{ checked: selected as boolean }}
-              buttonProps={{ onChange: () => handleChange(selected as boolean) }}
               checkboxPadding
               button={customize}
               disabled={!selected}
+              onClick={() => handleChange(selected as boolean)}
             >
               {(spec?.params || []).map((param, param_id) =>
                 !param.editable && !customize && hidden ? null : (

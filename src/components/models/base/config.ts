@@ -416,7 +416,7 @@ export type MetadataConfig = {
 /** Submission Parameters for profile */
 export type SubmissionProfileParams = {
   /** Does the submission automatically goes into the archive when completed? */
-  auto_archive: boolean;
+  auto_archive?: boolean;
 
   /** Should a deep scan be performed? */
   deep_scan?: boolean;
@@ -424,8 +424,8 @@ export type SubmissionProfileParams = {
   /** When the submission is archived, should we delete it from hot storage right away? */
   delete_after_archive?: boolean;
 
-  /** A list of service-specific parameters that can be configured */
-  editable_params: { [service: string]: string[] };
+  /** Default submission classification */
+  classification?: string;
 
   /** Should this submission generate an alert? */
   generate_alert?: boolean;

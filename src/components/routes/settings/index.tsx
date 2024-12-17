@@ -14,7 +14,7 @@ import { SubmissionSection } from './components/Submission';
 import { Tab } from './components/Tab';
 import type { SettingsStore } from './contexts/form';
 import { FormProvider, useForm } from './contexts/form';
-import { decompressSubmissionProfiles } from './utils/utils';
+import { loadSubmissionProfiles } from './utils/utils';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -131,7 +131,7 @@ const SettingsContent = () => {
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
           const settings = { ...api_response, ...s.next };
-          const decompress = decompressSubmissionProfiles(settings, currentUser);
+          const decompress = loadSubmissionProfiles(settings, currentUser);
 
           s.next = _.cloneDeep(decompress);
           s.prev = _.cloneDeep(decompress);

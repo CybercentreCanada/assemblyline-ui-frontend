@@ -13,7 +13,8 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
-import { compressSubmissionProfiles } from 'components/routes/settings/utils/utils';
+import type { SubmitSettings } from 'components/routes/settings/utils/utils';
+import { parseSubmissionProfiles } from 'components/routes/settings/utils/utils';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import _ from 'lodash';
@@ -35,12 +36,13 @@ export const HeaderSection = ({ hidden = false, loading = false, profile = 'inte
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
 
   const handleSubmit = useCallback(
-    () => {
-      if (!form.state.values.next) return;
+    (data: SubmitSettings) => {
+      if (!data) return;
+
       apiCall({
         url: `/api/v4/user/settings/${currentUser.username}/`,
         method: 'POST',
-        body: compressSubmissionProfiles(form.state.values.next, currentUser),
+        body: parseSubmissionProfiles(data, currentUser),
         onSuccess: () => {
           showSuccessMessage(t('success_save'));
           form.setStore(s => {
@@ -119,7 +121,7 @@ export const HeaderSection = ({ hidden = false, loading = false, profile = 'inte
                     return s;
                   });
                 }}
-                handleAccept={() => handleSubmit()}
+                handleAccept={() => handleSubmit(form.getFieldValue('next'))}
                 title={t('save.title')}
                 cancelText={t('save.cancelText')}
                 acceptText={t('save.acceptText')}
