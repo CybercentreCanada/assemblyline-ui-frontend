@@ -71,7 +71,7 @@ const WrappedNumberListInput = ({
             margin="dense"
             size="small"
             fullWidth
-            value={value}
+            value={value.toString()}
             disabled={disabled}
             sx={{ maxWidth: '30%' }}
             inputProps={{ id, min, max }}

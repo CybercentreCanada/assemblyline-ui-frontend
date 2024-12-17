@@ -83,13 +83,13 @@ const Parameter = React.memo(
                   primary={primary}
                   secondary={secondary}
                   capitalize
-                  value={state.value as number}
+                  value={Number(state.value)}
                   loading={loading}
                   hidden={hidden}
                   disabled={disabled || (!customize && (!selected || !param.editable))}
                   showReset={param.default !== null && state.value !== param.default}
                   onBlur={handleBlur}
-                  onChange={e => handleChange(parseInt(e.target.value))}
+                  onChange={e => handleChange(Number(e.target.value))}
                   onReset={() => handleChange(param.default)}
                 />
               );
