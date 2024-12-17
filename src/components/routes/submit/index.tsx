@@ -18,6 +18,8 @@ import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
+import { FileSubmit } from './components/File';
+import { HashSubmit } from './components/Hash';
 import { MetadataParameters } from './components/MetadataParameters';
 import { ServiceSelection } from './components/ServiceSelection';
 import { SubmissionParameters } from './components/SubmissionParameters';
@@ -25,10 +27,8 @@ import { SubmissionProfile } from './components/SubmissionProfile';
 import type { SubmitStore, Tabs } from './contexts/form';
 import { FormProvider, useForm } from './contexts/form';
 import { DEFAULT_SETTINGS } from './mock/settings';
-import { FileSubmit } from './tabs/file';
-import { HashSubmit } from './tabs/hash';
 
-const FLOW = new Flow({
+export const FLOW = new Flow({
   target: '/api/v4/ui/flowjs/',
   permanentErrors: [412, 500, 501],
   maxChunkRetries: 1,
@@ -45,12 +45,12 @@ type SubmitState = {
 
 const WrappedSubmitContent = () => {
   const { t, i18n } = useTranslation(['submit']);
-  const { apiCall } = useMyAPI();
-  const theme = useTheme();
-  const location = useLocation();
   const banner = useAppBanner();
-  const { user: currentUser, c12nDef, configuration } = useALContext();
+  const location = useLocation();
+  const theme = useTheme();
+  const { apiCall } = useMyAPI();
   const { closeSnackbar } = useMySnackbar();
+  const { user: currentUser, c12nDef, configuration } = useALContext();
 
   const form = useForm();
 
@@ -504,5 +504,11 @@ const WrappedSubmitPage = () => {
   );
 };
 
-export const SubmitPage = React.memo(WrappedSubmitPage);
+const WrappedSettingsPage2 = () => (
+  <FormProvider>
+    <SubmitContent />
+  </FormProvider>
+);
+
+export const SubmitPage = React.memo(WrappedSettingsPage2);
 export default SubmitPage;
