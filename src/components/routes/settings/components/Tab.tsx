@@ -72,7 +72,7 @@ export const Tab = ({ rootElement = null, loading = false, profile = 'interface'
         disablePadding
         sx={{ marginTop: theme.spacing(1) }}
       >
-        <ListItemButton component={Link} to={`/settings2/interface`}>
+        <ListItemButton component={Link} to={`/settings/interface`}>
           <ListItemText primary={t('interface')} />
         </ListItemButton>
       </ListItem>
@@ -91,7 +91,7 @@ export const Tab = ({ rootElement = null, loading = false, profile = 'interface'
                 className={clsx(profile === name ? classes.active : classes.default)}
                 disablePadding
               >
-                <ListItemButton component={Link} to={`/settings2/${name}`}>
+                <ListItemButton component={Link} to={`/settings/${name}`}>
                   <ListItemText
                     primary={t(`profile.${name}`)}
                     primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
