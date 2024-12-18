@@ -1,64 +1,67 @@
 import { createFormContext } from 'components/core/form/createFormContext';
 import type { HashPatternMap, Submission } from 'components/models/base/config';
-import type { UserSettings } from 'components/models/base/user_settings';
-import { DEFAULT_SETTINGS } from 'components/routes/submit/mock/settings';
+import { SubmitSettings } from 'components/routes/settings/utils/utils';
 import generateUUID from 'helpers/uuid';
 
 export const TABS = ['file', 'hash', 'options'] as const;
 export type Tabs = (typeof TABS)[number];
 
 export type SubmitStore = {
-  tab: Tabs;
-  submit: {
-    uuid: string;
-    type: 'file' | 'hash';
-    isFetchingSettings: boolean;
+  /** State related to the interface of the Submit page */
+  state: {
+    /** Is the confirmation dialog open? */
     isConfirmationOpen: boolean;
+
+    /** Are the settings currently being fetched? */
+    isFetchingSettings: boolean;
+
+    /** Is a submission being sent? */
     isUploading: boolean;
+
+    /** Selected profile for the submission */
+    profile: keyof Submission['profiles'];
+
+    /** Selected tab */
+    tab: Tabs;
+
+    /** Type of submission being made */
+    type: 'file' | 'hash';
+
+    /** Upload progress of a file submission */
     uploadProgress: number;
+
+    /** UUID of the submission */
+    uuid: string;
   };
+
+  /** Details of the file input  */
   file: File & { relativePath: string; fileName: string; path: string };
+
+  /** Details of the hash input */
   hash: { type: HashPatternMap; value: string; hasError: boolean; urlAutoSelect: boolean };
-  profile: keyof Submission['profiles'];
+
+  /** Selected metadata of the submission */
   metadata: Record<string, unknown>;
-  settings: UserSettings;
+
+  /** All the user's settings */
+  settings: SubmitSettings;
 };
 
 export const { FormProvider, useForm } = createFormContext<SubmitStore>({
   defaultValues: {
-    tab: 'file',
-    submit: {
+    state: {
       uuid: generateUUID(),
       type: 'file',
       isFetchingSettings: false,
       isConfirmationOpen: false,
       isUploading: false,
-      uploadProgress: 0
+      uploadProgress: 0,
+      tab: 'file',
+      profile: null
     },
     file: null,
     hash: { type: null, value: '', hasError: true, urlAutoSelect: true },
     metadata: {},
-    settings: {
-      classification: '',
-      deep_scan: false,
-      default_external_sources: [],
-      default_zip_password: '',
-      description: '',
-      download_encoding: 'cart',
-      executive_summary: false,
-      expand_min_score: 0,
-      generate_alert: false,
-      ignore_cache: false,
-      ignore_dynamic_recursion_prevention: false,
-      ignore_filtering: false,
-      malicious: false,
-      priority: 0,
-      services: [],
-      service_spec: [],
-      submission_view: 'report',
-      ttl: 0,
-      ...DEFAULT_SETTINGS
-    },
-    profile: null
+    settings: null
   }
 });

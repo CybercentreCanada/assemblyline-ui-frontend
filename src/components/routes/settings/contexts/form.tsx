@@ -5,6 +5,7 @@ export const TABS = ['file', 'hash', 'options'] as const;
 export type Tabs = (typeof TABS)[number];
 
 export type SettingsStore = {
+  /** State related to the interface of the Settings page */
   state: {
     /** Key of the selected profile */
     tab: 'static' | 'static_with_internet' | 'dynamic' | 'interface';
@@ -33,13 +34,13 @@ export type SettingsStore = {
     /** Is the confirmation dialog opened */
     confirm: boolean;
   };
+
+  /** Modified settings made by the user  */
   next: SubmitSettings;
+
+  /** Previous settings in the system */
   prev: SubmitSettings;
 };
-
-/**
- * Group -> Section -> Param
- */
 
 export const { FormProvider, useForm } = createFormContext<SettingsStore>({
   defaultValues: {
