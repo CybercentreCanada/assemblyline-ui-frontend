@@ -14,7 +14,7 @@ type Props = Omit<ListItemButtonProps, 'defaultValue'> & {
 
   value: boolean;
   capitalize?: boolean;
-  hidden?: boolean;
+  render?: boolean;
   loading?: boolean;
   showReset?: boolean;
   resetProps?: ResetListInputProps;
@@ -31,16 +31,16 @@ const WrappedBooleanListInput = ({
   value,
   capitalize = false,
   disabled = false,
-  hidden: hiddenProp = false,
+  render: renderProp = false,
   loading = false,
   showReset,
   resetProps = null,
   onReset = () => null,
   ...other
 }: Props) => {
-  const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
+  const render = useMemo<boolean>(() => renderProp && disabled, [disabled, renderProp]);
 
-  return hidden ? null : (
+  return render ? null : (
     <BaseListItemButton disabled={disabled} {...other}>
       <BaseListItemText
         id={id}

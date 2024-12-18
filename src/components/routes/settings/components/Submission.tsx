@@ -58,7 +58,7 @@ export const SubmissionSection = ({
                     secondary={t('settings:submissions.classification_desc')}
                     value={state.value.value}
                     loading={loading}
-                    hidden={hidden}
+                    render={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
                     showReset={state.value.default !== null && state.value.value !== state.value.default}
                     onChange={value => handleChange(prev => ({ ...prev, value: value }))}
@@ -77,7 +77,7 @@ export const SubmissionSection = ({
                     endAdornment={t('settings:submissions.ttl_days')}
                     value={state.value.value}
                     loading={loading}
-                    hidden={hidden}
+                    render={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
                     showReset={state.value.default !== null && state.value.value !== state.value.default}
                     min={configuration.submission.max_dtl !== 0 ? 1 : 0}
@@ -98,7 +98,7 @@ export const SubmissionSection = ({
                     secondary={t('settings:submissions.deep_scan_desc')}
                     value={state.value.value}
                     loading={loading}
-                    hidden={hidden}
+                    render={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
                     showReset={state.value.default !== null && state.value.value !== state.value.default}
                     onBlur={handleBlur}
@@ -119,7 +119,7 @@ export const SubmissionSection = ({
                     secondary={t('settings:submissions.dynamic_recursion_desc')}
                     value={state.value.value}
                     loading={loading}
-                    hidden={hidden}
+                    render={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
                     showReset={state.value.default !== null && state.value.value !== state.value.default}
                     onBlur={handleBlur}
@@ -138,7 +138,7 @@ export const SubmissionSection = ({
                     secondary={t('settings:submissions.filtering_desc')}
                     value={state.value.value}
                     loading={loading}
-                    hidden={hidden}
+                    render={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
                     showReset={state.value.default !== null && state.value.value !== state.value.default}
                     onBlur={handleBlur}
@@ -157,7 +157,7 @@ export const SubmissionSection = ({
                     secondary={t('settings:submissions.generate_alert_desc')}
                     value={state.value.value}
                     loading={loading}
-                    hidden={hidden}
+                    render={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
                     showReset={state.value.default !== null && state.value.value !== state.value.default}
                     onBlur={handleBlur}
@@ -176,7 +176,7 @@ export const SubmissionSection = ({
                     secondary={t('settings:submissions.result_caching_desc')}
                     value={state.value.value}
                     loading={loading}
-                    hidden={hidden}
+                    render={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
                     showReset={state.value.default !== null && state.value.value !== state.value.default}
                     onBlur={handleBlur}

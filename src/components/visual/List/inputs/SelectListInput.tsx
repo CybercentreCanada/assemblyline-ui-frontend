@@ -13,7 +13,7 @@ type Props = Omit<SelectProps, 'defaultValue'> & {
   secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
 
   capitalize?: boolean;
-  hidden?: boolean;
+  render?: boolean;
   loading?: boolean;
   showReset?: boolean;
   resetProps?: ResetListInputProps;
@@ -32,7 +32,7 @@ const WrappedSelectListInput = ({
   value,
   capitalize = false,
   disabled = false,
-  hidden: hiddenProp = false,
+  render: renderProp = false,
   loading = false,
   showReset,
   resetProps = null,
@@ -41,9 +41,9 @@ const WrappedSelectListInput = ({
   onReset = () => null,
   ...other
 }: Props) => {
-  const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
+  const render = useMemo<boolean>(() => renderProp && disabled, [disabled, renderProp]);
 
-  return hidden ? null : (
+  return render ? null : (
     <ListItem disabled={disabled}>
       <BaseListItemText
         id={id}

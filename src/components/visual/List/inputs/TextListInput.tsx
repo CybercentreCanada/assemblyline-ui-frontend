@@ -24,7 +24,7 @@ type Props<
 
   value: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['inputValue'];
   capitalize?: boolean;
-  hidden?: boolean;
+  render?: boolean;
   loading?: boolean;
   showReset?: boolean;
   resetProps?: ResetListInputProps;
@@ -50,7 +50,7 @@ const WrappedTextListInput = <
   value,
   capitalize = false,
   disabled = false,
-  hidden: hiddenProp = false,
+  render: renderProp = false,
   loading = false,
   showReset,
   resetProps = null,
@@ -60,9 +60,9 @@ const WrappedTextListInput = <
   onReset = () => null,
   ...other
 }: Props<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
-  const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
+  const render = useMemo<boolean>(() => renderProp && disabled, [disabled, renderProp]);
 
-  return hidden ? null : (
+  return render ? null : (
     <ListItem disabled={disabled}>
       <BaseListItemText
         id={id}

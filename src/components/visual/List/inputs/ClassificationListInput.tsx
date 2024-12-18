@@ -16,7 +16,7 @@ type Props = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
 
   value: ClassificationProps['c12n'];
   capitalize?: boolean;
-  hidden?: boolean;
+  render?: boolean;
   loading?: boolean;
   showReset?: boolean;
   resetProps?: ResetListInputProps;
@@ -34,7 +34,7 @@ const WrappedClassificationListInput = ({
   value,
   capitalize = false,
   disabled = false,
-  hidden: hiddenProp = false,
+  render: renderProp = false,
   loading = false,
   showReset,
   resetProps = null,
@@ -42,9 +42,9 @@ const WrappedClassificationListInput = ({
   onReset = () => null,
   ...other
 }: Props) => {
-  const hidden = useMemo<boolean>(() => hiddenProp && disabled, [disabled, hiddenProp]);
+  const render = useMemo<boolean>(() => renderProp && disabled, [disabled, renderProp]);
 
-  return hidden ? null : (
+  return render ? null : (
     <ListItem disabled={disabled} {...other}>
       <BaseListItemText
         id={id}

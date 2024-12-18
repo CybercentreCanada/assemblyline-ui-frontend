@@ -68,7 +68,7 @@ const Parameter = React.memo(
                   capitalize
                   value={state.value as string}
                   loading={loading}
-                  hidden={hidden}
+                  render={hidden}
                   disabled={disabled || (!customize && (!selected || !param.editable))}
                   showReset={param.default !== null && state.value !== param.default}
                   onBlur={handleBlur}
@@ -85,7 +85,7 @@ const Parameter = React.memo(
                   capitalize
                   value={Number(state.value)}
                   loading={loading}
-                  hidden={hidden}
+                  render={hidden}
                   disabled={disabled || (!customize && (!selected || !param.editable))}
                   showReset={param.default !== null && state.value !== param.default}
                   onBlur={handleBlur}
@@ -102,7 +102,7 @@ const Parameter = React.memo(
                   capitalize
                   value={state.value as boolean}
                   loading={loading}
-                  hidden={hidden}
+                  render={hidden}
                   disabled={disabled || (!customize && (!selected || !param.editable))}
                   showReset={param.default !== null && state.value !== param.default}
                   onBlur={handleBlur}
@@ -119,7 +119,7 @@ const Parameter = React.memo(
                   capitalize
                   value={state.value}
                   loading={loading}
-                  hidden={hidden}
+                  render={hidden}
                   disabled={disabled || (!customize && (!selected || !param.editable))}
                   showReset={param.default !== null && state.value !== param.default}
                   options={param.list.map(item => ({
