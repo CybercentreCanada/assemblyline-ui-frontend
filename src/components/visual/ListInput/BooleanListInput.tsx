@@ -1,31 +1,28 @@
-import { ListItem, type IconButtonProps, type ListItemTextProps } from '@mui/material';
-import type { ClassificationProps } from 'components/visual/Classification';
-import Classification from 'components/visual/Classification';
+import type { IconButtonProps, ListItemButtonProps, ListItemTextProps } from '@mui/material';
+import { Switch } from '@mui/material';
 import React, { useMemo } from 'react';
-import { BaseListItemText } from './BaseListInput';
-import type { ResetListInputProps } from './ResetListInput';
-import { ResetListInput } from './ResetListInput';
-import { SkeletonListInput } from './SkeletonListInput';
+import { BaseListItemButton, BaseListItemText } from './components/BaseListInput';
+import type { ResetListInputProps } from './components/ResetListInput';
+import { ResetListInput } from './components/ResetListInput';
+import { SkeletonListInput } from './components/SkeletonListInput';
 
-type Props = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
-  id: string;
+type Props = Omit<ListItemButtonProps, 'defaultValue'> & {
   primary?: ListItemTextProps['primary'];
   primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
   secondary?: ListItemTextProps['secondary'];
   secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
 
-  value: ClassificationProps['c12n'];
+  value: boolean;
   capitalize?: boolean;
   render?: boolean;
   loading?: boolean;
   showReset?: boolean;
   resetProps?: ResetListInputProps;
 
-  onChange: ClassificationProps['setClassification'];
   onReset?: IconButtonProps['onClick'];
 };
 
-const WrappedClassificationListInput = ({
+const WrappedBooleanListInput = ({
   id,
   primary,
   primaryProps = null,
@@ -38,14 +35,13 @@ const WrappedClassificationListInput = ({
   loading = false,
   showReset,
   resetProps = null,
-  onChange,
   onReset = () => null,
   ...other
 }: Props) => {
   const render = useMemo<boolean>(() => renderProp && disabled, [disabled, renderProp]);
 
   return !render ? null : (
-    <ListItem disabled={disabled} {...other}>
+    <BaseListItemButton disabled={disabled} {...other}>
       <BaseListItemText
         id={id}
         primary={primary}
@@ -59,19 +55,11 @@ const WrappedClassificationListInput = ({
       ) : (
         <>
           {showReset === null ? null : <ResetListInput visible={showReset} onClick={onReset} {...resetProps} />}
-          <div style={{ maxWidth: '30%', width: '100%' }}>
-            <Classification
-              type={!disabled ? 'picker' : 'pill'}
-              size="small"
-              c12n={value}
-              setClassification={onChange}
-              {...other}
-            />
-          </div>
+          <Switch checked={value} edge="end" inputProps={{ id }} />
         </>
       )}
-    </ListItem>
+    </BaseListItemButton>
   );
 };
 
-export const ClassificationListInput = React.memo(WrappedClassificationListInput);
+export const BooleanListInput = React.memo(WrappedBooleanListInput);

@@ -1,0 +1,86 @@
+import type { IconButtonProps, ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
+import { ListItem, MenuItem, Select } from '@mui/material';
+import React, { useMemo } from 'react';
+import { BaseListItemText } from './components/BaseListInput';
+import type { ResetListInputProps } from './components/ResetListInput';
+import { ResetListInput } from './components/ResetListInput';
+import { SkeletonListInput } from './components/SkeletonListInput';
+
+type Props = Omit<SelectProps, 'defaultValue'> & {
+  primary?: ListItemTextProps['primary'];
+  primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
+  secondary?: ListItemTextProps['secondary'];
+  secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
+
+  capitalize?: boolean;
+  render?: boolean;
+  loading?: boolean;
+  showReset?: boolean;
+  resetProps?: ResetListInputProps;
+  options: { label: MenuItemProps['children']; value: MenuItemProps['value'] }[];
+
+  onReset?: IconButtonProps['onClick'];
+};
+
+const WrappedSelectListInput = ({
+  id,
+  primary,
+  primaryProps = null,
+  secondary,
+  secondaryProps = null,
+
+  value,
+  capitalize = false,
+  disabled = false,
+  render: renderProp = true,
+  loading = false,
+  showReset,
+  resetProps = null,
+  options = [],
+
+  onReset = () => null,
+  ...other
+}: Props) => {
+  const render = useMemo<boolean>(() => renderProp && disabled, [disabled, renderProp]);
+
+  return !render ? null : (
+    <ListItem disabled={disabled}>
+      <BaseListItemText
+        id={id}
+        primary={primary}
+        secondary={secondary}
+        primaryTypographyProps={primaryProps}
+        secondaryTypographyProps={secondaryProps}
+        capitalize={capitalize}
+      />
+      {loading ? (
+        <SkeletonListInput />
+      ) : (
+        <>
+          {showReset === null ? null : <ResetListInput visible={showReset} onClick={onReset} {...resetProps} />}
+          <Select
+            variant="outlined"
+            size="small"
+            fullWidth
+            disabled={disabled}
+            sx={{
+              maxWidth: '30%',
+              ...(capitalize && { textTransform: 'capitalize' })
+            }}
+            value={value}
+            inputProps={{ id }}
+            {...other}
+          >
+            {options.map((option, i) => (
+              <MenuItem key={i} value={option.value} sx={{ ...(capitalize && { textTransform: 'capitalize' }) }}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </>
+      )}
+    </ListItem>
+  );
+};
+
+export const SelectListInput = React.memo(WrappedSelectListInput);
