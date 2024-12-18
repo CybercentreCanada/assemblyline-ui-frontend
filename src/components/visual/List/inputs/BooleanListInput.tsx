@@ -31,7 +31,7 @@ const WrappedBooleanListInput = ({
   value,
   capitalize = false,
   disabled = false,
-  render: renderProp = false,
+  render: renderProp = true,
   loading = false,
   showReset,
   resetProps = null,
@@ -40,7 +40,7 @@ const WrappedBooleanListInput = ({
 }: Props) => {
   const render = useMemo<boolean>(() => renderProp && disabled, [disabled, renderProp]);
 
-  return render ? null : (
+  return !render ? null : (
     <BaseListItemButton disabled={disabled} {...other}>
       <BaseListItemText
         id={id}

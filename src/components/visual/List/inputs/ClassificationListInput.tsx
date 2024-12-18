@@ -34,7 +34,7 @@ const WrappedClassificationListInput = ({
   value,
   capitalize = false,
   disabled = false,
-  render: renderProp = false,
+  render: renderProp = true,
   loading = false,
   showReset,
   resetProps = null,
@@ -44,7 +44,7 @@ const WrappedClassificationListInput = ({
 }: Props) => {
   const render = useMemo<boolean>(() => renderProp && disabled, [disabled, renderProp]);
 
-  return render ? null : (
+  return !render ? null : (
     <ListItem disabled={disabled} {...other}>
       <BaseListItemText
         id={id}

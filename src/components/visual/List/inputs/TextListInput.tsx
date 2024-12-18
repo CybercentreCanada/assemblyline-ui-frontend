@@ -50,7 +50,7 @@ const WrappedTextListInput = <
   value,
   capitalize = false,
   disabled = false,
-  render: renderProp = false,
+  render: renderProp = true,
   loading = false,
   showReset,
   resetProps = null,
@@ -62,7 +62,7 @@ const WrappedTextListInput = <
 }: Props<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
   const render = useMemo<boolean>(() => renderProp && disabled, [disabled, renderProp]);
 
-  return render ? null : (
+  return !render ? null : (
     <ListItem disabled={disabled}>
       <BaseListItemText
         id={id}
