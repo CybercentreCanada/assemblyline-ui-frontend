@@ -27,7 +27,7 @@ type Props<
 > & {
   error?: FormHelperTextProps['children'];
   errorProps?: FormHelperTextProps;
-  label: TypographyProps['children'];
+  label: string;
   labelProps?: TypographyProps;
   loading?: boolean;
   options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
