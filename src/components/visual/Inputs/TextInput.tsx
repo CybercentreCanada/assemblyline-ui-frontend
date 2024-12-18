@@ -1,12 +1,5 @@
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
-import type {
-  AutocompleteProps,
-  FormHelperTextProps,
-  IconButtonProps,
-  TextFieldProps,
-  TooltipProps,
-  TypographyProps
-} from '@mui/material';
+import type { AutocompleteProps, FormHelperTextProps, IconButtonProps, TypographyProps } from '@mui/material';
 import {
   Autocomplete,
   FormControl,
@@ -32,17 +25,14 @@ type Props<
   AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>,
   'renderInput' | 'options' | 'onChange' | 'value'
 > & {
-  label: string;
+  error?: FormHelperTextProps['children'];
+  errorProps?: FormHelperTextProps;
+  label: TypographyProps['children'];
   labelProps?: TypographyProps;
   loading?: boolean;
   options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
-  value: string;
-  errors?: (string | false)[];
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  error?: TextFieldProps['helperText'];
-  errorProps?: FormHelperTextProps;
   reset?: boolean;
+  value: string;
   onChange?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['onInputChange'];
   onReset?: IconButtonProps['onClick'];
 };
@@ -56,19 +46,16 @@ const WrappedTextInput = <
 >({
   label,
   labelProps,
-  value,
   disabled,
-  loading = false,
-  options = [],
-
-  tooltip,
-  tooltipProps,
   error = null,
   errorProps = null,
+  loading = false,
+  options = [],
   reset = false,
+  value,
   onChange,
   onReset,
-  ...other
+  ...autocompleteProps
 }: Props<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
   const theme = useTheme();
 
@@ -133,7 +120,7 @@ const WrappedTextInput = <
                 )}
               </>
             )}
-            {...other}
+            {...autocompleteProps}
           />
         )}
       </FormControl>
