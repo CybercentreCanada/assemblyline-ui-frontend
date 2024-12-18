@@ -3,7 +3,7 @@
 [![Static Badge](https://img.shields.io/badge/github-assemblyline-blue?logo=github)](https://github.com/CybercentreCanada/assemblyline)
 [![Static Badge](https://img.shields.io/badge/github-assemblyline--ui--frontend-blue?logo=github)](https://github.com/CybercentreCanada/assemblyline-ui-frontend)
 [![GitHub Issues or Pull Requests by label](https://img.shields.io/github/issues/CybercentreCanada/assemblyline/ui-frontend)](https://github.com/CybercentreCanada/assemblyline/issues?q=is:issue+is:open+label:ui-frontend)
-[![License](https://img.shields.io/github/license/CybercentreCanada/assemblyline-ui-frontend)](./LICENSE.md)
+[![License](https://img.shields.io/github/license/CybercentreCanada/assemblyline-ui-frontend)](./LICENCE.md)
 
 # Assemblyline UI Frontend
 
