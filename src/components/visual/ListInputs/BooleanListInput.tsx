@@ -1,47 +1,43 @@
 import type { IconButtonProps, ListItemButtonProps, ListItemTextProps } from '@mui/material';
 import { Switch } from '@mui/material';
-import React, { useMemo } from 'react';
+import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
+import React from 'react';
 import { BaseListItemButton, BaseListItemText } from './components/BaseListInput';
 import type { ResetListInputProps } from './components/ResetListInput';
-import { ResetListInput } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
 type Props = Omit<ListItemButtonProps, 'defaultValue'> & {
-  primary?: ListItemTextProps['primary'];
+  capitalize?: boolean;
+  loading?: boolean;
+  preventRender?: boolean;
+  primary?: string;
   primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
+  reset?: boolean;
+  resetProps?: ResetListInputProps;
   secondary?: ListItemTextProps['secondary'];
   secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
-
   value: boolean;
-  capitalize?: boolean;
-  render?: boolean;
-  loading?: boolean;
-  showReset?: boolean;
-  resetProps?: ResetListInputProps;
-
   onReset?: IconButtonProps['onClick'];
 };
 
 const WrappedBooleanListInput = ({
+  capitalize = false,
+  disabled = false,
   id,
+  loading = false,
+  preventRender = false,
   primary,
   primaryProps = null,
+  reset = false,
+  resetProps = null,
   secondary,
   secondaryProps = null,
   value,
-  capitalize = false,
-  disabled = false,
-  render: renderProp = true,
-  loading = false,
-  showReset,
-  resetProps = null,
   onReset = () => null,
-  ...other
-}: Props) => {
-  const render = useMemo<boolean>(() => renderProp && disabled, [disabled, renderProp]);
-
-  return !render ? null : (
-    <BaseListItemButton disabled={disabled} {...other}>
+  ...buttonProps
+}: Props) =>
+  preventRender ? null : (
+    <BaseListItemButton disabled={disabled} {...buttonProps}>
       <BaseListItemText
         id={id}
         primary={primary}
@@ -54,12 +50,11 @@ const WrappedBooleanListInput = ({
         <SkeletonListInput />
       ) : (
         <>
-          {showReset === null ? null : <ResetListInput visible={showReset} onClick={onReset} {...resetProps} />}
+          <ResetInput label={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
           <Switch checked={value} edge="end" inputProps={{ id }} />
         </>
       )}
     </BaseListItemButton>
   );
-};
 
 export const BooleanListInput = React.memo(WrappedBooleanListInput);

@@ -1,57 +1,49 @@
 import type { IconButtonProps, ListItemTextProps, OutlinedInputProps } from '@mui/material';
 import { InputAdornment, ListItem, OutlinedInput } from '@mui/material';
+import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import type { ReactNode } from 'react';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { BaseListItemText } from './components/BaseListInput';
 import type { ResetListInputProps } from './components/ResetListInput';
-import { ResetListInput } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
 type Props = Omit<OutlinedInputProps, 'value'> & {
-  primary?: ListItemTextProps['primary'];
-  primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
-  secondary?: ListItemTextProps['secondary'];
-  secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
-
-  value: number;
   capitalize?: boolean;
-  render?: boolean;
+  endAdornment?: ReactNode;
   loading?: boolean;
-  showReset?: boolean;
-  resetProps?: ResetListInputProps;
-
   max?: number;
   min?: number;
-  endAdornment?: ReactNode;
-
+  preventRender?: boolean;
+  primary?: string;
+  primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
+  reset?: boolean;
+  resetProps?: ResetListInputProps;
+  secondary?: ListItemTextProps['secondary'];
+  secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
+  value: number;
   onReset?: IconButtonProps['onClick'];
 };
 
 const WrappedNumberListInput = ({
-  id,
-  primary,
-  primaryProps = null,
-  secondary,
-  secondaryProps = null,
-
-  value,
   capitalize = false,
   disabled = false,
-  render: renderProp = true,
+  endAdornment,
+  id,
   loading = false,
-  showReset,
-  resetProps = null,
-
   max,
   min,
-  endAdornment,
-
+  preventRender = false,
+  primary,
+  primaryProps = null,
+  reset = false,
+  resetProps = null,
+  secondary,
+  secondaryProps = null,
+  value,
   onReset = () => null,
-  ...other
-}: Props) => {
-  const render = useMemo<boolean>(() => renderProp && disabled, [disabled, renderProp]);
-
-  return !render ? null : (
+  ...inputProps
+}: Props) =>
+  preventRender ? null : (
     <ListItem disabled={disabled}>
       <BaseListItemText
         id={id}
@@ -65,7 +57,7 @@ const WrappedNumberListInput = ({
         <SkeletonListInput />
       ) : (
         <>
-          {showReset === null ? null : <ResetListInput visible={showReset} onClick={onReset} {...resetProps} />}
+          <ResetInput label={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
           <OutlinedInput
             type="number"
             margin="dense"
@@ -76,12 +68,11 @@ const WrappedNumberListInput = ({
             sx={{ maxWidth: '30%' }}
             inputProps={{ id, min, max }}
             endAdornment={endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
-            {...other}
+            {...inputProps}
           />
         </>
       )}
     </ListItem>
   );
-};
 
 export const NumberListInput = React.memo(WrappedNumberListInput);

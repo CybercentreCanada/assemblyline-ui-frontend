@@ -1,49 +1,44 @@
 import type { IconButtonProps, ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
 import { ListItem, MenuItem, Select } from '@mui/material';
-import React, { useMemo } from 'react';
+import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
+import React from 'react';
 import { BaseListItemText } from './components/BaseListInput';
 import type { ResetListInputProps } from './components/ResetListInput';
-import { ResetListInput } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
 type Props = Omit<SelectProps, 'defaultValue'> & {
-  primary?: ListItemTextProps['primary'];
+  capitalize?: boolean;
+  loading?: boolean;
+  options: { label: MenuItemProps['children']; value: MenuItemProps['value'] }[];
+  preventRender?: boolean;
+  primary?: string;
   primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
+  render?: boolean;
+  reset?: boolean;
+  resetProps?: ResetListInputProps;
   secondary?: ListItemTextProps['secondary'];
   secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
-
-  capitalize?: boolean;
-  render?: boolean;
-  loading?: boolean;
-  showReset?: boolean;
-  resetProps?: ResetListInputProps;
-  options: { label: MenuItemProps['children']; value: MenuItemProps['value'] }[];
-
   onReset?: IconButtonProps['onClick'];
 };
 
 const WrappedSelectListInput = ({
-  id,
-  primary,
-  primaryProps = null,
-  secondary,
-  secondaryProps = null,
-
-  value,
   capitalize = false,
   disabled = false,
-  render: renderProp = true,
+  id,
   loading = false,
-  showReset,
-  resetProps = null,
   options = [],
-
+  preventRender = false,
+  primary,
+  primaryProps = null,
+  reset = false,
+  resetProps = null,
+  secondary,
+  secondaryProps = null,
+  value,
   onReset = () => null,
-  ...other
-}: Props) => {
-  const render = useMemo<boolean>(() => renderProp && disabled, [disabled, renderProp]);
-
-  return !render ? null : (
+  ...selectProps
+}: Props) =>
+  preventRender ? null : (
     <ListItem disabled={disabled}>
       <BaseListItemText
         id={id}
@@ -57,7 +52,7 @@ const WrappedSelectListInput = ({
         <SkeletonListInput />
       ) : (
         <>
-          {showReset === null ? null : <ResetListInput visible={showReset} onClick={onReset} {...resetProps} />}
+          <ResetInput label={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
           <Select
             variant="outlined"
             size="small"
@@ -69,7 +64,7 @@ const WrappedSelectListInput = ({
             }}
             value={value}
             inputProps={{ id }}
-            {...other}
+            {...selectProps}
           >
             {options.map((option, i) => (
               <MenuItem key={i} value={option.value} sx={{ ...(capitalize && { textTransform: 'capitalize' }) }}>
@@ -81,6 +76,5 @@ const WrappedSelectListInput = ({
       )}
     </ListItem>
   );
-};
 
 export const SelectListInput = React.memo(WrappedSelectListInput);

@@ -1,10 +1,15 @@
-import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
-import type { AutocompleteProps, FormHelperTextProps, IconButtonProps, TypographyProps } from '@mui/material';
+import type {
+  AutocompleteProps,
+  AutocompleteValue,
+  FormHelperTextProps,
+  IconButtonProps,
+  OutlinedInputProps,
+  TypographyProps
+} from '@mui/material';
 import {
   Autocomplete,
   FormControl,
   FormHelperText,
-  IconButton,
   InputAdornment,
   InputLabel,
   OutlinedInput,
@@ -14,6 +19,8 @@ import {
 } from '@mui/material';
 import type { ElementType } from 'react';
 import React, { useState } from 'react';
+import type { ResetInputProps } from './components/ResetInput';
+import { ResetInput } from './components/ResetInput';
 
 type Props<
   Value,
@@ -31,7 +38,9 @@ type Props<
   labelProps?: TypographyProps;
   loading?: boolean;
   options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
+  preventRender?: boolean;
   reset?: boolean;
+  resetProps?: ResetInputProps;
   value: string;
   onChange?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['onInputChange'];
   onReset?: IconButtonProps['onClick'];
@@ -44,14 +53,16 @@ const WrappedTextInput = <
   FreeSolo extends boolean,
   ChipComponent extends ElementType
 >({
-  label,
-  labelProps,
   disabled,
   error = null,
   errorProps = null,
+  label,
+  labelProps,
   loading = false,
   options = [],
+  preventRender = false,
   reset = false,
+  resetProps = null,
   value,
   onChange,
   onReset,
@@ -59,10 +70,11 @@ const WrappedTextInput = <
 }: Props<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
   const theme = useTheme();
 
-  const [_value, setValue] = useState(null);
+  const [_value, setValue] =
+    useState<AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>>(null);
 
-  return (
-    <>
+  return preventRender ? null : (
+    <div>
       <Typography
         component={InputLabel}
         htmlFor={label}
@@ -90,24 +102,30 @@ const WrappedTextInput = <
             options={options}
             onChange={(e, v) => setValue(v)}
             onInputChange={(e, v, o) => {
-              setValue(v);
+              setValue(v as AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>);
               onChange(e, v, o);
             }}
-            renderInput={params => (
+            // eslint-disable-next-line no-unused-vars
+            renderInput={({ InputLabelProps, InputProps, inputProps, ...otherParams }) => (
               <>
                 <OutlinedInput
                   id={label}
                   error={!!error}
                   endAdornment={
                     !reset ? null : (
-                      <InputAdornment position="start">
-                        <IconButton edge="end" onClick={onReset}>
-                          <RefreshOutlinedIcon />
-                        </IconButton>
+                      <InputAdornment position="end">
+                        <ResetInput
+                          label={label}
+                          preventRender={!reset || disabled}
+                          onReset={onReset}
+                          {...resetProps}
+                        />
                       </InputAdornment>
                     )
                   }
-                  {...params}
+                  style={{ padding: 0, ...inputProps?.style }}
+                  {...otherParams}
+                  {...(inputProps as unknown as OutlinedInputProps)}
                 />
                 {!error || disabled ? null : (
                   <FormHelperText
@@ -124,7 +142,7 @@ const WrappedTextInput = <
           />
         )}
       </FormControl>
-    </>
+    </div>
   );
 };
 
