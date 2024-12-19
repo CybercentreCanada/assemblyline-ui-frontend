@@ -1,25 +1,13 @@
-import { ExpandMore } from '@mui/icons-material';
-import {
-  Checkbox,
-  Collapse,
-  IconButton,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-  useTheme
-} from '@mui/material';
+import { Collapse, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import type { SelectedService, SelectedServiceCategory } from 'components/models/base/service';
 import { useForm } from 'components/routes/submit/contexts/form';
-import { BooleanInput } from 'components/routes/submit/inputs/BooleanInput';
-import { NumberInput } from 'components/routes/submit/inputs/NumberInput';
-import { SelectInput } from 'components/routes/submit/inputs/SelectInput';
-import { TextInput } from 'components/routes/submit/inputs/TextInput';
+import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
+import { NumberInput } from 'components/visual/Inputs/NumberInput';
+import { SelectInput } from 'components/visual/Inputs/SelectInput';
+import { TextInput } from 'components/visual/Inputs/TextInput';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HiOutlineExternalLink } from 'react-icons/hi';
 
 type ServiceTreeItemSkelProps = {
   size: 'medium' | 'small';
@@ -95,9 +83,19 @@ type ServiceProps = {
   cat_id: number;
   svr_id: number;
   service: SelectedService;
+  profile?: string;
+  loading?: boolean;
+  disabled?: boolean;
 };
 
-const Service: React.FC<ServiceProps> = ({ cat_id, svr_id, service }) => {
+const Service: React.FC<ServiceProps> = ({
+  cat_id,
+  svr_id,
+  service,
+  profile = null,
+  loading = false,
+  disabled = false
+}) => {
   const theme = useTheme();
   const form = useForm();
 
@@ -105,25 +103,27 @@ const Service: React.FC<ServiceProps> = ({ cat_id, svr_id, service }) => {
   const [render, setRender] = useState<boolean>(false);
 
   const specId = useMemo(
-    () => form.store.state.values.settings.service_spec.findIndex(s => s.name === service.name),
-    [form.store.state.values.settings.service_spec, service.name]
+    () => form.store.state.values.settings.profiles[profile].service_spec.findIndex(s => s.name === service.name),
+    [form.store.state.values.settings.profiles, profile, service.name]
   );
 
   const handleClick = useCallback(
     (value: boolean) => {
       form.setStore(s => {
         if (value) {
-          s.settings.services[cat_id].selected = false;
-          s.settings.services[cat_id].services[svr_id].selected = false;
+          s.settings.profiles[profile].services[cat_id].selected = false;
+          s.settings.profiles[profile].services[cat_id].services[svr_id].selected = false;
         } else {
-          s.settings.services[cat_id].services[svr_id].selected = true;
-          s.settings.services[cat_id].selected = s.settings.services[cat_id].services.every(srv => srv.selected);
+          s.settings.profiles[profile].services[cat_id].services[svr_id].selected = true;
+          s.settings.profiles[profile].services[cat_id].selected = s.settings.profiles[profile].services[
+            cat_id
+          ].services.every(srv => srv.selected);
         }
 
         return s;
       });
     },
-    [cat_id, form, svr_id]
+    [cat_id, form, profile, svr_id]
   );
 
   const handleExpand = useCallback<React.MouseEventHandler<HTMLButtonElement>>(event => {
@@ -136,93 +136,86 @@ const Service: React.FC<ServiceProps> = ({ cat_id, svr_id, service }) => {
   return (
     <>
       <form.Subscribe
-        selector={state => [state.values.settings.services[cat_id].services[svr_id].selected]}
+        selector={state => [state.values.settings.profiles[profile].services[cat_id].services[svr_id].selected]}
         children={([selected]) => (
-          <ListItemButton sx={{ padding: '0px 12px' }} onClick={() => handleClick(selected)}>
-            <ListItemIcon sx={{ minWidth: 0 }}>
-              <Checkbox checked={selected} edge="start" size="small" />
-            </ListItemIcon>
-            <ListItemText
-              style={{ marginRight: theme.spacing(2) }}
-              primaryTypographyProps={{
-                variant: 'body2',
-                whiteSpace: 'nowrap',
-                textTransform: 'capitalize',
-                display: 'flex',
-                columnGap: theme.spacing(1)
-              }}
-              primary={
-                <>
-                  {service.name}
-                  {service.is_external && <HiOutlineExternalLink fontSize="large" />}
-                </>
-              }
-            />
-
-            {specId >= 0 && (
-              <ListItemIcon sx={{ minWidth: 0 }}>
-                <IconButton onClick={handleExpand}>
-                  <ExpandMore
-                    sx={{
-                      transition: theme.transitions.create('transform', {
-                        duration: theme.transitions.duration.shortest
-                      }),
-                      transform: 'rotate(0deg)',
-                      ...(open && { transform: 'rotate(180deg)' })
-                    }}
-                  />
-                </IconButton>
-              </ListItemIcon>
-            )}
-          </ListItemButton>
+          <CheckboxInput
+            label={service.name}
+            value={selected}
+            disableGap
+            onChange={() => handleClick(selected)}
+            expend={specId < 0 ? null : open}
+            onExpend={handleExpand}
+          />
         )}
       />
 
       <Collapse in={open}>
         {render && specId >= 0 && (
           <div style={{ marginLeft: theme.spacing(3) }}>
-            {form.store.state.values.settings.service_spec[specId].params.map((param, i) => (
-              <form.Field
+            {form.store.state.values.settings.profiles[profile].service_spec[specId].params.map((param, i) => (
+              <form.Subscribe
                 key={i}
-                name={`settings.service_spec[${specId}].params[${i}].value` as any}
-                children={({ state, handleBlur, handleChange }) => {
+                selector={state => [state.values.settings.profiles[profile].service_spec[specId].params[i].value]}
+                children={([value]) => {
                   switch (param.type) {
                     case 'bool':
                       return (
-                        <BooleanInput
-                          label={param.name}
-                          value={state.value}
-                          onClick={() => handleChange(!state.value)}
-                          onBlur={handleBlur}
+                        <CheckboxInput
+                          label={param.name.replaceAll('_', ' ')}
+                          labelProps={{ textTransform: 'capitalize' }}
+                          value={value as boolean}
+                          disableGap
+                          onChange={() => {
+                            form.setStore(s => {
+                              s.settings.profiles[profile].service_spec[specId].params[i].value =
+                                !s.settings.profiles[profile].service_spec[specId].params[i].value;
+                              return s;
+                            });
+                          }}
                         />
                       );
                     case 'int':
                       return (
                         <NumberInput
-                          label={param.name}
-                          value={state.value}
-                          onChange={event => handleChange(parseInt(event.target.value))}
-                          onBlur={handleBlur}
+                          label={param.name.replaceAll('_', ' ')}
+                          labelProps={{ textTransform: 'capitalize' }}
+                          value={value as number}
+                          onChange={(event, v) => {
+                            form.setStore(s => {
+                              s.settings.profiles[profile].service_spec[specId].params[i].value = v;
+                              return s;
+                            });
+                          }}
                         />
                       );
                     case 'str':
                       return (
                         <TextInput
-                          label={param.name}
-                          value={state.value}
+                          label={param.name.replaceAll('_', ' ')}
+                          labelProps={{ textTransform: 'capitalize' }}
+                          value={value as string}
                           options={param.list}
-                          onChange={v => handleChange(v)}
-                          onBlur={handleBlur}
+                          onChange={(event, v) => {
+                            form.setStore(s => {
+                              s.settings.profiles[profile].service_spec[specId].params[i].value = v;
+                              return s;
+                            });
+                          }}
                         />
                       );
                     case 'list':
                       return (
                         <SelectInput
-                          label={param.name}
-                          value={state.value}
+                          label={param.name.replaceAll('_', ' ')}
+                          labelProps={{ textTransform: 'capitalize' }}
+                          value={value as string}
                           items={param.list}
-                          onChange={e => handleChange(e.target.value)}
-                          onBlur={handleBlur}
+                          onChange={(event, v) => {
+                            form.setStore(s => {
+                              s.settings.profiles[profile].service_spec[specId].params[i].value = v;
+                              return s;
+                            });
+                          }}
                         />
                       );
                   }
@@ -239,9 +232,12 @@ const Service: React.FC<ServiceProps> = ({ cat_id, svr_id, service }) => {
 type CategoryProps = {
   cat_id: number;
   category: SelectedServiceCategory;
+  profile?: string;
+  loading?: boolean;
+  disabled?: boolean;
 };
 
-const Category = ({ cat_id, category }: CategoryProps) => {
+const Category = ({ cat_id, category, profile = null, loading = false, disabled = false }: CategoryProps) => {
   const theme = useTheme();
   const form = useForm();
 
@@ -249,14 +245,18 @@ const Category = ({ cat_id, category }: CategoryProps) => {
     (value: boolean) => {
       form.setStore(s => {
         if (value) {
-          s.settings.services[cat_id].selected = false;
-          s.settings.services[cat_id].services = s.settings.services[cat_id].services.map(srv => ({
+          s.settings.profiles[profile].services[cat_id].selected = false;
+          s.settings.profiles[profile].services[cat_id].services = s.settings.profiles[profile].services[
+            cat_id
+          ].services.map(srv => ({
             ...srv,
             selected: false
           }));
         } else {
-          s.settings.services[cat_id].selected = true;
-          s.settings.services[cat_id].services = s.settings.services[cat_id].services.map(srv => ({
+          s.settings.profiles[profile].services[cat_id].selected = true;
+          s.settings.profiles[profile].services[cat_id].services = s.settings.profiles[profile].services[
+            cat_id
+          ].services.map(srv => ({
             ...srv,
             selected: true
           }));
@@ -265,49 +265,53 @@ const Category = ({ cat_id, category }: CategoryProps) => {
         return s;
       });
     },
-    [cat_id, form]
+    [cat_id, form, profile]
   );
 
   return (
     <>
       <form.Subscribe
         selector={state => {
-          const selected = state.values.settings.services[cat_id].selected;
-          const list = state.values.settings.services[cat_id].services.map(svr => svr.selected);
+          const selected = state.values.settings.profiles[profile].services[cat_id].selected;
+          const list = state.values.settings.profiles[profile].services[cat_id].services.map(svr => svr.selected);
           return [selected, !list.every(i => i) && list.some(i => i)];
         }}
         children={([selected, indeterminate]) => (
-          <ListItem disablePadding dense>
-            <ListItemButton sx={{ padding: '0px 12px' }} onClick={() => handleClick(selected)}>
-              <ListItemIcon sx={{ minWidth: 0 }}>
-                <Checkbox checked={selected} indeterminate={indeterminate} edge="start" size="small" />
-              </ListItemIcon>
-              <ListItemText primary={category.name} primaryTypographyProps={{}} />
-            </ListItemButton>
-          </ListItem>
+          <CheckboxInput
+            label={category.name}
+            value={selected}
+            disableGap
+            indeterminate={indeterminate}
+            onChange={() => handleClick(selected)}
+          />
         )}
       />
 
-      <form.Field
-        name={`settings.services[${cat_id}].services`}
-        mode="array"
-        children={({ state }: any) => (
-          <div style={{ marginLeft: theme.spacing(3) }}>
-            {state.value.map((service, svr_id) => (
-              <Service key={svr_id} cat_id={cat_id} svr_id={svr_id} service={service} />
-            ))}
-          </div>
-        )}
-      />
+      <div style={{ marginLeft: theme.spacing(3) }}>
+        {category.services.map((service, svr_id) => (
+          <Service
+            key={svr_id}
+            cat_id={cat_id}
+            svr_id={svr_id}
+            service={service}
+            profile={profile}
+            loading={loading}
+            disabled={disabled}
+          />
+        ))}
+      </div>
     </>
   );
 };
 
 type Props = {
+  profile?: string;
+  loading?: boolean;
+  disabled?: boolean;
   size?: 'medium' | 'small';
 };
 
-const WrappedServiceSelection = ({ size = 'medium' }: Props) => {
+const WrappedServiceSelection = ({ profile = null, loading = false, disabled = false, size = 'medium' }: Props) => {
   const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const form = useForm();
@@ -318,22 +322,25 @@ const WrappedServiceSelection = ({ size = 'medium' }: Props) => {
         {t('options.service')}
       </Typography>
 
-      <form.Subscribe
-        selector={state => state.values.submit.isFetchingSettings}
-        children={fetching =>
-          fetching ? (
-            <ServiceSkeleton size={size} spacing={theme.spacing(4)} />
-          ) : (
-            <form.Field
-              name="settings.services"
-              mode="array"
-              children={({ state }) =>
-                state.value.map((category, cat_id) => <Category key={cat_id} cat_id={cat_id} category={category} />)
-              }
-            />
-          )
-        }
-      />
+      {loading ? (
+        <ServiceSkeleton size={size} spacing={theme.spacing(4)} />
+      ) : (
+        <form.Subscribe
+          selector={state => [state.values?.settings?.profiles?.[profile]?.services]}
+          children={([categories]) =>
+            categories.map((category, cat_id) => (
+              <Category
+                key={cat_id}
+                cat_id={cat_id}
+                category={category}
+                profile={profile}
+                loading={loading}
+                disabled={disabled}
+              />
+            ))
+          }
+        />
+      )}
     </div>
   );
 };
