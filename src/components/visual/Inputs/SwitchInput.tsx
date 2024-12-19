@@ -1,5 +1,5 @@
 import type { IconButtonProps, ListItemButtonProps, SwitchProps, TooltipProps, TypographyProps } from '@mui/material';
-import { ListItemButton, ListItemIcon, ListItemText, Skeleton, Switch, Typography } from '@mui/material';
+import { ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton, Switch, Typography } from '@mui/material';
 import React from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
@@ -35,16 +35,33 @@ export const SwitchInput: React.FC<Props> = React.memo(
     onReset = () => null,
     ...switchProps
   }: Props) =>
-    preventRender ? null : (
+    preventRender ? null : loading ? (
+      <ListItem sx={{ padding: 0, columnGap: 1 }}>
+        <ListItemIcon>
+          <Skeleton variant="circular" sx={{ height: '26px', width: '26px', margin: '6px' }} />
+        </ListItemIcon>
+        <ListItemText
+          primary={
+            <TooltipInput tooltip={tooltip} {...tooltipProps}>
+              <Typography
+                component="label"
+                htmlFor={label}
+                variant="body2"
+                whiteSpace="nowrap"
+                textTransform="capitalize"
+                onClick={onChange}
+                {...labelProps}
+                children={label}
+              />
+            </TooltipInput>
+          }
+        />
+      </ListItem>
+    ) : (
       <ListItemButton disabled={disabled} sx={{ padding: 0, columnGap: 1 }} onClick={onChange}>
         <ListItemIcon>
-          {loading ? (
-            <Skeleton sx={{ height: '2rem', width: '1.5rem', marginLeft: 2, marginRight: 2 }} />
-          ) : (
-            <Switch id={label} checked={value} size="small" disabled={disabled} {...switchProps} />
-          )}
+          <Switch id={label} checked={value} size="small" disabled={disabled} {...switchProps} />
         </ListItemIcon>
-
         <ListItemText
           primary={
             <TooltipInput tooltip={tooltip} {...tooltipProps}>
@@ -62,7 +79,6 @@ export const SwitchInput: React.FC<Props> = React.memo(
             </TooltipInput>
           }
         />
-
         <ResetInput label={label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
       </ListItemButton>
     )
