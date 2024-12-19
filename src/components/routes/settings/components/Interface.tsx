@@ -1,9 +1,9 @@
 import { useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/settings/contexts/form';
-import { SelectListInput } from 'components/visual/List/inputs/SelectListInput';
 import { List } from 'components/visual/List/List';
 import { ListHeader } from 'components/visual/List/ListHeader';
+import { SelectListInput } from 'components/visual/ListInputs/SelectListInput';
 import { useTranslation } from 'react-i18next';
 
 type Props = {

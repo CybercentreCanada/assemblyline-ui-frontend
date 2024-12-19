@@ -13,7 +13,6 @@ type Props = Omit<SelectProps, 'defaultValue'> & {
   preventRender?: boolean;
   primary?: string;
   primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
-  render?: boolean;
   reset?: boolean;
   resetProps?: ResetListInputProps;
   secondary?: ListItemTextProps['secondary'];

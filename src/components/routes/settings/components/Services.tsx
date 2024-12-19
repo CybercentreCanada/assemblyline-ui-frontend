@@ -7,12 +7,12 @@ import type {
 } from 'components/models/base/service';
 import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
-import { BooleanListInput } from 'components/visual/List/inputs/BooleanListInput';
-import { NumberListInput } from 'components/visual/List/inputs/NumberListInput';
-import { SelectListInput } from 'components/visual/List/inputs/SelectListInput';
-import { TextListInput } from 'components/visual/List/inputs/TextListInput';
 import { List } from 'components/visual/List/List';
 import { ListHeader } from 'components/visual/List/ListHeader';
+import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
+import { NumberListInput } from 'components/visual/ListInputs/NumberListInput';
+import { SelectListInput } from 'components/visual/ListInputs/SelectListInput';
+import { TextListInput } from 'components/visual/ListInputs/TextListInput';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -68,9 +68,9 @@ const Parameter = React.memo(
                   capitalize
                   value={state.value as string}
                   loading={loading}
-                  render={!hidden}
+                  preventRender={hidden}
                   disabled={disabled || (!customize && (!selected || !param.editable))}
-                  showReset={param.default !== null && state.value !== param.default}
+                  reset={param.default !== null && state.value !== param.default}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   onReset={() => handleChange(param.default)}
@@ -85,9 +85,9 @@ const Parameter = React.memo(
                   capitalize
                   value={Number(state.value)}
                   loading={loading}
-                  render={!hidden}
+                  preventRender={hidden}
                   disabled={disabled || (!customize && (!selected || !param.editable))}
-                  showReset={param.default !== null && state.value !== param.default}
+                  reset={param.default !== null && state.value !== param.default}
                   onBlur={handleBlur}
                   onChange={e => handleChange(Number(e.target.value))}
                   onReset={() => handleChange(param.default)}
@@ -102,9 +102,9 @@ const Parameter = React.memo(
                   capitalize
                   value={state.value as boolean}
                   loading={loading}
-                  render={!hidden}
+                  preventRender={hidden}
                   disabled={disabled || (!customize && (!selected || !param.editable))}
-                  showReset={param.default !== null && state.value !== param.default}
+                  reset={param.default !== null && state.value !== param.default}
                   onBlur={handleBlur}
                   onClick={() => handleChange(!state.value)}
                   onReset={() => handleChange(param.default)}
@@ -119,9 +119,9 @@ const Parameter = React.memo(
                   capitalize
                   value={state.value}
                   loading={loading}
-                  render={!hidden}
+                  preventRender={hidden}
                   disabled={disabled || (!customize && (!selected || !param.editable))}
-                  showReset={param.default !== null && state.value !== param.default}
+                  reset={param.default !== null && state.value !== param.default}
                   options={param.list.map(item => ({
                     value: item,
                     label: item.replaceAll('_', ' ')

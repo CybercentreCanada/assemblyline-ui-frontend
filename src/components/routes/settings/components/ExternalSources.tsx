@@ -2,7 +2,7 @@ import { List, ListItem, ListItemText, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
-import { BooleanListInput } from 'components/visual/List/inputs/BooleanListInput';
+import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 

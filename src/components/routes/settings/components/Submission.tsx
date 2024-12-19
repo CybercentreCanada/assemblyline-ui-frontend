@@ -2,11 +2,11 @@ import { useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
-import { BooleanListInput } from 'components/visual/List/inputs/BooleanListInput';
-import { ClassificationListInput } from 'components/visual/List/inputs/ClassificationListInput';
-import { NumberListInput } from 'components/visual/List/inputs/NumberListInput';
 import { List } from 'components/visual/List/List';
 import { ListHeader } from 'components/visual/List/ListHeader';
+import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
+import { ClassificationListInput } from 'components/visual/ListInputs/ClassificationListInput';
+import { NumberListInput } from 'components/visual/ListInputs/NumberListInput';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -58,7 +58,7 @@ export const SubmissionSection = ({
                     secondary={t('settings:submissions.classification_desc')}
                     value={state.value as string}
                     loading={loading}
-                    render={!hidden}
+                    preventRender={hidden}
                     disabled={disabled || !customize}
                     onChange={value => handleChange(prev => ({ ...prev, value: value }))}
                   />
@@ -75,9 +75,9 @@ export const SubmissionSection = ({
                     endAdornment={t('settings:submissions.ttl_days')}
                     value={state.value.value}
                     loading={loading}
-                    render={!hidden}
+                    preventRender={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
-                    showReset={state.value.default !== null && state.value.value !== state.value.default}
+                    reset={state.value.default !== null && state.value.value !== state.value.default}
                     min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                     max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
                     onBlur={handleBlur}
@@ -96,9 +96,9 @@ export const SubmissionSection = ({
                     secondary={t('settings:submissions.deep_scan_desc')}
                     value={state.value.value}
                     loading={loading}
-                    render={!hidden}
+                    preventRender={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
-                    showReset={state.value.default !== null && state.value.value !== state.value.default}
+                    reset={state.value.default !== null && state.value.value !== state.value.default}
                     onBlur={handleBlur}
                     onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
                     onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
@@ -117,9 +117,9 @@ export const SubmissionSection = ({
                     secondary={t('settings:submissions.dynamic_recursion_desc')}
                     value={state.value.value}
                     loading={loading}
-                    render={!hidden}
+                    preventRender={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
-                    showReset={state.value.default !== null && state.value.value !== state.value.default}
+                    reset={state.value.default !== null && state.value.value !== state.value.default}
                     onBlur={handleBlur}
                     onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
                     onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
@@ -136,9 +136,9 @@ export const SubmissionSection = ({
                     secondary={t('settings:submissions.filtering_desc')}
                     value={state.value.value}
                     loading={loading}
-                    render={!hidden}
+                    preventRender={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
-                    showReset={state.value.default !== null && state.value.value !== state.value.default}
+                    reset={state.value.default !== null && state.value.value !== state.value.default}
                     onBlur={handleBlur}
                     onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
                     onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
@@ -155,9 +155,9 @@ export const SubmissionSection = ({
                     secondary={t('settings:submissions.generate_alert_desc')}
                     value={state.value.value}
                     loading={loading}
-                    render={!hidden}
+                    preventRender={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
-                    showReset={state.value.default !== null && state.value.value !== state.value.default}
+                    reset={state.value.default !== null && state.value.value !== state.value.default}
                     onBlur={handleBlur}
                     onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
                     onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
@@ -174,9 +174,9 @@ export const SubmissionSection = ({
                     secondary={t('settings:submissions.result_caching_desc')}
                     value={state.value.value}
                     loading={loading}
-                    render={!hidden}
+                    preventRender={hidden}
                     disabled={disabled || (!customize && !state.value.editable)}
-                    showReset={state.value.default !== null && state.value.value !== state.value.default}
+                    reset={state.value.default !== null && state.value.value !== state.value.default}
                     onBlur={handleBlur}
                     onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
                     onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
