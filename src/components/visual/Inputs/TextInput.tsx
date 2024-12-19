@@ -3,7 +3,6 @@ import type {
   AutocompleteValue,
   FormHelperTextProps,
   IconButtonProps,
-  OutlinedInputProps,
   TypographyProps
 } from '@mui/material';
 import {
@@ -12,8 +11,8 @@ import {
   FormHelperText,
   InputAdornment,
   InputLabel,
-  OutlinedInput,
   Skeleton,
+  TextField,
   Typography,
   useTheme
 } from '@mui/material';
@@ -64,8 +63,8 @@ const WrappedTextInput = <
   reset = false,
   resetProps = null,
   value,
-  onChange,
-  onReset,
+  onChange = () => null,
+  onReset = () => null,
   ...autocompleteProps
 }: Props<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
   const theme = useTheme();
@@ -80,7 +79,6 @@ const WrappedTextInput = <
         htmlFor={label}
         variant="body2"
         whiteSpace="nowrap"
-        textTransform="capitalize"
         gutterBottom
         {...labelProps}
         children={label}
@@ -105,14 +103,14 @@ const WrappedTextInput = <
               setValue(v as AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>);
               onChange(e, v, o);
             }}
-            // eslint-disable-next-line no-unused-vars
-            renderInput={({ InputLabelProps, InputProps, inputProps, ...otherParams }) => (
+            renderInput={({ InputProps, ...params }) => (
               <>
-                <OutlinedInput
+                <TextField
                   id={label}
+                  variant="outlined"
                   error={!!error}
-                  endAdornment={
-                    !reset ? null : (
+                  InputProps={{
+                    endAdornment: !reset ? null : (
                       <InputAdornment position="end">
                         <ResetInput
                           label={label}
@@ -121,11 +119,10 @@ const WrappedTextInput = <
                           {...resetProps}
                         />
                       </InputAdornment>
-                    )
-                  }
-                  style={{ padding: 0, ...inputProps?.style }}
-                  {...otherParams}
-                  {...(inputProps as unknown as OutlinedInputProps)}
+                    ),
+                    ...InputProps
+                  }}
+                  {...params}
                 />
                 {!error || disabled ? null : (
                   <FormHelperText

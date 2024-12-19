@@ -6,6 +6,7 @@ import { ResetInput } from './components/ResetInput';
 import { TooltipInput } from './components/TooltipInput';
 
 type Props = Omit<SwitchProps, 'onClick'> & {
+  disableGap?: boolean;
   label: string;
   labelProps?: TypographyProps;
   loading?: boolean;
@@ -22,6 +23,7 @@ type Props = Omit<SwitchProps, 'onClick'> & {
 export const SwitchInput: React.FC<Props> = React.memo(
   ({
     disabled = false,
+    disableGap = false,
     label = null,
     labelProps = null,
     loading = false,
@@ -37,7 +39,7 @@ export const SwitchInput: React.FC<Props> = React.memo(
   }: Props) =>
     preventRender ? null : loading ? (
       <ListItem sx={{ padding: 0, columnGap: 1 }}>
-        <ListItemIcon>
+        <ListItemIcon sx={{ ...(disableGap && { minWidth: 0 }) }}>
           <Skeleton variant="circular" sx={{ height: '26px', width: '26px', margin: '6px' }} />
         </ListItemIcon>
         <ListItemText
@@ -48,7 +50,6 @@ export const SwitchInput: React.FC<Props> = React.memo(
                 htmlFor={label}
                 variant="body2"
                 whiteSpace="nowrap"
-                textTransform="capitalize"
                 onClick={onChange}
                 {...labelProps}
                 children={label}
@@ -59,7 +60,7 @@ export const SwitchInput: React.FC<Props> = React.memo(
       </ListItem>
     ) : (
       <ListItemButton disabled={disabled} sx={{ padding: 0, columnGap: 1 }} onClick={onChange}>
-        <ListItemIcon>
+        <ListItemIcon sx={{ ...(disableGap && { minWidth: 0 }) }}>
           <Switch id={label} checked={value} size="small" disabled={disabled} {...switchProps} />
         </ListItemIcon>
         <ListItemText
@@ -70,7 +71,6 @@ export const SwitchInput: React.FC<Props> = React.memo(
                 htmlFor={label}
                 variant="body2"
                 whiteSpace="nowrap"
-                textTransform="capitalize"
                 sx={{ cursor: 'pointer', ...labelProps?.sx }}
                 onClick={onChange}
                 {...labelProps}

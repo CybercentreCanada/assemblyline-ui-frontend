@@ -1,11 +1,16 @@
 import type { CheckboxProps, IconButtonProps, ListItemButtonProps, TooltipProps, TypographyProps } from '@mui/material';
 import { Checkbox, ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton, Typography } from '@mui/material';
 import React from 'react';
+import type { ExpendInputProps } from './components/ExpendInput';
+import { ExpendInput } from './components/ExpendInput';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 import { TooltipInput } from './components/TooltipInput';
 
 type Props = Omit<CheckboxProps, 'onClick'> & {
+  disableGap?: boolean;
+  expend?: boolean;
+  expendProps?: ExpendInputProps;
   label: string;
   labelProps?: TypographyProps;
   loading?: boolean;
@@ -15,6 +20,7 @@ type Props = Omit<CheckboxProps, 'onClick'> & {
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   value: CheckboxProps['checked'];
+  onExpend?: IconButtonProps['onClick'];
   onChange?: ListItemButtonProps['onClick'];
   onReset?: IconButtonProps['onClick'];
 };
@@ -22,6 +28,9 @@ type Props = Omit<CheckboxProps, 'onClick'> & {
 export const CheckboxInput: React.FC<Props> = React.memo(
   ({
     disabled = false,
+    disableGap = false,
+    expend = null,
+    expendProps = null,
     label = null,
     labelProps = null,
     loading = false,
@@ -31,13 +40,14 @@ export const CheckboxInput: React.FC<Props> = React.memo(
     tooltip = null,
     tooltipProps = null,
     value = false,
+    onExpend = () => null,
     onChange = () => null,
     onReset = () => null,
     ...checkboxProps
   }: Props) =>
     preventRender ? null : loading ? (
       <ListItem sx={{ padding: 0, columnGap: 1 }}>
-        <ListItemIcon>
+        <ListItemIcon sx={{ ...(disableGap && { minWidth: 0 }) }}>
           <Skeleton variant="circular" sx={{ height: '26px', width: '26px', margin: '6px' }} />
         </ListItemIcon>
         <ListItemText
@@ -48,7 +58,6 @@ export const CheckboxInput: React.FC<Props> = React.memo(
                 htmlFor={label}
                 variant="body2"
                 whiteSpace="nowrap"
-                textTransform="capitalize"
                 onClick={onChange}
                 {...labelProps}
                 children={label}
@@ -59,7 +68,7 @@ export const CheckboxInput: React.FC<Props> = React.memo(
       </ListItem>
     ) : (
       <ListItemButton disabled={disabled} role={undefined} sx={{ padding: 0, columnGap: 1 }} onClick={onChange}>
-        <ListItemIcon>
+        <ListItemIcon sx={{ ...(disableGap && { minWidth: 0 }) }}>
           <Checkbox id={label} checked={value} size="small" disabled={disabled} {...checkboxProps} />
         </ListItemIcon>
         <ListItemText
@@ -70,7 +79,6 @@ export const CheckboxInput: React.FC<Props> = React.memo(
                 htmlFor={label}
                 variant="body2"
                 whiteSpace="nowrap"
-                textTransform="capitalize"
                 sx={{ cursor: 'pointer', ...labelProps?.sx }}
                 onClick={onChange}
                 {...labelProps}
@@ -80,6 +88,7 @@ export const CheckboxInput: React.FC<Props> = React.memo(
           }
         />
         <ResetInput label={label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+        <ExpendInput label={label} open={expend} onExpend={onExpend} {...expendProps} />
       </ListItemButton>
     )
 );

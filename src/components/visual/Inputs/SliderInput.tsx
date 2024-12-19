@@ -31,7 +31,6 @@ const WrappedSliderInput = ({
         color="textSecondary"
         variant="body2"
         whiteSpace="nowrap"
-        textTransform="capitalize"
         gutterBottom
         {...labelProps}
         children={label}

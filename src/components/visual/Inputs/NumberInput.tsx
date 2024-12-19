@@ -43,7 +43,6 @@ const WrappedNumberInput = ({
         htmlFor={label}
         variant="body2"
         whiteSpace="nowrap"
-        textTransform="capitalize"
         gutterBottom
         {...labelProps}
         children={label}
@@ -58,7 +57,7 @@ const WrappedNumberInput = ({
             margin="dense"
             size="small"
             fullWidth
-            value={value.toString()}
+            value={value?.toString()}
             disabled={disabled}
             inputProps={{ min: min, max: max }}
             onChange={event => {
