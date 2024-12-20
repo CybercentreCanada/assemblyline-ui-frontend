@@ -183,11 +183,11 @@ function DrawerProvider({ children }: DrawerProviderProps) {
         )}
         <Drawer
           classes={{ root: classes.appRightDrawer, paper: clsx(classes.paper, isMaximized && MAXIMIZE_CLASS) }}
-          disableEnforceFocus
           open={globalDrawerOpened}
           anchor="right"
           variant={isXL ? 'persistent' : 'temporary'}
           style={{ width: globalDrawer ? drawerWidth : 0 }}
+          ModalProps={{ disableEnforceFocus: true }}
           onClose={closeGlobalDrawer}
         >
           {useMemo(
