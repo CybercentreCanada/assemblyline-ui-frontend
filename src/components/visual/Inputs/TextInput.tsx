@@ -33,6 +33,7 @@ type Props<
 > & {
   error?: FormHelperTextProps['children'];
   errorProps?: FormHelperTextProps;
+
   label: string;
   labelProps?: TypographyProps;
   loading?: boolean;
@@ -55,6 +56,7 @@ const WrappedTextInput = <
   disabled,
   error = null,
   errorProps = null,
+  id = null,
   label,
   labelProps,
   loading = false,
@@ -76,7 +78,7 @@ const WrappedTextInput = <
     <div>
       <Typography
         component={InputLabel}
-        htmlFor={label}
+        htmlFor={id || label}
         variant="body2"
         whiteSpace="nowrap"
         gutterBottom
@@ -88,7 +90,7 @@ const WrappedTextInput = <
           <Skeleton sx={{ height: '40px', transform: 'unset' }} />
         ) : (
           <Autocomplete
-            id={label}
+            id={id || label}
             autoComplete
             freeSolo
             disableClearable
@@ -106,14 +108,14 @@ const WrappedTextInput = <
             renderInput={({ InputProps, ...params }) => (
               <>
                 <TextField
-                  id={label}
+                  id={id || label}
                   variant="outlined"
                   error={!!error}
                   InputProps={{
                     endAdornment: !reset ? null : (
                       <InputAdornment position="end">
                         <ResetInput
-                          label={label}
+                          id={id || label}
                           preventRender={!reset || disabled}
                           onReset={onReset}
                           {...resetProps}

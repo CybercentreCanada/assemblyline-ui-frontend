@@ -31,6 +31,7 @@ export const CheckboxInput: React.FC<Props> = React.memo(
     disableGap = false,
     expend = null,
     expendProps = null,
+    id = null,
     label = null,
     labelProps = null,
     loading = false,
@@ -55,7 +56,7 @@ export const CheckboxInput: React.FC<Props> = React.memo(
             <TooltipInput tooltip={tooltip} {...tooltipProps}>
               <Typography
                 component="label"
-                htmlFor={label}
+                htmlFor={id || label}
                 variant="body2"
                 whiteSpace="nowrap"
                 onClick={onChange}
@@ -69,14 +70,14 @@ export const CheckboxInput: React.FC<Props> = React.memo(
     ) : (
       <ListItemButton disabled={disabled} role={undefined} sx={{ padding: 0, columnGap: 1 }} onClick={onChange}>
         <ListItemIcon sx={{ ...(disableGap && { minWidth: 0 }) }}>
-          <Checkbox id={label} checked={value} size="small" disabled={disabled} {...checkboxProps} />
+          <Checkbox id={id || label} checked={value} size="small" disabled={disabled} {...checkboxProps} />
         </ListItemIcon>
         <ListItemText
           primary={
             <TooltipInput tooltip={tooltip} {...tooltipProps}>
               <Typography
                 component="label"
-                htmlFor={label}
+                htmlFor={id || label}
                 variant="body2"
                 whiteSpace="nowrap"
                 sx={{ cursor: 'pointer', ...labelProps?.sx }}
@@ -87,8 +88,8 @@ export const CheckboxInput: React.FC<Props> = React.memo(
             </TooltipInput>
           }
         />
-        <ResetInput label={label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
-        <ExpendInput label={label} open={expend} onExpend={onExpend} {...expendProps} />
+        <ResetInput id={id || label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+        <ExpendInput id={id || label} open={expend} onExpend={onExpend} {...expendProps} />
       </ListItemButton>
     )
 );

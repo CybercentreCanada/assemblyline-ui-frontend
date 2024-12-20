@@ -24,6 +24,7 @@ export const SwitchInput: React.FC<Props> = React.memo(
   ({
     disabled = false,
     disableGap = false,
+    id = null,
     label = null,
     labelProps = null,
     loading = false,
@@ -47,7 +48,7 @@ export const SwitchInput: React.FC<Props> = React.memo(
             <TooltipInput tooltip={tooltip} {...tooltipProps}>
               <Typography
                 component="label"
-                htmlFor={label}
+                htmlFor={id || label}
                 variant="body2"
                 whiteSpace="nowrap"
                 onClick={onChange}
@@ -61,14 +62,14 @@ export const SwitchInput: React.FC<Props> = React.memo(
     ) : (
       <ListItemButton disabled={disabled} sx={{ padding: 0, columnGap: 1 }} onClick={onChange}>
         <ListItemIcon sx={{ ...(disableGap && { minWidth: 0 }) }}>
-          <Switch id={label} checked={value} size="small" disabled={disabled} {...switchProps} />
+          <Switch id={id || label} checked={value} size="small" disabled={disabled} {...switchProps} />
         </ListItemIcon>
         <ListItemText
           primary={
             <TooltipInput tooltip={tooltip} {...tooltipProps}>
               <Typography
                 component="label"
-                htmlFor={label}
+                htmlFor={id || label}
                 variant="body2"
                 whiteSpace="nowrap"
                 sx={{ cursor: 'pointer', ...labelProps?.sx }}
@@ -79,7 +80,7 @@ export const SwitchInput: React.FC<Props> = React.memo(
             </TooltipInput>
           }
         />
-        <ResetInput label={label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+        <ResetInput id={id || label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
       </ListItemButton>
     )
 );

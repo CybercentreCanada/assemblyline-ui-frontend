@@ -3,17 +3,17 @@ import type { IconButtonProps } from '@mui/material';
 import { IconButton } from '@mui/material';
 import React from 'react';
 
-export type ResetInputProps = IconButtonProps & {
-  label: string;
+export type ResetInputProps = Omit<IconButtonProps, 'id'> & {
+  id: string;
   preventRender: boolean;
   onReset: IconButtonProps['onClick'];
 };
 
 export const ResetInput: React.FC<ResetInputProps> = React.memo(
-  ({ label, preventRender = false, onReset, ...buttonProps }: ResetInputProps) =>
+  ({ id = null, preventRender = false, onReset, ...buttonProps }: ResetInputProps) =>
     preventRender ? null : (
       <IconButton
-        aria-label={`refresh ${label}`}
+        aria-label={`refresh ${id}`}
         type="reset"
         color="secondary"
         onClick={event => {

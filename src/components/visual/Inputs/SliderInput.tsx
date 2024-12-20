@@ -16,6 +16,7 @@ type Props = SliderProps & {
 
 const WrappedSliderInput = ({
   disabled,
+  id = null,
   label,
   labelProps,
   loading,
@@ -42,15 +43,15 @@ const WrappedSliderInput = ({
           <div style={{ display: 'flex', alignItems: 'flex-start' }}>
             <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
               <Slider
-                aria-label={label}
-                id={label}
+                aria-label={id || label}
+                id={id || label}
                 disabled={disabled}
                 valueLabelDisplay="auto"
                 size="small"
                 {...sliderProps}
               />
             </div>
-            <ResetInput label={label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+            <ResetInput id={id || label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
           </div>
         )}
       </FormControl>

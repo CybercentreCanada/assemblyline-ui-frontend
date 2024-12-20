@@ -5,11 +5,11 @@ import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
 type Props = Omit<SelectProps, 'onChange'> & {
+  items: string[];
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
   preventRender?: boolean;
-  items: string[];
   reset?: boolean;
   resetProps?: ResetInputProps;
   onChange?: (event: SelectChangeEvent<unknown>, value: string) => void;
@@ -17,15 +17,16 @@ type Props = Omit<SelectProps, 'onChange'> & {
 };
 
 const WrappedSelectInput = ({
+  disabled,
+  id = null,
+  items = [],
   label,
   labelProps,
   loading = false,
   preventRender = false,
   reset = false,
   resetProps = null,
-  items = [],
   value,
-  disabled,
   onChange = () => null,
   onReset = () => null,
   ...selectProps
@@ -34,7 +35,7 @@ const WrappedSelectInput = ({
     <div>
       <Typography
         component={InputLabel}
-        htmlFor={label}
+        htmlFor={id || label}
         variant="body2"
         whiteSpace="nowrap"
         gutterBottom
@@ -50,14 +51,14 @@ const WrappedSelectInput = ({
             size="small"
             fullWidth
             displayEmpty
-            inputProps={{ id: label }}
+            inputProps={{ id: id || label }}
             value={items.includes(value as string) ? value : ''}
             sx={{ textTransform: 'capitalize' }}
             onChange={event => onChange(event, event.target.value as string)}
             endAdornment={
               !reset ? null : (
                 <InputAdornment position="end">
-                  <ResetInput label={label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+                  <ResetInput id={id || label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
                 </InputAdornment>
               )
             }

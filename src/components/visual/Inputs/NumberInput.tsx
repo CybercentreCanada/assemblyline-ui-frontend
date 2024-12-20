@@ -23,6 +23,7 @@ type Props = Omit<OutlinedInputProps, 'value' | 'onChange'> & {
 const WrappedNumberInput = ({
   disabled = false,
   endAdornment,
+  id = null,
   label,
   labelProps,
   loading = false,
@@ -40,7 +41,7 @@ const WrappedNumberInput = ({
     <div>
       <Typography
         component={InputLabel}
-        htmlFor={label}
+        htmlFor={id || label}
         variant="body2"
         whiteSpace="nowrap"
         gutterBottom
@@ -52,7 +53,7 @@ const WrappedNumberInput = ({
           <Skeleton sx={{ height: '40px', transform: 'unset' }} />
         ) : (
           <OutlinedInput
-            id={label}
+            id={id || label}
             type="number"
             margin="dense"
             size="small"
@@ -70,7 +71,7 @@ const WrappedNumberInput = ({
               <>
                 {!reset ? null : (
                   <InputAdornment position="end">
-                    <ResetInput label={label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+                    <ResetInput id={id || label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
                   </InputAdornment>
                 )}
                 {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
