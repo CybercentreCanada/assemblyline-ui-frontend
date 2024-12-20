@@ -68,8 +68,9 @@ export const getRowFoldingMap = (
   store: Store,
   columnSize: number
 ): Map<number, { index: number; type: FoldingType }> => {
-  let data = store.hex.data.replaceAll(' ', '').match(new RegExp(`.{1,${2 * columnSize}}`, 'g'));
-  let map: Map<number, { index: number; type: FoldingType }> = new Map();
+  const data = store.hex.data.replaceAll(' ', '').match(new RegExp(`.{1,${2 * columnSize}}`, 'g'));
+  const map: Map<number, { index: number; type: FoldingType }> = new Map();
+  const zeroes = '0'.repeat(2 * columnSize);
 
   let i: number = 1; // data
   let j: number = 1; // map
@@ -81,17 +82,12 @@ export const getRowFoldingMap = (
   if (data.length === 1) return map;
 
   while (i < data.length - 1) {
-    if (data[i - 1] !== data[i] && data[i] !== data[i + 1]) {
-      map.set(j, { index: i, type: FoldingType.SHOW });
-      j++;
-    } else if (data[i - 1] !== data[i] && data[i] === data[i + 1]) {
-      map.set(j, { index: i, type: FoldingType.SHOW });
-      j++;
-    } else if (data[i - 1] === data[i] && data[i] !== data[i + 1] && hiddenSection) {
+    const allZeroes = data[i - 1] === zeroes && data[i] === zeroes && data[i + 1] === zeroes;
+    if (!allZeroes) {
       map.set(j, { index: i, type: FoldingType.SHOW });
       hiddenSection = false;
       j++;
-    } else if (data[i - 1] === data[i] && data[i] === data[i + 1] && !hiddenSection) {
+    } else if (allZeroes && !hiddenSection) {
       map.set(j, { index: i, type: FoldingType.HIDE });
       hiddenSection = true;
       j++;
