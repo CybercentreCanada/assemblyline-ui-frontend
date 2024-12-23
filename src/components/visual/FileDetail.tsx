@@ -34,6 +34,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import HeuristicDetail from 'components/routes/manage/heuristic_detail';
+import SignatureDetail from 'components/routes/manage/signature_detail';
 import AISummarySection from 'components/routes/submission/detail/ai_summary';
 import Classification from 'components/visual/Classification';
 import { emptyResult } from 'components/visual/ResultCard';
@@ -92,6 +93,7 @@ const WrappedFileDetail: React.FC<Props> = ({
   const [promotedSections, setPromotedSections] = useState([]);
   const [insideDrawer, setInsideDrawer] = useState<boolean>(null);
   const [loaded, setLoaded] = useState<boolean>(false);
+  const [heuristics, setHeuristics] = useState<string[]>([]);
 
   const ref = useRef();
 
@@ -139,6 +141,15 @@ const WrappedFileDetail: React.FC<Props> = ({
     newData.emptys = data.results.filter(result => emptyResult(result));
     newData.results = data.results.filter(result => !emptyResult(result));
     newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
+
+    // Compile a simplified list of heuristics for later reference
+    const heurs = [];
+    Object.values(newData?.heuristics || {}).map(hs => {
+      hs.map(h => {
+        heurs.push(h[0]);
+      });
+    });
+    setHeuristics(heurs);
     return newData;
   };
 
@@ -325,10 +336,19 @@ const WrappedFileDetail: React.FC<Props> = ({
   useEffect(() => {
     if (insideDrawer === false) {
       setLoaded(true);
-      if (location.hash) setGlobalDrawer(<HeuristicDetail heur_id={location.hash.slice(1)} />);
-      else if (!location.hash) setGlobalDrawer(null);
+      if (!location.hash) {
+        setGlobalDrawer(null);
+      } else if (file) {
+        // Set the drawer content based on the hash
+        var id = location.hash.slice(1);
+        if (heuristics.includes(id)) {
+          setGlobalDrawer(<HeuristicDetail heur_id={id} />);
+        } else {
+          setGlobalDrawer(<SignatureDetail signature_id={id} />);
+        }
+      }
     }
-  }, [insideDrawer, location.hash, setGlobalDrawer]);
+  }, [insideDrawer, location.hash, setGlobalDrawer, file]);
 
   useEffect(() => {
     if (loaded && insideDrawer === false && !globalDrawerOpened && location.hash) {
