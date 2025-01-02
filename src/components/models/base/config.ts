@@ -657,7 +657,6 @@ export const CONFIGURATION: Configuration = {
     profiles: {
       'Dynamic Analysis': {
         auto_archive: false,
-        editable_params: {},
         services: {
           excluded: [],
           rescan: [],
@@ -667,7 +666,6 @@ export const CONFIGURATION: Configuration = {
       },
       'Static Analysis': {
         auto_archive: false,
-        editable_params: {},
         services: {
           excluded: [],
           rescan: [],
@@ -677,7 +675,6 @@ export const CONFIGURATION: Configuration = {
       },
       'Static Analysis with Internet': {
         auto_archive: false,
-        editable_params: {},
         services: {
           excluded: [],
           rescan: [],

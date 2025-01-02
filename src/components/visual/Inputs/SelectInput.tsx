@@ -1,10 +1,20 @@
 import type { IconButtonProps, SelectChangeEvent, SelectProps, TypographyProps } from '@mui/material';
-import { FormControl, InputAdornment, InputLabel, MenuItem, Select, Skeleton, Typography } from '@mui/material';
+import {
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  Skeleton,
+  Typography,
+  useTheme
+} from '@mui/material';
 import React from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
 type Props = Omit<SelectProps, 'onChange'> & {
+  hasEmpty?: boolean;
   items: string[];
   label?: string;
   labelProps?: TypographyProps;
@@ -18,6 +28,7 @@ type Props = Omit<SelectProps, 'onChange'> & {
 
 const WrappedSelectInput = ({
   disabled,
+  hasEmpty = false,
   id = null,
   items = [],
   label,
@@ -30,8 +41,10 @@ const WrappedSelectInput = ({
   onChange = () => null,
   onReset = () => null,
   ...selectProps
-}: Props) =>
-  preventRender ? null : (
+}: Props) => {
+  const theme = useTheme();
+
+  return preventRender ? null : (
     <div>
       <Typography
         component={InputLabel}
@@ -57,14 +70,14 @@ const WrappedSelectInput = ({
             onChange={event => onChange(event, event.target.value as string)}
             endAdornment={
               !reset ? null : (
-                <InputAdornment position="end">
+                <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
                   <ResetInput id={id || label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
                 </InputAdornment>
               )
             }
             {...selectProps}
           >
-            <MenuItem value="" sx={{ height: '36px' }}></MenuItem>
+            {hasEmpty && <MenuItem value="" sx={{ height: '36px' }}></MenuItem>}
             {items.map((item, i) => (
               <MenuItem key={i} value={item} sx={{ textTransform: 'capitalize' }}>
                 {item.replaceAll('_', ' ')}
@@ -75,5 +88,6 @@ const WrappedSelectInput = ({
       </FormControl>
     </div>
   );
+};
 
 export const SelectInput = React.memo(WrappedSelectInput);

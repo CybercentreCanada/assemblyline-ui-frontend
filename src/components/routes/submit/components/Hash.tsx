@@ -1,32 +1,131 @@
-import {
-  Button,
-  Checkbox,
-  CircularProgress,
-  FormControlLabel,
-  Skeleton,
-  TextField,
-  Typography,
-  useTheme
-} from '@mui/material';
+import { Button, CircularProgress, TextField, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
+import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { Submission } from 'components/models/base/submission';
+import { parseSubmissionProfiles } from 'components/routes/settings/utils/utils';
 import { MetadataSummary } from 'components/routes/submit/components/MetadataSummary';
 import type { SubmitStore } from 'components/routes/submit/contexts/form';
 import { useForm } from 'components/routes/submit/contexts/form';
-import { BooleanInput } from 'components/routes/submit/inputs/BooleanInput';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { getSubmitType } from 'helpers/utils';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-export const HashSubmit = () => {
+type Props = {
+  profile?: string;
+  loading?: boolean;
+  disabled?: boolean;
+};
+
+export const HashSubmit = ({ profile = null, loading = false, disabled = false }: Props) => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const { configuration } = useALContext();
-  const { closeSnackbar } = useMySnackbar();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const { closeSnackbar, showErrorMessage, showSuccessMessage } = useMySnackbar();
+  const { user: currentUser, configuration } = useALContext();
 
   const form = useForm();
 
-  return (
+  const handleSubmitHash = useCallback(
+    (store: SubmitStore) => {
+      if (store.hash.hasError) {
+        showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
+        return;
+      }
+
+      apiCall<Submission>({
+        url: '/api/v4/submit/',
+        method: 'POST',
+        body: {
+          ui_params: parseSubmissionProfiles(store.settings, currentUser),
+          submission_profile: store.state.profile,
+          [store.hash.type]: store.hash.value,
+          metadata: store.metadata
+        },
+        onSuccess: ({ api_response }) => {
+          showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
+          form.setStore(s => {
+            s.state.isConfirmationOpen = false;
+            return s;
+          });
+          setTimeout(() => {
+            navigate(`/submission/detail/${api_response.sid}`);
+          }, 500);
+        },
+        onFailure: ({ api_status_code, api_error_message }) => {
+          showErrorMessage(api_error_message);
+          if (api_status_code === 400 && api_error_message.includes('metadata')) {
+            form.setStore(s => {
+              s.state.tab = 'options';
+              return s;
+            });
+          }
+
+          form.setStore(s => {
+            s.hash.hasError = true;
+            s.state.isUploading = false;
+            s.state.isConfirmationOpen = false;
+            return s;
+          });
+        },
+        onEnter: () => {
+          form.setStore(s => {
+            s.state.isUploading = true;
+            return s;
+          });
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [configuration.ui.allow_url_submissions, currentUser, form, t]
+  );
+
+  const handleDeselectServices = useCallback(
+    (store: SubmitStore) => {
+      store.settings.profiles[store.state.profile].services.forEach((category, i) => {
+        category.services.forEach((service, j) => {
+          if (service.selected && service.is_external) {
+            store.settings.profiles[store.state.profile].services[i].services[j].selected = false;
+          }
+        });
+        store.settings.profiles[store.state.profile].services[i].selected = store.settings.profiles[
+          store.state.profile
+        ].services[i].services.every(svr => svr.selected);
+      });
+
+      handleSubmitHash(store);
+    },
+    [handleSubmitHash]
+  );
+
+  const handleConfirm = useCallback(
+    (store: SubmitStore) => {
+      const showValidate = store.settings.profiles[profile].services.some(cat =>
+        cat.services.some(svr => svr.selected && svr.is_external)
+      );
+
+      if (showValidate && !store.state.isConfirmationOpen) {
+        form.setStore(s => {
+          s.state.isConfirmationOpen = true;
+          return s;
+        });
+      } else {
+        form.setStore(s => {
+          s.state.isConfirmationOpen = false;
+          return s;
+        });
+
+        handleSubmitHash(store);
+      }
+    },
+    [form, handleSubmitHash, profile]
+  );
+
+  return loading || !profile ? null : (
     <>
       <div
         style={{
@@ -38,99 +137,93 @@ export const HashSubmit = () => {
         }}
       >
         <form.Subscribe
-          selector={state => [state.values.submit.isFetchingSettings]}
-          children={([fetching]) => (
-            <>
-              <form.Field
-                name="hash"
-                children={({ state, handleBlur }) =>
-                  fetching ? (
-                    <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
-                  ) : (
-                    <div style={{ flex: 1, textAlign: 'start' }}>
-                      <TextField
-                        label={`${t('urlHash.input_title')}${t('urlHash.input_suffix')}`}
-                        size="small"
-                        type="stringInput"
-                        variant="outlined"
-                        fullWidth
-                        value={state.value.value}
-                        style={{ flexGrow: 1, marginRight: '1rem' }}
-                        onBlur={handleBlur}
-                        onChange={event => {
-                          closeSnackbar();
-                          const [type, value] = getSubmitType(event.target.value, configuration);
+          selector={state => [state.values.state.isConfirmationOpen, state.values.state.isUploading]}
+          children={([open, isUploading]) => (
+            <ConfirmationDialog
+              open={open}
+              waiting={isUploading}
+              waitingCancel={isUploading}
+              handleClose={() =>
+                form.setStore(s => {
+                  s.state.isConfirmationOpen = false;
+                  return s;
+                })
+              }
+              handleCancel={() => handleDeselectServices(form.state.values)}
+              handleAccept={() => handleSubmitHash(form.state.values)}
+              title={t('validate.title')}
+              cancelText={t('validate.cancelText')}
+              acceptText={t('validate.acceptText')}
+              text={t('validate.text')}
+            />
+          )}
+        />
+        <form.Subscribe
+          selector={state => [state.values.hash]}
+          children={([hash]) => (
+            <div style={{ flex: 1 }}>
+              <TextField
+                label={`${t('urlHash.input_title')}${t('urlHash.input_suffix')}`}
+                size="small"
+                type="stringInput"
+                variant="outlined"
+                fullWidth
+                value={hash.value}
+                onChange={event => {
+                  closeSnackbar();
+                  const [type, value] = getSubmitType(event.target.value, configuration);
 
-                          form.setStore(s => {
-                            s.hash.type = type;
-                            s.hash.value = value;
-                            s.hash.hasError = !type || (!configuration.ui.allow_url_submissions && type === 'url');
+                  form.setStore(s => {
+                    s.hash = { ...s.hash, type, value };
 
-                            if (type === 'url' && s.hash.urlAutoSelect) {
-                              s.hash.urlAutoSelect = false;
-                              s.settings.services.forEach((category, i) => {
-                                category.services.forEach((service, j) => {
-                                  if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
-                                    s.settings.services[i].services[j].selected = true;
-                                  }
-                                });
-                                s.settings.services[i].selected = s.settings.services[i].services.every(
-                                  svr => svr.selected
-                                );
-                              });
-                            } else if (type !== 'url') {
-                              s.hash.urlAutoSelect = true;
-                            }
+                    if (type === 'url' && s.hash.urlAutoSelect) {
+                      s.hash.urlAutoSelect = false;
+                      s.settings.profiles[profile].services.forEach((category, i) => {
+                        category.services.forEach((service, j) => {
+                          if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
+                            s.settings.profiles[profile].services[i].services[j].selected = true;
+                          }
+                        });
+                        s.settings.profiles[profile].services[i].selected = s.settings.profiles[profile].services[
+                          i
+                        ].services.every(svr => svr.selected);
+                      });
+                    } else if (type !== 'url') {
+                      s.hash.urlAutoSelect = true;
+                    }
 
-                            return s;
-                          });
-                        }}
-                      />
-                      {!state.meta.errors ? null : (
-                        <Typography variant="caption" color="error" children={state.meta.errors.join(', ')} />
-                      )}
-                    </div>
-                  )
-                }
+                    return s;
+                  });
+                }}
               />
+            </div>
+          )}
+        />
 
-              <form.Subscribe
-                selector={state => [
-                  state.values.submit.isUploading,
-                  state.values.hash.type,
-                  state.values.hash.hasError
-                ]}
-                children={([isUploading, type, error]) =>
-                  fetching ? (
-                    <Skeleton style={{ height: '3rem', width: '5rem' }} />
-                  ) : (
-                    <Button
-                      disabled={Boolean(isUploading || error)}
-                      color="primary"
-                      variant="contained"
-                      onClick={async () => {
-                        await form.handleSubmit();
-                      }}
-                      style={{ height: '40px' }}
-                    >
-                      {type ? `${t('urlHash.button')} ${type}` : t('urlHash.button')}
-                      {isUploading && (
-                        <CircularProgress
-                          size={24}
-                          style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            marginTop: -12,
-                            marginLeft: -12
-                          }}
-                        />
-                      )}
-                    </Button>
-                  )
-                }
-              />
-            </>
+        <form.Subscribe
+          selector={state => [state.values.state.isUploading, state.values.hash.type, state.values.hash.hasError]}
+          children={([isUploading, type, error]) => (
+            <Button
+              disabled={Boolean(isUploading || error || !type)}
+              color="primary"
+              variant="contained"
+              onClick={() => handleConfirm(form.state.values)}
+              style={{ height: '40px' }}
+            >
+              {type ? `${t('urlHash.button')} ${type}` : t('urlHash.button')}
+              {isUploading && (
+                <CircularProgress
+                  size={24}
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: -12,
+                    marginLeft: -12
+                  }}
+                />
+              )}
+            </Button>
           )}
         />
       </div>
@@ -139,7 +232,7 @@ export const HashSubmit = () => {
         selector={state =>
           [
             state.values.hash.type === 'url',
-            state.values?.settings?.services.reduce((prev: [number, number][], category, i) => {
+            state.values.settings.profiles[profile].services.reduce((prev: [number, number][], category, i) => {
               category.services.forEach((service, j) => {
                 if (configuration?.ui?.url_submission_auto_service_selection?.includes(service.name)) prev.push([i, j]);
               });
@@ -154,23 +247,28 @@ export const HashSubmit = () => {
                 {t('options.submission.url_submission_auto_service_selection')}
               </Typography>
               {services.map(([cat, svr], i) => (
-                <form.Field
+                <form.Subscribe
                   key={i}
-                  name={`settings.services[${cat}].services[${svr}]`}
-                  children={({ state, handleBlur }) => (
-                    <BooleanInput
-                      label={state.value.name}
-                      value={state.value.selected}
-                      onClick={() =>
+                  selector={state => [state.values.settings.profiles[profile].services[cat].services[svr]]}
+                  children={([service]) => (
+                    <CheckboxInput
+                      key={i}
+                      id={`url_submission_auto_service_selection-${service.name.replace('_', ' ')}`}
+                      label={service.name.replace('_', ' ')}
+                      labelProps={{ textTransform: 'capitalize' }}
+                      value={service.selected}
+                      loading={loading}
+                      disabled={disabled}
+                      disableGap
+                      onChange={() => {
                         form.setStore(s => {
-                          s.settings.services[cat].services[svr].selected = !state.value.selected;
-                          s.settings.services[cat].selected = s.settings.services[cat].services.every(
-                            val => val.selected
-                          );
+                          s.settings.profiles[profile].services[cat].services[svr].selected = !service.selected;
+                          s.settings.profiles[profile].services[cat].selected = s.settings.profiles[profile].services[
+                            cat
+                          ].services.every(val => val.selected);
                           return s;
-                        })
-                      }
-                      onBlur={handleBlur}
+                        });
+                      }}
                     />
                   )}
                 />
@@ -195,50 +293,25 @@ export const HashSubmit = () => {
               <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
                 <Typography variant="subtitle1">{t('options.submission.default_external_sources')}</Typography>
                 {fileSources[type].sources.map((source, i) => (
-                  <div key={i}>
-                    <FormControlLabel
-                      style={{
-                        ...(settings && {
-                          marginLeft: 0,
-                          width: '100%',
-                          '&:hover': {
-                            background: theme.palette.action.hover
-                          }
-                        })
-                      }}
-                      label={<Typography variant="body2">{source}</Typography>}
-                      control={
-                        !settings ? (
-                          <Skeleton
-                            style={{
-                              height: '2rem',
-                              width: '1.5rem',
-                              marginLeft: theme.spacing(2),
-                              marginRight: theme.spacing(2)
-                            }}
-                          />
-                        ) : (
-                          <Checkbox
-                            size="small"
-                            checked={settings.default_external_sources.indexOf(source) !== -1}
-                            name="label"
-                            onChange={() => {
-                              if (!settings) return;
-                              form.setStore(s => {
-                                const newSources = settings.default_external_sources;
-                                if (newSources.indexOf(source) === -1) {
-                                  newSources.push(source);
-                                } else {
-                                  newSources.splice(newSources.indexOf(source), 1);
-                                }
-                                return { ...s, default_external_sources: newSources };
-                              });
-                            }}
-                          />
-                        )
-                      }
-                    />
-                  </div>
+                  <CheckboxInput
+                    key={i}
+                    id={`source-${source.replace('_', ' ')}`}
+                    label={source.replace('_', ' ')}
+                    labelProps={{ textTransform: 'capitalize' }}
+                    value={settings.default_external_sources.indexOf(source) !== -1}
+                    loading={loading}
+                    disabled={disabled}
+                    disableGap
+                    onChange={() => {
+                      if (!settings) return;
+                      form.setStore(s => {
+                        const newSources = settings.default_external_sources;
+                        if (newSources.indexOf(source) === -1) newSources.push(source);
+                        else newSources.splice(newSources.indexOf(source), 1);
+                        return { ...s, default_external_sources: newSources };
+                      });
+                    }}
+                  />
                 ))}
               </div>
             )

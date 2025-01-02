@@ -1,10 +1,10 @@
 import type { IconButtonProps, ListItemTextProps, OutlinedInputProps } from '@mui/material';
 import { InputAdornment, ListItem, OutlinedInput } from '@mui/material';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { BaseListItemText } from './components/BaseListInput';
 import type { ResetListInputProps } from './components/ResetListInput';
+import { ResetListInput } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
 type Props = Omit<OutlinedInputProps, 'value'> & {
@@ -57,7 +57,7 @@ const WrappedNumberListInput = ({
         <SkeletonListInput />
       ) : (
         <>
-          <ResetInput label={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+          <ResetListInput id={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
           <OutlinedInput
             type="number"
             margin="dense"

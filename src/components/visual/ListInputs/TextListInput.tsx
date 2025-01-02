@@ -1,10 +1,9 @@
 import type { AutocompleteProps, IconButtonProps, ListItemTextProps } from '@mui/material';
 import { Autocomplete, ListItem, TextField } from '@mui/material';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import type { ElementType } from 'react';
 import React from 'react';
 import { BaseListItemText } from './components/BaseListInput';
-import type { ResetListInputProps } from './components/ResetListInput';
+import { ResetListInput, type ResetListInputProps } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
 type Props<
@@ -71,7 +70,7 @@ const WrappedTextListInput = <
         <SkeletonListInput />
       ) : (
         <>
-          <ResetInput label={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+          <ResetListInput id={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
           <Autocomplete
             autoComplete
             freeSolo

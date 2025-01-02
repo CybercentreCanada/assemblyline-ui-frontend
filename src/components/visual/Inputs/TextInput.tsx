@@ -3,6 +3,7 @@ import type {
   AutocompleteValue,
   FormHelperTextProps,
   IconButtonProps,
+  TooltipProps,
   TypographyProps
 } from '@mui/material';
 import {
@@ -20,6 +21,7 @@ import type { ElementType } from 'react';
 import React, { useState } from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
+import { TooltipInput } from './components/TooltipInput';
 
 type Props<
   Value,
@@ -33,7 +35,6 @@ type Props<
 > & {
   error?: FormHelperTextProps['children'];
   errorProps?: FormHelperTextProps;
-
   label: string;
   labelProps?: TypographyProps;
   loading?: boolean;
@@ -41,6 +42,8 @@ type Props<
   preventRender?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  tooltip?: TooltipProps['title'];
+  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   value: string;
   onChange?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['onInputChange'];
   onReset?: IconButtonProps['onClick'];
@@ -64,6 +67,8 @@ const WrappedTextInput = <
   preventRender = false,
   reset = false,
   resetProps = null,
+  tooltip = null,
+  tooltipProps = null,
   value,
   onChange = () => null,
   onReset = () => null,
@@ -89,56 +94,58 @@ const WrappedTextInput = <
         {loading ? (
           <Skeleton sx={{ height: '40px', transform: 'unset' }} />
         ) : (
-          <Autocomplete
-            id={id || label}
-            autoComplete
-            freeSolo
-            disableClearable
-            fullWidth
-            size="small"
-            value={_value}
-            disabled={disabled}
-            inputValue={value || ''}
-            options={options}
-            onChange={(e, v) => setValue(v)}
-            onInputChange={(e, v, o) => {
-              setValue(v as AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>);
-              onChange(e, v, o);
-            }}
-            renderInput={({ InputProps, ...params }) => (
-              <>
-                <TextField
-                  id={id || label}
-                  variant="outlined"
-                  error={!!error}
-                  InputProps={{
-                    endAdornment: !reset ? null : (
-                      <InputAdornment position="end">
-                        <ResetInput
-                          id={id || label}
-                          preventRender={!reset || disabled}
-                          onReset={onReset}
-                          {...resetProps}
-                        />
-                      </InputAdornment>
-                    ),
-                    ...InputProps
-                  }}
-                  {...params}
-                />
-                {!error || disabled ? null : (
-                  <FormHelperText
-                    sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
+          <TooltipInput tooltip={tooltip} {...tooltipProps}>
+            <Autocomplete
+              id={id || label}
+              autoComplete
+              freeSolo
+              disableClearable
+              fullWidth
+              size="small"
+              value={_value}
+              disabled={disabled}
+              inputValue={value || ''}
+              options={options}
+              onChange={(e, v) => setValue(v)}
+              onInputChange={(e, v, o) => {
+                setValue(v as AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>);
+                onChange(e, v, o);
+              }}
+              renderInput={({ InputProps, ...params }) => (
+                <>
+                  <TextField
+                    id={id || label}
                     variant="outlined"
-                    {...errorProps}
-                  >
-                    {error}
-                  </FormHelperText>
-                )}
-              </>
-            )}
-            {...autocompleteProps}
-          />
+                    error={!!error}
+                    InputProps={{
+                      endAdornment: !reset ? null : (
+                        <InputAdornment position="end">
+                          <ResetInput
+                            id={id || label}
+                            preventRender={!reset || disabled}
+                            onReset={onReset}
+                            {...resetProps}
+                          />
+                        </InputAdornment>
+                      ),
+                      ...InputProps
+                    }}
+                    {...params}
+                  />
+                  {!error || disabled ? null : (
+                    <FormHelperText
+                      sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
+                      variant="outlined"
+                      {...errorProps}
+                    >
+                      {error}
+                    </FormHelperText>
+                  )}
+                </>
+              )}
+              {...autocompleteProps}
+            />
+          </TooltipInput>
         )}
       </FormControl>
     </div>

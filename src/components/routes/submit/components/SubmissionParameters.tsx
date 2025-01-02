@@ -35,7 +35,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
       </Typography>
 
       <form.Subscribe
-        selector={state => [state.values?.settings?.description]}
+        selector={state => [loading ? null : state.values.settings.description]}
         children={([description]) => (
           <TextInput
             label={t('options.submission.desc')}
@@ -53,7 +53,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
       />
 
       <form.Subscribe
-        selector={state => [state.values?.settings?.priority]}
+        selector={state => [loading ? null : state.values.settings.priority]}
         children={([priority]) => (
           <SliderInput
             label={t('options.submission.priority')}
@@ -80,7 +80,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
 
       <div>
         <form.Subscribe
-          selector={state => [state.values?.settings?.profiles?.[profile]?.generate_alert]}
+          selector={state => [loading ? null : state.values.settings.profiles[profile].generate_alert]}
           children={([generate_alert]) => (
             <CheckboxInput
               label={t('options.submission.generate_alert')}
@@ -101,7 +101,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
         />
 
         <form.Subscribe
-          selector={state => [state.values?.settings?.profiles?.[profile]?.ignore_filtering]}
+          selector={state => [loading ? null : state.values.settings.profiles[profile].ignore_filtering]}
           children={([ignore_filtering]) => (
             <CheckboxInput
               label={t('options.submission.ignore_filtering')}
@@ -122,7 +122,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
         />
 
         <form.Subscribe
-          selector={state => [state.values?.settings?.profiles?.[profile]?.ignore_cache]}
+          selector={state => [loading ? null : state.values.settings.profiles[profile].ignore_cache]}
           children={([ignore_cache]) => (
             <CheckboxInput
               label={t('options.submission.ignore_cache')}
@@ -143,7 +143,9 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
         />
 
         <form.Subscribe
-          selector={state => [state.values?.settings?.profiles?.[profile]?.ignore_dynamic_recursion_prevention]}
+          selector={state => [
+            loading ? null : state.values.settings.profiles[profile].ignore_dynamic_recursion_prevention
+          ]}
           children={([ignore_dynamic_recursion_prevention]) => (
             <CheckboxInput
               label={t('options.submission.ignore_dynamic_recursion_prevention')}
@@ -164,7 +166,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
         />
 
         <form.Subscribe
-          selector={state => [state.values?.settings?.profile]}
+          selector={state => [loading ? null : state.values.settings.profile]}
           children={([profiling]) => (
             <CheckboxInput
               label={t('options.submission.profile')}
@@ -182,7 +184,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
         />
 
         <form.Subscribe
-          selector={state => [state.values?.settings?.profiles?.[profile]?.deep_scan]}
+          selector={state => [loading ? null : state.values.settings.profiles[profile].deep_scan]}
           children={([deep_scan]) => (
             <CheckboxInput
               label={t('options.submission.deep_scan')}
@@ -204,7 +206,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
       </div>
 
       <form.Subscribe
-        selector={state => [state.values?.settings?.profiles?.[profile]?.ttl]}
+        selector={state => [loading ? null : state.values.settings.profiles[profile].ttl]}
         children={([ttl]) => (
           <NumberInput
             label={`${t('options.submission.ttl')} (${

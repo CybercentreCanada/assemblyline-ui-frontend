@@ -14,7 +14,9 @@ const WrappedMetadataSummary = () => {
       selector={state => [Object.entries(state.values.metadata || {})]}
       children={([metadata]) =>
         metadata.length === 0 ? null : (
-          <div style={{ textAlign: 'start', marginTop: theme.spacing(3), marginBottom: theme.spacing(3) }}>
+          <div
+            style={{ width: '100%', textAlign: 'start', marginTop: theme.spacing(3), marginBottom: theme.spacing(3) }}
+          >
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Typography style={{ flexGrow: 1 }} variant="subtitle1">
                 {t('options.submission.metadata')}

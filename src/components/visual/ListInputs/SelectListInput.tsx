@@ -1,9 +1,9 @@
 import type { IconButtonProps, ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
 import { ListItem, MenuItem, Select } from '@mui/material';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import React from 'react';
 import { BaseListItemText } from './components/BaseListInput';
 import type { ResetListInputProps } from './components/ResetListInput';
+import { ResetListInput } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
 type Props = Omit<SelectProps, 'defaultValue'> & {
@@ -51,7 +51,7 @@ const WrappedSelectListInput = ({
         <SkeletonListInput />
       ) : (
         <>
-          <ResetInput label={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+          <ResetListInput id={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
           <Select
             variant="outlined"
             size="small"

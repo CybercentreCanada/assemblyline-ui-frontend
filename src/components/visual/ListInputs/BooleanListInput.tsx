@@ -1,9 +1,8 @@
 import type { IconButtonProps, ListItemButtonProps, ListItemTextProps } from '@mui/material';
 import { Switch } from '@mui/material';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import React from 'react';
 import { BaseListItemButton, BaseListItemText } from './components/BaseListInput';
-import type { ResetListInputProps } from './components/ResetListInput';
+import { ResetListInput, type ResetListInputProps } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
 type Props = Omit<ListItemButtonProps, 'defaultValue'> & {
@@ -50,7 +49,7 @@ const WrappedBooleanListInput = ({
         <SkeletonListInput />
       ) : (
         <>
-          <ResetInput label={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+          <ResetListInput id={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
           <Switch checked={value} edge="end" inputProps={{ id }} />
         </>
       )}

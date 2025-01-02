@@ -1,10 +1,10 @@
 import { createFormContext } from 'components/core/form/createFormContext';
 import type { HashPatternMap, Submission } from 'components/models/base/config';
-import { SubmitSettings } from 'components/routes/settings/utils/utils';
+import type { SubmitSettings } from 'components/routes/settings/utils/utils';
 import generateUUID from 'helpers/uuid';
 
 export const TABS = ['file', 'hash', 'options'] as const;
-export type Tabs = (typeof TABS)[number];
+export type TabKey = (typeof TABS)[number];
 
 export type SubmitStore = {
   /** State related to the interface of the Submit page */
@@ -22,7 +22,7 @@ export type SubmitStore = {
     profile: keyof Submission['profiles'];
 
     /** Selected tab */
-    tab: Tabs;
+    tab: TabKey;
 
     /** Type of submission being made */
     type: 'file' | 'hash';
@@ -32,6 +32,12 @@ export type SubmitStore = {
 
     /** UUID of the submission */
     uuid: string;
+
+    /** loading the settings */
+    loading: boolean;
+
+    /** disable the inputs */
+    disabled: boolean;
   };
 
   /** Details of the file input  */
@@ -52,15 +58,17 @@ export const { FormProvider, useForm } = createFormContext<SubmitStore>({
     state: {
       uuid: generateUUID(),
       type: 'file',
-      isFetchingSettings: false,
+      isFetchingSettings: true,
       isConfirmationOpen: false,
       isUploading: false,
       uploadProgress: 0,
       tab: 'file',
-      profile: null
+      profile: null,
+      loading: true,
+      disabled: false
     },
     file: null,
-    hash: { type: null, value: '', hasError: true, urlAutoSelect: true },
+    hash: { type: null, value: '', hasError: false, urlAutoSelect: true },
     metadata: {},
     settings: null
   }

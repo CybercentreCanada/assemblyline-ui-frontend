@@ -151,7 +151,15 @@ const Service: React.FC<ServiceProps> = ({
 
       <Collapse in={open}>
         {render && specId >= 0 && (
-          <div style={{ marginLeft: theme.spacing(3) }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              rowGap: theme.spacing(1),
+              marginLeft: theme.spacing(3),
+              padding: `${theme.spacing(1)} 0`
+            }}
+          >
             {form.store.state.values.settings.profiles[profile].service_spec[specId].params.map((param, i) => (
               <form.Subscribe
                 key={i}
@@ -161,9 +169,12 @@ const Service: React.FC<ServiceProps> = ({
                     case 'bool':
                       return (
                         <CheckboxInput
+                          id={`${service.category} ${service.name} ${param.name.replaceAll('_', ' ')}`}
                           label={param.name.replaceAll('_', ' ')}
                           labelProps={{ textTransform: 'capitalize' }}
                           value={value as boolean}
+                          loading={loading}
+                          disabled={disabled}
                           disableGap
                           onChange={() => {
                             form.setStore(s => {
@@ -177,9 +188,12 @@ const Service: React.FC<ServiceProps> = ({
                     case 'int':
                       return (
                         <NumberInput
+                          id={`${service.category} ${service.name} ${param.name.replaceAll('_', ' ')}`}
                           label={param.name.replaceAll('_', ' ')}
                           labelProps={{ textTransform: 'capitalize' }}
                           value={value as number}
+                          loading={loading}
+                          disabled={disabled}
                           onChange={(event, v) => {
                             form.setStore(s => {
                               s.settings.profiles[profile].service_spec[specId].params[i].value = v;
@@ -191,9 +205,12 @@ const Service: React.FC<ServiceProps> = ({
                     case 'str':
                       return (
                         <TextInput
+                          id={`${service.category} ${service.name} ${param.name.replaceAll('_', ' ')}`}
                           label={param.name.replaceAll('_', ' ')}
                           labelProps={{ textTransform: 'capitalize' }}
                           value={value as string}
+                          loading={loading}
+                          disabled={disabled}
                           options={param.list}
                           onChange={(event, v) => {
                             form.setStore(s => {
@@ -206,9 +223,12 @@ const Service: React.FC<ServiceProps> = ({
                     case 'list':
                       return (
                         <SelectInput
+                          id={`${service.category} ${service.name} ${param.name.replaceAll('_', ' ')}`}
                           label={param.name.replaceAll('_', ' ')}
                           labelProps={{ textTransform: 'capitalize' }}
                           value={value as string}
+                          loading={loading}
+                          disabled={disabled}
                           items={param.list}
                           onChange={(event, v) => {
                             form.setStore(s => {
@@ -287,7 +307,9 @@ const Category = ({ cat_id, category, profile = null, loading = false, disabled 
         )}
       />
 
-      <div style={{ marginLeft: theme.spacing(3) }}>
+      <div
+        style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.25), marginLeft: theme.spacing(3) }}
+      >
         {category.services.map((service, svr_id) => (
           <Service
             key={svr_id}
@@ -326,19 +348,21 @@ const WrappedServiceSelection = ({ profile = null, loading = false, disabled = f
         <ServiceSkeleton size={size} spacing={theme.spacing(4)} />
       ) : (
         <form.Subscribe
-          selector={state => [state.values?.settings?.profiles?.[profile]?.services]}
-          children={([categories]) =>
-            categories.map((category, cat_id) => (
-              <Category
-                key={cat_id}
-                cat_id={cat_id}
-                category={category}
-                profile={profile}
-                loading={loading}
-                disabled={disabled}
-              />
-            ))
-          }
+          selector={state => [loading ? null : state.values.settings.profiles[profile].services]}
+          children={([categories]) => (
+            <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.25) }}>
+              {categories?.map((category, cat_id) => (
+                <Category
+                  key={cat_id}
+                  cat_id={cat_id}
+                  category={category}
+                  profile={profile}
+                  loading={loading}
+                  disabled={disabled}
+                />
+              ))}
+            </div>
+          )}
         />
       )}
     </div>

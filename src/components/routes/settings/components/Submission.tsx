@@ -50,17 +50,17 @@ export const SubmissionSection = ({
 
             <List checkboxPadding>
               <form.Field
-                name={`next.profiles[${profile}].classification` as `next.profiles.profile.classification`}
+                name={`next.classification`}
                 children={({ state, handleChange }) => (
                   <ClassificationListInput
                     id="settings:submissions.classification"
                     primary={t('settings:submissions.classification')}
                     secondary={t('settings:submissions.classification_desc')}
-                    value={state.value as string}
+                    value={state.value}
                     loading={loading}
                     preventRender={hidden}
                     disabled={disabled || !customize}
-                    onChange={value => handleChange(prev => ({ ...prev, value: value }))}
+                    onChange={value => handleChange(value)}
                   />
                 )}
               />

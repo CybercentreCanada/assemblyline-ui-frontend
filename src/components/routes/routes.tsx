@@ -57,13 +57,11 @@ const WorkflowDetail = lazy(() => import('components/routes/manage/workflows/det
 const RetroHunt = lazy(() => import('components/routes/retrohunt'));
 const RetroHuntDetail = lazy(() => import('components/routes/retrohunt/detail'));
 const Search = lazy(() => import('components/routes/search'));
-const Settings = lazy(() => import('components/routes/settings'));
-const Settings2 = lazy(() => import('components/routes/settings/index'));
+const Settings = lazy(() => import('components/routes/settings/index'));
 const SubmissionDetail = lazy(() => import('components/routes/submission/detail'));
 const SubmissionReport = lazy(() => import('components/routes/submission/report'));
 const Submissions = lazy(() => import('components/routes/submissions'));
 const Submit = lazy(() => import('components/routes/submit/index'));
-const Submit2 = lazy(() => import('components/routes/submit'));
 const Tos = lazy(() => import('components/routes/tos'));
 const User = lazy(() => import('components/routes/user'));
 
@@ -180,11 +178,9 @@ const WrappedRoutes = () => {
         <Route path="/retrohunt/:key" element={<RetroHuntDetail />} />
         <Route path="/search" element={<Search />} />
         <Route path="/search/:id" element={<Search />} />
-        <Route path="/settings2" element={<Settings />} />
-        <Route path="/settings" element={<Settings2 />} />
-        <Route path="/settings/:tab" element={<Settings2 />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/settings/:tab" element={<Settings />} />
         <Route path="/submit" element={<Submit />} />
-        <Route path="/submit2" element={<Submit2 />} />
         <Route path="/submission/detail/:id/:fid" element={<SubmissionDetail />} />
         <Route path="/submission/detail/:id" element={<SubmissionDetail />} />
         <Route path="/submission/report/:id" element={<SubmissionReport />} />

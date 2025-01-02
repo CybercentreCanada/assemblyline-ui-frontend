@@ -4,6 +4,8 @@ import type { CustomUser } from 'components/models/ui/user';
 
 type InterfaceKey = keyof Pick<
   UserSettings,
+  | 'classification'
+  | 'default_external_sources'
   | 'default_zip_password'
   | 'description'
   | 'download_encoding'
@@ -18,6 +20,8 @@ type InterfaceKey = keyof Pick<
 >;
 
 const INTERFACE_KEYS: InterfaceKey[] = [
+  'classification',
+  'default_external_sources',
   'default_zip_password',
   'description',
   'download_encoding',
@@ -33,17 +37,10 @@ const INTERFACE_KEYS: InterfaceKey[] = [
 
 type ProfileKey = keyof Pick<
   UserSettings,
-  | 'classification'
-  | 'deep_scan'
-  | 'generate_alert'
-  | 'ignore_cache'
-  | 'ignore_dynamic_recursion_prevention'
-  | 'ignore_filtering'
-  | 'ttl'
+  'deep_scan' | 'generate_alert' | 'ignore_cache' | 'ignore_dynamic_recursion_prevention' | 'ignore_filtering' | 'ttl'
 >;
 
 const PROFILE_KEYS: ProfileKey[] = [
-  'classification',
   'deep_scan',
   'generate_alert',
   'ignore_cache',

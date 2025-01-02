@@ -67,14 +67,14 @@ const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) =>
         !disabled && classes.drop_zone_hover_enabled
       )}
     >
-      <input {...getInputProps()} />
+      <input id="file_dropper" {...getInputProps()} />
       {currentUser.roles.includes('submission_create') ? (
         <AiOutlineSecurityScan style={{ fontSize: '140px' }} />
       ) : (
         <BlockIcon style={{ fontSize: '140px' }} />
       )}
       <div style={{ minHeight: '44px', textAlign: 'center' }}>
-        <Typography variant="body1" style={{ wordBreak: 'break-word' }}>
+        <Typography htmlFor="file_dropper" component="label" variant="body1" style={{ wordBreak: 'break-word' }}>
           <b>
             {isDragActive && !disabled
               ? t('file.drophere')
