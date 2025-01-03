@@ -118,10 +118,17 @@ const Param: React.FC<ParamProps> = ({
                 loading={loading}
                 disabled={disabled}
                 disableGap
+                reset={value !== param.default}
                 onChange={() => {
                   form.setStore(s => {
                     s.settings.profiles[profile].service_spec[specId].params[param_id].value =
                       !s.settings.profiles[profile].service_spec[specId].params[param_id].value;
+                    return s;
+                  });
+                }}
+                onReset={() => {
+                  form.setStore(s => {
+                    s.settings.profiles[profile].service_spec[specId].params[param_id].value = param.default;
                     return s;
                   });
                 }}
@@ -136,9 +143,16 @@ const Param: React.FC<ParamProps> = ({
                 value={value as number}
                 loading={loading}
                 disabled={disabled}
+                reset={value !== param.default}
                 onChange={(event, v) => {
                   form.setStore(s => {
                     s.settings.profiles[profile].service_spec[specId].params[param_id].value = v;
+                    return s;
+                  });
+                }}
+                onReset={() => {
+                  form.setStore(s => {
+                    s.settings.profiles[profile].service_spec[specId].params[param_id].value = param.default;
                     return s;
                   });
                 }}
@@ -154,9 +168,16 @@ const Param: React.FC<ParamProps> = ({
                 loading={loading}
                 disabled={disabled}
                 options={param.list}
+                reset={value !== param.default}
                 onChange={(event, v) => {
                   form.setStore(s => {
                     s.settings.profiles[profile].service_spec[specId].params[param_id].value = v;
+                    return s;
+                  });
+                }}
+                onReset={() => {
+                  form.setStore(s => {
+                    s.settings.profiles[profile].service_spec[specId].params[param_id].value = param.default;
                     return s;
                   });
                 }}
@@ -172,9 +193,16 @@ const Param: React.FC<ParamProps> = ({
                 loading={loading}
                 disabled={disabled}
                 items={param.list}
+                reset={value !== param.default}
                 onChange={(event, v) => {
                   form.setStore(s => {
                     s.settings.profiles[profile].service_spec[specId].params[param_id].value = v;
+                    return s;
+                  });
+                }}
+                onReset={() => {
+                  form.setStore(s => {
+                    s.settings.profiles[profile].service_spec[specId].params[param_id].value = param.default;
                     return s;
                   });
                 }}
