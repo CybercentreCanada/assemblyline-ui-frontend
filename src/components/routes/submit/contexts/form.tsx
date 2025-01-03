@@ -53,23 +53,25 @@ export type SubmitStore = {
   settings: SubmitSettings;
 };
 
+export const DEFAULT_SUBMIT_FORM: SubmitStore = Object.freeze({
+  state: {
+    uuid: generateUUID(),
+    type: 'file',
+    isFetchingSettings: true,
+    isConfirmationOpen: false,
+    isUploading: false,
+    uploadProgress: 0,
+    tab: 'file',
+    profile: null,
+    loading: true,
+    disabled: false
+  },
+  file: null,
+  hash: { type: null, value: '', hasError: false, urlAutoSelect: true },
+  metadata: {},
+  settings: null
+});
+
 export const { FormProvider, useForm } = createFormContext<SubmitStore>({
-  defaultValues: {
-    state: {
-      uuid: generateUUID(),
-      type: 'file',
-      isFetchingSettings: true,
-      isConfirmationOpen: false,
-      isUploading: false,
-      uploadProgress: 0,
-      tab: 'file',
-      profile: null,
-      loading: true,
-      disabled: false
-    },
-    file: null,
-    hash: { type: null, value: '', hasError: false, urlAutoSelect: true },
-    metadata: {},
-    settings: null
-  }
+  defaultValues: structuredClone(DEFAULT_SUBMIT_FORM)
 });

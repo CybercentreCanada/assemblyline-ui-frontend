@@ -11,8 +11,7 @@ import { loadSubmissionProfiles } from 'components/routes/settings/utils/utils';
 import Classification from 'components/visual/Classification';
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
-import generateUUID from 'helpers/uuid';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { FileSubmit } from './components/File';
@@ -22,7 +21,7 @@ import { ServiceSelection } from './components/ServiceSelection';
 import { SubmissionParameters } from './components/SubmissionParameters';
 import { SubmissionProfile } from './components/SubmissionProfile';
 import type { TabKey } from './contexts/form';
-import { FormProvider, useForm } from './contexts/form';
+import { DEFAULT_SUBMIT_FORM, FormProvider, useForm } from './contexts/form';
 
 export const FLOW = new Flow({
   target: '/api/v4/ui/flowjs/',
@@ -31,13 +30,6 @@ export const FLOW = new Flow({
   chunkRetryInterval: 500,
   simultaneousUploads: 4
 });
-
-type SubmitState = {
-  hash: string;
-  tabContext: TabKey; // Ensure this is set correct elsewhere
-  c12n: string;
-  metadata?: Metadata;
-};
 
 const WrappedSubmitContent = () => {
   const { t, i18n } = useTranslation(['submit']);
@@ -53,25 +45,52 @@ const WrappedSubmitContent = () => {
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
 
-  const submitState = useMemo<SubmitState>(() => location.state as SubmitState, [location.state]);
-  const submitParams = useMemo<URLSearchParams>(() => new URLSearchParams(location.search), [location.search]);
+  useEffect(() => {
+    closeSnackbar();
+    const submitParams = new URLSearchParams(location.search);
+    form.setStore(s => {
+      s = { ...s, ...structuredClone(DEFAULT_SUBMIT_FORM) };
+
+      const hashParam = submitParams.get('hash');
+      if (hashParam) {
+        const [type, value] = getSubmitType(hashParam, configuration);
+        s.state.tab = 'hash';
+        s.hash.type = type;
+        s.hash.value = value;
+        s.hash.hasError = false;
+      }
+
+      const classification = submitParams.get('classification');
+      if (classification) {
+        s.settings = { ...s.settings, classification };
+      }
+
+      const metadata = JSON.parse(submitParams.get('metadata')) as Record<string, unknown>;
+      if (metadata) {
+        s.metadata = metadata;
+      }
+
+      return s;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closeSnackbar, configuration]);
 
   useEffect(() => {
     apiCall<UserSettings>({
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
-          s.settings = loadSubmissionProfiles(api_response, currentUser);
+          s.settings = loadSubmissionProfiles({ ...api_response, ...s.settings }, currentUser);
 
           // // Check if some file sources should auto-select and do so
-          s.settings.default_external_sources = Array.from(
-            new Set(
+          s.settings.default_external_sources = [
+            ...new Set(
               Object.entries(configuration.submission.file_sources).reduce(
                 (prev, [, fileSource]) => [...prev, ...fileSource.auto_selected],
                 api_response?.default_external_sources || []
               )
             )
-          );
+          ].sort();
 
           const profileKeys = Object.keys(api_response.submission_profiles);
           s.state.profile = profileKeys.includes(api_response.preferred_submission_profile)
@@ -98,66 +117,6 @@ const WrappedSubmitContent = () => {
   }, [configuration, currentUser]);
 
   useEffect(() => {
-    form.setStore(s => {
-      s.state = {
-        ...s.state,
-        isConfirmationOpen: false,
-        isUploading: false,
-        profile: null,
-        tab: 'file',
-        type: 'file',
-        uploadProgress: 0,
-        uuid: generateUUID()
-      };
-      s.file = null;
-      s.hash = { ...s.hash, type: null, value: '', hasError: false, urlAutoSelect: true };
-      s.metadata = {};
-      return s;
-    });
-  }, [form]);
-
-  useEffect(() => {
-    const inputParam = submitParams.get('input') || '';
-    if (inputParam) {
-      const [type, value] = getSubmitType(inputParam, configuration);
-      form.setStore(s => {
-        s.state.tab = 'hash';
-        s.hash.type = type;
-        s.hash.value = value;
-        s.hash.hasError = false;
-        return s;
-      });
-      closeSnackbar();
-    }
-
-    const classification = submitParams.get('classification');
-    if (classification) {
-      form.setStore(s => {
-        s.settings = { ...s.settings, classification };
-        return s;
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [closeSnackbar, configuration, submitParams]);
-
-  useEffect(() => {
-    if (submitState) {
-      const [type, value] = getSubmitType(submitState.hash, configuration);
-      form.setStore(s => {
-        s.state.tab = submitState.tabContext;
-        s.hash.type = type;
-        s.hash.value = value;
-        s.hash.hasError = false;
-        s.settings.classification = submitState.c12n;
-        s.metadata = submitState.metadata;
-        return s;
-      });
-      closeSnackbar();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [closeSnackbar, configuration, submitState]);
-
-  useEffect(() => {
     if (!configuration?.submission?.metadata?.submit) return;
     form.setStore(s => ({
       ...s,
@@ -171,8 +130,7 @@ const WrappedSubmitContent = () => {
         ...s.metadata
       }
     }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration]);
+  }, [configuration, form]);
 
   return (
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
