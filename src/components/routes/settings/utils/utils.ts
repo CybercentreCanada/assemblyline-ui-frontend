@@ -238,6 +238,6 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
 };
 
 export const getProfileNames = (settings: SubmitSettings, user: CustomUser) =>
-  Object.keys(settings.profiles).filter(
-    p => p !== 'default' || user.is_admin || user.roles.includes('submission_customize')
-  );
+  Object.keys(settings.profiles)
+    .filter(p => p !== 'default' || user.is_admin || user.roles.includes('submission_customize'))
+    .sort();
