@@ -42,7 +42,7 @@ export const HeaderSection = ({ hidden = false, loading = false, profile = 'inte
       apiCall({
         url: `/api/v4/user/settings/${currentUser.username}/`,
         method: 'POST',
-        body: parseSubmissionProfiles(data, currentUser),
+        body: parseSubmissionProfiles(data),
         onSuccess: () => {
           showSuccessMessage(t('success_save'));
           form.setStore(s => {

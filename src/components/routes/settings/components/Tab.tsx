@@ -1,6 +1,4 @@
-import { List, ListItem, ListItemButton, ListItemText, useTheme } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import clsx from 'clsx';
+import { alpha, List, ListItem, ListItemButton, ListItemText, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
@@ -8,16 +6,6 @@ import { getProfileNames } from 'components/routes/settings/utils/utils';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-
-const useStyles = makeStyles(theme => ({
-  default: {
-    marginLeft: '1px'
-  },
-  active: {
-    borderRight: `1px solid ${theme.palette.primary.main}`,
-    color: theme.palette.primary.main
-  }
-}));
 
 type Props = {
   rootElement?: HTMLDivElement;
@@ -28,7 +16,6 @@ type Props = {
 export const Tab = ({ rootElement = null, loading = false, profile = 'interface' }: Props) => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
-  const classes = useStyles();
   const form = useForm();
   const { user: currentUser } = useALContext();
 
@@ -70,12 +57,18 @@ export const Tab = ({ rootElement = null, loading = false, profile = 'interface'
 
   return !profile || loading ? null : (
     <List dense sx={{ '& ul': { padding: 0 } }}>
-      <ListItem
-        className={clsx(profile === 'interface' ? classes.active : classes.default)}
-        disablePadding
-        sx={{ marginTop: theme.spacing(1) }}
-      >
-        <ListItemButton component={Link} to={`/settings/interface`}>
+      <ListItem disablePadding sx={{ marginTop: theme.spacing(1) }}>
+        <ListItemButton
+          component={Link}
+          to={`/settings/interface`}
+          sx={{
+            paddingRight: 0,
+            borderRadius: '0 18px 18px  0',
+            ...(profile === 'interface'
+              ? { color: theme.palette.primary.main, backgroundColor: alpha(theme.palette.primary.main, 0.1) }
+              : { marginLeft: '1px' })
+          }}
+        >
           <ListItemText primary={t('interface')} />
         </ListItemButton>
       </ListItem>
@@ -86,24 +79,28 @@ export const Tab = ({ rootElement = null, loading = false, profile = 'interface'
 
       <form.Subscribe
         selector={state => getProfileNames(state.values.next, currentUser)}
-        children={names => (
-          <>
-            {names.map((name, i) => (
-              <ListItem
-                key={`${name}-${i}`}
-                className={clsx(profile === name ? classes.active : classes.default)}
-                disablePadding
+        children={names =>
+          names.map((name, i) => (
+            <ListItem key={`${name}-${i}`} disablePadding>
+              <ListItemButton
+                component={Link}
+                to={`/settings/${name}`}
+                sx={{
+                  paddingRight: 0,
+                  borderRadius: '0 18px 18px  0',
+                  ...(profile === name
+                    ? { color: theme.palette.primary.main, backgroundColor: alpha(theme.palette.primary.main, 0.1) }
+                    : { marginLeft: '1px' })
+                }}
               >
-                <ListItemButton component={Link} to={`/settings/${name}`}>
-                  <ListItemText
-                    primary={t(`profile.${name}`)}
-                    primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
-                  />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </>
-        )}
+                <ListItemText
+                  primary={t(`profile.${name}`)}
+                  primaryTypographyProps={{ marginLeft: theme.spacing(2), marginRight: theme.spacing(2) }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))
+        }
       />
     </List>
   );
