@@ -1,11 +1,13 @@
-import { Collapse, Typography, useTheme } from '@mui/material';
+import { Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import type { SelectedService, SelectedServiceCategory } from 'components/models/base/service';
+import type { SelectedService, SelectedServiceCategory, ServiceParameter } from 'components/models/base/service';
 import { useForm } from 'components/routes/submit/contexts/form';
+import { Collapse } from 'components/visual/Collapse';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
+import { ShowMore } from 'components/visual/ShowMore';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -79,6 +81,111 @@ const ServiceSkeleton = ({ size, spacing }: SkelItemsProps) => (
   </>
 );
 
+type ParamProps = {
+  param: ServiceParameter;
+  param_id: number;
+  service: SelectedService;
+  specId: number;
+  profile?: string;
+  loading?: boolean;
+  disabled?: boolean;
+};
+
+const Param: React.FC<ParamProps> = ({
+  param,
+  param_id,
+  service,
+  specId,
+  profile = null,
+  loading = false,
+  disabled = false
+}) => {
+  const theme = useTheme();
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [state.values.settings.profiles[profile].service_spec[specId].params[param_id].value]}
+      children={([value]) => {
+        switch (param.type) {
+          case 'bool':
+            return (
+              <CheckboxInput
+                id={`${service.category} ${service.name} ${param.name.replaceAll('_', ' ')}`}
+                label={param.name.replaceAll('_', ' ')}
+                labelProps={{ textTransform: 'capitalize' }}
+                value={value as boolean}
+                loading={loading}
+                disabled={disabled}
+                disableGap
+                onChange={() => {
+                  form.setStore(s => {
+                    s.settings.profiles[profile].service_spec[specId].params[param_id].value =
+                      !s.settings.profiles[profile].service_spec[specId].params[param_id].value;
+                    return s;
+                  });
+                }}
+              />
+            );
+          case 'int':
+            return (
+              <NumberInput
+                id={`${service.category} ${service.name} ${param.name.replaceAll('_', ' ')}`}
+                label={param.name.replaceAll('_', ' ')}
+                labelProps={{ textTransform: 'capitalize' }}
+                value={value as number}
+                loading={loading}
+                disabled={disabled}
+                onChange={(event, v) => {
+                  form.setStore(s => {
+                    s.settings.profiles[profile].service_spec[specId].params[param_id].value = v;
+                    return s;
+                  });
+                }}
+              />
+            );
+          case 'str':
+            return (
+              <TextInput
+                id={`${service.category} ${service.name} ${param.name.replaceAll('_', ' ')}`}
+                label={param.name.replaceAll('_', ' ')}
+                labelProps={{ textTransform: 'capitalize' }}
+                value={value as string}
+                loading={loading}
+                disabled={disabled}
+                options={param.list}
+                onChange={(event, v) => {
+                  form.setStore(s => {
+                    s.settings.profiles[profile].service_spec[specId].params[param_id].value = v;
+                    return s;
+                  });
+                }}
+              />
+            );
+          case 'list':
+            return (
+              <SelectInput
+                id={`${service.category} ${service.name} ${param.name.replaceAll('_', ' ')}`}
+                label={param.name.replaceAll('_', ' ')}
+                labelProps={{ textTransform: 'capitalize' }}
+                value={value as string}
+                loading={loading}
+                disabled={disabled}
+                items={param.list}
+                onChange={(event, v) => {
+                  form.setStore(s => {
+                    s.settings.profiles[profile].service_spec[specId].params[param_id].value = v;
+                    return s;
+                  });
+                }}
+              />
+            );
+        }
+      }}
+    />
+  );
+};
+
 type ServiceProps = {
   cat_id: number;
   svr_id: number;
@@ -100,12 +207,24 @@ const Service: React.FC<ServiceProps> = ({
   const form = useForm();
 
   const [open, setOpen] = useState<boolean>(false);
-  const [render, setRender] = useState<boolean>(false);
+  const [showMore, setShowMore] = useState<boolean>(false);
 
-  const specId = useMemo(
+  const specId = useMemo<number>(
     () => form.store.state.values.settings.profiles[profile].service_spec.findIndex(s => s.name === service.name),
     [form.store.state.values.settings.profiles, profile, service.name]
   );
+
+  const params = useMemo<{ show: [ServiceParameter, number][]; hidden: [ServiceParameter, number][] }>(() => {
+    if (specId < 0) return null;
+    const p = form.store.state.values.settings.profiles[profile].service_spec[specId].params;
+    return p.reduce(
+      (prev, current, i) =>
+        current.hide
+          ? { ...prev, hidden: [...prev.hidden, [current, i]] }
+          : { ...prev, show: [...prev.show, [current, i]] },
+      { show: [], hidden: [] }
+    );
+  }, [form.store.state.values.settings.profiles, profile, specId]);
 
   const handleClick = useCallback(
     (value: boolean) => {
@@ -130,7 +249,6 @@ const Service: React.FC<ServiceProps> = ({
     event.preventDefault();
     event.stopPropagation();
     setOpen(o => !o);
-    setRender(true);
   }, []);
 
   return (
@@ -149,8 +267,8 @@ const Service: React.FC<ServiceProps> = ({
         )}
       />
 
-      <Collapse in={open}>
-        {render && specId >= 0 && (
+      {specId >= 0 && (
+        <Collapse in={open}>
           <div
             style={{
               display: 'flex',
@@ -160,91 +278,38 @@ const Service: React.FC<ServiceProps> = ({
               padding: `${theme.spacing(1)} 0`
             }}
           >
-            {form.store.state.values.settings.profiles[profile].service_spec[specId].params.map((param, i) => (
-              <form.Subscribe
+            {params.show.map(([param, i]) => (
+              <Param
                 key={i}
-                selector={state => [state.values.settings.profiles[profile].service_spec[specId].params[i].value]}
-                children={([value]) => {
-                  switch (param.type) {
-                    case 'bool':
-                      return (
-                        <CheckboxInput
-                          id={`${service.category} ${service.name} ${param.name.replaceAll('_', ' ')}`}
-                          label={param.name.replaceAll('_', ' ')}
-                          labelProps={{ textTransform: 'capitalize' }}
-                          value={value as boolean}
-                          loading={loading}
-                          disabled={disabled}
-                          disableGap
-                          onChange={() => {
-                            form.setStore(s => {
-                              s.settings.profiles[profile].service_spec[specId].params[i].value =
-                                !s.settings.profiles[profile].service_spec[specId].params[i].value;
-                              return s;
-                            });
-                          }}
-                        />
-                      );
-                    case 'int':
-                      return (
-                        <NumberInput
-                          id={`${service.category} ${service.name} ${param.name.replaceAll('_', ' ')}`}
-                          label={param.name.replaceAll('_', ' ')}
-                          labelProps={{ textTransform: 'capitalize' }}
-                          value={value as number}
-                          loading={loading}
-                          disabled={disabled}
-                          onChange={(event, v) => {
-                            form.setStore(s => {
-                              s.settings.profiles[profile].service_spec[specId].params[i].value = v;
-                              return s;
-                            });
-                          }}
-                        />
-                      );
-                    case 'str':
-                      return (
-                        <TextInput
-                          id={`${service.category} ${service.name} ${param.name.replaceAll('_', ' ')}`}
-                          label={param.name.replaceAll('_', ' ')}
-                          labelProps={{ textTransform: 'capitalize' }}
-                          value={value as string}
-                          loading={loading}
-                          disabled={disabled}
-                          options={param.list}
-                          onChange={(event, v) => {
-                            form.setStore(s => {
-                              s.settings.profiles[profile].service_spec[specId].params[i].value = v;
-                              return s;
-                            });
-                          }}
-                        />
-                      );
-                    case 'list':
-                      return (
-                        <SelectInput
-                          id={`${service.category} ${service.name} ${param.name.replaceAll('_', ' ')}`}
-                          label={param.name.replaceAll('_', ' ')}
-                          labelProps={{ textTransform: 'capitalize' }}
-                          value={value as string}
-                          loading={loading}
-                          disabled={disabled}
-                          items={param.list}
-                          onChange={(event, v) => {
-                            form.setStore(s => {
-                              s.settings.profiles[profile].service_spec[specId].params[i].value = v;
-                              return s;
-                            });
-                          }}
-                        />
-                      );
-                  }
-                }}
+                param={param}
+                param_id={i}
+                service={service}
+                specId={specId}
+                profile={profile}
+                loading={loading}
+                disabled={disabled}
               />
             ))}
+
+            {params.hidden.length === 0 ? null : !showMore ? (
+              <ShowMore variant="long" onClick={() => setShowMore(true)} />
+            ) : (
+              params.hidden.map(([param, i]) => (
+                <Param
+                  key={i}
+                  param={param}
+                  param_id={i}
+                  service={service}
+                  specId={specId}
+                  profile={profile}
+                  loading={loading}
+                  disabled={disabled}
+                />
+              ))
+            )}
           </div>
-        )}
-      </Collapse>
+        </Collapse>
+      )}
     </>
   );
 };
