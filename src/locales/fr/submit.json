@@ -11,6 +11,7 @@
   "invalid_url": "L'URL est invalide",
   "malicious": "Je sais que ce fichier est malveillant, dites m'en plus!",
   "malicious.tooltip": "Sélectionnez uniquement si vous êtes sûr que ce fichier est malveillant, cela nous permet d'améliorer notre détection",
+  "max_file_size": "Max",
   "options": "Options",
   "options.service": "Sélection de service",
   "options.service_spec": "Paramètres spécifiques au services",

@@ -2,12 +2,12 @@ import BlockIcon from '@mui/icons-material/Block';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import clsx from 'clsx';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
-import type { CustomUser } from 'components/models/ui/user';
+import useALContext from 'components/hooks/useALContext';
 import React, { memo, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineSecurityScan } from 'react-icons/ai';
+import { ByteNumber } from './ByteNumber';
 
 type FileDropperProps = {
   file: File;
@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
 const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) => {
   const { t } = useTranslation(['submit']);
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({ disabled });
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser, configuration } = useALContext();
   const classes = useStyles();
 
   useEffect(() => {
@@ -83,10 +83,12 @@ const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) =>
               : t(currentUser.roles.includes('submission_create') ? 'file.dragzone' : 'file.disabled')}
           </b>
         </Typography>
-        {file && (!isDragActive || disabled) && (
-          <Typography variant="body2" align="center">
-            {file.size} {t('file.dragzone.byte')}
-          </Typography>
+        {file && (!isDragActive || disabled) ? (
+          <ByteNumber bytes={file.size} variant="body2" align="center" />
+        ) : (
+          <ByteNumber bytes={configuration.submission.max_file_size} variant="body2" align="center">
+            {size => `${t('max_file_size')} ${size}`}
+          </ByteNumber>
         )}
       </div>
     </div>
