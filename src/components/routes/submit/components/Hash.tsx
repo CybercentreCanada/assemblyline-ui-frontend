@@ -49,6 +49,7 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
         onSuccess: ({ api_response }) => {
           showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
           form.setStore(s => {
+            s.state.isUploading = false;
             s.state.isConfirmationOpen = false;
             return s;
           });
@@ -159,8 +160,8 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
           )}
         />
         <form.Subscribe
-          selector={state => [state.values.hash]}
-          children={([hash]) => (
+          selector={state => [state.values.hash.value, state.values.hash.hasError]}
+          children={([hash, error]) => (
             <div style={{ flex: 1 }}>
               <TextField
                 label={`${t('urlHash.input_title')}${t('urlHash.input_suffix')}`}
@@ -168,13 +169,14 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
                 type="stringInput"
                 variant="outlined"
                 fullWidth
-                value={hash.value}
+                value={hash as string}
+                error={error as boolean}
                 onChange={event => {
                   closeSnackbar();
                   const [type, value] = getSubmitType(event.target.value, configuration);
 
                   form.setStore(s => {
-                    s.hash = { ...s.hash, type, value };
+                    s.hash = { ...s.hash, type, value, hasError: false };
 
                     if (type === 'url' && s.hash.urlAutoSelect) {
                       s.hash.urlAutoSelect = false;

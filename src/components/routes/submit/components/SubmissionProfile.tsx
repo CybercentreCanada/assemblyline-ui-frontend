@@ -1,4 +1,4 @@
-import { Typography, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { Submission } from 'components/models/base/config';
 import { useForm } from 'components/routes/submit/contexts/form';
@@ -51,20 +51,24 @@ const WrappedSubmissionProfile = () => {
         Object.keys(state.values.settings.profiles)
       ]}
       children={([fetching, profile, profileKeys]) => (
-        <div style={{ textAlign: 'left', marginTop: theme.spacing(2), paddingLeft: theme.spacing(2) }}>
-          <Typography variant="h6" gutterBottom>
-            {t('options.submission.profile_name')}
-          </Typography>
-          <div style={{ paddingBottom: theme.spacing(1) }}>
-            <SelectInput
-              id={`submission profile`}
-              value={profile}
-              items={(profileKeys as string[]).sort()}
-              loading={fetching as boolean}
-              displayEmpty={false}
-              onChange={(e, v) => handleChange(v)}
-            />
-          </div>
+        <div
+          style={{
+            textAlign: 'left',
+            marginTop: theme.spacing(2),
+            paddingLeft: theme.spacing(2),
+            marginBottom: theme.spacing(1)
+          }}
+        >
+          <SelectInput
+            id={`submission profile name`}
+            label={t('options.submission.profile_name')}
+            labelProps={{ color: 'textPrimary', variant: 'h6', gutterBottom: true }}
+            value={profile}
+            items={(profileKeys as string[]).sort()}
+            loading={fetching as boolean}
+            displayEmpty={false}
+            onChange={(e, v) => handleChange(v)}
+          />
         </div>
       )}
     />

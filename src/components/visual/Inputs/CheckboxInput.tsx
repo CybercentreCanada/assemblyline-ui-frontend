@@ -80,7 +80,7 @@ export const CheckboxInput: React.FC<Props> = React.memo(
                 htmlFor={id || label}
                 variant="body2"
                 whiteSpace="nowrap"
-                sx={{ cursor: 'pointer', ...labelProps?.sx }}
+                sx={{ cursor: 'pointer', paddingRight: 1.5, ...labelProps?.sx }}
                 onClick={onChange}
                 {...labelProps}
                 children={label}
