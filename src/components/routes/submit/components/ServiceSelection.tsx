@@ -100,7 +100,6 @@ const Param: React.FC<ParamProps> = ({
   loading = false,
   disabled = false
 }) => {
-  const theme = useTheme();
   const form = useForm();
 
   return (
@@ -250,7 +249,7 @@ const Service: React.FC<ServiceProps> = ({
         current.hide
           ? { ...prev, hidden: [...prev.hidden, [current, i]] }
           : { ...prev, show: [...prev.show, [current, i]] },
-      { show: [], hidden: [] }
+      { show: [], hidden: [] } as { show: [ServiceParameter, number][]; hidden: [ServiceParameter, number][] }
     );
   }, [form.store.state.values.settings.profiles, profile, specId]);
 
