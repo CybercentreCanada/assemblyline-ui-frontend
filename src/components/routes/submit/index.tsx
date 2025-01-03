@@ -80,7 +80,7 @@ const WrappedSubmitContent = () => {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
-          s.settings = loadSubmissionProfiles({ ...api_response, ...s.settings }, currentUser);
+          s.settings = loadSubmissionProfiles({ ...api_response, ...s.settings });
 
           // // Check if some file sources should auto-select and do so
           s.settings.default_external_sources = [

@@ -1,8 +1,10 @@
 import { List, ListItem, ListItemButton, ListItemText, useTheme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import clsx from 'clsx';
+import useALContext from 'components/hooks/useALContext';
 import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
+import { getProfileNames } from 'components/routes/settings/utils/utils';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -28,6 +30,7 @@ export const Tab = ({ rootElement = null, loading = false, profile = 'interface'
   const theme = useTheme();
   const classes = useStyles();
   const form = useForm();
+  const { user: currentUser } = useALContext();
 
   const isElementInViewport = useCallback((element: Element) => {
     const rect = element.getBoundingClientRect();
@@ -82,7 +85,7 @@ export const Tab = ({ rootElement = null, loading = false, profile = 'interface'
       </ListItem>
 
       <form.Subscribe
-        selector={state => Object.keys(state.values.next.profiles)}
+        selector={state => getProfileNames(state.values.next, currentUser)}
         children={names => (
           <>
             {names.map((name, i) => (

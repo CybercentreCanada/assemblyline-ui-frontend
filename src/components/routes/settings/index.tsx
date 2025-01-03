@@ -131,7 +131,7 @@ const SettingsContent = () => {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
-          const decompress = loadSubmissionProfiles(api_response, currentUser);
+          const decompress = loadSubmissionProfiles(api_response);
 
           s.next = _.cloneDeep(decompress);
           s.prev = _.cloneDeep(decompress);

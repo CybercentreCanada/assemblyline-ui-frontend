@@ -1,6 +1,7 @@
 import { useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/settings/contexts/form';
+import { getProfileNames } from 'components/routes/settings/utils/utils';
 import { List } from 'components/visual/List/List';
 import { ListHeader } from 'components/visual/List/ListHeader';
 import { SelectListInput } from 'components/visual/ListInputs/SelectListInput';
@@ -15,7 +16,7 @@ export const InterfaceSection = ({ disabled = false, loading = false }: Props) =
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const { configuration } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
@@ -25,21 +26,26 @@ export const InterfaceSection = ({ disabled = false, loading = false }: Props) =
       />
 
       <List checkboxPadding>
-        <form.Field
-          name="next.preferred_submission_profile"
-          children={({ state, handleBlur, handleChange }) => (
-            <SelectListInput
-              primary={t('settings:submissions.submission_profile')}
-              secondary={t('settings:submissions.submission_profile_desc')}
-              value={state.value}
-              loading={loading}
-              disabled={disabled}
-              options={Object.keys(configuration?.submission?.profiles || {}).map(profileValue => ({
-                value: profileValue,
-                label: t(`profile.${profileValue}`)
-              }))}
-              onChange={e => handleChange(e.target.value as string)}
-              onBlur={handleBlur}
+        <form.Subscribe
+          selector={state => state.values.next}
+          children={next => (
+            <form.Field
+              name="next.preferred_submission_profile"
+              children={({ state, handleBlur, handleChange }) => (
+                <SelectListInput
+                  primary={t('settings:submissions.submission_profile')}
+                  secondary={t('settings:submissions.submission_profile_desc')}
+                  value={state.value}
+                  loading={loading}
+                  disabled={disabled}
+                  options={getProfileNames(next, currentUser).map(profileValue => ({
+                    value: profileValue,
+                    label: t(`profile.${profileValue}`)
+                  }))}
+                  onChange={e => handleChange(e.target.value as string)}
+                  onBlur={handleBlur}
+                />
+              )}
             />
           )}
         />

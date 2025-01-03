@@ -1,6 +1,7 @@
 import { useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { Submission } from 'components/models/base/config';
+import { getProfileNames } from 'components/routes/settings/utils/utils';
 import { useForm } from 'components/routes/submit/contexts/form';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import React, { useCallback } from 'react';
@@ -9,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 const WrappedSubmissionProfile = () => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const { configuration } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
 
   const form = useForm();
 
@@ -48,7 +49,7 @@ const WrappedSubmissionProfile = () => {
       selector={state => [
         state.values.state.isFetchingSettings,
         state.values.state.profile,
-        Object.keys(state.values.settings.profiles)
+        getProfileNames(state.values.settings, currentUser)
       ]}
       children={([fetching, profile, profileKeys]) => (
         <div

@@ -125,7 +125,7 @@ const loadProfile = (settings: UserSettings, profile: SubmissionProfile): Profil
   return out;
 };
 
-export const loadSubmissionProfiles = (settings: UserSettings, user: CustomUser): SubmitSettings => {
+export const loadSubmissionProfiles = (settings: UserSettings): SubmitSettings => {
   if (!settings) return null;
 
   let out = { profiles: { default: null } } as SubmitSettings;
@@ -137,9 +137,7 @@ export const loadSubmissionProfiles = (settings: UserSettings, user: CustomUser)
     }
   });
 
-  if (user.roles.includes('submission_customize') || user.is_admin) {
-    out.profiles = { ...out.profiles, default: loadProfile(settings, null) };
-  }
+  out.profiles = { ...out.profiles, default: loadProfile(settings, null) };
 
   Object.entries(settings?.submission_profiles || {}).forEach(([name, profile]) => {
     out.profiles = { ...out.profiles, [name]: loadProfile(settings, profile) };
@@ -148,10 +146,8 @@ export const loadSubmissionProfiles = (settings: UserSettings, user: CustomUser)
   return out;
 };
 
-export const parseSubmissionProfiles = (submit: SubmitSettings, user: CustomUser): UserSettings => {
+export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings => {
   if (!submit) return null;
-
-  // const out = _.omit(submit, ['profiles']) as UserSettings;
 
   let out: UserSettings = {} as UserSettings;
 
@@ -240,3 +236,8 @@ export const parseSubmissionProfiles = (submit: SubmitSettings, user: CustomUser
 
   return out;
 };
+
+export const getProfileNames = (settings: SubmitSettings, user: CustomUser) =>
+  Object.keys(settings.profiles).filter(
+    p => p !== 'default' || user.is_admin || user.roles.includes('submission_customize')
+  );
