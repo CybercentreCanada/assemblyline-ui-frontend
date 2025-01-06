@@ -1,6 +1,7 @@
 import type { IconButtonProps, ListItemButtonProps, SwitchProps, TooltipProps, TypographyProps } from '@mui/material';
-import { ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton, Switch, Typography } from '@mui/material';
+import { ListItemIcon, ListItemText, Skeleton, Switch, Typography } from '@mui/material';
 import React from 'react';
+import { ListInput } from './components/ListInput';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 import { TooltipInput } from './components/TooltipInput';
@@ -38,10 +39,20 @@ export const SwitchInput: React.FC<Props> = React.memo(
     onReset = () => null,
     ...switchProps
   }: Props) =>
-    preventRender ? null : loading ? (
-      <ListItem sx={{ padding: 0, columnGap: 1 }}>
+    preventRender ? null : (
+      <ListInput
+        button={!loading && !disabled}
+        buttonProps={{ sx: { padding: 0, columnGap: 1 }, onClick: onChange }}
+        itemProps={{ sx: { padding: 0, columnGap: 1 } }}
+      >
         <ListItemIcon sx={{ ...(disableGap && { minWidth: 0 }) }}>
-          <Skeleton variant="circular" sx={{ height: '26px', width: '26px', margin: '6px' }} />
+          {loading ? (
+            <Skeleton variant="circular" sx={{ height: '26px', width: '26px', margin: '6px' }} />
+          ) : (
+            <ListItemIcon sx={{ ...(disableGap && { minWidth: 0 }) }}>
+              <Switch id={id || label} checked={value} size="small" disabled={disabled} {...switchProps} />
+            </ListItemIcon>
+          )}
         </ListItemIcon>
         <ListItemText
           primary={
@@ -51,36 +62,16 @@ export const SwitchInput: React.FC<Props> = React.memo(
                 htmlFor={id || label}
                 variant="body2"
                 whiteSpace="nowrap"
-                onClick={onChange}
+                {...(!loading && !disabled
+                  ? { sx: { cursor: 'pointer', paddingRight: 1.5, ...labelProps?.sx }, onClick: onChange }
+                  : null)}
                 {...labelProps}
                 children={label}
               />
             </TooltipInput>
           }
         />
-      </ListItem>
-    ) : (
-      <ListItemButton disabled={disabled} sx={{ padding: 0, columnGap: 1 }} onClick={onChange}>
-        <ListItemIcon sx={{ ...(disableGap && { minWidth: 0 }) }}>
-          <Switch id={id || label} checked={value} size="small" disabled={disabled} {...switchProps} />
-        </ListItemIcon>
-        <ListItemText
-          primary={
-            <TooltipInput tooltip={tooltip} {...tooltipProps}>
-              <Typography
-                component="label"
-                htmlFor={id || label}
-                variant="body2"
-                whiteSpace="nowrap"
-                sx={{ cursor: 'pointer', paddingRight: 1.5, ...labelProps?.sx }}
-                onClick={onChange}
-                {...labelProps}
-                children={label}
-              />
-            </TooltipInput>
-          }
-        />
-        <ResetInput id={id || label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
-      </ListItemButton>
+        <ResetInput id={id || label} preventRender={loading || !reset || disabled} onReset={onReset} {...resetProps} />
+      </ListInput>
     )
 );

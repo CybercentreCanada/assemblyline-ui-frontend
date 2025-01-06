@@ -50,5 +50,7 @@ export const ShowMore: React.FC<ShowMoreProps> = React.memo(({ variant = 'long',
           </div>
         </Tooltip>
       );
+    default:
+      return null;
   }
 });

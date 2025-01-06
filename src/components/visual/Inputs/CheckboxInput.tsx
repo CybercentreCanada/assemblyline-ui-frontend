@@ -1,8 +1,9 @@
 import type { CheckboxProps, IconButtonProps, ListItemButtonProps, TooltipProps, TypographyProps } from '@mui/material';
-import { Checkbox, ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton, Typography } from '@mui/material';
+import { Checkbox, ListItemIcon, ListItemText, Skeleton, Typography } from '@mui/material';
 import React from 'react';
 import type { ExpendInputProps } from './components/ExpendInput';
 import { ExpendInput } from './components/ExpendInput';
+import { ListInput } from './components/ListInput';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 import { TooltipInput } from './components/TooltipInput';
@@ -46,10 +47,20 @@ export const CheckboxInput: React.FC<Props> = React.memo(
     onReset = () => null,
     ...checkboxProps
   }: Props) =>
-    preventRender ? null : loading ? (
-      <ListItem sx={{ padding: 0, columnGap: 1 }}>
+    preventRender ? null : (
+      <ListInput
+        button={!loading && !disabled}
+        buttonProps={{ sx: { padding: 0, columnGap: 1 }, onClick: onChange }}
+        itemProps={{ sx: { padding: 0, columnGap: 1 } }}
+      >
         <ListItemIcon sx={{ ...(disableGap && { minWidth: 0 }) }}>
-          <Skeleton variant="circular" sx={{ height: '26px', width: '26px', margin: '6px' }} />
+          {loading ? (
+            <Skeleton variant="circular" sx={{ height: '26px', width: '26px', margin: '6px' }} />
+          ) : (
+            <ListItemIcon sx={{ ...(disableGap && { minWidth: 0 }) }}>
+              <Checkbox id={id || label} checked={value} size="small" disabled={disabled} {...checkboxProps} />
+            </ListItemIcon>
+          )}
         </ListItemIcon>
         <ListItemText
           primary={
@@ -59,37 +70,17 @@ export const CheckboxInput: React.FC<Props> = React.memo(
                 htmlFor={id || label}
                 variant="body2"
                 whiteSpace="nowrap"
-                onClick={onChange}
+                {...(!loading && !disabled
+                  ? { sx: { cursor: 'pointer', paddingRight: 1.5, ...labelProps?.sx }, onClick: onChange }
+                  : null)}
                 {...labelProps}
                 children={label}
               />
             </TooltipInput>
           }
         />
-      </ListItem>
-    ) : (
-      <ListItemButton disabled={disabled} role={undefined} sx={{ padding: 0, columnGap: 1 }} onClick={onChange}>
-        <ListItemIcon sx={{ ...(disableGap && { minWidth: 0 }) }}>
-          <Checkbox id={id || label} checked={value} size="small" disabled={disabled} {...checkboxProps} />
-        </ListItemIcon>
-        <ListItemText
-          primary={
-            <TooltipInput tooltip={tooltip} {...tooltipProps}>
-              <Typography
-                component="label"
-                htmlFor={id || label}
-                variant="body2"
-                whiteSpace="nowrap"
-                sx={{ cursor: 'pointer', paddingRight: 1.5, ...labelProps?.sx }}
-                onClick={onChange}
-                {...labelProps}
-                children={label}
-              />
-            </TooltipInput>
-          }
-        />
-        <ResetInput id={id || label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+        <ResetInput id={id || label} preventRender={loading || !reset || disabled} onReset={onReset} {...resetProps} />
         <ExpendInput id={id || label} open={expend} onExpend={onExpend} {...expendProps} />
-      </ListItemButton>
+      </ListInput>
     )
 );
