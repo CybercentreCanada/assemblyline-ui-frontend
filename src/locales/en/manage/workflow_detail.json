@@ -1,11 +1,11 @@
 {
-  "add.button": "Add",
+  "add.button": "Add workflow",
   "add.success": "Successfully added the new workflow.",
   "add.title": "Adding a workflow",
   "backport_workflow_matching": "matching alerts",
   "backport_workflow_prompt": "Apply workflow to all existing alerts?",
   "cancel": "Cancel changes",
-  "cancel.button": "Cancel",
+  "cancel.button": "Cancel changes",
   "chart.title": "Number of hits in the last 30 days",
   "created_by": "Created by",
   "delete.acceptText": "Yes, remove it!",
@@ -67,7 +67,7 @@
   "status.TRIAGE": "TRIAGE",
   "status.null": "",
   "title": "Workflow Details",
-  "update.button": "Update",
+  "update.button": "Update workflow",
   "update.success": "Workflow was successfully updated.",
   "usage": "Show related alerts"
 }

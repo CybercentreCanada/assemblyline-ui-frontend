@@ -43,7 +43,7 @@ const MyAppMain = () => {
   const provider = getProvider();
   const { setUser, setConfiguration, user, configuration } = useALContext();
   const { setReady: setAppLayoutReady } = useAppLayout();
-  const { setReady: setBorealisReady } = useBorealis();
+  const { setReady: setBorealisReady, setCustomIconify } = useBorealis();
   const { setItems } = useAppSwitcher();
   const { bootstrap } = useMyAPI();
 
@@ -56,9 +56,10 @@ const MyAppMain = () => {
     }
   };
 
-  const setReady = (layout: boolean, borealis: boolean) => {
+  const setReady = (layout: boolean, borealis: boolean, iconifyUrl: string = null) => {
     setAppLayoutReady(layout);
     setBorealisReady(borealis);
+    setCustomIconify(iconifyUrl);
   };
 
   useEffect(() => {

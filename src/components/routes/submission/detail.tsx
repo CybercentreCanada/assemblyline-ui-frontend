@@ -130,7 +130,7 @@ function WrappedSubmissionDetail() {
   const [partial, setPartial] = useState<boolean>(false);
   const [watchQueue, setWatchQueue] = useState<string>(null);
   const [configuration, setConfiguration] = useState<Configuration>(null);
-  const [liveErrors, setLiveErrors] = useState<ParsedErrors>(null);
+  const [liveErrors, setLiveErrors] = useState<string[]>(null);
   const [liveTagMap, setLiveTagMap] = useState<SubmissionTags>(null);
   const [outstanding, setOutstanding] = useState<OutstandingServices>(null);
   const [liveStatus, setLiveStatus] = useState<LiveStatus>('queued');
@@ -918,7 +918,7 @@ function WrappedSubmissionDetail() {
     if (newResults.length !== 0 || newErrors.length !== 0) {
       // eslint-disable-next-line no-console
       console.debug(`LIVE :: New Results: ${newResults.join(' | ')} - New Errors: ${newErrors.join(' | ')}`);
-      setLiveErrors(getParsedErrors(liveErrorKeys));
+      setLiveErrors(liveErrorKeys);
 
       apiCall<MultipleKeys>({
         method: 'POST',
@@ -1466,11 +1466,11 @@ function WrappedSubmissionDetail() {
           )}
 
         {submission && submission.state === 'completed' && Object.keys(submission.errors).length !== 0 && (
-          <ErrorSection sid={id} parsed_errors={submission.parsed_errors} />
+          <ErrorSection sid={id} errors={submission.errors} />
         )}
 
         {submission && submission.state !== 'completed' && liveErrorKeys.length !== 0 && liveErrors !== null && (
-          <ErrorSection sid={id} parsed_errors={liveErrors} />
+          <ErrorSection sid={id} errors={liveErrors} />
         )}
 
         <FileTreeSection tree={tree} sid={id} baseFiles={baseFiles} force={submission && submission.max_score < 0} />

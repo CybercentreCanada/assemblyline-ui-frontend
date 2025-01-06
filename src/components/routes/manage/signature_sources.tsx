@@ -1,16 +1,17 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CardMembershipOutlinedIcon from '@mui/icons-material/CardMembershipOutlined';
+import CheckIcon from '@mui/icons-material/Check';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
+import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 import {
-  Button,
   Card,
-  CircularProgress,
   Collapse,
   Divider,
   Grid,
@@ -62,6 +63,19 @@ const useStyles = makeStyles(theme => ({
     wordBreak: 'break-word',
     '&:hover': {
       backgroundColor: theme.palette.mode === 'dark' ? '#ffffff10' : '#00000005',
+      cursor: 'pointer'
+    }
+  },
+  disableCard: {
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: '4px',
+    padding: '8px',
+    margin: '0.25rem 0',
+    overflow: 'auto',
+    opacity: '50%',
+    wordBreak: 'break-word',
+    '&:hover': {
+      backgroundColor: theme.palette.mode === 'dark' ? '#ffffff10' : '#00000010',
       cursor: 'pointer'
     }
   },
@@ -132,15 +146,14 @@ type SourceDetailDrawerProps = {
 const WrappedSourceDetailDrawer = ({ service, base, onClose, generatesSignatures }: SourceDetailDrawerProps) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
 
   const [source, setSource] = useState<UpdateSource>(null);
-  const [modified, setModified] = useState(false);
-  const [deleteDialog, setDeleteDialog] = useState(false);
-  const [buttonLoading, setButtonLoading] = useState(false);
+  const [modified, setModified] = useState<boolean>(false);
+  const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
+  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
 
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
@@ -199,6 +212,20 @@ const WrappedSourceDetailDrawer = ({ service, base, onClose, generatesSignatures
     });
   };
 
+  const toggleSource = () => {
+    apiCall({
+      method: 'PUT',
+      url: `/api/v4/signature/sources/enable/${service}/${encodeURIComponent(source.name)}/`,
+      body: { enabled: !source.enabled },
+      onSuccess: () => {
+        setSource({ ...source, enabled: !source.enabled });
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadUpdateSources')), 100);
+      }
+    });
+  };
+
+  const saveEnabled = source?.name && source?.uri && modified && !buttonLoading;
+
   return (
     source && (
       <div style={{ paddingTop: theme.spacing(2) }}>
@@ -221,42 +248,65 @@ const WrappedSourceDetailDrawer = ({ service, base, onClose, generatesSignatures
                 {`${t(base ? 'editing_source' : 'adding_source')}${base ? ` (${base.name})` : ''}`}
               </Typography>
             </Grid>
-            {base && (
-              <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 1 }}>
-                {generatesSignatures && (
-                  <Tooltip title={t('view_signatures')}>
-                    <IconButton
-                      style={{
-                        color: theme.palette.mode === 'dark' ? '#F' : '#0'
-                      }}
-                      component={Link}
-                      to={`/manage/signatures/?query=${encodeURIComponent(
-                        `type:${service.toLowerCase()} AND source:${source.name}`
-                      )}`}
-                      size="large"
-                    >
-                      <FingerprintOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {base && (
-                  <Tooltip title={t('update')}>
-                    <IconButton
-                      style={{
-                        color: isSourceUpdating(source)
-                          ? theme.palette.action.disabled
-                          : theme.palette.mode === 'dark'
-                          ? theme.palette.info.light
-                          : theme.palette.info.dark
-                      }}
-                      disabled={isSourceUpdating(source)}
-                      onClick={triggerSourceUpdate}
-                      size="large"
-                    >
-                      <SystemUpdateAltIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
+            <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 1 }}>
+              {base && (
+                <Tooltip title={t(source.enabled ? 'disable' : 'enable')}>
+                  <IconButton onClick={toggleSource} size="large">
+                    {source.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+                  </IconButton>
+                </Tooltip>
+              )}
+              {base && generatesSignatures && (
+                <Tooltip title={t('view_signatures')}>
+                  <IconButton
+                    style={{
+                      color: theme.palette.mode === 'dark' ? '#F' : '#0'
+                    }}
+                    component={Link}
+                    to={`/manage/signatures/?query=${encodeURIComponent(
+                      `type:${service.toLowerCase()} AND source:${source.name}`
+                    )}`}
+                    size="large"
+                  >
+                    <FingerprintOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {base && (
+                <Tooltip title={t('update')}>
+                  <IconButton
+                    style={{
+                      color: isSourceUpdating(source)
+                        ? theme.palette.action.disabled
+                        : theme.palette.mode === 'dark'
+                        ? theme.palette.info.light
+                        : theme.palette.info.dark
+                    }}
+                    disabled={isSourceUpdating(source)}
+                    onClick={triggerSourceUpdate}
+                    size="large"
+                  >
+                    <SystemUpdateAltIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              <Tooltip title={t(base ? 'change.save' : 'add.save')}>
+                <IconButton
+                  style={{
+                    color: saveEnabled
+                      ? theme.palette.mode === 'dark'
+                        ? theme.palette.success.light
+                        : theme.palette.success.dark
+                      : theme.palette.grey[750]
+                  }}
+                  onClick={saveChanges}
+                  disabled={!saveEnabled}
+                  size="large"
+                >
+                  <CheckIcon />
+                </IconButton>
+              </Tooltip>
+              {base && (
                 <Tooltip title={t('delete')}>
                   <IconButton
                     style={{
@@ -268,8 +318,8 @@ const WrappedSourceDetailDrawer = ({ service, base, onClose, generatesSignatures
                     <RemoveCircleOutlineOutlinedIcon />
                   </IconButton>
                 </Tooltip>
-              </Grid>
-            )}
+              )}
+            </Grid>
           </Grid>
         </div>
         <SourceDetail
@@ -282,18 +332,6 @@ const WrappedSourceDetailDrawer = ({ service, base, onClose, generatesSignatures
         />
 
         <RouterPrompt when={modified} />
-
-        <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2), textAlign: 'right' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            disabled={!source.name || !source.uri || !modified || buttonLoading}
-            onClick={saveChanges}
-          >
-            {t(base ? 'change.save' : 'add.save')}
-            {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-          </Button>
-        </div>
       </div>
     )
   );
@@ -333,7 +371,13 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
   return (
     <div style={{ paddingTop: theme.spacing(1) }}>
       <Card
-        className={source.status && source.status.state === 'ERROR' ? classes.errorCard : classes.card}
+        className={
+          !source.enabled
+            ? classes.disableCard
+            : source.status && source.status.state === 'ERROR'
+            ? classes.errorCard
+            : classes.card
+        }
         onClick={onClick}
       >
         <div style={{ paddingBottom: theme.spacing(2) }}>
@@ -440,22 +484,6 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
               </Grid>
             </>
           )}
-          {source.username && (
-            <>
-              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('username')}:`}</Grid>
-              <Grid item xs={7} sm={8} md={10} className={classes.mono}>
-                {source.username}
-              </Grid>
-            </>
-          )}
-          {source.password && (
-            <>
-              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('password')}:`}</Grid>
-              <Grid item xs={7} sm={8} md={10} className={classes.mono}>
-                ******
-              </Grid>
-            </>
-          )}
           {c12nDef.enforce && (
             <>
               <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('classification')}:`}</Grid>
@@ -466,16 +494,6 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
             </>
           )}
         </Grid>
-        {source.headers && source.headers.length !== 0 && (
-          <div>
-            <div className={classes.label}>{`${t('headers')}:`}&nbsp;</div>
-            {source.headers.map((item, id) => (
-              <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
-                {`${item.name} = ${item.value}`}
-              </div>
-            ))}
-          </div>
-        )}
       </Card>
     </div>
   );
@@ -489,12 +507,13 @@ type ServiceDetailProps = {
 
 const ServiceDetail = ({ service, sources, generatesSignatures }: ServiceDetailProps) => {
   const { t } = useTranslation(['manageSignatureSources']);
-  const [open, setOpen] = React.useState(true);
   const theme = useTheme();
-  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
+  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const { showSuccessMessage } = useMySnackbar();
+
+  const [open, setOpen] = useState<boolean>(true);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const triggerSourceUpdateAll = () => {

@@ -25,12 +25,19 @@ type SSOProps = {
   buttonLoading: boolean;
   onSubmit: (event) => void;
   reset: (event) => void;
+  quickLogin: boolean;
 };
 
-export function SSOLogin({ avatar, username, email, tokenID, buttonLoading, onSubmit, reset }: SSOProps) {
+export function SSOLogin({ avatar, username, email, tokenID, buttonLoading, onSubmit, reset, quickLogin }: SSOProps) {
   const { t } = useTranslation(['login']);
   const classes = useStyles();
   const theme = useTheme();
+
+  // Perform a quick login if we have all the necessary data
+  if (quickLogin && tokenID) {
+    onSubmit(null);
+    return;
+  }
 
   return (
     <form onSubmit={onSubmit}>

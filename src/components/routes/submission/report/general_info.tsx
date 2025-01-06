@@ -123,14 +123,14 @@ function WrappedGeneralInformation({ report }: Props) {
             <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
           </Grid>
           <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-            {report ? report.files[0].name : <Skeleton />}
+            {report ? report?.files[0]?.name : <Skeleton />}
           </Grid>
 
           <Grid item xs={4} sm={3} lg={2}>
             <span style={{ fontWeight: 500 }}>{t('file.description')}</span>
           </Grid>
           <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-            {report ? report.params.description : <Skeleton />}
+            {report ? report?.params?.description : <Skeleton />}
           </Grid>
 
           <Grid item xs={12}>
@@ -141,14 +141,14 @@ function WrappedGeneralInformation({ report }: Props) {
             <span style={{ fontWeight: 500 }}>{t('submission.date')}</span>
           </Grid>
           <Grid item xs={8} sm={9} lg={10}>
-            {report ? <Moment>{report.times.submitted}</Moment> : <Skeleton />}
+            {report ? <Moment>{report?.times?.submitted}</Moment> : <Skeleton />}
           </Grid>
 
           <Grid item xs={4} sm={3} lg={2}>
             <span style={{ fontWeight: 500 }}>{t('submission.user')}</span>
           </Grid>
           <Grid item xs={8} sm={9} lg={10}>
-            {report ? report.params.submitter : <Skeleton />}
+            {report ? report?.params?.submitter : <Skeleton />}
           </Grid>
 
           <Grid item xs={4} sm={3} lg={2}>
@@ -156,22 +156,24 @@ function WrappedGeneralInformation({ report }: Props) {
           </Grid>
           <Grid item xs={8} sm={9} lg={10}>
             {report ? (
-              report.params.services.rescan ? (
+              report?.params?.services?.rescan ? (
                 [
-                  ...report.params.services.selected,
-                  ...report.params.services.rescan.filter(word => report.params.services.selected.indexOf(word) === -1)
+                  ...report?.params?.services?.selected,
+                  ...report?.params?.services?.rescan?.filter(
+                    word => report?.params?.services?.selected?.indexOf(word) === -1
+                  )
                 ]
                   .sort((a: string, b: string) => a.localeCompare(b))
                   .join(' | ')
               ) : (
-                report.params.services.selected.sort((a: string, b: string) => a.localeCompare(b)).join(' | ')
+                report?.params?.services?.selected?.sort((a: string, b: string) => a.localeCompare(b)).join(' | ')
               )
             ) : (
               <Skeleton />
             )}
           </Grid>
 
-          {report && report.params.services.errors.length !== 0 && (
+          {report && report?.params?.services?.errors?.length !== 0 && (
             <>
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('submission.services.errors')}</span>
@@ -188,7 +190,7 @@ function WrappedGeneralInformation({ report }: Props) {
             </>
           )}
 
-          {(!report || report.file_info) && report?.file_info?.type.startsWith('uri/') ? (
+          {(!report || report?.file_info) && report?.file_info?.type?.startsWith('uri/') ? (
             <>
               <Grid item xs={12}>
                 <div style={{ height: theme.spacing(2) }} />
@@ -198,7 +200,7 @@ function WrappedGeneralInformation({ report }: Props) {
                 <span style={{ fontWeight: 500 }}>{t('file.scheme')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10}>
-                {report.file_info?.uri_info ? report.file_info.uri_info.scheme : <Skeleton />}
+                {report.file_info?.uri_info ? report?.file_info?.uri_info.scheme : <Skeleton />}
               </Grid>
 
               {report.file_info?.uri_info?.username && (
@@ -207,7 +209,7 @@ function WrappedGeneralInformation({ report }: Props) {
                     <span style={{ fontWeight: 500 }}>{t('file.username')}</span>
                   </Grid>
                   <Grid item xs={8} sm={9} lg={10}>
-                    {report.file_info.uri_info.username}
+                    {report?.file_info?.uri_info.username}
                   </Grid>
                 </>
               )}
@@ -218,7 +220,7 @@ function WrappedGeneralInformation({ report }: Props) {
                     <span style={{ fontWeight: 500 }}>{t('file.password')}</span>
                   </Grid>
                   <Grid item xs={8} sm={9} lg={10}>
-                    {report.file_info.uri_info.password}
+                    {report?.file_info?.uri_info.password}
                   </Grid>
                 </>
               )}
@@ -227,7 +229,7 @@ function WrappedGeneralInformation({ report }: Props) {
                 <span style={{ fontWeight: 500 }}>{t('file.hostname')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10}>
-                {report.file_info.uri_info.hostname}
+                {report?.file_info?.uri_info?.hostname}
               </Grid>
 
               {report.file_info?.uri_info?.port && (
@@ -236,7 +238,7 @@ function WrappedGeneralInformation({ report }: Props) {
                     <span style={{ fontWeight: 500 }}>{t('file.port')}</span>
                   </Grid>
                   <Grid item xs={8} sm={9} lg={10}>
-                    {report.file_info.uri_info.port}
+                    {report?.file_info?.uri_info?.port}
                   </Grid>
                 </>
               )}
@@ -247,7 +249,7 @@ function WrappedGeneralInformation({ report }: Props) {
                     <span style={{ fontWeight: 500 }}>{t('file.path')}</span>
                   </Grid>
                   <Grid item xs={8} sm={9} lg={10}>
-                    {report.file_info.uri_info.path}
+                    {report?.file_info?.uri_info?.path}
                   </Grid>
                 </>
               )}
@@ -258,7 +260,7 @@ function WrappedGeneralInformation({ report }: Props) {
                     <span style={{ fontWeight: 500 }}>{t('file.params')}</span>
                   </Grid>
                   <Grid item xs={8} sm={9} lg={10}>
-                    {report.file_info.uri_info.params}
+                    {report?.file_info?.uri_info?.params}
                   </Grid>
                 </>
               )}
@@ -269,7 +271,7 @@ function WrappedGeneralInformation({ report }: Props) {
                     <span style={{ fontWeight: 500 }}>{t('file.query')}</span>
                   </Grid>
                   <Grid item xs={8} sm={9} lg={10}>
-                    {report.file_info.uri_info.query}
+                    {report?.file_info?.uri_info?.query}
                   </Grid>
                 </>
               )}
@@ -280,7 +282,7 @@ function WrappedGeneralInformation({ report }: Props) {
                     <span style={{ fontWeight: 500 }}>{t('file.fragment')}</span>
                   </Grid>
                   <Grid item xs={8} sm={9} lg={10}>
-                    {report.file_info.uri_info.fragment}
+                    {report?.file_info?.uri_info?.fragment}
                   </Grid>
                 </>
               )}
@@ -295,72 +297,72 @@ function WrappedGeneralInformation({ report }: Props) {
                 <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10}>
-                {report ? report.file_info.type : <Skeleton />}
+                {report ? report?.file_info?.type : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.mime')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10}>
-                {report ? report.file_info.mime : <Skeleton />}
+                {report ? report?.file_info?.mime : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.magic')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10}>
-                {report ? report.file_info.magic : <Skeleton />}
+                {report ? report?.file_info?.magic : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10}>
-                {report ? report.file_info.size : <Skeleton />}
+                {report ? report?.file_info?.size : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                {report ? report.file_info.md5 : <Skeleton />}
+                {report ? report?.file_info?.md5 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.sha1')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                {report ? report.file_info.sha1 : <Skeleton />}
+                {report ? report?.file_info?.sha1 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.sha256')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                {report ? report.file_info.sha256 : <Skeleton />}
+                {report ? report?.file_info?.sha256 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.ssdeep')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                {report ? report.file_info.ssdeep : <Skeleton />}
+                {report ? report?.file_info?.ssdeep : <Skeleton />}
               </Grid>
 
-              {report && report.file_info.tlsh && (
+              {report && report?.file_info?.tlsh && (
                 <>
                   <Grid item xs={4} sm={3} lg={2}>
                     <span style={{ fontWeight: 500 }}>{t('file.tlsh')}</span>
                   </Grid>
                   <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                    {report.file_info.tlsh}
+                    {report?.file_info?.tlsh}
                   </Grid>
                 </>
               )}
             </>
           )}
 
-          {report && report.promoted_sections
+          {report && report?.promoted_sections
             ? report.promoted_sections
                 .filter(section => section.promote_to === 'URI_PARAMS')
                 .map((section, idx) =>
@@ -376,15 +378,15 @@ function WrappedGeneralInformation({ report }: Props) {
             <span style={{ fontWeight: 500 }}>{t('file.entropy')}</span>
           </Grid>
           <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-            {report ? report.file_info.entropy : <Skeleton />}
+            {report ? report?.file_info?.entropy : <Skeleton />}
           </Grid>
 
-          {report && report.file_info.entropy && report.promoted_sections ? (
+          {report && report?.file_info?.entropy && report?.promoted_sections ? (
             <>
               <Grid item xs={4} sm={3} lg={2} />
               <Grid item xs={8} sm={9} lg={10}>
-                {report.promoted_sections
-                  .filter(section => section.promote_to === 'ENTROPY')
+                {report?.promoted_sections
+                  .filter(section => section?.promote_to === 'ENTROPY')
                   .map((section, idx) =>
                     section.body_format === 'GRAPH_DATA' ? <GraphBody key={idx} body={section.body} /> : null
                   )}
@@ -393,9 +395,9 @@ function WrappedGeneralInformation({ report }: Props) {
           ) : null}
         </Grid>
         <div>
-          {report && report.promoted_sections
+          {report && report?.promoted_sections
             ? report.promoted_sections
-                .filter(section => section.promote_to === 'SCREENSHOT')
+                .filter(section => section?.promote_to === 'SCREENSHOT')
                 .map((section, idx) =>
                   section.body_format === 'IMAGE' ? (
                     <ImageInlineBody key={idx} body={section.body} size="large" />

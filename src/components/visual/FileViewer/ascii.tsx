@@ -151,7 +151,7 @@ const WrappedASCIISection: React.FC<Props> = ({
 
   if (!currentUser.roles.includes('file_detail')) return <ForbiddenPage />;
   else if (error) return <Alert severity="error">{error}</Alert>;
-  else if (!data) return <LinearProgress />;
+  else if (data === null) return <LinearProgress />;
   else
     return (
       <Grid container style={{ flexGrow: 1 }}>

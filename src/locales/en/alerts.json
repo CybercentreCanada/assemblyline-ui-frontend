@@ -25,7 +25,7 @@
   "btn.submission": "Submission",
   "btn.workflow": "Workflow Action",
   "category": "Categories",
-  "data_filtered_msg": "Alert data filtered because user does not have the privileges to see all the results",
+  "data_filtered_msg": "Alert data filtered because submitter does not have the privileges to see all the results",
   "dates": "Dates",
   "detail.title": "Alert Detail",
   "domain": "Domains",

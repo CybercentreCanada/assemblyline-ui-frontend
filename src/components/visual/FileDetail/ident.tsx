@@ -1,15 +1,16 @@
-import { Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
+import { Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { File as FileInfo } from 'components/models/base/file';
 import type { Section } from 'components/models/base/result';
 import ActionableText from 'components/visual/ActionableText';
 import Classification from 'components/visual/Classification';
-import { ImageInlineBody } from 'components/visual/image_inline';
 import { GraphBody } from 'components/visual/ResultCard/graph_body';
 import SectionContainer from 'components/visual/SectionContainer';
+import { ImageInlineBody } from 'components/visual/image_inline';
 import { bytesToSize } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import Moment from '../Moment';
 
 type IdentificationSectionProps = {
   fileinfo: FileInfo;
@@ -125,6 +126,24 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
             <Skeleton />
           )}
         </Grid>
+
+        {!fileinfo?.expiry_ts ? null : (
+          <>
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('expiry.ts')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+              <Typography component="span" variant="body2">
+                <Moment variant="fromNow">{fileinfo.expiry_ts}</Moment>
+              </Typography>
+              <Typography color="textSecondary" component="span" variant="body2">
+                {` (`}
+                <Moment format="YYYY-MM-DD HH:mm:ss">{fileinfo.expiry_ts}</Moment>
+                {`)`}
+              </Typography>
+            </Grid>
+          </>
+        )}
 
         <Grid item xs={4} sm={3} lg={2}>
           <span style={{ fontWeight: 500 }}>{t('size')}</span>

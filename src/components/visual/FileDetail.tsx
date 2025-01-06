@@ -24,6 +24,7 @@ import {
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
+import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Error } from 'components/models/base/error';
@@ -32,10 +33,11 @@ import type { File } from 'components/models/ui/file';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
+import HeuristicDetail from 'components/routes/manage/heuristic_detail';
 import AISummarySection from 'components/routes/submission/detail/ai_summary';
 import Classification from 'components/visual/Classification';
 import { emptyResult } from 'components/visual/ResultCard';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
@@ -78,6 +80,7 @@ const WrappedFileDetail: React.FC<Props> = ({
   const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage } = useMySnackbar();
   const { addInsight, removeInsight } = useAssistant();
+  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
 
   const [file, setFile] = useState<File | null>(null);
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
@@ -87,14 +90,18 @@ const WrappedFileDetail: React.FC<Props> = ({
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const [promotedSections, setPromotedSections] = useState([]);
+  const [insideDrawer, setInsideDrawer] = useState<boolean>(null);
+  const [loaded, setLoaded] = useState<boolean>(false);
 
-  const sp2 = theme.spacing(2);
-  const sp4 = theme.spacing(4);
+  const ref = useRef();
+
+  const sp2 = useMemo(() => theme.spacing(2), [theme]);
+  const sp4 = useMemo(() => theme.spacing(4), [theme]);
 
   const popoverOpen = Boolean(resubmitAnchor);
 
-  const params = new URLSearchParams(location.search);
-  const fileName = file ? params.get('name') || sha256 : null;
+  const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const fileName = useMemo(() => (file ? params.get('name') || sha256 : null), [file, params, sha256]);
 
   const fileViewerPath = useMemo<string>(() => {
     const tab = TAB_OPTIONS.find(option => location.pathname.indexOf(option) >= 0);
@@ -311,8 +318,27 @@ const WrappedFileDetail: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
 
+  useEffect(() => {
+    setInsideDrawer(document.getElementById('drawerContent')?.contains(ref.current) || false);
+  }, [file]);
+
+  useEffect(() => {
+    if (insideDrawer === false) {
+      setLoaded(true);
+      if (location.hash) setGlobalDrawer(<HeuristicDetail heur_id={location.hash.slice(1)} />);
+      else if (!location.hash) setGlobalDrawer(null);
+    }
+  }, [insideDrawer, location.hash, setGlobalDrawer]);
+
+  useEffect(() => {
+    if (loaded && insideDrawer === false && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [insideDrawer, globalDrawerOpened]);
+
   return currentUser.roles.includes('submission_view') ? (
-    <div id="fileDetailTop" style={{ textAlign: 'left' }}>
+    <div id="fileDetailTop" ref={ref} style={{ textAlign: 'left' }}>
       <InputDialog
         open={safelistDialog}
         handleClose={() => setSafelistDialog(false)}
@@ -325,6 +351,13 @@ const WrappedFileDetail: React.FC<Props> = ({
         inputLabel={t('safelist.input')}
         text={t('safelist.text')}
         waiting={waitingDialog}
+        extra={
+          <Classification
+            size="tiny"
+            type="outlined"
+            c12n={file?.file_info?.classification ? file.file_info.classification : null}
+          />
+        }
       />
       <InputDialog
         open={badlistDialog}
@@ -338,6 +371,13 @@ const WrappedFileDetail: React.FC<Props> = ({
         inputLabel={t('badlist.input')}
         text={t('badlist.text')}
         waiting={waitingDialog}
+        extra={
+          <Classification
+            size="tiny"
+            type="outlined"
+            c12n={file?.file_info?.classification ? file.file_info.classification : null}
+          />
+        }
       />
       {c12nDef.enforce && (
         <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>

@@ -383,7 +383,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                             tabIndex={-1}
                             to={
                               event.entity_type === 'workflow' && event.entity_id !== 'DEFAULT'
-                                ? `/manage/workflow/${event.entity_id}`
+                                ? `/manage/workflow/detail/${event.entity_id}`
                                 : null
                             }
                           >
@@ -422,7 +422,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                                         size="small"
                                         variant="outlined"
                                         color={[...event.labels].includes(label) ? 'success' : 'error'}
-                                        label={t(`status_${label}`)}
+                                        label={label}
                                         style={{ cursor: 'inherit' }}
                                       />
                                     ))

@@ -61,7 +61,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
           classification={classification}
         />
       )}
-      {configuration.ui.api_proxies.includes('borealis') && data_type in BOREALIS_TYPE_MAP && label !== null ? (
+      {'borealis' in configuration.ui.api_proxies && data_type in BOREALIS_TYPE_MAP && label !== null ? (
         <EnrichmentCustomChip
           dataType={BOREALIS_TYPE_MAP[data_type]}
           dataValue={label}
