@@ -49,6 +49,7 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
         onSuccess: ({ api_response }) => {
           showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
           form.setStore(s => {
+            s.state.disabled = false;
             s.state.isUploading = false;
             s.state.isConfirmationOpen = false;
             return s;
@@ -68,6 +69,7 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
 
           form.setStore(s => {
             s.hash.hasError = true;
+            s.state.disabled = false;
             s.state.isUploading = false;
             s.state.isConfirmationOpen = false;
             return s;
@@ -75,6 +77,7 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
         },
         onEnter: () => {
           form.setStore(s => {
+            s.state.disabled = true;
             s.state.isUploading = true;
             return s;
           });

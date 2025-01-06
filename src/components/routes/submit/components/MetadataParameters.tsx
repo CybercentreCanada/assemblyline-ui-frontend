@@ -19,10 +19,11 @@ type MetadataParamParam = {
   profile?: string;
   loading?: boolean;
   disabled?: boolean;
+  customize?: boolean;
 };
 
 const MetadataParam: React.FC<MetadataParamParam> = React.memo(
-  ({ name, metadata, profile = null, loading = false, disabled = false }) => {
+  ({ name, metadata, profile = null, loading = false, disabled = false, customize = false }) => {
     const { t } = useTranslation(['submit', 'settings']);
     const form = useForm();
     const { apiCall } = useMyAPI();
@@ -189,9 +190,10 @@ type Props = {
   profile?: string;
   loading?: boolean;
   disabled?: boolean;
+  customize?: boolean;
 };
 
-const WrappedMetadataParameters = ({ profile = null, loading = false, disabled = false }: Props) => {
+const WrappedMetadataParameters = ({ profile = null, loading = false, disabled = false, customize = false }: Props) => {
   const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const { configuration } = useALContext();
@@ -213,6 +215,7 @@ const WrappedMetadataParameters = ({ profile = null, loading = false, disabled =
                 profile={profile}
                 loading={loading}
                 disabled={disabled}
+                customize={customize}
               />
             ))}
           </div>

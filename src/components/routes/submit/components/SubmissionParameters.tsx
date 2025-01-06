@@ -12,9 +12,15 @@ type Props = {
   profile?: string;
   loading?: boolean;
   disabled?: boolean;
+  customize?: boolean;
 };
 
-const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled = false }: Props) => {
+const WrappedSubmissionParameters = ({
+  profile = null,
+  loading = false,
+  disabled = false,
+  customize = false
+}: Props) => {
   const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const form = useForm();
@@ -86,7 +92,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
               label={t('options.submission.generate_alert')}
               value={generate_alert?.value}
               loading={loading}
-              disabled={disabled}
+              disabled={disabled || (!customize && !generate_alert.editable)}
               onChange={() => {
                 form.setStore(s => {
                   s.settings.profiles[profile].generate_alert = {
@@ -107,7 +113,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
               label={t('options.submission.ignore_filtering')}
               value={ignore_filtering?.value}
               loading={loading}
-              disabled={disabled}
+              disabled={disabled || (!customize && !ignore_filtering.editable)}
               onChange={() => {
                 form.setStore(s => {
                   s.settings.profiles[profile].ignore_filtering = {
@@ -128,7 +134,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
               label={t('options.submission.ignore_cache')}
               value={ignore_cache?.value}
               loading={loading}
-              disabled={disabled}
+              disabled={disabled || (!customize && !ignore_cache.editable)}
               onChange={() => {
                 form.setStore(s => {
                   s.settings.profiles[profile].ignore_cache = {
@@ -151,7 +157,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
               label={t('options.submission.ignore_dynamic_recursion_prevention')}
               value={ignore_dynamic_recursion_prevention?.value}
               loading={loading}
-              disabled={disabled}
+              disabled={disabled || (!customize && !ignore_dynamic_recursion_prevention.editable)}
               onChange={() => {
                 form.setStore(s => {
                   s.settings.profiles[profile].ignore_dynamic_recursion_prevention = {
@@ -190,7 +196,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
               label={t('options.submission.deep_scan')}
               value={deep_scan?.value}
               loading={loading}
-              disabled={disabled}
+              disabled={disabled || (!customize && !deep_scan.editable)}
               onChange={() => {
                 form.setStore(s => {
                   s.settings.profiles[profile].deep_scan = {
@@ -217,7 +223,7 @@ const WrappedSubmissionParameters = ({ profile = null, loading = false, disabled
             endAdornment={t('settings:submissions.ttl_days')}
             value={ttl?.value}
             loading={loading}
-            disabled={disabled}
+            disabled={disabled || (!customize && !ttl.editable)}
             min={configuration.submission.max_dtl !== 0 ? 1 : 0}
             max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
             onChange={(event, value) => {

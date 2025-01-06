@@ -38,6 +38,9 @@ export type SubmitStore = {
 
     /** disable the inputs */
     disabled: boolean;
+
+    /** The user is able to customize the values */
+    customize: boolean;
   };
 
   /** Details of the file input  */
@@ -64,7 +67,8 @@ export const DEFAULT_SUBMIT_FORM: SubmitStore = Object.freeze({
     tab: 'file',
     profile: null,
     loading: true,
-    disabled: false
+    disabled: false,
+    customize: false
   },
   file: null,
   hash: { type: null, value: '', hasError: false, urlAutoSelect: true },

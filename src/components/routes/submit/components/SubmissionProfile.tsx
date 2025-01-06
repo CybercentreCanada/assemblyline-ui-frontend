@@ -7,7 +7,14 @@ import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const WrappedSubmissionProfile = () => {
+type Props = {
+  profile?: string;
+  loading?: boolean;
+  disabled?: boolean;
+  customize?: boolean;
+};
+
+const WrappedSubmissionProfile = ({ loading = false, disabled = false }: Props) => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { user: currentUser, configuration } = useALContext();
@@ -46,12 +53,8 @@ const WrappedSubmissionProfile = () => {
 
   return (
     <form.Subscribe
-      selector={state => [
-        state.values.state.isFetchingSettings,
-        state.values.state.profile,
-        getProfileNames(state.values.settings, currentUser)
-      ]}
-      children={([fetching, profile, profileKeys]) => (
+      selector={state => [state.values.state.profile, getProfileNames(state.values.settings, currentUser)]}
+      children={([profile, profileKeys]) => (
         <div
           style={{
             textAlign: 'left',
@@ -66,7 +69,8 @@ const WrappedSubmissionProfile = () => {
             labelProps={{ color: 'textPrimary', variant: 'h6', gutterBottom: true }}
             value={profile}
             items={(profileKeys as string[]).sort()}
-            loading={fetching as boolean}
+            loading={loading}
+            disabled={disabled}
             displayEmpty={false}
             onChange={(e, v) => handleChange(v)}
           />

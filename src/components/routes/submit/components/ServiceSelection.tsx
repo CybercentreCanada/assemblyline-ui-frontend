@@ -89,6 +89,7 @@ type ParamProps = {
   profile?: string;
   loading?: boolean;
   disabled?: boolean;
+  customize?: boolean;
 };
 
 const Param: React.FC<ParamProps> = ({
@@ -98,7 +99,8 @@ const Param: React.FC<ParamProps> = ({
   specId,
   profile = null,
   loading = false,
-  disabled = false
+  disabled = false,
+  customize = false
 }) => {
   const form = useForm();
 
@@ -115,7 +117,7 @@ const Param: React.FC<ParamProps> = ({
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as boolean}
                 loading={loading}
-                disabled={disabled}
+                disabled={disabled || (!customize && !param.editable)}
                 disableGap
                 reset={value !== param.default}
                 onChange={() => {
@@ -141,7 +143,7 @@ const Param: React.FC<ParamProps> = ({
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as number}
                 loading={loading}
-                disabled={disabled}
+                disabled={disabled || (!customize && !param.editable)}
                 reset={value !== param.default}
                 onChange={(event, v) => {
                   form.setStore(s => {
@@ -165,7 +167,7 @@ const Param: React.FC<ParamProps> = ({
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as string}
                 loading={loading}
-                disabled={disabled}
+                disabled={disabled || (!customize && !param.editable)}
                 options={param.list}
                 reset={value !== param.default}
                 onChange={(event, v) => {
@@ -190,7 +192,7 @@ const Param: React.FC<ParamProps> = ({
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as string}
                 loading={loading}
-                disabled={disabled}
+                disabled={disabled || (!customize && !param.editable)}
                 items={param.list}
                 reset={value !== param.default}
                 onChange={(event, v) => {
@@ -220,6 +222,7 @@ type ServiceProps = {
   profile?: string;
   loading?: boolean;
   disabled?: boolean;
+  customize?: boolean;
 };
 
 const Service: React.FC<ServiceProps> = ({
@@ -228,7 +231,8 @@ const Service: React.FC<ServiceProps> = ({
   service,
   profile = null,
   loading = false,
-  disabled = false
+  disabled = false,
+  customize = false
 }) => {
   const theme = useTheme();
   const form = useForm();
@@ -287,6 +291,7 @@ const Service: React.FC<ServiceProps> = ({
             label={service.name}
             value={selected}
             disableGap
+            disabled={disabled || !customize}
             onChange={() => handleClick(selected)}
             expend={specId < 0 ? null : open}
             onExpend={handleExpand}
@@ -315,6 +320,7 @@ const Service: React.FC<ServiceProps> = ({
                 profile={profile}
                 loading={loading}
                 disabled={disabled}
+                customize={customize}
               />
             ))}
 
@@ -331,6 +337,7 @@ const Service: React.FC<ServiceProps> = ({
                   profile={profile}
                   loading={loading}
                   disabled={disabled}
+                  customize={customize}
                 />
               ))
             )}
@@ -347,9 +354,17 @@ type CategoryProps = {
   profile?: string;
   loading?: boolean;
   disabled?: boolean;
+  customize?: boolean;
 };
 
-const Category = ({ cat_id, category, profile = null, loading = false, disabled = false }: CategoryProps) => {
+const Category = ({
+  cat_id,
+  category,
+  profile = null,
+  loading = false,
+  disabled = false,
+  customize = false
+}: CategoryProps) => {
   const theme = useTheme();
   const form = useForm();
 
@@ -394,6 +409,7 @@ const Category = ({ cat_id, category, profile = null, loading = false, disabled 
             value={selected}
             disableGap
             indeterminate={indeterminate}
+            disabled={disabled || !customize}
             onChange={() => handleClick(selected)}
           />
         )}
@@ -411,6 +427,7 @@ const Category = ({ cat_id, category, profile = null, loading = false, disabled 
             profile={profile}
             loading={loading}
             disabled={disabled}
+            customize={customize}
           />
         ))}
       </div>
@@ -422,10 +439,17 @@ type Props = {
   profile?: string;
   loading?: boolean;
   disabled?: boolean;
+  customize?: boolean;
   size?: 'medium' | 'small';
 };
 
-const WrappedServiceSelection = ({ profile = null, loading = false, disabled = false, size = 'medium' }: Props) => {
+const WrappedServiceSelection = ({
+  profile = null,
+  loading = false,
+  disabled = false,
+  customize = false,
+  size = 'medium'
+}: Props) => {
   const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const form = useForm();
@@ -451,6 +475,7 @@ const WrappedServiceSelection = ({ profile = null, loading = false, disabled = f
                   profile={profile}
                   loading={loading}
                   disabled={disabled}
+                  customize={customize}
                 />
               ))}
             </div>

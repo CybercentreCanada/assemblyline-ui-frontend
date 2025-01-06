@@ -80,6 +80,7 @@ const WrappedSubmitContent = () => {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
+          s.state.customize = currentUser.is_admin || currentUser.roles.includes('submission_customize');
           s.settings = loadSubmissionProfiles({ ...api_response, ...s.settings });
 
           // // Check if some file sources should auto-select and do so
@@ -143,8 +144,13 @@ const WrappedSubmitContent = () => {
       )}
 
       <form.Subscribe
-        selector={state => [state.values.state.profile, !state.values.settings, state.values.state.disabled]}
-        children={([profile, loading, disabled]) => (
+        selector={state => [
+          state.values.state.profile,
+          !state.values.settings,
+          state.values.state.disabled,
+          state.values.state.customize
+        ]}
+        children={([profile, loading, disabled, customize]) => (
           <>
             {!c12nDef?.enforce ? null : (
               <form.Field
@@ -210,13 +216,14 @@ const WrappedSubmitContent = () => {
                       inner: (
                         <Grid container columnGap={2}>
                           <Grid item xs={12}>
-                            <SubmissionProfile />
+                            <SubmissionProfile loading={loading as boolean} disabled={disabled as boolean} />
                           </Grid>
                           <Grid item xs={12} md>
                             <ServiceSelection
                               profile={profile as string}
                               loading={loading as boolean}
                               disabled={disabled as boolean}
+                              customize={customize as boolean}
                             />
                           </Grid>
                           <Grid item xs={12} md>
@@ -224,11 +231,13 @@ const WrappedSubmitContent = () => {
                               profile={profile as string}
                               loading={loading as boolean}
                               disabled={disabled as boolean}
+                              customize={customize as boolean}
                             />
                             <MetadataParameters
                               profile={profile as string}
                               loading={loading as boolean}
                               disabled={disabled as boolean}
+                              customize={customize as boolean}
                             />
                           </Grid>
                         </Grid>

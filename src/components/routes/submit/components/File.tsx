@@ -55,7 +55,7 @@ export const FileSubmit = ({ profile = null, loading = false, disabled = false }
   }, [form]);
 
   const handleSubmitFile = useCallback(
-    (store: SubmitStore) => {
+    () => {
       const file = form.getFieldValue('file');
       const metadata = form.getFieldValue('metadata');
       const settings = form.getFieldValue('settings');
@@ -64,6 +64,7 @@ export const FileSubmit = ({ profile = null, loading = false, disabled = false }
       const uuid = form.getFieldValue('state.uuid');
 
       form.setStore(s => {
+        s.state.disabled = true;
         s.state.isUploading = true;
         s.state.uploadProgress = 0;
         return s;
@@ -137,6 +138,7 @@ export const FileSubmit = ({ profile = null, loading = false, disabled = false }
           onFailure: ({ api_status_code, api_error_message }) => {
             if (api_status_code === 400 && api_error_message.includes('metadata')) {
               form.setStore(s => {
+                s.state.disabled = false;
                 s.state.tab = 'options';
                 return s;
               });
@@ -173,7 +175,7 @@ export const FileSubmit = ({ profile = null, loading = false, disabled = false }
         ].services[i].services.every(svr => svr.selected);
       });
 
-      handleSubmitFile(store);
+      handleSubmitFile();
     },
     [handleSubmitFile]
   );
@@ -195,7 +197,7 @@ export const FileSubmit = ({ profile = null, loading = false, disabled = false }
           return s;
         });
 
-        handleSubmitFile(store);
+        handleSubmitFile();
       }
     },
     [form, handleSubmitFile, profile]
@@ -217,7 +219,7 @@ export const FileSubmit = ({ profile = null, loading = false, disabled = false }
               })
             }
             handleCancel={() => handleDeselectServices(form.state.values)}
-            handleAccept={() => handleSubmitFile(form.state.values)}
+            handleAccept={() => handleSubmitFile()}
             title={t('validate.title')}
             cancelText={t('validate.cancelText')}
             acceptText={t('validate.acceptText')}
