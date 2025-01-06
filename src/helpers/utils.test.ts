@@ -592,5 +592,13 @@ describe('Test `getSubmitType`', () => {
     const url = 'http://blah.com';
     expect(getSubmitType(url, CONFIGURATION)).toStrictEqual(['url', url]);
     expect(getSubmitType(`   ${url}`, CONFIGURATION)).toStrictEqual(['url', url]);
+
+    const domain = 'blah.com';
+    expect(getSubmitType(domain, CONFIGURATION)).toStrictEqual(['domain', domain]);
+    expect(getSubmitType(`   ${domain}`, CONFIGURATION)).toStrictEqual(['domain', domain]);
+
+    const ip = '123.123.123.123';
+    expect(getSubmitType(ip, CONFIGURATION)).toStrictEqual(['ip', ip]);
+    expect(getSubmitType(`   ${ip}`, CONFIGURATION)).toStrictEqual(['ip', ip]);
   });
 });

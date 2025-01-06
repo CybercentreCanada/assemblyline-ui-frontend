@@ -434,9 +434,9 @@ export function getSubmitType(input: string, configuration: Configuration): [Has
   )?.[0] as HashPatternMap;
 
   if (detectedHashType) return [detectedHashType, value.trim()];
-  else if (!detectedHashType && IP_REGEX.exec(value.trimStart())) return ['ip', value.trimStart()];
-  else if (!detectedHashType && DOMAIN_REGEX.exec(value.trimStart())) return ['domain', value.trimStart()];
   else if (!detectedHashType && URL_REGEX.exec(value.trimStart())) return ['url', value.trimStart()];
+  else if (!detectedHashType && DOMAIN_REGEX.exec(value.trimStart())) return ['domain', value.trimStart()];
+  else if (!detectedHashType && IP_REGEX.exec(value.trimStart())) return ['ip', value.trimStart()];
   else return [null, input];
 }
 

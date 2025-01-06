@@ -644,9 +644,9 @@ export const CONFIGURATION: Configuration = {
       sha256: { pattern: '^[a-f0-9]{64}$', sources: [], auto_selected: [] },
       tlsh: { pattern: '^((?:T1)?[0-9a-fA-F]{70})$', sources: [], auto_selected: [] },
       ssdeep: { pattern: '^[0-9]{1,18}:[a-zA-Z0-9/+]{0,64}:[a-zA-Z0-9/+]{0,64}$', sources: [], auto_selected: [] },
-      domain: { pattern: '([/?#]S*)', sources: [], auto_selected: [] },
-      ip: { pattern: '([/?#]S*)', sources: [], auto_selected: [] },
-      url: { pattern: '([/?#]S*)', sources: [], auto_selected: [] }
+      domain: { pattern: '^$', sources: [], auto_selected: [] },
+      ip: { pattern: '^$', sources: [], auto_selected: [] },
+      url: { pattern: '^$', sources: [], auto_selected: [] }
     },
     max_dtl: 0,
     max_extraction_depth: 0,
