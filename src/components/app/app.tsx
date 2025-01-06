@@ -34,7 +34,7 @@ declare module '@mui/styles/defaultTheme' {
   interface DefaultTheme extends Theme {}
 }
 
-type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos';
+type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos' | 'quota';
 
 const MyAppMain = () => {
   const storedLoginParams = localStorage.getItem('loginParams');
