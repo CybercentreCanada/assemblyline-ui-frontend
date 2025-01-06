@@ -13,9 +13,9 @@ export const ListInput: React.FC<ListInputProps> = React.memo(
   ({ button = false, children = null, buttonProps = null, itemProps = null }: ListInputProps) => {
     switch (button) {
       case true:
-        return <ListItemButton {...buttonProps}>{children}</ListItemButton>;
+        return <ListItemButton role={undefined} {...buttonProps} children={children} />;
       case false:
-        return <ListItem {...itemProps}>{children}</ListItem>;
+        return <ListItem {...itemProps} children={children} />;
       default:
         return null;
     }

@@ -90,6 +90,7 @@ const WrappedSubmissionParameters = ({
           children={([generate_alert]) => (
             <CheckboxInput
               label={t('options.submission.generate_alert')}
+              tooltip={t('settings:submissions.generate_alert_desc')}
               value={generate_alert?.value}
               loading={loading}
               disabled={disabled || (!customize && !generate_alert.editable)}
@@ -111,6 +112,7 @@ const WrappedSubmissionParameters = ({
           children={([ignore_filtering]) => (
             <CheckboxInput
               label={t('options.submission.ignore_filtering')}
+              tooltip={t('settings:submissions.filtering_desc')}
               value={ignore_filtering?.value}
               loading={loading}
               disabled={disabled || (!customize && !ignore_filtering.editable)}
@@ -132,6 +134,7 @@ const WrappedSubmissionParameters = ({
           children={([ignore_cache]) => (
             <CheckboxInput
               label={t('options.submission.ignore_cache')}
+              tooltip={t('settings:submissions.result_caching_desc')}
               value={ignore_cache?.value}
               loading={loading}
               disabled={disabled || (!customize && !ignore_cache.editable)}
@@ -155,6 +158,7 @@ const WrappedSubmissionParameters = ({
           children={([ignore_dynamic_recursion_prevention]) => (
             <CheckboxInput
               label={t('options.submission.ignore_dynamic_recursion_prevention')}
+              tooltip={t('settings:submissions.dynamic_recursion_desc')}
               value={ignore_dynamic_recursion_prevention?.value}
               loading={loading}
               disabled={disabled || (!customize && !ignore_dynamic_recursion_prevention.editable)}
@@ -194,6 +198,7 @@ const WrappedSubmissionParameters = ({
           children={([deep_scan]) => (
             <CheckboxInput
               label={t('options.submission.deep_scan')}
+              tooltip={t('settings:submissions.deep_scan_desc')}
               value={deep_scan?.value}
               loading={loading}
               disabled={disabled || (!customize && !deep_scan.editable)}
@@ -220,6 +225,7 @@ const WrappedSubmissionParameters = ({
                 ? `${t('options.submission.ttl.max')}: ${configuration.submission.max_dtl}`
                 : t('options.submission.ttl.forever')
             })`}
+            tooltip={t('settings:submissions.ttl_desc')}
             endAdornment={t('settings:submissions.ttl_days')}
             value={ttl?.value}
             loading={loading}

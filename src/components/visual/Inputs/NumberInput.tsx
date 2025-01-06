@@ -1,9 +1,10 @@
-import type { IconButtonProps, OutlinedInputProps, TypographyProps } from '@mui/material';
+import type { IconButtonProps, OutlinedInputProps, TooltipProps, TypographyProps } from '@mui/material';
 import { FormControl, InputAdornment, InputLabel, OutlinedInput, Skeleton, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import React from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
+import { TooltipInput } from './components/TooltipInput';
 
 type Props = Omit<OutlinedInputProps, 'value' | 'onChange'> & {
   endAdornment?: ReactNode;
@@ -15,6 +16,8 @@ type Props = Omit<OutlinedInputProps, 'value' | 'onChange'> & {
   preventRender?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  tooltip?: TooltipProps['title'];
+  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   value: number;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, value: number) => void;
   onReset?: IconButtonProps['onClick'];
@@ -32,6 +35,8 @@ const WrappedNumberInput = ({
   preventRender = false,
   reset = false,
   resetProps = null,
+  tooltip,
+  tooltipProps,
   value,
   onChange = () => null,
   onReset = () => null,
@@ -39,15 +44,17 @@ const WrappedNumberInput = ({
 }: Props) =>
   preventRender ? null : (
     <div>
-      <Typography
-        component={InputLabel}
-        htmlFor={id || label}
-        variant="body2"
-        whiteSpace="nowrap"
-        gutterBottom
-        {...labelProps}
-        children={label}
-      />
+      <TooltipInput tooltip={tooltip} {...tooltipProps}>
+        <Typography
+          component={InputLabel}
+          htmlFor={id || label}
+          variant="body2"
+          whiteSpace="nowrap"
+          gutterBottom
+          {...labelProps}
+          children={label}
+        />
+      </TooltipInput>
       <FormControl fullWidth>
         {loading ? (
           <Skeleton sx={{ height: '40px', transform: 'unset' }} />
