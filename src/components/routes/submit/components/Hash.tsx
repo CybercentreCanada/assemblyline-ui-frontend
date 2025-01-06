@@ -45,7 +45,8 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
         body: {
           ui_params: parseSubmissionProfiles(store.settings),
           submission_profile: store.state.profile,
-          [store.hash.type]: store.hash.value,
+          [URI_HASH_PATTERN_MAP.includes(store.hash.type as URIHashPatternMap) ? 'url' : store.hash.type]:
+            store.hash.value,
           metadata: store.metadata
         },
         onSuccess: ({ api_response }) => {
