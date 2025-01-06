@@ -7,7 +7,8 @@ export const AUTO_PROPERTY_TYPES = ['access', 'classification', 'type', 'role', 
 export const BANNER_LEVELS = ['info', 'warning', 'success', 'error'] as const;
 export const DOWNLOAD_ENCODINGS = ['raw', 'cart', 'zip'] as const;
 export const EXTERNAL_LINK_TYPES = ['hash', 'metadata', 'tag'] as const;
-export const HASH_PATTERN_MAP = ['sha256', 'sha1', 'md5', 'tlsh', 'ssdeep', 'url'] as const;
+export const URI_HASH_PATTERN_MAP = ['url', 'ip', 'domain'] as const;
+export const HASH_PATTERN_MAP = ['sha256', 'sha1', 'md5', 'tlsh', 'ssdeep', ...URI_HASH_PATTERN_MAP] as const;
 export const KUBERNETES_LABEL_OPS = ['In', 'NotIn', 'Exists', 'DoesNotExist'] as const;
 export const METADATA_FIELDTYPE_MAP = [
   'boolean',
@@ -53,6 +54,7 @@ export type ServiceCategory = (typeof SERVICE_CATEGORIES)[number];
 export type ServiceStage = (typeof SERVICE_STAGES)[number];
 export type SystemType = (typeof SYSTEM_TYPES)[number];
 export type TemporaryKeyType = (typeof TEMPORARY_KEY_TYPES)[number];
+export type URIHashPatternMap = (typeof URI_HASH_PATTERN_MAP)[number];
 
 /** Authentication Methods */
 export type Auth = {
@@ -642,6 +644,8 @@ export const CONFIGURATION: Configuration = {
       sha256: { pattern: '^[a-f0-9]{64}$', sources: [], auto_selected: [] },
       tlsh: { pattern: '^((?:T1)?[0-9a-fA-F]{70})$', sources: [], auto_selected: [] },
       ssdeep: { pattern: '^[0-9]{1,18}:[a-zA-Z0-9/+]{0,64}:[a-zA-Z0-9/+]{0,64}$', sources: [], auto_selected: [] },
+      domain: { pattern: '([/?#]S*)', sources: [], auto_selected: [] },
+      ip: { pattern: '([/?#]S*)', sources: [], auto_selected: [] },
       url: { pattern: '([/?#]S*)', sources: [], auto_selected: [] }
     },
     max_dtl: 0,

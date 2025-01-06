@@ -2,6 +2,8 @@ import { Button, CircularProgress, TextField, Typography, useTheme } from '@mui/
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { URIHashPatternMap } from 'components/models/base/config';
+import { URI_HASH_PATTERN_MAP } from 'components/models/base/config';
 import type { Submission } from 'components/models/base/submission';
 import { parseSubmissionProfiles } from 'components/routes/settings/utils/utils';
 import { MetadataSummary } from 'components/routes/submit/components/MetadataSummary';
@@ -181,7 +183,7 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
                   form.setStore(s => {
                     s.hash = { ...s.hash, type, value, hasError: false };
 
-                    if (type === 'url' && s.hash.urlAutoSelect) {
+                    if (URI_HASH_PATTERN_MAP.includes(type as URIHashPatternMap) && s.hash.urlAutoSelect) {
                       s.hash.urlAutoSelect = false;
                       s.settings.profiles[profile].services.forEach((category, i) => {
                         category.services.forEach((service, j) => {
@@ -193,7 +195,7 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
                           i
                         ].services.every(svr => svr.selected);
                       });
-                    } else if (type !== 'url') {
+                    } else if (!URI_HASH_PATTERN_MAP.includes(type as URIHashPatternMap)) {
                       s.hash.urlAutoSelect = true;
                     }
 
