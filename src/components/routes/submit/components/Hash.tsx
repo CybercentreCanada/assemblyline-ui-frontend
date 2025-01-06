@@ -41,7 +41,7 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
         url: '/api/v4/submit/',
         method: 'POST',
         body: {
-          ui_params: parseSubmissionProfiles(store.settings, currentUser),
+          ui_params: parseSubmissionProfiles(store.settings),
           submission_profile: store.state.profile,
           [store.hash.type]: store.hash.value,
           metadata: store.metadata

@@ -123,7 +123,7 @@ export const FileSubmit = ({ profile = null, loading = false, disabled = false }
           url: `/api/v4/ui/start/${uuid}/`,
           method: 'POST',
           body: {
-            ...parseSubmissionProfiles(settings, currentUser),
+            ...parseSubmissionProfiles(settings),
             submission_profile: submissionProfile,
             filename: file.path,
             metadata: metadata
