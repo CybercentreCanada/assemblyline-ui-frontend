@@ -1,18 +1,19 @@
-import type { IconButtonProps, OutlinedInputProps, TooltipProps, TypographyProps } from '@mui/material';
-import { FormControl, InputAdornment, InputLabel, OutlinedInput, Skeleton, Typography } from '@mui/material';
+import type { IconButtonProps, TextFieldProps, TooltipProps, TypographyProps } from '@mui/material';
+import { FormControl, InputAdornment, InputLabel, Skeleton, TextField, Typography, useTheme } from '@mui/material';
+import { Tooltip } from 'components/visual/Tooltip';
 import type { ReactNode } from 'react';
 import React from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
-import { TooltipInput } from './components/TooltipInput';
 
-type Props = Omit<OutlinedInputProps, 'value' | 'onChange'> & {
+type Props = Omit<TextFieldProps, 'value' | 'onChange'> & {
   endAdornment?: ReactNode;
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
   max?: number;
   min?: number;
+  preventDisabledColor?: boolean;
   preventRender?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
@@ -32,6 +33,7 @@ const WrappedNumberInput = ({
   loading = false,
   max,
   min,
+  preventDisabledColor = false,
   preventRender = false,
   reset = false,
   resetProps = null,
@@ -40,55 +42,71 @@ const WrappedNumberInput = ({
   value,
   onChange = () => null,
   onReset = () => null,
-  ...other
-}: Props) =>
-  preventRender ? null : (
+  ...textFieldProps
+}: Props) => {
+  const theme = useTheme();
+
+  return preventRender ? null : (
     <div>
-      <TooltipInput tooltip={tooltip} {...tooltipProps}>
+      <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
           component={InputLabel}
           htmlFor={id || label}
           variant="body2"
           whiteSpace="nowrap"
           gutterBottom
+          sx={{
+            ...(disabled &&
+              !preventDisabledColor && {
+                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+              })
+          }}
           {...labelProps}
           children={label}
         />
-      </TooltipInput>
+      </Tooltip>
       <FormControl fullWidth>
         {loading ? (
           <Skeleton sx={{ height: '40px', transform: 'unset' }} />
         ) : (
-          <OutlinedInput
+          <TextField
             id={id || label}
             type="number"
-            margin="dense"
             size="small"
             fullWidth
             value={value?.toString()}
             disabled={disabled}
             inputProps={{ min: min, max: max }}
+            InputProps={{
+              sx: { paddingRight: '9px' },
+              endAdornment: (
+                <>
+                  {!reset ? null : (
+                    <InputAdornment position="end">
+                      <ResetInput
+                        id={id || label}
+                        preventRender={!reset || disabled}
+                        onReset={onReset}
+                        {...resetProps}
+                      />
+                    </InputAdornment>
+                  )}
+                  {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
+                </>
+              )
+            }}
             onChange={event => {
               let num = Number(event.target.value);
               num = max ? Math.min(num, max) : num;
               num = min ? Math.max(num, min) : num;
               onChange(event, num);
             }}
-            endAdornment={
-              <>
-                {!reset ? null : (
-                  <InputAdornment position="end">
-                    <ResetInput id={id || label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
-                  </InputAdornment>
-                )}
-                {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
-              </>
-            }
-            {...other}
+            {...textFieldProps}
           />
         )}
       </FormControl>
     </div>
   );
+};
 
 export const NumberInput = React.memo(WrappedNumberInput);
