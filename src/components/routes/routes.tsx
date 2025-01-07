@@ -64,6 +64,7 @@ const Submissions = lazy(() => import('components/routes/submissions'));
 const Submit = lazy(() => import('components/routes/submit/index'));
 const Tos = lazy(() => import('components/routes/tos'));
 const User = lazy(() => import('components/routes/user'));
+const Library = lazy(() => import('components/routes/developer/library'));
 
 const APP_NAME = 'AL4';
 
@@ -150,6 +151,7 @@ const WrappedRoutes = () => {
         <Route path="/authorize" element={<AppRegistration />} />
         <Route path="/crash" element={<CrashTest />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/developer/library" element={<Library />} />
         <Route path="/file/detail/:id" element={<FileFullDetail />} />
         <Route path="/file/viewer/:id/:tab" element={<FileViewer />} />
         <Route path="/file/viewer/:id" element={<FileViewer />} />
