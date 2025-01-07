@@ -1,6 +1,14 @@
-import type { IconButtonProps, SelectChangeEvent, SelectProps, TooltipProps, TypographyProps } from '@mui/material';
+import type {
+  FormHelperTextProps,
+  IconButtonProps,
+  SelectChangeEvent,
+  SelectProps,
+  TooltipProps,
+  TypographyProps
+} from '@mui/material';
 import {
   FormControl,
+  FormHelperText,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -10,11 +18,13 @@ import {
   useTheme
 } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
-type Props = Omit<SelectProps, 'onChange'> & {
+type Props = Omit<SelectProps, 'error' | 'value' | 'onChange'> & {
+  error?: (value: string) => string;
+  errorProps?: FormHelperTextProps;
   hasEmpty?: boolean;
   items: string[];
   label?: string;
@@ -26,12 +36,16 @@ type Props = Omit<SelectProps, 'onChange'> & {
   resetProps?: ResetInputProps;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
+  value: string;
   onChange?: (event: SelectChangeEvent<unknown>, value: string) => void;
   onReset?: IconButtonProps['onClick'];
+  onError?: (error: string) => void;
 };
 
 const WrappedSelectInput = ({
   disabled,
+  error = () => null,
+  errorProps = null,
   hasEmpty = false,
   id = null,
   items = [],
@@ -47,9 +61,12 @@ const WrappedSelectInput = ({
   value,
   onChange = () => null,
   onReset = () => null,
+  onError = () => null,
   ...selectProps
 }: Props) => {
   const theme = useTheme();
+
+  const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
     <div>
@@ -57,6 +74,7 @@ const WrappedSelectInput = ({
         <Typography
           component={InputLabel}
           htmlFor={id || label}
+          color={!disabled && errorValue ? 'error' : 'textSecondary'}
           variant="body2"
           whiteSpace="nowrap"
           gutterBottom
@@ -70,7 +88,7 @@ const WrappedSelectInput = ({
           children={label}
         />
       </Tooltip>
-      <FormControl fullWidth>
+      <FormControl fullWidth error={!!errorValue}>
         {loading ? (
           <Skeleton sx={{ height: '40px', transform: 'unset' }} />
         ) : (
@@ -81,9 +99,14 @@ const WrappedSelectInput = ({
             disabled={disabled}
             displayEmpty
             inputProps={{ id: id || label }}
-            value={items.includes(value as string) ? value : ''}
+            value={items.includes(value) ? value : ''}
             sx={{ textTransform: 'capitalize' }}
-            onChange={event => onChange(event, event.target.value as string)}
+            onChange={event => {
+              onChange(event, event.target.value as string);
+
+              const err = error(event.target.value as string);
+              if (err) onError(err);
+            }}
             endAdornment={
               !reset ? null : (
                 <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
@@ -100,6 +123,15 @@ const WrappedSelectInput = ({
               </MenuItem>
             ))}
           </Select>
+        )}
+        {!errorValue || disabled ? null : (
+          <FormHelperText
+            sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
+            variant="outlined"
+            {...errorProps}
+          >
+            {errorValue}
+          </FormHelperText>
         )}
       </FormControl>
     </div>

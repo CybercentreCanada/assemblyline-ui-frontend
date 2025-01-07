@@ -2,12 +2,13 @@ import type { IconButtonProps, TextFieldProps, TooltipProps, TypographyProps } f
 import { FormControl, InputAdornment, InputLabel, Skeleton, TextField, Typography, useTheme } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ReactNode } from 'react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
-type Props = Omit<TextFieldProps, 'value' | 'onChange'> & {
+type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   endAdornment?: ReactNode;
+  error?: (value: number) => string;
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
@@ -22,11 +23,13 @@ type Props = Omit<TextFieldProps, 'value' | 'onChange'> & {
   value: number;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, value: number) => void;
   onReset?: IconButtonProps['onClick'];
+  onError?: (error: string) => void;
 };
 
 const WrappedNumberInput = ({
   disabled = false,
   endAdornment,
+  error = () => null,
   id = null,
   label,
   labelProps,
@@ -42,9 +45,12 @@ const WrappedNumberInput = ({
   value,
   onChange = () => null,
   onReset = () => null,
+  onError = () => null,
   ...textFieldProps
 }: Props) => {
   const theme = useTheme();
+
+  const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
     <div>
@@ -52,6 +58,7 @@ const WrappedNumberInput = ({
         <Typography
           component={InputLabel}
           htmlFor={id || label}
+          color={!disabled && errorValue ? 'error' : 'textSecondary'}
           variant="body2"
           whiteSpace="nowrap"
           gutterBottom
@@ -76,6 +83,8 @@ const WrappedNumberInput = ({
             fullWidth
             value={value?.toString()}
             disabled={disabled}
+            error={!!errorValue}
+            helperText={errorValue}
             inputProps={{ min: min, max: max }}
             InputProps={{
               sx: { paddingRight: '9px' },
@@ -100,6 +109,9 @@ const WrappedNumberInput = ({
               num = max ? Math.min(num, max) : num;
               num = min ? Math.max(num, min) : num;
               onChange(event, num);
+
+              const err = error(num);
+              if (err) onError(err);
             }}
             {...textFieldProps}
           />

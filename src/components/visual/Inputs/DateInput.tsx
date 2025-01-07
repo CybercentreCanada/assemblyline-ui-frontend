@@ -6,13 +6,14 @@ import { Tooltip } from 'components/visual/Tooltip';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import type { ReactNode } from 'react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
-type Props = Omit<TextFieldProps, 'value' | 'onChange'> & {
+type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   defaultDateOffset?: number | null;
   endAdornment?: ReactNode;
+  error?: (value: string) => string;
   id?: string;
   label?: string;
   labelProps?: TypographyProps;
@@ -28,12 +29,14 @@ type Props = Omit<TextFieldProps, 'value' | 'onChange'> & {
   value: string;
   onChange?: (event: unknown, value: string) => void;
   onReset?: IconButtonProps['onClick'];
+  onError?: (error: string) => void;
 };
 
 const WrappedDateInput = ({
   defaultDateOffset = null,
   disabled,
   endAdornment,
+  error = () => null,
   id = null,
   label,
   labelProps,
@@ -49,6 +52,7 @@ const WrappedDateInput = ({
   value,
   onChange = () => null,
   onReset = () => null,
+  onError = () => null,
   ...textFieldProps
 }: Props) => {
   const theme = useTheme();
@@ -56,6 +60,11 @@ const WrappedDateInput = ({
   const [tempDate, setTempDate] = useState<Moment>(null);
   const [tomorrow, setTomorrow] = useState<Moment>(null);
   const [today, setToday] = useState<Moment>(null);
+
+  const errorValue = useMemo<string>(
+    () => error(tempDate && tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null),
+    [error, tempDate]
+  );
 
   useEffect(() => {
     const tempTomorrow = new Date();
@@ -89,6 +98,7 @@ const WrappedDateInput = ({
           <Typography
             component={InputLabel}
             htmlFor={id || label}
+            color={!disabled && errorValue ? 'error' : 'textSecondary'}
             variant="body2"
             whiteSpace="nowrap"
             gutterBottom
@@ -111,16 +121,22 @@ const WrappedDateInput = ({
               value={tempDate}
               onChange={newValue => {
                 setTempDate(newValue);
-                onChange(
-                  null,
-                  newValue && newValue.isValid() ? `${newValue.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null
-                );
+
+                const parsedValue =
+                  newValue && newValue.isValid() ? `${newValue.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null;
+
+                onChange(null, parsedValue);
+
+                const err = error(parsedValue);
+                if (err) onError(err);
               }}
               renderInput={({ inputRef, inputProps, InputProps }) => (
                 <TextField
                   id={id || label}
                   size="small"
                   ref={inputRef}
+                  error={!!errorValue && !disabled}
+                  helperText={errorValue}
                   disabled={disabled}
                   {...textFieldProps}
                   inputProps={{ ...inputProps, ...textFieldProps?.inputProps }}

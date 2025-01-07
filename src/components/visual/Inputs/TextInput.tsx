@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ElementType } from 'react';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
@@ -33,7 +33,7 @@ type Props<
   AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>,
   'renderInput' | 'options' | 'onChange' | 'value'
 > & {
-  error?: FormHelperTextProps['children'];
+  error?: (value: string) => string;
   errorProps?: FormHelperTextProps;
   label: string;
   labelProps?: TypographyProps;
@@ -48,6 +48,7 @@ type Props<
   value: string;
   onChange?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['onInputChange'];
   onReset?: IconButtonProps['onClick'];
+  onError?: (error: string) => void;
 };
 
 const WrappedTextInput = <
@@ -58,7 +59,7 @@ const WrappedTextInput = <
   ChipComponent extends ElementType
 >({
   disabled,
-  error = null,
+  error = () => null,
   errorProps = null,
   id = null,
   label,
@@ -74,6 +75,7 @@ const WrappedTextInput = <
   value,
   onChange = () => null,
   onReset = () => null,
+  onError = () => null,
   ...autocompleteProps
 }: Props<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
   const theme = useTheme();
@@ -81,12 +83,15 @@ const WrappedTextInput = <
   const [_value, setValue] =
     useState<AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>>(null);
 
+  const errorValue = useMemo<string>(() => error(value), [error, value]);
+
   return preventRender ? null : (
     <div>
       <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
           component={InputLabel}
           htmlFor={id || label}
+          color={!disabled && errorValue ? 'error' : 'textSecondary'}
           variant="body2"
           whiteSpace="nowrap"
           gutterBottom
@@ -119,13 +124,16 @@ const WrappedTextInput = <
             onInputChange={(e, v, o) => {
               setValue(v as AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>);
               onChange(e, v, o);
+
+              const err = error(v);
+              if (err) onError(err);
             }}
             renderInput={({ InputProps, ...params }) => (
               <>
                 <TextField
                   id={id || label}
                   variant="outlined"
-                  error={!!error}
+                  error={!!errorValue}
                   InputProps={{
                     endAdornment: !reset ? null : (
                       <InputAdornment position="end">
@@ -141,13 +149,13 @@ const WrappedTextInput = <
                   }}
                   {...params}
                 />
-                {!error || disabled ? null : (
+                {!errorValue || disabled ? null : (
                   <FormHelperText
                     sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
                     variant="outlined"
                     {...errorProps}
                   >
-                    {error}
+                    {errorValue}
                   </FormHelperText>
                 )}
               </>

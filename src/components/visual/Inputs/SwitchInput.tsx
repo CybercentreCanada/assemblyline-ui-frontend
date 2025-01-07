@@ -1,12 +1,21 @@
-import type { ButtonProps, IconButtonProps, SwitchProps, TooltipProps, TypographyProps } from '@mui/material';
-import { Button, Skeleton, Switch, Typography, useTheme } from '@mui/material';
+import type {
+  ButtonProps,
+  FormHelperTextProps,
+  IconButtonProps,
+  SwitchProps,
+  TooltipProps,
+  TypographyProps
+} from '@mui/material';
+import { Button, FormHelperText, Skeleton, Switch, Typography, useTheme } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
 type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   disableGap?: boolean;
+  error?: (value: boolean) => string;
+  errorProps?: FormHelperTextProps;
   label: string;
   labelProps?: TypographyProps;
   loading?: boolean;
@@ -22,12 +31,15 @@ type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
     value: boolean
   ) => void;
   onReset?: IconButtonProps['onClick'];
+  onError?: (error: string) => void;
 };
 
 export const SwitchInput: React.FC<Props> = React.memo(
   ({
     disabled = false,
     disableGap = false,
+    error = () => null,
+    errorProps = null,
     id = null,
     label = null,
     labelProps = null,
@@ -41,9 +53,12 @@ export const SwitchInput: React.FC<Props> = React.memo(
     value = false,
     onChange = () => null,
     onReset = () => null,
+    onError = () => null,
     ...buttonProps
   }: Props) => {
     const theme = useTheme();
+
+    const errorValue = useMemo<string>(() => error(value), [error, value]);
 
     return preventRender ? null : (
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -56,6 +71,9 @@ export const SwitchInput: React.FC<Props> = React.memo(
               event.stopPropagation();
               event.preventDefault();
               onChange(event, !value);
+
+              const err = error(!value);
+              if (err) onError(err);
             }}
             sx={{ padding: 0, justifyContent: 'flex-start', columnGap: theme.spacing(1), textTransform: 'none' }}
             {...buttonProps}
@@ -79,6 +97,9 @@ export const SwitchInput: React.FC<Props> = React.memo(
                     event.stopPropagation();
                     event.preventDefault();
                     onChange(event, !value);
+
+                    const err = error(!value);
+                    if (err) onError(err);
                   }}
                 />
                 {!disableGap && <div style={{ width: theme.spacing(0.75) }} />}
@@ -88,6 +109,7 @@ export const SwitchInput: React.FC<Props> = React.memo(
             <Typography
               component="label"
               htmlFor={id || label}
+              color={!disabled && errorValue ? 'error' : 'textPrimary'}
               margin="9px 0px"
               overflow="hidden"
               textAlign="start"
@@ -99,6 +121,9 @@ export const SwitchInput: React.FC<Props> = React.memo(
                 event.stopPropagation();
                 event.preventDefault();
                 onChange(event, !value);
+
+                const err = error(!value);
+                if (err) onError(err);
               }}
               sx={{
                 ...(!disabled && !loading && { cursor: 'pointer' }),
@@ -119,6 +144,16 @@ export const SwitchInput: React.FC<Props> = React.memo(
             {!(loading || !reset || disabled) && <div style={{ width: '40px' }} />}
           </Button>
         </Tooltip>
+
+        {!errorValue || disabled ? null : (
+          <FormHelperText
+            sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
+            variant="outlined"
+            {...errorProps}
+          >
+            {errorValue}
+          </FormHelperText>
+        )}
 
         <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0 }}>
           <ResetInput

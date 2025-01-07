@@ -1292,6 +1292,206 @@ export const InputsSection = React.memo(() => {
 
         <div className={classes.container}>
           <div>
+            <Typography variant="h6">{'Error'}</Typography>
+            <Typography color="textSecondary" variant="body2">
+              <span>
+                {'Error prop takes a function that evaluates the value. If that function returns an error message, '}
+              </span>
+              <span>{"it will trigger the input' error state and show that message in the helper text. "}</span>
+              <span>{"There's also the onError event handler that triggers when an error is detected."}</span>
+            </Typography>
+          </div>
+
+          <Grid container spacing={2}>
+            <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+              <form.Subscribe
+                selector={state => state.values.inputs.text}
+                children={value => (
+                  <TextInput
+                    label="Error Text Input"
+                    value={value}
+                    error={v => (v !== '' ? null : 'Input field cannot be empty')}
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.text = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.inputs.number}
+                children={value => (
+                  <NumberInput
+                    label="Error Number Input"
+                    value={value}
+                    error={v => (v !== 0 ? null : 'Input field cannot be 0')}
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.number = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.inputs.select}
+                children={value => (
+                  <SelectInput
+                    label="Error Select Input"
+                    value={value}
+                    error={v => (v !== '' ? null : 'Input field cannot be null')}
+                    items={['option 1', 'option 2', 'option 3']}
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.select = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.inputs.date}
+                children={value => (
+                  <DateInput
+                    label="Error Date Input"
+                    value={value}
+                    error={v => (v !== null ? null : 'Input field cannot be null')}
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.date = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.inputs.slider}
+                children={value => (
+                  <SliderInput
+                    label="Error Slider Input"
+                    value={value}
+                    error={v => (v !== 0 ? null : 'Input field cannot be 0')}
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.slider = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.inputs.checkbox}
+                children={value => (
+                  <CheckboxInput
+                    label="Error Checkbox Input"
+                    value={value}
+                    error={v => (v !== false ? null : 'Input field cannot be false')}
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.checkbox = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.inputs.switch}
+                children={value => (
+                  <SwitchInput
+                    label="Error Switch Input"
+                    value={value}
+                    error={v => (v !== false ? null : 'Input field cannot be false')}
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.switch = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid md={6} xs={12} sx={{ display: 'flex', minHeight: '500px' }}>
+              <MonacoEditor
+                language="javascript"
+                value={`<>
+  <TextInput
+    label="Error Text Input"
+    value={value}
+    error={v => (v !== '' ? null : 'Input field cannot be empty')}
+    onChange={(event, next) => {}}
+    onError={error => {}}
+  />
+
+  <NumberInput
+    label="Error Number Input"
+    value={value}
+    error={v => (v !== 0 ? null : 'Input field cannot be 0')}
+    onChange={(event, next) => {}}
+    onError={error => {}}
+  />
+
+  <SelectInput
+    label="Error Select Input"
+    value={value}
+    items={['option 1', 'option 2', 'option 3']}
+    error={v => (v !== '' ? null : 'Input field cannot be null')}
+    onChange={(event, next) => {}}
+    onError={error => {}}
+  />
+
+  <DateInput
+    label="Error Date Input"
+    value={value}
+    error={v => (v !== null ? null : 'Input field cannot be null')}
+    onChange={next => {}}
+    onError={error => {}}
+  />
+
+  <SliderInput
+    label="Error Slider Input"
+    value={value}
+    error={v => (v !== 0 ? null : 'Input field cannot be 0')}
+    onChange={(event, next) => {}}
+    onError={error => {}}
+  />
+
+  <CheckboxInput
+    label="Error Checkbox Input"
+    value={value}
+    error={v => (v !== false ? null : 'Input field cannot be false')}
+    onChange={(event, next) => {}}
+    onError={error => {}}
+  />
+
+  <SwitchInput
+    label="Error Switch Input"
+    value={value}
+    error={v => (v !== false ? null : 'Input field cannot be false')}
+    onChange={(event, next) => {}}
+    onError={error => {}}
+  />
+</>`}
+              />
+            </Grid>
+          </Grid>
+        </div>
+
+        <div className={classes.container}>
+          <div>
             <Typography variant="h6">{'Edge Case: Long label names'}</Typography>
             <Typography color="textSecondary" variant="body2">
               <span>{"The labels should handle the case where there's a really long label name "}</span>

@@ -1,10 +1,10 @@
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
-import type { ButtonProps, IconButtonProps, TooltipProps, TypographyProps } from '@mui/material';
-import { Button, Skeleton, Typography, useTheme } from '@mui/material';
+import type { ButtonProps, FormHelperTextProps, IconButtonProps, TooltipProps, TypographyProps } from '@mui/material';
+import { Button, FormHelperText, Skeleton, Typography, useTheme } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { ExpendInputProps } from './components/ExpendInput';
 import { ExpendInput } from './components/ExpendInput';
 import type { ResetInputProps } from './components/ResetInput';
@@ -12,6 +12,8 @@ import { ResetInput } from './components/ResetInput';
 
 type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   disableGap?: boolean;
+  error?: (value: boolean) => string;
+  errorProps?: FormHelperTextProps;
   expend?: boolean;
   expendProps?: ExpendInputProps;
   indeterminate?: boolean;
@@ -31,12 +33,15 @@ type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
     value: boolean
   ) => void;
   onReset?: IconButtonProps['onClick'];
+  onError?: (error: string) => void;
 };
 
 export const CheckboxInput: React.FC<Props> = React.memo(
   ({
     disabled = false,
     disableGap = false,
+    error = () => null,
+    errorProps = null,
     expend = null,
     expendProps = null,
     id = null,
@@ -54,9 +59,12 @@ export const CheckboxInput: React.FC<Props> = React.memo(
     onExpend = () => null,
     onChange = () => null,
     onReset = () => null,
+    onError = () => null,
     ...buttonProps
   }: Props) => {
     const theme = useTheme();
+
+    const errorValue = useMemo<string>(() => error(value), [error, value]);
 
     return preventRender ? null : (
       <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: 'auto' }}>
@@ -66,7 +74,12 @@ export const CheckboxInput: React.FC<Props> = React.memo(
             color="inherit"
             disabled={loading || disabled}
             fullWidth
-            onClick={event => onChange(event, !value)}
+            onClick={event => {
+              onChange(event, !value);
+
+              const err = error(!value);
+              if (err) onError(err);
+            }}
             sx={{ padding: 0, justifyContent: 'flex-start', columnGap: theme.spacing(1), textTransform: 'none' }}
             {...buttonProps}
           >
@@ -96,6 +109,7 @@ export const CheckboxInput: React.FC<Props> = React.memo(
 
             <Typography
               component="label"
+              color={!disabled && errorValue ? 'error' : 'textPrimary'}
               htmlFor={id || label}
               margin="9px 0px"
               overflow="hidden"
@@ -124,6 +138,16 @@ export const CheckboxInput: React.FC<Props> = React.memo(
             {expend !== null && <div style={{ width: '40px' }} />}
           </Button>
         </Tooltip>
+
+        {!errorValue || disabled ? null : (
+          <FormHelperText
+            sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
+            variant="outlined"
+            {...errorProps}
+          >
+            {errorValue}
+          </FormHelperText>
+        )}
 
         <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0 }}>
           <ResetInput
