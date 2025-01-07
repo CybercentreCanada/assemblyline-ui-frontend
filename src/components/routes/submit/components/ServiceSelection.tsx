@@ -238,7 +238,6 @@ const Service: React.FC<ServiceProps> = ({
   const form = useForm();
 
   const [open, setOpen] = useState<boolean>(false);
-  const [showMore, setShowMore] = useState<boolean>(false);
 
   const specId = useMemo<number>(
     () => form.store.state.values.settings.profiles[profile].service_spec.findIndex(s => s.name === service.name),
@@ -291,6 +290,7 @@ const Service: React.FC<ServiceProps> = ({
             label={service.name}
             value={selected}
             disableGap
+            preventDisabledColor
             disabled={disabled || !customize}
             onChange={() => handleClick(selected)}
             expend={specId < 0 ? null : open}
@@ -324,10 +324,8 @@ const Service: React.FC<ServiceProps> = ({
               />
             ))}
 
-            {params.hidden.length === 0 ? null : !showMore ? (
-              <ShowMore variant="long" onClick={() => setShowMore(true)} />
-            ) : (
-              params.hidden.map(([param, i]) => (
+            <ShowMore variant="long">
+              {params.hidden.map(([param, i]) => (
                 <Param
                   key={i}
                   param={param}
@@ -339,8 +337,8 @@ const Service: React.FC<ServiceProps> = ({
                   disabled={disabled}
                   customize={customize}
                 />
-              ))
-            )}
+              ))}
+            </ShowMore>
           </div>
         </Collapse>
       )}
@@ -408,6 +406,7 @@ const Category = ({
             label={category.name}
             value={selected}
             disableGap
+            preventDisabledColor
             indeterminate={indeterminate}
             disabled={disabled || !customize}
             onChange={() => handleClick(selected)}

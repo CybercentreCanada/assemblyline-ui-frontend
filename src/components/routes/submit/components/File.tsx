@@ -259,17 +259,15 @@ export const FileSubmit = ({ profile = null, loading = false, disabled = false }
                   tooltip={t('malicious.tooltip')}
                   tooltipProps={{ placement: 'top' }}
                   name="is_malware"
-                  color="secondary"
                   size="medium"
-                  checked={malicious !== undefined && malicious !== null ? malicious : true}
+                  value={malicious !== undefined && malicious !== null ? malicious : true}
                   disabled={malicious === undefined && malicious === null}
-                  onChange={() => {
+                  onChange={(event, value) => {
                     form.setStore(s => {
-                      s.settings.malicious = !s.settings.malicious;
+                      s.settings.malicious = value;
                       return s;
                     });
                   }}
-                  value={false}
                 />
               </div>
             )
