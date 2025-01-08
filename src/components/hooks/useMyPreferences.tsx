@@ -6,6 +6,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
+import CodeIcon from '@mui/icons-material/Code';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
@@ -16,8 +17,10 @@ import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
+import PaletteIcon from '@mui/icons-material/Palette';
 import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchIcon from '@mui/icons-material/Search';
@@ -419,6 +422,45 @@ const useMyPreferences = () => {
               i18nKey: 'drawer.help.services',
               icon: <AccountTreeOutlinedIcon />,
               route: '/help/services',
+              nested: true
+            }
+          ]
+        }
+      },
+      {
+        type: 'group' as 'group',
+        element: {
+          id: 'developer',
+          i18nKey: 'drawer.developer',
+          userPropValidators: [
+            { prop: 'user.is_admin', value: true, enforce: true },
+            { prop: 'configuration.system.type', value: 'development' },
+            { prop: 'configuration.system.type', value: 'staging' }
+          ],
+          icon: <CodeIcon />,
+          items: [
+            {
+              id: 'developer.library',
+              i18nKey: 'drawer.developer.library',
+              userPropValidators: [
+                { prop: 'user.is_admin', value: true, enforce: true },
+                { prop: 'configuration.system.type', value: 'development' },
+                { prop: 'configuration.system.type', value: 'staging' }
+              ],
+              icon: <LibraryBooksIcon />,
+              route: '/developer/library',
+              nested: true
+            },
+            {
+              id: 'developer.theme',
+              i18nKey: 'drawer.developer.theme',
+              userPropValidators: [
+                { prop: 'user.is_admin', value: true, enforce: true },
+                { prop: 'configuration.system.type', value: 'development' },
+                { prop: 'configuration.system.type', value: 'staging' }
+              ],
+              icon: <PaletteIcon />,
+              route: '/developer/theme',
               nested: true
             }
           ]

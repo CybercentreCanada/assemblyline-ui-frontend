@@ -8,7 +8,6 @@ import { resetFavicon } from 'helpers/utils';
 import { lazy, memo, Suspense, useEffect, useState } from 'react';
 import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router';
 import LoadingScreen from './loading';
-import Theme from './theme';
 
 const ForbiddenPage = lazy(() => import('components/routes/403'));
 const NotFoundPage = lazy(() => import('components/routes/404_dl'));
@@ -19,6 +18,8 @@ const AdminErrorDetail = lazy(() => import('components/routes/admin/error_detail
 const AdminErrorViewer = lazy(() => import('components/routes/admin/error_viewer'));
 const AdminIdentify = lazy(() => import('components/routes/admin/identify'));
 const AdminServices = lazy(() => import('components/routes/admin/services'));
+const DeveloperLibrary = lazy(() => import('components/routes/developer/library'));
+const DeveloperTheme = lazy(() => import('components/routes/developer/theme'));
 const Service = lazy(() => import('components/routes/admin/service_detail'));
 const ServiceReview = lazy(() => import('components/routes/admin/service_review'));
 const AdminSiteMap = lazy(() => import('components/routes/admin/site_map'));
@@ -64,7 +65,6 @@ const Submissions = lazy(() => import('components/routes/submissions'));
 const Submit = lazy(() => import('components/routes/submit/index'));
 const Tos = lazy(() => import('components/routes/tos'));
 const User = lazy(() => import('components/routes/user'));
-const Library = lazy(() => import('components/routes/developer/library'));
 
 const APP_NAME = 'AL4';
 
@@ -151,7 +151,8 @@ const WrappedRoutes = () => {
         <Route path="/authorize" element={<AppRegistration />} />
         <Route path="/crash" element={<CrashTest />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/developer/library" element={<Library />} />
+        <Route path="/developer/library" element={<DeveloperLibrary />} />
+        <Route path="/developer/theme" element={<DeveloperTheme />} />
         <Route path="/file/detail/:id" element={<FileFullDetail />} />
         <Route path="/file/viewer/:id/:tab" element={<FileViewer />} />
         <Route path="/file/viewer/:id" element={<FileViewer />} />
@@ -188,7 +189,6 @@ const WrappedRoutes = () => {
         <Route path="/submission/report/:id" element={<SubmissionReport />} />
         <Route path="/submission/:id" element={<RedirectSubmission />} />
         <Route path="/submissions" element={<Submissions />} />
-        <Route path="/theme" element={<Theme />} />
         <Route path="/tos" element={<Tos />} />
         <Route path="/forbidden" element={<ForbiddenPage />} />
         <Route path="/notfound" element={<NotFoundPage />} />

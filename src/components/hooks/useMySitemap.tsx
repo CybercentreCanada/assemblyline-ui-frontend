@@ -8,6 +8,7 @@ import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOutlined';
+import CodeIcon from '@mui/icons-material/Code';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
@@ -19,12 +20,14 @@ import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
+import PaletteIcon from '@mui/icons-material/Palette';
 import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined';
@@ -306,6 +309,20 @@ export default function useMySitemap() {
         isRoot: true,
         icon: <AccountCircleOutlinedIcon />,
         breadcrumbs: ['/admin', '/admin/users']
+      },
+
+      { path: '/developer', title: t('drawer.developer'), isRoot: true, icon: <CodeIcon /> },
+      {
+        path: '/developer/library',
+        title: t('drawer.developer.library'),
+        icon: <LibraryBooksIcon />,
+        breadcrumbs: ['/developer']
+      },
+      {
+        path: '/developer/theme',
+        title: t('drawer.developer.theme'),
+        icon: <PaletteIcon />,
+        breadcrumbs: ['/developer']
       }
     ]
   };
