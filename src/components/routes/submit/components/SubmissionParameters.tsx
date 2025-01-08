@@ -180,6 +180,7 @@ const WrappedSubmissionParameters = ({
           children={([profiling]) => (
             <CheckboxInput
               label={t('options.submission.profile')}
+              tooltip={t('settings:submissions.profile_desc')}
               value={profiling}
               loading={loading}
               disabled={disabled}
