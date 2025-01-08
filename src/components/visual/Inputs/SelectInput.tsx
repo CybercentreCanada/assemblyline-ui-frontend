@@ -32,6 +32,7 @@ type Props = Omit<SelectProps, 'error' | 'value' | 'onChange'> & {
   loading?: boolean;
   preventDisabledColor?: boolean;
   preventRender?: boolean;
+  readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
   tooltip?: TooltipProps['title'];
@@ -54,6 +55,7 @@ const WrappedSelectInput = ({
   loading = false,
   preventDisabledColor = false,
   preventRender = false,
+  readOnly = false,
   reset = false,
   resetProps = null,
   tooltip = null,
@@ -88,7 +90,19 @@ const WrappedSelectInput = ({
           children={label}
         />
       </Tooltip>
-      <FormControl fullWidth error={!!errorValue}>
+      <FormControl
+        fullWidth
+        error={!!errorValue}
+        {...(readOnly && {
+          focused: null,
+          sx: {
+            '& .MuiInputBase-input': { cursor: 'default' },
+            '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'rgba(255, 255, 255, 0.23)'
+            }
+          }
+        })}
+      >
         {loading ? (
           <Skeleton sx={{ height: '40px', transform: 'unset' }} />
         ) : (
@@ -98,6 +112,7 @@ const WrappedSelectInput = ({
             fullWidth
             disabled={disabled}
             displayEmpty
+            readOnly={readOnly}
             inputProps={{ id: id || label }}
             value={items.includes(value) ? value : ''}
             sx={{ textTransform: 'capitalize' }}

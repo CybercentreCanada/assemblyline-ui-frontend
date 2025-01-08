@@ -21,6 +21,7 @@ type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   loading?: boolean;
   preventDisabledColor?: boolean;
   preventRender?: boolean;
+  readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
   tooltip?: TooltipProps['title'];
@@ -46,6 +47,7 @@ export const SwitchInput: React.FC<Props> = React.memo(
     loading = false,
     preventDisabledColor = false,
     preventRender = false,
+    readOnly = false,
     reset = false,
     resetProps = null,
     tooltip = null,
@@ -65,7 +67,7 @@ export const SwitchInput: React.FC<Props> = React.memo(
         <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
           <Button
             color="inherit"
-            disabled={loading || disabled}
+            disabled={loading || disabled || readOnly}
             fullWidth
             onClick={event => {
               event.stopPropagation();
@@ -75,7 +77,14 @@ export const SwitchInput: React.FC<Props> = React.memo(
               const err = error(!value);
               if (err) onError(err);
             }}
-            sx={{ padding: 0, justifyContent: 'flex-start', columnGap: theme.spacing(1), textTransform: 'none' }}
+            sx={{
+              padding: 0,
+              justifyContent: 'flex-start',
+              columnGap: theme.spacing(1),
+              textTransform: 'none',
+              ...(readOnly && { color: 'initial' }),
+              ...buttonProps?.sx
+            }}
             {...buttonProps}
           >
             {loading ? (

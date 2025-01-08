@@ -1492,6 +1492,199 @@ export const InputsSection = React.memo(() => {
 
         <div className={classes.container}>
           <div>
+            <Typography variant="h6">{'Read Only'}</Typography>
+            <Typography color="textSecondary" variant="body2">
+              <span>
+                {
+                  'The readOnly prop prevents the user from making changes, but still shows the input in its default state. '
+                }
+              </span>
+            </Typography>
+          </div>
+
+          <Grid container spacing={2}>
+            <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+              <form.Subscribe
+                selector={state => state.values.inputs.text}
+                children={value => (
+                  <TextInput
+                    label="ReadOnly Text Input"
+                    value={value}
+                    readOnly
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.text = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.inputs.number}
+                children={value => (
+                  <NumberInput
+                    label="ReadOnly Number Input"
+                    value={value}
+                    readOnly
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.number = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.inputs.select}
+                children={value => (
+                  <SelectInput
+                    label="ReadOnly Select Input"
+                    value={value}
+                    readOnly
+                    items={['option 1', 'option 2', 'option 3']}
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.select = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.inputs.date}
+                children={value => (
+                  <DateInput
+                    label="ReadOnly Date Input"
+                    value={value}
+                    readOnly
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.date = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.inputs.slider}
+                children={value => (
+                  <SliderInput
+                    label="ReadOnly Slider Input"
+                    value={value}
+                    readOnly
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.slider = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.inputs.checkbox}
+                children={value => (
+                  <CheckboxInput
+                    label="ReadOnly Checkbox Input"
+                    value={value}
+                    readOnly
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.checkbox = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.inputs.switch}
+                children={value => (
+                  <SwitchInput
+                    label="ReadOnly Switch Input"
+                    value={value}
+                    readOnly
+                    onChange={(event, next) => {
+                      form.setStore(s => {
+                        s.inputs.switch = next;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid md={6} xs={12} sx={{ display: 'flex', minHeight: '500px' }}>
+              <MonacoEditor
+                language="javascript"
+                value={`<>
+  <TextInput
+    label="ReadOnly Text Input"
+    value={value}
+    readonly
+    onChange={(event, next) => {}}
+  />
+
+  <NumberInput
+    label="ReadOnly Number Input"
+    value={value}
+    readonly
+    onChange={(event, next) => {}}
+  />
+
+  <SelectInput
+    label="ReadOnly Select Input"
+    value={value}
+    readonly
+    items={['option 1', 'option 2', 'option 3']}
+    onChange={(event, next) => {}}
+  />
+
+  <DateInput
+    label="ReadOnly Date Input"
+    value={value}
+    readonly
+    onChange={next => {}}
+  />
+
+  <SliderInput
+    label="ReadOnly Slider Input"
+    value={value}
+    readonly
+    onChange={(event, next) => {}}
+  />
+
+  <CheckboxInput
+    label="ReadOnly Checkbox Input"
+    value={value}
+    readonly
+    onChange={(event, next) => {}}
+  />
+
+  <SwitchInput
+    label="ReadOnly Switch Input"
+    value={value}
+    readonly
+    onChange={(event, next) => {}}
+  />
+</>`}
+              />
+            </Grid>
+          </Grid>
+        </div>
+
+        <div className={classes.container}>
+          <div>
             <Typography variant="h6">{'Edge Case: Long label names'}</Typography>
             <Typography color="textSecondary" variant="body2">
               <span>{"The labels should handle the case where there's a really long label name "}</span>

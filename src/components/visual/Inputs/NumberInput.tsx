@@ -1,4 +1,10 @@
-import type { IconButtonProps, TextFieldProps, TooltipProps, TypographyProps } from '@mui/material';
+import type {
+  FormHelperTextProps,
+  IconButtonProps,
+  TextFieldProps,
+  TooltipProps,
+  TypographyProps
+} from '@mui/material';
 import { FormControl, InputAdornment, InputLabel, Skeleton, TextField, Typography, useTheme } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ReactNode } from 'react';
@@ -9,6 +15,7 @@ import { ResetInput } from './components/ResetInput';
 type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   endAdornment?: ReactNode;
   error?: (value: number) => string;
+  errorProps?: FormHelperTextProps;
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
@@ -16,6 +23,7 @@ type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   min?: number;
   preventDisabledColor?: boolean;
   preventRender?: boolean;
+  readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
   tooltip?: TooltipProps['title'];
@@ -30,6 +38,7 @@ const WrappedNumberInput = ({
   disabled = false,
   endAdornment,
   error = () => null,
+  errorProps = null,
   id = null,
   label,
   labelProps,
@@ -38,6 +47,7 @@ const WrappedNumberInput = ({
   min,
   preventDisabledColor = false,
   preventRender = false,
+  readOnly = false,
   reset = false,
   resetProps = null,
   tooltip,
@@ -85,8 +95,19 @@ const WrappedNumberInput = ({
             disabled={disabled}
             error={!!errorValue}
             helperText={errorValue}
+            FormHelperTextProps={errorProps}
+            {...(readOnly && {
+              focused: null,
+              sx: {
+                '& .MuiInputBase-input': { cursor: 'default' },
+                '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(255, 255, 255, 0.23)'
+                }
+              }
+            })}
             inputProps={{ min: min, max: max }}
             InputProps={{
+              readOnly: readOnly,
               sx: { paddingRight: '9px' },
               endAdornment: (
                 <>

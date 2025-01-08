@@ -41,6 +41,7 @@ type Props<
   options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
+  readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
   tooltip?: TooltipProps['title'];
@@ -68,6 +69,7 @@ const WrappedTextInput = <
   options = [],
   preventDisabledColor = false,
   preventRender = false,
+  readOnly = false,
   reset = false,
   resetProps = null,
   tooltip = null,
@@ -118,6 +120,7 @@ const WrappedTextInput = <
             size="small"
             value={_value}
             disabled={disabled}
+            readOnly={readOnly}
             inputValue={value || ''}
             options={options}
             onChange={(e, v) => setValue(v)}
@@ -134,7 +137,17 @@ const WrappedTextInput = <
                   id={id || label}
                   variant="outlined"
                   error={!!errorValue}
+                  {...(readOnly && {
+                    focused: null,
+                    sx: {
+                      '& .MuiInputBase-input': { cursor: 'default' },
+                      '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255, 255, 255, 0.23)'
+                      }
+                    }
+                  })}
                   InputProps={{
+                    readOnly: readOnly,
                     endAdornment: !reset ? null : (
                       <InputAdornment position="end">
                         <ResetInput

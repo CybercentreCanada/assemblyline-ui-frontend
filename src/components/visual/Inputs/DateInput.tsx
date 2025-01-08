@@ -1,4 +1,10 @@
-import type { IconButtonProps, TextFieldProps, TooltipProps, TypographyProps } from '@mui/material';
+import type {
+  FormHelperTextProps,
+  IconButtonProps,
+  TextFieldProps,
+  TooltipProps,
+  TypographyProps
+} from '@mui/material';
 import { FormControl, InputAdornment, InputLabel, Skeleton, TextField, Typography, useTheme } from '@mui/material';
 import { LocalizationProvider, DatePicker as MuiDatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -14,6 +20,7 @@ type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   defaultDateOffset?: number | null;
   endAdornment?: ReactNode;
   error?: (value: string) => string;
+  errorProps?: FormHelperTextProps;
   id?: string;
   label?: string;
   labelProps?: TypographyProps;
@@ -22,6 +29,7 @@ type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   minDateTomorrow?: boolean;
   preventDisabledColor?: boolean;
   preventRender?: boolean;
+  readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
   tooltip?: TooltipProps['title'];
@@ -37,6 +45,7 @@ const WrappedDateInput = ({
   disabled,
   endAdornment,
   error = () => null,
+  errorProps = null,
   id = null,
   label,
   labelProps,
@@ -45,6 +54,7 @@ const WrappedDateInput = ({
   minDateTomorrow = false,
   preventDisabledColor = false,
   preventRender = false,
+  readOnly = false,
   reset = false,
   resetProps = null,
   tooltip = null,
@@ -119,6 +129,7 @@ const WrappedDateInput = ({
           ) : (
             <MuiDatePicker
               value={tempDate}
+              readOnly={readOnly}
               onChange={newValue => {
                 setTempDate(newValue);
 
@@ -137,7 +148,17 @@ const WrappedDateInput = ({
                   ref={inputRef}
                   error={!!errorValue && !disabled}
                   helperText={errorValue}
+                  FormHelperTextProps={errorProps}
                   disabled={disabled}
+                  {...(readOnly && {
+                    focused: null,
+                    sx: {
+                      '& .MuiInputBase-input': { cursor: 'default' },
+                      '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255, 255, 255, 0.23)'
+                      }
+                    }
+                  })}
                   {...textFieldProps}
                   inputProps={{ ...inputProps, ...textFieldProps?.inputProps }}
                   InputProps={{

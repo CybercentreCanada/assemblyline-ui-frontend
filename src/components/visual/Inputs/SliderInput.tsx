@@ -13,6 +13,7 @@ type Props = Omit<SliderProps, 'value' | 'onChange'> & {
   loading?: boolean;
   preventDisabledColor?: boolean;
   preventRender?: boolean;
+  readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
   tooltip?: TooltipProps['title'];
@@ -33,6 +34,7 @@ const WrappedSliderInput = ({
   loading,
   preventDisabledColor = false,
   preventRender,
+  readOnly = false,
   reset = false,
   resetProps = null,
   tooltip = null,
@@ -80,7 +82,7 @@ const WrappedSliderInput = ({
                   aria-label={id || label}
                   id={id || label}
                   color={!disabled && errorValue ? 'error' : 'primary'}
-                  disabled={disabled}
+                  disabled={disabled || readOnly}
                   valueLabelDisplay="auto"
                   size="small"
                   value={value}
