@@ -137,15 +137,16 @@ const WrappedTextInput = <
                   id={id || label}
                   variant="outlined"
                   error={!!errorValue}
-                  {...(readOnly && {
-                    focused: null,
-                    sx: {
-                      '& .MuiInputBase-input': { cursor: 'default' },
-                      '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(255, 255, 255, 0.23)'
+                  {...(readOnly &&
+                    !disabled && {
+                      focused: null,
+                      sx: {
+                        '& .MuiInputBase-input': { cursor: 'default' },
+                        '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(255, 255, 255, 0.23)'
+                        }
                       }
-                    }
-                  })}
+                    })}
                   InputProps={{
                     readOnly: readOnly,
                     endAdornment:

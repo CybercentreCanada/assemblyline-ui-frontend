@@ -96,15 +96,16 @@ const WrappedNumberInput = ({
             error={!!errorValue}
             helperText={errorValue}
             FormHelperTextProps={errorProps}
-            {...(readOnly && {
-              focused: null,
-              sx: {
-                '& .MuiInputBase-input': { cursor: 'default' },
-                '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(255, 255, 255, 0.23)'
+            {...(readOnly &&
+              !disabled && {
+                focused: null,
+                sx: {
+                  '& .MuiInputBase-input': { cursor: 'default' },
+                  '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.23)'
+                  }
                 }
-              }
-            })}
+              })}
             inputProps={{ min: min, max: max }}
             InputProps={{
               readOnly: readOnly,
