@@ -123,9 +123,14 @@ const WrappedSelectInput = ({
               if (err) onError(err);
             }}
             endAdornment={
-              !reset ? null : (
+              loading || !reset || disabled || readOnly ? null : (
                 <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
-                  <ResetInput id={id || label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+                  <ResetInput
+                    id={id || label}
+                    preventRender={loading || !reset || disabled || readOnly}
+                    onReset={onReset}
+                    {...resetProps}
+                  />
                 </InputAdornment>
               )
             }

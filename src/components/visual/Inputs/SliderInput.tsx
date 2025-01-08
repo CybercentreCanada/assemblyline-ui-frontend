@@ -95,7 +95,12 @@ const WrappedSliderInput = ({
                   {...sliderProps}
                 />
               </div>
-              <ResetInput id={id || label} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+              <ResetInput
+                id={id || label}
+                preventRender={loading || !reset || disabled || readOnly}
+                onReset={onReset}
+                {...resetProps}
+              />
             </div>
             {!errorValue || disabled ? null : (
               <FormHelperText

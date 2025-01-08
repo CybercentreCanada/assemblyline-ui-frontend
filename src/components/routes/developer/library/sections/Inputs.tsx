@@ -46,14 +46,14 @@ export const InputsSection = React.memo(() => {
           <Grid container spacing={2}>
             <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
               <form.Subscribe
-                selector={state => state.values.inputs.text}
+                selector={state => state.values.inputs.values.text}
                 children={value => (
                   <TextInput
                     label="Text Input"
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.text = next;
+                        s.inputs.values.text = next;
                         return s;
                       });
                     }}
@@ -62,14 +62,14 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.number}
+                selector={state => state.values.inputs.values.number}
                 children={value => (
                   <NumberInput
                     label="Number Input"
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.number = next;
+                        s.inputs.values.number = next;
                         return s;
                       });
                     }}
@@ -78,7 +78,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.select}
+                selector={state => state.values.inputs.values.select}
                 children={value => (
                   <SelectInput
                     label="Select Input"
@@ -86,7 +86,7 @@ export const InputsSection = React.memo(() => {
                     items={['option 1', 'option 2', 'option 3']}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.select = next;
+                        s.inputs.values.select = next;
                         return s;
                       });
                     }}
@@ -95,14 +95,14 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.date}
+                selector={state => state.values.inputs.values.date}
                 children={value => (
                   <DateInput
                     label="Date Input"
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.date = next;
+                        s.inputs.values.date = next;
                         return s;
                       });
                     }}
@@ -111,14 +111,14 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.slider}
+                selector={state => state.values.inputs.values.slider}
                 children={value => (
                   <SliderInput
                     label="Slider Input"
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.slider = next;
+                        s.inputs.values.slider = next;
                         return s;
                       });
                     }}
@@ -127,14 +127,14 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.checkbox}
+                selector={state => state.values.inputs.values.checkbox}
                 children={value => (
                   <CheckboxInput
                     label="Checkbox Input"
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.checkbox = next;
+                        s.inputs.values.checkbox = next;
                         return s;
                       });
                     }}
@@ -143,14 +143,14 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.switch}
+                selector={state => state.values.inputs.values.switch}
                 children={value => (
                   <SwitchInput
                     label="Switch Input"
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.switch = next;
+                        s.inputs.values.switch = next;
                         return s;
                       });
                     }}
@@ -221,7 +221,7 @@ export const InputsSection = React.memo(() => {
           <Grid container spacing={2}>
             <Grid md={6} xs={12}>
               <form.Subscribe
-                selector={state => state.values.inputs.text}
+                selector={state => state.values.inputs.values.text}
                 children={value => (
                   <TextInput
                     label="Controlled Text Input"
@@ -229,13 +229,13 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.text = next;
+                        s.inputs.values.text = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.text = '';
+                        s.inputs.values.text = '';
                         return s;
                       });
                     }}
@@ -246,7 +246,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
               <form.Subscribe
-                selector={state => state.values.inputs.text}
+                selector={state => state.values.inputs.values.text}
                 children={value => (
                   <div>
                     <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
@@ -258,7 +258,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12}>
               <form.Subscribe
-                selector={state => state.values.inputs.number}
+                selector={state => state.values.inputs.values.number}
                 children={value => (
                   <NumberInput
                     label="Controlled Number Input"
@@ -266,13 +266,13 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.number = next;
+                        s.inputs.values.number = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.number = 0;
+                        s.inputs.values.number = 0;
                         return s;
                       });
                     }}
@@ -283,7 +283,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
               <form.Subscribe
-                selector={state => state.values.inputs.number}
+                selector={state => state.values.inputs.values.number}
                 children={value => (
                   <div>
                     <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
@@ -295,7 +295,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12}>
               <form.Subscribe
-                selector={state => state.values.inputs.select}
+                selector={state => state.values.inputs.values.select}
                 children={value => (
                   <SelectInput
                     label="Controlled Select Input"
@@ -304,13 +304,13 @@ export const InputsSection = React.memo(() => {
                     items={['option 1', 'option 2', 'option 3']}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.select = next;
+                        s.inputs.values.select = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.select = '';
+                        s.inputs.values.select = '';
                         return s;
                       });
                     }}
@@ -321,7 +321,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
               <form.Subscribe
-                selector={state => state.values.inputs.select}
+                selector={state => state.values.inputs.values.select}
                 children={value => (
                   <div>
                     <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
@@ -333,7 +333,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12}>
               <form.Subscribe
-                selector={state => state.values.inputs.date}
+                selector={state => state.values.inputs.values.date}
                 children={value => (
                   <DateInput
                     label="Controlled Date Input"
@@ -341,13 +341,13 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.date = next;
+                        s.inputs.values.date = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.date = null;
+                        s.inputs.values.date = null;
                         return s;
                       });
                     }}
@@ -358,7 +358,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
               <form.Subscribe
-                selector={state => state.values.inputs.date}
+                selector={state => state.values.inputs.values.date}
                 children={value => (
                   <div>
                     <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
@@ -370,7 +370,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12}>
               <form.Subscribe
-                selector={state => state.values.inputs.slider}
+                selector={state => state.values.inputs.values.slider}
                 children={value => (
                   <SliderInput
                     label="Controlled Slider Input"
@@ -378,13 +378,13 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.slider = next;
+                        s.inputs.values.slider = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.slider = 0;
+                        s.inputs.values.slider = 0;
                         return s;
                       });
                     }}
@@ -395,7 +395,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
               <form.Subscribe
-                selector={state => state.values.inputs.slider}
+                selector={state => state.values.inputs.values.slider}
                 children={value => (
                   <div>
                     <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
@@ -407,7 +407,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12}>
               <form.Subscribe
-                selector={state => state.values.inputs.checkbox}
+                selector={state => state.values.inputs.values.checkbox}
                 children={value => (
                   <CheckboxInput
                     label="Controlled Checkbox Input"
@@ -415,13 +415,13 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.checkbox = next;
+                        s.inputs.values.checkbox = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.checkbox = false;
+                        s.inputs.values.checkbox = false;
                         return s;
                       });
                     }}
@@ -432,7 +432,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
               <form.Subscribe
-                selector={state => state.values.inputs.checkbox}
+                selector={state => state.values.inputs.values.checkbox}
                 children={value => (
                   <div>
                     <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
@@ -444,7 +444,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12}>
               <form.Subscribe
-                selector={state => state.values.inputs.switch}
+                selector={state => state.values.inputs.values.switch}
                 children={value => (
                   <SwitchInput
                     label="Controlled Switch Input"
@@ -452,13 +452,13 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.switch = next;
+                        s.inputs.values.switch = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.switch = false;
+                        s.inputs.values.switch = false;
                         return s;
                       });
                     }}
@@ -469,7 +469,7 @@ export const InputsSection = React.memo(() => {
 
             <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
               <form.Subscribe
-                selector={state => state.values.inputs.switch}
+                selector={state => state.values.inputs.values.switch}
                 children={value => (
                   <div>
                     <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
@@ -493,7 +493,7 @@ export const InputsSection = React.memo(() => {
           <Grid container spacing={2}>
             <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
               <form.Subscribe
-                selector={state => state.values.inputs.text}
+                selector={state => state.values.inputs.values.text}
                 children={value => (
                   <TextInput
                     label="Disabled Text Input"
@@ -501,7 +501,7 @@ export const InputsSection = React.memo(() => {
                     disabled
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.text = next;
+                        s.inputs.values.text = next;
                         return s;
                       });
                     }}
@@ -510,7 +510,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.number}
+                selector={state => state.values.inputs.values.number}
                 children={value => (
                   <NumberInput
                     label="Disabled Number Input"
@@ -518,7 +518,7 @@ export const InputsSection = React.memo(() => {
                     disabled
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.number = next;
+                        s.inputs.values.number = next;
                         return s;
                       });
                     }}
@@ -527,7 +527,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.select}
+                selector={state => state.values.inputs.values.select}
                 children={value => (
                   <SelectInput
                     label="Disabled Select Input"
@@ -536,7 +536,7 @@ export const InputsSection = React.memo(() => {
                     items={['option 1', 'option 2', 'option 3']}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.select = next;
+                        s.inputs.values.select = next;
                         return s;
                       });
                     }}
@@ -545,7 +545,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.date}
+                selector={state => state.values.inputs.values.date}
                 children={value => (
                   <DateInput
                     label="Disabled Date Input"
@@ -553,7 +553,7 @@ export const InputsSection = React.memo(() => {
                     disabled
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.date = next;
+                        s.inputs.values.date = next;
                         return s;
                       });
                     }}
@@ -562,7 +562,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.slider}
+                selector={state => state.values.inputs.values.slider}
                 children={value => (
                   <SliderInput
                     label="Disabled Slider Input"
@@ -570,7 +570,7 @@ export const InputsSection = React.memo(() => {
                     disabled
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.slider = next;
+                        s.inputs.values.slider = next;
                         return s;
                       });
                     }}
@@ -579,7 +579,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.checkbox}
+                selector={state => state.values.inputs.values.checkbox}
                 children={value => (
                   <CheckboxInput
                     label="Disabled Checkbox Input"
@@ -587,7 +587,7 @@ export const InputsSection = React.memo(() => {
                     disabled
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.checkbox = next;
+                        s.inputs.values.checkbox = next;
                         return s;
                       });
                     }}
@@ -596,7 +596,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.switch}
+                selector={state => state.values.inputs.values.switch}
                 children={value => (
                   <SwitchInput
                     label="Disabled Switch Input"
@@ -604,7 +604,7 @@ export const InputsSection = React.memo(() => {
                     disabled
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.switch = next;
+                        s.inputs.values.switch = next;
                         return s;
                       });
                     }}
@@ -684,7 +684,7 @@ export const InputsSection = React.memo(() => {
           <Grid container spacing={2}>
             <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
               <form.Subscribe
-                selector={state => state.values.inputs.text}
+                selector={state => state.values.inputs.values.text}
                 children={value => (
                   <TextInput
                     label="Loading Text Input"
@@ -692,7 +692,7 @@ export const InputsSection = React.memo(() => {
                     loading
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.text = next;
+                        s.inputs.values.text = next;
                         return s;
                       });
                     }}
@@ -701,7 +701,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.number}
+                selector={state => state.values.inputs.values.number}
                 children={value => (
                   <NumberInput
                     label="Loading Number Input"
@@ -709,7 +709,7 @@ export const InputsSection = React.memo(() => {
                     loading
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.number = next;
+                        s.inputs.values.number = next;
                         return s;
                       });
                     }}
@@ -718,7 +718,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.select}
+                selector={state => state.values.inputs.values.select}
                 children={value => (
                   <SelectInput
                     label="Loading Select Input"
@@ -727,7 +727,7 @@ export const InputsSection = React.memo(() => {
                     items={['option 1', 'option 2', 'option 3']}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.select = next;
+                        s.inputs.values.select = next;
                         return s;
                       });
                     }}
@@ -736,7 +736,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.date}
+                selector={state => state.values.inputs.values.date}
                 children={value => (
                   <DateInput
                     label="Loading Date Input"
@@ -744,7 +744,7 @@ export const InputsSection = React.memo(() => {
                     loading
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.date = next;
+                        s.inputs.values.date = next;
                         return s;
                       });
                     }}
@@ -753,7 +753,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.slider}
+                selector={state => state.values.inputs.values.slider}
                 children={value => (
                   <SliderInput
                     label="Loading Slider Input"
@@ -761,7 +761,7 @@ export const InputsSection = React.memo(() => {
                     loading
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.slider = next;
+                        s.inputs.values.slider = next;
                         return s;
                       });
                     }}
@@ -770,7 +770,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.checkbox}
+                selector={state => state.values.inputs.values.checkbox}
                 children={value => (
                   <CheckboxInput
                     label="Loading Checkbox Input"
@@ -778,7 +778,7 @@ export const InputsSection = React.memo(() => {
                     loading
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.checkbox = next;
+                        s.inputs.values.checkbox = next;
                         return s;
                       });
                     }}
@@ -787,7 +787,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.switch}
+                selector={state => state.values.inputs.values.switch}
                 children={value => (
                   <SwitchInput
                     label="Loading Switch Input"
@@ -795,7 +795,7 @@ export const InputsSection = React.memo(() => {
                     loading
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.switch = next;
+                        s.inputs.values.switch = next;
                         return s;
                       });
                     }}
@@ -874,7 +874,7 @@ export const InputsSection = React.memo(() => {
           <Grid container spacing={2}>
             <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
               <form.Subscribe
-                selector={state => state.values.inputs.text}
+                selector={state => state.values.inputs.values.text}
                 children={value => (
                   <TextInput
                     label="Reset Text Input"
@@ -882,13 +882,13 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.text = next;
+                        s.inputs.values.text = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.text = '';
+                        s.inputs.values.text = '';
                         return s;
                       });
                     }}
@@ -897,7 +897,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.number}
+                selector={state => state.values.inputs.values.number}
                 children={value => (
                   <NumberInput
                     label="Reset Number Input"
@@ -905,13 +905,13 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.number = next;
+                        s.inputs.values.number = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.number = 0;
+                        s.inputs.values.number = 0;
                         return s;
                       });
                     }}
@@ -920,7 +920,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.select}
+                selector={state => state.values.inputs.values.select}
                 children={value => (
                   <SelectInput
                     label="Reset Select Input"
@@ -929,13 +929,13 @@ export const InputsSection = React.memo(() => {
                     items={['option 1', 'option 2', 'option 3']}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.select = next;
+                        s.inputs.values.select = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.select = 'option 1';
+                        s.inputs.values.select = 'option 1';
                         return s;
                       });
                     }}
@@ -944,7 +944,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.date}
+                selector={state => state.values.inputs.values.date}
                 children={value => (
                   <DateInput
                     label="Reset Date Input"
@@ -952,13 +952,13 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.date = next;
+                        s.inputs.values.date = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.date = null;
+                        s.inputs.values.date = null;
                         return s;
                       });
                     }}
@@ -967,7 +967,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.slider}
+                selector={state => state.values.inputs.values.slider}
                 children={value => (
                   <SliderInput
                     label="Reset Slider Input"
@@ -975,13 +975,13 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.slider = next;
+                        s.inputs.values.slider = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.slider = 0;
+                        s.inputs.values.slider = 0;
                         return s;
                       });
                     }}
@@ -990,7 +990,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.checkbox}
+                selector={state => state.values.inputs.values.checkbox}
                 children={value => (
                   <CheckboxInput
                     label="Reset Checkbox Input"
@@ -998,13 +998,13 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.checkbox = next;
+                        s.inputs.values.checkbox = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.checkbox = false;
+                        s.inputs.values.checkbox = false;
                         return s;
                       });
                     }}
@@ -1013,7 +1013,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.switch}
+                selector={state => state.values.inputs.values.switch}
                 children={value => (
                   <SwitchInput
                     label="Reset Switch Input"
@@ -1021,13 +1021,13 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.switch = next;
+                        s.inputs.values.switch = next;
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.inputs.switch = false;
+                        s.inputs.values.switch = false;
                         return s;
                       });
                     }}
@@ -1112,7 +1112,7 @@ export const InputsSection = React.memo(() => {
           <Grid container spacing={2}>
             <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
               <form.Subscribe
-                selector={state => state.values.inputs.text}
+                selector={state => state.values.inputs.values.text}
                 children={value => (
                   <TextInput
                     label="Tooltip Text Input"
@@ -1120,7 +1120,7 @@ export const InputsSection = React.memo(() => {
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.text = next;
+                        s.inputs.values.text = next;
                         return s;
                       });
                     }}
@@ -1129,7 +1129,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.number}
+                selector={state => state.values.inputs.values.number}
                 children={value => (
                   <NumberInput
                     label="Tooltip Number Input"
@@ -1137,7 +1137,7 @@ export const InputsSection = React.memo(() => {
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.number = next;
+                        s.inputs.values.number = next;
                         return s;
                       });
                     }}
@@ -1146,7 +1146,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.select}
+                selector={state => state.values.inputs.values.select}
                 children={value => (
                   <SelectInput
                     label="Tooltip Select Input"
@@ -1155,7 +1155,7 @@ export const InputsSection = React.memo(() => {
                     items={['option 1', 'option 2', 'option 3']}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.select = next;
+                        s.inputs.values.select = next;
                         return s;
                       });
                     }}
@@ -1164,7 +1164,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.date}
+                selector={state => state.values.inputs.values.date}
                 children={value => (
                   <DateInput
                     label="Tooltip Date Input"
@@ -1172,7 +1172,7 @@ export const InputsSection = React.memo(() => {
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.date = next;
+                        s.inputs.values.date = next;
                         return s;
                       });
                     }}
@@ -1181,7 +1181,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.slider}
+                selector={state => state.values.inputs.values.slider}
                 children={value => (
                   <SliderInput
                     label="Tooltip Slider Input"
@@ -1189,7 +1189,7 @@ export const InputsSection = React.memo(() => {
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.slider = next;
+                        s.inputs.values.slider = next;
                         return s;
                       });
                     }}
@@ -1198,7 +1198,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.checkbox}
+                selector={state => state.values.inputs.values.checkbox}
                 children={value => (
                   <CheckboxInput
                     label="Tooltip Checkbox Input"
@@ -1206,7 +1206,7 @@ export const InputsSection = React.memo(() => {
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.checkbox = next;
+                        s.inputs.values.checkbox = next;
                         return s;
                       });
                     }}
@@ -1215,7 +1215,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.switch}
+                selector={state => state.values.inputs.values.switch}
                 children={value => (
                   <SwitchInput
                     label="Tooltip Switch Input"
@@ -1223,7 +1223,7 @@ export const InputsSection = React.memo(() => {
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.switch = next;
+                        s.inputs.values.switch = next;
                         return s;
                       });
                     }}
@@ -1305,7 +1305,7 @@ export const InputsSection = React.memo(() => {
           <Grid container spacing={2}>
             <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
               <form.Subscribe
-                selector={state => state.values.inputs.text}
+                selector={state => state.values.inputs.values.text}
                 children={value => (
                   <TextInput
                     label="Error Text Input"
@@ -1313,7 +1313,7 @@ export const InputsSection = React.memo(() => {
                     error={v => (v !== '' ? null : 'Input field cannot be empty')}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.text = next;
+                        s.inputs.values.text = next;
                         return s;
                       });
                     }}
@@ -1322,7 +1322,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.number}
+                selector={state => state.values.inputs.values.number}
                 children={value => (
                   <NumberInput
                     label="Error Number Input"
@@ -1330,7 +1330,7 @@ export const InputsSection = React.memo(() => {
                     error={v => (v !== 0 ? null : 'Input field cannot be 0')}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.number = next;
+                        s.inputs.values.number = next;
                         return s;
                       });
                     }}
@@ -1339,7 +1339,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.select}
+                selector={state => state.values.inputs.values.select}
                 children={value => (
                   <SelectInput
                     label="Error Select Input"
@@ -1348,7 +1348,7 @@ export const InputsSection = React.memo(() => {
                     items={['option 1', 'option 2', 'option 3']}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.select = next;
+                        s.inputs.values.select = next;
                         return s;
                       });
                     }}
@@ -1357,7 +1357,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.date}
+                selector={state => state.values.inputs.values.date}
                 children={value => (
                   <DateInput
                     label="Error Date Input"
@@ -1365,7 +1365,7 @@ export const InputsSection = React.memo(() => {
                     error={v => (v !== null ? null : 'Input field cannot be null')}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.date = next;
+                        s.inputs.values.date = next;
                         return s;
                       });
                     }}
@@ -1374,7 +1374,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.slider}
+                selector={state => state.values.inputs.values.slider}
                 children={value => (
                   <SliderInput
                     label="Error Slider Input"
@@ -1382,7 +1382,7 @@ export const InputsSection = React.memo(() => {
                     error={v => (v !== 0 ? null : 'Input field cannot be 0')}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.slider = next;
+                        s.inputs.values.slider = next;
                         return s;
                       });
                     }}
@@ -1391,7 +1391,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.checkbox}
+                selector={state => state.values.inputs.values.checkbox}
                 children={value => (
                   <CheckboxInput
                     label="Error Checkbox Input"
@@ -1399,7 +1399,7 @@ export const InputsSection = React.memo(() => {
                     error={v => (v !== false ? null : 'Input field cannot be false')}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.checkbox = next;
+                        s.inputs.values.checkbox = next;
                         return s;
                       });
                     }}
@@ -1408,7 +1408,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.switch}
+                selector={state => state.values.inputs.values.switch}
                 children={value => (
                   <SwitchInput
                     label="Error Switch Input"
@@ -1416,7 +1416,7 @@ export const InputsSection = React.memo(() => {
                     error={v => (v !== false ? null : 'Input field cannot be false')}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.switch = next;
+                        s.inputs.values.switch = next;
                         return s;
                       });
                     }}
@@ -1505,7 +1505,7 @@ export const InputsSection = React.memo(() => {
           <Grid container spacing={2}>
             <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
               <form.Subscribe
-                selector={state => state.values.inputs.text}
+                selector={state => state.values.inputs.values.text}
                 children={value => (
                   <TextInput
                     label="ReadOnly Text Input"
@@ -1513,7 +1513,7 @@ export const InputsSection = React.memo(() => {
                     readOnly
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.text = next;
+                        s.inputs.values.text = next;
                         return s;
                       });
                     }}
@@ -1522,7 +1522,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.number}
+                selector={state => state.values.inputs.values.number}
                 children={value => (
                   <NumberInput
                     label="ReadOnly Number Input"
@@ -1530,7 +1530,7 @@ export const InputsSection = React.memo(() => {
                     readOnly
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.number = next;
+                        s.inputs.values.number = next;
                         return s;
                       });
                     }}
@@ -1539,7 +1539,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.select}
+                selector={state => state.values.inputs.values.select}
                 children={value => (
                   <SelectInput
                     label="ReadOnly Select Input"
@@ -1548,7 +1548,7 @@ export const InputsSection = React.memo(() => {
                     items={['option 1', 'option 2', 'option 3']}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.select = next;
+                        s.inputs.values.select = next;
                         return s;
                       });
                     }}
@@ -1557,7 +1557,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.date}
+                selector={state => state.values.inputs.values.date}
                 children={value => (
                   <DateInput
                     label="ReadOnly Date Input"
@@ -1565,7 +1565,7 @@ export const InputsSection = React.memo(() => {
                     readOnly
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.date = next;
+                        s.inputs.values.date = next;
                         return s;
                       });
                     }}
@@ -1574,7 +1574,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.slider}
+                selector={state => state.values.inputs.values.slider}
                 children={value => (
                   <SliderInput
                     label="ReadOnly Slider Input"
@@ -1582,7 +1582,7 @@ export const InputsSection = React.memo(() => {
                     readOnly
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.slider = next;
+                        s.inputs.values.slider = next;
                         return s;
                       });
                     }}
@@ -1591,7 +1591,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.checkbox}
+                selector={state => state.values.inputs.values.checkbox}
                 children={value => (
                   <CheckboxInput
                     label="ReadOnly Checkbox Input"
@@ -1599,7 +1599,7 @@ export const InputsSection = React.memo(() => {
                     readOnly
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.checkbox = next;
+                        s.inputs.values.checkbox = next;
                         return s;
                       });
                     }}
@@ -1608,7 +1608,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.switch}
+                selector={state => state.values.inputs.values.switch}
                 children={value => (
                   <SwitchInput
                     label="ReadOnly Switch Input"
@@ -1616,7 +1616,7 @@ export const InputsSection = React.memo(() => {
                     readOnly
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.switch = next;
+                        s.inputs.values.switch = next;
                         return s;
                       });
                     }}
@@ -1685,6 +1685,344 @@ export const InputsSection = React.memo(() => {
 
         <div className={classes.container}>
           <div>
+            <Typography variant="h6">{'Interactions'}</Typography>
+            <Typography color="textSecondary" variant="body2">
+              <span>{'Use this to test the different interaction with the different props. '}</span>
+            </Typography>
+          </div>
+
+          <Grid container spacing={2}>
+            <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+              <form.Subscribe
+                selector={state => [
+                  state.values.inputs.state.disabled,
+                  state.values.inputs.state.loading,
+                  state.values.inputs.state.reset,
+                  state.values.inputs.state.tooltip,
+                  state.values.inputs.state.error,
+                  state.values.inputs.state.readOnly
+                ]}
+                children={([disabled, loading, reset, tooltip, error, readOnly]) => (
+                  <>
+                    <form.Subscribe
+                      selector={state => state.values.inputs.values.text}
+                      children={value => (
+                        <TextInput
+                          label="Interaction Text Input"
+                          value={value}
+                          onChange={(event, next) => {
+                            form.setStore(s => {
+                              s.inputs.values.text = next;
+                              return s;
+                            });
+                          }}
+                          {...(disabled && { disabled })}
+                          {...(loading && { loading })}
+                          {...(readOnly && { readOnly })}
+                          {...(reset && {
+                            reset,
+                            onReset: () => {
+                              form.setStore(s => {
+                                s.inputs.values.text = '';
+                                return s;
+                              });
+                            }
+                          })}
+                          {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                          {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
+                        />
+                      )}
+                    />
+
+                    <form.Subscribe
+                      selector={state => state.values.inputs.values.number}
+                      children={value => (
+                        <NumberInput
+                          label="Interaction Number Input"
+                          value={value}
+                          onChange={(event, next) => {
+                            form.setStore(s => {
+                              s.inputs.values.number = next;
+                              return s;
+                            });
+                          }}
+                          {...(disabled && { disabled })}
+                          {...(loading && { loading })}
+                          {...(readOnly && { readOnly })}
+                          {...(reset && {
+                            reset,
+                            onReset: () => {
+                              form.setStore(s => {
+                                s.inputs.values.number = 0;
+                                return s;
+                              });
+                            }
+                          })}
+                          {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                          {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
+                        />
+                      )}
+                    />
+
+                    <form.Subscribe
+                      selector={state => state.values.inputs.values.select}
+                      children={value => (
+                        <SelectInput
+                          label="Interaction Select Input"
+                          value={value}
+                          items={['option 1', 'option 2', 'option 3']}
+                          onChange={(event, next) => {
+                            form.setStore(s => {
+                              s.inputs.values.select = next;
+                              return s;
+                            });
+                          }}
+                          {...(disabled && { disabled })}
+                          {...(loading && { loading })}
+                          {...(readOnly && { readOnly })}
+                          {...(reset && {
+                            reset,
+                            onReset: () => {
+                              form.setStore(s => {
+                                s.inputs.values.select = '';
+                                return s;
+                              });
+                            }
+                          })}
+                          {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                          {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
+                        />
+                      )}
+                    />
+
+                    <form.Subscribe
+                      selector={state => state.values.inputs.values.date}
+                      children={value => (
+                        <DateInput
+                          label="Interaction Date Input"
+                          value={value}
+                          onChange={(event, next) => {
+                            form.setStore(s => {
+                              s.inputs.values.date = next;
+                              return s;
+                            });
+                          }}
+                          {...(disabled && { disabled })}
+                          {...(loading && { loading })}
+                          {...(readOnly && { readOnly })}
+                          {...(reset && {
+                            reset,
+                            onReset: () => {
+                              form.setStore(s => {
+                                s.inputs.values.date = null;
+                                return s;
+                              });
+                            }
+                          })}
+                          {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                          {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
+                        />
+                      )}
+                    />
+
+                    <form.Subscribe
+                      selector={state => state.values.inputs.values.slider}
+                      children={value => (
+                        <SliderInput
+                          label="Interaction Slider Input"
+                          value={value}
+                          onChange={(event, next) => {
+                            form.setStore(s => {
+                              s.inputs.values.slider = next;
+                              return s;
+                            });
+                          }}
+                          {...(disabled && { disabled })}
+                          {...(loading && { loading })}
+                          {...(readOnly && { readOnly })}
+                          {...(reset && {
+                            reset,
+                            onReset: () => {
+                              form.setStore(s => {
+                                s.inputs.values.slider = 0;
+                                return s;
+                              });
+                            }
+                          })}
+                          {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                          {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
+                        />
+                      )}
+                    />
+
+                    <form.Subscribe
+                      selector={state => state.values.inputs.values.checkbox}
+                      children={value => (
+                        <CheckboxInput
+                          label="Interaction Checkbox Input"
+                          value={value}
+                          onChange={(event, next) => {
+                            form.setStore(s => {
+                              s.inputs.values.checkbox = next;
+                              return s;
+                            });
+                          }}
+                          {...(disabled && { disabled })}
+                          {...(loading && { loading })}
+                          {...(readOnly && { readOnly })}
+                          {...(reset && {
+                            reset,
+                            onReset: () => {
+                              form.setStore(s => {
+                                s.inputs.values.checkbox = false;
+                                return s;
+                              });
+                            }
+                          })}
+                          {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                          {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
+                        />
+                      )}
+                    />
+
+                    <form.Subscribe
+                      selector={state => state.values.inputs.values.switch}
+                      children={value => (
+                        <SwitchInput
+                          label="Interaction Switch Input"
+                          value={value}
+                          onChange={(event, next) => {
+                            form.setStore(s => {
+                              s.inputs.values.switch = next;
+                              return s;
+                            });
+                          }}
+                          {...(disabled && { disabled })}
+                          {...(loading && { loading })}
+                          {...(readOnly && { readOnly })}
+                          {...(reset && {
+                            reset,
+                            onReset: () => {
+                              form.setStore(s => {
+                                s.inputs.values.switch = false;
+                                return s;
+                              });
+                            }
+                          })}
+                          {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                          {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
+                        />
+                      )}
+                    />
+                  </>
+                )}
+              />
+            </Grid>
+
+            <Grid md={6} xs={12}>
+              <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
+                <form.Subscribe
+                  selector={state => state.values.inputs.state.disabled}
+                  children={value => (
+                    <CheckboxInput
+                      label="Disabled"
+                      value={value}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.inputs.state.disabled = next;
+                          return s;
+                        });
+                      }}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.inputs.state.loading}
+                  children={value => (
+                    <CheckboxInput
+                      label="Loading"
+                      value={value}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.inputs.state.loading = next;
+                          return s;
+                        });
+                      }}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.inputs.state.reset}
+                  children={value => (
+                    <CheckboxInput
+                      label="Reset"
+                      value={value}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.inputs.state.reset = next;
+                          return s;
+                        });
+                      }}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.inputs.state.tooltip}
+                  children={value => (
+                    <CheckboxInput
+                      label="Tooltip"
+                      value={value}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.inputs.state.tooltip = next;
+                          return s;
+                        });
+                      }}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.inputs.state.error}
+                  children={value => (
+                    <CheckboxInput
+                      label="Error"
+                      value={value}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.inputs.state.error = next;
+                          return s;
+                        });
+                      }}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.inputs.state.readOnly}
+                  children={value => (
+                    <CheckboxInput
+                      label="ReadOnly"
+                      value={value}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.inputs.state.readOnly = next;
+                          return s;
+                        });
+                      }}
+                    />
+                  )}
+                />
+              </div>
+            </Grid>
+          </Grid>
+        </div>
+
+        <div className={classes.container}>
+          <div>
             <Typography variant="h6">{'Edge Case: Long label names'}</Typography>
             <Typography color="textSecondary" variant="body2">
               <span>{"The labels should handle the case where there's a really long label name "}</span>
@@ -1695,14 +2033,14 @@ export const InputsSection = React.memo(() => {
           <Grid container spacing={2}>
             <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
               <form.Subscribe
-                selector={state => state.values.inputs.text}
+                selector={state => state.values.inputs.values.text}
                 children={value => (
                   <TextInput
                     label="Text Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.text = next;
+                        s.inputs.values.text = next;
                         return s;
                       });
                     }}
@@ -1711,14 +2049,14 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.number}
+                selector={state => state.values.inputs.values.number}
                 children={value => (
                   <NumberInput
                     label="Number Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.number = next;
+                        s.inputs.values.number = next;
                         return s;
                       });
                     }}
@@ -1727,7 +2065,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.select}
+                selector={state => state.values.inputs.values.select}
                 children={value => (
                   <SelectInput
                     label="Select Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
@@ -1735,7 +2073,7 @@ export const InputsSection = React.memo(() => {
                     items={['option 1', 'option 2', 'option 3']}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.select = next;
+                        s.inputs.values.select = next;
                         return s;
                       });
                     }}
@@ -1744,14 +2082,14 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.date}
+                selector={state => state.values.inputs.values.date}
                 children={value => (
                   <DateInput
                     label="Date Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.date = next;
+                        s.inputs.values.date = next;
                         return s;
                       });
                     }}
@@ -1760,14 +2098,14 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.slider}
+                selector={state => state.values.inputs.values.slider}
                 children={value => (
                   <SliderInput
                     label="Slider Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     value={value}
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.slider = next;
+                        s.inputs.values.slider = next;
                         return s;
                       });
                     }}
@@ -1776,7 +2114,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.checkbox}
+                selector={state => state.values.inputs.values.checkbox}
                 children={value => (
                   <CheckboxInput
                     label="Checkbox Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
@@ -1784,7 +2122,7 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.checkbox = next;
+                        s.inputs.values.checkbox = next;
                         return s;
                       });
                     }}
@@ -1793,7 +2131,7 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.inputs.switch}
+                selector={state => state.values.inputs.values.switch}
                 children={value => (
                   <SwitchInput
                     label="Slider Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
@@ -1801,7 +2139,7 @@ export const InputsSection = React.memo(() => {
                     reset
                     onChange={(event, next) => {
                       form.setStore(s => {
-                        s.inputs.switch = next;
+                        s.inputs.values.switch = next;
                         return s;
                       });
                     }}

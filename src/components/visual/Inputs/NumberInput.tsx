@@ -111,11 +111,11 @@ const WrappedNumberInput = ({
               sx: { paddingRight: '9px' },
               endAdornment: (
                 <>
-                  {!reset ? null : (
+                  {loading || !reset || disabled || readOnly ? null : (
                     <InputAdornment position="end">
                       <ResetInput
                         id={id || label}
-                        preventRender={!reset || disabled}
+                        preventRender={loading || !reset || disabled || readOnly}
                         onReset={onReset}
                         {...resetProps}
                       />

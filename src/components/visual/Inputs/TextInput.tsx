@@ -148,16 +148,17 @@ const WrappedTextInput = <
                   })}
                   InputProps={{
                     readOnly: readOnly,
-                    endAdornment: !reset ? null : (
-                      <InputAdornment position="end">
-                        <ResetInput
-                          id={id || label}
-                          preventRender={!reset || disabled}
-                          onReset={onReset}
-                          {...resetProps}
-                        />
-                      </InputAdornment>
-                    ),
+                    endAdornment:
+                      loading || !reset || disabled || readOnly ? null : (
+                        <InputAdornment position="end">
+                          <ResetInput
+                            id={id || label}
+                            preventRender={loading || !reset || disabled || readOnly}
+                            onReset={onReset}
+                            {...resetProps}
+                          />
+                        </InputAdornment>
+                      ),
                     ...InputProps
                   }}
                   {...params}

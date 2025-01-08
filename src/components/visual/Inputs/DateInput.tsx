@@ -167,14 +167,14 @@ const WrappedDateInput = ({
                     endAdornment: (
                       <>
                         {InputProps?.endAdornment}
-                        {!reset ? null : (
+                        {loading || !reset || disabled || readOnly ? null : (
                           <InputAdornment
                             position="end"
                             sx={{ paddingLeft: theme.spacing(0.5), marginRight: theme.spacing(-0.5) }}
                           >
                             <ResetInput
                               id={id || label}
-                              preventRender={!reset || disabled}
+                              preventRender={loading || !reset || disabled || readOnly}
                               onReset={onReset}
                               {...resetProps}
                             />

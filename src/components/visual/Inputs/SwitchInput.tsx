@@ -150,7 +150,7 @@ export const SwitchInput: React.FC<Props> = React.memo(
               {label}
             </Typography>
 
-            {!(loading || !reset || disabled) && <div style={{ width: '40px' }} />}
+            {!(loading || !reset || disabled || readOnly) && <div style={{ width: '40px' }} />}
           </Button>
         </Tooltip>
 
@@ -167,7 +167,7 @@ export const SwitchInput: React.FC<Props> = React.memo(
         <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0 }}>
           <ResetInput
             id={id || label}
-            preventRender={loading || !reset || disabled}
+            preventRender={loading || !reset || disabled || readOnly}
             onReset={onReset}
             {...resetProps}
           />
