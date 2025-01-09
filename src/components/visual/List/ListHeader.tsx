@@ -54,7 +54,7 @@ export const ListHeader: FC<ListHeaderProps> = ({
         {...buttonProps}
         sx={{
           padding: 0,
-          '&.MuiButtonBase-root:hover': { bgcolor: 'transparent' },
+          // '&.MuiButtonBase-root:hover': { bgcolor: 'transparent' },
           ...(underlined && { borderBottom: `1px solid ${theme.palette.divider}` })
         }}
       >
