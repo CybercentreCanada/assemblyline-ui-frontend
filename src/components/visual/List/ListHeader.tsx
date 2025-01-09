@@ -12,18 +12,36 @@ export interface ListHeaderProps extends ListItemProps {
   edge?: 'start' | 'end';
   button?: boolean;
   disabled?: boolean;
+
+  primary?: React.ReactNode;
+  secondary?: React.ReactNode;
+
+  checkbox?: boolean;
+  checked?: boolean;
+  indeterminate?: boolean;
+  preventDefault?: boolean;
 }
 
 export const ListHeader: FC<ListHeaderProps> = ({
   id,
-  primaryProps,
-  secondaryProps,
+
   checkboxProps,
   buttonProps,
   underlined = false,
   edge = 'end',
   button = false,
   disabled = false,
+
+  primary = null,
+  secondary = null,
+  primaryProps = null,
+  secondaryProps = null,
+
+  checkbox = false,
+  checked = null,
+  indeterminate = null,
+  preventDefault = false,
+
   ...other
 }) => {
   const theme = useTheme();
@@ -46,7 +64,7 @@ export const ListHeader: FC<ListHeaderProps> = ({
           </ListItemIcon>
         )}
         <ListItemText
-          primary={primaryProps?.children}
+          primary={primary}
           primaryTypographyProps={{
             htmlFor: `${id}-input`,
             component: 'label',
@@ -54,7 +72,7 @@ export const ListHeader: FC<ListHeaderProps> = ({
             sx: { '&:hover': { cursor: 'pointer' } },
             ...primaryProps
           }}
-          secondary={secondaryProps?.children}
+          secondary={secondary}
           secondaryTypographyProps={secondaryProps}
         />
       </ListItemButton>
@@ -81,9 +99,9 @@ export const ListHeader: FC<ListHeaderProps> = ({
         </ListItemIcon>
       )}
       <ListItemText
-        primary={primaryProps?.children}
+        primary={primary}
         primaryTypographyProps={{ variant: 'body1', ...primaryProps }}
-        secondary={secondaryProps?.children}
+        secondary={secondary}
         secondaryTypographyProps={secondaryProps}
       />
     </ListItem>
