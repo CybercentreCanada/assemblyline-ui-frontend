@@ -1,6 +1,7 @@
 import type {
   FormHelperTextProps,
   IconButtonProps,
+  MenuItemProps,
   SelectChangeEvent,
   SelectProps,
   TooltipProps,
@@ -26,10 +27,10 @@ type Props = Omit<SelectProps, 'error' | 'value' | 'onChange'> & {
   error?: (value: string) => string;
   errorProps?: FormHelperTextProps;
   hasEmpty?: boolean;
-  items: string[];
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
+  options: { label: MenuItemProps['children']; value: MenuItemProps['value'] }[];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
   readOnly?: boolean;
@@ -49,10 +50,10 @@ const WrappedSelectInput = ({
   errorProps = null,
   hasEmpty = false,
   id = null,
-  items = [],
   label,
   labelProps,
   loading = false,
+  options = [],
   preventDisabledColor = false,
   preventRender = false,
   readOnly = false,
@@ -99,7 +100,7 @@ const WrappedSelectInput = ({
             sx: {
               '& .MuiInputBase-input': { cursor: 'default' },
               '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'rgba(255, 255, 255, 0.23)'
+                borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
               }
             }
           })}
@@ -115,7 +116,7 @@ const WrappedSelectInput = ({
             displayEmpty
             readOnly={readOnly}
             inputProps={{ id: id || label }}
-            value={items.includes(value) ? value : ''}
+            value={options.some(o => o.value === value) ? value : ''}
             sx={{ textTransform: 'capitalize' }}
             onChange={event => {
               onChange(event, event.target.value as string);
@@ -138,9 +139,9 @@ const WrappedSelectInput = ({
             {...selectProps}
           >
             {hasEmpty && <MenuItem value="" sx={{ height: '36px' }}></MenuItem>}
-            {items.map((item, i) => (
-              <MenuItem key={i} value={item} sx={{ textTransform: 'capitalize' }}>
-                {item.replaceAll('_', ' ')}
+            {options.map((option, i) => (
+              <MenuItem key={i} value={option.value} sx={{ textTransform: 'capitalize' }}>
+                {option.label}
               </MenuItem>
             ))}
           </Select>
