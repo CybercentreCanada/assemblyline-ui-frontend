@@ -1,8 +1,8 @@
-import type { AutocompleteProps, IconButtonProps, ListItemTextProps } from '@mui/material';
-import { Autocomplete, ListItem, TextField } from '@mui/material';
+import type { AutocompleteProps, FormHelperTextProps, IconButtonProps, ListItemTextProps } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import type { ElementType } from 'react';
-import React from 'react';
-import { BaseListItemText } from './components/BaseListInput';
+import React, { useMemo } from 'react';
+import { BaseListItem, BaseListItemText } from './components/BaseListInput';
 import { ResetListInput, type ResetListInputProps } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
@@ -17,19 +17,23 @@ type Props<
   'value' | 'renderInput' | 'options' | 'onChange'
 > & {
   capitalize?: boolean;
+  error?: (value: string) => string;
+  errorProps?: FormHelperTextProps;
   loading?: boolean;
   options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
   preventRender?: boolean;
   primary?: string;
   primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
+  readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetListInputProps;
   secondary?: ListItemTextProps['secondary'];
   secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
   showReset?: boolean;
   value: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['inputValue'];
-  onChange?: (value: string) => void;
+  onChange?: (event: React.SyntheticEvent<Element, Event>, value: string) => void;
   onReset?: IconButtonProps['onClick'];
+  onError?: (error: string) => void;
 };
 
 const WrappedTextListInput = <
@@ -41,23 +45,34 @@ const WrappedTextListInput = <
 >({
   capitalize = false,
   disabled = false,
+  error = () => null,
+  errorProps = null,
   id,
   loading = false,
   options = [],
   preventRender = false,
   primary,
   primaryProps = null,
+  readOnly = false,
   reset,
   resetProps = null,
   secondary,
   secondaryProps = null,
   value,
-  onChange,
+  onChange = () => null,
   onReset = () => null,
+  onError = () => null,
   ...autocompleteProps
-}: Props<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) =>
-  preventRender ? null : (
-    <ListItem disabled={disabled}>
+}: Props<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
+  const errorValue = useMemo<string>(() => error(value), [error, value]);
+
+  return preventRender ? null : (
+    <BaseListItem
+      disabled={disabled && !loading}
+      error={errorValue && !disabled && !loading && !readOnly}
+      helperText={errorValue}
+      FormHelperTextProps={errorProps}
+    >
       <BaseListItemText
         id={id}
         primary={primary}
@@ -70,25 +85,53 @@ const WrappedTextListInput = <
         <SkeletonListInput />
       ) : (
         <>
-          <ResetListInput id={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
+          <ResetListInput
+            id={primary}
+            preventRender={!reset || disabled || readOnly}
+            onReset={onReset}
+            {...resetProps}
+          />
           <Autocomplete
             autoComplete
             freeSolo
             disableClearable
             fullWidth
             size="small"
-            sx={{ maxWidth: '30%' }}
+            sx={{ maxWidth: '30%', minWidth: '30%' }}
             // value={value || null}
             disabled={disabled}
+            readOnly={readOnly}
             options={options}
             inputValue={value}
-            onInputChange={(_, v) => onChange(v)}
-            renderInput={({ inputProps, ...params }) => <TextField {...params} inputProps={{ ...inputProps, id }} />}
+            onInputChange={(e, v) => {
+              onChange(e, v);
+
+              const err = error(v);
+              if (err) onError(err);
+            }}
+            renderInput={({ inputProps, ...params }) => (
+              <TextField
+                error={!!errorValue && !readOnly}
+                {...(readOnly &&
+                  !disabled && {
+                    focused: null,
+                    sx: {
+                      '& .MuiInputBase-input': { cursor: 'default' },
+                      '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255, 255, 255, 0.23)'
+                      }
+                    }
+                  })}
+                {...params}
+                inputProps={{ ...inputProps, id }}
+              />
+            )}
             {...autocompleteProps}
           />
         </>
       )}
-    </ListItem>
+    </BaseListItem>
   );
+};
 
 export const TextListInput = React.memo(WrappedTextListInput);

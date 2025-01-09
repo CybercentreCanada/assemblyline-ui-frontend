@@ -6,9 +6,7 @@ interface SkeletonListInputProps extends SkeletonProps {
   visible?: boolean;
 }
 
-export const SkeletonListInput: FC<SkeletonListInputProps> = ({ visible = false, sx, ...other }) => {
+export const SkeletonListInput: FC<SkeletonListInputProps> = ({ sx, ...other }) => {
   const theme = useTheme();
-  return !visible ? null : (
-    <Skeleton sx={{ height: '2rem', width: '2.5rem', marginRight: theme.spacing(0.5), ...sx }} {...other} />
-  );
+  return <Skeleton sx={{ height: '2rem', width: '30%', marginRight: theme.spacing(0.5), ...sx }} {...other} />;
 };

@@ -1,33 +1,47 @@
-import type { IconButtonProps, ListItemTextProps, OutlinedInputProps } from '@mui/material';
-import { InputAdornment, ListItem, OutlinedInput } from '@mui/material';
+import type { TextFieldProps } from '@mui/material';
+import {
+  InputAdornment,
+  TextField,
+  useTheme,
+  type FormHelperTextProps,
+  type IconButtonProps,
+  type ListItemTextProps
+} from '@mui/material';
 import type { ReactNode } from 'react';
-import React from 'react';
-import { BaseListItemText } from './components/BaseListInput';
+import React, { useMemo } from 'react';
+import { BaseListItem, BaseListItemText } from './components/BaseListInput';
 import type { ResetListInputProps } from './components/ResetListInput';
 import { ResetListInput } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
-type Props = Omit<OutlinedInputProps, 'value'> & {
+type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   capitalize?: boolean;
   endAdornment?: ReactNode;
+  error?: (value: number) => string;
+  errorProps?: FormHelperTextProps;
   loading?: boolean;
   max?: number;
   min?: number;
   preventRender?: boolean;
   primary?: string;
   primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
+  readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetListInputProps;
   secondary?: ListItemTextProps['secondary'];
   secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
   value: number;
+  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, value: number) => void;
   onReset?: IconButtonProps['onClick'];
+  onError?: (error: string) => void;
 };
 
 const WrappedNumberListInput = ({
   capitalize = false,
   disabled = false,
   endAdornment,
+  error = () => null,
+  errorProps = null,
   id,
   loading = false,
   max,
@@ -35,16 +49,28 @@ const WrappedNumberListInput = ({
   preventRender = false,
   primary,
   primaryProps = null,
+  readOnly = false,
   reset = false,
   resetProps = null,
   secondary,
   secondaryProps = null,
   value,
+  onChange = () => null,
   onReset = () => null,
-  ...inputProps
-}: Props) =>
-  preventRender ? null : (
-    <ListItem disabled={disabled}>
+  onError = () => null,
+  ...textFieldProps
+}: Props) => {
+  const theme = useTheme();
+
+  const errorValue = useMemo<string>(() => error(value), [error, value]);
+
+  return preventRender ? null : (
+    <BaseListItem
+      disabled={disabled && !loading}
+      error={errorValue && !disabled && !loading && !readOnly}
+      helperText={errorValue}
+      FormHelperTextProps={errorProps}
+    >
       <BaseListItemText
         id={id}
         primary={primary}
@@ -57,22 +83,51 @@ const WrappedNumberListInput = ({
         <SkeletonListInput />
       ) : (
         <>
-          <ResetListInput id={primary} preventRender={!reset || disabled} onReset={onReset} {...resetProps} />
-          <OutlinedInput
+          <ResetListInput
+            id={primary}
+            preventRender={!reset || disabled || readOnly}
+            onReset={onReset}
+            {...resetProps}
+          />
+          <TextField
+            id={id || primary}
             type="number"
-            margin="dense"
             size="small"
             fullWidth
-            value={value.toString()}
+            value={value?.toString()}
             disabled={disabled}
-            sx={{ maxWidth: '30%' }}
-            inputProps={{ id, min, max }}
-            endAdornment={endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
-            {...inputProps}
+            error={!!errorValue && !readOnly}
+            {...(readOnly && !disabled && { focused: null })}
+            inputProps={{ min: min, max: max }}
+            InputProps={{
+              readOnly: readOnly,
+              endAdornment: endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>
+            }}
+            sx={{
+              maxWidth: '30%',
+              minWidth: '30%',
+              ...(readOnly &&
+                !disabled && {
+                  '& .MuiInputBase-input': { cursor: 'default' },
+                  '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+                  }
+                })
+            }}
+            onChange={event => {
+              let num = Number(event.target.value);
+              num = max ? Math.min(num, max) : num;
+              num = min ? Math.max(num, min) : num;
+              onChange(event, num);
+
+              const err = error(num);
+              if (err) onError(err);
+            }}
+            {...textFieldProps}
           />
         </>
       )}
-    </ListItem>
+    </BaseListItem>
   );
-
+};
 export const NumberListInput = React.memo(WrappedNumberListInput);

@@ -14,8 +14,8 @@ export const ResetListInput: FC<ResetListInputProps> = ({
   preventRender = false,
   onReset,
   ...buttonProps
-}) => (
-  <div style={{ ...(preventRender && { opacity: 0 }) }}>
+}) =>
+  preventRender ? null : (
     <IconButton
       aria-label={`refresh ${id}`}
       type="reset"
@@ -28,5 +28,5 @@ export const ResetListInput: FC<ResetListInputProps> = ({
       }}
       {...buttonProps}
     />
-  </div>
-);
+    // </div>
+  );
