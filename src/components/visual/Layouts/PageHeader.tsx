@@ -10,7 +10,7 @@ import React, { isValidElement } from 'react';
 type TitleActionPartialProps = IconButtonProps & {
   icon: React.ReactNode;
   tooltip?: TooltipProps['title'];
-  tooltipPops?: TooltipProps;
+  tooltipProps?: Omit<TooltipProps, 'children'>;
 };
 
 export type TitleActionProps = ReactNode | TitleActionPartialProps;
@@ -22,13 +22,14 @@ function isValidAction(action: TitleActionProps): action is TitleActionPartialPr
 export type PageHeaderProps = {
   actions?: TitleActionProps[];
   classification?: ClassificationProps['c12n'];
-  classificationProps?: ClassificationProps;
+  classificationProps?: Omit<ClassificationProps, 'c12n' | 'setClassification'>;
   endAdornment?: React.ReactNode;
   loading?: boolean;
-  primary: string;
+  primary: React.ReactNode;
   primaryProps?: TypographyProps;
-  secondary?: string;
+  secondary?: React.ReactNode;
   secondaryProps?: TypographyProps;
+  onClassificationChange?: ClassificationProps['setClassification'];
 };
 
 export const PageHeader: React.FC<PageHeaderProps> = React.memo(
@@ -41,7 +42,8 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
     primary = null,
     primaryProps = null,
     secondary = null,
-    secondaryProps = null
+    secondaryProps = null,
+    onClassificationChange = null
   }: PageHeaderProps) => {
     const theme = useTheme();
 
@@ -49,7 +51,13 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {!classification ? null : (
           <div style={{ paddingBottom: theme.spacing(4) }}>
-            <Classification size="tiny" c12n={loading ? null : classification} {...classificationProps} />
+            <Classification
+              type={!onClassificationChange ? 'pill' : 'picker'}
+              size="tiny"
+              c12n={loading ? null : classification}
+              setClassification={onClassificationChange}
+              {...classificationProps}
+            />
           </div>
         )}
 
@@ -86,30 +94,34 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
             </Typography>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', rowGap: theme.spacing(1) }}>
-            <div>
-              {Array.isArray(actions) && (
-                <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
-                  {actions.map((action, i) => {
-                    if (isValidAction(action)) {
-                      const { icon = null, tooltip = null, tooltipPops, ...iconButtonProps } = action;
-                      return (
-                        <div key={i}>
-                          <Tooltip title={tooltip} placement="bottom" {...tooltipPops}>
-                            <IconButton size="large" {...iconButtonProps}>
-                              {icon}
-                            </IconButton>
-                          </Tooltip>
-                        </div>
-                      );
-                    } else return action;
-                  })}
-                </div>
-              )}
-            </div>
+          {loading ? null : (
+            <div
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', rowGap: theme.spacing(1) }}
+            >
+              <div>
+                {Array.isArray(actions) && (
+                  <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+                    {actions.map((action, i) => {
+                      if (isValidAction(action)) {
+                        const { icon = null, tooltip = null, tooltipProps, ...iconButtonProps } = action;
+                        return (
+                          <div key={i}>
+                            <Tooltip title={tooltip} placement="bottom" {...tooltipProps}>
+                              <IconButton size="large" {...iconButtonProps}>
+                                {icon}
+                              </IconButton>
+                            </Tooltip>
+                          </div>
+                        );
+                      } else return action;
+                    })}
+                  </div>
+                )}
+              </div>
 
-            {endAdornment}
-          </div>
+              {endAdornment}
+            </div>
+          )}
         </div>
       </div>
     );
