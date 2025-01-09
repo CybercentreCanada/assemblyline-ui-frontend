@@ -62,10 +62,12 @@ export const BaseListItemText: FC<BaseListItemTextProps> = ({
   const theme = useTheme();
   return (
     <ListItemText
-      primary={!id ? primary : <label htmlFor={id}>{primary}</label>}
+      primary={
+        <label htmlFor={id || primary.toString()} style={{ cursor: 'pointer' }}>
+          {primary}
+        </label>
+      }
       primaryTypographyProps={{
-        component: 'label',
-        htmlFor: `${id || primary.toString()}`,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',

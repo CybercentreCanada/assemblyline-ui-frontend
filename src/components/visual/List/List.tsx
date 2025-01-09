@@ -16,6 +16,7 @@ export const List: FC<ListProps> = ({
   checkboxPadding = false,
   containerProps,
   listProps,
+  primary,
   primaryProps,
   ...other
 }) => {
@@ -26,7 +27,7 @@ export const List: FC<ListProps> = ({
       style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.5), ...containerProps?.style }}
       {...containerProps}
     >
-      {!primaryProps ? null : <ListHeader primaryProps={primaryProps} {...other} />}
+      {!primary ? null : <ListHeader primary={primary} primaryProps={primaryProps} {...other} />}
 
       <MuiList
         component={props => <Paper {...props} component="ul" />}

@@ -196,9 +196,9 @@ const Service = React.memo(
               key={`${service.name}-${svr_id}`}
               id={`${service.category} - ${service.name}`}
               data-anchor={`${service.category} - ${service.name}`}
+              primary={service.name}
               primaryProps={{
                 id: `${service.category} - ${service.name}`,
-                children: service.name,
                 className: 'Anchor'
               }}
               secondaryProps={{ children: service.description }}
@@ -206,7 +206,7 @@ const Service = React.memo(
               checkboxPadding
               button={customize}
               disabled={!selected}
-              onClick={() => handleChange(selected as boolean)}
+              buttonProps={{ onClick: () => handleChange(selected as boolean) }}
             >
               {(spec?.params || []).map((param, param_id) =>
                 !param.editable && !customize && hidden ? null : (
@@ -300,7 +300,8 @@ const Category = React.memo(
                 key={`${category.name}-${cat_id}`}
                 id={category.name}
                 data-anchor={category.name}
-                primaryProps={{ id: category.name, children: category.name, className: 'Anchor', color: 'primary' }}
+                primary={category.name}
+                primaryProps={{ id: category.name, className: 'Anchor', color: 'primary' }}
                 button={customize}
                 disabled={!selected && !indeterminate}
                 underlined
@@ -308,9 +309,7 @@ const Category = React.memo(
                   checked: selected,
                   indeterminate: indeterminate
                 }}
-                buttonProps={{
-                  onChange: () => handleChange(selected)
-                }}
+                buttonProps={{ onClick: () => handleChange(selected) }}
               />
 
               {category.services.map((service, svr_id) => (

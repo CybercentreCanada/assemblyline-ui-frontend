@@ -41,14 +41,14 @@ export const ListHeader: FC<ListHeaderProps> = ({
   checked = null,
   indeterminate = null,
   preventDefault = false,
-
   ...other
 }) => {
   const theme = useTheme();
 
   return button ? (
-    <ListItem id={id} disableGutters disablePadding disabled={disabled} {...other}>
+    <ListItem key={primary.toString()} id={id} disableGutters disablePadding disabled={disabled} {...other}>
       <ListItemButton
+        role={undefined}
         dense
         disableGutters
         {...buttonProps}
@@ -60,14 +60,22 @@ export const ListHeader: FC<ListHeaderProps> = ({
       >
         {checkboxProps && (
           <ListItemIcon>
-            <Checkbox edge={edge} tabIndex={-1} disableRipple inputProps={{ id: `${id}-input` }} {...checkboxProps} />
+            <Checkbox
+              edge={edge}
+              tabIndex={-1}
+              disableRipple
+              inputProps={{ id: id || primary.toString() }}
+              {...checkboxProps}
+            />
           </ListItemIcon>
         )}
         <ListItemText
-          primary={primary}
+          primary={
+            <label htmlFor={id || primary.toString()} style={{ cursor: 'pointer' }}>
+              {primary}
+            </label>
+          }
           primaryTypographyProps={{
-            htmlFor: `${id}-input`,
-            component: 'label',
             variant: 'body1',
             sx: { '&:hover': { cursor: 'pointer' } },
             ...primaryProps
