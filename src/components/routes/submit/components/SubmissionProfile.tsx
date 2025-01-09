@@ -68,7 +68,7 @@ const WrappedSubmissionProfile = ({ loading = false, disabled = false }: Props) 
             label={t('options.submission.profile_name')}
             labelProps={{ color: 'textPrimary', variant: 'h6', gutterBottom: true }}
             value={profile as string}
-            items={(profileKeys as string[]).sort()}
+            options={(profileKeys as string[]).map(key => ({ label: key.replaceAll('_', ' '), value: key })).sort()}
             loading={loading}
             disabled={disabled}
             displayEmpty={false}

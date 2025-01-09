@@ -32,8 +32,9 @@ export const SubmissionSection = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
       <ListHeader
-        primaryProps={{ children: t('submissions'), id: 'submissions', className: 'Anchor', variant: 'h6' }}
-        secondaryProps={{ children: t('submissions.description') }}
+        primary={t('submissions')}
+        primaryProps={{ id: 'submissions', className: 'Anchor' }}
+        secondary={t('submissions.description')}
       />
 
       <List checkboxPadding>
@@ -85,7 +86,7 @@ export const SubmissionSection = ({
               disabled={disabled || (!customize && !state.value.editable)}
               reset={state.value.default !== null && state.value.value !== state.value.default}
               onBlur={handleBlur}
-              onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
+              onChange={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
               onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
             />
           )}
@@ -105,7 +106,7 @@ export const SubmissionSection = ({
               disabled={disabled || (!customize && !state.value.editable)}
               reset={state.value.default !== null && state.value.value !== state.value.default}
               onBlur={handleBlur}
-              onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
+              onChange={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
               onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
             />
           )}
@@ -123,7 +124,7 @@ export const SubmissionSection = ({
               disabled={disabled || (!customize && !state.value.editable)}
               reset={state.value.default !== null && state.value.value !== state.value.default}
               onBlur={handleBlur}
-              onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
+              onChange={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
               onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
             />
           )}
@@ -141,7 +142,7 @@ export const SubmissionSection = ({
               disabled={disabled || (!customize && !state.value.editable)}
               reset={state.value.default !== null && state.value.value !== state.value.default}
               onBlur={handleBlur}
-              onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
+              onChange={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
               onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
             />
           )}
@@ -159,7 +160,7 @@ export const SubmissionSection = ({
               disabled={disabled || (!customize && !state.value.editable)}
               reset={state.value.default !== null && state.value.value !== state.value.default}
               onBlur={handleBlur}
-              onClick={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
+              onChange={() => handleChange(prev => ({ ...prev, value: !prev.value }))}
               onReset={() => handleChange(prev => ({ ...prev, value: prev.default }))}
             />
           )}

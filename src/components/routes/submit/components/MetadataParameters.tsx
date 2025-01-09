@@ -117,7 +117,9 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   label={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
                   labelProps={{ textTransform: 'capitalize' }}
                   value={(state.value as string) || ''}
-                  items={metadata.validator_params.values as string[]}
+                  options={(metadata.validator_params.values as string[])
+                    .map(key => ({ label: key.replaceAll('_', ' '), value: key }))
+                    .sort()}
                   loading={loading}
                   disabled={disabled}
                   reset={!!state.value}

@@ -65,7 +65,7 @@ export const ExternalSourcesSection = ({
                 value={value}
                 loading={loading}
                 disabled={disabled}
-                onClick={() => {
+                onChange={() => {
                   form.setStore(s => {
                     if (value) s.next.default_external_sources.filter(item => item !== source);
                     else s.next.default_external_sources.push(source);

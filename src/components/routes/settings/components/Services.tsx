@@ -72,7 +72,7 @@ const Parameter = React.memo(
                   disabled={disabled || (!customize && (!selected || !param.editable))}
                   reset={param.default !== null && state.value !== param.default}
                   onBlur={handleBlur}
-                  onChange={handleChange}
+                  onChange={(e, v) => handleChange(v)}
                   onReset={() => handleChange(param.default)}
                 />
               );
@@ -106,7 +106,7 @@ const Parameter = React.memo(
                   disabled={disabled || (!customize && (!selected || !param.editable))}
                   reset={param.default !== null && state.value !== param.default}
                   onBlur={handleBlur}
-                  onClick={() => handleChange(!state.value)}
+                  onChange={() => handleChange(!state.value)}
                   onReset={() => handleChange(param.default)}
                 />
               );
@@ -356,8 +356,9 @@ export const ServicesSection = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
       <ListHeader
-        primaryProps={{ children: t('services'), id: 'services', className: 'Anchor', variant: 'h6' }}
-        secondaryProps={{ children: t('services.description') }}
+        primary={t('services')}
+        secondary={t('services.description')}
+        primaryProps={{ id: 'services', className: 'Anchor' }}
       />
 
       <form.Subscribe

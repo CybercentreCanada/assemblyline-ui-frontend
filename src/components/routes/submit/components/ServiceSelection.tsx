@@ -193,7 +193,7 @@ const Param: React.FC<ParamProps> = ({
                 value={value as string}
                 loading={loading}
                 disabled={disabled || (!customize && !param.editable)}
-                items={param.list}
+                options={param.list.map(key => ({ label: key.replaceAll('_', ' '), value: key })).sort()}
                 reset={value !== param.default}
                 onChange={(event, v) => {
                   form.setStore(s => {
