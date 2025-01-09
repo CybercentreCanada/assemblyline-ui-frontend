@@ -1,49 +1,17 @@
 import { createFormContext } from 'components/core/form/createFormContext';
+import { INPUTS_LIBRARY_STATE, type InputsLibraryState } from 'components/routes/developer/library/sections/Inputs';
+import { LAYOUT_LIBRARY_STATE, type LayoutLibraryState } from 'components/routes/developer/library/sections/Layout';
+import {
+  LIST_INPUTS_LIBRARY_STATE,
+  type ListInputsLibraryState
+} from 'components/routes/developer/library/sections/ListInputs';
 
-type LibraryFormStore = {
-  inputs: {
-    open: boolean;
-    state: {
-      disabled: boolean;
-      loading: boolean;
-      reset: boolean;
-      tooltip: boolean;
-      error: boolean;
-      readOnly: boolean;
-    };
-    values: {
-      text: string;
-      number: number;
-      date: string;
-      select: string;
-      checkbox: boolean;
-      switch: boolean;
-      slider: number;
-    };
-  };
-};
+type LibraryFormStore = ListInputsLibraryState & InputsLibraryState & LayoutLibraryState;
 
 const LIBRARY_FORM_STORE: LibraryFormStore = Object.freeze({
-  inputs: {
-    open: false,
-    state: {
-      disabled: false,
-      loading: false,
-      reset: false,
-      tooltip: false,
-      error: false,
-      readOnly: false
-    },
-    values: {
-      text: '',
-      number: 0,
-      date: '',
-      select: '',
-      checkbox: false,
-      switch: false,
-      slider: 0
-    }
-  }
+  ...INPUTS_LIBRARY_STATE,
+  ...LAYOUT_LIBRARY_STATE,
+  ...LIST_INPUTS_LIBRARY_STATE
 });
 
 export const { FormProvider, useForm } = createFormContext<LibraryFormStore>({
