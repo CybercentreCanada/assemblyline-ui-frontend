@@ -1,5 +1,5 @@
 import type { AutocompleteProps, FormHelperTextProps, IconButtonProps, ListItemTextProps } from '@mui/material';
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, TextField, useTheme } from '@mui/material';
 import type { ElementType } from 'react';
 import React, { useMemo } from 'react';
 import { BaseListItem, BaseListItemText } from './components/BaseListInput';
@@ -64,6 +64,8 @@ const WrappedTextListInput = <
   onError = () => null,
   ...autocompleteProps
 }: Props<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
+  const theme = useTheme();
+
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
@@ -118,7 +120,7 @@ const WrappedTextListInput = <
                     sx: {
                       '& .MuiInputBase-input': { cursor: 'default' },
                       '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(255, 255, 255, 0.23)'
+                        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
                       }
                     }
                   })}
