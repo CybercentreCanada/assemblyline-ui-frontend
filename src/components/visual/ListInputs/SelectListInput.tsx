@@ -39,7 +39,7 @@ const WrappedSelectListInput = ({
   error = () => null,
   errorProps = null,
   hasEmpty = false,
-  id,
+  id = null,
   loading = false,
   options = [],
   preventRender = false,
@@ -80,7 +80,7 @@ const WrappedSelectListInput = ({
       ) : (
         <>
           <ResetListInput
-            id={primary}
+            id={id || primary}
             preventRender={!reset || disabled || readOnly}
             onReset={onReset}
             {...resetProps}
@@ -105,7 +105,7 @@ const WrappedSelectListInput = ({
                 })
             }}
             value={value}
-            inputProps={{ id, style: { color: 'textPrimary' } }}
+            inputProps={{ id: id || primary, style: { color: 'textPrimary' } }}
             onChange={event => {
               onChange(event, event.target.value as string);
 

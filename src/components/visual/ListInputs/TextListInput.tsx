@@ -47,7 +47,7 @@ const WrappedTextListInput = <
   disabled = false,
   error = () => null,
   errorProps = null,
-  id,
+  id = null,
   loading = false,
   options = [],
   preventRender = false,
@@ -88,7 +88,7 @@ const WrappedTextListInput = <
       ) : (
         <>
           <ResetListInput
-            id={primary}
+            id={id || primary}
             preventRender={!reset || disabled || readOnly}
             onReset={onReset}
             {...resetProps}
@@ -113,6 +113,7 @@ const WrappedTextListInput = <
             }}
             renderInput={({ inputProps, ...params }) => (
               <TextField
+                variant="outlined"
                 error={!!errorValue && !readOnly}
                 {...(readOnly &&
                   !disabled && {
@@ -125,7 +126,7 @@ const WrappedTextListInput = <
                     }
                   })}
                 {...params}
-                inputProps={{ ...inputProps, id }}
+                inputProps={{ ...inputProps, id: id || primary }}
               />
             )}
             {...autocompleteProps}

@@ -42,7 +42,7 @@ const WrappedNumberListInput = ({
   endAdornment,
   error = () => null,
   errorProps = null,
-  id,
+  id = null,
   loading = false,
   max,
   min,
@@ -84,13 +84,12 @@ const WrappedNumberListInput = ({
       ) : (
         <>
           <ResetListInput
-            id={primary}
+            id={id || primary}
             preventRender={!reset || disabled || readOnly}
             onReset={onReset}
             {...resetProps}
           />
           <TextField
-            id={id || primary}
             type="number"
             size="small"
             fullWidth
@@ -98,7 +97,7 @@ const WrappedNumberListInput = ({
             disabled={disabled}
             error={!!errorValue && !readOnly}
             {...(readOnly && !disabled && { focused: null })}
-            inputProps={{ min: min, max: max }}
+            inputProps={{ id: id || primary, min: min, max: max }}
             InputProps={{
               readOnly: readOnly,
               endAdornment: endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>

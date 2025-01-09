@@ -32,7 +32,7 @@ const WrappedClassificationListInput = ({
   disabled = false,
   error = () => null,
   errorProps = null,
-  id,
+  id = null,
   loading = false,
   preventRender = false,
   primary,
@@ -70,7 +70,7 @@ const WrappedClassificationListInput = ({
       ) : (
         <>
           <ResetListInput
-            id={primary}
+            id={id || primary}
             preventRender={!reset || disabled || readOnly}
             onReset={onReset}
             {...resetProps}

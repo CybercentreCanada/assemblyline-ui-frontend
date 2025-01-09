@@ -29,7 +29,7 @@ const WrappedBooleanListInput = ({
   disabled = false,
   error = () => null,
   errorProps = null,
-  id,
+  id = null,
   loading = false,
   preventRender = false,
   primary,
@@ -78,12 +78,12 @@ const WrappedBooleanListInput = ({
           ) : (
             <>
               <ResetListInput
-                id={primary}
+                id={id || primary}
                 preventRender={!reset || disabled || readOnly}
                 onReset={onReset}
                 {...resetProps}
               />
-              <Switch checked={value} edge="end" inputProps={{ id }} />
+              <Switch checked={value} edge="end" inputProps={{ id: id || primary }} />
             </>
           )}
         </div>
