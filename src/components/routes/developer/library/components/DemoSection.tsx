@@ -1,6 +1,7 @@
 import { Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import makeStyles from '@mui/styles/makeStyles';
+import { Anchor } from 'components/core/tableofcontent/Anchor';
 import React from 'react';
 
 export const useStyles = makeStyles(theme => ({
@@ -32,7 +33,9 @@ export const DemoSection: React.FC<DemoSectionProps> = React.memo(
       <div className={classes.main}>
         <div className={classes.container}>
           <div>
-            <Typography variant="h6">{primary}</Typography>
+            <Typography component={Anchor} variant="h6">
+              {primary}
+            </Typography>
             <Typography color="textSecondary" variant="body2">
               {secondary}
             </Typography>
