@@ -64,6 +64,7 @@ const LibraryContent = () => {
                   options={sections.map(section => ({ primary: section.name }))}
                   render={({ primary, ...params }, i, NavItem) => (
                     <ActiveAnchor
+                      key={`${primary}-${i}`}
                       anchor={primary}
                       children={isActive => (
                         <form.Subscribe
