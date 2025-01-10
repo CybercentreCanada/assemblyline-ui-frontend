@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'reac
 
 export type TableOfContentStore = {
   active?: string;
-  anchors?: string[];
+  anchors?: { name: string; level: number }[];
 };
 
 const TABLE_OF_CONTENT_STORE: TableOfContentStore = Object.freeze({
@@ -20,8 +20,10 @@ export type TableOfContentContextProps = {
   headerRef: React.MutableRefObject<HTMLDivElement>;
   loadAnchors: () => void;
   scrollTo: (event: React.SyntheticEvent, anchor: string) => void;
-  Anchors: React.FC<{
-    children: (anchors: TableOfContentStore['anchors'], active: TableOfContentStore['active']) => React.ReactNode;
+  Anchors: React.FC<{ children: (anchors: TableOfContentStore['anchors']) => React.ReactNode }>;
+  ActiveAnchor: React.FC<{
+    anchor: TableOfContentStore['active'];
+    children: (active: boolean) => React.ReactNode;
   }>;
 };
 
@@ -46,14 +48,14 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
     const Anchors = useMemo<TableOfContentContextProps['Anchors']>(
       () =>
         ({ children: render }) =>
-          (
-            <form.Subscribe
-              selector={state => [state.values.anchors, state.values.active]}
-              children={([anchors, active]) =>
-                render(anchors as TableOfContentStore['anchors'], active as TableOfContentStore['active'])
-              }
-            />
-          ),
+          <form.Subscribe selector={state => state.values.anchors} children={anchors => render(anchors)} />,
+      [form]
+    );
+
+    const ActiveAnchor = useMemo<TableOfContentContextProps['ActiveAnchor']>(
+      () =>
+        ({ anchor, children: render }) =>
+          <form.Subscribe selector={state => anchor === state.values.active} children={active => render(active)} />,
       [form]
     );
 
@@ -63,7 +65,7 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
 
         s.anchors = [];
         elements.forEach(element => {
-          s.anchors.push(element.textContent);
+          s.anchors.push({ name: element.textContent, level: Number(element.getAttribute('data-anchor-level')) });
         });
 
         return s;
@@ -118,7 +120,7 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
     }, [form, isElementInViewport]);
 
     return (
-      <TableOfContentContext.Provider value={{ rootRef, headerRef, loadAnchors, scrollTo, Anchors }}>
+      <TableOfContentContext.Provider value={{ rootRef, headerRef, loadAnchors, scrollTo, Anchors, ActiveAnchor }}>
         {children}
       </TableOfContentContext.Provider>
     );

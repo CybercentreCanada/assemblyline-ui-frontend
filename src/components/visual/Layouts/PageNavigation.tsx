@@ -68,7 +68,7 @@ const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((props: 
           id={id || primary}
           sx={{
             paddingLeft: theme.spacing(3),
-            paddingRight: 0,
+            // paddingRight: 0,
             ...(!active && { marginLeft: '1px' }),
             ...(variant === 'left' && {
               borderRadius: '0 18px 18px  0',

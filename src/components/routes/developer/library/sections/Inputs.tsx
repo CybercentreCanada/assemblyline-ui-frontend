@@ -30,7 +30,6 @@ export const useStyles = makeStyles(theme => ({
 export type InputsLibraryState = {
   inputs: {
     name: string;
-    sections: string[];
     state: {
       disabled: boolean;
       loading: boolean;
@@ -54,7 +53,6 @@ export type InputsLibraryState = {
 export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
   inputs: {
     name: 'Inputs',
-    sections: ['basic', 'controlled', 'disabled'],
     state: {
       disabled: false,
       loading: false,

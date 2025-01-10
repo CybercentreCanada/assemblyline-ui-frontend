@@ -17,7 +17,6 @@ import React from 'react';
 export type ListInputsLibraryState = {
   list_inputs: {
     name: string;
-    sections: string[];
     state: {
       disabled: boolean;
       loading: boolean;
@@ -42,7 +41,6 @@ export type ListInputsLibraryState = {
 export const LIST_INPUTS_LIBRARY_STATE: ListInputsLibraryState = {
   list_inputs: {
     name: 'List Inputs',
-    sections: ['basic', 'controlled', 'disabled'],
     state: {
       disabled: false,
       loading: false,

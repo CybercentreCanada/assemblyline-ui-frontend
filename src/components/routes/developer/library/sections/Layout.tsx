@@ -14,7 +14,6 @@ import React from 'react';
 export type LayoutLibraryState = {
   layout: {
     name: string;
-    sections: string[];
     values: {
       classification: string;
       sectionOpen: boolean;
@@ -24,7 +23,6 @@ export type LayoutLibraryState = {
 export const LAYOUT_LIBRARY_STATE: LayoutLibraryState = {
   layout: {
     name: 'Layout',
-    sections: ['basic', 'controlled', 'disabled'],
     values: {
       classification: 'TLP:C',
       sectionOpen: true

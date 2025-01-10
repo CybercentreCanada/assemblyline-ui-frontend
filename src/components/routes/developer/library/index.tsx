@@ -10,7 +10,7 @@ import { ListSection } from './sections/List';
 import { ListInputsSection } from './sections/ListInputs';
 
 const LibraryContent = () => {
-  const { rootRef, headerRef, Anchors, scrollTo } = useTableOfContent();
+  const { rootRef, headerRef, Anchors, ActiveAnchor, scrollTo } = useTableOfContent();
   const form = useForm();
 
   return (
@@ -45,6 +45,7 @@ const LibraryContent = () => {
                     />
                   )}
                   onPageNavigation={(event, { id }) => {
+                    rootRef.current.scrollTo({ top: 0, behavior: 'instant' });
                     form.setStore(s => {
                       s.state.active = id as any;
                       return s;
@@ -56,16 +57,21 @@ const LibraryContent = () => {
           }
           rightNav={
             <Anchors
-              children={(sections, activeSection) => (
+              children={sections => (
                 <PageNavigation
                   subheader="CONTENT"
                   variant="right"
-                  options={sections.map(section => ({ primary: section }))}
+                  options={sections.map(section => ({ primary: section.name }))}
                   render={({ primary, ...params }, i, NavItem) => (
-                    <form.Subscribe
-                      key={`${primary}-${i}`}
-                      selector={state => state}
-                      children={() => <NavItem primary={primary} active={primary === activeSection} {...params} />}
+                    <ActiveAnchor
+                      anchor={primary}
+                      children={isActive => (
+                        <form.Subscribe
+                          key={`${primary}-${i}`}
+                          selector={state => state}
+                          children={() => <NavItem primary={primary} active={isActive} {...params} />}
+                        />
+                      )}
                     />
                   )}
                   onPageNavigation={(event, { primary }) => scrollTo(event, primary)}
