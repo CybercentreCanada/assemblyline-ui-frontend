@@ -61,11 +61,11 @@ const LibraryContent = () => {
                 <PageNavigation
                   subheader="CONTENT"
                   variant="right"
-                  options={sections.map(section => ({ primary: section.name }))}
+                  options={sections.map(({ label, level }) => ({ primary: label, subheader: level === 1 }))}
                   render={({ primary, ...params }, i, NavItem) => (
                     <ActiveAnchor
                       key={`${primary}-${i}`}
-                      anchor={primary}
+                      anchorIndex={i}
                       children={isActive => (
                         <form.Subscribe
                           key={`${primary}-${i}`}

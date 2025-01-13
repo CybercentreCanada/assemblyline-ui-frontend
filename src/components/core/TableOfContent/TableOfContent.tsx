@@ -2,8 +2,8 @@ import { createFormContext } from 'components/core/form/createFormContext';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 
 export type TableOfContentStore = {
-  active?: string;
-  anchors?: { name: string; level: number }[];
+  active?: number;
+  anchors?: { label: string; level: number }[];
 };
 
 const TABLE_OF_CONTENT_STORE: TableOfContentStore = Object.freeze({
@@ -22,7 +22,7 @@ export type TableOfContentContextProps = {
   scrollTo: (event: React.SyntheticEvent, anchor: string) => void;
   Anchors: React.FC<{ children: (anchors: TableOfContentStore['anchors']) => React.ReactNode }>;
   ActiveAnchor: React.FC<{
-    anchor: TableOfContentStore['active'];
+    anchorIndex: TableOfContentStore['active'];
     children: (active: boolean) => React.ReactNode;
   }>;
 };
@@ -54,8 +54,13 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
 
     const ActiveAnchor = useMemo<TableOfContentContextProps['ActiveAnchor']>(
       () =>
-        ({ anchor, children: render }) =>
-          <form.Subscribe selector={state => anchor === state.values.active} children={active => render(active)} />,
+        ({ anchorIndex, children: render }) =>
+          (
+            <form.Subscribe
+              selector={state => anchorIndex === state.values.active}
+              children={active => render(active)}
+            />
+          ),
       [form]
     );
 
@@ -65,7 +70,7 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
 
         s.anchors = [];
         elements.forEach(element => {
-          s.anchors.push({ name: element.textContent, level: Number(element.getAttribute('data-anchor-level')) });
+          s.anchors.push({ label: element.textContent, level: Number(element.getAttribute('data-anchor-level')) });
         });
 
         return s;
@@ -104,7 +109,7 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
         for (let i = 0; i < elements.length; i++) {
           if (isElementInViewport(elements.item(i))) {
             form.setStore(s => {
-              s.active = elements.item(i).textContent;
+              s.active = i;
               return s;
             });
             break;
