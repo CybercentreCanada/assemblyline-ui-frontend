@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { useTableOfContent } from './TableOfContent';
 
-export type AnchorProps = {
+export type AnchorProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
   anchor?: string;
-  level?: number;
-  children?: React.ReactNode;
+  label?: string;
+  subheader?: boolean;
 };
 
 export const Anchor: React.FC<AnchorProps> = React.memo(
-  ({ anchor = null, level = 1, children = null, ...props }: AnchorProps) => {
+  ({ anchor = null, label = null, subheader = false, children = null, ...props }: AnchorProps) => {
     const { loadAnchors } = useTableOfContent();
 
     useEffect(() => {
@@ -16,7 +16,13 @@ export const Anchor: React.FC<AnchorProps> = React.memo(
     }, [loadAnchors]);
 
     return (
-      <div data-anchor={anchor || children.toString()} data-anchor-level={level} {...props}>
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      <div
+        data-anchor={anchor || children.toString()}
+        data-anchor-label={label || children.toString()}
+        data-anchor-subheader={subheader}
+        {...props}
+      >
         {children}
       </div>
     );

@@ -61,7 +61,7 @@ const LibraryContent = () => {
                 <PageNavigation
                   subheader="CONTENT"
                   variant="right"
-                  options={sections.map(({ label, level }) => ({ primary: label, subheader: level === 1 }))}
+                  options={sections.map(({ id, label, subheader }) => ({ id, primary: label, subheader }))}
                   render={({ primary, ...params }, i, NavItem) => (
                     <ActiveAnchor
                       key={`${primary}-${i}`}
@@ -75,7 +75,7 @@ const LibraryContent = () => {
                       )}
                     />
                   )}
-                  onPageNavigation={(event, { primary }) => scrollTo(event, primary)}
+                  onPageNavigation={(event, { id }) => scrollTo(event, id)}
                 />
               )}
             />

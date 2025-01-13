@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'reac
 
 export type TableOfContentStore = {
   active?: number;
-  anchors?: { label: string; level: number }[];
+  anchors?: { id: string; label: string; subheader: boolean }[];
 };
 
 const TABLE_OF_CONTENT_STORE: TableOfContentStore = Object.freeze({
@@ -70,7 +70,11 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
 
         s.anchors = [];
         elements.forEach(element => {
-          s.anchors.push({ label: element.textContent, level: Number(element.getAttribute('data-anchor-level')) });
+          s.anchors.push({
+            id: element.getAttribute('data-anchor'),
+            label: element.getAttribute('data-anchor-label'),
+            subheader: element.getAttribute('data-anchor-subheader') === 'true'
+          });
         });
 
         return s;
@@ -106,8 +110,11 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
 
       const handler = () => {
         const elements = rootRef.current?.querySelectorAll('[data-anchor]');
-        for (let i = 0; i < elements.length; i++) {
-          if (isElementInViewport(elements.item(i))) {
+        for (let i = elements.length - 1; i >= 0; i--) {
+          if (
+            elements.item(i).getBoundingClientRect().top - 2 <=
+            rootElement.getBoundingClientRect().top + headerRef.current.getBoundingClientRect().height
+          ) {
             form.setStore(s => {
               s.active = i;
               return s;

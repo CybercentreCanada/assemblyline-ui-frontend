@@ -1,6 +1,5 @@
 import { Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
-import makeStyles from '@mui/styles/makeStyles';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
 import { useForm } from 'components/routes/development/library/contexts/form';
@@ -11,21 +10,9 @@ import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SliderInput } from 'components/visual/Inputs/SliderInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
+import { PageSection } from 'components/visual/Layouts/PageSection';
 import MonacoEditor from 'components/visual/MonacoEditor';
 import React from 'react';
-
-export const useStyles = makeStyles(theme => ({
-  main: {
-    display: 'flex',
-    flexDirection: 'column',
-    rowGap: theme.spacing(8)
-  },
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    rowGap: theme.spacing(3)
-  }
-}));
 
 export type InputsLibraryState = {
   inputs: {
@@ -75,12 +62,12 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
 
 export const InputsSection = React.memo(() => {
   const theme = useTheme();
-  const classes = useStyles();
   const form = useForm();
 
   return (
     <DemoContainer>
       <DemoSection
+        id={'Basic Example'}
         primary={'Basic Example'}
         secondary={
           <>
@@ -263,14 +250,11 @@ export const InputsSection = React.memo(() => {
         }
       />
 
-      <div className={classes.container}>
-        <div>
-          <Typography variant="h6">{'Controlled'}</Typography>
-          <Typography color="textSecondary" variant="body2">
-            <span>{'Input components are controlled by default. '}</span>
-          </Typography>
-        </div>
-
+      <PageSection
+        primary={'Controlled'}
+        secondary={<span>{'Input components are controlled by default. '}</span>}
+        anchor
+      >
         <Grid container spacing={2}>
           <Grid md={6} xs={12}>
             <form.Subscribe
@@ -536,19 +520,18 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
         </Grid>
-      </div>
+      </PageSection>
 
-      <div className={classes.container}>
-        <div>
-          <Typography variant="h6">{'Disabled'}</Typography>
-          <Typography color="textSecondary" variant="body2">
+      <DemoSection
+        primary={'Disabled'}
+        secondary={
+          <>
             <span>{'The disabled prop stops the user from making changes. '}</span>
             <span>{'Note: the label should also be the disabled color.'}</span>
-          </Typography>
-        </div>
-
-        <Grid container spacing={2}>
-          <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+          </>
+        }
+        left={
+          <>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.text}
               children={value => (
@@ -672,82 +655,81 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-          </Grid>
-          <Grid md={6} xs={12} sx={{ display: 'flex', minHeight: '500px' }}>
-            <MonacoEditor
-              language="javascript"
-              value={`<>
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
   <TextInput
-    label="Disabled Text Input"
-    value={value}
-    disabled
-    onChange={(event, next) => {}}
+  label="Disabled Text Input"
+  value={value}
+  disabled
+  onChange={(event, next) => {}}
   />
 
   <NumberInput
-    label="Disabled Number Input"
-    value={value}
-    disabled
-    onChange={(event, next) => {}}
+  label="Disabled Number Input"
+  value={value}
+  disabled
+  onChange={(event, next) => {}}
   />
 
   <SelectInput
-    label="Disabled Select Input"
-    value={value}
-    disabled
-    options={[
-      { label: 'Options 1', value: 'option 1' },
-      { label: 'Options 2', value: 'option 2' },
-      { label: 'Options 3', value: 'option 3' }
-    ]}
-    onChange={(event, next) => {}}
+  label="Disabled Select Input"
+  value={value}
+  disabled
+  options={[
+    { label: 'Options 1', value: 'option 1' },
+    { label: 'Options 2', value: 'option 2' },
+    { label: 'Options 3', value: 'option 3' }
+  ]}
+  onChange={(event, next) => {}}
   />
 
   <DateInput
-    label="Disabled Date Input"
-    value={value}
-    disabled
-    onChange={next => {}}
+  label="Disabled Date Input"
+  value={value}
+  disabled
+  onChange={next => {}}
   />
 
   <SliderInput
-    label="Disabled Slider Input"
-    value={value}
-    disabled
-    onChange={(event, next) => {}}
+  label="Disabled Slider Input"
+  value={value}
+  disabled
+  onChange={(event, next) => {}}
   />
 
   <CheckboxInput
-    label="Disabled Checkbox Input"
-    value={value}
-    disabled
-    onChange={(event, next) => {}}
+  label="Disabled Checkbox Input"
+  value={value}
+  disabled
+  onChange={(event, next) => {}}
   />
 
   <SwitchInput
-    label="Disabled Switch Input"
-    value={value}
-    disabled
-    onChange={(event, next) => {}}
+  label="Disabled Switch Input"
+  value={value}
+  disabled
+  onChange={(event, next) => {}}
   />
 </>`}
-            />
-          </Grid>
-        </Grid>
-      </div>
+          />
+        }
+      />
 
-      <div className={classes.container}>
-        <div>
-          <Typography variant="h6">{'Loading'}</Typography>
-          <Typography color="textSecondary" variant="body2">
+      <DemoSection
+        primary={'Loading'}
+        secondary={
+          <>
             <span>
               {'All inputs have a loading state that can be set using the loading prop and prevents value change. '}
             </span>
-          </Typography>
-        </div>
-
-        <Grid container spacing={2}>
-          <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+          </>
+        }
+        left={
+          <>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.text}
               children={value => (
@@ -871,81 +853,80 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-          </Grid>
-          <Grid md={6} xs={12} sx={{ display: 'flex', minHeight: '500px' }}>
-            <MonacoEditor
-              language="javascript"
-              value={`<>
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
   <TextInput
-    label="Loading Text Input"
-    value={value}
-    loading
-    onChange={(event, next) => {}}
+  label="Loading Text Input"
+  value={value}
+  loading
+  onChange={(event, next) => {}}
   />
 
   <NumberInput
-    label="Loading Number Input"
-    value={value}
-    loading
-    onChange={(event, next) => {}}
+  label="Loading Number Input"
+  value={value}
+  loading
+  onChange={(event, next) => {}}
   />
 
   <SelectInput
-    label="Loading Select Input"
-    value={value}
-    loading
-    options={[
-      { label: 'Options 1', value: 'option 1' },
-      { label: 'Options 2', value: 'option 2' },
-      { label: 'Options 3', value: 'option 3' }
-    ]}
-    onChange={(event, next) => {}}
+  label="Loading Select Input"
+  value={value}
+  loading
+  options={[
+    { label: 'Options 1', value: 'option 1' },
+    { label: 'Options 2', value: 'option 2' },
+    { label: 'Options 3', value: 'option 3' }
+  ]}
+  onChange={(event, next) => {}}
   />
 
   <DateInput
-    label="Loading Date Input"
-    value={value}
-    loading
-    onChange={next => {}}
+  label="Loading Date Input"
+  value={value}
+  loading
+  onChange={next => {}}
   />
 
   <SliderInput
-    label="Loading Slider Input"
-    value={value}
-    loading
-    onChange={(event, next) => {}}
+  label="Loading Slider Input"
+  value={value}
+  loading
+  onChange={(event, next) => {}}
   />
 
   <CheckboxInput
-    label="Loading Checkbox Input"
-    value={value}
-    loading
-    onChange={(event, next) => {}}
+  label="Loading Checkbox Input"
+  value={value}
+  loading
+  onChange={(event, next) => {}}
   />
 
   <SwitchInput
-    label="Loading Switch Input"
-    value={value}
-    loading
-    onChange={(event, next) => {}}
+  label="Loading Switch Input"
+  value={value}
+  loading
+  onChange={(event, next) => {}}
   />
 </>`}
-            />
-          </Grid>
-        </Grid>
-      </div>
+          />
+        }
+      />
 
-      <div className={classes.container}>
-        <div>
-          <Typography variant="h6">{'Reset'}</Typography>
-          <Typography color="textSecondary" variant="body2">
+      <DemoSection
+        primary={'Reset'}
+        secondary={
+          <>
             <span>{'All inputs implements a reset button which the button can be made visible '}</span>
             <span>{'via the reset prop. Handle the reset change can be made using the onReset event handle.'}</span>
-          </Typography>
-        </div>
-
-        <Grid container spacing={2}>
-          <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+          </>
+        }
+        left={
+          <>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.text}
               children={value => (
@@ -1111,11 +1092,12 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-          </Grid>
-          <Grid md={6} xs={12} sx={{ display: 'flex', minHeight: '500px' }}>
-            <MonacoEditor
-              language="javascript"
-              value={`<>
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
   <TextInput
     label="Reset Text Input"
     value={value}
@@ -1177,21 +1159,19 @@ export const InputsSection = React.memo(() => {
     onReset={() => {}}
   />
 </>`}
-            />
-          </Grid>
-        </Grid>
-      </div>
+          />
+        }
+      />
 
-      <div className={classes.container}>
-        <div>
-          <Typography variant="h6">{'Tooltip'}</Typography>
-          <Typography color="textSecondary" variant="body2">
+      <DemoSection
+        primary={'Tooltip'}
+        secondary={
+          <>
             <span>{'Hovering the label should open a tooltip.'}</span>
-          </Typography>
-        </div>
-
-        <Grid container spacing={2}>
-          <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+          </>
+        }
+        left={
+          <>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.text}
               children={value => (
@@ -1208,7 +1188,6 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-
             <form.Subscribe
               selector={state => state.values.components.inputs.values.number}
               children={value => (
@@ -1225,7 +1204,6 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-
             <form.Subscribe
               selector={state => state.values.components.inputs.values.select}
               children={value => (
@@ -1247,7 +1225,6 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-
             <form.Subscribe
               selector={state => state.values.components.inputs.values.date}
               children={value => (
@@ -1264,7 +1241,6 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-
             <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
@@ -1281,7 +1257,6 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-
             <form.Subscribe
               selector={state => state.values.components.inputs.values.checkbox}
               children={value => (
@@ -1298,7 +1273,6 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-
             <form.Subscribe
               selector={state => state.values.components.inputs.values.switch}
               children={value => (
@@ -1315,84 +1289,83 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-          </Grid>
-          <Grid md={6} xs={12} sx={{ display: 'flex', minHeight: '500px' }}>
-            <MonacoEditor
-              language="javascript"
-              value={`<>
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
   <TextInput
-    label="Tooltip Text Input"
-    tooltip="Tooltip Text Input"
-    value={value}
-    onChange={(event, next) => {}}
+  label="Tooltip Text Input"
+  tooltip="Tooltip Text Input"
+  value={value}
+  onChange={(event, next) => {}}
   />
 
   <NumberInput
-    label="Tooltip Number Input"
-    tooltip="Tooltip Number Input"
-    value={value}
-    onChange={(event, next) => {}}
+  label="Tooltip Number Input"
+  tooltip="Tooltip Number Input"
+  value={value}
+  onChange={(event, next) => {}}
   />
 
   <SelectInput
-    label="Tooltip Select Input"
-    tooltip="Tooltip Select Input"
-    value={value}
-    options={[
-      { label: 'Options 1', value: 'option 1' },
-      { label: 'Options 2', value: 'option 2' },
-      { label: 'Options 3', value: 'option 3' }
-    ]}
-    onChange={(event, next) => {}}
+  label="Tooltip Select Input"
+  tooltip="Tooltip Select Input"
+  value={value}
+  options={[
+    { label: 'Options 1', value: 'option 1' },
+    { label: 'Options 2', value: 'option 2' },
+    { label: 'Options 3', value: 'option 3' }
+  ]}
+  onChange={(event, next) => {}}
   />
 
   <DateInput
-    label="Tooltip Date Input"
-    tooltip="Tooltip Date Input"
-    value={value}
-    onChange={next => {}}
+  label="Tooltip Date Input"
+  tooltip="Tooltip Date Input"
+  value={value}
+  onChange={next => {}}
   />
 
   <SliderInput
-    label="Tooltip Slider Input"
-    tooltip="Tooltip Slider Input"
-    value={value}
-    onChange={(event, next) => {}}
+  label="Tooltip Slider Input"
+  tooltip="Tooltip Slider Input"
+  value={value}
+  onChange={(event, next) => {}}
   />
 
   <CheckboxInput
-    label="Tooltip Checkbox Input"
-    tooltip="Tooltip Checkbox Input"
-    value={value}
-    onChange={(event, next) => {}}
+  label="Tooltip Checkbox Input"
+  tooltip="Tooltip Checkbox Input"
+  value={value}
+  onChange={(event, next) => {}}
   />
 
   <SwitchInput
-    label="Tooltip Switch Input"
-    tooltip="Tooltip Switch Input"
-    value={value}
-    onChange={(event, next) => {}}
+  label="Tooltip Switch Input"
+  tooltip="Tooltip Switch Input"
+  value={value}
+  onChange={(event, next) => {}}
   />
 </>`}
-            />
-          </Grid>
-        </Grid>
-      </div>
+          />
+        }
+      />
 
-      <div className={classes.container}>
-        <div>
-          <Typography variant="h6">{'Error'}</Typography>
-          <Typography color="textSecondary" variant="body2">
+      <DemoSection
+        primary={'Error'}
+        secondary={
+          <>
             <span>
               {'Error prop takes a function that evaluates the value. If that function returns an error message, '}
             </span>
             <span>{"it will trigger the input' error state and show that message in the helper text. "}</span>
             <span>{"There's also the onError event handler that triggers when an error is detected."}</span>
-          </Typography>
-        </div>
-
-        <Grid container spacing={2}>
-          <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+          </>
+        }
+        left={
+          <>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.text}
               children={value => (
@@ -1409,7 +1382,6 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-
             <form.Subscribe
               selector={state => state.values.components.inputs.values.number}
               children={value => (
@@ -1426,7 +1398,6 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-
             <form.Subscribe
               selector={state => state.values.components.inputs.values.select}
               children={value => (
@@ -1448,7 +1419,6 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-
             <form.Subscribe
               selector={state => state.values.components.inputs.values.date}
               children={value => (
@@ -1465,7 +1435,6 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-
             <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
@@ -1482,7 +1451,6 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-
             <form.Subscribe
               selector={state => state.values.components.inputs.values.checkbox}
               children={value => (
@@ -1499,7 +1467,6 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-
             <form.Subscribe
               selector={state => state.values.components.inputs.values.switch}
               children={value => (
@@ -1516,91 +1483,90 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-          </Grid>
-          <Grid md={6} xs={12} sx={{ display: 'flex', minHeight: '500px' }}>
-            <MonacoEditor
-              language="javascript"
-              value={`<>
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
   <TextInput
-    label="Error Text Input"
-    value={value}
-    error={v => (v !== '' ? null : 'Input field cannot be empty')}
-    onChange={(event, next) => {}}
-    onError={error => {}}
+  label="Error Text Input"
+  value={value}
+  error={v => (v !== '' ? null : 'Input field cannot be empty')}
+  onChange={(event, next) => {}}
+  onError={error => {}}
   />
 
   <NumberInput
-    label="Error Number Input"
-    value={value}
-    error={v => (v !== 0 ? null : 'Input field cannot be 0')}
-    onChange={(event, next) => {}}
-    onError={error => {}}
+  label="Error Number Input"
+  value={value}
+  error={v => (v !== 0 ? null : 'Input field cannot be 0')}
+  onChange={(event, next) => {}}
+  onError={error => {}}
   />
 
   <SelectInput
-    label="Error Select Input"
-    value={value}
-    options={[
-      { label: 'Options 1', value: 'option 1' },
-      { label: 'Options 2', value: 'option 2' },
-      { label: 'Options 3', value: 'option 3' }
-    ]}
-    error={v => (v !== '' ? null : 'Input field cannot be null')}
-    onChange={(event, next) => {}}
-    onError={error => {}}
+  label="Error Select Input"
+  value={value}
+  options={[
+    { label: 'Options 1', value: 'option 1' },
+    { label: 'Options 2', value: 'option 2' },
+    { label: 'Options 3', value: 'option 3' }
+  ]}
+  error={v => (v !== '' ? null : 'Input field cannot be null')}
+  onChange={(event, next) => {}}
+  onError={error => {}}
   />
 
   <DateInput
-    label="Error Date Input"
-    value={value}
-    error={v => (v !== null ? null : 'Input field cannot be null')}
-    onChange={next => {}}
-    onError={error => {}}
+  label="Error Date Input"
+  value={value}
+  error={v => (v !== null ? null : 'Input field cannot be null')}
+  onChange={next => {}}
+  onError={error => {}}
   />
 
   <SliderInput
-    label="Error Slider Input"
-    value={value}
-    error={v => (v !== 0 ? null : 'Input field cannot be 0')}
-    onChange={(event, next) => {}}
-    onError={error => {}}
+  label="Error Slider Input"
+  value={value}
+  error={v => (v !== 0 ? null : 'Input field cannot be 0')}
+  onChange={(event, next) => {}}
+  onError={error => {}}
   />
 
   <CheckboxInput
-    label="Error Checkbox Input"
-    value={value}
-    error={v => (v !== false ? null : 'Input field cannot be false')}
-    onChange={(event, next) => {}}
-    onError={error => {}}
+  label="Error Checkbox Input"
+  value={value}
+  error={v => (v !== false ? null : 'Input field cannot be false')}
+  onChange={(event, next) => {}}
+  onError={error => {}}
   />
 
   <SwitchInput
-    label="Error Switch Input"
-    value={value}
-    error={v => (v !== false ? null : 'Input field cannot be false')}
-    onChange={(event, next) => {}}
-    onError={error => {}}
+  label="Error Switch Input"
+  value={value}
+  error={v => (v !== false ? null : 'Input field cannot be false')}
+  onChange={(event, next) => {}}
+  onError={error => {}}
   />
 </>`}
-            />
-          </Grid>
-        </Grid>
-      </div>
+          />
+        }
+      />
 
-      <div className={classes.container}>
-        <div>
-          <Typography variant="h6">{'Read Only'}</Typography>
-          <Typography color="textSecondary" variant="body2">
+      <DemoSection
+        primary={'Read Only'}
+        secondary={
+          <>
             <span>
               {
                 'The readOnly prop prevents the user from making changes, but still shows the input in its default state. '
               }
             </span>
-          </Typography>
-        </div>
-
-        <Grid container spacing={2}>
-          <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+          </>
+        }
+        left={
+          <>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.text}
               children={value => (
@@ -1724,423 +1690,414 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-          </Grid>
-          <Grid md={6} xs={12} sx={{ display: 'flex', minHeight: '500px' }}>
-            <MonacoEditor
-              language="javascript"
-              value={`<>
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
   <TextInput
-    label="ReadOnly Text Input"
-    value={value}
-    readOnly
-    onChange={(event, next) => {}}
+  label="ReadOnly Text Input"
+  value={value}
+  readOnly
+  onChange={(event, next) => {}}
   />
 
   <NumberInput
-    label="ReadOnly Number Input"
-    value={value}
-    readOnly
-    onChange={(event, next) => {}}
+  label="ReadOnly Number Input"
+  value={value}
+  readOnly
+  onChange={(event, next) => {}}
   />
 
   <SelectInput
-    label="ReadOnly Select Input"
-    value={value}
-    readOnly
-    options={[
-      { label: 'Options 1', value: 'option 1' },
-      { label: 'Options 2', value: 'option 2' },
-      { label: 'Options 3', value: 'option 3' }
-    ]}
-    onChange={(event, next) => {}}
+  label="ReadOnly Select Input"
+  value={value}
+  readOnly
+  options={[
+    { label: 'Options 1', value: 'option 1' },
+    { label: 'Options 2', value: 'option 2' },
+    { label: 'Options 3', value: 'option 3' }
+  ]}
+  onChange={(event, next) => {}}
   />
 
   <DateInput
-    label="ReadOnly Date Input"
-    value={value}
-    readOnly
-    onChange={next => {}}
+  label="ReadOnly Date Input"
+  value={value}
+  readOnly
+  onChange={next => {}}
   />
 
   <SliderInput
-    label="ReadOnly Slider Input"
-    value={value}
-    readOnly
-    onChange={(event, next) => {}}
+  label="ReadOnly Slider Input"
+  value={value}
+  readOnly
+  onChange={(event, next) => {}}
   />
 
   <CheckboxInput
-    label="ReadOnly Checkbox Input"
-    value={value}
-    readOnly
-    onChange={(event, next) => {}}
+  label="ReadOnly Checkbox Input"
+  value={value}
+  readOnly
+  onChange={(event, next) => {}}
   />
 
   <SwitchInput
-    label="ReadOnly Switch Input"
-    value={value}
-    readOnly
-    onChange={(event, next) => {}}
+  label="ReadOnly Switch Input"
+  value={value}
+  readOnly
+  onChange={(event, next) => {}}
   />
 </>`}
-            />
-          </Grid>
-        </Grid>
-      </div>
+          />
+        }
+      />
 
-      <div className={classes.container}>
-        <div>
-          <Typography variant="h6">{'Interactions'}</Typography>
-          <Typography color="textSecondary" variant="body2">
+      <DemoSection
+        primary={'Interactions'}
+        secondary={
+          <>
+            {' '}
             <span>{'Use this to test the different interaction with the different props. '}</span>
-          </Typography>
-        </div>
+          </>
+        }
+        left={
+          <form.Subscribe
+            selector={state => [
+              state.values.components.inputs.state.disabled,
+              state.values.components.inputs.state.loading,
+              state.values.components.inputs.state.reset,
+              state.values.components.inputs.state.tooltip,
+              state.values.components.inputs.state.error,
+              state.values.components.inputs.state.readOnly
+            ]}
+            children={([disabled, loading, reset, tooltip, error, readOnly]) => (
+              <>
+                <form.Subscribe
+                  selector={state => state.values.components.inputs.values.text}
+                  children={value => (
+                    <TextInput
+                      label="Interaction Text Input"
+                      value={value}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.components.inputs.values.text = next;
+                          return s;
+                        });
+                      }}
+                      {...(disabled && { disabled })}
+                      {...(loading && { loading })}
+                      {...(readOnly && { readOnly })}
+                      {...(reset && {
+                        reset,
+                        onReset: () => {
+                          form.setStore(s => {
+                            s.components.inputs.values.text = '';
+                            return s;
+                          });
+                        }
+                      })}
+                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                      {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
+                    />
+                  )}
+                />
 
-        <Grid container spacing={2}>
-          <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+                <form.Subscribe
+                  selector={state => state.values.components.inputs.values.number}
+                  children={value => (
+                    <NumberInput
+                      label="Interaction Number Input"
+                      value={value}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.components.inputs.values.number = next;
+                          return s;
+                        });
+                      }}
+                      {...(disabled && { disabled })}
+                      {...(loading && { loading })}
+                      {...(readOnly && { readOnly })}
+                      {...(reset && {
+                        reset,
+                        onReset: () => {
+                          form.setStore(s => {
+                            s.components.inputs.values.number = 0;
+                            return s;
+                          });
+                        }
+                      })}
+                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                      {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.components.inputs.values.select}
+                  children={value => (
+                    <SelectInput
+                      label="Interaction Select Input"
+                      value={value}
+                      options={[
+                        { label: 'Options 1', value: 'option 1' },
+                        { label: 'Options 2', value: 'option 2' },
+                        { label: 'Options 3', value: 'option 3' }
+                      ]}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.components.inputs.values.select = next;
+                          return s;
+                        });
+                      }}
+                      {...(disabled && { disabled })}
+                      {...(loading && { loading })}
+                      {...(readOnly && { readOnly })}
+                      {...(reset && {
+                        reset,
+                        onReset: () => {
+                          form.setStore(s => {
+                            s.components.inputs.values.select = '';
+                            return s;
+                          });
+                        }
+                      })}
+                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                      {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.components.inputs.values.date}
+                  children={value => (
+                    <DateInput
+                      label="Interaction Date Input"
+                      value={value}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.components.inputs.values.date = next;
+                          return s;
+                        });
+                      }}
+                      {...(disabled && { disabled })}
+                      {...(loading && { loading })}
+                      {...(readOnly && { readOnly })}
+                      {...(reset && {
+                        reset,
+                        onReset: () => {
+                          form.setStore(s => {
+                            s.components.inputs.values.date = null;
+                            return s;
+                          });
+                        }
+                      })}
+                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                      {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.components.inputs.values.slider}
+                  children={value => (
+                    <SliderInput
+                      label="Interaction Slider Input"
+                      value={value}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.components.inputs.values.slider = next;
+                          return s;
+                        });
+                      }}
+                      {...(disabled && { disabled })}
+                      {...(loading && { loading })}
+                      {...(readOnly && { readOnly })}
+                      {...(reset && {
+                        reset,
+                        onReset: () => {
+                          form.setStore(s => {
+                            s.components.inputs.values.slider = 0;
+                            return s;
+                          });
+                        }
+                      })}
+                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                      {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.components.inputs.values.checkbox}
+                  children={value => (
+                    <CheckboxInput
+                      label="Interaction Checkbox Input"
+                      value={value}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.components.inputs.values.checkbox = next;
+                          return s;
+                        });
+                      }}
+                      {...(disabled && { disabled })}
+                      {...(loading && { loading })}
+                      {...(readOnly && { readOnly })}
+                      {...(reset && {
+                        reset,
+                        onReset: () => {
+                          form.setStore(s => {
+                            s.components.inputs.values.checkbox = false;
+                            return s;
+                          });
+                        }
+                      })}
+                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                      {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.components.inputs.values.switch}
+                  children={value => (
+                    <SwitchInput
+                      label="Interaction Switch Input"
+                      value={value}
+                      onChange={(event, next) => {
+                        form.setStore(s => {
+                          s.components.inputs.values.switch = next;
+                          return s;
+                        });
+                      }}
+                      {...(disabled && { disabled })}
+                      {...(loading && { loading })}
+                      {...(readOnly && { readOnly })}
+                      {...(reset && {
+                        reset,
+                        onReset: () => {
+                          form.setStore(s => {
+                            s.components.inputs.values.switch = false;
+                            return s;
+                          });
+                        }
+                      })}
+                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                      {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
+                    />
+                  )}
+                />
+              </>
+            )}
+          />
+        }
+        right={
+          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
             <form.Subscribe
-              selector={state => [
-                state.values.components.inputs.state.disabled,
-                state.values.components.inputs.state.loading,
-                state.values.components.inputs.state.reset,
-                state.values.components.inputs.state.tooltip,
-                state.values.components.inputs.state.error,
-                state.values.components.inputs.state.readOnly
-              ]}
-              children={([disabled, loading, reset, tooltip, error, readOnly]) => (
-                <>
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.text}
-                    children={value => (
-                      <TextInput
-                        label="Interaction Text Input"
-                        value={value}
-                        onChange={(event, next) => {
-                          form.setStore(s => {
-                            s.components.inputs.values.text = next;
-                            return s;
-                          });
-                        }}
-                        {...(disabled && { disabled })}
-                        {...(loading && { loading })}
-                        {...(readOnly && { readOnly })}
-                        {...(reset && {
-                          reset,
-                          onReset: () => {
-                            form.setStore(s => {
-                              s.components.inputs.values.text = '';
-                              return s;
-                            });
-                          }
-                        })}
-                        {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                        {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
-                      />
-                    )}
-                  />
-
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.number}
-                    children={value => (
-                      <NumberInput
-                        label="Interaction Number Input"
-                        value={value}
-                        onChange={(event, next) => {
-                          form.setStore(s => {
-                            s.components.inputs.values.number = next;
-                            return s;
-                          });
-                        }}
-                        {...(disabled && { disabled })}
-                        {...(loading && { loading })}
-                        {...(readOnly && { readOnly })}
-                        {...(reset && {
-                          reset,
-                          onReset: () => {
-                            form.setStore(s => {
-                              s.components.inputs.values.number = 0;
-                              return s;
-                            });
-                          }
-                        })}
-                        {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                        {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
-                      />
-                    )}
-                  />
-
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.select}
-                    children={value => (
-                      <SelectInput
-                        label="Interaction Select Input"
-                        value={value}
-                        options={[
-                          { label: 'Options 1', value: 'option 1' },
-                          { label: 'Options 2', value: 'option 2' },
-                          { label: 'Options 3', value: 'option 3' }
-                        ]}
-                        onChange={(event, next) => {
-                          form.setStore(s => {
-                            s.components.inputs.values.select = next;
-                            return s;
-                          });
-                        }}
-                        {...(disabled && { disabled })}
-                        {...(loading && { loading })}
-                        {...(readOnly && { readOnly })}
-                        {...(reset && {
-                          reset,
-                          onReset: () => {
-                            form.setStore(s => {
-                              s.components.inputs.values.select = '';
-                              return s;
-                            });
-                          }
-                        })}
-                        {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                        {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
-                      />
-                    )}
-                  />
-
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.date}
-                    children={value => (
-                      <DateInput
-                        label="Interaction Date Input"
-                        value={value}
-                        onChange={(event, next) => {
-                          form.setStore(s => {
-                            s.components.inputs.values.date = next;
-                            return s;
-                          });
-                        }}
-                        {...(disabled && { disabled })}
-                        {...(loading && { loading })}
-                        {...(readOnly && { readOnly })}
-                        {...(reset && {
-                          reset,
-                          onReset: () => {
-                            form.setStore(s => {
-                              s.components.inputs.values.date = null;
-                              return s;
-                            });
-                          }
-                        })}
-                        {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                        {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
-                      />
-                    )}
-                  />
-
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.slider}
-                    children={value => (
-                      <SliderInput
-                        label="Interaction Slider Input"
-                        value={value}
-                        onChange={(event, next) => {
-                          form.setStore(s => {
-                            s.components.inputs.values.slider = next;
-                            return s;
-                          });
-                        }}
-                        {...(disabled && { disabled })}
-                        {...(loading && { loading })}
-                        {...(readOnly && { readOnly })}
-                        {...(reset && {
-                          reset,
-                          onReset: () => {
-                            form.setStore(s => {
-                              s.components.inputs.values.slider = 0;
-                              return s;
-                            });
-                          }
-                        })}
-                        {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                        {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
-                      />
-                    )}
-                  />
-
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.checkbox}
-                    children={value => (
-                      <CheckboxInput
-                        label="Interaction Checkbox Input"
-                        value={value}
-                        onChange={(event, next) => {
-                          form.setStore(s => {
-                            s.components.inputs.values.checkbox = next;
-                            return s;
-                          });
-                        }}
-                        {...(disabled && { disabled })}
-                        {...(loading && { loading })}
-                        {...(readOnly && { readOnly })}
-                        {...(reset && {
-                          reset,
-                          onReset: () => {
-                            form.setStore(s => {
-                              s.components.inputs.values.checkbox = false;
-                              return s;
-                            });
-                          }
-                        })}
-                        {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                        {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
-                      />
-                    )}
-                  />
-
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.switch}
-                    children={value => (
-                      <SwitchInput
-                        label="Interaction Switch Input"
-                        value={value}
-                        onChange={(event, next) => {
-                          form.setStore(s => {
-                            s.components.inputs.values.switch = next;
-                            return s;
-                          });
-                        }}
-                        {...(disabled && { disabled })}
-                        {...(loading && { loading })}
-                        {...(readOnly && { readOnly })}
-                        {...(reset && {
-                          reset,
-                          onReset: () => {
-                            form.setStore(s => {
-                              s.components.inputs.values.switch = false;
-                              return s;
-                            });
-                          }
-                        })}
-                        {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                        {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
-                      />
-                    )}
-                  />
-                </>
+              selector={state => state.values.components.inputs.state.disabled}
+              children={value => (
+                <CheckboxInput
+                  label="Disabled"
+                  value={value}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.state.disabled = next;
+                      return s;
+                    });
+                  }}
+                />
               )}
             />
-          </Grid>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.loading}
+              children={value => (
+                <CheckboxInput
+                  label="Loading"
+                  value={value}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.state.loading = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.reset}
+              children={value => (
+                <CheckboxInput
+                  label="Reset"
+                  value={value}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.state.reset = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.tooltip}
+              children={value => (
+                <CheckboxInput
+                  label="Tooltip"
+                  value={value}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.state.tooltip = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.error}
+              children={value => (
+                <CheckboxInput
+                  label="Error"
+                  value={value}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.state.error = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.readOnly}
+              children={value => (
+                <CheckboxInput
+                  label="ReadOnly"
+                  value={value}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.state.readOnly = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+          </div>
+        }
+      />
 
-          <Grid md={6} xs={12}>
-            <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
-              <form.Subscribe
-                selector={state => state.values.components.inputs.state.disabled}
-                children={value => (
-                  <CheckboxInput
-                    label="Disabled"
-                    value={value}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.inputs.state.disabled = next;
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
-
-              <form.Subscribe
-                selector={state => state.values.components.inputs.state.loading}
-                children={value => (
-                  <CheckboxInput
-                    label="Loading"
-                    value={value}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.inputs.state.loading = next;
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
-
-              <form.Subscribe
-                selector={state => state.values.components.inputs.state.reset}
-                children={value => (
-                  <CheckboxInput
-                    label="Reset"
-                    value={value}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.inputs.state.reset = next;
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
-
-              <form.Subscribe
-                selector={state => state.values.components.inputs.state.tooltip}
-                children={value => (
-                  <CheckboxInput
-                    label="Tooltip"
-                    value={value}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.inputs.state.tooltip = next;
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
-
-              <form.Subscribe
-                selector={state => state.values.components.inputs.state.error}
-                children={value => (
-                  <CheckboxInput
-                    label="Error"
-                    value={value}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.inputs.state.error = next;
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
-
-              <form.Subscribe
-                selector={state => state.values.components.inputs.state.readOnly}
-                children={value => (
-                  <CheckboxInput
-                    label="ReadOnly"
-                    value={value}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.inputs.state.readOnly = next;
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
-            </div>
-          </Grid>
-        </Grid>
-      </div>
-
-      <div className={classes.container}>
-        <div>
-          <Typography variant="h6">{'Edge Case: Long label names'}</Typography>
-          <Typography color="textSecondary" variant="body2">
+      <DemoSection
+        primary={'Edge Case: Long label names'}
+        secondary={
+          <>
             <span>{"The labels should handle the case where there's a really long label name "}</span>
             <span>{"or there isn't enough space for the full title."}</span>
-          </Typography>
-        </div>
-
-        <Grid container spacing={2}>
-          <Grid md={6} xs={12} sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+          </>
+        }
+        left={
+          <>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.text}
               children={value => (
@@ -2259,62 +2216,62 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
-          </Grid>
-          <Grid md={6} xs={12} sx={{ display: 'flex', minHeight: '500px' }}>
-            <MonacoEditor
-              language="javascript"
-              value={`<>
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
   <TextInput
-    label="Text Input"
-    value={value}
-    onChange={(event, next) => {}}
+  label="Text Input"
+  value={value}
+  onChange={(event, next) => {}}
   />
 
   <NumberInput
-    label="Number Input"
-    value={value}
-    onChange={(event, next) => {}}
+  label="Number Input"
+  value={value}
+  onChange={(event, next) => {}}
   />
 
   <SelectInput
-    label="Select Input"
-    value={value}
-    options={[
-      { label: 'Options 1', value: 'option 1' },
-      { label: 'Options 2', value: 'option 2' },
-      { label: 'Options 3', value: 'option 3' }
-    ]}
-    onChange={(event, next) => {}}
+  label="Select Input"
+  value={value}
+  options={[
+    { label: 'Options 1', value: 'option 1' },
+    { label: 'Options 2', value: 'option 2' },
+    { label: 'Options 3', value: 'option 3' }
+  ]}
+  onChange={(event, next) => {}}
   />
 
   <DateInput
-    label="Date Input"
-    value={value}
-    onChange={next => {}}
+  label="Date Input"
+  value={value}
+  onChange={next => {}}
   />
 
   <SliderInput
-    label="Slider Input"
-    value={value}
-    onChange={(event, next) => {}}
+  label="Slider Input"
+  value={value}
+  onChange={(event, next) => {}}
   />
 
   <CheckboxInput
-    label="Checkbox Input"
-    value={value}
-    onChange={(event, next) => {}}
+  label="Checkbox Input"
+  value={value}
+  onChange={(event, next) => {}}
   />
 
   <SwitchInput
-    label="Switch Input"
-    value={value}
-    onChange={(event, next) => {}}
+  label="Switch Input"
+  value={value}
+  onChange={(event, next) => {}}
   />
 </>`}
-            />
-          </Grid>
-        </Grid>
-      </div>
+          />
+        }
+      />
     </DemoContainer>
   );
 });

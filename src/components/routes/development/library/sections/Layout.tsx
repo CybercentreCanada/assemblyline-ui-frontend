@@ -35,8 +35,11 @@ export const LayoutSection = React.memo(() => {
 
   return (
     <DemoContainer>
+      <PageSection primary="Page Header" anchor subheader divider />
+
       <DemoSection
-        primary={'Page Header: Basic Example'}
+        id="Page Header: Basic Example"
+        primary={'Basic Example'}
         secondary={
           <>
             <span>{'This Header is the component used on top of every page. '}</span>
@@ -93,7 +96,8 @@ export const LayoutSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Page Header: Classification'}
+        id="Page Header: Classification"
+        primary={'Classification'}
         secondary={
           <>
             <span>{'Use the onClassificationChange to change to classifiation component into a picker. '}</span>
@@ -132,7 +136,8 @@ export const LayoutSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Page Header: Loading'}
+        id="Page Header: Loading"
+        primary={'Loading'}
         secondary={
           <>
             <span>{'Use the loading prop to enter the loading state. '}</span>
@@ -192,7 +197,8 @@ export const LayoutSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Page Header: Long names'}
+        id="Page Header: Long names"
+        primary={'Long names'}
         secondary={'The Header component should handle long names'}
         left={
           <form.Subscribe
@@ -244,8 +250,11 @@ export const LayoutSection = React.memo(() => {
         }
       />
 
+      <PageSection primary="Page Section" anchor subheader divider />
+
       <DemoSection
-        primary={'Page Section: Basic Example'}
+        id="Page Section: Basic Example"
+        primary={'Basic Example'}
         secondary={
           <>
             <span>{'This section component. Use the Use the loading prop to enter the loading state. '}</span>
@@ -255,8 +264,8 @@ export const LayoutSection = React.memo(() => {
         }
         left={
           <PageSection
-            primary="Page Section: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque"
-            secondary="Description of the Page Section: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque"
+            primary="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque"
+            secondary="Description of the Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque"
             collapsible
             divider
             endAdornment={<Button variant="outlined">{'End Adornement'}</Button>}
@@ -284,7 +293,8 @@ export const LayoutSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Page Section: Not collapsible and no divider'}
+        id="Page Section: Not collapsible and no divider"
+        primary={'Not collapsible and no divider'}
         secondary={
           <>
             <span>{'If the collapsible prop is not provided, the button functionality will not be present. '}</span>
@@ -313,7 +323,8 @@ export const LayoutSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Page Section: Controlled'}
+        id="Page Section: Controlled"
+        primary={'Controlled'}
         secondary={
           <>
             <span>{'By default, the component manages its own collapsible state. '}</span>

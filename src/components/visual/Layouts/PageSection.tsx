@@ -4,8 +4,9 @@ import { Button, Collapse, Divider, Typography, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import { Anchor } from 'components/core/TableOfContent/Anchor';
 import type { CSSProperties } from 'react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 interface ExpandMoreProps extends SvgIconProps {
   expand: boolean;
@@ -70,34 +71,40 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export type PageSectionProps = {
+  anchor?: boolean;
   children?: React.ReactNode;
   closedInitially?: boolean;
   collapsible?: boolean;
   divider?: boolean;
   endAdornment?: React.ReactNode;
   flex?: boolean;
+  id?: string;
   open?: boolean;
   primary: React.ReactNode;
   primaryProps?: TypographyProps;
   secondary?: React.ReactNode;
   secondaryProps?: TypographyProps;
+  subheader?: boolean;
   wrapperProps?: React.HTMLProps<HTMLDivElement>;
   onChange?: (value: boolean) => void;
 };
 
 export const PageSection: React.FC<PageSectionProps> = React.memo(
   ({
+    anchor = false,
     children = null,
     closedInitially = false,
     collapsible = false,
     divider = false,
     endAdornment = null,
     flex = false,
+    id = null,
     open: openProp = null,
     primary = null,
     primaryProps = null,
     secondary = null,
     secondaryProps = null,
+    subheader = false,
     wrapperProps = null,
     onChange = () => null
   }: PageSectionProps) => {
@@ -109,6 +116,24 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
     const [width, setWidth] = useState<CSSProperties['width']>(0);
 
     const endRef = useRef<HTMLDivElement>(null);
+
+    const Wrapper = useMemo<React.FC<{ children?: React.ReactNode }>>(
+      () =>
+        ({ children: childProp }) =>
+          anchor ? (
+            <Anchor
+              className={classes.root}
+              anchor={id || primary.toString()}
+              label={primary.toString()}
+              subheader={subheader}
+            >
+              {childProp}
+            </Anchor>
+          ) : (
+            <div className={classes.root}>{childProp}</div>
+          ),
+      [anchor, classes.root, id, primary, subheader]
+    );
 
     useEffect(() => {
       if (!endAdornment) return;
@@ -124,7 +149,7 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
     }, [endAdornment]);
 
     return (
-      <div className={classes.root}>
+      <Wrapper>
         <div className={classes.container}>
           <Button
             className={classes.button}
@@ -143,6 +168,7 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
                 variant="h6"
                 whiteSpace="nowrap"
                 width="100%"
+                {...(subheader && { variant: 'h5' })}
                 sx={{ ...(!collapsible && { cursor: 'text', userSelect: 'initial' }), ...primaryProps?.sx }}
                 {...primaryProps}
               >
@@ -178,7 +204,7 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
 
         {!divider ? null : <Divider />}
 
-        {collapsible ? (
+        {!children ? null : collapsible ? (
           <Collapse
             in={openProp !== null ? openProp : open}
             timeout="auto"
@@ -200,7 +226,7 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
             {render && children}
           </div>
         )}
-      </div>
+      </Wrapper>
     );
   }
 );
