@@ -1,9 +1,9 @@
 import { Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import makeStyles from '@mui/styles/makeStyles';
-import { DemoContainer } from 'components/routes/developer/library/components/DemoContainer';
-import { DemoSection } from 'components/routes/developer/library/components/DemoSection';
-import { useForm } from 'components/routes/developer/library/contexts/form';
+import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
+import { DemoSection } from 'components/routes/development/library/components/DemoSection';
+import { useForm } from 'components/routes/development/library/contexts/form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { DateInput } from 'components/visual/Inputs/DateInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';

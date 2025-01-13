@@ -1,5 +1,5 @@
-import { DemoContainer } from 'components/routes/developer/library/components/DemoContainer';
-import { useForm } from 'components/routes/developer/library/contexts/form';
+import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
+import { useForm } from 'components/routes/development/library/contexts/form';
 import React from 'react';
 
 export type ListLibraryState = {

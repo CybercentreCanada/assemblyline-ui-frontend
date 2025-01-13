@@ -1,11 +1,11 @@
 import { createFormContext } from 'components/core/form/createFormContext';
-import { INPUTS_LIBRARY_STATE, type InputsLibraryState } from 'components/routes/developer/library/sections/Inputs';
-import { LAYOUT_LIBRARY_STATE, type LayoutLibraryState } from 'components/routes/developer/library/sections/Layout';
-import { LIST_LIBRARY_STATE, type ListLibraryState } from 'components/routes/developer/library/sections/List';
+import { INPUTS_LIBRARY_STATE, type InputsLibraryState } from 'components/routes/development/library/sections/Inputs';
+import { LAYOUT_LIBRARY_STATE, type LayoutLibraryState } from 'components/routes/development/library/sections/Layout';
+import { LIST_LIBRARY_STATE, type ListLibraryState } from 'components/routes/development/library/sections/List';
 import {
   LIST_INPUTS_LIBRARY_STATE,
   type ListInputsLibraryState
-} from 'components/routes/developer/library/sections/ListInputs';
+} from 'components/routes/development/library/sections/ListInputs';
 
 type LibraryComponents = ListInputsLibraryState & InputsLibraryState & LayoutLibraryState & ListLibraryState;
 

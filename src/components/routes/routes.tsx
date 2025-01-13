@@ -18,10 +18,10 @@ const AdminErrorDetail = lazy(() => import('components/routes/admin/error_detail
 const AdminErrorViewer = lazy(() => import('components/routes/admin/error_viewer'));
 const AdminIdentify = lazy(() => import('components/routes/admin/identify'));
 const AdminServices = lazy(() => import('components/routes/admin/services'));
-const DevelopmentAPI = lazy(() => import('components/routes/developer/api/api'));
-const DevelopmentAPI2 = lazy(() => import('components/routes/developer/api/api2'));
-const DevelopmentLibrary = lazy(() => import('components/routes/developer/library'));
-const DevelopmentTheme = lazy(() => import('components/routes/developer/theme'));
+const DevelopmentAPI = lazy(() => import('components/routes/development/api/api'));
+const DevelopmentAPI2 = lazy(() => import('components/routes/development/api/api2'));
+const DevelopmentLibrary = lazy(() => import('components/routes/development/library'));
+const DevelopmentTheme = lazy(() => import('components/routes/development/theme'));
 const Service = lazy(() => import('components/routes/admin/service_detail'));
 const ServiceReview = lazy(() => import('components/routes/admin/service_review'));
 const AdminSiteMap = lazy(() => import('components/routes/admin/site_map'));
