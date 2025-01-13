@@ -13,6 +13,7 @@ export const Anchor: React.FC<AnchorProps> = React.memo(
 
     useEffect(() => {
       loadAnchors();
+      return () => loadAnchors();
     }, [loadAnchors]);
 
     return (

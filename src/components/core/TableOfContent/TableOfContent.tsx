@@ -64,10 +64,27 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
       [form]
     );
 
+    const findActive = useCallback(() => {
+      const elements = rootRef.current?.querySelectorAll('[data-anchor]');
+      for (let i = elements.length - 1; i >= 0; i--) {
+        if (
+          elements.item(i).getBoundingClientRect().top - 2 <=
+          rootRef.current.getBoundingClientRect().top + headerRef.current.getBoundingClientRect().height
+        ) {
+          form.setStore(s => {
+            s.active = i;
+            return s;
+          });
+          break;
+        }
+      }
+    }, [form]);
+
     const loadAnchors = useCallback(() => {
       form.setStore(s => {
         const elements = rootRef.current?.querySelectorAll('[data-anchor]');
 
+        s.active = null;
         s.anchors = [];
         elements.forEach(element => {
           s.anchors.push({
@@ -95,41 +112,15 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
       [behavior]
     );
 
-    const isElementInViewport = useCallback((element: Element) => {
-      const rect = element.getBoundingClientRect();
-      const offsetTop = headerRef.current.getBoundingClientRect().bottom;
-      return (
-        rect.top >= offsetTop &&
-        rect.bottom <= offsetTop + (window.innerHeight || document.documentElement.clientHeight)
-      );
-    }, []);
-
     useEffect(() => {
       const rootElement = rootRef.current;
       if (!rootElement) return;
 
-      const handler = () => {
-        const elements = rootRef.current?.querySelectorAll('[data-anchor]');
-        for (let i = elements.length - 1; i >= 0; i--) {
-          if (
-            elements.item(i).getBoundingClientRect().top - 2 <=
-            rootElement.getBoundingClientRect().top + headerRef.current.getBoundingClientRect().height
-          ) {
-            form.setStore(s => {
-              s.active = i;
-              return s;
-            });
-            break;
-          }
-        }
-      };
-
-      handler();
-      rootElement.addEventListener('scroll', handler, false);
+      rootElement.addEventListener('scroll', findActive, false);
       return () => {
-        rootElement.removeEventListener('scroll', handler, false);
+        rootElement.removeEventListener('scroll', findActive, false);
       };
-    }, [form, isElementInViewport]);
+    }, [findActive]);
 
     return (
       <TableOfContentContext.Provider value={{ rootRef, headerRef, loadAnchors, scrollTo, Anchors, ActiveAnchor }}>
