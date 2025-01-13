@@ -55,6 +55,7 @@
   "done": "Done",
   "email": "Email Address",
   "enabled": "Account Enabled",
+  "identity_id": "Identity ID",
   "groups": "Groups",
   "groups_edit_title": "Groups are not for access control, they are used to group submissions of users of the same group together. When you submit a file, all groups you are member of are assigned to the submission.",
   "name": "Full Name",

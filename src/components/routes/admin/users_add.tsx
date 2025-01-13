@@ -43,6 +43,7 @@ const useStyles = makeStyles(theme => ({
 type User = {
   avatar: string;
   email: string;
+  identity_id: string;
   groups: string[];
   is_active: boolean;
   type: string[];
@@ -54,6 +55,7 @@ type User = {
   submission_quota: number;
   api_daily_quota: number;
   submission_daily_quota: number;
+  submission_async_quota: number;
   roles?: string[];
 };
 
@@ -73,13 +75,15 @@ const WrappedAddUserPage = () => {
       type: ['user'],
       classification: c12nDef.UNRESTRICTED,
       email: '',
+      identity_id: '',
       name: '',
       new_pass: '',
       uname: '',
       api_quota: 10,
       submission_quota: 5,
       api_daily_quota: 0,
-      submission_daily_quota: 0
+      submission_daily_quota: 0,
+      submission_async_quota: 0
     }),
     [c12nDef.UNRESTRICTED]
   );
@@ -160,7 +164,7 @@ const WrappedAddUserPage = () => {
             <CloseOutlinedIcon />
           </IconButton>
         </div>
-        <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>
+        <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2), paddingBottom: theme.spacing(6) }}>
           <Box mb={3}>
             <Typography variant="h5">{t('newuser.title')}</Typography>
           </Box>
@@ -218,7 +222,7 @@ const WrappedAddUserPage = () => {
                 onChange={(event, chips) => setNewUser(u => ({ ...u, groups: chips }))}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <Typography variant="caption">{t('newuser.new_pass')}</Typography>
               <TextField
                 fullWidth
@@ -230,7 +234,7 @@ const WrappedAddUserPage = () => {
                 value={newUser.new_pass}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <Typography variant="caption">{t('newuser.email')}</Typography>
               <TextField
                 fullWidth
@@ -239,6 +243,17 @@ const WrappedAddUserPage = () => {
                 variant="outlined"
                 onChange={event => setNewUser(u => ({ ...u, email: event.target.value }))}
                 value={newUser.email}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Typography variant="caption">{t('newuser.identity_id')}</Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="dense"
+                variant="outlined"
+                onChange={event => setNewUser(u => ({ ...u, identity_id: event.target.value }))}
+                value={newUser.identity_id}
               />
             </Grid>
             <Grid item xs={12}>
@@ -281,7 +296,7 @@ const WrappedAddUserPage = () => {
                 value={String(newUser.api_daily_quota)}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <Typography variant="caption">{t('newuser.submission_quota')}</Typography>
               <TextField
                 fullWidth
@@ -293,7 +308,19 @@ const WrappedAddUserPage = () => {
                 value={String(newUser.submission_quota)}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
+              <Typography variant="caption">{t('newuser.submission_async_quota')}</Typography>
+              <TextField
+                fullWidth
+                type="number"
+                margin="dense"
+                size="small"
+                variant="outlined"
+                onChange={event => setNewUser(u => ({ ...u, submission_async_quota: parseNum(event) }))}
+                value={String(newUser.submission_async_quota)}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
               <Typography variant="caption">{t('newuser.submission_daily_quota')}</Typography>
               <TextField
                 fullWidth
