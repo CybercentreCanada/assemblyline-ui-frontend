@@ -1,4 +1,4 @@
-import { TableOfContentProvider, useTableOfContent } from 'components/core/tableofcontent/TableOfContent';
+import { TableOfContentProvider, useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { PageLayout } from 'components/visual/Layouts/PageLayout';
 import { PageNavigation } from 'components/visual/Layouts/PageNavigation';
