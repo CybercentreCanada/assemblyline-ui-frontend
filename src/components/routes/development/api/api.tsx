@@ -12,13 +12,13 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import CustomChip from 'components/visual/CustomChip';
+import { ROLES_COLORS } from 'helpers/colors';
 import { bytesToSize } from 'helpers/utils';
 import { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { STATUS_CODE_MESSAGE } from './utils/status_code_message';
-import { USER_COLOR } from './utils/user_role_color';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
@@ -525,7 +525,7 @@ export default function AdminAPI() {
                   header={t('require_role')}
                   span={3}
                   children={currentRoute?.require_role?.sort().map((r, i) => (
-                    <CustomChip key={i} color={USER_COLOR[r]} type="rounded" size="tiny" label={t(`role.${r}`)} />
+                    <CustomChip key={i} color={ROLES_COLORS[r]} type="rounded" size="tiny" label={t(`role.${r}`)} />
                   ))}
                 />
                 <Row

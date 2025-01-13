@@ -4,7 +4,7 @@ export type PossibleColor = 'default' | 'primary' | 'secondary' | 'info' | 'succ
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-export const METHOD_COLOR: Record<Method, PossibleColor> = {
+export const METHOD_COLORS: Record<Method, PossibleColor> = {
   DELETE: 'error',
   GET: 'info',
   POST: 'success',
@@ -12,7 +12,7 @@ export const METHOD_COLOR: Record<Method, PossibleColor> = {
   PATCH: 'default'
 };
 
-export const STATUS_CODE_COLOR: Record<number, PossibleColor> = {
+export const STATUS_CODE_COLORS: Record<number, PossibleColor> = {
   1: 'info',
   2: 'success',
   3: 'warning',
@@ -20,7 +20,7 @@ export const STATUS_CODE_COLOR: Record<number, PossibleColor> = {
   5: 'error'
 };
 
-export const ROLES_COLOR: Record<(typeof ROLES)[number], PossibleColor> = {
+export const ROLES_COLORS: Record<(typeof ROLES)[number], PossibleColor> = {
   archive_comment: 'default',
   administration: 'error',
   alert_manage: 'info',

@@ -15,7 +15,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { CompletionItem, IRange, Snippet } from 'components/routes/development/api/utils/monaco';
 import { CompletionItemInsertTextRule, CompletionItemKind } from 'components/routes/development/api/utils/monaco';
 import CustomChip from 'components/visual/CustomChip';
-import { METHOD_COLOR, STATUS_CODE_COLOR } from 'helpers/colors';
+import { METHOD_COLORS, ROLES_COLORS, STATUS_CODE_COLORS } from 'helpers/colors';
 import { bytesToSize } from 'helpers/utils';
 import 'moment/locale/fr';
 import React, { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react';
@@ -23,7 +23,6 @@ import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { STATUS_CODE_MESSAGE } from './utils/status_code_message';
-import { USER_COLOR } from './utils/user_role_color';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
@@ -423,7 +422,7 @@ const WrappedAPIPage = () => {
                     variant="outlined"
                     type="rounded"
                     size="small"
-                    color={METHOD_COLOR[request?.method]}
+                    color={METHOD_COLORS[request?.method]}
                     label={t(request?.method)}
                   />
                 )}
@@ -457,7 +456,7 @@ const WrappedAPIPage = () => {
                 {currentRoute?.methods?.sort().map((m, i) => (
                   <CustomChip
                     key={i}
-                    color={METHOD_COLOR[m]}
+                    color={METHOD_COLORS[m]}
                     type="rounded"
                     size="tiny"
                     variant={request?.method === m ? 'filled' : 'outlined'}
@@ -469,7 +468,7 @@ const WrappedAPIPage = () => {
               <Typography variant="body2" fontWeight={500} children={t('require_role')} />
               <div style={{ gridColumn: 'span 3' }}>
                 {currentRoute?.require_role?.sort().map((r, i) => (
-                  <CustomChip key={i} color={USER_COLOR[r]} type="rounded" size="tiny" label={t(`role.${r}`)} />
+                  <CustomChip key={i} color={ROLES_COLORS[r]} type="rounded" size="tiny" label={t(`role.${r}`)} />
                 ))}
               </div>
             </div>
@@ -494,7 +493,7 @@ const WrappedAPIPage = () => {
                     type="rounded"
                     variant="outlined"
                     size="small"
-                    color={STATUS_CODE_COLOR[response?.statusCode.toString().charAt(0)]}
+                    color={STATUS_CODE_COLORS[response?.statusCode.toString().charAt(0)]}
                     label={response?.statusCode}
                   />
                 )}
