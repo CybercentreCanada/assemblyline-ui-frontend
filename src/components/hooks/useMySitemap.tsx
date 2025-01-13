@@ -1,5 +1,6 @@
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import ApiIcon from '@mui/icons-material/Api';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined';
@@ -311,18 +312,24 @@ export default function useMySitemap() {
         breadcrumbs: ['/admin', '/admin/users']
       },
 
-      { path: '/developer', title: t('drawer.developer'), isRoot: true, icon: <CodeIcon /> },
+      { path: '/development', title: t('drawer.development'), isRoot: true, icon: <CodeIcon /> },
       {
-        path: '/developer/library',
-        title: t('drawer.developer.library'),
-        icon: <LibraryBooksIcon />,
-        breadcrumbs: ['/developer']
+        path: '/development/api',
+        title: t('drawer.development.api'),
+        icon: <ApiIcon />,
+        breadcrumbs: ['/development']
       },
       {
-        path: '/developer/theme',
-        title: t('drawer.developer.theme'),
+        path: '/development/library',
+        title: t('drawer.development.library'),
+        icon: <LibraryBooksIcon />,
+        breadcrumbs: ['/development']
+      },
+      {
+        path: '/development/theme',
+        title: t('drawer.development.theme'),
         icon: <PaletteIcon />,
-        breadcrumbs: ['/developer']
+        breadcrumbs: ['/development']
       }
     ]
   };

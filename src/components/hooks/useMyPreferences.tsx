@@ -430,8 +430,8 @@ const useMyPreferences = () => {
       {
         type: 'group' as 'group',
         element: {
-          id: 'developer',
-          i18nKey: 'drawer.developer',
+          id: 'development',
+          i18nKey: 'drawer.development',
           userPropValidators: [
             { prop: 'user.is_admin', value: true, enforce: true },
             { prop: 'configuration.system.type', value: 'development' },
@@ -439,28 +439,40 @@ const useMyPreferences = () => {
           ],
           icon: <CodeIcon />,
           items: [
+            // {
+            //   id: 'development.api',
+            //   i18nKey: 'drawer.development.api',
+            //   userPropValidators: [
+            //     { prop: 'user.is_admin', value: true, enforce: true },
+            //     { prop: 'configuration.system.type', value: 'development' },
+            //     { prop: 'configuration.system.type', value: 'staging' }
+            //   ],
+            //   icon: <ApiIcon />,
+            //   route: '/development/api',
+            //   nested: true
+            // },
             {
-              id: 'developer.library',
-              i18nKey: 'drawer.developer.library',
+              id: 'development.library',
+              i18nKey: 'drawer.development.library',
               userPropValidators: [
                 { prop: 'user.is_admin', value: true, enforce: true },
                 { prop: 'configuration.system.type', value: 'development' },
                 { prop: 'configuration.system.type', value: 'staging' }
               ],
               icon: <LibraryBooksIcon />,
-              route: '/developer/library',
+              route: '/development/library',
               nested: true
             },
             {
-              id: 'developer.theme',
-              i18nKey: 'drawer.developer.theme',
+              id: 'development.theme',
+              i18nKey: 'drawer.development.theme',
               userPropValidators: [
                 { prop: 'user.is_admin', value: true, enforce: true },
                 { prop: 'configuration.system.type', value: 'development' },
                 { prop: 'configuration.system.type', value: 'staging' }
               ],
               icon: <PaletteIcon />,
-              route: '/developer/theme',
+              route: '/development/theme',
               nested: true
             }
           ]
