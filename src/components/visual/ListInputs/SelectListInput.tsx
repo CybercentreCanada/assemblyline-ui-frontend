@@ -7,8 +7,9 @@ import type {
   SelectProps
 } from '@mui/material';
 import { MenuItem, Select, useTheme } from '@mui/material';
+import { ListItemText } from 'components/visual/List/ListItemText';
 import React, { useMemo } from 'react';
-import { BaseListItem, BaseListItemText } from './components/BaseListInput';
+import { BaseListItem } from './components/BaseListInput';
 import type { ResetListInputProps } from './components/ResetListInput';
 import { ResetListInput } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
@@ -21,12 +22,12 @@ type Props = Omit<SelectProps, 'defaultValue' | 'error' | 'onChange'> & {
   loading?: boolean;
   options: { label: MenuItemProps['children']; value: MenuItemProps['value'] }[];
   preventRender?: boolean;
-  primary?: string;
+  primary?: React.ReactNode;
   primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetListInputProps;
-  secondary?: ListItemTextProps['secondary'];
+  secondary?: React.ReactNode;
   secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
   onChange?: (event: SelectChangeEvent<unknown>, value: string) => void;
   onReset?: IconButtonProps['onClick'];
@@ -67,20 +68,21 @@ const WrappedSelectListInput = ({
       helperText={errorValue}
       FormHelperTextProps={errorProps}
     >
-      <BaseListItemText
+      <ListItemText
         id={id}
         primary={primary}
         secondary={secondary}
         primaryTypographyProps={primaryProps}
         secondaryTypographyProps={secondaryProps}
         capitalize={capitalize}
+        style={{ marginRight: theme.spacing(2), margin: `${theme.spacing(0.25)} 0` }}
       />
       {loading ? (
         <SkeletonListInput />
       ) : (
         <>
           <ResetListInput
-            id={id || primary}
+            id={id || primary.toString()}
             preventRender={!reset || disabled || readOnly}
             onReset={onReset}
             {...resetProps}
@@ -105,7 +107,7 @@ const WrappedSelectListInput = ({
                 })
             }}
             value={value}
-            inputProps={{ id: id || primary, style: { color: 'textPrimary' } }}
+            inputProps={{ id: id || primary.toString(), style: { color: 'textPrimary' } }}
             onChange={event => {
               onChange(event, event.target.value as string);
 

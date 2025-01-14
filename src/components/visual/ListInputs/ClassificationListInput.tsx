@@ -1,9 +1,10 @@
 import type { FormHelperTextProps } from '@mui/material';
-import { type IconButtonProps, type ListItemTextProps } from '@mui/material';
+import { useTheme, type IconButtonProps, type ListItemTextProps } from '@mui/material';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
+import { ListItemText } from 'components/visual/List/ListItemText';
 import React, { useMemo } from 'react';
-import { BaseListItem, BaseListItemText } from './components/BaseListInput';
+import { BaseListItem } from './components/BaseListInput';
 import { ResetListInput, type ResetListInputProps } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
@@ -14,12 +15,12 @@ type Props = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
   id?: string;
   loading?: boolean;
   preventRender?: boolean;
-  primary?: string;
+  primary?: React.ReactNode;
   primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetListInputProps;
-  secondary?: ListItemTextProps['secondary'];
+  secondary?: React.ReactNode;
   secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
   value: ClassificationProps['c12n'];
   onChange: ClassificationProps['setClassification'];
@@ -48,6 +49,8 @@ const WrappedClassificationListInput = ({
   onError = () => null,
   ...classificationProps
 }: Props) => {
+  const theme = useTheme();
+
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
@@ -57,13 +60,14 @@ const WrappedClassificationListInput = ({
       helperText={errorValue}
       FormHelperTextProps={errorProps}
     >
-      <BaseListItemText
+      <ListItemText
         id={id}
         primary={primary}
         secondary={secondary}
         primaryTypographyProps={primaryProps}
         secondaryTypographyProps={secondaryProps}
         capitalize={capitalize}
+        style={{ marginRight: theme.spacing(2), margin: `${theme.spacing(0.25)} 0` }}
       />
       {loading ? (
         <SkeletonListInput />

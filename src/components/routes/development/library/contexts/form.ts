@@ -11,14 +11,14 @@ type LibraryComponents = ListInputsLibraryState & InputsLibraryState & LayoutLib
 
 type LibraryFormStore = {
   state: {
-    active: keyof LibraryComponents;
+    tab: keyof LibraryComponents;
   };
   components: LibraryComponents;
 };
 
 const LIBRARY_FORM_STORE: LibraryFormStore = Object.freeze({
   state: {
-    active: null
+    tab: null
   },
   components: {
     ...INPUTS_LIBRARY_STATE,

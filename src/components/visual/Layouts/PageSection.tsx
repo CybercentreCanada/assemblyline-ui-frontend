@@ -1,12 +1,12 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { SvgIconProps, TypographyProps } from '@mui/material';
-import { Button, Collapse, Divider, Typography, useTheme } from '@mui/material';
+import { Button, Collapse, Divider, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { Anchor } from 'components/core/TableOfContent/Anchor';
 import type { CSSProperties } from 'react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface ExpandMoreProps extends SvgIconProps {
   expand: boolean;
@@ -70,6 +70,33 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+type WrapperProps = {
+  anchor: boolean;
+  children: React.ReactNode;
+  id: string;
+  primary: React.ReactNode;
+  subheader: boolean;
+};
+
+const Wrapper: React.FC<WrapperProps> = React.memo(
+  ({ anchor = null, children = null, id = null, primary = null, subheader = false }: WrapperProps) => {
+    const classes = useStyles();
+
+    return anchor ? (
+      <Anchor
+        className={classes.root}
+        anchor={id || primary.toString()}
+        label={primary.toString()}
+        subheader={subheader}
+      >
+        {children}
+      </Anchor>
+    ) : (
+      <div className={classes.root}>{children}</div>
+    );
+  }
+);
+
 export type PageSectionProps = {
   anchor?: boolean;
   children?: React.ReactNode;
@@ -108,7 +135,6 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
     wrapperProps = null,
     onChange = () => null
   }: PageSectionProps) => {
-    const theme = useTheme();
     const classes = useStyles();
 
     const [open, setOpen] = useState<boolean>(!closedInitially);
@@ -116,24 +142,6 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
     const [width, setWidth] = useState<CSSProperties['width']>(0);
 
     const endRef = useRef<HTMLDivElement>(null);
-
-    const Wrapper = useMemo<React.FC<{ children?: React.ReactNode }>>(
-      () =>
-        ({ children: childProp }) =>
-          anchor ? (
-            <Anchor
-              className={classes.root}
-              anchor={id || primary.toString()}
-              label={primary.toString()}
-              subheader={subheader}
-            >
-              {childProp}
-            </Anchor>
-          ) : (
-            <div className={classes.root}>{childProp}</div>
-          ),
-      [anchor, classes.root, id, primary, subheader]
-    );
 
     useEffect(() => {
       if (!endAdornment) return;
@@ -149,7 +157,7 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
     }, [endAdornment]);
 
     return (
-      <Wrapper>
+      <Wrapper anchor={anchor} id={id} primary={primary} subheader={subheader}>
         <div className={classes.container}>
           <Button
             className={classes.button}

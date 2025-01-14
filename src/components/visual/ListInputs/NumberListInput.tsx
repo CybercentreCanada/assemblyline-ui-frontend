@@ -7,9 +7,10 @@ import {
   type IconButtonProps,
   type ListItemTextProps
 } from '@mui/material';
+import { ListItemText } from 'components/visual/List/ListItemText';
 import type { ReactNode } from 'react';
 import React, { useMemo } from 'react';
-import { BaseListItem, BaseListItemText } from './components/BaseListInput';
+import { BaseListItem } from './components/BaseListInput';
 import type { ResetListInputProps } from './components/ResetListInput';
 import { ResetListInput } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
@@ -23,12 +24,12 @@ type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   max?: number;
   min?: number;
   preventRender?: boolean;
-  primary?: string;
+  primary?: React.ReactNode;
   primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetListInputProps;
-  secondary?: ListItemTextProps['secondary'];
+  secondary?: React.ReactNode;
   secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
   value: number;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, value: number) => void;
@@ -71,25 +72,27 @@ const WrappedNumberListInput = ({
       helperText={errorValue}
       FormHelperTextProps={errorProps}
     >
-      <BaseListItemText
+      <ListItemText
         id={id}
         primary={primary}
         secondary={secondary}
         primaryTypographyProps={primaryProps}
         secondaryTypographyProps={secondaryProps}
         capitalize={capitalize}
+        style={{ marginRight: theme.spacing(2), margin: `${theme.spacing(0.25)} 0` }}
       />
       {loading ? (
         <SkeletonListInput />
       ) : (
         <>
           <ResetListInput
-            id={id || primary}
+            id={id || primary.toString()}
             preventRender={!reset || disabled || readOnly}
             onReset={onReset}
             {...resetProps}
           />
           <TextField
+            id={id || primary.toString()}
             type="number"
             size="small"
             fullWidth
@@ -97,7 +100,7 @@ const WrappedNumberListInput = ({
             disabled={disabled}
             error={!!errorValue && !readOnly}
             {...(readOnly && !disabled && { focused: null })}
-            inputProps={{ id: id || primary, min: min, max: max }}
+            inputProps={{ id: id || primary.toString(), min: min, max: max }}
             InputProps={{
               readOnly: readOnly,
               endAdornment: endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>

@@ -2,7 +2,9 @@ import { TableOfContentProvider, useTableOfContent } from 'components/core/Table
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { PageLayout } from 'components/visual/Layouts/PageLayout';
 import { PageNavigation } from 'components/visual/Layouts/PageNavigation';
-import React from 'react';
+import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import { FormProvider, useForm } from './contexts/form';
 import { InputsSection } from './sections/Inputs';
 import { LayoutSection } from './sections/Layout';
@@ -12,15 +14,25 @@ import { ListInputsSection } from './sections/ListInputs';
 const LibraryContent = () => {
   const { rootRef, headerRef, Anchors, ActiveAnchor, scrollTo } = useTableOfContent();
   const form = useForm();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const url = new SimpleSearchQuery(location.search);
+    form.setStore(s => {
+      s.state.tab = url.get('tab');
+      return s;
+    });
+  }, [form, location.search]);
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.active, state.values.components?.[state.values.state.active]?.name]}
-      children={([active, activeName]) => (
+      selector={state => [state.values.state.tab, state.values.components?.[state.values.state.tab]?.name]}
+      children={([tab, name]) => (
         <PageLayout
           rootRef={rootRef}
           headerRef={headerRef}
-          header={<PageHeader primary="Library" secondary={activeName} />}
+          header={<PageHeader primary="Library" secondary={name} />}
           leftNav={
             <form.Subscribe
               selector={state => Object.entries(state.values.components)}
@@ -37,7 +49,7 @@ const LibraryContent = () => {
                         <NavItem
                           id={id}
                           primary={primary}
-                          active={id === active}
+                          active={id === tab}
                           primaryProps={{ textTransform: 'capitalize' }}
                           {...params}
                         />
@@ -46,10 +58,11 @@ const LibraryContent = () => {
                   )}
                   onPageNavigation={(event, { id }) => {
                     rootRef.current.scrollTo({ top: 0, behavior: 'instant' });
-                    form.setStore(s => {
-                      s.state.active = id as any;
-                      return s;
-                    });
+                    navigate(`${location.pathname}?tab=${id}`);
+                    // form.setStore(s => {
+                    //   s.state.tab = id as any;
+                    //   return s;
+                    // });
                   }}
                 />
               )}
@@ -82,7 +95,7 @@ const LibraryContent = () => {
           }
         >
           {(() => {
-            switch (active) {
+            switch (tab) {
               case 'inputs':
                 return <InputsSection />;
               case 'layout':

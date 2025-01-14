@@ -1,21 +1,7 @@
 import { useTheme } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
-import makeStyles from '@mui/styles/makeStyles';
 import { PageSection } from 'components/visual/Layouts/PageSection';
 import React from 'react';
-
-export const useStyles = makeStyles(theme => ({
-  main: {
-    display: 'flex',
-    flexDirection: 'column',
-    rowGap: theme.spacing(8)
-  },
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    rowGap: theme.spacing(3)
-  }
-}));
 
 type DemoSectionProps = {
   id?: string;
@@ -28,7 +14,6 @@ type DemoSectionProps = {
 export const DemoSection: React.FC<DemoSectionProps> = React.memo(
   ({ id = null, primary, secondary, left, right }: DemoSectionProps) => {
     const theme = useTheme();
-    const classes = useStyles();
 
     return (
       <PageSection id={id} primary={primary} secondary={secondary} anchor>

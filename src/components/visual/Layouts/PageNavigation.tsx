@@ -4,14 +4,15 @@ import ListItemText from '@mui/material/ListItemText';
 import React, { useMemo } from 'react';
 
 type PageNavigationItemProp = {
-  id?: string;
   active?: boolean;
+  readOnly?: boolean;
+  checkboxProps?: CheckboxProps;
+  id?: string;
   primary: string;
   primaryProps?: ListItemTextProps['primaryTypographyProps'];
   secondary?: string;
   secondaryProps?: ListItemTextProps['secondaryTypographyProps'];
   subheader?: boolean;
-  checkboxProps?: CheckboxProps;
   variant?: 'left' | 'right';
   onPageNavigation?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, props: PageNavigationItemProp) => void;
 };
@@ -20,13 +21,14 @@ const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((props: 
   const theme = useTheme();
 
   const {
-    id = null,
     active = false,
+    readOnly = false,
+    checkboxProps: checkbox = null,
+    id = null,
     primary,
     primaryProps = null,
     secondary = null,
     secondaryProps = null,
-    checkboxProps: checkbox = null,
     subheader = false,
     variant = 'left',
     onPageNavigation = () => null,
@@ -34,6 +36,70 @@ const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((props: 
   } = useMemo<PageNavigationItemProp>(() => props, [props]);
 
   const { ...checkboxProps } = useMemo<CheckboxProps>(() => ({ ...checkbox }), [checkbox]);
+
+  return readOnly ? (
+    <ListItem
+      disablePadding
+      sx={{ margin: `${theme.spacing(1)} ${theme.spacing(1)} ${theme.spacing(0.5)} ${theme.spacing(2)}` }}
+    >
+      <ListItemText
+        primary={primary}
+        primaryTypographyProps={{ color: 'textSecondary', ...primaryProps }}
+        secondary={secondary}
+        secondaryTypographyProps={secondaryProps}
+      />
+    </ListItem>
+  ) : (
+    <ListItem
+      disablePadding
+      sx={{}}
+      secondaryAction={
+        !checkbox ? null : (
+          <Checkbox
+            edge="end"
+            // inputProps={{ id: `navigation: ${service.category}-${service.name}` }}
+            // checked={selected}
+            // disabled={disabled || !customize}
+            // onChange={() => handleChange(selected)}
+            {...checkboxProps}
+          />
+        )
+      }
+    >
+      <ListItemButton
+        id={id || primary}
+        sx={{
+          paddingLeft: theme.spacing(3),
+          ...(subheader && { paddingLeft: theme.spacing(1.5) }),
+          ...(!active && { marginLeft: '1px' }),
+          ...(variant === 'left' && {
+            borderRadius: '0 18px 18px  0',
+            ...(active && {
+              color: theme.palette.primary.main,
+              backgroundColor: alpha(theme.palette.primary.main, 0.1)
+            })
+          }),
+          ...(variant === 'right' && {
+            ...(active && {
+              color: theme.palette.primary.main,
+              borderLeft: `1px solid ${theme.palette.primary.main}`
+            })
+          })
+        }}
+        onClick={event => onPageNavigation(event, props)}
+      >
+        <ListItemText
+          primary={primary}
+          primaryTypographyProps={{
+            color: active ? 'primary' : subheader ? 'textSecondary' : 'textPrimary',
+            ...primaryProps
+          }}
+          secondary={secondary}
+          secondaryTypographyProps={secondaryProps}
+        />
+      </ListItemButton>
+    </ListItem>
+  );
 
   return subheader ? (
     <ListItem

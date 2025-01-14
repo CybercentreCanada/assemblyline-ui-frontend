@@ -1,117 +1,122 @@
 import type { CheckboxProps, ListItemButtonProps, ListItemProps, ListItemTextProps } from '@mui/material';
-import { Checkbox, ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from '@mui/material';
-import { type FC } from 'react';
+import { Checkbox, ListItem, ListItemButton, ListItemIcon, useTheme } from '@mui/material';
+import { type FC, type MouseEvent } from 'react';
+import { ListItemText } from './ListItemText';
 
-export interface ListHeaderProps extends ListItemProps {
-  primaryProps?: ListItemTextProps['primaryTypographyProps'];
-  secondaryProps?: ListItemTextProps['secondaryTypographyProps'];
-  checkboxProps?: CheckboxProps;
+export type ListHeaderProps = Omit<ListItemProps, 'onChange'> & {
   buttonProps?: ListItemButtonProps;
-
-  underlined?: boolean;
-  edge?: 'start' | 'end';
-  button?: boolean;
+  checkboxProps?: CheckboxProps;
+  checked?: CheckboxProps['checked'];
   disabled?: boolean;
-
-  primary?: React.ReactNode;
+  divider?: boolean;
+  edge?: CheckboxProps['edge'];
+  indeterminate?: CheckboxProps['indeterminate'];
+  primary: React.ReactNode;
+  primaryProps?: ListItemTextProps['primaryTypographyProps'];
   secondary?: React.ReactNode;
-
-  checkbox?: boolean;
-  checked?: boolean;
-  indeterminate?: boolean;
-  preventDefault?: boolean;
-}
+  secondaryProps?: ListItemTextProps['secondaryTypographyProps'];
+  onChange?: (
+    event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
+    checked: boolean,
+    indeterminate: boolean
+  ) => void;
+};
 
 export const ListHeader: FC<ListHeaderProps> = ({
-  id,
-
-  checkboxProps,
   buttonProps,
-  underlined = false,
-  edge = 'end',
-  button = false,
-  disabled = false,
-
-  primary = null,
-  secondary = null,
-  primaryProps = null,
-  secondaryProps = null,
-
-  checkbox = false,
+  checkboxProps,
   checked = null,
+  disabled = false,
+  divider = false,
+  edge = 'end',
+  id = null,
   indeterminate = null,
-  preventDefault = false,
-  ...other
+  primary = null,
+  primaryProps = null,
+  secondary = null,
+  secondaryProps = null,
+  onChange = null,
+  ...listItemProps
 }) => {
   const theme = useTheme();
 
-  return button ? (
-    <ListItem key={primary.toString()} id={id} disableGutters disablePadding disabled={disabled} {...other}>
-      <ListItemButton
-        role={undefined}
-        dense
-        disableGutters
-        {...buttonProps}
-        sx={{
-          padding: 0,
-          // '&.MuiButtonBase-root:hover': { bgcolor: 'transparent' },
-          ...(underlined && { borderBottom: `1px solid ${theme.palette.divider}` })
-        }}
-      >
-        {checkboxProps && (
-          <ListItemIcon>
-            <Checkbox
-              edge={edge}
-              tabIndex={-1}
-              disableRipple
-              inputProps={{ id: id || primary.toString() }}
-              {...checkboxProps}
-            />
-          </ListItemIcon>
-        )}
-        <ListItemText
-          primary={
-            <label htmlFor={id || primary.toString()} style={{ cursor: 'pointer' }}>
-              {primary}
-            </label>
-          }
-          primaryTypographyProps={{
-            variant: 'body1',
-            sx: { '&:hover': { cursor: 'pointer' } },
-            ...primaryProps
-          }}
-          secondary={secondary}
-          secondaryTypographyProps={secondaryProps}
-        />
-      </ListItemButton>
-    </ListItem>
-  ) : (
+  return onChange === null ? (
     <ListItem
-      id={id}
+      key={id || primary.toString()}
       disableGutters
       disablePadding
       disabled={disabled}
-      sx={{ ...(underlined && { borderBottom: `1px solid ${theme.palette.divider}` }) }}
-      {...other}
+      {...listItemProps}
+      sx={{ ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }), ...listItemProps?.sx }}
     >
-      {checkboxProps && (
+      {checked !== null && (
         <ListItemIcon>
           <Checkbox
-            edge={edge}
-            tabIndex={-1}
+            checked={checked}
+            disabled={disabled}
             disableRipple
-            disabled
-            inputProps={{ id: `${id}-input` }}
+            edge={edge}
+            indeterminate={indeterminate}
+            inputProps={{ id: id || primary.toString(), ...checkboxProps?.inputProps }}
+            sx={{ cursor: 'initial', ...checkboxProps?.sx }}
+            tabIndex={-1}
             {...checkboxProps}
           />
         </ListItemIcon>
       )}
+
       <ListItemText
+        id={id}
         primary={primary}
         primaryTypographyProps={{ variant: 'body1', ...primaryProps }}
         secondary={secondary}
         secondaryTypographyProps={secondaryProps}
       />
+    </ListItem>
+  ) : (
+    <ListItem key={id || primary.toString()} disableGutters disablePadding {...listItemProps}>
+      <ListItemButton
+        role={undefined}
+        dense
+        disableGutters
+        disabled={disabled}
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          onChange(event, checked, indeterminate);
+        }}
+        {...buttonProps}
+        sx={{
+          padding: 0,
+          ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
+          ...buttonProps?.sx
+        }}
+      >
+        {checked !== null && (
+          <ListItemIcon>
+            <Checkbox
+              checked={checked}
+              disabled={disabled}
+              disableRipple
+              edge={edge}
+              indeterminate={indeterminate}
+              inputProps={{ id: id || primary.toString(), ...checkboxProps?.inputProps }}
+              sx={{ ...checkboxProps?.sx }}
+              tabIndex={-1}
+              {...checkboxProps}
+            />
+          </ListItemIcon>
+        )}
+
+        <ListItemText
+          id={id}
+          primary={primary}
+          primaryTypographyProps={{ variant: 'body1', ...primaryProps }}
+          secondary={secondary}
+          secondaryTypographyProps={secondaryProps}
+          cursor="pointer"
+        />
+      </ListItemButton>
     </ListItem>
   );
 };

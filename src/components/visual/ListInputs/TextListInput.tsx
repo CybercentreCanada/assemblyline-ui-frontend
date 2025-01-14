@@ -1,8 +1,9 @@
 import type { AutocompleteProps, FormHelperTextProps, IconButtonProps, ListItemTextProps } from '@mui/material';
 import { Autocomplete, TextField, useTheme } from '@mui/material';
+import { ListItemText } from 'components/visual/List/ListItemText';
 import type { ElementType } from 'react';
 import React, { useMemo } from 'react';
-import { BaseListItem, BaseListItemText } from './components/BaseListInput';
+import { BaseListItem } from './components/BaseListInput';
 import { ResetListInput, type ResetListInputProps } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
@@ -22,12 +23,12 @@ type Props<
   loading?: boolean;
   options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
   preventRender?: boolean;
-  primary?: string;
+  primary?: React.ReactNode;
   primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetListInputProps;
-  secondary?: ListItemTextProps['secondary'];
+  secondary?: React.ReactNode;
   secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
   showReset?: boolean;
   value: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['inputValue'];
@@ -75,25 +76,27 @@ const WrappedTextListInput = <
       helperText={errorValue}
       FormHelperTextProps={errorProps}
     >
-      <BaseListItemText
+      <ListItemText
         id={id}
         primary={primary}
         secondary={secondary}
         primaryTypographyProps={primaryProps}
         secondaryTypographyProps={secondaryProps}
         capitalize={capitalize}
+        style={{ marginRight: theme.spacing(2), margin: `${theme.spacing(0.25)} 0` }}
       />
       {loading ? (
         <SkeletonListInput />
       ) : (
         <>
           <ResetListInput
-            id={id || primary}
+            id={id || primary.toString()}
             preventRender={!reset || disabled || readOnly}
             onReset={onReset}
             {...resetProps}
           />
           <Autocomplete
+            id={id || primary.toString()}
             autoComplete
             freeSolo
             disableClearable
@@ -126,7 +129,7 @@ const WrappedTextListInput = <
                     }
                   })}
                 {...params}
-                inputProps={{ ...inputProps, id: id || primary }}
+                inputProps={inputProps}
               />
             )}
             {...autocompleteProps}

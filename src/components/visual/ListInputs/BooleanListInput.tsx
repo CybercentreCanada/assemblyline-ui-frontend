@@ -1,7 +1,8 @@
 import type { FormHelperTextProps, IconButtonProps, ListItemButtonProps, ListItemTextProps } from '@mui/material';
 import { FormHelperText, Switch, useTheme } from '@mui/material';
+import { ListItemText } from 'components/visual/List/ListItemText';
 import React, { useMemo } from 'react';
-import { BaseListItemButton, BaseListItemText } from './components/BaseListInput';
+import { BaseListItemButton } from './components/BaseListInput';
 import { ResetListInput, type ResetListInputProps } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
@@ -11,12 +12,12 @@ type Props = Omit<ListItemButtonProps, 'defaultValue' | 'onChange' | 'onClick' |
   errorProps?: FormHelperTextProps;
   loading?: boolean;
   preventRender?: boolean;
-  primary?: string;
+  primary?: React.ReactNode;
   primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetListInputProps;
-  secondary?: ListItemTextProps['secondary'];
+  secondary?: React.ReactNode;
   secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
   value: boolean;
   onChange?: (event: React.FormEvent<HTMLDivElement>, value: boolean) => void;
@@ -65,25 +66,27 @@ const WrappedBooleanListInput = ({
     >
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 0, width: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', minWidth: 0, width: '100%', columnGap: theme.spacing(1) }}>
-          <BaseListItemText
+          <ListItemText
             id={id}
             primary={primary}
             secondary={secondary}
             primaryTypographyProps={primaryProps}
             secondaryTypographyProps={secondaryProps}
             capitalize={capitalize}
+            cursor="pointer"
+            style={{ marginRight: theme.spacing(2), margin: `${theme.spacing(0.25)} 0` }}
           />
           {loading ? (
             <SkeletonListInput />
           ) : (
             <>
               <ResetListInput
-                id={id || primary}
+                id={id || primary.toString()}
                 preventRender={!reset || disabled || readOnly}
                 onReset={onReset}
                 {...resetProps}
               />
-              <Switch checked={value} edge="end" inputProps={{ id: id || primary }} />
+              <Switch checked={value} edge="end" disableRipple inputProps={{ id: id || primary.toString() }} />
             </>
           )}
         </div>

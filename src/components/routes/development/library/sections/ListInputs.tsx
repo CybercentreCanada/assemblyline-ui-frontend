@@ -247,8 +247,8 @@ export const ListInputsSection = React.memo(() => {
               selector={state => state.values.components.list_inputs.values.text}
               children={value => (
                 <TextListInput
-                  primary="Text List Input"
-                  secondary="Text List Input Description"
+                  primary="Controlled Text List Input"
+                  secondary="Controlled Text List Input Description"
                   value={value}
                   onChange={(event, next) => {
                     form.setStore(s => {
@@ -278,8 +278,8 @@ export const ListInputsSection = React.memo(() => {
               selector={state => state.values.components.list_inputs.values.number}
               children={value => (
                 <NumberListInput
-                  primary="Number List Input"
-                  secondary="Number List Input Description"
+                  primary="Controlled Number List Input"
+                  secondary="Controlled Number List Input Description"
                   value={value}
                   onChange={(event, next) => {
                     form.setStore(s => {
@@ -309,8 +309,8 @@ export const ListInputsSection = React.memo(() => {
               selector={state => state.values.components.list_inputs.values.select}
               children={value => (
                 <SelectListInput
-                  primary="Select List Input"
-                  secondary="Select List Input Description"
+                  primary="Controlled Select List Input"
+                  secondary="Controlled Select List Input Description"
                   value={value}
                   options={[
                     { label: 'Options 1', value: 'option 1' },
@@ -345,8 +345,8 @@ export const ListInputsSection = React.memo(() => {
               selector={state => state.values.components.list_inputs.values.classification}
               children={value => (
                 <ClassificationListInput
-                  primary="Classification List Input"
-                  secondary="Classification List Input Description"
+                  primary="Controlled Classification List Input"
+                  secondary="Controlled Classification List Input Description"
                   value={value}
                   onChange={next => {
                     form.setStore(s => {
@@ -376,8 +376,8 @@ export const ListInputsSection = React.memo(() => {
               selector={state => state.values.components.list_inputs.values.boolean}
               children={value => (
                 <BooleanListInput
-                  primary="Boolean List Input"
-                  secondary="Boolean List Input Description"
+                  primary="Controlled Boolean List Input"
+                  secondary="Controlled Boolean List Input Description"
                   value={value}
                   onChange={(event, next) => {
                     form.setStore(s => {
