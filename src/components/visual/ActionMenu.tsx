@@ -15,8 +15,6 @@ import useExternalLookup from 'components/hooks/useExternalLookup';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { URIHashPatternMap } from 'components/models/base/config';
-import { URI_HASH_PATTERN_MAP } from 'components/models/base/config';
 import { isAccessible } from 'helpers/classificationParser';
 import { getSubmitType, safeFieldValueURI, toTitleCase } from 'helpers/utils';
 import React, { useCallback, useEffect } from 'react';
@@ -455,9 +453,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           </Tooltip>
         )}
         {submitType &&
-          (!URI_HASH_PATTERN_MAP.includes(submitType as URIHashPatternMap) ||
-            (URI_HASH_PATTERN_MAP.includes(submitType as URIHashPatternMap) &&
-              !!currentUserConfig?.ui?.allow_url_submissions)) && (
+          (submitType !== 'url' || (submitType === 'url' && !!currentUserConfig?.ui?.allow_url_submissions)) && (
             <MenuItem
               dense
               component={Link}

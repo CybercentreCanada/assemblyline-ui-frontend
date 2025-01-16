@@ -1,6 +1,6 @@
 import type { Configuration, HashPatternMap } from 'components/models/base/config';
 import type { PossibleColors } from 'components/visual/CustomChip';
-import { DOMAIN_REGEX, IP_REGEX, URL_REGEX } from './constants';
+import { URL_REGEX } from './constants';
 
 /**
  *
@@ -426,8 +426,6 @@ export function getSubmitType(input: string, configuration: Configuration): [Has
 
   if (detectedHashType) return [detectedHashType, value.trim()];
   else if (!detectedHashType && URL_REGEX.exec(value.trimStart())) return ['url', value.trimStart()];
-  else if (!detectedHashType && DOMAIN_REGEX.exec(value.trimStart())) return ['domain', value.trimStart()];
-  else if (!detectedHashType && IP_REGEX.exec(value.trimStart())) return ['ip', value.trimStart()];
   else return [null, input];
 }
 
