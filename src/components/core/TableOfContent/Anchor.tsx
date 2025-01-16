@@ -1,29 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useId } from 'react';
 import { useTableOfContent } from './TableOfContent';
 
 export type AnchorProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
   anchor?: string;
-  label?: string;
+  label?: React.ReactNode;
   subheader?: boolean;
+  disabled?: boolean;
 };
 
 export const Anchor: React.FC<AnchorProps> = React.memo(
-  ({ anchor = null, label = null, subheader = false, children = null, ...props }: AnchorProps) => {
+  ({ anchor = null, label = '', subheader = false, children = null, disabled = false, ...props }: AnchorProps) => {
+    const id = useId();
     const { loadAnchors } = useTableOfContent();
 
     useEffect(() => {
-      loadAnchors();
-      return () => loadAnchors();
-    }, [loadAnchors]);
+      if (disabled) return;
+      loadAnchors({ id: anchor || id, label: label.toString(), subheader });
+      return () => loadAnchors({});
+    }, [anchor, disabled, id, label, loadAnchors, subheader]);
 
-    return (
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
-      <div
-        data-anchor={anchor || children.toString()}
-        data-anchor-label={label || children.toString()}
-        data-anchor-subheader={subheader}
-        {...props}
-      >
+    return disabled ? (
+      children
+    ) : (
+      <div data-anchor={anchor || id} {...props}>
         {children}
       </div>
     );

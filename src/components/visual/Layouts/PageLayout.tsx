@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React from 'react';
 
@@ -11,6 +11,7 @@ const useStyles = makeStyles(theme => ({
     overflowY: 'auto'
   },
   wrapper: {
+    minWidth: 0,
     flex: 1,
     display: 'flex',
     justifyContent: 'center',
@@ -19,9 +20,9 @@ const useStyles = makeStyles(theme => ({
   container: {
     display: 'flex',
     flexDirection: 'column',
-    margin: `0 ${theme.spacing(4)}`,
+    // margin: `0 ${theme.spacing(4)}`,
     width: '100%',
-    minWidth: `${theme.breakpoints.values.md}px`,
+    // minWidth: `${theme.breakpoints.values.md}px`,
     maxWidth: '1200px'
   },
   navigation: {
@@ -37,14 +38,17 @@ const useStyles = makeStyles(theme => ({
     top: 0,
     zIndex: 1000,
     backgroundColor: theme.palette.background.default,
-    paddingBottom: theme.spacing(2)
+    paddingBottom: theme.spacing(2),
+    margin: theme.spacing(4),
+    marginBottom: 0
   },
   content: {
     display: 'flex',
     flexDirection: 'column',
     rowGap: theme.spacing(4),
-    marginTop: theme.spacing(2),
-    padding: '1px'
+    padding: '1px',
+    margin: theme.spacing(4),
+    marginTop: 0
   }
 }));
 
@@ -56,6 +60,7 @@ export type PageLayoutProps = {
   rootRef?: React.MutableRefObject<HTMLDivElement>;
   contentRef?: React.MutableRefObject<HTMLDivElement>;
   headerRef?: React.MutableRefObject<HTMLDivElement>;
+  margin?: number;
 };
 
 export const PageLayout: React.FC<PageLayoutProps> = React.memo(
@@ -66,8 +71,10 @@ export const PageLayout: React.FC<PageLayoutProps> = React.memo(
     rightNav = null,
     rootRef = null,
     contentRef = null,
-    headerRef = null
+    headerRef = null,
+    margin = 0
   }: PageLayoutProps) => {
+    const theme = useTheme();
     const classes = useStyles();
 
     return (

@@ -62,40 +62,12 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: theme.spacing(2),
     paddingTop: theme.spacing(2)
   },
-
   flex: {
     display: 'flex',
     flexDirection: 'column',
     flex: 1
   }
 }));
-
-type WrapperProps = {
-  anchor: boolean;
-  children: React.ReactNode;
-  id: string;
-  primary: React.ReactNode;
-  subheader: boolean;
-};
-
-const Wrapper: React.FC<WrapperProps> = React.memo(
-  ({ anchor = null, children = null, id = null, primary = null, subheader = false }: WrapperProps) => {
-    const classes = useStyles();
-
-    return anchor ? (
-      <Anchor
-        className={classes.root}
-        anchor={id || primary.toString()}
-        label={primary.toString()}
-        subheader={subheader}
-      >
-        {children}
-      </Anchor>
-    ) : (
-      <div className={classes.root}>{children}</div>
-    );
-  }
-);
 
 export type PageSectionProps = {
   anchor?: boolean;
@@ -125,7 +97,6 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
     divider = false,
     endAdornment = null,
     flex = false,
-    id = null,
     open: openProp = null,
     primary = null,
     primaryProps = null,
@@ -157,84 +128,86 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
     }, [endAdornment]);
 
     return (
-      <Wrapper anchor={anchor} id={id} primary={primary} subheader={subheader}>
-        <div className={classes.container}>
-          <Button
-            className={classes.button}
-            color="inherit"
-            fullWidth
-            disabled={!collapsible}
-            onClick={() => (openProp !== null ? onChange(!openProp) : setOpen(o => !o))}
-          >
-            <div className={classes.titles}>
-              <Typography
-                color="textPrimary"
-                overflow="hidden"
-                textAlign="start"
-                textOverflow="ellipsis"
-                textTransform="initial"
-                variant="h6"
-                whiteSpace="nowrap"
-                width="100%"
-                {...(subheader && { variant: 'h5' })}
-                sx={{ ...(!collapsible && { cursor: 'text', userSelect: 'initial' }), ...primaryProps?.sx }}
-                {...primaryProps}
-              >
-                {primary}
-              </Typography>
+      <Anchor label={primary} subheader={subheader} disabled={!anchor}>
+        <div className={classes.root}>
+          <div className={classes.container}>
+            <Button
+              className={classes.button}
+              color="inherit"
+              fullWidth
+              disabled={!collapsible}
+              onClick={() => (openProp !== null ? onChange(!openProp) : setOpen(o => !o))}
+            >
+              <div className={classes.titles}>
+                <Typography
+                  color="textPrimary"
+                  overflow="hidden"
+                  textAlign="start"
+                  textOverflow="ellipsis"
+                  textTransform="initial"
+                  variant="h6"
+                  whiteSpace="nowrap"
+                  width="100%"
+                  {...(subheader && { variant: 'h5' })}
+                  sx={{ ...(!collapsible && { cursor: 'text', userSelect: 'initial' }), ...primaryProps?.sx }}
+                  {...primaryProps}
+                >
+                  {primary}
+                </Typography>
 
-              <Typography
-                color="textSecondary"
-                component="div"
-                overflow="hidden"
-                textAlign="start"
-                textOverflow="ellipsis"
-                textTransform="initial"
-                variant="caption"
-                whiteSpace="nowrap"
-                width="100%"
-                sx={{ ...(!collapsible && { cursor: 'text', userSelect: 'initial' }), ...secondaryProps?.sx }}
-                {...secondaryProps}
-              >
-                {secondary}
-              </Typography>
-            </div>
+                <Typography
+                  color="textSecondary"
+                  component="div"
+                  overflow="hidden"
+                  textAlign="start"
+                  textOverflow="ellipsis"
+                  textTransform="initial"
+                  variant="caption"
+                  whiteSpace="nowrap"
+                  width="100%"
+                  sx={{ ...(!collapsible && { cursor: 'text', userSelect: 'initial' }), ...secondaryProps?.sx }}
+                  {...secondaryProps}
+                >
+                  {secondary}
+                </Typography>
+              </div>
 
-            {!collapsible ? null : <ExpandMore expand={openProp !== null ? openProp : open} />}
-            {!endAdornment ? null : <div style={{ width: width }} />}
-          </Button>
-          {!endAdornment ? null : (
-            <div className={classes.endAdornment} ref={endRef}>
-              {endAdornment}
-            </div>
-          )}
-        </div>
+              {!collapsible ? null : <ExpandMore expand={openProp !== null ? openProp : open} />}
+              {!endAdornment ? null : <div style={{ width: width }} />}
+            </Button>
+            {!endAdornment ? null : (
+              <div className={classes.endAdornment} ref={endRef}>
+                {endAdornment}
+              </div>
+            )}
+          </div>
 
-        {!divider ? null : <Divider />}
+          {!divider ? null : <Divider />}
 
-        {!children ? null : collapsible ? (
-          <Collapse
-            in={openProp !== null ? openProp : open}
-            timeout="auto"
-            onEnter={() => setRender(true)}
-            sx={{
-              ...(flex && {
-                '&.MuiCollapse-root': { display: 'flex', flexDirection: 'column', flex: 1 },
-                '& .MuiCollapse-wrapper': { display: 'flex', flexDirection: 'column', flex: 1 },
-                '& .MuiCollapse-wrapperInner': { display: 'flex', flexDirection: 'column', flex: 1 }
-              })
-            }}
-          >
+          {!children ? null : collapsible ? (
+            <Collapse
+              in={openProp !== null ? openProp : open}
+              timeout="auto"
+              onEnter={() => setRender(true)}
+              sx={{
+                ...(flex && {
+                  '&.MuiCollapse-root': { display: 'flex', flexDirection: 'column', flex: 1 },
+                  '& .MuiCollapse-wrapper': { display: 'flex', flexDirection: 'column', flex: 1 },
+                  '& .MuiCollapse-wrapperInner': { display: 'flex', flexDirection: 'column', flex: 1 }
+                })
+              }}
+            >
+              <div className={clsx(classes.spacer, flex && classes.flex)} {...wrapperProps}>
+                {render && children}
+              </div>
+            </Collapse>
+          ) : (
             <div className={clsx(classes.spacer, flex && classes.flex)} {...wrapperProps}>
               {render && children}
             </div>
-          </Collapse>
-        ) : (
-          <div className={clsx(classes.spacer, flex && classes.flex)} {...wrapperProps}>
-            {render && children}
-          </div>
-        )}
-      </Wrapper>
+          )}
+        </div>
+      </Anchor>
     );
   }
 );

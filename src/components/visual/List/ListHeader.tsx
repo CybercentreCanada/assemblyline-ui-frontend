@@ -1,9 +1,12 @@
 import type { CheckboxProps, ListItemButtonProps, ListItemProps, ListItemTextProps } from '@mui/material';
 import { Checkbox, ListItem, ListItemButton, ListItemIcon, useTheme } from '@mui/material';
+import { Anchor, AnchorProps } from 'components/core/TableOfContent/Anchor';
 import { type FC, type MouseEvent } from 'react';
 import { ListItemText } from './ListItemText';
 
 export type ListHeaderProps = Omit<ListItemProps, 'onChange'> & {
+  anchor?: boolean;
+  anchorProps?: AnchorProps;
   buttonProps?: ListItemButtonProps;
   checkboxProps?: CheckboxProps;
   checked?: CheckboxProps['checked'];
@@ -23,6 +26,8 @@ export type ListHeaderProps = Omit<ListItemProps, 'onChange'> & {
 };
 
 export const ListHeader: FC<ListHeaderProps> = ({
+  anchor = false,
+  anchorProps = null,
   buttonProps,
   checkboxProps,
   checked = null,
@@ -41,56 +46,14 @@ export const ListHeader: FC<ListHeaderProps> = ({
   const theme = useTheme();
 
   return onChange === null ? (
-    <ListItem
-      key={id || primary.toString()}
-      disableGutters
-      disablePadding
-      disabled={disabled}
-      {...listItemProps}
-      sx={{ ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }), ...listItemProps?.sx }}
-    >
-      {checked !== null && (
-        <ListItemIcon>
-          <Checkbox
-            checked={checked}
-            disabled={disabled}
-            disableRipple
-            edge={edge}
-            indeterminate={indeterminate}
-            inputProps={{ id: id || primary.toString(), ...checkboxProps?.inputProps }}
-            sx={{ cursor: 'initial', ...checkboxProps?.sx }}
-            tabIndex={-1}
-            {...checkboxProps}
-          />
-        </ListItemIcon>
-      )}
-
-      <ListItemText
-        id={id}
-        primary={primary}
-        primaryTypographyProps={{ variant: 'body1', ...primaryProps }}
-        secondary={secondary}
-        secondaryTypographyProps={secondaryProps}
-      />
-    </ListItem>
-  ) : (
-    <ListItem key={id || primary.toString()} disableGutters disablePadding {...listItemProps}>
-      <ListItemButton
-        role={undefined}
-        dense
+    <Anchor label={id || primary.toString()} disabled={!anchor} {...anchorProps}>
+      <ListItem
+        key={id || primary.toString()}
         disableGutters
+        disablePadding
         disabled={disabled}
-        onClick={event => {
-          event.preventDefault();
-          event.stopPropagation();
-          onChange(event, checked, indeterminate);
-        }}
-        {...buttonProps}
-        sx={{
-          padding: 0,
-          ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
-          ...buttonProps?.sx
-        }}
+        {...listItemProps}
+        sx={{ ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }), ...listItemProps?.sx }}
       >
         {checked !== null && (
           <ListItemIcon>
@@ -101,7 +64,7 @@ export const ListHeader: FC<ListHeaderProps> = ({
               edge={edge}
               indeterminate={indeterminate}
               inputProps={{ id: id || primary.toString(), ...checkboxProps?.inputProps }}
-              sx={{ ...checkboxProps?.sx }}
+              sx={{ cursor: 'initial', ...checkboxProps?.sx }}
               tabIndex={-1}
               {...checkboxProps}
             />
@@ -114,9 +77,55 @@ export const ListHeader: FC<ListHeaderProps> = ({
           primaryTypographyProps={{ variant: 'body1', ...primaryProps }}
           secondary={secondary}
           secondaryTypographyProps={secondaryProps}
-          cursor="pointer"
         />
-      </ListItemButton>
-    </ListItem>
+      </ListItem>
+    </Anchor>
+  ) : (
+    <Anchor label={id || primary.toString()} disabled={!anchor} {...anchorProps}>
+      <ListItem key={id || primary.toString()} disableGutters disablePadding {...listItemProps}>
+        <ListItemButton
+          role={undefined}
+          dense
+          disableGutters
+          disabled={disabled}
+          onClick={event => {
+            event.preventDefault();
+            event.stopPropagation();
+            onChange(event, checked, indeterminate);
+          }}
+          {...buttonProps}
+          sx={{
+            padding: 0,
+            ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
+            ...buttonProps?.sx
+          }}
+        >
+          {checked !== null && (
+            <ListItemIcon>
+              <Checkbox
+                checked={checked}
+                disabled={disabled}
+                disableRipple
+                edge={edge}
+                indeterminate={indeterminate}
+                inputProps={{ id: id || primary.toString(), ...checkboxProps?.inputProps }}
+                sx={{ ...checkboxProps?.sx }}
+                tabIndex={-1}
+                {...checkboxProps}
+              />
+            </ListItemIcon>
+          )}
+
+          <ListItemText
+            id={id}
+            primary={primary}
+            primaryTypographyProps={{ variant: 'body1', ...primaryProps }}
+            secondary={secondary}
+            secondaryTypographyProps={secondaryProps}
+            cursor="pointer"
+          />
+        </ListItemButton>
+      </ListItem>
+    </Anchor>
   );
 };

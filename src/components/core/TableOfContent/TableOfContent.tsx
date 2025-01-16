@@ -18,8 +18,8 @@ const { FormProvider, useForm } = createFormContext<TableOfContentStore>({
 export type TableOfContentContextProps = {
   rootRef: React.MutableRefObject<HTMLDivElement>;
   headerRef: React.MutableRefObject<HTMLDivElement>;
-  loadAnchors: () => void;
-  scrollTo: (event: React.SyntheticEvent, anchor: string) => void;
+  loadAnchors: (props?: { id?: string; label?: string; subheader?: boolean }) => void;
+  scrollTo: (event: React.SyntheticEvent, index: number) => void;
   Anchors: React.FC<{ children: (anchors: TableOfContentStore['anchors']) => React.ReactNode }>;
   ActiveAnchor: React.FC<{
     anchorIndex: TableOfContentStore['active'];
@@ -80,36 +80,40 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
       }
     }, [form]);
 
-    const loadAnchors = useCallback(() => {
-      form.setStore(s => {
-        const elements = rootRef.current?.querySelectorAll('[data-anchor]');
+    const loadAnchors = useCallback<TableOfContentContextProps['loadAnchors']>(
+      ({ id = null, label = null, subheader = false }) => {
+        form.setStore(s => {
+          const elements = rootRef.current?.querySelectorAll('[data-anchor]');
+          const anchors: TableOfContentStore['anchors'] = [];
 
-        s.active = null;
-        s.anchors = [];
-        elements.forEach(element => {
-          s.anchors.push({
-            id: element.getAttribute('data-anchor'),
-            label: element.getAttribute('data-anchor-label'),
-            subheader: element.getAttribute('data-anchor-subheader') === 'true'
+          elements.forEach(element => {
+            const anchorID = element.getAttribute('data-anchor');
+            const index = s.anchors.findIndex(a => a.id === anchorID);
+            if (id === anchorID) anchors.push({ id, label, subheader });
+            else if (index >= 0) anchors.push(s.anchors[index]);
           });
+
+          s.active = null;
+          s.anchors = anchors;
+          return s;
         });
+      },
+      [form]
+    );
 
-        return s;
-      });
-    }, [form]);
-
-    const scrollTo = useCallback(
-      (event: React.SyntheticEvent, anchor: string) => {
+    const scrollTo = useCallback<TableOfContentContextProps['scrollTo']>(
+      (event, index) => {
         event.preventDefault();
         event.stopPropagation();
 
+        const anchor = form.getFieldValue(`anchors[${index}].id`) as string;
         const element: HTMLDivElement = rootRef.current.querySelector("[data-anchor='" + anchor + "']");
         rootRef.current.scrollTo({
           top: element.offsetTop - rootRef.current.offsetTop - headerRef.current.getBoundingClientRect().height,
           behavior: behavior
         });
       },
-      [behavior]
+      [behavior, form]
     );
 
     useEffect(() => {
