@@ -1,13 +1,23 @@
-import type { FormHelperTextProps, IconButtonProps, SliderProps, TooltipProps, TypographyProps } from '@mui/material';
+import type {
+  FormHelperTextProps,
+  IconButtonProps,
+  SliderProps,
+  TextFieldProps,
+  TooltipProps,
+  TypographyProps
+} from '@mui/material';
 import { FormControl, FormHelperText, Skeleton, Slider, Typography, useTheme } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
 type Props = Omit<SliderProps, 'value' | 'onChange'> & {
+  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
   error?: (value: number) => string;
   errorProps?: FormHelperTextProps;
+  helperText?: string;
+  helperTextProps?: FormHelperTextProps;
   label: string;
   labelProps?: TypographyProps;
   loading?: boolean;
@@ -26,8 +36,11 @@ type Props = Omit<SliderProps, 'value' | 'onChange'> & {
 
 const WrappedSliderInput = ({
   disabled,
+  endAdornment = null,
   error = () => null,
   errorProps = null,
+  helperText = null,
+  helperTextProps = null,
   id = null,
   label,
   labelProps,
@@ -47,13 +60,15 @@ const WrappedSliderInput = ({
 }: Props) => {
   const theme = useTheme();
 
+  const [focused, setFocused] = useState<boolean>(false);
+
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
-    <div>
+    <div style={{ textAlign: 'left' }}>
       <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
-          color={!disabled && errorValue ? 'error' : 'textSecondary'}
+          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
           gutterBottom
           overflow="hidden"
           textAlign="start"
@@ -92,6 +107,8 @@ const WrappedSliderInput = ({
                     const err = error(v as number);
                     if (err) onError(err);
                   }}
+                  onFocus={event => setFocused(document.activeElement === event.target)}
+                  onBlur={() => setFocused(false)}
                   {...sliderProps}
                 />
               </div>
@@ -102,7 +119,7 @@ const WrappedSliderInput = ({
                 {...resetProps}
               />
             </div>
-            {!errorValue || disabled ? null : (
+            {disabled ? null : errorValue ? (
               <FormHelperText
                 sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
                 variant="outlined"
@@ -110,7 +127,15 @@ const WrappedSliderInput = ({
               >
                 {errorValue}
               </FormHelperText>
-            )}
+            ) : helperText ? (
+              <FormHelperText
+                sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
+                variant="outlined"
+                {...helperTextProps}
+              >
+                {helperText}
+              </FormHelperText>
+            ) : null}
           </>
         )}
       </FormControl>

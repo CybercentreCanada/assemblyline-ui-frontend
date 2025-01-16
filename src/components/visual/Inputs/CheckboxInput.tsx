@@ -1,10 +1,17 @@
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
-import type { ButtonProps, FormHelperTextProps, IconButtonProps, TooltipProps, TypographyProps } from '@mui/material';
+import type {
+  ButtonProps,
+  FormHelperTextProps,
+  IconButtonProps,
+  TextFieldProps,
+  TooltipProps,
+  TypographyProps
+} from '@mui/material';
 import { Button, FormHelperText, Skeleton, Typography, useTheme } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { ExpendInputProps } from './components/ExpendInput';
 import { ExpendInput } from './components/ExpendInput';
 import type { ResetInputProps } from './components/ResetInput';
@@ -12,10 +19,13 @@ import { ResetInput } from './components/ResetInput';
 
 type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   disableGap?: boolean;
+  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
   error?: (value: boolean) => string;
   errorProps?: FormHelperTextProps;
   expend?: boolean;
   expendProps?: ExpendInputProps;
+  helperText?: string;
+  helperTextProps?: FormHelperTextProps;
   indeterminate?: boolean;
   label: string;
   labelProps?: TypographyProps;
@@ -41,10 +51,13 @@ export const CheckboxInput: React.FC<Props> = React.memo(
   ({
     disabled = false,
     disableGap = false,
+    endAdornment = null,
     error = () => null,
     errorProps = null,
     expend = null,
     expendProps = null,
+    helperText = null,
+    helperTextProps = null,
     id = null,
     indeterminate = false,
     label = null,
@@ -66,6 +79,8 @@ export const CheckboxInput: React.FC<Props> = React.memo(
   }: Props) => {
     const theme = useTheme();
 
+    const [focused, setFocused] = useState<boolean>(false);
+
     const errorValue = useMemo<string>(() => error(value), [error, value]);
 
     return preventRender ? null : (
@@ -82,6 +97,8 @@ export const CheckboxInput: React.FC<Props> = React.memo(
               const err = error(!value);
               if (err) onError(err);
             }}
+            onFocus={event => setFocused(document.activeElement === event.target)}
+            onBlur={() => setFocused(false)}
             sx={{
               padding: 0,
               justifyContent: 'flex-start',
@@ -118,7 +135,7 @@ export const CheckboxInput: React.FC<Props> = React.memo(
 
             <Typography
               component="label"
-              color={!disabled && errorValue ? 'error' : 'textPrimary'}
+              color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
               htmlFor={id || label}
               margin="9px 0px"
               overflow="hidden"
@@ -148,7 +165,7 @@ export const CheckboxInput: React.FC<Props> = React.memo(
           </Button>
         </Tooltip>
 
-        {!errorValue || disabled ? null : (
+        {disabled ? null : errorValue ? (
           <FormHelperText
             sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
             variant="outlined"
@@ -156,7 +173,15 @@ export const CheckboxInput: React.FC<Props> = React.memo(
           >
             {errorValue}
           </FormHelperText>
-        )}
+        ) : helperText ? (
+          <FormHelperText
+            sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
+            variant="outlined"
+            {...helperTextProps}
+          >
+            {helperText}
+          </FormHelperText>
+        ) : null}
 
         <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0 }}>
           <ResetInput

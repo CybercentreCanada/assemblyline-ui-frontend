@@ -1,4 +1,4 @@
-import { Typography, useTheme } from '@mui/material';
+import { Button, Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
@@ -24,6 +24,9 @@ export type InputsLibraryState = {
       tooltip: boolean;
       error: boolean;
       readOnly: boolean;
+      helperText: boolean;
+      placeholder: boolean;
+      endAdornment: boolean;
     };
     values: {
       text: string;
@@ -46,11 +49,14 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
       reset: false,
       tooltip: false,
       error: false,
-      readOnly: false
+      readOnly: false,
+      helperText: false,
+      placeholder: false,
+      endAdornment: false
     },
     values: {
       text: '',
-      number: 0,
+      number: null,
       date: '',
       select: '',
       checkbox: false,
@@ -1388,7 +1394,7 @@ export const InputsSection = React.memo(() => {
                 <NumberInput
                   label="Error Number Input"
                   value={value}
-                  error={v => (v !== 0 ? null : 'Input field cannot be 0')}
+                  error={v => (v !== null ? null : 'Input field cannot be null')}
                   onChange={(event, next) => {
                     form.setStore(s => {
                       s.components.inputs.values.number = next;
@@ -1548,6 +1554,319 @@ export const InputsSection = React.memo(() => {
   error={v => (v !== false ? null : 'Input field cannot be false')}
   onChange={(event, next) => {}}
   onError={error => {}}
+  />
+</>`}
+          />
+        }
+      />
+
+      <DemoSection
+        primary={'Helper Text'}
+        secondary={
+          <>
+            <span>
+              {"A Helper Text is visible below the inputs only if it is not disabled or doesn't have an error. "}
+            </span>
+          </>
+        }
+        left={
+          <>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.text}
+              children={value => (
+                <TextInput
+                  label="Helper Text Text Input"
+                  value={value}
+                  helperText="Helper Text"
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.text = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.number}
+              children={value => (
+                <NumberInput
+                  label="Helper Text Number Input"
+                  value={value}
+                  helperText="Helper Text"
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.number = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.select}
+              children={value => (
+                <SelectInput
+                  label="Helper Text Select Input"
+                  value={value}
+                  helperText="Helper Text"
+                  options={[
+                    { label: 'Options 1', value: 'option 1' },
+                    { label: 'Options 2', value: 'option 2' },
+                    { label: 'Options 3', value: 'option 3' }
+                  ]}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.select = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.date}
+              children={value => (
+                <DateInput
+                  label="Helper Text Date Input"
+                  value={value}
+                  helperText="Helper Text"
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.date = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.slider}
+              children={value => (
+                <SliderInput
+                  label="Helper Text Slider Input"
+                  value={value}
+                  helperText="Helper Text"
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.slider = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.checkbox}
+              children={value => (
+                <CheckboxInput
+                  label="Helper Text Checkbox Input"
+                  value={value}
+                  helperText="Helper Text"
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.checkbox = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.switch}
+              children={value => (
+                <SwitchInput
+                  label="Helper Text Switch Input"
+                  value={value}
+                  helperText="Helper Text"
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.switch = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
+  <TextInput
+  label="Helper Text Text Input"
+  value={value}
+  helperText='Helper Text'
+  onChange={(event, next) => {}}
+  />
+
+  <NumberInput
+  label="Helper Text Number Input"
+  value={value}
+  helperText='Helper Text'
+  onChange={(event, next) => {}}
+  />
+
+  <SelectInput
+  label="Helper Text Select Input"
+  value={value}
+  options={[
+    { label: 'Options 1', value: 'option 1' },
+    { label: 'Options 2', value: 'option 2' },
+    { label: 'Options 3', value: 'option 3' }
+  ]}
+  helperText='Helper Text'
+  onChange={(event, next) => {}}
+  />
+
+  <DateInput
+  label="Helper Text Date Input"
+  value={value}
+  helperText='Helper Text'
+  onChange={next => {}}
+  />
+
+  <SliderInput
+  label="Helper Text Slider Input"
+  value={value}
+  helperText='Helper Text'
+  onChange={(event, next) => {}}
+  />
+
+  <CheckboxInput
+  label="Helper Text Checkbox Input"
+  value={value}
+  helperText='Helper Text'
+  onChange={(event, next) => {}}
+  />
+
+  <SwitchInput
+  label="Helper Text Switch Input"
+  value={value}
+  helperText='Helper Text'
+  onChange={(event, next) => {}}
+  />
+</>`}
+          />
+        }
+      />
+
+      <DemoSection
+        primary={'Placeholder'}
+        secondary={
+          <>
+            <span></span>
+          </>
+        }
+        left={
+          <>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.text}
+              children={value => (
+                <TextInput
+                  label="Placeholder Text Input"
+                  value={value}
+                  placeholder="Placeholder"
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.text = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.number}
+              children={value => (
+                <NumberInput
+                  label="Placeholder Number Input"
+                  value={value}
+                  placeholder="Placeholder"
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.number = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.select}
+              children={value => (
+                <SelectInput
+                  label="Placeholder Select Input"
+                  value={value}
+                  placeholder="Placeholder"
+                  options={[
+                    { label: 'Options 1', value: 'option 1' },
+                    { label: 'Options 2', value: 'option 2' },
+                    { label: 'Options 3', value: 'option 3' }
+                  ]}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.select = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.date}
+              children={value => (
+                <DateInput
+                  label="Placeholder Date Input"
+                  value={value}
+                  placeholder="Placeholder"
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.date = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
+  <TextInput
+  label="Placeholder Text Input"
+  value={value}
+  placeholder="Placeholder"
+  onChange={(event, next) => {}}
+  />
+
+  <NumberInput
+  label="Placeholder Number Input"
+  value={value}
+  placeholder="Placeholder"
+  onChange={(event, next) => {}}
+  />
+
+  <SelectInput
+  label="Placeholder Select Input"
+  value={value}
+  options={[
+    { label: 'Options 1', value: 'option 1' },
+    { label: 'Options 2', value: 'option 2' },
+    { label: 'Options 3', value: 'option 3' }
+  ]}
+  placeholder="Placeholder"
+  onChange={(event, next) => {}}
+  />
+
+  <DateInput
+  label="Placeholder Date Input"
+  value={value}
+  placeholder="Placeholder"
+  onChange={next => {}}
   />
 </>`}
           />
@@ -1755,6 +2074,196 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
+        primary={'End Adornment'}
+        secondary={
+          <>
+            <span></span>
+          </>
+        }
+        left={
+          <>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.text}
+              children={value => (
+                <TextInput
+                  label="End Adornment Text Input"
+                  value={value}
+                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.text = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.number}
+              children={value => (
+                <NumberInput
+                  label="End Adornment Number Input"
+                  value={value}
+                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.number = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.select}
+              children={value => (
+                <SelectInput
+                  label="End Adornment Select Input"
+                  value={value}
+                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+                  options={[
+                    { label: 'Options 1', value: 'option 1' },
+                    { label: 'Options 2', value: 'option 2' },
+                    { label: 'Options 3', value: 'option 3' }
+                  ]}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.select = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.date}
+              children={value => (
+                <DateInput
+                  label="End Adornment Date Input"
+                  value={value}
+                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.date = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.slider}
+              children={value => (
+                <SliderInput
+                  label="End Adornment Slider Input"
+                  value={value}
+                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.slider = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.checkbox}
+              children={value => (
+                <CheckboxInput
+                  label="End Adornment Checkbox Input"
+                  value={value}
+                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.checkbox = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.switch}
+              children={value => (
+                <SwitchInput
+                  label="End Adornment Switch Input"
+                  value={value}
+                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.values.switch = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
+  <TextInput
+  label="End Adornment Text Input"
+  value={value}
+  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+  onChange={(event, next) => {}}
+  />
+
+  <NumberInput
+  label="End Adornment Number Input"
+  value={value}
+  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+  onChange={(event, next) => {}}
+  />
+
+  <SelectInput
+  label="End Adornment Select Input"
+  value={value}
+  options={[
+    { label: 'Options 1', value: 'option 1' },
+    { label: 'Options 2', value: 'option 2' },
+    { label: 'Options 3', value: 'option 3' }
+  ]}
+  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+  onChange={(event, next) => {}}
+  />
+
+  <DateInput
+  label="End Adornment Date Input"
+  value={value}
+  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+  onChange={next => {}}
+  />
+
+  <SliderInput
+  label="End Adornment Slider Input"
+  value={value}
+  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+  onChange={(event, next) => {}}
+  />
+
+  <CheckboxInput
+  label="End Adornment Checkbox Input"
+  value={value}
+  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+  onChange={(event, next) => {}}
+  />
+
+  <SwitchInput
+  label="End Adornment Switch Input"
+  value={value}
+  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+  onChange={(event, next) => {}}
+  />
+</>`}
+          />
+        }
+      />
+
+      <DemoSection
         primary={'Interactions'}
         secondary={
           <>
@@ -1770,9 +2279,12 @@ export const InputsSection = React.memo(() => {
               state.values.components.inputs.state.reset,
               state.values.components.inputs.state.tooltip,
               state.values.components.inputs.state.error,
-              state.values.components.inputs.state.readOnly
+              state.values.components.inputs.state.readOnly,
+              state.values.components.inputs.state.helperText,
+              state.values.components.inputs.state.placeholder,
+              state.values.components.inputs.state.endAdornment
             ]}
-            children={([disabled, loading, reset, tooltip, error, readOnly]) => (
+            children={([disabled, loading, reset, tooltip, error, readOnly, helperText, placeholder, endAdornment]) => (
               <>
                 <form.Subscribe
                   selector={state => state.values.components.inputs.values.text}
@@ -1800,6 +2312,9 @@ export const InputsSection = React.memo(() => {
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
+                      {...(helperText && { helperText: 'Helper Text' })}
+                      {...(placeholder && { placeholder: 'Placeholder' })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
                     />
                   )}
                 />
@@ -1830,6 +2345,9 @@ export const InputsSection = React.memo(() => {
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
+                      {...(helperText && { helperText: 'Helper Text' })}
+                      {...(placeholder && { placeholder: 'Placeholder' })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
                     />
                   )}
                 />
@@ -1865,6 +2383,9 @@ export const InputsSection = React.memo(() => {
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
+                      {...(helperText && { helperText: 'Helper Text' })}
+                      {...(placeholder && { placeholder: 'Placeholder' })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
                     />
                   )}
                 />
@@ -1895,6 +2416,9 @@ export const InputsSection = React.memo(() => {
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
+                      {...(helperText && { helperText: 'Helper Text' })}
+                      {...(placeholder && { placeholder: 'Placeholder' })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
                     />
                   )}
                 />
@@ -1925,6 +2449,9 @@ export const InputsSection = React.memo(() => {
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
+                      {...(helperText && { helperText: 'Helper Text' })}
+                      {...(placeholder && { placeholder: 'Placeholder' })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
                     />
                   )}
                 />
@@ -1955,6 +2482,9 @@ export const InputsSection = React.memo(() => {
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
+                      {...(helperText && { helperText: 'Helper Text' })}
+                      {...(placeholder && { placeholder: 'Placeholder' })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
                     />
                   )}
                 />
@@ -1985,6 +2515,9 @@ export const InputsSection = React.memo(() => {
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
+                      {...(helperText && { helperText: 'Helper Text' })}
+                      {...(placeholder && { placeholder: 'Placeholder' })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
                     />
                   )}
                 />
@@ -2078,6 +2611,51 @@ export const InputsSection = React.memo(() => {
                   onChange={(event, next) => {
                     form.setStore(s => {
                       s.components.inputs.state.readOnly = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.helperText}
+              children={value => (
+                <CheckboxInput
+                  label="Helper Text"
+                  value={value}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.state.helperText = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.placeholder}
+              children={value => (
+                <CheckboxInput
+                  label="Placeholder"
+                  value={value}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.state.placeholder = next;
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.endAdornment}
+              children={value => (
+                <CheckboxInput
+                  label="End Adonrment"
+                  value={value}
+                  onChange={(event, next) => {
+                    form.setStore(s => {
+                      s.components.inputs.state.endAdornment = next;
                       return s;
                     });
                   }}

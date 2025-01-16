@@ -3,13 +3,13 @@ import type {
   AutocompleteValue,
   FormHelperTextProps,
   IconButtonProps,
+  TextFieldProps,
   TooltipProps,
   TypographyProps
 } from '@mui/material';
 import {
   Autocomplete,
   FormControl,
-  FormHelperText,
   InputAdornment,
   InputLabel,
   Skeleton,
@@ -33,12 +33,16 @@ type Props<
   AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>,
   'renderInput' | 'options' | 'onChange' | 'value'
 > & {
+  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
   error?: (value: string) => string;
   errorProps?: FormHelperTextProps;
+  helperText?: string;
+  helperTextProps?: FormHelperTextProps;
   label: string;
   labelProps?: TypographyProps;
   loading?: boolean;
   options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
+  placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
   readOnly?: boolean;
@@ -60,13 +64,17 @@ const WrappedTextInput = <
   ChipComponent extends ElementType
 >({
   disabled,
+  endAdornment = null,
   error = () => null,
   errorProps = null,
+  helperText = null,
+  helperTextProps = null,
   id = null,
   label,
   labelProps,
   loading = false,
   options = [],
+  placeholder = null,
   preventDisabledColor = false,
   preventRender = false,
   readOnly = false,
@@ -84,16 +92,17 @@ const WrappedTextInput = <
 
   const [_value, setValue] =
     useState<AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>>(null);
+  const [focused, setFocused] = useState<boolean>(false);
 
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
-    <div>
+    <div style={{ textAlign: 'left' }}>
       <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
           component={InputLabel}
           htmlFor={id || label}
-          color={!disabled && errorValue ? 'error' : 'textSecondary'}
+          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
           variant="body2"
           whiteSpace="nowrap"
           gutterBottom
@@ -131,27 +140,43 @@ const WrappedTextInput = <
               const err = error(v);
               if (err) onError(err);
             }}
+            onFocus={event => setFocused(document.activeElement === event.target)}
+            onBlur={() => setFocused(false)}
             renderInput={({ InputProps, ...params }) => (
-              <>
-                <TextField
-                  id={id || label}
-                  variant="outlined"
-                  error={!!errorValue}
-                  {...(readOnly &&
-                    !disabled && {
-                      focused: null,
-                      sx: {
-                        '& .MuiInputBase-input': { cursor: 'default' },
-                        '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor:
-                            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                        }
+              <TextField
+                id={id || label}
+                variant="outlined"
+                error={!!errorValue}
+                helperText={disabled ? null : errorValue || helperText}
+                FormHelperTextProps={
+                  disabled
+                    ? null
+                    : errorValue
+                    ? { variant: 'outlined', sx: { color: theme.palette.error.main, ...errorProps?.sx }, ...errorProps }
+                    : helperText
+                    ? {
+                        variant: 'outlined',
+                        sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
+                        ...errorProps
                       }
-                    })}
-                  InputProps={{
-                    readOnly: readOnly,
-                    endAdornment:
-                      loading || !reset || disabled || readOnly ? null : (
+                    : null
+                }
+                {...(readOnly &&
+                  !disabled && {
+                    focused: null,
+                    sx: {
+                      '& .MuiInputBase-input': { cursor: 'default' },
+                      '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+                      }
+                    }
+                  })}
+                InputProps={{
+                  placeholder: placeholder,
+                  readOnly: readOnly,
+                  endAdornment: (
+                    <>
+                      {loading || !reset || disabled || readOnly ? null : (
                         <InputAdornment position="end">
                           <ResetInput
                             id={id || label}
@@ -160,21 +185,18 @@ const WrappedTextInput = <
                             {...resetProps}
                           />
                         </InputAdornment>
-                      ),
-                    ...InputProps
-                  }}
-                  {...params}
-                />
-                {!errorValue || disabled ? null : (
-                  <FormHelperText
-                    sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
-                    variant="outlined"
-                    {...errorProps}
-                  >
-                    {errorValue}
-                  </FormHelperText>
-                )}
-              </>
+                      )}
+                      {endAdornment && (
+                        <InputAdornment position="end" sx={{ marginRight: `-7px` }}>
+                          {endAdornment}
+                        </InputAdornment>
+                      )}
+                    </>
+                  ),
+                  ...InputProps
+                }}
+                {...params}
+              />
             )}
             {...autocompleteProps}
           />

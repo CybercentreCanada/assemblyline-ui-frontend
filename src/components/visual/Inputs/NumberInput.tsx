@@ -7,20 +7,22 @@ import type {
 } from '@mui/material';
 import { FormControl, InputAdornment, InputLabel, Skeleton, TextField, Typography, useTheme } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
-import type { ReactNode } from 'react';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
 type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
-  endAdornment?: ReactNode;
+  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
   error?: (value: number) => string;
   errorProps?: FormHelperTextProps;
+  helperText?: string;
+  helperTextProps?: FormHelperTextProps;
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
   max?: number;
   min?: number;
+  placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
   readOnly?: boolean;
@@ -36,15 +38,18 @@ type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
 
 const WrappedNumberInput = ({
   disabled = false,
-  endAdornment,
+  endAdornment = null,
   error = () => null,
   errorProps = null,
+  helperText = null,
+  helperTextProps = null,
   id = null,
   label,
   labelProps,
   loading = false,
   max,
   min,
+  placeholder = null,
   preventDisabledColor = false,
   preventRender = false,
   readOnly = false,
@@ -60,15 +65,17 @@ const WrappedNumberInput = ({
 }: Props) => {
   const theme = useTheme();
 
+  const [focused, setFocused] = useState<boolean>(false);
+
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
-    <div>
+    <div style={{ textAlign: 'left' }}>
       <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
           component={InputLabel}
           htmlFor={id || label}
-          color={!disabled && errorValue ? 'error' : 'textSecondary'}
+          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
           variant="body2"
           whiteSpace="nowrap"
           gutterBottom
@@ -91,11 +98,23 @@ const WrappedNumberInput = ({
             type="number"
             size="small"
             fullWidth
-            value={value?.toString()}
+            value={value?.toString() || ''}
             disabled={disabled}
             error={!!errorValue}
-            helperText={errorValue}
-            FormHelperTextProps={errorProps}
+            helperText={disabled ? null : errorValue || helperText}
+            FormHelperTextProps={
+              disabled
+                ? null
+                : errorValue
+                ? { variant: 'outlined', sx: { color: theme.palette.error.main, ...errorProps?.sx }, ...errorProps }
+                : helperText
+                ? {
+                    variant: 'outlined',
+                    sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
+                    ...errorProps
+                  }
+                : null
+            }
             {...(readOnly &&
               !disabled && {
                 focused: null,
@@ -108,6 +127,7 @@ const WrappedNumberInput = ({
               })}
             inputProps={{ min: min, max: max }}
             InputProps={{
+              placeholder: placeholder,
               readOnly: readOnly,
               sx: { paddingRight: '9px' },
               endAdornment: (
@@ -122,7 +142,11 @@ const WrappedNumberInput = ({
                       />
                     </InputAdornment>
                   )}
-                  {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
+                  {endAdornment && (
+                    <InputAdornment position="end" sx={{ marginRight: `-7px` }}>
+                      {endAdornment}
+                    </InputAdornment>
+                  )}
                 </>
               )
             }}
@@ -135,6 +159,8 @@ const WrappedNumberInput = ({
               const err = error(num);
               if (err) onError(err);
             }}
+            onFocus={event => setFocused(document.activeElement === event.target)}
+            onBlur={() => setFocused(false)}
             {...textFieldProps}
           />
         )}

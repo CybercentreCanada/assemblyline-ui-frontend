@@ -11,22 +11,24 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { Moment } from 'moment';
 import moment from 'moment';
-import type { ReactNode } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
 type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   defaultDateOffset?: number | null;
-  endAdornment?: ReactNode;
+  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
   error?: (value: string) => string;
   errorProps?: FormHelperTextProps;
+  helperText?: string;
+  helperTextProps?: FormHelperTextProps;
   id?: string;
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
   maxDateToday?: boolean;
   minDateTomorrow?: boolean;
+  placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
   readOnly?: boolean;
@@ -43,15 +45,18 @@ type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
 const WrappedDateInput = ({
   defaultDateOffset = null,
   disabled,
-  endAdornment,
+  endAdornment = null,
   error = () => null,
   errorProps = null,
+  helperText = null,
+  helperTextProps = null,
   id = null,
   label,
   labelProps,
   loading = false,
   maxDateToday = false,
   minDateTomorrow = false,
+  placeholder = null,
   preventDisabledColor = false,
   preventRender = false,
   readOnly = false,
@@ -70,6 +75,7 @@ const WrappedDateInput = ({
   const [tempDate, setTempDate] = useState<Moment>(null);
   const [tomorrow, setTomorrow] = useState<Moment>(null);
   const [today, setToday] = useState<Moment>(null);
+  const [focused, setFocused] = useState<boolean>(false);
 
   const errorValue = useMemo<string>(
     () => error(tempDate && tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null),
@@ -103,12 +109,12 @@ const WrappedDateInput = ({
 
   return preventRender ? null : (
     <LocalizationProvider dateAdapter={AdapterMoment}>
-      <div>
+      <div style={{ textAlign: 'left' }}>
         <Tooltip title={tooltip} {...tooltipProps}>
           <Typography
             component={InputLabel}
             htmlFor={id || label}
-            color={!disabled && errorValue ? 'error' : 'textSecondary'}
+            color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
             variant="body2"
             whiteSpace="nowrap"
             gutterBottom
@@ -147,9 +153,36 @@ const WrappedDateInput = ({
                   size="small"
                   ref={inputRef}
                   error={!!errorValue && !disabled}
-                  helperText={errorValue}
-                  FormHelperTextProps={errorProps}
                   disabled={disabled}
+                  helperText={disabled ? null : errorValue || helperText}
+                  FormHelperTextProps={
+                    disabled
+                      ? null
+                      : errorValue
+                      ? {
+                          variant: 'outlined',
+                          sx: { color: theme.palette.error.main, ...errorProps?.sx },
+                          ...errorProps
+                        }
+                      : helperText
+                      ? {
+                          variant: 'outlined',
+                          sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
+                          ...errorProps
+                        }
+                      : null
+                  }
+                  {...(readOnly &&
+                    !disabled && {
+                      focused: null,
+                      sx: {
+                        '& .MuiInputBase-input': { cursor: 'default' },
+                        '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor:
+                            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+                        }
+                      }
+                    })}
                   {...(readOnly &&
                     !disabled && {
                       focused: null,
@@ -162,10 +195,14 @@ const WrappedDateInput = ({
                       }
                     })}
                   {...textFieldProps}
+                  onFocus={event => setFocused(document.activeElement === event.target)}
+                  onBlur={() => setFocused(false)}
                   inputProps={{ ...inputProps, ...textFieldProps?.inputProps }}
                   InputProps={{
                     ...InputProps,
                     ...textFieldProps?.InputProps,
+
+                    placeholder: placeholder,
                     endAdornment: (
                       <>
                         {InputProps?.endAdornment}
@@ -182,8 +219,6 @@ const WrappedDateInput = ({
                             />
                           </InputAdornment>
                         )}
-
-                        {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
                       </>
                     )
                   }}
