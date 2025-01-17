@@ -296,10 +296,14 @@ const WrappedAPIPage = () => {
       const comment: string = deferredBody.match(/\/\*(.|\n|\r)*\*\//g)?.shift() || null;
 
       // Remove comment section and parse body string to data object
-      const { url = '', body = null, response = null } = JSON.parse(deferredBody.replace(comment, '')) as any;
+      const parsedData = JSON.parse(deferredBody.replace(comment, '')) as {
+        url: Request['url'];
+        body: Request['body'];
+        response: unknown;
+      };
 
       // Check if the URL is valid
-      const href = new URL(`http://www.malware.ca${url}`);
+      const href = new URL(`http://www.malware.ca${parsedData?.url || ''}`);
 
       // Find the API route
       if (!Array.isArray(routes)) throw new RouteValidationError('Invalid list of API routes.');
@@ -315,11 +319,11 @@ const WrappedAPIPage = () => {
 
       setRequest(r => ({
         ...r,
-        body: body,
+        body: parsedData?.body,
         comment: comment,
         error: null,
         method: route?.methods?.includes(r?.method) ? r?.method : route?.methods[0],
-        url: url
+        url: parsedData?.url
       }));
     } catch (error) {
       setRequest(r => ({ ...r, error }));
