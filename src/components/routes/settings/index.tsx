@@ -7,7 +7,6 @@ import { PageLayout } from 'components/visual/Layouts/PageLayout';
 import _ from 'lodash';
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { MOCK_SETTINGS } from '../submit/mock/settings';
 import { ExternalSourcesSection } from './components/ExternalSources';
 import { HeaderSection } from './components/Header';
 import { InterfaceSection } from './components/Interface';
@@ -44,7 +43,7 @@ const SettingsContent = () => {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
-          const decompress = loadSubmissionProfiles({ ...api_response, ...MOCK_SETTINGS });
+          const decompress = loadSubmissionProfiles(api_response);
 
           s.next = _.cloneDeep(decompress);
           s.prev = _.cloneDeep(decompress);
