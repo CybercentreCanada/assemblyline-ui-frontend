@@ -81,7 +81,7 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
           const elements = rootRef.current?.querySelectorAll('[data-anchor]');
           const anchors: TableOfContentStore['anchors'] = [];
 
-          elements.forEach(element => {
+          (elements || []).forEach(element => {
             const anchorID = element.getAttribute('data-anchor');
             const index = s.anchors.findIndex(a => a.id === anchorID);
             if (id === anchorID) anchors.push({ id, label, subheader });
