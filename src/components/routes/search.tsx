@@ -33,7 +33,7 @@ import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { searchResultsDisplay } from 'helpers/utils';
 import type { Dispatch, SetStateAction } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useLocation, useParams } from 'react-router-dom';
@@ -108,78 +108,105 @@ function Search({ index = null }: Props) {
   // Current index
   const currentIndex = index || id;
 
-  const stateMap: Record<keyof SearchIndexes, Dispatch<SetStateAction<SearchResult<any>>>> = {
-    submission: setSubmissionResults,
-    file: setFileResults,
-    result: setResultResults,
-    signature: setSignatureResults,
-    alert: setAlertResults,
-    retrohunt: setRetrohuntResults
-  };
+  const stateMap = useMemo<Record<keyof SearchIndexes, Dispatch<SetStateAction<SearchResult<unknown>>>>>(
+    () => ({
+      submission: setSubmissionResults,
+      file: setFileResults,
+      result: setResultResults,
+      signature: setSignatureResults,
+      alert: setAlertResults,
+      retrohunt: setRetrohuntResults
+    }),
+    []
+  );
 
-  const resMap: Record<keyof SearchIndexes, SearchResult<any>> = {
-    submission: submissionResults,
-    file: fileResults,
-    result: resultResults,
-    signature: signatureResults,
-    alert: alertResults,
-    retrohunt: retrohuntResults
-  };
+  const resMap = useMemo<Record<keyof SearchIndexes, SearchResult<unknown>>>(
+    () => ({
+      submission: submissionResults,
+      file: fileResults,
+      result: resultResults,
+      signature: signatureResults,
+      alert: alertResults,
+      retrohunt: retrohuntResults
+    }),
+    [alertResults, fileResults, resultResults, retrohuntResults, signatureResults, submissionResults]
+  );
 
-  const permissionMap: Record<keyof SearchIndexes, Role> = {
-    submission: 'submission_view',
-    file: 'submission_view',
-    result: 'submission_view',
-    signature: 'signature_view',
-    alert: 'alert_view',
-    retrohunt: 'retrohunt_view'
-  };
+  const permissionMap = useMemo<Record<keyof SearchIndexes, Role>>(
+    () => ({
+      submission: 'submission_view',
+      file: 'submission_view',
+      result: 'submission_view',
+      signature: 'signature_view',
+      alert: 'alert_view',
+      retrohunt: 'retrohunt_view'
+    }),
+    []
+  );
 
   const queryValue = useRef<string>('');
 
-  const handleChangeTab = (event, newTab) => {
-    navigate(`${location.pathname}?${query.toString()}#${newTab}`);
-  };
+  const handleChangeTab = useCallback(
+    (event, newTab) => {
+      navigate(`${location.pathname}?${query.toString()}#${newTab}`);
+    },
+    [location.pathname, navigate, query]
+  );
 
-  const onClear = () => {
+  const onClear = useCallback(() => {
     query.delete('query');
     navigate(`${location.pathname}?${query.toString()}${location.hash}`);
-  };
+  }, [location.hash, location.pathname, navigate, query]);
 
-  const onSearch = () => {
+  const onSearch = useCallback(() => {
     if (queryValue.current !== '') {
       query.set('query', queryValue.current);
       navigate(`${location.pathname}?${query.toString()}${location.hash}`);
     } else {
       onClear();
     }
-  };
+  }, [location.hash, location.pathname, navigate, onClear, query]);
 
-  const onFilterValueChange = (inputValue: string) => {
+  const onFilterValueChange = useCallback((inputValue: string) => {
     queryValue.current = inputValue;
-  };
+  }, []);
 
-  const resetResults = () => {
+  const resetResults = useCallback(() => {
     setAlertResults(null);
     setFileResults(null);
     setResultResults(null);
     setRetrohuntResults(null);
     setSignatureResults(null);
     setSubmissionResults(null);
-  };
+  }, []);
 
   useEffect(() => {
     // On index change we need to update the search suggestion
-    setSearchSuggestion([
-      ...Object.keys(indexes[index || id] || {}).filter(name => indexes[index || id][name].indexed),
-      ...DEFAULT_SUGGESTION
-    ]);
-  }, [index, id, indexes]);
+    let indexFields: string[] = [];
+    if (index || id) {
+      // Retrieve the fields specific to the index of interest
+      indexFields = Object.keys(indexes[index || id] || {}).filter(name => indexes[index || id][name].indexed);
+    } else {
+      // Retrieve all fields across indices
+      Object.keys(permissionMap)
+        // Ensure the user has permission to access those indices
+        .filter(searchableIndex => currentUser.roles.includes(permissionMap[searchableIndex]))
+        .forEach(searchableIndex => {
+          indexFields.push(
+            ...Object.keys(indexes[searchableIndex] || {}).filter(name => indexes[searchableIndex][name].indexed)
+          );
+        });
+      // De-dup fields shared across indices and re-sort them
+      indexFields = Array.from(new Set<string>(indexFields)).sort();
+    }
+    setSearchSuggestion([...indexFields, ...DEFAULT_SUGGESTION]);
+  }, [index, id, indexes, permissionMap, currentUser.roles]);
 
   useEffect(() => {
     // On location.search change we need to change the query object and reset the results
     setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&filters=NOT%20to_be_deleted:true`));
     resetResults();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search, pageSize]);
 
   useEffect(() => {
@@ -240,9 +267,9 @@ function Search({ index = null }: Props) {
     // eslint-disable-next-line
   }, [query]);
 
-  const TabSpacer = props => <div style={{ flexGrow: 1 }} />;
+  const TabSpacer = useCallback(props => <div style={{ flexGrow: 1 }} />, []);
 
-  const SpecialTab = ({ children, ...otherProps }) => children;
+  const SpecialTab = useCallback(({ children, ...otherProps }) => children, []);
 
   return (currentIndex && !currentUser.roles.includes(permissionMap[index || id])) ||
     (!currentIndex && Object.values(permissionMap).every(val => !currentUser.roles.includes(val))) ||

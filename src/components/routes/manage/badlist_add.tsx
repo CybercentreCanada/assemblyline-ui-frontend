@@ -258,10 +258,10 @@ const BadlistNew = ({}: Props) => {
           </FormControl>
         </Grid>
         {badlist?.type === 'tag' && (
-          <Grid xs={12}>
+          <Grid container xs={12}>
             <Typography variant="h6">{t('information.tag')}</Typography>
-            <Grid container spacing={1}>
-              <Grid xs={12} md={6}>
+            <Grid container spacing={1} width={'100%'}>
+              <Grid xs={12} md={6} paddingLeft={theme.spacing(1)}>
                 <FormControl fullWidth required>
                   <FormLabel id="tag-type-label">{t('tag.type.title')}</FormLabel>
                   <Autocomplete
@@ -294,9 +294,9 @@ const BadlistNew = ({}: Props) => {
         )}
         {badlist?.type === 'file' && (
           <>
-            <Grid xs={12}>
+            <Grid container xs={12} width={'100%'}>
               <Typography variant="h6">{t('file.prop')}</Typography>
-              <Grid container spacing={1}>
+              <Grid container spacing={1} width={'100%'} paddingLeft={theme.spacing(1)}>
                 <Grid xs={12}>
                   <FormLabel>{t('file.name')}</FormLabel>
                   <TextField
@@ -337,9 +337,9 @@ const BadlistNew = ({}: Props) => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid xs={12}>
+            <Grid container xs={12} width={'100%'} paddingTop={theme.spacing(2)}>
               <Typography variant="h6">{t('file.hashes')}</Typography>
-              <Grid container spacing={1}>
+              <Grid container spacing={1} paddingLeft={theme.spacing(1)}>
                 {badlist?.type === 'file' &&
                   HASHES.map((hash, idx) => (
                     <Grid key={idx} xs={12} md={6}>
@@ -361,9 +361,9 @@ const BadlistNew = ({}: Props) => {
           </>
         )}
         {badlist?.type && (
-          <Grid xs={12}>
+          <Grid container xs={12} width={'100%'} paddingTop={theme.spacing(2)}>
             <Typography variant="h6">{t('details')}</Typography>
-            <Grid container spacing={1}>
+            <Grid container spacing={1} width={'100%'}>
               <Grid xs={12} md={9}>
                 <FormControl fullWidth required>
                   <FormLabel id="reason-label">{t('reason.title')}</FormLabel>
@@ -413,9 +413,9 @@ const BadlistNew = ({}: Props) => {
         )}
         {badlist?.type && (
           <>
-            <Grid xs={12}>
+            <Grid container xs={12} width={'100%'} paddingTop={theme.spacing(2)}>
               <Typography variant="h6">{t('attribution')}</Typography>
-              <Grid container spacing={1}>
+              <Grid container spacing={1} width={'100%'} paddingLeft={theme.spacing(1)}>
                 {ATTRIBUTION_TYPES.map((atype, idx) => (
                   <Grid key={idx} xs={12} md={6}>
                     <FormLabel id="tag-value-label">{t(`attribution.${atype}.title`)}</FormLabel>

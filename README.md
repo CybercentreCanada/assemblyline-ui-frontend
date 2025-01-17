@@ -1,113 +1,60 @@
+[![Discord](https://img.shields.io/badge/chat-on%20discord-7289da.svg?sanitize=true)](https://discord.gg/GUAy9wErNu)
+[![](https://img.shields.io/discord/908084610158714900)](https://discord.gg/GUAy9wErNu)
+[![Static Badge](https://img.shields.io/badge/github-assemblyline-blue?logo=github)](https://github.com/CybercentreCanada/assemblyline)
+[![Static Badge](https://img.shields.io/badge/github-assemblyline--ui--frontend-blue?logo=github)](https://github.com/CybercentreCanada/assemblyline-ui-frontend)
+[![GitHub Issues or Pull Requests by label](https://img.shields.io/github/issues/CybercentreCanada/assemblyline/ui-frontend)](https://github.com/CybercentreCanada/assemblyline/issues?q=is:issue+is:open+label:ui-frontend)
+[![License](https://img.shields.io/github/license/CybercentreCanada/assemblyline-ui-frontend)](./LICENCE.md)
+
 # Assemblyline UI Frontend
 
-This repo is dedicated for the new version off Assemblyline 4 UI. It uses React as the framework and Material UI for the visual components.
+This repo is dedicated for the new version of Assemblyline 4 UI. It uses the React library and Material UI for the visual components.
 
-## Install dev environment pre-requisites
+## Image variants and tags
 
-### Install NodeJS (Ubuntu)
+| **Tag Type** | **Description**                                                                                  |      **Example Tag**       |
+| :----------: | :----------------------------------------------------------------------------------------------- | :------------------------: |
+|    latest    | The most recent build (can be unstable).                                                         |          `latest`          |
+|  build_type  | The type of build used. `dev` is the latest unstable build. `stable` is the latest stable build. |     `stable` or `dev`      |
+|    series    | Complete build details, including version and build type: `version.buildType`.                   | `4.5.stable`, `4.5.1.dev3` |
 
-Follow these simple command to get NodeJS installed
+#### Running this component
 
-    curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-    sudo apt-get install gcc g++ make
-    sudo apt-get install -y nodejs
+```bash
+docker run --name frontend cccs/assemblyline-ui-frontend
+```
 
-### Install Yarn (NPM modules manager)
+## Development
 
-    curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
-    echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-    sudo apt-get update && sudo apt-get install yarn
+For information on frontend development, follow this [guide](https://cybercentrecanada.github.io/assemblyline4_docs/developer_manual/frontend/frontend/).
 
-### Install NPM dependencies
+## Documentation
 
-Go to your `assemblyline-ui-frontend` directory and type:
+For more information about this Assemblyline component, follow this [overview](https://cybercentrecanada.github.io/assemblyline4_docs/overview/architecture/) of the system's architecture.
 
-    yarn install
+---
 
-### Install docker (Ubuntu)
+# Front-end de l'interface utilisateur d'Assemblyline
 
-Follow these simple commands to get Docker running on your machine:
+Ce repo est dédié à la nouvelle version d'Assemblyline 4 UI. Elle utilise la bibliothèque React et Material UI pour les composants visuels.
 
-    # Add Docker repository
-    sudo apt-get update
-    sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    sudo apt-key fingerprint 0EBFCD88
-    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+## Variantes et étiquettes d'image
 
-    # Install Docker
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+| **Type d'étiquette** | **Description**                                                                                                  |  **Exemple d'étiquette**   |
+| :------------------: | :--------------------------------------------------------------------------------------------------------------- | :------------------------: |
+|       dernière       | La version la plus récente (peut être instable).                                                                 |          `latest`          |
+|      build_type      | Le type de compilation utilisé. `dev` est la dernière version instable. `stable` est la dernière version stable. |     `stable` ou `dev`      |
+|        séries        | Le détail de compilation utilisé, incluant la version et le type de compilation : `version.buildType`.           | `4.5.stable`, `4.5.1.dev3` |
 
-    # Test Docker installation
-    sudo docker run hello-world
+#### Exécuter ce composant
 
-### Install docker-compose
+```bash
+docker run --name frontend cccs/assemblyline-ui-frontend
+```
 
-Installing docker-compose is done the same way on all Linux distros. Follow these simple instructions:
+## Développement
 
-    # Install docker-compose
-    sudo curl -L "https://github.com/docker/compose/releases/download/1.28.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
+Pour des informations sur le développement du frontend, suivez ce [guide](https://cybercentrecanada.github.io/assemblyline4_docs/developer_manual/frontend/frontend/).
 
-    # Test docker-compose installation
-    docker-compose --version
+## Documentation
 
-For reference, here are the instructions on Docker’s website: <https://docs.docker.com/compose/install/>
-
-## Configure the dev environment
-
-### Setup Webpack for debugging behing a proxy
-
-Create a file named `.env.local` at the root of the assemblyline-ui-frontend directory with the following content:
-
-    HOST=0.0.0.0
-    WDS_SOCKET_PORT=443
-    HTTPS=true
-    BROWSER=none
-
-### Setup docker compose environment
-
-#### Setup IP routing
-
-Create a file in the `docker` directory named `.env`.
-
-This file should only contain the following where `<YOUR_IP>` is replaced by your dev computer IP.
-
-    EXTERNAL_IP=<YOUR_IP>
-
-#### Setup Assemblyline config file
-
-From the `docker` directory, copy the file `config.yml.template` to `config.yml` in the same directory.
-
-Change the `<YOUR_IP>` in the newly created `config.yml`file to the IP of your dev machine.
-
-#### Setup Assemblyline classification engine file
-
-From the `docker` directory, copy the file `classification.yml.template` to `classification.yml` in the same directory.
-
-Change the `enforce` value to `true` in the `classification.yml` file to turn on the classification engine.
-
-## Launch the dev environment
-
-### Dependencies
-
-Go to the `docker` directory and run the following command to launch the Assemblyline DB and UI.
-
-    docker-compose up
-
-### Frontend
-
-Simply use the `npm start script` to launch the frontend.
-
-### Once dependencies and frontend started
-
-Access the dev frontend at the following link: `https://<YOUR_IP>.nip.io`
-
-## Testing
-
-Testing is done through the `jest` framework.
-
-To run the tests, simply use the `npm test` command. (Development dependencies should already have been installed
-previously via the `yarn install` command).
-
-NOTE: the test command will only run tests related to changed files based on git.
+Pour plus d'informations sur ce composant Assemblyline, suivez ce [overview](https://cybercentrecanada.github.io/assemblyline4_docs/overview/architecture/) de l'architecture du système.

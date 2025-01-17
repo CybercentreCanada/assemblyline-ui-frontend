@@ -4,6 +4,7 @@ export const ACCESS_MODES = ['ReadWriteOnce', 'ReadWriteMany'] as const;
 export const OPERATING_SYSTEMS = ['windows', 'linux'] as const;
 export const SUBMISSION_PARAM_TYPES = ['str', 'int', 'list', 'bool'] as const;
 export const UPDATE_CHANNELS = ['stable', 'rc', 'beta', 'dev'] as const;
+export const FETCH_METHODS = ['GET', 'POST', 'GIT'] as const;
 export const SIGNATURE_DELIMITERS = {
   new_line: '\n',
   double_new_line: '\n\n',
@@ -20,6 +21,7 @@ export type OperatingSystem = (typeof OPERATING_SYSTEMS)[number];
 export type SubmissionParamType = (typeof SUBMISSION_PARAM_TYPES)[number];
 export type UpdateChannel = (typeof UPDATE_CHANNELS)[number];
 export type SignatureDelimiter = keyof typeof SIGNATURE_DELIMITERS;
+export type FetchMethod = (typeof FETCH_METHODS)[number];
 
 // TODO There is too much invalidation to make the multi_type_param work that should be necessary
 /**
@@ -236,8 +238,17 @@ export type UpdateSource = {
   /** CA cert for source */
   ca_cert?: string;
 
+  /** Processing configuration for source */
+  configuration?: { [key: string]: any };
+
   /** Default classification used in absence of one defined in files from source */
   default_classification: string;
+
+  /** Is this source enabled for periodic fetching? */
+  enabled: boolean;
+
+  /** Method of fetching data */
+  fetch_method: FetchMethod;
 
   /** Branch to checkout from Git repository. */
   git_branch?: string;
@@ -245,8 +256,14 @@ export type UpdateSource = {
   /** Headers */
   headers: EnvironmentVariable[];
 
+  //** Ignore caching */
+  ignore_cache: boolean;
+
   /** Name of source */
   name: string;
+
+  /** Override signature classification with source */
+  override_classification: boolean;
 
   /** Password used to authenticate with source */
   password?: string;
@@ -268,6 +285,9 @@ export type UpdateSource = {
 
   /** Synchronize signatures with remote source. Allows system to auto-disable signatures no longer found in source. */
   sync: boolean;
+
+  /** Interval to update this specific source */
+  update_interval: number;
 
   /** URI to source */
   uri: string;
@@ -422,9 +442,14 @@ export type ServiceIndexed = Pick<
 
 export const DEFAULT_SOURCE: UpdateSource = {
   ca_cert: '',
+  configuration: {},
   default_classification: '',
+  enabled: true,
+  fetch_method: 'GET',
   headers: [],
+  ignore_cache: false,
   name: '',
+  override_classification: false,
   password: '',
   pattern: '',
   private_key: '',
@@ -432,6 +457,7 @@ export const DEFAULT_SOURCE: UpdateSource = {
   ssl_ignore_errors: false,
   uri: '',
   username: '',
+  update_interval: 1,
   git_branch: '',
   status: {
     last_successful_update: '',

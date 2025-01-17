@@ -73,6 +73,7 @@
   "header.identification": "Identification",
   "header.is_supplementary": "Supplémentaire",
   "header.labels": "Étiquettes",
+  "header.seen.last": "Vu la dernière fois",
   "header.sha256": "SHA256",
   "header.type": "Type de fichier",
   "hex": "Hex",

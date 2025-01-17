@@ -464,15 +464,15 @@ const ServiceGeneral = ({
                     value={service.min_instances > 0 ? service.min_instances : ''}
                     error={instancesError}
                     InputProps={{
-                      inputProps: { min: 0, max: service.licence_count },
-                      endAdornment: <InputAdornment position="end">↓</InputAdornment>
+                      inputProps: { min: 0, ...(service.licence_count && { max: service.licence_count }) },
+                      endAdornment: <InputAdornment position="end">{'↓'}</InputAdornment>
                     }}
                     onChange={e => {
                       const value = Number(e.target.value);
                       setModified(true);
                       setService(s => ({
                         ...s,
-                        min_instances: !e.target.value ? 0 : Math.min(s.licence_count, value)
+                        min_instances: !e.target.value ? 0 : s.licence_count ? Math.min(s.licence_count, value) : value
                       }));
                     }}
                   />
@@ -493,7 +493,7 @@ const ServiceGeneral = ({
                     error={instancesError}
                     InputProps={{
                       inputProps: { min: 0 },
-                      endAdornment: <InputAdornment position="end">↑</InputAdornment>
+                      endAdornment: <InputAdornment position="end">{'↑'}</InputAdornment>
                     }}
                     onChange={e => {
                       const value = Number(e.target.value);

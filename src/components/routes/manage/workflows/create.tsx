@@ -1,19 +1,22 @@
+import CheckIcon from '@mui/icons-material/Check';
 import type { Theme } from '@mui/material';
 import {
   Autocomplete,
-  Button,
   Checkbox,
   Chip,
-  CircularProgress,
   FormControlLabel,
   Grid,
+  IconButton,
   MenuItem,
   Select,
   Skeleton,
   TextField,
+  Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
+
+import DoDisturbAltOutlinedIcon from '@mui/icons-material/DoDisturbAltOutlined';
 import FormControl from '@mui/material/FormControl';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
@@ -260,30 +263,48 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               >
                 {id ? (
                   <>
-                    <Button variant="outlined" color="primary" disabled={loading} onClick={() => onClose(id)}>
-                      {t('cancel.button')}
-                      {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      disabled={disabled}
-                      onClick={() => handleUpdate(workflow, runWorkflow)}
-                    >
-                      {t('update.button')}
-                      {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                    </Button>
+                    <Tooltip title={t('cancel.button')}>
+                      <IconButton
+                        style={{
+                          color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        }}
+                        onClick={() => onClose(id)}
+                      >
+                        <DoDisturbAltOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('update.button')}>
+                      <IconButton
+                        style={{
+                          color: !disabled
+                            ? theme.palette.mode === 'dark'
+                              ? theme.palette.success.light
+                              : theme.palette.success.dark
+                            : theme.palette.grey[750]
+                        }}
+                        disabled={disabled}
+                        onClick={() => handleUpdate(workflow, runWorkflow)}
+                      >
+                        <CheckIcon />
+                      </IconButton>
+                    </Tooltip>
                   </>
                 ) : (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={disabled}
-                    onClick={() => handleAdd(workflow, runWorkflow)}
-                  >
-                    {t('add.button')}
-                    {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                  </Button>
+                  <Tooltip title={t('add.button')}>
+                    <IconButton
+                      style={{
+                        color: !disabled
+                          ? theme.palette.mode === 'dark'
+                            ? theme.palette.success.light
+                            : theme.palette.success.dark
+                          : theme.palette.grey[750]
+                      }}
+                      disabled={disabled}
+                      onClick={() => handleAdd(workflow, runWorkflow)}
+                    >
+                      <CheckIcon />
+                    </IconButton>
+                  </Tooltip>
                 )}
               </Grid>
             </Grid>

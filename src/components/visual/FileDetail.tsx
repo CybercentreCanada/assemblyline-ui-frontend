@@ -24,6 +24,7 @@ import {
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
+import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Error } from 'components/models/base/error';
@@ -32,10 +33,12 @@ import type { File } from 'components/models/ui/file';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
+import HeuristicDetail from 'components/routes/manage/heuristic_detail';
+import SignatureDetail from 'components/routes/manage/signature_detail';
 import AISummarySection from 'components/routes/submission/detail/ai_summary';
 import Classification from 'components/visual/Classification';
 import { emptyResult } from 'components/visual/ResultCard';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
@@ -78,6 +81,7 @@ const WrappedFileDetail: React.FC<Props> = ({
   const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage } = useMySnackbar();
   const { addInsight, removeInsight } = useAssistant();
+  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
 
   const [file, setFile] = useState<File | null>(null);
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
@@ -87,14 +91,19 @@ const WrappedFileDetail: React.FC<Props> = ({
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const [promotedSections, setPromotedSections] = useState([]);
+  const [insideDrawer, setInsideDrawer] = useState<boolean>(null);
+  const [loaded, setLoaded] = useState<boolean>(false);
+  const [heuristics, setHeuristics] = useState<string[]>([]);
 
-  const sp2 = theme.spacing(2);
-  const sp4 = theme.spacing(4);
+  const ref = useRef();
+
+  const sp2 = useMemo(() => theme.spacing(2), [theme]);
+  const sp4 = useMemo(() => theme.spacing(4), [theme]);
 
   const popoverOpen = Boolean(resubmitAnchor);
 
-  const params = new URLSearchParams(location.search);
-  const fileName = file ? params.get('name') || sha256 : null;
+  const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const fileName = useMemo(() => (file ? params.get('name') || sha256 : null), [file, params, sha256]);
 
   const fileViewerPath = useMemo<string>(() => {
     const tab = TAB_OPTIONS.find(option => location.pathname.indexOf(option) >= 0);
@@ -132,6 +141,15 @@ const WrappedFileDetail: React.FC<Props> = ({
     newData.emptys = data.results.filter(result => emptyResult(result));
     newData.results = data.results.filter(result => !emptyResult(result));
     newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
+
+    // Compile a simplified list of heuristics for later reference
+    const heurs = [];
+    Object.values(newData?.heuristics || {}).map(hs => {
+      hs.map(h => {
+        heurs.push(h[0]);
+      });
+    });
+    setHeuristics(heurs);
     return newData;
   };
 
@@ -311,8 +329,36 @@ const WrappedFileDetail: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
 
+  useEffect(() => {
+    setInsideDrawer(document.getElementById('drawerContent')?.contains(ref.current) || false);
+  }, [file]);
+
+  useEffect(() => {
+    if (insideDrawer === false) {
+      setLoaded(true);
+      if (!location.hash) {
+        setGlobalDrawer(null);
+      } else if (file) {
+        // Set the drawer content based on the hash
+        var id = location.hash.slice(1);
+        if (heuristics.includes(id)) {
+          setGlobalDrawer(<HeuristicDetail heur_id={id} />);
+        } else {
+          setGlobalDrawer(<SignatureDetail signature_id={id} />);
+        }
+      }
+    }
+  }, [insideDrawer, location.hash, setGlobalDrawer, file]);
+
+  useEffect(() => {
+    if (loaded && insideDrawer === false && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [insideDrawer, globalDrawerOpened]);
+
   return currentUser.roles.includes('submission_view') ? (
-    <div id="fileDetailTop" style={{ textAlign: 'left' }}>
+    <div id="fileDetailTop" ref={ref} style={{ textAlign: 'left' }}>
       <InputDialog
         open={safelistDialog}
         handleClose={() => setSafelistDialog(false)}

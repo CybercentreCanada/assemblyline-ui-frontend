@@ -422,7 +422,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                                         size="small"
                                         variant="outlined"
                                         color={[...event.labels].includes(label) ? 'success' : 'error'}
-                                        label={t(`status_${label}`)}
+                                        label={label}
                                         style={{ cursor: 'inherit' }}
                                       />
                                     ))

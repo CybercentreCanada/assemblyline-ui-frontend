@@ -66,6 +66,9 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
   const [webAuthNResponse, setWebAuthNResponse] = useState(null);
   const [buttonLoading, setButtonLoading] = useState(false);
 
+  // Quick login can only be used if there's exactly one external authentication service configured
+  const quickSSOLogin = allowSAML && !oAuthProviders ? true : !allowSAML && oAuthProviders?.length === 1;
+
   function reset(event) {
     if ((['oauth'].includes(shownControls) && oauthTokenID) || !['oauth'].includes(shownControls)) {
       setWebAuthNResponse(null);
@@ -134,8 +137,13 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
   }
 
   function onSubmit(event) {
-    login(event.target[0]);
-    event.preventDefault();
+    if (event) {
+      login(event.target[0]);
+      event.preventDefault();
+    } else {
+      // onSubmit was called manually
+      login(null);
+    }
   }
 
   function resetPW(event) {
@@ -307,6 +315,7 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
               email={email}
               onSubmit={onSubmit}
               buttonLoading={buttonLoading}
+              quickLogin={quickSSOLogin}
             />
           ),
           otp: <OneTimePassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setOneTimePass={setOneTimePass} />,
@@ -326,6 +335,7 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
               email={email}
               onSubmit={onSubmit}
               buttonLoading={buttonLoading}
+              quickLogin={quickSSOLogin}
             />
           )
         }[shownControls]

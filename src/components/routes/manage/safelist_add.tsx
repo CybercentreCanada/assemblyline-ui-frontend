@@ -277,9 +277,9 @@ const SafelistNew = ({}: Props) => {
           </FormControl>
         </Grid>
         {safelist?.type === 'tag' && (
-          <Grid xs={12}>
+          <Grid container xs={12}>
             <Typography variant="h6">{t('information.tag')}</Typography>
-            <Grid container spacing={1}>
+            <Grid container spacing={1} width={'100%'}>
               <Grid xs={12} md={6}>
                 <FormControl fullWidth required>
                   <FormLabel id="tag-type-label">{t('tag.type.title')}</FormLabel>
@@ -314,9 +314,9 @@ const SafelistNew = ({}: Props) => {
           </Grid>
         )}
         {safelist?.type === 'signature' && (
-          <Grid xs={12}>
+          <Grid container xs={12}>
             <Typography variant="h6">{t('information.signature')}</Typography>
-            <Grid container spacing={1}>
+            <Grid container spacing={1} width={'100%'}>
               <Grid xs={12}>
                 <FormControl fullWidth required>
                   <FormLabel id="signature-label">{t('signature.name.title')}</FormLabel>
@@ -335,9 +335,9 @@ const SafelistNew = ({}: Props) => {
         )}
         {safelist?.type === 'file' && (
           <>
-            <Grid xs={12}>
+            <Grid container xs={12}>
               <Typography variant="h6">{t('file.prop')}</Typography>
-              <Grid container spacing={1}>
+              <Grid container spacing={1} width={'100%'} paddingLeft={theme.spacing(1)}>
                 <Grid xs={12}>
                   <FormLabel>{t('file.name')}</FormLabel>
                   <TextField
@@ -378,9 +378,9 @@ const SafelistNew = ({}: Props) => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid xs={12}>
+            <Grid container xs={12} paddingTop={theme.spacing(2)}>
               <Typography variant="h6">{t('file.hashes')}</Typography>
-              <Grid container spacing={1}>
+              <Grid container spacing={1} width={'100%'} paddingLeft={theme.spacing(1)}>
                 {safelist?.type === 'file' &&
                   HASHES.map((hash, idx) => (
                     <Grid key={idx} xs={12} md={6}>
@@ -402,9 +402,9 @@ const SafelistNew = ({}: Props) => {
           </>
         )}
         {safelist?.type && (
-          <Grid xs={12}>
+          <Grid container xs={12} paddingTop={theme.spacing(2)}>
             <Typography variant="h6">{t('details')}</Typography>
-            <Grid container spacing={1}>
+            <Grid container spacing={1} width={'100%'}>
               <Grid xs={12} md={9}>
                 <FormControl fullWidth required>
                   <FormLabel id="reason-label">{t('reason.title')}</FormLabel>

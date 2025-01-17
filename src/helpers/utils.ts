@@ -203,27 +203,27 @@ export function verdictRank(verdict): number {
  *
  */
 export function priorityText(priority: number | null) {
-  if (priority >= 1500) {
+  if (priority > 1000) {
     return 'user-high';
   }
 
-  if (priority >= 1000) {
+  if (priority > 500) {
     return 'user-medium';
   }
 
-  if (priority >= 500) {
+  if (priority > 400) {
     return 'user-low';
   }
 
-  if (priority >= 300) {
+  if (priority > 300) {
     return 'critical';
   }
 
-  if (priority >= 200) {
+  if (priority > 200) {
     return 'high';
   }
 
-  if (priority >= 100) {
+  if (priority > 100) {
     return 'medium';
   }
 
