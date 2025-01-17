@@ -4,6 +4,7 @@ import { Button, Collapse, Divider, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
+import type { AnchorProps } from 'components/core/TableOfContent/Anchor';
 import { Anchor } from 'components/core/TableOfContent/Anchor';
 import type { CSSProperties } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
@@ -71,6 +72,7 @@ const useStyles = makeStyles(theme => ({
 
 export type PageSectionProps = {
   anchor?: boolean;
+  anchorProps?: AnchorProps;
   children?: React.ReactNode;
   closedInitially?: boolean;
   collapsible?: boolean;
@@ -91,12 +93,14 @@ export type PageSectionProps = {
 export const PageSection: React.FC<PageSectionProps> = React.memo(
   ({
     anchor = false,
+    anchorProps = null,
     children = null,
     closedInitially = false,
     collapsible = false,
     divider = false,
     endAdornment = null,
     flex = false,
+    id = null,
     open: openProp = null,
     primary = null,
     primaryProps = null,
@@ -128,7 +132,7 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
     }, [endAdornment]);
 
     return (
-      <Anchor label={primary} subheader={subheader} disabled={!anchor}>
+      <Anchor anchor={id} label={primary} subheader={subheader} disabled={!anchor} {...anchorProps}>
         <div className={classes.root}>
           <div className={classes.container}>
             <Button

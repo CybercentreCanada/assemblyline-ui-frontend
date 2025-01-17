@@ -19,17 +19,8 @@ export type SettingsStore = {
     /** Submitting the new settings values */
     submitting: boolean;
 
-    /** ID of the Anchor element that is in view used by the navigation pane */
-    activeID: string;
-
-    /** Hide all disabled parameters */
-    hidden: boolean;
-
     /** User is allowed to customize all service-specific parameters. Otherwise, they may only change the parameters that are editable */
     customize: boolean;
-
-    /** User is allowed to make changes to their settings */
-    selfManage: boolean;
 
     /** Is the confirmation dialog opened */
     confirm: boolean;
@@ -49,10 +40,7 @@ export const { FormProvider, useForm } = createFormContext<SettingsStore>({
       disabled: false,
       loading: true,
       submitting: false,
-      activeID: null,
-      hidden: false,
       customize: false,
-      selfManage: false,
       confirm: false
     },
     prev: null,

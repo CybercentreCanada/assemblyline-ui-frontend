@@ -46,6 +46,7 @@
   "terms2": ", vous acceptez nos ",
   "terms3": "Conditions d'utilisation",
   "urlHash.button": "Analyser",
+  "urlHash.input_helpertext": "Note: Une URL valide nécessite un schéma, c'est-à-dire : https://www.google.com",
   "urlHash.input_suffix": " à Analyser",
   "urlHash.input_title": "Hachage/URL",
   "validate.acceptText": "Continuer",

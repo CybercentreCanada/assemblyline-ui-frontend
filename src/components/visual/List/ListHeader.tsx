@@ -1,6 +1,7 @@
 import type { CheckboxProps, ListItemButtonProps, ListItemProps, ListItemTextProps } from '@mui/material';
 import { Checkbox, ListItem, ListItemButton, ListItemIcon, useTheme } from '@mui/material';
-import { Anchor, AnchorProps } from 'components/core/TableOfContent/Anchor';
+import type { AnchorProps } from 'components/core/TableOfContent/Anchor';
+import { Anchor } from 'components/core/TableOfContent/Anchor';
 import { type FC, type MouseEvent } from 'react';
 import { ListItemText } from './ListItemText';
 
@@ -14,6 +15,7 @@ export type ListHeaderProps = Omit<ListItemProps, 'onChange'> & {
   divider?: boolean;
   edge?: CheckboxProps['edge'];
   indeterminate?: CheckboxProps['indeterminate'];
+  preventRender?: boolean;
   primary: React.ReactNode;
   primaryProps?: ListItemTextProps['primaryTypographyProps'];
   secondary?: React.ReactNode;
@@ -36,6 +38,7 @@ export const ListHeader: FC<ListHeaderProps> = ({
   edge = 'end',
   id = null,
   indeterminate = null,
+  preventRender = false,
   primary = null,
   primaryProps = null,
   secondary = null,
@@ -45,8 +48,8 @@ export const ListHeader: FC<ListHeaderProps> = ({
 }) => {
   const theme = useTheme();
 
-  return onChange === null ? (
-    <Anchor label={id || primary.toString()} disabled={!anchor} {...anchorProps}>
+  return preventRender ? null : onChange === null ? (
+    <Anchor anchor={id} label={primary.toString()} disabled={!anchor} {...anchorProps}>
       <ListItem
         key={id || primary.toString()}
         disableGutters
@@ -81,7 +84,7 @@ export const ListHeader: FC<ListHeaderProps> = ({
       </ListItem>
     </Anchor>
   ) : (
-    <Anchor label={id || primary.toString()} disabled={!anchor} {...anchorProps}>
+    <Anchor anchor={id} label={primary.toString()} disabled={!anchor} {...anchorProps}>
       <ListItem key={id || primary.toString()} disableGutters disablePadding {...listItemProps}>
         <ListItemButton
           role={undefined}

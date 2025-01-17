@@ -41,9 +41,9 @@ const LibraryContent = () => {
                   subheader="Components"
                   variant="left"
                   options={entries.map(([key, values]) => ({ id: key, primary: values.name }))}
-                  render={({ id, primary, ...params }, i, NavItem) => (
+                  renderItem={({ id, primary, ...params }, i, NavItem) => (
                     <form.Subscribe
-                      key={`${primary}-${i}`}
+                      key={`${primary.toString()}-${i}`}
                       selector={state => state}
                       children={() => (
                         <NavItem
@@ -59,10 +59,6 @@ const LibraryContent = () => {
                   onPageNavigation={(event, { id }) => {
                     rootRef.current.scrollTo({ top: 0, behavior: 'instant' });
                     navigate(`${location.pathname}?tab=${id}`);
-                    // form.setStore(s => {
-                    //   s.state.tab = id as any;
-                    //   return s;
-                    // });
                   }}
                 />
               )}
@@ -75,20 +71,26 @@ const LibraryContent = () => {
                   subheader="CONTENT"
                   variant="right"
                   options={sections.map(({ id, label, subheader }) => ({ id, primary: label, subheader }))}
-                  render={({ primary, ...params }, i, NavItem) => (
+                  renderItem={({ id, primary, ...params }, i, NavItem) => (
                     <ActiveAnchor
-                      key={`${primary}-${i}`}
-                      anchorIndex={i}
+                      key={`${primary.toString()}-${i}`}
+                      activeID={id}
                       children={isActive => (
                         <form.Subscribe
-                          key={`${primary}-${i}`}
+                          key={`${primary.toString()}-${i}`}
                           selector={state => state}
-                          children={() => <NavItem primary={primary} active={isActive} {...params} />}
+                          children={() => (
+                            <NavItem
+                              primary={primary}
+                              active={isActive}
+                              onPageNavigation={event => scrollTo(event, id)}
+                              {...params}
+                            />
+                          )}
                         />
                       )}
                     />
                   )}
-                  onPageNavigation={(event, { id }) => scrollTo(event, id)}
                 />
               )}
             />

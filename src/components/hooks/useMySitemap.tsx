@@ -248,6 +248,7 @@ export default function useMySitemap() {
       { path: '/tos', title: t('breadcrumb.tos'), isRoot: true, icon: <ReceiptOutlinedIcon /> },
       { path: '/account', title: t('usermenu.account'), isRoot: true, icon: <AccountCircleOutlinedIcon /> },
       { path: '/settings', title: t('usermenu.settings'), isRoot: true, icon: <SettingsOutlinedIcon /> },
+      { path: '/settings/:tab', title: t('usermenu.settings'), isRoot: true, icon: <SettingsOutlinedIcon /> },
       { path: '/admin', title: t('adminmenu'), isRoot: true, icon: <BusinessOutlinedIcon /> },
       {
         path: '/admin/service_review',

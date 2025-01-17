@@ -7,56 +7,48 @@ import type {
 } from 'components/models/base/service';
 import type { SettingsStore } from 'components/routes/settings/contexts/form';
 import { useForm } from 'components/routes/settings/contexts/form';
+import { PageSection } from 'components/visual/Layouts/PageSection';
 import { List } from 'components/visual/List/List';
 import { ListHeader } from 'components/visual/List/ListHeader';
 import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
 import { NumberListInput } from 'components/visual/ListInputs/NumberListInput';
 import { SelectListInput } from 'components/visual/ListInputs/SelectListInput';
 import { TextListInput } from 'components/visual/ListInputs/TextListInput';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ParameterProps = {
-  spec: ServiceSpecification;
-  spec_id: number;
-  param: ServiceParameter;
-  param_id: number;
   customize: boolean;
   disabled: boolean;
-  profile: SettingsStore['state']['tab'];
   loading: boolean;
+  param_id: number;
+  param: ServiceParameter;
+  profile: SettingsStore['state']['tab'];
   selected: boolean;
-  hidden: boolean;
+  spec_id: number;
+  spec: ServiceSpecification;
 };
 
 const Parameter = React.memo(
   ({
-    spec = null,
-    spec_id = null,
-    param = null,
-    param_id = null,
     customize = false,
     disabled = false,
-    profile = 'interface',
     loading = false,
+    param = null,
+    param_id = null,
+    profile = 'interface',
     selected = false,
-    hidden = false
+    spec = null,
+    spec_id = null
   }: ParameterProps) => {
     const form = useForm();
 
-    const name = useMemo<string>(
-      () => `next.profiles[${profile}].service_spec[${spec_id}].params[${param_id}].value`,
-      [param_id, profile, spec_id]
-    );
-
     return (
-      <form.Field
+      <form.Subscribe
         key={`${param.name}-${param_id}`}
-        name={name as 'next.profiles.default.service_spec[0].params[0].value'}
-        children={({ state, handleChange, handleBlur }) => {
+        selector={state => state.values.next.profiles[profile].service_spec[spec_id].params[param_id].value}
+        children={state => {
           const primary = param.name.replaceAll('_', ' ');
-          // const secondary = `[${param.type}]`;
-          const secondary = null;
 
           switch (param.type) {
             case 'str':
@@ -64,16 +56,24 @@ const Parameter = React.memo(
                 <TextListInput
                   id={`${spec.name}-${param.name}`}
                   primary={primary}
-                  secondary={secondary}
                   capitalize
-                  value={state.value as string}
+                  disabled={disabled}
                   loading={loading}
-                  preventRender={hidden}
-                  disabled={disabled || (!customize && (!selected || !param.editable))}
-                  reset={param.default !== null && state.value !== param.default}
-                  onBlur={handleBlur}
-                  onChange={(e, v) => handleChange(v)}
-                  onReset={() => handleChange(param.default)}
+                  preventRender={customize ? false : !selected || !param.editable}
+                  reset={param.default !== null && state !== param.default}
+                  value={state as string}
+                  onChange={(event, value) => {
+                    form.setStore(s => {
+                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = value;
+                      return s;
+                    });
+                  }}
+                  onReset={() => {
+                    form.setStore(s => {
+                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = param.default;
+                      return s;
+                    });
+                  }}
                 />
               );
             case 'int':
@@ -81,16 +81,24 @@ const Parameter = React.memo(
                 <NumberListInput
                   id={`${spec.name}-${param.name}`}
                   primary={primary}
-                  secondary={secondary}
                   capitalize
-                  value={Number(state.value)}
+                  disabled={disabled}
                   loading={loading}
-                  preventRender={hidden}
-                  disabled={disabled || (!customize && (!selected || !param.editable))}
-                  reset={param.default !== null && state.value !== param.default}
-                  onBlur={handleBlur}
-                  onChange={e => handleChange(Number(e.target.value))}
-                  onReset={() => handleChange(param.default)}
+                  preventRender={customize ? false : !selected || !param.editable}
+                  reset={param.default !== null && state !== param.default}
+                  value={state as number}
+                  onChange={(event, value) => {
+                    form.setStore(s => {
+                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = value;
+                      return s;
+                    });
+                  }}
+                  onReset={() => {
+                    form.setStore(s => {
+                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = param.default;
+                      return s;
+                    });
+                  }}
                 />
               );
             case 'bool':
@@ -98,16 +106,24 @@ const Parameter = React.memo(
                 <BooleanListInput
                   id={`${spec.name}-${param.name}`}
                   primary={primary}
-                  secondary={secondary}
                   capitalize
-                  value={state.value as boolean}
+                  disabled={disabled}
                   loading={loading}
-                  preventRender={hidden}
-                  disabled={disabled || (!customize && (!selected || !param.editable))}
-                  reset={param.default !== null && state.value !== param.default}
-                  onBlur={handleBlur}
-                  onChange={() => handleChange(!state.value)}
-                  onReset={() => handleChange(param.default)}
+                  preventRender={customize ? false : !selected || !param.editable}
+                  reset={param.default !== null && state !== param.default}
+                  value={state as boolean}
+                  onChange={(event, value) => {
+                    form.setStore(s => {
+                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = value;
+                      return s;
+                    });
+                  }}
+                  onReset={() => {
+                    form.setStore(s => {
+                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = param.default;
+                      return s;
+                    });
+                  }}
                 />
               );
             case 'list':
@@ -115,20 +131,28 @@ const Parameter = React.memo(
                 <SelectListInput
                   id={`${spec.name}-${param.name}`}
                   primary={primary}
-                  secondary={secondary}
                   capitalize
-                  value={state.value}
+                  disabled={disabled}
                   loading={loading}
-                  preventRender={hidden}
-                  disabled={disabled || (!customize && (!selected || !param.editable))}
-                  reset={param.default !== null && state.value !== param.default}
+                  preventRender={customize ? false : !selected || !param.editable}
+                  reset={param.default !== null && state !== param.default}
+                  value={state as string}
                   options={param.list.map(item => ({
                     value: item,
                     label: item.replaceAll('_', ' ')
                   }))}
-                  onBlur={handleBlur}
-                  onChange={event => handleChange(event.target.value as string)}
-                  onReset={() => handleChange(param.default)}
+                  onChange={(event, value) => {
+                    form.setStore(s => {
+                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = value;
+                      return s;
+                    });
+                  }}
+                  onReset={() => {
+                    form.setStore(s => {
+                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = param.default;
+                      return s;
+                    });
+                  }}
                 />
               );
           }
@@ -144,7 +168,6 @@ type ServiceProps = {
   service: SelectedService;
   customize: boolean;
   disabled: boolean;
-  hidden: boolean;
   profile: SettingsStore['state']['tab'];
   loading: boolean;
 };
@@ -156,10 +179,10 @@ const Service = React.memo(
     service = null,
     customize = false,
     disabled = false,
-    hidden = false,
     profile = 'interface',
     loading = false
   }: ServiceProps) => {
+    const theme = useTheme();
     const form = useForm();
 
     const handleChange = useCallback(
@@ -191,41 +214,42 @@ const Service = React.memo(
           const specID = spec_id as number;
           const spec = specID >= 0 ? form.state.values.next.profiles[profile].service_spec[specID] : null;
 
-          return !customize && hidden && !selected ? null : (
-            <List
+          return !customize && !selected ? null : (
+            <div
               key={`${service.name}-${svr_id}`}
-              id={`${service.category} - ${service.name}`}
-              data-anchor={`${service.category} - ${service.name}`}
-              primary={service.name}
-              primaryProps={{
-                id: `${service.category} - ${service.name}`,
-                className: 'Anchor'
-              }}
-              secondaryProps={{ children: service.description }}
-              checkboxProps={{ checked: selected as boolean }}
-              checkboxPadding
-              button={customize}
-              disabled={!selected}
-              buttonProps={{ onClick: () => handleChange(selected as boolean) }}
+              style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.25) }}
             >
-              {(spec?.params || []).map((param, param_id) =>
-                !param.editable && !customize && hidden ? null : (
-                  <Parameter
-                    key={`${param.name}-${param_id}`}
-                    spec={spec}
-                    spec_id={specID}
-                    param={param}
-                    param_id={param_id}
-                    customize={customize}
-                    disabled={disabled}
-                    profile={profile}
-                    loading={loading}
-                    hidden={hidden}
-                    selected={selected as boolean}
-                  />
-                )
+              <ListHeader
+                id={`${service.category}-${service.name}`}
+                primary={service.name}
+                primaryProps={{ className: 'Anchor' }}
+                secondary={service.description}
+                checked={selected as boolean}
+                preventRender={!customize && !selected}
+                anchor
+                sx={{ ...(!selected && { opacity: 0.38 }) }}
+                onChange={!customize ? null : (event, checked) => handleChange(checked)}
+              />
+
+              {specID < 0 || !spec.params.filter(p => (customize ? true : selected && p.editable)).length ? null : (
+                <List inset>
+                  {spec.params.map((param, param_id) => (
+                    <Parameter
+                      key={`${param.name}-${param_id}`}
+                      customize={customize}
+                      disabled={disabled}
+                      loading={loading}
+                      param_id={param_id}
+                      param={param}
+                      profile={profile}
+                      selected={selected as boolean}
+                      spec_id={specID}
+                      spec={spec}
+                    />
+                  ))}
+                </List>
               )}
-            </List>
+            </div>
           );
         }}
       />
@@ -238,7 +262,6 @@ type CategoryProps = {
   category: SelectedServiceCategory;
   customize: boolean;
   disabled: boolean;
-  hidden: boolean;
   profile: SettingsStore['state']['tab'];
   loading: boolean;
 };
@@ -249,7 +272,6 @@ const Category = React.memo(
     category = null,
     customize = false,
     disabled = false,
-    hidden = false,
     profile = 'interface',
     loading = false
   }: CategoryProps) => {
@@ -291,38 +313,34 @@ const Category = React.memo(
           return [selected, !list.every(i => i) && list.some(i => i)];
         }}
         children={([selected, indeterminate]) =>
-          !customize && hidden && !(selected || indeterminate) ? null : (
+          !customize && !(selected || indeterminate) ? null : (
             <div
               key={`${category.name}-${cat_id}`}
               style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}
             >
               <ListHeader
-                key={`${category.name}-${cat_id}`}
                 id={category.name}
-                data-anchor={category.name}
+                anchorProps={{ subheader: true }}
                 primary={category.name}
-                primaryProps={{ id: category.name, className: 'Anchor', color: 'primary' }}
-                button={customize}
-                disabled={!selected && !indeterminate}
-                underlined
-                checkboxProps={{
-                  checked: selected,
-                  indeterminate: indeterminate
-                }}
-                buttonProps={{ onClick: () => handleChange(selected) }}
+                checked={selected}
+                indeterminate={indeterminate}
+                preventRender={!customize && !(selected || indeterminate)}
+                divider
+                anchor
+                sx={{ ...(!selected && !indeterminate && { opacity: 0.38 }) }}
+                onChange={!customize ? null : (event, checked) => handleChange(checked)}
               />
 
               {category.services.map((service, svr_id) => (
                 <Service
                   key={`${cat_id}-${svr_id}`}
-                  service={service}
-                  svr_id={svr_id}
                   cat_id={cat_id}
                   customize={customize}
                   disabled={disabled}
-                  hidden={hidden}
-                  profile={profile}
                   loading={loading}
+                  profile={profile}
+                  service={service}
+                  svr_id={svr_id}
                 />
               ))}
             </div>
@@ -333,50 +351,55 @@ const Category = React.memo(
   }
 );
 
-type Props = {
-  customize: boolean;
-  disabled: boolean;
-  hidden: boolean;
-  loading: boolean;
-  profile: SettingsStore['state']['tab'];
-};
-
-export const ServicesSection = ({
-  customize = false,
-  disabled = false,
-  hidden = false,
-  loading = false,
-  profile = 'interface'
-}: Props) => {
+export const ServicesSection = () => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
-      <ListHeader
-        primary={t('services')}
-        secondary={t('services.description')}
-        primaryProps={{ id: 'services', className: 'Anchor' }}
-      />
+    <form.Subscribe
+      selector={state => [
+        state.values.state.customize,
+        state.values.state.disabled,
+        state.values.state.loading,
+        state.values.state.tab
+      ]}
+      children={props => {
+        const customize = props[0] as boolean;
+        const disabled = props[1] as boolean;
+        const loading = props[2] as boolean;
+        const profile = props[3] as SettingsStore['state']['tab'];
 
-      <form.Subscribe
-        selector={state => state.values.next.profiles[profile].services}
-        children={categories =>
-          categories.map((category, cat_id) => (
-            <Category
-              key={`${category.name}-${cat_id}`}
-              category={category}
-              cat_id={cat_id}
-              customize={customize}
-              disabled={disabled}
-              hidden={hidden}
-              profile={profile}
-              loading={loading}
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+            <PageSection
+              id="services"
+              primary={t('services')}
+              secondary={t('services.description')}
+              primaryProps={{ variant: 'h6' }}
+              subheader
+              anchor
             />
-          ))
-        }
-      />
-    </div>
+
+            <form.Subscribe
+              selector={state => state.values.next.profiles[profile].services}
+              children={categories =>
+                categories.map((category, cat_id) => (
+                  <Category
+                    key={`${category.name}-${cat_id}`}
+                    cat_id={cat_id}
+                    category={category}
+                    customize={customize}
+                    disabled={disabled}
+                    loading={loading}
+                    profile={profile}
+                  />
+                ))
+              }
+            />
+          </div>
+        );
+      }}
+    />
   );
 };

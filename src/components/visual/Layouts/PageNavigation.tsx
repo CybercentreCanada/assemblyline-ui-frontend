@@ -1,5 +1,12 @@
 import MenuIcon from '@mui/icons-material/Menu';
-import type { CheckboxProps, DrawerProps, ListItemTextProps, ListProps, ListSubheaderProps } from '@mui/material';
+import type {
+  CheckboxProps,
+  DrawerProps,
+  ListItemProps,
+  ListItemTextProps,
+  ListProps,
+  ListSubheaderProps
+} from '@mui/material';
 import {
   alpha,
   Checkbox,
@@ -24,7 +31,10 @@ const useStyles = makeStyles(theme => ({
     padding: `${theme.spacing(0.5)} ${theme.spacing(2)} ${theme.spacing(0.5)} ${theme.spacing(1.5)}`
   },
   button: {
-    paddingLeft: theme.spacing(3)
+    paddingLeft: theme.spacing(3),
+    '&:not(.Active)': {
+      marginLeft: '1px'
+    }
   },
   subheader: {
     paddingLeft: theme.spacing(1.5)
@@ -76,14 +86,14 @@ const PageNavigationDrawer = React.memo(({ children = null, variant = 'left' }: 
   );
 });
 
-type PageNavigationItemProp = {
+export type PageNavigationItemProp = ListItemProps & {
   active?: boolean;
   checkboxProps?: CheckboxProps;
-  id?: string;
-  primary: string;
+  preventRender?: boolean;
+  primary: React.ReactNode;
   primaryProps?: ListItemTextProps['primaryTypographyProps'];
   readOnly?: boolean;
-  secondary?: string;
+  secondary?: React.ReactNode;
   secondaryProps?: ListItemTextProps['secondaryTypographyProps'];
   subheader?: boolean;
   to?: LinkProps['to'];
@@ -91,7 +101,7 @@ type PageNavigationItemProp = {
   onPageNavigation?: (event: React.MouseEvent<HTMLElement, MouseEvent>, props: PageNavigationItemProp) => void;
 };
 
-const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((props: PageNavigationItemProp) => {
+export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((props: PageNavigationItemProp) => {
   const theme = useTheme();
   const classes = useStyles();
 
@@ -99,6 +109,7 @@ const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((props: 
     active = false,
     checkboxProps: checkbox = null,
     id = null,
+    preventRender = false,
     primary,
     primaryProps = null,
     readOnly = false,
@@ -115,8 +126,8 @@ const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((props: 
 
   const isDownLG = useMediaQuery(theme.breakpoints.down('lg'));
 
-  return readOnly ? (
-    <ListItem className={clsx(classes.readOnly)} disablePadding>
+  return preventRender ? null : readOnly ? (
+    <ListItem className={clsx(classes.readOnly)} disablePadding {...listItemProps}>
       <ListItemText
         primary={primary}
         primaryTypographyProps={{ color: 'textSecondary', ...primaryProps }}
@@ -125,9 +136,13 @@ const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((props: 
       />
     </ListItem>
   ) : (
-    <ListItem disablePadding secondaryAction={!checkbox ? null : <Checkbox edge="end" {...checkboxProps} />}>
+    <ListItem
+      disablePadding
+      secondaryAction={!checkbox ? null : <Checkbox edge="end" {...checkboxProps} />}
+      {...listItemProps}
+    >
       <ListItemButton
-        id={id || primary}
+        id={id || primary.toString()}
         className={clsx(
           classes.button,
           subheader && classes.subheader,
@@ -152,11 +167,14 @@ const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((props: 
 });
 
 export type PageNavigationProps = Omit<ListProps, 'subheader'> & {
+  children?: React.ReactNode;
+  loading?: boolean;
+  options?: PageNavigationItemProp[];
+  preventRender?: boolean;
   subheader?: string;
   subheaderProps?: ListSubheaderProps;
-  options: PageNavigationItemProp[];
   variant?: DrawerProps['anchor'];
-  render?: (
+  renderItem?: (
     params: PageNavigationItemProp,
     index?: number,
     NavItem?: React.FC<PageNavigationItemProp>
@@ -166,20 +184,23 @@ export type PageNavigationProps = Omit<ListProps, 'subheader'> & {
 
 export const PageNavigation: React.FC<PageNavigationProps> = React.memo(
   ({
+    children = null,
+    loading = false,
+    options = null,
+    preventRender = false,
     subheader = null,
     subheaderProps = null,
-    options = [],
     variant = 'left',
-    render = null,
+    renderItem = null,
     onPageNavigation = () => null,
     ...listProps
   }: PageNavigationProps) => {
-    return (
+    return preventRender ? null : (
       <PageNavigationDrawer variant={variant}>
         <List
           component="nav"
           subheader={
-            !subheader ? null : (
+            !subheader || loading ? null : (
               <ListSubheader
                 {...subheaderProps}
                 sx={{
@@ -196,15 +217,19 @@ export const PageNavigation: React.FC<PageNavigationProps> = React.memo(
           sx={{ '& ul': { padding: 0 }, ...listProps?.sx }}
           {...listProps}
         >
-          {options.map((option, i) =>
-            !render ? (
-              <PageNavigationItem key={i} variant={variant} onPageNavigation={onPageNavigation} {...option} />
-            ) : (
-              render(option, i, props => (
-                <PageNavigationItem key={i} variant={variant} onPageNavigation={onPageNavigation} {...props} />
-              ))
-            )
-          )}
+          {loading
+            ? null
+            : !Array.isArray(options)
+            ? children
+            : options.map((option, i) =>
+                !renderItem ? (
+                  <PageNavigationItem key={i} variant={variant} onPageNavigation={onPageNavigation} {...option} />
+                ) : (
+                  renderItem(option, i, props => (
+                    <PageNavigationItem key={i} variant={variant} onPageNavigation={onPageNavigation} {...props} />
+                  ))
+                )
+              )}
         </List>
       </PageNavigationDrawer>
     );

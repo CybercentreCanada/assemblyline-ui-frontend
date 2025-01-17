@@ -2,12 +2,12 @@ import { createFormContext } from 'components/core/form/createFormContext';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 
 export type TableOfContentStore = {
-  active?: number;
+  activeID?: string;
   anchors?: { id: string; label: string; subheader: boolean }[];
 };
 
 const TABLE_OF_CONTENT_STORE: TableOfContentStore = Object.freeze({
-  active: null,
+  activeID: null,
   anchors: []
 });
 
@@ -19,10 +19,10 @@ export type TableOfContentContextProps = {
   rootRef: React.MutableRefObject<HTMLDivElement>;
   headerRef: React.MutableRefObject<HTMLDivElement>;
   loadAnchors: (props?: { id?: string; label?: string; subheader?: boolean }) => void;
-  scrollTo: (event: React.SyntheticEvent, index: number) => void;
+  scrollTo: (event: React.SyntheticEvent, activeAnchor: string) => void;
   Anchors: React.FC<{ children: (anchors: TableOfContentStore['anchors']) => React.ReactNode }>;
   ActiveAnchor: React.FC<{
-    anchorIndex: TableOfContentStore['active'];
+    activeID: TableOfContentStore['activeID'];
     children: (active: boolean) => React.ReactNode;
   }>;
 };
@@ -54,13 +54,8 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
 
     const ActiveAnchor = useMemo<TableOfContentContextProps['ActiveAnchor']>(
       () =>
-        ({ anchorIndex, children: render }) =>
-          (
-            <form.Subscribe
-              selector={state => anchorIndex === state.values.active}
-              children={active => render(active)}
-            />
-          ),
+        ({ activeID, children: render }) =>
+          <form.Subscribe selector={state => activeID === state.values.activeID} children={active => render(active)} />,
       [form]
     );
 
@@ -72,7 +67,7 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
           rootRef.current.getBoundingClientRect().top + headerRef.current.getBoundingClientRect().height
         ) {
           form.setStore(s => {
-            s.active = i;
+            s.activeID = elements.item(i).getAttribute('data-anchor');
             return s;
           });
           break;
@@ -93,7 +88,7 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
             else if (index >= 0) anchors.push(s.anchors[index]);
           });
 
-          s.active = null;
+          s.activeID = null;
           s.anchors = anchors;
           return s;
         });
@@ -102,18 +97,17 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
     );
 
     const scrollTo = useCallback<TableOfContentContextProps['scrollTo']>(
-      (event, index) => {
+      (event, activeAnchor) => {
         event.preventDefault();
         event.stopPropagation();
 
-        const anchor = form.getFieldValue(`anchors[${index}].id`) as string;
-        const element: HTMLDivElement = rootRef.current.querySelector("[data-anchor='" + anchor + "']");
+        const element: HTMLDivElement = rootRef.current.querySelector("[data-anchor='" + activeAnchor + "']");
         rootRef.current.scrollTo({
           top: element.offsetTop - rootRef.current.offsetTop - headerRef.current.getBoundingClientRect().height,
           behavior: behavior
         });
       },
-      [behavior, form]
+      [behavior]
     );
 
     useEffect(() => {
