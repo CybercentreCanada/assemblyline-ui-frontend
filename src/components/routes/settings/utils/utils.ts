@@ -237,7 +237,41 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
   return out;
 };
 
+export const applySubmissionProfile = (submit: SubmitSettings, profile: string | number): UserSettings => {
+  if (!submit) return null;
+
+  let out: UserSettings = {} as UserSettings;
+
+  // Applying the default submission parameters
+  Object.entries(submit).forEach(([key, value]) => {
+    if (INTERFACE_KEYS.includes(key as InterfaceKey)) {
+      out[key] = value;
+    }
+  });
+
+  // Applying the selected submission profile parameters
+  Object.entries(submit.profiles[profile]).forEach(([key, value]: [string, unknown]) => {
+    const param = value as ProfileParam<unknown>;
+    if (PROFILE_KEYS.includes(key as ProfileKey)) {
+      out[key] = param.value;
+    }
+  });
+
+  // Applying the selected submission profile service specs
+  out.service_spec = structuredClone(submit.profiles[profile].service_spec);
+  out.service_spec.forEach((spec, i) => {
+    out.service_spec[i].params.forEach((param, j) => {
+      delete out.service_spec[i].params[j].editable;
+    });
+  });
+
+  // Applying the selected submission profile service specs
+  out.services = structuredClone(submit.profiles[profile].services);
+
+  return out;
+};
+
 export const getProfileNames = (settings: SubmitSettings, user: CustomUser) =>
-  Object.keys(settings.profiles)
+  Object.keys(settings?.profiles || {})
     .filter(p => p !== 'default' || user.is_admin || user.roles.includes('submission_customize'))
     .sort();

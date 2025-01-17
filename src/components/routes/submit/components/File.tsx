@@ -4,7 +4,7 @@ import useALContext from 'components/hooks/useALContext';
 import type { APIResponseProps } from 'components/hooks/useMyAPI';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { parseSubmissionProfiles } from 'components/routes/settings/utils/utils';
+import { applySubmissionProfile } from 'components/routes/settings/utils/utils';
 import type { SubmitStore } from 'components/routes/submit/contexts/form';
 import { useForm } from 'components/routes/submit/contexts/form';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -124,7 +124,7 @@ export const FileSubmit = ({ profile = null, loading = false, disabled = false }
           url: `/api/v4/ui/start/${uuid}/`,
           method: 'POST',
           body: {
-            ...parseSubmissionProfiles(settings),
+            ...applySubmissionProfile(settings, submissionProfile),
             submission_profile: submissionProfile,
             filename: file.path,
             metadata: metadata

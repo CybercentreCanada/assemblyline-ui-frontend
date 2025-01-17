@@ -1,16 +1,15 @@
-import { Button, CircularProgress, TextField, Typography, useTheme } from '@mui/material';
+import { Button, CircularProgress, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { URIHashPatternMap } from 'components/models/base/config';
-import { URI_HASH_PATTERN_MAP } from 'components/models/base/config';
 import type { Submission } from 'components/models/base/submission';
-import { parseSubmissionProfiles } from 'components/routes/settings/utils/utils';
+import { applySubmissionProfile } from 'components/routes/settings/utils/utils';
 import { MetadataSummary } from 'components/routes/submit/components/MetadataSummary';
 import type { SubmitStore } from 'components/routes/submit/contexts/form';
 import { useForm } from 'components/routes/submit/contexts/form';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
+import { TextInput } from 'components/visual/Inputs/TextInput';
 import { getSubmitType } from 'helpers/utils';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,10 +42,9 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
         url: '/api/v4/submit/',
         method: 'POST',
         body: {
-          ui_params: parseSubmissionProfiles(store.settings),
+          ui_params: applySubmissionProfile(store.settings, store.state.profile),
           submission_profile: store.state.profile,
-          [URI_HASH_PATTERN_MAP.includes(store.hash.type as URIHashPatternMap) ? 'url' : store.hash.type]:
-            store.hash.value,
+          [store.hash.type]: store.hash.value,
           metadata: store.metadata
         },
         onSuccess: ({ api_response }) => {
@@ -139,7 +137,7 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
           display: 'flex',
           flexDirection: 'row',
           marginTop: theme.spacing(2),
-          alignItems: 'flex-start',
+          alignItems: 'flex-end',
           gap: theme.spacing(2)
         }}
       >
@@ -166,25 +164,53 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
           )}
         />
         <form.Subscribe
-          selector={state => [state.values.hash.value, state.values.hash.hasError]}
-          children={([hash, error]) => (
+          selector={state => [
+            state.values.hash.type,
+            state.values.hash.value,
+            state.values.hash.hasError,
+            state.values.state.isUploading
+          ]}
+          children={([hashType, hash, error, isUploading]) => (
             <div style={{ flex: 1 }}>
-              <TextField
+              <TextInput
                 label={`${t('urlHash.input_title')}${t('urlHash.input_suffix')}`}
-                size="small"
-                type="stringInput"
-                variant="outlined"
-                fullWidth
                 value={hash as string}
-                error={error as boolean}
-                onChange={event => {
+                helperText={t('urlHash.input_helpertext')}
+                endAdornment={
+                  <Button
+                    disabled={Boolean(isUploading || error || !hashType)}
+                    color="primary"
+                    variant="contained"
+                    onClick={() => handleConfirm(form.state.values)}
+                    style={{ height: '40px' }}
+                  >
+                    {hashType ? `${t('urlHash.button')} ${hashType}` : t('urlHash.button')}
+                    {isUploading && (
+                      <CircularProgress
+                        size={24}
+                        style={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          marginTop: -12,
+                          marginLeft: -12
+                        }}
+                      />
+                    )}
+                  </Button>
+                }
+                onKeyDown={event => {
+                  if (event.key !== 'Enter' || !hashType) return;
+                  handleConfirm(form.state.values);
+                }}
+                onChange={(event, v) => {
                   closeSnackbar();
-                  const [type, value] = getSubmitType(event.target.value, configuration);
+                  const [type, value] = getSubmitType(v, configuration);
 
                   form.setStore(s => {
                     s.hash = { ...s.hash, type, value, hasError: false };
 
-                    if (URI_HASH_PATTERN_MAP.includes(type as URIHashPatternMap) && s.hash.urlAutoSelect) {
+                    if (type === 'url' && s.hash.urlAutoSelect) {
                       s.hash.urlAutoSelect = false;
                       s.settings.profiles[profile].services.forEach((category, i) => {
                         category.services.forEach((service, j) => {
@@ -196,7 +222,7 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
                           i
                         ].services.every(svr => svr.selected);
                       });
-                    } else if (!URI_HASH_PATTERN_MAP.includes(type as URIHashPatternMap)) {
+                    } else if (type !== 'url') {
                       s.hash.urlAutoSelect = true;
                     }
 
@@ -205,33 +231,6 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
                 }}
               />
             </div>
-          )}
-        />
-
-        <form.Subscribe
-          selector={state => [state.values.state.isUploading, state.values.hash.type, state.values.hash.hasError]}
-          children={([isUploading, type, error]) => (
-            <Button
-              disabled={Boolean(isUploading || error || !type)}
-              color="primary"
-              variant="contained"
-              onClick={() => handleConfirm(form.state.values)}
-              style={{ height: '40px' }}
-            >
-              {type ? `${t('urlHash.button')} ${type}` : t('urlHash.button')}
-              {isUploading && (
-                <CircularProgress
-                  size={24}
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
-            </Button>
           )}
         />
       </div>

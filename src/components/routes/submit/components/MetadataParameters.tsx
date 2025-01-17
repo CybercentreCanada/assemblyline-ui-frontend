@@ -38,7 +38,7 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
 
         if (
           metadata.validator_type === 'regex' &&
-          !((value || '') as string).match(new RegExp(metadata.validator_params.validation_regex))
+          !((value || '') as string).match(new RegExp(metadata.validator_params.validation_regex as string))
         )
           return t('invalid_regex');
 
@@ -75,10 +75,9 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
     }, [metadata.validator_type, name, disabled]);
 
     return (
-      <form.Field
-        name={`metadata.${name}`}
-        validators={{ onChange: ({ value }) => handleValid(value) }}
-        children={({ state, handleBlur }) => {
+      <form.Subscribe
+        selector={state => state.values?.metadata?.[name]}
+        children={value => {
           switch (metadata.validator_type) {
             case 'boolean':
               return (
@@ -86,14 +85,13 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   id={`metadata-${name.replace('_', ' ')}`}
                   label={name.replace('_', ' ')}
                   labelProps={{ textTransform: 'capitalize' }}
-                  value={(state.value as boolean) || false}
+                  value={(value as boolean) || false}
                   loading={loading}
                   disabled={disabled}
-                  reset={!!state.value}
+                  reset={!!value}
                   disableGap
-                  onChange={() => handleChange(!!!state.value)}
+                  onChange={(event, v) => handleChange(v)}
                   onReset={() => handleReset()}
-                  onBlur={handleBlur}
                 />
               );
             case 'date':
@@ -102,11 +100,11 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   id={`metadata-${name.replace('_', ' ')}`}
                   label={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
                   labelProps={{ textTransform: 'capitalize' }}
-                  value={state.value as string}
+                  value={value as string}
                   loading={loading}
                   disabled={disabled}
-                  reset={!!state.value}
-                  onChange={v => handleChange(v)}
+                  reset={!!value}
+                  onChange={(event, v) => handleChange(v)}
                   onReset={() => handleReset()}
                 />
               );
@@ -116,16 +114,15 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   id={`metadata-${name.replace('_', ' ')}`}
                   label={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
                   labelProps={{ textTransform: 'capitalize' }}
-                  value={(state.value as string) || ''}
+                  value={(value as string) || ''}
                   options={(metadata.validator_params.values as string[])
                     .map(key => ({ label: key.replaceAll('_', ' '), value: key }))
                     .sort()}
                   loading={loading}
                   disabled={disabled}
-                  reset={!!state.value}
-                  onChange={(e, v) => handleChange(v)}
+                  reset={!!value}
+                  onChange={(event, v) => handleChange(v)}
                   onReset={() => handleReset()}
-                  onBlur={handleBlur}
                 />
               );
             case 'integer':
@@ -134,15 +131,14 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   id={`metadata-${name.replace('_', ' ')}`}
                   label={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
                   labelProps={{ textTransform: 'capitalize' }}
-                  value={state.value as number}
+                  value={value as number}
                   min={metadata.validator_params.min}
                   max={metadata.validator_params.max}
                   loading={loading}
                   disabled={disabled}
-                  reset={!!state.value}
-                  onChange={(e, v) => handleChange(v)}
+                  reset={!!value}
+                  onChange={(event, v) => handleChange(v)}
                   onReset={() => handleReset()}
-                  onBlur={handleBlur}
                 />
               );
             case 'regex':
@@ -151,17 +147,16 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   id={`metadata-${name.replace('_', ' ')}`}
                   label={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
                   labelProps={{ textTransform: 'capitalize' }}
-                  value={(state.value as string) || ''}
+                  value={(value as string) || ''}
                   options={options}
-                  error={handleValid}
                   loading={loading}
                   disabled={disabled}
-                  reset={!!state.value}
+                  reset={!!value}
+                  error={v => handleValid(v)}
                   tooltip={metadata.validator_params?.validation_regex || null}
                   tooltipProps={{ placement: 'right' }}
-                  onChange={(e, v) => handleChange(v)}
+                  onChange={(event, v) => handleChange(v)}
                   onReset={() => handleReset()}
-                  onBlur={handleBlur}
                 />
               );
             default:
@@ -170,15 +165,14 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   id={`metadata-${name.replace('_', ' ')}`}
                   label={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
                   labelProps={{ textTransform: 'capitalize' }}
-                  value={(state.value as string) || ''}
+                  value={(value as string) || ''}
                   options={options}
-                  error={handleValid}
                   loading={loading}
                   disabled={disabled}
-                  reset={!!state.value}
-                  onChange={(e, v) => handleChange(v)}
+                  reset={!!value}
+                  error={v => handleValid(v)}
+                  onChange={(event, v) => handleChange(v)}
                   onReset={() => handleReset()}
-                  onBlur={handleBlur}
                 />
               );
           }

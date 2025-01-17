@@ -1,15 +1,19 @@
+import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/settings/contexts/form';
+import type { SubmitSettings } from 'components/routes/settings/utils/utils';
+import { getProfileNames } from 'components/routes/settings/utils/utils';
 import { PageNavigation } from 'components/visual/Layouts/PageNavigation';
 import { useTranslation } from 'react-i18next';
 
 export const LeftNav = () => {
   const { t } = useTranslation(['settings']);
   const form = useForm();
+  const { user: currentUser } = useALContext();
 
   return (
     <form.Subscribe
       selector={state => [
-        state.values?.next?.profiles,
+        state.values?.next,
         state.values.state.tab,
         state.values.state.loading,
         state.values.state.customize
@@ -26,14 +30,11 @@ export const LeftNav = () => {
               to: `/settings/interface`
             },
             { primary: t('profiles'), subheader: true, readOnly: true },
-            ...Object.keys(profiles || {})
-              .filter(name => (customize ? true : name !== 'default'))
-              .sort()
-              .map(name => ({
-                primary: t(`profile.${name}`),
-                active: name === tab,
-                to: `/settings/${name}`
-              }))
+            ...getProfileNames(profiles as SubmitSettings, currentUser).map(name => ({
+              primary: t(`profile.${name}`),
+              active: name === tab,
+              to: `/settings/${name}`
+            }))
           ]}
         />
       )}

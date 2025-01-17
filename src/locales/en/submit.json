@@ -46,7 +46,7 @@
   "terms2": ", you consent to our ",
   "terms3": "Terms of Service",
   "urlHash.button": "Scan",
-  "urlHash.input_helpertext": "Note: A valid URL requires a scheme, i.e.: https://www.google.com",
+  "urlHash.input_helpertext": "Note: A valid URL requires a scheme, i.e.: https://www.example.com",
   "urlHash.input_suffix": " to Scan",
   "urlHash.input_title": "Hash/URL",
   "validate.acceptText": "Continue",
