@@ -11,11 +11,12 @@ import { SearchParamsProvider, useSearchParams } from 'components/core/SearchPar
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { SubmissionIndexed } from 'components/models/base/submission';
+import type { PossibleColor } from 'components/models/utils/color';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import { safeFieldValue } from 'helpers/utils';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ForbiddenPage from './403';
 
@@ -52,14 +53,35 @@ const SubmissionSearch = () => {
     [indexes.submission]
   );
 
-  const mySubmissionsParam = useMemo<string>(
-    () => `params.submitter:${safeFieldValue(currentUser.username)}`,
-    [currentUser.username]
-  );
+  const mySubmissions = useMemo<{ param: string; has: boolean; color: PossibleColor }>(() => {
+    const param = `params.submitter:${safeFieldValue(currentUser.username)}`;
+    const has = search.get('filters').includes(param);
+    const color = has ? 'primary' : 'default';
+    return { param, has, color };
+  }, [currentUser.username, search]);
 
-  const isMySubmissions = useMemo<boolean>(
-    () => search.get('filters').includes(mySubmissionsParam),
-    [mySubmissionsParam, search]
+  const completed = useMemo<{ param: string; has: boolean; color: PossibleColor }>(() => {
+    const param = 'state:completed';
+    const has = search.get('filters').includes(param);
+    const color = has ? 'primary' : 'default';
+    return { param, has, color };
+  }, [search]);
+
+  const malicious = useMemo<{ param: string; has: boolean; color: PossibleColor }>(() => {
+    const param = 'max_score:>=1000';
+    const has = search.get('filters').includes(param);
+    const color = has ? 'primary' : 'default';
+    return { param, has, color };
+  }, [search]);
+
+  const handleToggleFilter = useCallback(
+    (param: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(param) ? o.filters.filter(f => f !== param) : [...o.filters, param];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
   );
 
   useEffect(() => {
@@ -101,32 +123,27 @@ const SubmissionSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: isMySubmissions ? t('all_submission') : t('my_submission') },
+                tooltip: { title: mySubmissions.has ? t('all_submission') : t('my_submission') },
                 icon: { children: <PersonIcon /> },
                 button: {
-                  color: isMySubmissions ? 'primary' : 'default',
-                  onClick: () =>
-                    setSearchObject(o => {
-                      const filters = o.filters.includes(mySubmissionsParam)
-                        ? o.filters.filter(f => f !== mySubmissionsParam)
-                        : [...o.filters, mySubmissionsParam];
-                      return { ...o, offset: 0, filters };
-                    })
+                  color: mySubmissions.color,
+                  onClick: () => handleToggleFilter(mySubmissions.param)
                 }
               },
               {
-                tooltip: { title: t('completed_submissions') },
+                tooltip: { title: completed.has ? t('all_submission') : t('completed_submissions') },
                 icon: { children: <AssignmentTurnedInIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'state:completed'] }))
+                  color: completed.color,
+                  onClick: () => handleToggleFilter(completed.param)
                 }
               },
               {
-                tooltip: { title: t('malicious_submissions') },
+                tooltip: { title: malicious.has ? t('all_submission') : t('malicious_submissions') },
                 icon: { children: <BugReportOutlinedIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'max_score:>=1000'] }))
+                  color: malicious.color,
+                  onClick: () => handleToggleFilter(malicious.param)
                 }
               }
             ]}
