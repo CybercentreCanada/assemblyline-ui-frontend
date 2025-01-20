@@ -66,7 +66,7 @@ export const useMyTheme = () => {
     fetch('/theme.json')
       .then(response => response.json())
       .then(data => setTheme(data as AppThemeConfigs))
-      .catch(error => console.error('Error fetching JSON:', error));
+      .catch(error => console.error('Error fetching the JSON theme file:', error));
   }, []);
 
   return useMemo((): AppThemeConfigs => theme, [theme]);
