@@ -52,6 +52,16 @@ const SubmissionSearch = () => {
     [indexes.submission]
   );
 
+  const mySubmissionsParam = useMemo<string>(
+    () => `params.submitter:${safeFieldValue(currentUser.username)}`,
+    [currentUser.username]
+  );
+
+  const isMySubmissions = useMemo<boolean>(
+    () => search.get('filters').includes(mySubmissionsParam),
+    [mySubmissionsParam, search]
+  );
+
   useEffect(() => {
     if (!search || !currentUser.roles.includes('submission_view')) return;
 
@@ -91,12 +101,15 @@ const SubmissionSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('my_submission') },
+                tooltip: { title: isMySubmissions ? t('all_submission') : t('my_submission') },
                 icon: { children: <PersonIcon /> },
                 button: {
+                  color: isMySubmissions ? 'primary' : 'default',
                   onClick: () =>
                     setSearchObject(o => {
-                      const filters = [...o.filters, `params.submitter:${safeFieldValue(currentUser.username)}`];
+                      const filters = o.filters.includes(mySubmissionsParam)
+                        ? o.filters.filter(f => f !== mySubmissionsParam)
+                        : [...o.filters, mySubmissionsParam];
                       return { ...o, offset: 0, filters };
                     })
                 }
