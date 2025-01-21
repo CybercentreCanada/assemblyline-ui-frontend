@@ -27,7 +27,7 @@ export const useLayoutReducer: UseReducer = () => {
       const newRowSize = handleLayoutRowResize(height as number);
       const ColumnSize = columnAuto ? newColumnSize : Math.min(newColumnSize, maxColumns);
       const RowSize = rowAuto && isType.mode.body(store, 'table') ? newRowSize : Math.min(newRowSize, maxRows);
-      const foldingRows = foldingActive ? getRowFoldingMap(store, newColumnSize) : new Map();
+      const foldingRows = foldingActive ? getRowFoldingMap(store, ColumnSize) : new Map();
 
       return {
         ...store,
