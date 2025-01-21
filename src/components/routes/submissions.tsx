@@ -60,19 +60,27 @@ const SubmissionSearch = () => {
     return { param, has, color };
   }, [currentUser.username, search]);
 
-  const completed = useMemo<{ param: string; has: boolean; color: PossibleColor }>(() => {
+  const completed = useMemo<{ param: string; has: boolean; color: unknown }>(() => {
     const param = 'state:completed';
     const has = search.get('filters').includes(param);
-    const color = has ? 'primary' : 'default';
+    const color = !has
+      ? 'default'
+      : theme.palette.mode === 'dark'
+      ? theme.palette.success.light
+      : theme.palette.success.dark;
     return { param, has, color };
-  }, [search]);
+  }, [search, theme.palette.mode, theme.palette.success.dark, theme.palette.success.light]);
 
-  const malicious = useMemo<{ param: string; has: boolean; color: PossibleColor }>(() => {
+  const malicious = useMemo<{ param: string; has: boolean; color: unknown }>(() => {
     const param = 'max_score:>=1000';
     const has = search.get('filters').includes(param);
-    const color = has ? 'primary' : 'default';
+    const color = !has
+      ? 'default'
+      : theme.palette.mode === 'dark'
+      ? theme.palette.error.light
+      : theme.palette.error.dark;
     return { param, has, color };
-  }, [search]);
+  }, [search, theme.palette.error.dark, theme.palette.error.light, theme.palette.mode]);
 
   const handleToggleFilter = useCallback(
     (param: string) => {
@@ -134,7 +142,7 @@ const SubmissionSearch = () => {
                 tooltip: { title: completed.has ? t('all_submission') : t('completed_submissions') },
                 icon: { children: <AssignmentTurnedInIcon /> },
                 button: {
-                  color: completed.color,
+                  sx: { color: completed.color },
                   onClick: () => handleToggleFilter(completed.param)
                 }
               },
@@ -142,7 +150,7 @@ const SubmissionSearch = () => {
                 tooltip: { title: malicious.has ? t('all_submission') : t('malicious_submissions') },
                 icon: { children: <BugReportOutlinedIcon /> },
                 button: {
-                  color: malicious.color,
+                  sx: { color: malicious.color },
                   onClick: () => handleToggleFilter(malicious.param)
                 }
               }
