@@ -6,6 +6,7 @@ type HighlighMapProps = {
 
 export type HighlightContextProps = {
   getKey: (type: string, value: string) => string;
+  getHighlightedValues: () => string[];
   triggerHighlight: (key: string) => void;
   isHighlighted: (key: string) => boolean;
   hasHighlightedKeys: (keyList: string[]) => boolean;
@@ -26,6 +27,11 @@ function HighlightProvider(props: HighlightProviderProps) {
 
   const getKey = useCallback((type: string, value: string) => `${type}__${value}`, []);
 
+  const getHighlightedValues = useCallback<HighlightContextProps['getHighlightedValues']>(
+    () => Array.from(highlighted).map((v: string) => v.split('__').slice(1).join('__')),
+    [highlighted]
+  );
+
   const isHighlighted = useCallback(
     key => {
       if (highlightMap) {
@@ -36,9 +42,10 @@ function HighlightProvider(props: HighlightProviderProps) {
     [highlighted, relatedHighlighted, highlightMap]
   );
 
-  const hasHighlightedKeys = useCallback((keyList: string[]) => keyList.some(item => isHighlighted(item)), [
-    isHighlighted
-  ]);
+  const hasHighlightedKeys = useCallback(
+    (keyList: string[]) => keyList.some(item => isHighlighted(item)),
+    [isHighlighted]
+  );
 
   const triggerHighlight = useCallback((data: string) => {
     window.dispatchEvent(new CustomEvent('tiggerHighlight', { detail: data }));
@@ -80,6 +87,7 @@ function HighlightProvider(props: HighlightProviderProps) {
     <HighlightContext.Provider
       value={{
         getKey,
+        getHighlightedValues,
         triggerHighlight,
         isHighlighted,
         hasHighlightedKeys,
