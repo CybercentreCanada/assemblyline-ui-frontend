@@ -72,6 +72,8 @@
   "show_tags": "Tags",
   "size": "Size",
   "supplementary": "Supplementary files",
+  "table.menubutton": "Show large table",
+  "table.title": "Result Table",
   "title": "File Details",
   "type": "Type",
   "uri_identification": "URI Identification",

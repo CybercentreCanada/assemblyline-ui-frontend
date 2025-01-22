@@ -1,9 +1,22 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
-import { Box, Collapse, IconButton, Menu, MenuItem, Tooltip, useTheme } from '@mui/material';
+import TableViewOutlinedIcon from '@mui/icons-material/TableViewOutlined';
+import {
+  Box,
+  Collapse,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
@@ -16,7 +29,7 @@ import Heuristic from 'components/visual/Heuristic';
 import SectionHighlight from 'components/visual/SectionHighlight';
 import Tag from 'components/visual/Tag';
 import Verdict from 'components/visual/Verdict';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GraphBody } from './graph_body';
 import { ImageBody } from './image_body';
@@ -34,6 +47,7 @@ import { URLBody } from './url_body';
 
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
 const HEURISTIC_ICON = <SimCardOutlinedIcon style={{ marginRight: '16px' }} />;
+const TABLE_ICON = <TableViewOutlinedIcon style={{ marginRight: '16px' }} />;
 const TAGS_ICON = <LabelOutlinedIcon style={{ marginRight: '16px' }} />;
 const ATTACK_ICON = (
   <span
@@ -97,16 +111,18 @@ const WrappedResultSection: React.FC<Props> = ({
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(!section.auto_collapse || printable);
-  const [render, setRender] = React.useState(!section.auto_collapse || printable);
-  const [showTags, setShowTags] = React.useState(false);
-  const [showHeur, setShowHeur] = React.useState(false);
-  const [showAttack, setShowAttack] = React.useState(false);
-  const { getKey, hasHighlightedKeys } = useHighlighter();
   const { c12nDef } = useALContext();
-  const [state, setState] = React.useState(null);
   const { copy } = useClipboard();
+  const { getKey, hasHighlightedKeys } = useHighlighter();
   const { showSafeResults } = useSafeResults();
+
+  const [state, setState] = useState<{ mouseX: number; mouseY: number }>(null);
+  const [open, setOpen] = useState<boolean>(!section.auto_collapse || printable);
+  const [render, setRender] = useState<boolean>(!section.auto_collapse || printable);
+  const [showTags, setShowTags] = useState<boolean>(false);
+  const [showHeur, setShowHeur] = useState<boolean>(false);
+  const [showAttack, setShowAttack] = useState<boolean>(false);
+  const [showTable, setShowTable] = useState<boolean>(false);
 
   const allTags = useMemo(() => {
     const tagList = [];
@@ -207,6 +223,18 @@ const WrappedResultSection: React.FC<Props> = ({
             {CLIPBOARD_ICON}
             {t('clipboard')}
           </MenuItem>
+          {section.body_format === 'TABLE' && (
+            <MenuItem
+              dense
+              onClick={() => {
+                setShowTable(true);
+                setState(null);
+              }}
+            >
+              {TABLE_ICON}
+              {t('table.menubutton')}
+            </MenuItem>
+          )}
           {!highlighted && section.heuristic && (
             <MenuItem
               dense
@@ -242,6 +270,34 @@ const WrappedResultSection: React.FC<Props> = ({
               </MenuItem>
             )}
         </Menu>
+      )}
+      {section.body_format !== 'TABLE' ? null : (
+        <Dialog
+          open={showTable}
+          aria-labelledby="result-table-dialog-title"
+          aria-describedby="result-table-dialog-description"
+          maxWidth="xl"
+          fullWidth
+          onClose={() => setShowTable(false)}
+        >
+          <div>
+            <IconButton
+              size="large"
+              style={{ float: 'right', padding: theme.spacing(2) }}
+              onClick={() => setShowTable(false)}
+            >
+              <CloseOutlinedIcon />
+            </IconButton>
+            <DialogTitle id="result-table-dialog-title">{t('table.title')}</DialogTitle>
+            <DialogContent>
+              <TblBody
+                body={section.body}
+                printable={printable}
+                order={section.body_config ? section.body_config.column_order : []}
+              />
+            </DialogContent>
+          </div>
+        </Dialog>
       )}
       <div
         style={{
