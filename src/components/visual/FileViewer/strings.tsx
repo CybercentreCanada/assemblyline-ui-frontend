@@ -1,11 +1,13 @@
 import { Alert, LinearProgress } from '@mui/material';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import MonacoEditor, { LANGUAGE_SELECTOR } from 'components/visual/MonacoEditor';
 import type { editor } from 'monaco-editor';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   sha256: string;
@@ -14,7 +16,9 @@ type Props = {
 };
 
 const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null, options = null }) => {
+  const { t } = useTranslation(['fileViewer']);
   const { apiCall } = useMyAPI();
+  const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [data, setData] = useState<string>(null);
@@ -24,14 +28,18 @@ const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null,
 
   useEffect(() => {
     if (!sha256 || data) return;
-    apiCall({
+    apiCall<{ content: string; truncated: boolean }>({
       url: `/api/v4/file/strings/${sha256}/`,
       allowCache: true,
       onEnter: () => {
         setData(null);
         setError(null);
+        closeSnackbar();
       },
-      onSuccess: api_data => setData(api_data.api_response),
+      onSuccess: ({ api_response }) => {
+        setData(api_response?.content || '');
+        if (api_response?.truncated) showErrorMessage(t('error.truncated'));
+      },
       onFailure: api_data => setError(api_data.api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
