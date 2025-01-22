@@ -9,6 +9,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import AIMarkdown from 'components/visual/AiMarkdown';
 import MonacoEditor, { LANGUAGE_SELECTOR } from 'components/visual/MonacoEditor';
+import type { editor } from 'monaco-editor';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -60,13 +61,15 @@ type Props = {
   type?: string;
   codeAllowed?: boolean;
   archiveOnly?: boolean;
+  options?: editor.IStandaloneEditorConstructionOptions;
 };
 
 const WrappedASCIISection: React.FC<Props> = ({
   sha256,
   type: propType = null,
   codeAllowed = false,
-  archiveOnly = false
+  archiveOnly = false,
+  options = null
 }) => {
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -159,7 +162,8 @@ const WrappedASCIISection: React.FC<Props> = ({
           <MonacoEditor
             value={data}
             language={LANGUAGE_SELECTOR[type]}
-            options={{ links: false, readOnly: true, beautify: true }}
+            options={{ links: false, readOnly: true, ...options }}
+            beautify
           />
         </Grid>
         {codeAllowed && isMdUp && (
