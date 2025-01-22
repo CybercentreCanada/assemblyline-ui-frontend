@@ -232,7 +232,7 @@ const WrappedResultSection: React.FC<Props> = ({
               }}
             >
               {TABLE_ICON}
-              {t('show_table')}
+              {t('table.menubutton')}
             </MenuItem>
           )}
           {!highlighted && section.heuristic && (
@@ -288,7 +288,7 @@ const WrappedResultSection: React.FC<Props> = ({
             >
               <CloseOutlinedIcon />
             </IconButton>
-            <DialogTitle id="result-table-dialog-title">{t('result_table')}</DialogTitle>
+            <DialogTitle id="result-table-dialog-title">{t('table.title')}</DialogTitle>
             <DialogContent>
               <TblBody
                 body={section.body}
