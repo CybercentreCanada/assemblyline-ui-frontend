@@ -2,6 +2,7 @@ import { loader } from '@monaco-editor/react';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
+import WrapTextOutlinedIcon from '@mui/icons-material/WrapTextOutlined';
 import { Grid, IconButton, Skeleton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -57,17 +58,18 @@ const WrappedFileViewer: React.FC<Props> = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { addInsight, removeInsight } = useAssistant();
   const { apiCall } = useMyAPI();
+  const { configuration } = useALContext();
   const { id: sha256, tab: paramTab } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const [codeAllowed, setCodeAllowed] = useState(false);
-  const { configuration } = useALContext();
-  const { addInsight, removeInsight } = useAssistant();
-
-  const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const [type, setType] = useState<string>('unknown');
+  const [codeAllowed, setCodeAllowed] = useState<boolean>(false);
   const [imageAllowed, setImageAllowed] = useState<boolean>(null);
+  const [wordwrap, setWordwrap] = useState<'on' | 'off'>('off');
+
+  const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
   useEffect(() => {
     if (!sha256 || !currentUser.roles.includes('file_detail')) return;
@@ -118,6 +120,17 @@ const WrappedFileViewer: React.FC<Props> = () => {
         <Grid item xs={12} sm={12} md={4} style={{ textAlign: 'right', flexGrow: 0 }}>
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
             {currentUser.roles.includes('submission_view') && (
+              <Tooltip title={wordwrap == 'on' ? t('wordwrap.off') : t('wordwrap.on')}>
+                <IconButton
+                  color={wordwrap == 'on' ? 'primary' : 'default'}
+                  size="large"
+                  onClick={() => setWordwrap(v => (v === 'on' ? 'off' : 'on'))}
+                >
+                  <WrapTextOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {currentUser.roles.includes('submission_view') && (
               <Tooltip title={t('detail')}>
                 <IconButton component={Link} to={`/file/detail/${sha256}`} size="large">
                   <DescriptionOutlinedIcon />
@@ -165,7 +178,12 @@ const WrappedFileViewer: React.FC<Props> = () => {
                 label: t('ascii'),
                 inner: (
                   <div className={classes.tab}>
-                    <ASCIISection sha256={sha256} type={type} codeAllowed={codeAllowed} />
+                    <ASCIISection
+                      sha256={sha256}
+                      type={type}
+                      codeAllowed={codeAllowed}
+                      options={{ wordWrap: wordwrap }}
+                    />
                   </div>
                 )
               },
@@ -182,7 +200,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
                 label: t('strings'),
                 inner: (
                   <div className={classes.tab}>
-                    <StringsSection sha256={sha256} type={type} />
+                    <StringsSection sha256={sha256} type={type} options={{ wordWrap: wordwrap }} />
                   </div>
                 )
               },

@@ -1,12 +1,15 @@
 {
-  "show_analyse_code": "Afficher l'analyse du code par l'IA",
-  "hide_analyse_code": "Masquer l'analyse du code par l'IA",
   "analysing_code": "Demander aux robots de donner un sens à ce code...",
   "code_summary": "Résumé du code",
   "detail": "Détails de l'analyse du fichier",
   "download": "Télécharger le fichier",
+  "error.truncated": "La taille du fichier est trop grande et l'aperçu a été tronqué.",
+  "hide_analyse_code": "Masquer l'analyse du code par l'IA",
   "powered_by_ai": "Propulsé par l'IA",
   "powered_by_ai.tooltip": "Le résumé du code a été généré automatiquement par un modèle LLM, les résultats sont imprévisibles. Cliquez pour obtenir les nouveaux résultats du LLM...",
   "related": "Soumissions connexes",
-  "title": "Visualisateur de Fichiers"
+  "show_analyse_code": "Afficher l'analyse du code par l'IA",
+  "title": "Visualisateur de Fichiers",
+  "wordwrap.off": "Désactiver le retour à la ligne automatique",
+  "wordwrap.on": "Activer le retour à la ligne automatique"
 }

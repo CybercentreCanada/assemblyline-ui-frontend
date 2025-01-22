@@ -1,5 +1,6 @@
-/* eslint-disable no-template-curly-in-string */
-export const yaraDef = {
+import type { languages, Thenable } from 'monaco-editor';
+
+export const yaraDef: languages.IMonarchLanguage | Thenable<languages.IMonarchLanguage> = {
   defaultToken: 'invalid',
   octaldigits: /-?0o[0-7]+/,
   hexdigits: /-?0x[0-9a-fA-F]+/,
@@ -529,7 +530,7 @@ export const yaraDef = {
   }
 };
 
-export const yaraConfig = {
+export const yaraConfig: languages.LanguageConfiguration = {
   comments: {
     // symbol used for single line comment. Remove this entry if your language does not support line comments
     lineComment: '//',
@@ -578,7 +579,7 @@ export const yaraConfig = {
     ['"', '"'],
     ['/', '/']
   ]
-};
+} as unknown as languages.LanguageConfiguration;
 
 /**
  * The following configuration is based on the VSCode extension for the YARA pattern matching language made by infosec-intern on Github
