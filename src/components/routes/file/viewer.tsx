@@ -120,7 +120,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
         <Grid item xs={12} sm={12} md={4} style={{ textAlign: 'right', flexGrow: 0 }}>
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
             {currentUser.roles.includes('submission_view') && (
-              <Tooltip title={wordwrap == 'on' ? t('wordwrap.off') : t('wordwrap.on')}>
+              <Tooltip title={wordwrap == 'on' ? t('linewrap.off') : t('linewrap.on')}>
                 <IconButton
                   color={wordwrap == 'on' ? 'primary' : 'default'}
                   size="large"
