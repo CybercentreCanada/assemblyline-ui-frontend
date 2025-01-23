@@ -1,5 +1,6 @@
 import StarIcon from '@mui/icons-material/Star';
 import {
+  Checkbox,
   Chip,
   FormControlLabel,
   Grid,
@@ -127,6 +128,20 @@ const ServiceGeneral = ({
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
             )}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  checked={service.auto_update}
+                  name="label"
+                  onChange={e => {
+                    setModified(true);
+                    setService(s => ({ ...s, auto_update: !s.auto_update }));
+                  }}
+                />
+              }
+              label={<Typography variant="subtitle2">{t('general.auto_update')}</Typography>}
+            />
           </Grid>
           {c12nDef.enforce && (
             <Grid item xs={12} sm={6}>
