@@ -324,21 +324,23 @@ const Service: React.FC<ServiceProps> = ({
               />
             ))}
 
-            <ShowMore variant="long">
-              {params.hidden.map(([param, i]) => (
-                <Param
-                  key={i}
-                  param={param}
-                  param_id={i}
-                  service={service}
-                  specId={specId}
-                  profile={profile}
-                  loading={loading}
-                  disabled={disabled}
-                  customize={customize}
-                />
-              ))}
-            </ShowMore>
+            {params.hidden.length > 0 && (
+              <ShowMore variant="long">
+                {params.hidden.map(([param, i]) => (
+                  <Param
+                    key={i}
+                    param={param}
+                    param_id={i}
+                    service={service}
+                    specId={specId}
+                    profile={profile}
+                    loading={loading}
+                    disabled={disabled}
+                    customize={customize}
+                  />
+                ))}
+              </ShowMore>
+            )}
           </div>
         </Collapse>
       )}
