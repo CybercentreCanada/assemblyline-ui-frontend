@@ -29,7 +29,6 @@
   "options.submission.priority.high": "High",
   "options.submission.priority.low": "Low",
   "options.submission.priority.medium": "Medium",
-  "options.submission.profile": "Profile current scan",
   "options.submission.profile_name": "Submission profile",
   "options.submission.ttl": "Days to live",
   "options.submission.ttl.forever": "0: Forever",
