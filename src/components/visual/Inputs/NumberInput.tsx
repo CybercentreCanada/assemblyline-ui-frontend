@@ -142,11 +142,7 @@ const WrappedNumberInput = ({
                       />
                     </InputAdornment>
                   )}
-                  {endAdornment && (
-                    <InputAdornment position="end" sx={{ marginRight: `-7px` }}>
-                      {endAdornment}
-                    </InputAdornment>
-                  )}
+                  {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
                 </>
               )
             }}
