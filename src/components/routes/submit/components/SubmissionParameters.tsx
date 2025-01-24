@@ -176,25 +176,6 @@ const WrappedSubmissionParameters = ({
         />
 
         <form.Subscribe
-          selector={state => [loading ? null : state.values.settings.profile]}
-          children={([profiling]) => (
-            <CheckboxInput
-              label={t('options.submission.profile')}
-              tooltip={t('settings:submissions.profile_desc')}
-              value={profiling}
-              loading={loading}
-              disabled={disabled}
-              onChange={() => {
-                form.setStore(s => {
-                  s.settings.profile = !s.settings.profile;
-                  return s;
-                });
-              }}
-            />
-          )}
-        />
-
-        <form.Subscribe
           selector={state => [loading ? null : state.values.settings.profiles[profile].deep_scan]}
           children={([deep_scan]) => (
             <CheckboxInput

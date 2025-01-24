@@ -56,9 +56,6 @@ export type UserSettings = {
   /** Preferred submission profile */
   preferred_submission_profile?: string;
 
-  /** Should the submission do extra profiling? */
-  profile: boolean;
-
   /** Default submission profile settings */
   submission_profiles?: { [profile_name: string]: SubmissionProfile };
 
