@@ -325,7 +325,7 @@ const Service: React.FC<ServiceProps> = ({
             ))}
 
             {params.hidden.length > 0 && (
-              <ShowMore variant="long">
+              <ShowMore variant="tiny">
                 {params.hidden.map(([param, i]) => (
                   <Param
                     key={i}

@@ -53,7 +53,7 @@ export const ShowMore: React.FC<ShowMoreProps> = React.memo(
         );
       case 'tiny':
         return !showMore ? (
-          <Tooltip title={t('show_more')}>
+          <Tooltip title={t('show_more')} placement="bottom-start">
             <div>
               <IconButton color="primary" size="small" onClick={() => setShowMore(true)} {...props}>
                 <MoreHorizIcon />
