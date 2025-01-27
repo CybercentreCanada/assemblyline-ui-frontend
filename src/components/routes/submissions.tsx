@@ -131,7 +131,7 @@ const SubmissionSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: mySubmissions.has ? t('all_submission') : t('my_submission') },
+                tooltip: { title: mySubmissions.has ? t('filter.personal.remove') : t('filter.personal.add') },
                 icon: { children: <PersonIcon /> },
                 button: {
                   color: mySubmissions.color,
@@ -139,7 +139,7 @@ const SubmissionSearch = () => {
                 }
               },
               {
-                tooltip: { title: completed.has ? t('all_submission') : t('completed_submissions') },
+                tooltip: { title: completed.has ? t('filter.completed.remove') : t('filter.completed.add') },
                 icon: { children: <AssignmentTurnedInIcon /> },
                 button: {
                   sx: { color: completed.color },
@@ -147,7 +147,7 @@ const SubmissionSearch = () => {
                 }
               },
               {
-                tooltip: { title: malicious.has ? t('all_submission') : t('malicious_submissions') },
+                tooltip: { title: malicious.has ? t('filter.malicious.remove') : t('filter.malicious.add') },
                 icon: { children: <BugReportOutlinedIcon /> },
                 button: {
                   sx: { color: malicious.color },
