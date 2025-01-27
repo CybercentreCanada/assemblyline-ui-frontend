@@ -19,6 +19,7 @@ import assistantEN from 'locales/en/assistant.json';
 import authorizeEN from 'locales/en/authorize.json';
 import carouselEN from 'locales/en/carousel.json';
 import dashboardEN from 'locales/en/dashboard.json';
+import developmentAPIEN from 'locales/en/development/api.json';
 import favoritesEN from 'locales/en/favorites.json';
 import fileDetailEN from 'locales/en/file/detail.json';
 import hexViewerEN from 'locales/en/file/hex.json';
@@ -74,6 +75,7 @@ import assistantFR from 'locales/fr/assistant.json';
 import authorizeFR from 'locales/fr/authorize.json';
 import carouselFR from 'locales/fr/carousel.json';
 import dashboardFR from 'locales/fr/dashboard.json';
+import developmentAPIFR from 'locales/fr/development/api.json';
 import favoritesFR from 'locales/fr/favorites.json';
 import fileDetailFR from 'locales/fr/file/detail.json';
 import hexViewerFR from 'locales/fr/file/hex.json';
@@ -131,6 +133,7 @@ const resources = {
     borealis: borealisEN,
     carousel: carouselEN,
     dashboard: dashboardEN,
+    developmentAPI: developmentAPIEN,
     error403: error403EN,
     error404: error404EN,
     fileDetail: fileDetailEN,
@@ -189,6 +192,7 @@ const resources = {
     borealis: borealisFR,
     carousel: carouselFR,
     dashboard: dashboardFR,
+    developmentAPI: developmentAPIFR,
     error403: error403FR,
     error404: error404FR,
     fileDetail: fileDetailFR,

@@ -31,6 +31,7 @@ const AppRegistration = lazy(() => import('components/routes/authorize'));
 const ArchiveDetail = lazy(() => import('components/routes/archive/detail'));
 const CrashTest = lazy(() => import('components/routes/crash'));
 const Dashboard = lazy(() => import('components/routes/dashboard'));
+const DevelopmentAPI = lazy(() => import('components/routes/development/api'));
 const FileFullDetail = lazy(() => import('components/routes/file/detail'));
 const FileViewer = lazy(() => import('components/routes/file/viewer'));
 const Help = lazy(() => import('components/routes/help'));
@@ -150,6 +151,7 @@ const WrappedRoutes = () => {
         <Route path="/authorize" element={<AppRegistration />} />
         <Route path="/crash" element={<CrashTest />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/development/api" element={<DevelopmentAPI />} />
         <Route path="/file/detail/:id" element={<FileFullDetail />} />
         <Route path="/file/viewer/:id/:tab" element={<FileViewer />} />
         <Route path="/file/viewer/:id" element={<FileViewer />} />
