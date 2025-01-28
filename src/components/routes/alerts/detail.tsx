@@ -3,6 +3,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Button, Collapse, Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import makeStyles from '@mui/styles/makeStyles';
+import { Fetcher } from 'borealis-ui';
 import ListCarousel from 'commons/addons/lists/carousel/ListCarousel';
 import ListNavigator from 'commons/addons/lists/navigator/ListNavigator';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -56,7 +57,11 @@ const useStyles = makeStyles(theme => ({
   sectionTitle: {
     fontWeight: 'bold'
   },
-  sectionContent: {},
+  sectionContent: {
+    display: 'flex',
+    flexDirection: 'row',
+    columnGap: theme.spacing(1)
+  },
   clipboardIcon: {
     '&:hover': {
       cursor: 'pointer',
@@ -483,74 +488,87 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
               </div>
               <Divider />
               <div className={classes.sectionContent}>
-                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                  {alert ? (
-                    Object.keys(alert.metadata)
-                      .filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
-                      .map(k => (
-                        <Grid container spacing={1} key={`alert-metadata-${k}`}>
-                          <Grid
-                            item
-                            xs={3}
-                            sm={2}
-                            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                          >
-                            {k}
+                <div style={{ flex: 1 }}>
+                  <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                    {alert ? (
+                      Object.keys(alert.metadata)
+                        .filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
+                        .map(k => (
+                          <Grid container spacing={1} key={`alert-metadata-${k}`}>
+                            <Grid
+                              item
+                              xs={3}
+                              sm={2}
+                              style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                            >
+                              {k}
+                            </Grid>
+                            <Grid item xs={9} sm={10}>
+                              <ActionableText
+                                category="metadata"
+                                type={k}
+                                value={alert.metadata[k]}
+                                classification={alert.classification}
+                              />
+                            </Grid>
                           </Grid>
-                          <Grid item xs={9} sm={10}>
-                            <ActionableText
-                              category="metadata"
-                              type={k}
-                              value={alert.metadata[k]}
-                              classification={alert.classification}
-                            />
-                          </Grid>
-                        </Grid>
-                      ))
-                  ) : (
-                    <>
-                      <Skeleton />
-                      <Skeleton />
-                      <Skeleton />
-                    </>
-                  )}
-                  {alert &&
-                    Object.keys(alert.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
-                      .length !== 0 && (
-                      <Collapse in={metaOpen} timeout="auto" style={{ marginTop: theme.spacing(0.5) }}>
-                        {alert ? (
-                          Object.keys(alert.metadata)
-                            .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
-                            .map(k => (
-                              <Grid container spacing={1} key={`alert-metadata-${k}`}>
-                                <Grid
-                                  item
-                                  xs={3}
-                                  sm={2}
-                                  style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                                >
-                                  {k}
-                                </Grid>
-                                <Grid item xs={9} sm={10}>
-                                  <ActionableText
-                                    category="metadata"
-                                    type={k}
-                                    value={alert.metadata[k]}
-                                    classification={alert.classification}
-                                  />
-                                </Grid>
-                              </Grid>
-                            ))
-                        ) : (
-                          <>
-                            <Skeleton />
-                            <Skeleton />
-                            <Skeleton />
-                          </>
-                        )}
-                      </Collapse>
+                        ))
+                    ) : (
+                      <>
+                        <Skeleton />
+                        <Skeleton />
+                        <Skeleton />
+                      </>
                     )}
-                </pre>
+                    {alert &&
+                      Object.keys(alert.metadata).filter(
+                        k => configuration.ui.alerting_meta.important.indexOf(k) === -1
+                      ).length !== 0 && (
+                        <Collapse in={metaOpen} timeout="auto" style={{ marginTop: theme.spacing(0.5) }}>
+                          {alert ? (
+                            Object.keys(alert.metadata)
+                              .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
+                              .map(k => (
+                                <Grid container spacing={1} key={`alert-metadata-${k}`}>
+                                  <Grid
+                                    item
+                                    xs={3}
+                                    sm={2}
+                                    style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                                  >
+                                    {k}
+                                  </Grid>
+                                  <Grid item xs={9} sm={10}>
+                                    <ActionableText
+                                      category="metadata"
+                                      type={k}
+                                      value={alert.metadata[k]}
+                                      classification={alert.classification}
+                                    />
+                                  </Grid>
+                                </Grid>
+                              ))
+                          ) : (
+                            <>
+                              <Skeleton />
+                              <Skeleton />
+                              <Skeleton />
+                            </>
+                          )}
+                        </Collapse>
+                      )}
+                  </pre>
+                </div>
+                <div>
+                  {alert?.metadata?.eml_path && (
+                    <Fetcher
+                      fetcherId="eml-preview.preview"
+                      type="eml_id"
+                      value={alert?.metadata?.eml_path}
+                      slotProps={{ paper: { sx: { maxWidth: '96px', maxHeight: '96px' } } }}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           ) : null}
