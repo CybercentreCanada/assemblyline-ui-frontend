@@ -375,6 +375,26 @@ export function matchSHA256(data: string) {
 
 /**
  *
+ * A defanged URL has had some of its parts changed to make it inaccessible or unclickable
+ * Here is the list of techniques used to refang URLs:
+ * https://www.npmjs.com/package/fanger
+ *
+ * @param value - URL to be refanged
+ * @returns refanged URL
+ */
+const refang = (value: string): string =>
+  value
+    .replaceAll(' ', '')
+    .replaceAll(/[[|(|{](\.|dot)[\]|)|}]/g, '.')
+    .replaceAll(/[[|(|{](@|at)[\]|)|}]/g, '@')
+    .replaceAll(/[[|(|{]\/[\]|)|}]/g, '/')
+    .replaceAll(/[[|(|{]:[\]|)|}]/g, ':')
+    .replaceAll(/[[|(|{]:\/\/[\]|)|}]/g, '://')
+    .replaceAll('\\.', '.')
+    .replaceAll('hxxp', 'http');
+
+/**
+ *
  * Matches on valid URL and returns the result array. Returns `null` on invalid URLs.
  * Note: Path and Query params are validated but not captured.
  *
@@ -383,11 +403,7 @@ export function matchSHA256(data: string) {
  * @returns Matching RegEx Result Array or NULL
  *
  */
-export function matchURL(data: string): RegExpExecArray | null {
-  const urlParseRE =
-    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
-  return urlParseRE.exec(data);
-}
+export const isURL = (value: string): boolean => !!URL_REGEX.exec(refang(value));
 
 /**
  *
@@ -425,7 +441,7 @@ export function getSubmitType(input: string, configuration: Configuration): [Has
   )?.[0] as HashPatternMap;
 
   if (detectedHashType) return [detectedHashType, value.trim()];
-  else if (!detectedHashType && URL_REGEX.exec(value.trimStart())) return ['url', value.trimStart()];
+  else if (!detectedHashType && isURL(value)) return ['url', value.trimStart()];
   else return [null, input];
 }
 

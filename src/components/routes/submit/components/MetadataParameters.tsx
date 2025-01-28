@@ -8,7 +8,7 @@ import { DateInput } from 'components/visual/Inputs/DateInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
-import { matchURL } from 'helpers/utils';
+import { isURL } from 'helpers/utils';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +34,7 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
       (value: unknown): string => {
         if (!value) return metadata.required ? t('required') : null;
 
-        if (metadata.validator_type === 'uri' && !matchURL((value || '') as string)) return t('invalid_url');
+        if (metadata.validator_type === 'uri' && !isURL((value || '') as string)) return t('invalid_url');
 
         if (
           metadata.validator_type === 'regex' &&

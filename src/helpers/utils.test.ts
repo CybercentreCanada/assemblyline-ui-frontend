@@ -7,8 +7,8 @@ import {
   getValueFromPath,
   getVersionQuery,
   humanReadableNumber,
+  isURL,
   matchSHA256,
-  matchURL,
   maxLenStr,
   priorityText,
   resetFavicon,
@@ -527,37 +527,60 @@ describe('Test `matchSHA256`', () => {
   });
 });
 
-describe('Test `matchURL`', () => {
+describe('Test `isURL`', () => {
   it('Should match valid URLs', () => {
-    expect(matchURL('http://blah.com')[0]).toBe('http://blah.com');
-    expect(matchURL('http://blah.com:123')[0]).toBe('http://blah.com');
-    expect(matchURL('http://blah.com:123?blah')[0]).toBe('http://blah.com');
-    expect(matchURL('http://blah.com:123/blah')[0]).toBe('http://blah.com');
-    expect(matchURL('http://blah.com:123/blah?blah')[0]).toBe('http://blah.com');
-    expect(matchURL('https://user:pass@www.blah.com:123/blah#anchor?blah&q=blah2')[0]).toBe(
-      'https://user:pass@www.blah.com'
-    );
-    expect(matchURL('http://1.1.1.1')[0]).toBe('http://1.1.1.1');
-    expect(matchURL('http://1.1.1.1:123')[0]).toBe('http://1.1.1.1');
-    expect(matchURL('http://1.1.1.1:123/blah')[0]).toBe('http://1.1.1.1');
-    expect(matchURL('http://1.1.1.1:123/blah?blah')[0]).toBe('http://1.1.1.1');
-    expect(matchURL('net.tcp://1.1.1.1:123')[0]).toBe('tcp://1.1.1.1');
-    expect(matchURL('net.tcp://1.1.1.1:1')[0]).toBe('tcp://1.1.1.1');
+    expect(isURL('http://blah.com')).toBe(true);
+    expect(isURL('http://blah.com:123')).toBe(true);
+    expect(isURL('http://blah.com:123?blah')).toBe(true);
+    expect(isURL('http://blah.com:123/blah')).toBe(true);
+    expect(isURL('http://blah.com:123/blah?blah')).toBe(true);
+    expect(isURL('https://user:pass@www.blah.com:123/blah#anchor?blah&q=blah2')).toBe(true);
+    expect(isURL('http://1.1.1.1')).toBe(true);
+    expect(isURL('http://1.1.1.1:123')).toBe(true);
+    expect(isURL('http://1.1.1.1:123/blah')).toBe(true);
+    expect(isURL('http://1.1.1.1:123/blah?blah')).toBe(true);
+    expect(isURL('net.tcp://1.1.1.1:123')).toBe(true);
+    expect(isURL('net.tcp://1.1.1.1:1')).toBe(true);
   });
-  it('Should not match invalid URLs', () => {
-    expect(matchSHA256('')).toBe(null);
-    expect(matchSHA256(null)).toBe(null);
-    expect(matchSHA256(undefined)).toBe(null);
-    expect(matchURL('blah')).toBe(null);
-    expect(matchURL('1.1.1.1')).toBe(null);
-    // URI requires a scheme: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#scheme
-    expect(matchURL('//1.1.1.1:1')).toBe(null);
 
-    // TODO The follow are invalid inputs that are currently passing. The function needs to be updated.
-    // expect(matchURL('http://blah')).toBe(null);
-    // expect(matchURL('hxxp://blah.com')).toBe(null);
-    // expect(matchURL('http://1.1.1.1:123:123')).toBe(null);
-    // expect(matchURL('http://blah.com:abc')).toBe(null);
+  it('Should not match invalid URLs', () => {
+    expect(isURL('blah')).toBe(false);
+    expect(isURL('1.1.1.1')).toBe(false);
+    expect(
+      isURL('//1.1.1.1:1'),
+      'URI requires a scheme https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#scheme'
+    ).toBe(false);
+    expect(isURL('http://blah')).toBe(false);
+    expect(isURL('http://1.1.1.1:123:123')).toBe(false);
+    expect(isURL('http://blah.com:abc')).toBe(false);
+  });
+
+  it('These defanged URL should match as valid URLs', () => {
+    expect(isURL('http   :   //  www. examples .com'), 'Remove all spaces').toBe(true);
+
+    expect(isURL('http://examples[.]com'), 'Replace [.] -> .').toBe(true);
+    expect(isURL('http://examples(.)com'), 'Replace (.) -> .').toBe(true);
+    expect(isURL('http://examples{.}com'), 'Replace {.} -> .').toBe(true);
+    expect(isURL('http://examples[.)com'), 'Replace to .').toBe(true);
+    expect(isURL('http://examples(.}com'), 'Replace to -> .').toBe(true);
+    expect(isURL('http://examples{.]com'), 'Replace to -> .').toBe(true);
+
+    expect(isURL('http://examples\\.com'), 'Replace \\. -> .').toBe(true);
+
+    expect(isURL('http://examples.com[/]path'), 'Replace [/] -> /').toBe(true);
+    expect(isURL('http://examples.com[/)path'), 'Replace [/] -> /').toBe(true);
+    expect(isURL('http://examples.com[/}path'), 'Replace [/] -> /').toBe(true);
+
+    expect(isURL('http[:]//examples.com'), 'Replace [:] -> :').toBe(true);
+    expect(isURL('http[:)//examples.com'), 'Replace [:] -> :').toBe(true);
+    expect(isURL('http[:}//examples.com'), 'Replace [:] -> :').toBe(true);
+
+    expect(isURL('http[://]examples.com'), 'Replace [://] -> ://').toBe(true);
+    expect(isURL('http[://)examples.com'), 'Replace [://] -> ://').toBe(true);
+    expect(isURL('http[://}examples.com'), 'Replace [://] -> ://').toBe(true);
+
+    expect(isURL('hxxp://examples.com'), 'Replace hxxp -> http').toBe(true);
+    expect(isURL('hxxps[:]//test\\.example[.)com{.]uk[dot)test[/]path'), 'any combination').toBe(true);
   });
 });
 
