@@ -580,6 +580,9 @@ describe('Test `isURL`', () => {
     expect(isURL('http[://}examples.com'), 'Replace [://] -> ://').toBe(true);
 
     expect(isURL('hxxp://examples.com'), 'Replace hxxp -> http').toBe(true);
+    expect(isURL('hxXp://examples.com'), 'Replace hxXp -> http').toBe(true);
+    expect(isURL('hXXp://examples.com'), 'Replace hxxp -> http').toBe(true);
+
     expect(isURL('hxxps[:]//test\\.example[.)com{.]uk[dot)test[/]path'), 'any combination').toBe(true);
   });
 });

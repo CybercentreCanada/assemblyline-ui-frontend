@@ -391,7 +391,7 @@ const refang = (value: string): string =>
     .replaceAll(/[[|(|{]:[\]|)|}]/g, ':')
     .replaceAll(/[[|(|{]:\/\/[\]|)|}]/g, '://')
     .replaceAll('\\.', '.')
-    .replaceAll('hxxp', 'http');
+    .replaceAll(/h(x|X){1,2}p/g, 'http');
 
 /**
  *
