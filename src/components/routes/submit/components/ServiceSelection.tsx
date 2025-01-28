@@ -90,6 +90,7 @@ type ParamProps = {
   loading?: boolean;
   disabled?: boolean;
   customize?: boolean;
+  filterServiceParams?: boolean;
 };
 
 const Param: React.FC<ParamProps> = ({
@@ -100,7 +101,8 @@ const Param: React.FC<ParamProps> = ({
   profile = null,
   loading = false,
   disabled = false,
-  customize = false
+  customize = false,
+  filterServiceParams = false
 }) => {
   const form = useForm();
 
@@ -118,6 +120,7 @@ const Param: React.FC<ParamProps> = ({
                 value={value as boolean}
                 loading={loading}
                 disabled={disabled || (!customize && !param.editable)}
+                preventRender={filterServiceParams && !param.editable}
                 disableGap
                 reset={value !== param.default}
                 onChange={() => {
@@ -144,6 +147,7 @@ const Param: React.FC<ParamProps> = ({
                 value={value as number}
                 loading={loading}
                 disabled={disabled || (!customize && !param.editable)}
+                preventRender={filterServiceParams && !param.editable}
                 reset={value !== param.default}
                 onChange={(event, v) => {
                   form.setStore(s => {
@@ -168,6 +172,7 @@ const Param: React.FC<ParamProps> = ({
                 value={value as string}
                 loading={loading}
                 disabled={disabled || (!customize && !param.editable)}
+                preventRender={filterServiceParams && !param.editable}
                 options={param.list}
                 reset={value !== param.default}
                 onChange={(event, v) => {
@@ -193,6 +198,7 @@ const Param: React.FC<ParamProps> = ({
                 value={value as string}
                 loading={loading}
                 disabled={disabled || (!customize && !param.editable)}
+                preventRender={filterServiceParams && !param.editable}
                 options={param.list.map(key => ({ label: key.replaceAll('_', ' '), value: key })).sort()}
                 reset={value !== param.default}
                 onChange={(event, v) => {
@@ -223,6 +229,7 @@ type ServiceProps = {
   loading?: boolean;
   disabled?: boolean;
   customize?: boolean;
+  filterServiceParams?: boolean;
 };
 
 const Service: React.FC<ServiceProps> = ({
@@ -232,7 +239,8 @@ const Service: React.FC<ServiceProps> = ({
   profile = null,
   loading = false,
   disabled = false,
-  customize = false
+  customize = false,
+  filterServiceParams = false
 }) => {
   const theme = useTheme();
   const form = useForm();
@@ -255,6 +263,13 @@ const Service: React.FC<ServiceProps> = ({
       { show: [], hidden: [] } as { show: [ServiceParameter, number][]; hidden: [ServiceParameter, number][] }
     );
   }, [form.store.state.values.settings.profiles, profile, specId]);
+
+  const showCollapse = useMemo<boolean>(() => {
+    if (specId < 0) return false;
+    else if (customize) return true;
+    // If the user isn't able to customize service parameters, we check if there is at least one parameter that is customizable before showing the collapse
+    return form.store.state.values.settings.profiles[profile].service_spec[specId].params.some(p => p.editable);
+  }, [form.store.state.values.settings.profiles, profile, specId, customize]);
 
   const handleClick = useCallback(
     (value: boolean) => {
@@ -293,13 +308,13 @@ const Service: React.FC<ServiceProps> = ({
             preventDisabledColor
             disabled={disabled || !customize}
             onChange={() => handleClick(selected)}
-            expend={specId < 0 ? null : open}
+            expend={specId < 0 || !showCollapse ? null : open}
             onExpend={handleExpand}
           />
         )}
       />
 
-      {specId >= 0 && (
+      {specId >= 0 && showCollapse && (
         <Collapse in={open}>
           <div
             style={{
@@ -321,6 +336,7 @@ const Service: React.FC<ServiceProps> = ({
                 loading={loading}
                 disabled={disabled}
                 customize={customize}
+                filterServiceParams={!customize && filterServiceParams}
               />
             ))}
 
@@ -337,6 +353,7 @@ const Service: React.FC<ServiceProps> = ({
                     loading={loading}
                     disabled={disabled}
                     customize={customize}
+                    filterServiceParams={filterServiceParams}
                   />
                 ))}
               </ShowMore>
@@ -355,6 +372,7 @@ type CategoryProps = {
   loading?: boolean;
   disabled?: boolean;
   customize?: boolean;
+  filterServiceParams?: boolean;
 };
 
 const Category = ({
@@ -363,7 +381,8 @@ const Category = ({
   profile = null,
   loading = false,
   disabled = false,
-  customize = false
+  customize = false,
+  filterServiceParams = false
 }: CategoryProps) => {
   const theme = useTheme();
   const form = useForm();
@@ -429,6 +448,7 @@ const Category = ({
             loading={loading}
             disabled={disabled}
             customize={customize}
+            filterServiceParams={filterServiceParams}
           />
         ))}
       </div>
@@ -442,6 +462,7 @@ type Props = {
   disabled?: boolean;
   customize?: boolean;
   size?: 'medium' | 'small';
+  filterServiceParams?: boolean;
 };
 
 const WrappedServiceSelection = ({
@@ -449,7 +470,8 @@ const WrappedServiceSelection = ({
   loading = false,
   disabled = false,
   customize = false,
-  size = 'medium'
+  size = 'medium',
+  filterServiceParams = false
 }: Props) => {
   const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
@@ -477,6 +499,7 @@ const WrappedServiceSelection = ({
                   loading={loading}
                   disabled={disabled}
                   customize={customize}
+                  filterServiceParams={filterServiceParams}
                 />
               ))}
             </div>

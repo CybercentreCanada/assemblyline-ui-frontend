@@ -224,6 +224,7 @@ const WrappedSubmitContent = () => {
                               loading={loading as boolean}
                               disabled={disabled as boolean}
                               customize={customize as boolean}
+                              filterServiceParams={true}
                             />
                           </Grid>
                           <Grid item xs={12} md>
