@@ -558,30 +558,37 @@ describe('Test `isURL`', () => {
   it('These defanged URL should match as valid URLs', () => {
     expect(isURL('http   :   //  www. examples .com'), 'Remove all spaces').toBe(true);
 
-    expect(isURL('http://examples[.]com'), 'Replace [.] -> .').toBe(true);
-    expect(isURL('http://examples(.)com'), 'Replace (.) -> .').toBe(true);
-    expect(isURL('http://examples{.}com'), 'Replace {.} -> .').toBe(true);
+    expect(isURL('http://examples[.]com'), 'Replace [.] to .').toBe(true);
+    expect(isURL('http://examples(.)com'), 'Replace (.) to .').toBe(true);
+    expect(isURL('http://examples{.}com'), 'Replace {.} to .').toBe(true);
     expect(isURL('http://examples[.)com'), 'Replace to .').toBe(true);
-    expect(isURL('http://examples(.}com'), 'Replace to -> .').toBe(true);
-    expect(isURL('http://examples{.]com'), 'Replace to -> .').toBe(true);
+    expect(isURL('http://examples(.}com'), 'Replace to .').toBe(true);
+    expect(isURL('http://examples{.]com'), 'Replace to .').toBe(true);
 
-    expect(isURL('http://examples\\.com'), 'Replace \\. -> .').toBe(true);
+    expect(isURL('http://examples[dot]com'), 'Replace [dot] to .').toBe(true);
+    expect(isURL('http://examples(dot)com'), 'Replace (dot) to .').toBe(true);
+    expect(isURL('http://examples{dot}com'), 'Replace {dot} to .').toBe(true);
+    expect(isURL('http://examples[dot)com'), 'Replace dot to .').toBe(true);
+    expect(isURL('http://examples(dot}com'), 'Replace dot to .').toBe(true);
+    expect(isURL('http://examples{dot]com'), 'Replace dot to .').toBe(true);
 
-    expect(isURL('http://examples.com[/]path'), 'Replace [/] -> /').toBe(true);
-    expect(isURL('http://examples.com[/)path'), 'Replace [/] -> /').toBe(true);
-    expect(isURL('http://examples.com[/}path'), 'Replace [/] -> /').toBe(true);
+    expect(isURL('http://examples\\.com'), 'Replace \\. to .').toBe(true);
 
-    expect(isURL('http[:]//examples.com'), 'Replace [:] -> :').toBe(true);
-    expect(isURL('http[:)//examples.com'), 'Replace [:] -> :').toBe(true);
-    expect(isURL('http[:}//examples.com'), 'Replace [:] -> :').toBe(true);
+    expect(isURL('http://examples.com[/]path'), 'Replace [/] to /').toBe(true);
+    expect(isURL('http://examples.com[/)path'), 'Replace [/] to /').toBe(true);
+    expect(isURL('http://examples.com[/}path'), 'Replace [/] to /').toBe(true);
 
-    expect(isURL('http[://]examples.com'), 'Replace [://] -> ://').toBe(true);
-    expect(isURL('http[://)examples.com'), 'Replace [://] -> ://').toBe(true);
-    expect(isURL('http[://}examples.com'), 'Replace [://] -> ://').toBe(true);
+    expect(isURL('http[:]//examples.com'), 'Replace [:] to :').toBe(true);
+    expect(isURL('http[:)//examples.com'), 'Replace [:] to :').toBe(true);
+    expect(isURL('http[:}//examples.com'), 'Replace [:] to :').toBe(true);
 
-    expect(isURL('hxxp://examples.com'), 'Replace hxxp -> http').toBe(true);
-    expect(isURL('hxXp://examples.com'), 'Replace hxXp -> http').toBe(true);
-    expect(isURL('hXXp://examples.com'), 'Replace hxxp -> http').toBe(true);
+    expect(isURL('http[://]examples.com'), 'Replace [://] to ://').toBe(true);
+    expect(isURL('http[://)examples.com'), 'Replace [://] to ://').toBe(true);
+    expect(isURL('http[://}examples.com'), 'Replace [://] to ://').toBe(true);
+
+    expect(isURL('hxxp://examples.com'), 'Replace hxxp to http').toBe(true);
+    expect(isURL('hxXp://examples.com'), 'Replace hxXp to http').toBe(true);
+    expect(isURL('hXXp://examples.com'), 'Replace hxxp to http').toBe(true);
 
     expect(isURL('hxxps[:]//test\\.example[.)com{.]uk[dot)test[/]path'), 'any combination').toBe(true);
   });
