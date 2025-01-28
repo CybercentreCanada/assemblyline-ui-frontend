@@ -15,7 +15,6 @@ type InterfaceKey = keyof Pick<
   | 'malicious'
   | 'preferred_submission_profile'
   | 'priority'
-  | 'profile'
   | 'submission_view'
 >;
 
@@ -31,7 +30,6 @@ const INTERFACE_KEYS: InterfaceKey[] = [
   'malicious',
   'preferred_submission_profile',
   'priority',
-  'profile',
   'submission_view'
 ];
 
