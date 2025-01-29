@@ -36,7 +36,7 @@ export type FetchMethod = (typeof FETCH_METHODS)[number];
 export type ServiceParameter =
   | {
       type: 'bool';
-      hide: boolean | 'true' | 'false';
+      hide?: boolean | 'true' | 'false';
       name: string;
       value: boolean | 'true' | 'false';
       default: boolean | 'true' | 'false';
@@ -45,7 +45,7 @@ export type ServiceParameter =
     }
   | {
       type: 'int';
-      hide: boolean | 'true' | 'false';
+      hide?: boolean | 'true' | 'false';
       name: string;
       value: number;
       default: number;
@@ -54,7 +54,7 @@ export type ServiceParameter =
     }
   | {
       type: 'str';
-      hide: boolean | 'true' | 'false';
+      hide?: boolean | 'true' | 'false';
       name: string;
       value: string;
       default: string;
@@ -63,7 +63,7 @@ export type ServiceParameter =
     }
   | {
       type: 'list';
-      hide: boolean | 'true' | 'false';
+      hide?: boolean | 'true' | 'false';
       name: string;
       value: string;
       default: string;

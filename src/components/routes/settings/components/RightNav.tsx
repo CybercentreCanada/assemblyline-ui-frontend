@@ -112,7 +112,6 @@ export const RightNav = () => {
                               primary={category.name}
                               variant="right"
                               active={active}
-                              preventRender={!customize && !(categoryProps[0] || categoryProps[1])}
                               subheader
                               sx={categoryProps[0] || categoryProps[1] ? null : { opacity: 0.38 }}
                               onPageNavigation={event => scrollTo(event, category.name)}
@@ -152,7 +151,6 @@ export const RightNav = () => {
                                     }
                                     variant="right"
                                     active={active}
-                                    preventRender={!customize && !serviceProps[0]}
                                     sx={serviceProps[0] ? null : { opacity: 0.38 }}
                                     onPageNavigation={event => scrollTo(event, `${service.category}-${service.name}`)}
                                     checkboxProps={{

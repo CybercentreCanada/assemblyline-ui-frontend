@@ -57,9 +57,8 @@ const Parameter = React.memo(
                   id={`${spec.name}-${param.name}`}
                   primary={primary}
                   capitalize
-                  disabled={disabled}
+                  disabled={disabled || (!customize && (!selected || !param.editable))}
                   loading={loading}
-                  preventRender={customize ? false : !selected || !param.editable}
                   reset={param.default !== null && state !== param.default}
                   value={state as string}
                   onChange={(event, value) => {
@@ -82,9 +81,8 @@ const Parameter = React.memo(
                   id={`${spec.name}-${param.name}`}
                   primary={primary}
                   capitalize
-                  disabled={disabled}
+                  disabled={disabled || (!customize && (!selected || !param.editable))}
                   loading={loading}
-                  preventRender={customize ? false : !selected || !param.editable}
                   reset={param.default !== null && state !== param.default}
                   value={state as number}
                   onChange={(event, value) => {
@@ -107,9 +105,8 @@ const Parameter = React.memo(
                   id={`${spec.name}-${param.name}`}
                   primary={primary}
                   capitalize
-                  disabled={disabled}
+                  disabled={disabled || (!customize && (!selected || !param.editable))}
                   loading={loading}
-                  preventRender={customize ? false : !selected || !param.editable}
                   reset={param.default !== null && state !== param.default}
                   value={state as boolean}
                   onChange={(event, value) => {
@@ -132,9 +129,8 @@ const Parameter = React.memo(
                   id={`${spec.name}-${param.name}`}
                   primary={primary}
                   capitalize
-                  disabled={disabled}
+                  disabled={disabled || (!customize && (!selected || !param.editable))}
                   loading={loading}
-                  preventRender={customize ? false : !selected || !param.editable}
                   reset={param.default !== null && state !== param.default}
                   value={state as string}
                   options={param.list.map(item => ({
@@ -214,7 +210,7 @@ const Service = React.memo(
           const specID = spec_id as number;
           const spec = specID >= 0 ? form.state.values.next.profiles[profile].service_spec[specID] : null;
 
-          return !customize && !selected ? null : (
+          return (
             <div
               key={`${service.name}-${svr_id}`}
               style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.25) }}
@@ -225,13 +221,12 @@ const Service = React.memo(
                 primaryProps={{ className: 'Anchor' }}
                 secondary={service.description}
                 checked={selected as boolean}
-                preventRender={!customize && !selected}
                 anchor
                 sx={{ ...(!selected && { opacity: 0.38 }) }}
                 onChange={!customize ? null : (event, checked) => handleChange(checked)}
               />
 
-              {specID < 0 || !spec.params.filter(p => (customize ? true : selected && p.editable)).length ? null : (
+              {spec?.params?.length > 0 && (
                 <List inset>
                   {spec.params.map((param, param_id) => (
                     <Parameter
@@ -312,40 +307,37 @@ const Category = React.memo(
           const list = state.values.next.profiles[profile].services[cat_id].services.map(svr => svr.selected);
           return [selected, !list.every(i => i) && list.some(i => i)];
         }}
-        children={([selected, indeterminate]) =>
-          !customize && !(selected || indeterminate) ? null : (
-            <div
-              key={`${category.name}-${cat_id}`}
-              style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}
-            >
-              <ListHeader
-                id={category.name}
-                anchorProps={{ subheader: true }}
-                primary={category.name}
-                checked={selected}
-                indeterminate={indeterminate}
-                preventRender={!customize && !(selected || indeterminate)}
-                divider
-                anchor
-                sx={{ ...(!selected && !indeterminate && { opacity: 0.38 }) }}
-                onChange={!customize ? null : (event, checked) => handleChange(checked)}
-              />
+        children={([selected, indeterminate]) => (
+          <div
+            key={`${category.name}-${cat_id}`}
+            style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}
+          >
+            <ListHeader
+              id={category.name}
+              anchorProps={{ subheader: true }}
+              primary={category.name}
+              checked={selected}
+              indeterminate={indeterminate}
+              divider
+              anchor
+              sx={{ ...(!selected && !indeterminate && { opacity: 0.38 }) }}
+              onChange={!customize ? null : (event, checked) => handleChange(checked)}
+            />
 
-              {category.services.map((service, svr_id) => (
-                <Service
-                  key={`${cat_id}-${svr_id}`}
-                  cat_id={cat_id}
-                  customize={customize}
-                  disabled={disabled}
-                  loading={loading}
-                  profile={profile}
-                  service={service}
-                  svr_id={svr_id}
-                />
-              ))}
-            </div>
-          )
-        }
+            {category.services.map((service, svr_id) => (
+              <Service
+                key={`${cat_id}-${svr_id}`}
+                cat_id={cat_id}
+                customize={customize}
+                disabled={disabled}
+                loading={loading}
+                profile={profile}
+                service={service}
+                svr_id={svr_id}
+              />
+            ))}
+          </div>
+        )}
       />
     );
   }
