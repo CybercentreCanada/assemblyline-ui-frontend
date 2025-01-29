@@ -1,7 +1,7 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
-import { Menu, MenuItem } from '@mui/material';
+import { Divider, ListSubheader, Menu, MenuItem } from '@mui/material';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
@@ -45,7 +45,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
 }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
-  const { isHighlighted, triggerHighlight } = useHighlighter();
+  const { isHighlighted, triggerHighlight, getHighlightedValues } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
   const { scoreToVerdict } = useALContext();
@@ -94,10 +94,6 @@ const WrappedAttack: React.FC<AttackProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
-        <MenuItem id="clipID" dense onClick={handleMenuCopy}>
-          {CLIPBOARD_ICON}
-          {t('clipboard')}
-        </MenuItem>
         {currentUser.roles.includes('submission_view') && (
           <MenuItem
             component={Link}
@@ -113,6 +109,34 @@ const WrappedAttack: React.FC<AttackProps> = ({
           {HIGHLIGHT_ICON}
           {t('highlight')}
         </MenuItem>
+        <div>
+          <Divider />
+          <ListSubheader disableSticky sx={{ lineHeight: '32px' }}>
+            {t('clipboard')}
+          </ListSubheader>
+          <MenuItem
+            id="clipID.value"
+            dense
+            onClick={async () => {
+              await copy(text, 'clipID.value');
+              handleClose();
+            }}
+          >
+            {CLIPBOARD_ICON}
+            {t('clipboard')}
+          </MenuItem>
+          <MenuItem
+            id="clipID.highlighted_values"
+            dense
+            onClick={async () => {
+              await copy(getHighlightedValues().join('\n'), 'clipID.highlighted_values');
+              handleClose();
+            }}
+          >
+            {CLIPBOARD_ICON}
+            {t('clipboard.highlighted_values')}
+          </MenuItem>
+        </div>
       </Menu>
       <CustomChip
         wrap
