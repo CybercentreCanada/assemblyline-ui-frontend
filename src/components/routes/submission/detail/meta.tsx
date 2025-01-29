@@ -150,16 +150,16 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
               </Collapse>
             )}
         </div>
-        <div>
-          {metadata?.eml_path && (
+        {metadata?.eml_path && (
+          <div>
             <Fetcher
               fetcherId="eml-preview.preview"
               type="eml_id"
               value={metadata?.eml_path}
               slotProps={{ paper: { sx: { maxWidth: '200px', maxHeight: '200px' } } }}
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   ) : null;

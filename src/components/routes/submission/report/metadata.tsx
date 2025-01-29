@@ -170,16 +170,16 @@ function WrappedMetadata({ report }: Props) {
                 </Collapse>
               )}
           </div>
-          <div>
-            {report?.metadata?.eml_path && (
+          {report?.metadata?.eml_path && (
+            <div>
               <Fetcher
                 fetcherId="eml-preview.preview"
                 type="eml_id"
                 value={report?.metadata?.eml_path}
                 slotProps={{ paper: { sx: { maxWidth: '200px', maxHeight: '200px' } } }}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     )
