@@ -345,6 +345,20 @@ const WrappedResultSection: React.FC<Props> = ({
             {!printable && (
               <>
                 <div style={{ color: theme.palette.text.disabled, whiteSpace: 'nowrap' }} onClick={stopPropagation}>
+                  {section.body_format !== 'TABLE' ? null : (
+                    <Tooltip title={t('table.menubutton')} placement="top">
+                      <IconButton
+                        color="inherit"
+                        size="small"
+                        onClick={() => {
+                          setShowTable(true);
+                          setState(null);
+                        }}
+                      >
+                        <TableViewOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                   {section.heuristic && (
                     <Tooltip title={t('show_heur')} placement="top">
                       <IconButton size="small" onClick={handleShowHeur} color={showHeur ? 'default' : 'inherit'}>
