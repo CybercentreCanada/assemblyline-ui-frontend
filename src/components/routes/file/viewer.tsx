@@ -1,5 +1,6 @@
 import { loader } from '@monaco-editor/react';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WrapTextOutlinedIcon from '@mui/icons-material/WrapTextOutlined';
@@ -10,6 +11,7 @@ import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
 import useMyAPI from 'components/hooks/useMyAPI';
+import type { File } from 'components/models/base/file';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import FileDownloader from 'components/visual/FileDownloader';
@@ -49,9 +51,7 @@ type ParamProps = {
   tab: Tab;
 };
 
-type Props = {};
-
-const WrappedFileViewer: React.FC<Props> = () => {
+const WrappedFileViewer = () => {
   const { t } = useTranslation(['fileViewer']);
   const classes = useStyles();
   const theme = useTheme();
@@ -68,12 +68,13 @@ const WrappedFileViewer: React.FC<Props> = () => {
   const [codeAllowed, setCodeAllowed] = useState<boolean>(false);
   const [imageAllowed, setImageAllowed] = useState<boolean>(null);
   const [wordwrap, setWordwrap] = useState<'on' | 'off'>('off');
+  const [dataTruncated, setDataTruncated] = useState<boolean>(false);
 
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
   useEffect(() => {
     if (!sha256 || !currentUser.roles.includes('file_detail')) return;
-    apiCall({
+    apiCall<File>({
       url: `/api/v4/file/info/${sha256}/`,
       onSuccess: api_data => {
         setType(api_data.api_response.type);
@@ -113,9 +114,26 @@ const WrappedFileViewer: React.FC<Props> = () => {
       <Grid container alignItems="center">
         <Grid item xs>
           <Typography variant="h4">{t('title')}</Typography>
-          <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-            {sha256}
-          </Typography>
+          {dataTruncated ? (
+            <Tooltip title={t('error.truncated')} placement="bottom-start">
+              <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(1) }}>
+                <ErrorOutlineIcon color="error" />
+                <Typography
+                  variant="caption"
+                  style={{
+                    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
+                    wordBreak: 'break-word'
+                  }}
+                >
+                  {sha256}
+                </Typography>
+              </div>
+            </Tooltip>
+          ) : (
+            <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
+              {sha256}
+            </Typography>
+          )}
         </Grid>
         <Grid item xs={12} sm={12} md={4} style={{ textAlign: 'right', flexGrow: 0 }}>
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
@@ -183,6 +201,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
                       type={type}
                       codeAllowed={codeAllowed}
                       options={{ wordWrap: wordwrap }}
+                      onDataTruncated={setDataTruncated}
                     />
                   </div>
                 )
@@ -200,7 +219,12 @@ const WrappedFileViewer: React.FC<Props> = () => {
                 label: t('strings'),
                 inner: (
                   <div className={classes.tab}>
-                    <StringsSection sha256={sha256} type={type} options={{ wordWrap: wordwrap }} />
+                    <StringsSection
+                      sha256={sha256}
+                      type={type}
+                      options={{ wordWrap: wordwrap }}
+                      onDataTruncated={setDataTruncated}
+                    />
                   </div>
                 )
               },
@@ -208,7 +232,7 @@ const WrappedFileViewer: React.FC<Props> = () => {
                 label: t('hex'),
                 inner: (
                   <div className={classes.tab}>
-                    <HexSection sha256={sha256} />
+                    <HexSection sha256={sha256} onDataTruncated={setDataTruncated} />
                   </div>
                 )
               },

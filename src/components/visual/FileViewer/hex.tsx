@@ -24,9 +24,10 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   sha256: string;
+  onDataTruncated?: (truncated: boolean) => void;
 };
 
-const WrappedHexSection: React.FC<Props> = ({ sha256 }) => {
+const WrappedHexSection: React.FC<Props> = ({ sha256, onDataTruncated = () => null }) => {
   const { t } = useTranslation(['fileViewer']);
   const classes = useStyles();
   const { apiCall } = useMyAPI();
@@ -48,6 +49,7 @@ const WrappedHexSection: React.FC<Props> = ({ sha256 }) => {
       },
       onSuccess: ({ api_response }) => {
         setData(api_response?.content || '');
+        onDataTruncated(api_response?.truncated || false);
         if (api_response?.truncated) showErrorMessage(t('error.truncated'));
       },
       onFailure: api_data => setError(api_data.api_error_message)
