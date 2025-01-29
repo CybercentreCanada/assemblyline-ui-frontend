@@ -13,9 +13,15 @@ type Props = {
   sha256: string;
   type?: string;
   options?: editor.IStandaloneEditorConstructionOptions;
+  onDataTruncated?: (truncated: boolean) => void;
 };
 
-const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null, options = null }) => {
+const WrappedStringsSection: React.FC<Props> = ({
+  sha256,
+  type: propType = null,
+  options = null,
+  onDataTruncated = () => null
+}) => {
   const { t } = useTranslation(['fileViewer']);
   const { apiCall } = useMyAPI();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
@@ -38,6 +44,7 @@ const WrappedStringsSection: React.FC<Props> = ({ sha256, type: propType = null,
       },
       onSuccess: ({ api_response }) => {
         setData(api_response?.content || '');
+        onDataTruncated(api_response?.truncated || false);
         if (api_response?.truncated) showErrorMessage(t('error.truncated'));
       },
       onFailure: api_data => setError(api_data.api_error_message)

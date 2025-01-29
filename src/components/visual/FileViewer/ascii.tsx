@@ -63,6 +63,7 @@ type Props = {
   codeAllowed?: boolean;
   archiveOnly?: boolean;
   options?: editor.IStandaloneEditorConstructionOptions;
+  onDataTruncated?: (truncated: boolean) => void;
 };
 
 const WrappedASCIISection: React.FC<Props> = ({
@@ -70,7 +71,8 @@ const WrappedASCIISection: React.FC<Props> = ({
   type: propType = null,
   codeAllowed = false,
   archiveOnly = false,
-  options = null
+  options = null,
+  onDataTruncated = () => null
 }) => {
   const { t, i18n } = useTranslation(['fileViewer']);
   const theme = useTheme();
@@ -135,6 +137,7 @@ const WrappedASCIISection: React.FC<Props> = ({
       },
       onSuccess: ({ api_response }) => {
         setData(api_response?.content || '');
+        onDataTruncated(api_response?.truncated || false);
         if (api_response?.truncated) showErrorMessage(t('error.truncated'));
       },
       onFailure: api_data => setError(api_data.api_error_message)
