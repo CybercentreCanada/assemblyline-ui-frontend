@@ -559,16 +559,16 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                       )}
                   </pre>
                 </div>
-                <div>
-                  {alert?.metadata?.eml_path && (
+                {alert?.metadata?.eml_path && (
+                  <div>
                     <Fetcher
                       fetcherId="eml-preview.preview"
                       type="eml_id"
                       value={alert?.metadata?.eml_path}
                       slotProps={{ paper: { sx: { maxWidth: '96px', maxHeight: '96px' } } }}
                     />
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           ) : null}
