@@ -126,7 +126,7 @@ export const SubmissionSection = () => {
 
               <form.Subscribe
                 selector={state =>
-                  state.values?.next?.profiles?.[profile]?.ignore_dynamic_recursion_prevention || {
+                  state.values?.next?.profiles?.[profile]?.ignore_recursion_prevention || {
                     value: null,
                     default: null,
                     editable: false
@@ -134,22 +134,22 @@ export const SubmissionSection = () => {
                 }
                 children={state => (
                   <BooleanListInput
-                    id="settings:submissions.dynamic_recursion"
-                    primary={t('settings:submissions.dynamic_recursion')}
-                    secondary={t('settings:submissions.dynamic_recursion_desc')}
+                    id="settings:submissions.recursion_prevention"
+                    primary={t('settings:submissions.recursion_prevention')}
+                    secondary={t('settings:submissions.recursion_prevention_desc')}
                     value={state.value}
                     loading={loading}
                     disabled={disabled || (!customize && !state.editable)}
                     reset={state.default !== null && state.value !== state.default}
                     onChange={(event, value) => {
                       form.setStore(s => {
-                        s.next.profiles[profile].ignore_dynamic_recursion_prevention = { ...state, value };
+                        s.next.profiles[profile].ignore_recursion_prevention = { ...state, value };
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.next.profiles[profile].ignore_dynamic_recursion_prevention = {
+                        s.next.profiles[profile].ignore_recursion_prevention = {
                           ...state,
                           value: state.default
                         };

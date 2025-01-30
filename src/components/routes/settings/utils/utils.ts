@@ -35,14 +35,14 @@ const INTERFACE_KEYS: InterfaceKey[] = [
 
 type ProfileKey = keyof Pick<
   UserSettings,
-  'deep_scan' | 'generate_alert' | 'ignore_cache' | 'ignore_dynamic_recursion_prevention' | 'ignore_filtering' | 'ttl'
+  'deep_scan' | 'generate_alert' | 'ignore_cache' | 'ignore_recursion_prevention' | 'ignore_filtering' | 'ttl'
 >;
 
 const PROFILE_KEYS: ProfileKey[] = [
   'deep_scan',
   'generate_alert',
   'ignore_cache',
-  'ignore_dynamic_recursion_prevention',
+  'ignore_recursion_prevention',
   'ignore_filtering',
   'ttl'
 ];

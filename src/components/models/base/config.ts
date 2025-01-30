@@ -436,7 +436,7 @@ export type SubmissionProfileParams = {
   ignore_cache?: boolean;
 
   /** Should we ignore dynamic recursion prevention? */
-  ignore_dynamic_recursion_prevention?: boolean;
+  ignore_recursion_prevention?: boolean;
 
   /** Should we ignore filtering services? */
   ignore_filtering?: boolean;

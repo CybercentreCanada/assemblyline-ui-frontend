@@ -55,7 +55,7 @@
   "params.generate_alert": "Générer une alerte",
   "params.groups": "Groupes",
   "params.ignore_cache": "Ignorer la cache",
-  "params.ignore_dynamic_recursion_prevention": "Ignorer la prévention de récursivité dynamique",
+  "params.ignore_recursion_prevention": "Ignorer la prévention de la récursivité",
   "params.ignore_filtering": "Ignorer le filtrage",
   "params.priority": "Priorité",
   "params.services.selected": "Services sélectionnés",

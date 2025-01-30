@@ -21,7 +21,7 @@
   "options.submission.desc": "Description",
   "options.submission.generate_alert": "Générer une alerte",
   "options.submission.ignore_cache": "Ignorer le cache des résultats",
-  "options.submission.ignore_dynamic_recursion_prevention": "Ignorer la prévention de la récursivité dynamique",
+  "options.submission.ignore_recursion_prevention": "Ignorer la prévention de la récursivité",
   "options.submission.ignore_filtering": "Ignorer les services de filtrage",
   "options.submission.metadata": "Métadonnées de la soumission",
   "options.submission.metadata.clear": "Effacer les métadonnées",

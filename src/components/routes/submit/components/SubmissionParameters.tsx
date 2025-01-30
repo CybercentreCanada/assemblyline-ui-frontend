@@ -152,21 +152,19 @@ const WrappedSubmissionParameters = ({
         />
 
         <form.Subscribe
-          selector={state => [
-            loading ? null : state.values.settings.profiles[profile].ignore_dynamic_recursion_prevention
-          ]}
-          children={([ignore_dynamic_recursion_prevention]) => (
+          selector={state => [loading ? null : state.values.settings.profiles[profile].ignore_recursion_prevention]}
+          children={([ignore_recursion_prevention]) => (
             <CheckboxInput
-              label={t('options.submission.ignore_dynamic_recursion_prevention')}
-              tooltip={t('settings:submissions.dynamic_recursion_desc')}
-              value={ignore_dynamic_recursion_prevention?.value}
+              label={t('options.submission.ignore_recursion_prevention')}
+              tooltip={t('settings:submissions.recursion_prevention_desc')}
+              value={ignore_recursion_prevention?.value}
               loading={loading}
-              disabled={disabled || (!customize && !ignore_dynamic_recursion_prevention.editable)}
+              disabled={disabled || (!customize && !ignore_recursion_prevention.editable)}
               onChange={() => {
                 form.setStore(s => {
-                  s.settings.profiles[profile].ignore_dynamic_recursion_prevention = {
-                    ...s.settings.profiles[profile].ignore_dynamic_recursion_prevention,
-                    value: !s.settings.profiles[profile].ignore_dynamic_recursion_prevention.value
+                  s.settings.profiles[profile].ignore_recursion_prevention = {
+                    ...s.settings.profiles[profile].ignore_recursion_prevention,
+                    value: !s.settings.profiles[profile].ignore_recursion_prevention.value
                   };
                   return s;
                 });
