@@ -189,7 +189,7 @@ const WorkflowsSearch = () => {
                 icon: { children: <EventOutlinedIcon /> },
                 button: {
                   onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'last_seen:[* TO now-3m]'] }))
+                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'last_seen:[* TO now-3M]'] }))
                 }
               }
             ]}
