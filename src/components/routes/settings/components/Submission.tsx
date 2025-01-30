@@ -13,7 +13,7 @@ export const SubmissionSection = () => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const { configuration } = useALContext();
+  const { configuration, c12nDef } = useALContext();
 
   return (
     <form.Subscribe
@@ -41,25 +41,27 @@ export const SubmissionSection = () => {
             />
 
             <List inset>
-              <form.Subscribe
-                selector={state => state.values?.next?.classification}
-                children={value => (
-                  <ClassificationListInput
-                    id="settings:submissions.classification"
-                    primary={t('settings:submissions.classification')}
-                    secondary={t('settings:submissions.classification_desc')}
-                    value={value}
-                    loading={loading}
-                    disabled={disabled || !customize}
-                    onChange={v => {
-                      form.setStore(s => {
-                        s.next.classification = v;
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
+              {c12nDef.enforce && (
+                <form.Subscribe
+                  selector={state => state.values?.next?.classification}
+                  children={value => (
+                    <ClassificationListInput
+                      id="settings:submissions.classification"
+                      primary={t('settings:submissions.classification')}
+                      secondary={t('settings:submissions.classification_desc')}
+                      value={value as string}
+                      loading={loading}
+                      disabled={disabled || !customize}
+                      onChange={v => {
+                        form.setStore(s => {
+                          s.next.classification = v;
+                          return s;
+                        });
+                      }}
+                    />
+                  )}
+                />
+              )}
 
               <form.Subscribe
                 selector={state =>
