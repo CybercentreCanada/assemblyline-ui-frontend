@@ -1,4 +1,5 @@
-import { useTheme } from '@mui/material';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import { IconButton, Tooltip, useTheme } from '@mui/material';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import type { Verdict } from 'components/models/base/alert';
@@ -33,15 +34,11 @@ const ShowMore: React.FC<ShowMoreProps> = React.memo(
     const [showMore, setShowMore] = useState<boolean>(open);
 
     return !showMore ? (
-      <CustomChip
-        label={`${count} ${t('show_more.count')}`}
-        aria-label="show more"
-        size="small"
-        variant="outlined"
-        type="rounded"
-        color="primary"
-        onClick={() => setShowMore(true)}
-      />
+      <Tooltip title={`${count} ${t('show_more.count')}`}>
+        <IconButton size="small" onClick={() => setShowMore(true)} style={{ padding: 0 }}>
+          <MoreHorizOutlinedIcon />
+        </IconButton>
+      </Tooltip>
     ) : (
       children
     );
@@ -156,15 +153,11 @@ const GroupedTagList: React.FC<GroupedTagListProps> = React.memo(
       <>
         {items.slice(0, targetMax).map((tag, idx) => children(tag, idx))}
         {items.length > targetMax && (
-          <CustomChip
-            label={`${items.length - targetMax} ${t('show_more.count')}`}
-            aria-label="show more"
-            size="small"
-            variant="outlined"
-            type="rounded"
-            color="primary"
-            onClick={() => setHideExtra(false)}
-          />
+          <Tooltip title={`${items.length - targetMax} ${t('show_more.count')}`}>
+            <IconButton size="small" onClick={() => setHideExtra(false)} style={{ padding: 0 }}>
+              <MoreHorizOutlinedIcon />
+            </IconButton>
+          </Tooltip>
         )}
       </>
     ) : (
