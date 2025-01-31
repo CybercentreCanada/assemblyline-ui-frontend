@@ -1,6 +1,5 @@
 import AssignmentLateOutlinedIcon from '@mui/icons-material/AssignmentLateOutlined';
 import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
-import FileOpenIcon from '@mui/icons-material/FileOpen';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
 import { Chip, Grid, MenuItem, Select, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
@@ -118,7 +117,7 @@ export default function MalwareArchive() {
   const filterValue = useRef<string>('');
 
   const handleClear = useCallback(() => {
-    if (query.getAll('filters').length !== 0) {
+    if (query?.getAll('filters').length !== 0) {
       query.delete('query');
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
     } else {
@@ -327,45 +326,51 @@ export default function MalwareArchive() {
               buttons={[
                 {
                   icon: <AssignmentLateOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: t('filter.attributed'),
+                  tooltip: (query?.getAll('filters') as string[])?.includes('label_categories.attribution:*')
+                    ? t('filter.attributed.remove')
+                    : t('filter.attributed.add'),
                   props: {
+                    color: (query?.getAll('filters') as string[])?.includes('label_categories.attribution:*')
+                      ? 'primary'
+                      : 'default',
                     onClick: () => {
-                      query.add('filters', 'label_categories.attribution:*');
+                      if ((query?.getAll('filters') as string[])?.includes('label_categories.attribution:*'))
+                        query.remove('filters', 'label_categories.attribution:*');
+                      else query.add('filters', 'label_categories.attribution:*');
+
                       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                     }
                   }
                 },
                 {
                   icon: <ClassOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: t('filter.labelled'),
+                  tooltip: (query?.getAll('filters') as string[])?.includes('labels:*')
+                    ? t('filter.labelled.remove')
+                    : t('filter.labelled.add'),
                   props: {
+                    color: (query?.getAll('filters') as string[])?.includes('labels:*') ? 'primary' : 'default',
                     onClick: () => {
-                      query.add('filters', 'labels:*');
+                      if ((query?.getAll('filters') as string[])?.includes('labels:*'))
+                        query.remove('filters', 'labels:*');
+                      else query.add('filters', 'labels:*');
+
                       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                     }
                   }
                 },
-                query?.has('supplementary')
-                  ? {
-                      icon: <FileOpenIcon fontSize={downSM ? 'small' : 'medium'} />,
-                      tooltip: t('supplementary.exclude'),
-                      props: {
-                        onClick: () => {
-                          query.delete('supplementary');
-                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                        }
-                      }
+                {
+                  icon: <FileOpenOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                  tooltip: query?.has('supplementary') ? t('supplementary.exclude') : t('supplementary.include'),
+                  props: {
+                    color: query?.has('supplementary') ? 'primary' : 'default',
+                    onClick: () => {
+                      if (query?.has('supplementary')) query.delete('supplementary');
+                      else query.set('supplementary', true);
+
+                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                     }
-                  : {
-                      icon: <FileOpenOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                      tooltip: t('supplementary.include'),
-                      props: {
-                        onClick: () => {
-                          query.set('supplementary', true);
-                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                        }
-                      }
-                    }
+                  }
+                }
               ]}
             >
               {fileResults !== null && (
