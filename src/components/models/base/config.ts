@@ -453,9 +453,6 @@ export type SubmissionProfileParams = {
   /** Priority of the scan */
   priority?: number;
 
-  /** Should the submission do extra profiling? */
-  profile?: boolean;
-
   /** Service-specific parameters */
   service_spec?: { [service: string]: { [param: string]: any } };
 
@@ -471,14 +468,11 @@ export type SubmissionProfileParams = {
 
 /** Configuration for defining submission profiles for basic users */
 export type SubmissionProfile = {
-  /** Submission profile classification */
-  classification: string;
+  /** Submission profile display name */
+  display_name: string;
 
   /** A list of service-specific parameters that can be configured */
   editable_params: { [service: string]: string[] };
-
-  /** Submission profile name */
-  name: string;
 
   /** Default submission parameters for profile */
   params: SubmissionProfileParams;
@@ -541,7 +535,7 @@ export type Submission = {
   metadata: MetadataConfig;
 
   /** Submission profiles with preset submission parameters */
-  profiles: { [profile_name: string]: SubmissionProfileParams };
+  profiles: { [profile_name: string]: SubmissionProfile };
 
   /** List of external source to fetch file via their SHA256 hashes */
   sha256_sources: string[];

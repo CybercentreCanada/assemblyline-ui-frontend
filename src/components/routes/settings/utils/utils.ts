@@ -76,7 +76,7 @@ const loadProfile = (settings: UserSettings, profile: SubmissionProfile): Profil
         [key]: {
           default: defaultValue === null || defaultValue === undefined ? null : defaultValue,
           value: value,
-          editable: !profile ? true : !!profile.editable_params?.submit?.includes(key)
+          editable: !profile ? true : !!profile.editable_params?.submission?.includes(key)
         }
       };
     }
