@@ -18,7 +18,7 @@ export const HeaderSection = () => {
   const theme = useTheme();
   const form = useForm();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
 
   const handleSubmit = useCallback(
@@ -109,7 +109,13 @@ export const HeaderSection = () => {
             />
             <PageHeader
               primary={t('title')}
-              secondary={!tab ? null : t(`profile.${tab}`)}
+              secondary={
+                !tab
+                  ? null
+                  : ['interface', 'default'].includes(tab)
+                  ? t(`profile.${tab}`)
+                  : configuration.submission.profiles[tab].display_name
+              }
               loading={loading}
               endAdornment={
                 <div

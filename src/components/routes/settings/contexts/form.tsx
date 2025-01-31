@@ -8,7 +8,7 @@ export type SettingsStore = {
   /** State related to the interface of the Settings page */
   state: {
     /** Key of the selected profile */
-    tab: 'static' | 'static_with_internet' | 'dynamic' | 'interface';
+    tab: string;
 
     /** Disable all the component */
     disabled: boolean;
