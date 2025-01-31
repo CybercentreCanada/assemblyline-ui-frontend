@@ -13,6 +13,7 @@ export const InterfaceSection = () => {
   const theme = useTheme();
   const form = useForm();
   const { user: currentUser, configuration } = useALContext();
+
   return (
     <form.Subscribe
       selector={state => [state.values.state.loading, state.values.state.disabled]}
@@ -78,50 +79,48 @@ export const InterfaceSection = () => {
             />
 
             <form.Subscribe
-              selector={state => [state.values.next.download_encoding, state.values.next.default_zip_password]}
-              children={([download_encoding, default_zip_password]) => (
-                <>
-                  <SelectListInput
-                    primary={t('interface.encoding')}
-                    secondary={t('interface.encoding_desc')}
-                    value={download_encoding}
-                    loading={loading}
-                    disabled={disabled}
-                    options={[
-                      ...(configuration.ui.allow_raw_downloads && [
-                        { value: 'raw', label: t('interface.encoding_raw') }
-                      ]),
-                      { value: 'cart', label: t('interface.encoding_cart') },
-                      ...(configuration.ui.allow_zip_downloads && [
-                        { value: 'zip', label: t('interface.encoding_zip') }
-                      ])
-                    ]}
-                    onChange={(event, v) => {
-                      form.setStore(s => {
-                        s.next.download_encoding = v as 'raw' | 'cart' | 'zip';
-                        return s;
-                      });
-                    }}
-                  />
-                  <form.Subscribe
-                    selector={state => state.values.next.default_zip_password}
-                    children={value => (
-                      <TextListInput
-                        primary={t('interface.encoding_password')}
-                        value={value}
-                        loading={loading}
-                        disabled={disabled}
-                        preventRender={download_encoding !== 'zip'}
-                        onChange={(event, v) => {
-                          form.setStore(s => {
-                            s.next.default_zip_password = v;
-                            return s;
-                          });
-                        }}
-                      />
-                    )}
-                  />
-                </>
+              selector={state => state.values.next.download_encoding}
+              children={download_encoding => (
+                <SelectListInput
+                  primary={t('interface.encoding')}
+                  secondary={t('interface.encoding_desc')}
+                  value={download_encoding}
+                  loading={loading}
+                  disabled={disabled}
+                  options={[
+                    ...(configuration.ui.allow_raw_downloads && [{ value: 'raw', label: t('interface.encoding_raw') }]),
+                    { value: 'cart', label: t('interface.encoding_cart') },
+                    ...(configuration.ui.allow_zip_downloads && [{ value: 'zip', label: t('interface.encoding_zip') }])
+                  ]}
+                  onChange={(event, v) => {
+                    form.setStore(s => {
+                      s.next.download_encoding = v as 'raw' | 'cart' | 'zip';
+                      return s;
+                    });
+                  }}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => [
+                state.values.next.default_zip_password,
+                state.values.next.download_encoding !== 'zip'
+              ]}
+              children={([default_zip_password, preventRender]) => (
+                <TextListInput
+                  primary={t('interface.encoding_password')}
+                  value={default_zip_password as string}
+                  loading={loading}
+                  disabled={disabled}
+                  preventRender={preventRender as boolean}
+                  onChange={(event, v) => {
+                    form.setStore(s => {
+                      s.next.default_zip_password = v;
+                      return s;
+                    });
+                  }}
+                />
               )}
             />
 
