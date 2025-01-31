@@ -11,7 +11,6 @@ import { SearchParamsProvider, useSearchParams } from 'components/core/SearchPar
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { SubmissionIndexed } from 'components/models/base/submission';
-import type { PossibleColor } from 'components/models/utils/color';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
@@ -52,35 +51,6 @@ const SubmissionSearch = () => {
     () => [...Object.keys(indexes.submission).filter(name => indexes.submission[name].indexed), ...DEFAULT_SUGGESTION],
     [indexes.submission]
   );
-
-  const mySubmissions = useMemo<{ param: string; has: boolean; color: PossibleColor }>(() => {
-    const param = `params.submitter:${safeFieldValue(currentUser.username)}`;
-    const has = search.get('filters').includes(param);
-    const color = has ? 'primary' : 'default';
-    return { param, has, color };
-  }, [currentUser.username, search]);
-
-  const completed = useMemo<{ param: string; has: boolean; color: unknown }>(() => {
-    const param = 'state:completed';
-    const has = search.get('filters').includes(param);
-    const color = !has
-      ? 'default'
-      : theme.palette.mode === 'dark'
-      ? theme.palette.success.light
-      : theme.palette.success.dark;
-    return { param, has, color };
-  }, [search, theme.palette.mode, theme.palette.success.dark, theme.palette.success.light]);
-
-  const malicious = useMemo<{ param: string; has: boolean; color: unknown }>(() => {
-    const param = 'max_score:>=1000';
-    const has = search.get('filters').includes(param);
-    const color = !has
-      ? 'default'
-      : theme.palette.mode === 'dark'
-      ? theme.palette.error.light
-      : theme.palette.error.dark;
-    return { param, has, color };
-  }, [search, theme.palette.error.dark, theme.palette.error.light, theme.palette.mode]);
 
   const handleToggleFilter = useCallback(
     (param: string) => {
@@ -131,27 +101,53 @@ const SubmissionSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: mySubmissions.has ? t('filter.personal.remove') : t('filter.personal.add') },
+                tooltip: {
+                  title: search.get('filters').includes(`params.submitter:${safeFieldValue(currentUser.username)}`)
+                    ? t('filter.personal.remove')
+                    : t('filter.personal.add')
+                },
                 icon: { children: <PersonIcon /> },
                 button: {
-                  color: mySubmissions.color,
-                  onClick: () => handleToggleFilter(mySubmissions.param)
+                  color: search.get('filters').includes(`params.submitter:${safeFieldValue(currentUser.username)}`)
+                    ? 'primary'
+                    : 'default',
+                  onClick: () => handleToggleFilter(`params.submitter:${safeFieldValue(currentUser.username)}`)
                 }
               },
               {
-                tooltip: { title: completed.has ? t('filter.completed.remove') : t('filter.completed.add') },
+                tooltip: {
+                  title: search.get('filters').includes('state:completed')
+                    ? t('filter.completed.remove')
+                    : t('filter.completed.add')
+                },
                 icon: { children: <AssignmentTurnedInIcon /> },
                 button: {
-                  sx: { color: completed.color },
-                  onClick: () => handleToggleFilter(completed.param)
+                  sx: {
+                    color: !search.get('filters').includes('state:completed')
+                      ? 'default'
+                      : theme.palette.mode === 'dark'
+                      ? theme.palette.success.light
+                      : theme.palette.success.dark
+                  },
+                  onClick: () => handleToggleFilter('state:completed')
                 }
               },
               {
-                tooltip: { title: malicious.has ? t('filter.malicious.remove') : t('filter.malicious.add') },
+                tooltip: {
+                  title: search.get('filters').includes('max_score:>=1000')
+                    ? t('filter.malicious.remove')
+                    : t('filter.malicious.add')
+                },
                 icon: { children: <BugReportOutlinedIcon /> },
                 button: {
-                  sx: { color: malicious.color },
-                  onClick: () => handleToggleFilter(malicious.param)
+                  sx: {
+                    color: !search.get('filters').includes('max_score:>=1000')
+                      ? 'default'
+                      : theme.palette.mode === 'dark'
+                      ? theme.palette.error.light
+                      : theme.palette.error.dark
+                  },
+                  onClick: () => handleToggleFilter('max_score:>=1000')
                 }
               }
             ]}
