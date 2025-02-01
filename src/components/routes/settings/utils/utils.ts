@@ -1,49 +1,47 @@
 import type { SubmissionProfile, SubmissionProfileParams } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
-import type { CustomUser } from 'components/models/ui/user';
 
 type InterfaceKey = keyof Pick<
   UserSettings,
-  | 'classification'
   | 'default_external_sources'
   | 'default_zip_password'
-  | 'description'
-  | 'download_encoding'
   | 'download_encoding'
   | 'executive_summary'
   | 'expand_min_score'
-  | 'malicious'
   | 'preferred_submission_profile'
-  | 'priority'
   | 'submission_view'
 >;
 
 const INTERFACE_KEYS: InterfaceKey[] = [
-  'classification',
   'default_external_sources',
   'default_zip_password',
-  'description',
-  'download_encoding',
   'download_encoding',
   'executive_summary',
   'expand_min_score',
-  'malicious',
   'preferred_submission_profile',
-  'priority',
   'submission_view'
 ];
 
 type ProfileKey = keyof Pick<
   UserSettings,
-  'deep_scan' | 'generate_alert' | 'ignore_cache' | 'ignore_recursion_prevention' | 'ignore_filtering' | 'ttl'
+  | 'classification'
+  | 'deep_scan'
+  | 'generate_alert'
+  | 'ignore_cache'
+  | 'ignore_recursion_prevention'
+  | 'ignore_filtering'
+  | 'priority'
+  | 'ttl'
 >;
 
 const PROFILE_KEYS: ProfileKey[] = [
+  'classification',
   'deep_scan',
   'generate_alert',
   'ignore_cache',
   'ignore_recursion_prevention',
   'ignore_filtering',
+  'priority',
   'ttl'
 ];
 
@@ -57,25 +55,26 @@ export type ProfileSettings = {
   [K in keyof Pick<SubmissionProfileParams, ProfileKey>]: ProfileParam<SubmissionProfileParams[K]>;
 } & Pick<UserSettings, 'services' | 'service_spec'>;
 
-export type SubmitSettings = Pick<UserSettings, InterfaceKey> & {
+export type SubmitSettings = Pick<UserSettings, ProfileKey> & {
+  description: string;
+  default_external_sources: string[];
   profiles: {
-    default: ProfileSettings;
     [profile: string]: ProfileSettings;
   };
 };
 
-const loadProfile = (settings: UserSettings, profile: SubmissionProfile): ProfileSettings => {
+const loadProfile = (profile_name: string, settings: UserSettings, profile: SubmissionProfile): ProfileSettings => {
   let out: ProfileSettings = null;
 
   // Load the submission parameters
   Object.entries(settings).forEach(([key, value]) => {
     if (PROFILE_KEYS.includes(key as ProfileKey)) {
-      const defaultValue: unknown = settings?.[key];
+      const defaultValue: unknown = settings.submission_profiles[profile_name][key];
       out = {
         ...out,
         [key]: {
           default: defaultValue === null || defaultValue === undefined ? null : defaultValue,
-          value: value,
+          value: defaultValue || value,
           editable: !profile ? true : !!profile.editable_params?.submission?.includes(key)
         }
       };
@@ -123,22 +122,23 @@ const loadProfile = (settings: UserSettings, profile: SubmissionProfile): Profil
   return out;
 };
 
-export const loadSubmissionProfiles = (settings: UserSettings): SubmitSettings => {
+export const loadSubmissionProfiles = (
+  settings: UserSettings,
+  submission_profiles: { [key: string]: SubmissionProfile }
+): SubmitSettings => {
   if (!settings) return null;
+  let out = { default_external_sources: [], description: '', profiles: {} } as SubmitSettings;
 
-  let out = { profiles: { default: null } } as SubmitSettings;
-
-  // Load the submission parameters
+  // Load settings for the interface section
   Object.entries(settings).forEach(([key, value]) => {
     if (INTERFACE_KEYS.includes(key as InterfaceKey)) {
       out = { ...out, [key]: value };
     }
   });
 
-  out.profiles = { ...out.profiles, default: loadProfile(settings, null) };
-
-  Object.entries(settings?.submission_profiles || {}).forEach(([name, profile]) => {
-    out.profiles = { ...out.profiles, [name]: loadProfile(settings, profile) };
+  // Load submission profile information
+  Object.keys(settings?.submission_profiles || {}).forEach(name => {
+    out.profiles = { ...out.profiles, [name]: loadProfile(name, settings, submission_profiles[name]) };
   });
 
   return out;
@@ -156,46 +156,47 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
     }
   });
 
-  // Applying the default submission parameters
-  Object.entries(submit.profiles.default).forEach(([key, value]: [string, unknown]) => {
-    const param = value as ProfileParam<unknown>;
-    if (PROFILE_KEYS.includes(key as ProfileKey)) {
-      out[key] = param.value;
-    }
-  });
-
-  out = { ...out, services: submit.profiles.default.services, service_spec: submit.profiles.default.service_spec };
-
-  // Remove the editable property
-  out.service_spec.forEach((spec, i) => {
-    out.service_spec[i].params.forEach((param, j) => {
-      delete out.service_spec[i].params[j].editable;
+  if (submit.profiles?.default) {
+    // Applying the default submission parameters
+    Object.entries(submit.profiles.default).forEach(([key, value]: [string, unknown]) => {
+      const param = value as ProfileParam<unknown>;
+      if (PROFILE_KEYS.includes(key as ProfileKey)) {
+        out[key] = param.value;
+      }
     });
-  });
+
+    out = { ...out, services: submit.profiles.default.services, service_spec: submit.profiles.default.service_spec };
+  }
+
+  if (out?.service_spec) {
+    // Remove the editable property
+    out.service_spec.forEach((spec, i) => {
+      out.service_spec[i].params.forEach((param, j) => {
+        delete out.service_spec[i].params[j].editable;
+      });
+    });
+  }
 
   // Applying the submission profile changes
-  Object.entries(submit.profiles)
-    .filter(([name]) => name !== 'default')
-    .forEach(([name, profile]: [string, ProfileSettings]) => {
+  if (submit?.profiles) {
+    Object.entries(submit.profiles).forEach(([name, profile]: [string, ProfileSettings]) => {
       out = {
         ...out,
         submission_profiles: {
           ...out.submission_profiles,
           [name]: {
             classification: null,
-            editable_params: {},
             name: name,
-            params: { services: { excluded: [], rescan: [], resubmit: [], selected: [] }, service_spec: {} }
+            services: { excluded: [], rescan: [], resubmit: [], selected: [] },
+            service_spec: {}
           }
         }
       };
 
-      // Submission options
       Object.entries(profile).forEach(([key, value]: [string, unknown]) => {
         const param = value as ProfileParam<unknown>;
-        const defaultParam = submit?.profiles?.default?.[key] as ProfileParam<unknown>;
-        if (PROFILE_KEYS.includes(key as ProfileKey) && param.value !== defaultParam.value) {
-          out.submission_profiles[name].params[key] = param.value;
+        if (PROFILE_KEYS.includes(key as ProfileKey) && param.value !== param.default) {
+          out.submission_profiles[name][key] = param.value;
         }
       });
 
@@ -212,40 +213,38 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
           });
         }
       });
-      out.submission_profiles[name].params.services.selected = selected;
+      out.submission_profiles[name].services.selected = selected;
 
       // Default Service Parameters
       profile.service_spec.forEach((service, i) => {
         let spec: { [name: string]: unknown } = null;
         service.params.forEach((param, j) => {
-          if (param.value !== out.service_spec[i].params[j].value) {
+          if (out?.service_spec && param.value !== out.service_spec[i].params[j].value) {
             spec = { ...spec, [param.name]: param.value };
           }
 
           if (spec !== null) {
-            out.submission_profiles[name].params.service_spec = {
-              ...out.submission_profiles[name].params.service_spec,
+            out.submission_profiles[name].service_spec = {
+              ...out.submission_profiles[name].service_spec,
               [service.name]: spec
             };
           }
         });
       });
     });
+  }
 
+  console.log(out);
   return out;
 };
 
 export const applySubmissionProfile = (submit: SubmitSettings, profile: string | number): UserSettings => {
   if (!submit) return null;
 
-  let out: UserSettings = {} as UserSettings;
-
-  // Applying the default submission parameters
-  Object.entries(submit).forEach(([key, value]) => {
-    if (INTERFACE_KEYS.includes(key as InterfaceKey)) {
-      out[key] = value;
-    }
-  });
+  let out: UserSettings = {
+    description: submit.description || '',
+    default_external_sources: submit.default_external_sources || []
+  } as UserSettings;
 
   // Applying the selected submission profile parameters
   Object.entries(submit.profiles[profile]).forEach(([key, value]: [string, unknown]) => {
@@ -257,8 +256,8 @@ export const applySubmissionProfile = (submit: SubmitSettings, profile: string |
 
   // Applying the selected submission profile service specs
   out.service_spec = structuredClone(submit.profiles[profile].service_spec);
-  out.service_spec.forEach((spec, i) => {
-    out.service_spec[i].params.forEach((param, j) => {
+  out.service_spec.forEach((_, i) => {
+    out.service_spec[i].params.forEach((__, j) => {
       delete out.service_spec[i].params[j].editable;
     });
   });
@@ -269,7 +268,4 @@ export const applySubmissionProfile = (submit: SubmitSettings, profile: string |
   return out;
 };
 
-export const getProfileNames = (settings: SubmitSettings, user: CustomUser) =>
-  Object.keys(settings?.profiles || {})
-    .filter(p => p !== 'default' || user.is_admin || user.roles.includes('submission_customize'))
-    .sort();
+export const getProfileNames = (settings: SubmitSettings) => Object.keys(settings?.profiles || {}).sort();

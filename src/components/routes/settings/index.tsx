@@ -26,7 +26,7 @@ const SettingsContent = () => {
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { tab: tabParam } = useParams<Params>();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
 
   const form = useForm();
   const { rootRef, headerRef } = useTableOfContent();
@@ -43,7 +43,7 @@ const SettingsContent = () => {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
-          const decompress = loadSubmissionProfiles(api_response);
+          const decompress = loadSubmissionProfiles(api_response, configuration.submission.profiles);
 
           s.next = _.cloneDeep(decompress);
           s.prev = _.cloneDeep(decompress);

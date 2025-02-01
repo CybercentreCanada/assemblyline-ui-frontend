@@ -8,17 +8,12 @@ import { useTranslation } from 'react-i18next';
 export const LeftNav = () => {
   const { t } = useTranslation(['settings']);
   const form = useForm();
-  const { user: currentUser } = useALContext();
+  const { configuration } = useALContext();
 
   return (
     <form.Subscribe
-      selector={state => [
-        state.values?.next,
-        state.values.state.tab,
-        state.values.state.loading,
-        state.values.state.customize
-      ]}
-      children={([profiles, tab, loading, customize]) => (
+      selector={state => [state.values?.next, state.values.state.tab, state.values.state.loading]}
+      children={([profiles, tab, loading]) => (
         <PageNavigation
           subheader={loading ? null : t('settings')}
           loading={loading as boolean}
@@ -30,8 +25,10 @@ export const LeftNav = () => {
               to: `/settings/interface`
             },
             { primary: t('profiles'), subheader: true, readOnly: true },
-            ...getProfileNames(profiles as SubmitSettings, currentUser).map(name => ({
-              primary: t(`profile.${name}`),
+            ...getProfileNames(profiles as SubmitSettings).map(name => ({
+              primary: ['interface', 'default'].includes(name)
+                ? t(`profile.${name}`)
+                : configuration.submission.profiles[name].display_name,
               active: name === tab,
               to: `/settings/${name}`
             }))

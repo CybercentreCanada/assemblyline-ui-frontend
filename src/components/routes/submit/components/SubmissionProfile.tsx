@@ -24,36 +24,21 @@ const WrappedSubmissionProfile = ({ loading = false, disabled = false }: Props) 
   const handleChange = useCallback(
     (profileKey: keyof Submission['profiles']) => {
       form.setStore(s => {
+        // Update selected profile
         s.state.profile = profileKey;
 
-        const profile = configuration.submission.profiles[profileKey];
-        if (!profile) {
-          s.settings.profiles[profileKey].services.forEach((cat, i) => {
-            s.settings.profiles[profileKey].services[i].selected = true;
-            cat.services.forEach((svr, j) => {
-              s.settings.profiles[profileKey].services[i].services[j].selected = true;
-            });
-          });
-        } else {
-          s.settings.profiles[profileKey].services.forEach((cat, i) => {
-            s.settings.profiles[profileKey].services[i].selected =
-              profile.services.selected.includes(cat.name) && !profile.services.excluded.includes(cat.name);
-            cat.services.forEach((svr, j) => {
-              s.settings.profiles[profileKey].services[i].services[j].selected =
-                (profile.services.selected.includes(svr.name) || profile.services.selected.includes(svr.category)) &&
-                !(profile.services.excluded.includes(svr.name) || profile.services.excluded.includes(svr.category));
-            });
-          });
-        }
+        // Update settings with profile settings
+        Object.entries(s.settings.profiles[s.state.profile]).forEach(([k, v]) => (s.settings[k] = v.value));
+
         return s;
       });
     },
-    [configuration.submission.profiles, form]
+    [form]
   );
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.profile, getProfileNames(state.values.settings, currentUser)]}
+      selector={state => [state.values.state.profile, getProfileNames(state.values.settings)]}
       children={([profile, profileKeys]) => (
         <div
           style={{
@@ -68,7 +53,12 @@ const WrappedSubmissionProfile = ({ loading = false, disabled = false }: Props) 
             label={t('options.submission.profile_name')}
             labelProps={{ color: 'textPrimary', variant: 'h6', gutterBottom: true }}
             value={profile as string}
-            options={(profileKeys as string[]).map(key => ({ label: key.replaceAll('_', ' '), value: key })).sort()}
+            options={(profileKeys as string[])
+              .map(key => ({
+                label: key === 'default' ? t('profile.default') : configuration.submission.profiles[key]?.display_name,
+                value: key
+              }))
+              .sort()}
             loading={loading}
             disabled={disabled}
             displayEmpty={false}

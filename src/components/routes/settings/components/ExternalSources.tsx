@@ -59,8 +59,7 @@ export const ExternalSourcesSection = () => {
                 selector={state => state.values.next.default_external_sources.includes(source)}
                 children={value => (
                   <BooleanListInput
-                    primary={t('interface.view')}
-                    secondary={t('interface.view_desc')}
+                    primary={source}
                     value={value}
                     loading={loading}
                     disabled={disabled}

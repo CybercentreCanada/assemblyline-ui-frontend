@@ -43,18 +43,18 @@ export const SubmissionSection = () => {
             <List inset>
               {c12nDef.enforce && (
                 <form.Subscribe
-                  selector={state => state.values?.next?.classification}
+                  selector={state => state.values?.next?.profiles[profile]?.classification}
                   children={value => (
                     <ClassificationListInput
                       id="settings:submissions.classification"
                       primary={t('settings:submissions.classification')}
                       secondary={t('settings:submissions.classification_desc')}
-                      value={value as string}
+                      value={value.value || value.default}
                       loading={loading}
                       disabled={disabled || !customize}
                       onChange={v => {
                         form.setStore(s => {
-                          s.next.classification = v;
+                          s.next.profiles[profile].classification.value = v;
                           return s;
                         });
                       }}

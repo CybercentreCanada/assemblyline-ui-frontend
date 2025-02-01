@@ -39,9 +39,12 @@ export const InterfaceSection = () => {
                       value={value}
                       loading={loading}
                       disabled={disabled}
-                      options={getProfileNames(next, currentUser).map(profileValue => ({
+                      options={getProfileNames(next).map(profileValue => ({
                         value: profileValue,
-                        label: t(`profile.${profileValue}`)
+                        label:
+                          profileValue === 'default'
+                            ? t(`profile.${profileValue}`)
+                            : configuration.submission.profiles[profileValue].display_name
                       }))}
                       onChange={(event, v) => {
                         form.setStore(s => {

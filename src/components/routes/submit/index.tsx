@@ -80,10 +80,20 @@ const WrappedSubmitContent = () => {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       onSuccess: ({ api_response }) => {
         form.setStore(s => {
+          // Check if the user is allowed to customize their submission and load profiles accordingly
           s.state.customize = currentUser.is_admin || currentUser.roles.includes('submission_customize');
-          s.settings = loadSubmissionProfiles({ ...api_response, ...s.settings });
+          s.settings = loadSubmissionProfiles({ ...api_response }, configuration.submission.profiles);
 
-          // // Check if some file sources should auto-select and do so
+          // Determine the profile that gets auto-selected on page load
+          const profileKeys = Object.keys(api_response.submission_profiles);
+          s.state.profile = profileKeys.includes(api_response.preferred_submission_profile)
+            ? api_response.preferred_submission_profile
+            : profileKeys[0];
+
+          // Assign properties of the preferred profile to what will be sent to the API
+          Object.entries(s.settings.profiles[s.state.profile]).forEach(([k, v]) => (s.settings[k] = v.value));
+
+          // Check if some file sources should auto-select and do so
           s.settings.default_external_sources = [
             ...new Set(
               Object.entries(configuration.submission.file_sources).reduce(
@@ -92,12 +102,6 @@ const WrappedSubmitContent = () => {
               )
             )
           ].sort();
-
-          const profileKeys = Object.keys(api_response.submission_profiles);
-          s.state.profile = profileKeys.includes(api_response.preferred_submission_profile)
-            ? api_response.preferred_submission_profile
-            : profileKeys[0];
-
           return s;
         });
       },
@@ -161,7 +165,7 @@ const WrappedSubmitContent = () => {
                     <Classification
                       format="long"
                       type="picker"
-                      c12n={state.value ? state.value : null}
+                      c12n={state.value}
                       setClassification={classification => handleChange(classification)}
                       disabled={!currentUser.roles.includes('submission_create')}
                     />
