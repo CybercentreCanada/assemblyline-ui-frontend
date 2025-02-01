@@ -99,6 +99,16 @@ const ErrorViewer = () => {
     [location.search]
   );
 
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
+  );
+
   useEffect(() => {
     if (!search || !currentUser.is_admin) return;
 
@@ -207,26 +217,37 @@ const ErrorViewer = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('exception') },
+                tooltip: {
+                  title: search.has('filters', 'type:(EXCEPTION OR UNKNOWN)')
+                    ? t('filter.exception.remove')
+                    : t('filter.exception.add')
+                },
                 icon: { children: <ReportProblemOutlinedIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:(EXCEPTION OR UNKNOWN)'] }))
+                  color: search.has('filters', 'type:(EXCEPTION OR UNKNOWN)') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:(EXCEPTION OR UNKNOWN)')
                 }
               },
               {
-                tooltip: { title: t('canceled') },
+                tooltip: {
+                  title: search.has('filters', 'type:(SERVICE* OR TASK*)')
+                    ? t('filter.canceled.remove')
+                    : t('filter.canceled.add')
+                },
                 icon: { children: <CancelOutlinedIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:(SERVICE* OR TASK*)'] }))
+                  color: search.has('filters', 'type:(SERVICE* OR TASK*)') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:(SERVICE* OR TASK*)')
                 }
               },
               {
-                tooltip: { title: t('maxed') },
+                tooltip: {
+                  title: search.has('filters', 'type:MAX*') ? t('filter.maxed.remove') : t('filter.maxed.add')
+                },
                 icon: { children: <PanToolOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:MAX*'] }))
+                  color: search.has('filters', 'type:MAX*') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:MAX*')
                 }
               }
             ]}
