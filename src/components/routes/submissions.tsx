@@ -11,6 +11,7 @@ import { SearchParamsProvider, useSearchParams } from 'components/core/SearchPar
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { SubmissionIndexed } from 'components/models/base/submission';
+import type { PossibleColor } from 'components/models/utils/color';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';

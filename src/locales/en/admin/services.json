@@ -68,6 +68,7 @@
   "enabled": "Enabled",
   "errors": "View errors in Error Viewer",
   "general.accept": "Accepted file types",
+  "general.auto_update": "Auto-update",
   "general.caching": "Result caching",
   "general.caching.disabled": "Disabled",
   "general.caching.enabled": "Enabled",

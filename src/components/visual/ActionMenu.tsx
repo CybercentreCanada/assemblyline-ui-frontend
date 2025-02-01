@@ -17,7 +17,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { isAccessible } from 'helpers/classificationParser';
 import { getSubmitType, safeFieldValueURI, toTitleCase } from 'helpers/utils';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
@@ -106,28 +106,36 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   setBorealisDetails = null
 }) => {
   const { t } = useTranslation();
-  const { user: currentUser, configuration: currentUserConfig, c12nDef } = useALContext();
-  const { copy } = useClipboard();
   const classes = useStyles();
-  const [confirmationDialog, setConfirmationDialog] = React.useState(false);
-  const [currentEvent, setCurrentEvent] = React.useState<Event>(null);
-  const [currentAllowBypass, setCurrentAllowBypass] = React.useState(false);
-  const [currentLinkClassification, setCurrentLinkClassification] = React.useState('');
-  const [safelistDialog, setSafelistDialog] = React.useState(false);
-  const [safelistReason, setSafelistReason] = React.useState<string>(null);
-  const [badlistDialog, setBadlistDialog] = React.useState(false);
-  const [badlistReason, setBadlistReason] = React.useState<string>(null);
-  const [waitingDialog, setWaitingDialog] = React.useState(false);
-  const [badlisted, setBadlisted] = React.useState(null);
-  const [safelisted, setSafelisted] = React.useState(null);
-  const { showSuccessMessage } = useMySnackbar();
-  const { triggerHighlight } = useHighlighter();
   const { apiCall } = useMyAPI();
-
+  const { copy } = useClipboard();
   const { enrichTagExternal, enrichmentState, getKey } = useExternalLookup();
-  const externalLookupResults = enrichmentState[getKey(type, value)];
-  const [allInProgress, setAllInProgress] = React.useState(false);
-  const submitType = category === 'tag' && type.endsWith('.uri') ? 'url' : getSubmitType(value, currentUserConfig)[0];
+  const { showSuccessMessage } = useMySnackbar();
+  const { triggerHighlight, getHighlightedValues } = useHighlighter();
+  const { user: currentUser, configuration: currentUserConfig, c12nDef } = useALContext();
+
+  const [confirmationDialog, setConfirmationDialog] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState<Event>(null);
+  const [currentAllowBypass, setCurrentAllowBypass] = useState(false);
+  const [currentLinkClassification, setCurrentLinkClassification] = useState('');
+  const [safelistDialog, setSafelistDialog] = useState(false);
+  const [safelistReason, setSafelistReason] = useState<string>(null);
+  const [badlistDialog, setBadlistDialog] = useState(false);
+  const [badlistReason, setBadlistReason] = useState<string>(null);
+  const [waitingDialog, setWaitingDialog] = useState(false);
+  const [badlisted, setBadlisted] = useState(null);
+  const [safelisted, setSafelisted] = useState(null);
+  const [allInProgress, setAllInProgress] = useState(false);
+
+  const externalLookupResults = useMemo(
+    () => enrichmentState[getKey(type, value)],
+    [enrichmentState, getKey, type, value]
+  );
+
+  const submitType = useMemo(
+    () => (category === 'tag' && type.endsWith('.uri') ? 'url' : getSubmitType(value, currentUserConfig)[0]),
+    [category, currentUserConfig, type, value]
+  );
 
   useEffect(() => {
     if (state.mouseY !== null) {
@@ -405,10 +413,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             {t('goto_signature')}
           </MenuItem>
         )}
-        <MenuItem id="clipID" dense onClick={handleMenuCopy}>
-          {CLIPBOARD_ICON}
-          {t('clipboard')}
-        </MenuItem>
+
         {currentUser.roles.includes('submission_view') && (
           <MenuItem
             dense
@@ -468,6 +473,36 @@ const WrappedActionMenu: React.FC<TagProps> = ({
               {t('submit') + ` ${submitType.toUpperCase()}`}
             </MenuItem>
           )}
+
+        <div>
+          <Divider />
+          <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
+            {t('clipboard')}
+          </ListSubheader>
+          <MenuItem
+            id="clipID.value"
+            dense
+            onClick={async () => {
+              await copy(value, 'clipID.value');
+              handleClose();
+            }}
+          >
+            {CLIPBOARD_ICON}
+            {t('clipboard.value')}
+          </MenuItem>
+          <MenuItem
+            id="clipID.highlighted_values"
+            dense
+            onClick={async () => {
+              await copy(getHighlightedValues().join('\n'), 'clipID.highlighted_values');
+              handleClose();
+            }}
+          >
+            {CLIPBOARD_ICON}
+            {t('clipboard.highlighted_values')}
+          </MenuItem>
+        </div>
+
         {hasExternalQuery && (
           <div>
             <Divider />

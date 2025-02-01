@@ -2,10 +2,12 @@ import { Alert, LinearProgress } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import { HexViewerApp } from 'components/visual/HexViewer';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
   wrapper: {
@@ -22,11 +24,14 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   sha256: string;
+  onDataTruncated?: (truncated: boolean) => void;
 };
 
-const WrappedHexSection: React.FC<Props> = ({ sha256 }) => {
+const WrappedHexSection: React.FC<Props> = ({ sha256, onDataTruncated = () => null }) => {
+  const { t } = useTranslation(['fileViewer']);
   const classes = useStyles();
   const { apiCall } = useMyAPI();
+  const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [data, setData] = useState<string>(null);
@@ -34,14 +39,19 @@ const WrappedHexSection: React.FC<Props> = ({ sha256 }) => {
 
   useEffect(() => {
     if (!sha256 || data) return;
-    apiCall({
+    apiCall<{ content: string; truncated: boolean }>({
       url: `/api/v4/file/hex/${sha256}/?bytes_only=true`,
       allowCache: true,
       onEnter: () => {
         setData(null);
         setError(null);
+        closeSnackbar();
       },
-      onSuccess: api_data => setData(api_data.api_response),
+      onSuccess: ({ api_response }) => {
+        setData(api_response?.content || '');
+        onDataTruncated(api_response?.truncated || false);
+        if (api_response?.truncated) showErrorMessage(t('error.truncated'));
+      },
       onFailure: api_data => setError(api_data.api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

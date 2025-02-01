@@ -317,6 +317,9 @@ export type Service = {
   /** Regex to accept files as identified by Assemblyline */
   accepts: string;
 
+  /** Should the service auto-update? */
+  auto_update: boolean;
+
   /** Which category does this service belong to? */
   category: string;
 
