@@ -116,6 +116,18 @@ export default function MalwareArchive() {
 
   const filterValue = useRef<string>('');
 
+  const hasFilter = useCallback((filter: string) => (query?.getAll('filters') as string[])?.includes(filter), [query]);
+
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      if ((query?.getAll('filters') as string[])?.includes(filter)) query.remove('filters', filter);
+      else query.add('filters', filter);
+
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+    },
+    [location.hash, location.pathname, navigate, query]
+  );
+
   const handleClear = useCallback(() => {
     if (query?.getAll('filters').length !== 0) {
       query.delete('query');
@@ -326,36 +338,20 @@ export default function MalwareArchive() {
               buttons={[
                 {
                   icon: <AssignmentLateOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: (query?.getAll('filters') as string[])?.includes('label_categories.attribution:*')
+                  tooltip: hasFilter('label_categories.attribution:*')
                     ? t('filter.attributed.remove')
                     : t('filter.attributed.add'),
                   props: {
-                    color: (query?.getAll('filters') as string[])?.includes('label_categories.attribution:*')
-                      ? 'primary'
-                      : 'default',
-                    onClick: () => {
-                      if ((query?.getAll('filters') as string[])?.includes('label_categories.attribution:*'))
-                        query.remove('filters', 'label_categories.attribution:*');
-                      else query.add('filters', 'label_categories.attribution:*');
-
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    }
+                    color: hasFilter('label_categories.attribution:*') ? 'primary' : 'default',
+                    onClick: () => handleToggleFilter('label_categories.attribution:*')
                   }
                 },
                 {
                   icon: <ClassOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: (query?.getAll('filters') as string[])?.includes('labels:*')
-                    ? t('filter.labelled.remove')
-                    : t('filter.labelled.add'),
+                  tooltip: hasFilter('labels:*') ? t('filter.labelled.remove') : t('filter.labelled.add'),
                   props: {
-                    color: (query?.getAll('filters') as string[])?.includes('labels:*') ? 'primary' : 'default',
-                    onClick: () => {
-                      if ((query?.getAll('filters') as string[])?.includes('labels:*'))
-                        query.remove('filters', 'labels:*');
-                      else query.add('filters', 'labels:*');
-
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    }
+                    color: hasFilter('labels:*') ? 'primary' : 'default',
+                    onClick: () => handleToggleFilter('labels:*')
                   }
                 },
                 {

@@ -62,6 +62,16 @@ const BadlistSearch = () => {
     [indexes.badlist]
   );
 
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
+  );
+
   const handleReload = useCallback(
     (body: SearchParamsResult<BadlistParams>) => {
       if (!currentUser.roles.includes('badlist_view')) return;
@@ -157,25 +167,31 @@ const BadlistSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('user') },
+                tooltip: {
+                  title: search.has('filters', 'sources.type:user') ? t('filter.user.remove') : t('filter.user.add')
+                },
                 icon: { children: <PersonOutlineOutlinedIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'sources.type:user'] }))
+                  color: search.has('filters', 'sources.type:user') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('sources.type:user')
                 }
               },
               {
-                tooltip: { title: t('tag') },
+                tooltip: { title: search.has('filters', 'type:tag') ? t('filter.tag.remove') : t('filter.tag.add') },
                 icon: { children: <LabelOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:tag'] }))
+                  color: search.has('filters', 'type:tag') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:tag')
                 }
               },
               {
-                tooltip: { title: t('disabled') },
+                tooltip: {
+                  title: search.has('filters', 'enabled:false') ? t('filter.disabled.remove') : t('filter.disabled.add')
+                },
                 icon: { children: <BlockOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'enabled:false'] }))
+                  color: search.has('filters', 'enabled:false') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('enabled:false')
                 }
               }
             ]}

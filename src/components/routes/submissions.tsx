@@ -53,9 +53,9 @@ const SubmissionSearch = () => {
   );
 
   const handleToggleFilter = useCallback(
-    (param: string) => {
+    (filter: string) => {
       setSearchObject(o => {
-        const filters = o.filters.includes(param) ? o.filters.filter(f => f !== param) : [...o.filters, param];
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
         return { ...o, offset: 0, filters };
       });
     },
@@ -102,13 +102,13 @@ const SubmissionSearch = () => {
             actionProps={[
               {
                 tooltip: {
-                  title: search.get('filters').includes(`params.submitter:${safeFieldValue(currentUser.username)}`)
+                  title: search.has('filters', `params.submitter:${safeFieldValue(currentUser.username)}`)
                     ? t('filter.personal.remove')
                     : t('filter.personal.add')
                 },
                 icon: { children: <PersonIcon /> },
                 button: {
-                  color: search.get('filters').includes(`params.submitter:${safeFieldValue(currentUser.username)}`)
+                  color: search.has('filters', `params.submitter:${safeFieldValue(currentUser.username)}`)
                     ? 'primary'
                     : 'default',
                   onClick: () => handleToggleFilter(`params.submitter:${safeFieldValue(currentUser.username)}`)
@@ -116,14 +116,14 @@ const SubmissionSearch = () => {
               },
               {
                 tooltip: {
-                  title: search.get('filters').includes('state:completed')
+                  title: search.has('filters', 'state:completed')
                     ? t('filter.completed.remove')
                     : t('filter.completed.add')
                 },
                 icon: { children: <AssignmentTurnedInIcon /> },
                 button: {
                   sx: {
-                    color: !search.get('filters').includes('state:completed')
+                    color: !search.has('filters', 'state:completed')
                       ? 'default'
                       : theme.palette.mode === 'dark'
                       ? theme.palette.success.light
@@ -134,14 +134,14 @@ const SubmissionSearch = () => {
               },
               {
                 tooltip: {
-                  title: search.get('filters').includes('max_score:>=1000')
+                  title: search.has('filters', 'max_score:>=1000')
                     ? t('filter.malicious.remove')
                     : t('filter.malicious.add')
                 },
                 icon: { children: <BugReportOutlinedIcon /> },
                 button: {
                   sx: {
-                    color: !search.get('filters').includes('max_score:>=1000')
+                    color: !search.has('filters', 'max_score:>=1000')
                       ? 'default'
                       : theme.palette.mode === 'dark'
                       ? theme.palette.error.light

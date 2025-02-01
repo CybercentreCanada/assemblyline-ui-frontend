@@ -38,8 +38,8 @@ export class SearchParamsResult<P extends Params> {
     return new SearchParamsResult<P>(this.formats, values);
   }
 
-  public has<K extends keyof P>(key: K): boolean {
-    return key in this.values;
+  public has<K extends keyof P>(key: K, value: unknown = undefined): boolean {
+    return !(key in this.formats) ? false : this.formats[key as string].has(this.values?.[key], value);
   }
 
   public get<K extends keyof P>(key: K): P[K] {

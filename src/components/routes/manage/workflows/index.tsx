@@ -64,6 +64,16 @@ const WorkflowsSearch = () => {
     [indexes.workflow]
   );
 
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
+  );
+
   const handleReload = useCallback(
     (body: SearchParamsResult<WorkflowsParams>) => {
       if (!currentUser.roles.includes('workflow_view')) return;
@@ -178,18 +188,25 @@ const WorkflowsSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('never_used') },
+                tooltip: {
+                  title: search.has('filters', 'hit_count:0')
+                    ? t('filter.never_used.remove')
+                    : t('filter.never_used.add')
+                },
                 icon: { children: <EventBusyOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'hit_count:0'] }))
+                  color: search.has('filters', 'hit_count:0') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('hit_count:0')
                 }
               },
               {
-                tooltip: { title: t('old') },
+                tooltip: {
+                  title: search.has('filters', 'last_seen:[* TO now-3m]') ? t('filter.old.remove') : t('filter.old.add')
+                },
                 icon: { children: <EventOutlinedIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'last_seen:[* TO now-3m]'] }))
+                  color: search.has('filters', 'last_seen:[* TO now-3m]') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('last_seen:[* TO now-3m]')
                 }
               }
             ]}
