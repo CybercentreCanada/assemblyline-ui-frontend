@@ -201,12 +201,12 @@ const WorkflowsSearch = () => {
               },
               {
                 tooltip: {
-                  title: search.has('filters', 'last_seen:[* TO now-3m]') ? t('filter.old.remove') : t('filter.old.add')
+                  title: search.has('filters', 'last_seen:[* TO now-3M]') ? t('filter.old.remove') : t('filter.old.add')
                 },
                 icon: { children: <EventOutlinedIcon /> },
                 button: {
-                  color: search.has('filters', 'last_seen:[* TO now-3m]') ? 'primary' : 'default',
-                  onClick: () => handleToggleFilter('last_seen:[* TO now-3m]')
+                  color: search.has('filters', 'last_seen:[* TO now-3M]') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('last_seen:[* TO now-3M]')
                 }
               }
             ]}
