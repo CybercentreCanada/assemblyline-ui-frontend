@@ -70,6 +70,16 @@ const SignaturesSearch = () => {
     [search]
   );
 
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
+  );
+
   const handleReload = useCallback(
     (body: SearchParamsResult<SignaturesParams>) => {
       if (!currentUser.roles.includes('signature_view')) return;
@@ -177,17 +187,25 @@ const SignaturesSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('noisy') },
+                tooltip: {
+                  title: search.has('filters', 'status:NOISY') ? t('filter.noisy.remove') : t('filter.noisy.add')
+                },
                 icon: { children: <RecordVoiceOverOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'status:NOISY'] }))
+                  color: search.has('filters', 'status:NOISY') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('status:NOISY')
                 }
               },
               {
-                tooltip: { title: t('disabled') },
+                tooltip: {
+                  title: search.has('filters', 'status:DISABLED')
+                    ? t('filter.disabled.remove')
+                    : t('filter.disabled.add')
+                },
                 icon: { children: <BlockIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'status:DISABLED'] }))
+                  color: search.has('filters', 'status:DISABLED') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('status:DISABLED')
                 }
               }
             ]}

@@ -1,6 +1,5 @@
 import AssignmentLateOutlinedIcon from '@mui/icons-material/AssignmentLateOutlined';
 import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
-import FileOpenIcon from '@mui/icons-material/FileOpen';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
 import { Chip, Grid, MenuItem, Select, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
@@ -117,8 +116,20 @@ export default function MalwareArchive() {
 
   const filterValue = useRef<string>('');
 
+  const hasFilter = useCallback((filter: string) => (query?.getAll('filters') as string[])?.includes(filter), [query]);
+
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      if ((query?.getAll('filters') as string[])?.includes(filter)) query.remove('filters', filter);
+      else query.add('filters', filter);
+
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+    },
+    [location.hash, location.pathname, navigate, query]
+  );
+
   const handleClear = useCallback(() => {
-    if (query.getAll('filters').length !== 0) {
+    if (query?.getAll('filters').length !== 0) {
       query.delete('query');
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
     } else {
@@ -327,45 +338,35 @@ export default function MalwareArchive() {
               buttons={[
                 {
                   icon: <AssignmentLateOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: t('filter.attributed'),
+                  tooltip: hasFilter('label_categories.attribution:*')
+                    ? t('filter.attributed.remove')
+                    : t('filter.attributed.add'),
                   props: {
-                    onClick: () => {
-                      query.add('filters', 'label_categories.attribution:*');
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    }
+                    color: hasFilter('label_categories.attribution:*') ? 'primary' : 'default',
+                    onClick: () => handleToggleFilter('label_categories.attribution:*')
                   }
                 },
                 {
                   icon: <ClassOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: t('filter.labelled'),
+                  tooltip: hasFilter('labels:*') ? t('filter.labelled.remove') : t('filter.labelled.add'),
                   props: {
+                    color: hasFilter('labels:*') ? 'primary' : 'default',
+                    onClick: () => handleToggleFilter('labels:*')
+                  }
+                },
+                {
+                  icon: <FileOpenOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                  tooltip: query?.has('supplementary') ? t('supplementary.exclude') : t('supplementary.include'),
+                  props: {
+                    color: query?.has('supplementary') ? 'primary' : 'default',
                     onClick: () => {
-                      query.add('filters', 'labels:*');
+                      if (query?.has('supplementary')) query.delete('supplementary');
+                      else query.set('supplementary', true);
+
                       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                     }
                   }
-                },
-                query?.has('supplementary')
-                  ? {
-                      icon: <FileOpenIcon fontSize={downSM ? 'small' : 'medium'} />,
-                      tooltip: t('supplementary.exclude'),
-                      props: {
-                        onClick: () => {
-                          query.delete('supplementary');
-                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                        }
-                      }
-                    }
-                  : {
-                      icon: <FileOpenOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                      tooltip: t('supplementary.include'),
-                      props: {
-                        onClick: () => {
-                          query.set('supplementary', true);
-                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                        }
-                      }
-                    }
+                }
               ]}
             >
               {fileResults !== null && (

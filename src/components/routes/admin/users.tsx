@@ -43,6 +43,16 @@ const UsersSearch = () => {
   const [searching, setSearching] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
 
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
+  );
+
   const handleReload = useCallback(
     (body: SearchParamsResult<UsersParams>) => {
       if (!currentUser.is_admin) return;
@@ -119,17 +129,25 @@ const UsersSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('admins') },
+                tooltip: {
+                  title: search.has('filters', 'type:admin') ? t('filter.admins.remove') : t('filter.admins.add')
+                },
                 icon: { children: <SupervisorAccountIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:admin'] }))
+                  color: search.has('filters', 'type:admin') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:admin')
                 }
               },
               {
-                tooltip: { title: t('disabled') },
+                tooltip: {
+                  title: search.has('filters', 'is_active:false')
+                    ? t('filter.disabled.remove')
+                    : t('filter.disabled.add')
+                },
                 icon: { children: <BlockIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'is_active:false'] }))
+                  color: search.has('filters', 'is_active:false') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('is_active:false')
                 }
               }
             ]}

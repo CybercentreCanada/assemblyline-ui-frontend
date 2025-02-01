@@ -101,6 +101,27 @@ export default function RetrohuntPage() {
     [retrohuntResults]
   );
 
+  const last24hDate = useMemo<string>(
+    () =>
+      new Date(new Date().setMinutes(0, 0, 0) - 24 * 60 * 60 * 1000)
+        .toISOString()
+        .replaceAll(':', '\\:')
+        .replaceAll('.', '\\.'),
+    []
+  );
+
+  const hasFilter = useCallback((filter: string) => (query?.getAll('filters') as string[])?.includes(filter), [query]);
+
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      if ((query?.getAll('filters') as string[])?.includes(filter)) query.remove('filters', filter);
+      else query.add('filters', filter);
+
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+    },
+    [location.hash, location.pathname, navigate, query]
+  );
+
   const handleQueryChange = useCallback(
     (key: string, value: string | number) => {
       query.set(key, value);
@@ -315,26 +336,22 @@ export default function RetrohuntPage() {
               buttons={[
                 {
                   icon: <TimerOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: t('filter.completed_last_24'),
+                  tooltip: hasFilter(`completed_time:>=${last24hDate}`)
+                    ? t('filter.completed_last_24.remove')
+                    : t('filter.completed_last_24.add'),
                   props: {
-                    onClick: () => {
-                      const completedTime = new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-                        .toISOString()
-                        .replaceAll(':', '\\:')
-                        .replaceAll('.', '\\.');
-                      query.add('filters', `completed_time:>=${completedTime}`);
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    }
+                    color: hasFilter(`completed_time:>=${last24hDate}`) ? 'primary' : 'default',
+                    onClick: () => handleToggleFilter(`completed_time:>=${last24hDate}`)
                   }
                 },
                 {
                   icon: <PersonOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: t('filter.creator_self'),
+                  tooltip: hasFilter(`creator:${currentUser.username}`)
+                    ? t('filter.creator_self.remove')
+                    : t('filter.creator_self.add'),
                   props: {
-                    onClick: () => {
-                      query.add('filters', `creator:${currentUser.username}`);
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    }
+                    color: hasFilter(`creator:${currentUser.username}`) ? 'primary' : 'default',
+                    onClick: () => handleToggleFilter(`creator:${currentUser.username}`)
                   }
                 }
               ]}
