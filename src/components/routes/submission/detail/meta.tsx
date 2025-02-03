@@ -156,7 +156,7 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
               fetcherId="eml-preview.preview"
               type="eml_id"
               value={metadata?.eml_path}
-              slotProps={{ paper: { sx: { maxWidth: '200px', maxHeight: '200px' } } }}
+              slotProps={{ paper: { style: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } } }}
             />
           </div>
         )}
