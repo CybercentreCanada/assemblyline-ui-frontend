@@ -1759,7 +1759,7 @@
   resolved "https://registry.yarnpkg.com/@kurkle/color/-/color-0.3.2.tgz#5acd38242e8bde4f9986e7913c8fdf49d3aa199f"
   integrity sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==
 
-"@microlink/react-json-view@^1.23.0":
+"@microlink/react-json-view@^1.24.0":
   version "1.24.0"
   resolved "https://registry.yarnpkg.com/@microlink/react-json-view/-/react-json-view-1.24.0.tgz#5d3a51463e432297dbca8fdb59a60704fad96ca1"
   integrity sha512-xrOBvWUR05Pe1x/H7op/yrLFpmf+VjMc5acu7pQpfS70Pux6AmoI+sO7jf2e76OYv27TOvt0TnYSXc3OtjH3Bg==
@@ -3405,21 +3405,20 @@ bidi-js@^1.0.3:
   dependencies:
     require-from-string "^2.0.2"
 
-borealis-ui@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/borealis-ui/-/borealis-ui-0.4.0.tgz#40976478529ae0bc4ad5100a898de14e33b0c01d"
-  integrity sha512-S67kG10qTDm0yNXq+9EcnoN+6pobUhy+GYctkgo1pC2StEtJWxInjJVzpjcbc4uV8t1sYNQ+igdHOgkFZS6etw==
+borealis-ui@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/borealis-ui/-/borealis-ui-0.6.0.tgz#7d67f7ffa0fb6ce242b403525582f99efebe8f73"
+  integrity sha512-EVKupswqUrXVwgridurOqJ2FcKNo/iVWouRhtLQzoSrkIJbrp0NtamkWU2nGjmYtee+vgLFsJavFSXBB+yTONQ==
   dependencies:
     "@jsonforms/core" "^3.3.0"
     "@jsonforms/material-renderers" "^3.3.0"
     "@jsonforms/react" "^3.3.0"
-    "@microlink/react-json-view" "^1.23.0"
+    "@microlink/react-json-view" "^1.24.0"
     "@types/json-schema" "^7.0.15"
     ajv "^8.17.1"
     i18next "^23.2.3"
     i18next-browser-languagedetector "^7.0.2"
     lodash-es "^4.17.21"
-    mdast "^3.0.0"
     react-i18next "^13.0.1"
     react-markdown "^8.0.7"
     react-syntax-highlighter "^15.5.0"
@@ -6121,11 +6120,6 @@ mdast-util-to-string@^3.0.0, mdast-util-to-string@^3.1.0:
   integrity sha512-V4Zn/ncyN1QNSqSBxTrMOLpjr+IKdHl2v3KVLoWmDPscP4r9GcCi71gjgvUV1SFSKh92AjAG4peFuBl2/YgCJg==
   dependencies:
     "@types/mdast" "^3.0.0"
-
-mdast@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/mdast/-/mdast-3.0.0.tgz#626bce9603ed43fb6fb053245a6e4a17f4457aa8"
-  integrity sha512-xySmf8g4fPKMeC07jXGz971EkLbWAJ83s4US2Tj9lEdnZ142UP5grN73H1Xd3HzrdbU5o9GYYP/y8F9ZSwLE9g==
 
 mdn-data@2.0.30:
   version "2.0.30"
