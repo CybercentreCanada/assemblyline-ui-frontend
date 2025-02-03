@@ -173,6 +173,7 @@
   "safelist.title": "Liste sûre",
   "searching": "Recherche en cours...",
   "show_more": "Afficher plus...",
+  "show_more.count": "de plus...",
   "signature.status.DEPLOYED": "DÉPLOYÉE",
   "signature.status.DISABLED": "DÉSACTIVÉE",
   "signature.status.NOISY": "BRUYANTE",
