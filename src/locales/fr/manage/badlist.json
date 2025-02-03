@@ -1,13 +1,16 @@
 {
   "add_badlist": "Ajouter un item à la liste mauvaise",
-  "disabled": "Hachages désactivés",
   "filter": "Filtrer les hachages de la liste mauvaise...",
+  "filter.disabled.add": "Ajouter un filtre pour afficher les hachages désactivés",
+  "filter.disabled.remove": "Supprimer le filtre pour afficher les hachages désactivés",
+  "filter.tag.add": "Ajouter un filtre pour afficher les hachages basés sur des balises",
+  "filter.tag.remove": "Supprimer le filtre pour afficher les hachages basés sur des balises",
+  "filter.user.add": "Ajouter un filtre pour afficher les hachages ajoutés par les utilisateurs",
+  "filter.user.remove": "Supprimer le filtre pour afficher les hachages ajoutés par les utilisateurs",
   "filtered": "hachage correspondant au filtre",
   "filtereds": "hachages correspondant au filtre",
   "searching": "Recherche...",
-  "tag": "Hachages basés sur des balises",
   "title": "Liste Mauvaise",
   "total": "hachage dans la liste mauvaise",
-  "totals": "hachages dans la liste mauvaise",
-  "user": "Hachages ajoutés par les utilisateurs"
+  "totals": "hachages dans la liste mauvaise"
 }
