@@ -1,13 +1,16 @@
 {
   "add_badlist": "Add an item to the badlist",
-  "disabled": "Disabled hashes",
   "filter": "Filter badlisted hashes...",
+  "filter.disabled.add": "Add filter query to show disabled hashes",
+  "filter.disabled.remove": "Remove filter query to show disabled hashes",
+  "filter.tag.add": "Add filter query to show tag based hashes",
+  "filter.tag.remove": "Remove filter query to show tag based hashes",
+  "filter.user.add": "Add filter query to show hashes added by users",
+  "filter.user.remove": "Remove filter query to show hashes added by users",
   "filtered": "hash matching filter",
   "filtereds": "hashes matching filter",
   "searching": "Searching...",
-  "tag": "Tag based hashes",
   "title": "Badlist",
   "total": "hash in badlist",
-  "totals": "hashes in badlist",
-  "user": "Hashes added by users"
+  "totals": "hashes in badlist"
 }

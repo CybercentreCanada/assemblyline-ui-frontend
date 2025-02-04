@@ -5,10 +5,12 @@ import { Alert, Button, CircularProgress, Grid, LinearProgress, Tooltip, useMedi
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import AIMarkdown from 'components/visual/AiMarkdown';
 import MonacoEditor, { LANGUAGE_SELECTOR } from 'components/visual/MonacoEditor';
+import type { editor } from 'monaco-editor';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -60,29 +62,34 @@ type Props = {
   type?: string;
   codeAllowed?: boolean;
   archiveOnly?: boolean;
+  options?: editor.IStandaloneEditorConstructionOptions;
+  onDataTruncated?: (truncated: boolean) => void;
 };
 
 const WrappedASCIISection: React.FC<Props> = ({
   sha256,
   type: propType = null,
   codeAllowed = false,
-  archiveOnly = false
+  archiveOnly = false,
+  options = null,
+  onDataTruncated = () => null
 }) => {
-  const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
   const { t, i18n } = useTranslation(['fileViewer']);
-  const classes = useStyles();
   const theme = useTheme();
-  const [analysing, setAnalysing] = useState(false);
-  const [codeError, setCodeError] = useState(null);
-  const [codeSummary, setCodeSummary] = useState(null);
-  const [codeTruncated, setCodeTruncated] = useState(false);
-  const [showCodeSummary, setShowCodeSummary] = useState(false);
-
-  const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
+  const classes = useStyles();
+  const { apiCall } = useMyAPI();
+  const { showErrorMessage, closeSnackbar } = useMySnackbar();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   const [data, setData] = useState<string>(null);
   const [error, setError] = useState<string>(null);
+  const [codeError, setCodeError] = useState<string>(null);
+  const [codeSummary, setCodeSummary] = useState<string>(null);
+  const [analysing, setAnalysing] = useState<boolean>(false);
+  const [codeTruncated, setCodeTruncated] = useState<boolean>(false);
+  const [showCodeSummary, setShowCodeSummary] = useState<boolean>(false);
+
+  const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const type = useMemo<string>(() => (propType && propType in LANGUAGE_SELECTOR ? propType : 'unknown'), [propType]);
 
@@ -95,7 +102,7 @@ const WrappedASCIISection: React.FC<Props> = ({
       if (archiveOnly) {
         params.push('archive_only');
       }
-      apiCall({
+      apiCall<{ content: string; truncated: boolean }>({
         allowCache: !noCache,
         url: `/api/v4/file/code_summary/${sha256}/${params ? `?${params.join('&')}` : ''}`,
         onSuccess: api_data => {
@@ -120,14 +127,19 @@ const WrappedASCIISection: React.FC<Props> = ({
 
   useEffect(() => {
     if (!sha256 || data) return;
-    apiCall({
+    apiCall<{ content: string; truncated: boolean }>({
       url: `/api/v4/file/ascii/${sha256}/`,
       allowCache: true,
       onEnter: () => {
         setData(null);
         setError(null);
+        closeSnackbar();
       },
-      onSuccess: api_data => setData(api_data.api_response),
+      onSuccess: ({ api_response }) => {
+        setData(api_response?.content || '');
+        onDataTruncated(api_response?.truncated || false);
+        if (api_response?.truncated) showErrorMessage(t('error.truncated'));
+      },
       onFailure: api_data => setError(api_data.api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -159,7 +171,8 @@ const WrappedASCIISection: React.FC<Props> = ({
           <MonacoEditor
             value={data}
             language={LANGUAGE_SELECTOR[type]}
-            options={{ links: false, readOnly: true, beautify: true }}
+            options={{ links: false, readOnly: true, ...options }}
+            beautify
           />
         </Grid>
         {codeAllowed && isMdUp && (

@@ -70,6 +70,7 @@
   "enabled": "Activé",
   "errors": "Afficher les erreurs dans le Visualiseur d'Erreurs",
   "general.accept": "Types de fichiers acceptés",
+  "general.auto_update": "Mise-à-jour automatique",
   "general.caching": "Mise en cache des résultats",
   "general.caching.disabled": "Désactivée",
   "general.caching.enabled": "Activé",

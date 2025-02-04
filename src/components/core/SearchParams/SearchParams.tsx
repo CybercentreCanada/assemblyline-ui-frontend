@@ -58,6 +58,10 @@ export abstract class BaseParam<T extends ValueTypes> {
     return this;
   }
 
+  public has(origin: T = null, value: unknown = undefined): boolean {
+    return value === undefined ? true : origin === value;
+  }
+
   public hidden(value: boolean = true) {
     this._hidden = value;
     return this;
@@ -274,6 +278,10 @@ export class FiltersParam extends BaseParam<string[]> {
     if (!param) return;
     this._not = param._not;
     this._omit = param._omit;
+  }
+
+  public has(origin: string[] = null, value: string = undefined): boolean {
+    return value === undefined ? true : origin.includes(value);
   }
 
   public not(value: string = 'NOT') {
