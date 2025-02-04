@@ -42,6 +42,7 @@ export const ROLES = [
   'signature_manage',
   'signature_view',
   'submission_create',
+  'submission_customize',
   'submission_delete',
   'submission_manage',
   'submission_view',

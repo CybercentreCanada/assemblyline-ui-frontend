@@ -27,18 +27,11 @@ import {
   DEFAULT_BADLIST_TAG,
   HASHES
 } from 'components/models/base/badlist';
-import {
-  HASH_MAP,
-  MD5_REGEX,
-  SHA1_REGEX,
-  SHA256_REGEX,
-  SSDEEP_REGEX,
-  TLSH_REGEX
-} from 'components/models/utils/constants';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import DatePicker from 'components/visual/DatePicker';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
+import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX } from 'helpers/constants';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
