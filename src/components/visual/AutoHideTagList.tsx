@@ -45,16 +45,16 @@ const ShowMore: React.FC<ShowMoreProps> = React.memo(
   }
 );
 
-const compareTags = (a: TagProps, b: TagProps) => {
+const compareTags = (a: TagProps, b: TagProps): number => {
   const aVerdict = a.safelisted ? 4 : verdictRank(a.lvl);
   const bVerdict = b.safelisted ? 4 : verdictRank(b.lvl);
 
   const verdictComparison = aVerdict - bVerdict;
   if (verdictComparison !== 0) return verdictComparison;
-  else return a.value.localeCompare(b.value);
+  else return a.value < b.value ? -1 : 1;
 };
 
-const compareIPs = (a: TagProps, b: TagProps) => {
+const compareIPs = (a: TagProps, b: TagProps): number => {
   const aVerdict = a.safelisted ? 4 : verdictRank(a.lvl);
   const bVerdict = b.safelisted ? 4 : verdictRank(b.lvl);
 
@@ -69,7 +69,7 @@ const compareIPs = (a: TagProps, b: TagProps) => {
   }
 };
 
-const compareDomains = (a: TagProps, b: TagProps) => {
+const compareDomains = (a: TagProps, b: TagProps): number => {
   const aVerdict = a.safelisted ? 4 : verdictRank(a.lvl);
   const bVerdict = b.safelisted ? 4 : verdictRank(b.lvl);
 
@@ -81,7 +81,7 @@ const compareDomains = (a: TagProps, b: TagProps) => {
   return reversedA.localeCompare(reversedB);
 };
 
-const compareURLs = (a: TagProps, b: TagProps) => {
+const compareURLs = (a: TagProps, b: TagProps): number => {
   const aVerdict = a.safelisted ? 4 : verdictRank(a.lvl);
   const bVerdict = b.safelisted ? 4 : verdictRank(b.lvl);
 
