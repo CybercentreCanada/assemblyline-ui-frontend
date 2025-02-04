@@ -1,13 +1,15 @@
 {
   "add_workflow": "Add workflow",
   "filter": "Filter workflows...",
+  "filter.never_used.add": "Add filter query to show workflows that were never used",
+  "filter.never_used.remove": "Remove filter query to show workflows that were never used",
+  "filter.old.add": "Add filter query to show workflows not used in the past 3 months",
+  "filter.old.remove": "Remove filter query to show workflows not used in the past 3 months",
   "filtered": "workflow matching filter",
   "filtereds": "workflows matching filter",
   "noisy": "Show noisy workflows",
   "searching": "Searching...",
   "title": "Workflows",
   "total": "workflow",
-  "totals": "workflows",
-  "never_used": "Workflows that were never used",
-  "old": "Workflows not used in the past 3 months"
+  "totals": "workflows"
 }

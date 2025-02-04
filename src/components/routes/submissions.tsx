@@ -5,17 +5,17 @@ import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
+import type { SearchParams } from 'components/core/SearchParams/SearchParams';
+import { createSearchParams } from 'components/core/SearchParams/SearchParams';
+import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { SubmissionIndexed } from 'components/models/base/submission';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
-import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
-import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import { safeFieldValue } from 'helpers/utils';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ForbiddenPage from './403';
 
@@ -50,6 +50,16 @@ const SubmissionSearch = () => {
   const suggestions = useMemo<string[]>(
     () => [...Object.keys(indexes.submission).filter(name => indexes.submission[name].indexed), ...DEFAULT_SUGGESTION],
     [indexes.submission]
+  );
+
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
   );
 
   useEffect(() => {
@@ -91,29 +101,53 @@ const SubmissionSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('my_submission') },
+                tooltip: {
+                  title: search.has('filters', `params.submitter:${safeFieldValue(currentUser.username)}`)
+                    ? t('filter.personal.remove')
+                    : t('filter.personal.add')
+                },
                 icon: { children: <PersonIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => {
-                      const filters = [...o.filters, `params.submitter:${safeFieldValue(currentUser.username)}`];
-                      return { ...o, offset: 0, filters };
-                    })
+                  color: search.has('filters', `params.submitter:${safeFieldValue(currentUser.username)}`)
+                    ? 'primary'
+                    : 'default',
+                  onClick: () => handleToggleFilter(`params.submitter:${safeFieldValue(currentUser.username)}`)
                 }
               },
               {
-                tooltip: { title: t('completed_submissions') },
+                tooltip: {
+                  title: search.has('filters', 'state:completed')
+                    ? t('filter.completed.remove')
+                    : t('filter.completed.add')
+                },
                 icon: { children: <AssignmentTurnedInIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'state:completed'] }))
+                  sx: {
+                    color: !search.has('filters', 'state:completed')
+                      ? 'default'
+                      : theme.palette.mode === 'dark'
+                      ? theme.palette.success.light
+                      : theme.palette.success.dark
+                  },
+                  onClick: () => handleToggleFilter('state:completed')
                 }
               },
               {
-                tooltip: { title: t('malicious_submissions') },
+                tooltip: {
+                  title: search.has('filters', 'max_score:>=1000')
+                    ? t('filter.malicious.remove')
+                    : t('filter.malicious.add')
+                },
                 icon: { children: <BugReportOutlinedIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'max_score:>=1000'] }))
+                  sx: {
+                    color: !search.has('filters', 'max_score:>=1000')
+                      ? 'default'
+                      : theme.palette.mode === 'dark'
+                      ? theme.palette.error.light
+                      : theme.palette.error.dark
+                  },
+                  onClick: () => handleToggleFilter('max_score:>=1000')
                 }
               }
             ]}

@@ -177,6 +177,7 @@
   "safelist.title": "Safelist",
   "searching": "Searching...",
   "show_more": "Show more...",
+  "show_more.count": "more...",
   "signature.status.DEPLOYED": "DEPLOYED",
   "signature.status.DISABLED": "DISABLED",
   "signature.status.NOISY": "NOISY",

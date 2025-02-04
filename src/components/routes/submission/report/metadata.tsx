@@ -2,6 +2,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Button, Collapse, Divider, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { Fetcher } from 'borealis-ui';
 import useALContext from 'components/hooks/useALContext';
 import type { SubmissionReport } from 'components/models/ui/submission_report';
 import React, { useState } from 'react';
@@ -37,7 +38,10 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
     pageBreakBefore: 'avoid',
-    pageBreakInside: 'avoid'
+    pageBreakInside: 'avoid',
+    display: 'flex',
+    flexDirection: 'row',
+    columnGap: theme.spacing(1)
   },
   section: {
     pageBreakInside: 'avoid'
@@ -102,54 +106,14 @@ function WrappedMetadata({ report }: Props) {
           <Divider className={classes.divider} />
         </div>
         <div className={classes.section_content}>
-          {report ? (
-            Object.keys(report.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
-              .length !== 0 ? (
-              <table width="100%">
-                <tbody>
-                  {Object.keys(report.metadata)
-                    .filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
-                    .map((meta, i) => (
-                      <tr key={i}>
-                        <td style={{ width: '20%' }}>
-                          <span style={{ fontWeight: 500 }}>{meta}</span>
-                        </td>
-                        <td style={{ marginLeft: theme.spacing(1), width: '80%', wordBreak: 'break-word' }}>
-                          {report.metadata[meta]}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            ) : (
-              <Collapse in={!metaOpen} timeout="auto">
-                <pre className={classes.alert}>{t('meta.empty')}</pre>
-              </Collapse>
-            )
-          ) : (
-            <table width="100%">
-              <tbody>
-                {[...Array(3)].map((_, i) => (
-                  <tr key={i} style={{ width: '100%' }}>
-                    <td width="33%">
-                      <Skeleton />
-                    </td>
-                    <td width="67%">
-                      <Skeleton />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-          {report &&
-            Object.keys(report.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
-              .length !== 0 && (
-              <Collapse in={metaOpen} timeout="auto">
+          <div style={{ flex: 1 }}>
+            {report ? (
+              Object.keys(report.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
+                .length !== 0 ? (
                 <table width="100%">
                   <tbody>
                     {Object.keys(report.metadata)
-                      .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
+                      .filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
                       .map((meta, i) => (
                         <tr key={i}>
                           <td style={{ width: '20%' }}>
@@ -162,8 +126,60 @@ function WrappedMetadata({ report }: Props) {
                       ))}
                   </tbody>
                 </table>
-              </Collapse>
+              ) : (
+                <Collapse in={!metaOpen} timeout="auto">
+                  <pre className={classes.alert}>{t('meta.empty')}</pre>
+                </Collapse>
+              )
+            ) : (
+              <table width="100%">
+                <tbody>
+                  {[...Array(3)].map((_, i) => (
+                    <tr key={i} style={{ width: '100%' }}>
+                      <td width="33%">
+                        <Skeleton />
+                      </td>
+                      <td width="67%">
+                        <Skeleton />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
+            {report &&
+              Object.keys(report.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
+                .length !== 0 && (
+                <Collapse in={metaOpen} timeout="auto">
+                  <table width="100%">
+                    <tbody>
+                      {Object.keys(report.metadata)
+                        .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
+                        .map((meta, i) => (
+                          <tr key={i}>
+                            <td style={{ width: '20%' }}>
+                              <span style={{ fontWeight: 500 }}>{meta}</span>
+                            </td>
+                            <td style={{ marginLeft: theme.spacing(1), width: '80%', wordBreak: 'break-word' }}>
+                              {report.metadata[meta]}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </Collapse>
+              )}
+          </div>
+          {report?.metadata?.eml_path && (
+            <div>
+              <Fetcher
+                fetcherId="eml-preview.preview"
+                type="eml_id"
+                value={report?.metadata?.eml_path}
+                slotProps={{ paper: { style: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } } }}
+              />
+            </div>
+          )}
         </div>
       </div>
     )

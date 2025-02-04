@@ -7,6 +7,10 @@ import Typography from '@mui/material/Typography';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
+import type { SearchParams } from 'components/core/SearchParams/SearchParams';
+import { createSearchParams } from 'components/core/SearchParams/SearchParams';
+import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
+import type { SearchParamsResult } from 'components/core/SearchParams/SearchParser';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -15,10 +19,6 @@ import type { SearchResult } from 'components/models/ui/search';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
-import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
-import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
-import type { SearchParamsResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SafelistTable from 'components/visual/SearchResult/safelist';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -60,6 +60,16 @@ const SafelistSearch = () => {
         ? [...Object.keys(indexes.safelist).filter(name => indexes.safelist[name].indexed), ...DEFAULT_SUGGESTION]
         : [...DEFAULT_SUGGESTION],
     [indexes.safelist]
+  );
+
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
   );
 
   const handleReload = useCallback(
@@ -158,25 +168,31 @@ const SafelistSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('user') },
+                tooltip: {
+                  title: search.has('filters', 'sources.type:user') ? t('filter.user.remove') : t('filter.user.add')
+                },
                 icon: { children: <PersonOutlineOutlinedIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'sources.type:user'] }))
+                  color: search.has('filters', 'sources.type:user') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('sources.type:user')
                 }
               },
               {
-                tooltip: { title: t('tag') },
+                tooltip: { title: search.has('filters', 'type:tag') ? t('filter.tag.remove') : t('filter.tag.add') },
                 icon: { children: <LabelOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:tag'] }))
+                  color: search.has('filters', 'type:tag') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:tag')
                 }
               },
               {
-                tooltip: { title: t('disabled') },
+                tooltip: {
+                  title: search.has('filters', 'enabled:false') ? t('filter.disabled.remove') : t('filter.disabled.add')
+                },
                 icon: { children: <BlockOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'enabled:false'] }))
+                  color: search.has('filters', 'enabled:false') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('enabled:false')
                 }
               }
             ]}

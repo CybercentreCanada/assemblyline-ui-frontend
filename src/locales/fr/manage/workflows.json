@@ -1,12 +1,14 @@
 {
   "add_workflow": "Ajouter un flux de travail",
   "filter": "Filtrer les flux de travail ...",
+  "filter.never_used.add": "Ajouter un filtre pour afficher les flux de travail qui n'ont jamais été utilisés",
+  "filter.never_used.remove": "Supprimer le filtre pour afficher les flux de travail qui n'ont jamais été utilisés",
+  "filter.old.add": "Ajouter un filtre pour afficher les flux de travail non utilisés au cours des 3 derniers mois",
+  "filter.old.remove": "Supprimer le filtre pour afficher les flux de travail non utilisés au cours des 3 derniers mois",
   "filtered": "flu de travail correspondant au filtre",
   "filtereds": "flux de travail correspondant au filtre",
   "searching": "Recherche en cours...",
   "title": "Flux de travail",
   "total": "flu de travail",
-  "totals": "flux de travail",
-  "never_used": "Flux de travail qui n'ont jamais été utilisés",
-  "old": "Flux de travail non utilisés au cours des 3 derniers mois"
+  "totals": "flux de travail"
 }

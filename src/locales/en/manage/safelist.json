@@ -1,13 +1,16 @@
 {
   "add_safelist": "Add an item to the safelist",
   "filter": "Filter safelisted hashes...",
+  "filter.disabled.add": "Add filter query to show disabled hashes",
+  "filter.disabled.remove": "Remove filter query to show disabled hashes",
+  "filter.tag.add": "Add filter query to show tag based hashes",
+  "filter.tag.remove": "Remove filter query to show tag based hashes",
+  "filter.user.add": "Add filter query to show hashes added by users",
+  "filter.user.remove": "Remove filter query to show hashes added by users",
   "filtered": "hash matching filter",
   "filtereds": "hashes matching filter",
   "searching": "Searching...",
   "title": "Safelist",
   "total": "hash in safelist",
-  "totals": "hashes in safelist",
-  "user": "Hashes added by users",
-  "disabled": "Disabled hashes",
-  "tag": "Tag based hashes"
+  "totals": "hashes in safelist"
 }

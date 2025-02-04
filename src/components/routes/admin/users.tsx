@@ -4,15 +4,15 @@ import { Grid, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
+import type { SearchParams } from 'components/core/SearchParams/SearchParams';
+import { createSearchParams } from 'components/core/SearchParams/SearchParams';
+import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
+import type { SearchParamsResult } from 'components/core/SearchParams/SearchParser';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { UserIndexed } from 'components/models/base/user';
 import type { SearchResult } from 'components/models/ui/search';
 import { SearchHeader } from 'components/visual/SearchBar/SearchHeader';
-import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
-import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
-import type { SearchParamsResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import UsersTable from 'components/visual/SearchResult/users';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -42,6 +42,16 @@ const UsersSearch = () => {
   const [userResults, setUserResults] = useState<SearchResult<UserIndexed>>(null);
   const [searching, setSearching] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
+
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
+  );
 
   const handleReload = useCallback(
     (body: SearchParamsResult<UsersParams>) => {
@@ -119,17 +129,25 @@ const UsersSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('admins') },
+                tooltip: {
+                  title: search.has('filters', 'type:admin') ? t('filter.admins.remove') : t('filter.admins.add')
+                },
                 icon: { children: <SupervisorAccountIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:admin'] }))
+                  color: search.has('filters', 'type:admin') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:admin')
                 }
               },
               {
-                tooltip: { title: t('disabled') },
+                tooltip: {
+                  title: search.has('filters', 'is_active:false')
+                    ? t('filter.disabled.remove')
+                    : t('filter.disabled.add')
+                },
                 icon: { children: <BlockIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'is_active:false'] }))
+                  color: search.has('filters', 'is_active:false') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('is_active:false')
                 }
               }
             ]}

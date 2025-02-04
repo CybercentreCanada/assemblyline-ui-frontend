@@ -6,6 +6,9 @@ import FormControl from '@mui/material/FormControl';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
+import type { SearchParams } from 'components/core/SearchParams/SearchParams';
+import { createSearchParams } from 'components/core/SearchParams/SearchParams';
+import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Error } from 'components/models/base/error';
@@ -13,9 +16,6 @@ import type { CustomUser } from 'components/models/ui/user';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
-import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
-import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import ErrorsTable from 'components/visual/SearchResult/errors';
 import { safeFieldValue } from 'helpers/utils';
@@ -97,6 +97,16 @@ const ErrorViewer = () => {
     (error_key: string) => navigate(`${location.pathname}${location.search || ''}#${error_key}`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.search]
+  );
+
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
   );
 
   useEffect(() => {
@@ -207,26 +217,37 @@ const ErrorViewer = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('exception') },
+                tooltip: {
+                  title: search.has('filters', 'type:(EXCEPTION OR UNKNOWN)')
+                    ? t('filter.exception.remove')
+                    : t('filter.exception.add')
+                },
                 icon: { children: <ReportProblemOutlinedIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:(EXCEPTION OR UNKNOWN)'] }))
+                  color: search.has('filters', 'type:(EXCEPTION OR UNKNOWN)') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:(EXCEPTION OR UNKNOWN)')
                 }
               },
               {
-                tooltip: { title: t('canceled') },
+                tooltip: {
+                  title: search.has('filters', 'type:(SERVICE* OR TASK*)')
+                    ? t('filter.canceled.remove')
+                    : t('filter.canceled.add')
+                },
                 icon: { children: <CancelOutlinedIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:(SERVICE* OR TASK*)'] }))
+                  color: search.has('filters', 'type:(SERVICE* OR TASK*)') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:(SERVICE* OR TASK*)')
                 }
               },
               {
-                tooltip: { title: t('maxed') },
+                tooltip: {
+                  title: search.has('filters', 'type:MAX*') ? t('filter.maxed.remove') : t('filter.maxed.add')
+                },
                 icon: { children: <PanToolOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:MAX*'] }))
+                  color: search.has('filters', 'type:MAX*') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:MAX*')
                 }
               }
             ]}
