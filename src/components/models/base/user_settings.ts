@@ -1,4 +1,5 @@
-import type { SelectedService, ServiceSpecification } from './service';
+import type { SubmissionProfileParams } from './config';
+import type { SelectedServiceCategory, ServiceSpecification } from './service';
 
 export const ENCODINGS = ['cart', 'raw', 'zip'] as const;
 export const VIEWS = ['report', 'details'] as const;
@@ -43,20 +44,26 @@ export type UserSettings = {
   /** Ignore filtering services? */
   ignore_filtering: boolean;
 
+  /** Should we ignore recursion prevention? */
+  ignore_recursion_prevention: boolean;
+
   /** Is the file submitted already known to be malicious? */
   malicious: boolean;
 
   /** Default priority for the submissions */
   priority: number;
 
-  /** Should the submission do extra profiling? */
-  profile: boolean;
+  /** Preferred submission profile */
+  preferred_submission_profile?: string;
+
+  /** Default submission profile settings */
+  submission_profiles?: { [profile_name: string]: SubmissionProfileParams };
 
   /** Default service specific settings */
   service_spec: ServiceSpecification[];
 
   /** Default service selection */
-  services: SelectedService[];
+  services: SelectedServiceCategory[];
 
   /** Default view for completed submissions */
   submission_view: View;

@@ -31,7 +31,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface ClassificationProps {
+export interface ClassificationProps {
   c12n: string;
   setClassification?: (classification: string) => void;
   size?: 'medium' | 'small' | 'tiny';
@@ -351,9 +351,9 @@ function WrappedClassification({
                                   }
                                   onClick={() => toggleGroups(grp)}
                                 >
-                                  <ListItemText 
-                                    style={{ textAlign: 'center' }} 
-                                    primary={applyAliases(grp.name, classificationAliases)} 
+                                  <ListItemText
+                                    style={{ textAlign: 'center' }}
+                                    primary={applyAliases(grp.name, classificationAliases)}
                                   />
                                 </ListItem>
                               ))}

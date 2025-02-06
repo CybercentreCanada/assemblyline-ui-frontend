@@ -533,7 +533,11 @@ const WrappedSourceDetail = ({
                       <div style={{ textAlign: 'center', paddingTop: theme.spacing(3), flexGrow: 1 }}>
                         <Typography variant="subtitle2" color="textSecondary">
                           {`${t('update.label.last_successful')}: `}
-                          <Moment variant="fromNow">{source.status.last_successful_update}</Moment>
+                          {source.status.last_successful_update !== '1970-01-01T00:00:00Z' ? (
+                            <Moment variant="fromNow">{source.status.last_successful_update}</Moment>
+                          ) : (
+                            t('update.never')
+                          )}
                         </Typography>
                         <Typography variant="subtitle2" color="textSecondary">
                           {`${t('update.label.status')}: ${source.status.message}`}

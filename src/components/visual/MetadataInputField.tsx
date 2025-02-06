@@ -13,7 +13,7 @@ import { makeStyles, useTheme } from '@mui/styles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Metadata } from 'components/models/base/config';
 import DatePicker from 'components/visual/DatePicker';
-import { matchURL } from 'helpers/utils';
+import { isURL } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 
 interface MetadataInputFieldProps {
@@ -47,7 +47,7 @@ const isValid = (input: string, field_cfg: Metadata) => {
     return true;
   }
 
-  if (field_cfg.validator_type === 'uri' && matchURL(input)) {
+  if (field_cfg.validator_type === 'uri' && isURL(input)) {
     return true;
   } else if (
     field_cfg.validator_type !== 'uri' &&

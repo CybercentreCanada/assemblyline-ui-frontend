@@ -42,6 +42,7 @@
   "update": "Update the current signature source",
   "update.label.last_successful": "Last Successful Update",
   "update.label.status": "Status",
+  "update.never": "Never",
   "update.response.success": "The following source was triggered for update",
   "update_all": "Update all signature sources for service",
   "update_all.response.success": "All sources for the following service were triggered for update",
