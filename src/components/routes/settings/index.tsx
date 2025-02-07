@@ -48,7 +48,9 @@ const SettingsContent = () => {
           s.next = _.cloneDeep(decompress);
           s.prev = _.cloneDeep(decompress);
 
-          const nextTab = ['interface', ...Object.keys(s.next.profiles)].includes(tabParam) ? tabParam : 'interface';
+          const nextTab = ['interface', ...Object.keys(s.next.submission_profiles)].includes(tabParam)
+            ? tabParam
+            : 'interface';
           navigate(`/settings/${nextTab}`);
 
           return s;
@@ -71,7 +73,9 @@ const SettingsContent = () => {
   useEffect(() => {
     form.setStore(s => {
       if (!s.next) return s;
-      s.state.tab = ['interface', ...Object.keys(s.next.profiles)].includes(tabParam) ? tabParam : 'interface';
+      s.state.tab = ['interface', ...Object.keys(s.next.submission_profiles)].includes(tabParam)
+        ? tabParam
+        : 'interface';
       return s;
     });
   }, [form, tabParam]);

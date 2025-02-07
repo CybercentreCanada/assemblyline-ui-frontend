@@ -650,35 +650,7 @@ export const CONFIGURATION: Configuration = {
       strict_schemes: [],
       submit: {}
     },
-    profiles: {
-      'Dynamic Analysis': {
-        auto_archive: false,
-        services: {
-          excluded: [],
-          rescan: [],
-          resubmit: [],
-          selected: []
-        }
-      },
-      'Static Analysis': {
-        auto_archive: false,
-        services: {
-          excluded: [],
-          rescan: [],
-          resubmit: [],
-          selected: []
-        }
-      },
-      'Static Analysis with Internet': {
-        auto_archive: false,
-        services: {
-          excluded: [],
-          rescan: [],
-          resubmit: [],
-          selected: []
-        }
-      }
-    },
+    profiles: {},
     sha256_sources: [],
     tag_types: {
       attribution: [],

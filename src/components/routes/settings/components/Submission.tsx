@@ -43,7 +43,7 @@ export const SubmissionSection = () => {
             <List inset>
               {c12nDef.enforce && (
                 <form.Subscribe
-                  selector={state => state.values?.next?.profiles[profile]?.classification}
+                  selector={state => state.values?.next?.submission_profiles[profile]?.classification}
                   children={value => (
                     <ClassificationListInput
                       id="settings:submissions.classification"
@@ -54,7 +54,7 @@ export const SubmissionSection = () => {
                       disabled={disabled || !customize}
                       onChange={v => {
                         form.setStore(s => {
-                          s.next.profiles[profile].classification.value = v;
+                          s.next.submission_profiles[profile].classification.value = v;
                           return s;
                         });
                       }}
@@ -65,7 +65,11 @@ export const SubmissionSection = () => {
 
               <form.Subscribe
                 selector={state =>
-                  state.values?.next?.profiles?.[profile]?.ttl || { value: null, default: null, editable: false }
+                  state.values?.next?.submission_profiles?.[profile]?.ttl || {
+                    value: null,
+                    default: null,
+                    editable: false
+                  }
                 }
                 children={state => (
                   <NumberListInput
@@ -81,13 +85,13 @@ export const SubmissionSection = () => {
                     max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
                     onChange={(event, value) => {
                       form.setStore(s => {
-                        s.next.profiles[profile].ttl = { ...state, value };
+                        s.next.submission_profiles[profile].ttl = { ...state, value };
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.next.profiles[profile].ttl = { ...state, value: state.default };
+                        s.next.submission_profiles[profile].ttl = { ...state, value: state.default };
                         return s;
                       });
                     }}
@@ -97,7 +101,11 @@ export const SubmissionSection = () => {
 
               <form.Subscribe
                 selector={state =>
-                  state.values?.next?.profiles?.[profile]?.deep_scan || { value: null, default: null, editable: false }
+                  state.values?.next?.submission_profiles?.[profile]?.deep_scan || {
+                    value: null,
+                    default: null,
+                    editable: false
+                  }
                 }
                 children={state => (
                   <BooleanListInput
@@ -110,13 +118,13 @@ export const SubmissionSection = () => {
                     reset={state.default !== null && state.value !== state.default}
                     onChange={(event, value) => {
                       form.setStore(s => {
-                        s.next.profiles[profile].deep_scan = { ...state, value };
+                        s.next.submission_profiles[profile].deep_scan = { ...state, value };
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.next.profiles[profile].deep_scan = { ...state, value: state.default };
+                        s.next.submission_profiles[profile].deep_scan = { ...state, value: state.default };
                         return s;
                       });
                     }}
@@ -126,7 +134,7 @@ export const SubmissionSection = () => {
 
               <form.Subscribe
                 selector={state =>
-                  state.values?.next?.profiles?.[profile]?.ignore_recursion_prevention || {
+                  state.values?.next?.submission_profiles?.[profile]?.ignore_recursion_prevention || {
                     value: null,
                     default: null,
                     editable: false
@@ -143,13 +151,13 @@ export const SubmissionSection = () => {
                     reset={state.default !== null && state.value !== state.default}
                     onChange={(event, value) => {
                       form.setStore(s => {
-                        s.next.profiles[profile].ignore_recursion_prevention = { ...state, value };
+                        s.next.submission_profiles[profile].ignore_recursion_prevention = { ...state, value };
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.next.profiles[profile].ignore_recursion_prevention = {
+                        s.next.submission_profiles[profile].ignore_recursion_prevention = {
                           ...state,
                           value: state.default
                         };
@@ -162,7 +170,7 @@ export const SubmissionSection = () => {
 
               <form.Subscribe
                 selector={state =>
-                  state.values?.next?.profiles?.[profile]?.ignore_filtering || {
+                  state.values?.next?.submission_profiles?.[profile]?.ignore_filtering || {
                     value: null,
                     default: null,
                     editable: false
@@ -179,13 +187,13 @@ export const SubmissionSection = () => {
                     reset={state.default !== null && state.value !== state.default}
                     onChange={(event, value) => {
                       form.setStore(s => {
-                        s.next.profiles[profile].ignore_filtering = { ...state, value };
+                        s.next.submission_profiles[profile].ignore_filtering = { ...state, value };
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.next.profiles[profile].ignore_filtering = { ...state, value: state.default };
+                        s.next.submission_profiles[profile].ignore_filtering = { ...state, value: state.default };
                         return s;
                       });
                     }}
@@ -195,7 +203,7 @@ export const SubmissionSection = () => {
 
               <form.Subscribe
                 selector={state =>
-                  state.values?.next?.profiles?.[profile]?.generate_alert || {
+                  state.values?.next?.submission_profiles?.[profile]?.generate_alert || {
                     value: null,
                     default: null,
                     editable: false
@@ -212,13 +220,13 @@ export const SubmissionSection = () => {
                     reset={state.default !== null && state.value !== state.default}
                     onChange={(event, value) => {
                       form.setStore(s => {
-                        s.next.profiles[profile].generate_alert = { ...state, value };
+                        s.next.submission_profiles[profile].generate_alert = { ...state, value };
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.next.profiles[profile].generate_alert = { ...state, value: state.default };
+                        s.next.submission_profiles[profile].generate_alert = { ...state, value: state.default };
                         return s;
                       });
                     }}
@@ -228,7 +236,7 @@ export const SubmissionSection = () => {
 
               <form.Subscribe
                 selector={state =>
-                  state.values?.next?.profiles?.[profile]?.ignore_cache || {
+                  state.values?.next?.submission_profiles?.[profile]?.ignore_cache || {
                     value: null,
                     default: null,
                     editable: false
@@ -245,13 +253,13 @@ export const SubmissionSection = () => {
                     reset={state.default !== null && state.value !== state.default}
                     onChange={(event, value) => {
                       form.setStore(s => {
-                        s.next.profiles[profile].ignore_cache = { ...state, value };
+                        s.next.submission_profiles[profile].ignore_cache = { ...state, value };
                         return s;
                       });
                     }}
                     onReset={() => {
                       form.setStore(s => {
-                        s.next.profiles[profile].ignore_cache = { ...state, value: state.default };
+                        s.next.submission_profiles[profile].ignore_cache = { ...state, value: state.default };
                         return s;
                       });
                     }}

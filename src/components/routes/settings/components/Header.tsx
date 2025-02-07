@@ -37,7 +37,7 @@ export const HeaderSection = () => {
           });
         },
         onFailure: api_data => {
-          if (api_data.api_status_code === 403) {
+          if (api_data.api_status_code === 403 || api_data.api_status_code === 401) {
             showErrorMessage(api_data.api_error_message);
           }
         },

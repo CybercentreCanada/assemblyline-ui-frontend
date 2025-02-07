@@ -14,6 +14,7 @@ import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput'
 import { NumberListInput } from 'components/visual/ListInputs/NumberListInput';
 import { SelectListInput } from 'components/visual/ListInputs/SelectListInput';
 import { TextListInput } from 'components/visual/ListInputs/TextListInput';
+import { ShowMore } from 'components/visual/ShowMore';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -46,10 +47,9 @@ const Parameter = React.memo(
     return (
       <form.Subscribe
         key={`${param.name}-${param_id}`}
-        selector={state => state.values.next.profiles[profile].service_spec[spec_id].params[param_id].value}
+        selector={state => state.values.next.submission_profiles[profile].service_spec[spec_id].params[param_id].value}
         children={state => {
           const primary = param.name.replaceAll('_', ' ');
-
           switch (param.type) {
             case 'str':
               return (
@@ -63,13 +63,13 @@ const Parameter = React.memo(
                   value={state as string}
                   onChange={(event, value) => {
                     form.setStore(s => {
-                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = value;
+                      s.next.submission_profiles[profile].service_spec[spec_id].params[param_id].value = value;
                       return s;
                     });
                   }}
                   onReset={() => {
                     form.setStore(s => {
-                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = param.default;
+                      s.next.submission_profiles[profile].service_spec[spec_id].params[param_id].value = param.default;
                       return s;
                     });
                   }}
@@ -87,13 +87,13 @@ const Parameter = React.memo(
                   value={state as number}
                   onChange={(event, value) => {
                     form.setStore(s => {
-                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = value;
+                      s.next.submission_profiles[profile].service_spec[spec_id].params[param_id].value = value;
                       return s;
                     });
                   }}
                   onReset={() => {
                     form.setStore(s => {
-                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = param.default;
+                      s.next.submission_profiles[profile].service_spec[spec_id].params[param_id].value = param.default;
                       return s;
                     });
                   }}
@@ -111,13 +111,13 @@ const Parameter = React.memo(
                   value={state as boolean}
                   onChange={(event, value) => {
                     form.setStore(s => {
-                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = value;
+                      s.next.submission_profiles[profile].service_spec[spec_id].params[param_id].value = value;
                       return s;
                     });
                   }}
                   onReset={() => {
                     form.setStore(s => {
-                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = param.default;
+                      s.next.submission_profiles[profile].service_spec[spec_id].params[param_id].value = param.default;
                       return s;
                     });
                   }}
@@ -139,13 +139,13 @@ const Parameter = React.memo(
                   }))}
                   onChange={(event, value) => {
                     form.setStore(s => {
-                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = value;
+                      s.next.submission_profiles[profile].service_spec[spec_id].params[param_id].value = value;
                       return s;
                     });
                   }}
                   onReset={() => {
                     form.setStore(s => {
-                      s.next.profiles[profile].service_spec[spec_id].params[param_id].value = param.default;
+                      s.next.submission_profiles[profile].service_spec[spec_id].params[param_id].value = param.default;
                       return s;
                     });
                   }}
@@ -185,13 +185,13 @@ const Service = React.memo(
       (selected: boolean) => {
         form.setStore(s => {
           if (selected) {
-            s.next.profiles[profile].services[cat_id].selected = false;
-            s.next.profiles[profile].services[cat_id].services[svr_id].selected = false;
+            s.next.submission_profiles[profile].services[cat_id].selected = false;
+            s.next.submission_profiles[profile].services[cat_id].services[svr_id].selected = false;
           } else {
-            s.next.profiles[profile].services[cat_id].services[svr_id].selected = true;
-            s.next.profiles[profile].services[cat_id].selected = s.next.profiles[profile].services[
-              cat_id
-            ].services.every(srv => srv.selected);
+            s.next.submission_profiles[profile].services[cat_id].services[svr_id].selected = true;
+            s.next.submission_profiles[profile].services[cat_id].selected = s.next.submission_profiles[
+              profile
+            ].services[cat_id].services.every(srv => srv.selected);
           }
           return s;
         });
@@ -199,16 +199,39 @@ const Service = React.memo(
       [cat_id, form, profile, svr_id]
     );
 
+    const calculateParams = useCallback(
+      (service_spec: ServiceSpecification, selected: boolean) => {
+        if (!service_spec?.params)
+          return { show: [], hidden: [] } as {
+            show: [ServiceParameter, number][];
+            hidden: [ServiceParameter, number][];
+          };
+        return service_spec.params.reduce(
+          (prev, current, i) =>
+            (selected && current.editable) || customize
+              ? { ...prev, show: [...prev.show, [current, i]] }
+              : { ...prev, hidden: [...prev.hidden, [current, i]] },
+          { show: [], hidden: [] } as { show: [ServiceParameter, number][]; hidden: [ServiceParameter, number][] }
+        );
+      },
+      [customize]
+    );
+
     return (
       <form.Subscribe
         key={`${cat_id}-${svr_id}`}
         selector={state => [
-          state.values.next.profiles[profile].services[cat_id].services[svr_id].selected,
-          state.values.next.profiles[profile].service_spec.findIndex(spec => spec.name === service.name)
+          state.values.next.submission_profiles[profile].services[cat_id].services[svr_id].selected,
+          state.values.next.submission_profiles[profile].service_spec.findIndex(spec => spec.name === service.name)
         ]}
         children={([selected, spec_id]) => {
           const specID = spec_id as number;
-          const spec = specID >= 0 ? form.state.values.next.profiles[profile].service_spec[specID] : null;
+          const spec = specID >= 0 ? form.state.values.next.submission_profiles[profile].service_spec[specID] : null;
+
+          const params = calculateParams(spec, selected as boolean) as {
+            show: [ServiceParameter, number][];
+            hidden: [ServiceParameter, number][];
+          };
 
           return (
             <div
@@ -226,9 +249,10 @@ const Service = React.memo(
                 onChange={!customize ? null : (event, checked) => handleChange(checked)}
               />
 
-              {spec?.params?.length > 0 && (
+              {params && (
                 <List inset>
-                  {spec.params.map((param, param_id) => (
+                  {params.show.map(([param, param_id]) => (
+                    // For restricted users, they should only see what they can edit until they select the "Show more" button
                     <Parameter
                       key={`${param.name}-${param_id}`}
                       customize={customize}
@@ -242,6 +266,27 @@ const Service = React.memo(
                       spec={spec}
                     />
                   ))}
+                  {!customize && params.hidden.length > 0 && (
+                    <ShowMore
+                      variant="long"
+                      sx={{ width: '100%' }}
+                      children={params.hidden.map(([param, param_id]) => (
+                        // For restricted users, they should only see what they can edit until they select the "Show more" button
+                        <Parameter
+                          key={`${param.name}-${param_id}`}
+                          customize={customize}
+                          disabled={disabled}
+                          loading={loading}
+                          param_id={param_id}
+                          param={param}
+                          profile={profile}
+                          selected={selected as boolean}
+                          spec_id={specID}
+                          spec={spec}
+                        />
+                      ))}
+                    />
+                  )}
                 </List>
               )}
             </div>
@@ -277,21 +322,21 @@ const Category = React.memo(
       (selected: boolean) => {
         form.setStore(s => {
           if (selected) {
-            s.next.profiles[profile].services[cat_id].selected = false;
-            s.next.profiles[profile].services[cat_id].services = s.next.profiles[profile].services[cat_id].services.map(
-              srv => ({
-                ...srv,
-                selected: false
-              })
-            );
+            s.next.submission_profiles[profile].services[cat_id].selected = false;
+            s.next.submission_profiles[profile].services[cat_id].services = s.next.submission_profiles[
+              profile
+            ].services[cat_id].services.map(srv => ({
+              ...srv,
+              selected: false
+            }));
           } else {
-            s.next.profiles[profile].services[cat_id].selected = true;
-            s.next.profiles[profile].services[cat_id].services = s.next.profiles[profile].services[cat_id].services.map(
-              srv => ({
-                ...srv,
-                selected: true
-              })
-            );
+            s.next.submission_profiles[profile].services[cat_id].selected = true;
+            s.next.submission_profiles[profile].services[cat_id].services = s.next.submission_profiles[
+              profile
+            ].services[cat_id].services.map(srv => ({
+              ...srv,
+              selected: true
+            }));
           }
 
           return s;
@@ -303,8 +348,10 @@ const Category = React.memo(
     return (
       <form.Subscribe
         selector={state => {
-          const selected = state.values.next.profiles[profile].services[cat_id].selected;
-          const list = state.values.next.profiles[profile].services[cat_id].services.map(svr => svr.selected);
+          const selected = state.values.next.submission_profiles[profile].services[cat_id].selected;
+          const list = state.values.next.submission_profiles[profile].services[cat_id].services.map(
+            svr => svr.selected
+          );
           return [selected, !list.every(i => i) && list.some(i => i)];
         }}
         children={([selected, indeterminate]) => (
@@ -374,7 +421,7 @@ export const ServicesSection = () => {
             />
 
             <form.Subscribe
-              selector={state => state.values.next.profiles[profile].services}
+              selector={state => state.values.next.submission_profiles[profile].services}
               children={categories =>
                 categories.map((category, cat_id) => (
                   <Category

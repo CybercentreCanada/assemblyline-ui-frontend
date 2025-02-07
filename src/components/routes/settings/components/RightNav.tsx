@@ -15,14 +15,14 @@ export const RightNav = () => {
     (selected: boolean, profile: SettingsStore['state']['tab'], cat_id: number) => {
       form.setStore(s => {
         if (selected) {
-          s.next.profiles[profile].services[cat_id].selected = false;
-          s.next.profiles[profile].services[cat_id].services.forEach((svr, i) => {
-            s.next.profiles[profile].services[cat_id].services[i].selected = false;
+          s.next.submission_profiles[profile].services[cat_id].selected = false;
+          s.next.submission_profiles[profile].services[cat_id].services.forEach((svr, i) => {
+            s.next.submission_profiles[profile].services[cat_id].services[i].selected = false;
           });
         } else {
-          s.next.profiles[profile].services[cat_id].selected = true;
-          s.next.profiles[profile].services[cat_id].services.forEach((svr, i) => {
-            s.next.profiles[profile].services[cat_id].services[i].selected = true;
+          s.next.submission_profiles[profile].services[cat_id].selected = true;
+          s.next.submission_profiles[profile].services[cat_id].services.forEach((svr, i) => {
+            s.next.submission_profiles[profile].services[cat_id].services[i].selected = true;
           });
         }
 
@@ -36,13 +36,13 @@ export const RightNav = () => {
     (selected: boolean, profile: SettingsStore['state']['tab'], cat_id: number, svr_id: number) => {
       form.setStore(s => {
         if (selected) {
-          s.next.profiles[profile].services[cat_id].selected = false;
-          s.next.profiles[profile].services[cat_id].services[svr_id].selected = false;
+          s.next.submission_profiles[profile].services[cat_id].selected = false;
+          s.next.submission_profiles[profile].services[cat_id].services[svr_id].selected = false;
         } else {
-          s.next.profiles[profile].services[cat_id].services[svr_id].selected = true;
-          s.next.profiles[profile].services[cat_id].selected = s.next.profiles[profile].services[cat_id].services.every(
-            srv => srv.selected
-          );
+          s.next.submission_profiles[profile].services[cat_id].services[svr_id].selected = true;
+          s.next.submission_profiles[profile].services[cat_id].selected = s.next.submission_profiles[profile].services[
+            cat_id
+          ].services.every(srv => srv.selected);
         }
         return s;
       });
@@ -91,7 +91,7 @@ export const RightNav = () => {
             />
 
             <form.Subscribe
-              selector={state => state.values?.next?.profiles?.[profile]?.services || []}
+              selector={state => state.values?.next?.submission_profiles?.[profile]?.services || []}
               children={categories =>
                 categories.map((category, cat_id) => (
                   <div key={cat_id} style={{ display: 'contents' }}>
@@ -101,8 +101,8 @@ export const RightNav = () => {
                       children={active => (
                         <form.Subscribe
                           selector={state => {
-                            const selected = state.values.next.profiles[profile].services[cat_id].selected;
-                            const list = state.values.next.profiles[profile].services[cat_id].services.map(
+                            const selected = state.values.next.submission_profiles[profile].services[cat_id].selected;
+                            const list = state.values.next.submission_profiles[profile].services[cat_id].services.map(
                               svr => svr.selected
                             );
                             return [selected, !list.every(i => i) && list.some(i => i)];
@@ -127,7 +127,9 @@ export const RightNav = () => {
                       )}
                     />
                     <form.Subscribe
-                      selector={state => state.values?.next?.profiles?.[profile]?.services?.[cat_id]?.services || []}
+                      selector={state =>
+                        state.values?.next?.submission_profiles?.[profile]?.services?.[cat_id]?.services || []
+                      }
                       children={services =>
                         services.map((service, svr_id) => (
                           <ActiveAnchor
@@ -136,8 +138,9 @@ export const RightNav = () => {
                             children={active => (
                               <form.Subscribe
                                 selector={state => [
-                                  state.values.next.profiles[profile].services[cat_id].services[svr_id].selected,
-                                  state.values.next.profiles[profile].service_spec.some(
+                                  state.values.next.submission_profiles[profile].services[cat_id].services[svr_id]
+                                    .selected,
+                                  state.values.next.submission_profiles[profile].service_spec.some(
                                     spec => spec.name === service.name
                                   )
                                 ]}
