@@ -38,7 +38,7 @@ export const { FormProvider, useForm } = createFormContext<SettingsStore>({
     state: {
       tab: null,
       disabled: false,
-      loading: true,
+      loading: false,
       submitting: false,
       customize: false,
       confirm: false

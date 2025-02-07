@@ -1,7 +1,5 @@
 import TableOfContentProvider, { useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
-import type { UserSettings } from 'components/models/base/user_settings';
 import ForbiddenPage from 'components/routes/403';
 import { PageLayout } from 'components/visual/Layouts/PageLayout';
 import _ from 'lodash';
@@ -24,9 +22,8 @@ type Params = {
 
 const SettingsContent = () => {
   const navigate = useNavigate();
-  const { apiCall } = useMyAPI();
   const { tab: tabParam } = useParams<Params>();
-  const { user: currentUser, configuration } = useALContext();
+  const { user: currentUser, configuration, settings } = useALContext();
 
   const form = useForm();
   const { rootRef, headerRef } = useTableOfContent();
@@ -39,33 +36,18 @@ const SettingsContent = () => {
     });
 
     // Load user on start
-    apiCall<UserSettings>({
-      url: `/api/v4/user/settings/${currentUser.username}/`,
-      onSuccess: ({ api_response }) => {
-        form.setStore(s => {
-          const decompress = loadSubmissionProfiles(api_response, configuration.submission.profiles);
+    form.setStore(s => {
+      const decompress = loadSubmissionProfiles(settings, configuration.submission.profiles);
 
-          s.next = _.cloneDeep(decompress);
-          s.prev = _.cloneDeep(decompress);
+      s.next = _.cloneDeep(decompress);
+      s.prev = _.cloneDeep(decompress);
 
-          const nextTab = ['interface', ...Object.keys(s.next.submission_profiles)].includes(tabParam)
-            ? tabParam
-            : 'interface';
-          navigate(`/settings/${nextTab}`);
+      const nextTab = ['interface', ...Object.keys(s.next.submission_profiles)].includes(tabParam)
+        ? tabParam
+        : 'interface';
+      navigate(`/settings/${nextTab}`);
 
-          return s;
-        });
-      },
-      onEnter: () =>
-        form.setStore(s => {
-          s.state.loading = true;
-          return s;
-        }),
-      onExit: () =>
-        form.setStore(s => {
-          s.state.loading = false;
-          return s;
-        })
+      return s;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
