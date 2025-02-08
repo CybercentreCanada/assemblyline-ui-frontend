@@ -17,7 +17,7 @@ type Props = {
 const WrappedSubmissionProfile = ({ loading = false, disabled = false }: Props) => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const { user: currentUser, configuration } = useALContext();
+  const { configuration, settings } = useALContext();
 
   const form = useForm();
 
@@ -28,7 +28,9 @@ const WrappedSubmissionProfile = ({ loading = false, disabled = false }: Props) 
         s.state.profile = profileKey;
 
         // Update settings with profile settings
-        Object.entries(s.settings.profiles[s.state.profile]).forEach(([k, v]) => (s.settings[k] = v.value));
+        Object.entries(s.settings.profiles[s.state.profile]).forEach(
+          ([k, v]) => (s.settings = { ...s.settings, [k]: 'value' in v ? v.value : v })
+        );
 
         return s;
       });
@@ -38,7 +40,7 @@ const WrappedSubmissionProfile = ({ loading = false, disabled = false }: Props) 
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.profile, getProfileNames(state.values.settings)]}
+      selector={state => [state.values.state.profile, getProfileNames(settings)]}
       children={([profile, profileKeys]) => (
         <div
           style={{

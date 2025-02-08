@@ -1,6 +1,6 @@
 import { createFormContext } from 'components/core/form/createFormContext';
 import type { HashPatternMap, Submission } from 'components/models/base/config';
-import type { SubmitSettings } from 'components/routes/settings/utils/utils';
+import type { SubmitSettings } from 'components/routes/submit/utils/utils';
 import generateUUID from 'helpers/uuid';
 
 export const TABS = ['file', 'hash', 'options'] as const;

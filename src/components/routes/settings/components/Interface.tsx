@@ -12,7 +12,7 @@ export const InterfaceSection = () => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const { user: currentUser, configuration } = useALContext();
+  const { configuration, settings } = useALContext();
 
   return (
     <form.Subscribe
@@ -28,32 +28,27 @@ export const InterfaceSection = () => {
 
           <List inset>
             <form.Subscribe
-              selector={state => state.values.next}
-              children={next => (
-                <form.Subscribe
-                  selector={state => state.values.next.preferred_submission_profile}
-                  children={value => (
-                    <SelectListInput
-                      primary={t('settings:submissions.submission_profile')}
-                      secondary={t('settings:submissions.submission_profile_desc')}
-                      value={value}
-                      loading={loading}
-                      disabled={disabled}
-                      options={getProfileNames(next).map(profileValue => ({
-                        value: profileValue,
-                        label:
-                          profileValue === 'default'
-                            ? t(`profile.${profileValue}`)
-                            : configuration.submission.profiles[profileValue].display_name
-                      }))}
-                      onChange={(event, v) => {
-                        form.setStore(s => {
-                          s.next.preferred_submission_profile = v;
-                          return s;
-                        });
-                      }}
-                    />
-                  )}
+              selector={state => state.values.next.preferred_submission_profile}
+              children={value => (
+                <SelectListInput
+                  primary={t('settings:submissions.submission_profile')}
+                  secondary={t('settings:submissions.submission_profile_desc')}
+                  value={value}
+                  loading={loading}
+                  disabled={disabled}
+                  options={getProfileNames(settings).map(profileValue => ({
+                    value: profileValue,
+                    label:
+                      profileValue === 'default'
+                        ? t(`profile.${profileValue}`)
+                        : configuration.submission.profiles[profileValue].display_name
+                  }))}
+                  onChange={(event, v) => {
+                    form.setStore(s => {
+                      s.next.preferred_submission_profile = v;
+                      return s;
+                    });
+                  }}
                 />
               )}
             />

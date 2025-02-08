@@ -3,11 +3,9 @@ import { Alert, Grid, useMediaQuery, useTheme } from '@mui/material';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Metadata } from 'components/models/base/submission';
-import type { UserSettings } from 'components/models/base/user_settings';
-import { loadSubmissionProfiles } from 'components/routes/settings/utils/utils';
+import { loadSubmissionProfiles } from 'components/routes/submit/utils/utils';
 import Classification from 'components/visual/Classification';
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
@@ -36,9 +34,8 @@ const WrappedSubmitContent = () => {
   const banner = useAppBanner();
   const location = useLocation();
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
   const { closeSnackbar } = useMySnackbar();
-  const { user: currentUser, c12nDef, configuration } = useALContext();
+  const { user: currentUser, c12nDef, configuration, settings } = useALContext();
 
   const form = useForm();
 
@@ -76,47 +73,32 @@ const WrappedSubmitContent = () => {
   }, [closeSnackbar, configuration]);
 
   useEffect(() => {
-    apiCall<UserSettings>({
-      url: `/api/v4/user/settings/${currentUser.username}/`,
-      onSuccess: ({ api_response }) => {
-        form.setStore(s => {
-          // Check if the user is allowed to customize their submission and load profiles accordingly
-          s.state.customize = currentUser.is_admin || currentUser.roles.includes('submission_customize');
-          s.settings = loadSubmissionProfiles({ ...api_response }, configuration.submission.profiles);
+    form.setStore(s => {
+      // Check if the user is allowed to customize their submission and load profiles accordingly
+      s.state.customize = currentUser.is_admin || currentUser.roles.includes('submission_customize');
+      s.settings = loadSubmissionProfiles(settings, configuration.submission.profiles);
 
-          // Determine the profile that gets auto-selected on page load
-          const profileKeys = Object.keys(api_response.submission_profiles);
-          s.state.profile = profileKeys.includes(api_response.preferred_submission_profile)
-            ? api_response.preferred_submission_profile
-            : profileKeys[0];
+      // Determine the profile that gets auto-selected on page load
+      const profileKeys = Object.keys(settings.submission_profiles);
+      s.state.profile = profileKeys.includes(settings.preferred_submission_profile)
+        ? settings.preferred_submission_profile
+        : profileKeys[0];
 
-          // Assign properties of the preferred profile to what will be sent to the API
-          Object.entries(s.settings.profiles[s.state.profile]).forEach(([k, v]) => (s.settings[k] = v.value));
+      // // Assign properties of the preferred profile to what will be sent to the API
+      // Object.entries(s.settings.profiles[s.state.profile]).forEach(([k, v]) => (s.settings[k] = v.value));
+      s.settings.classification = s.settings.profiles[s.state.profile].classification.value;
 
-          // Check if some file sources should auto-select and do so
-          s.settings.default_external_sources = [
-            ...new Set(
-              Object.entries(configuration.submission.file_sources).reduce(
-                (prev, [, fileSource]) => [...prev, ...fileSource.auto_selected],
-                api_response?.default_external_sources || []
-              )
-            )
-          ].sort();
-          return s;
-        });
-      },
-      onEnter: () =>
-        form.setStore(s => {
-          s.state.loading = true;
-          s.state.isFetchingSettings = true;
-          return s;
-        }),
-      onExit: () =>
-        form.setStore(s => {
-          s.state.loading = false;
-          s.state.isFetchingSettings = false;
-          return s;
-        })
+      // Check if some file sources should auto-select and do so
+      s.settings.default_external_sources = [
+        ...new Set(
+          Object.entries(configuration.submission.file_sources).reduce(
+            (prev, [, fileSource]) => [...prev, ...fileSource.auto_selected],
+            settings?.default_external_sources || []
+          )
+        )
+      ].sort();
+      console.log(s);
+      return s;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configuration, currentUser]);
