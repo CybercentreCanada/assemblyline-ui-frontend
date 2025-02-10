@@ -3,6 +3,7 @@ import FileOpenIcon from '@mui/icons-material/FileOpen';
 import { Button, IconButton, Stack, Switch, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import PageCenter from 'commons/components/pages/PageCenter';
+import { AlertExtendedScan, AlertPriority, AlertStatus } from 'components/routes/alerts/components/Components';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import AssemblylineIcon from 'components/visual/Icons';
@@ -12,7 +13,6 @@ import SubmissionState from 'components/visual/SubmissionState';
 import Tag from 'components/visual/Tag';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
-import { AlertExtendedScan, AlertPriority, AlertStatus } from './alerts/components/Components';
 
 const Theme = () => {
   const theme = useTheme();

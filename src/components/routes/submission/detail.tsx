@@ -1257,13 +1257,11 @@ function WrappedSubmissionDetail() {
                               <ListItem
                                 button
                                 component={Link}
-                                to="/submit"
-                                state={{
-                                  hash: submission.files[0].sha256,
-                                  tabContext: '1',
-                                  c12n: submission.classification,
-                                  metadata: submission.metadata
-                                }}
+                                to={`/submit?${new URLSearchParams([
+                                  ['hash', submission.files[0].sha256],
+                                  ['classification', submission.classification],
+                                  ['metadata', JSON.stringify(submission.metadata)]
+                                ]).toString()}`}
                                 dense
                                 onClick={() => setResubmitAnchor(null)}
                               >

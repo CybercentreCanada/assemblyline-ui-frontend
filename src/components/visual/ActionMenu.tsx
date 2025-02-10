@@ -457,12 +457,10 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             <MenuItem
               dense
               component={Link}
-              to="/submit"
-              state={{
-                hash: value,
-                tabContext: '1',
-                c12n: classification
-              }}
+              to={`/submit?${new URLSearchParams([
+                ['hash', value],
+                ['classification', classification]
+              ]).toString()}`}
             >
               {SUBMIT_ICON}
               {t('submit') + ` ${submitType.toUpperCase()}`}

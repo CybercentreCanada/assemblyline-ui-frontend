@@ -1,4 +1,4 @@
-import { PossibleColor } from '../utils/color';
+import type { PossibleColor } from 'helpers/colors';
 import type { UserIndexed } from './user';
 import type { UserAvatar } from './user_avatar';
 

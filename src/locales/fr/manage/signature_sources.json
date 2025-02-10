@@ -42,6 +42,7 @@
   "update": "Mettre à jour la source de signature actuelle",
   "update.label.last_successful": "Dernière mise à jour réussie",
   "update.label.status": "Statut",
+  "update.never": "Jamais",
   "update.response.success": "La source suivante a été déclenchée pour la mise à jour",
   "update_all": "Mettre à jour toutes les sources de signature pour le service",
   "update_all.response.success": "Toutes les sources du service suivant ont été déclenchées pour la mise à jour",
