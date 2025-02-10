@@ -69,6 +69,7 @@ const WrappedSourceDetail = ({
   const [showPrivateKey, setShowPrivateKey] = useState<boolean>(false);
 
   const gitFetch = useMemo<boolean>(() => source.fetch_method === 'GIT', [source.fetch_method]);
+  const postFetch = useMemo<boolean>(() => source.fetch_method === 'POST', [source.fetch_method]);
 
   const handleFieldChange = useCallback(
     event => {
@@ -114,6 +115,14 @@ const WrappedSourceDetail = ({
           return { name: header[0], value: header[1] } as EnvironmentVariable;
         })
       });
+      setModified(true);
+    },
+    [setModified, setSource, source]
+  );
+
+  const handlePostDataChange = useCallback(
+    event => {
+      setSource({ ...source, post_data: event.updated_src });
       setModified(true);
     },
     [setModified, setSource, source]
@@ -470,7 +479,32 @@ const WrappedSourceDetail = ({
                         }}
                       />
                     </Grid>
-
+                    {postFetch && (
+                      <Grid item xs={12}>
+                        <div className={classes.label}>{t('post_data')}</div>
+                        <JSONEditor
+                          name={false}
+                          src={source.post_data}
+                          enableClipboard={false}
+                          groupArraysAfterLength={10}
+                          displayDataTypes={false}
+                          displayObjectSize={false}
+                          onAdd={handlePostDataChange}
+                          onDelete={handlePostDataChange}
+                          onEdit={handlePostDataChange}
+                          collapsed={true}
+                          style={{
+                            border: `1px solid ${theme.palette.divider}`,
+                            borderRadius: '4px',
+                            fontSize: '1rem',
+                            minHeight: theme.spacing(5),
+                            padding: '4px',
+                            overflowX: 'auto',
+                            width: '100%'
+                          }}
+                        />
+                      </Grid>
+                    )}
                     <Grid item xs={12}>
                       <div className={classes.label}>
                         {t('proxy')}

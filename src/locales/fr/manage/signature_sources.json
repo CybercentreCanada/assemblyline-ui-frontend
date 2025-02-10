@@ -31,6 +31,7 @@
   "override_classification": "Override signature-defined classification with source classificationRemplacer la classification définie par la signature par la classification de la source",
   "password": "Mot de passe",
   "pattern": "Modèle Regex",
+  "post_data": "Données POST",
   "private_key": "Clé privée",
   "private_key_used": "Une clé privée sera utilisée pour se connecter à la source",
   "proxy": "Serveur Proxy",

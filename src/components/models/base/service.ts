@@ -271,6 +271,9 @@ export type UpdateSource = {
   /** Pattern used to find files of interest from source */
   pattern?: string;
 
+  /** Data that's sent in POST requests */
+  post_data?: { [key: string]: any };
+
   /** Private key used to authenticate with source */
   private_key?: string;
 
@@ -455,6 +458,7 @@ export const DEFAULT_SOURCE: UpdateSource = {
   override_classification: false,
   password: '',
   pattern: '',
+  post_data: {},
   private_key: '',
   proxy: '',
   ssl_ignore_errors: false,
