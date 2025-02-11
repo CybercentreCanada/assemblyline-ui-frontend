@@ -887,7 +887,7 @@ function WrappedSubmissionDetail() {
           <FileDetail
             sha256={fid}
             sid={id}
-            metadata={submission.metadata}
+            metadata={submission?.metadata}
             liveResultKeys={liveResultKeys}
             liveErrors={curFileLiveErrors}
             force={submission && submission.max_score < 0}
@@ -899,7 +899,7 @@ function WrappedSubmissionDetail() {
           <FileDetail
             sha256={fid}
             sid={id}
-            metadata={submission.metadata}
+            metadata={submission?.metadata}
             force={submission && submission.max_score < 0}
           />,
           {
