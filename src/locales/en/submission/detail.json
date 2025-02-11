@@ -74,6 +74,7 @@
   "resubmit.carbon_copy": "Use the same parameters",
   "resubmit.dynamic": "Resubmit for Dynamic analysis",
   "resubmit.modify": "Adjust parameters before submission",
+  "resubmit.with": "Resubmit with",
   "show_more": "Show more...",
   "submit.success": "Submission successfully resubmitted. You will be redirected to it...",
   "times.completed": "Completed Time",

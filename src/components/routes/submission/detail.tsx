@@ -62,7 +62,7 @@ import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
 import { setNotifyFavicon } from 'helpers/utils';
 import moment from 'moment';
-import React, { useCallback, useEffect, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
@@ -154,6 +154,14 @@ function WrappedSubmissionDetail() {
   const sp4 = theme.spacing(4);
 
   const popoverOpen = Boolean(resubmitAnchor);
+
+  const submissionProfiles: { [name: string]: string } = useMemo<{ [name: string]: string }>(() => {
+    let profileMap = {};
+    Object.entries(systemConfig.submission.profiles).map(([name, config]) => {
+      profileMap = { ...profileMap, [name]: config.display_name };
+    });
+    return profileMap;
+  }, [systemConfig]);
 
   const updateLiveSumary = (results: object) => {
     const tempSummary: any = summary !== null ? { ...summary } : { tags: {}, heuristics: {}, attack_matrix: {} };
@@ -537,25 +545,28 @@ function WrappedSubmissionDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetLiveMode, showSuccessMessage, submission, t]);
 
-  const resubmitDynamic = useCallback(() => {
-    if (submission != null) {
-      apiCall<Submission>({
-        url: `/api/v4/submit/dynamic/${submission.files[0].sha256}/?copy_sid=${submission.sid}`,
-        onSuccess: api_data => {
-          showSuccessMessage(t('submit.success'));
-          resetLiveMode();
-          setSubmission(null);
-          setSummary(null);
-          setTree(null);
-          setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
-          }, 500);
-        }
-      });
-    }
-    setResubmitAnchor(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showSuccessMessage, submission, t]);
+  const resubmitWithType = useCallback(
+    (resubmit_type: string) => {
+      if (submission != null) {
+        apiCall<Submission>({
+          url: `/api/v4/submit/${resubmit_type}/${submission.files[0].sha256}/?copy_sid=${submission.sid}`,
+          onSuccess: api_data => {
+            showSuccessMessage(t('submit.success'));
+            resetLiveMode();
+            setSubmission(null);
+            setSummary(null);
+            setTree(null);
+            setTimeout(() => {
+              navigate(`/submission/detail/${api_data.api_response.sid}`);
+            }, 500);
+          }
+        });
+      }
+      setResubmitAnchor(null);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [showSuccessMessage, submission, t]
+  );
 
   const replay = useCallback(() => {
     if (submission != null && systemConfig.ui.allow_replay) {
@@ -876,6 +887,7 @@ function WrappedSubmissionDetail() {
           <FileDetail
             sha256={fid}
             sid={id}
+            metadata={submission.metadata}
             liveResultKeys={liveResultKeys}
             liveErrors={curFileLiveErrors}
             force={submission && submission.max_score < 0}
@@ -883,9 +895,17 @@ function WrappedSubmissionDetail() {
           { hasMaximize: true }
         );
       } else {
-        setGlobalDrawer(<FileDetail sha256={fid} sid={id} force={submission && submission.max_score < 0} />, {
-          hasMaximize: true
-        });
+        setGlobalDrawer(
+          <FileDetail
+            sha256={fid}
+            sid={id}
+            metadata={submission.metadata}
+            force={submission && submission.max_score < 0}
+          />,
+          {
+            hasMaximize: true
+          }
+        );
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1270,12 +1290,21 @@ function WrappedSubmissionDetail() {
                                 </ListItemIcon>
                                 <ListItemText primary={t('resubmit.modify')} />
                               </ListItem>
-                              <ListItem button dense onClick={resubmitDynamic}>
+                              <ListItem button dense onClick={() => resubmitWithType('dynamic')}>
                                 <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                   <OndemandVideoOutlinedIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={t('resubmit.dynamic')} />
                               </ListItem>
+                              {submissionProfiles &&
+                                Object.entries(submissionProfiles).map(([name, display]) => (
+                                  <ListItem key={name} button dense onClick={() => resubmitWithType(name)}>
+                                    <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                                      <OndemandVideoOutlinedIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
+                                  </ListItem>
+                                ))}
                               <ListItem button dense onClick={resubmit}>
                                 <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                   <RepeatOutlinedIcon />

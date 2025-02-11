@@ -60,6 +60,7 @@ import InputDialog from './InputDialog';
 type Props = {
   sha256: string;
   sid?: string;
+  metadata?: { [key: string]: string };
   liveResultKeys?: string[];
   liveErrors?: Error[];
   force?: boolean;
@@ -68,6 +69,7 @@ type Props = {
 const WrappedFileDetail: React.FC<Props> = ({
   sha256,
   sid = null,
+  metadata = null,
   liveResultKeys = null,
   liveErrors = null,
   force = false
@@ -101,6 +103,14 @@ const WrappedFileDetail: React.FC<Props> = ({
   const sp4 = useMemo(() => theme.spacing(4), [theme]);
 
   const popoverOpen = Boolean(resubmitAnchor);
+
+  const submissionProfiles: { [name: string]: string } = useMemo<{ [name: string]: string }>(() => {
+    let profileMap = {};
+    Object.entries(configuration.submission.profiles).map(([name, config]) => {
+      profileMap = { ...profileMap, [name]: config.display_name };
+    });
+    return profileMap;
+  }, [configuration]);
 
   const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const fileName = useMemo(() => (file ? params.get('name') || sha256 : null), [file, params, sha256]);
@@ -153,19 +163,22 @@ const WrappedFileDetail: React.FC<Props> = ({
     return newData;
   };
 
-  const resubmit = useCallback(() => {
-    apiCall<Submission>({
-      url: `/api/v4/submit/dynamic/${sha256}/${sid ? `?copy_sid=${sid}` : ''}`,
-      onSuccess: api_data => {
-        showSuccessMessage(t('resubmit.success'));
-        setTimeout(() => {
-          navigate(`/submission/detail/${api_data.api_response.sid}`);
-        }, 500);
-      }
-    });
-    setResubmitAnchor(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256]);
+  const resubmit = useCallback(
+    (resubmit_type: string) => {
+      apiCall<Submission>({
+        url: `/api/v4/submit/${resubmit_type}/${sha256}/${sid ? `?copy_sid=${sid}` : ''}`,
+        onSuccess: api_data => {
+          showSuccessMessage(t('resubmit.success'));
+          setTimeout(() => {
+            navigate(`/submission/detail/${api_data.api_response.sid}`);
+          }, 500);
+        }
+      });
+      setResubmitAnchor(null);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [sha256]
+  );
 
   const prepareSafelist = useCallback(() => {
     setSafelistReason('');
@@ -479,7 +492,8 @@ const WrappedFileDetail: React.FC<Props> = ({
                           component={Link}
                           to={`/submit?${new URLSearchParams([
                             ['hash', file.file_info.sha256],
-                            ['classification', file.file_info.classification]
+                            ['classification', file.file_info.classification],
+                            ['metadata', JSON.stringify(metadata)]
                           ]).toString()}`}
                           dense
                           onClick={() => setResubmitAnchor(null)}
@@ -489,12 +503,21 @@ const WrappedFileDetail: React.FC<Props> = ({
                           </ListItemIcon>
                           <ListItemText primary={t('resubmit.modify')} />
                         </ListItem>
-                        <ListItem button dense onClick={resubmit}>
+                        <ListItem button dense onClick={() => resubmit('dynamic')}>
                           <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                             <OndemandVideoOutlinedIcon />
                           </ListItemIcon>
                           <ListItemText primary={t('resubmit.dynamic')} />
                         </ListItem>
+                        {submissionProfiles &&
+                          Object.entries(submissionProfiles).map(([name, display]) => (
+                            <ListItem key={name} button dense onClick={() => resubmit(name)}>
+                              <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                                <OndemandVideoOutlinedIcon />
+                              </ListItemIcon>
+                              <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
+                            </ListItem>
+                          ))}
                       </List>
                     </Popover>
                   </>
