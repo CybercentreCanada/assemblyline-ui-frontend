@@ -155,6 +155,7 @@ const WrappedSubmitContent = () => {
                 )}
               />
             )}
+            <SubmissionProfile loading={loading as boolean} disabled={disabled as boolean} />
 
             <form.Subscribe
               selector={state => [state.values.state.tab]}
@@ -201,9 +202,6 @@ const WrappedSubmitContent = () => {
                       disabled: !currentUser.roles.includes('submission_create'),
                       inner: (
                         <Grid container columnGap={2}>
-                          <Grid item xs={12}>
-                            <SubmissionProfile loading={loading as boolean} disabled={disabled as boolean} />
-                          </Grid>
                           <Grid item xs={12} md>
                             <ServiceSelection
                               profile={profile as string}

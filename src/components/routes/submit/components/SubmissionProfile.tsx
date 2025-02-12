@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/material';
+import { Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { Submission } from 'components/models/base/config';
 import { getProfileNames } from 'components/routes/settings/utils/utils';
@@ -42,31 +42,36 @@ const WrappedSubmissionProfile = ({ loading = false, disabled = false }: Props) 
     <form.Subscribe
       selector={state => [state.values.state.profile, getProfileNames(settings)]}
       children={([profile, profileKeys]) => (
-        <div
-          style={{
-            textAlign: 'left',
-            marginTop: theme.spacing(2),
-            paddingLeft: theme.spacing(2),
-            marginBottom: theme.spacing(1)
-          }}
-        >
-          <SelectInput
-            id={`submission profile name`}
-            label={t('options.submission.profile_name')}
-            labelProps={{ color: 'textPrimary', variant: 'h6', gutterBottom: true }}
-            value={profile as string}
-            options={(profileKeys as string[])
-              .map(key => ({
-                label: key === 'default' ? t('profile.default') : configuration.submission.profiles[key]?.display_name,
-                value: key
-              }))
-              .sort()}
-            loading={loading}
-            disabled={disabled}
-            displayEmpty={false}
-            onChange={(e, v) => handleChange(v)}
-          />
-        </div>
+        <>
+          <div>
+            <SelectInput
+              id={`submission profile name`}
+              labelProps={{ color: 'textPrimary', variant: 'h6', gutterBottom: true }}
+              value={profile as string}
+              options={(profileKeys as string[])
+                .map(key => ({
+                  label:
+                    key === 'default' ? t('profile.default') : configuration.submission.profiles[key]?.display_name,
+                  value: key
+                }))
+                .sort()}
+              loading={loading}
+              disabled={disabled}
+              displayEmpty={false}
+              onChange={(e, v) => handleChange(v)}
+            />
+          </div>
+          {configuration.submission.profiles[profile as string]?.description && (
+            <Typography
+              variant="caption"
+              fontStyle={'italic'}
+              color={theme.palette.mode == 'dark' ? theme.palette.primary.light : theme.palette.primary.dark}
+              alignItems="left"
+            >
+              {configuration.submission.profiles[profile as string]?.description}
+            </Typography>
+          )}
+        </>
       )}
     />
   );
