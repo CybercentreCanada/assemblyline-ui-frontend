@@ -1,11 +1,17 @@
-import { Typography, useTheme } from '@mui/material';
+import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
+import { Button, Grid, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
+import useDrawer from 'components/hooks/useDrawer';
 import type { Submission } from 'components/models/base/config';
 import { getProfileNames } from 'components/routes/settings/utils/utils';
 import { useForm } from 'components/routes/submit/contexts/form';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { ReactElement } from 'react-markdown/lib/react-markdown';
+import { MetadataParameters } from './MetadataParameters';
+import { ServiceSelection } from './ServiceSelection';
+import { SubmissionParameters } from './SubmissionParameters';
 
 type Props = {
   profile?: string;
@@ -17,9 +23,10 @@ type Props = {
 const WrappedSubmissionProfile = ({ loading = false, disabled = false }: Props) => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const { configuration, settings } = useALContext();
+  const { user, configuration, settings } = useALContext();
 
   const form = useForm();
+  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
 
   const handleChange = useCallback(
     (profileKey: keyof Submission['profiles']) => {
@@ -38,12 +45,43 @@ const WrappedSubmissionProfile = ({ loading = false, disabled = false }: Props) 
     [form]
   );
 
+  const drawerContent = useMemo<ReactElement>(() => {
+    return (
+      <form.Subscribe
+        selector={state => [state.values.state.profile, state.values.state.customize]}
+        children={([profile, customize]) => (
+          <>
+            <ServiceSelection
+              profile={profile as string}
+              loading={loading as boolean}
+              disabled={disabled as boolean}
+              customize={customize as boolean}
+              filterServiceParams={true}
+            />
+            <SubmissionParameters
+              profile={profile as string}
+              loading={loading as boolean}
+              disabled={disabled as boolean}
+              customize={customize as boolean}
+            />
+            <MetadataParameters
+              profile={profile as string}
+              loading={loading as boolean}
+              disabled={disabled as boolean}
+              customize={customize as boolean}
+            />
+          </>
+        )}
+      />
+    );
+  }, [loading, disabled, form, globalDrawerOpened]);
+
   return (
     <form.Subscribe
-      selector={state => [state.values.state.profile, getProfileNames(settings)]}
-      children={([profile, profileKeys]) => (
-        <>
-          <div>
+      selector={state => [state.values.state.profile, getProfileNames(settings), state.values.state.customize]}
+      children={([profile, profileKeys, customize]) => (
+        <Grid container>
+          <Grid item xs={11}>
             <SelectInput
               id={`submission profile name`}
               labelProps={{ color: 'textPrimary', variant: 'h6', gutterBottom: true }}
@@ -60,18 +98,28 @@ const WrappedSubmissionProfile = ({ loading = false, disabled = false }: Props) 
               displayEmpty={false}
               onChange={(e, v) => handleChange(v)}
             />
-          </div>
-          {configuration.submission.profiles[profile as string]?.description && (
-            <Typography
-              variant="caption"
-              fontStyle={'italic'}
-              color={theme.palette.mode == 'dark' ? theme.palette.primary.light : theme.palette.primary.dark}
-              alignItems="left"
+          </Grid>
+          <Grid item xs={1} style={{ alignContent: 'center' }}>
+            <Button
+              // TODO: Figure out why "Store is not found" is raised when using a drawer
+              /*onClick={() => setGlobalDrawer(drawerContent)}*/ disabled={!user.roles.includes('submission_create')}
             >
-              {configuration.submission.profiles[profile as string]?.description}
-            </Typography>
-          )}
-        </>
+              <TuneOutlinedIcon />
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            {configuration.submission.profiles[profile as string]?.description && (
+              <Typography
+                variant="caption"
+                fontStyle={'italic'}
+                color={theme.palette.mode == 'dark' ? theme.palette.primary.light : theme.palette.primary.dark}
+                alignItems="left"
+              >
+                {configuration.submission.profiles[profile as string]?.description}
+              </Typography>
+            )}
+          </Grid>
+        </Grid>
       )}
     />
   );

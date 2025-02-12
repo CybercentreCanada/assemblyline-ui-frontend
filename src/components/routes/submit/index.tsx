@@ -1,5 +1,5 @@
 import Flow from '@flowjs/flow.js';
-import { Alert, Grid, useMediaQuery, useTheme } from '@mui/material';
+import { Alert, useMediaQuery, useTheme } from '@mui/material';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -14,9 +14,6 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { FileSubmit } from './components/File';
 import { HashSubmit } from './components/Hash';
-import { MetadataParameters } from './components/MetadataParameters';
-import { ServiceSelection } from './components/ServiceSelection';
-import { SubmissionParameters } from './components/SubmissionParameters';
 import { SubmissionProfile } from './components/SubmissionProfile';
 import type { TabKey } from './contexts/form';
 import { DEFAULT_SUBMIT_FORM, FormProvider, useForm } from './contexts/form';
@@ -97,7 +94,6 @@ const WrappedSubmitContent = () => {
           )
         )
       ].sort();
-      console.log(s);
       return s;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,37 +191,6 @@ const WrappedSubmitContent = () => {
                           loading={loading as boolean}
                           disabled={disabled as boolean}
                         />
-                      )
-                    },
-                    options: {
-                      label: t('options'),
-                      disabled: !currentUser.roles.includes('submission_create'),
-                      inner: (
-                        <Grid container columnGap={2}>
-                          <Grid item xs={12} md>
-                            <ServiceSelection
-                              profile={profile as string}
-                              loading={loading as boolean}
-                              disabled={disabled as boolean}
-                              customize={customize as boolean}
-                              filterServiceParams={true}
-                            />
-                          </Grid>
-                          <Grid item xs={12} md>
-                            <SubmissionParameters
-                              profile={profile as string}
-                              loading={loading as boolean}
-                              disabled={disabled as boolean}
-                              customize={customize as boolean}
-                            />
-                            <MetadataParameters
-                              profile={profile as string}
-                              loading={loading as boolean}
-                              disabled={disabled as boolean}
-                              customize={customize as boolean}
-                            />
-                          </Grid>
-                        </Grid>
                       )
                     }
                   }}
