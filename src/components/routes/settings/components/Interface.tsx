@@ -4,6 +4,7 @@ import { useForm } from 'components/routes/settings/contexts/form';
 import { getProfileNames } from 'components/routes/settings/utils/utils';
 import { List } from 'components/visual/List/List';
 import { ListHeader } from 'components/visual/List/ListHeader';
+import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
 import { SelectListInput } from 'components/visual/ListInputs/SelectListInput';
 import { TextListInput } from 'components/visual/ListInputs/TextListInput';
 import { useTranslation } from 'react-i18next';
@@ -148,6 +149,26 @@ export const InterfaceSection = () => {
                 />
               )}
             />
+            {configuration.ui.ai.enabled && (
+              <form.Subscribe
+                selector={state => state.values.next.executive_summary}
+                children={value => (
+                  <BooleanListInput
+                    primary={t('interface.executive_summary')}
+                    secondary={t('interface.executive_summary_desc')}
+                    value={value}
+                    loading={loading}
+                    disabled={disabled}
+                    onChange={(event, v) => {
+                      form.setStore(s => {
+                        s.next.executive_summary = v;
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+            )}
           </List>
         </div>
       )}
