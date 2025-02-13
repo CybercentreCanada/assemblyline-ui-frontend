@@ -1,5 +1,5 @@
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
-import { Button, Grid, Typography, useTheme } from '@mui/material';
+import { Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { Submission } from 'components/models/base/config';
 import { getProfileNames } from 'components/routes/settings/utils/utils';
@@ -46,8 +46,8 @@ const WrappedSubmissionProfile = ({
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.profile, getProfileNames(settings), state.values.state.customize]}
-      children={([profile, profileKeys, customize]) => (
+      selector={state => [state.values.state.profile, getProfileNames(settings)]}
+      children={([profile, profileKeys]) => (
         <Grid container>
           <Grid item xs={11}>
             <SelectInput
@@ -68,9 +68,14 @@ const WrappedSubmissionProfile = ({
             />
           </Grid>
           <Grid item xs={1} style={{ alignContent: 'center' }}>
-            <Button onClick={() => setDrawerOpen(!drawerOpen)} disabled={!user.roles.includes('submission_create')}>
-              <TuneOutlinedIcon />
-            </Button>
+            <Tooltip title={t('options')}>
+              <IconButton
+                onClick={() => setDrawerOpen(!drawerOpen)}
+                disabled={!user.roles.includes('submission_create')}
+              >
+                <TuneOutlinedIcon />
+              </IconButton>
+            </Tooltip>
           </Grid>
           <Grid item xs={12}>
             {configuration.submission.profiles[profile as string]?.description && (
