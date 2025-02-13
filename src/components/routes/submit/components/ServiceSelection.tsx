@@ -306,7 +306,7 @@ const Service: React.FC<ServiceProps> = ({
             value={selected}
             disableGap
             preventDisabledColor
-            preventRender={filterServiceParams && !params || !showCollapse || !selected }
+            preventRender={(filterServiceParams && !params) || !showCollapse || !selected}
             disabled={disabled || !customize}
             onChange={() => handleClick(selected)}
             expend={specId < 0 || !showCollapse ? null : open}
@@ -479,7 +479,7 @@ const WrappedServiceSelection = ({
   const form = useForm();
 
   return (
-    <div style={{ paddingLeft: theme.spacing(2), textAlign: 'left', marginTop: theme.spacing(2) }}>
+    <div style={{ textAlign: 'left', marginTop: theme.spacing(2) }}>
       <Typography variant="h6" gutterBottom>
         {t('options.service')}
       </Typography>
