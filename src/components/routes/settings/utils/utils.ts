@@ -60,6 +60,7 @@ export type SubmitSettings = Pick<UserSettings, ProfileKey> & {
   default_external_sources: string[];
   default_zip_password: string;
   download_encoding: 'raw' | 'cart' | 'zip';
+  executive_summary: boolean;
   expand_min_score: number;
   preferred_submission_profile: string;
   submission_profiles: {

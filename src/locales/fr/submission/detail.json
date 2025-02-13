@@ -74,6 +74,7 @@
   "resubmit.carbon_copy": "Utiliser les mêmes paramètres",
   "resubmit.dynamic": "Resoumettre pour analyse dynamique",
   "resubmit.modify": "Ajustez les paramètres avant la soumission",
+  "resubmit.with": "Soumettre à nouveau avec",
   "show_more": "Afficher plus...",
   "submit.success": "Soumission soumis à nouveau avec succès. Vous y serez redirigé ...",
   "times.completed": "Temps terminé",

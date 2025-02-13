@@ -1,5 +1,6 @@
 import Flow from '@flowjs/flow.js';
-import { Alert, Grid, useMediaQuery, useTheme } from '@mui/material';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import { Alert, Drawer, IconButton, useMediaQuery, useTheme } from '@mui/material';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -9,7 +10,7 @@ import { loadSubmissionProfiles } from 'components/routes/submit/utils/utils';
 import Classification from 'components/visual/Classification';
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { FileSubmit } from './components/File';
@@ -29,6 +30,8 @@ export const FLOW = new Flow({
   simultaneousUploads: 4
 });
 
+const drawerPadding = 40;
+
 const WrappedSubmitContent = () => {
   const { t, i18n } = useTranslation(['submit']);
   const banner = useAppBanner();
@@ -36,6 +39,7 @@ const WrappedSubmitContent = () => {
   const theme = useTheme();
   const { closeSnackbar } = useMySnackbar();
   const { user: currentUser, c12nDef, configuration, settings } = useALContext();
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
   const form = useForm();
 
@@ -97,7 +101,6 @@ const WrappedSubmitContent = () => {
           )
         )
       ].sort();
-      console.log(s);
       return s;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -155,6 +158,12 @@ const WrappedSubmitContent = () => {
                 )}
               />
             )}
+            <SubmissionProfile
+              loading={loading as boolean}
+              disabled={disabled as boolean}
+              drawerOpen={drawerOpen}
+              setDrawerOpen={setDrawerOpen}
+            />
 
             <form.Subscribe
               selector={state => [state.values.state.tab]}
@@ -195,45 +204,55 @@ const WrappedSubmitContent = () => {
                           disabled={disabled as boolean}
                         />
                       )
-                    },
-                    options: {
-                      label: t('options'),
-                      disabled: !currentUser.roles.includes('submission_create'),
-                      inner: (
-                        <Grid container columnGap={2}>
-                          <Grid item xs={12}>
-                            <SubmissionProfile loading={loading as boolean} disabled={disabled as boolean} />
-                          </Grid>
-                          <Grid item xs={12} md>
-                            <ServiceSelection
-                              profile={profile as string}
-                              loading={loading as boolean}
-                              disabled={disabled as boolean}
-                              customize={customize as boolean}
-                              filterServiceParams={true}
-                            />
-                          </Grid>
-                          <Grid item xs={12} md>
-                            <SubmissionParameters
-                              profile={profile as string}
-                              loading={loading as boolean}
-                              disabled={disabled as boolean}
-                              customize={customize as boolean}
-                            />
-                            <MetadataParameters
-                              profile={profile as string}
-                              loading={loading as boolean}
-                              disabled={disabled as boolean}
-                              customize={customize as boolean}
-                            />
-                          </Grid>
-                        </Grid>
-                      )
                     }
                   }}
                 />
               )}
             />
+            {profile && (
+              <Drawer
+                onClose={() => setDrawerOpen(false)}
+                anchor="right"
+                open={drawerOpen}
+                variant={drawerOpen ? 'persistent' : 'temporary'}
+              >
+                <>
+                  <IconButton
+                    onClick={() => setDrawerOpen(false)}
+                    style={{ justifyContent: 'left', width: 'min-content' }}
+                  >
+                    <CloseOutlinedIcon />
+                  </IconButton>
+                  <div
+                    style={{
+                      paddingRight: `${drawerPadding}px`,
+                      paddingLeft: `${drawerPadding}px`,
+                      marginTop: '-20px'
+                    }}
+                  >
+                    <ServiceSelection
+                      profile={profile as string}
+                      loading={loading as boolean}
+                      disabled={disabled as boolean}
+                      customize={customize as boolean}
+                      filterServiceParams={true}
+                    />
+                    <SubmissionParameters
+                      profile={profile as string}
+                      loading={loading as boolean}
+                      disabled={disabled as boolean}
+                      customize={customize as boolean}
+                    />
+                    <MetadataParameters
+                      profile={profile as string}
+                      loading={loading as boolean}
+                      disabled={disabled as boolean}
+                      customize={customize as boolean}
+                    />
+                  </div>
+                </>
+              </Drawer>
+            )}
           </>
         )}
       />
@@ -243,11 +262,11 @@ const WrappedSubmitContent = () => {
 
 const SubmitContent = React.memo(WrappedSubmitContent);
 
-const WrappedSettingsPage2 = () => (
+const WrappedSubmitPage = () => (
   <FormProvider>
     <SubmitContent />
   </FormProvider>
 );
 
-export const SubmitPage = React.memo(WrappedSettingsPage2);
+export const SubmitPage = React.memo(WrappedSubmitPage);
 export default SubmitPage;
