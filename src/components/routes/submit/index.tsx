@@ -235,7 +235,7 @@ const WrappedSubmitContent = () => {
                       loading={loading as boolean}
                       disabled={disabled as boolean}
                       customize={customize as boolean}
-                      filterServiceParams={true}
+                      filterServiceParams={!customize}
                     />
                     <SubmissionParameters
                       profile={profile as string}
