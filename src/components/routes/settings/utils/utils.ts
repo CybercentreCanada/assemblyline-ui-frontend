@@ -127,6 +127,7 @@ const loadProfile = (profile_name: string, settings: UserSettings, profile: Subm
         })
     }));
 
+  console.log(out);
   return out;
 };
 
@@ -233,7 +234,7 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
       profile.service_spec.forEach((service, i) => {
         let spec: { [name: string]: unknown } = null;
         service.params.forEach((param, j) => {
-          if (out?.service_spec && param.value !== out.service_spec[i].params[j].value) {
+          if (param.value !== param.default) {
             spec = { ...spec, [param.name]: param.value };
           }
 
@@ -247,37 +248,6 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
       });
     });
   }
-
-  return out;
-};
-
-export const applySubmissionProfile = (submit: SubmitSettings, profile: string | number): UserSettings => {
-  if (!submit) return null;
-
-  const out: UserSettings = {
-    description: submit.description || '',
-    default_external_sources: submit.default_external_sources || []
-  } as UserSettings;
-
-  // Applying the selected submission profile parameters
-  Object.entries(submit.submission_profiles[profile]).forEach(([key, value]: [string, unknown]) => {
-    const param = value as ProfileParam<unknown>;
-    if (PROFILE_KEYS.includes(key as ProfileKey)) {
-      out[key] = param.value;
-    }
-  });
-
-  // Applying the selected submission profile service specs
-  out.service_spec = structuredClone(submit.submission_profiles[profile].service_spec);
-  out.service_spec.forEach((_, i) => {
-    out.service_spec[i].params.forEach((__, j) => {
-      delete out.service_spec[i].params[j].editable;
-    });
-  });
-
-  // Applying the selected submission profile service specs
-  out.services = structuredClone(submit.submission_profiles[profile].services);
-
   return out;
 };
 
