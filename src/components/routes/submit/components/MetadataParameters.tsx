@@ -16,14 +16,12 @@ import { useTranslation } from 'react-i18next';
 type MetadataParamParam = {
   name: string;
   metadata: Metadata;
-  profile?: string;
   loading?: boolean;
   disabled?: boolean;
-  customize?: boolean;
 };
 
 const MetadataParam: React.FC<MetadataParamParam> = React.memo(
-  ({ name, metadata, profile = null, loading = false, disabled = false, customize = false }) => {
+  ({ name, metadata, loading = false, disabled = false }) => {
     const { t } = useTranslation(['submit', 'settings']);
     const form = useForm();
     const { apiCall } = useMyAPI();
@@ -183,13 +181,11 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
 );
 
 type Props = {
-  profile?: string;
   loading?: boolean;
   disabled?: boolean;
-  customize?: boolean;
 };
 
-const WrappedMetadataParameters = ({ profile = null, loading = false, disabled = false, customize = false }: Props) => {
+const WrappedMetadataParameters = ({ loading = false, disabled = false }: Props) => {
   const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const { configuration } = useALContext();
@@ -204,15 +200,7 @@ const WrappedMetadataParameters = ({ profile = null, loading = false, disabled =
 
           <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
             {Object.entries(configuration.submission.metadata.submit).map(([name, metadata]) => (
-              <MetadataParam
-                key={name}
-                name={name}
-                metadata={metadata}
-                profile={profile}
-                loading={loading}
-                disabled={disabled}
-                customize={customize}
-              />
+              <MetadataParam key={name} name={name} metadata={metadata} loading={loading} disabled={disabled} />
             ))}
           </div>
         </div>

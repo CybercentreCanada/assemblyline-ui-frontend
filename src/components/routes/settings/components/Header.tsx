@@ -112,8 +112,10 @@ export const HeaderSection = () => {
               secondary={
                 !tab
                   ? null
-                  : ['interface', 'default'].includes(tab)
-                  ? t(`profile.${tab}`)
+                  : tab === 'interface'
+                  ? t('profile.interface')
+                  : tab === 'default'
+                  ? t('profile.custom')
                   : configuration.submission.profiles[tab].display_name
               }
               loading={loading}

@@ -25,9 +25,12 @@ export const LeftNav = () => {
             },
             { primary: t('profiles'), subheader: true, readOnly: true },
             ...getProfileNames(settings).map(name => ({
-              primary: ['interface', 'default'].includes(name)
-                ? t(`profile.${name}`)
-                : configuration.submission.profiles[name].display_name,
+              primary:
+                name === 'interface'
+                  ? t('profile.interface')
+                  : name === 'default'
+                  ? t('profile.custom')
+                  : configuration.submission.profiles[name].display_name,
               active: name === tab,
               to: `/settings/${name}`
             }))

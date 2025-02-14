@@ -56,8 +56,7 @@ const WrappedSubmissionProfile = ({
               value={profile as string}
               options={(profileKeys as string[])
                 .map(key => ({
-                  label:
-                    key === 'default' ? t('profile.default') : configuration.submission.profiles[key]?.display_name,
+                  label: key === 'default' ? t('profile.custom') : configuration.submission.profiles[key]?.display_name,
                   value: key
                 }))
                 .sort()}
@@ -78,16 +77,14 @@ const WrappedSubmissionProfile = ({
             </Tooltip>
           </Grid>
           <Grid item xs={12}>
-            {configuration.submission.profiles[profile as string]?.description && (
-              <Typography
-                variant="caption"
-                fontStyle={'italic'}
-                color={theme.palette.mode == 'dark' ? theme.palette.primary.light : theme.palette.primary.dark}
-                alignItems="left"
-              >
-                {configuration.submission.profiles[profile as string]?.description}
-              </Typography>
-            )}
+            <Typography
+              variant="caption"
+              fontStyle={'italic'}
+              color={theme.palette.mode == 'dark' ? theme.palette.primary.light : theme.palette.primary.dark}
+              alignItems="left"
+            >
+              {configuration.submission.profiles[profile as string]?.description || t('profile.custom_desc')}
+            </Typography>
           </Grid>
         </Grid>
       )}

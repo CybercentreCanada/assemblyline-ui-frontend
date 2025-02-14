@@ -306,7 +306,7 @@ const Service: React.FC<ServiceProps> = ({
             value={selected}
             disableGap
             preventDisabledColor
-            preventRender={(filterServiceParams && !params) || !showCollapse || !selected}
+            preventRender={customize ? false : (filterServiceParams && !params) || !showCollapse || !selected}
             disabled={disabled || !customize}
             onChange={() => handleClick(selected)}
             expend={specId < 0 || !showCollapse ? null : open}

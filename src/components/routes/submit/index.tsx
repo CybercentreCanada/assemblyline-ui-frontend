@@ -235,7 +235,7 @@ const WrappedSubmitContent = () => {
                       loading={loading as boolean}
                       disabled={disabled as boolean}
                       customize={customize as boolean}
-                      filterServiceParams={true}
+                      filterServiceParams={!customize}
                     />
                     <SubmissionParameters
                       profile={profile as string}
@@ -243,12 +243,7 @@ const WrappedSubmitContent = () => {
                       disabled={disabled as boolean}
                       customize={customize as boolean}
                     />
-                    <MetadataParameters
-                      profile={profile as string}
-                      loading={loading as boolean}
-                      disabled={disabled as boolean}
-                      customize={customize as boolean}
-                    />
+                    <MetadataParameters loading={loading as boolean} disabled={disabled as boolean} />
                   </div>
                 </>
               </Drawer>
