@@ -315,7 +315,8 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
                         const newSources = settings.default_external_sources;
                         if (newSources.indexOf(source) === -1) newSources.push(source);
                         else newSources.splice(newSources.indexOf(source), 1);
-                        return { ...s, default_external_sources: newSources };
+                        s.settings = { ...s.settings, default_external_sources: newSources };
+                        return s;
                       });
                     }}
                   />
