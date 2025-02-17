@@ -116,12 +116,23 @@ const loadProfile = (profile_name: string, settings: UserSettings, profile: Subm
       params: spec.params
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(param => {
+          // Check if there's a value set by the user for the profile, otherwise default to what's set in the profile configuration, if any.
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const paramValue = profile?.params?.service_spec?.[spec?.name]?.[param?.name];
+          const profileUserParam = settings.submission_profiles[profile_name].service_spec?.[spec.name]?.[param.name];
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const profileDefaultParam = profile?.params?.service_spec?.[spec.name]?.[param.name];
           return {
             ...param,
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            value: paramValue === undefined || paramValue === null ? param?.value : paramValue,
+            default:
+              profileUserParam === undefined || profileUserParam === null
+                ? profileDefaultParam || param?.default
+                : profileUserParam,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            value:
+              profileUserParam === undefined || profileUserParam === null
+                ? profileDefaultParam || param?.value
+                : profileUserParam,
             editable: !profile ? true : profile.editable_params?.[spec.name]?.includes(param?.name) ?? false
           };
         })
@@ -233,7 +244,7 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
       profile.service_spec.forEach((service, i) => {
         let spec: { [name: string]: unknown } = null;
         service.params.forEach((param, j) => {
-          if (out?.service_spec && param.value !== out.service_spec[i].params[j].value) {
+          if (param.value !== param.default) {
             spec = { ...spec, [param.name]: param.value };
           }
 
@@ -247,37 +258,6 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
       });
     });
   }
-
-  return out;
-};
-
-export const applySubmissionProfile = (submit: SubmitSettings, profile: string | number): UserSettings => {
-  if (!submit) return null;
-
-  const out: UserSettings = {
-    description: submit.description || '',
-    default_external_sources: submit.default_external_sources || []
-  } as UserSettings;
-
-  // Applying the selected submission profile parameters
-  Object.entries(submit.submission_profiles[profile]).forEach(([key, value]: [string, unknown]) => {
-    const param = value as ProfileParam<unknown>;
-    if (PROFILE_KEYS.includes(key as ProfileKey)) {
-      out[key] = param.value;
-    }
-  });
-
-  // Applying the selected submission profile service specs
-  out.service_spec = structuredClone(submit.submission_profiles[profile].service_spec);
-  out.service_spec.forEach((_, i) => {
-    out.service_spec[i].params.forEach((__, j) => {
-      delete out.service_spec[i].params[j].editable;
-    });
-  });
-
-  // Applying the selected submission profile service specs
-  out.services = structuredClone(submit.submission_profiles[profile].services);
-
   return out;
 };
 

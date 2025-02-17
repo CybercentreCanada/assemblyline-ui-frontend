@@ -41,7 +41,7 @@ export const InterfaceSection = () => {
                     value: profileValue,
                     label:
                       profileValue === 'default'
-                        ? t(`profile.${profileValue}`)
+                        ? t(`profile.custom`)
                         : configuration.submission.profiles[profileValue].display_name
                   }))}
                   onChange={(event, v) => {
