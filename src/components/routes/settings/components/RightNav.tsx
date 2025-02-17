@@ -78,6 +78,18 @@ export const RightNav = () => {
               )}
             />
             <ActiveAnchor
+              activeID="default_external_sources"
+              children={active => (
+                <PageNavigationItem
+                  primary={t('submissions.default_external_sources')}
+                  variant="right"
+                  active={active}
+                  subheader
+                  onPageNavigation={event => scrollTo(event, 'default_external_sources')}
+                />
+              )}
+            />
+            <ActiveAnchor
               activeID="services"
               children={active => (
                 <PageNavigationItem

@@ -40,7 +40,7 @@ export const SubmissionSection = () => {
               anchor
             />
 
-            <List inset>
+            <List>
               {c12nDef.enforce && (
                 <form.Subscribe
                   selector={state => state.values?.next?.submission_profiles[profile]?.classification}

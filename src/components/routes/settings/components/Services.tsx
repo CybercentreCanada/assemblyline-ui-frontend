@@ -372,18 +372,20 @@ const Category = React.memo(
               onChange={!customize ? null : (event, checked) => handleChange(checked)}
             />
 
-            {category.services.map((service, svr_id) => (
-              <Service
-                key={`${cat_id}-${svr_id}`}
-                cat_id={cat_id}
-                customize={customize}
-                disabled={disabled}
-                loading={loading}
-                profile={profile}
-                service={service}
-                svr_id={svr_id}
-              />
-            ))}
+            <List inset>
+              {category.services.map((service, svr_id) => (
+                <Service
+                  key={`${cat_id}-${svr_id}`}
+                  cat_id={cat_id}
+                  customize={customize}
+                  disabled={disabled}
+                  loading={loading}
+                  profile={profile}
+                  service={service}
+                  svr_id={svr_id}
+                />
+              ))}
+            </List>
           </div>
         )}
       />
