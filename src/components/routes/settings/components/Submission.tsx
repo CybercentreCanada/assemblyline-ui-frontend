@@ -51,7 +51,7 @@ export const SubmissionSection = () => {
                       secondary={t('settings:submissions.classification_desc')}
                       value={value.value || value.default}
                       loading={loading}
-                      disabled={disabled || !customize}
+                      disabled={disabled || !(customize || value.editable)}
                       onChange={v => {
                         form.setStore(s => {
                           s.next.submission_profiles[profile].classification.value = v;
