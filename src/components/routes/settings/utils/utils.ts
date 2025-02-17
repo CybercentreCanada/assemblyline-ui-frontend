@@ -116,18 +116,28 @@ const loadProfile = (profile_name: string, settings: UserSettings, profile: Subm
       params: spec.params
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(param => {
+          // Check if there's a value set by the user for the profile, otherwise default to what's set in the profile configuration, if any.
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const paramValue = profile?.params?.service_spec?.[spec?.name]?.[param?.name];
+          const profileUserParam = settings.submission_profiles[profile_name];
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const profileDefaultParam = profile?.params?.service_spec?.[spec.name]?.[param.name];
           return {
             ...param,
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            value: paramValue === undefined || paramValue === null ? param?.value : paramValue,
+            default:
+              profileUserParam === undefined || profileUserParam === null
+                ? profileDefaultParam || param?.default
+                : profileUserParam,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            value:
+              profileUserParam === undefined || profileUserParam === null
+                ? profileDefaultParam || param?.value
+                : profileUserParam,
             editable: !profile ? true : profile.editable_params?.[spec.name]?.includes(param?.name) ?? false
           };
         })
     }));
 
-  console.log(out);
   return out;
 };
 

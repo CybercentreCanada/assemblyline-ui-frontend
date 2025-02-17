@@ -43,6 +43,7 @@ const Parameter = React.memo(
     spec_id = null
   }: ParameterProps) => {
     const form = useForm();
+    const paramDisabled: boolean = disabled || !selected || !(customize || param.editable);
 
     return (
       <form.Subscribe
@@ -57,7 +58,7 @@ const Parameter = React.memo(
                   id={`${spec.name}-${param.name}`}
                   primary={primary}
                   capitalize
-                  disabled={disabled || (!customize && (!selected || !param.editable))}
+                  disabled={paramDisabled}
                   loading={loading}
                   reset={param.default !== null && state !== param.default}
                   value={state as string}
@@ -81,7 +82,7 @@ const Parameter = React.memo(
                   id={`${spec.name}-${param.name}`}
                   primary={primary}
                   capitalize
-                  disabled={disabled || (!customize && (!selected || !param.editable))}
+                  disabled={paramDisabled}
                   loading={loading}
                   reset={param.default !== null && state !== param.default}
                   value={state as number}
@@ -105,7 +106,7 @@ const Parameter = React.memo(
                   id={`${spec.name}-${param.name}`}
                   primary={primary}
                   capitalize
-                  disabled={disabled || (!customize && (!selected || !param.editable))}
+                  disabled={paramDisabled}
                   loading={loading}
                   reset={param.default !== null && state !== param.default}
                   value={state as boolean}
@@ -129,7 +130,7 @@ const Parameter = React.memo(
                   id={`${spec.name}-${param.name}`}
                   primary={primary}
                   capitalize
-                  disabled={disabled || (!customize && (!selected || !param.editable))}
+                  disabled={paramDisabled}
                   loading={loading}
                   reset={param.default !== null && state !== param.default}
                   value={state as string}
