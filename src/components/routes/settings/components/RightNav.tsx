@@ -64,7 +64,7 @@ export const RightNav = () => {
         const customize = props[3] as boolean;
 
         return (
-          <PageNavigation subheader={t('content')} preventRender={loading || profile === 'interface'} variant="right">
+          <PageNavigation preventRender={loading || profile === 'interface'} variant="right">
             <ActiveAnchor
               activeID="submissions"
               children={active => (
