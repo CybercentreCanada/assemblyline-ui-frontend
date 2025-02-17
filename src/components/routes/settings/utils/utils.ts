@@ -118,7 +118,7 @@ const loadProfile = (profile_name: string, settings: UserSettings, profile: Subm
         .map(param => {
           // Check if there's a value set by the user for the profile, otherwise default to what's set in the profile configuration, if any.
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const profileUserParam = settings.submission_profiles[profile_name];
+          const profileUserParam = settings.submission_profiles[profile_name].service_spec?.[spec.name]?.[param.name];
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const profileDefaultParam = profile?.params?.service_spec?.[spec.name]?.[param.name];
           return {
