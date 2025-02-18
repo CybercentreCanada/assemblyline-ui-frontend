@@ -136,7 +136,7 @@ const Parameter = React.memo(
                   value={state as string}
                   options={param.list.map(item => ({
                     value: item,
-                    label: item.replaceAll('_', ' ')
+                    primary: item.replaceAll('_', ' ')
                   }))}
                   onChange={(event, value) => {
                     form.setStore(s => {
@@ -237,7 +237,7 @@ const Service = React.memo(
           return (
             <div
               key={`${service.name}-${svr_id}`}
-              style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.25) }}
+              style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.25), marginLeft: '42px' }}
             >
               <ListHeader
                 id={`${service.category}-${service.name}`}
@@ -372,20 +372,18 @@ const Category = React.memo(
               onChange={!customize ? null : (event, checked) => handleChange(checked)}
             />
 
-            <List inset>
-              {category.services.map((service, svr_id) => (
-                <Service
-                  key={`${cat_id}-${svr_id}`}
-                  cat_id={cat_id}
-                  customize={customize}
-                  disabled={disabled}
-                  loading={loading}
-                  profile={profile}
-                  service={service}
-                  svr_id={svr_id}
-                />
-              ))}
-            </List>
+            {category.services.map((service, svr_id) => (
+              <Service
+                key={`${cat_id}-${svr_id}`}
+                cat_id={cat_id}
+                customize={customize}
+                disabled={disabled}
+                loading={loading}
+                profile={profile}
+                service={service}
+                svr_id={svr_id}
+              />
+            ))}
           </div>
         )}
       />

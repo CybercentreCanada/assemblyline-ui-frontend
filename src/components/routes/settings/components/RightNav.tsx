@@ -1,4 +1,3 @@
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
 import type { SettingsStore } from 'components/routes/settings/settings.form';
 import { useForm } from 'components/routes/settings/settings.form';
@@ -158,12 +157,7 @@ export const RightNav = () => {
                                 ]}
                                 children={serviceProps => (
                                   <PageNavigationItem
-                                    primary={
-                                      <div style={{ display: 'flex' }}>
-                                        <span>{service.name}</span>
-                                        {serviceProps[1] && <ArrowRightIcon style={{ height: '20px' }} />}
-                                      </div>
-                                    }
+                                    primary={service.name}
                                     variant="right"
                                     active={active}
                                     sx={serviceProps[0] ? null : { opacity: 0.38 }}

@@ -27,7 +27,7 @@ export const InterfaceSection = () => {
             primaryProps={{ className: 'Anchor', variant: 'h6' }}
           />
 
-          <List inset>
+          <List>
             <form.Subscribe
               selector={state => state.values.next.preferred_submission_profile}
               children={value => (
@@ -39,17 +39,16 @@ export const InterfaceSection = () => {
                   disabled={disabled}
                   options={getProfileNames(settings).map(profileValue => ({
                     value: profileValue,
-                    label:
+                    primary:
                       profileValue === 'default'
                         ? t(`profile.custom`)
-                        : configuration.submission.profiles[profileValue].display_name
+                        : configuration.submission.profiles[profileValue].display_name,
+                    secondary:
+                      profileValue === 'default'
+                        ? t(`profile.custom`)
+                        : configuration.submission.profiles[profileValue].description
                   }))}
-                  onChange={(event, v) => {
-                    form.setStore(s => {
-                      s.next.preferred_submission_profile = v;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, v) => form.setFieldValue('next.preferred_submission_profile', v)}
                 />
               )}
             />
@@ -64,8 +63,8 @@ export const InterfaceSection = () => {
                   loading={loading}
                   disabled={disabled}
                   options={[
-                    { value: 'report', label: t('interface.view_report') },
-                    { value: 'details', label: t('interface.view_details') }
+                    { value: 'report', primary: t('interface.view_report') },
+                    { value: 'details', primary: t('interface.view_details') }
                   ]}
                   onChange={(event, v) => {
                     form.setStore(s => {
@@ -87,9 +86,13 @@ export const InterfaceSection = () => {
                   loading={loading}
                   disabled={disabled}
                   options={[
-                    ...(configuration.ui.allow_raw_downloads && [{ value: 'raw', label: t('interface.encoding_raw') }]),
-                    { value: 'cart', label: t('interface.encoding_cart') },
-                    ...(configuration.ui.allow_zip_downloads && [{ value: 'zip', label: t('interface.encoding_zip') }])
+                    ...(configuration.ui.allow_raw_downloads && [
+                      { value: 'raw', primary: t('interface.encoding_raw') }
+                    ]),
+                    { value: 'cart', primary: t('interface.encoding_cart') },
+                    ...(configuration.ui.allow_zip_downloads && [
+                      { value: 'zip', primary: t('interface.encoding_zip') }
+                    ])
                   ]}
                   onChange={(event, v) => {
                     form.setStore(s => {
@@ -133,12 +136,12 @@ export const InterfaceSection = () => {
                   loading={loading}
                   disabled={disabled}
                   options={[
-                    { value: '-1000000', label: t('interface.score_-1000000') },
-                    { value: '0', label: t('interface.score_0') },
-                    { value: '100', label: t('interface.score_100') },
-                    { value: '500', label: t('interface.score_500') },
-                    { value: '2000', label: t('interface.score_2000') },
-                    { value: '100000000', label: t('interface.score_100000000') }
+                    { value: '-1000000', primary: t('interface.score_-1000000') },
+                    { value: '0', primary: t('interface.score_0') },
+                    { value: '100', primary: t('interface.score_100') },
+                    { value: '500', primary: t('interface.score_500') },
+                    { value: '2000', primary: t('interface.score_2000') },
+                    { value: '100000000', primary: t('interface.score_100000000') }
                   ]}
                   onChange={(event, v) => {
                     form.setStore(s => {
