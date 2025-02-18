@@ -19,8 +19,13 @@ type Props = Omit<SelectProps, 'defaultValue' | 'error' | 'onChange'> & {
   error?: (value: SelectProps['value']) => string;
   errorProps?: FormHelperTextProps;
   hasEmpty?: boolean;
+  inset?: boolean;
   loading?: boolean;
-  options: { label: MenuItemProps['children']; value: MenuItemProps['value'] }[];
+  options: {
+    primary: ListItemTextProps['primary'];
+    secondary?: ListItemTextProps['secondary'];
+    value: MenuItemProps['value'];
+  }[];
   preventRender?: boolean;
   primary?: React.ReactNode;
   primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
@@ -41,6 +46,7 @@ const WrappedSelectListInput = ({
   errorProps = null,
   hasEmpty = false,
   id = null,
+  inset = false,
   loading = false,
   options = [],
   preventRender = false,
@@ -75,7 +81,11 @@ const WrappedSelectListInput = ({
         primaryTypographyProps={primaryProps}
         secondaryTypographyProps={secondaryProps}
         capitalize={capitalize}
-        style={{ marginRight: theme.spacing(2), margin: `${theme.spacing(0.25)} 0` }}
+        style={{
+          marginRight: theme.spacing(2),
+          margin: `${theme.spacing(0.25)} 0`,
+          ...(inset && { marginLeft: '42px' })
+        }}
       />
       {loading ? (
         <SkeletonListInput />
@@ -108,6 +118,12 @@ const WrappedSelectListInput = ({
             }}
             value={value}
             inputProps={{ id: id || primary.toString(), style: { color: 'textPrimary' } }}
+            renderValue={option => (
+              <ListItemText
+                primary={options.find(o => o.value === option)?.primary || ''}
+                primaryTypographyProps={{ sx: { cursor: 'pointer' } }}
+              />
+            )}
             onChange={event => {
               onChange(event, event.target.value as string);
 
@@ -118,8 +134,20 @@ const WrappedSelectListInput = ({
           >
             {hasEmpty && <MenuItem value="" sx={{ height: '36px' }}></MenuItem>}
             {options.map((option, i) => (
-              <MenuItem key={i} value={option.value} sx={{ ...(capitalize && { textTransform: 'capitalize' }) }}>
-                {option.label}
+              <MenuItem
+                key={i}
+                value={option.value}
+                sx={{
+                  '&>label': { margin: 0, cursor: 'pointer !important', maxWidth: theme.breakpoints.values.sm },
+                  ...(capitalize && { textTransform: 'capitalize' })
+                }}
+              >
+                <ListItemText
+                  primary={option.primary}
+                  secondary={option.secondary}
+                  primaryTypographyProps={{ overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' }}
+                  secondaryTypographyProps={{ overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' }}
+                />
               </MenuItem>
             ))}
           </Select>

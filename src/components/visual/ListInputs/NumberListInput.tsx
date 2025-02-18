@@ -20,6 +20,7 @@ type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   endAdornment?: ReactNode;
   error?: (value: number) => string;
   errorProps?: FormHelperTextProps;
+  inset?: boolean;
   loading?: boolean;
   max?: number;
   min?: number;
@@ -44,6 +45,7 @@ const WrappedNumberListInput = ({
   error = () => null,
   errorProps = null,
   id = null,
+  inset = false,
   loading = false,
   max,
   min,
@@ -79,7 +81,11 @@ const WrappedNumberListInput = ({
         primaryTypographyProps={primaryProps}
         secondaryTypographyProps={secondaryProps}
         capitalize={capitalize}
-        style={{ marginRight: theme.spacing(2), margin: `${theme.spacing(0.25)} 0` }}
+        style={{
+          marginRight: theme.spacing(2),
+          margin: `${theme.spacing(0.25)} 0`,
+          ...(inset && { marginLeft: '42px' })
+        }}
       />
       {loading ? (
         <SkeletonListInput />

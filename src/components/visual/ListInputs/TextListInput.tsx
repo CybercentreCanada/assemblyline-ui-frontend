@@ -20,6 +20,7 @@ type Props<
   capitalize?: boolean;
   error?: (value: string) => string;
   errorProps?: FormHelperTextProps;
+  inset?: boolean;
   loading?: boolean;
   options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
   preventRender?: boolean;
@@ -49,6 +50,7 @@ const WrappedTextListInput = <
   error = () => null,
   errorProps = null,
   id = null,
+  inset = false,
   loading = false,
   options = [],
   preventRender = false,
@@ -83,7 +85,11 @@ const WrappedTextListInput = <
         primaryTypographyProps={primaryProps}
         secondaryTypographyProps={secondaryProps}
         capitalize={capitalize}
-        style={{ marginRight: theme.spacing(2), margin: `${theme.spacing(0.25)} 0` }}
+        style={{
+          marginRight: theme.spacing(2),
+          margin: `${theme.spacing(0.25)} 0`,
+          ...(inset && { marginLeft: '42px' })
+        }}
       />
       {loading ? (
         <SkeletonListInput />

@@ -10,6 +10,7 @@ type Props = Omit<ListItemButtonProps, 'defaultValue' | 'onChange' | 'onClick' |
   capitalize?: boolean;
   error?: (value: boolean) => string;
   errorProps?: FormHelperTextProps;
+  inset?: boolean;
   loading?: boolean;
   preventRender?: boolean;
   primary?: React.ReactNode;
@@ -31,6 +32,7 @@ const WrappedBooleanListInput = ({
   error = () => null,
   errorProps = null,
   id = null,
+  inset = false,
   loading = false,
   preventRender = false,
   primary,
@@ -74,7 +76,11 @@ const WrappedBooleanListInput = ({
             secondaryTypographyProps={secondaryProps}
             capitalize={capitalize}
             cursor="pointer"
-            style={{ marginRight: theme.spacing(2), margin: `${theme.spacing(0.25)} 0` }}
+            style={{
+              marginRight: theme.spacing(2),
+              margin: `${theme.spacing(0.25)} 0`,
+              ...(inset && { marginLeft: '42px' })
+            }}
           />
           {loading ? (
             <SkeletonListInput />

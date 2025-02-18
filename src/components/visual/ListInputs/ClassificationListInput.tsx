@@ -13,6 +13,7 @@ type Props = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
   error?: (value: string) => string;
   errorProps?: FormHelperTextProps;
   id?: string;
+  inset?: boolean;
   loading?: boolean;
   preventRender?: boolean;
   primary?: React.ReactNode;
@@ -34,6 +35,7 @@ const WrappedClassificationListInput = ({
   error = () => null,
   errorProps = null,
   id = null,
+  inset = false,
   loading = false,
   preventRender = false,
   primary,
@@ -67,7 +69,11 @@ const WrappedClassificationListInput = ({
         primaryTypographyProps={primaryProps}
         secondaryTypographyProps={secondaryProps}
         capitalize={capitalize}
-        style={{ marginRight: theme.spacing(2), margin: `${theme.spacing(0.25)} 0` }}
+        style={{
+          marginRight: theme.spacing(2),
+          margin: `${theme.spacing(0.25)} 0`,
+          ...(inset && { marginLeft: '42px' })
+        }}
       />
       {loading ? (
         <SkeletonListInput />
