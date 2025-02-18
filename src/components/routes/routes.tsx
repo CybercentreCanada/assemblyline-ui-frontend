@@ -62,7 +62,7 @@ const Settings = lazy(() => import('components/routes/settings/settings'));
 const SubmissionDetail = lazy(() => import('components/routes/submission/detail'));
 const SubmissionReport = lazy(() => import('components/routes/submission/report'));
 const Submissions = lazy(() => import('components/routes/submissions'));
-const Submit = lazy(() => import('components/routes/submit/index'));
+const Submit = lazy(() => import('components/routes/submit/submit'));
 const Tos = lazy(() => import('components/routes/tos'));
 const User = lazy(() => import('components/routes/user'));
 

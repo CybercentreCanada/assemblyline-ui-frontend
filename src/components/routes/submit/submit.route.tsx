@@ -6,7 +6,7 @@ import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Metadata } from 'components/models/base/submission';
-import { loadSubmissionProfiles } from 'components/routes/submit/utils/utils';
+import { loadSubmissionProfiles } from 'components/routes/submit/submit.utils';
 import Classification from 'components/visual/Classification';
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
@@ -19,8 +19,8 @@ import { MetadataParameters } from './components/MetadataParameters';
 import { ServiceSelection } from './components/ServiceSelection';
 import { SubmissionParameters } from './components/SubmissionParameters';
 import { SubmissionProfile } from './components/SubmissionProfile';
-import type { TabKey } from './contexts/form';
-import { DEFAULT_SUBMIT_FORM, FormProvider, useForm } from './contexts/form';
+import type { TabKey } from './submit.form';
+import { DEFAULT_SUBMIT_FORM, useForm } from './submit.form';
 
 export const FLOW = new Flow({
   target: '/api/v4/ui/flowjs/',
@@ -32,7 +32,7 @@ export const FLOW = new Flow({
 
 const drawerPadding = 40;
 
-const WrappedSubmitContent = () => {
+const WrappedSubmitRoute = () => {
   const { t, i18n } = useTranslation(['submit']);
   const banner = useAppBanner();
   const location = useLocation();
@@ -255,13 +255,4 @@ const WrappedSubmitContent = () => {
   );
 };
 
-const SubmitContent = React.memo(WrappedSubmitContent);
-
-const WrappedSubmitPage = () => (
-  <FormProvider>
-    <SubmitContent />
-  </FormProvider>
-);
-
-export const SubmitPage = React.memo(WrappedSubmitPage);
-export default SubmitPage;
+export const SubmitRoute = React.memo(WrappedSubmitRoute);
