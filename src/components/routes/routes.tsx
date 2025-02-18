@@ -58,7 +58,7 @@ const WorkflowDetail = lazy(() => import('components/routes/manage/workflows/det
 const RetroHunt = lazy(() => import('components/routes/retrohunt'));
 const RetroHuntDetail = lazy(() => import('components/routes/retrohunt/detail'));
 const Search = lazy(() => import('components/routes/search'));
-const Settings = lazy(() => import('components/routes/settings/index'));
+const Settings = lazy(() => import('components/routes/settings/settings'));
 const SubmissionDetail = lazy(() => import('components/routes/submission/detail'));
 const SubmissionReport = lazy(() => import('components/routes/submission/report'));
 const Submissions = lazy(() => import('components/routes/submissions'));

@@ -1,5 +1,5 @@
 import { createFormContext } from 'components/core/form/createFormContext';
-import type { SubmitSettings } from 'components/routes/settings/utils/utils';
+import type { SubmitSettings } from './settings.utils';
 
 export const TABS = ['file', 'hash', 'options'] as const;
 export type Tabs = (typeof TABS)[number];

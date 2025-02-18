@@ -1,7 +1,7 @@
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
-import type { SettingsStore } from 'components/routes/settings/contexts/form';
-import { useForm } from 'components/routes/settings/contexts/form';
+import type { SettingsStore } from 'components/routes/settings/settings.form';
+import { useForm } from 'components/routes/settings/settings.form';
 import { PageNavigation, PageNavigationItem } from 'components/visual/Layouts/PageNavigation';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';

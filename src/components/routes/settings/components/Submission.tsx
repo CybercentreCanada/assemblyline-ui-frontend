@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
-import type { SettingsStore } from 'components/routes/settings/contexts/form';
-import { useForm } from 'components/routes/settings/contexts/form';
+import type { SettingsStore } from 'components/routes/settings/settings.form';
+import { useForm } from 'components/routes/settings/settings.form';
 import { PageSection } from 'components/visual/Layouts/PageSection';
 import { List } from 'components/visual/List/List';
 import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';

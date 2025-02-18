@@ -5,8 +5,8 @@ import type {
   ServiceParameter,
   ServiceSpecification
 } from 'components/models/base/service';
-import type { SettingsStore } from 'components/routes/settings/contexts/form';
-import { useForm } from 'components/routes/settings/contexts/form';
+import type { SettingsStore } from 'components/routes/settings/settings.form';
+import { useForm } from 'components/routes/settings/settings.form';
 import { PageSection } from 'components/visual/Layouts/PageSection';
 import { List } from 'components/visual/List/List';
 import { ListHeader } from 'components/visual/List/ListHeader';

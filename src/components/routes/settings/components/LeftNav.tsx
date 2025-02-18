@@ -1,6 +1,6 @@
 import useALContext from 'components/hooks/useALContext';
-import { useForm } from 'components/routes/settings/contexts/form';
-import { getProfileNames } from 'components/routes/settings/utils/utils';
+import { useForm } from 'components/routes/settings/settings.form';
+import { getProfileNames } from 'components/routes/settings/settings.utils';
 import { PageNavigation } from 'components/visual/Layouts/PageNavigation';
 import { useTranslation } from 'react-i18next';
 

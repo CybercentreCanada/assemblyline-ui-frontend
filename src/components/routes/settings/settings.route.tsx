@@ -1,4 +1,4 @@
-import TableOfContentProvider, { useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
+import { useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
 import useALContext from 'components/hooks/useALContext';
 import ForbiddenPage from 'components/routes/403';
 import { PageLayout } from 'components/visual/Layouts/PageLayout';
@@ -12,15 +12,15 @@ import { LeftNav } from './components/LeftNav';
 import { RightNav } from './components/RightNav';
 import { ServicesSection } from './components/Services';
 import { SubmissionSection } from './components/Submission';
-import type { SettingsStore } from './contexts/form';
-import { FormProvider, useForm } from './contexts/form';
-import { loadSubmissionProfiles } from './utils/utils';
+import type { SettingsStore } from './settings.form';
+import { useForm } from './settings.form';
+import { loadSubmissionProfiles } from './settings.utils';
 
 type Params = {
   tab: SettingsStore['state']['tab'];
 };
 
-const SettingsContent = () => {
+const WrappedSettingsRoute = () => {
   const navigate = useNavigate();
   const { tab: tabParam } = useParams<Params>();
   const { user: currentUser, configuration, settings } = useALContext();
@@ -90,13 +90,4 @@ const SettingsContent = () => {
     );
 };
 
-const WrappedSettingsPage = () => (
-  <TableOfContentProvider>
-    <FormProvider>
-      <SettingsContent />
-    </FormProvider>
-  </TableOfContentProvider>
-);
-
-export const SettingsPage = React.memo(WrappedSettingsPage);
-export default SettingsPage;
+export const SettingsRoute = React.memo(WrappedSettingsRoute);
