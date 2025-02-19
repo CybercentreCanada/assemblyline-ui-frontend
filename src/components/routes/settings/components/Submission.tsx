@@ -1,15 +1,15 @@
 import { useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
-import type { SettingsStore } from 'components/routes/settings/settings.form';
 import { useForm } from 'components/routes/settings/settings.form';
 import { PageSection } from 'components/visual/Layouts/PageSection';
 import { List } from 'components/visual/List/List';
 import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
 import { ClassificationListInput } from 'components/visual/ListInputs/ClassificationListInput';
 import { NumberListInput } from 'components/visual/ListInputs/NumberListInput';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const SubmissionSection = () => {
+export const SubmissionSection = React.memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
@@ -17,259 +17,164 @@ export const SubmissionSection = () => {
 
   return (
     <form.Subscribe
-      selector={state => [
-        state.values.state.customize,
-        state.values.state.disabled,
-        state.values.state.loading,
-        state.values.state.tab
-      ]}
-      children={props => {
-        const customize = props[0] as boolean;
-        const disabled = props[1] as boolean;
-        const loading = props[2] as boolean;
-        const profile = props[3] as SettingsStore['state']['tab'];
+      selector={state => [state.values.state.customize, state.values.state.disabled, state.values.state.loading]}
+      children={([customize, disabled, loading]) => (
+        <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
+          <PageSection
+            id="submissions"
+            primary={t('submissions')}
+            secondary={t('submissions.description')}
+            primaryProps={{ variant: 'h6' }}
+            subheader
+            anchor
+          />
 
-        return (
-          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
-            <PageSection
-              id="submissions"
-              primary={t('submissions')}
-              secondary={t('submissions.description')}
-              primaryProps={{ variant: 'h6' }}
-              subheader
-              anchor
-            />
+          <List>
+            {c12nDef.enforce && (
+              <form.Subscribe
+                selector={state => {
+                  const param = state.values.next.classification;
+                  return [param.value, param.default, param.editable];
+                }}
+                children={([value, defaultValue, editable]) => (
+                  <ClassificationListInput
+                    id="settings:submissions.classification"
+                    primary={t('settings:submissions.classification')}
+                    secondary={t('settings:submissions.classification_desc')}
+                    value={(value || defaultValue) as string}
+                    loading={loading}
+                    disabled={disabled || !(customize || (editable as boolean))}
+                    onChange={v => form.setFieldValue(`next.classification.value`, v)}
+                  />
+                )}
+              />
+            )}
 
-            <List>
-              {c12nDef.enforce && (
-                <form.Subscribe
-                  selector={state => state.values?.next?.submission_profiles[profile]?.classification}
-                  children={value => (
-                    <ClassificationListInput
-                      id="settings:submissions.classification"
-                      primary={t('settings:submissions.classification')}
-                      secondary={t('settings:submissions.classification_desc')}
-                      value={value.value || value.default}
-                      loading={loading}
-                      disabled={disabled || !(customize || value.editable)}
-                      onChange={v => {
-                        form.setStore(s => {
-                          s.next.submission_profiles[profile].classification.value = v;
-                          return s;
-                        });
-                      }}
-                    />
-                  )}
+            <form.Subscribe
+              selector={state => {
+                const param = state.values.next.ttl;
+                return [param.value, param.default, param.editable];
+              }}
+              children={([value, defaultValue, editable]) => (
+                <NumberListInput
+                  id="settings:submissions.ttl"
+                  primary={t('settings:submissions.ttl')}
+                  secondary={t('settings:submissions.ttl_desc')}
+                  endAdornment={t('settings:submissions.ttl_days')}
+                  value={value as number}
+                  loading={loading}
+                  disabled={disabled || (!customize && !editable)}
+                  reset={defaultValue !== null && value !== defaultValue}
+                  min={configuration.submission.max_dtl !== 0 ? 1 : 0}
+                  max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
+                  onChange={(event, v) => form.setFieldValue(`next.ttl.value`, v)}
+                  onReset={() => form.setFieldValue(`next.ttl.value`, defaultValue as number)}
                 />
               )}
+            />
 
-              <form.Subscribe
-                selector={state =>
-                  state.values?.next?.submission_profiles?.[profile]?.ttl || {
-                    value: null,
-                    default: null,
-                    editable: false
-                  }
-                }
-                children={state => (
-                  <NumberListInput
-                    id="settings:submissions.ttl"
-                    primary={t('settings:submissions.ttl')}
-                    secondary={t('settings:submissions.ttl_desc')}
-                    endAdornment={t('settings:submissions.ttl_days')}
-                    value={state.value}
-                    loading={loading}
-                    disabled={disabled || (!customize && !state.editable)}
-                    reset={state.default !== null && state.value !== state.default}
-                    min={configuration.submission.max_dtl !== 0 ? 1 : 0}
-                    max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
-                    onChange={(event, value) => {
-                      form.setStore(s => {
-                        s.next.submission_profiles[profile].ttl = { ...state, value };
-                        return s;
-                      });
-                    }}
-                    onReset={() => {
-                      form.setStore(s => {
-                        s.next.submission_profiles[profile].ttl = { ...state, value: state.default };
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
+            <form.Subscribe
+              selector={state => {
+                const param = state.values.next.deep_scan;
+                return [param.value, param.default, param.editable];
+              }}
+              children={([value, defaultValue, editable]) => (
+                <BooleanListInput
+                  id="settings:submissions.deep_scan"
+                  primary={t('settings:submissions.deep_scan')}
+                  secondary={t('settings:submissions.deep_scan_desc')}
+                  value={value}
+                  loading={loading}
+                  disabled={disabled || (!customize && !editable)}
+                  reset={defaultValue !== null && value !== defaultValue}
+                  onChange={(event, v) => form.setFieldValue(`next.deep_scan.value`, v)}
+                  onReset={() => form.setFieldValue(`next.deep_scan.value`, defaultValue)}
+                />
+              )}
+            />
 
-              <form.Subscribe
-                selector={state =>
-                  state.values?.next?.submission_profiles?.[profile]?.deep_scan || {
-                    value: null,
-                    default: null,
-                    editable: false
-                  }
-                }
-                children={state => (
-                  <BooleanListInput
-                    id="settings:submissions.deep_scan"
-                    primary={t('settings:submissions.deep_scan')}
-                    secondary={t('settings:submissions.deep_scan_desc')}
-                    value={state.value}
-                    loading={loading}
-                    disabled={disabled || (!customize && !state.editable)}
-                    reset={state.default !== null && state.value !== state.default}
-                    onChange={(event, value) => {
-                      form.setStore(s => {
-                        s.next.submission_profiles[profile].deep_scan = { ...state, value };
-                        return s;
-                      });
-                    }}
-                    onReset={() => {
-                      form.setStore(s => {
-                        s.next.submission_profiles[profile].deep_scan = { ...state, value: state.default };
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
+            <form.Subscribe
+              selector={state => {
+                const param = state.values.next.ignore_recursion_prevention;
+                return [param.value, param.default, param.editable];
+              }}
+              children={([value, defaultValue, editable]) => (
+                <BooleanListInput
+                  id="settings:submissions.recursion_prevention"
+                  primary={t('settings:submissions.recursion_prevention')}
+                  secondary={t('settings:submissions.recursion_prevention_desc')}
+                  value={value}
+                  loading={loading}
+                  disabled={disabled || (!customize && !editable)}
+                  reset={defaultValue !== null && value !== defaultValue}
+                  onChange={(event, v) => form.setFieldValue(`next.ignore_recursion_prevention.value`, v)}
+                  onReset={() => form.setFieldValue(`next.ignore_recursion_prevention.value`, defaultValue)}
+                />
+              )}
+            />
 
-              <form.Subscribe
-                selector={state =>
-                  state.values?.next?.submission_profiles?.[profile]?.ignore_recursion_prevention || {
-                    value: null,
-                    default: null,
-                    editable: false
-                  }
-                }
-                children={state => (
-                  <BooleanListInput
-                    id="settings:submissions.recursion_prevention"
-                    primary={t('settings:submissions.recursion_prevention')}
-                    secondary={t('settings:submissions.recursion_prevention_desc')}
-                    value={state.value}
-                    loading={loading}
-                    disabled={disabled || (!customize && !state.editable)}
-                    reset={state.default !== null && state.value !== state.default}
-                    onChange={(event, value) => {
-                      form.setStore(s => {
-                        s.next.submission_profiles[profile].ignore_recursion_prevention = { ...state, value };
-                        return s;
-                      });
-                    }}
-                    onReset={() => {
-                      form.setStore(s => {
-                        s.next.submission_profiles[profile].ignore_recursion_prevention = {
-                          ...state,
-                          value: state.default
-                        };
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
+            <form.Subscribe
+              selector={state => {
+                const param = state.values.next.ignore_filtering;
+                return [param.value, param.default, param.editable];
+              }}
+              children={([value, defaultValue, editable]) => (
+                <BooleanListInput
+                  id="settings:submissions.filtering"
+                  primary={t('settings:submissions.filtering')}
+                  secondary={t('settings:submissions.filtering_desc')}
+                  value={value}
+                  loading={loading}
+                  disabled={disabled || (!customize && !editable)}
+                  reset={defaultValue !== null && value !== defaultValue}
+                  onChange={(event, v) => form.setFieldValue(`next.ignore_filtering.value`, v)}
+                  onReset={() => form.setFieldValue(`next.ignore_filtering.value`, defaultValue)}
+                />
+              )}
+            />
 
-              <form.Subscribe
-                selector={state =>
-                  state.values?.next?.submission_profiles?.[profile]?.ignore_filtering || {
-                    value: null,
-                    default: null,
-                    editable: false
-                  }
-                }
-                children={state => (
-                  <BooleanListInput
-                    id="settings:submissions.filtering"
-                    primary={t('settings:submissions.filtering')}
-                    secondary={t('settings:submissions.filtering_desc')}
-                    value={state.value}
-                    loading={loading}
-                    disabled={disabled || (!customize && !state.editable)}
-                    reset={state.default !== null && state.value !== state.default}
-                    onChange={(event, value) => {
-                      form.setStore(s => {
-                        s.next.submission_profiles[profile].ignore_filtering = { ...state, value };
-                        return s;
-                      });
-                    }}
-                    onReset={() => {
-                      form.setStore(s => {
-                        s.next.submission_profiles[profile].ignore_filtering = { ...state, value: state.default };
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
+            <form.Subscribe
+              selector={state => {
+                const param = state.values.next.generate_alert;
+                return [param.value, param.default, param.editable];
+              }}
+              children={([value, defaultValue, editable]) => (
+                <BooleanListInput
+                  id="settings:submissions.generate_alert"
+                  primary={t('settings:submissions.generate_alert')}
+                  secondary={t('settings:submissions.generate_alert_desc')}
+                  value={value}
+                  loading={loading}
+                  disabled={disabled || (!customize && !editable)}
+                  reset={defaultValue !== null && value !== defaultValue}
+                  onChange={(event, v) => form.setFieldValue(`next.generate_alert.value`, v)}
+                  onReset={() => form.setFieldValue(`next.generate_alert.value`, defaultValue)}
+                />
+              )}
+            />
 
-              <form.Subscribe
-                selector={state =>
-                  state.values?.next?.submission_profiles?.[profile]?.generate_alert || {
-                    value: null,
-                    default: null,
-                    editable: false
-                  }
-                }
-                children={state => (
-                  <BooleanListInput
-                    id="settings:submissions.generate_alert"
-                    primary={t('settings:submissions.generate_alert')}
-                    secondary={t('settings:submissions.generate_alert_desc')}
-                    value={state.value}
-                    loading={loading}
-                    disabled={disabled || (!customize && !state.editable)}
-                    reset={state.default !== null && state.value !== state.default}
-                    onChange={(event, value) => {
-                      form.setStore(s => {
-                        s.next.submission_profiles[profile].generate_alert = { ...state, value };
-                        return s;
-                      });
-                    }}
-                    onReset={() => {
-                      form.setStore(s => {
-                        s.next.submission_profiles[profile].generate_alert = { ...state, value: state.default };
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
-
-              <form.Subscribe
-                selector={state =>
-                  state.values?.next?.submission_profiles?.[profile]?.ignore_cache || {
-                    value: null,
-                    default: null,
-                    editable: false
-                  }
-                }
-                children={state => (
-                  <BooleanListInput
-                    id="settings:submissions.result_caching"
-                    primary={t('settings:submissions.result_caching')}
-                    secondary={t('settings:submissions.result_caching_desc')}
-                    value={state.value}
-                    loading={loading}
-                    disabled={disabled || (!customize && !state.editable)}
-                    reset={state.default !== null && state.value !== state.default}
-                    onChange={(event, value) => {
-                      form.setStore(s => {
-                        s.next.submission_profiles[profile].ignore_cache = { ...state, value };
-                        return s;
-                      });
-                    }}
-                    onReset={() => {
-                      form.setStore(s => {
-                        s.next.submission_profiles[profile].ignore_cache = { ...state, value: state.default };
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
-            </List>
-          </div>
-        );
-      }}
+            <form.Subscribe
+              selector={state => {
+                const param = state.values.next.ignore_cache;
+                return [param.value, param.default, param.editable];
+              }}
+              children={([value, defaultValue, editable]) => (
+                <BooleanListInput
+                  id="settings:submissions.result_caching"
+                  primary={t('settings:submissions.result_caching')}
+                  secondary={t('settings:submissions.result_caching_desc')}
+                  value={value}
+                  loading={loading}
+                  disabled={disabled || (!customize && !editable)}
+                  reset={defaultValue !== null && value !== defaultValue}
+                  onChange={(event, v) => form.setFieldValue(`next.ignore_cache.value`, v)}
+                  onReset={() => form.setFieldValue(`next.ignore_cache.value`, defaultValue)}
+                />
+              )}
+            />
+          </List>
+        </div>
+      )}
     />
   );
-};
+});

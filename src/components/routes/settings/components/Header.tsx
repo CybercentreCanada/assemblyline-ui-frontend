@@ -4,16 +4,15 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { SettingsStore } from 'components/routes/settings/settings.form';
 import { useForm } from 'components/routes/settings/settings.form';
-import type { SubmitSettings } from 'components/routes/settings/settings.utils';
 import { parseSubmissionProfiles } from 'components/routes/settings/settings.utils';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import _ from 'lodash';
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const HeaderSection = () => {
+export const HeaderSection = React.memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
@@ -22,7 +21,8 @@ export const HeaderSection = () => {
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
 
   const handleSubmit = useCallback(
-    (data: SubmitSettings) => {
+    () => {
+      const data = form.getFieldValue('next');
       if (!data) return;
 
       apiCall({
@@ -31,10 +31,7 @@ export const HeaderSection = () => {
         body: parseSubmissionProfiles(data),
         onSuccess: () => {
           showSuccessMessage(t('success_save'));
-          form.setStore(s => {
-            s.prev = _.cloneDeep(s.next);
-            return s;
-          });
+          form.setFieldValue('prev', structuredClone(form.getFieldValue('next')));
         },
         onFailure: api_data => {
           if (api_data.api_status_code === 403 || api_data.api_status_code === 401) {
@@ -42,18 +39,12 @@ export const HeaderSection = () => {
           }
         },
         onEnter: () => {
-          form.setStore(s => {
-            s.state.confirm = true;
-            s.state.submitting = true;
-            return s;
-          });
+          form.setFieldValue('state.confirm', true);
+          form.setFieldValue('state.submitting', true);
         },
         onExit: () => {
-          form.setStore(s => {
-            s.state.confirm = false;
-            s.state.submitting = false;
-            return s;
-          });
+          form.setFieldValue('state.confirm', false);
+          form.setFieldValue('state.submitting', false);
         }
       });
     },
@@ -83,10 +74,7 @@ export const HeaderSection = () => {
               <RouterPrompt
                 when={modified}
                 onAccept={() => {
-                  form.setStore(s => {
-                    s.next = structuredClone(s.prev);
-                    return s;
-                  });
+                  form.setFieldValue('next', structuredClone(form.getFieldValue('prev')));
                   return true;
                 }}
               />
@@ -94,13 +82,8 @@ export const HeaderSection = () => {
 
             <ConfirmationDialog
               open={confirm}
-              handleClose={() => {
-                form.setStore(s => {
-                  s.state.confirm = false;
-                  return s;
-                });
-              }}
-              handleAccept={() => handleSubmit(form.getFieldValue('next'))}
+              handleClose={() => form.setFieldValue('state.confirm', false)}
+              handleAccept={() => handleSubmit()}
               title={t('save.title')}
               cancelText={t('save.cancelText')}
               acceptText={t('save.acceptText')}
@@ -130,14 +113,30 @@ export const HeaderSection = () => {
                 >
                   <Button
                     variant="outlined"
+                    color="secondary"
+                    disabled={submitting || !modified}
+                    onClick={() => form.setFieldValue('next', structuredClone(form.getFieldValue('prev')))}
+                  >
+                    {t('cancel')}
+                    {submitting && (
+                      <CircularProgress
+                        size={24}
+                        style={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          marginTop: -12,
+                          marginLeft: -12
+                        }}
+                      />
+                    )}
+                  </Button>
+
+                  <Button
+                    variant="outlined"
                     color="primary"
                     disabled={submitting || !modified}
-                    onClick={() => {
-                      form.setStore(s => {
-                        s.next = structuredClone(s.prev);
-                        return s;
-                      });
-                    }}
+                    onClick={() => form.setFieldValue('next', structuredClone(form.getFieldValue('prev')))}
                   >
                     {t('reset')}
                     {submitting && (
@@ -158,12 +157,7 @@ export const HeaderSection = () => {
                     variant="contained"
                     color="primary"
                     disabled={submitting || !modified}
-                    onClick={() => {
-                      form.setStore(s => {
-                        s.state.confirm = true;
-                        return s;
-                      });
-                    }}
+                    onClick={() => form.setFieldValue('state.confirm', true)}
                   >
                     {t('save')}
                     {submitting && (
@@ -187,4 +181,4 @@ export const HeaderSection = () => {
       }}
     />
   );
-};
+});

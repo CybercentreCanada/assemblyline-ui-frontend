@@ -4,10 +4,10 @@ import type { SettingsStore } from 'components/routes/settings/settings.form';
 import { useForm } from 'components/routes/settings/settings.form';
 import { PageSection } from 'components/visual/Layouts/PageSection';
 import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const ExternalSourcesSection = () => {
+export const ExternalSourcesSection = React.memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
@@ -66,9 +66,9 @@ export const ExternalSourcesSection = () => {
                       loading={loading}
                       disabled={disabled}
                       onChange={() => {
-                        form.setStore(s => {
-                          if (value) s.next.default_external_sources.filter(item => item !== source);
-                          else s.next.default_external_sources.push(source);
+                        form.setFieldValue('next', s => {
+                          if (value) s.default_external_sources.filter(item => item !== source);
+                          else s.default_external_sources.push(source);
                           return s;
                         });
                       }}
@@ -82,4 +82,4 @@ export const ExternalSourcesSection = () => {
       }}
     />
   );
-};
+});

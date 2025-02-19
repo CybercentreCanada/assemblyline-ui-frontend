@@ -2,9 +2,10 @@ import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/settings/settings.form';
 import { getProfileNames } from 'components/routes/settings/settings.utils';
 import { PageNavigation } from 'components/visual/Layouts/PageNavigation';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const LeftNav = () => {
+export const LeftNav = React.memo(() => {
   const { t } = useTranslation(['settings']);
   const form = useForm();
   const { configuration, settings } = useALContext();
@@ -39,4 +40,4 @@ export const LeftNav = () => {
       )}
     />
   );
-};
+});

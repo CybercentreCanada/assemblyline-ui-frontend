@@ -1,47 +1,44 @@
 import { createFormContext } from 'components/core/form/createFormContext';
-import type { SubmitSettings } from './settings.utils';
-
-export const TABS = ['file', 'hash', 'options'] as const;
-export type Tabs = (typeof TABS)[number];
+import type { ProfileSettings } from './settings.utils';
 
 export type SettingsStore = {
   /** State related to the interface of the Settings page */
   state: {
-    /** Key of the selected profile */
-    tab: string;
+    /** Is the confirmation dialog opened */
+    confirm: boolean;
+
+    /** User is allowed to customize all service-specific parameters. Otherwise, they may only change the parameters that are editable */
+    customize: boolean;
 
     /** Disable all the component */
     disabled: boolean;
 
-    /** Fetching the settings values  */
+    /** Fetching the settings values */
     loading: boolean;
 
     /** Submitting the new settings values */
     submitting: boolean;
 
-    /** User is allowed to customize all service-specific parameters. Otherwise, they may only change the parameters that are editable */
-    customize: boolean;
-
-    /** Is the confirmation dialog opened */
-    confirm: boolean;
+    /** Key of the selected profile */
+    tab: string;
   };
 
-  /** Modified settings made by the user  */
-  next: SubmitSettings;
+  /** Modified settings made by the user */
+  next: ProfileSettings;
 
   /** Previous settings in the system */
-  prev: SubmitSettings;
+  prev: ProfileSettings;
 };
 
 export const { FormProvider, useForm } = createFormContext<SettingsStore>({
   defaultValues: {
     state: {
-      tab: null,
+      confirm: false,
+      customize: false,
       disabled: false,
       loading: false,
       submitting: false,
-      customize: false,
-      confirm: false
+      tab: null
     },
     prev: null,
     next: null

@@ -7,9 +7,10 @@ import { ListHeader } from 'components/visual/List/ListHeader';
 import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
 import { SelectListInput } from 'components/visual/ListInputs/SelectListInput';
 import { TextListInput } from 'components/visual/ListInputs/TextListInput';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const InterfaceSection = () => {
+export const InterfaceSection = React.memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
@@ -66,12 +67,7 @@ export const InterfaceSection = () => {
                     { value: 'report', primary: t('interface.view_report') },
                     { value: 'details', primary: t('interface.view_details') }
                   ]}
-                  onChange={(event, v) => {
-                    form.setStore(s => {
-                      s.next.submission_view = v as 'report' | 'details';
-                      return s;
-                    });
-                  }}
+                  onChange={(event, v) => form.setFieldValue('next.submission_view', v as 'report' | 'details')}
                 />
               )}
             />
@@ -94,12 +90,7 @@ export const InterfaceSection = () => {
                       { value: 'zip', primary: t('interface.encoding_zip') }
                     ])
                   ]}
-                  onChange={(event, v) => {
-                    form.setStore(s => {
-                      s.next.download_encoding = v as 'raw' | 'cart' | 'zip';
-                      return s;
-                    });
-                  }}
+                  onChange={(event, v) => form.setFieldValue('next.download_encoding', v as 'raw' | 'cart' | 'zip')}
                 />
               )}
             />
@@ -116,12 +107,7 @@ export const InterfaceSection = () => {
                   loading={loading}
                   disabled={disabled}
                   preventRender={preventRender as boolean}
-                  onChange={(event, v) => {
-                    form.setStore(s => {
-                      s.next.default_zip_password = v;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, v) => form.setFieldValue('next.default_zip_password', v)}
                 />
               )}
             />
@@ -143,12 +129,7 @@ export const InterfaceSection = () => {
                     { value: '2000', primary: t('interface.score_2000') },
                     { value: '100000000', primary: t('interface.score_100000000') }
                   ]}
-                  onChange={(event, v) => {
-                    form.setStore(s => {
-                      s.next.expand_min_score = v as unknown as number;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, v) => form.setFieldValue('next.expand_min_score', v as unknown as number)}
                 />
               )}
             />
@@ -162,12 +143,7 @@ export const InterfaceSection = () => {
                     value={value}
                     loading={loading}
                     disabled={disabled}
-                    onChange={(event, v) => {
-                      form.setStore(s => {
-                        s.next.executive_summary = v;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, v) => form.setFieldValue('next.executive_summary', v)}
                   />
                 )}
               />
@@ -177,4 +153,4 @@ export const InterfaceSection = () => {
       )}
     />
   );
-};
+});

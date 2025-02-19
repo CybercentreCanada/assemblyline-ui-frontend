@@ -1,27 +1,26 @@
 import { useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
-import type { SettingsStore } from 'components/routes/settings/settings.form';
 import { useForm } from 'components/routes/settings/settings.form';
 import { PageNavigation, PageNavigationItem } from 'components/visual/Layouts/PageNavigation';
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const RightNav = () => {
+export const RightNav = React.memo(() => {
   const { t } = useTranslation(['settings']);
   const form = useForm();
   const { ActiveAnchor, scrollTo } = useTableOfContent();
 
   const handleCategoryChange = useCallback(
-    (selected: boolean, profile: SettingsStore['state']['tab'], cat_id: number) => {
-      form.setStore(s => {
+    (selected: boolean, cat_id: number) => {
+      form.setFieldValue('next', s => {
         if (selected) {
-          s.next.submission_profiles[profile].services[cat_id].selected = false;
-          s.next.submission_profiles[profile].services[cat_id].services.forEach((svr, i) => {
-            s.next.submission_profiles[profile].services[cat_id].services[i].selected = false;
+          s.services[cat_id].selected = false;
+          s.services[cat_id].services.forEach((svr, i) => {
+            s.services[cat_id].services[i].selected = false;
           });
         } else {
-          s.next.submission_profiles[profile].services[cat_id].selected = true;
-          s.next.submission_profiles[profile].services[cat_id].services.forEach((svr, i) => {
-            s.next.submission_profiles[profile].services[cat_id].services[i].selected = true;
+          s.services[cat_id].selected = true;
+          s.services[cat_id].services.forEach((svr, i) => {
+            s.services[cat_id].services[i].selected = true;
           });
         }
 
@@ -32,16 +31,14 @@ export const RightNav = () => {
   );
 
   const handleServiceChange = useCallback(
-    (selected: boolean, profile: SettingsStore['state']['tab'], cat_id: number, svr_id: number) => {
-      form.setStore(s => {
+    (selected: boolean, cat_id: number, svr_id: number) => {
+      form.setFieldValue('next', s => {
         if (selected) {
-          s.next.submission_profiles[profile].services[cat_id].selected = false;
-          s.next.submission_profiles[profile].services[cat_id].services[svr_id].selected = false;
+          s.services[cat_id].selected = false;
+          s.services[cat_id].services[svr_id].selected = false;
         } else {
-          s.next.submission_profiles[profile].services[cat_id].services[svr_id].selected = true;
-          s.next.submission_profiles[profile].services[cat_id].selected = s.next.submission_profiles[profile].services[
-            cat_id
-          ].services.every(srv => srv.selected);
+          s.services[cat_id].services[svr_id].selected = true;
+          s.services[cat_id].selected = s.services[cat_id].services.every(srv => srv.selected);
         }
         return s;
       });
@@ -51,19 +48,17 @@ export const RightNav = () => {
   return (
     <form.Subscribe
       selector={state => [
-        state.values.state.tab,
-        state.values.state.loading,
+        state.values.state.loading || state.values.state.tab === 'interface',
         state.values.state.disabled,
         state.values.state.customize
       ]}
       children={props => {
-        const profile = props[0] as SettingsStore['state']['tab'];
-        const loading = props[1] as boolean;
-        const disabled = props[2] as boolean;
-        const customize = props[3] as boolean;
+        const preventRender = props[0];
+        const disabled = props[1];
+        const customize = props[2];
 
         return (
-          <PageNavigation preventRender={loading || profile === 'interface'} variant="right">
+          <PageNavigation preventRender={preventRender} variant="right">
             <ActiveAnchor
               activeID="submissions"
               children={active => (
@@ -102,20 +97,17 @@ export const RightNav = () => {
             />
 
             <form.Subscribe
-              selector={state => state.values?.next?.submission_profiles?.[profile]?.services || []}
+              selector={state => state.values.next.services}
               children={categories =>
                 categories.map((category, cat_id) => (
                   <div key={cat_id} style={{ display: 'contents' }}>
                     <ActiveAnchor
-                      key={cat_id}
                       activeID={category.name}
                       children={active => (
                         <form.Subscribe
                           selector={state => {
-                            const selected = state.values.next.submission_profiles[profile].services[cat_id].selected;
-                            const list = state.values.next.submission_profiles[profile].services[cat_id].services.map(
-                              svr => svr.selected
-                            );
+                            const selected = state.values.next.services[cat_id].selected;
+                            const list = state.values.next.services[cat_id].services.map(svr => svr.selected);
                             return [selected, !list.every(i => i) && list.some(i => i)];
                           }}
                           children={categoryProps => (
@@ -130,7 +122,7 @@ export const RightNav = () => {
                                 checked: categoryProps[0],
                                 indeterminate: categoryProps[1],
                                 disabled: disabled || !customize,
-                                onChange: () => handleCategoryChange(categoryProps[0], profile, cat_id)
+                                onChange: () => handleCategoryChange(categoryProps[0], cat_id)
                               }}
                             />
                           )}
@@ -138,9 +130,7 @@ export const RightNav = () => {
                       )}
                     />
                     <form.Subscribe
-                      selector={state =>
-                        state.values?.next?.submission_profiles?.[profile]?.services?.[cat_id]?.services || []
-                      }
+                      selector={state => state.values?.next.services[cat_id].services}
                       children={services =>
                         services.map((service, svr_id) => (
                           <ActiveAnchor
@@ -149,11 +139,8 @@ export const RightNav = () => {
                             children={active => (
                               <form.Subscribe
                                 selector={state => [
-                                  state.values.next.submission_profiles[profile].services[cat_id].services[svr_id]
-                                    .selected,
-                                  state.values.next.submission_profiles[profile].service_spec.some(
-                                    spec => spec.name === service.name
-                                  )
+                                  state.values.next.services[cat_id].services[svr_id].selected,
+                                  state.values.next.service_spec.some(spec => spec.name === service.name)
                                 ]}
                                 children={serviceProps => (
                                   <PageNavigationItem
@@ -165,7 +152,7 @@ export const RightNav = () => {
                                     checkboxProps={{
                                       checked: serviceProps[0],
                                       disabled: disabled || !customize,
-                                      onChange: () => handleServiceChange(serviceProps[0], profile, cat_id, svr_id)
+                                      onChange: () => handleServiceChange(serviceProps[0], cat_id, svr_id)
                                     }}
                                   />
                                 )}
@@ -184,4 +171,4 @@ export const RightNav = () => {
       }}
     />
   );
-};
+});
