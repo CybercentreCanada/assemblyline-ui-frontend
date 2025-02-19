@@ -2,8 +2,8 @@ import { createFormContext } from 'components/core/form/createFormContext';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 
 export type TableOfContentStore = {
-  activeID?: string;
-  anchors?: { id: string; label: string; subheader: boolean }[];
+  activeID: string;
+  anchors: { id: string; label: string; subheader: boolean }[];
 };
 
 const TABLE_OF_CONTENT_STORE: TableOfContentStore = Object.freeze({
@@ -66,10 +66,7 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
           elements.item(i).getBoundingClientRect().top - 2 <=
           rootRef.current.getBoundingClientRect().top + headerRef.current.getBoundingClientRect().height
         ) {
-          form.setStore(s => {
-            s.activeID = elements.item(i).getAttribute('data-anchor');
-            return s;
-          });
+          form.setFieldValue('activeID', elements.item(i).getAttribute('data-anchor'));
           break;
         }
       }
@@ -77,21 +74,19 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
 
     const loadAnchors = useCallback<TableOfContentContextProps['loadAnchors']>(
       ({ id = null, label = null, subheader = false }) => {
-        form.setStore(s => {
-          const elements = rootRef.current?.querySelectorAll('[data-anchor]');
-          const anchors: TableOfContentStore['anchors'] = [];
+        const elements = rootRef.current?.querySelectorAll('[data-anchor]');
+        const prevAnchors = form.getFieldValue('anchors');
+        const nextAnchors: TableOfContentStore['anchors'] = [];
 
-          (elements || []).forEach(element => {
-            const anchorID = element.getAttribute('data-anchor');
-            const index = s.anchors.findIndex(a => a.id === anchorID);
-            if (id === anchorID) anchors.push({ id, label, subheader });
-            else if (index >= 0) anchors.push(s.anchors[index]);
-          });
-
-          s.activeID = null;
-          s.anchors = anchors;
-          return s;
+        (elements || []).forEach((element: Element) => {
+          const anchorID = element.getAttribute('data-anchor');
+          const index = prevAnchors.findIndex(a => a.id === anchorID);
+          if (id === anchorID) nextAnchors.push({ id, label, subheader });
+          else if (index >= 0) nextAnchors.push(prevAnchors[index]);
         });
+
+        form.setFieldValue('activeID', null);
+        form.setFieldValue('anchors', nextAnchors);
       },
       [form]
     );
