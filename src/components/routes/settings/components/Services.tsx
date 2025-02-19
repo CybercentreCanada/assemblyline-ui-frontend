@@ -12,8 +12,6 @@ import { ShowMore } from 'components/visual/ShowMore';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type SpecParam = ProfileSettings['service_spec'][number]['params'][number];
-
 type SpecParamList = {
   show: number[];
   hidden: number[];
@@ -148,11 +146,11 @@ const Service = React.memo(
       (selected: boolean) => {
         form.setStore(s => {
           if (selected) {
-            s.next.services[cat_id].selected = false;
-            s.next.services[cat_id].services[svr_id].selected = false;
-          } else {
             s.next.services[cat_id].services[svr_id].selected = true;
             s.next.services[cat_id].selected = s.next.services[cat_id].services.every(srv => srv.selected);
+          } else {
+            s.next.services[cat_id].selected = false;
+            s.next.services[cat_id].services[svr_id].selected = false;
           }
           return s;
         });
@@ -179,13 +177,13 @@ const Service = React.memo(
       <form.Subscribe
         key={`${cat_id}-${svr_id}`}
         selector={state => {
-          const selected = state.values.next.services[cat_id].services[svr_id].selected;
+          const svr = state.values.next.services[cat_id].services[svr_id];
           const specID = state.values.next.service_spec.findIndex(spec => spec.name === service.name);
           const spec = specID >= 0 ? state.values.next.service_spec[specID] : null;
-          const params = JSON.stringify(calculateParams(spec, selected));
-          return [selected, specID, spec, params];
+          const params = JSON.stringify(calculateParams(spec, svr.selected));
+          return [svr.selected, svr.default, svr.editable, specID, spec, params];
         }}
-        children={([selected, specID, spec, p]) => {
+        children={([selected, defaultValue, editable, specID, spec, p]) => {
           const params = JSON.parse(p as string) as SpecParamList;
 
           return (
@@ -200,8 +198,9 @@ const Service = React.memo(
                 secondary={service.description}
                 checked={selected as boolean}
                 anchor
-                sx={{ ...(!selected && { opacity: 0.38 }) }}
-                onChange={!customize ? null : (event, checked) => handleChange(checked)}
+                reset={defaultValue !== null && selected !== defaultValue}
+                onChange={!customize && !editable ? null : (event, checked) => handleChange(!checked)}
+                onReset={!customize && !editable ? null : () => handleChange(defaultValue as boolean)}
               />
 
               {params && (
@@ -263,16 +262,16 @@ const Category = React.memo(
       (selected: boolean) => {
         form.setFieldValue('next', s => {
           if (selected) {
-            s.services[cat_id].selected = false;
-            s.services[cat_id].services = s.services[cat_id].services.map(srv => ({
-              ...srv,
-              selected: false
-            }));
-          } else {
             s.services[cat_id].selected = true;
             s.services[cat_id].services = s.services[cat_id].services.map(srv => ({
               ...srv,
               selected: true
+            }));
+          } else {
+            s.services[cat_id].selected = false;
+            s.services[cat_id].services = s.services[cat_id].services.map(srv => ({
+              ...srv,
+              selected: false
             }));
           }
 
@@ -285,11 +284,11 @@ const Category = React.memo(
     return (
       <form.Subscribe
         selector={state => {
-          const selected = state.values.next.services[cat_id].selected;
+          const cat = state.values.next.services[cat_id];
           const list = state.values.next.services[cat_id].services.map(svr => svr.selected);
-          return [selected, !list.every(i => i) && list.some(i => i)];
+          return [cat.selected, cat.default, cat.editable, !list.every(i => i) && list.some(i => i)];
         }}
-        children={([selected, indeterminate]) => (
+        children={([selected, defaultValue, editable, indeterminate]) => (
           <div
             key={`${category.name}-${cat_id}`}
             style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}
@@ -303,8 +302,9 @@ const Category = React.memo(
               indeterminate={indeterminate}
               divider
               anchor
-              sx={{ ...(!selected && !indeterminate && { opacity: 0.38 }) }}
-              onChange={!customize ? null : (event, checked) => handleChange(checked)}
+              reset={defaultValue !== null && selected !== defaultValue}
+              onChange={!customize && !editable ? null : (event, checked) => handleChange(!checked)}
+              onReset={!customize && !editable ? null : () => handleChange(defaultValue)}
             />
 
             {category.services.map((service, svr_id) => (

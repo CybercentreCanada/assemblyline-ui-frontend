@@ -107,7 +107,7 @@ export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((
 
   const {
     active = false,
-    checkboxProps: checkbox = null,
+    checkboxProps = null,
     id = null,
     preventRender = false,
     primary,
@@ -122,13 +122,12 @@ export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((
     ...listItemProps
   } = useMemo<PageNavigationItemProp>(() => props, [props]);
 
-  const { ...checkboxProps } = useMemo<CheckboxProps>(() => ({ ...checkbox }), [checkbox]);
-
   const isDownLG = useMediaQuery(theme.breakpoints.down('lg'));
 
   return preventRender ? null : readOnly ? (
     <ListItem className={clsx(classes.readOnly)} disablePadding {...listItemProps}>
       <ListItemText
+        id={id}
         primary={primary}
         primaryTypographyProps={{ color: 'textSecondary', ...primaryProps }}
         secondary={secondary}
@@ -138,7 +137,15 @@ export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((
   ) : (
     <ListItem
       disablePadding
-      secondaryAction={!checkbox ? null : <Checkbox edge="end" {...checkboxProps} />}
+      secondaryAction={
+        !checkboxProps ? null : (
+          <Checkbox
+            edge="end"
+            inputProps={{ id: id || primary.toString(), ...checkboxProps?.inputProps }}
+            {...checkboxProps}
+          />
+        )
+      }
       {...listItemProps}
     >
       <ListItemButton
@@ -156,10 +163,20 @@ export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((
           primary={primary}
           primaryTypographyProps={{
             color: active ? 'primary' : subheader ? 'textSecondary' : 'textPrimary',
+            sx: {
+              ...(checkboxProps && !checkboxProps?.checked && !checkboxProps?.indeterminate && { opacity: 0.38 }),
+              ...primaryProps?.sx
+            },
             ...primaryProps
           }}
           secondary={secondary}
-          secondaryTypographyProps={secondaryProps}
+          secondaryTypographyProps={{
+            sx: {
+              ...(checkboxProps && !checkboxProps?.checked && !checkboxProps?.indeterminate && { opacity: 0.38 }),
+              ...secondaryProps?.sx
+            },
+            ...secondaryProps
+          }}
         />
       </ListItemButton>
     </ListItem>
@@ -194,8 +211,8 @@ export const PageNavigation: React.FC<PageNavigationProps> = React.memo(
     renderItem = null,
     onPageNavigation = () => null,
     ...listProps
-  }: PageNavigationProps) => {
-    return preventRender ? null : (
+  }: PageNavigationProps) =>
+    preventRender ? null : (
       <PageNavigationDrawer variant={variant}>
         <List
           component="nav"
@@ -232,6 +249,5 @@ export const PageNavigation: React.FC<PageNavigationProps> = React.memo(
               )}
         </List>
       </PageNavigationDrawer>
-    );
-  }
+    )
 );

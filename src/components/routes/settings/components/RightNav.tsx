@@ -112,16 +112,16 @@ export const RightNav = React.memo(() => {
                           }}
                           children={categoryProps => (
                             <PageNavigationItem
+                              id={`${category.name}`}
                               primary={category.name}
                               variant="right"
                               active={active}
                               subheader
-                              sx={categoryProps[0] || categoryProps[1] ? null : { opacity: 0.38 }}
                               onPageNavigation={event => scrollTo(event, category.name)}
                               checkboxProps={{
                                 checked: categoryProps[0],
                                 indeterminate: categoryProps[1],
-                                disabled: disabled || !customize,
+                                disabled: disabled || !(customize || category.editable),
                                 onChange: () => handleCategoryChange(categoryProps[0], cat_id)
                               }}
                             />
@@ -144,14 +144,14 @@ export const RightNav = React.memo(() => {
                                 ]}
                                 children={serviceProps => (
                                   <PageNavigationItem
+                                    id={`${service.category}-${service.name}`}
                                     primary={service.name}
                                     variant="right"
                                     active={active}
-                                    sx={serviceProps[0] ? null : { opacity: 0.38 }}
                                     onPageNavigation={event => scrollTo(event, `${service.category}-${service.name}`)}
                                     checkboxProps={{
                                       checked: serviceProps[0],
-                                      disabled: disabled || !customize,
+                                      disabled: disabled || !(customize || category.editable),
                                       onChange: () => handleServiceChange(serviceProps[0], cat_id, svr_id)
                                     }}
                                   />
