@@ -30,7 +30,7 @@ export const InterfaceSection = React.memo(() => {
 
           <List>
             <form.Subscribe
-              selector={state => state.values.next.preferred_submission_profile}
+              selector={state => state.values.settings.preferred_submission_profile.value}
               children={value => (
                 <SelectListInput
                   primary={t('settings:submissions.submission_profile')}
@@ -49,13 +49,13 @@ export const InterfaceSection = React.memo(() => {
                         ? t(`profile.custom`)
                         : configuration.submission.profiles[profileValue].description
                   }))}
-                  onChange={(event, v) => form.setFieldValue('next.preferred_submission_profile', v)}
+                  onChange={(event, v) => form.setFieldValue('settings.preferred_submission_profile.value', v)}
                 />
               )}
             />
 
             <form.Subscribe
-              selector={state => state.values.next.submission_view}
+              selector={state => state.values.settings.submission_view.value}
               children={value => (
                 <SelectListInput
                   primary={t('interface.view')}
@@ -67,13 +67,15 @@ export const InterfaceSection = React.memo(() => {
                     { value: 'report', primary: t('interface.view_report') },
                     { value: 'details', primary: t('interface.view_details') }
                   ]}
-                  onChange={(event, v) => form.setFieldValue('next.submission_view', v as 'report' | 'details')}
+                  onChange={(event, v) =>
+                    form.setFieldValue('settings.submission_view.value', v as 'report' | 'details')
+                  }
                 />
               )}
             />
 
             <form.Subscribe
-              selector={state => state.values.next.download_encoding}
+              selector={state => state.values.settings.download_encoding.value}
               children={download_encoding => (
                 <SelectListInput
                   primary={t('interface.encoding')}
@@ -90,15 +92,17 @@ export const InterfaceSection = React.memo(() => {
                       { value: 'zip', primary: t('interface.encoding_zip') }
                     ])
                   ]}
-                  onChange={(event, v) => form.setFieldValue('next.download_encoding', v as 'raw' | 'cart' | 'zip')}
+                  onChange={(event, v) =>
+                    form.setFieldValue('settings.download_encoding.value', v as 'raw' | 'cart' | 'zip')
+                  }
                 />
               )}
             />
 
             <form.Subscribe
               selector={state => [
-                state.values.next.default_zip_password,
-                state.values.next.download_encoding !== 'zip'
+                state.values.settings.default_zip_password.value,
+                state.values.settings.download_encoding.value !== 'zip'
               ]}
               children={([default_zip_password, preventRender]) => (
                 <TextListInput
@@ -107,13 +111,13 @@ export const InterfaceSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled}
                   preventRender={preventRender as boolean}
-                  onChange={(event, v) => form.setFieldValue('next.default_zip_password', v)}
+                  onChange={(event, v) => form.setFieldValue('settings.default_zip_password.value', v)}
                 />
               )}
             />
 
             <form.Subscribe
-              selector={state => state.values.next.expand_min_score}
+              selector={state => state.values.settings.expand_min_score.value}
               children={value => (
                 <SelectListInput
                   primary={t('interface.score')}
@@ -129,13 +133,13 @@ export const InterfaceSection = React.memo(() => {
                     { value: '2000', primary: t('interface.score_2000') },
                     { value: '100000000', primary: t('interface.score_100000000') }
                   ]}
-                  onChange={(event, v) => form.setFieldValue('next.expand_min_score', v as unknown as number)}
+                  onChange={(event, v) => form.setFieldValue('settings.expand_min_score.value', v as unknown as number)}
                 />
               )}
             />
             {configuration.ui.ai.enabled && (
               <form.Subscribe
-                selector={state => state.values.next.executive_summary}
+                selector={state => state.values.settings.executive_summary.value}
                 children={value => (
                   <BooleanListInput
                     primary={t('interface.executive_summary')}
@@ -143,7 +147,7 @@ export const InterfaceSection = React.memo(() => {
                     value={value}
                     loading={loading}
                     disabled={disabled}
-                    onChange={(event, v) => form.setFieldValue('next.executive_summary', v)}
+                    onChange={(event, v) => form.setFieldValue('settings.executive_summary.value', v)}
                   />
                 )}
               />

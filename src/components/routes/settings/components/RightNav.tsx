@@ -11,7 +11,7 @@ export const RightNav = React.memo(() => {
 
   const handleCategoryChange = useCallback(
     (selected: boolean, cat_id: number) => {
-      form.setFieldValue('next', s => {
+      form.setFieldValue('settings', s => {
         if (selected) {
           s.services[cat_id].selected = false;
           s.services[cat_id].services.forEach((svr, i) => {
@@ -32,7 +32,7 @@ export const RightNav = React.memo(() => {
 
   const handleServiceChange = useCallback(
     (selected: boolean, cat_id: number, svr_id: number) => {
-      form.setFieldValue('next', s => {
+      form.setFieldValue('settings', s => {
         if (selected) {
           s.services[cat_id].selected = false;
           s.services[cat_id].services[svr_id].selected = false;
@@ -97,7 +97,7 @@ export const RightNav = React.memo(() => {
             />
 
             <form.Subscribe
-              selector={state => state.values.next.services}
+              selector={state => state.values.settings.services}
               children={categories =>
                 categories.map((category, cat_id) => (
                   <div key={cat_id} style={{ display: 'contents' }}>
@@ -106,8 +106,8 @@ export const RightNav = React.memo(() => {
                       children={active => (
                         <form.Subscribe
                           selector={state => {
-                            const selected = state.values.next.services[cat_id].selected;
-                            const list = state.values.next.services[cat_id].services.map(svr => svr.selected);
+                            const selected = state.values.settings.services[cat_id].selected;
+                            const list = state.values.settings.services[cat_id].services.map(svr => svr.selected);
                             return [selected, !list.every(i => i) && list.some(i => i)];
                           }}
                           children={categoryProps => (
@@ -130,7 +130,7 @@ export const RightNav = React.memo(() => {
                       )}
                     />
                     <form.Subscribe
-                      selector={state => state.values?.next.services[cat_id].services}
+                      selector={state => state.values?.settings.services[cat_id].services}
                       children={services =>
                         services.map((service, svr_id) => (
                           <ActiveAnchor
@@ -139,8 +139,8 @@ export const RightNav = React.memo(() => {
                             children={active => (
                               <form.Subscribe
                                 selector={state => [
-                                  state.values.next.services[cat_id].services[svr_id].selected,
-                                  state.values.next.service_spec.some(spec => spec.name === service.name)
+                                  state.values.settings.services[cat_id].services[svr_id].selected,
+                                  state.values.settings.service_spec.some(spec => spec.name === service.name)
                                 ]}
                                 children={serviceProps => (
                                   <PageNavigationItem

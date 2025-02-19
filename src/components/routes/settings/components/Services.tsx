@@ -41,17 +41,17 @@ const Parameter = React.memo(
       <form.Subscribe
         key={param_id}
         selector={state => {
-          const param = state.values.next.service_spec[spec_id].params[param_id];
+          const param = state.values.settings.service_spec[spec_id].params[param_id];
           return [param.type, param.name, param.default, param.editable, param.list];
         }}
         children={([type, name, defaultValue, editable, list]) => {
-          const field = `next.service_spec[${spec_id}].params[${param_id}].value` as const;
+          const field = `settings.service_spec[${spec_id}].params[${param_id}].value` as const;
           const paramDisabled: boolean = disabled || !selected || !(customize || editable);
 
           return (
             <form.Subscribe
               key={param_id}
-              selector={state => state.values.next.service_spec[spec_id].params[param_id].value}
+              selector={state => state.values.settings.service_spec[spec_id].params[param_id].value}
               children={value => {
                 switch (type) {
                   case 'str':
@@ -146,11 +146,11 @@ const Service = React.memo(
       (selected: boolean) => {
         form.setStore(s => {
           if (selected) {
-            s.next.services[cat_id].services[svr_id].selected = true;
-            s.next.services[cat_id].selected = s.next.services[cat_id].services.every(srv => srv.selected);
+            s.settings.services[cat_id].services[svr_id].selected = true;
+            s.settings.services[cat_id].selected = s.settings.services[cat_id].services.every(srv => srv.selected);
           } else {
-            s.next.services[cat_id].selected = false;
-            s.next.services[cat_id].services[svr_id].selected = false;
+            s.settings.services[cat_id].selected = false;
+            s.settings.services[cat_id].services[svr_id].selected = false;
           }
           return s;
         });
@@ -177,9 +177,9 @@ const Service = React.memo(
       <form.Subscribe
         key={`${cat_id}-${svr_id}`}
         selector={state => {
-          const svr = state.values.next.services[cat_id].services[svr_id];
-          const specID = state.values.next.service_spec.findIndex(spec => spec.name === service.name);
-          const spec = specID >= 0 ? state.values.next.service_spec[specID] : null;
+          const svr = state.values.settings.services[cat_id].services[svr_id];
+          const specID = state.values.settings.service_spec.findIndex(spec => spec.name === service.name);
+          const spec = specID >= 0 ? state.values.settings.service_spec[specID] : null;
           const params = JSON.stringify(calculateParams(spec, svr.selected));
           return [svr.selected, svr.default, svr.editable, specID, spec, params];
         }}
@@ -260,7 +260,7 @@ const Category = React.memo(
 
     const handleChange = useCallback(
       (selected: boolean) => {
-        form.setFieldValue('next', s => {
+        form.setFieldValue('settings', s => {
           if (selected) {
             s.services[cat_id].selected = true;
             s.services[cat_id].services = s.services[cat_id].services.map(srv => ({
@@ -284,8 +284,8 @@ const Category = React.memo(
     return (
       <form.Subscribe
         selector={state => {
-          const cat = state.values.next.services[cat_id];
-          const list = state.values.next.services[cat_id].services.map(svr => svr.selected);
+          const cat = state.values.settings.services[cat_id];
+          const list = state.values.settings.services[cat_id].services.map(svr => svr.selected);
           return [cat.selected, cat.default, cat.editable, !list.every(i => i) && list.some(i => i)];
         }}
         children={([selected, defaultValue, editable, indeterminate]) => (
@@ -345,7 +345,7 @@ export const ServicesSection = React.memo(() => {
           />
 
           <form.Subscribe
-            selector={state => state.values.next.services}
+            selector={state => state.values.settings.services}
             children={categories =>
               categories.map((category, cat_id) => (
                 <Category

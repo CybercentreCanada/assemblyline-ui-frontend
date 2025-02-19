@@ -33,7 +33,7 @@ export const SubmissionSection = React.memo(() => {
             {c12nDef.enforce && (
               <form.Subscribe
                 selector={state => {
-                  const param = state.values.next.classification;
+                  const param = state.values.settings.classification;
                   return [param.value, param.default, param.editable];
                 }}
                 children={([value, defaultValue, editable]) => (
@@ -44,7 +44,7 @@ export const SubmissionSection = React.memo(() => {
                     value={(value || defaultValue) as string}
                     loading={loading}
                     disabled={disabled || !(customize || (editable as boolean))}
-                    onChange={v => form.setFieldValue(`next.classification.value`, v)}
+                    onChange={v => form.setFieldValue(`settings.classification.value`, v)}
                   />
                 )}
               />
@@ -52,7 +52,7 @@ export const SubmissionSection = React.memo(() => {
 
             <form.Subscribe
               selector={state => {
-                const param = state.values.next.ttl;
+                const param = state.values.settings.ttl;
                 return [param.value, param.default, param.editable];
               }}
               children={([value, defaultValue, editable]) => (
@@ -67,15 +67,15 @@ export const SubmissionSection = React.memo(() => {
                   reset={defaultValue !== null && value !== defaultValue}
                   min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                   max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
-                  onChange={(event, v) => form.setFieldValue(`next.ttl.value`, v)}
-                  onReset={() => form.setFieldValue(`next.ttl.value`, defaultValue as number)}
+                  onChange={(event, v) => form.setFieldValue(`settings.ttl.value`, v)}
+                  onReset={() => form.setFieldValue(`settings.ttl.value`, defaultValue as number)}
                 />
               )}
             />
 
             <form.Subscribe
               selector={state => {
-                const param = state.values.next.deep_scan;
+                const param = state.values.settings.deep_scan;
                 return [param.value, param.default, param.editable];
               }}
               children={([value, defaultValue, editable]) => (
@@ -87,15 +87,15 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && !editable)}
                   reset={defaultValue !== null && value !== defaultValue}
-                  onChange={(event, v) => form.setFieldValue(`next.deep_scan.value`, v)}
-                  onReset={() => form.setFieldValue(`next.deep_scan.value`, defaultValue)}
+                  onChange={(event, v) => form.setFieldValue(`settings.deep_scan.value`, v)}
+                  onReset={() => form.setFieldValue(`settings.deep_scan.value`, defaultValue)}
                 />
               )}
             />
 
             <form.Subscribe
               selector={state => {
-                const param = state.values.next.ignore_recursion_prevention;
+                const param = state.values.settings.ignore_recursion_prevention;
                 return [param.value, param.default, param.editable];
               }}
               children={([value, defaultValue, editable]) => (
@@ -107,15 +107,15 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && !editable)}
                   reset={defaultValue !== null && value !== defaultValue}
-                  onChange={(event, v) => form.setFieldValue(`next.ignore_recursion_prevention.value`, v)}
-                  onReset={() => form.setFieldValue(`next.ignore_recursion_prevention.value`, defaultValue)}
+                  onChange={(event, v) => form.setFieldValue(`settings.ignore_recursion_prevention.value`, v)}
+                  onReset={() => form.setFieldValue(`settings.ignore_recursion_prevention.value`, defaultValue)}
                 />
               )}
             />
 
             <form.Subscribe
               selector={state => {
-                const param = state.values.next.ignore_filtering;
+                const param = state.values.settings.ignore_filtering;
                 return [param.value, param.default, param.editable];
               }}
               children={([value, defaultValue, editable]) => (
@@ -127,15 +127,15 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && !editable)}
                   reset={defaultValue !== null && value !== defaultValue}
-                  onChange={(event, v) => form.setFieldValue(`next.ignore_filtering.value`, v)}
-                  onReset={() => form.setFieldValue(`next.ignore_filtering.value`, defaultValue)}
+                  onChange={(event, v) => form.setFieldValue(`settings.ignore_filtering.value`, v)}
+                  onReset={() => form.setFieldValue(`settings.ignore_filtering.value`, defaultValue)}
                 />
               )}
             />
 
             <form.Subscribe
               selector={state => {
-                const param = state.values.next.generate_alert;
+                const param = state.values.settings.generate_alert;
                 return [param.value, param.default, param.editable];
               }}
               children={([value, defaultValue, editable]) => (
@@ -147,15 +147,15 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && !editable)}
                   reset={defaultValue !== null && value !== defaultValue}
-                  onChange={(event, v) => form.setFieldValue(`next.generate_alert.value`, v)}
-                  onReset={() => form.setFieldValue(`next.generate_alert.value`, defaultValue)}
+                  onChange={(event, v) => form.setFieldValue(`settings.generate_alert.value`, v)}
+                  onReset={() => form.setFieldValue(`settings.generate_alert.value`, defaultValue)}
                 />
               )}
             />
 
             <form.Subscribe
               selector={state => {
-                const param = state.values.next.ignore_cache;
+                const param = state.values.settings.ignore_cache;
                 return [param.value, param.default, param.editable];
               }}
               children={([value, defaultValue, editable]) => (
@@ -167,8 +167,8 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && !editable)}
                   reset={defaultValue !== null && value !== defaultValue}
-                  onChange={(event, v) => form.setFieldValue(`next.ignore_cache.value`, v)}
-                  onReset={() => form.setFieldValue(`next.ignore_cache.value`, defaultValue)}
+                  onChange={(event, v) => form.setFieldValue(`settings.ignore_cache.value`, v)}
+                  onReset={() => form.setFieldValue(`settings.ignore_cache.value`, defaultValue)}
                 />
               )}
             />

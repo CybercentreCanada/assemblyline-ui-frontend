@@ -4,11 +4,16 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { SettingsStore } from 'components/routes/settings/settings.form';
 import { useForm } from 'components/routes/settings/settings.form';
-import { parseSubmissionProfiles } from 'components/routes/settings/settings.utils';
+import {
+  hasDifferentDefaultSubmissionValues,
+  hasDifferentPreviousSubmissionValues,
+  parseSubmissionProfiles,
+  resetDefaultSubmissionValues,
+  resetPreviousSubmissionValues
+} from 'components/routes/settings/settings.utils';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import _ from 'lodash';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -22,7 +27,7 @@ export const HeaderSection = React.memo(() => {
 
   const handleSubmit = useCallback(
     () => {
-      const data = form.getFieldValue('next');
+      const data = form.getFieldValue('settings');
       if (!data) return;
 
       apiCall({
@@ -31,7 +36,7 @@ export const HeaderSection = React.memo(() => {
         body: parseSubmissionProfiles(data),
         onSuccess: () => {
           showSuccessMessage(t('success_save'));
-          form.setFieldValue('prev', structuredClone(form.getFieldValue('next')));
+          form.setFieldValue('settings', s => resetPreviousSubmissionValues(s));
         },
         onFailure: api_data => {
           if (api_data.api_status_code === 403 || api_data.api_status_code === 401) {
@@ -59,7 +64,8 @@ export const HeaderSection = React.memo(() => {
         state.values.state.loading,
         state.values.state.submitting,
         state.values.state.confirm,
-        !_.isEqual(state.values.next, state.values.prev)
+        hasDifferentPreviousSubmissionValues(state.values.settings),
+        hasDifferentDefaultSubmissionValues(state.values.settings)
       ]}
       children={props => {
         const tab = props[0] as SettingsStore['state']['tab'];
@@ -67,6 +73,7 @@ export const HeaderSection = React.memo(() => {
         const submitting = props[2] as boolean;
         const confirm = props[3] as boolean;
         const modified = props[4] as boolean;
+        const hasReset = props[5] as boolean;
 
         return (
           <>
@@ -74,7 +81,7 @@ export const HeaderSection = React.memo(() => {
               <RouterPrompt
                 when={modified}
                 onAccept={() => {
-                  form.setFieldValue('next', structuredClone(form.getFieldValue('prev')));
+                  form.setFieldValue('settings', s => resetPreviousSubmissionValues(s));
                   return true;
                 }}
               />
@@ -115,7 +122,7 @@ export const HeaderSection = React.memo(() => {
                     variant="outlined"
                     color="secondary"
                     disabled={submitting || !modified}
-                    onClick={() => form.setFieldValue('next', structuredClone(form.getFieldValue('prev')))}
+                    onClick={() => form.setFieldValue('settings', s => resetPreviousSubmissionValues(s))}
                   >
                     {t('cancel')}
                     {submitting && (
@@ -135,8 +142,8 @@ export const HeaderSection = React.memo(() => {
                   <Button
                     variant="outlined"
                     color="primary"
-                    disabled={submitting || !modified}
-                    onClick={() => form.setFieldValue('next', structuredClone(form.getFieldValue('prev')))}
+                    disabled={submitting || !hasReset}
+                    onClick={() => form.setFieldValue('settings', s => resetDefaultSubmissionValues(s))}
                   >
                     {t('reset')}
                     {submitting && (

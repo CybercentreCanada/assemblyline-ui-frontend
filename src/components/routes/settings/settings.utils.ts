@@ -29,6 +29,7 @@ type ProfileKey = keyof Pick<UserSettings, (typeof PROFILE_KEYS)[number]>;
 
 export type ProfileParam<T> = {
   default: T;
+  prev: T;
   value: T;
   editable: boolean;
 };
@@ -37,22 +38,22 @@ export type ProfileParam<T> = {
 //   [K in keyof Pick<SubmissionProfileParams, ProfileKey>]: ProfileParam<SubmissionProfileParams[K]>;
 // } & Pick<UserSettings, 'services' | 'service_spec'>;
 
-// export type SubmitSettings = Pick<UserSettings, ProfileKey> & {
-//   description: string;
-//   default_external_sources: string[];
-//   default_zip_password: string;
-//   download_encoding: 'raw' | 'cart' | 'zip';
-//   executive_summary: boolean;
-//   expand_min_score: number;
-//   preferred_submission_profile: string;
-//   submission_profiles: {
-//     [profile: string]: ProfileSettings;
-//   };
-//   submission_view: 'report' | 'details';
-// };
+export type SubmitSettings = Pick<UserSettings, ProfileKey> & {
+  description: string;
+  default_external_sources: string[];
+  default_zip_password: string;
+  download_encoding: 'raw' | 'cart' | 'zip';
+  executive_summary: boolean;
+  expand_min_score: number;
+  preferred_submission_profile: string;
+  submission_profiles: {
+    [profile: string]: ProfileSettings;
+  };
+  submission_view: 'report' | 'details';
+};
 
 export type ProfileSettings = {
-  [K in keyof Pick<UserSettings, InterfaceKey>]: UserSettings[K];
+  [K in keyof Pick<UserSettings, InterfaceKey>]: { value: UserSettings[K]; prev: UserSettings[K] };
 } & {
   [K in keyof Pick<UserSettings, ProfileKey>]: ProfileParam<UserSettings[K]>;
 } & {
@@ -60,11 +61,13 @@ export type ProfileSettings = {
     [K in keyof Omit<UserSettings['services'][number], 'services'>]: UserSettings['services'][number][K];
   } & {
     default: boolean;
+    prev: boolean;
     editable: boolean;
     services?: ({
       [P in keyof UserSettings['services'][number]['services'][number]]: UserSettings['services'][number]['services'][number][P];
     } & {
       default: boolean;
+      prev: boolean;
       editable: boolean;
     })[];
   })[];
@@ -74,6 +77,7 @@ export type ProfileSettings = {
     params: ({
       [K in keyof UserSettings['service_spec'][number]['params'][number]]: UserSettings['service_spec'][number]['params'][number][K];
     } & {
+      prev: UserSettings['service_spec'][number]['params'][number]['value'];
       editable: boolean;
     })[];
   }[];
@@ -103,21 +107,21 @@ const loadProfile = (profile_name: string, settings: UserSettings, profile: Subm
   out = { ...out, services: null };
   const selected = profile?.params?.services?.selected;
   const excluded = profile?.params?.services?.excluded;
-  out.services = settings.services
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map(category => ({
-      ...category,
-      selected: !profile ? category.selected : selected.includes(category.name) && !excluded.includes(category.name),
-      services: category.services
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map(service => ({
-          ...service,
-          selected: !profile
-            ? service.selected
-            : (selected.includes(service.category) || selected.includes(service.name)) &&
-              !(excluded.includes(service.category) || excluded.includes(service.name))
-        }))
-    }));
+  // out.services = settings.services
+  //   .sort((a, b) => a.name.localeCompare(b.name))
+  //   .map(category => ({
+  //     ...category,
+  //     selected: !profile ? category.selected : selected.includes(category.name) && !excluded.includes(category.name),
+  //     services: category.services
+  //       .sort((a, b) => a.name.localeCompare(b.name))
+  //       .map(service => ({
+  //         ...service,
+  //         selected: !profile
+  //           ? service.selected
+  //           : (selected.includes(service.category) || selected.includes(service.name)) &&
+  //             !(excluded.includes(service.category) || excluded.includes(service.name))
+  //       }))
+  //   }));
 
   // Loading the service specs
   out = { ...out, service_spec: null };
@@ -201,8 +205,8 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
 
     out = {
       ...out,
-      services: submit.submission_profiles.default.services,
-      service_spec: submit.submission_profiles.default.service_spec
+      services: submit.submission_profiles.default.services
+      // service_spec: submit.submission_profiles.default.service_spec
     };
   }
 
@@ -210,7 +214,7 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
     // Remove the editable property
     out.service_spec.forEach((spec, i) => {
       out.service_spec[i].params.forEach((param, j) => {
-        delete out.service_spec[i].params[j].editable;
+        // delete out.service_spec[i].params[j].editable;
       });
     });
   }
@@ -233,7 +237,7 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
       Object.entries(profile).forEach(([key, value]: [string, unknown]) => {
         const param = value as ProfileParam<unknown>;
         if (PROFILE_KEYS.includes(key as ProfileKey) && param.value !== param.default) {
-          out.submission_profiles?.[name][key] = param.value;
+          // out.submission_profiles?.[name][key] = param.value;
         }
       });
 
@@ -250,7 +254,7 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
           });
         }
       });
-      out.submission_profiles?.[name].services.selected = selected;
+      // out.submission_profiles?.[name].services.selected = selected;
 
       // Default Service Parameters
       profile.service_spec.forEach((service, i) => {
@@ -261,10 +265,10 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
           }
 
           if (spec !== null) {
-            out.submission_profiles?.[name].service_spec = {
-              ...out.submission_profiles?.[name].service_spec,
-              [service.name]: spec
-            };
+            // out.submission_profiles?.[name].service_spec = {
+            //   ...out.submission_profiles?.[name].service_spec,
+            //   [service.name]: spec
+            // };
           }
         });
       });
@@ -275,7 +279,7 @@ export const parseSubmissionProfiles = (submit: SubmitSettings): UserSettings =>
 
 export const getProfileNames = (settings: UserSettings) => Object.keys(settings?.submission_profiles || {}).sort();
 
-export const initializeProfile = (settings: UserSettings): ProfileSettings => {
+export const initializeSettings = (settings: UserSettings): ProfileSettings => {
   if (!settings) return null;
 
   const out = {} as ProfileSettings;
@@ -283,14 +287,14 @@ export const initializeProfile = (settings: UserSettings): ProfileSettings => {
   // Applying interface parameters
   Object.entries(settings).forEach(([key, value]) => {
     if (INTERFACE_KEYS.includes(key as InterfaceKey)) {
-      out[key] = value;
+      out[key] = { value: value, prev: value };
     }
   });
 
   // Applying the profile parameters
   Object.entries(settings).forEach(([key, value]: [string, unknown]) => {
     if (PROFILE_KEYS.includes(key as ProfileKey)) {
-      out[key] = { default: value, value: value, editable: false };
+      out[key] = { default: value, value: value, prev: value, editable: false };
     }
   });
 
@@ -300,10 +304,11 @@ export const initializeProfile = (settings: UserSettings): ProfileSettings => {
     .map(category => ({
       ...category,
       default: false,
+      prev: category.selected,
       editable: false,
       services: category.services
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map(service => ({ ...service, default: false, editable: false }))
+        .map(service => ({ ...service, default: false, prev: service.selected, editable: false }))
     }));
 
   // Applying the service spec parameters
@@ -311,7 +316,9 @@ export const initializeProfile = (settings: UserSettings): ProfileSettings => {
     .sort((a, b) => a.name.localeCompare(b.name))
     .map(spec => ({
       ...spec,
-      params: spec.params.sort((a, b) => a.name.localeCompare(b.name)).map(param => ({ ...param, editable: false }))
+      params: spec.params
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(param => ({ ...param, prev: param.value, editable: false }))
     }));
 
   return out;
@@ -323,47 +330,36 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings)
   // Applying interface parameters
   Object.entries(out).forEach(([key, value]) => {
     if (INTERFACE_KEYS.includes(key as InterfaceKey)) {
-      out[key] = value;
+      out[key] = { value: value, prev: value };
     }
   });
 
   // Applying the profile parameters
   Object.keys(out).forEach((key: ProfileKey) => {
     if (PROFILE_KEYS.includes(key)) {
-      // Setting the value property
       out[key].value = settings?.submission_profiles?.default?.[key] || settings[key];
-
-      // Setting the editable property
       out[key].editable = true;
-
-      // Setting the default property
       out[key].default = settings[key];
+      out[key].prev = out[key].value;
     }
   });
 
   // Applying the services parameter
   out.services.forEach((cat, i) => {
-    // Setting the selected property
     out.services[i].selected = settings.submission_profiles?.default?.services?.selected?.includes(cat?.name) || false;
-
-    // Setting the editable property
     out.services[i].editable = true;
-
-    // Setting the default property
     out.services[i].default = out.services[i].selected;
+    out.services[i].prev = out.services[i].selected;
 
     cat.services.forEach((svr, j) => {
-      // Setting the selected property
       out.services[i].services[j].selected =
         settings.submission_profiles?.default?.services?.selected?.includes(svr?.category) ||
         settings.submission_profiles?.default?.services?.selected?.includes(svr?.name) ||
         false;
 
-      // Setting the editable property
       out.services[i].services[j].editable = true;
-
-      // Setting the default property
       out.services[i].services[j].default = out.services[i].services[j].selected;
+      out.services[i].services[j].prev = out.services[i].services[j].selected;
     });
   });
 
@@ -374,17 +370,14 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings)
         ?.find(s => s.name === svr.name)
         ?.params?.find(p => p.name === param.name);
 
-      // Setting the value property
       out.service_spec[i].params[j].value =
         (settings?.submission_profiles?.default?.service_spec?.[svr.name]?.[param.name] as string | number | boolean) ||
         settingsSpec?.value ||
         out.service_spec[i].params[j].value;
 
-      // Setting the default property
-      out.service_spec[i].params[j].default = settingsSpec?.default || out.service_spec[i].params[j].default;
-
-      // Setting the editable property
       out.service_spec[i].params[j].editable = true;
+      out.service_spec[i].params[j].default = settingsSpec?.default || out.service_spec[i].params[j].default;
+      out.service_spec[i].params[j].prev = out.service_spec[i].params[j].value;
     });
   });
 
@@ -402,51 +395,42 @@ export const loadSubmissionProfile = (
   // Applying interface parameters
   Object.entries(settings).forEach(([key, value]) => {
     if (INTERFACE_KEYS.includes(key as InterfaceKey)) {
-      out[key] = value;
+      out[key] = { value: value, prev: value };
     }
   });
 
   // Applying the profile parameters
   Object.keys(out).forEach((key: ProfileKey) => {
     if (PROFILE_KEYS.includes(key)) {
-      // Setting the value property
       out[key].value = settings?.submission_profiles?.[name]?.[key] || settings[key];
-
-      // Setting the editable property
       out[key].editable = profiles?.[name]?.editable_params?.submission?.includes(key) || false;
-
-      // Setting the default property
       out[key].default = profiles?.[name]?.params?.[key] || settings[key];
+      out[key].prev = out[key].value;
     }
   });
 
   // Applying the services parameter
   out.services.forEach((cat, i) => {
-    // Setting the selected property
     out.services[i].selected = settings.submission_profiles?.[name]?.services?.selected?.includes(cat?.name) || false;
-
-    // Setting the editable property
     out.services[i].editable = profiles?.[name].editable_params?.submission?.includes('services') || false;
-
-    // Setting the default property
     out.services[i].default = profiles?.[name].params?.services?.selected?.includes(cat.name) || false;
+    out.services[i].prev = out.services[i].selected;
 
     cat.services.forEach((svr, j) => {
-      // Setting the selected property
       out.services[i].services[j].selected =
         settings.submission_profiles?.[name]?.services?.selected?.includes(svr?.category) ||
         settings.submission_profiles?.[name]?.services?.selected?.includes(svr?.name) ||
         false;
 
-      // Setting the editable property
       out.services[i].services[j].editable =
         profiles?.[name].editable_params?.submission?.includes('services') || false;
 
-      // Setting the default property
       out.services[i].services[j].default =
         profiles?.[name].params?.services?.selected?.includes(svr?.name) ||
         profiles?.[name].params?.services?.selected?.includes(svr?.category) ||
         false;
+
+      out.services[i].services[j].prev = out.services[i].services[j].selected;
     });
   });
 
@@ -457,21 +441,150 @@ export const loadSubmissionProfile = (
         ?.find(s => s.name === svr.name)
         ?.params?.find(p => p.name === param.name);
 
-      // Setting the value property
       out.service_spec[i].params[j].value =
         (settings?.submission_profiles?.[name]?.service_spec?.[svr.name]?.[param.name] as string | number | boolean) ||
         settingsSpec?.value ||
         out.service_spec[i].params[j].value;
 
-      // Setting the default property
       out.service_spec[i].params[j].default =
         (profiles?.[name]?.params?.service_spec?.[svr.name]?.[param.name] as string | number | boolean) ||
         settingsSpec?.default ||
         out.service_spec[i].params[j].default;
 
-      // Setting the editable property
       out.service_spec[i].params[j].editable =
         profiles?.[name].editable_params?.[svr.name]?.includes(param.name) || false;
+
+      out.service_spec[i].params[j].prev = out.service_spec[i].params[j].value;
+    });
+  });
+
+  return out;
+};
+
+export const hasDifferentPreviousSubmissionValues = (out: ProfileSettings): boolean => {
+  let res: boolean = false;
+
+  // Applying interface parameters
+  Object.keys(out).forEach((key: InterfaceKey) => {
+    if (INTERFACE_KEYS.includes(key) && out[key].value !== out[key].prev) {
+      res = true;
+    }
+  });
+
+  // Applying the profile parameters
+  Object.keys(out).forEach((key: ProfileKey) => {
+    if (PROFILE_KEYS.includes(key) && out[key].value !== out[key].prev) {
+      res = true;
+    }
+  });
+
+  // Applying the services parameter
+  out.services.forEach((cat, i) => {
+    if (out.services[i].selected !== out.services[i].prev) {
+      res = true;
+    }
+
+    cat.services.forEach((svr, j) => {
+      if (out.services[i].services[j].selected !== out.services[i].services[j].prev) {
+        res = true;
+      }
+    });
+  });
+
+  // Applying the service spec parameters
+  out.service_spec.forEach((svr, i) => {
+    out.service_spec[i].params.forEach((param, j) => {
+      if (out.service_spec[i].params[j].value !== out.service_spec[i].params[j].prev) {
+        res = true;
+      }
+    });
+  });
+
+  return res;
+};
+
+export const resetPreviousSubmissionValues = (out: ProfileSettings): ProfileSettings => {
+  // Applying interface parameters
+  Object.keys(out).forEach((key: InterfaceKey) => {
+    if (INTERFACE_KEYS.includes(key)) out[key].value = out[key].prev;
+  });
+
+  // Applying the profile parameters
+  Object.keys(out).forEach((key: ProfileKey) => {
+    if (PROFILE_KEYS.includes(key)) out[key].value = out[key].prev;
+  });
+
+  // Applying the services parameter
+  out.services.forEach((cat, i) => {
+    out.services[i].selected = out.services[i].prev;
+    cat.services.forEach((svr, j) => {
+      out.services[i].services[j].selected = out.services[i].services[j].prev;
+    });
+  });
+
+  // Applying the service spec parameters
+  out.service_spec.forEach((svr, i) => {
+    out.service_spec[i].params.forEach((param, j) => {
+      out.service_spec[i].params[j].value = out.service_spec[i].params[j].prev;
+    });
+  });
+
+  return out;
+};
+
+export const hasDifferentDefaultSubmissionValues = (out: ProfileSettings): boolean => {
+  let res: boolean = false;
+
+  // Applying the profile parameters
+  Object.keys(out).forEach((key: ProfileKey) => {
+    if (PROFILE_KEYS.includes(key) && out[key].value !== out[key].default) {
+      res = true;
+    }
+  });
+
+  // Applying the services parameter
+  out.services.forEach((cat, i) => {
+    if (out.services[i].selected !== out.services[i].default) {
+      res = true;
+    }
+
+    cat.services.forEach((svr, j) => {
+      if (out.services[i].services[j].selected !== out.services[i].services[j].default) {
+        res = true;
+      }
+    });
+  });
+
+  // Applying the service spec parameters
+  out.service_spec.forEach((svr, i) => {
+    out.service_spec[i].params.forEach((param, j) => {
+      if (out.service_spec[i].params[j].value !== out.service_spec[i].params[j].default) {
+        res = true;
+      }
+    });
+  });
+
+  return res;
+};
+
+export const resetDefaultSubmissionValues = (out: ProfileSettings): ProfileSettings => {
+  // Applying the profile parameters
+  Object.keys(out).forEach((key: ProfileKey) => {
+    if (PROFILE_KEYS.includes(key)) out[key].value = out[key].default;
+  });
+
+  // Applying the services parameter
+  out.services.forEach((cat, i) => {
+    out.services[i].selected = out.services[i].default;
+    cat.services.forEach((svr, j) => {
+      out.services[i].services[j].selected = out.services[i].services[j].default;
+    });
+  });
+
+  // Applying the service spec parameters
+  out.service_spec.forEach((svr, i) => {
+    out.service_spec[i].params.forEach((param, j) => {
+      out.service_spec[i].params[j].value = out.service_spec[i].params[j].default;
     });
   });
 

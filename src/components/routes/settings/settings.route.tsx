@@ -14,7 +14,7 @@ import { SubmissionSection } from './components/Submission';
 import type { SettingsStore } from './settings.form';
 import { useForm } from './settings.form';
 import type { ProfileSettings } from './settings.utils';
-import { initializeProfile, loadDefaultProfile, loadSubmissionProfile } from './settings.utils';
+import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from './settings.utils';
 import { MOCK_SETTINGS } from './utils/data3';
 
 type Params = {
@@ -30,14 +30,13 @@ const WrappedSettingsRoute = () => {
   const { rootRef, headerRef } = useTableOfContent();
 
   useEffect(() => {
-    if (!!form.getFieldValue('next')) return;
+    if (!!form.getFieldValue('settings')) return;
 
     form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('self_manage'));
     form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
 
-    const defaults = initializeProfile(MOCK_SETTINGS);
-    form.setFieldValue('prev', defaults);
-    form.setFieldValue('next', defaults);
+    const s = initializeSettings(MOCK_SETTINGS);
+    form.setFieldValue('settings', s);
   }, [currentUser.is_admin, currentUser.roles, form]);
 
   useEffect(() => {
@@ -51,21 +50,22 @@ const WrappedSettingsRoute = () => {
   useEffect(() => {
     if (tabParam === form.getFieldValue('state.tab')) return;
 
-    let data: ProfileSettings = form.getFieldValue('next');
-    if (tabParam === 'interface') data = form.getFieldValue('next');
-    else if (tabParam === 'default') data = loadDefaultProfile(data, MOCK_SETTINGS);
-    else data = loadSubmissionProfile(data, MOCK_SETTINGS, configuration.submission.profiles, tabParam);
+    let s: ProfileSettings = form.getFieldValue('settings');
+    if (tabParam === 'interface') s = form.getFieldValue('settings');
+    else if (tabParam === 'default') s = loadDefaultProfile(s, MOCK_SETTINGS);
+    else s = loadSubmissionProfile(s, MOCK_SETTINGS, configuration.submission.profiles, tabParam);
 
     form.setFieldValue('state.tab', tabParam);
-    form.setFieldValue('next', data);
-    form.setFieldValue('prev', structuredClone(data));
+    form.setFieldValue('settings', s);
+
+    console.log(s, MOCK_SETTINGS, configuration.submission.profiles);
   }, [configuration.submission.profiles, form, tabParam]);
 
   if (!currentUser.is_admin && !currentUser.roles.includes('self_manage')) return <ForbiddenPage />;
   else
     return (
       <form.Subscribe
-        selector={state => [state.values.state.tab, !!state.values.next]}
+        selector={state => [state.values.state.tab, !!state.values.settings]}
         children={([tab, hasNext]) => (
           <PageLayout
             rootRef={rootRef}

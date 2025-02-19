@@ -23,11 +23,8 @@ export type SettingsStore = {
     tab: string;
   };
 
-  /** Modified settings made by the user */
-  next: ProfileSettings;
-
-  /** Previous settings in the system */
-  prev: ProfileSettings;
+  /** Aggregate user settings */
+  settings: ProfileSettings;
 };
 
 export const { FormProvider, useForm } = createFormContext<SettingsStore>({
@@ -40,7 +37,6 @@ export const { FormProvider, useForm } = createFormContext<SettingsStore>({
       submitting: false,
       tab: null
     },
-    prev: null,
-    next: null
+    settings: null
   }
 });

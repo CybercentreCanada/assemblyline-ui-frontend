@@ -46,7 +46,7 @@ export const ExternalSourcesSection = React.memo(() => {
             {fileSources.map((source, i) => (
               <form.Subscribe
                 key={`${source}-${i}`}
-                selector={state => state.values.next.default_external_sources.includes(source)}
+                selector={state => state.values.settings.default_external_sources.value.includes(source)}
                 children={value => (
                   <BooleanListInput
                     primary={source}
@@ -54,9 +54,9 @@ export const ExternalSourcesSection = React.memo(() => {
                     loading={loading}
                     disabled={disabled}
                     onChange={() => {
-                      form.setFieldValue('next', s => {
-                        if (value) s.default_external_sources.filter(item => item !== source);
-                        else s.default_external_sources.push(source);
+                      form.setFieldValue('settings', s => {
+                        if (value) s.default_external_sources.value.filter(item => item !== source);
+                        else s.default_external_sources.value.push(source);
                         return s;
                       });
                     }}
