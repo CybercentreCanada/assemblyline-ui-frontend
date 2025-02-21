@@ -2,14 +2,16 @@ import { Button, CircularProgress, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { UserSettings } from 'components/models/base/user_settings';
 import type { SettingsStore } from 'components/routes/settings/settings.form';
 import { useForm } from 'components/routes/settings/settings.form';
 import {
   hasDifferentDefaultSubmissionValues,
   hasDifferentPreviousSubmissionValues,
-  parseSubmissionProfiles,
+  parseSubmissionProfile,
   resetDefaultSubmissionValues,
-  resetPreviousSubmissionValues
+  resetPreviousSubmissionValues,
+  updatePreviousSubmissionValues
 } from 'components/routes/settings/settings.utils';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
@@ -22,21 +24,24 @@ export const HeaderSection = React.memo(() => {
   const theme = useTheme();
   const form = useForm();
   const { apiCall } = useMyAPI();
-  const { user: currentUser, configuration } = useALContext();
+  const { user: currentUser, configuration, settings } = useALContext();
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
 
   const handleSubmit = useCallback(
     () => {
-      const data = form.getFieldValue('settings');
-      if (!data) return;
+      const tab = form.getFieldValue('state.tab');
+      const profileSettings = form.getFieldValue('settings');
+      if (!profileSettings) return;
+
+      const body: UserSettings = parseSubmissionProfile(settings, profileSettings, tab);
 
       apiCall({
         url: `/api/v4/user/settings/${currentUser.username}/`,
         method: 'POST',
-        body: parseSubmissionProfiles(data),
+        body: body,
         onSuccess: () => {
           showSuccessMessage(t('success_save'));
-          form.setFieldValue('settings', s => resetPreviousSubmissionValues(s));
+          form.setFieldValue('settings', s => updatePreviousSubmissionValues(s));
         },
         onFailure: api_data => {
           if (api_data.api_status_code === 403 || api_data.api_status_code === 401) {

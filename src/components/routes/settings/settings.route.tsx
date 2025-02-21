@@ -57,8 +57,6 @@ const WrappedSettingsRoute = () => {
 
     form.setFieldValue('state.tab', tabParam);
     form.setFieldValue('settings', s);
-
-    console.log(s, MOCK_SETTINGS, configuration.submission.profiles);
   }, [configuration.submission.profiles, form, tabParam]);
 
   if (!currentUser.is_admin && !currentUser.roles.includes('self_manage')) return <ForbiddenPage />;
