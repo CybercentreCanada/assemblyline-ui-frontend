@@ -15,7 +15,6 @@ import type { SettingsStore } from './settings.form';
 import { useForm } from './settings.form';
 import type { ProfileSettings } from './settings.utils';
 import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from './settings.utils';
-import { MOCK_SETTINGS } from './utils/data3';
 
 type Params = {
   tab: SettingsStore['state']['tab'];
@@ -35,9 +34,9 @@ const WrappedSettingsRoute = () => {
     form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('self_manage'));
     form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
 
-    const s = initializeSettings(MOCK_SETTINGS);
+    const s = initializeSettings(settings);
     form.setFieldValue('settings', s);
-  }, [currentUser.is_admin, currentUser.roles, form]);
+  }, [currentUser.is_admin, currentUser.roles, form, settings]);
 
   useEffect(() => {
     if (tabParam === form.getFieldValue('state.tab')) return;
@@ -52,12 +51,12 @@ const WrappedSettingsRoute = () => {
 
     let s: ProfileSettings = form.getFieldValue('settings');
     if (tabParam === 'interface') s = form.getFieldValue('settings');
-    else if (tabParam === 'default') s = loadDefaultProfile(s, MOCK_SETTINGS);
-    else s = loadSubmissionProfile(s, MOCK_SETTINGS, configuration.submission.profiles, tabParam);
+    else if (tabParam === 'default') s = loadDefaultProfile(s, settings);
+    else s = loadSubmissionProfile(s, settings, configuration.submission.profiles, tabParam);
 
     form.setFieldValue('state.tab', tabParam);
     form.setFieldValue('settings', s);
-  }, [configuration.submission.profiles, form, tabParam]);
+  }, [configuration.submission.profiles, form, settings, tabParam]);
 
   if (!currentUser.is_admin && !currentUser.roles.includes('self_manage')) return <ForbiddenPage />;
   else
