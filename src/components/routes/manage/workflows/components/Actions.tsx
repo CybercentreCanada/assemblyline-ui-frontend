@@ -192,7 +192,11 @@ export const EditWorkflowAction: React.FC<EditWorkflowActionProps> = React.memo(
           <IconButton
             style={{ color: theme.palette.primary.main }}
             component={Link}
-            to={`${location.pathname}${location.search}#/create/${id}`}
+            to={
+              location.pathname === '/manage/workflows'
+                ? `/manage/workflows${location.search}#/create/${id}`
+                : location.pathname.replace('detail', 'create')
+            }
             size="large"
             disabled={editingDisabled}
           >
