@@ -195,7 +195,9 @@ const WrappedSubmitContent = () => {
                       )
                     },
                     hash: {
-                      label: t('urlHash.input_title'),
+                      label: configuration.ui.allow_url_submissions
+                        ? `${t('urlHash.input_title_hash')}/${t('urlHash.input_title_url')}`
+                        : t('urlHash.input_title_hash'),
                       disabled: !currentUser.roles.includes('submission_create'),
                       inner: (
                         <HashSubmit

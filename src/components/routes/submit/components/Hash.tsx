@@ -31,6 +31,11 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
 
   const form = useForm();
 
+  const stringInputTitle: string = configuration.ui.allow_url_submissions
+    ? `${t('urlHash.input_title_hash')}/${t('urlHash.input_title_url')}`
+    : t('urlHash.input_title_hash');
+  const stringInputText: string = stringInputTitle + t('urlHash.input_suffix');
+
   const handleSubmitHash = useCallback(
     (store: SubmitStore) => {
       if (store.hash.hasError) {
@@ -173,7 +178,7 @@ export const HashSubmit = ({ profile = null, loading = false, disabled = false }
           children={([hashType, hash, error, isUploading]) => (
             <div style={{ flex: 1 }}>
               <TextInput
-                label={`${t('urlHash.input_title')}${t('urlHash.input_suffix')}`}
+                label={stringInputText}
                 value={hash as string}
                 helperText={t('urlHash.input_helpertext')}
                 endAdornment={
