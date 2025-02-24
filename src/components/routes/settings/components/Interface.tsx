@@ -126,12 +126,12 @@ export const InterfaceSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled}
                   options={[
-                    { value: '-1000000', primary: t('interface.score_-1000000') },
-                    { value: '0', primary: t('interface.score_0') },
-                    { value: '100', primary: t('interface.score_100') },
-                    { value: '500', primary: t('interface.score_500') },
-                    { value: '2000', primary: t('interface.score_2000') },
-                    { value: '100000000', primary: t('interface.score_100000000') }
+                    { value: -1000000, primary: t('interface.score_-1000000') },
+                    { value: 0, primary: t('interface.score_0') },
+                    { value: 100, primary: t('interface.score_100') },
+                    { value: 500, primary: t('interface.score_500') },
+                    { value: 2000, primary: t('interface.score_2000') },
+                    { value: 100000000, primary: t('interface.score_100000000') }
                   ]}
                   onChange={(event, v) => form.setFieldValue('settings.expand_min_score.value', v as unknown as number)}
                 />
