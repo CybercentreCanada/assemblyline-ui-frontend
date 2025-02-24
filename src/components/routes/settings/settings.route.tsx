@@ -71,14 +71,14 @@ const WrappedSettingsRoute = () => {
             leftNav={!hasNext ? null : <LeftNav />}
             rightNav={!hasNext ? null : <RightNav />}
           >
-            {!hasNext ? null : tab === 'interface' ? (
-              <InterfaceSection />
-            ) : (
+            {!hasNext ? null : (tab as string) in settings.submission_profiles ? (
               <>
                 <SubmissionSection />
                 <ExternalSourcesSection />
                 <ServicesSection />
               </>
+            ) : (
+              <InterfaceSection />
             )}
           </PageLayout>
         )}

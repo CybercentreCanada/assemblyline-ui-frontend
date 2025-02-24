@@ -94,12 +94,12 @@ export const ListHeader: FC<ListHeaderProps> = ({
               primary={primary}
               primaryTypographyProps={{
                 variant: 'body1',
-                sx: { ...(!checked && !indeterminate && { opacity: 0.38 }), ...primaryProps?.sx },
+                sx: { ...(checked !== null && !checked && !indeterminate && { opacity: 0.38 }), ...primaryProps?.sx },
                 ...primaryProps
               }}
               secondary={secondary}
               secondaryTypographyProps={{
-                sx: { ...(!checked && !indeterminate && { opacity: 0.38 }), ...secondaryProps?.sx },
+                sx: { ...(checked !== null && !checked && !indeterminate && { opacity: 0.38 }), ...secondaryProps?.sx },
                 ...secondaryProps
               }}
             />
@@ -116,11 +116,7 @@ export const ListHeader: FC<ListHeaderProps> = ({
               onChange(event, checked, indeterminate);
             }}
             {...buttonProps}
-            sx={{
-              padding: 0,
-              ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
-              ...buttonProps?.sx
-            }}
+            sx={{ padding: 0, ...buttonProps?.sx }}
           >
             {checked !== null && (
               <ListItemIcon>
@@ -142,12 +138,12 @@ export const ListHeader: FC<ListHeaderProps> = ({
               primary={primary}
               primaryTypographyProps={{
                 variant: 'body1',
-                sx: { ...(!checked && !indeterminate && { opacity: 0.38 }), ...primaryProps?.sx },
+                sx: { ...(checked !== null && !checked && !indeterminate && { opacity: 0.38 }), ...primaryProps?.sx },
                 ...primaryProps
               }}
               secondary={secondary}
               secondaryTypographyProps={{
-                sx: { ...(!checked && !indeterminate && { opacity: 0.38 }), ...secondaryProps?.sx },
+                sx: { ...(checked !== null && !checked && !indeterminate && { opacity: 0.38 }), ...secondaryProps?.sx },
                 ...secondaryProps
               }}
               cursor="pointer"

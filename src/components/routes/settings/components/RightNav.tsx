@@ -1,4 +1,5 @@
 import { useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
+import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/settings/settings.form';
 import { PageNavigation, PageNavigationItem } from 'components/visual/Layouts/PageNavigation';
 import React, { useCallback } from 'react';
@@ -7,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 export const RightNav = React.memo(() => {
   const { t } = useTranslation(['settings']);
   const form = useForm();
+  const { settings } = useALContext();
   const { ActiveAnchor, scrollTo } = useTableOfContent();
 
   const handleCategoryChange = useCallback(
@@ -48,7 +50,7 @@ export const RightNav = React.memo(() => {
   return (
     <form.Subscribe
       selector={state => [
-        state.values.state.loading || state.values.state.tab === 'interface',
+        state.values.state.loading || !(state.values.state.tab in settings.submission_profiles),
         state.values.state.disabled,
         state.values.state.customize
       ]}
