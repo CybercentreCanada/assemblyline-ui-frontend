@@ -1,6 +1,6 @@
 import type { ChipProps } from '@mui/material';
 import type { RuleStatus } from 'components/models/base/signature';
-import type { PossibleColor } from 'components/models/utils/color';
+import type { PossibleColor } from 'helpers/colors';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import CustomChip from './CustomChip';
