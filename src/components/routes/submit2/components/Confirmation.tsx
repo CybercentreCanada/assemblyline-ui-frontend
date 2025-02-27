@@ -13,16 +13,25 @@ import {
   useTheme
 } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
+import useMyAPI from 'components/hooks/useMyAPI';
+import type { Metadata } from 'components/models/base/config';
 import type { SubmitStore } from 'components/routes/submit2/submit.form';
 import { useForm } from 'components/routes/submit2/submit.form';
 import { ByteNumber } from 'components/visual/ByteNumber';
 import Classification from 'components/visual/Classification';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
+import { DateInput } from 'components/visual/Inputs/DateInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
-import React from 'react';
+import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
+import { NumberListInput } from 'components/visual/ListInputs/NumberListInput';
+import { SelectListInput } from 'components/visual/ListInputs/SelectListInput';
+import { TextListInput } from 'components/visual/ListInputs/TextListInput';
+import { isURL } from 'helpers/utils';
+import _ from 'lodash';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -215,6 +224,7 @@ const SubmissionOptions = React.memo(() => {
                   label={t('options.submission.generate_alert')}
                   tooltip={t('settings:submissions.generate_alert_desc')}
                   value={value}
+                  tiny
                   loading={loading}
                   disabled={disabled || (!customize && !editable)}
                   reset={value !== defaultValue}
@@ -235,6 +245,7 @@ const SubmissionOptions = React.memo(() => {
                   label={t('options.submission.ignore_filtering')}
                   tooltip={t('settings:submissions.filtering_desc')}
                   value={value}
+                  tiny
                   loading={loading}
                   disabled={disabled || (!customize && !editable)}
                   reset={value !== defaultValue}
@@ -255,6 +266,7 @@ const SubmissionOptions = React.memo(() => {
                   label={t('options.submission.ignore_cache')}
                   tooltip={t('settings:submissions.result_caching_desc')}
                   value={value}
+                  tiny
                   loading={loading}
                   disabled={disabled || (!customize && !editable)}
                   reset={value !== defaultValue}
@@ -275,6 +287,7 @@ const SubmissionOptions = React.memo(() => {
                   label={t('options.submission.ignore_recursion_prevention')}
                   tooltip={t('settings:submissions.recursion_prevention_desc')}
                   value={value}
+                  tiny
                   loading={loading}
                   disabled={disabled || (!customize && !editable)}
                   reset={value !== defaultValue}
@@ -295,6 +308,7 @@ const SubmissionOptions = React.memo(() => {
                   label={t('options.submission.deep_scan')}
                   tooltip={t('settings:submissions.deep_scan_desc')}
                   value={value}
+                  tiny
                   loading={loading}
                   disabled={disabled || (!customize && !editable)}
                   reset={value !== defaultValue}
@@ -319,89 +333,338 @@ const AdditionalOptions = React.memo(() => {
 
   return (
     <form.Subscribe
-      selector={state => [
-        state.values.state.tab === 'hash',
-        state.values.hash.type,
-        state.values.state.loading,
-        state.values.state.disabled,
-        state.values.state.customize
-      ]}
-      children={props => {
-        const tab = props[0] as boolean;
-        const type = props[1] as SubmitStore['hash']['type'];
-        const loading = props[2] as boolean;
-        const disabled = props[3] as boolean;
-        const customize = props[4] as boolean;
-
-        return (
-          <Section primary={'Additional Options'} sx={{ padding: `${theme.spacing(1)} 0` }}>
-            <form.Subscribe
-              selector={state => [state.values.state.tab === 'file', state.values.settings.malicious]}
-              children={([render, value]) => (
-                <SwitchInput
-                  label={t('malicious')}
-                  labelProps={{ color: 'textPrimary' }}
-                  tooltip={t('malicious.tooltip')}
-                  value={value}
-                  loading={loading}
-                  disabled={disabled}
-                  preventRender={false && !render}
-                  onChange={(e, v) => form.setFieldValue('settings.malicious', v)}
-                />
-              )}
-            />
-
-            {configuration.submission.file_sources?.[type]?.sources?.map((source, i) => (
-              <form.Subscribe
-                key={`${source}-${i}`}
-                selector={state => state.values?.settings?.default_external_sources?.indexOf(source) !== -1}
-                children={value => (
-                  <CheckboxInput
-                    key={i}
-                    id={`source-${source.replace('_', ' ')}`}
-                    label={source.replace('_', ' ')}
-                    labelProps={{
-                      margin: `${theme.spacing(0.5)} 0`,
-                      textTransform: 'capitalize',
-                      variant: 'body2'
-                    }}
-                    value={value}
-                    loading={loading}
-                    disabled={disabled}
-                    disableGap
-                    onChange={() => {
-                      if (!form.getFieldValue('settings')) return;
-
-                      const newSources = form.getFieldValue('settings.default_external_sources');
-                      if (newSources.indexOf(source) === -1) newSources.push(source);
-                      else newSources.splice(newSources.indexOf(source), 1);
-
-                      form.setFieldValue('hash.hasError', false);
-                      form.setFieldValue('settings.default_external_sources', newSources);
-                    }}
-                  />
-                )}
+      selector={state => [state.values.state.loading, state.values.state.disabled, state.values.state.customize]}
+      children={([loading, disabled, customize]) => (
+        <Section primary={'Additional Options'} sx={{ padding: `${theme.spacing(1)} 0` }}>
+          <form.Subscribe
+            selector={state => [state.values.state.tab === 'file', state.values.settings.malicious]}
+            children={([render, value]) => (
+              <SwitchInput
+                label={t('malicious')}
+                labelProps={{ color: 'textPrimary' }}
+                tooltip={t('malicious.tooltip')}
+                value={value}
+                tiny
+                loading={loading}
+                disabled={disabled}
+                preventRender={!render}
+                onChange={(e, v) => form.setFieldValue('settings.malicious', v)}
               />
-            ))}
-          </Section>
-        );
-      }}
+            )}
+          />
+
+          <form.Subscribe
+            selector={state => [
+              state.values.state.tab === 'hash',
+              ...((configuration.submission.file_sources?.[state.values.state.tab]?.sources || []) as string[])
+            ]}
+            children={([render, ...sources]) =>
+              !render || sources.length === 0 ? null : (
+                <>
+                  <Typography
+                    color="textSecondary"
+                    variant="body2"
+                    margin={`${theme.spacing(0.5)} ${theme.spacing(1)}`}
+                  >
+                    {'Select the following external sources'}
+                  </Typography>
+                  {sources.map((source: string, i) => (
+                    <form.Subscribe
+                      key={`${source}-${i}`}
+                      selector={state => state.values?.settings?.default_external_sources?.indexOf(source) !== -1}
+                      children={value => (
+                        <CheckboxInput
+                          key={i}
+                          id={`source-${source.replace('_', ' ')}`}
+                          label={source.replace('_', ' ')}
+                          labelProps={{ color: 'textPrimary' }}
+                          value={value}
+                          loading={loading}
+                          disabled={disabled}
+                          disableGap
+                          tiny
+                          onChange={() => {
+                            if (!form.getFieldValue('settings')) return;
+
+                            const newSources = form.getFieldValue('settings.default_external_sources');
+                            if (newSources.indexOf(source) === -1) newSources.push(source);
+                            else newSources.splice(newSources.indexOf(source), 1);
+
+                            form.setFieldValue('hash.hasError', false);
+                            form.setFieldValue('settings.default_external_sources', newSources);
+                          }}
+                        />
+                      )}
+                    />
+                  ))}
+                </>
+              )
+            }
+          />
+
+          <form.Subscribe
+            selector={state => [
+              state.values.settings.services,
+              state.values.state.tab === 'hash' &&
+                state.values.hash.type === 'url' &&
+                state.values.settings.services.some(cat =>
+                  cat.services.some(svr => configuration?.ui?.url_submission_auto_service_selection?.includes(svr.name))
+                )
+            ]}
+            children={([services, render]) =>
+              !render ? null : (
+                <>
+                  <Typography
+                    color="textSecondary"
+                    variant="body2"
+                    margin={`${theme.spacing(0.5)} ${theme.spacing(1)}`}
+                  >
+                    {t('options.submission.url_submission_auto_service_selection')}
+                  </Typography>
+                  {(services as SubmitStore['settings']['services'])
+                    .reduce((prev: [number, number][], category, i) => {
+                      category.services.forEach((service, j) => {
+                        if (configuration?.ui?.url_submission_auto_service_selection?.includes(service.name))
+                          prev.push([i, j]);
+                      });
+                      return prev;
+                    }, [])
+                    .map(([cat, svr], i) => (
+                      <form.Subscribe
+                        key={i}
+                        selector={state => {
+                          const service = state.values.settings.services[cat].services[svr];
+                          return [service.name, service.selected];
+                        }}
+                        children={([name, selected]) => (
+                          <CheckboxInput
+                            key={i}
+                            id={`url_submission_auto_service_selection-${(name as string).replace('_', ' ')}`}
+                            label={(name as string).replace('_', ' ')}
+                            labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
+                            value={selected as boolean}
+                            loading={loading}
+                            disabled={disabled}
+                            disableGap
+                            tiny
+                            onChange={() => {
+                              form.setFieldValue('settings', s => {
+                                s.services[cat].services[svr].selected = !selected;
+                                s.services[cat].selected = s.services[cat].services.every(val => val.selected);
+                                return s;
+                              });
+                            }}
+                          />
+                        )}
+                      />
+                    ))}
+                </>
+              )
+            }
+          />
+        </Section>
+      )}
     />
   );
 });
 
+type MetadataParamParam = {
+  name: string;
+  metadata: Metadata;
+  loading?: boolean;
+  disabled?: boolean;
+};
+
+const MetadataParam: React.FC<MetadataParamParam> = React.memo(
+  ({ name, metadata, loading = false, disabled = false }) => {
+    const { t } = useTranslation(['submit', 'settings']);
+    const form = useForm();
+    const { apiCall } = useMyAPI();
+
+    const [options, setOptions] = useState([...new Set(metadata.suggestions)].sort());
+
+    const handleValid = useCallback(
+      (value: unknown): string => {
+        if (!value) return metadata.required ? t('required') : null;
+
+        if (metadata.validator_type === 'uri' && !isURL((value || '') as string)) return t('invalid_url');
+
+        if (
+          metadata.validator_type === 'regex' &&
+          !((value || '') as string).match(new RegExp(metadata.validator_params.validation_regex as string))
+        )
+          return t('invalid_regex');
+
+        return null;
+      },
+      [metadata.required, metadata.validator_params.validation_regex, metadata.validator_type, t]
+    );
+
+    const handleChange = useCallback(
+      (value: unknown) => {
+        form.setStore(s => {
+          s.metadata = !value ? _.omit(s?.metadata || {}, name) : { ...(s?.metadata || {}), [name]: value };
+          return s;
+        });
+      },
+      [form, name]
+    );
+
+    const handleReset = useCallback(() => {
+      form.setStore(s => {
+        s.metadata = _.omit(s?.metadata || {}, name);
+        return s;
+      });
+    }, [form, name]);
+
+    useEffect(() => {
+      if (disabled || metadata.validator_type in ['enum', 'boolean', 'integer', 'date']) return;
+      apiCall<string[]>({
+        url: `/api/v4/search/facet/submission/metadata.${name}/`,
+        onSuccess: api_data => setOptions(o => [...new Set([...o, ...Object.keys(api_data.api_response)])].sort()),
+        onFailure: () => null
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [metadata.validator_type, name, disabled]);
+
+    const props = useMemo(
+      () => ({
+        id: `metadata-${name.replace('_', ' ')}`,
+        primary: name.replace('_', ' '),
+        primaryProps: { textTransform: 'capitalize' },
+        loading: loading,
+        disabled: disabled,
+        disabledGap: true,
+        onChange: (e, v) => handleChange(v),
+        onReset: () => handleReset()
+      }),
+      []
+    );
+
+    return (
+      <form.Subscribe
+        selector={state => state.values?.metadata?.[name]}
+        children={value => {
+          switch (metadata.validator_type) {
+            case 'boolean':
+              return (
+                <BooleanListInput
+                  id={`metadata-${name.replace('_', ' ')}`}
+                  primary={name.replace('_', ' ')}
+                  primaryProps={{ textTransform: 'capitalize' }}
+                  value={(value as boolean) || false}
+                  loading={loading}
+                  disabled={disabled}
+                  reset={!!value}
+                  disableGap
+                  onChange={(event, v) => handleChange(v)}
+                  onReset={() => handleReset()}
+                  {...props}
+                />
+              );
+            case 'date':
+              return (
+                <DateInput
+                  id={`metadata-${name.replace('_', ' ')}`}
+                  primary={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
+                  primaryProps={{ textTransform: 'capitalize' }}
+                  value={value as string}
+                  loading={loading}
+                  disabled={disabled}
+                  reset={!!value}
+                  onChange={(event, v) => handleChange(v)}
+                  onReset={() => handleReset()}
+                />
+              );
+            case 'enum':
+              return (
+                <SelectListInput
+                  id={`metadata-${name.replace('_', ' ')}`}
+                  primary={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
+                  primaryProps={{ textTransform: 'capitalize' }}
+                  value={(value as string) || ''}
+                  options={(metadata.validator_params.values as string[])
+                    .map(key => ({ primary: key.replaceAll('_', ' '), value: key }))
+                    .sort()}
+                  loading={loading}
+                  disabled={disabled}
+                  reset={!!value}
+                  onChange={(event, v) => handleChange(v)}
+                  onReset={() => handleReset()}
+                />
+              );
+            case 'integer':
+              return (
+                <NumberListInput
+                  id={`metadata-${name.replace('_', ' ')}`}
+                  primary={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
+                  primaryProps={{ textTransform: 'capitalize' }}
+                  value={value as number}
+                  min={metadata.validator_params.min}
+                  max={metadata.validator_params.max}
+                  loading={loading}
+                  disabled={disabled}
+                  reset={!!value}
+                  onChange={(event, v) => handleChange(v)}
+                  onReset={() => handleReset()}
+                />
+              );
+            case 'regex':
+              return (
+                <TextListInput
+                  id={`metadata-${name.replace('_', ' ')}`}
+                  primary={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
+                  primaryProps={{ textTransform: 'capitalize' }}
+                  value={(value as string) || ''}
+                  options={options}
+                  loading={loading}
+                  disabled={disabled}
+                  reset={!!value}
+                  error={v => handleValid(v)}
+                  tooltip={metadata.validator_params?.validation_regex || null}
+                  tooltipProps={{ placement: 'right' }}
+                  onChange={(event, v) => handleChange(v)}
+                  onReset={() => handleReset()}
+                />
+              );
+            default:
+              return (
+                <TextListInput
+                  id={`metadata-${name.replace('_', ' ')}`}
+                  primary={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
+                  primaryProps={{ textTransform: 'capitalize', variant: 'body2' }}
+                  value={(value as string) || ''}
+                  options={options}
+                  loading={loading}
+                  disabled={disabled}
+                  reset={!!value}
+                  error={v => handleValid(v)}
+                  onChange={(event, v) => handleChange(v)}
+                  onReset={() => handleReset()}
+                />
+              );
+          }
+        }}
+      />
+    );
+  }
+);
+
 const SubmissionMetadata = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+  const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
-  const { configuration } = useALContext();
   const form = useForm();
+  const { configuration } = useALContext();
 
   return (
     <form.Subscribe
-      selector={state => [state.values.metadata]}
-      children={([metadata]) => {
+      selector={state => [state.values.state.loading, state.values.state.disabled]}
+      children={([loading, disabled]) => {
         return (
-          <Section primary={'Submission Metadata'} sx={{ padding: `${theme.spacing(1)} 0` }}>
+          <Section primary={t('options.submission.metadata')} sx={{ padding: `${theme.spacing(1)} 0` }}>
+            {Object.entries(configuration.submission.metadata.submit).map(([name, metadata]) => (
+              <MetadataParam key={name} name={name} metadata={metadata} loading={loading} disabled={disabled} />
+            ))}
             {/* {configuration.submission.file_sources?.[type]?.sources?.map((source, i) => (
                 <form.Subscribe
                   key={`${source}-${i}`}
@@ -515,7 +778,7 @@ const ExternalServices = React.memo(() => {
   return (
     <form.Subscribe
       selector={state => {
-        if (state.values.hash.type !== 'url') return [false, [], false, false];
+        if (state.values.state.tab !== 'hash' || state.values.hash.type !== 'url') return [false, [], false, false];
         else {
           const svr = state.values?.settings?.services?.reduce((prev: [number, number][], category, i) => {
             category.services.forEach((service, j) => {
@@ -547,11 +810,12 @@ const ExternalServices = React.memo(() => {
                     key={i}
                     id={`url_submission_auto_service_selection-${service.name.replace('_', ' ')}`}
                     label={service.name.replace('_', ' ')}
-                    labelProps={{ textTransform: 'capitalize' }}
+                    labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
                     value={service.selected}
                     loading={loading}
                     disabled={disabled}
                     disableGap
+                    tiny
                     onChange={() => {
                       form.setFieldValue('settings', s => {
                         s.services[cat].services[svr].selected = !service.selected;
