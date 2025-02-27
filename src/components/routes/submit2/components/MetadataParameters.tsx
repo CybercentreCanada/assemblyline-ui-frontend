@@ -2,7 +2,7 @@ import { Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Metadata } from 'components/models/base/config';
-import { useForm } from 'components/routes/submit/submit.form';
+import { useForm } from 'components/routes/submit2/submit.form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { DateInput } from 'components/visual/Inputs/DateInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';

@@ -4,7 +4,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { getProfileNames } from 'components/routes/settings/settings.utils';
-import { useForm } from 'components/routes/submit/submit.form';
+import { useForm } from 'components/routes/submit2/submit.form';
 import { Button } from 'components/visual/Buttons/Button';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import React, { useMemo } from 'react';

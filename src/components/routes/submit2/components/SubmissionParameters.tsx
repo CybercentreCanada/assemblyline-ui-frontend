@@ -1,6 +1,6 @@
 import { Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
-import { useForm } from 'components/routes/submit/submit.form';
+import { useForm } from 'components/routes/submit2/submit.form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SliderInput } from 'components/visual/Inputs/SliderInput';

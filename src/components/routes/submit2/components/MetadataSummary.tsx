@@ -1,6 +1,6 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import { Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
-import { useForm } from 'components/routes/submit/submit.form';
+import { useForm } from 'components/routes/submit2/submit.form';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

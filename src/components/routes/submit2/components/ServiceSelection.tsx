@@ -1,7 +1,7 @@
 import { Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import type { SelectedService, SelectedServiceCategory, ServiceParameter } from 'components/models/base/service';
-import { useForm } from 'components/routes/submit/submit.form';
+import { useForm } from 'components/routes/submit2/submit.form';
 import { Collapse } from 'components/visual/Collapse';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
