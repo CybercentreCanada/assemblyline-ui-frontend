@@ -12,6 +12,7 @@ const INTERFACE_KEYS = [
 ] as const;
 
 const PROFILE_KEYS = [
+  'description',
   'classification',
   'deep_scan',
   'generate_alert',
