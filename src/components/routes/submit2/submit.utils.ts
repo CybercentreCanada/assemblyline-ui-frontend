@@ -1,166 +1,219 @@
-import type { SubmissionProfile, SubmissionProfileParams } from 'components/models/base/config';
+import type { Configuration, Metadata } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
-import type { ProfileSettings as ProfileSettings2 } from 'components/routes/settings/settings.utils';
+import {
+  loadDefaultProfile,
+  loadSubmissionProfile,
+  type ProfileSettings
+} from 'components/routes/settings/settings.utils';
 
-type ProfileKey = keyof Pick<
-  UserSettings,
-  | 'classification'
-  | 'deep_scan'
-  | 'generate_alert'
-  | 'ignore_cache'
-  | 'ignore_recursion_prevention'
-  | 'ignore_filtering'
-  | 'priority'
-  | 'ttl'
->;
+export type SubmitMetadata = Record<string, unknown>;
 
-const PROFILE_KEYS: ProfileKey[] = [
-  'classification',
-  'deep_scan',
-  'generate_alert',
-  'ignore_cache',
-  'ignore_recursion_prevention',
-  'ignore_filtering',
-  'priority',
-  'ttl'
-];
+export const getPreferredSubmissionProfile = (settings: UserSettings): string =>
+  !settings
+    ? null
+    : Object.keys(settings.submission_profiles).includes(settings.preferred_submission_profile)
+    ? settings.preferred_submission_profile
+    : Object.keys(settings.submission_profiles)[0];
 
-export type ProfileParam<T> = {
-  default: T;
-  value: T;
-  editable: boolean;
-};
-
-export type ProfileSettings = {
-  [K in keyof Pick<SubmissionProfileParams, ProfileKey>]: ProfileParam<SubmissionProfileParams[K]>;
-} & Pick<UserSettings, 'services' | 'service_spec'>;
-
-export type SubmitSettings = Pick<UserSettings, ProfileKey> & {
-  description: string;
-  default_external_sources: string[];
-  malicious: boolean;
-  profiles: {
-    [profile: string]: ProfileSettings;
-  };
-};
-
-export type SubmitSettings2 = ProfileSettings2 & {
-  default_external_sources: string[];
-  malicious: boolean;
-};
-
-const loadProfile = (profile_name: string, settings: UserSettings, profile: SubmissionProfile): ProfileSettings => {
-  let out: ProfileSettings = null;
-
-  // Load the submission parameters
-  Object.entries(settings).forEach(([key, value]) => {
-    if (PROFILE_KEYS.includes(key as ProfileKey)) {
-      const defaultValue: unknown = settings.submission_profiles[profile_name][key];
-      out = {
-        ...out,
-        [key]: {
-          default: defaultValue === null || defaultValue === undefined ? null : defaultValue,
-          value: defaultValue || value,
-          editable: !profile ? true : !!profile.editable_params?.submission?.includes(key)
-        }
-      };
-    }
-  });
-
-  // Loading the services
-  out = { ...out, services: null };
-  const selected = profile?.params?.services?.selected;
-  const excluded = profile?.params?.services?.excluded;
-  out.services = settings.services
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map(category => ({
-      ...category,
-      selected: !profile ? category.selected : selected.includes(category.name) && !excluded.includes(category.name),
-      services: category.services
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map(service => ({
-          ...service,
-          selected: !profile
-            ? service.selected
-            : (selected.includes(service.category) || selected.includes(service.name)) &&
-              !(excluded.includes(service.category) || excluded.includes(service.name))
-        }))
-    }));
-
-  // Loading the service specs
-  out = { ...out, service_spec: null };
-  out.service_spec = settings.service_spec
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map(spec => ({
-      ...spec,
-      params: spec.params
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map(param => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const paramValue = profile?.params?.service_spec?.[spec?.name]?.[param?.name];
-          return {
-            ...param,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            value: paramValue === undefined || paramValue === null ? param?.value : paramValue,
-            editable: !profile ? true : profile.editable_params?.[spec.name]?.includes(param?.name) ?? false
-          };
-        })
-    }));
-
-  return out;
-};
-
-export const loadSubmissionProfiles = (
+export const getDefaultExternalSources = (
   settings: UserSettings,
-  submission_profiles: { [key: string]: SubmissionProfile }
-): SubmitSettings => {
-  if (!settings) return null;
-  let out = { default_external_sources: [], description: '', profiles: {} } as SubmitSettings;
-
-  // Load default settings
-  Object.entries(settings).forEach(([key, value]) => {
-    if (PROFILE_KEYS.includes(key as ProfileKey)) {
-      out = { ...out, [key]: value };
-    }
-  });
-
-  // Load submission profile information
-  Object.keys(settings?.submission_profiles || {}).forEach(name => {
-    out.profiles = { ...out.profiles, [name]: loadProfile(name, settings, submission_profiles[name]) };
-  });
-
-  return out;
+  configuration: Configuration
+): ProfileSettings['default_external_sources'] => {
+  let sources = Object.entries(configuration.submission.file_sources).reduce(
+    (prev, [, fileSource]) => [...prev, ...fileSource.auto_selected],
+    settings?.default_external_sources || []
+  );
+  sources = [...new Set(sources)].sort();
+  return { prev: sources, value: sources };
 };
 
-export const applySubmissionProfile = (submit: SubmitSettings, profile: string | number): UserSettings => {
-  if (!submit) return null;
+export const getDefaultMetadata = (
+  out: SubmitMetadata,
+  configuration: Configuration,
+  metadata: SubmitMetadata
+): SubmitMetadata => ({
+  ...out,
+  ...(Object.fromEntries(
+    Object.entries(configuration?.submission?.metadata?.submit || {}).reduce(
+      (prev: [string, unknown][], [key, value]) => {
+        if (value.default !== null) prev.push([key, value]);
+        return prev;
+      },
+      []
+    )
+  ) as Metadata),
+  ...metadata
+});
 
-  const out: UserSettings = {
-    description: submit.description || '',
-    default_external_sources: submit.default_external_sources || []
-  } as UserSettings;
+export const switchProfile = (
+  out: ProfileSettings,
+  configuration: Configuration,
+  settings: UserSettings,
+  name: string
+): ProfileSettings =>
+  name === 'default'
+    ? loadDefaultProfile(out, settings)
+    : loadSubmissionProfile(out, settings, configuration.submission.profiles, name);
 
-  // Applying the selected submission profile parameters
-  Object.entries(submit.profiles[profile]).forEach(([key, value]: [string, unknown]) => {
-    const param = value as ProfileParam<unknown>;
-    if (PROFILE_KEYS.includes(key as ProfileKey)) {
-      out[key] = param.value;
-    }
-  });
+// type ProfileKey = keyof Pick<
+//   UserSettings,
+//   | 'classification'
+//   | 'deep_scan'
+//   | 'generate_alert'
+//   | 'ignore_cache'
+//   | 'ignore_recursion_prevention'
+//   | 'ignore_filtering'
+//   | 'priority'
+//   | 'ttl'
+// >;
 
-  // Applying the selected submission profile service specs
-  out.service_spec = structuredClone(submit.profiles[profile].service_spec);
-  out.service_spec.forEach((_, i) => {
-    out.service_spec[i].params.forEach((__, j) => {
-      delete out.service_spec[i].params[j].editable;
-    });
-  });
+// const PROFILE_KEYS: ProfileKey[] = [
+//   'classification',
+//   'deep_scan',
+//   'generate_alert',
+//   'ignore_cache',
+//   'ignore_recursion_prevention',
+//   'ignore_filtering',
+//   'priority',
+//   'ttl'
+// ];
 
-  // Applying the selected submission profile service specs
-  out.services = structuredClone(submit.profiles[profile].services);
-  console.log(out);
+// export type ProfileParam<T> = {
+//   default: T;
+//   value: T;
+//   editable: boolean;
+// };
 
-  return out;
-};
+// export type ProfileSettings = {
+//   [K in keyof Pick<SubmissionProfileParams, ProfileKey>]: ProfileParam<SubmissionProfileParams[K]>;
+// } & Pick<UserSettings, 'services' | 'service_spec'>;
 
-export const getProfileNames = (settings: UserSettings) => Object.keys(settings?.submission_profiles || {}).sort();
+// export type SubmitSettings = Pick<UserSettings, ProfileKey> & {
+//   description: string;
+//   default_external_sources: string[];
+//   malicious: boolean;
+//   profiles: {
+//     [profile: string]: ProfileSettings;
+//   };
+// };
+
+// export type SubmitSettings2 = ProfileSettings2 & {
+//   default_external_sources: string[];
+//   malicious: boolean;
+// };
+
+// const loadProfile = (profile_name: string, settings: UserSettings, profile: SubmissionProfile): ProfileSettings => {
+//   let out: ProfileSettings = null;
+
+//   // Load the submission parameters
+//   Object.entries(settings).forEach(([key, value]) => {
+//     if (PROFILE_KEYS.includes(key as ProfileKey)) {
+//       const defaultValue: unknown = settings.submission_profiles[profile_name][key];
+//       out = {
+//         ...out,
+//         [key]: {
+//           default: defaultValue === null || defaultValue === undefined ? null : defaultValue,
+//           value: defaultValue || value,
+//           editable: !profile ? true : !!profile.editable_params?.submission?.includes(key)
+//         }
+//       };
+//     }
+//   });
+
+//   // Loading the services
+//   out = { ...out, services: null };
+//   const selected = profile?.params?.services?.selected;
+//   const excluded = profile?.params?.services?.excluded;
+//   out.services = settings.services
+//     .sort((a, b) => a.name.localeCompare(b.name))
+//     .map(category => ({
+//       ...category,
+//       selected: !profile ? category.selected : selected.includes(category.name) && !excluded.includes(category.name),
+//       services: category.services
+//         .sort((a, b) => a.name.localeCompare(b.name))
+//         .map(service => ({
+//           ...service,
+//           selected: !profile
+//             ? service.selected
+//             : (selected.includes(service.category) || selected.includes(service.name)) &&
+//               !(excluded.includes(service.category) || excluded.includes(service.name))
+//         }))
+//     }));
+
+//   // Loading the service specs
+//   out = { ...out, service_spec: null };
+//   out.service_spec = settings.service_spec
+//     .sort((a, b) => a.name.localeCompare(b.name))
+//     .map(spec => ({
+//       ...spec,
+//       params: spec.params
+//         .sort((a, b) => a.name.localeCompare(b.name))
+//         .map(param => {
+//           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+//           const paramValue = profile?.params?.service_spec?.[spec?.name]?.[param?.name];
+//           return {
+//             ...param,
+//             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+//             value: paramValue === undefined || paramValue === null ? param?.value : paramValue,
+//             editable: !profile ? true : profile.editable_params?.[spec.name]?.includes(param?.name) ?? false
+//           };
+//         })
+//     }));
+
+//   return out;
+// };
+
+// export const loadSubmissionProfiles = (
+//   settings: UserSettings,
+//   submission_profiles: { [key: string]: SubmissionProfile }
+// ): SubmitSettings => {
+//   if (!settings) return null;
+//   let out = { default_external_sources: [], description: '', profiles: {} } as SubmitSettings;
+
+//   // Load default settings
+//   Object.entries(settings).forEach(([key, value]) => {
+//     if (PROFILE_KEYS.includes(key as ProfileKey)) {
+//       out = { ...out, [key]: value };
+//     }
+//   });
+
+//   // Load submission profile information
+//   Object.keys(settings?.submission_profiles || {}).forEach(name => {
+//     out.profiles = { ...out.profiles, [name]: loadProfile(name, settings, submission_profiles[name]) };
+//   });
+
+//   return out;
+// };
+
+// export const applySubmissionProfile = (submit: SubmitSettings, profile: string | number): UserSettings => {
+//   if (!submit) return null;
+
+//   const out: UserSettings = {
+//     description: submit.description || '',
+//     default_external_sources: submit.default_external_sources || []
+//   } as UserSettings;
+
+//   // Applying the selected submission profile parameters
+//   Object.entries(submit.profiles[profile]).forEach(([key, value]: [string, unknown]) => {
+//     const param = value as ProfileParam<unknown>;
+//     if (PROFILE_KEYS.includes(key as ProfileKey)) {
+//       out[key] = param.value;
+//     }
+//   });
+
+//   // Applying the selected submission profile service specs
+//   out.service_spec = structuredClone(submit.profiles[profile].service_spec);
+//   out.service_spec.forEach((_, i) => {
+//     out.service_spec[i].params.forEach((__, j) => {
+//       delete out.service_spec[i].params[j].editable;
+//     });
+//   });
+
+//   // Applying the selected submission profile service specs
+//   out.services = structuredClone(submit.profiles[profile].services);
+//   console.log(out);
+
+//   return out;
+// };
+
+// export const getProfileNames = (settings: UserSettings) => Object.keys(settings?.submission_profiles || {}).sort();

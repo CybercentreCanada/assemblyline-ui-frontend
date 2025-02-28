@@ -7,18 +7,19 @@ const INTERFACE_KEYS = [
   'download_encoding',
   'executive_summary',
   'expand_min_score',
+  'malicious',
   'preferred_submission_profile',
   'submission_view'
 ] as const;
 
 const PROFILE_KEYS = [
-  'description',
   'classification',
   'deep_scan',
+  'description',
   'generate_alert',
   'ignore_cache',
-  'ignore_recursion_prevention',
   'ignore_filtering',
+  'ignore_recursion_prevention',
   'priority',
   'ttl'
 ] as const;

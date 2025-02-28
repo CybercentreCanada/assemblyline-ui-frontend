@@ -13,7 +13,7 @@ import generateUUID from 'helpers/uuid';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { AnalyzeButton, CancelButton } from './Components';
+import { AnalyzeButton, CancelButton } from './Landing';
 import { MetadataSummary } from './MetadataSummary';
 import { SelectSubmissionProfile } from './SubmissionProfile';
 

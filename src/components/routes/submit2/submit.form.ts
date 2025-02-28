@@ -1,61 +1,9 @@
 import Flow from '@flowjs/flow.js';
 import { createFormContext } from 'components/core/form/createFormContext';
 import type { HashPatternMap } from 'components/models/base/config';
-import type { SubmitSettings2 } from 'components/routes/submit/submit.utils';
+import type { ProfileSettings } from 'components/routes/settings/settings.utils';
+import type { SubmitMetadata } from 'components/routes/submit2/submit.utils';
 import generateUUID from 'helpers/uuid';
-
-export const TABS = ['file', 'hash', 'options'] as const;
-export type TabKey = (typeof TABS)[number];
-
-export type SubmitStore = {
-  /** State related to the interface of the Submit page */
-  state: {
-    /** Is the confirmation dialog open? */
-    isConfirmationOpen: boolean;
-
-    /** Are the settings currently being fetched? */
-    isFetchingSettings: boolean;
-
-    /** Is a submission being sent? */
-    isUploading: boolean;
-
-    /** Selected profile for the submission */
-    profile: string;
-
-    /** Selected tab */
-    tab: TabKey;
-
-    /** Type of submission being made */
-    type: 'file' | 'hash';
-
-    /** Upload progress of a file submission */
-    uploadProgress: number;
-
-    /** UUID of the submission */
-    uuid: string;
-
-    /** loading the settings */
-    loading: boolean;
-
-    /** disable the inputs */
-    disabled: boolean;
-
-    /** The user is able to customize the values */
-    customize: boolean;
-  };
-
-  /** Details of the file input  */
-  file: File & { relativePath: string; fileName: string; path: string };
-
-  /** Details of the hash input */
-  hash: { type: HashPatternMap; value: string; hasError: boolean; urlAutoSelect: boolean };
-
-  /** Selected metadata of the submission */
-  metadata: Record<string, unknown>;
-
-  /** All the user's settings */
-  settings: SubmitSettings2;
-};
 
 export const FLOW = new Flow({
   target: '/api/v4/ui/flowjs/',
@@ -65,27 +13,74 @@ export const FLOW = new Flow({
   simultaneousUploads: 4
 });
 
+export type SubmitStore = {
+  /** State related to the interface of the Submit page */
+  state: {
+    /** adjust the service selection and parameters */
+    adjust: boolean;
+
+    /** Is the confirmation dialog open? */
+    confirmation: boolean;
+
+    /** The user is able to customize the values */
+    customize: boolean;
+
+    /** disable the inputs */
+    disabled: boolean;
+
+    /** Are the settings currently being fetched? */
+    isFetchingSettings: boolean;
+
+    /** loading the settings */
+    loading: boolean;
+
+    /** Selected profile for the submission */
+    profile: string;
+
+    /** Type of submission being made */
+    tab: 'file' | 'hash';
+
+    /** Is a submission being sent? */
+    uploading: boolean;
+
+    /** Upload progress of a file submission */
+    uploadProgress: number;
+
+    /** UUID of the submission */
+    uuid: string;
+  };
+
+  /** Details of the file input  */
+  file: File & { relativePath: string; fileName: string; path: string };
+
+  /** Details of the hash input */
+  hash: { type: HashPatternMap; value: string };
+
+  /** Selected metadata of the submission */
+  metadata: SubmitMetadata;
+
+  /** All the user's settings */
+  settings: ProfileSettings;
+};
+
 export const DEFAULT_SUBMIT_FORM: SubmitStore = Object.freeze({
   state: {
-    uuid: generateUUID(),
-    type: 'file',
-    isFetchingSettings: true,
-    isConfirmationOpen: false,
-    isUploading: false,
-    uploadProgress: 0,
-    tab: 'file',
-    profile: null,
-    loading: false,
-    // loading: true,
+    adjust: false,
+    confirmation: false,
+    customize: false,
     disabled: false,
-    customize: false
+    isFetchingSettings: true,
+    loading: true,
+    profile: null,
+    tab: 'file',
+    uploading: false,
+    uploadProgress: 0,
+    uuid: generateUUID()
   },
   file: null,
   hash: {
     type: 'url',
-    value: 'https://www.google.ca',
-    hasError: false,
-    urlAutoSelect: true
+    value: 'https://www.google.ca'
   },
   metadata: {},
   settings: null

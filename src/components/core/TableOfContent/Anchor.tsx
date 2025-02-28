@@ -11,7 +11,8 @@ export type AnchorProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEl
 export const Anchor: React.FC<AnchorProps> = React.memo(
   ({ anchor = null, label = '', subheader = false, children = null, disabled = false, ...props }: AnchorProps) => {
     const id = useId();
-    const { loadAnchors } = useTableOfContent();
+
+    const loadAnchors = useTableOfContent()?.loadAnchors;
 
     useEffect(() => {
       if (disabled) return;

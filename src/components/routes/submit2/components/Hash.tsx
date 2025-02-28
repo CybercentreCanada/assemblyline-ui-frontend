@@ -16,7 +16,7 @@ import { getSubmitType } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { CancelButton } from './Components';
+import { CancelButton } from './Landing';
 import { SelectSubmissionProfile, SubmissionProfile } from './SubmissionProfile';
 
 const HashInput = React.memo(() => {

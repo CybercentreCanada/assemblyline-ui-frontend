@@ -25,10 +25,10 @@ import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
-import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
-import { NumberListInput } from 'components/visual/ListInputs/NumberListInput';
-import { SelectListInput } from 'components/visual/ListInputs/SelectListInput';
-import { TextListInput } from 'components/visual/ListInputs/TextListInput';
+import { BooleanListInput, BooleanListInputProps } from 'components/visual/ListInputs/BooleanListInput';
+import { NumberListInput, NumberListInputProps } from 'components/visual/ListInputs/NumberListInput';
+import { SelectListInput, SelectListInputProps } from 'components/visual/ListInputs/SelectListInput';
+import { TextListInput, TextListInputProps } from 'components/visual/ListInputs/TextListInput';
 import { isURL } from 'helpers/utils';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -325,7 +325,7 @@ const SubmissionOptions = React.memo(() => {
   );
 });
 
-const AdditionalOptions = React.memo(() => {
+const SupplementaryOptions = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { configuration } = useALContext();
@@ -335,7 +335,7 @@ const AdditionalOptions = React.memo(() => {
     <form.Subscribe
       selector={state => [state.values.state.loading, state.values.state.disabled, state.values.state.customize]}
       children={([loading, disabled, customize]) => (
-        <Section primary={'Additional Options'} sx={{ padding: `${theme.spacing(1)} 0` }}>
+        <Section primary={'Supplementary Options'} sx={{ padding: `${theme.spacing(1)} 0` }}>
           <form.Subscribe
             selector={state => [state.values.state.tab === 'file', state.values.settings.malicious]}
             children={([render, value]) => (
@@ -527,18 +527,22 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [metadata.validator_type, name, disabled]);
 
-    const props = useMemo(
+    const props = useMemo<unknown>(
       () => ({
-        id: `metadata-${name.replace('_', ' ')}`,
-        primary: name.replace('_', ' '),
-        primaryProps: { textTransform: 'capitalize' },
-        loading: loading,
         disabled: disabled,
         disabledGap: true,
+        disablePadding: true,
+        id: `metadata-${name.replace('_', ' ')}`,
+        loading: loading,
+        primary: name.replace('_', ' '),
+        primaryProps: { textTransform: 'capitalize' },
+        tiny: true,
+        primaryVariant: 'body2',
+        width: '60%',
         onChange: (e, v) => handleChange(v),
         onReset: () => handleReset()
       }),
-      []
+      [disabled, handleChange, handleReset, loading, name]
     );
 
     return (
@@ -549,25 +553,17 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
             case 'boolean':
               return (
                 <BooleanListInput
-                  id={`metadata-${name.replace('_', ' ')}`}
-                  primary={name.replace('_', ' ')}
-                  primaryProps={{ textTransform: 'capitalize' }}
+                  {...(props as BooleanListInputProps)}
                   value={(value as boolean) || false}
-                  loading={loading}
-                  disabled={disabled}
                   reset={!!value}
-                  disableGap
-                  onChange={(event, v) => handleChange(v)}
-                  onReset={() => handleReset()}
-                  {...props}
                 />
               );
             case 'date':
               return (
                 <DateInput
                   id={`metadata-${name.replace('_', ' ')}`}
-                  primary={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
-                  primaryProps={{ textTransform: 'capitalize' }}
+                  label={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
+                  labelProps={{ textTransform: 'capitalize' }}
                   value={value as string}
                   loading={loading}
                   disabled={disabled}
@@ -579,68 +575,44 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
             case 'enum':
               return (
                 <SelectListInput
-                  id={`metadata-${name.replace('_', ' ')}`}
-                  primary={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
-                  primaryProps={{ textTransform: 'capitalize' }}
+                  {...(props as SelectListInputProps)}
                   value={(value as string) || ''}
                   options={(metadata.validator_params.values as string[])
                     .map(key => ({ primary: key.replaceAll('_', ' '), value: key }))
                     .sort()}
-                  loading={loading}
-                  disabled={disabled}
                   reset={!!value}
-                  onChange={(event, v) => handleChange(v)}
-                  onReset={() => handleReset()}
                 />
               );
             case 'integer':
               return (
                 <NumberListInput
-                  id={`metadata-${name.replace('_', ' ')}`}
-                  primary={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
-                  primaryProps={{ textTransform: 'capitalize' }}
+                  {...(props as NumberListInputProps)}
                   value={value as number}
                   min={metadata.validator_params.min}
                   max={metadata.validator_params.max}
-                  loading={loading}
-                  disabled={disabled}
                   reset={!!value}
-                  onChange={(event, v) => handleChange(v)}
-                  onReset={() => handleReset()}
                 />
               );
             case 'regex':
               return (
                 <TextListInput
-                  id={`metadata-${name.replace('_', ' ')}`}
-                  primary={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
-                  primaryProps={{ textTransform: 'capitalize' }}
+                  {...(props as TextListInputProps)}
                   value={(value as string) || ''}
                   options={options}
-                  loading={loading}
-                  disabled={disabled}
                   reset={!!value}
                   error={v => handleValid(v)}
                   tooltip={metadata.validator_params?.validation_regex || null}
                   tooltipProps={{ placement: 'right' }}
-                  onChange={(event, v) => handleChange(v)}
-                  onReset={() => handleReset()}
                 />
               );
             default:
               return (
                 <TextListInput
-                  id={`metadata-${name.replace('_', ' ')}`}
-                  primary={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
-                  primaryProps={{ textTransform: 'capitalize', variant: 'body2' }}
+                  {...(props as TextListInputProps)}
                   value={(value as string) || ''}
                   options={options}
-                  loading={loading}
-                  disabled={disabled}
                   reset={!!value}
                   error={v => handleValid(v)}
-                  onChange={(event, v) => handleChange(v)}
-                  onReset={() => handleReset()}
                 />
               );
           }
@@ -1012,21 +984,16 @@ export const AnalysisConfirmation = React.memo(() => {
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.isConfirmationOpen]}
+      selector={state => [state.values.state.confirmation]}
       children={([open]) => {
         return (
-          <Dialog
-            fullWidth
-            maxWidth="md"
-            open={open}
-            onClose={() => form.setFieldValue('state.isConfirmationOpen', false)}
-          >
+          <Dialog fullWidth maxWidth="md" open={open} onClose={() => form.setFieldValue('state.confirmation', false)}>
             <Title />
 
             <DialogContent sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1.5) }}>
               <ClassificationInfo />
               <SubmissionOptions />
-              <AdditionalOptions />
+              <SupplementaryOptions />
               <SubmissionMetadata />
               {/* <ExternalSources />
               <ExternalServices /> */}
@@ -1037,7 +1004,7 @@ export const AnalysisConfirmation = React.memo(() => {
             <ToS />
 
             <DialogActions>
-              <Button onClick={() => form.setFieldValue('state.isConfirmationOpen', false)}>{t('cancel')}</Button>
+              <Button onClick={() => form.setFieldValue('state.confirmation', false)}>{t('cancel')}</Button>
               <Button>{t('analyze')}</Button>
             </DialogActions>
           </Dialog>
