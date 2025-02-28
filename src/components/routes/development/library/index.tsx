@@ -5,6 +5,7 @@ import { PageNavigation } from 'components/visual/Layouts/PageNavigation';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
+import type { LibraryFormStore } from './contexts/form';
 import { FormProvider, useForm } from './contexts/form';
 import { InputsSection } from './sections/Inputs';
 import { LayoutSection } from './sections/Layout';
@@ -19,10 +20,7 @@ const LibraryContent = () => {
 
   useEffect(() => {
     const url = new SimpleSearchQuery(location.search);
-    form.setStore(s => {
-      s.state.tab = url.get('tab');
-      return s;
-    });
+    form.setFieldValue('state.tab', url.get('tab') as LibraryFormStore['state']['tab']);
   }, [form, location.search]);
 
   return (

@@ -144,15 +144,15 @@ const Service = React.memo(
 
     const handleChange = useCallback(
       (selected: boolean) => {
-        form.setStore(s => {
+        form.setFieldValue('settings.services', categories => {
           if (selected) {
-            s.settings.services[cat_id].services[svr_id].selected = true;
-            s.settings.services[cat_id].selected = s.settings.services[cat_id].services.every(srv => srv.selected);
+            categories[cat_id].services[svr_id].selected = true;
+            categories[cat_id].selected = categories[cat_id].services.every(srv => srv.selected);
           } else {
-            s.settings.services[cat_id].selected = false;
-            s.settings.services[cat_id].services[svr_id].selected = false;
+            categories[cat_id].selected = false;
+            categories[cat_id].services[svr_id].selected = false;
           }
-          return s;
+          return categories;
         });
       },
       [cat_id, form, svr_id]

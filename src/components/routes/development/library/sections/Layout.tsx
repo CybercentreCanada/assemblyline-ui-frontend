@@ -111,12 +111,7 @@ export const LayoutSection = React.memo(() => {
                 primary="Page Header"
                 secondary="Description of the Page Header"
                 classification={value}
-                onClassificationChange={next => {
-                  form.setStore(s => {
-                    s.components.layout.values.classification = next;
-                    return s;
-                  });
-                }}
+                onClassificationChange={next => form.setFieldValue('components.layout.values.classification', next)}
               />
             )}
           />
@@ -340,12 +335,7 @@ export const LayoutSection = React.memo(() => {
                 secondary="Description of the Page Section"
                 collapsible
                 open={value}
-                onChange={next => {
-                  form.setStore(s => {
-                    s.components.layout.values.sectionOpen = next;
-                    return s;
-                  });
-                }}
+                onChange={next => form.setFieldValue('components.layout.values.sectionOpen', next)}
               >
                 {
                   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque, fringilla consequat diam suscipit. Donec sed arcu blandit, luctus lorem quis, sodales elit. Phasellus blandit posuere sapien, ut pharetra ipsum efficitur at. Sed vel nulla risus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce efficitur nunc at urna imperdiet mattis. Sed condimentum vel ex et semper.'

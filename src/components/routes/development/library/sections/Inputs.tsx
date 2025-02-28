@@ -89,12 +89,7 @@ export const InputsSection = React.memo(() => {
                 <TextInput
                   label="Text Input"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
             />
@@ -105,12 +100,7 @@ export const InputsSection = React.memo(() => {
                 <NumberInput
                   label="Number Input"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
             />
@@ -122,16 +112,11 @@ export const InputsSection = React.memo(() => {
                   label="Select Input"
                   value={value}
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -142,12 +127,7 @@ export const InputsSection = React.memo(() => {
                 <DateInput
                   label="Date Input"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                 />
               )}
             />
@@ -158,12 +138,7 @@ export const InputsSection = React.memo(() => {
                 <SliderInput
                   label="Slider Input"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                 />
               )}
             />
@@ -174,12 +149,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Checkbox Input"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                 />
               )}
             />
@@ -190,12 +160,7 @@ export const InputsSection = React.memo(() => {
                 <SwitchInput
                   label="Switch Input"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                 />
               )}
             />
@@ -221,9 +186,9 @@ export const InputsSection = React.memo(() => {
   label="Select Input"
   value={value}
   options={[
-    { label: 'Options 1', value: 'option 1' },
-    { label: 'Options 2', value: 'option 2' },
-    { label: 'Options 3', value: 'option 3' }
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
   ]}
   onChange={(event, next) => {}}
   />
@@ -270,18 +235,8 @@ export const InputsSection = React.memo(() => {
                   label="Controlled Text Input"
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = '';
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.text', '')}
                 />
               )}
             />
@@ -307,18 +262,8 @@ export const InputsSection = React.memo(() => {
                   label="Controlled Number Input"
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = 0;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.number', 0)}
                 />
               )}
             />
@@ -345,22 +290,12 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   reset
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = '';
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.select', '')}
                 />
               )}
             />
@@ -386,18 +321,8 @@ export const InputsSection = React.memo(() => {
                   label="Controlled Date Input"
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = null;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.date', null)}
                 />
               )}
             />
@@ -423,18 +348,8 @@ export const InputsSection = React.memo(() => {
                   label="Controlled Slider Input"
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = 0;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.slider', 0)}
                 />
               )}
             />
@@ -460,18 +375,8 @@ export const InputsSection = React.memo(() => {
                   label="Controlled Checkbox Input"
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = false;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.checkbox', false)}
                 />
               )}
             />
@@ -497,18 +402,8 @@ export const InputsSection = React.memo(() => {
                   label="Controlled Switch Input"
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = false;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.switch', false)}
                 />
               )}
             />
@@ -545,12 +440,7 @@ export const InputsSection = React.memo(() => {
                   label="Disabled Text Input"
                   value={value}
                   disabled
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
             />
@@ -562,12 +452,7 @@ export const InputsSection = React.memo(() => {
                   label="Disabled Number Input"
                   value={value}
                   disabled
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
             />
@@ -580,16 +465,11 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   disabled
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -601,12 +481,7 @@ export const InputsSection = React.memo(() => {
                   label="Disabled Date Input"
                   value={value}
                   disabled
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                 />
               )}
             />
@@ -618,12 +493,7 @@ export const InputsSection = React.memo(() => {
                   label="Disabled Slider Input"
                   value={value}
                   disabled
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                 />
               )}
             />
@@ -635,12 +505,7 @@ export const InputsSection = React.memo(() => {
                   label="Disabled Checkbox Input"
                   value={value}
                   disabled
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                 />
               )}
             />
@@ -652,12 +517,7 @@ export const InputsSection = React.memo(() => {
                   label="Disabled Switch Input"
                   value={value}
                   disabled
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                 />
               )}
             />
@@ -686,9 +546,9 @@ export const InputsSection = React.memo(() => {
   value={value}
   disabled
   options={[
-    { label: 'Options 1', value: 'option 1' },
-    { label: 'Options 2', value: 'option 2' },
-    { label: 'Options 3', value: 'option 3' }
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
   ]}
   onChange={(event, next) => {}}
   />
@@ -743,12 +603,7 @@ export const InputsSection = React.memo(() => {
                   label="Loading Text Input"
                   value={value}
                   loading
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
             />
@@ -760,12 +615,7 @@ export const InputsSection = React.memo(() => {
                   label="Loading Number Input"
                   value={value}
                   loading
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
             />
@@ -778,16 +628,11 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   loading
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -799,12 +644,7 @@ export const InputsSection = React.memo(() => {
                   label="Loading Date Input"
                   value={value}
                   loading
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                 />
               )}
             />
@@ -816,12 +656,7 @@ export const InputsSection = React.memo(() => {
                   label="Loading Slider Input"
                   value={value}
                   loading
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                 />
               )}
             />
@@ -833,12 +668,7 @@ export const InputsSection = React.memo(() => {
                   label="Loading Checkbox Input"
                   value={value}
                   loading
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                 />
               )}
             />
@@ -850,12 +680,7 @@ export const InputsSection = React.memo(() => {
                   label="Loading Switch Input"
                   value={value}
                   loading
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                 />
               )}
             />
@@ -884,9 +709,9 @@ export const InputsSection = React.memo(() => {
   value={value}
   loading
   options={[
-    { label: 'Options 1', value: 'option 1' },
-    { label: 'Options 2', value: 'option 2' },
-    { label: 'Options 3', value: 'option 3' }
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
   ]}
   onChange={(event, next) => {}}
   />
@@ -940,18 +765,8 @@ export const InputsSection = React.memo(() => {
                   label="Reset Text Input"
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = '';
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.text', '')}
                 />
               )}
             />
@@ -963,18 +778,8 @@ export const InputsSection = React.memo(() => {
                   label="Reset Number Input"
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = 0;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.number', 0)}
                 />
               )}
             />
@@ -987,22 +792,12 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   reset
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = 'option 1';
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.select', 'option 1')}
                 />
               )}
             />
@@ -1014,18 +809,8 @@ export const InputsSection = React.memo(() => {
                   label="Reset Date Input"
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = null;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.date', null)}
                 />
               )}
             />
@@ -1037,18 +822,8 @@ export const InputsSection = React.memo(() => {
                   label="Reset Slider Input"
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = 0;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.slider', 0)}
                 />
               )}
             />
@@ -1060,18 +835,8 @@ export const InputsSection = React.memo(() => {
                   label="Reset Checkbox Input"
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = false;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.checkbox', false)}
                 />
               )}
             />
@@ -1083,18 +848,8 @@ export const InputsSection = React.memo(() => {
                   label="Reset Switch Input"
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = next;
-                      return s;
-                    });
-                  }}
-                  onReset={() => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = false;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.switch', false)}
                 />
               )}
             />
@@ -1125,9 +880,9 @@ export const InputsSection = React.memo(() => {
     value={value}
     reset
     options={[
-      { label: 'Options 1', value: 'option 1' },
-      { label: 'Options 2', value: 'option 2' },
-      { label: 'Options 3', value: 'option 3' }
+      { primary: 'Options 1', value: 'option 1' },
+      { primary: 'Options 2', value: 'option 2' },
+      { primary: 'Options 3', value: 'option 3' }
     ]}
     onChange={(event, next) => {}}
     onReset={() => {}}
@@ -1185,12 +940,7 @@ export const InputsSection = React.memo(() => {
                   label="Tooltip Text Input"
                   tooltip="Tooltip Text Input"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
             />
@@ -1201,12 +951,7 @@ export const InputsSection = React.memo(() => {
                   label="Tooltip Number Input"
                   tooltip="Tooltip Number Input"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
             />
@@ -1218,16 +963,11 @@ export const InputsSection = React.memo(() => {
                   tooltip="Tooltip Select Input"
                   value={value}
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -1238,12 +978,7 @@ export const InputsSection = React.memo(() => {
                   label="Tooltip Date Input"
                   tooltip="Tooltip Date Input"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                 />
               )}
             />
@@ -1254,12 +989,7 @@ export const InputsSection = React.memo(() => {
                   label="Tooltip Slider Input"
                   tooltip="Tooltip Slider Input"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                 />
               )}
             />
@@ -1270,12 +1000,7 @@ export const InputsSection = React.memo(() => {
                   label="Tooltip Checkbox Input"
                   tooltip="Tooltip Checkbox Input"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                 />
               )}
             />
@@ -1286,12 +1011,7 @@ export const InputsSection = React.memo(() => {
                   label="Tooltip Switch Input"
                   tooltip="Tooltip Switch Input"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                 />
               )}
             />
@@ -1320,9 +1040,9 @@ export const InputsSection = React.memo(() => {
   tooltip="Tooltip Select Input"
   value={value}
   options={[
-    { label: 'Options 1', value: 'option 1' },
-    { label: 'Options 2', value: 'option 2' },
-    { label: 'Options 3', value: 'option 3' }
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
   ]}
   onChange={(event, next) => {}}
   />
@@ -1379,12 +1099,7 @@ export const InputsSection = React.memo(() => {
                   label="Error Text Input"
                   value={value}
                   error={v => (v !== '' ? null : 'Input field cannot be empty')}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
             />
@@ -1395,12 +1110,7 @@ export const InputsSection = React.memo(() => {
                   label="Error Number Input"
                   value={value}
                   error={v => (v !== null ? null : 'Input field cannot be null')}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
             />
@@ -1412,16 +1122,11 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   error={v => (v !== '' ? null : 'Input field cannot be null')}
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -1432,12 +1137,7 @@ export const InputsSection = React.memo(() => {
                   label="Error Date Input"
                   value={value}
                   error={v => (v !== null ? null : 'Input field cannot be null')}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                 />
               )}
             />
@@ -1448,12 +1148,7 @@ export const InputsSection = React.memo(() => {
                   label="Error Slider Input"
                   value={value}
                   error={v => (v !== 0 ? null : 'Input field cannot be 0')}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                 />
               )}
             />
@@ -1464,12 +1159,7 @@ export const InputsSection = React.memo(() => {
                   label="Error Checkbox Input"
                   value={value}
                   error={v => (v !== false ? null : 'Input field cannot be false')}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                 />
               )}
             />
@@ -1480,12 +1170,7 @@ export const InputsSection = React.memo(() => {
                   label="Error Switch Input"
                   value={value}
                   error={v => (v !== false ? null : 'Input field cannot be false')}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                 />
               )}
             />
@@ -1515,9 +1200,9 @@ export const InputsSection = React.memo(() => {
   label="Error Select Input"
   value={value}
   options={[
-    { label: 'Options 1', value: 'option 1' },
-    { label: 'Options 2', value: 'option 2' },
-    { label: 'Options 3', value: 'option 3' }
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
   ]}
   error={v => (v !== '' ? null : 'Input field cannot be null')}
   onChange={(event, next) => {}}
@@ -1578,12 +1263,7 @@ export const InputsSection = React.memo(() => {
                   label="Helper Text Text Input"
                   value={value}
                   helperText="Helper Text"
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
             />
@@ -1594,12 +1274,7 @@ export const InputsSection = React.memo(() => {
                   label="Helper Text Number Input"
                   value={value}
                   helperText="Helper Text"
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
             />
@@ -1611,16 +1286,11 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   helperText="Helper Text"
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -1631,12 +1301,7 @@ export const InputsSection = React.memo(() => {
                   label="Helper Text Date Input"
                   value={value}
                   helperText="Helper Text"
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                 />
               )}
             />
@@ -1647,12 +1312,7 @@ export const InputsSection = React.memo(() => {
                   label="Helper Text Slider Input"
                   value={value}
                   helperText="Helper Text"
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                 />
               )}
             />
@@ -1663,12 +1323,7 @@ export const InputsSection = React.memo(() => {
                   label="Helper Text Checkbox Input"
                   value={value}
                   helperText="Helper Text"
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                 />
               )}
             />
@@ -1679,12 +1334,7 @@ export const InputsSection = React.memo(() => {
                   label="Helper Text Switch Input"
                   value={value}
                   helperText="Helper Text"
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                 />
               )}
             />
@@ -1712,9 +1362,9 @@ export const InputsSection = React.memo(() => {
   label="Helper Text Select Input"
   value={value}
   options={[
-    { label: 'Options 1', value: 'option 1' },
-    { label: 'Options 2', value: 'option 2' },
-    { label: 'Options 3', value: 'option 3' }
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
   ]}
   helperText='Helper Text'
   onChange={(event, next) => {}}
@@ -1768,12 +1418,7 @@ export const InputsSection = React.memo(() => {
                   label="Placeholder Text Input"
                   value={value}
                   placeholder="Placeholder"
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
             />
@@ -1784,12 +1429,7 @@ export const InputsSection = React.memo(() => {
                   label="Placeholder Number Input"
                   value={value}
                   placeholder="Placeholder"
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
             />
@@ -1801,16 +1441,11 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   placeholder="Placeholder"
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -1821,12 +1456,7 @@ export const InputsSection = React.memo(() => {
                   label="Placeholder Date Input"
                   value={value}
                   placeholder="Placeholder"
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                 />
               )}
             />
@@ -1854,9 +1484,9 @@ export const InputsSection = React.memo(() => {
   label="Placeholder Select Input"
   value={value}
   options={[
-    { label: 'Options 1', value: 'option 1' },
-    { label: 'Options 2', value: 'option 2' },
-    { label: 'Options 3', value: 'option 3' }
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
   ]}
   placeholder="Placeholder"
   onChange={(event, next) => {}}
@@ -1893,12 +1523,7 @@ export const InputsSection = React.memo(() => {
                   label="ReadOnly Text Input"
                   value={value}
                   readOnly
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
             />
@@ -1910,12 +1535,7 @@ export const InputsSection = React.memo(() => {
                   label="ReadOnly Number Input"
                   value={value}
                   readOnly
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
             />
@@ -1928,16 +1548,11 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   readOnly
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -1949,12 +1564,7 @@ export const InputsSection = React.memo(() => {
                   label="ReadOnly Date Input"
                   value={value}
                   readOnly
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                 />
               )}
             />
@@ -1966,12 +1576,7 @@ export const InputsSection = React.memo(() => {
                   label="ReadOnly Slider Input"
                   value={value}
                   readOnly
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                 />
               )}
             />
@@ -1983,12 +1588,7 @@ export const InputsSection = React.memo(() => {
                   label="ReadOnly Checkbox Input"
                   value={value}
                   readOnly
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                 />
               )}
             />
@@ -2000,12 +1600,7 @@ export const InputsSection = React.memo(() => {
                   label="ReadOnly Switch Input"
                   value={value}
                   readOnly
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                 />
               )}
             />
@@ -2034,9 +1629,9 @@ export const InputsSection = React.memo(() => {
   value={value}
   readOnly
   options={[
-    { label: 'Options 1', value: 'option 1' },
-    { label: 'Options 2', value: 'option 2' },
-    { label: 'Options 3', value: 'option 3' }
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
   ]}
   onChange={(event, next) => {}}
   />
@@ -2089,12 +1684,7 @@ export const InputsSection = React.memo(() => {
                   label="End Adornment Text Input"
                   value={value}
                   endAdornment={<Button variant="contained">{'Submit'}</Button>}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
             />
@@ -2105,12 +1695,7 @@ export const InputsSection = React.memo(() => {
                   label="End Adornment Number Input"
                   value={value}
                   endAdornment={<Button variant="contained">{'Submit'}</Button>}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
             />
@@ -2122,16 +1707,11 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   endAdornment={<Button variant="contained">{'Submit'}</Button>}
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -2142,12 +1722,7 @@ export const InputsSection = React.memo(() => {
                   label="End Adornment Date Input"
                   value={value}
                   endAdornment={<Button variant="contained">{'Submit'}</Button>}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                 />
               )}
             />
@@ -2158,12 +1733,7 @@ export const InputsSection = React.memo(() => {
                   label="End Adornment Slider Input"
                   value={value}
                   endAdornment={<Button variant="contained">{'Submit'}</Button>}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                 />
               )}
             />
@@ -2174,12 +1744,7 @@ export const InputsSection = React.memo(() => {
                   label="End Adornment Checkbox Input"
                   value={value}
                   endAdornment={<Button variant="contained">{'Submit'}</Button>}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                 />
               )}
             />
@@ -2190,12 +1755,7 @@ export const InputsSection = React.memo(() => {
                   label="End Adornment Switch Input"
                   value={value}
                   endAdornment={<Button variant="contained">{'Submit'}</Button>}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                 />
               )}
             />
@@ -2223,9 +1783,9 @@ export const InputsSection = React.memo(() => {
   label="End Adornment Select Input"
   value={value}
   options={[
-    { label: 'Options 1', value: 'option 1' },
-    { label: 'Options 2', value: 'option 2' },
-    { label: 'Options 3', value: 'option 3' }
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
   ]}
   endAdornment={<Button variant="contained">{'Submit'}</Button>}
   onChange={(event, next) => {}}
@@ -2292,23 +1852,13 @@ export const InputsSection = React.memo(() => {
                     <TextInput
                       label="Interaction Text Input"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.inputs.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
                       {...(reset && {
                         reset,
-                        onReset: () => {
-                          form.setStore(s => {
-                            s.components.inputs.values.text = '';
-                            return s;
-                          });
-                        }
+                        onReset: () => form.setFieldValue('components.inputs.values.text', '')
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
@@ -2325,23 +1875,13 @@ export const InputsSection = React.memo(() => {
                     <NumberInput
                       label="Interaction Number Input"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.inputs.values.number = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
                       {...(reset && {
                         reset,
-                        onReset: () => {
-                          form.setStore(s => {
-                            s.components.inputs.values.number = 0;
-                            return s;
-                          });
-                        }
+                        onReset: () => form.setFieldValue('components.inputs.values.number', 0)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
@@ -2359,27 +1899,17 @@ export const InputsSection = React.memo(() => {
                       label="Interaction Select Input"
                       value={value}
                       options={[
-                        { label: 'Options 1', value: 'option 1' },
-                        { label: 'Options 2', value: 'option 2' },
-                        { label: 'Options 3', value: 'option 3' }
+                        { primary: 'Options 1', value: 'option 1' },
+                        { primary: 'Options 2', value: 'option 2' },
+                        { primary: 'Options 3', value: 'option 3' }
                       ]}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.inputs.values.select = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
                       {...(reset && {
                         reset,
-                        onReset: () => {
-                          form.setStore(s => {
-                            s.components.inputs.values.select = '';
-                            return s;
-                          });
-                        }
+                        onReset: () => form.setFieldValue('components.inputs.values.select', '')
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
@@ -2396,23 +1926,13 @@ export const InputsSection = React.memo(() => {
                     <DateInput
                       label="Interaction Date Input"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.inputs.values.date = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
                       {...(reset && {
                         reset,
-                        onReset: () => {
-                          form.setStore(s => {
-                            s.components.inputs.values.date = null;
-                            return s;
-                          });
-                        }
+                        onReset: () => form.setFieldValue('components.inputs.values.date', null)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
@@ -2429,23 +1949,13 @@ export const InputsSection = React.memo(() => {
                     <SliderInput
                       label="Interaction Slider Input"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.inputs.values.slider = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
                       {...(reset && {
                         reset,
-                        onReset: () => {
-                          form.setStore(s => {
-                            s.components.inputs.values.slider = 0;
-                            return s;
-                          });
-                        }
+                        onReset: () => form.setFieldValue('components.inputs.values.slider', 0)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
@@ -2462,23 +1972,13 @@ export const InputsSection = React.memo(() => {
                     <CheckboxInput
                       label="Interaction Checkbox Input"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.inputs.values.checkbox = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
                       {...(reset && {
                         reset,
-                        onReset: () => {
-                          form.setStore(s => {
-                            s.components.inputs.values.checkbox = false;
-                            return s;
-                          });
-                        }
+                        onReset: () => form.setFieldValue('components.inputs.values.checkbox', false)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
@@ -2495,23 +1995,13 @@ export const InputsSection = React.memo(() => {
                     <SwitchInput
                       label="Interaction Switch Input"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.inputs.values.switch = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
                       {...(reset && {
                         reset,
-                        onReset: () => {
-                          form.setStore(s => {
-                            s.components.inputs.values.switch = false;
-                            return s;
-                          });
-                        }
+                        onReset: () => form.setFieldValue('components.inputs.values.switch', false)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
@@ -2533,12 +2023,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Disabled"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.state.disabled = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.disabled', next)}
                 />
               )}
             />
@@ -2548,12 +2033,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Loading"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.state.loading = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.loading', next)}
                 />
               )}
             />
@@ -2563,12 +2043,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Reset"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.state.reset = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.reset', next)}
                 />
               )}
             />
@@ -2578,12 +2053,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Tooltip"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.state.tooltip = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.tooltip', next)}
                 />
               )}
             />
@@ -2593,12 +2063,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Error"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.state.error = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.error', next)}
                 />
               )}
             />
@@ -2608,12 +2073,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="ReadOnly"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.state.readOnly = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.readOnly', next)}
                 />
               )}
             />
@@ -2623,12 +2083,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Helper Text"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.state.helperText = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.helperText', next)}
                 />
               )}
             />
@@ -2638,12 +2093,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Placeholder"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.state.placeholder = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.placeholder', next)}
                 />
               )}
             />
@@ -2653,12 +2103,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="End Adonrment"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.state.endAdornment = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.endAdornment', next)}
                 />
               )}
             />
@@ -2682,12 +2127,7 @@ export const InputsSection = React.memo(() => {
                 <TextInput
                   label="Text Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.text = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
             />
@@ -2698,12 +2138,7 @@ export const InputsSection = React.memo(() => {
                 <NumberInput
                   label="Number Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.number = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
             />
@@ -2715,16 +2150,11 @@ export const InputsSection = React.memo(() => {
                   label="Select Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.select = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -2735,12 +2165,7 @@ export const InputsSection = React.memo(() => {
                 <DateInput
                   label="Date Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.date = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                 />
               )}
             />
@@ -2751,12 +2176,7 @@ export const InputsSection = React.memo(() => {
                 <SliderInput
                   label="Slider Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.slider = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                 />
               )}
             />
@@ -2768,12 +2188,7 @@ export const InputsSection = React.memo(() => {
                   label="Checkbox Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.checkbox = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                 />
               )}
             />
@@ -2785,12 +2200,7 @@ export const InputsSection = React.memo(() => {
                   label="Slider Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
                   reset
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.inputs.values.switch = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                 />
               )}
             />
@@ -2816,9 +2226,9 @@ export const InputsSection = React.memo(() => {
   label="Select Input"
   value={value}
   options={[
-    { label: 'Options 1', value: 'option 1' },
-    { label: 'Options 2', value: 'option 2' },
-    { label: 'Options 3', value: 'option 3' }
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
   ]}
   onChange={(event, next) => {}}
   />

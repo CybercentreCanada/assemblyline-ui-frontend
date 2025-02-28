@@ -88,12 +88,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Text List Input"
                     secondary="Text List Input Description"
                     value={value}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.text = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.text', next)}
                   />
                 )}
               />
@@ -105,12 +100,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Number List Input"
                     secondary="Number List Input Description"
                     value={value}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.number = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.number', next)}
                   />
                 )}
               />
@@ -123,16 +113,11 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Select List Input Description"
                     value={value}
                     options={[
-                      { label: 'Options 1', value: 'option 1' },
-                      { label: 'Options 2', value: 'option 2' },
-                      { label: 'Options 3', value: 'option 3' }
+                      { primary: 'Options 1', value: 'option 1' },
+                      { primary: 'Options 2', value: 'option 2' },
+                      { primary: 'Options 3', value: 'option 3' }
                     ]}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.select = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
                   />
                 )}
               />
@@ -144,12 +129,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Classification List Input"
                     secondary="Classification List Input Description"
                     value={value}
-                    onChange={next => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.classification = next;
-                        return s;
-                      });
-                    }}
+                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
               />
@@ -161,12 +141,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Boolean List Input"
                     secondary="Boolean List Input Description"
                     value={value}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.boolean = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.boolean', next)}
                   />
                 )}
               />
@@ -201,9 +176,9 @@ export const ListInputsSection = React.memo(() => {
       secondary="Select List Input Description"
       value={value}
       options={[
-        { label: 'Options 1', value: 'option 1' },
-        { label: 'Options 2', value: 'option 2' },
-        { label: 'Options 3', value: 'option 3' }
+        { primary: 'Options 1', value: 'option 1' },
+        { primary: 'Options 2', value: 'option 2' },
+        { primary: 'Options 3', value: 'option 3' }
       ]}
       onChange={(event, next) => {}}
     />
@@ -250,12 +225,7 @@ export const ListInputsSection = React.memo(() => {
                   primary="Controlled Text List Input"
                   secondary="Controlled Text List Input Description"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.list_inputs.values.text = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.values.text', next)}
                 />
               )}
             />
@@ -281,12 +251,7 @@ export const ListInputsSection = React.memo(() => {
                   primary="Controlled Number List Input"
                   secondary="Controlled Number List Input Description"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.list_inputs.values.number = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.values.number', next)}
                 />
               )}
             />
@@ -313,16 +278,11 @@ export const ListInputsSection = React.memo(() => {
                   secondary="Controlled Select List Input Description"
                   value={value}
                   options={[
-                    { label: 'Options 1', value: 'option 1' },
-                    { label: 'Options 2', value: 'option 2' },
-                    { label: 'Options 3', value: 'option 3' }
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
                   ]}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.list_inputs.values.select = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
                 />
               )}
             />
@@ -348,12 +308,7 @@ export const ListInputsSection = React.memo(() => {
                   primary="Controlled Classification List Input"
                   secondary="Controlled Classification List Input Description"
                   value={value}
-                  onChange={next => {
-                    form.setStore(s => {
-                      s.components.list_inputs.values.classification = next;
-                      return s;
-                    });
-                  }}
+                  onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
                 />
               )}
             />
@@ -379,12 +334,7 @@ export const ListInputsSection = React.memo(() => {
                   primary="Controlled Boolean List Input"
                   secondary="Controlled Boolean List Input Description"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.list_inputs.values.boolean = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.values.boolean', next)}
                 />
               )}
             />
@@ -424,12 +374,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Disabled Text List Input Description"
                     value={value}
                     disabled
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.text = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.text', next)}
                   />
                 )}
               />
@@ -442,12 +387,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Disabled Number List Input Description"
                     value={value}
                     disabled
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.number = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.number', next)}
                   />
                 )}
               />
@@ -461,16 +401,11 @@ export const ListInputsSection = React.memo(() => {
                     value={value}
                     disabled
                     options={[
-                      { label: 'Options 1', value: 'option 1' },
-                      { label: 'Options 2', value: 'option 2' },
-                      { label: 'Options 3', value: 'option 3' }
+                      { primary: 'Options 1', value: 'option 1' },
+                      { primary: 'Options 2', value: 'option 2' },
+                      { primary: 'Options 3', value: 'option 3' }
                     ]}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.select = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
                   />
                 )}
               />
@@ -483,12 +418,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Disabled Classification List Input Description"
                     value={value}
                     disabled
-                    onChange={next => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.classification = next;
-                        return s;
-                      });
-                    }}
+                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
               />
@@ -501,12 +431,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Disabled Boolean List Input Description"
                     value={value}
                     disabled
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.boolean = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.boolean', next)}
                   />
                 )}
               />
@@ -544,9 +469,9 @@ export const ListInputsSection = React.memo(() => {
       value={value}
       disabled
       options={[
-        { label: 'Options 1', value: 'option 1' },
-        { label: 'Options 2', value: 'option 2' },
-        { label: 'Options 3', value: 'option 3' }
+        { primary: 'Options 1', value: 'option 1' },
+        { primary: 'Options 2', value: 'option 2' },
+        { primary: 'Options 3', value: 'option 3' }
       ]}
       onChange={(event, next) => {}}
     />
@@ -593,12 +518,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Loading Text List Input Description"
                     value={value}
                     loading
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.text = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.text', next)}
                   />
                 )}
               />
@@ -611,12 +531,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Loading Number List Input Description"
                     value={value}
                     loading
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.number = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.number', next)}
                   />
                 )}
               />
@@ -630,16 +545,11 @@ export const ListInputsSection = React.memo(() => {
                     value={value}
                     loading
                     options={[
-                      { label: 'Options 1', value: 'option 1' },
-                      { label: 'Options 2', value: 'option 2' },
-                      { label: 'Options 3', value: 'option 3' }
+                      { primary: 'Options 1', value: 'option 1' },
+                      { primary: 'Options 2', value: 'option 2' },
+                      { primary: 'Options 3', value: 'option 3' }
                     ]}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.select = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
                   />
                 )}
               />
@@ -652,12 +562,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Loading Classification List Input Description"
                     value={value}
                     loading
-                    onChange={next => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.classification = next;
-                        return s;
-                      });
-                    }}
+                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
               />
@@ -670,12 +575,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Loading Boolean List Input Description"
                     value={value}
                     loading
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.boolean = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.boolean', next)}
                   />
                 )}
               />
@@ -713,9 +613,9 @@ export const ListInputsSection = React.memo(() => {
       value={value}
       loading
       options={[
-        { label: 'Options 1', value: 'option 1' },
-        { label: 'Options 2', value: 'option 2' },
-        { label: 'Options 3', value: 'option 3' }
+        { primary: 'Options 1', value: 'option 1' },
+        { primary: 'Options 2', value: 'option 2' },
+        { primary: 'Options 3', value: 'option 3' }
       ]}
       onChange={(event, next) => {}}
     />
@@ -763,18 +663,8 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Reset Text List Input Description"
                     value={value}
                     reset
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.text = next;
-                        return s;
-                      });
-                    }}
-                    onReset={() => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.text = '';
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.text', next)}
+                    onReset={() => form.setFieldValue('components.list_inputs.values.text', '')}
                   />
                 )}
               />
@@ -787,18 +677,8 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Reset Number List Input Description"
                     value={value}
                     reset
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.number = next;
-                        return s;
-                      });
-                    }}
-                    onReset={() => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.number = 0;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.number', next)}
+                    onReset={() => form.setFieldValue('components.list_inputs.values.number', 0)}
                   />
                 )}
               />
@@ -812,22 +692,12 @@ export const ListInputsSection = React.memo(() => {
                     value={value}
                     reset
                     options={[
-                      { label: 'Options 1', value: 'option 1' },
-                      { label: 'Options 2', value: 'option 2' },
-                      { label: 'Options 3', value: 'option 3' }
+                      { primary: 'Options 1', value: 'option 1' },
+                      { primary: 'Options 2', value: 'option 2' },
+                      { primary: 'Options 3', value: 'option 3' }
                     ]}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.select = next;
-                        return s;
-                      });
-                    }}
-                    onReset={() => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.select = '';
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
+                    onReset={() => form.setFieldValue('components.list_inputs.values.select', '')}
                   />
                 )}
               />
@@ -840,18 +710,8 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Reset Classification List Input Description"
                     value={value}
                     reset
-                    onChange={next => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.classification = next;
-                        return s;
-                      });
-                    }}
-                    onReset={() => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.classification = 'TLP:C';
-                        return s;
-                      });
-                    }}
+                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
+                    onReset={() => form.setFieldValue('components.list_inputs.values.classification', 'TLP:C')}
                   />
                 )}
               />
@@ -864,18 +724,8 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Reset Boolean List Input Description"
                     value={value}
                     reset
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.boolean = next;
-                        return s;
-                      });
-                    }}
-                    onReset={() => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.boolean = false;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.boolean', next)}
+                    onReset={() => form.setFieldValue('components.list_inputs.values.boolean', false)}
                   />
                 )}
               />
@@ -915,9 +765,9 @@ export const ListInputsSection = React.memo(() => {
       value={value}
       reset
       options={[
-        { label: 'Options 1', value: 'option 1' },
-        { label: 'Options 2', value: 'option 2' },
-        { label: 'Options 3', value: 'option 3' }
+        { primary: 'Options 1', value: 'option 1' },
+        { primary: 'Options 2', value: 'option 2' },
+        { primary: 'Options 3', value: 'option 3' }
       ]}
       onChange={(event, next) => {}}
       onReset={() => {}}
@@ -969,12 +819,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Error Text List Input Description"
                     value={value}
                     error={v => (v !== '' ? null : 'Input field cannot be empty')}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.text = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.text', next)}
                   />
                 )}
               />
@@ -987,12 +832,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Error Number List Input Description"
                     value={value}
                     error={v => (v !== 0 ? null : 'Input field cannot be 0')}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.number = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.number', next)}
                   />
                 )}
               />
@@ -1006,16 +846,11 @@ export const ListInputsSection = React.memo(() => {
                     value={value}
                     error={v => (v !== '' ? null : 'Input field cannot be null')}
                     options={[
-                      { label: 'Options 1', value: 'option 1' },
-                      { label: 'Options 2', value: 'option 2' },
-                      { label: 'Options 3', value: 'option 3' }
+                      { primary: 'Options 1', value: 'option 1' },
+                      { primary: 'Options 2', value: 'option 2' },
+                      { primary: 'Options 3', value: 'option 3' }
                     ]}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.select = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
                   />
                 )}
               />
@@ -1028,12 +863,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Error Classification List Input Description"
                     value={value}
                     error={v => (v !== 'TLP:C' ? null : 'Input field cannot be TLP:C')}
-                    onChange={next => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.classification = next;
-                        return s;
-                      });
-                    }}
+                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
               />
@@ -1046,12 +876,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Error Boolean List Input Description"
                     value={value}
                     error={v => (v !== false ? null : 'Input field cannot be false')}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.boolean = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.boolean', next)}
                   />
                 )}
               />
@@ -1091,9 +916,9 @@ export const ListInputsSection = React.memo(() => {
       value={value}
       error={v => (v !== '' ? null : 'Input field cannot be null')}
       options={[
-        { label: 'Options 1', value: 'option 1' },
-        { label: 'Options 2', value: 'option 2' },
-        { label: 'Options 3', value: 'option 3' }
+        { primary: 'Options 1', value: 'option 1' },
+        { primary: 'Options 2', value: 'option 2' },
+        { primary: 'Options 3', value: 'option 3' }
       ]}
       onChange={(event, next) => {}}
       onError={() => {}}
@@ -1143,12 +968,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Read Only Text List Input Description"
                     value={value}
                     readOnly
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.text = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.text', next)}
                   />
                 )}
               />
@@ -1161,12 +981,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Read Only Number List Input Description"
                     value={value}
                     readOnly
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.number = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.number', next)}
                   />
                 )}
               />
@@ -1180,16 +995,11 @@ export const ListInputsSection = React.memo(() => {
                     value={value}
                     readOnly
                     options={[
-                      { label: 'Options 1', value: 'option 1' },
-                      { label: 'Options 2', value: 'option 2' },
-                      { label: 'Options 3', value: 'option 3' }
+                      { primary: 'Options 1', value: 'option 1' },
+                      { primary: 'Options 2', value: 'option 2' },
+                      { primary: 'Options 3', value: 'option 3' }
                     ]}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.select = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
                   />
                 )}
               />
@@ -1202,12 +1012,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Read Only Classification List Input Description"
                     value={value}
                     readOnly
-                    onChange={next => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.classification = next;
-                        return s;
-                      });
-                    }}
+                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
               />
@@ -1220,12 +1025,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Read Only Boolean List Input Description"
                     value={value}
                     readOnly
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.boolean = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.boolean', next)}
                   />
                 )}
               />
@@ -1263,9 +1063,9 @@ export const ListInputsSection = React.memo(() => {
       value={value}
       readOnly
       options={[
-        { label: 'Options 1', value: 'option 1' },
-        { label: 'Options 2', value: 'option 2' },
-        { label: 'Options 3', value: 'option 3' }
+        { primary: 'Options 1', value: 'option 1' },
+        { primary: 'Options 2', value: 'option 2' },
+        { primary: 'Options 3', value: 'option 3' }
       ]}
       onChange={(event, next) => {}}
     />
@@ -1321,23 +1121,13 @@ export const ListInputsSection = React.memo(() => {
                         primary="Interactions Text List Input"
                         secondary="Interactions Text List Input Description"
                         value={value}
-                        onChange={(event, next) => {
-                          form.setStore(s => {
-                            s.components.list_inputs.values.text = next;
-                            return s;
-                          });
-                        }}
+                        onChange={(event, next) => form.setFieldValue('components.list_inputs.values.text', next)}
                         {...(disabled && { disabled })}
                         {...(loading && { loading })}
                         {...(readOnly && { readOnly })}
                         {...(reset && {
                           reset,
-                          onReset: () => {
-                            form.setStore(s => {
-                              s.components.list_inputs.values.text = '';
-                              return s;
-                            });
-                          }
+                          onReset: () => form.setFieldValue('components.list_inputs.values.text', '')
                         })}
                         {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
                       />
@@ -1351,23 +1141,13 @@ export const ListInputsSection = React.memo(() => {
                         primary="Interactions Number List Input"
                         secondary="Interactions Number List Input Description"
                         value={value}
-                        onChange={(event, next) => {
-                          form.setStore(s => {
-                            s.components.list_inputs.values.number = next;
-                            return s;
-                          });
-                        }}
+                        onChange={(event, next) => form.setFieldValue('components.list_inputs.values.number', next)}
                         {...(disabled && { disabled })}
                         {...(loading && { loading })}
                         {...(readOnly && { readOnly })}
                         {...(reset && {
                           reset,
-                          onReset: () => {
-                            form.setStore(s => {
-                              s.components.list_inputs.values.number = 0;
-                              return s;
-                            });
-                          }
+                          onReset: () => form.setFieldValue('components.list_inputs.values.number', 0)
                         })}
                         {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
                       />
@@ -1382,27 +1162,17 @@ export const ListInputsSection = React.memo(() => {
                         secondary="Interactions Select List Input Description"
                         value={value}
                         options={[
-                          { label: 'Options 1', value: 'option 1' },
-                          { label: 'Options 2', value: 'option 2' },
-                          { label: 'Options 3', value: 'option 3' }
+                          { primary: 'Options 1', value: 'option 1' },
+                          { primary: 'Options 2', value: 'option 2' },
+                          { primary: 'Options 3', value: 'option 3' }
                         ]}
-                        onChange={(event, next) => {
-                          form.setStore(s => {
-                            s.components.list_inputs.values.select = next;
-                            return s;
-                          });
-                        }}
+                        onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
                         {...(disabled && { disabled })}
                         {...(loading && { loading })}
                         {...(readOnly && { readOnly })}
                         {...(reset && {
                           reset,
-                          onReset: () => {
-                            form.setStore(s => {
-                              s.components.list_inputs.values.select = '';
-                              return s;
-                            });
-                          }
+                          onReset: () => form.setFieldValue('components.list_inputs.values.select', '')
                         })}
                         {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
                       />
@@ -1416,23 +1186,13 @@ export const ListInputsSection = React.memo(() => {
                         primary="Interactions Classification List Input"
                         secondary="Interactions Classification List Input Description"
                         value={value}
-                        onChange={next => {
-                          form.setStore(s => {
-                            s.components.list_inputs.values.classification = next;
-                            return s;
-                          });
-                        }}
+                        onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
                         {...(disabled && { disabled })}
                         {...(loading && { loading })}
                         {...(readOnly && { readOnly })}
                         {...(reset && {
                           reset,
-                          onReset: () => {
-                            form.setStore(s => {
-                              s.components.list_inputs.values.classification = 'TLP:C';
-                              return s;
-                            });
-                          }
+                          onReset: () => form.setFieldValue('components.list_inputs.values.classification', 'TLP:C')
                         })}
                         {...(error && { error: v => (v !== 'TLP:C' ? null : 'Input field cannot be TLP:C') })}
                       />
@@ -1446,23 +1206,13 @@ export const ListInputsSection = React.memo(() => {
                         primary="Interactions Boolean List Input"
                         secondary="Interactions Boolean List Input Description"
                         value={value}
-                        onChange={(event, next) => {
-                          form.setStore(s => {
-                            s.components.list_inputs.values.boolean = next;
-                            return s;
-                          });
-                        }}
+                        onChange={(event, next) => form.setFieldValue('components.list_inputs.values.boolean', next)}
                         {...(disabled && { disabled })}
                         {...(loading && { loading })}
                         {...(readOnly && { readOnly })}
                         {...(reset && {
                           reset,
-                          onReset: () => {
-                            form.setStore(s => {
-                              s.components.list_inputs.values.boolean = false;
-                              return s;
-                            });
-                          }
+                          onReset: () => form.setFieldValue('components.list_inputs.values.boolean', false)
                         })}
                         {...(error && { error: v => (v !== false ? null : 'Input field cannot be TLP:C') })}
                       />
@@ -1481,12 +1231,7 @@ export const ListInputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Disabled"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.list_inputs.state.disabled = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.disabled', next)}
                 />
               )}
             />
@@ -1497,12 +1242,7 @@ export const ListInputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Loading"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.list_inputs.state.loading = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.loading', next)}
                 />
               )}
             />
@@ -1513,12 +1253,7 @@ export const ListInputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Reset"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.list_inputs.state.reset = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.reset', next)}
                 />
               )}
             />
@@ -1529,12 +1264,7 @@ export const ListInputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Error"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.list_inputs.state.error = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.error', next)}
                 />
               )}
             />
@@ -1545,12 +1275,7 @@ export const ListInputsSection = React.memo(() => {
                 <CheckboxInput
                   label="ReadOnly"
                   value={value}
-                  onChange={(event, next) => {
-                    form.setStore(s => {
-                      s.components.list_inputs.state.readOnly = next;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.readOnly', next)}
                 />
               )}
             />
@@ -1577,12 +1302,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Text List Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     secondary="Text List Input Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     value={value}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.text = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.text', next)}
                   />
                 )}
               />
@@ -1594,12 +1314,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Number List Inpu: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.t"
                     secondary="Number List Input Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     value={value}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.number = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.number', next)}
                   />
                 )}
               />
@@ -1612,16 +1327,11 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Select List Input Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     value={value}
                     options={[
-                      { label: 'Options 1', value: 'option 1' },
-                      { label: 'Options 2', value: 'option 2' },
-                      { label: 'Options 3', value: 'option 3' }
+                      { primary: 'Options 1', value: 'option 1' },
+                      { primary: 'Options 2', value: 'option 2' },
+                      { primary: 'Options 3', value: 'option 3' }
                     ]}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.select = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
                   />
                 )}
               />
@@ -1633,12 +1343,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Classification List Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     secondary="Classification List Input Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     value={value}
-                    onChange={next => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.classification = next;
-                        return s;
-                      });
-                    }}
+                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
               />
@@ -1650,12 +1355,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Boolean List Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     secondary="Boolean List Input Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     value={value}
-                    onChange={(event, next) => {
-                      form.setStore(s => {
-                        s.components.list_inputs.values.boolean = next;
-                        return s;
-                      });
-                    }}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.boolean', next)}
                   />
                 )}
               />
@@ -1690,9 +1390,9 @@ export const ListInputsSection = React.memo(() => {
       secondary="Select List Input Description"
       value={value}
       options={[
-        { label: 'Options 1', value: 'option 1' },
-        { label: 'Options 2', value: 'option 2' },
-        { label: 'Options 3', value: 'option 3' }
+        { primary: 'Options 1', value: 'option 1' },
+        { primary: 'Options 2', value: 'option 2' },
+        { primary: 'Options 3', value: 'option 3' }
       ]}
       onChange={(event, next) => {}}
     />

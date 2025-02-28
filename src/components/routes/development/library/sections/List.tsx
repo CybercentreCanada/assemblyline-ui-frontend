@@ -60,34 +60,19 @@ export const ListSection = React.memo(() => {
                       primary="Text List Input 1"
                       secondary="Text List Input Description 1"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.list.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.list.values.text', next)}
                     />
                     <TextListInput
                       primary="Text List Input 2"
                       secondary="Text List Input Description 2"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.list.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.list.values.text', next)}
                     />
                     <TextListInput
                       primary="Text List Input 3"
                       secondary="Text List Input Description 3"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.list.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.list.values.text', next)}
                     />
                   </>
                 )}
@@ -147,12 +132,7 @@ export const ListSection = React.memo(() => {
                   primaryProps={{ color: 'primary' }}
                   divider
                   checked={checked}
-                  onChange={(event, c, i) => {
-                    form.setStore(s => {
-                      s.components.list.values.checked1 = !c;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, c, i) => form.setFieldValue('components.list.values.checked1', !c)}
                 />
               )}
             />
@@ -163,12 +143,7 @@ export const ListSection = React.memo(() => {
                   primary="Checkbox List"
                   secondary="Checkbox List description"
                   checked={value}
-                  onChange={(event, c, i) => {
-                    form.setStore(s => {
-                      s.components.list.values.checked2 = !c;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, c, i) => form.setFieldValue('components.list.values.checked2', !c)}
                 />
               )}
             />
@@ -181,34 +156,19 @@ export const ListSection = React.memo(() => {
                       primary="Checkbox Text List Input 1"
                       secondary="Checkbox Text List Input Description 1"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.list.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.list.values.text', next)}
                     />
                     <TextListInput
                       primary="Checkbox Text List Input 2"
                       secondary="Checkbox Text List Input Description 2"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.list.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.list.values.text', next)}
                     />
                     <TextListInput
                       primary="Checkbox Text List Input 3"
                       secondary="Checkbox Text List Input Description 3"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.list.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.list.values.text', next)}
                     />
                   </>
                 )}
@@ -364,12 +324,7 @@ export const ListSection = React.memo(() => {
                   divider
                   disabled
                   checked={checked}
-                  onChange={(event, c, i) => {
-                    form.setStore(s => {
-                      s.components.list.values.checked1 = !c;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, c, i) => form.setFieldValue('components.list.values.checked1', !c)}
                 />
               )}
             />
@@ -381,12 +336,7 @@ export const ListSection = React.memo(() => {
                   secondary="Disabled List description"
                   checked={value}
                   disabled
-                  onChange={(event, c, i) => {
-                    form.setStore(s => {
-                      s.components.list.values.checked2 = !c;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, c, i) => form.setFieldValue('components.list.values.checked2', !c)}
                 />
               )}
             />
@@ -400,36 +350,21 @@ export const ListSection = React.memo(() => {
                       secondary="Disabled Text List Input Description 1"
                       value={value}
                       disabled
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.list.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.list.values.text', next)}
                     />
                     <TextListInput
                       primary="Disabled Text List Input 2"
                       secondary="Disabled Text List Input Description 2"
                       value={value}
                       disabled
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.list.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.list.values.text', next)}
                     />
                     <TextListInput
                       primary="Disabled Text List Input 3"
                       secondary="Disabled Text List Input Description 3"
                       value={value}
                       disabled
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.list.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.list.values.text', next)}
                     />
                   </>
                 )}
@@ -493,12 +428,7 @@ export const ListSection = React.memo(() => {
                   primaryProps={{ color: 'primary' }}
                   divider
                   checked={checked}
-                  onChange={(event, c, i) => {
-                    form.setStore(s => {
-                      s.components.list.values.checked1 = !c;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, c, i) => form.setFieldValue('components.list.values.checked1', !c)}
                 />
               )}
             />
@@ -509,12 +439,7 @@ export const ListSection = React.memo(() => {
                   primary="List: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   secondary="List description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   checked={value}
-                  onChange={(event, c, i) => {
-                    form.setStore(s => {
-                      s.components.list.values.checked2 = !c;
-                      return s;
-                    });
-                  }}
+                  onChange={(event, c, i) => form.setFieldValue('components.list.values.checked2', !c)}
                 />
               )}
             />
@@ -527,36 +452,21 @@ export const ListSection = React.memo(() => {
                       primary="Long Names Text List Input 1"
                       secondary="Long Names Text List Input Description 1"
                       value={value}
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.list.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.list.values.text', next)}
                     />
                     <TextListInput
                       primary="Long Names Text List Input 2"
                       secondary="Long Names Text List Input Description 2"
                       value={value}
                       disabled
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.list.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.list.values.text', next)}
                     />
                     <TextListInput
                       primary="Long Names Text List Input 3"
                       secondary="Long Names Text List Input Description 3"
                       value={value}
                       disabled
-                      onChange={(event, next) => {
-                        form.setStore(s => {
-                          s.components.list.values.text = next;
-                          return s;
-                        });
-                      }}
+                      onChange={(event, next) => form.setFieldValue('components.list.values.text', next)}
                     />
                   </>
                 )}

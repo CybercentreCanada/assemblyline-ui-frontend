@@ -2,7 +2,8 @@ import type { TooltipProps as MuiTooltipProps } from '@mui/material';
 import { Tooltip as MuiTooltip } from '@mui/material';
 import React, { useState } from 'react';
 
-export type TooltipProps = Omit<MuiTooltipProps, 'title'> & {
+export type TooltipProps = Omit<MuiTooltipProps, 'title' | 'children'> & {
+  children?: React.ReactNode;
   title?: MuiTooltipProps['title'];
 };
 

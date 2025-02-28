@@ -9,7 +9,7 @@ import {
 
 type LibraryComponents = ListInputsLibraryState & InputsLibraryState & LayoutLibraryState & ListLibraryState;
 
-type LibraryFormStore = {
+export type LibraryFormStore = {
   state: {
     tab: keyof LibraryComponents;
   };
