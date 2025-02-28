@@ -25,10 +25,14 @@ import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
-import { BooleanListInput, BooleanListInputProps } from 'components/visual/ListInputs/BooleanListInput';
-import { NumberListInput, NumberListInputProps } from 'components/visual/ListInputs/NumberListInput';
-import { SelectListInput, SelectListInputProps } from 'components/visual/ListInputs/SelectListInput';
-import { TextListInput, TextListInputProps } from 'components/visual/ListInputs/TextListInput';
+import type { BooleanListInputProps } from 'components/visual/ListInputs/BooleanListInput';
+import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
+import type { NumberListInputProps } from 'components/visual/ListInputs/NumberListInput';
+import { NumberListInput } from 'components/visual/ListInputs/NumberListInput';
+import type { SelectListInputProps } from 'components/visual/ListInputs/SelectListInput';
+import { SelectListInput } from 'components/visual/ListInputs/SelectListInput';
+import type { TextListInputProps } from 'components/visual/ListInputs/TextListInput';
+import { TextListInput } from 'components/visual/ListInputs/TextListInput';
 import { isURL } from 'helpers/utils';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -337,7 +341,7 @@ const SupplementaryOptions = React.memo(() => {
       children={([loading, disabled, customize]) => (
         <Section primary={'Supplementary Options'} sx={{ padding: `${theme.spacing(1)} 0` }}>
           <form.Subscribe
-            selector={state => [state.values.state.tab === 'file', state.values.settings.malicious]}
+            selector={state => [state.values.state.tab === 'file', state.values.settings.malicious.value]}
             children={([render, value]) => (
               <SwitchInput
                 label={t('malicious')}
@@ -348,7 +352,7 @@ const SupplementaryOptions = React.memo(() => {
                 loading={loading}
                 disabled={disabled}
                 preventRender={!render}
-                onChange={(e, v) => form.setFieldValue('settings.malicious', v)}
+                onChange={(e, v) => form.setFieldValue('settings.malicious.value', v)}
               />
             )}
           />
@@ -371,7 +375,9 @@ const SupplementaryOptions = React.memo(() => {
                   {sources.map((source: string, i) => (
                     <form.Subscribe
                       key={`${source}-${i}`}
-                      selector={state => state.values?.settings?.default_external_sources?.indexOf(source) !== -1}
+                      selector={state =>
+                        state.values?.settings?.default_external_sources?.value?.indexOf(source) !== -1
+                      }
                       children={value => (
                         <CheckboxInput
                           key={i}
@@ -386,12 +392,11 @@ const SupplementaryOptions = React.memo(() => {
                           onChange={() => {
                             if (!form.getFieldValue('settings')) return;
 
-                            const newSources = form.getFieldValue('settings.default_external_sources');
+                            const newSources = form.getFieldValue('settings.default_external_sources.value');
                             if (newSources.indexOf(source) === -1) newSources.push(source);
                             else newSources.splice(newSources.indexOf(source), 1);
 
-                            form.setFieldValue('hash.hasError', false);
-                            form.setFieldValue('settings.default_external_sources', newSources);
+                            form.setFieldValue('settings.default_external_sources.value', newSources);
                           }}
                         />
                       )}
@@ -705,7 +710,7 @@ const ExternalSources = React.memo(() => {
             {configuration.submission.file_sources?.[type]?.sources?.map((source, i) => (
               <form.Subscribe
                 key={`${source}-${i}`}
-                selector={state => state.values?.settings?.default_external_sources?.indexOf(source) !== -1}
+                selector={state => state.values?.settings?.default_external_sources?.value?.indexOf(source) !== -1}
                 children={value => (
                   <CheckboxInput
                     key={i}
@@ -723,12 +728,11 @@ const ExternalSources = React.memo(() => {
                     onChange={() => {
                       if (!form.getFieldValue('settings')) return;
 
-                      const newSources = form.getFieldValue('settings.default_external_sources');
+                      const newSources = form.getFieldValue('settings.default_external_sources.value');
                       if (newSources.indexOf(source) === -1) newSources.push(source);
                       else newSources.splice(newSources.indexOf(source), 1);
 
-                      form.setFieldValue('hash.hasError', false);
-                      form.setFieldValue('settings.default_external_sources', newSources);
+                      form.setFieldValue('settings.default_external_sources.value', newSources);
                     }}
                   />
                 )}
@@ -822,7 +826,7 @@ const SelectedServices = React.memo(() => {
       }}
     >
       <form.Subscribe
-        selector={state => [state.values.state.isConfirmationOpen, state.values.settings.services]}
+        selector={state => [state.values.state.confirmation, state.values.settings.services]}
         children={([open, categories]) =>
           !open
             ? null
@@ -865,7 +869,7 @@ const ServiceParameters = React.memo(() => {
       }}
     >
       <form.Subscribe
-        selector={state => [state.values.state.isConfirmationOpen, state.values.settings.service_spec]}
+        selector={state => [state.values.state.confirmation, state.values.settings.service_spec]}
         children={([open, specs]) =>
           !open
             ? null
