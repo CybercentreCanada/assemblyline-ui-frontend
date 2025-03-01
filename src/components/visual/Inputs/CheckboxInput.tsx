@@ -8,7 +8,7 @@ import { HelperText } from './components/HelperText';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
-type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
+export type CheckboxInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   error?: (value: boolean) => string;
   errorProps?: FormHelperTextProps;
   expend?: boolean;
@@ -37,7 +37,7 @@ type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   onError?: (error: string) => void;
 };
 
-export const CheckboxInput: React.FC<Props> = React.memo(
+export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
   ({
     disabled = false,
     error = () => null,
@@ -65,7 +65,7 @@ export const CheckboxInput: React.FC<Props> = React.memo(
     onReset = () => null,
     onError = () => null,
     ...buttonProps
-  }: Props) => {
+  }: CheckboxInputProps) => {
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);

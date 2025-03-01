@@ -12,7 +12,7 @@ import React, { useMemo, useState } from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
-type Props = Omit<SliderProps, 'value' | 'onChange'> & {
+export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & {
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
   error?: (value: number) => string;
   errorProps?: FormHelperTextProps;
@@ -59,7 +59,7 @@ const WrappedSliderInput = ({
   onReset = () => null,
   onError = () => null,
   ...sliderProps
-}: Props) => {
+}: SliderInputProps) => {
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);

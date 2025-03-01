@@ -15,7 +15,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
-type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
+export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   defaultDateOffset?: number | null;
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
   error?: (value: string) => string;
@@ -71,7 +71,7 @@ const WrappedDateInput = ({
   onReset = () => null,
   onError = () => null,
   ...textFieldProps
-}: Props) => {
+}: DateInputProps) => {
   const theme = useTheme();
 
   const [tempDate, setTempDate] = useState<Moment>(null);

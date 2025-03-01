@@ -24,12 +24,12 @@ import { HelperText } from './components/HelperText';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
-type Props<
-  Value,
-  Multiple extends boolean,
-  DisableClearable extends boolean,
-  FreeSolo extends boolean,
-  ChipComponent extends ElementType
+export type TextInputProps<
+  Value extends string = string,
+  Multiple extends boolean = boolean,
+  DisableClearable extends boolean = boolean,
+  FreeSolo extends boolean = boolean,
+  ChipComponent extends ElementType = ElementType
 > = Omit<
   AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>,
   'renderInput' | 'options' | 'onChange' | 'value'
@@ -60,11 +60,11 @@ type Props<
 };
 
 const WrappedTextInput = <
-  Value,
-  Multiple extends boolean,
-  DisableClearable extends boolean,
-  FreeSolo extends boolean,
-  ChipComponent extends ElementType
+  Value extends string = string,
+  Multiple extends boolean = boolean,
+  DisableClearable extends boolean = boolean,
+  FreeSolo extends boolean = boolean,
+  ChipComponent extends ElementType = ElementType
 >({
   disabled,
   endAdornment = null,
@@ -92,7 +92,7 @@ const WrappedTextInput = <
   onReset = () => null,
   onError = () => null,
   ...autocompleteProps
-}: Props<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
+}: TextInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
   const theme = useTheme();
 
   const [_value, setValue] =
@@ -160,7 +160,7 @@ const WrappedTextInput = <
                   'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id || label}-helper-text`,
                   placeholder: placeholder,
                   readOnly: readOnly,
-                  startAdornment: endAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
+                  startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
                   endAdornment: (
                     <>
                       {loading || !reset || disabled || readOnly ? null : (
@@ -174,11 +174,7 @@ const WrappedTextInput = <
                           />
                         </InputAdornment>
                       )}
-                      {endAdornment && (
-                        <InputAdornment position="end" sx={{ marginRight: `-7px` }}>
-                          {endAdornment}
-                        </InputAdornment>
-                      )}
+                      {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
                     </>
                   )
                 }}

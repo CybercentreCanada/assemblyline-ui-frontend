@@ -26,7 +26,7 @@ import { HelperText } from './components/HelperText';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
-type Props = Omit<SelectProps, 'error' | 'value' | 'onChange'> & {
+export type SelectInputProps = Omit<SelectProps, 'error' | 'value' | 'onChange'> & {
   capitalize?: boolean;
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
   error?: (value: MenuItemProps['value']) => string;
@@ -85,7 +85,7 @@ const WrappedSelectInput = ({
   onReset = () => null,
   onError = () => null,
   ...selectProps
-}: Props) => {
+}: SelectInputProps) => {
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
@@ -138,7 +138,10 @@ const WrappedSelectInput = ({
             size="small"
             value={options.some(o => o.value === value) ? value : ''}
             variant="outlined"
-            inputProps={{ id: id || label, ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } }) }}
+            inputProps={{
+              id: id || label,
+              ...(tiny && { sx: { paddingTop: theme.spacing(0.25), paddingBottom: theme.spacing(0.25) } })
+            }}
             renderValue={option => (
               <ListItemText
                 primary={options.find(o => o.value === option)?.primary || ''}

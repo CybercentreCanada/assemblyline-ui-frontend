@@ -13,7 +13,7 @@ import { HelperText } from './components/HelperText';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
-type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
+export type SwitchInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   error?: (value: boolean) => string;
   errorProps?: FormHelperTextProps;
   helperText?: string;
@@ -35,10 +35,9 @@ type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   onError?: (error: string) => void;
 };
 
-export const SwitchInput: React.FC<Props> = React.memo(
+export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
   ({
     disabled = false,
-
     error = () => null,
     errorProps = null,
     helperText = null,
@@ -60,7 +59,7 @@ export const SwitchInput: React.FC<Props> = React.memo(
     onReset = () => null,
     onError = () => null,
     ...buttonProps
-  }: Props) => {
+  }: SwitchInputProps) => {
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);

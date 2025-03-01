@@ -11,7 +11,7 @@ import React, { useMemo, useState } from 'react';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
-type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
+export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
   error?: (value: number) => string;
   errorProps?: FormHelperTextProps;
@@ -66,7 +66,7 @@ const WrappedNumberInput = ({
   onReset = () => null,
   onError = () => null,
   ...textFieldProps
-}: Props) => {
+}: NumberInputProps) => {
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
@@ -126,7 +126,7 @@ const WrappedNumberInput = ({
               placeholder: placeholder,
               readOnly: readOnly,
               sx: { paddingRight: '9px', ...(tiny && { '& .MuiInputBase-root': { padding: '0px !important' } }) },
-              startAdornment: endAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
+              startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
               endAdornment: (
                 <>
                   {loading || !reset || disabled || readOnly ? null : (

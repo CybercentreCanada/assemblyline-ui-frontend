@@ -21,18 +21,14 @@ import { ByteNumber } from 'components/visual/ByteNumber';
 import Classification from 'components/visual/Classification';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { DateInput } from 'components/visual/Inputs/DateInput';
+import type { NumberInputProps } from 'components/visual/Inputs/NumberInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
+import type { SelectInputProps } from 'components/visual/Inputs/SelectInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
+import type { SwitchInputProps } from 'components/visual/Inputs/SwitchInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
+import type { TextInputProps } from 'components/visual/Inputs/TextInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
-import type { BooleanListInputProps } from 'components/visual/ListInputs/BooleanListInput';
-import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
-import type { NumberListInputProps } from 'components/visual/ListInputs/NumberListInput';
-import { NumberListInput } from 'components/visual/ListInputs/NumberListInput';
-import type { SelectListInputProps } from 'components/visual/ListInputs/SelectListInput';
-import { SelectListInput } from 'components/visual/ListInputs/SelectListInput';
-import type { TextListInputProps } from 'components/visual/ListInputs/TextListInput';
-import { TextListInput } from 'components/visual/ListInputs/TextListInput';
 import { isURL } from 'helpers/utils';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -155,7 +151,9 @@ const SubmissionOptions = React.memo(() => {
                 value={value as string}
                 loading={loading}
                 disabled={disabled || (!customize && !editable)}
+                reset={value !== defaultValue}
                 onChange={(e, v) => form.setFieldValue('settings.description.value', v)}
+                onReset={() => form.setFieldValue('settings.description.value', defaultValue as string)}
               />
             )}
           />
@@ -168,23 +166,21 @@ const SubmissionOptions = React.memo(() => {
                   return [param.value, param.default, param.editable];
                 }}
                 children={([value, defaultValue, editable]) => (
-                  <>
-                    <SelectInput
-                      label={t('options.submission.priority')}
-                      value={value as number}
-                      fullWidth
-                      loading={loading}
-                      disabled={disabled || (!customize && !editable)}
-                      reset={value !== defaultValue}
-                      options={[
-                        { primary: t('options.submission.priority.low'), value: 500 },
-                        { primary: t('options.submission.priority.medium'), value: 1000 },
-                        { primary: t('options.submission.priority.high'), value: 1500 }
-                      ]}
-                      onChange={(e, v) => form.setFieldValue('settings.priority.value', v as number)}
-                      onReset={() => form.setFieldValue('settings.priority.value', defaultValue as number)}
-                    />
-                  </>
+                  <SelectInput
+                    label={t('options.submission.priority')}
+                    value={value as number}
+                    fullWidth
+                    loading={loading}
+                    disabled={disabled || (!customize && !editable)}
+                    reset={value !== defaultValue}
+                    options={[
+                      { primary: t('options.submission.priority.low'), value: 500 },
+                      { primary: t('options.submission.priority.medium'), value: 1000 },
+                      { primary: t('options.submission.priority.high'), value: 1500 }
+                    ]}
+                    onChange={(e, v) => form.setFieldValue('settings.priority.value', v as number)}
+                    onReset={() => form.setFieldValue('settings.priority.value', defaultValue as number)}
+                  />
                 )}
               />
             </Grid>
@@ -387,7 +383,6 @@ const SupplementaryOptions = React.memo(() => {
                           value={value}
                           loading={loading}
                           disabled={disabled}
-                          disableGap
                           tiny
                           onChange={() => {
                             if (!form.getFieldValue('settings')) return;
@@ -450,7 +445,6 @@ const SupplementaryOptions = React.memo(() => {
                             value={selected as boolean}
                             loading={loading}
                             disabled={disabled}
-                            disableGap
                             tiny
                             onChange={() => {
                               form.setFieldValue('settings', s => {
@@ -535,19 +529,16 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
     const props = useMemo<unknown>(
       () => ({
         disabled: disabled,
-        disabledGap: true,
-        disablePadding: true,
         id: `metadata-${name.replace('_', ' ')}`,
         loading: loading,
-        primary: name.replace('_', ' '),
-        primaryProps: { textTransform: 'capitalize' },
-        tiny: true,
-        primaryVariant: 'body2',
+        label: `${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`,
+        labelProps: { textTransform: 'capitalize' },
         width: '60%',
+        tiny: true,
         onChange: (e, v) => handleChange(v),
         onReset: () => handleReset()
       }),
-      [disabled, handleChange, handleReset, loading, name]
+      [disabled, handleChange, handleReset, loading, metadata.validator_type, name]
     );
 
     return (
@@ -557,11 +548,7 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
           switch (metadata.validator_type) {
             case 'boolean':
               return (
-                <BooleanListInput
-                  {...(props as BooleanListInputProps)}
-                  value={(value as boolean) || false}
-                  reset={!!value}
-                />
+                <SwitchInput {...(props as SwitchInputProps)} value={(value as boolean) || false} reset={!!value} />
               );
             case 'date':
               return (
@@ -579,8 +566,8 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
               );
             case 'enum':
               return (
-                <SelectListInput
-                  {...(props as SelectListInputProps)}
+                <SelectInput
+                  {...(props as SelectInputProps)}
                   value={(value as string) || ''}
                   options={(metadata.validator_params.values as string[])
                     .map(key => ({ primary: key.replaceAll('_', ' '), value: key }))
@@ -590,8 +577,8 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
               );
             case 'integer':
               return (
-                <NumberListInput
-                  {...(props as NumberListInputProps)}
+                <NumberInput
+                  {...(props as NumberInputProps)}
                   value={value as number}
                   min={metadata.validator_params.min}
                   max={metadata.validator_params.max}
@@ -600,8 +587,8 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
               );
             case 'regex':
               return (
-                <TextListInput
-                  {...(props as TextListInputProps)}
+                <TextInput
+                  {...(props as TextInputProps)}
                   value={(value as string) || ''}
                   options={options}
                   reset={!!value}
@@ -612,8 +599,8 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
               );
             default:
               return (
-                <TextListInput
-                  {...(props as TextListInputProps)}
+                <TextInput
+                  {...(props as TextInputProps)}
                   value={(value as string) || ''}
                   options={options}
                   reset={!!value}
@@ -635,10 +622,13 @@ const SubmissionMetadata = React.memo(() => {
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.loading, state.values.state.disabled]}
-      children={([loading, disabled]) => {
-        return (
-          <Section primary={t('options.submission.metadata')} sx={{ padding: `${theme.spacing(1)} 0` }}>
+      selector={state => [state.values.state.confirmation, state.values.state.loading, state.values.state.disabled]}
+      children={([open, loading, disabled]) => {
+        return !open ? null : (
+          <Section
+            primary={t('options.submission.metadata')}
+            sx={{ padding: theme.spacing(1), display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}
+          >
             {Object.entries(configuration.submission.metadata.submit).map(([name, metadata]) => (
               <MetadataParam key={name} name={name} metadata={metadata} loading={loading} disabled={disabled} />
             ))}
@@ -659,7 +649,7 @@ const SubmissionMetadata = React.memo(() => {
                       value={value}
                       loading={loading}
                       disabled={disabled}
-                      disableGap
+
                       onChange={() => {
                         if (!form.getFieldValue('settings')) return;
 
@@ -724,7 +714,6 @@ const ExternalSources = React.memo(() => {
                     value={value}
                     loading={loading}
                     disabled={disabled}
-                    disableGap
                     onChange={() => {
                       if (!form.getFieldValue('settings')) return;
 
@@ -790,7 +779,6 @@ const ExternalServices = React.memo(() => {
                     value={service.selected}
                     loading={loading}
                     disabled={disabled}
-                    disableGap
                     tiny
                     onChange={() => {
                       form.setFieldValue('settings', s => {
@@ -830,23 +818,32 @@ const SelectedServices = React.memo(() => {
         children={([open, categories]) =>
           !open
             ? null
-            : (categories as SubmitStore['settings']['services']).map((cat, i) =>
-                !cat.selected ? null : (
-                  <div key={`${cat.name}-${i}`} style={{ display: 'contents' }}>
-                    <Typography color="textSecondary" variant="body2">
-                      {cat.name}
-                    </Typography>
-                    <Typography variant="body2">
-                      {cat.services
-                        .reduce((prev: string[], svr) => {
-                          if (svr.selected) prev.push(svr.name);
-                          return prev;
-                        }, [] as string[])
-                        .join(', ')}
-                    </Typography>
-                  </div>
-                )
-              )
+            : (categories as SubmitStore['settings']['services']).map((cat, i) => (
+                <form.Subscribe
+                  key={`${cat.name}-${i}`}
+                  selector={state => [state.values.settings.services[i].selected]}
+                  children={([catSelected]) =>
+                    !catSelected ? null : (
+                      <div key={`${cat.name}-${i}`} style={{ display: 'contents' }}>
+                        <Typography color="textSecondary" variant="body2">
+                          {cat.name}
+                        </Typography>
+                        <Typography variant="body2">
+                          <form.Subscribe
+                            key={`${cat.name}-${i}`}
+                            selector={state =>
+                              state.values.settings.services[i].services
+                                .filter(svr => svr.selected)
+                                .map(svr => svr.name)
+                            }
+                            children={services => services.join(', ')}
+                          />
+                        </Typography>
+                      </div>
+                    )
+                  }
+                />
+              ))
         }
       />
     </Section>
@@ -873,90 +870,107 @@ const ServiceParameters = React.memo(() => {
         children={([open, specs]) =>
           !open
             ? null
-            : (specs as SubmitStore['settings']['service_spec'])
-                .filter(spec => spec.params.some(param => param.value !== param.default))
-                .map((spec, i) => (
-                  <div key={`${spec.name}`} style={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography color="textSecondary" variant="body2">
-                      {spec.name}
-                    </Typography>
+            : (specs as SubmitStore['settings']['service_spec']).map((spec, i) => (
+                <form.Subscribe
+                  key={`${spec.name}-${i}`}
+                  selector={state =>
+                    state.values.settings.service_spec[i].params.some(param => param.value !== param.default)
+                  }
+                  children={hasParams =>
+                    !hasParams ? null : (
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <Typography color="textSecondary" variant="body2">
+                          {spec.name}
+                        </Typography>
 
-                    {spec.params
-                      .filter(param => param.value !== param.default)
-                      .map((param, j) => (
-                        <div key={`${param.name}-${j}`}>
-                          <Typography component="span" variant="body2" textTransform="capitalize">
-                            {`${param.name.replace(/_/g, ' ')}: `}
-                          </Typography>
+                        {spec.params.map((param, j) => (
+                          <form.Subscribe
+                            key={`${spec.name}-${param.name}-${j}`}
+                            selector={state => {
+                              const p = state.values.settings.service_spec[i].params[j];
+                              return p.value !== p.default;
+                            }}
+                            children={hasParam =>
+                              !hasParam ? null : (
+                                <div key={`${param.name}-${j}`}>
+                                  <Typography component="span" variant="body2" textTransform="capitalize">
+                                    {`${param.name.replace(/_/g, ' ')}: `}
+                                  </Typography>
 
-                          {(() => {
-                            switch (param.type) {
-                              case 'bool':
-                                return (
-                                  <Typography
-                                    component="span"
-                                    variant="body2"
-                                    sx={{
-                                      color:
-                                        theme.palette.mode === 'dark'
-                                          ? theme.palette.info.light
-                                          : theme.palette.info.dark
-                                    }}
-                                  >
-                                    {param.value ? 'true' : 'false'}
-                                  </Typography>
-                                );
-                              case 'int':
-                                return (
-                                  <Typography
-                                    component="span"
-                                    variant="body2"
-                                    sx={{
-                                      color:
-                                        theme.palette.mode === 'dark'
-                                          ? theme.palette.success.light
-                                          : theme.palette.success.dark
-                                    }}
-                                  >
-                                    {param.value}
-                                  </Typography>
-                                );
-                              case 'str':
-                                return (
-                                  <Typography
-                                    component="span"
-                                    variant="body2"
-                                    sx={{
-                                      color:
-                                        theme.palette.mode === 'dark'
-                                          ? theme.palette.warning.light
-                                          : theme.palette.warning.dark
-                                    }}
-                                  >
-                                    {`"${param.value}"`}
-                                  </Typography>
-                                );
-                              case 'list':
-                                return (
-                                  <Typography
-                                    component="span"
-                                    variant="body2"
-                                    sx={{
-                                      color:
-                                        theme.palette.mode === 'dark'
-                                          ? theme.palette.warning.dark
-                                          : theme.palette.warning.light
-                                    }}
-                                  >
-                                    {`"${param.value}"`}
-                                  </Typography>
-                                );
+                                  {(() => {
+                                    switch (param.type) {
+                                      case 'bool':
+                                        return (
+                                          <Typography
+                                            component="span"
+                                            variant="body2"
+                                            sx={{
+                                              color:
+                                                theme.palette.mode === 'dark'
+                                                  ? theme.palette.info.light
+                                                  : theme.palette.info.dark
+                                            }}
+                                          >
+                                            {param.value ? 'true' : 'false'}
+                                          </Typography>
+                                        );
+                                      case 'int':
+                                        return (
+                                          <Typography
+                                            component="span"
+                                            variant="body2"
+                                            sx={{
+                                              color:
+                                                theme.palette.mode === 'dark'
+                                                  ? theme.palette.success.light
+                                                  : theme.palette.success.dark
+                                            }}
+                                          >
+                                            {param.value}
+                                          </Typography>
+                                        );
+                                      case 'str':
+                                        return (
+                                          <Typography
+                                            component="span"
+                                            variant="body2"
+                                            sx={{
+                                              color:
+                                                theme.palette.mode === 'dark'
+                                                  ? theme.palette.warning.light
+                                                  : theme.palette.warning.dark
+                                            }}
+                                          >
+                                            {`"${param.value}"`}
+                                          </Typography>
+                                        );
+                                      case 'list':
+                                        return (
+                                          <Typography
+                                            component="span"
+                                            variant="body2"
+                                            sx={{
+                                              color:
+                                                theme.palette.mode === 'dark'
+                                                  ? theme.palette.warning.dark
+                                                  : theme.palette.warning.light
+                                            }}
+                                          >
+                                            {`"${param.value}"`}
+                                          </Typography>
+                                        );
+                                    }
+                                  })()}
+                                </div>
+                              )
                             }
-                          })()}
-                        </div>
-                      ))}
-                  </div>
-                ))
+                          />
+                        ))}
+                      </div>
+                    )
+                  }
+                />
+              ))
         }
       />
     </Section>

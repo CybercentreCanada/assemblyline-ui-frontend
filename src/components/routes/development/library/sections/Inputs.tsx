@@ -1745,7 +1745,6 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="End Adornment Checkbox Input"
                   value={value}
-                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                 />
               )}
@@ -1756,7 +1755,6 @@ export const InputsSection = React.memo(() => {
                 <SwitchInput
                   label="End Adornment Switch Input"
                   value={value}
-                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                 />
               )}
