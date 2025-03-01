@@ -756,12 +756,12 @@ const ExternalServices = React.memo(() => {
         }
       }}
       children={props => {
-        const isURL = props[0] as boolean;
+        const url = props[0] as boolean;
         const services = props[1] as [number, number][];
         const loading = props[2] as boolean;
         const disabled = props[3] as boolean;
 
-        return !isURL || !services?.length ? null : (
+        return !url || !services?.length ? null : (
           <Section
             primary={t('options.submission.url_submission_auto_service_selection')}
             sx={{ padding: `${theme.spacing(1)} 0` }}
