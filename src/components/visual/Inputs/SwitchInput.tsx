@@ -3,19 +3,17 @@ import type {
   FormHelperTextProps,
   IconButtonProps,
   SwitchProps,
-  TextFieldProps,
   TooltipProps,
   TypographyProps
 } from '@mui/material';
-import { Button, FormHelperText, Skeleton, Switch, Typography, useTheme } from '@mui/material';
+import { Button, FormControl, FormControlLabel, Skeleton, Switch, useTheme } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
+import { HelperText } from './components/HelperText';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
 type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
-  disableGap?: boolean;
-  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
   error?: (value: boolean) => string;
   errorProps?: FormHelperTextProps;
   helperText?: string;
@@ -28,13 +26,11 @@ type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   value: SwitchProps['checked'];
-  onChange?: (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.FormEvent<HTMLButtonElement>,
-    value: boolean
-  ) => void;
+  onChange?: (event: React.MouseEvent<HTMLLabelElement | HTMLButtonElement, MouseEvent>, value: boolean) => void;
   onReset?: IconButtonProps['onClick'];
   onError?: (error: string) => void;
 };
@@ -42,8 +38,7 @@ type Props = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
 export const SwitchInput: React.FC<Props> = React.memo(
   ({
     disabled = false,
-    disableGap = false,
-    endAdornment = null,
+
     error = () => null,
     errorProps = null,
     helperText = null,
@@ -57,6 +52,7 @@ export const SwitchInput: React.FC<Props> = React.memo(
     readOnly = false,
     reset = false,
     resetProps = null,
+    tiny = false,
     tooltip = null,
     tooltipProps = null,
     value = false,
@@ -72,12 +68,12 @@ export const SwitchInput: React.FC<Props> = React.memo(
     const errorValue = useMemo<string>(() => error(value), [error, value]);
 
     return preventRender ? null : (
-      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-        <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
+      <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
+        <FormControl size="small" fullWidth>
           <Button
-            color="inherit"
             disabled={loading || disabled || readOnly}
             fullWidth
+            size="small"
             onClick={event => {
               event.stopPropagation();
               event.preventDefault();
@@ -89,109 +85,90 @@ export const SwitchInput: React.FC<Props> = React.memo(
             onFocus={event => setFocused(document.activeElement === event.target)}
             onBlur={() => setFocused(false)}
             sx={{
-              padding: 0,
-              justifyContent: 'flex-start',
-              columnGap: theme.spacing(1),
+              justifyContent: 'start',
+              color: 'inherit',
               textTransform: 'none',
-              ...(readOnly && { color: 'initial' }),
-              ...buttonProps?.sx
+              height: '40px',
+              paddingLeft: theme.spacing(2),
+              ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
+              ...(tiny && {
+                height: 'auto'
+              })
             }}
             {...buttonProps}
           >
-            {loading ? (
-              <>
-                <div>
-                  <Skeleton variant="circular" sx={{ height: '26px', width: '26px', margin: '6px' }} />
-                </div>
-
-                {!disableGap && <div style={{ width: theme.spacing(1) }} />}
-              </>
-            ) : (
-              <>
-                <Switch
-                  id={id || label}
-                  checked={value}
-                  size="small"
-                  disabled={disabled}
-                  onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    onChange(event, !value);
-
-                    const err = error(!value);
-                    if (err) onError(err);
-                  }}
-                />
-                {!disableGap && <div style={{ width: theme.spacing(0.75) }} />}
-              </>
-            )}
-
-            <Typography
-              component="label"
-              htmlFor={id || label}
-              color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-              margin="9px 0px"
-              overflow="hidden"
-              textAlign="start"
-              textOverflow="ellipsis"
-              variant="body2"
-              whiteSpace="nowrap"
-              width="100%"
-              onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-                event.stopPropagation();
-                event.preventDefault();
-                onChange(event, !value);
-
-                const err = error(!value);
-                if (err) onError(err);
+            <FormControlLabel
+              control={
+                loading ? (
+                  <div>
+                    <Skeleton
+                      variant="circular"
+                      sx={{
+                        height: '24px',
+                        width: '24px',
+                        marginLeft: theme.spacing(0.75),
+                        marginRight: theme.spacing(1.25)
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <Switch
+                    checked={value}
+                    disableFocusRipple
+                    disableRipple
+                    disableTouchRipple
+                    size="small"
+                    sx={{
+                      '&>.Mui-disabled': { ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }) }
+                    }}
+                  />
+                )
+              }
+              disabled={loading || disabled || readOnly}
+              label={label}
+              slotProps={{
+                typography: {
+                  color: !disabled && errorValue ? 'error' : focused ? 'primary' : 'textPrimary',
+                  marginLeft: theme.spacing(1),
+                  overflow: 'hidden',
+                  textAlign: 'start',
+                  textOverflow: 'ellipsis',
+                  variant: 'body2',
+                  whiteSpace: 'nowrap',
+                  width: '100%',
+                  ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
+                  ...labelProps
+                }
               }}
               sx={{
-                ...(!disabled && !loading && { cursor: 'pointer' }),
-                ...(loading && {
-                  color: theme.palette.text.primary
-                }),
-                ...(disabled &&
-                  !preventDisabledColor && {
-                    WebkitTextFillColor:
-                      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-                  })
+                overflow: 'hidden',
+                ...(!(loading || !reset || disabled || readOnly) && { paddingRight: theme.spacing(2) })
               }}
-              {...labelProps}
-            >
-              {label}
-            </Typography>
-
-            {!(loading || !reset || disabled || readOnly) && <div style={{ width: '40px' }} />}
+            />
           </Button>
-        </Tooltip>
-
-        {disabled ? null : errorValue ? (
-          <FormHelperText
-            sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
-            variant="outlined"
-            {...errorProps}
-          >
-            {errorValue}
-          </FormHelperText>
-        ) : helperText ? (
-          <FormHelperText
-            sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
-            variant="outlined"
-            {...helperTextProps}
-          >
-            {helperText}
-          </FormHelperText>
-        ) : null}
-
-        <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0 }}>
-          <ResetInput
-            id={id || label}
-            preventRender={loading || !reset || disabled || readOnly}
-            onReset={onReset}
-            {...resetProps}
+          <HelperText
+            id={id}
+            label={label}
+            disabled={disabled}
+            errorProps={errorProps}
+            errorText={errorValue}
+            helperText={helperText}
+            helperTextProps={helperTextProps}
           />
-        </div>
-      </div>
+
+          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
+            <div>
+              <ResetInput
+                id={id || label}
+                preventRender={loading || !reset || disabled || readOnly}
+                tiny={tiny}
+                onReset={onReset}
+                {...resetProps}
+              />
+            </div>
+          </div>
+        </FormControl>
+      </Tooltip>
     );
   }
 );

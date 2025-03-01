@@ -7,7 +7,6 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'nowrap',
-    // maxHeight: 'calc(100vh-64px)',
     overflowY: 'auto'
   },
   wrapper: {
@@ -20,9 +19,7 @@ const useStyles = makeStyles(theme => ({
   container: {
     display: 'flex',
     flexDirection: 'column',
-    // margin: `0 ${theme.spacing(4)}`,
     width: '100%',
-    // minWidth: `${theme.breakpoints.values.md}px`,
     maxWidth: '1200px'
   },
   navigation: {
@@ -35,7 +32,7 @@ const useStyles = makeStyles(theme => ({
   },
   header: {
     position: 'sticky',
-    top: 0,
+    top: -1,
     zIndex: 1000,
     backgroundColor: theme.palette.background.default,
     paddingBottom: theme.spacing(2),

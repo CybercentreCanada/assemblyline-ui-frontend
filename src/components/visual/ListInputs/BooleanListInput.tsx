@@ -6,7 +6,7 @@ import { BaseListItemButton } from './components/BaseListInput';
 import { ResetListInput, type ResetListInputProps } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
-type Props = Omit<ListItemButtonProps, 'defaultValue' | 'onChange' | 'onClick' | 'value'> & {
+export type BooleanListInputProps = Omit<ListItemButtonProps, 'defaultValue' | 'onChange' | 'onClick' | 'value'> & {
   capitalize?: boolean;
   error?: (value: boolean) => string;
   errorProps?: FormHelperTextProps;
@@ -47,7 +47,7 @@ const WrappedBooleanListInput = ({
   onReset = () => null,
   onError = () => null,
   ...buttonProps
-}: Props) => {
+}: BooleanListInputProps) => {
   const theme = useTheme();
 
   const errorValue = useMemo<string>(() => error(value), [error, value]);

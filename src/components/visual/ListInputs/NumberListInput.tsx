@@ -15,7 +15,7 @@ import type { ResetListInputProps } from './components/ResetListInput';
 import { ResetListInput } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
-type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
+export type NumberListInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   capitalize?: boolean;
   endAdornment?: ReactNode;
   error?: (value: number) => string;
@@ -62,7 +62,7 @@ const WrappedNumberListInput = ({
   onReset = () => null,
   onError = () => null,
   ...textFieldProps
-}: Props) => {
+}: NumberListInputProps) => {
   const theme = useTheme();
 
   const errorValue = useMemo<string>(() => error(value), [error, value]);

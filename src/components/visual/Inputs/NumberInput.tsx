@@ -28,6 +28,8 @@ type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  startAdornment?: TextFieldProps['InputProps']['startAdornment'];
+  tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   value: number;
@@ -55,6 +57,8 @@ const WrappedNumberInput = ({
   readOnly = false,
   reset = false,
   resetProps = null,
+  startAdornment = null,
+  tiny = false,
   tooltip,
   tooltipProps,
   value,
@@ -73,25 +77,26 @@ const WrappedNumberInput = ({
     <div style={{ textAlign: 'left' }}>
       <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
-          component={InputLabel}
-          htmlFor={id || label}
           color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
+          component={InputLabel}
+          gutterBottom
+          htmlFor={id || label}
           variant="body2"
           whiteSpace="nowrap"
-          gutterBottom
+          {...labelProps}
+          children={label}
           sx={{
+            ...labelProps?.sx,
             ...(disabled &&
               !preventDisabledColor && {
                 WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
               })
           }}
-          {...labelProps}
-          children={label}
         />
       </Tooltip>
       <FormControl fullWidth>
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset' }} />
+          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
         ) : (
           <TextField
             id={id || label}
@@ -101,6 +106,7 @@ const WrappedNumberInput = ({
             value={value?.toString() || ''}
             disabled={disabled}
             error={!!errorValue}
+            {...(readOnly && !disabled && { focused: null })}
             helperText={disabled ? null : errorValue || helperText}
             FormHelperTextProps={
               disabled
@@ -115,21 +121,12 @@ const WrappedNumberInput = ({
                   }
                 : null
             }
-            {...(readOnly &&
-              !disabled && {
-                focused: null,
-                sx: {
-                  '& .MuiInputBase-input': { cursor: 'default' },
-                  '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                  }
-                }
-              })}
-            inputProps={{ min: min, max: max }}
+            inputProps={{ min: min, max: max, ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } }) }}
             InputProps={{
               placeholder: placeholder,
               readOnly: readOnly,
-              sx: { paddingRight: '9px' },
+              sx: { paddingRight: '9px', ...(tiny && { '& .MuiInputBase-root': { padding: '0px !important' } }) },
+              startAdornment: endAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
               endAdornment: (
                 <>
                   {loading || !reset || disabled || readOnly ? null : (
@@ -137,6 +134,7 @@ const WrappedNumberInput = ({
                       <ResetInput
                         id={id || label}
                         preventRender={loading || !reset || disabled || readOnly}
+                        tiny={tiny}
                         onReset={onReset}
                         {...resetProps}
                       />
@@ -157,6 +155,15 @@ const WrappedNumberInput = ({
             }}
             onFocus={event => setFocused(document.activeElement === event.target)}
             onBlur={() => setFocused(false)}
+            sx={{
+              ...(readOnly &&
+                !disabled && {
+                  '& .MuiInputBase-input': { cursor: 'default' },
+                  '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+                  }
+                })
+            }}
             {...textFieldProps}
           />
         )}

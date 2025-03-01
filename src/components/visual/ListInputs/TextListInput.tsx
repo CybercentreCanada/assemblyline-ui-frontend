@@ -7,12 +7,12 @@ import { BaseListItem } from './components/BaseListInput';
 import { ResetListInput, type ResetListInputProps } from './components/ResetListInput';
 import { SkeletonListInput } from './components/SkeletonListInput';
 
-type Props<
-  Value,
-  Multiple extends boolean,
-  DisableClearable extends boolean,
-  FreeSolo extends boolean,
-  ChipComponent extends ElementType
+export type TextListInputProps<
+  Value extends string = string,
+  Multiple extends boolean = boolean,
+  DisableClearable extends boolean = boolean,
+  FreeSolo extends boolean = boolean,
+  ChipComponent extends ElementType = ElementType
 > = Omit<
   AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>,
   'value' | 'renderInput' | 'options' | 'onChange'
@@ -39,11 +39,11 @@ type Props<
 };
 
 const WrappedTextListInput = <
-  Value,
-  Multiple extends boolean,
-  DisableClearable extends boolean,
-  FreeSolo extends boolean,
-  ChipComponent extends ElementType
+  Value extends string = string,
+  Multiple extends boolean = boolean,
+  DisableClearable extends boolean = boolean,
+  FreeSolo extends boolean = boolean,
+  ChipComponent extends ElementType = ElementType
 >({
   capitalize = false,
   disabled = false,
@@ -66,7 +66,7 @@ const WrappedTextListInput = <
   onReset = () => null,
   onError = () => null,
   ...autocompleteProps
-}: Props<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
+}: TextListInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
   const theme = useTheme();
 
   const errorValue = useMemo<string>(() => error(value), [error, value]);

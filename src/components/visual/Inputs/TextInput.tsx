@@ -20,6 +20,7 @@ import {
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ElementType } from 'react';
 import React, { useMemo, useState } from 'react';
+import { HelperText } from './components/HelperText';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
@@ -48,6 +49,8 @@ type Props<
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  startAdornment?: TextFieldProps['InputProps']['startAdornment'];
+  tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   value: string;
@@ -80,6 +83,8 @@ const WrappedTextInput = <
   readOnly = false,
   reset = false,
   resetProps = null,
+  startAdornment = null,
+  tiny = false,
   tooltip = null,
   tooltipProps = null,
   value,
@@ -100,38 +105,39 @@ const WrappedTextInput = <
     <div style={{ textAlign: 'left' }}>
       <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
-          component={InputLabel}
-          htmlFor={id || label}
           color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
+          component={InputLabel}
+          gutterBottom
+          htmlFor={id || label}
           variant="body2"
           whiteSpace="nowrap"
-          gutterBottom
+          {...labelProps}
+          children={label}
           sx={{
+            ...labelProps?.sx,
             ...(disabled &&
               !preventDisabledColor && {
                 WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
               })
           }}
-          {...labelProps}
-          children={label}
         />
       </Tooltip>
       <FormControl fullWidth>
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset' }} />
+          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
         ) : (
           <Autocomplete
             id={id || label}
             autoComplete
-            freeSolo
             disableClearable
-            fullWidth
-            size="small"
-            value={_value}
             disabled={disabled}
-            readOnly={readOnly}
+            freeSolo
+            fullWidth
             inputValue={value || ''}
             options={options}
+            readOnly={readOnly}
+            size="small"
+            value={_value}
             onChange={(e, v) => setValue(v)}
             onInputChange={(e, v, o) => {
               setValue(v as AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>);
@@ -142,38 +148,19 @@ const WrappedTextInput = <
             }}
             onFocus={event => setFocused(document.activeElement === event.target)}
             onBlur={() => setFocused(false)}
-            renderInput={({ InputProps, ...params }) => (
+            renderInput={params => (
               <TextField
                 id={id || label}
                 variant="outlined"
                 error={!!errorValue}
-                helperText={disabled ? null : errorValue || helperText}
-                FormHelperTextProps={
-                  disabled
-                    ? null
-                    : errorValue
-                    ? { variant: 'outlined', sx: { color: theme.palette.error.main, ...errorProps?.sx }, ...errorProps }
-                    : helperText
-                    ? {
-                        variant: 'outlined',
-                        sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
-                        ...errorProps
-                      }
-                    : null
-                }
-                {...(readOnly &&
-                  !disabled && {
-                    focused: null,
-                    sx: {
-                      '& .MuiInputBase-input': { cursor: 'default' },
-                      '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                      }
-                    }
-                  })}
+                {...(readOnly && !disabled && { focused: null })}
+                {...params}
                 InputProps={{
+                  ...params?.InputProps,
+                  'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id || label}-helper-text`,
                   placeholder: placeholder,
                   readOnly: readOnly,
+                  startAdornment: endAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
                   endAdornment: (
                     <>
                       {loading || !reset || disabled || readOnly ? null : (
@@ -181,6 +168,7 @@ const WrappedTextInput = <
                           <ResetInput
                             id={id || label}
                             preventRender={loading || !reset || disabled || readOnly}
+                            tiny={tiny}
                             onReset={onReset}
                             {...resetProps}
                           />
@@ -192,15 +180,34 @@ const WrappedTextInput = <
                         </InputAdornment>
                       )}
                     </>
-                  ),
-                  ...InputProps
+                  )
                 }}
-                {...params}
+                sx={{
+                  ...(tiny && {
+                    '& .MuiInputBase-root': { paddingTop: '0px !important', paddingBottom: '0px !important' }
+                  }),
+                  ...(readOnly &&
+                    !disabled && {
+                      '& .MuiInputBase-input': { cursor: 'default' },
+                      '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+                      }
+                    })
+                }}
               />
             )}
             {...autocompleteProps}
           />
         )}
+        <HelperText
+          disabled={disabled}
+          errorProps={errorProps}
+          errorText={errorValue}
+          helperText={helperText}
+          helperTextProps={helperTextProps}
+          id={id}
+          label={label}
+        />
       </FormControl>
     </div>
   );

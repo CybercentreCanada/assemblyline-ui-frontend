@@ -1,21 +1,25 @@
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import type { IconButtonProps } from '@mui/material';
-import { IconButton } from '@mui/material';
-import { type FC } from 'react';
+import { IconButton, useTheme } from '@mui/material';
+import type { FC } from 'react';
 
 export type ResetListInputProps = Omit<IconButtonProps, 'id'> & {
   id: string;
   preventRender: boolean;
+  tiny?: boolean;
   onReset: IconButtonProps['onClick'];
 };
 
 export const ResetListInput: FC<ResetListInputProps> = ({
   id = null,
   preventRender = false,
+  tiny = false,
   onReset,
   ...buttonProps
-}) =>
-  preventRender ? null : (
+}) => {
+  const theme = useTheme();
+
+  return preventRender ? null : (
     <IconButton
       aria-label={`refresh ${id}`}
       type="reset"
@@ -27,6 +31,7 @@ export const ResetListInput: FC<ResetListInputProps> = ({
         onReset(event);
       }}
       {...buttonProps}
+      sx={{ ...(tiny && { padding: theme.spacing(0.5) }), ...buttonProps?.sx }}
     />
-    // </div>
   );
+};

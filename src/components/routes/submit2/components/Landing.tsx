@@ -112,8 +112,9 @@ const HashInput = React.memo(() => {
       ]}
       children={([loading, disabled, uploading, type, value]) => (
         <TextInput
+          id={'Hash Input'}
           label={configuration.ui.allow_url_submissions ? t('url.input.label') : t('hash.input.label')}
-          helperText={configuration.ui.allow_url_submissions ? t('url.input.helperText') : null}
+          helperText={configuration.ui.allow_url_submissions ? t('url.input.helperText') : ''}
           value={value as string}
           loading={loading as boolean}
           disabled={(disabled || uploading) as boolean}

@@ -26,6 +26,7 @@ type Props = Omit<SliderProps, 'value' | 'onChange'> & {
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   value: number;
@@ -50,6 +51,7 @@ const WrappedSliderInput = ({
   readOnly = false,
   reset = false,
   resetProps = null,
+  tiny = false,
   tooltip = null,
   tooltipProps = null,
   value,
@@ -88,7 +90,7 @@ const WrappedSliderInput = ({
       </Tooltip>
       <FormControl fullWidth error={!!errorValue}>
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset' }} />
+          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
         ) : (
           <>
             <div style={{ display: 'flex', alignItems: 'flex-start' }}>

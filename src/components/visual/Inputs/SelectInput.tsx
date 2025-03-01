@@ -1,6 +1,7 @@
 import type {
   FormHelperTextProps,
   IconButtonProps,
+  ListItemTextProps,
   MenuItemProps,
   SelectChangeEvent,
   SelectProps,
@@ -10,9 +11,9 @@ import type {
 } from '@mui/material';
 import {
   FormControl,
-  FormHelperText,
   InputAdornment,
   InputLabel,
+  ListItemText,
   MenuItem,
   Select,
   Skeleton,
@@ -21,12 +22,14 @@ import {
 } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
+import { HelperText } from './components/HelperText';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
 type Props = Omit<SelectProps, 'error' | 'value' | 'onChange'> & {
+  capitalize?: boolean;
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: string) => string;
+  error?: (value: MenuItemProps['value']) => string;
   errorProps?: FormHelperTextProps;
   hasEmpty?: boolean;
   helperText?: string;
@@ -34,22 +37,28 @@ type Props = Omit<SelectProps, 'error' | 'value' | 'onChange'> & {
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
-  options: { label: MenuItemProps['children']; value: MenuItemProps['value'] }[];
+  options: {
+    primary: ListItemTextProps['primary'];
+    secondary?: ListItemTextProps['secondary'];
+    value: MenuItemProps['value'];
+  }[];
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: string;
-  onChange?: (event: SelectChangeEvent<unknown>, value: string) => void;
+  value: MenuItemProps['value'];
+  onChange?: (event: SelectChangeEvent<unknown>, value: MenuItemProps['value']) => void;
   onReset?: IconButtonProps['onClick'];
   onError?: (error: string) => void;
 };
 
 const WrappedSelectInput = ({
+  capitalize = false,
   disabled,
   endAdornment = null,
   error = () => null,
@@ -68,6 +77,7 @@ const WrappedSelectInput = ({
   readOnly = false,
   reset = false,
   resetProps = null,
+  tiny = false,
   tooltip = null,
   tooltipProps = null,
   value,
@@ -117,7 +127,7 @@ const WrappedSelectInput = ({
           })}
       >
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset' }} />
+          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
         ) : (
           <Select
             disabled={disabled}
@@ -128,7 +138,14 @@ const WrappedSelectInput = ({
             size="small"
             value={options.some(o => o.value === value) ? value : ''}
             variant="outlined"
-            inputProps={{ id: id || label }}
+            inputProps={{ id: id || label, ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } }) }}
+            renderValue={option => (
+              <ListItemText
+                primary={options.find(o => o.value === option)?.primary || ''}
+                primaryTypographyProps={{ sx: { cursor: 'pointer' } }}
+                sx={{ margin: 0 }}
+              />
+            )}
             sx={{ textTransform: 'capitalize' }}
             onChange={event => {
               const v = event.target.value as string;
@@ -146,40 +163,51 @@ const WrappedSelectInput = ({
                     <ResetInput
                       id={id || label}
                       preventRender={loading || !reset || disabled || readOnly}
+                      tiny={tiny}
                       onReset={onReset}
                       {...resetProps}
                     />
                   </InputAdornment>
                 )}
+                {endAdornment && (
+                  <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
+                    {endAdornment}
+                  </InputAdornment>
+                )}
               </>
             }
+            MenuProps={{ sx: { maxWidth: 'min-content' } }}
             {...selectProps}
           >
             {hasEmpty && <MenuItem value="" sx={{ height: '36px' }}></MenuItem>}
             {options.map((option, i) => (
-              <MenuItem key={i} value={option.value} sx={{ textTransform: 'capitalize' }}>
-                {option.label}
+              <MenuItem
+                key={i}
+                value={option.value}
+                sx={{
+                  '&>div': { margin: 0, cursor: 'pointer !important' },
+                  ...(capitalize && { textTransform: 'capitalize' })
+                }}
+              >
+                <ListItemText
+                  primary={option.primary}
+                  secondary={option.secondary}
+                  primaryTypographyProps={{ overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' }}
+                  secondaryTypographyProps={{ overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' }}
+                />
               </MenuItem>
             ))}
           </Select>
         )}
-        {disabled ? null : errorValue ? (
-          <FormHelperText
-            sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
-            variant="outlined"
-            {...errorProps}
-          >
-            {errorValue}
-          </FormHelperText>
-        ) : helperText ? (
-          <FormHelperText
-            sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
-            variant="outlined"
-            {...helperTextProps}
-          >
-            {helperText}
-          </FormHelperText>
-        ) : null}
+        <HelperText
+          id={id}
+          label={label}
+          disabled={disabled}
+          errorProps={errorProps}
+          errorText={errorValue}
+          helperText={helperText}
+          helperTextProps={helperTextProps}
+        />
       </FormControl>
     </div>
   );

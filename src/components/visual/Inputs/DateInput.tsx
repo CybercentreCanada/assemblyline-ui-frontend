@@ -34,6 +34,7 @@ type Props = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   value: string;
@@ -62,6 +63,7 @@ const WrappedDateInput = ({
   readOnly = false,
   reset = false,
   resetProps = null,
+  tiny = false,
   tooltip = null,
   tooltipProps = null,
   value,
@@ -131,7 +133,7 @@ const WrappedDateInput = ({
         </Tooltip>
         <FormControl fullWidth>
           {loading ? (
-            <Skeleton sx={{ height: '40px', transform: 'unset' }} />
+            <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
           ) : (
             <MuiDatePicker
               value={tempDate}
@@ -197,7 +199,11 @@ const WrappedDateInput = ({
                   {...textFieldProps}
                   onFocus={event => setFocused(document.activeElement === event.target)}
                   onBlur={() => setFocused(false)}
-                  inputProps={{ ...inputProps, ...textFieldProps?.inputProps }}
+                  inputProps={{
+                    ...inputProps,
+                    ...textFieldProps?.inputProps,
+                    ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
+                  }}
                   InputProps={{
                     ...InputProps,
                     ...textFieldProps?.InputProps,
@@ -214,6 +220,7 @@ const WrappedDateInput = ({
                             <ResetInput
                               id={id || label}
                               preventRender={loading || !reset || disabled || readOnly}
+                              tiny={tiny}
                               onReset={onReset}
                               {...resetProps}
                             />

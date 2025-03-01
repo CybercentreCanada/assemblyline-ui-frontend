@@ -27,6 +27,7 @@ export type InputsLibraryState = {
       helperText: boolean;
       placeholder: boolean;
       endAdornment: boolean;
+      tiny: boolean;
     };
     values: {
       text: string;
@@ -52,7 +53,8 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
       readOnly: false,
       helperText: false,
       placeholder: false,
-      endAdornment: false
+      endAdornment: false,
+      tiny: false
     },
     values: {
       text: '',
@@ -1824,10 +1826,157 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
+        primary={'Tiny Size'}
+        secondary={
+          <>
+            <span></span>
+          </>
+        }
+        left={
+          <>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.text}
+              children={value => (
+                <TextInput
+                  label="Tiny Text Input"
+                  value={value}
+                  tiny
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.number}
+              children={value => (
+                <NumberInput
+                  label="Tiny Number Input"
+                  value={value}
+                  tiny
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.select}
+              children={value => (
+                <SelectInput
+                  label="Tiny Select Input"
+                  value={value}
+                  tiny
+                  options={[
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
+                  ]}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.date}
+              children={value => (
+                <DateInput
+                  label="Tiny Date Input"
+                  value={value}
+                  tiny
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.slider}
+              children={value => (
+                <SliderInput
+                  label="Tiny Slider Input"
+                  value={value}
+                  tiny
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.checkbox}
+              children={value => (
+                <CheckboxInput
+                  label="Tiny Checkbox Input"
+                  value={value}
+                  tiny
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.switch}
+              children={value => (
+                <SwitchInput
+                  label="Tiny Switch Input"
+                  value={value}
+                  tiny
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
+                />
+              )}
+            />
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
+  <TextInput
+  label="End Adornment Text Input"
+  value={value}
+  onChange={(event, next) => {}}
+  />
+
+  <NumberInput
+  label="End Adornment Number Input"
+  value={value}
+  onChange={(event, next) => {}}
+  />
+
+  <SelectInput
+  label="End Adornment Select Input"
+  value={value}
+  options={[
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
+  ]}
+  onChange={(event, next) => {}}
+  />
+
+  <DateInput
+  label="End Adornment Date Input"
+  value={value}
+  onChange={next => {}}
+  />
+
+  <SliderInput
+  label="End Adornment Slider Input"
+  value={value}
+  onChange={(event, next) => {}}
+  />
+
+  <CheckboxInput
+  label="End Adornment Checkbox Input"
+  value={value}
+  onChange={(event, next) => {}}
+  />
+
+  <SwitchInput
+  label="End Adornment Switch Input"
+  value={value}
+  onChange={(event, next) => {}}
+  />
+</>`}
+          />
+        }
+      />
+
+      <DemoSection
         primary={'Interactions'}
         secondary={
           <>
-            {' '}
             <span>{'Use this to test the different interaction with the different props. '}</span>
           </>
         }
@@ -1842,9 +1991,21 @@ export const InputsSection = React.memo(() => {
               state.values.components.inputs.state.readOnly,
               state.values.components.inputs.state.helperText,
               state.values.components.inputs.state.placeholder,
-              state.values.components.inputs.state.endAdornment
+              state.values.components.inputs.state.endAdornment,
+              state.values.components.inputs.state.tiny
             ]}
-            children={([disabled, loading, reset, tooltip, error, readOnly, helperText, placeholder, endAdornment]) => (
+            children={([
+              disabled,
+              loading,
+              reset,
+              tooltip,
+              error,
+              readOnly,
+              helperText,
+              placeholder,
+              endAdornment,
+              tiny
+            ]) => (
               <>
                 <form.Subscribe
                   selector={state => state.values.components.inputs.values.text}
@@ -1856,6 +2017,7 @@ export const InputsSection = React.memo(() => {
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
+                      {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
                         onReset: () => form.setFieldValue('components.inputs.values.text', '')
@@ -1879,6 +2041,7 @@ export const InputsSection = React.memo(() => {
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
+                      {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
                         onReset: () => form.setFieldValue('components.inputs.values.number', 0)
@@ -1907,6 +2070,7 @@ export const InputsSection = React.memo(() => {
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
+                      {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
                         onReset: () => form.setFieldValue('components.inputs.values.select', '')
@@ -1930,6 +2094,7 @@ export const InputsSection = React.memo(() => {
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
+                      {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
                         onReset: () => form.setFieldValue('components.inputs.values.date', null)
@@ -1953,6 +2118,7 @@ export const InputsSection = React.memo(() => {
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
+                      {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
                         onReset: () => form.setFieldValue('components.inputs.values.slider', 0)
@@ -1976,6 +2142,7 @@ export const InputsSection = React.memo(() => {
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
+                      {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
                         onReset: () => form.setFieldValue('components.inputs.values.checkbox', false)
@@ -1999,6 +2166,7 @@ export const InputsSection = React.memo(() => {
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
+                      {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
                         onReset: () => form.setFieldValue('components.inputs.values.switch', false)
@@ -2101,9 +2269,19 @@ export const InputsSection = React.memo(() => {
               selector={state => state.values.components.inputs.state.endAdornment}
               children={value => (
                 <CheckboxInput
-                  label="End Adonrment"
+                  label="End Adornment"
                   value={value}
                   onChange={(event, next) => form.setFieldValue('components.inputs.state.endAdornment', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.tiny}
+              children={value => (
+                <CheckboxInput
+                  label="Tiny"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.tiny', next)}
                 />
               )}
             />
