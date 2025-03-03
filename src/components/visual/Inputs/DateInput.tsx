@@ -174,28 +174,20 @@ const WrappedDateInput = ({
                         }
                       : null
                   }
-                  {...(readOnly &&
-                    !disabled && {
-                      focused: null,
-                      sx: {
-                        '& .MuiInputBase-input': { cursor: 'default' },
-                        '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      ...(tiny && { fontSize: '14px' }),
+                      ...(readOnly && !disabled && { cursor: 'default' })
+                    },
+                    '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                      ...(readOnly &&
+                        !disabled && {
                           borderColor:
                             theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                        }
-                      }
-                    })}
-                  {...(readOnly &&
-                    !disabled && {
-                      focused: null,
-                      sx: {
-                        '& .MuiInputBase-input': { cursor: 'default' },
-                        '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor:
-                            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                        }
-                      }
-                    })}
+                        })
+                    }
+                  }}
+                  {...(readOnly && !disabled && { focused: null })}
                   {...textFieldProps}
                   onFocus={event => setFocused(document.activeElement === event.target)}
                   onBlur={() => setFocused(false)}

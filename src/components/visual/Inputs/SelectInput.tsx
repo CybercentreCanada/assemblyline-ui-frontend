@@ -140,12 +140,19 @@ const WrappedSelectInput = ({
             variant="outlined"
             inputProps={{
               id: id || label,
-              ...(tiny && { sx: { paddingTop: theme.spacing(0.25), paddingBottom: theme.spacing(0.25) } })
+              sx: {
+                display: 'flex',
+                alignItems: 'center',
+                ...(tiny && {
+                  paddingTop: theme.spacing(0.25),
+                  paddingBottom: theme.spacing(0.25)
+                })
+              }
             }}
             renderValue={option => (
               <ListItemText
                 primary={options.find(o => o.value === option)?.primary || ''}
-                primaryTypographyProps={{ sx: { cursor: 'pointer' } }}
+                primaryTypographyProps={{ sx: { cursor: 'pointer' }, ...(tiny && { variant: 'body2' }) }}
                 sx={{ margin: 0 }}
               />
             )}
@@ -195,8 +202,18 @@ const WrappedSelectInput = ({
                 <ListItemText
                   primary={option.primary}
                   secondary={option.secondary}
-                  primaryTypographyProps={{ overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' }}
-                  secondaryTypographyProps={{ overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' }}
+                  primaryTypographyProps={{
+                    overflow: 'auto',
+                    textOverflow: 'initial',
+                    whiteSpace: 'normal',
+                    ...(tiny && { variant: 'body2' })
+                  }}
+                  secondaryTypographyProps={{
+                    overflow: 'auto',
+                    textOverflow: 'initial',
+                    whiteSpace: 'normal',
+                    ...(tiny && { variant: 'body2' })
+                  }}
                 />
               </MenuItem>
             ))}

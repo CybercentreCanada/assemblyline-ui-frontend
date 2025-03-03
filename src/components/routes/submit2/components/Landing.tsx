@@ -286,6 +286,18 @@ export const AnalyzeButton = React.memo(() => {
           onClick={() => {
             form.setFieldValue('state.confirmation', s => !s);
 
+            if (tab === 'file') {
+              form.setFieldValue(
+                'settings.description.value',
+                `Inspection of file: ${form.getFieldValue('file.name')}`
+              );
+            } else if (tab === 'hash') {
+              form.setFieldValue(
+                'settings.description.value',
+                `Inspection of ${form.getFieldValue('hash.type').toUpperCase()}: ${form.getFieldValue('hash.value')}`
+              );
+            }
+
             if (tab === 'hash' && (hash as SubmitStore['hash']['type']) === 'url') {
               form.setFieldValue('settings.services', categories => {
                 categories.forEach((category, i) => {

@@ -1,3 +1,4 @@
+import CloseIcon from '@mui/icons-material/Close';
 import type { PaperProps, TypographyProps } from '@mui/material';
 import {
   Button,
@@ -7,6 +8,7 @@ import {
   DialogContentText,
   DialogTitle,
   Grid,
+  IconButton,
   ListItemText,
   Paper,
   Typography,
@@ -580,8 +582,8 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                 <NumberInput
                   {...(props as NumberInputProps)}
                   value={value as number}
-                  min={metadata.validator_params.min}
-                  max={metadata.validator_params.max}
+                  min={metadata?.validator_params?.min}
+                  max={metadata?.validator_params?.max}
                   reset={!!value}
                 />
               );
@@ -593,7 +595,7 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   options={options}
                   reset={!!value}
                   error={v => handleValid(v)}
-                  tooltip={metadata.validator_params?.validation_regex || null}
+                  tooltip={metadata?.validator_params?.validation_regex || null}
                   tooltipProps={{ placement: 'right' }}
                 />
               );
@@ -622,48 +624,60 @@ const SubmissionMetadata = React.memo(() => {
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.confirmation, state.values.state.loading, state.values.state.disabled]}
-      children={([open, loading, disabled]) => {
+      selector={state => [state.values.state.loading, state.values.state.disabled, state.values.state.confirmation]}
+      children={([loading, disabled]) => {
         return !open ? null : (
-          <Section
-            primary={t('options.submission.metadata')}
-            sx={{ padding: theme.spacing(1), display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}
-          >
-            {Object.entries(configuration.submission.metadata.submit).map(([name, metadata]) => (
-              <MetadataParam key={name} name={name} metadata={metadata} loading={loading} disabled={disabled} />
-            ))}
-            {/* {configuration.submission.file_sources?.[type]?.sources?.map((source, i) => (
-                <form.Subscribe
-                  key={`${source}-${i}`}
-                  selector={state => state.values?.settings?.default_external_sources?.indexOf(source) !== -1}
-                  children={value => (
-                    <CheckboxInput
-                      key={i}
-                      id={`source-${source.replace('_', ' ')}`}
-                      label={source.replace('_', ' ')}
-                      labelProps={{
-                        margin: `${theme.spacing(0.5)} 0`,
-                        textTransform: 'capitalize',
-                        variant: 'body2'
-                      }}
-                      value={value}
-                      loading={loading}
-                      disabled={disabled}
+          <Section primary={t('options.submission.metadata')} sx={{}}>
+            <div
+              style={{ padding: theme.spacing(1), display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}
+            >
+              {Object.entries(configuration.submission.metadata.submit).map(([name, metadata]) => (
+                <MetadataParam key={name} name={name} metadata={metadata} loading={loading} disabled={disabled} />
+              ))}
+            </div>
 
-                      onChange={() => {
-                        if (!form.getFieldValue('settings')) return;
+            <form.Subscribe
+              selector={state => state.values.metadata}
+              children={metadatas => {
+                const data = Object.entries(metadatas)
+                  .filter(([name]) => !(name in configuration.submission.metadata.submit))
+                  .sort(([name1], [name2]) => name1.localeCompare(name2));
 
-                        const newSources = form.getFieldValue('settings.default_external_sources');
-                        if (newSources.indexOf(source) === -1) newSources.push(source);
-                        else newSources.splice(newSources.indexOf(source), 1);
-
-                        form.setFieldValue('hash.hasError', false);
-                        form.setFieldValue('settings.default_external_sources', newSources);
-                      }}
-                    />
-                  )}
-                />
-              ))} */}
+                return !data.length ? null : (
+                  <div
+                    style={{
+                      padding: theme.spacing(1),
+                      display: 'grid',
+                      alignItems: 'center',
+                      gridTemplateColumns: `auto auto auto 1fr`,
+                      columnGap: theme.spacing(1)
+                    }}
+                  >
+                    {data.map(([name, value]) => (
+                      <>
+                        <Typography color="textSecondary" variant="body2">{`${name}: `}</Typography>
+                        <Typography variant="body2">{value as string}</Typography>
+                        <IconButton
+                          aria-label="delete"
+                          color="secondary"
+                          edge="end"
+                          size="small"
+                          onClick={() => {
+                            form.setFieldValue('metadata', m => {
+                              const { [name]: removed, ...o } = m;
+                              return o;
+                            });
+                          }}
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                        <div />
+                      </>
+                    ))}
+                  </div>
+                );
+              }}
+            />
           </Section>
         );
       }}
@@ -814,8 +828,8 @@ const SelectedServices = React.memo(() => {
       }}
     >
       <form.Subscribe
-        selector={state => [state.values.state.confirmation, state.values.settings.services]}
-        children={([open, categories]) =>
+        selector={state => state.values.settings.services}
+        children={categories =>
           !open
             ? null
             : (categories as SubmitStore['settings']['services']).map((cat, i) => (
@@ -866,8 +880,8 @@ const ServiceParameters = React.memo(() => {
       }}
     >
       <form.Subscribe
-        selector={state => [state.values.state.confirmation, state.values.settings.service_spec]}
-        children={([open, specs]) =>
+        selector={state => state.values.settings.service_spec}
+        children={specs =>
           !open
             ? null
             : (specs as SubmitStore['settings']['service_spec']).map((spec, i) => (
