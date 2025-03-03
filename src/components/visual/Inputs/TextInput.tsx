@@ -186,8 +186,8 @@ const WrappedTextInput = <
                 sx={{
                   ...(tiny && {
                     '& .MuiInputBase-root': {
-                      paddingTop: '0px !important',
-                      paddingBottom: '0px !important',
+                      paddingTop: '2px !important',
+                      paddingBottom: '2px !important',
                       fontSize: '14px'
                     }
                   }),

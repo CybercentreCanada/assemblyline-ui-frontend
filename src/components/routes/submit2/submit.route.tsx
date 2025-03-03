@@ -52,7 +52,7 @@ const WrappedSubmitRoute = () => {
     const classification = submitParams.get('classification');
     if (classification) form.setFieldValue('settings.classification.value', classification);
     const metadata = JSON.parse(submitParams.get('metadata')) as Record<string, unknown>;
-    form.setFieldValue('metadata', v => getDefaultMetadata(v, configuration, metadata));
+    form.setFieldValue('metadata.config', v => getDefaultMetadata(v, configuration, metadata));
     form.setFieldValue('state.loading', false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

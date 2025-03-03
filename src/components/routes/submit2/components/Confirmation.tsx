@@ -1,4 +1,3 @@
-import CloseIcon from '@mui/icons-material/Close';
 import type { PaperProps, TypographyProps } from '@mui/material';
 import {
   Button,
@@ -7,18 +6,23 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormHelperText,
   Grid,
-  IconButton,
   ListItemText,
   Paper,
   Typography,
   useTheme
 } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
+import type { APIResponseProps } from 'components/hooks/useMyAPI';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Metadata } from 'components/models/base/config';
+import type { Submission } from 'components/models/base/submission';
+import { applySubmissionProfile } from 'components/routes/submit/submit.utils';
 import type { SubmitStore } from 'components/routes/submit2/submit.form';
-import { useForm } from 'components/routes/submit2/submit.form';
+import { FLOW, useForm } from 'components/routes/submit2/submit.form';
+import { isSubmissionValid, isValidJSON } from 'components/routes/submit2/submit.utils';
 import { ByteNumber } from 'components/visual/ByteNumber';
 import Classification from 'components/visual/Classification';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
@@ -31,11 +35,13 @@ import type { SwitchInputProps } from 'components/visual/Inputs/SwitchInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import type { TextInputProps } from 'components/visual/Inputs/TextInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
+import MonacoEditor from 'components/visual/MonacoEditor';
 import { isURL } from 'helpers/utils';
+import generateUUID from 'helpers/uuid';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 type SectionProps = PaperProps & {
   primary: TypographyProps['children'];
@@ -154,6 +160,7 @@ const SubmissionOptions = React.memo(() => {
                 loading={loading}
                 disabled={disabled || (!customize && !editable)}
                 reset={value !== defaultValue}
+                error={v => (v ? null : t('options.submission.desc.error'))}
                 onChange={(e, v) => form.setFieldValue('settings.description.value', v)}
                 onReset={() => form.setFieldValue('settings.description.value', defaultValue as string)}
               />
@@ -167,23 +174,34 @@ const SubmissionOptions = React.memo(() => {
                   const param = state.values.settings.priority;
                   return [param.value, param.default, param.editable];
                 }}
-                children={([value, defaultValue, editable]) => (
-                  <SelectInput
-                    label={t('options.submission.priority')}
-                    value={value as number}
-                    fullWidth
-                    loading={loading}
-                    disabled={disabled || (!customize && !editable)}
-                    reset={value !== defaultValue}
-                    options={[
-                      { primary: t('options.submission.priority.low'), value: 500 },
-                      { primary: t('options.submission.priority.medium'), value: 1000 },
-                      { primary: t('options.submission.priority.high'), value: 1500 }
-                    ]}
-                    onChange={(e, v) => form.setFieldValue('settings.priority.value', v as number)}
-                    onReset={() => form.setFieldValue('settings.priority.value', defaultValue as number)}
-                  />
-                )}
+                children={([value, defaultValue, editable]) => {
+                  const options = [
+                    { primary: t('options.submission.priority.low'), value: 500 },
+                    { primary: t('options.submission.priority.medium'), value: 1000 },
+                    { primary: t('options.submission.priority.high'), value: 1500 }
+                  ];
+
+                  return (
+                    <SelectInput
+                      label={t('options.submission.priority')}
+                      value={value as number}
+                      fullWidth
+                      loading={loading}
+                      disabled={disabled || (!customize && !editable)}
+                      reset={value !== defaultValue}
+                      options={options}
+                      error={v =>
+                        !v
+                          ? t('options.submission.priority.error.empty')
+                          : !options.some(o => o.value === v)
+                          ? t('options.submission.priority.error.invalid')
+                          : null
+                      }
+                      onChange={(e, v) => form.setFieldValue('settings.priority.value', v as number)}
+                      onReset={() => form.setFieldValue('settings.priority.value', defaultValue as number)}
+                    />
+                  );
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -446,7 +464,7 @@ const SupplementaryOptions = React.memo(() => {
                             labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
                             value={selected as boolean}
                             loading={loading}
-                            disabled={disabled}
+                            disabled={disabled || !customize}
                             tiny
                             onChange={() => {
                               form.setFieldValue('settings', s => {
@@ -503,19 +521,13 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
 
     const handleChange = useCallback(
       (value: unknown) => {
-        form.setStore(s => {
-          s.metadata = !value ? _.omit(s?.metadata || {}, name) : { ...(s?.metadata || {}), [name]: value };
-          return s;
-        });
+        form.setFieldValue(`metadata.config`, m => (!value ? _.omit(m || {}, name) : { ...m, [name]: value }));
       },
       [form, name]
     );
 
     const handleReset = useCallback(() => {
-      form.setStore(s => {
-        s.metadata = _.omit(s?.metadata || {}, name);
-        return s;
-      });
+      form.setFieldValue(`metadata.config`, m => _.omit(m || {}, name));
     }, [form, name]);
 
     useEffect(() => {
@@ -545,7 +557,7 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
 
     return (
       <form.Subscribe
-        selector={state => state.values?.metadata?.[name]}
+        selector={state => state.values?.metadata?.config?.[name]}
         children={value => {
           switch (metadata.validator_type) {
             case 'boolean':
@@ -624,8 +636,13 @@ const SubmissionMetadata = React.memo(() => {
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.loading, state.values.state.disabled, state.values.state.confirmation]}
-      children={([loading, disabled]) => {
+      selector={state => [
+        state.values.state.loading,
+        state.values.state.disabled,
+        state.values.state.customize,
+        state.values.state.confirmation
+      ]}
+      children={([loading, disabled, customize]) => {
         return !open ? null : (
           <Section primary={t('options.submission.metadata')} sx={{}}>
             <div
@@ -634,177 +651,30 @@ const SubmissionMetadata = React.memo(() => {
               {Object.entries(configuration.submission.metadata.submit).map(([name, metadata]) => (
                 <MetadataParam key={name} name={name} metadata={metadata} loading={loading} disabled={disabled} />
               ))}
-            </div>
 
-            <form.Subscribe
-              selector={state => state.values.metadata}
-              children={metadatas => {
-                const data = Object.entries(metadatas)
-                  .filter(([name]) => !(name in configuration.submission.metadata.submit))
-                  .sort(([name1], [name2]) => name1.localeCompare(name2));
-
-                return !data.length ? null : (
-                  <div
-                    style={{
-                      padding: theme.spacing(1),
-                      display: 'grid',
-                      alignItems: 'center',
-                      gridTemplateColumns: `auto auto auto 1fr`,
-                      columnGap: theme.spacing(1)
-                    }}
-                  >
-                    {data.map(([name, value]) => (
-                      <>
-                        <Typography color="textSecondary" variant="body2">{`${name}: `}</Typography>
-                        <Typography variant="body2">{value as string}</Typography>
-                        <IconButton
-                          aria-label="delete"
-                          color="secondary"
-                          edge="end"
-                          size="small"
-                          onClick={() => {
-                            form.setFieldValue('metadata', m => {
-                              const { [name]: removed, ...o } = m;
-                              return o;
-                            });
-                          }}
-                        >
-                          <CloseIcon fontSize="small" />
-                        </IconButton>
-                        <div />
-                      </>
-                    ))}
+              <form.Subscribe
+                selector={state => [state.values.metadata.extra, isValidJSON(state.values.metadata.extra)]}
+                children={([data, error]) => (
+                  <div style={{ minHeight: `${8 * 19 + 20}px`, display: 'flex', flexDirection: 'column' }}>
+                    <Typography color={error ? 'error' : 'textSecondary'} variant="body2">
+                      {'Extra'}
+                    </Typography>
+                    <MonacoEditor
+                      language="json"
+                      value={data}
+                      error={!!error}
+                      options={{ readOnly: disabled || !customize }}
+                      onChange={v => form.setFieldValue('metadata.extra', v)}
+                    />
+                    {error && (
+                      <FormHelperText variant="outlined" sx={{ color: theme.palette.error.main }}>
+                        {error}
+                      </FormHelperText>
+                    )}
                   </div>
-                );
-              }}
-            />
-          </Section>
-        );
-      }}
-    />
-  );
-});
-
-const ExternalSources = React.memo(() => {
-  const { t } = useTranslation(['submit']);
-  const theme = useTheme();
-  const { configuration } = useALContext();
-  const form = useForm();
-
-  return (
-    <form.Subscribe
-      selector={state => [
-        state.values.state.tab === 'hash',
-        state.values.hash.type,
-        state.values.state.loading,
-        state.values.state.disabled
-      ]}
-      children={props => {
-        const tab = props[0] as boolean;
-        const type = props[1] as SubmitStore['hash']['type'];
-        const loading = props[2] as boolean;
-        const disabled = props[3] as boolean;
-
-        {
-          /* <Typography variant="body1">{t('options.submission.default_external_sources')}</Typography> */
-        }
-
-        return !tab || !configuration.submission.file_sources?.[type]?.sources?.length ? null : (
-          <Section primary={'Select these external sources'} sx={{ padding: `${theme.spacing(1)} 0` }}>
-            {configuration.submission.file_sources?.[type]?.sources?.map((source, i) => (
-              <form.Subscribe
-                key={`${source}-${i}`}
-                selector={state => state.values?.settings?.default_external_sources?.value?.indexOf(source) !== -1}
-                children={value => (
-                  <CheckboxInput
-                    key={i}
-                    id={`source-${source.replace('_', ' ')}`}
-                    label={source.replace('_', ' ')}
-                    labelProps={{
-                      margin: `${theme.spacing(0.5)} 0`,
-                      textTransform: 'capitalize',
-                      variant: 'body2'
-                    }}
-                    value={value}
-                    loading={loading}
-                    disabled={disabled}
-                    onChange={() => {
-                      if (!form.getFieldValue('settings')) return;
-
-                      const newSources = form.getFieldValue('settings.default_external_sources.value');
-                      if (newSources.indexOf(source) === -1) newSources.push(source);
-                      else newSources.splice(newSources.indexOf(source), 1);
-
-                      form.setFieldValue('settings.default_external_sources.value', newSources);
-                    }}
-                  />
                 )}
               />
-            ))}
-          </Section>
-        );
-      }}
-    />
-  );
-});
-
-const ExternalServices = React.memo(() => {
-  const { t } = useTranslation(['submit']);
-  const theme = useTheme();
-  const { configuration } = useALContext();
-  const form = useForm();
-
-  return (
-    <form.Subscribe
-      selector={state => {
-        if (state.values.state.tab !== 'hash' || state.values.hash.type !== 'url') return [false, [], false, false];
-        else {
-          const svr = state.values?.settings?.services?.reduce((prev: [number, number][], category, i) => {
-            category.services.forEach((service, j) => {
-              if (configuration?.ui?.url_submission_auto_service_selection?.includes(service.name)) prev.push([i, j]);
-            });
-            return prev;
-          }, []);
-
-          return [true, svr, state.values.state.loading, state.values.state.disabled];
-        }
-      }}
-      children={props => {
-        const url = props[0] as boolean;
-        const services = props[1] as [number, number][];
-        const loading = props[2] as boolean;
-        const disabled = props[3] as boolean;
-
-        return !url || !services?.length ? null : (
-          <Section
-            primary={t('options.submission.url_submission_auto_service_selection')}
-            sx={{ padding: `${theme.spacing(1)} 0` }}
-          >
-            {services.map(([cat, svr], i) => (
-              <form.Subscribe
-                key={i}
-                selector={state => [state.values.settings.services[cat].services[svr]]}
-                children={([service]) => (
-                  <CheckboxInput
-                    key={i}
-                    id={`url_submission_auto_service_selection-${service.name.replace('_', ' ')}`}
-                    label={service.name.replace('_', ' ')}
-                    labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
-                    value={service.selected}
-                    loading={loading}
-                    disabled={disabled}
-                    tiny
-                    onChange={() => {
-                      form.setFieldValue('settings', s => {
-                        s.services[cat].services[svr].selected = !service.selected;
-                        s.services[cat].selected = s.services[cat].services.every(val => val.selected);
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
-            ))}
+            </div>
           </Section>
         );
       }}
@@ -832,7 +702,7 @@ const SelectedServices = React.memo(() => {
         children={categories =>
           !open
             ? null
-            : (categories as SubmitStore['settings']['services']).map((cat, i) => (
+            : categories.map((cat, i) => (
                 <form.Subscribe
                   key={`${cat.name}-${i}`}
                   selector={state => [state.values.settings.services[i].selected]}
@@ -884,7 +754,7 @@ const ServiceParameters = React.memo(() => {
         children={specs =>
           !open
             ? null
-            : (specs as SubmitStore['settings']['service_spec']).map((spec, i) => (
+            : specs.map((spec, i) => (
                 <form.Subscribe
                   key={`${spec.name}-${i}`}
                   selector={state =>
@@ -1009,6 +879,207 @@ const ToS = React.memo(() => {
   );
 });
 
+const AnalyzeButton = React.memo(() => {
+  const { t } = useTranslation(['submit']);
+  const form = useForm();
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const { apiCall } = useMyAPI();
+  const { closeSnackbar, showErrorMessage, showSuccessMessage } = useMySnackbar();
+  const { user: currentUser, configuration } = useALContext();
+
+  const handleCancel = useCallback(() => {
+    form.setStore(s => {
+      s.file = null;
+      s.state.isUploading = false;
+      s.state.uploadProgress = null;
+      s.state.uuid = generateUUID();
+      return s;
+    });
+    FLOW.cancel();
+    FLOW.off('complete');
+    FLOW.off('fileError');
+    FLOW.off('progress');
+  }, [form]);
+
+  const handleSubmitFile = useCallback(
+    () => {
+      const file = form.getFieldValue('file');
+      const metadata = form.getFieldValue('metadata');
+      const settings = form.getFieldValue('settings');
+      const size = form.getFieldValue('file.size');
+      const submissionProfile = form.getFieldValue('state.profile');
+      const uuid = form.getFieldValue('state.uuid');
+
+      form.setStore(s => {
+        s.state.disabled = true;
+        s.state.isUploading = true;
+        s.state.uploadProgress = 0;
+        return s;
+      });
+
+      FLOW.opts.generateUniqueIdentifier = selectedFile => {
+        const relativePath =
+          selectedFile?.relativePath ||
+          selectedFile?.file?.webkitRelativePath ||
+          selectedFile?.file?.name ||
+          selectedFile?.name;
+        return `${uuid}_${size}_${relativePath.replace(/[^0-9a-zA-Z_-]/gim, '')}`;
+      };
+
+      FLOW.on('fileError', (event, api_data) => {
+        try {
+          const data = JSON.parse(api_data) as APIResponseProps<unknown>;
+          if ('api_status_code' in data) {
+            if (
+              data.api_status_code === 401 ||
+              (data.api_status_code === 503 &&
+                data.api_error_message.includes('quota') &&
+                data.api_error_message.includes('daily') &&
+                data.api_error_message.includes('API'))
+            ) {
+              window.location.reload();
+            } else {
+              // Unexpected error occurred, cancel upload and show error message
+              handleCancel();
+              showErrorMessage(t('submit.file.upload_fail'));
+            }
+          }
+        } catch (ex) {
+          handleCancel();
+          showErrorMessage(t('submit.file.upload_fail'));
+        }
+      });
+
+      FLOW.on('progress', () => {
+        form.setStore(s => {
+          s.state.uploadProgress = Math.trunc(FLOW.progress() * 100);
+          return s;
+        });
+      });
+
+      FLOW.on('complete', () => {
+        if (FLOW.files.length === 0) {
+          return;
+        }
+
+        for (let x = 0; x < FLOW.files.length; x++) {
+          if (FLOW.files[x].error) {
+            return;
+          }
+        }
+        apiCall<{ started: boolean; sid: string }>({
+          url: `/api/v4/ui/start/${uuid}/`,
+          method: 'POST',
+          body: {
+            ...applySubmissionProfile(settings, submissionProfile),
+            submission_profile: submissionProfile,
+            filename: file.path,
+            metadata: metadata
+          },
+          onSuccess: ({ api_response }) => {
+            showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
+            setTimeout(() => {
+              navigate(`/submission/detail/${api_response.sid}`);
+            }, 500);
+          },
+          onFailure: ({ api_status_code, api_error_message }) => {
+            if (api_status_code === 400 && api_error_message.includes('metadata')) {
+              form.setStore(s => {
+                s.state.disabled = false;
+                s.state.tab = 'options';
+                return s;
+              });
+            }
+
+            if ([400, 403, 404, 503].includes(api_status_code)) {
+              showErrorMessage(api_error_message);
+            } else {
+              showErrorMessage(t('submit.file.failure'));
+            }
+
+            handleCancel();
+          }
+        });
+      });
+
+      FLOW.addFile(file);
+      FLOW.upload();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [form, handleCancel, t]
+  );
+
+  const handleSubmitHash = useCallback(
+    (store: SubmitStore) => {
+      if (store.hash.hasError) {
+        showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
+        return;
+      }
+
+      apiCall<Submission>({
+        url: '/api/v4/submit/',
+        method: 'POST',
+        body: {
+          ui_params: applySubmissionProfile(store.settings, store.state.profile),
+          submission_profile: store.state.profile,
+          [store.hash.type]: store.hash.value,
+          metadata: store.metadata
+        },
+        onSuccess: ({ api_response }) => {
+          showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
+          form.setStore(s => {
+            s.state.disabled = false;
+            s.state.isUploading = false;
+            s.state.isConfirmationOpen = false;
+            return s;
+          });
+          setTimeout(() => {
+            navigate(`/submission/detail/${api_response.sid}`);
+          }, 500);
+        },
+        onFailure: ({ api_status_code, api_error_message }) => {
+          showErrorMessage(api_error_message);
+          if (api_status_code === 400 && api_error_message.includes('metadata')) {
+            form.setStore(s => {
+              s.state.tab = 'options';
+              return s;
+            });
+          }
+
+          form.setStore(s => {
+            s.hash.hasError = true;
+            s.state.disabled = false;
+            s.state.isUploading = false;
+            s.state.isConfirmationOpen = false;
+            return s;
+          });
+        },
+        onEnter: () => {
+          form.setStore(s => {
+            s.state.disabled = true;
+            s.state.isUploading = true;
+            return s;
+          });
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [configuration.ui.allow_url_submissions, currentUser, form, t]
+  );
+
+  return (
+    <form.Subscribe
+      selector={state => [isSubmissionValid(state.values, configuration)]}
+      children={([valid]) => (
+        <Button disabled={!valid} onClick={() => {}}>
+          {t('analyze')}
+        </Button>
+      )}
+    />
+  );
+});
+
 export const AnalysisConfirmation = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
@@ -1027,8 +1098,6 @@ export const AnalysisConfirmation = React.memo(() => {
               <SubmissionOptions />
               <SupplementaryOptions />
               <SubmissionMetadata />
-              {/* <ExternalSources />
-              <ExternalServices /> */}
               <SelectedServices />
               <ServiceParameters />
             </DialogContent>
@@ -1037,7 +1106,7 @@ export const AnalysisConfirmation = React.memo(() => {
 
             <DialogActions>
               <Button onClick={() => form.setFieldValue('state.confirmation', false)}>{t('cancel')}</Button>
-              <Button>{t('analyze')}</Button>
+              <AnalyzeButton />
             </DialogActions>
           </Dialog>
         );

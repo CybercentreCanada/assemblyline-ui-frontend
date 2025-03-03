@@ -57,7 +57,11 @@ export type SubmitStore = {
   hash: { type: HashPatternMap; value: string };
 
   /** Selected metadata of the submission */
-  metadata: SubmitMetadata;
+  // metadata: SubmitMetadata;
+  metadata: {
+    config: SubmitMetadata;
+    extra: string;
+  };
 
   /** All the user's settings */
   settings: ProfileSettings;
@@ -72,17 +76,20 @@ export const DEFAULT_SUBMIT_FORM: SubmitStore = Object.freeze({
     isFetchingSettings: true,
     loading: true,
     profile: null,
-    tab: 'file',
+    tab: 'file' as const,
     uploading: false,
     uploadProgress: 0,
     uuid: generateUUID()
   },
   file: null,
   hash: {
-    type: 'url',
-    value: 'https://www.google.ca'
+    type: 'url' as const,
+    value: 'https://www.google.ca' as const
   },
-  metadata: {},
+  metadata: {
+    config: {},
+    extra: ''
+  },
   settings: null
 });
 

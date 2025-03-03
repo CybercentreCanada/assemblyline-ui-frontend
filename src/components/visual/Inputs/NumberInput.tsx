@@ -127,7 +127,7 @@ const WrappedNumberInput = ({
               readOnly: readOnly,
               sx: {
                 paddingRight: '9px',
-                ...(tiny && { '& .MuiInputBase-root': { padding: '0px !important', fontSize: '14px' } })
+                ...(tiny && { '& .MuiInputBase-root': { padding: '2px !important', fontSize: '14px' } })
               },
               startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
               endAdornment: (
