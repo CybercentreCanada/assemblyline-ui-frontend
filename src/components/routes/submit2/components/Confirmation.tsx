@@ -19,7 +19,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Metadata } from 'components/models/base/config';
 import type { Submission } from 'components/models/base/submission';
-import { applySubmissionProfile } from 'components/routes/submit/submit.utils';
+import { parseSubmissionProfile } from 'components/routes/settings/settings.utils';
 import type { SubmitStore } from 'components/routes/submit2/submit.form';
 import { FLOW, useForm } from 'components/routes/submit2/submit.form';
 import { isSubmissionValid, isValidJSON } from 'components/routes/submit2/submit.utils';
@@ -867,7 +867,7 @@ const ToS = React.memo(() => {
   const { configuration } = useALContext();
 
   return !configuration.ui.tos ? null : (
-    <DialogContentText variant="body2" sx={{ textAlign: 'center' }}>
+    <DialogContentText variant="body2" sx={{ textAlign: 'center', paddingTop: theme.spacing(1) }}>
       {t('terms1')}
       <i>{t('urlHash.button')}</i>
       {t('terms2')}
@@ -879,23 +879,22 @@ const ToS = React.memo(() => {
   );
 });
 
-const AnalyzeButton = React.memo(() => {
+const AnalysisActions = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
   const navigate = useNavigate();
-  const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useMySnackbar();
-  const { user: currentUser, configuration } = useALContext();
+  const { configuration, settings } = useALContext();
 
   const handleCancel = useCallback(() => {
-    form.setStore(s => {
-      s.file = null;
-      s.state.isUploading = false;
-      s.state.uploadProgress = null;
-      s.state.uuid = generateUUID();
-      return s;
-    });
+    form.setFieldValue('file', null);
+    form.setFieldValue('hash.type', null);
+    form.setFieldValue('hash.value', '');
+    form.setFieldValue('state.uploading', false);
+    form.setFieldValue('state.uploadProgress', null);
+    form.setFieldValue('state.uuid', generateUUID());
+
     FLOW.cancel();
     FLOW.off('complete');
     FLOW.off('fileError');
@@ -904,19 +903,18 @@ const AnalyzeButton = React.memo(() => {
 
   const handleSubmitFile = useCallback(
     () => {
+      closeSnackbar();
       const file = form.getFieldValue('file');
-      const metadata = form.getFieldValue('metadata');
-      const settings = form.getFieldValue('settings');
       const size = form.getFieldValue('file.size');
-      const submissionProfile = form.getFieldValue('state.profile');
       const uuid = form.getFieldValue('state.uuid');
+      const params = form.getFieldValue('settings');
+      const metadata = form.getFieldValue('metadata');
+      const profile = form.getFieldValue('state.profile');
 
-      form.setStore(s => {
-        s.state.disabled = true;
-        s.state.isUploading = true;
-        s.state.uploadProgress = 0;
-        return s;
-      });
+      form.setFieldValue('state.disabled', true);
+      form.setFieldValue('state.uploading', true);
+      form.setFieldValue('state.uploadProgress', 0);
+      form.setFieldValue('state.confirmation', false);
 
       FLOW.opts.generateUniqueIdentifier = selectedFile => {
         const relativePath =
@@ -972,10 +970,12 @@ const AnalyzeButton = React.memo(() => {
           url: `/api/v4/ui/start/${uuid}/`,
           method: 'POST',
           body: {
-            ...applySubmissionProfile(settings, submissionProfile),
-            submission_profile: submissionProfile,
+            ...parseSubmissionProfile(settings, params, profile),
+            submission_profile: profile,
             filename: file.path,
-            metadata: metadata
+            metadata: !isValidJSON(metadata.extra)
+              ? metadata.config
+              : { ...(JSON.parse(metadata.extra) as object), ...metadata.config }
           },
           onSuccess: ({ api_response }) => {
             showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
@@ -984,14 +984,6 @@ const AnalyzeButton = React.memo(() => {
             }, 500);
           },
           onFailure: ({ api_status_code, api_error_message }) => {
-            if (api_status_code === 400 && api_error_message.includes('metadata')) {
-              form.setStore(s => {
-                s.state.disabled = false;
-                s.state.tab = 'options';
-                return s;
-              });
-            }
-
             if ([400, 403, 404, 503].includes(api_status_code)) {
               showErrorMessage(api_error_message);
             } else {
@@ -999,6 +991,10 @@ const AnalyzeButton = React.memo(() => {
             }
 
             handleCancel();
+          },
+          onExit: () => {
+            form.setFieldValue('state.disabled', false);
+            form.setFieldValue('state.uploading', false);
           }
         });
       });
@@ -1007,81 +1003,69 @@ const AnalyzeButton = React.memo(() => {
       FLOW.upload();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [form, handleCancel, t]
+    [form, handleCancel, navigate, settings, showErrorMessage, showSuccessMessage, t]
   );
 
   const handleSubmitHash = useCallback(
-    (store: SubmitStore) => {
-      if (store.hash.hasError) {
-        showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
-        return;
-      }
+    () => {
+      closeSnackbar();
+
+      const hash = form.getFieldValue('hash');
+      const params = form.getFieldValue('settings');
+      const metadata = form.getFieldValue('metadata');
+      const profile = form.getFieldValue('state.profile');
 
       apiCall<Submission>({
         url: '/api/v4/submit/',
         method: 'POST',
         body: {
-          ui_params: applySubmissionProfile(store.settings, store.state.profile),
-          submission_profile: store.state.profile,
-          [store.hash.type]: store.hash.value,
-          metadata: store.metadata
+          ui_params: parseSubmissionProfile(settings, params, profile),
+          submission_profile: profile,
+          [hash.type]: hash.value,
+          metadata: !isValidJSON(metadata.extra)
+            ? metadata.config
+            : { ...(JSON.parse(metadata.extra) as object), ...metadata.config }
         },
         onSuccess: ({ api_response }) => {
           showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
-          form.setStore(s => {
-            s.state.disabled = false;
-            s.state.isUploading = false;
-            s.state.isConfirmationOpen = false;
-            return s;
-          });
           setTimeout(() => {
             navigate(`/submission/detail/${api_response.sid}`);
           }, 500);
         },
-        onFailure: ({ api_status_code, api_error_message }) => {
+        onFailure: ({ api_error_message }) => {
           showErrorMessage(api_error_message);
-          if (api_status_code === 400 && api_error_message.includes('metadata')) {
-            form.setStore(s => {
-              s.state.tab = 'options';
-              return s;
-            });
-          }
-
-          form.setStore(s => {
-            s.hash.hasError = true;
-            s.state.disabled = false;
-            s.state.isUploading = false;
-            s.state.isConfirmationOpen = false;
-            return s;
-          });
         },
         onEnter: () => {
-          form.setStore(s => {
-            s.state.disabled = true;
-            s.state.isUploading = true;
-            return s;
-          });
+          form.setFieldValue('state.disabled', true);
+          form.setFieldValue('state.uploading', true);
+          form.setFieldValue('state.confirmation', false);
+        },
+        onExit: () => {
+          form.setFieldValue('state.disabled', false);
+          form.setFieldValue('state.uploading', false);
         }
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [configuration.ui.allow_url_submissions, currentUser, form, t]
+    [form, navigate, settings, showErrorMessage, showSuccessMessage, t]
   );
 
   return (
-    <form.Subscribe
-      selector={state => [isSubmissionValid(state.values, configuration)]}
-      children={([valid]) => (
-        <Button disabled={!valid} onClick={() => {}}>
-          {t('analyze')}
-        </Button>
-      )}
-    />
+    <DialogActions sx={{ paddingTop: 0 }}>
+      <Button onClick={() => handleCancel()}>{t('cancel')}</Button>
+      <form.Subscribe
+        selector={state => [state.values.state.tab, isSubmissionValid(state.values, configuration)]}
+        children={([tab, valid]) => (
+          <Button disabled={!valid} onClick={() => (tab === 'file' ? handleSubmitFile() : handleSubmitHash())}>
+            {t('analyze')}
+          </Button>
+        )}
+      />
+    </DialogActions>
   );
 });
 
 export const AnalysisConfirmation = React.memo(() => {
-  const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const form = useForm();
 
@@ -1104,10 +1088,7 @@ export const AnalysisConfirmation = React.memo(() => {
 
             <ToS />
 
-            <DialogActions>
-              <Button onClick={() => form.setFieldValue('state.confirmation', false)}>{t('cancel')}</Button>
-              <AnalyzeButton />
-            </DialogActions>
+            <AnalysisActions />
           </Dialog>
         );
       }}
