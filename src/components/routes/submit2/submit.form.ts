@@ -51,7 +51,7 @@ export type SubmitStore = {
   };
 
   /** Details of the file input  */
-  file: File & { relativePath: string; fileName: string; path: string };
+  file: File & { relativePath: string; fileName: string; path: string; hash: string };
 
   /** Details of the hash input */
   hash: { type: HashPatternMap; value: string };

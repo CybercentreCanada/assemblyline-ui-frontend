@@ -60,7 +60,7 @@ export const switchProfile = (
 export const isValidJSON = (value: string): string => {
   try {
     if (!value) return null;
-    JSON.parse(value);
+    const data = JSON.parse(value) as object;
   } catch (e) {
     return `${e}`;
   }
@@ -121,3 +121,26 @@ export const isSubmissionValid = (values: SubmitStore, configuration: Configurat
 
   return true;
 };
+
+export const calculateFileHash = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = async e => {
+      const data = e.target.result as ArrayBuffer;
+      try {
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        resolve(hashHex);
+      } catch (error) {
+        reject(`Hashing failed: ${error}`);
+      }
+    };
+    reader.onerror = () => {
+      reject('File reading failed');
+    };
+    reader.readAsArrayBuffer(file);
+  });
+
+export const getHashQuery = (type: string, value: string) =>
+  type === 'file' ? `sha256:"${value}"` : `${type}:"${value}"`;

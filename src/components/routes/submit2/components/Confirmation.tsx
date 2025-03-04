@@ -17,7 +17,7 @@ import useALContext from 'components/hooks/useALContext';
 import type { APIResponseProps } from 'components/hooks/useMyAPI';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { Metadata } from 'components/models/base/config';
+import type { HashPatternMap, Metadata } from 'components/models/base/config';
 import type { Submission } from 'components/models/base/submission';
 import { parseSubmissionProfile } from 'components/routes/settings/settings.utils';
 import type { SubmitStore } from 'components/routes/submit2/submit.form';
@@ -376,7 +376,7 @@ const SupplementaryOptions = React.memo(() => {
           <form.Subscribe
             selector={state => [
               state.values.state.tab === 'hash',
-              ...((configuration.submission.file_sources?.[state.values.state.tab]?.sources || []) as string[])
+              ...(configuration.submission.file_sources?.[state.values.state.tab as HashPatternMap]?.sources || [])
             ]}
             children={([render, ...sources]) =>
               !render || sources.length === 0 ? null : (
@@ -594,8 +594,8 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                 <NumberInput
                   {...(props as NumberInputProps)}
                   value={value as number}
-                  min={metadata?.validator_params?.min}
-                  max={metadata?.validator_params?.max}
+                  min={metadata?.validator_params?.min as number}
+                  max={metadata?.validator_params?.max as number}
                   reset={!!value}
                 />
               );
@@ -607,7 +607,7 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   options={options}
                   reset={!!value}
                   error={v => handleValid(v)}
-                  tooltip={metadata?.validator_params?.validation_regex || null}
+                  tooltip={(metadata?.validator_params?.validation_regex || null) as string}
                   tooltipProps={{ placement: 'right' }}
                 />
               );
@@ -663,7 +663,7 @@ const SubmissionMetadata = React.memo(() => {
                       language="json"
                       value={data}
                       error={!!error}
-                      options={{ readOnly: disabled || !customize }}
+                      options={{ readOnly: disabled }}
                       onChange={v => form.setFieldValue('metadata.extra', v)}
                     />
                     {error && (
@@ -760,99 +760,97 @@ const ServiceParameters = React.memo(() => {
                   selector={state =>
                     state.values.settings.service_spec[i].params.some(param => param.value !== param.default)
                   }
-                  children={hasParams =>
-                    !hasParams ? null : (
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Typography color="textSecondary" variant="body2">
-                          {spec.name}
-                        </Typography>
+                  children={hasParams => (
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <Typography color="textSecondary" variant="body2">
+                        {spec.name}
+                      </Typography>
 
-                        {spec.params.map((param, j) => (
-                          <form.Subscribe
-                            key={`${spec.name}-${param.name}-${j}`}
-                            selector={state => {
-                              const p = state.values.settings.service_spec[i].params[j];
-                              return p.value !== p.default;
-                            }}
-                            children={hasParam =>
-                              !hasParam ? null : (
-                                <div key={`${param.name}-${j}`}>
-                                  <Typography component="span" variant="body2" textTransform="capitalize">
-                                    {`${param.name.replace(/_/g, ' ')}: `}
-                                  </Typography>
+                      {spec.params.map((param, j) => (
+                        <form.Subscribe
+                          key={`${spec.name}-${param.name}-${j}`}
+                          selector={state => {
+                            const p = state.values.settings.service_spec[i].params[j];
+                            return true;
+                          }}
+                          children={hasParam =>
+                            !hasParam ? null : (
+                              <div key={`${param.name}-${j}`}>
+                                <Typography component="span" variant="body2" textTransform="capitalize">
+                                  {`${param.name.replace(/_/g, ' ')}: `}
+                                </Typography>
 
-                                  {(() => {
-                                    switch (param.type) {
-                                      case 'bool':
-                                        return (
-                                          <Typography
-                                            component="span"
-                                            variant="body2"
-                                            sx={{
-                                              color:
-                                                theme.palette.mode === 'dark'
-                                                  ? theme.palette.info.light
-                                                  : theme.palette.info.dark
-                                            }}
-                                          >
-                                            {param.value ? 'true' : 'false'}
-                                          </Typography>
-                                        );
-                                      case 'int':
-                                        return (
-                                          <Typography
-                                            component="span"
-                                            variant="body2"
-                                            sx={{
-                                              color:
-                                                theme.palette.mode === 'dark'
-                                                  ? theme.palette.success.light
-                                                  : theme.palette.success.dark
-                                            }}
-                                          >
-                                            {param.value}
-                                          </Typography>
-                                        );
-                                      case 'str':
-                                        return (
-                                          <Typography
-                                            component="span"
-                                            variant="body2"
-                                            sx={{
-                                              color:
-                                                theme.palette.mode === 'dark'
-                                                  ? theme.palette.warning.light
-                                                  : theme.palette.warning.dark
-                                            }}
-                                          >
-                                            {`"${param.value}"`}
-                                          </Typography>
-                                        );
-                                      case 'list':
-                                        return (
-                                          <Typography
-                                            component="span"
-                                            variant="body2"
-                                            sx={{
-                                              color:
-                                                theme.palette.mode === 'dark'
-                                                  ? theme.palette.warning.dark
-                                                  : theme.palette.warning.light
-                                            }}
-                                          >
-                                            {`"${param.value}"`}
-                                          </Typography>
-                                        );
-                                    }
-                                  })()}
-                                </div>
-                              )
-                            }
-                          />
-                        ))}
-                      </div>
-                    )
-                  }
+                                {(() => {
+                                  switch (param.type) {
+                                    case 'bool':
+                                      return (
+                                        <Typography
+                                          component="span"
+                                          variant="body2"
+                                          sx={{
+                                            color:
+                                              theme.palette.mode === 'dark'
+                                                ? theme.palette.info.light
+                                                : theme.palette.info.dark
+                                          }}
+                                        >
+                                          {param.value ? 'true' : 'false'}
+                                        </Typography>
+                                      );
+                                    case 'int':
+                                      return (
+                                        <Typography
+                                          component="span"
+                                          variant="body2"
+                                          sx={{
+                                            color:
+                                              theme.palette.mode === 'dark'
+                                                ? theme.palette.success.light
+                                                : theme.palette.success.dark
+                                          }}
+                                        >
+                                          {param.value}
+                                        </Typography>
+                                      );
+                                    case 'str':
+                                      return (
+                                        <Typography
+                                          component="span"
+                                          variant="body2"
+                                          sx={{
+                                            color:
+                                              theme.palette.mode === 'dark'
+                                                ? theme.palette.warning.light
+                                                : theme.palette.warning.dark
+                                          }}
+                                        >
+                                          {`"${param.value}"`}
+                                        </Typography>
+                                      );
+                                    case 'list':
+                                      return (
+                                        <Typography
+                                          component="span"
+                                          variant="body2"
+                                          sx={{
+                                            color:
+                                              theme.palette.mode === 'dark'
+                                                ? theme.palette.warning.dark
+                                                : theme.palette.warning.light
+                                          }}
+                                        >
+                                          {`"${param.value}"`}
+                                        </Typography>
+                                      );
+                                  }
+                                })()}
+                              </div>
+                            )
+                          }
+                        />
+                      ))}
+                    </div>
+                  )}
                 />
               ))
         }
@@ -911,7 +909,6 @@ const AnalysisActions = React.memo(() => {
       const metadata = form.getFieldValue('metadata');
       const profile = form.getFieldValue('state.profile');
 
-      form.setFieldValue('state.disabled', true);
       form.setFieldValue('state.uploading', true);
       form.setFieldValue('state.uploadProgress', 0);
       form.setFieldValue('state.confirmation', false);
@@ -950,10 +947,7 @@ const AnalysisActions = React.memo(() => {
       });
 
       FLOW.on('progress', () => {
-        form.setStore(s => {
-          s.state.uploadProgress = Math.trunc(FLOW.progress() * 100);
-          return s;
-        });
+        form.setFieldValue('state.uploadProgress', Math.trunc(FLOW.progress() * 100));
       });
 
       FLOW.on('complete', () => {
@@ -984,16 +978,11 @@ const AnalysisActions = React.memo(() => {
             }, 500);
           },
           onFailure: ({ api_status_code, api_error_message }) => {
-            if ([400, 403, 404, 503].includes(api_status_code)) {
-              showErrorMessage(api_error_message);
-            } else {
-              showErrorMessage(t('submit.file.failure'));
-            }
-
+            if ([400, 403, 404, 503].includes(api_status_code)) showErrorMessage(api_error_message);
+            else showErrorMessage(t('submit.file.failure'));
             handleCancel();
           },
           onExit: () => {
-            form.setFieldValue('state.disabled', false);
             form.setFieldValue('state.uploading', false);
           }
         });
@@ -1036,12 +1025,10 @@ const AnalysisActions = React.memo(() => {
           showErrorMessage(api_error_message);
         },
         onEnter: () => {
-          form.setFieldValue('state.disabled', true);
           form.setFieldValue('state.uploading', true);
           form.setFieldValue('state.confirmation', false);
         },
         onExit: () => {
-          form.setFieldValue('state.disabled', false);
           form.setFieldValue('state.uploading', false);
         }
       });
@@ -1073,6 +1060,7 @@ export const AnalysisConfirmation = React.memo(() => {
     <form.Subscribe
       selector={state => [state.values.state.confirmation]}
       children={([open]) => {
+        console.log(form.getFieldValue('file'));
         return (
           <Dialog fullWidth maxWidth="md" open={open} onClose={() => form.setFieldValue('state.confirmation', false)}>
             <Title />

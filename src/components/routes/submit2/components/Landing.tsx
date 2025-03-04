@@ -1,13 +1,21 @@
 import PublishIcon from '@mui/icons-material/Publish';
+import SearchIcon from '@mui/icons-material/Search';
 import TuneIcon from '@mui/icons-material/Tune';
-import { Alert, Typography, useTheme } from '@mui/material';
+import { Alert, CircularProgress, ListItemText, Button as MuiButton, Typography, useTheme } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import useALContext from 'components/hooks/useALContext';
+import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { File } from 'components/models/base/file';
+import type { SearchResult } from 'components/models/ui/search';
 import { getProfileNames } from 'components/routes/settings/settings.utils';
 import type { SubmitStore } from 'components/routes/submit2/submit.form';
 import { FLOW, useForm } from 'components/routes/submit2/submit.form';
-import { switchProfile } from 'components/routes/submit2/submit.utils';
+import { calculateFileHash, getHashQuery, switchProfile } from 'components/routes/submit2/submit.utils';
 import { Button } from 'components/visual/Buttons/Button';
 import Classification from 'components/visual/Classification';
 import FileDropper from 'components/visual/FileDropper';
@@ -16,7 +24,7 @@ import { TextInput } from 'components/visual/Inputs/TextInput';
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -86,7 +94,18 @@ const FileInput = React.memo(() => {
         <div style={{ width: '100%' }}>
           <FileDropper
             file={file as SubmitStore['file']}
-            setFile={(value: SubmitStore['file']) => form.setFieldValue('file', value)}
+            setFile={(value: SubmitStore['file']) => {
+              form.setFieldValue('file', value);
+
+              calculateFileHash(value)
+                .then((hash: string) =>
+                  form.setFieldValue('file', f => {
+                    f.hash = hash;
+                    return f;
+                  })
+                )
+                .catch(e => console.error(e));
+            }}
             disabled={(loading || disabled || uploading) as boolean}
           />
         </div>
@@ -226,6 +245,146 @@ const CancelButton = React.memo(() => {
   );
 });
 
+const FindButton = React.memo(() => {
+  const { t } = useTranslation(['submit']);
+  const theme = useTheme();
+  const form = useForm();
+  const { apiCall } = useMyAPI();
+
+  const [type, setType] = useState<SubmitStore['hash']['type'] | 'file'>(null);
+  const [hash, setHash] = useState<string>(null);
+  const [results, setResults] = useState<SearchResult<File>>(null);
+  const [open, setOpen] = useState<boolean>(false);
+  const [fetching, setFetching] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!type || !hash || !open) return;
+
+    apiCall<SearchResult<File>>({
+      method: 'POST',
+      url: '/api/v4/search/file/',
+      body: {
+        query: getHashQuery(type, hash),
+        offset: 0,
+        rows: 1
+      },
+      onSuccess: api_data => setResults(api_data.api_response),
+      onEnter: () => setFetching(true),
+      onExit: () => setFetching(false)
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hash, open, type]);
+
+  return (
+    <>
+      <form.Subscribe
+        selector={state => [state.values.state.tab, state.values.file, state.values.hash.type]}
+        children={([tab, file, hashType]) =>
+          (tab === 'file' && !file) || (tab === 'hash' && !hashType) ? null : (
+            <Dialog open={open} onClose={() => setOpen(false)}>
+              <DialogTitle>
+                <ListItemText
+                  primary={
+                    <>
+                      <span>{'Find '}</span>
+                      {tab === 'file' ? (
+                        'File'
+                      ) : (
+                        <span style={{ textTransform: 'uppercase' }}>{hashType as string}</span>
+                      )}
+                    </>
+                  }
+                  secondary={tab === 'file' ? (file as SubmitStore['file']).hash : hash}
+                  primaryTypographyProps={{ variant: 'h6' }}
+                />
+              </DialogTitle>
+              <DialogContent>
+                {fetching ? (
+                  <Alert
+                    variant="outlined"
+                    icon={<CircularProgress style={{ height: '22px', width: '22px' }} />}
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      border: `1px solid ${theme.palette.text.secondary}`
+                    }}
+                  >
+                    {'Searching for matching files'}
+                  </Alert>
+                ) : results.total > 0 ? (
+                  <Alert
+                    variant="outlined"
+                    severity="success"
+                    sx={{ backgroundColor: `${theme.palette.success.main}10` }}
+                  >
+                    {'A file matching your input was found!'}
+                  </Alert>
+                ) : (
+                  <Alert variant="outlined" severity="error" sx={{ backgroundColor: `${theme.palette.error.main}10` }}>
+                    {'No files matching your input were found.'}
+                  </Alert>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <div style={{ flex: 1 }}>
+                  <Button onClick={() => setOpen(false)}>{'Close'}</Button>
+                </div>
+
+                <MuiButton
+                  component={Link}
+                  autoFocus
+                  to={`/file/detail/${results?.items?.[0]?.sha256}`}
+                  disabled={fetching || !results?.items?.[0]?.sha256}
+                  onClick={() => setOpen(false)}
+                >
+                  {'Navigate to File'}
+                </MuiButton>
+              </DialogActions>
+            </Dialog>
+          )
+        }
+      />
+      <form.Subscribe
+        selector={state => [
+          state.values.state.loading,
+          state.values.state.disabled,
+          state.values.state.uploading,
+          state.values.state.customize,
+          state.values.state.tab,
+          state.values.file,
+          state.values.hash.type,
+          state.values.hash.value
+        ]}
+        children={([loading, disabled, uploading, customize, tab, file, hashType, hashValue]) => (
+          <Button
+            color="secondary"
+            disabled={(disabled || (tab === 'file' ? !file : tab === 'hash' ? !hashType : false)) as boolean}
+            loading={(loading || uploading) as boolean}
+            startIcon={<SearchIcon />}
+            preventRender={!customize}
+            tooltip={t('find.button.tooltip')}
+            tooltipProps={{ placement: 'bottom' }}
+            variant="contained"
+            onClick={() => {
+              setOpen(true);
+
+              if (tab === 'file') {
+                setType('file');
+                setHash((file as SubmitStore['file']).hash);
+              } else if (tab === 'hash') {
+                setType(hashType as SubmitStore['hash']['type'] | 'file');
+                setHash(hashValue as string);
+              }
+            }}
+          >
+            {t('find.button.label')}
+          </Button>
+        )}
+      />
+    </>
+  );
+});
+
 const AdjustButton = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
@@ -265,6 +424,35 @@ export const AnalyzeButton = React.memo(() => {
   const { configuration } = useALContext();
   const form = useForm();
 
+  const handleOpenConfirmation = useCallback(() => {
+    const tab = form.getFieldValue('state.tab');
+    const hashType = form.getFieldValue('hash.type');
+    form.setFieldValue('state.confirmation', s => !s);
+
+    if (tab === 'file') {
+      form.setFieldValue('settings.description.value', `Inspection of file: ${form.getFieldValue('file.name')}`);
+    } else if (tab === 'hash') {
+      form.setFieldValue(
+        'settings.description.value',
+        `Inspection of ${form.getFieldValue('hash.type').toUpperCase()}: ${form.getFieldValue('hash.value')}`
+      );
+    }
+
+    if (tab === 'hash' && hashType === 'url') {
+      form.setFieldValue('settings.services', categories => {
+        categories.forEach((category, i) => {
+          category.services.forEach((service, j) => {
+            if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
+              categories[i].services[j].selected = true;
+            }
+          });
+          categories[i].selected = categories[i].services.every(svr => svr.selected);
+        });
+        return categories;
+      });
+    }
+  }, [configuration.ui.url_submission_auto_service_selection, form]);
+
   return (
     <form.Subscribe
       selector={state => [
@@ -283,35 +471,7 @@ export const AnalyzeButton = React.memo(() => {
           tooltip={t('analyze.button.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           variant="contained"
-          onClick={() => {
-            form.setFieldValue('state.confirmation', s => !s);
-
-            if (tab === 'file') {
-              form.setFieldValue(
-                'settings.description.value',
-                `Inspection of file: ${form.getFieldValue('file.name')}`
-              );
-            } else if (tab === 'hash') {
-              form.setFieldValue(
-                'settings.description.value',
-                `Inspection of ${form.getFieldValue('hash.type').toUpperCase()}: ${form.getFieldValue('hash.value')}`
-              );
-            }
-
-            if (tab === 'hash' && (hash as SubmitStore['hash']['type']) === 'url') {
-              form.setFieldValue('settings.services', categories => {
-                categories.forEach((category, i) => {
-                  category.services.forEach((service, j) => {
-                    if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
-                      categories[i].services[j].selected = true;
-                    }
-                  });
-                  categories[i].selected = categories[i].services.every(svr => svr.selected);
-                });
-                return categories;
-              });
-            }
-          }}
+          onClick={() => handleOpenConfirmation()}
         >
           {t('analyze.button.label')}
         </Button>
@@ -412,6 +572,7 @@ export const Landing = React.memo(
               <CancelButton />
             </div>
 
+            <FindButton />
             <AdjustButton />
             <AnalyzeButton />
           </div>
