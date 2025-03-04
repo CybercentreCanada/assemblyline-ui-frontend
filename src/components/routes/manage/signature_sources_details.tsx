@@ -482,26 +482,16 @@ const WrappedSourceDetail = ({
                     {postFetch && (
                       <Grid item xs={12}>
                         <div className={classes.label}>{t('post_data')}</div>
-                        <JSONEditor
-                          name={false}
-                          src={source.post_data}
-                          enableClipboard={false}
-                          groupArraysAfterLength={10}
-                          displayDataTypes={false}
-                          displayObjectSize={false}
-                          onAdd={handlePostDataChange}
-                          onDelete={handlePostDataChange}
-                          onEdit={handlePostDataChange}
-                          collapsed={true}
-                          style={{
-                            border: `1px solid ${theme.palette.divider}`,
-                            borderRadius: '4px',
-                            fontSize: '1rem',
-                            minHeight: theme.spacing(5),
-                            padding: '4px',
-                            overflowX: 'auto',
-                            width: '100%'
-                          }}
+                        <TextField
+                          id="post_data"
+                          size="small"
+                          value={source.post_data}
+                          multiline
+                          rows={6}
+                          fullWidth
+                          variant="outlined"
+                          InputProps={{ style: { fontFamily: 'monospace' } }}
+                          onChange={handleFieldChange}
                         />
                       </Grid>
                     )}
