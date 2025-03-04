@@ -344,7 +344,7 @@ describe('Test `getValueFromPath`', () => {
 });
 
 describe('Test `getProvider`', () => {
-  let loc = { ...window.location };
+  const loc = { ...window.location };
   afterEach(() => {
     window.location = loc;
   });
@@ -391,7 +391,7 @@ describe('Test `getProvider`', () => {
 });
 
 describe('Test `searchResultsDisplay`', () => {
-  let loc = { ...window.location };
+  const loc = { ...window.location };
   afterEach(() => {
     window.location = loc;
   });
