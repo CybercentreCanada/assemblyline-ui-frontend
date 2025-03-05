@@ -14,8 +14,14 @@ import { useLocation } from 'react-router';
 import { AnalysisConfirmation } from './components/Confirmation';
 import { Customize } from './components/Customize';
 import { Landing } from './components/Landing';
+import type { SubmitState } from './submit.form';
 import { useForm } from './submit.form';
-import { getDefaultExternalSources, getDefaultMetadata, getPreferredSubmissionProfile } from './submit.utils';
+import {
+  getDefaultExternalSources,
+  getDefaultMetadata,
+  getPreferredSubmissionProfile,
+  isValidJSON
+} from './submit.utils';
 
 const WrappedSubmitRoute = () => {
   const location = useLocation();
@@ -30,9 +36,12 @@ const WrappedSubmitRoute = () => {
 
   useEffect(() => {
     closeSnackbar();
-    form.setFieldValue('settings', initializeSettings({ ...settings, ...MOCK_SETTINGS }));
+
     form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('submission_create'));
     form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
+
+    // to do: Remove the mock settings
+    form.setFieldValue('settings', initializeSettings({ ...settings, ...MOCK_SETTINGS }));
     const profile = getPreferredSubmissionProfile(settings);
     form.setFieldValue('state.profile', profile);
     if (profile === 'default') form.setFieldValue('settings', s => loadDefaultProfile(s, settings));
@@ -41,22 +50,38 @@ const WrappedSubmitRoute = () => {
         loadSubmissionProfile(s, settings, configuration.submission.profiles, profile)
       );
     form.setFieldValue('settings.default_external_sources', getDefaultExternalSources(settings, configuration));
-    const submitParams = new URLSearchParams(location.search);
-    const hashParam = submitParams.get('hash');
-    if (hashParam) {
-      const [type, value] = getSubmitType(hashParam, configuration);
+
+    const search = new URLSearchParams(location.search);
+    const state = location.state as SubmitState;
+
+    if (state?.c12n) {
+      form.setFieldValue('settings.classification.value', state.c12n);
+    } else if (search.get('classification')) {
+      form.setFieldValue('settings.classification.value', search.get('classification'));
+    }
+
+    if (state?.hash) {
+      const [type, value] = getSubmitType(state?.hash || '', configuration);
+      form.setFieldValue('state.tab', 'hash');
+      form.setFieldValue('hash.type', type);
+      form.setFieldValue('hash.value', value);
+    } else if (search.get('hash')) {
+      const [type, value] = getSubmitType(search.get('hash'), configuration);
       form.setFieldValue('state.tab', 'hash');
       form.setFieldValue('hash.type', type);
       form.setFieldValue('hash.value', value);
     }
-    const classification = submitParams.get('classification');
-    if (classification) form.setFieldValue('settings.classification.value', classification);
-    const metadata = JSON.parse(submitParams.get('metadata')) as Record<string, unknown>;
-    form.setFieldValue('metadata.config', v => getDefaultMetadata(v, configuration, metadata));
-    form.setFieldValue('state.loading', false);
 
+    if (state?.metadata && typeof state.metadata === 'object' && Object.keys(state.metadata).length > 0) {
+      form.setFieldValue('metadata', getDefaultMetadata(state.metadata, configuration));
+    } else if (isValidJSON(search.get('metadata'))) {
+      const metadata = JSON.parse(search.get('metadata')) as object;
+      form.setFieldValue('metadata', getDefaultMetadata(metadata, configuration));
+    }
+
+    form.setFieldValue('state.loading', false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [closeSnackbar, configuration, currentUser, form, settings]);
+  }, [configuration, currentUser, settings]);
 
   return (
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">

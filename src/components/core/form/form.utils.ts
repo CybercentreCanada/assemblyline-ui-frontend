@@ -1,4 +1,4 @@
-import type { NestedTypeUsingTuplesAgain2, ValidPathTuples } from './models';
+import type { NestedTypeUsingTuplesAgain2, ValidPathTuples } from './form.models';
 
 export type FieldPath<Data> = Data extends any[]
   ? { [K in keyof Data]: FieldPath<Data[K]> }

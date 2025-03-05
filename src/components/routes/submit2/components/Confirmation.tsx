@@ -661,7 +661,7 @@ const SubmissionMetadata = React.memo(() => {
                     </Typography>
                     <MonacoEditor
                       language="json"
-                      value={data}
+                      value={data as string}
                       error={!!error}
                       options={{ readOnly: disabled }}
                       onChange={v => form.setFieldValue('metadata.extra', v)}
@@ -750,107 +750,109 @@ const ServiceParameters = React.memo(() => {
       }}
     >
       <form.Subscribe
-        selector={state => state.values.settings.service_spec}
-        children={specs =>
+        selector={state => [state.values.state.confirmation, state.values.settings.service_spec]}
+        children={([open, specs]) =>
           !open
             ? null
-            : specs.map((spec, i) => (
+            : (specs as SubmitStore['settings']['service_spec']).map((spec, i) => (
                 <form.Subscribe
                   key={`${spec.name}-${i}`}
                   selector={state =>
                     state.values.settings.service_spec[i].params.some(param => param.value !== param.default)
                   }
-                  children={hasParams => (
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <Typography color="textSecondary" variant="body2">
-                        {spec.name}
-                      </Typography>
+                  children={hasParams =>
+                    !hasParams ? null : (
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <Typography color="textSecondary" variant="body2">
+                          {spec.name}
+                        </Typography>
 
-                      {spec.params.map((param, j) => (
-                        <form.Subscribe
-                          key={`${spec.name}-${param.name}-${j}`}
-                          selector={state => {
-                            const p = state.values.settings.service_spec[i].params[j];
-                            return true;
-                          }}
-                          children={hasParam =>
-                            !hasParam ? null : (
-                              <div key={`${param.name}-${j}`}>
-                                <Typography component="span" variant="body2" textTransform="capitalize">
-                                  {`${param.name.replace(/_/g, ' ')}: `}
-                                </Typography>
+                        {spec.params.map((param, j) => (
+                          <form.Subscribe
+                            key={`${spec.name}-${param.name}-${j}`}
+                            selector={state => {
+                              const p = state.values.settings.service_spec[i].params[j];
+                              return p.value !== p.default;
+                            }}
+                            children={hasParam =>
+                              !hasParam ? null : (
+                                <div key={`${param.name}-${j}`}>
+                                  <Typography component="span" variant="body2" textTransform="capitalize">
+                                    {`${param.name.replace(/_/g, ' ')}: `}
+                                  </Typography>
 
-                                {(() => {
-                                  switch (param.type) {
-                                    case 'bool':
-                                      return (
-                                        <Typography
-                                          component="span"
-                                          variant="body2"
-                                          sx={{
-                                            color:
-                                              theme.palette.mode === 'dark'
-                                                ? theme.palette.info.light
-                                                : theme.palette.info.dark
-                                          }}
-                                        >
-                                          {param.value ? 'true' : 'false'}
-                                        </Typography>
-                                      );
-                                    case 'int':
-                                      return (
-                                        <Typography
-                                          component="span"
-                                          variant="body2"
-                                          sx={{
-                                            color:
-                                              theme.palette.mode === 'dark'
-                                                ? theme.palette.success.light
-                                                : theme.palette.success.dark
-                                          }}
-                                        >
-                                          {param.value}
-                                        </Typography>
-                                      );
-                                    case 'str':
-                                      return (
-                                        <Typography
-                                          component="span"
-                                          variant="body2"
-                                          sx={{
-                                            color:
-                                              theme.palette.mode === 'dark'
-                                                ? theme.palette.warning.light
-                                                : theme.palette.warning.dark
-                                          }}
-                                        >
-                                          {`"${param.value}"`}
-                                        </Typography>
-                                      );
-                                    case 'list':
-                                      return (
-                                        <Typography
-                                          component="span"
-                                          variant="body2"
-                                          sx={{
-                                            color:
-                                              theme.palette.mode === 'dark'
-                                                ? theme.palette.warning.dark
-                                                : theme.palette.warning.light
-                                          }}
-                                        >
-                                          {`"${param.value}"`}
-                                        </Typography>
-                                      );
-                                  }
-                                })()}
-                              </div>
-                            )
-                          }
-                        />
-                      ))}
-                    </div>
-                  )}
+                                  {(() => {
+                                    switch (param.type) {
+                                      case 'bool':
+                                        return (
+                                          <Typography
+                                            component="span"
+                                            variant="body2"
+                                            sx={{
+                                              color:
+                                                theme.palette.mode === 'dark'
+                                                  ? theme.palette.info.light
+                                                  : theme.palette.info.dark
+                                            }}
+                                          >
+                                            {param.value ? 'true' : 'false'}
+                                          </Typography>
+                                        );
+                                      case 'int':
+                                        return (
+                                          <Typography
+                                            component="span"
+                                            variant="body2"
+                                            sx={{
+                                              color:
+                                                theme.palette.mode === 'dark'
+                                                  ? theme.palette.success.light
+                                                  : theme.palette.success.dark
+                                            }}
+                                          >
+                                            {param.value}
+                                          </Typography>
+                                        );
+                                      case 'str':
+                                        return (
+                                          <Typography
+                                            component="span"
+                                            variant="body2"
+                                            sx={{
+                                              color:
+                                                theme.palette.mode === 'dark'
+                                                  ? theme.palette.warning.light
+                                                  : theme.palette.warning.dark
+                                            }}
+                                          >
+                                            {`"${param.value}"`}
+                                          </Typography>
+                                        );
+                                      case 'list':
+                                        return (
+                                          <Typography
+                                            component="span"
+                                            variant="body2"
+                                            sx={{
+                                              color:
+                                                theme.palette.mode === 'dark'
+                                                  ? theme.palette.warning.dark
+                                                  : theme.palette.warning.light
+                                            }}
+                                          >
+                                            {`"${param.value}"`}
+                                          </Typography>
+                                        );
+                                    }
+                                  })()}
+                                </div>
+                              )
+                            }
+                          />
+                        ))}
+                      </div>
+                    )
+                  }
                 />
               ))
         }
@@ -1039,7 +1041,7 @@ const AnalysisActions = React.memo(() => {
 
   return (
     <DialogActions sx={{ paddingTop: 0 }}>
-      <Button onClick={() => handleCancel()}>{t('cancel')}</Button>
+      <Button onClick={() => form.setFieldValue('state.confirmation', false)}>{t('cancel')}</Button>
       <form.Subscribe
         selector={state => [state.values.state.tab, isSubmissionValid(state.values, configuration)]}
         children={([tab, valid]) => (

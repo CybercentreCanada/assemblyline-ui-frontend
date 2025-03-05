@@ -506,7 +506,7 @@ type Props = React.HTMLAttributes<HTMLDivElement> & {
 
 export const Landing = React.memo(
   React.forwardRef(({ hidden = false, ...props }: Props, ref: React.LegacyRef<HTMLDivElement>) => {
-    const { t } = useTranslation(['submit']);
+    const { t } = useTranslation('submit2');
     const theme = useTheme();
     const { configuration } = useALContext();
 

@@ -490,11 +490,10 @@ const WrappedFileDetail: React.FC<Props> = ({
                         <ListItem
                           button
                           component={Link}
-                          to={`/submit?${new URLSearchParams([
-                            ['hash', file.file_info.sha256],
-                            ['classification', file.file_info.classification],
-                            ['metadata', JSON.stringify(metadata)]
-                          ]).toString()}`}
+                          to={`/submit?hash=${file.file_info.sha256}`}
+                          state={{
+                            c12n: file.file_info.classification
+                          }}
                           dense
                           onClick={() => setResubmitAnchor(null)}
                         >

@@ -1,4 +1,4 @@
-import type { Configuration, Metadata } from 'components/models/base/config';
+import type { Configuration } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
 import {
   loadDefaultProfile,
@@ -6,9 +6,7 @@ import {
   type ProfileSettings
 } from 'components/routes/settings/settings.utils';
 import { isURL } from 'helpers/utils';
-import type { SubmitStore } from './submit.form';
-
-export type SubmitMetadata = Record<string, unknown>;
+import type { SubmitMetadata, SubmitStore } from './submit.form';
 
 export const getPreferredSubmissionProfile = (settings: UserSettings): string =>
   !settings
@@ -29,23 +27,21 @@ export const getDefaultExternalSources = (
   return { prev: sources, value: sources };
 };
 
-export const getDefaultMetadata = (
-  out: SubmitMetadata,
-  configuration: Configuration,
-  metadata: SubmitMetadata
-): SubmitMetadata => ({
-  ...out,
-  ...(Object.fromEntries(
-    Object.entries(configuration?.submission?.metadata?.submit || {}).reduce(
-      (prev: [string, unknown][], [key, value]) => {
-        if (value.default !== null) prev.push([key, value]);
-        return prev;
-      },
-      []
-    )
-  ) as Metadata),
-  ...metadata
-});
+export const getDefaultMetadata = (data: object, configuration: Configuration): SubmitMetadata => {
+  const configKeys = Object.keys(configuration?.submission?.metadata?.submit || {});
+
+  const out = Object.entries(data).reduce(
+    (prev, [key, value]) => {
+      if (configKeys.includes(key)) prev.config.push([key, value]);
+      else prev.extra.push([key, value]);
+
+      return prev;
+    },
+    { config: [], extra: [] } as { config: [string, unknown][]; extra: [string, unknown][] }
+  );
+
+  return { config: Object.fromEntries(out.config), extra: JSON.stringify(Object.fromEntries(out.extra)) };
+};
 
 export const switchProfile = (
   out: ProfileSettings,
@@ -57,7 +53,17 @@ export const switchProfile = (
     ? loadDefaultProfile(out, settings)
     : loadSubmissionProfile(out, settings, configuration.submission.profiles, name);
 
-export const isValidJSON = (value: string): string => {
+export const isValidJSON = (value: string): boolean => {
+  try {
+    if (!value) return false;
+    JSON.parse(value) as object;
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+export const isValidMetadata = (value: string): string => {
   try {
     if (!value) return null;
     const data = JSON.parse(value) as object;
@@ -65,7 +71,6 @@ export const isValidJSON = (value: string): string => {
     return `${e}`;
   }
 };
-
 export const isSubmissionValid = (values: SubmitStore, configuration: Configuration) => {
   if (values.state.tab === 'file' && !values.file) {
     return false;
