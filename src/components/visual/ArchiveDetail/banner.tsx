@@ -537,10 +537,8 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                         <ListItem
                           button
                           component={Link}
-                          to="/submit"
+                          to={`/submit?hash=${file.file_info.sha256}`}
                           state={{
-                            hash: file.file_info.sha256,
-                            tabContext: '1',
                             c12n: file.file_info.classification
                           }}
                           dense
