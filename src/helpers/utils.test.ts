@@ -346,7 +346,7 @@ describe('Test `getValueFromPath`', () => {
 describe('Test `getProvider`', () => {
   const loc = { ...window.location };
   afterEach(() => {
-    window.location = loc as Location;
+    window.location = loc as unknown as Location & string;
   });
 
   it('Should return correct provider info if pathname provides oauth', () => {
@@ -393,7 +393,7 @@ describe('Test `getProvider`', () => {
 describe('Test `searchResultsDisplay`', () => {
   const loc = { ...window.location };
   afterEach(() => {
-    window.location = loc as Location;
+    window.location = loc as unknown as Location & string;
   });
 
   it('Should return the exact count if not at the ES limit', () => {
