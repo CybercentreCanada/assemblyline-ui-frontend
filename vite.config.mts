@@ -37,6 +37,7 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       strictPort: true,
       hmr: {
+        host: `${env.EXTERNAL_IP}.nip.io`,
         overlay: false,
         path: '/ws',
         protocol: 'wss'
