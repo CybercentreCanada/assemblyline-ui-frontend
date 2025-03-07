@@ -116,8 +116,10 @@ const Submit = () => {
 
   const state: SubmitState = location.state as SubmitState;
   const params = new URLSearchParams(location.search);
-  const stringInputTitle = t('urlHash.input_title');
-  const stringInputText = stringInputTitle + t('urlHash.input_suffix');
+  const stringInputTitle: string = configuration.ui.allow_url_submissions
+    ? `${t('urlHash.input_title_hash')}/${t('urlHash.input_title_url')}`
+    : t('urlHash.input_title_hash');
+  const stringInputText: string = stringInputTitle + t('urlHash.input_suffix');
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

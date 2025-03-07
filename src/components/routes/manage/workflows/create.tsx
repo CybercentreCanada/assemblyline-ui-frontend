@@ -71,7 +71,6 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
   const { t } = useTranslation(['manageWorkflowDetail']);
   const { id: paramID } = useParams<Params>();
   const theme = useTheme();
-  const classes = useStyles();
   const location = useLocation();
   const { apiCall } = useMyAPI();
   const { c12nDef, configuration, user: currentUser } = useALContext();
@@ -168,7 +167,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
   );
 
   useEffect(() => {
-    if (!id || !currentUser.roles.includes('workflow_manage')) return;
+    if (!id || !currentUser.roles.includes('workflow_manage') || originalWorkflow) return;
 
     apiCall<Workflow>({
       url: `/api/v4/workflow/${id}/`,
@@ -188,7 +187,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.roles, id, onClose]);
+  }, [currentUser.roles, id, onClose, originalWorkflow]);
 
   useEffect(() => {
     setOriginalWorkflow(defaultWorkflow);
