@@ -507,9 +507,10 @@ type ServiceDetailProps = {
   service: string;
   sources: UpdateConfig['sources'];
   generatesSignatures: UpdateConfig['generates_signatures'];
+  updateIntervalSeconds: UpdateConfig['update_interval_seconds'];
 };
 
-const ServiceDetail = ({ service, sources, generatesSignatures }: ServiceDetailProps) => {
+const ServiceDetail = ({ service, sources, generatesSignatures, updateIntervalSeconds }: ServiceDetailProps) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const classes = useStyles();
@@ -565,7 +566,7 @@ const ServiceDetail = ({ service, sources, generatesSignatures }: ServiceDetailP
                   color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
                   margin: '-4px 0'
                 }}
-                onClick={() => openDrawer(service, null)}
+                onClick={() => openDrawer(service, { ...DEFAULT_SOURCE, update_interval: updateIntervalSeconds })}
                 size="large"
               >
                 <AddCircleOutlineOutlinedIcon />
@@ -627,7 +628,18 @@ const ServiceDetail = ({ service, sources, generatesSignatures }: ServiceDetailP
         </Collapse>
       </div>
     ),
-    [classes.title, generatesSignatures, open, openDrawer, service, sources, t, theme, triggerSourceUpdateAll]
+    [
+      classes.title,
+      generatesSignatures,
+      open,
+      openDrawer,
+      service,
+      sources,
+      t,
+      theme,
+      triggerSourceUpdateAll,
+      updateIntervalSeconds
+    ]
   );
 };
 
@@ -678,6 +690,7 @@ export default function SignatureSources() {
                 service={key}
                 sources={sources[key].sources}
                 generatesSignatures={sources[key].generates_signatures}
+                updateIntervalSeconds={sources[key].update_interval_seconds}
               />
             ))
           : [...Array(2)].map((item, i) => (

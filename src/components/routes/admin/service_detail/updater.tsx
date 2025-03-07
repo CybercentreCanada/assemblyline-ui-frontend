@@ -18,7 +18,7 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import { Service, UpdateSource } from 'components/models/base/service';
+import { DEFAULT_SOURCE, Service, UpdateSource } from 'components/models/base/service';
 import { SourceCard } from 'components/routes/manage/signature_sources';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -365,7 +365,12 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
       </Grid>
 
       <Grid item xs={12}>
-        <SourceDialog open={dialog} setOpen={setDialog} onSave={handleSaveSource} />
+        <SourceDialog
+          open={dialog}
+          source={{ ...DEFAULT_SOURCE, update_interval: service.update_config.update_interval_seconds }}
+          setOpen={setDialog}
+          onSave={handleSaveSource}
+        />
         <Button variant="contained" color="primary" onClick={() => setDialog(true)}>
           {t('updater.sources.add')}
         </Button>
