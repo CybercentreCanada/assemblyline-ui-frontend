@@ -39,7 +39,8 @@ export default defineConfig(({ mode }) => {
       hmr: {
         overlay: false,
         path: '/ws',
-        protocol: 'wss'
+        protocol: 'wss',
+        ...(env?.EXTERNAL_IP && { host: `${env.EXTERNAL_IP}.nip.io` })
       }
     },
     test: {
