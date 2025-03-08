@@ -6,7 +6,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -17,6 +16,7 @@ import type { SubmitStore } from 'components/routes/submit2/submit.form';
 import { FLOW, useForm } from 'components/routes/submit2/submit.form';
 import { calculateFileHash, getHashQuery, switchProfile } from 'components/routes/submit2/submit.utils';
 import { Button } from 'components/visual/Buttons/Button';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
 import FileDropper from 'components/visual/FileDropper';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
@@ -28,26 +28,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-const Banner = React.memo(() => {
-  const banner = useAppBanner();
-  return banner;
-});
-
-const BannerAlert = React.memo(() => {
-  const { i18n } = useTranslation(['submit']);
-  const { configuration } = useALContext();
-
-  return (
-    configuration.ui.banner && (
-      <Alert severity={configuration.ui.banner_level}>
-        {configuration.ui.banner[i18n.language] ? configuration.ui.banner[i18n.language] : configuration.ui.banner.en}
-      </Alert>
-    )
-  );
-});
-
-const ClassificationInput = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+export const ClassificationInput = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
 
@@ -65,7 +47,7 @@ const ClassificationInput = React.memo(() => {
       ]}
       children={([loading, disabled, customize, uploading, value, editable]) => (
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
-          <Typography>{t('classification')}</Typography>
+          <Typography>{t('classification.input.label')}</Typography>
           <Classification
             format="long"
             type="picker"
@@ -79,7 +61,7 @@ const ClassificationInput = React.memo(() => {
   );
 });
 
-const FileInput = React.memo(() => {
+export const FileInput = React.memo(() => {
   const form = useForm();
 
   return (
@@ -104,6 +86,7 @@ const FileInput = React.memo(() => {
                     return f;
                   })
                 )
+                // eslint-disable-next-line no-console
                 .catch(e => console.error(e));
             }}
             disabled={(loading || disabled || uploading) as boolean}
@@ -114,8 +97,8 @@ const FileInput = React.memo(() => {
   );
 });
 
-const HashInput = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+export const HashInput = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
   const { configuration } = useALContext();
   const { closeSnackbar } = useMySnackbar();
   const form = useForm();
@@ -158,8 +141,8 @@ const HashInput = React.memo(() => {
   );
 });
 
-const SubmissionProfileInput = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+export const SubmissionProfileInput = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
   const { configuration, settings } = useALContext();
   const form = useForm();
 
@@ -169,10 +152,12 @@ const SubmissionProfileInput = React.memo(() => {
         value: profileValue,
         primary:
           profileValue === 'default'
-            ? t(`profile.custom`)
+            ? t('profile.option.custom.label')
             : configuration.submission.profiles[profileValue].display_name,
         secondary:
-          profileValue === 'default' ? t(`profile.custom`) : configuration.submission.profiles[profileValue].description
+          profileValue === 'default'
+            ? t('profile.option.custom.description')
+            : configuration.submission.profiles[profileValue].description
       })),
     [configuration.submission.profiles, settings, t]
   );
@@ -186,27 +171,25 @@ const SubmissionProfileInput = React.memo(() => {
         state.values.state.profile
       ]}
       children={([loading, disabled, uploading, value]) => (
-        <div style={{ flex: 1 }}>
-          <SelectInput
-            id="submission profile name"
-            label={t('profile.input.label')}
-            value={value as string}
-            loading={loading as boolean}
-            disabled={(disabled || uploading) as boolean}
-            options={options}
-            onChange={(e, profile: string) => {
-              form.setFieldValue('state.profile', profile);
-              form.setFieldValue('settings', s => switchProfile(s, configuration, settings, profile));
-            }}
-          />
-        </div>
+        <SelectInput
+          id="submission profile name"
+          label={t('profile.input.label')}
+          value={value as string}
+          loading={loading as boolean}
+          disabled={(disabled || uploading) as boolean}
+          options={options}
+          onChange={(e, profile: string) => {
+            form.setFieldValue('state.profile', profile);
+            form.setFieldValue('settings', s => switchProfile(s, configuration, settings, profile));
+          }}
+        />
       )}
     />
   );
 });
 
-const CancelButton = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+export const CancelButton = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
   const form = useForm();
 
   return (
@@ -220,6 +203,8 @@ const CancelButton = React.memo(() => {
       ]}
       children={([loading, disabled, tab, file, hash]) => (
         <Button
+          tooltip={t('cancel.button.tooltip')}
+          tooltipProps={{ placement: 'bottom' }}
           color="primary"
           disabled={(disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)) as boolean}
           loading={loading as boolean}
@@ -238,33 +223,35 @@ const CancelButton = React.memo(() => {
             FLOW.off('progress');
           }}
         >
-          {t('file.cancel')}
+          {t('cancel.button.label')}
         </Button>
       )}
     />
   );
 });
 
-const FindButton = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+export const FindButton = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
   const theme = useTheme();
   const form = useForm();
   const { apiCall } = useMyAPI();
 
-  const [type, setType] = useState<SubmitStore['hash']['type'] | 'file'>(null);
-  const [hash, setHash] = useState<string>(null);
   const [results, setResults] = useState<SearchResult<File>>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [fetching, setFetching] = useState<boolean>(true);
+  const [query, setQuery] = useState<string>(null);
+  const [prevQuery, setPrevQuery] = useState<string>(null);
 
   useEffect(() => {
-    if (!type || !hash || !open) return;
+    if (!open || query === prevQuery) return;
+
+    setPrevQuery(query);
 
     apiCall<SearchResult<File>>({
       method: 'POST',
       url: '/api/v4/search/file/',
       body: {
-        query: getHashQuery(type, hash),
+        query: query,
         offset: 0,
         rows: 1
       },
@@ -274,20 +261,20 @@ const FindButton = React.memo(() => {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hash, open, type]);
+  }, [open, prevQuery, query]);
 
   return (
     <>
       <form.Subscribe
-        selector={state => [state.values.state.tab, state.values.file, state.values.hash.type]}
-        children={([tab, file, hashType]) =>
+        selector={state => [state.values.state.tab, state.values.file, state.values.hash.type, state.values.hash.value]}
+        children={([tab, file, hashType, hashValue]) =>
           (tab === 'file' && !file) || (tab === 'hash' && !hashType) ? null : (
             <Dialog open={open} onClose={() => setOpen(false)}>
               <DialogTitle>
                 <ListItemText
                   primary={
                     <>
-                      <span>{'Find '}</span>
+                      {t('find.button.title')}
                       {tab === 'file' ? (
                         'File'
                       ) : (
@@ -295,7 +282,7 @@ const FindButton = React.memo(() => {
                       )}
                     </>
                   }
-                  secondary={tab === 'file' ? (file as SubmitStore['file']).hash : hash}
+                  secondary={tab === 'file' ? (file as SubmitStore['file']).hash : (hashValue as string)}
                   primaryTypographyProps={{ variant: 'h6' }}
                 />
               </DialogTitle>
@@ -309,7 +296,7 @@ const FindButton = React.memo(() => {
                       border: `1px solid ${theme.palette.text.secondary}`
                     }}
                   >
-                    {'Searching for matching files'}
+                    {t('find.searching.title')}
                   </Alert>
                 ) : results.total > 0 ? (
                   <Alert
@@ -317,17 +304,17 @@ const FindButton = React.memo(() => {
                     severity="success"
                     sx={{ backgroundColor: `${theme.palette.success.main}10` }}
                   >
-                    {'A file matching your input was found!'}
+                    {t('find.found.title')}
                   </Alert>
                 ) : (
                   <Alert variant="outlined" severity="error" sx={{ backgroundColor: `${theme.palette.error.main}10` }}>
-                    {'No files matching your input were found.'}
+                    {t('find.not_found.title')}
                   </Alert>
                 )}
               </DialogContent>
               <DialogActions>
                 <div style={{ flex: 1 }}>
-                  <Button onClick={() => setOpen(false)}>{'Close'}</Button>
+                  <Button onClick={() => setOpen(false)}> {t('find.close.title')}</Button>
                 </div>
 
                 <MuiButton
@@ -337,7 +324,7 @@ const FindButton = React.memo(() => {
                   disabled={fetching || !results?.items?.[0]?.sha256}
                   onClick={() => setOpen(false)}
                 >
-                  {'Navigate to File'}
+                  {t('find.link.title')}
                 </MuiButton>
               </DialogActions>
             </Dialog>
@@ -356,37 +343,32 @@ const FindButton = React.memo(() => {
           state.values.hash.value
         ]}
         children={([loading, disabled, uploading, customize, tab, file, hashType, hashValue]) => (
-          <Button
-            color="secondary"
+          <IconButton
             disabled={(disabled || (tab === 'file' ? !file : tab === 'hash' ? !hashType : false)) as boolean}
             loading={(loading || uploading) as boolean}
-            startIcon={<SearchIcon />}
             preventRender={!customize}
             tooltip={t('find.button.tooltip')}
             tooltipProps={{ placement: 'bottom' }}
-            variant="contained"
             onClick={() => {
               setOpen(true);
 
               if (tab === 'file') {
-                setType('file');
-                setHash((file as SubmitStore['file']).hash);
+                setQuery(getHashQuery('file', (file as SubmitStore['file']).hash));
               } else if (tab === 'hash') {
-                setType(hashType as SubmitStore['hash']['type'] | 'file');
-                setHash(hashValue as string);
+                setQuery(getHashQuery(hashType as SubmitStore['hash']['type'] | 'file', hashValue as string));
               }
             }}
           >
-            {t('find.button.label')}
-          </Button>
+            <SearchIcon />
+          </IconButton>
         )}
       />
     </>
   );
 });
 
-const AdjustButton = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+export const AdjustButton = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
   const form = useForm();
 
   return (
@@ -396,31 +378,26 @@ const AdjustButton = React.memo(() => {
         state.values.state.disabled,
         state.values.state.uploading,
         state.values.state.customize,
-        state.values.state.tab,
-        !state.values.file,
-        !state.values.hash.type
+        state.values.state.adjust
       ]}
-      children={([loading, disabled, uploading, customize, tab, file, hash]) => (
-        <Button
-          color="secondary"
-          disabled={(disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)) as boolean}
-          loading={(loading || uploading) as boolean}
-          startIcon={<TuneIcon />}
+      children={([loading, disabled, uploading, customize, adjust]) => (
+        <IconButton
+          disabled={disabled}
+          loading={loading || uploading}
           preventRender={!customize}
-          tooltip={t('adjust.button.tooltip')}
+          tooltip={adjust ? t('adjust.button.close.tooltip') : t('adjust.button.open.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
-          variant="contained"
           onClick={() => form.setFieldValue('state.adjust', s => !s)}
         >
-          {t('adjust.button.label')}
-        </Button>
+          <TuneIcon />
+        </IconButton>
       )}
     />
   );
 });
 
 export const AnalyzeButton = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+  const { t } = useTranslation(['submit2']);
   const { configuration } = useALContext();
   const form = useForm();
 
@@ -480,19 +457,19 @@ export const AnalyzeButton = React.memo(() => {
   );
 });
 
-const ToS = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+export const ToS = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
   const theme = useTheme();
   const { configuration } = useALContext();
 
   return !configuration.ui.tos ? null : (
     <div style={{ textAlign: 'center' }}>
       <Typography variant="body2">
-        {t('terms1')}
+        {t('tos.terms1')}
         <i>{t('analyze.button.label')}</i>
-        {t('terms2')}
+        {t('tos.terms2')}
         <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
-          {t('terms3')}
+          {t('tos.terms3')}
         </Link>
         .
       </Typography>
@@ -500,86 +477,99 @@ const ToS = React.memo(() => {
   );
 });
 
-type Props = React.HTMLAttributes<HTMLDivElement> & {
-  hidden?: boolean;
-};
+export const TabInput = React.memo(() => {
+  const { t } = useTranslation('submit2');
+  const { configuration } = useALContext();
 
-export const Landing = React.memo(
-  React.forwardRef(({ hidden = false, ...props }: Props, ref: React.LegacyRef<HTMLDivElement>) => {
-    const { t } = useTranslation('submit2');
-    const theme = useTheme();
-    const { configuration } = useALContext();
+  const form = useForm();
 
-    const form = useForm();
+  return (
+    <form.Subscribe
+      selector={state => [state.values.state.loading, state.values.state.disabled, state.values.state.tab]}
+      children={([loading, disabled, type]) => (
+        <TabContainer
+          paper
+          centered
+          variant="standard"
+          style={{ margin: '0px' }}
+          value={type as SubmitStore['state']['tab']}
+          onChange={(e, v: SubmitStore['state']['tab']) => form.setFieldValue('state.tab', v)}
+          tabs={{
+            file: {
+              label: t('tab.label.file'),
+              disabled: (disabled || loading) as boolean,
+              inner: <FileInput />
+            },
+            hash: {
+              label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
+              disabled: (disabled || loading) as boolean,
+              inner: <HashInput />
+            }
+          }}
+        />
+      )}
+    />
+  );
+});
 
-    return (
+export const Landing = React.memo(() => {
+  const { t } = useTranslation('submit2');
+  const theme = useTheme();
+  const { configuration } = useALContext();
+
+  const form = useForm();
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(3), justifyContent: 'start' }}>
+      <ClassificationInput />
+
+      <form.Subscribe
+        selector={state => [state.values.state.loading, state.values.state.disabled, state.values.state.tab]}
+        children={([loading, disabled, type]) => (
+          <TabContainer
+            paper
+            centered
+            variant="standard"
+            style={{ margin: '0px' }}
+            value={type as SubmitStore['state']['tab']}
+            onChange={(e, v: SubmitStore['state']['tab']) => form.setFieldValue('state.tab', v)}
+            tabs={{
+              file: {
+                label: t('tab.label.file'),
+                disabled: (disabled || loading) as boolean,
+                inner: <FileInput />
+              },
+              hash: {
+                label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
+                disabled: (disabled || loading) as boolean,
+                inner: <HashInput />
+              }
+            }}
+          />
+        )}
+      />
+
+      <SubmissionProfileInput />
+
       <div
-        {...props}
-        ref={ref}
         style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          top: '0',
-          left: '0',
-          ...props?.style,
-          ...(hidden && { maxHeight: '0px', overflow: 'hidden' })
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: theme.spacing(1),
+          textAlign: 'left'
         }}
       >
-        <Banner />
-        <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(4) }}>
-          <BannerAlert />
-          <ClassificationInput />
+        <CancelButton />
 
-          <form.Subscribe
-            selector={state => [state.values.state.loading, state.values.state.disabled, state.values.state.tab]}
-            children={([loading, disabled, type]) => (
-              <TabContainer
-                paper
-                centered
-                variant="standard"
-                style={{ margin: '0px' }}
-                value={type as SubmitStore['state']['tab']}
-                onChange={(e, v: SubmitStore['state']['tab']) => form.setFieldValue('state.tab', v)}
-                tabs={{
-                  file: {
-                    label: t('file'),
-                    disabled: (disabled || loading) as boolean,
-                    inner: <FileInput />
-                  },
-                  hash: {
-                    label: configuration.ui.allow_url_submissions ? t('url.input.title') : t('hash.input.title'),
-                    disabled: (disabled || loading) as boolean,
-                    inner: <HashInput />
-                  }
-                }}
-              />
-            )}
-          />
+        <div style={{ flex: 1 }} />
 
-          <SubmissionProfileInput />
-
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              gap: theme.spacing(2),
-              textAlign: 'left'
-            }}
-          >
-            <div style={{ flex: 1 }}>
-              <CancelButton />
-            </div>
-
-            <FindButton />
-            <AdjustButton />
-            <AnalyzeButton />
-          </div>
-
-          <ToS />
-        </div>
+        <FindButton />
+        <AdjustButton />
+        <AnalyzeButton />
       </div>
-    );
-  })
-);
+
+      <ToS />
+    </div>
+  );
+});

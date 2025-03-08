@@ -72,7 +72,7 @@ const Section = React.memo(({ primary, primaryProps, children, ...props }: Secti
   );
 });
 
-const Title = React.memo(() => {
+export const Title = React.memo(() => {
   const form = useForm();
 
   return (
@@ -114,7 +114,7 @@ const Title = React.memo(() => {
   );
 });
 
-const ClassificationInfo = React.memo(() => {
+export const ClassificationInfo = React.memo(() => {
   const { user: currentUser, c12nDef } = useALContext();
   const form = useForm();
 
@@ -137,7 +137,7 @@ const ClassificationInfo = React.memo(() => {
   );
 });
 
-const SubmissionOptions = React.memo(() => {
+export const SubmissionOptions = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { configuration } = useALContext();
@@ -345,7 +345,7 @@ const SubmissionOptions = React.memo(() => {
   );
 });
 
-const SupplementaryOptions = React.memo(() => {
+export const SupplementaryOptions = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { configuration } = useALContext();
@@ -494,7 +494,7 @@ type MetadataParamParam = {
   disabled?: boolean;
 };
 
-const MetadataParam: React.FC<MetadataParamParam> = React.memo(
+export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
   ({ name, metadata, loading = false, disabled = false }) => {
     const { t } = useTranslation(['submit', 'settings']);
     const form = useForm();
@@ -628,7 +628,7 @@ const MetadataParam: React.FC<MetadataParamParam> = React.memo(
   }
 );
 
-const SubmissionMetadata = React.memo(() => {
+export const SubmissionMetadata = React.memo(() => {
   const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const form = useForm();
@@ -682,7 +682,7 @@ const SubmissionMetadata = React.memo(() => {
   );
 });
 
-const SelectedServices = React.memo(() => {
+export const SelectedServices = React.memo(() => {
   const theme = useTheme();
   const form = useForm();
 
@@ -734,7 +734,7 @@ const SelectedServices = React.memo(() => {
   );
 });
 
-const ServiceParameters = React.memo(() => {
+export const ServiceParameters = React.memo(() => {
   const theme = useTheme();
   const form = useForm();
 
@@ -861,7 +861,7 @@ const ServiceParameters = React.memo(() => {
   );
 });
 
-const ToS = React.memo(() => {
+export const ToS = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { configuration } = useALContext();
@@ -879,7 +879,7 @@ const ToS = React.memo(() => {
   );
 });
 
-const AnalysisActions = React.memo(() => {
+export const AnalysisActions = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
   const navigate = useNavigate();
@@ -1061,27 +1061,24 @@ export const AnalysisConfirmation = React.memo(() => {
   return (
     <form.Subscribe
       selector={state => [state.values.state.confirmation]}
-      children={([open]) => {
-        console.log(form.getFieldValue('file'));
-        return (
-          <Dialog fullWidth maxWidth="md" open={open} onClose={() => form.setFieldValue('state.confirmation', false)}>
-            <Title />
+      children={([open]) => (
+        <Dialog fullWidth maxWidth="md" open={open} onClose={() => form.setFieldValue('state.confirmation', false)}>
+          <Title />
 
-            <DialogContent sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1.5) }}>
-              <ClassificationInfo />
-              <SubmissionOptions />
-              <SupplementaryOptions />
-              <SubmissionMetadata />
-              <SelectedServices />
-              <ServiceParameters />
-            </DialogContent>
+          <DialogContent sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1.5) }}>
+            <ClassificationInfo />
+            <SubmissionOptions />
+            <SupplementaryOptions />
+            <SubmissionMetadata />
+            <SelectedServices />
+            <ServiceParameters />
+          </DialogContent>
 
-            <ToS />
+          <ToS />
 
-            <AnalysisActions />
-          </Dialog>
-        );
-      }}
+          <AnalysisActions />
+        </Dialog>
+      )}
     />
   );
 });

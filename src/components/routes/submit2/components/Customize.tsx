@@ -1,8 +1,6 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useTheme } from '@mui/material';
+import { Paper, useTheme } from '@mui/material';
 import type { ProfileSettings } from 'components/routes/settings/settings.utils';
 import { useForm } from 'components/routes/submit2/submit.form';
-import { Button } from 'components/visual/Buttons/Button';
 import { PageSection } from 'components/visual/Layouts/PageSection';
 import { List } from 'components/visual/List/List';
 import { ListHeader } from 'components/visual/List/ListHeader';
@@ -13,7 +11,13 @@ import { TextListInput } from 'components/visual/ListInputs/TextListInput';
 import { ShowMore } from 'components/visual/ShowMore';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AnalyzeButton } from './Landing';
+import {
+  SelectedServices,
+  ServiceParameters,
+  SubmissionMetadata,
+  SubmissionOptions,
+  SupplementaryOptions
+} from './Confirmation';
 
 type SpecParamList = {
   show: number[];
@@ -365,54 +369,26 @@ export const ServicesSection = React.memo(() => {
   );
 });
 
-type Props = React.HTMLAttributes<HTMLDivElement> & {
-  hidden?: boolean;
-};
+export const Customize = React.memo(() => {
+  const theme = useTheme();
+  const form = useForm();
 
-export const Customize = React.memo(
-  React.forwardRef(({ hidden = false, ...props }: Props, ref: React.LegacyRef<HTMLDivElement>) => {
-    const theme = useTheme();
-    const form = useForm();
+  return (
+    <form.Subscribe
+      selector={state => [state.values.state.loading]}
+      children={([loading]) => {
+        return loading ? null : (
+          <Paper style={{ minWidth: 0, marginTop: theme.spacing(1), padding: theme.spacing(1) }}>
+            <SubmissionOptions />
+            <SupplementaryOptions />
+            <SubmissionMetadata />
+            <SelectedServices />
+            <ServiceParameters />
 
-    return (
-      <div
-        {...props}
-        ref={ref}
-        style={{
-          ...props?.style,
-          ...(hidden && { maxHeight: '0px', overflow: 'hidden' })
-        }}
-      >
-        <div
-          style={{
-            position: 'sticky',
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: theme.spacing(2),
-            textAlign: 'left',
-            top: '63px',
-            backgroundColor: theme.palette.background.default,
-            zIndex: 100000,
-            padding: `${theme.spacing(2)} 0px`
-          }}
-        >
-          <div style={{ flex: 1 }}>
-            <Button
-              variant="outlined"
-              startIcon={<ArrowBackIcon />}
-              onClick={() => form.setFieldValue('state.adjust', false)}
-            >
-              {'Previous'}
-            </Button>
-          </div>
-
-          <AnalyzeButton />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(4), textAlign: 'left' }}>
-          <ServicesSection />
-        </div>
-      </div>
-    );
-  })
-);
+            <ServicesSection />
+          </Paper>
+        );
+      }}
+    />
+  );
+});

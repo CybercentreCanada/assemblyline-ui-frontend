@@ -1,1 +1,69 @@
-{}
+{
+  "adjust.button.close.tooltip": "Close the panel to adjust the submit parameters",
+  "adjust.button.open.tooltip": "Open the panel to adjust the submit parameters",
+  "analyze.button.label": "Analyze",
+  "analyze.button.tooltip": "Analyze the input",
+  "cancel.button.label": "Cancel",
+  "cancel.button.tooltip": "Cancel the submission and reset all values",
+  "classification.input.label": "The following classification will be applied to your submission:",
+  "file_dropper.disabled": "File upload disabled due to missing role.",
+  "file_dropper.dragzone": "Select a file to analyze",
+  "file_dropper.drophere": "Drop your file here!",
+  "file_dropper.max_file_size": "Max",
+  "find.button.title": "Find",
+  "find.button.tooltip": "Check if a file matching your input exist in the system",
+  "find.close.title": "Close",
+  "find.found.title": "A file matching your input was found!",
+  "find.link.title": "Go to file",
+  "find.not_found.title": "No files matching your input were found.",
+  "find.searching.title": "Searching for matching files",
+  "hash.input.label": "Enter the Hash to Analyze",
+  "profile.input.label": "Select the type of analysis to perform",
+  "profile.option.custom.description": "The parameters specified are outside of any system-managed submission profile.",
+  "profile.option.custom.label": "Custom Analysis",
+  "tab.label.file": "File",
+  "tab.label.hash": "Hash",
+  "tab.label.url": "Hash/URL",
+  "tos.terms1": "By pressing ",
+  "tos.terms2": ", you consent to our ",
+  "tos.terms3": "Terms of Service",
+  "url.input.helperText": "A valid URL requires a scheme, i.e. https://www.example.com",
+  "url.input.label": "Enter the Hash or URL to Analyze",
+
+  "options.submission.title": "Submission Parameters",
+  "options.submission.description.label": "Description",
+
+  "options.submission.priority.label": "Priority",
+  "options.submission.priority.low": "Low",
+  "options.submission.priority.medium": "Medium",
+  "options.submission.priority.high": "High",
+  "options.submission.priority.error.empty": "Priority value cannot be empty",
+  "options.submission.priority.error.invalid": "Invalid priority value",
+
+  "options.submission.ttl.label": "Days to live",
+  "options.submission.ttl.max": "Maximum",
+  "options.submission.ttl.forever": "Forever",
+  "options.submission.ttl.tooltip": "Number of days your submissions will stay in the system.",
+  "options.submission.ttl.endAdornment": "day(s)",
+
+  "options.submission.generate_alert.label": "Generate alert",
+  "options.submission.generate_alert.tooltip": "Submission will trigger an alert on completion of analysis.",
+
+  "options.submission.ignore_filtering.label": "Ignore filtering services",
+  "options.submission.ignore_filtering.tooltip": "Allow filtering services to skip files if they believe the files are safe.",
+
+  "options.submission.ignore_cache.label": "Ignore result cache",
+  "options.submission.ignore_cache.tooltip": "Cache service results so files don't have to be re-scanned if the service did not change.",
+
+  "options.submission.ignore_recursion_prevention.label": "Ignore recursion prevention",
+  "options.submission.ignore_recursion_prevention.tooltip": "Ensures that children of analysis services are not sent back to certain services for analysis.",
+
+  "options.submission.deep_scan.label": "Perform deep analysis",
+  "options.submission.deep_scan.tooltip": "Perform deeper analysis of the file by turning on more checks. Slower and not recommended for bulk analysis.",
+
+  "options.metadata.title": "Submission Metadata",
+
+  "options.metadata.extra.label": "Extra parameters",
+
+  "options.services.title": "Service Parameters"
+}

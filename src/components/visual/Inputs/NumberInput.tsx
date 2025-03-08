@@ -28,6 +28,7 @@ export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChang
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  rootProps?: React.HTMLAttributes<HTMLDivElement>;
   startAdornment?: TextFieldProps['InputProps']['startAdornment'];
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
@@ -57,6 +58,7 @@ const WrappedNumberInput = ({
   readOnly = false,
   reset = false,
   resetProps = null,
+  rootProps = null,
   startAdornment = null,
   tiny = false,
   tooltip,
@@ -74,7 +76,7 @@ const WrappedNumberInput = ({
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
-    <div style={{ textAlign: 'left' }}>
+    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
       <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
           color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}

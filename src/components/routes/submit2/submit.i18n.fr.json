@@ -1,1 +1,10 @@
-{}
+{
+  "analyze.button.label": "Analyser",
+  "tos.terms1": "En appuyant sur ",
+  "tos.terms2": ", vous acceptez nos ",
+  "tos.terms3": "Conditions d'utilisation",
+  "classification.input.label": "The following classification will be applied to your submission:",
+  "tab.label.file": "File",
+  "tab.label.hash": "Hash",
+  "tab.label.url": "Hash/URL"
+}

@@ -48,6 +48,7 @@ export type SelectInputProps = Omit<SelectProps, 'error' | 'value' | 'onChange'>
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  rootProps?: React.HTMLAttributes<HTMLDivElement>;
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
@@ -77,6 +78,7 @@ const WrappedSelectInput = ({
   readOnly = false,
   reset = false,
   resetProps = null,
+  rootProps = null,
   tiny = false,
   tooltip = null,
   tooltipProps = null,
@@ -93,7 +95,7 @@ const WrappedSelectInput = ({
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
-    <div style={{ textAlign: 'left' }}>
+    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
       <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
           component={InputLabel}

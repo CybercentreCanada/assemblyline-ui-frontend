@@ -2,17 +2,18 @@ import type { ButtonProps, FormHelperTextProps, IconButtonProps, TooltipProps, T
 import { Button, Checkbox, FormControl, FormControlLabel, Skeleton, useTheme } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import type { ExpendInputProps } from './components/ExpendInput';
-import { ExpendInput } from './components/ExpendInput';
+import type { ExpandInputProps } from './components/ExpandInput';
+import { ExpandInput } from './components/ExpandInput';
 import { HelperText } from './components/HelperText';
 import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
 export type CheckboxInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
+  divider?: boolean;
   error?: (value: boolean) => string;
   errorProps?: FormHelperTextProps;
-  expend?: boolean;
-  expendProps?: ExpendInputProps;
+  expand?: boolean;
+  expandProps?: ExpandInputProps;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
   indeterminate?: boolean;
@@ -28,7 +29,7 @@ export type CheckboxInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'val
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   value: boolean;
-  onExpend?: IconButtonProps['onClick'];
+  onExpand?: IconButtonProps['onClick'];
   onChange?: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.FormEvent<HTMLButtonElement>,
     value: boolean
@@ -40,10 +41,11 @@ export type CheckboxInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'val
 export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
   ({
     disabled = false,
+    divider = false,
     error = () => null,
     errorProps = null,
-    expend = null,
-    expendProps = null,
+    expand = null,
+    expandProps = null,
     helperText = null,
     helperTextProps = null,
     id = null,
@@ -60,7 +62,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
     tooltip = null,
     tooltipProps = null,
     value = false,
-    onExpend = () => null,
+    onExpand = () => null,
     onChange = () => null,
     onReset = () => null,
     onError = () => null,
@@ -74,8 +76,13 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
 
     return preventRender ? null : (
       <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
-        <FormControl size="small" fullWidth>
+        <FormControl
+          size="small"
+          fullWidth
+          sx={{ ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }) }}
+        >
           <Button
+            color="inherit"
             disabled={loading || disabled || readOnly}
             fullWidth
             size="small"
@@ -95,6 +102,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
               textTransform: 'none',
               height: '40px',
               paddingLeft: theme.spacing(2),
+
               ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
               ...(tiny && {
                 height: 'auto'
@@ -164,16 +172,14 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
           />
 
           <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
-            <div>
-              <ResetInput
-                id={id || label}
-                preventRender={loading || !reset || disabled || readOnly}
-                tiny={tiny}
-                onReset={onReset}
-                {...resetProps}
-              />
-              <ExpendInput id={id || label} open={expend} onExpend={onExpend} {...expendProps} />
-            </div>
+            <ResetInput
+              id={id || label}
+              preventRender={loading || !reset || disabled || readOnly}
+              tiny={tiny}
+              onReset={onReset}
+              {...resetProps}
+            />
+            <ExpandInput id={id || label} open={expand} onExpand={onExpand} {...expandProps} />
           </div>
         </FormControl>
       </Tooltip>

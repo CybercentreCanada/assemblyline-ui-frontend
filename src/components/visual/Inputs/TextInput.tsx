@@ -49,6 +49,7 @@ export type TextInputProps<
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  rootProps?: React.HTMLAttributes<HTMLDivElement>;
   startAdornment?: TextFieldProps['InputProps']['startAdornment'];
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
@@ -85,6 +86,7 @@ const WrappedTextInput = <
   resetProps = null,
   startAdornment = null,
   tiny = false,
+  rootProps = null,
   tooltip = null,
   tooltipProps = null,
   value,
@@ -102,7 +104,7 @@ const WrappedTextInput = <
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
-    <div style={{ textAlign: 'left' }}>
+    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
       <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
           color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}

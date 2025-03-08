@@ -1,10 +1,20 @@
 import Flow from '@flowjs/flow.js';
 import { createFormContext } from 'components/core/form/createFormContext';
 import type { HashPatternMap } from 'components/models/base/config';
+import type { Metadata } from 'components/models/base/submission';
 import type { ProfileSettings } from 'components/routes/settings/settings.utils';
-import type { SubmitMetadata } from 'components/routes/submit2/submit.utils';
 import generateUUID from 'helpers/uuid';
 
+export type SubmitState = {
+  hash: string;
+  c12n: string;
+  metadata?: Metadata;
+};
+
+export type SubmitMetadata = {
+  config: Record<string, unknown>;
+  extra: string;
+};
 export const FLOW = new Flow({
   target: '/api/v4/ui/flowjs/',
   permanentErrors: [412, 500, 501],
@@ -57,11 +67,7 @@ export type SubmitStore = {
   hash: { type: HashPatternMap; value: string };
 
   /** Selected metadata of the submission */
-  // metadata: SubmitMetadata;
-  metadata: {
-    config: SubmitMetadata;
-    extra: string;
-  };
+  metadata: SubmitMetadata;
 
   /** All the user's settings */
   settings: ProfileSettings;
@@ -69,7 +75,7 @@ export type SubmitStore = {
 
 export const DEFAULT_SUBMIT_FORM: SubmitStore = Object.freeze({
   state: {
-    adjust: false,
+    adjust: true,
     confirmation: false,
     customize: false,
     disabled: false,

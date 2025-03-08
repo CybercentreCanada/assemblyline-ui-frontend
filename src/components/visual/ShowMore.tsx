@@ -7,23 +7,28 @@ import { useTranslation } from 'react-i18next';
 export type ShowMoreProps =
   | (Omit<ButtonProps, 'children' | 'variant'> & {
       children?: React.ReactNode;
+      preventRender?: boolean;
       variant?: 'long';
     })
   | (Omit<ButtonProps, 'children' | 'variant'> & {
       children?: React.ReactNode;
+      preventRender?: boolean;
       variant?: 'short';
     })
   | (Omit<ButtonProps, 'children' | 'variant'> & {
       children?: React.ReactNode;
+      preventRender?: boolean;
       variant?: 'tiny';
     });
 
 export const ShowMore: React.FC<ShowMoreProps> = React.memo(
-  ({ children = null, variant = 'long', ...props }: ShowMoreProps) => {
+  ({ children = null, preventRender = false, variant = 'long', ...props }: ShowMoreProps) => {
     const { t } = useTranslation();
     const theme = useTheme();
 
     const [showMore, setShowMore] = useState<boolean>(false);
+
+    if (preventRender) return null;
 
     switch (variant) {
       case 'long':

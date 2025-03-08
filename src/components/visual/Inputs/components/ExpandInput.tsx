@@ -3,25 +3,25 @@ import type { IconButtonProps } from '@mui/material';
 import { IconButton, ListItemIcon, useTheme } from '@mui/material';
 import React from 'react';
 
-export type ExpendInputProps = Omit<IconButtonProps, 'id'> & {
+export type ExpandInputProps = Omit<IconButtonProps, 'id'> & {
   id: string;
   open?: boolean;
-  onExpend: IconButtonProps['onClick'];
+  onExpand: IconButtonProps['onClick'];
 };
 
-export const ExpendInput: React.FC<ExpendInputProps> = React.memo(
-  ({ id = null, open = null, onExpend, ...buttonProps }: ExpendInputProps) => {
+export const ExpandInput: React.FC<ExpandInputProps> = React.memo(
+  ({ id = null, open = null, onExpand, ...buttonProps }: ExpandInputProps) => {
     const theme = useTheme();
 
     return open === null ? null : (
       <ListItemIcon sx={{ minWidth: 0 }}>
         <IconButton
-          aria-label={`expend ${id}`}
+          aria-label={`expand ${id}`}
           type="button"
           onClick={event => {
             event.preventDefault();
             event.stopPropagation();
-            onExpend(event);
+            onExpand(event);
           }}
           {...buttonProps}
         >
