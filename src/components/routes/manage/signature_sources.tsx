@@ -510,6 +510,7 @@ const ServiceDetail = ({ service, sources, generatesSignatures, updateIntervalSe
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const classes = useStyles();
+  const { c12nDef } = useALContext();
   const { apiCall } = useMyAPI();
   const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const { showSuccessMessage } = useMySnackbar();
@@ -562,7 +563,13 @@ const ServiceDetail = ({ service, sources, generatesSignatures, updateIntervalSe
                   color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
                   margin: '-4px 0'
                 }}
-                onClick={() => openDrawer(service, { ...DEFAULT_SOURCE, update_interval: updateIntervalSeconds })}
+                onClick={() =>
+                  openDrawer(service, {
+                    ...DEFAULT_SOURCE,
+                    update_interval: updateIntervalSeconds,
+                    default_classification: c12nDef.UNRESTRICTED
+                  })
+                }
                 size="large"
               >
                 <AddCircleOutlineOutlinedIcon />

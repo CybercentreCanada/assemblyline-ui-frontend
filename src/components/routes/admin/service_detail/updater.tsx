@@ -18,6 +18,7 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
+import useALContext from 'components/hooks/useALContext';
 import { DEFAULT_SOURCE, Service, UpdateSource } from 'components/models/base/service';
 import { SourceCard } from 'components/routes/manage/signature_sources';
 import { useEffect, useState } from 'react';
@@ -57,6 +58,7 @@ const marks = [
 
 const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceUpdaterProps) => {
   const { t } = useTranslation(['adminServices']);
+  const { c12nDef } = useALContext();
   const [dialog, setDialog] = useState<boolean>(false);
   const [editDialog, setEditDialog] = useState<boolean>(false);
   const [editedSourceID, setEditedSourceID] = useState(-1);
@@ -367,7 +369,11 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
       <Grid item xs={12}>
         <SourceDialog
           open={dialog}
-          source={{ ...DEFAULT_SOURCE, update_interval: service.update_config.update_interval_seconds }}
+          source={{
+            ...DEFAULT_SOURCE,
+            update_interval: service.update_config.update_interval_seconds,
+            default_classification: c12nDef.UNRESTRICTED
+          }}
           setOpen={setDialog}
           onSave={handleSaveSource}
         />
