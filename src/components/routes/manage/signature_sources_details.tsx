@@ -122,7 +122,7 @@ const WrappedSourceDetail = ({
 
   const handlePostDataChange = useCallback(
     event => {
-      setSource({ ...source, post_data: event.updated_src });
+      setSource({ ...source, data: event.updated_src });
       setModified(true);
     },
     [setModified, setSource, source]
@@ -485,7 +485,7 @@ const WrappedSourceDetail = ({
                         <TextField
                           id="post_data"
                           size="small"
-                          value={source.post_data}
+                          value={source.data}
                           multiline
                           rows={6}
                           fullWidth
