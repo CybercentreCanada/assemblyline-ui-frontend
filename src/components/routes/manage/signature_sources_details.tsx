@@ -483,7 +483,7 @@ const WrappedSourceDetail = ({
                       <Grid item xs={12}>
                         <div className={classes.label}>{t('post_data')}</div>
                         <TextField
-                          id="post_data"
+                          id="data"
                           size="small"
                           value={source.data}
                           multiline
