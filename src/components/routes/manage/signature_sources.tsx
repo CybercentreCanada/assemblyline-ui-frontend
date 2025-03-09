@@ -175,13 +175,13 @@ const WrappedSourceDetailDrawer = ({
 
   const saveChanges = () => {
     apiCall({
-      method: base ? 'POST' : 'PUT',
-      url: base
+      method: base?.name ? 'POST' : 'PUT',
+      url: base?.name
         ? `/api/v4/signature/sources/${service}/${encodeURIComponent(source.name)}/`
         : `/api/v4/signature/sources/${service}/`,
       body: source,
       onSuccess: () => {
-        showSuccessMessage(t(base ? 'change.success' : 'add.success'));
+        showSuccessMessage(t(base?.name ? 'change.success' : 'add.success'));
         setModified(false);
         if (!base || !isXL) onClose();
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadUpdateSources')), 1000);
