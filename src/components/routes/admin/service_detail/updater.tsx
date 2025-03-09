@@ -372,7 +372,8 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           source={{
             ...DEFAULT_SOURCE,
             update_interval: service.update_config.update_interval_seconds,
-            default_classification: c12nDef.UNRESTRICTED
+            default_classification: c12nDef.UNRESTRICTED,
+            pattern: service.update_config.default_pattern
           }}
           setOpen={setDialog}
           onSave={handleSaveSource}

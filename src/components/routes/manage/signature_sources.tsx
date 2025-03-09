@@ -504,9 +504,10 @@ type ServiceDetailProps = {
   sources: UpdateConfig['sources'];
   generatesSignatures: UpdateConfig['generates_signatures'];
   updateIntervalSeconds: UpdateConfig['update_interval_seconds'];
+  defaultPattern: UpdateConfig['default_pattern']
 };
 
-const ServiceDetail = ({ service, sources, generatesSignatures, updateIntervalSeconds }: ServiceDetailProps) => {
+const ServiceDetail = ({ service, sources, generatesSignatures, updateIntervalSeconds, defaultPattern }: ServiceDetailProps) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const classes = useStyles();
@@ -567,7 +568,8 @@ const ServiceDetail = ({ service, sources, generatesSignatures, updateIntervalSe
                   openDrawer(service, {
                     ...DEFAULT_SOURCE,
                     update_interval: updateIntervalSeconds,
-                    default_classification: c12nDef.UNRESTRICTED
+                    default_classification: c12nDef.UNRESTRICTED,
+                    pattern: defaultPattern
                   })
                 }
                 size="large"
@@ -694,6 +696,7 @@ export default function SignatureSources() {
                 sources={sources[key].sources}
                 generatesSignatures={sources[key].generates_signatures}
                 updateIntervalSeconds={sources[key].update_interval_seconds}
+                defaultPattern={sources[key].default_pattern}
               />
             ))
           : [...Array(2)].map((item, i) => (
