@@ -304,6 +304,9 @@ export type UpdateConfig = {
   /** Custom delimiter definition */
   custom_delimiter?: string;
 
+  /** Default pattern for finding signatures*/
+  default_pattern: string
+
   /** Does the updater produce signatures? */
   generates_signatures: boolean;
 
