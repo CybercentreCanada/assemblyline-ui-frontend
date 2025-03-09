@@ -453,7 +453,7 @@ export const DEFAULT_SOURCE: UpdateSource = {
   override_classification: false,
   password: '',
   pattern: '',
-  data: '',
+  data: null,
   private_key: '',
   proxy: '',
   ssl_ignore_errors: false,
