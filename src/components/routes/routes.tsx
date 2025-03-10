@@ -24,6 +24,7 @@ const ServiceReview = lazy(() => import('components/routes/admin/service_review'
 const AdminSiteMap = lazy(() => import('components/routes/admin/site_map'));
 const AdminTagSafelist = lazy(() => import('components/routes/admin/tag_safelist'));
 const AdminUsers = lazy(() => import('components/routes/admin/users'));
+const AdminApikeys = lazy(() => import('components/routes/admin/apikeys'));
 const AlertDetails = lazy(() => import('components/routes/alerts/detail'));
 const Alerts = lazy(() => import('components/routes/alerts'));
 const AlertsRedirect = lazy(() => import('components/routes/alerts/redirect'));
@@ -85,9 +86,8 @@ function RouteActions() {
 
     // Patch window title
     const currentLocation = pathname.split('/').join(' ').trim();
-    document.title = `${APP_NAME} | ${
-      currentLocation ? currentLocation.charAt(0).toUpperCase() + currentLocation.slice(1) : 'Submit'
-    }`;
+    document.title = `${APP_NAME} | ${currentLocation ? currentLocation.charAt(0).toUpperCase() + currentLocation.slice(1) : 'Submit'
+      }`;
 
     closeTemporaryDrawer();
 
@@ -143,6 +143,7 @@ const WrappedRoutes = () => {
         <Route path="/admin/sitemap" element={<AdminSiteMap />} />
         <Route path="/admin/tag_safelist" element={<AdminTagSafelist />} />
         <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/apikeys" element={<AdminApikeys />} />
         <Route path="/admin/users/:id" element={<User />} />
         <Route path="/archive" element={<MalwareArchive />} />
         <Route path="/archive/:id" element={<ArchiveDetail />} />

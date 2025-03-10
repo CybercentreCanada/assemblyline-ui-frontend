@@ -2,7 +2,7 @@ import { Button, Dialog, DialogActions, IconButton, TextField, Tooltip, useTheme
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
 import EventIcon from '@mui/icons-material/Event';
-import { DatePicker as MuiDatePicker, LocalizationProvider, StaticDatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, DatePicker as MuiDatePicker, StaticDatePicker } from '@mui/x-date-pickers';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import moment from 'moment';
 import React, { useEffect } from 'react';
@@ -50,6 +50,14 @@ function WrappedDatePicker({
     tempToday.setDate(tempToday.getDate() + 1);
     tempToday.setHours(0, 0, 0, 0);
     setToday(moment(tempToday));
+
+    if (defaultDateOffset) {
+      const defaultDate = new Date();
+      defaultDate.setDate(defaultDate.getDate() + defaultDateOffset);
+      defaultDate.setHours(0, 0, 0, 0);
+      setDate(moment(defaultDate).format('YYYY-MM-DDThh:mm:ss.SSSSSS') + "Z");
+    }
+
   });
 
   useEffect(() => {
@@ -63,6 +71,7 @@ function WrappedDatePicker({
     } else if (date === undefined || date === null) {
       setTempDate(null);
     }
+
   }, [date, defaultDateOffset]);
 
   // Build chip based on computed values
