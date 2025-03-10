@@ -9,25 +9,29 @@ import {
   loadSubmissionProfile
 } from 'components/routes/settings/settings.utils';
 import { MOCK_SETTINGS } from 'components/routes/settings/utils/data3';
+import type { SubmitStore } from 'components/routes/submit2/submit.form';
+import { useForm } from 'components/routes/submit2/submit.form';
+import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
-import { SubmissionMetadata, SubmissionOptions } from './components/Configuration';
 import { AnalysisConfirmation } from './components/Confirmation';
+import { ServiceParameters } from './components/ServiceParameters';
 import {
   AdjustButton,
   AnalyzeButton,
   CancelButton,
   ClassificationInput,
+  FileInput,
   FindButton,
+  HashInput,
   SubmissionProfileInput,
-  TabInput,
   ToS
-} from './components/Landing';
-import { ServiceParameters } from './components/ServiceParameters';
+} from './components/SubmissionInput';
+import { SubmissionMetadata } from './components/SubmissionMetadata';
+import { SubmissionOptions } from './components/SubmissionOptions';
 import type { SubmitState } from './submit.form';
-import { useForm } from './submit.form';
 import {
   getDefaultExternalSources,
   getDefaultMetadata,
@@ -36,7 +40,7 @@ import {
 } from './submit.utils';
 
 const WrappedSubmitRoute = () => {
-  const { i18n } = useTranslation(['submit2']);
+  const { t, i18n } = useTranslation(['submit2']);
   const theme = useTheme();
   const banner = useAppBanner();
   const location = useLocation();
@@ -110,8 +114,8 @@ const WrappedSubmitRoute = () => {
       )}
 
       <form.Subscribe
-        selector={state => [state.values.state.adjust, state.values.state.loading]}
-        children={([adjust, loading]) => (
+        selector={state => [state.values.state.adjust, state.values.state.loading, state.values.state.disabled]}
+        children={([adjust, loading, disabled]) => (
           <div style={{ display: 'flex', flexDirection: 'row', marginTop: theme.spacing(3) }}>
             <div
               style={{
@@ -137,7 +141,32 @@ const WrappedSubmitRoute = () => {
                 }}
               >
                 <ClassificationInput />
-                <TabInput />
+
+                <form.Subscribe
+                  selector={state => [state.values.state.tab]}
+                  children={([type]) => (
+                    <TabContainer
+                      paper
+                      centered
+                      variant="standard"
+                      style={{ margin: '0px' }}
+                      value={type}
+                      onChange={(e, v: SubmitStore['state']['tab']) => form.setFieldValue('state.tab', v)}
+                      tabs={{
+                        file: {
+                          label: t('tab.label.file'),
+                          disabled: disabled || loading,
+                          inner: <FileInput />
+                        },
+                        hash: {
+                          label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
+                          disabled: disabled || loading,
+                          inner: <HashInput />
+                        }
+                      }}
+                    />
+                  )}
+                />
                 <SubmissionProfileInput />
 
                 <div
@@ -191,8 +220,6 @@ const WrappedSubmitRoute = () => {
                   <ServiceParameters />
                 </div>
               )}
-
-              {/* <Customize /> */}
             </div>
           </div>
         )}

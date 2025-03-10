@@ -20,10 +20,9 @@ import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
-import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import FileDropper from './FileDropper';
@@ -398,28 +397,7 @@ export const AdjustButton = React.memo(() => {
 
 export const AnalyzeButton = React.memo(() => {
   const { t } = useTranslation(['submit2']);
-  const { configuration } = useALContext();
   const form = useForm();
-
-  const handleOpenConfirmation = useCallback(() => {
-    const tab = form.getFieldValue('state.tab');
-    const hashType = form.getFieldValue('hash.type');
-    form.setFieldValue('state.confirmation', s => !s);
-
-    // if (tab === 'hash' && hashType === 'url') {
-    //   form.setFieldValue('settings.services', categories => {
-    //     categories.forEach((category, i) => {
-    //       category.services.forEach((service, j) => {
-    //         if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
-    //           categories[i].services[j].selected = true;
-    //         }
-    //       });
-    //       categories[i].selected = categories[i].services.every(svr => svr.selected);
-    //     });
-    //     return categories;
-    //   });
-    // }
-  }, [configuration.ui.url_submission_auto_service_selection, form]);
 
   return (
     <form.Subscribe
@@ -439,7 +417,7 @@ export const AnalyzeButton = React.memo(() => {
           tooltip={t('analyze.button.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           variant="contained"
-          onClick={() => handleOpenConfirmation()}
+          onClick={() => form.setFieldValue('state.confirmation', s => !s)}
         >
           {t('analyze.button.label')}
         </Button>
@@ -464,103 +442,6 @@ export const ToS = React.memo(() => {
         </Link>
         .
       </Typography>
-    </div>
-  );
-});
-
-export const TabInput = React.memo(() => {
-  const { t } = useTranslation('submit2');
-  const { configuration } = useALContext();
-
-  const form = useForm();
-
-  return (
-    <form.Subscribe
-      selector={state => [state.values.state.loading, state.values.state.disabled, state.values.state.tab]}
-      children={([loading, disabled, type]) => (
-        <TabContainer
-          paper
-          centered
-          variant="standard"
-          style={{ margin: '0px' }}
-          value={type as SubmitStore['state']['tab']}
-          onChange={(e, v: SubmitStore['state']['tab']) => form.setFieldValue('state.tab', v)}
-          tabs={{
-            file: {
-              label: t('tab.label.file'),
-              disabled: (disabled || loading) as boolean,
-              inner: <FileInput />
-            },
-            hash: {
-              label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
-              disabled: (disabled || loading) as boolean,
-              inner: <HashInput />
-            }
-          }}
-        />
-      )}
-    />
-  );
-});
-
-export const Landing = React.memo(() => {
-  const { t } = useTranslation('submit2');
-  const theme = useTheme();
-  const { configuration } = useALContext();
-
-  const form = useForm();
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(3), justifyContent: 'start' }}>
-      <ClassificationInput />
-
-      <form.Subscribe
-        selector={state => [state.values.state.loading, state.values.state.disabled, state.values.state.tab]}
-        children={([loading, disabled, type]) => (
-          <TabContainer
-            paper
-            centered
-            variant="standard"
-            style={{ margin: '0px' }}
-            value={type as SubmitStore['state']['tab']}
-            onChange={(e, v: SubmitStore['state']['tab']) => form.setFieldValue('state.tab', v)}
-            tabs={{
-              file: {
-                label: t('tab.label.file'),
-                disabled: (disabled || loading) as boolean,
-                inner: <FileInput />
-              },
-              hash: {
-                label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
-                disabled: (disabled || loading) as boolean,
-                inner: <HashInput />
-              }
-            }}
-          />
-        )}
-      />
-
-      <SubmissionProfileInput />
-
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          gap: theme.spacing(1),
-          textAlign: 'left'
-        }}
-      >
-        <CancelButton />
-
-        <div style={{ flex: 1 }} />
-
-        <FindButton />
-        <AdjustButton />
-        <AnalyzeButton />
-      </div>
-
-      <ToS />
     </div>
   );
 });
