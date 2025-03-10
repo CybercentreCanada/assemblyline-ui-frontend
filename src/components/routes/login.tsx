@@ -67,7 +67,7 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
   const [buttonLoading, setButtonLoading] = useState(false);
 
   // Quick login can only be used if there's exactly one external authentication service configured
-  const quickSSOLogin = allowSAML && !oAuthProviders ? true : !allowSAML && oAuthProviders?.length === 1;
+  const quickSSOLogin = allowSAML && oAuthProviders.length === 0 ? true : !allowSAML && oAuthProviders?.length === 1;
 
   function reset(event) {
     if ((['oauth'].includes(shownControls) && oauthTokenID) || !['oauth'].includes(shownControls)) {

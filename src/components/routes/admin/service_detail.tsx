@@ -15,18 +15,19 @@ import {
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { ServiceConstants, Service as ServiceData } from 'components/models/base/service';
-import type { CustomUser } from 'components/models/ui/user';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
+import type { JSONFeedItem } from 'components/visual/Notification';
+import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { getVersionQuery } from 'helpers/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
@@ -56,18 +57,18 @@ type ServiceProps = {
   name?: string | null;
   onDeleted?: () => void;
   onUpdated?: () => void;
-  serviceNames?: string[];
 };
 
-function Service({ name = null, onDeleted = () => null, onUpdated = () => null, serviceNames }: ServiceProps) {
+function Service({ name = null, onDeleted = () => null, onUpdated = () => null }: ServiceProps) {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
   const navigate = useNavigate();
   const classes = useStyles();
   const { svc } = useParams<ParamProps>();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser, configuration } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
+  const { fetchJSONNotifications } = useNotificationFeed();
 
   const [service, setService] = useState<ServiceData>(null);
   const [serviceDefault, setServiceDefault] = useState<ServiceData>(null);
@@ -80,6 +81,15 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null, 
   const [modified, setModified] = useState<boolean>(false);
   const [buttonLoading, setButtonLoading] = useState<boolean>(false);
   const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
+  const [serviceFeeds, setServiceFeeds] = useState<JSONFeedItem[]>(null);
+
+  const serviceNames = useMemo<string[]>(
+    () =>
+      (serviceFeeds || [])
+        .reduce((prev: string[], item) => (item?.summary ? [...prev, item.summary] : prev), [])
+        .sort(),
+    [serviceFeeds]
+  );
 
   function saveService() {
     apiCall({
@@ -183,6 +193,13 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null, 
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    fetchJSONNotifications({
+      urls: configuration?.ui?.services_feed ? [configuration?.ui?.services_feed] : [],
+      onSuccess: values => setServiceFeeds(values)
+    });
+  }, [configuration?.ui?.services_feed, fetchJSONNotifications, setServiceFeeds]);
 
   return !currentUser.is_admin ? (
     <Navigate to="/forbidden" replace />
