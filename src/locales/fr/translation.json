@@ -8,6 +8,7 @@
   "adminmenu.sitemap": "Plan du site",
   "adminmenu.tag_safelist": "Liste sans danger système",
   "adminmenu.users": "Utilisateurs",
+  "adminmenu.apikeys": "Clés d'API",
   "ai_truncated": "La sortie AI a été tronquée car trop longue.",
   "already_badlist": "Déja dans la liste mauvaise",
   "already_safelist": "Déja dans la liste sûre",
