@@ -7,6 +7,7 @@ const INTERFACE_KEYS = [
   'download_encoding',
   'executive_summary',
   'expand_min_score',
+  'initial_data',
   'malicious',
   'preferred_submission_profile',
   'submission_view'
@@ -109,6 +110,9 @@ export const initializeSettings = (settings: UserSettings): ProfileSettings => {
         .map(param => ({ ...param, prev: param.value, editable: false }))
     }));
 
+  //Applying the initial data
+  out.initial_data = { value: '', prev: '' };
+
   return out;
 };
 
@@ -168,6 +172,9 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings)
       out.service_spec[i].params[j].prev = out.service_spec[i].params[j].value;
     });
   });
+
+  //Applying the initial data
+  out.initial_data = { value: '', prev: '' };
 
   return out;
 };
@@ -246,6 +253,9 @@ export const loadSubmissionProfile = (
     });
   });
 
+  //Applying the initial data
+  out.initial_data = { value: '', prev: '' };
+
   return out;
 };
 
@@ -298,6 +308,9 @@ export const parseSubmissionProfile = (
     });
   });
 
+  //Applying the initial data
+  out.initial_data = profile.initial_data.value;
+
   out.submission_profiles = { ...out.submission_profiles, [profileName]: params };
   return out;
 };
@@ -341,6 +354,11 @@ export const hasDifferentPreviousSubmissionValues = (out: ProfileSettings): bool
     });
   });
 
+  //Applying the initial data
+  if (out.initial_data.value !== out.initial_data.prev) {
+    res = true;
+  }
+
   return res;
 };
 
@@ -370,6 +388,9 @@ export const resetPreviousSubmissionValues = (out: ProfileSettings): ProfileSett
     });
   });
 
+  //Applying the initial data
+  out.initial_data.value = out.initial_data.prev;
+
   return out;
 };
 
@@ -398,6 +419,9 @@ export const updatePreviousSubmissionValues = (out: ProfileSettings): ProfileSet
       out.service_spec[i].params[j].prev = out.service_spec[i].params[j].value;
     });
   });
+
+  //Applying the initial data
+  out.initial_data.prev = out.initial_data.value;
 
   return out;
 };

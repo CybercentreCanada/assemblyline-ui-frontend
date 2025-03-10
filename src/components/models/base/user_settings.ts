@@ -47,6 +47,9 @@ export type UserSettings = {
   /** Should we ignore recursion prevention? */
   ignore_recursion_prevention: boolean;
 
+  /** Initialization for temporary submission data */
+  initial_data: string;
+
   /** Is the file submitted already known to be malicious? */
   malicious: boolean;
 

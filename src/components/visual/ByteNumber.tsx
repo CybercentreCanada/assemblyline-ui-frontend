@@ -10,7 +10,7 @@ export type ByteNumberProps = Omit<TypographyProps, 'children'> & {
 
 export const ByteNumber: React.FC<ByteNumberProps> = React.memo(
   ({ bytes = null, decimals = 2, children = null, ...typographyProps }: ByteNumberProps) => {
-    const { i18n } = useTranslation(['submit']);
+    const { i18n } = useTranslation();
 
     const sizes = useMemo<string[]>(
       () =>

@@ -80,10 +80,6 @@ export const isSubmissionValid = (values: SubmitStore, configuration: Configurat
     return false;
   }
 
-  if (!values.settings.description.value) {
-    return false;
-  }
-
   if (![500, 1000, 1500].includes(values.settings.priority.value)) {
     return false;
   }

@@ -1,6 +1,5 @@
 import type { PaperProps, TypographyProps } from '@mui/material';
 import {
-  Button,
   Dialog,
   DialogActions,
   DialogContent,
@@ -23,6 +22,7 @@ import { parseSubmissionProfile } from 'components/routes/settings/settings.util
 import type { SubmitStore } from 'components/routes/submit2/submit.form';
 import { FLOW, useForm } from 'components/routes/submit2/submit.form';
 import { isSubmissionValid, isValidJSON } from 'components/routes/submit2/submit.utils';
+import { Button } from 'components/visual/Buttons/Button';
 import { ByteNumber } from 'components/visual/ByteNumber';
 import Classification from 'components/visual/Classification';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
@@ -73,6 +73,7 @@ const Section = React.memo(({ primary, primaryProps, children, ...props }: Secti
 });
 
 export const Title = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
   const form = useForm();
 
   return (
@@ -87,12 +88,7 @@ export const Title = React.memo(() => {
         return (
           <DialogTitle>
             <ListItemText
-              primary={
-                <>
-                  {tab === 'file' ? 'File' : <span style={{ textTransform: 'uppercase' }}>{type}</span>}
-                  <span>{' Analysis Confirmation'}</span>
-                </>
-              }
+              primary={t('confirmation.title').replace('{type}', tab === 'file' ? 'File' : type.toUpperCase())}
               secondary={
                 tab === 'file' ? (
                   <>
@@ -138,7 +134,7 @@ export const ClassificationInfo = React.memo(() => {
 });
 
 export const SubmissionOptions = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+  const { t } = useTranslation(['submit2']);
   const theme = useTheme();
   const { configuration } = useALContext();
   const form = useForm();
@@ -346,7 +342,7 @@ export const SubmissionOptions = React.memo(() => {
 });
 
 export const SupplementaryOptions = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+  const { t } = useTranslation(['submit2']);
   const theme = useTheme();
   const { configuration } = useALContext();
   const form = useForm();
@@ -862,17 +858,17 @@ export const ServiceParameters = React.memo(() => {
 });
 
 export const ToS = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+  const { t } = useTranslation(['submit2']);
   const theme = useTheme();
   const { configuration } = useALContext();
 
   return !configuration.ui.tos ? null : (
     <DialogContentText variant="body2" sx={{ textAlign: 'center', paddingTop: theme.spacing(1) }}>
-      {t('terms1')}
-      <i>{t('urlHash.button')}</i>
-      {t('terms2')}
+      {t('tos.terms1')}
+      <i>{t('submit.button.label')}</i>
+      {t('tos.terms2')}
       <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
-        {t('terms3')}
+        {t('tos.terms3')}
       </Link>
       .
     </DialogContentText>
@@ -880,7 +876,7 @@ export const ToS = React.memo(() => {
 });
 
 export const AnalysisActions = React.memo(() => {
-  const { t } = useTranslation(['submit']);
+  const { t } = useTranslation(['submit2']);
   const form = useForm();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
@@ -1041,16 +1037,235 @@ export const AnalysisActions = React.memo(() => {
 
   return (
     <DialogActions sx={{ paddingTop: 0 }}>
-      <Button onClick={() => form.setFieldValue('state.confirmation', false)}>{t('cancel')}</Button>
+      <Button
+        tooltip={t('close.button.tooltip')}
+        tooltipProps={{ placement: 'bottom' }}
+        onClick={() => form.setFieldValue('state.confirmation', false)}
+      >
+        {t('close.button.label')}
+      </Button>
       <form.Subscribe
         selector={state => [state.values.state.tab, isSubmissionValid(state.values, configuration)]}
         children={([tab, valid]) => (
-          <Button disabled={!valid} onClick={() => (tab === 'file' ? handleSubmitFile() : handleSubmitHash())}>
-            {t('analyze')}
+          <Button
+            tooltip={t('submit.button.tooltip')}
+            tooltipProps={{ placement: 'bottom' }}
+            disabled={!valid}
+            onClick={() => (tab === 'file' ? handleSubmitFile() : handleSubmitHash())}
+          >
+            {t('submit.button.label')}
           </Button>
         )}
       />
     </DialogActions>
+  );
+});
+
+const Password = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [
+        state.values.state.loading,
+        state.values.state.disabled,
+        state.values.settings.initial_data.value
+      ]}
+      children={([loading, disabled, initialData]) => {
+        let text = '';
+        try {
+          text = JSON.parse(initialData as string)?.password || '';
+        } catch (e) {
+          text = '';
+        }
+
+        console.log(initialData);
+
+        return (
+          <TextInput
+            label={t('options.submission.password.label')}
+            tooltip={t('options.submission.password.tooltip')}
+            value={text}
+            loading={loading as boolean}
+            disabled={disabled as boolean}
+            onChange={(e, v) => {
+              form.setFieldValue('settings.initial_data.value', `{"password":"${v}"}`);
+            }}
+          />
+        );
+      }}
+    />
+  );
+});
+
+const Malicious = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [
+        state.values.state.tab === 'file',
+        state.values.settings.malicious.value,
+        state.values.state.loading,
+        state.values.state.disabled
+      ]}
+      children={([isFile, value, loading, disabled]) => (
+        <SwitchInput
+          label={t('malicious.switch.label')}
+          labelProps={{ color: 'textPrimary' }}
+          tooltip={t('malicious.switch.tooltip')}
+          value={value}
+          loading={loading}
+          disabled={disabled}
+          preventRender={!isFile}
+          onChange={(e, v) => form.setFieldValue('settings.malicious.value', v)}
+        />
+      )}
+    />
+  );
+});
+
+const ExternalSources = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const { configuration } = useALContext();
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [
+        state.values.state.tab === 'hash',
+        state.values.state.loading,
+        state.values.state.disabled,
+        ...(configuration.submission.file_sources?.[state.values.state.tab as HashPatternMap]?.sources || [])
+      ]}
+      children={([isHash, loading, disabled, ...sources]) =>
+        !isHash || sources.length === 0 ? null : (
+          <Section primary={t('options.submission.default_external_sources.label')}>
+            {sources.map((source: string, i) => (
+              <form.Subscribe
+                key={`${source}-${i}`}
+                selector={state => state.values.settings.default_external_sources.value.indexOf(source) !== -1}
+                children={value => (
+                  <CheckboxInput
+                    key={i}
+                    id={`source-${source.replace('_', ' ')}`}
+                    label={source.replace('_', ' ')}
+                    labelProps={{ color: 'textPrimary' }}
+                    value={value}
+                    loading={loading as boolean}
+                    disabled={disabled as boolean}
+                    onChange={() => {
+                      form.setFieldValue('settings.default_external_sources.value', s => {
+                        s.indexOf(source) >= 0 ? s.splice(s.indexOf(source), 1) : s.push(source);
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+            ))}
+          </Section>
+        )
+      }
+    />
+  );
+});
+
+const ExternalServices = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const { configuration } = useALContext();
+  const form = useForm();
+
+  useEffect(() => {
+    if (form.getFieldValue('state.tab') !== 'hash' || form.getFieldValue('hash.type') !== 'url') return;
+
+    const prevValues: [number, number, boolean][] = [];
+
+    form.setFieldValue('settings.services', categories => {
+      categories.forEach((category, i) => {
+        category.services.forEach((service, j) => {
+          if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
+            prevValues.push([i, j, categories[i].services[j].selected]);
+            categories[i].services[j].selected = true;
+          }
+        });
+        categories[i].selected = category.services.every(s => s.selected);
+      });
+
+      return categories;
+    });
+
+    return () => {
+      form.setFieldValue('settings.services', categories => {
+        prevValues.forEach(([i, j, value]) => {
+          categories[i].services[j].selected = value;
+        });
+
+        categories.forEach((category, i) => {
+          categories[i].selected = category.services.every(s => s.selected);
+        });
+
+        return categories;
+      });
+    };
+  }, [configuration.ui.url_submission_auto_service_selection, form]);
+
+  return (
+    <form.Subscribe
+      selector={state => [
+        state.values.state.loading,
+        state.values.state.disabled,
+        state.values.state.customize,
+        state.values.settings.services,
+        state.values.state.tab === 'hash' &&
+          state.values.hash.type === 'url' &&
+          state.values.settings.services.some(cat =>
+            cat.services.some(svr => configuration.ui.url_submission_auto_service_selection.includes(svr.name))
+          )
+      ]}
+      children={([loading, disabled, customize, categories, hasURLservices]) =>
+        !hasURLservices ? null : (
+          <Section primary={t('options.submission.url_submission_auto_service_selection')}>
+            {(categories as SubmitStore['settings']['services'])
+              .reduce((prev: [number, number][], category, i) => {
+                category.services.forEach((service, j) => {
+                  if (configuration.ui.url_submission_auto_service_selection?.includes(service.name)) prev.push([i, j]);
+                });
+                return prev;
+              }, [])
+              .map(([cat, svr], i) => (
+                <form.Subscribe
+                  key={i}
+                  selector={state => {
+                    const service = state.values.settings.services[cat].services[svr];
+                    return [service.name, service.selected];
+                  }}
+                  children={([name, selected]) => (
+                    <CheckboxInput
+                      key={i}
+                      id={`url_submission_auto_service_selection-${(name as string).replace('_', ' ')}`}
+                      label={(name as string).replace('_', ' ')}
+                      labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
+                      value={selected as boolean}
+                      loading={loading as boolean}
+                      disabled={(disabled || !customize) as boolean}
+                      onChange={() => {
+                        form.setFieldValue('settings', s => {
+                          s.services[cat].services[svr].selected = !selected;
+                          s.services[cat].selected = s.services[cat].services.every(val => val.selected);
+                          return s;
+                        });
+                      }}
+                    />
+                  )}
+                />
+              ))}
+          </Section>
+        )
+      }
+    />
   );
 });
 
@@ -1062,20 +1277,17 @@ export const AnalysisConfirmation = React.memo(() => {
     <form.Subscribe
       selector={state => [state.values.state.confirmation]}
       children={([open]) => (
-        <Dialog fullWidth maxWidth="md" open={open} onClose={() => form.setFieldValue('state.confirmation', false)}>
+        <Dialog fullWidth open={open} onClose={() => form.setFieldValue('state.confirmation', false)}>
           <Title />
 
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1.5) }}>
-            <ClassificationInfo />
-            <SubmissionOptions />
-            <SupplementaryOptions />
-            <SubmissionMetadata />
-            <SelectedServices />
-            <ServiceParameters />
+            <Password />
+            <Malicious />
+            <ExternalSources />
+            <ExternalServices />
           </DialogContent>
 
           <ToS />
-
           <AnalysisActions />
         </Dialog>
       )}

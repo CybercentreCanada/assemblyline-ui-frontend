@@ -292,17 +292,17 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
 
     const props = useMemo<unknown>(
       () => ({
-        disabled: disabled,
         id: `metadata-${name.replace('_', ' ')}`,
-        loading: loading,
         label: `${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`,
         labelProps: { textTransform: 'capitalize' },
+        disabled: disabled,
+        loading: loading,
         width: '60%',
         rootProps: { style: { margin: theme.spacing(1) } },
         onChange: (e, v) => handleChange(v),
         onReset: () => handleReset()
       }),
-      [disabled, handleChange, handleReset, loading, metadata.validator_type, name]
+      [disabled, handleChange, handleReset, loading, metadata.validator_type, name, theme]
     );
 
     return (

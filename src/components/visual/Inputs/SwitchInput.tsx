@@ -72,6 +72,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
           <Button
             disabled={loading || disabled || readOnly}
             fullWidth
+            color="inherit"
             size="small"
             onClick={event => {
               event.stopPropagation();

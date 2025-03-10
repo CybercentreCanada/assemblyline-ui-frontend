@@ -84,7 +84,14 @@ const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) =>
           </b>
         </Typography>
         {file && (!isDragActive || disabled) ? (
-          <ByteNumber bytes={file.size} variant="body2" align="center" />
+          <div>
+            <ByteNumber component="span" bytes={file.size} variant="body2" align="center" />
+            {' ('}
+            <ByteNumber component="span" bytes={configuration.submission.max_file_size} variant="body2" align="center">
+              {size => `${t('max_file_size')} ${size}`}
+            </ByteNumber>
+            {')'}
+          </div>
         ) : (
           <ByteNumber bytes={configuration.submission.max_file_size} variant="body2" align="center">
             {size => `${t('max_file_size')} ${size}`}

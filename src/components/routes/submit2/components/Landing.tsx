@@ -18,7 +18,6 @@ import { calculateFileHash, getHashQuery, switchProfile } from 'components/route
 import { Button } from 'components/visual/Buttons/Button';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
-import FileDropper from 'components/visual/FileDropper';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
 import { TabContainer } from 'components/visual/TabContainer';
@@ -27,6 +26,7 @@ import generateUUID from 'helpers/uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import FileDropper from './FileDropper';
 
 export const ClassificationInput = React.memo(() => {
   const { t } = useTranslation(['submit2']);
@@ -406,28 +406,19 @@ export const AnalyzeButton = React.memo(() => {
     const hashType = form.getFieldValue('hash.type');
     form.setFieldValue('state.confirmation', s => !s);
 
-    if (tab === 'file') {
-      form.setFieldValue('settings.description.value', `Inspection of file: ${form.getFieldValue('file.name')}`);
-    } else if (tab === 'hash') {
-      form.setFieldValue(
-        'settings.description.value',
-        `Inspection of ${form.getFieldValue('hash.type').toUpperCase()}: ${form.getFieldValue('hash.value')}`
-      );
-    }
-
-    if (tab === 'hash' && hashType === 'url') {
-      form.setFieldValue('settings.services', categories => {
-        categories.forEach((category, i) => {
-          category.services.forEach((service, j) => {
-            if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
-              categories[i].services[j].selected = true;
-            }
-          });
-          categories[i].selected = categories[i].services.every(svr => svr.selected);
-        });
-        return categories;
-      });
-    }
+    // if (tab === 'hash' && hashType === 'url') {
+    //   form.setFieldValue('settings.services', categories => {
+    //     categories.forEach((category, i) => {
+    //       category.services.forEach((service, j) => {
+    //         if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
+    //           categories[i].services[j].selected = true;
+    //         }
+    //       });
+    //       categories[i].selected = categories[i].services.every(svr => svr.selected);
+    //     });
+    //     return categories;
+    //   });
+    // }
   }, [configuration.ui.url_submission_auto_service_selection, form]);
 
   return (
