@@ -1,4 +1,4 @@
-import { Grid, Paper, Typography, useTheme } from '@mui/material';
+import { Grid, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/submit2/submit.form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
@@ -17,7 +17,7 @@ export const SubmissionOptions = React.memo(() => {
   return (
     <div>
       <Typography variant="h6">{t('options.submission.title')}</Typography>
-      <Paper sx={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         <form.Subscribe
           selector={state => [state.values.state.loading, state.values.state.disabled, state.values.state.customize]}
           children={([loading, disabled, customize]) => (
@@ -219,7 +219,7 @@ export const SubmissionOptions = React.memo(() => {
             </>
           )}
         />
-      </Paper>
+      </div>
     </div>
   );
 });

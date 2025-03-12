@@ -1,8 +1,9 @@
-import { Alert, useMediaQuery, useTheme } from '@mui/material';
+import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { Metadata } from 'components/models/base/submission';
 import {
   initializeSettings,
   loadDefaultProfile,
@@ -24,7 +25,6 @@ import {
   CancelButton,
   ClassificationInput,
   FileInput,
-  FindButton,
   HashInput,
   SubmissionProfileInput,
   ToS
@@ -32,12 +32,84 @@ import {
 import { SubmissionMetadata } from './components/SubmissionMetadata';
 import { SubmissionOptions } from './components/SubmissionOptions';
 import type { SubmitState } from './submit.form';
-import {
-  getDefaultExternalSources,
-  getDefaultMetadata,
-  getPreferredSubmissionProfile,
-  isValidJSON
-} from './submit.utils';
+import { getDefaultExternalSources, getPreferredSubmissionProfile, isValidJSON } from './submit.utils';
+
+type AdjustProps = {
+  adjust: boolean;
+};
+
+const Container = styled('div')<AdjustProps>(({ theme }) => ({
+  marginTop: theme.spacing(3),
+  display: 'flex',
+  flexDirection: 'row',
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+    rowGap: theme.spacing(3)
+  }
+}));
+
+const LeftPanel = styled('div')<AdjustProps>(({ theme, adjust }) => ({
+  paddingRight: '0px',
+  width: '100%',
+  transition: theme.transitions.create(['width', 'padding-left'], {
+    duration: theme.transitions.duration.shortest
+  }),
+  ...(adjust && {
+    width: '50%',
+    paddingRight: theme.spacing(1)
+  }),
+  [theme.breakpoints.down('md')]: {
+    display: 'contents',
+    ...(adjust && {
+      width: '100%'
+    })
+  }
+}));
+
+const LeftInnerPanel = styled('div')<AdjustProps>(({ theme }) => ({
+  position: 'sticky',
+  top: '64px',
+  display: 'flex',
+  flexDirection: 'column',
+  rowGap: theme.spacing(3),
+  justifyContent: 'start',
+  [theme.breakpoints.down('md')]: {
+    position: 'initial',
+    display: 'contents'
+  }
+}));
+
+const LeftPanelAction = styled('div')<AdjustProps>(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  textAlign: 'left',
+  [theme.breakpoints.down('md')]: {
+    position: 'sticky',
+    top: '63px',
+    backgroundColor: theme.palette.background.default,
+    zIndex: 1
+  }
+}));
+
+const RightPanel = styled('div')<AdjustProps>(({ theme, adjust }) => ({
+  paddingLeft: '0px',
+  overflow: 'hidden',
+  width: '0%',
+  transition: theme.transitions.create(['width', 'max-height', 'padding-left'], {
+    duration: theme.transitions.duration.shortest
+  }),
+  ...(adjust && {
+    width: '50%',
+    paddingLeft: theme.spacing(1)
+  }),
+  [theme.breakpoints.down('md')]: {
+    width: '100%',
+    paddingLeft: theme.spacing(0)
+  }
+}));
 
 const WrappedSubmitRoute = () => {
   const { t, i18n } = useTranslation(['submit2']);
@@ -49,8 +121,7 @@ const WrappedSubmitRoute = () => {
 
   const form = useForm();
 
-  const downSM = useMediaQuery(theme.breakpoints.down('md'));
-  const md = useMediaQuery(theme.breakpoints.only('md'));
+  const downMD = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
     closeSnackbar();
@@ -91,10 +162,10 @@ const WrappedSubmitRoute = () => {
     }
 
     if (state?.metadata && typeof state.metadata === 'object' && Object.keys(state.metadata).length > 0) {
-      form.setFieldValue('metadata', getDefaultMetadata(state.metadata, configuration));
+      form.setFieldValue('metadata.data', state.metadata);
     } else if (isValidJSON(search.get('metadata'))) {
-      const metadata = JSON.parse(search.get('metadata')) as object;
-      form.setFieldValue('metadata', getDefaultMetadata(metadata, configuration));
+      const metadata = JSON.parse(search.get('metadata')) as Metadata;
+      form.setFieldValue('metadata.data', metadata);
     }
 
     form.setFieldValue('state.loading', false);
@@ -102,7 +173,7 @@ const WrappedSubmitRoute = () => {
   }, [configuration, currentUser, settings]);
 
   return (
-    <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
+    <PageCenter maxWidth={downMD ? '100%' : `${theme.breakpoints.values.md}px`} margin={4} width="100%">
       <AnalysisConfirmation />
 
       {banner}
@@ -116,30 +187,9 @@ const WrappedSubmitRoute = () => {
       <form.Subscribe
         selector={state => [state.values.state.adjust, state.values.state.loading, state.values.state.disabled]}
         children={([adjust, loading, disabled]) => (
-          <div style={{ display: 'flex', flexDirection: 'row', marginTop: theme.spacing(3) }}>
-            <div
-              style={{
-                paddingRight: '0px',
-                width: '100%',
-                transition: theme.transitions.create(['width', 'padding-left'], {
-                  duration: theme.transitions.duration.shortest
-                }),
-                ...(adjust && {
-                  width: '50%',
-                  paddingRight: theme.spacing(1)
-                })
-              }}
-            >
-              <div
-                style={{
-                  position: 'sticky',
-                  top: '64px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  rowGap: theme.spacing(3),
-                  justifyContent: 'start'
-                }}
-              >
+          <Container adjust={adjust}>
+            <LeftPanel adjust={adjust}>
+              <LeftInnerPanel adjust={adjust}>
                 <ClassificationInput />
 
                 <form.Subscribe
@@ -164,50 +214,33 @@ const WrappedSubmitRoute = () => {
                           inner: <HashInput />
                         }
                       }}
+                      sx={{
+                        '.MuiTabs-indicator': {
+                          display: 'none'
+                        }
+                      }}
                     />
                   )}
                 />
                 <SubmissionProfileInput />
 
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    gap: theme.spacing(1),
-                    textAlign: 'left'
-                  }}
-                >
+                <LeftPanelAction adjust={adjust}>
                   <CancelButton />
                   <div style={{ flex: 1 }} />
-                  <FindButton />
+                  {/* <FindButton /> */}
                   <AdjustButton />
                   <AnalyzeButton />
-                </div>
+                </LeftPanelAction>
 
                 <ToS />
-              </div>
-            </div>
+              </LeftInnerPanel>
+            </LeftPanel>
 
-            <div
-              style={{
-                paddingLeft: '0px',
-                overflow: 'hidden',
-                width: '0%',
-                maxHeight: '0px',
-                transition: theme.transitions.create(['width', 'max-height', 'padding-left'], {
-                  duration: theme.transitions.duration.shortest
-                }),
-                ...(adjust && {
-                  width: '50%',
-                  maxHeight: 'fit-content',
-                  paddingLeft: theme.spacing(1)
-                })
-              }}
-            >
+            <RightPanel adjust={adjust}>
               {loading ? null : (
-                <div
-                  style={{
+                <Collapse
+                  in={adjust}
+                  sx={{
                     display: 'flex',
                     flexDirection: 'column',
                     rowGap: theme.spacing(3),
@@ -216,12 +249,12 @@ const WrappedSubmitRoute = () => {
                   }}
                 >
                   <SubmissionOptions />
-                  <SubmissionMetadata />
                   <ServiceParameters />
-                </div>
+                  <SubmissionMetadata />
+                </Collapse>
               )}
-            </div>
-          </div>
+            </RightPanel>
+          </Container>
         )}
       />
 

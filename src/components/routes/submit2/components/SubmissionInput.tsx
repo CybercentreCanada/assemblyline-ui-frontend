@@ -312,9 +312,7 @@ export const FindButton = React.memo(() => {
                 )}
               </DialogContent>
               <DialogActions>
-                <div style={{ flex: 1 }}>
-                  <Button onClick={() => setOpen(false)}> {t('find.close.title')}</Button>
-                </div>
+                <Button onClick={() => setOpen(false)}> {t('find.close.title')}</Button>
 
                 <MuiButton
                   component={Link}

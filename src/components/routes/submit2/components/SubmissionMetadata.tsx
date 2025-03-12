@@ -1,9 +1,18 @@
-import { FormHelperText, Paper, Typography, useTheme } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
+import EditIcon from '@mui/icons-material/Edit';
+import { FormHelperText, ListItemText, Typography, useTheme } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Metadata } from 'components/models/base/config';
+import type { SubmitMetadata } from 'components/routes/submit2/submit.form';
 import { useForm } from 'components/routes/submit2/submit.form';
-import { isValidJSON } from 'components/routes/submit2/submit.utils';
+import { isValidMetadata } from 'components/routes/submit2/submit.utils';
+import { Button } from 'components/visual/Buttons/Button';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import { DateInput } from 'components/visual/Inputs/DateInput';
 import type { NumberInputProps } from 'components/visual/Inputs/NumberInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
@@ -54,13 +63,13 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
 
     const handleChange = useCallback(
       (value: unknown) => {
-        form.setFieldValue(`metadata.config`, m => (!value ? _.omit(m || {}, name) : { ...m, [name]: value }));
+        form.setFieldValue(`metadata.data`, m => (!value ? _.omit(m || {}, name) : { ...m, [name]: value }));
       },
       [form, name]
     );
 
     const handleReset = useCallback(() => {
-      form.setFieldValue(`metadata.config`, m => _.omit(m || {}, name));
+      form.setFieldValue(`metadata.data`, m => _.omit(m || {}, name));
     }, [form, name]);
 
     useEffect(() => {
@@ -90,7 +99,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
 
     return (
       <form.Subscribe
-        selector={state => state.values?.metadata?.config?.[name]}
+        selector={state => state.values?.metadata?.data?.[name]}
         children={value => {
           switch (metadata.validator_type) {
             case 'boolean':
@@ -117,7 +126,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   {...(props as SelectInputProps)}
                   value={(value as string) || ''}
                   options={(metadata.validator_params.values as string[])
-                    .map(key => ({ primary: key.replaceAll('_', ' '), value: key }))
+                    .map(v => ({ primary: v.replaceAll('_', ' '), value: v }))
                     .sort()}
                   reset={!!value}
                 />
@@ -161,54 +170,145 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
   }
 );
 
-export const SubmissionMetadata = React.memo(() => {
+const ExtraMetadata = React.memo(() => {
   const { t } = useTranslation(['submit2']);
   const theme = useTheme();
   const { configuration } = useALContext();
   const form = useForm();
 
+  const handleApply = useCallback(() => {
+    try {
+      form.setFieldValue('metadata', m => {
+        const data = JSON.parse(m.edit) as SubmitMetadata['data'];
+        return { edit: null, data: { ...data, ...m.data } };
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+    }
+  }, [form]);
+
+  const handleClear = useCallback(() => {
+    form.setFieldValue('metadata.data', m =>
+      Object.fromEntries(Object.entries(m).filter(([key]) => key in configuration.submission.metadata.submit))
+    );
+  }, [configuration.submission.metadata.submit, form]);
+
+  return (
+    <>
+      <form.Subscribe
+        selector={state => state.values.metadata.edit}
+        children={data => {
+          const error = isValidMetadata(data, configuration);
+
+          return (
+            <Dialog
+              open={data !== null}
+              maxWidth="lg"
+              fullWidth
+              onClose={() => form.setFieldValue('metadata.edit', null)}
+            >
+              <DialogTitle>
+                <ListItemText primary={t('metadata.editor.title')} />
+              </DialogTitle>
+              <DialogContent sx={{ display: 'flex', flexDirection: 'column', height: 'min(600px, 80vh)' }}>
+                <MonacoEditor
+                  language="json"
+                  value={data}
+                  error={!!error}
+                  options={{ wordWrap: 'on' }}
+                  onChange={v => form.setFieldValue('metadata.edit', v)}
+                />
+                {error && (
+                  <FormHelperText variant="outlined" sx={{ color: theme.palette.error.main }}>
+                    {error}
+                  </FormHelperText>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => form.setFieldValue('metadata.edit', null)}> {t('metadata.cancel.title')}</Button>
+                <Button disabled={!!error} onClick={handleApply}>
+                  {t('metadata.apply.title')}
+                </Button>
+              </DialogActions>
+            </Dialog>
+          );
+        }}
+      />
+
+      <form.Subscribe
+        selector={state => [state.values.state.disabled, state.values.metadata.data]}
+        children={([disabled, data]) => {
+          const metadata = Object.entries(data).filter(([key]) => !(key in configuration.submission.metadata.submit));
+
+          return !metadata.length ? null : (
+            <div style={{ margin: theme.spacing(1) }}>
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}>
+                <Typography color={'textSecondary'} variant="body2" sx={{ flex: 1 }}>
+                  {t('metadata.extra.label')}
+                </Typography>
+
+                <IconButton
+                  disabled={disabled as boolean}
+                  size="small"
+                  tooltip={t('metadata.edit.tooltip')}
+                  onClick={() =>
+                    form.setFieldValue('metadata.edit', JSON.stringify(Object.fromEntries(metadata), undefined, 2))
+                  }
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  disabled={disabled as boolean}
+                  size="small"
+                  tooltip={t('metadata.clear.tooltip')}
+                  onClick={handleClear}
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              </div>
+
+              <div
+                style={{
+                  padding: theme.spacing(1),
+                  display: 'grid',
+                  gridTemplateColumns: 'minmax(auto, 100px) 1fr',
+                  gap: theme.spacing(0.25)
+                }}
+              >
+                {metadata.map(([k, v]) => (
+                  <div key={`${k}-${v}`} style={{ display: 'contents' }}>
+                    <Typography color="textSecondary" variant="body2" textTransform="capitalize">
+                      {k.replaceAll('_', ' ')}
+                    </Typography>
+                    <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
+                      {v}
+                    </Typography>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }}
+      />
+    </>
+  );
+});
+
+export const SubmissionMetadata = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const { configuration } = useALContext();
+
   return (
     <div>
-      <Typography variant="h6">{t('options.metadata.title')}</Typography>
-      <Paper sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Typography variant="h6">{t('metadata.title')}</Typography>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         {Object.entries(configuration.submission.metadata.submit).map(([name, metadata]) => (
           <MetadataParam key={name} name={name} metadata={metadata} />
         ))}
 
-        <form.Subscribe
-          selector={state => [
-            state.values.state.disabled,
-            state.values.metadata.extra,
-            isValidJSON(state.values.metadata.extra)
-          ]}
-          children={([disabled, data, error]) => (
-            <div
-              style={{
-                minHeight: `${8 * 19 + 20}px`,
-                display: 'flex',
-                flexDirection: 'column',
-                margin: theme.spacing(1)
-              }}
-            >
-              <Typography color={error ? 'error' : 'textSecondary'} variant="body2">
-                {t('options.metadata.extra.label')}
-              </Typography>
-              <MonacoEditor
-                language="json"
-                value={data as string}
-                error={!!error}
-                options={{ readOnly: disabled as boolean }}
-                onChange={v => form.setFieldValue('metadata.extra', v)}
-              />
-              {error && (
-                <FormHelperText variant="outlined" sx={{ color: theme.palette.error.main }}>
-                  {error}
-                </FormHelperText>
-              )}
-            </div>
-          )}
-        />
-      </Paper>
+        <ExtraMetadata />
+      </div>
     </div>
   );
 });

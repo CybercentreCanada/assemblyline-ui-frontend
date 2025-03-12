@@ -151,7 +151,7 @@ const WrappedTextInput = <
             onFocus={event => setFocused(document.activeElement === event.target)}
             onBlur={() => setFocused(false)}
             renderOption={(props, option) => (
-              <Typography {...props} {...(tiny && { variant: 'body2' })}>
+              <Typography {...props} key={option} {...(tiny && { variant: 'body2' })}>
                 {option}
               </Typography>
             )}

@@ -1,4 +1,4 @@
-import { Paper, Typography, useTheme } from '@mui/material';
+import { Typography, useTheme } from '@mui/material';
 import type { ProfileSettings } from 'components/routes/settings/settings.utils';
 import type { SubmitStore } from 'components/routes/submit2/submit.form';
 import { useForm } from 'components/routes/submit2/submit.form';
@@ -253,7 +253,7 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
           >
             {!hasParams ? null : (
               <>
-                <Paper sx={{ display: 'flex', flexDirection: 'column', marginLeft: '48px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '48px' }}>
                   {(() => {
                     const params = calculateParams(spec, selected, customize);
 
@@ -280,7 +280,7 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
                       </>
                     );
                   })()}
-                </Paper>
+                </div>
               </>
             )}
           </CollapseSection>

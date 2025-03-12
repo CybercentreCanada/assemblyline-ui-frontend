@@ -73,24 +73,22 @@ const Title = React.memo(() => {
         const hash = props[3] as SubmitStore['hash']['value'];
 
         return (
-          <DialogTitle>
-            <ListItemText
-              primary={t('confirmation.title').replace('{type}', tab === 'file' ? 'File' : type.toUpperCase())}
-              secondary={
-                tab === 'file' ? (
-                  <>
-                    {file.name}
-                    {' ('}
-                    <ByteNumber component="span" bytes={file.size} variant="body2" />
-                    {')'}
-                  </>
-                ) : (
-                  hash
-                )
-              }
-              primaryTypographyProps={{ variant: 'h6' }}
-            />
-          </DialogTitle>
+          <ListItemText
+            primary={t('confirmation.title').replace('{type}', tab === 'file' ? 'File' : type.toUpperCase())}
+            secondary={
+              tab === 'file' ? (
+                <>
+                  {file.name}
+                  {' ('}
+                  <ByteNumber component="span" bytes={file.size} variant="body2" />
+                  {')'}
+                </>
+              ) : (
+                hash
+              )
+            }
+            primaryTypographyProps={{ variant: 'h6' }}
+          />
         );
       }}
     />
@@ -482,7 +480,7 @@ export const AnalysisActions = React.memo(() => {
   );
 
   return (
-    <DialogActions sx={{ paddingTop: 0 }}>
+    <>
       <Button
         tooltip={t('close.button.tooltip')}
         tooltipProps={{ placement: 'bottom' }}
@@ -503,7 +501,7 @@ export const AnalysisActions = React.memo(() => {
           </Button>
         )}
       />
-    </DialogActions>
+    </>
   );
 });
 
@@ -515,8 +513,16 @@ export const AnalysisConfirmation = React.memo(() => {
     <form.Subscribe
       selector={state => [state.values.state.confirmation]}
       children={([open]) => (
-        <Dialog fullWidth open={open} onClose={() => form.setFieldValue('state.confirmation', false)}>
-          <Title />
+        <Dialog
+          aria-labelledby="submit-confirmation-dialog-title"
+          aria-describedby="submit-confirmation-dialog-description"
+          fullWidth
+          open={open}
+          onClose={() => form.setFieldValue('state.confirmation', false)}
+        >
+          <DialogTitle id="submit-confirmation-dialog-title">
+            <Title />
+          </DialogTitle>
 
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1.5) }}>
             <Password />
@@ -526,7 +532,9 @@ export const AnalysisConfirmation = React.memo(() => {
           </DialogContent>
 
           <ToS />
-          <AnalysisActions />
+          <DialogActions sx={{ paddingTop: 0 }}>
+            <AnalysisActions />
+          </DialogActions>
         </Dialog>
       )}
     />

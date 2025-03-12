@@ -21,7 +21,7 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
     ...props
   }: IconButtonProps) =>
     preventRender ? null : (
-      <Tooltip title={tooltip} {...tooltipProps}>
+      <Tooltip title={tooltip} placement="bottom" {...tooltipProps}>
         <MuiIconButton disabled={loading || disabled} {...props}>
           {children}
           {loading && (

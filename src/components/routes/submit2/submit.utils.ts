@@ -6,7 +6,7 @@ import {
   type ProfileSettings
 } from 'components/routes/settings/settings.utils';
 import { isURL } from 'helpers/utils';
-import type { SubmitMetadata, SubmitStore } from './submit.form';
+import type { SubmitStore } from './submit.form';
 
 export const getPreferredSubmissionProfile = (settings: UserSettings): string =>
   !settings
@@ -27,21 +27,21 @@ export const getDefaultExternalSources = (
   return { prev: sources, value: sources };
 };
 
-export const getDefaultMetadata = (data: object, configuration: Configuration): SubmitMetadata => {
-  const configKeys = Object.keys(configuration?.submission?.metadata?.submit || {});
+// export const getDefaultMetadata = (data: object, configuration: Configuration): SubmitMetadata => {
+//   const configKeys = Object.keys(configuration?.submission?.metadata?.submit || {});
 
-  const out = Object.entries(data).reduce(
-    (prev, [key, value]) => {
-      if (configKeys.includes(key)) prev.config.push([key, value]);
-      else prev.extra.push([key, value]);
+//   const out = Object.entries(data).reduce(
+//     (prev, [key, value]) => {
+//       if (configKeys.includes(key)) prev.config.push([key, value]);
+//       else prev.extra.push([key, value]);
 
-      return prev;
-    },
-    { config: [], extra: [] } as { config: [string, unknown][]; extra: [string, unknown][] }
-  );
+//       return prev;
+//     },
+//     { config: [], extra: [] } as { config: [string, unknown][]; extra: [string, unknown][] }
+//   );
 
-  return { config: Object.fromEntries(out.config), extra: JSON.stringify(Object.fromEntries(out.extra)) };
-};
+//   return { config: Object.fromEntries(out.config), extra: JSON.stringify(Object.fromEntries(out.extra)) };
+// };
 
 export const switchProfile = (
   out: ProfileSettings,
@@ -63,10 +63,18 @@ export const isValidJSON = (value: string): boolean => {
   }
 };
 
-export const isValidMetadata = (value: string): string => {
+export const isValidMetadata = (value: string, configuration: Configuration): string => {
   try {
     if (!value) return null;
     const data = JSON.parse(value) as object;
+
+    Object.entries(configuration.submission.metadata.submit).forEach(([k]) => {
+      if (k in data) {
+        throw new Error(`Cannot use the reserved key "${k}" as it must be defined using the system's configuration`);
+      }
+    });
+
+    return null;
   } catch (e) {
     return `${e}`;
   }
@@ -93,7 +101,7 @@ export const isSubmissionValid = (values: SubmitStore, configuration: Configurat
 
   if (
     Object.entries(configuration.submission.metadata.submit).some(([key, metadata]) => {
-      const value = values.metadata?.config?.[key];
+      const value = values.metadata?.data?.[key];
       if (metadata.required && !value) {
         return true;
       } else if (metadata.validator_type === 'uri' && !isURL((value || '') as string)) {
@@ -113,10 +121,6 @@ export const isSubmissionValid = (values: SubmitStore, configuration: Configurat
       }
     })
   ) {
-    return false;
-  }
-
-  if (isValidJSON(values.metadata.extra)) {
     return false;
   }
 
