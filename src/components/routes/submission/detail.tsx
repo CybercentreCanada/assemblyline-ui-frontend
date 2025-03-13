@@ -1277,7 +1277,7 @@ function WrappedSubmissionDetail() {
                               <ListItem
                                 button
                                 component={Link}
-                                to={`/submit?hash=${submission.files[0].sha256}`}
+                                to={`/submit2?hash=${submission.files[0].sha256}`}
                                 state={{
                                   c12n: submission.classification,
                                   metadata: submission.metadata

@@ -372,9 +372,8 @@ export const ServiceParameters = React.memo(() => {
   const form = useForm();
 
   return (
-    <div style={{ textAlign: 'left', marginTop: theme.spacing(2) }}>
+    <div>
       <Typography variant="h6">{t('options.services.title')}</Typography>
-
       <form.Subscribe
         selector={state => [state.values.settings.services]}
         children={([categories]) => (

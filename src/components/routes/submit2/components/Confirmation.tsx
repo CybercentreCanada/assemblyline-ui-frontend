@@ -1,5 +1,7 @@
+import PublishIcon from '@mui/icons-material/Publish';
 import type { PaperProps, TypographyProps } from '@mui/material';
 import {
+  Alert,
   Dialog,
   DialogActions,
   DialogContent,
@@ -7,6 +9,7 @@ import {
   DialogTitle,
   ListItemText,
   Paper,
+  Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
@@ -17,9 +20,10 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { HashPatternMap } from 'components/models/base/config';
 import type { Submission } from 'components/models/base/submission';
 import { parseSubmissionProfile } from 'components/routes/settings/settings.utils';
-import type { SubmitStore } from 'components/routes/submit2/submit.form';
+import type { AutoURLServiceIndices, SubmitStore } from 'components/routes/submit2/submit.form';
 import { FLOW, useForm } from 'components/routes/submit2/submit.form';
-import { isSubmissionValid, isValidJSON } from 'components/routes/submit2/submit.utils';
+import { isSubmissionValid, isUsingExternalServices, isValidJSON } from 'components/routes/submit2/submit.utils';
+import type { ButtonProps } from 'components/visual/Buttons/Button';
 import { Button } from 'components/visual/Buttons/Button';
 import { ByteNumber } from 'components/visual/ByteNumber';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
@@ -39,7 +43,7 @@ const Section = React.memo(({ primary, primaryProps, children, ...props }: Secti
   const theme = useTheme();
 
   return (
-    <div>
+    <div style={{ textAlign: 'left' }}>
       <Typography color="textSecondary" variant="body2" {...primaryProps}>
         {primary}
       </Typography>
@@ -131,14 +135,42 @@ const Password = React.memo(() => {
   );
 });
 
-const Malicious = React.memo(() => {
+export const CustomizabilityAlert = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const theme = useTheme();
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [state.values.state.customize]}
+      children={([customize]) => (
+        <Tooltip
+          placement="bottom-start"
+          title={customize ? t('customize.full.tooltip') : t('customize.limited.tooltip')}
+          slotProps={{ tooltip: { sx: { backgroundColor: 'rgba(97, 97, 97, 1)' } } }}
+        >
+          <div>
+            <Alert
+              severity={customize ? 'info' : 'warning'}
+              sx={{ paddingTop: theme.spacing(0.25), paddingBottom: theme.spacing(0.25) }}
+            >
+              {customize ? t('customize.full.label') : t('customize.limited.label')}
+            </Alert>
+          </div>
+        </Tooltip>
+      )}
+    />
+  );
+});
+
+export const Malicious = React.memo(() => {
   const { t } = useTranslation(['submit2']);
   const form = useForm();
 
   return (
     <form.Subscribe
       selector={state => [
-        state.values.state.tab === 'file',
+        state.values.state.tab === 'file' && !!state.values.file,
         state.values.settings.malicious.value,
         state.values.state.loading,
         state.values.state.disabled
@@ -159,7 +191,7 @@ const Malicious = React.memo(() => {
   );
 });
 
-const ExternalSources = React.memo(() => {
+export const ExternalSources = React.memo(() => {
   const { t } = useTranslation(['submit2']);
   const { configuration } = useALContext();
   const form = useForm();
@@ -174,7 +206,10 @@ const ExternalSources = React.memo(() => {
       ]}
       children={([isHash, loading, disabled, ...sources]) =>
         !isHash || sources.length === 0 ? null : (
-          <Section primary={t('options.submission.default_external_sources.label')}>
+          <div style={{ textAlign: 'left' }}>
+            <Typography color="textSecondary" variant="body2">
+              {t('options.submission.default_external_sources.label')}
+            </Typography>
             {sources.map((source: string, i) => (
               <form.Subscribe
                 key={`${source}-${i}`}
@@ -198,28 +233,25 @@ const ExternalSources = React.memo(() => {
                 )}
               />
             ))}
-          </Section>
+          </div>
         )
       }
     />
   );
 });
 
-const ExternalServices = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+const AutoURLServicesSelection = React.memo(({ hasURLservices = false }: { hasURLservices: boolean }) => {
   const { configuration } = useALContext();
   const form = useForm();
 
-  useEffect(() => {
-    if (form.getFieldValue('state.tab') !== 'hash' || form.getFieldValue('hash.type') !== 'url') return;
-
-    const prevValues: [number, number, boolean][] = [];
+  const addURLServiceSelection = useCallback(() => {
+    const current: AutoURLServiceIndices = [];
 
     form.setFieldValue('settings.services', categories => {
       categories.forEach((category, i) => {
         category.services.forEach((service, j) => {
           if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
-            prevValues.push([i, j, categories[i].services[j].selected]);
+            current.push([i, j, categories[i].services[j].selected]);
             categories[i].services[j].selected = true;
           }
         });
@@ -229,79 +261,119 @@ const ExternalServices = React.memo(() => {
       return categories;
     });
 
-    return () => {
-      form.setFieldValue('settings.services', categories => {
-        prevValues.forEach(([i, j, value]) => {
-          categories[i].services[j].selected = value;
-        });
-
-        categories.forEach((category, i) => {
-          categories[i].selected = category.services.every(s => s.selected);
-        });
-
-        return categories;
+    form.setFieldValue('state.autoURLServiceSelection', services => {
+      current.forEach(c => {
+        if (!services.some(s => s[0] === c[0] && s[1] === c[1])) {
+          services = [...services, c];
+        }
       });
-    };
+      return services;
+    });
   }, [configuration.ui.url_submission_auto_service_selection, form]);
 
+  const removeURLServiceSelection = useCallback(() => {
+    const urlServices = form.getFieldValue('state.autoURLServiceSelection');
+    if (urlServices.length == 0) return;
+
+    form.setFieldValue('settings.services', categories => {
+      urlServices.forEach(([i, j, value]) => {
+        categories[i].services[j].selected = value;
+      });
+
+      categories.forEach((category, i) => {
+        categories[i].selected = category.services.every(s => s.selected);
+      });
+
+      return categories;
+    });
+
+    form.setFieldValue('state.autoURLServiceSelection', []);
+  }, [form]);
+
+  useEffect(() => {
+    if (hasURLservices) addURLServiceSelection();
+    else removeURLServiceSelection();
+  }, [addURLServiceSelection, hasURLservices, removeURLServiceSelection]);
+
+  return null;
+});
+
+export const ExternalServices = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const { configuration } = useALContext();
+  const form = useForm();
+
   return (
-    <form.Subscribe
-      selector={state => [
-        state.values.state.loading,
-        state.values.state.disabled,
-        state.values.state.customize,
-        state.values.settings.services,
-        state.values.state.tab === 'hash' &&
-          state.values.hash.type === 'url' &&
-          state.values.settings.services.some(cat =>
-            cat.services.some(svr => configuration.ui.url_submission_auto_service_selection.includes(svr.name))
-          )
-      ]}
-      children={([loading, disabled, customize, categories, hasURLservices]) =>
-        !hasURLservices ? null : (
-          <Section primary={t('options.submission.url_submission_auto_service_selection.label')}>
-            {(categories as SubmitStore['settings']['services'])
-              .reduce((prev: [number, number][], category, i) => {
-                category.services.forEach((service, j) => {
-                  if (configuration.ui.url_submission_auto_service_selection?.includes(service.name)) prev.push([i, j]);
-                });
-                return prev;
-              }, [])
-              .map(([cat, svr], i) => (
+    <>
+      <form.Subscribe
+        selector={state => [
+          state.values.state.tab === 'hash' &&
+            state.values.hash.type === 'url' &&
+            state.values.settings.services.some(cat =>
+              cat.services.some(svr => configuration.ui.url_submission_auto_service_selection.includes(svr.name))
+            )
+        ]}
+        children={([hasURLservices]) => <AutoURLServicesSelection hasURLservices={hasURLservices} />}
+      />
+      <form.Subscribe
+        selector={state => [
+          state.values.state.loading,
+          state.values.state.disabled,
+          state.values.state.customize,
+          state.values.state.autoURLServiceSelection
+        ]}
+        children={props => {
+          const loading = props[0] as boolean;
+          const disabled = props[1] as boolean;
+          const customize = props[2] as boolean;
+          const autoURLServiceSelection = props[3] as SubmitStore['state']['autoURLServiceSelection'];
+
+          return autoURLServiceSelection.length === 0 ? null : (
+            <div style={{ textAlign: 'left' }}>
+              <Typography color="textSecondary" variant="body2">
+                {t('options.submission.url_submission_auto_service_selection.label')}
+              </Typography>
+              {autoURLServiceSelection.map(([cat, svr], i) => (
                 <form.Subscribe
                   key={i}
                   selector={state => {
                     const service = state.values.settings.services[cat].services[svr];
                     return [service.name, service.selected];
                   }}
-                  children={([name, selected]) => (
-                    <CheckboxInput
-                      key={i}
-                      id={`url_submission_auto_service_selection-${(name as string).replace('_', ' ')}`}
-                      label={(name as string).replace('_', ' ')}
-                      labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
-                      value={selected as boolean}
-                      loading={loading as boolean}
-                      disabled={(disabled || !customize) as boolean}
-                      onChange={() => {
-                        form.setFieldValue('settings', s => {
-                          s.services[cat].services[svr].selected = !selected;
-                          s.services[cat].selected = s.services[cat].services.every(val => val.selected);
-                          return s;
-                        });
-                      }}
-                    />
-                  )}
+                  children={props2 => {
+                    const name = props2[0] as string;
+                    const selected = props2[1] as boolean;
+
+                    return (
+                      <CheckboxInput
+                        key={i}
+                        id={`url_submission_auto_service_selection-${name.replace('_', ' ')}`}
+                        label={name.replace('_', ' ')}
+                        labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
+                        value={selected}
+                        loading={loading}
+                        disabled={disabled || !customize}
+                        onChange={() => {
+                          form.setFieldValue('settings', s => {
+                            s.services[cat].services[svr].selected = !selected;
+                            s.services[cat].selected = s.services[cat].services.every(val => val.selected);
+                            return s;
+                          });
+                        }}
+                      />
+                    );
+                  }}
                 />
               ))}
-          </Section>
-        )
-      }
-    />
+            </div>
+          );
+        }}
+      />
+    </>
   );
 });
 
-export const ToS = React.memo(() => {
+const ToS = React.memo(() => {
   const { t } = useTranslation(['submit2']);
   const theme = useTheme();
   const { configuration } = useALContext();
@@ -537,6 +609,104 @@ export const AnalysisConfirmation = React.memo(() => {
           </DialogActions>
         </Dialog>
       )}
+    />
+  );
+});
+
+export const CancelButton = React.memo(() => {
+  return null;
+});
+
+const AnalyzeButton = React.memo((props: ButtonProps) => {
+  const { t } = useTranslation(['submit2']);
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [
+        state.values.state.loading,
+        state.values.state.disabled,
+        state.values.state.uploading,
+        state.values.state.tab,
+        !state.values.file,
+        !state.values.hash.type
+      ]}
+      children={([loading, disabled, uploading, tab, file, hash]) => (
+        <Button
+          disabled={(disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)) as boolean}
+          loading={(loading || uploading) as boolean}
+          startIcon={<PublishIcon />}
+          tooltip={t('analyze.button.tooltip')}
+          tooltipProps={{ placement: 'bottom' }}
+          variant="contained"
+          onClick={() => form.setFieldValue('state.confirmation', s => !s)}
+          {...props}
+        >
+          {t('analyze.button.label')}
+        </Button>
+      )}
+    />
+  );
+});
+
+const ExternalServicesButton = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const theme = useTheme();
+  const { configuration } = useALContext();
+  const form = useForm();
+
+  return (
+    <>
+      <form.Subscribe
+        selector={state => [
+          state.values.state.tab === 'file' && !!state.values.file,
+          state.values.state.tab === 'hash' && !!state.values.hash.type,
+          state.values.state.confirmation
+        ]}
+        children={([isFile, isHash, confirmation]) => (
+          <Dialog
+            aria-labelledby="submit-confirmation-dialog-title"
+            aria-describedby="submit-confirmation-dialog-description"
+            fullWidth
+            open={confirmation}
+            onClose={() => form.setFieldValue('state.confirmation', false)}
+          >
+            <DialogTitle id="submit-confirmation-dialog-title"></DialogTitle>
+
+            <DialogContent></DialogContent>
+
+            <DialogActions sx={{ paddingTop: 0 }}>{isFile ? <></> : isHash ? <></> : null}</DialogActions>
+          </Dialog>
+        )}
+      />
+      <AnalyzeButton onClick={() => form.setFieldValue('state.confirmation', true)} />
+    </>
+  );
+});
+
+export const Confirmation = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const { configuration } = useALContext();
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [
+        state.values.state.tab === 'file' && !!state.values.file,
+        state.values.state.tab === 'hash' && !!state.values.hash.type,
+        state.values.state.loading ? false : isUsingExternalServices(state.values.settings, configuration)
+      ]}
+      children={([isFile, isHash, isExternal]) =>
+        isExternal ? (
+          <ExternalServicesButton />
+        ) : isFile ? (
+          <FileSubmit />
+        ) : isHash ? (
+          <HashSubmit />
+        ) : (
+          <AnalyzeButton disabled />
+        )
+      }
     />
   );
 });

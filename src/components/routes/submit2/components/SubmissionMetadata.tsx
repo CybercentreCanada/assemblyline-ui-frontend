@@ -227,7 +227,7 @@ const ExtraMetadata = React.memo(() => {
               </DialogContent>
               <DialogActions>
                 <Button onClick={() => form.setFieldValue('metadata.edit', null)}> {t('metadata.cancel.title')}</Button>
-                <Button disabled={!!error} onClick={handleApply}>
+                <Button disabled={!!error} variant="contained" onClick={handleApply}>
                   {t('metadata.apply.title')}
                 </Button>
               </DialogActions>

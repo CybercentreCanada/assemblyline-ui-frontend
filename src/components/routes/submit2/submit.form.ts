@@ -16,6 +16,9 @@ export type SubmitMetadata = {
   edit: string;
 };
 
+// [Category Index, Service Index, Previous Value]
+export type AutoURLServiceIndices = [number, number, boolean][];
+
 export const FLOW = new Flow({
   target: '/api/v4/ui/flowjs/',
   permanentErrors: [412, 500, 501],
@@ -29,6 +32,9 @@ export type SubmitStore = {
   state: {
     /** adjust the service selection and parameters */
     adjust: boolean;
+
+    /** adjust the service selection and parameters */
+    autoURLServiceSelection: AutoURLServiceIndices;
 
     /** Is the confirmation dialog open? */
     confirmation: boolean;
@@ -77,6 +83,7 @@ export type SubmitStore = {
 export const DEFAULT_SUBMIT_FORM: SubmitStore = Object.freeze({
   state: {
     adjust: true,
+    autoURLServiceSelection: [],
     confirmation: false,
     customize: false,
     disabled: false,

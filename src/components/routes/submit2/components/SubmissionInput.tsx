@@ -1,4 +1,3 @@
-import PublishIcon from '@mui/icons-material/Publish';
 import SearchIcon from '@mui/icons-material/Search';
 import TuneIcon from '@mui/icons-material/Tune';
 import { Alert, CircularProgress, ListItemText, Button as MuiButton, Typography, useTheme } from '@mui/material';
@@ -7,14 +6,22 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import useALContext from 'components/hooks/useALContext';
+import type { APIResponseProps } from 'components/hooks/useMyAPI';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { File } from 'components/models/base/file';
+import type { Submission } from 'components/models/base/submission';
 import type { SearchResult } from 'components/models/ui/search';
-import { getProfileNames } from 'components/routes/settings/settings.utils';
+import { getProfileNames, parseSubmissionProfile } from 'components/routes/settings/settings.utils';
 import type { SubmitStore } from 'components/routes/submit2/submit.form';
 import { FLOW, useForm } from 'components/routes/submit2/submit.form';
-import { calculateFileHash, getHashQuery, switchProfile } from 'components/routes/submit2/submit.utils';
+import {
+  calculateFileHash,
+  getHashQuery,
+  isUsingExternalServices,
+  switchProfile
+} from 'components/routes/submit2/submit.utils';
+import type { ButtonProps } from 'components/visual/Buttons/Button';
 import { Button } from 'components/visual/Buttons/Button';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
@@ -22,9 +29,9 @@ import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import FileDropper from './FileDropper';
 
 export const ClassificationInput = React.memo(() => {
@@ -393,7 +400,7 @@ export const AdjustButton = React.memo(() => {
   );
 });
 
-export const AnalyzeButton = React.memo(() => {
+const AnalyzeButton = React.memo(({ children = null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit2']);
   const form = useForm();
 
@@ -411,15 +418,281 @@ export const AnalyzeButton = React.memo(() => {
         <Button
           disabled={(disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)) as boolean}
           loading={(loading || uploading) as boolean}
-          startIcon={<PublishIcon />}
+          // startIcon={<PublishIcon />}
           tooltip={t('analyze.button.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           variant="contained"
           onClick={() => form.setFieldValue('state.confirmation', s => !s)}
+          {...props}
         >
-          {t('analyze.button.label')}
+          {children ? children : t('analyze.button.label')}
         </Button>
       )}
+    />
+  );
+});
+
+const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) => {
+  const { t } = useTranslation(['submit2']);
+  const form = useForm();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const { closeSnackbar, showErrorMessage, showSuccessMessage } = useMySnackbar();
+  const { settings } = useALContext();
+
+  const handleCancel = useCallback(() => {
+    form.setFieldValue('file', null);
+    form.setFieldValue('hash.type', null);
+    form.setFieldValue('hash.value', '');
+    form.setFieldValue('state.uploading', false);
+    form.setFieldValue('state.uploadProgress', null);
+    form.setFieldValue('state.uuid', generateUUID());
+
+    FLOW.cancel();
+    FLOW.off('complete');
+    FLOW.off('fileError');
+    FLOW.off('progress');
+  }, [form]);
+
+  const handleSubmitFile = useCallback(
+    () => {
+      closeSnackbar();
+      const file = form.getFieldValue('file');
+      const size = form.getFieldValue('file.size');
+      const uuid = form.getFieldValue('state.uuid');
+      const params = form.getFieldValue('settings');
+      const metadata = form.getFieldValue('metadata');
+      const profile = form.getFieldValue('state.profile');
+
+      form.setFieldValue('state.uploading', true);
+      form.setFieldValue('state.uploadProgress', 0);
+      form.setFieldValue('state.confirmation', false);
+
+      FLOW.opts.generateUniqueIdentifier = selectedFile => {
+        const relativePath =
+          selectedFile?.relativePath ||
+          selectedFile?.file?.webkitRelativePath ||
+          selectedFile?.file?.name ||
+          selectedFile?.name;
+        return `${uuid}_${size}_${relativePath.replace(/[^0-9a-zA-Z_-]/gim, '')}`;
+      };
+
+      FLOW.on('fileError', (event, api_data) => {
+        try {
+          const data = JSON.parse(api_data) as APIResponseProps<unknown>;
+          if ('api_status_code' in data) {
+            if (
+              data.api_status_code === 401 ||
+              (data.api_status_code === 503 &&
+                data.api_error_message.includes('quota') &&
+                data.api_error_message.includes('daily') &&
+                data.api_error_message.includes('API'))
+            ) {
+              window.location.reload();
+            } else {
+              // Unexpected error occurred, cancel upload and show error message
+              handleCancel();
+              showErrorMessage(t('submit.file.upload_fail'));
+            }
+          }
+        } catch (ex) {
+          handleCancel();
+          showErrorMessage(t('submit.file.upload_fail'));
+        }
+      });
+
+      FLOW.on('progress', () => {
+        form.setFieldValue('state.uploadProgress', Math.trunc(FLOW.progress() * 100));
+      });
+
+      FLOW.on('complete', () => {
+        if (FLOW.files.length === 0) {
+          return;
+        }
+
+        for (let x = 0; x < FLOW.files.length; x++) {
+          if (FLOW.files[x].error) {
+            return;
+          }
+        }
+        apiCall<{ started: boolean; sid: string }>({
+          url: `/api/v4/ui/start/${uuid}/`,
+          method: 'POST',
+          body: {
+            ...parseSubmissionProfile(settings, params, profile),
+            submission_profile: profile,
+            filename: file.path,
+            metadata: metadata.data
+          },
+          onSuccess: ({ api_response }) => {
+            showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
+            setTimeout(() => {
+              navigate(`/submission/detail/${api_response.sid}`);
+            }, 1000);
+          },
+          onFailure: ({ api_status_code, api_error_message }) => {
+            if ([400, 403, 404, 503].includes(api_status_code)) showErrorMessage(api_error_message);
+            else showErrorMessage(t('submit.file.failure'));
+            handleCancel();
+          },
+          onExit: () => {
+            form.setFieldValue('state.uploading', false);
+          }
+        });
+      });
+
+      FLOW.addFile(file);
+      FLOW.upload();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [form, handleCancel, navigate, settings, showErrorMessage, showSuccessMessage, t]
+  );
+
+  return (
+    <AnalyzeButton
+      {...props}
+      onClick={event => {
+        onClick(event);
+        handleSubmitFile();
+      }}
+    />
+  );
+});
+
+const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) => {
+  const { t } = useTranslation(['submit2']);
+  const form = useForm();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const { closeSnackbar, showErrorMessage, showSuccessMessage } = useMySnackbar();
+  const { settings } = useALContext();
+
+  const handleSubmitHash = useCallback(
+    () => {
+      closeSnackbar();
+
+      const hash = form.getFieldValue('hash');
+      const params = form.getFieldValue('settings');
+      const metadata = form.getFieldValue('metadata');
+      const profile = form.getFieldValue('state.profile');
+
+      apiCall<Submission>({
+        url: '/api/v4/submit/',
+        method: 'POST',
+        body: {
+          ui_params: parseSubmissionProfile(settings, params, profile),
+          submission_profile: profile,
+          [hash.type]: hash.value,
+          metadata: metadata.data
+        },
+        onSuccess: ({ api_response }) => {
+          showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
+          setTimeout(() => {
+            navigate(`/submission/detail/${api_response.sid}`);
+          }, 1000);
+        },
+        onFailure: ({ api_error_message }) => {
+          showErrorMessage(api_error_message);
+        },
+        onEnter: () => {
+          form.setFieldValue('state.uploading', true);
+          form.setFieldValue('state.confirmation', false);
+        },
+        onExit: () => {
+          form.setFieldValue('state.uploading', false);
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [form, navigate, settings, showErrorMessage, showSuccessMessage, t]
+  );
+
+  return (
+    <AnalyzeButton
+      {...props}
+      onClick={event => {
+        onClick(event);
+        handleSubmitHash();
+      }}
+    />
+  );
+});
+
+const ExternalServicesDialog = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const form = useForm();
+
+  const handleDeselectExternalServices = useCallback(() => {}, []);
+
+  return (
+    <>
+      <form.Subscribe
+        selector={state => [
+          state.values.state.tab === 'file' && !!state.values.file,
+          state.values.state.tab === 'hash' && !!state.values.hash.type,
+          state.values.state.confirmation
+        ]}
+        children={([isFile, isHash, confirmation]) => (
+          <Dialog
+            aria-labelledby={t('external_services.dialog.title')}
+            aria-describedby={t('external_services.dialog.content')}
+            fullWidth
+            open={confirmation}
+            onClose={() => form.setFieldValue('state.confirmation', false)}
+          >
+            <DialogTitle id={t('external_services.dialog.title')}>{t('external_services.dialog.title')}</DialogTitle>
+
+            <DialogContent>
+              <Typography color="textSecondary">{t('external_services.dialog.content')}</Typography>
+            </DialogContent>
+
+            <DialogActions sx={{ paddingTop: 0 }}>
+              {isFile ? (
+                <>
+                  <FileSubmit color="secondary" variant="text" onClick={() => handleDeselectExternalServices()}>
+                    {t('external_services.dialog.action.deselect')}
+                  </FileSubmit>
+                  <FileSubmit variant="text">{t('external_services.dialog.action.continue')}</FileSubmit>
+                </>
+              ) : isHash ? (
+                <>
+                  <HashSubmit color="secondary" variant="text" onClick={() => handleDeselectExternalServices()}>
+                    {t('external_services.dialog.action.deselect')}
+                  </HashSubmit>
+                  <HashSubmit variant="text">{t('external_services.dialog.action.continue')}</HashSubmit>
+                </>
+              ) : null}
+            </DialogActions>
+          </Dialog>
+        )}
+      />
+      <AnalyzeButton onClick={() => form.setFieldValue('state.confirmation', true)} />
+    </>
+  );
+});
+
+export const AnalyzeSubmission = React.memo(() => {
+  const { configuration } = useALContext();
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [
+        state.values.state.tab === 'file' && !!state.values.file,
+        state.values.state.tab === 'hash' && !!state.values.hash.type,
+        state.values.state.loading ? false : isUsingExternalServices(state.values.settings, configuration)
+      ]}
+      children={([isFile, isHash, isExternal]) =>
+        isExternal ? (
+          <ExternalServicesDialog />
+        ) : isFile ? (
+          <FileSubmit />
+        ) : isHash ? (
+          <HashSubmit />
+        ) : (
+          <AnalyzeButton disabled />
+        )
+      }
     />
   );
 });

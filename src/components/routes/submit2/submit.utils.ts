@@ -149,3 +149,10 @@ export const calculateFileHash = (file: File) =>
 
 export const getHashQuery = (type: string, value: string) =>
   type === 'file' ? `sha256:"${value}"` : `${type}:"${value}"`;
+
+export const isUsingExternalServices = (settings: ProfileSettings, configuration: Configuration): boolean =>
+  settings.services.some(category =>
+    category.services.some(
+      service => configuration.ui.url_submission_auto_service_selection.includes(service.name) && service.selected
+    )
+  );

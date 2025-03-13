@@ -17,11 +17,11 @@ import { getSubmitType } from 'helpers/utils';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
-import { AnalysisConfirmation } from './components/Confirmation';
+import { CustomizabilityAlert, ExternalServices, ExternalSources, Malicious } from './components/Confirmation';
 import { ServiceParameters } from './components/ServiceParameters';
 import {
   AdjustButton,
-  AnalyzeButton,
+  AnalyzeSubmission,
   CancelButton,
   ClassificationInput,
   FileInput,
@@ -174,7 +174,7 @@ const WrappedSubmitRoute = () => {
 
   return (
     <PageCenter maxWidth={downMD ? '100%' : `${theme.breakpoints.values.md}px`} margin={4} width="100%">
-      <AnalysisConfirmation />
+      {/* <AnalysisConfirmation /> */}
 
       {banner}
 
@@ -224,12 +224,20 @@ const WrappedSubmitRoute = () => {
                 />
                 <SubmissionProfileInput />
 
+                {loading ? null : (
+                  <>
+                    <Malicious />
+                    <ExternalSources />
+                    <ExternalServices />
+                  </>
+                )}
+
                 <LeftPanelAction adjust={adjust}>
                   <CancelButton />
                   <div style={{ flex: 1 }} />
                   {/* <FindButton /> */}
                   <AdjustButton />
-                  <AnalyzeButton />
+                  <AnalyzeSubmission />
                 </LeftPanelAction>
 
                 <ToS />
@@ -241,13 +249,17 @@ const WrappedSubmitRoute = () => {
                 <Collapse
                   in={adjust}
                   sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    rowGap: theme.spacing(3),
-                    justifyContent: 'start',
-                    textAlign: 'start'
+                    '& .MuiCollapse-wrapperInner': {
+                      display: 'flex',
+                      flexDirection: 'column',
+                      rowGap: theme.spacing(2),
+                      flex: 1,
+                      justifyContent: 'start',
+                      textAlign: 'start'
+                    }
                   }}
                 >
+                  <CustomizabilityAlert />
                   <SubmissionOptions />
                   <ServiceParameters />
                   <SubmissionMetadata />

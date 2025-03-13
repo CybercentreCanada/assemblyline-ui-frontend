@@ -3,7 +3,7 @@ import { CircularProgress, Button as MuiButton } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
 
-type ButtonProps = MuiButtonProps & {
+export type ButtonProps = MuiButtonProps & {
   loading?: boolean;
   preventRender?: boolean;
   tooltip?: string;
