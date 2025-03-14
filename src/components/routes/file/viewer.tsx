@@ -238,7 +238,7 @@ const WrappedFileViewer = () => {
               },
               image: {
                 label: t('image'),
-                disabled: !imageAllowed,
+                preventRender: !imageAllowed,
                 inner: (
                   <div className={classes.tab}>
                     <ImageSection sha256={sha256} name={sha256} />

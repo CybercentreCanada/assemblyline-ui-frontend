@@ -5,8 +5,8 @@
  * @returns the CSRF token
  *
  */
-export default function getXSRFCookie() {
-  let xsrfToken = null;
+export const getXSRFCookie = (): string => {
+  let xsrfToken: string = null;
   if (document.cookie !== undefined) {
     try {
       // eslint-disable-next-line prefer-destructuring
@@ -19,4 +19,6 @@ export default function getXSRFCookie() {
     }
   }
   return xsrfToken;
-}
+};
+
+export default getXSRFCookie;

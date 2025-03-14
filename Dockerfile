@@ -13,4 +13,5 @@ RUN yarn global add serve
 WORKDIR /usr/src/app
 COPY --from=builder /tmp/frontend/build .
 EXPOSE 3000
+USER node
 CMD ["serve", "-s",  "-p", "3000"]

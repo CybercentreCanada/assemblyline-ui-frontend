@@ -841,7 +841,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
               },
               errors: {
                 label: t('errors'),
-                disabled: !(
+                preventRender: !(
                   retrohunt &&
                   (retrohunt.total_warnings > 0 || retrohunt.total_errors > 0) &&
                   currentUser.is_admin
