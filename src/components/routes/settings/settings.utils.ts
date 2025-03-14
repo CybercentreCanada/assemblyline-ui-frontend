@@ -274,6 +274,10 @@ export const parseSubmissionProfile = (
   const out = structuredClone(settings);
   const params = {} as SubmissionProfileParams;
 
+  // Applying the description and malicious
+  out.description = profile.description.value;
+  out.malicious = profile.malicious.value;
+
   // Applying interface parameters
   Object.keys(out).forEach(key => {
     if (INTERFACE_KEYS.includes(key as InterfaceKey)) {
