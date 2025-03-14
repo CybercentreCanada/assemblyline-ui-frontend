@@ -2,7 +2,7 @@ import { Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Metadata } from 'components/models/base/config';
-import { useForm } from 'components/routes/submit/submit.form';
+import { useForm } from 'components/routes/submit2/submit.form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { DateInput } from 'components/visual/Inputs/DateInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
@@ -22,7 +22,7 @@ type MetadataParamParam = {
 
 const MetadataParam: React.FC<MetadataParamParam> = React.memo(
   ({ name, metadata, loading = false, disabled = false }) => {
-    const { t } = useTranslation(['submit', 'settings']);
+    const { t } = useTranslation(['submit2', 'settings']);
     const form = useForm();
     const { apiCall } = useMyAPI();
 
@@ -186,7 +186,7 @@ type Props = {
 };
 
 const WrappedMetadataParameters = ({ loading = false, disabled = false }: Props) => {
-  const { t } = useTranslation(['submit', 'settings']);
+  const { t } = useTranslation(['submit2', 'settings']);
   const theme = useTheme();
   const { configuration } = useALContext();
 

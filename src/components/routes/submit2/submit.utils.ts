@@ -1,158 +1,160 @@
-import type { Configuration } from 'components/models/base/config';
+import type { SubmissionProfile, SubmissionProfileParams } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
-import {
-  loadDefaultProfile,
-  loadSubmissionProfile,
-  type ProfileSettings
-} from 'components/routes/settings/settings.utils';
-import { isURL } from 'helpers/utils';
-import type { SubmitStore } from './submit.form';
 
-export const getPreferredSubmissionProfile = (settings: UserSettings): string =>
-  !settings
-    ? null
-    : Object.keys(settings.submission_profiles).includes(settings.preferred_submission_profile)
-    ? settings.preferred_submission_profile
-    : Object.keys(settings.submission_profiles)[0];
+type ProfileKey = keyof Pick<
+  UserSettings,
+  | 'classification'
+  | 'deep_scan'
+  | 'generate_alert'
+  | 'ignore_cache'
+  | 'ignore_recursion_prevention'
+  | 'ignore_filtering'
+  | 'priority'
+  | 'ttl'
+>;
 
-export const getDefaultExternalSources = (
-  settings: UserSettings,
-  configuration: Configuration
-): ProfileSettings['default_external_sources'] => {
-  let sources = Object.entries(configuration.submission.file_sources).reduce(
-    (prev, [, fileSource]) => [...prev, ...fileSource.auto_selected],
-    settings?.default_external_sources || []
-  );
-  sources = [...new Set(sources)].sort();
-  return { prev: sources, value: sources };
+const PROFILE_KEYS: ProfileKey[] = [
+  'classification',
+  'deep_scan',
+  'generate_alert',
+  'ignore_cache',
+  'ignore_recursion_prevention',
+  'ignore_filtering',
+  'priority',
+  'ttl'
+];
+
+export type ProfileParam<T> = {
+  default: T;
+  value: T;
+  editable: boolean;
 };
 
-// export const getDefaultMetadata = (data: object, configuration: Configuration): SubmitMetadata => {
-//   const configKeys = Object.keys(configuration?.submission?.metadata?.submit || {});
+export type ProfileSettings = {
+  [K in keyof Pick<SubmissionProfileParams, ProfileKey>]: ProfileParam<SubmissionProfileParams[K]>;
+} & Pick<UserSettings, 'services' | 'service_spec'>;
 
-//   const out = Object.entries(data).reduce(
-//     (prev, [key, value]) => {
-//       if (configKeys.includes(key)) prev.config.push([key, value]);
-//       else prev.extra.push([key, value]);
-
-//       return prev;
-//     },
-//     { config: [], extra: [] } as { config: [string, unknown][]; extra: [string, unknown][] }
-//   );
-
-//   return { config: Object.fromEntries(out.config), extra: JSON.stringify(Object.fromEntries(out.extra)) };
-// };
-
-export const switchProfile = (
-  out: ProfileSettings,
-  configuration: Configuration,
-  settings: UserSettings,
-  name: string
-): ProfileSettings =>
-  name === 'default'
-    ? loadDefaultProfile(out, settings)
-    : loadSubmissionProfile(out, settings, configuration.submission.profiles, name);
-
-export const isValidJSON = (value: string): boolean => {
-  try {
-    if (!value) return false;
-    JSON.parse(value) as object;
-    return true;
-  } catch (e) {
-    return false;
-  }
+export type SubmitSettings = Pick<UserSettings, ProfileKey> & {
+  description: string;
+  default_external_sources: string[];
+  malicious: boolean;
+  profiles: {
+    [profile: string]: ProfileSettings;
+  };
 };
 
-export const isValidMetadata = (value: string, configuration: Configuration): string => {
-  try {
-    if (!value) return null;
-    const data = JSON.parse(value) as object;
+const loadProfile = (profile_name: string, settings: UserSettings, profile: SubmissionProfile): ProfileSettings => {
+  let out: ProfileSettings = null;
 
-    Object.entries(configuration.submission.metadata.submit).forEach(([k]) => {
-      if (k in data) {
-        throw new Error(`Cannot use the reserved key "${k}" as it must be defined using the system's configuration`);
-      }
-    });
-
-    return null;
-  } catch (e) {
-    return `${e}`;
-  }
-};
-export const isSubmissionValid = (values: SubmitStore, configuration: Configuration) => {
-  if (values.state.tab === 'file' && !values.file) {
-    return false;
-  }
-
-  if (values.state.tab === 'hash' && !values.hash.type) {
-    return false;
-  }
-
-  if (![500, 1000, 1500].includes(values.settings.priority.value)) {
-    return false;
-  }
-
-  if (
-    values.settings.ttl.value < (configuration.submission.max_dtl !== 0 ? 1 : 0) ||
-    values.settings.ttl.value > (configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365)
-  ) {
-    return false;
-  }
-
-  if (
-    Object.entries(configuration.submission.metadata.submit).some(([key, metadata]) => {
-      const value = values.metadata?.data?.[key];
-      if (metadata.required && !value) {
-        return true;
-      } else if (metadata.validator_type === 'uri' && !isURL((value || '') as string)) {
-        return true;
-      } else if (
-        metadata.validator_type === 'regex' &&
-        !((value || '') as string).match(new RegExp(metadata.validator_params.validation_regex as string))
-      ) {
-        return true;
-      } else if (
-        metadata.validator_type === 'integer' &&
-        (value < metadata?.validator_params?.min || value > metadata?.validator_params?.max)
-      ) {
-        return true;
-      } else {
-        return false;
-      }
-    })
-  ) {
-    return false;
-  }
-
-  return true;
-};
-
-export const calculateFileHash = (file: File) =>
-  new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = async e => {
-      const data = e.target.result as ArrayBuffer;
-      try {
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        resolve(hashHex);
-      } catch (error) {
-        reject(`Hashing failed: ${error}`);
-      }
-    };
-    reader.onerror = () => {
-      reject('File reading failed');
-    };
-    reader.readAsArrayBuffer(file);
+  // Load the submission parameters
+  Object.entries(settings).forEach(([key, value]) => {
+    if (PROFILE_KEYS.includes(key as ProfileKey)) {
+      const defaultValue: unknown = settings.submission_profiles[profile_name][key];
+      out = {
+        ...out,
+        [key]: {
+          default: defaultValue === null || defaultValue === undefined ? null : defaultValue,
+          value: defaultValue || value,
+          editable: !profile ? true : !!profile.editable_params?.submission?.includes(key)
+        }
+      };
+    }
   });
 
-export const getHashQuery = (type: string, value: string) =>
-  type === 'file' ? `sha256:"${value}"` : `${type}:"${value}"`;
+  // Loading the services
+  out = { ...out, services: null };
+  const selected = profile?.params?.services?.selected;
+  const excluded = profile?.params?.services?.excluded;
+  out.services = settings.services
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(category => ({
+      ...category,
+      selected: !profile ? category.selected : selected.includes(category.name) && !excluded.includes(category.name),
+      services: category.services
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(service => ({
+          ...service,
+          selected: !profile
+            ? service.selected
+            : (selected.includes(service.category) || selected.includes(service.name)) &&
+              !(excluded.includes(service.category) || excluded.includes(service.name))
+        }))
+    }));
 
-export const isUsingExternalServices = (settings: ProfileSettings, configuration: Configuration): boolean =>
-  settings.services.some(category =>
-    category.services.some(
-      service => configuration.ui.url_submission_auto_service_selection.includes(service.name) && service.selected
-    )
-  );
+  // Loading the service specs
+  out = { ...out, service_spec: null };
+  out.service_spec = settings.service_spec
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(spec => ({
+      ...spec,
+      params: spec.params
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(param => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const paramValue = profile?.params?.service_spec?.[spec?.name]?.[param?.name];
+          return {
+            ...param,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            value: paramValue === undefined || paramValue === null ? param?.value : paramValue,
+            editable: !profile ? true : profile.editable_params?.[spec.name]?.includes(param?.name) ?? false
+          };
+        })
+    }));
+
+  return out;
+};
+
+export const loadSubmissionProfiles = (
+  settings: UserSettings,
+  submission_profiles: { [key: string]: SubmissionProfile }
+): SubmitSettings => {
+  if (!settings) return null;
+  let out = { default_external_sources: [], description: '', profiles: {} } as SubmitSettings;
+
+  // Load default settings
+  Object.entries(settings).forEach(([key, value]) => {
+    if (PROFILE_KEYS.includes(key as ProfileKey)) {
+      out = { ...out, [key]: value };
+    }
+  });
+
+  // Load submission profile information
+  Object.keys(settings?.submission_profiles || {}).forEach(name => {
+    out.profiles = { ...out.profiles, [name]: loadProfile(name, settings, submission_profiles[name]) };
+  });
+
+  return out;
+};
+
+export const applySubmissionProfile = (submit: SubmitSettings, profile: string | number): UserSettings => {
+  if (!submit) return null;
+
+  const out: UserSettings = {
+    description: submit.description || '',
+    default_external_sources: submit.default_external_sources || []
+  } as UserSettings;
+
+  // Applying the selected submission profile parameters
+  Object.entries(submit.profiles[profile]).forEach(([key, value]: [string, unknown]) => {
+    const param = value as ProfileParam<unknown>;
+    if (PROFILE_KEYS.includes(key as ProfileKey)) {
+      out[key] = param.value;
+    }
+  });
+
+  // Applying the selected submission profile service specs
+  out.service_spec = structuredClone(submit.profiles[profile].service_spec);
+  out.service_spec.forEach((_, i) => {
+    out.service_spec[i].params.forEach((__, j) => {
+      delete out.service_spec[i].params[j].editable;
+    });
+  });
+
+  // Applying the selected submission profile service specs
+  out.services = structuredClone(submit.profiles[profile].services);
+  console.log(out);
+
+  return out;
+};
+
+export const getProfileNames = (settings: SubmitSettings) => Object.keys(settings?.profiles || {}).sort();

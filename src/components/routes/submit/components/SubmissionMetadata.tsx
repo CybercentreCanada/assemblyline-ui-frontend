@@ -8,9 +8,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Metadata } from 'components/models/base/config';
-import type { SubmitMetadata } from 'components/routes/submit2/submit.form';
-import { useForm } from 'components/routes/submit2/submit.form';
-import { isValidMetadata } from 'components/routes/submit2/submit.utils';
+import type { SubmitMetadata } from 'components/routes/submit/submit.form';
+import { useForm } from 'components/routes/submit/submit.form';
+import { isValidMetadata } from 'components/routes/submit/submit.utils';
 import { Button } from 'components/visual/Buttons/Button';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import { DateInput } from 'components/visual/Inputs/DateInput';
@@ -171,7 +171,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
 );
 
 const ExtraMetadata = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { configuration } = useALContext();
   const form = useForm();
@@ -296,7 +296,7 @@ const ExtraMetadata = React.memo(() => {
 });
 
 export const SubmissionMetadata = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const { configuration } = useALContext();
 
   return (

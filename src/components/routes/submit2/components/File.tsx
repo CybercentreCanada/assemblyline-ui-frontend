@@ -4,9 +4,9 @@ import useALContext from 'components/hooks/useALContext';
 import type { APIResponseProps } from 'components/hooks/useMyAPI';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { SubmitStore } from 'components/routes/submit/submit.form';
-import { useForm } from 'components/routes/submit/submit.form';
-import { applySubmissionProfile } from 'components/routes/submit/submit.utils';
+import type { SubmitStore } from 'components/routes/submit2/submit.form';
+import { useForm } from 'components/routes/submit2/submit.form';
+import { applySubmissionProfile } from 'components/routes/submit2/submit.utils';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
@@ -31,7 +31,7 @@ type Props = {
 };
 
 export const FileSubmit = ({ profile = null, loading = false, disabled = false }: Props) => {
-  const { t } = useTranslation(['submit']);
+  const { t } = useTranslation(['submit2']);
   const theme = useTheme();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();

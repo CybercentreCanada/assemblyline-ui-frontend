@@ -1,6 +1,6 @@
 import { Grid, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
-import { useForm } from 'components/routes/submit2/submit.form';
+import { useForm } from 'components/routes/submit/submit.form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
@@ -9,7 +9,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const SubmissionOptions = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { configuration } = useALContext();
   const form = useForm();

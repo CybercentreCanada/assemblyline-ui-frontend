@@ -1,7 +1,7 @@
 import { Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import type { SelectedService, SelectedServiceCategory, ServiceParameter } from 'components/models/base/service';
-import { useForm } from 'components/routes/submit/submit.form';
+import { useForm } from 'components/routes/submit2/submit.form';
 import { Collapse } from 'components/visual/Collapse';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
@@ -474,7 +474,7 @@ const WrappedServiceSelection = ({
   size = 'medium',
   filterServiceParams = false
 }: Props) => {
-  const { t } = useTranslation(['submit', 'settings']);
+  const { t } = useTranslation(['submit2', 'settings']);
   const theme = useTheme();
   const form = useForm();
 

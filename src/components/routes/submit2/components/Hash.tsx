@@ -3,10 +3,10 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Submission } from 'components/models/base/submission';
-import { MetadataSummary } from 'components/routes/submit/components/MetadataSummary';
-import type { SubmitStore } from 'components/routes/submit/submit.form';
-import { useForm } from 'components/routes/submit/submit.form';
-import { applySubmissionProfile } from 'components/routes/submit/submit.utils';
+import { MetadataSummary } from 'components/routes/submit2/components/MetadataSummary';
+import type { SubmitStore } from 'components/routes/submit2/submit.form';
+import { useForm } from 'components/routes/submit2/submit.form';
+import { applySubmissionProfile } from 'components/routes/submit2/submit.utils';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
@@ -22,7 +22,7 @@ type Props = {
 };
 
 export const HashSubmit = ({ profile = null, loading = false, disabled = false }: Props) => {
-  const { t } = useTranslation(['submit']);
+  const { t } = useTranslation(['submit2']);
   const theme = useTheme();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();

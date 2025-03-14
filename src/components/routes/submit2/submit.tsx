@@ -1,10 +1,10 @@
 import { FormProvider } from './submit.form';
 import { SubmitRoute } from './submit.route';
 
-const SubmitPage = () => (
+const Submit = () => (
   <FormProvider>
     <SubmitRoute />
   </FormProvider>
 );
 
-export default SubmitPage;
+export default Submit;

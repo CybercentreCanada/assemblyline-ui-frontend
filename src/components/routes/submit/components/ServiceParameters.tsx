@@ -1,7 +1,7 @@
 import { Typography, useTheme } from '@mui/material';
 import type { ProfileSettings } from 'components/routes/settings/settings.utils';
-import type { SubmitStore } from 'components/routes/submit2/submit.form';
-import { useForm } from 'components/routes/submit2/submit.form';
+import type { SubmitStore } from 'components/routes/submit/submit.form';
+import { useForm } from 'components/routes/submit/submit.form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
@@ -367,7 +367,7 @@ const Category = React.memo(({ cat_id, category }: CategoryProps) => {
 });
 
 export const ServiceParameters = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const form = useForm();
 

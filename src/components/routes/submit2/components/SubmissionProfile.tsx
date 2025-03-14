@@ -3,7 +3,7 @@ import { Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { Submission } from 'components/models/base/config';
 import { getProfileNames } from 'components/routes/settings/settings.utils';
-import { useForm } from 'components/routes/submit/submit.form';
+import { useForm } from 'components/routes/submit2/submit.form';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +21,7 @@ const WrappedSubmissionProfile = ({
   drawerOpen = false,
   setDrawerOpen = null
 }: Props) => {
-  const { t } = useTranslation(['submit']);
+  const { t } = useTranslation(['submit2']);
   const theme = useTheme();
   const { user, configuration, settings } = useALContext();
 

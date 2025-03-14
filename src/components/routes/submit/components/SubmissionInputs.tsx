@@ -22,14 +22,14 @@ import type { File } from 'components/models/base/file';
 import type { Submission } from 'components/models/base/submission';
 import type { SearchResult } from 'components/models/ui/search';
 import { getProfileNames, parseSubmissionProfile } from 'components/routes/settings/settings.utils';
-import type { AutoURLServiceIndices, SubmitStore } from 'components/routes/submit2/submit.form';
-import { FLOW, useForm } from 'components/routes/submit2/submit.form';
+import type { AutoURLServiceIndices, SubmitStore } from 'components/routes/submit/submit.form';
+import { FLOW, useForm } from 'components/routes/submit/submit.form';
 import {
   calculateFileHash,
   getHashQuery,
   isUsingExternalServices,
   switchProfile
-} from 'components/routes/submit2/submit.utils';
+} from 'components/routes/submit/submit.utils';
 import type { ButtonProps } from 'components/visual/Buttons/Button';
 import { Button } from 'components/visual/Buttons/Button';
 import { IconButton } from 'components/visual/Buttons/IconButton';
@@ -46,7 +46,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import FileDropper from './FileDropper';
 
 export const ClassificationInput = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
 
@@ -115,7 +115,7 @@ export const FileInput = React.memo(() => {
 });
 
 export const HashInput = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const { configuration } = useALContext();
   const { closeSnackbar } = useMySnackbar();
   const form = useForm();
@@ -159,7 +159,7 @@ export const HashInput = React.memo(() => {
 });
 
 export const SubmissionProfileInput = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const { configuration, settings } = useALContext();
   const form = useForm();
 
@@ -206,7 +206,7 @@ export const SubmissionProfileInput = React.memo(() => {
 });
 
 export const PasswordInput = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const form = useForm();
 
   return (
@@ -238,7 +238,7 @@ export const PasswordInput = React.memo(() => {
 });
 
 export const MaliciousInput = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const form = useForm();
 
   return (
@@ -266,7 +266,7 @@ export const MaliciousInput = React.memo(() => {
 });
 
 export const ExternalSources = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const { configuration } = useALContext();
   const form = useForm();
 
@@ -373,7 +373,7 @@ const AutoURLServicesSelection = React.memo(({ hasURLservices = false }: { hasUR
 });
 
 export const ExternalServices = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const { configuration } = useALContext();
   const form = useForm();
 
@@ -448,7 +448,7 @@ export const ExternalServices = React.memo(() => {
 });
 
 export const CustomizabilityAlert = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const form = useForm();
 
@@ -476,7 +476,7 @@ export const CustomizabilityAlert = React.memo(() => {
 });
 
 export const CancelButton = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const form = useForm();
 
   return (
@@ -518,7 +518,7 @@ export const CancelButton = React.memo(() => {
 });
 
 export const FindButton = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const form = useForm();
   const { apiCall } = useMyAPI();
@@ -653,7 +653,7 @@ export const FindButton = React.memo(() => {
 });
 
 export const AdjustButton = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const form = useForm();
 
   return (
@@ -682,7 +682,7 @@ export const AdjustButton = React.memo(() => {
 });
 
 const AnalyzeButton = React.memo(({ children = null, ...props }: ButtonProps) => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const form = useForm();
 
   return (
@@ -714,7 +714,7 @@ const AnalyzeButton = React.memo(({ children = null, ...props }: ButtonProps) =>
 });
 
 const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const form = useForm();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
@@ -841,7 +841,7 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
 });
 
 const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const form = useForm();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
@@ -900,7 +900,7 @@ const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
 });
 
 const ExternalServicesDialog = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const form = useForm();
 
   const handleDeselectExternalServices = useCallback(() => {}, []);
@@ -979,7 +979,7 @@ export const AnalyzeSubmission = React.memo(() => {
 });
 
 export const ToS = React.memo(() => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { configuration } = useALContext();
 
