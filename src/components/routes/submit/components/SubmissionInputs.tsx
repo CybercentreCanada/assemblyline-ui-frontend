@@ -668,7 +668,7 @@ export const UploadProgress = React.memo(() => {
           <div>
             <LinearProgress value={progress as number} variant={progress ? 'determinate' : 'indeterminate'} />
             <Typography variant="body2">
-              {progress ? `${progress}% ${t('upload_progress.determinate')}` : t('upload_progress.indeterminate')}
+              {progress ? `${progress}% ${t('upload.progress.determinate')}` : t('upload.progress.indeterminate')}
             </Typography>
           </div>
         )
@@ -706,15 +706,14 @@ const AnalyzeButton = React.memo(({ children = null, ...props }: ButtonProps) =>
       selector={state => [
         state.values.state.loading,
         state.values.state.disabled,
-        state.values.state.uploading,
         state.values.state.tab,
         !state.values.file,
         !state.values.hash.type
       ]}
-      children={([loading, disabled, uploading, tab, file, hash]) => (
+      children={([loading, disabled, tab, file, hash]) => (
         <Button
           disabled={(disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)) as boolean}
-          loading={(loading || uploading) as boolean}
+          loading={loading as boolean}
           // startIcon={<PublishIcon />}
           tooltip={t('analyze.button.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
@@ -789,12 +788,12 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
             } else {
               // Unexpected error occurred, cancel upload and show error message
               handleCancel();
-              showErrorMessage(t('submit.file.upload_fail'));
+              showErrorMessage(t('upload.snackbar.file.upload_fail'));
             }
           }
         } catch (ex) {
           handleCancel();
-          showErrorMessage(t('submit.file.upload_fail'));
+          showErrorMessage(t('upload.snackbar.file.upload_fail'));
         }
       });
 
@@ -822,14 +821,14 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
             metadata: metadata.data
           },
           onSuccess: ({ api_response }) => {
-            showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
+            showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
             setTimeout(() => {
               navigate(`/submission/detail/${api_response.sid}`);
             }, 1000);
           },
           onFailure: ({ api_status_code, api_error_message }) => {
             if ([400, 403, 404, 503].includes(api_status_code)) showErrorMessage(api_error_message);
-            else showErrorMessage(t('submit.file.failure'));
+            else showErrorMessage(t('upload.snackbar.file.failure'));
             handleCancel();
           },
           onExit: () => {
@@ -883,7 +882,7 @@ const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
           metadata: metadata.data
         },
         onSuccess: ({ api_response }) => {
-          showSuccessMessage(`${t('submit.success')} ${api_response.sid}`);
+          showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
           setTimeout(() => {
             navigate(`/submission/detail/${api_response.sid}`);
           }, 1000);
@@ -917,9 +916,23 @@ const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
 
 const ExternalServicesDialog = React.memo(() => {
   const { t } = useTranslation(['submit']);
+  const { configuration } = useALContext();
   const form = useForm();
 
-  const handleDeselectExternalServices = useCallback(() => {}, []);
+  const handleDeselectExternalServices = useCallback(() => {
+    form.setFieldValue('settings.services', categories => {
+      categories.forEach((category, i) => {
+        category.services.forEach((service, j) => {
+          if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
+            categories[i].services[j].selected = false;
+          }
+        });
+        categories[i].selected = category.services.every(s => s.selected);
+      });
+
+      return categories;
+    });
+  }, []);
 
   return (
     <>

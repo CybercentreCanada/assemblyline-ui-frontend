@@ -2,7 +2,7 @@
   "adjust.button.close.tooltip": "Fermer le panneau qui affiche les paramètres de soumission",
   "adjust.button.open.tooltip": "Ouvrez le panneau pour ajuster les paramètres d'envoi",
   "analyze.button.label": "Analyser",
-  "analyze.button.tooltip": "Analyser la soumission",
+  "analyze.button.tooltip": "Soumettre la soumission pour se faire analyser",
   "cancel.button.label": "Annuler",
   "cancel.button.tooltip": "Annuler la soumission et réinitialiser toutes les valeurs",
   "classification.input.label": "La classification suivante sera appliquée à votre soumission :",
@@ -77,8 +77,11 @@
   "tos.terms1": "En appuyant sur ",
   "tos.terms2": ", vous acceptez nos ",
   "tos.terms3": "Conditions d'utilisation",
-  "upload_progress.determinate": "téléchargé...",
-  "upload_progress.indeterminate": "Téléchargement...",
+  "upload.progress.determinate": "téléchargé...",
+  "upload.progress.indeterminate": "Téléchargement...",
+  "upload.snackbar.file.failure": "Le fichier que vous essayez de démarrer n'a pas été téléchargé correctement. Réessayez...",
+  "upload.snackbar.file.upload_fail": "Le fichier n'a pas pu être téléchargé. Réessayez...",
+  "upload.snackbar.success": "Envoyé avec succès, vous êtes redirigé vers l'identifiant de soumission :",
   "url.input.helperText": "Une URL valide nécessite un schéma, par exemple https://www.example.com",
   "url.input.label": "Entrez le hachage ou l'URL à analyser"
 }

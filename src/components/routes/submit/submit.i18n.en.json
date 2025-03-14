@@ -2,7 +2,7 @@
   "adjust.button.close.tooltip": "Close the panel that displays the submit parameters",
   "adjust.button.open.tooltip": "Open the panel to adjust the submit parameters",
   "analyze.button.label": "Analyze",
-  "analyze.button.tooltip": "Analyze the input",
+  "analyze.button.tooltip": "Submit the input for analysis",
   "cancel.button.label": "Cancel",
   "cancel.button.tooltip": "Cancel the submission and reset all values",
   "classification.input.label": "The following classification will be applied to your submission:",
@@ -77,8 +77,11 @@
   "tos.terms1": "By pressing ",
   "tos.terms2": ", you consent to our ",
   "tos.terms3": "Terms of Service",
-  "upload_progress.determinate": "uploaded...",
-  "upload_progress.indeterminate": "Uploading...",
+  "upload.progress.determinate": "uploaded...",
+  "upload.progress.indeterminate": "Uploading...",
+  "upload.snackbar.file.failure": "The file you are trying to start did not upload properly, try again...",
+  "upload.snackbar.file.upload_fail": "The file failed to upload, try again...",
+  "upload.snackbar.success": "Successfully submitted, redirecting you to submission ID:",
   "url.input.helperText": "A valid URL requires a scheme, i.e. https://www.example.com",
   "url.input.label": "Enter the Hash or URL to Analyze"
 }
