@@ -159,6 +159,7 @@ type DiffEditorProps = {
   language?: Language;
   options?: editor.IStandaloneEditorConstructionOptions;
   beautify?: boolean;
+  error?: boolean;
   onChange?: (value: string) => void;
   reload?: () => void;
 };
@@ -171,6 +172,7 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
   language = 'plaintext',
   options = {},
   beautify = false,
+  error = false,
   onChange = () => null,
   reload = () => null
 }: EditorProps & DiffEditorProps) => {
@@ -219,7 +221,8 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
       style={{
         flexGrow: 1,
         border: `1px solid ${theme.palette.divider}`,
-        position: 'relative'
+        position: 'relative',
+        ...(error && { border: `1px solid ${theme.palette.error.main}` })
       }}
     >
       <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>

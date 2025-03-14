@@ -468,11 +468,15 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
             <>
               <div>
                 <span className={classes.card_caption}>{t('update.label.last_successful')}:&nbsp;</span>
-                <Tooltip title={source.status.last_successful_update}>
-                  <div className={classes.card_caption}>
-                    <Moment variant="fromNow">{source.status.last_successful_update}</Moment>
-                  </div>
-                </Tooltip>
+                {source.status.last_successful_update !== '1970-01-01T00:00:00Z' ? (
+                  <Tooltip title={source.status.last_successful_update}>
+                    <div className={classes.card_caption}>
+                      <Moment variant="fromNow">{source.status.last_successful_update}</Moment>
+                    </div>
+                  </Tooltip>
+                ) : (
+                  <div className={classes.card_caption}>{t('update.never')}</div>
+                )}
               </div>
               <Tooltip title={`${source.status.message} @ ${source.status.ts}`}>
                 <div className={classes.card_caption}>
