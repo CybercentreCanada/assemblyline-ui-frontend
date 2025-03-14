@@ -31,7 +31,8 @@ import {
   MaliciousInput,
   PasswordInput,
   SubmissionProfileInput,
-  ToS
+  ToS,
+  UploadProgress
 } from './components/SubmissionInputs';
 import { SubmissionMetadata } from './components/SubmissionMetadata';
 import { SubmissionOptions } from './components/SubmissionOptions';
@@ -197,24 +198,24 @@ const WrappedSubmitRoute = () => {
                 <ClassificationInput />
 
                 <form.Subscribe
-                  selector={state => [state.values.state.tab]}
-                  children={([type]) => (
+                  selector={state => [state.values.state.tab, state.values.state.uploading]}
+                  children={([type, uploading]) => (
                     <TabContainer
                       paper
                       centered
                       variant="standard"
                       style={{ margin: '0px' }}
-                      value={type}
+                      value={type as SubmitStore['state']['tab']}
                       onChange={(e, v: SubmitStore['state']['tab']) => form.setFieldValue('state.tab', v)}
                       tabs={{
                         file: {
                           label: t('tab.label.file'),
-                          disabled: disabled || loading,
+                          disabled: (disabled || uploading) as boolean,
                           inner: <FileInput />
                         },
                         hash: {
                           label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
-                          disabled: disabled || loading,
+                          disabled: (disabled || uploading) as boolean,
                           inner: <HashInput />
                         }
                       }}
@@ -236,6 +237,8 @@ const WrappedSubmitRoute = () => {
                     <ExternalServices />
                   </>
                 )}
+
+                <UploadProgress />
 
                 <LeftPanelAction adjust={adjust}>
                   <CancelButton />

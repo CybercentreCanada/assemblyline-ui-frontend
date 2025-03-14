@@ -77,6 +77,8 @@
   "tos.terms1": "By pressing ",
   "tos.terms2": ", you consent to our ",
   "tos.terms3": "Terms of Service",
+  "upload_progress.determinate": "uploaded...",
+  "upload_progress.indeterminate": "Uploading...",
   "url.input.helperText": "A valid URL requires a scheme, i.e. https://www.example.com",
   "url.input.label": "Enter the Hash or URL to Analyze"
 }

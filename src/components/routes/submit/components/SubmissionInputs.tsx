@@ -3,6 +3,7 @@ import TuneIcon from '@mui/icons-material/Tune';
 import {
   Alert,
   CircularProgress,
+  LinearProgress,
   ListItemText,
   Button as MuiButton,
   Tooltip,
@@ -214,16 +215,17 @@ export const PasswordInput = React.memo(() => {
       selector={state => [
         state.values.state.loading,
         state.values.state.disabled,
+        state.values.state.uploading,
         state.values.settings.initial_data.value?.password || ''
       ]}
-      children={([loading, disabled, password]) => {
+      children={([loading, disabled, uploading, password]) => {
         return (
           <TextInput
             label={t('options.submission.password.label')}
             tooltip={t('options.submission.password.tooltip')}
             value={password as string}
             loading={loading as boolean}
-            disabled={disabled as boolean}
+            disabled={(disabled || uploading) as boolean}
             onChange={(e, v) => {
               form.setFieldValue('settings.initial_data.value', s => {
                 s.password = v;
@@ -247,16 +249,17 @@ export const MaliciousInput = React.memo(() => {
         state.values.state.tab === 'file' && !!state.values.file,
         state.values.settings.malicious.value,
         state.values.state.loading,
-        state.values.state.disabled
+        state.values.state.disabled,
+        state.values.state.uploading
       ]}
-      children={([isFile, value, loading, disabled]) => (
+      children={([isFile, value, loading, disabled, uploading]) => (
         <SwitchInput
           label={t('malicious.switch.label')}
           labelProps={{ color: 'textPrimary' }}
           tooltip={t('malicious.switch.tooltip')}
           value={value}
           loading={loading}
-          disabled={disabled}
+          disabled={disabled || uploading}
           preventRender={!isFile}
           onChange={(e, v) => form.setFieldValue('settings.malicious.value', v)}
         />
@@ -276,9 +279,10 @@ export const ExternalSources = React.memo(() => {
         state.values.state.tab === 'hash',
         state.values.state.loading,
         state.values.state.disabled,
+        state.values.state.uploading,
         ...(configuration.submission.file_sources?.[state.values.state.tab as HashPatternMap]?.sources || [])
       ]}
-      children={([isHash, loading, disabled, ...sources]) =>
+      children={([isHash, loading, disabled, uploading, ...sources]) =>
         !isHash || sources.length === 0 ? null : (
           <div style={{ textAlign: 'left' }}>
             <Typography color="textSecondary" variant="body2">
@@ -296,7 +300,7 @@ export const ExternalSources = React.memo(() => {
                     labelProps={{ color: 'textPrimary' }}
                     value={value}
                     loading={loading as boolean}
-                    disabled={disabled as boolean}
+                    disabled={(disabled || uploading) as boolean}
                     onChange={() => {
                       form.setFieldValue('settings.default_external_sources.value', s => {
                         s.indexOf(source) >= 0 ? s.splice(s.indexOf(source), 1) : s.push(source);
@@ -393,13 +397,13 @@ export const ExternalServices = React.memo(() => {
         selector={state => [
           state.values.state.loading,
           state.values.state.disabled,
-          state.values.state.customize,
+          state.values.state.uploading,
           state.values.autoURLServiceSelection.prev
         ]}
         children={props => {
           const loading = props[0] as boolean;
           const disabled = props[1] as boolean;
-          const customize = props[2] as boolean;
+          const uploading = props[2] as boolean;
           const autoURLServiceSelection = props[3] as SubmitStore['autoURLServiceSelection']['prev'];
 
           return autoURLServiceSelection.length === 0 ? null : (
@@ -426,7 +430,7 @@ export const ExternalServices = React.memo(() => {
                         labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
                         value={selected}
                         loading={loading}
-                        disabled={disabled || !customize}
+                        disabled={disabled || uploading}
                         onChange={() => {
                           form.setFieldValue('settings', s => {
                             s.services[cat].services[svr].selected = !selected;
@@ -493,8 +497,8 @@ export const CancelButton = React.memo(() => {
           tooltip={t('cancel.button.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           color="primary"
-          disabled={(disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)) as boolean}
           loading={loading as boolean}
+          disabled={(disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)) as boolean}
           variant="outlined"
           onClick={() => {
             form.setFieldValue('file', null);
@@ -652,24 +656,36 @@ export const FindButton = React.memo(() => {
   );
 });
 
+export const UploadProgress = React.memo(() => {
+  const { t } = useTranslation(['submit']);
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [state.values.state.uploading, state.values.state.uploadProgress]}
+      children={([uploading, progress]) =>
+        !uploading ? null : (
+          <div>
+            <LinearProgress value={progress as number} variant={progress ? 'determinate' : 'indeterminate'} />
+            <Typography variant="body2">
+              {progress ? `${progress}% ${t('upload_progress.determinate')}` : t('upload_progress.indeterminate')}
+            </Typography>
+          </div>
+        )
+      }
+    />
+  );
+});
+
 export const AdjustButton = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
 
   return (
     <form.Subscribe
-      selector={state => [
-        state.values.state.loading,
-        state.values.state.disabled,
-        state.values.state.uploading,
-        state.values.state.customize,
-        state.values.state.adjust
-      ]}
-      children={([loading, disabled, uploading, customize, adjust]) => (
+      selector={state => [state.values.state.adjust]}
+      children={([adjust]) => (
         <IconButton
-          disabled={disabled}
-          loading={loading || uploading}
-          preventRender={!customize}
           tooltip={adjust ? t('adjust.button.close.tooltip') : t('adjust.button.open.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           onClick={() => form.setFieldValue('state.adjust', s => !s)}

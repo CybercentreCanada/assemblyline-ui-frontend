@@ -77,6 +77,8 @@
   "tos.terms1": "En appuyant sur ",
   "tos.terms2": ", vous acceptez nos ",
   "tos.terms3": "Conditions d'utilisation",
+  "upload_progress.determinate": "téléchargé...",
+  "upload_progress.indeterminate": "Téléchargement...",
   "url.input.helperText": "Une URL valide nécessite un schéma, par exemple https://www.example.com",
   "url.input.label": "Entrez le hachage ou l'URL à analyser"
 }
