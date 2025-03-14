@@ -335,10 +335,10 @@ const AutoURLServicesSelection = React.memo(({ hasURLservices = false }: { hasUR
       return categories;
     });
 
-    form.setFieldValue('state.autoURLServiceSelection', services => {
+    form.setFieldValue('autoURLServiceSelection.prev', services => {
       current.forEach(c => {
         if (!services.some(s => s[0] === c[0] && s[1] === c[1])) {
-          services = [...services, c] as AutoURLServiceIndices;
+          services = [...services, c];
         }
       });
       return services;
@@ -346,7 +346,7 @@ const AutoURLServicesSelection = React.memo(({ hasURLservices = false }: { hasUR
   }, [configuration.ui.url_submission_auto_service_selection, form]);
 
   const removeURLServiceSelection = useCallback(() => {
-    const urlServices = form.getFieldValue('state.autoURLServiceSelection');
+    const urlServices = form.getFieldValue('autoURLServiceSelection.prev');
     if (urlServices.length == 0) return;
 
     form.setFieldValue('settings.services', categories => {
@@ -361,7 +361,7 @@ const AutoURLServicesSelection = React.memo(({ hasURLservices = false }: { hasUR
       return categories;
     });
 
-    form.setFieldValue('state.autoURLServiceSelection', []);
+    form.setFieldValue('autoURLServiceSelection.prev', []);
   }, [form]);
 
   useEffect(() => {
@@ -394,13 +394,13 @@ export const ExternalServices = React.memo(() => {
           state.values.state.loading,
           state.values.state.disabled,
           state.values.state.customize,
-          state.values.state.autoURLServiceSelection
+          state.values.autoURLServiceSelection.prev
         ]}
         children={props => {
           const loading = props[0] as boolean;
           const disabled = props[1] as boolean;
           const customize = props[2] as boolean;
-          const autoURLServiceSelection = props[3] as SubmitStore['state']['autoURLServiceSelection'];
+          const autoURLServiceSelection = props[3] as SubmitStore['autoURLServiceSelection']['prev'];
 
           return autoURLServiceSelection.length === 0 ? null : (
             <div style={{ textAlign: 'left' }}>
@@ -703,7 +703,7 @@ const AnalyzeButton = React.memo(({ children = null, ...props }: ButtonProps) =>
           tooltip={t('analyze.button.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           variant="contained"
-          onClick={() => form.setFieldValue('state.confirmation', s => !s)}
+          onClick={() => form.setFieldValue('autoURLServiceSelection.open', s => !s)}
           {...props}
         >
           {children ? children : t('analyze.button.label')}
@@ -747,7 +747,7 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
 
       form.setFieldValue('state.uploading', true);
       form.setFieldValue('state.uploadProgress', 0);
-      form.setFieldValue('state.confirmation', false);
+      form.setFieldValue('autoURLServiceSelection.open', false);
 
       FLOW.opts.generateUniqueIdentifier = selectedFile => {
         const relativePath =
@@ -877,7 +877,7 @@ const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
         },
         onEnter: () => {
           form.setFieldValue('state.uploading', true);
-          form.setFieldValue('state.confirmation', false);
+          form.setFieldValue('autoURLServiceSelection.open', false);
         },
         onExit: () => {
           form.setFieldValue('state.uploading', false);
@@ -911,7 +911,7 @@ const ExternalServicesDialog = React.memo(() => {
         selector={state => [
           state.values.state.tab === 'file' && !!state.values.file,
           state.values.state.tab === 'hash' && !!state.values.hash.type,
-          state.values.state.confirmation
+          state.values.autoURLServiceSelection.open
         ]}
         children={([isFile, isHash, confirmation]) => (
           <Dialog
@@ -919,7 +919,7 @@ const ExternalServicesDialog = React.memo(() => {
             aria-describedby={t('external_services.dialog.content')}
             fullWidth
             open={confirmation}
-            onClose={() => form.setFieldValue('state.confirmation', false)}
+            onClose={() => form.setFieldValue('autoURLServiceSelection.open', false)}
           >
             <DialogTitle id={t('external_services.dialog.title')}>{t('external_services.dialog.title')}</DialogTitle>
 
@@ -947,7 +947,7 @@ const ExternalServicesDialog = React.memo(() => {
           </Dialog>
         )}
       />
-      <AnalyzeButton onClick={() => form.setFieldValue('state.confirmation', true)} />
+      <AnalyzeButton onClick={() => form.setFieldValue('autoURLServiceSelection.open', true)} />
     </>
   );
 });
