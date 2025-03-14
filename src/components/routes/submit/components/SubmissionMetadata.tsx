@@ -31,12 +31,13 @@ import { useTranslation } from 'react-i18next';
 type MetadataParamParam = {
   name: string;
   metadata: Metadata;
-  loading?: boolean;
-  disabled?: boolean;
+  loading: boolean;
+  disabled: boolean;
+  uploading: boolean;
 };
 
 export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
-  ({ name, metadata, loading = false, disabled = false }) => {
+  ({ name, metadata, loading = false, disabled = false, uploading = false }) => {
     const { t } = useTranslation(['submit', 'settings']);
     const theme = useTheme();
     const form = useForm();
@@ -87,7 +88,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
         id: `metadata-${name.replace('_', ' ')}`,
         label: `${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`,
         labelProps: { textTransform: 'capitalize' },
-        disabled: disabled,
+        disabled: disabled || uploading,
         loading: loading,
         width: '60%',
         rootProps: { style: { margin: theme.spacing(1) } },
@@ -197,13 +198,18 @@ const ExtraMetadata = React.memo(() => {
   return (
     <>
       <form.Subscribe
-        selector={state => state.values.metadata.edit}
-        children={data => {
-          const error = isValidMetadata(data, configuration);
+        selector={state => [
+          state.values.state.disabled,
+          state.values.state.customize,
+          state.values.state.uploading,
+          state.values.metadata.edit
+        ]}
+        children={([disabled, customize, uploading, data]) => {
+          const error = isValidMetadata(data as string, configuration);
 
           return (
             <Dialog
-              open={data !== null}
+              open={!(data === null || disabled || !customize || uploading)}
               maxWidth="lg"
               fullWidth
               onClose={() => form.setFieldValue('metadata.edit', null)}
@@ -214,7 +220,7 @@ const ExtraMetadata = React.memo(() => {
               <DialogContent sx={{ display: 'flex', flexDirection: 'column', height: 'min(600px, 80vh)' }}>
                 <MonacoEditor
                   language="json"
-                  value={data}
+                  value={data as string}
                   error={!!error}
                   options={{ wordWrap: 'on' }}
                   onChange={v => form.setFieldValue('metadata.edit', v)}
@@ -237,8 +243,13 @@ const ExtraMetadata = React.memo(() => {
       />
 
       <form.Subscribe
-        selector={state => [state.values.state.disabled, state.values.metadata.data]}
-        children={([disabled, data]) => {
+        selector={state => [
+          state.values.state.disabled,
+          state.values.state.customize,
+          state.values.state.uploading,
+          state.values.metadata.data
+        ]}
+        children={([disabled, customize, uploading, data]) => {
           const metadata = Object.entries(data).filter(([key]) => !(key in configuration.submission.metadata.submit));
 
           return !metadata.length ? null : (
@@ -249,7 +260,8 @@ const ExtraMetadata = React.memo(() => {
                 </Typography>
 
                 <IconButton
-                  disabled={disabled as boolean}
+                  disabled={(disabled || uploading) as boolean}
+                  preventRender={!customize}
                   size="small"
                   tooltip={t('metadata.edit.tooltip')}
                   onClick={() =>
@@ -259,7 +271,7 @@ const ExtraMetadata = React.memo(() => {
                   <EditIcon fontSize="small" />
                 </IconButton>
                 <IconButton
-                  disabled={disabled as boolean}
+                  disabled={(disabled || uploading) as boolean}
                   size="small"
                   tooltip={t('metadata.clear.tooltip')}
                   onClick={handleClear}
@@ -298,14 +310,27 @@ const ExtraMetadata = React.memo(() => {
 export const SubmissionMetadata = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const { configuration } = useALContext();
+  const form = useForm();
 
   return (
     <div>
       <Typography variant="h6">{t('metadata.title')}</Typography>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {Object.entries(configuration.submission.metadata.submit).map(([name, metadata]) => (
-          <MetadataParam key={name} name={name} metadata={metadata} />
-        ))}
+        <form.Subscribe
+          selector={state => [state.values.state.loading, state.values.state.disabled, state.values.state.uploading]}
+          children={([loading, disabled, uploading]) =>
+            Object.entries(configuration.submission.metadata.submit).map(([name, metadata]) => (
+              <MetadataParam
+                key={name}
+                name={name}
+                metadata={metadata}
+                loading={loading}
+                disabled={disabled}
+                uploading={uploading}
+              />
+            ))
+          }
+        />
 
         <ExtraMetadata />
       </div>
