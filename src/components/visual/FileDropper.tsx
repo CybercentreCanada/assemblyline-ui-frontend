@@ -46,7 +46,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) => {
-  const { t } = useTranslation(['submit2']);
+  const { t } = useTranslation(['submit']);
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({ disabled });
   const { user: currentUser, configuration } = useALContext();
   const classes = useStyles();

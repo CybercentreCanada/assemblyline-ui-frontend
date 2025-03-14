@@ -1210,7 +1210,9 @@ function WrappedSubmissionDetail() {
                 {submission ? (
                   submission.state === 'completed' ? (
                     <div style={{ display: 'flex' }}>
-                      {(currentUser.roles.includes('administration') || (currentUser.roles.includes('submission_delete') && submission.params.submitter === currentUser.uname)) && (
+                      {(currentUser.roles.includes('administration') ||
+                        (currentUser.roles.includes('submission_delete') &&
+                          submission.params.submitter === currentUser.uname)) && (
                         <Tooltip title={t('delete')}>
                           <IconButton
                             onClick={() => setDeleteDialog(true)}
@@ -1277,7 +1279,7 @@ function WrappedSubmissionDetail() {
                               <ListItem
                                 button
                                 component={Link}
-                                to={`/submit2?hash=${submission.files[0].sha256}`}
+                                to={`/submit?hash=${submission.files[0].sha256}`}
                                 state={{
                                   c12n: submission.classification,
                                   metadata: submission.metadata

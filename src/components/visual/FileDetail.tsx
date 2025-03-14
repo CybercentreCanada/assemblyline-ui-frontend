@@ -490,7 +490,7 @@ const WrappedFileDetail: React.FC<Props> = ({
                         <ListItem
                           button
                           component={Link}
-                          to={`/submit2?hash=${file.file_info.sha256}`}
+                          to={`/submit?hash=${file.file_info.sha256}`}
                           state={{
                             c12n: file.file_info.classification
                           }}

@@ -457,7 +457,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             <MenuItem
               dense
               component={Link}
-              to={`/submit2?hash=${value}`}
+              to={`/submit?hash=${value}`}
               state={{
                 c12n: classification
               }}
