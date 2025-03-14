@@ -32,7 +32,7 @@ import {
   PasswordInput,
   SubmissionProfileInput,
   ToS
-} from './components/SubmissionInput';
+} from './components/SubmissionInputs';
 import { SubmissionMetadata } from './components/SubmissionMetadata';
 import { SubmissionOptions } from './components/SubmissionOptions';
 import type { SubmitState } from './submit.form';
