@@ -77,24 +77,17 @@ const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) =>
         <Typography htmlFor="file_dropper" component="label" variant="body1" style={{ wordBreak: 'break-word' }}>
           <b>
             {isDragActive && !disabled
-              ? t('file.drophere')
+              ? t('file_dropper.drophere')
               : file
               ? file.name
-              : t(currentUser.roles.includes('submission_create') ? 'file.dragzone' : 'file.disabled')}
+              : t(currentUser.roles.includes('submission_create') ? 'file_dropper.dragzone' : 'file_dropper.disabled')}
           </b>
         </Typography>
         {file && (!isDragActive || disabled) ? (
-          <div>
-            <ByteNumber component="span" bytes={file.size} variant="body2" align="center" />
-            {' ('}
-            <ByteNumber component="span" bytes={configuration.submission.max_file_size} variant="body2" align="center">
-              {size => `${t('max_file_size')} ${size}`}
-            </ByteNumber>
-            {')'}
-          </div>
+          <ByteNumber bytes={file.size} variant="body2" align="center" />
         ) : (
           <ByteNumber bytes={configuration.submission.max_file_size} variant="body2" align="center">
-            {size => `${t('max_file_size')} ${size}`}
+            {size => `${t('file_dropper.max_file_size')} ${size}`}
           </ByteNumber>
         )}
       </div>
