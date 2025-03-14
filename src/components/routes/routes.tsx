@@ -63,7 +63,6 @@ const SubmissionDetail = lazy(() => import('components/routes/submission/detail'
 const SubmissionReport = lazy(() => import('components/routes/submission/report'));
 const Submissions = lazy(() => import('components/routes/submissions'));
 const Submit = lazy(() => import('components/routes/submit/submit'));
-const Submit2 = lazy(() => import('components/routes/submit2/submit'));
 const Tos = lazy(() => import('components/routes/tos'));
 const User = lazy(() => import('components/routes/user'));
 
@@ -185,7 +184,6 @@ const WrappedRoutes = () => {
         <Route path="/settings" element={<Settings />} />
         <Route path="/settings/:tab" element={<Settings />} />
         <Route path="/submit" element={<Submit />} />
-        <Route path="/submit2" element={<Submit2 />} />
         <Route path="/submission/detail/:id/:fid" element={<SubmissionDetail />} />
         <Route path="/submission/detail/:id" element={<SubmissionDetail />} />
         <Route path="/submission/report/:id" element={<SubmissionReport />} />

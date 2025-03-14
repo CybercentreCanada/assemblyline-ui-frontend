@@ -72,7 +72,10 @@ export const getProfileNames = (settings: UserSettings) => Object.keys(settings?
 export const initializeSettings = (settings: UserSettings): ProfileSettings => {
   if (!settings) return null;
 
-  const out = {} as ProfileSettings;
+  const out = {
+    description: { prev: '', value: '', default: '', editable: true },
+    malicious: { prev: false, value: false }
+  } as ProfileSettings;
 
   // Applying interface parameters
   Object.entries(settings).forEach(([key, value]) => {

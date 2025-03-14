@@ -55,7 +55,6 @@ import statisticsSignaturesEN from 'locales/en/statistics/signatures.json';
 import submissionDetailEN from 'locales/en/submission/detail.json';
 import submissionReportEN from 'locales/en/submission/report.json';
 import submissionsEN from 'locales/en/submissions.json';
-import submit2EN from 'locales/en/submit.json';
 import tosEN from 'locales/en/tos.json';
 import translationEN from 'locales/en/translation.json';
 import userEN from 'locales/en/user.json';
@@ -110,7 +109,6 @@ import statisticsSignaturesFR from 'locales/fr/statistics/signatures.json';
 import submissionDetailFR from 'locales/fr/submission/detail.json';
 import submissionReportFR from 'locales/fr/submission/report.json';
 import submissionsFR from 'locales/fr/submissions.json';
-import submit2FR from 'locales/fr/submit.json';
 import tosFR from 'locales/fr/tos.json';
 import translationFR from 'locales/fr/translation.json';
 import userFR from 'locales/fr/user.json';
@@ -171,7 +169,6 @@ const resources = {
     submissionReport: submissionReportEN,
     submissions: submissionsEN,
     submit: submitEN,
-    submit2: submit2EN,
     tos: tosEN,
     translation: translationEN,
     user: userEN
@@ -230,7 +227,6 @@ const resources = {
     submissionReport: submissionReportFR,
     submissions: submissionsFR,
     submit: submitFR,
-    submit2: submit2FR,
     tos: tosFR,
     translation: translationFR,
     user: userFR
