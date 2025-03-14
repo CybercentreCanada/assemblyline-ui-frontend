@@ -1,6 +1,14 @@
 import SearchIcon from '@mui/icons-material/Search';
 import TuneIcon from '@mui/icons-material/Tune';
-import { Alert, CircularProgress, ListItemText, Button as MuiButton, Typography, useTheme } from '@mui/material';
+import {
+  Alert,
+  CircularProgress,
+  ListItemText,
+  Button as MuiButton,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -9,11 +17,12 @@ import useALContext from 'components/hooks/useALContext';
 import type { APIResponseProps } from 'components/hooks/useMyAPI';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { HashPatternMap } from 'components/models/base/config';
 import type { File } from 'components/models/base/file';
 import type { Submission } from 'components/models/base/submission';
 import type { SearchResult } from 'components/models/ui/search';
 import { getProfileNames, parseSubmissionProfile } from 'components/routes/settings/settings.utils';
-import type { SubmitStore } from 'components/routes/submit2/submit.form';
+import type { AutoURLServiceIndices, SubmitStore } from 'components/routes/submit2/submit.form';
 import { FLOW, useForm } from 'components/routes/submit2/submit.form';
 import {
   calculateFileHash,
@@ -25,7 +34,9 @@ import type { ButtonProps } from 'components/visual/Buttons/Button';
 import { Button } from 'components/visual/Buttons/Button';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
+import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
+import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
@@ -189,6 +200,276 @@ export const SubmissionProfileInput = React.memo(() => {
             form.setFieldValue('settings', s => switchProfile(s, configuration, settings, profile));
           }}
         />
+      )}
+    />
+  );
+});
+
+export const PasswordInput = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [
+        state.values.state.loading,
+        state.values.state.disabled,
+        state.values.settings.initial_data.value?.password || ''
+      ]}
+      children={([loading, disabled, password]) => {
+        return (
+          <TextInput
+            label={t('options.submission.password.label')}
+            tooltip={t('options.submission.password.tooltip')}
+            value={password as string}
+            loading={loading as boolean}
+            disabled={disabled as boolean}
+            onChange={(e, v) => {
+              form.setFieldValue('settings.initial_data.value', s => {
+                s.password = v;
+                return s;
+              });
+            }}
+          />
+        );
+      }}
+    />
+  );
+});
+
+export const MaliciousInput = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [
+        state.values.state.tab === 'file' && !!state.values.file,
+        state.values.settings.malicious.value,
+        state.values.state.loading,
+        state.values.state.disabled
+      ]}
+      children={([isFile, value, loading, disabled]) => (
+        <SwitchInput
+          label={t('malicious.switch.label')}
+          labelProps={{ color: 'textPrimary' }}
+          tooltip={t('malicious.switch.tooltip')}
+          value={value}
+          loading={loading}
+          disabled={disabled}
+          preventRender={!isFile}
+          onChange={(e, v) => form.setFieldValue('settings.malicious.value', v)}
+        />
+      )}
+    />
+  );
+});
+
+export const ExternalSources = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const { configuration } = useALContext();
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [
+        state.values.state.tab === 'hash',
+        state.values.state.loading,
+        state.values.state.disabled,
+        ...(configuration.submission.file_sources?.[state.values.state.tab as HashPatternMap]?.sources || [])
+      ]}
+      children={([isHash, loading, disabled, ...sources]) =>
+        !isHash || sources.length === 0 ? null : (
+          <div style={{ textAlign: 'left' }}>
+            <Typography color="textSecondary" variant="body2">
+              {t('options.submission.default_external_sources.label')}
+            </Typography>
+            {sources.map((source: string, i) => (
+              <form.Subscribe
+                key={`${source}-${i}`}
+                selector={state => state.values.settings.default_external_sources.value.indexOf(source) !== -1}
+                children={value => (
+                  <CheckboxInput
+                    key={i}
+                    id={`source-${source.replace('_', ' ')}`}
+                    label={source.replace('_', ' ')}
+                    labelProps={{ color: 'textPrimary' }}
+                    value={value}
+                    loading={loading as boolean}
+                    disabled={disabled as boolean}
+                    onChange={() => {
+                      form.setFieldValue('settings.default_external_sources.value', s => {
+                        s.indexOf(source) >= 0 ? s.splice(s.indexOf(source), 1) : s.push(source);
+                        return s;
+                      });
+                    }}
+                  />
+                )}
+              />
+            ))}
+          </div>
+        )
+      }
+    />
+  );
+});
+
+const AutoURLServicesSelection = React.memo(({ hasURLservices = false }: { hasURLservices: boolean }) => {
+  const { configuration } = useALContext();
+  const form = useForm();
+
+  const addURLServiceSelection = useCallback(() => {
+    const current: AutoURLServiceIndices = [];
+
+    form.setFieldValue('settings.services', categories => {
+      categories.forEach((category, i) => {
+        category.services.forEach((service, j) => {
+          if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
+            current.push([i, j, categories[i].services[j].selected]);
+            categories[i].services[j].selected = true;
+          }
+        });
+        categories[i].selected = category.services.every(s => s.selected);
+      });
+
+      return categories;
+    });
+
+    form.setFieldValue('state.autoURLServiceSelection', services => {
+      current.forEach(c => {
+        if (!services.some(s => s[0] === c[0] && s[1] === c[1])) {
+          services = [...services, c] as AutoURLServiceIndices;
+        }
+      });
+      return services;
+    });
+  }, [configuration.ui.url_submission_auto_service_selection, form]);
+
+  const removeURLServiceSelection = useCallback(() => {
+    const urlServices = form.getFieldValue('state.autoURLServiceSelection');
+    if (urlServices.length == 0) return;
+
+    form.setFieldValue('settings.services', categories => {
+      urlServices.forEach(([i, j, value]) => {
+        categories[i].services[j].selected = value;
+      });
+
+      categories.forEach((category, i) => {
+        categories[i].selected = category.services.every(s => s.selected);
+      });
+
+      return categories;
+    });
+
+    form.setFieldValue('state.autoURLServiceSelection', []);
+  }, [form]);
+
+  useEffect(() => {
+    if (hasURLservices) addURLServiceSelection();
+    else removeURLServiceSelection();
+  }, [addURLServiceSelection, hasURLservices, removeURLServiceSelection]);
+
+  return null;
+});
+
+export const ExternalServices = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const { configuration } = useALContext();
+  const form = useForm();
+
+  return (
+    <>
+      <form.Subscribe
+        selector={state => [
+          state.values.state.tab === 'hash' &&
+            state.values.hash.type === 'url' &&
+            state.values.settings.services.some(cat =>
+              cat.services.some(svr => configuration.ui.url_submission_auto_service_selection.includes(svr.name))
+            )
+        ]}
+        children={([hasURLservices]) => <AutoURLServicesSelection hasURLservices={hasURLservices} />}
+      />
+      <form.Subscribe
+        selector={state => [
+          state.values.state.loading,
+          state.values.state.disabled,
+          state.values.state.customize,
+          state.values.state.autoURLServiceSelection
+        ]}
+        children={props => {
+          const loading = props[0] as boolean;
+          const disabled = props[1] as boolean;
+          const customize = props[2] as boolean;
+          const autoURLServiceSelection = props[3] as SubmitStore['state']['autoURLServiceSelection'];
+
+          return autoURLServiceSelection.length === 0 ? null : (
+            <div style={{ textAlign: 'left' }}>
+              <Typography color="textSecondary" variant="body2">
+                {t('options.submission.url_submission_auto_service_selection.label')}
+              </Typography>
+              {autoURLServiceSelection.map(([cat, svr], i) => (
+                <form.Subscribe
+                  key={i}
+                  selector={state => {
+                    const service = state.values.settings.services[cat].services[svr];
+                    return [service.name, service.selected];
+                  }}
+                  children={props2 => {
+                    const name = props2[0] as string;
+                    const selected = props2[1] as boolean;
+
+                    return (
+                      <CheckboxInput
+                        key={i}
+                        id={`url_submission_auto_service_selection-${name.replace('_', ' ')}`}
+                        label={name.replace('_', ' ')}
+                        labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
+                        value={selected}
+                        loading={loading}
+                        disabled={disabled || !customize}
+                        onChange={() => {
+                          form.setFieldValue('settings', s => {
+                            s.services[cat].services[svr].selected = !selected;
+                            s.services[cat].selected = s.services[cat].services.every(val => val.selected);
+                            return s;
+                          });
+                        }}
+                      />
+                    );
+                  }}
+                />
+              ))}
+            </div>
+          );
+        }}
+      />
+    </>
+  );
+});
+
+export const CustomizabilityAlert = React.memo(() => {
+  const { t } = useTranslation(['submit2']);
+  const theme = useTheme();
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state => [state.values.state.customize]}
+      children={([customize]) => (
+        <Tooltip
+          placement="bottom-start"
+          title={customize ? t('customize.full.tooltip') : t('customize.limited.tooltip')}
+          slotProps={{ tooltip: { sx: { backgroundColor: 'rgba(97, 97, 97, 1)' } } }}
+        >
+          <div>
+            <Alert
+              severity={customize ? 'info' : 'warning'}
+              sx={{ paddingTop: theme.spacing(0.25), paddingBottom: theme.spacing(0.25) }}
+            >
+              {customize ? t('customize.full.label') : t('customize.limited.label')}
+            </Alert>
+          </div>
+        </Tooltip>
       )}
     />
   );

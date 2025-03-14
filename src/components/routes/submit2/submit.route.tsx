@@ -17,15 +17,19 @@ import { getSubmitType } from 'helpers/utils';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
-import { CustomizabilityAlert, ExternalServices, ExternalSources, Malicious } from './components/Confirmation';
 import { ServiceParameters } from './components/ServiceParameters';
 import {
   AdjustButton,
   AnalyzeSubmission,
   CancelButton,
   ClassificationInput,
+  CustomizabilityAlert,
+  ExternalServices,
+  ExternalSources,
   FileInput,
   HashInput,
+  MaliciousInput,
+  PasswordInput,
   SubmissionProfileInput,
   ToS
 } from './components/SubmissionInput';
@@ -226,7 +230,8 @@ const WrappedSubmitRoute = () => {
 
                 {loading ? null : (
                   <>
-                    <Malicious />
+                    <PasswordInput />
+                    <MaliciousInput />
                     <ExternalSources />
                     <ExternalServices />
                   </>

@@ -7,7 +7,6 @@ const INTERFACE_KEYS = [
   'download_encoding',
   'executive_summary',
   'expand_min_score',
-  'initial_data',
   'malicious',
   'preferred_submission_profile',
   'submission_view'
@@ -64,6 +63,8 @@ export type ProfileSettings = {
       editable: boolean;
     })[];
   }[];
+} & {
+  initial_data: { prev: { [key: string]: unknown }; value: { [key: string]: unknown } };
 };
 
 export const getProfileNames = (settings: UserSettings) => Object.keys(settings?.submission_profiles || {}).sort();
@@ -111,7 +112,7 @@ export const initializeSettings = (settings: UserSettings): ProfileSettings => {
     }));
 
   //Applying the initial data
-  out.initial_data = { value: '', prev: '' };
+  out.initial_data = { value: { password: '' }, prev: { password: '' } };
 
   return out;
 };
@@ -174,7 +175,7 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings)
   });
 
   //Applying the initial data
-  out.initial_data = { value: '', prev: '' };
+  out.initial_data = { value: { password: '' }, prev: { password: '' } };
 
   return out;
 };
@@ -254,7 +255,7 @@ export const loadSubmissionProfile = (
   });
 
   //Applying the initial data
-  out.initial_data = { value: '', prev: '' };
+  out.initial_data = { value: { password: '' }, prev: { password: '' } };
 
   return out;
 };
@@ -309,7 +310,7 @@ export const parseSubmissionProfile = (
   });
 
   //Applying the initial data
-  out.initial_data = profile.initial_data.value;
+  out.initial_data = JSON.stringify(profile.initial_data.value, undefined, 2);
 
   out.submission_profiles = { ...out.submission_profiles, [profileName]: params };
   return out;
@@ -355,9 +356,11 @@ export const hasDifferentPreviousSubmissionValues = (out: ProfileSettings): bool
   });
 
   //Applying the initial data
-  if (out.initial_data.value !== out.initial_data.prev) {
-    res = true;
-  }
+  Object.keys(out.initial_data?.value || {}).forEach(k => {
+    if (out?.initial_data?.value?.[k] !== out.initial_data?.prev?.[k]) {
+      res = true;
+    }
+  });
 
   return res;
 };
@@ -389,7 +392,7 @@ export const resetPreviousSubmissionValues = (out: ProfileSettings): ProfileSett
   });
 
   //Applying the initial data
-  out.initial_data.value = out.initial_data.prev;
+  out.initial_data.value = structuredClone(out.initial_data.prev);
 
   return out;
 };
@@ -421,7 +424,7 @@ export const updatePreviousSubmissionValues = (out: ProfileSettings): ProfileSet
   });
 
   //Applying the initial data
-  out.initial_data.prev = out.initial_data.value;
+  out.initial_data.prev = structuredClone(out.initial_data.value);
 
   return out;
 };

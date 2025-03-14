@@ -51,7 +51,7 @@
   "options.submission.ignore_filtering.tooltip": "Autoriser les services de filtrage à ignorer les fichiers s'ils estiment que les fichiers sont sûrs.",
   "options.submission.ignore_recursion_prevention.label": "Ignorer la prévention de la récursivité",
   "options.submission.ignore_recursion_prevention.tooltip": "Garantit que les enfants des services d'analyse ne sont pas renvoyés à certains services pour analyse.",
-  "options.submission.password.label": "Paramètre de mot de passe",
+  "options.submission.password.label": "Facultatif : saisissez un mot de passe de déchiffrement",
   "options.submission.password.tooltip": "Vous pouvez fournir une valeur pour le mot de passe que le service d'extraction utilisera",
   "options.submission.priority.error.empty": "La valeur de priorité ne peut pas être vide",
   "options.submission.priority.error.invalid": "Valeur de priorité non valide",

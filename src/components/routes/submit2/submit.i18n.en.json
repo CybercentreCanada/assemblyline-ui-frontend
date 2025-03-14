@@ -51,7 +51,7 @@
   "options.submission.ignore_filtering.tooltip": "Allow filtering services to skip files if they believe the files are safe.",
   "options.submission.ignore_recursion_prevention.label": "Ignore recursion prevention",
   "options.submission.ignore_recursion_prevention.tooltip": "Ensures that children of analysis services are not sent back to certain services for analysis.",
-  "options.submission.password.label": "Decryption password",
+  "options.submission.password.label": "Optional: Enter a decryption password",
   "options.submission.password.tooltip": "You may provide a value for the password which extraction services will use",
   "options.submission.priority.error.empty": "Priority value cannot be empty",
   "options.submission.priority.error.invalid": "Invalid priority value",
