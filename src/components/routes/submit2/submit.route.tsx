@@ -13,7 +13,6 @@ import { getSubmitType } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
-import { MOCK_SETTINGS } from '../settings/utils/data3';
 import { FileSubmit } from './components/File';
 import { HashSubmit } from './components/Hash';
 import { MetadataParameters } from './components/MetadataParameters';
@@ -81,7 +80,7 @@ const WrappedSubmitRoute = () => {
     form.setStore(s => {
       // Check if the user is allowed to customize their submission and load profiles accordingly
       s.state.customize = currentUser.is_admin || currentUser.roles.includes('submission_customize');
-      s.settings = loadSubmissionProfiles({ ...settings, ...MOCK_SETTINGS }, configuration.submission.profiles);
+      s.settings = loadSubmissionProfiles(settings, configuration.submission.profiles);
 
       // Determine the profile that gets auto-selected on page load
       const profileKeys = Object.keys(settings.submission_profiles);

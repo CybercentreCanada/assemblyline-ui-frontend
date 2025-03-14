@@ -15,7 +15,6 @@ import type { SettingsStore } from './settings.form';
 import { useForm } from './settings.form';
 import type { ProfileSettings } from './settings.utils';
 import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from './settings.utils';
-import { MOCK_SETTINGS } from './utils/data3';
 
 type Params = {
   tab: SettingsStore['state']['tab'];
@@ -35,8 +34,7 @@ const WrappedSettingsRoute = () => {
     form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('self_manage'));
     form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
 
-    // todo: remove mock data
-    const s = initializeSettings({ ...settings, ...MOCK_SETTINGS });
+    const s = initializeSettings(settings);
     form.setFieldValue('settings', s);
   }, [currentUser.is_admin, currentUser.roles, form, settings]);
 

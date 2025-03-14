@@ -9,7 +9,6 @@ import {
   loadDefaultProfile,
   loadSubmissionProfile
 } from 'components/routes/settings/settings.utils';
-import { MOCK_SETTINGS } from 'components/routes/settings/utils/data3';
 import type { SubmitStore } from 'components/routes/submit/submit.form';
 import { useForm } from 'components/routes/submit/submit.form';
 import { TabContainer } from 'components/visual/TabContainer';
@@ -134,8 +133,7 @@ const WrappedSubmitRoute = () => {
     form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('submission_create'));
     form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
 
-    // to do: Remove the mock settings
-    form.setFieldValue('settings', initializeSettings({ ...settings, ...MOCK_SETTINGS }));
+    form.setFieldValue('settings', initializeSettings(settings));
     const profile = getPreferredSubmissionProfile(settings);
     form.setFieldValue('state.profile', profile);
     if (profile === 'default') form.setFieldValue('settings', s => loadDefaultProfile(s, settings));
