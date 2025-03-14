@@ -205,12 +205,14 @@ const WrappedSelectInput = ({
                   primary={option.primary}
                   secondary={option.secondary}
                   primaryTypographyProps={{
+                    textTransform: 'capitalize',
                     overflow: 'auto',
                     textOverflow: 'initial',
                     whiteSpace: 'normal',
                     ...(tiny && { variant: 'body2' })
                   }}
                   secondaryTypographyProps={{
+                    textTransform: 'capitalize',
                     overflow: 'auto',
                     textOverflow: 'initial',
                     whiteSpace: 'normal',
