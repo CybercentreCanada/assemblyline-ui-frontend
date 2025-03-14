@@ -188,101 +188,92 @@ const WrappedSubmitRoute = () => {
       )}
 
       <form.Subscribe
-        selector={state => [
-          state.values.state.adjust,
-          state.values.state.loading,
-          state.values.state.disabled,
-          state.values
-        ]}
-        children={([adjust, loading, disabled, values]) => {
-          console.log(settings, values);
+        selector={state => [state.values.state.adjust, state.values.state.loading, state.values.state.disabled]}
+        children={([adjust, loading, disabled]) => (
+          <Container adjust={adjust}>
+            <LeftPanel adjust={adjust}>
+              <LeftInnerPanel adjust={adjust}>
+                <ClassificationInput />
 
-          return (
-            <Container adjust={adjust}>
-              <LeftPanel adjust={adjust}>
-                <LeftInnerPanel adjust={adjust}>
-                  <ClassificationInput />
-
-                  <form.Subscribe
-                    selector={state => [state.values.state.tab, state.values.state.uploading]}
-                    children={([type, uploading]) => (
-                      <TabContainer
-                        paper
-                        centered
-                        variant="standard"
-                        style={{ margin: '0px' }}
-                        value={type as SubmitStore['state']['tab']}
-                        onChange={(e, v: SubmitStore['state']['tab']) => form.setFieldValue('state.tab', v)}
-                        tabs={{
-                          file: {
-                            label: t('tab.label.file'),
-                            disabled: (disabled || uploading) as boolean,
-                            inner: <FileInput />
-                          },
-                          hash: {
-                            label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
-                            disabled: (disabled || uploading) as boolean,
-                            inner: <HashInput />
-                          }
-                        }}
-                        sx={{
-                          '.MuiTabs-indicator': {
-                            display: 'none'
-                          }
-                        }}
-                      />
-                    )}
-                  />
-                  <SubmissionProfileInput />
-
-                  {loading ? null : (
-                    <>
-                      <PasswordInput />
-                      <MaliciousInput />
-                      <ExternalSources />
-                      <ExternalServices />
-                    </>
+                <form.Subscribe
+                  selector={state => [state.values.state.tab, state.values.state.uploading]}
+                  children={([type, uploading]) => (
+                    <TabContainer
+                      paper
+                      centered
+                      variant="standard"
+                      style={{ margin: '0px' }}
+                      value={type as SubmitStore['state']['tab']}
+                      onChange={(e, v: SubmitStore['state']['tab']) => form.setFieldValue('state.tab', v)}
+                      tabs={{
+                        file: {
+                          label: t('tab.label.file'),
+                          disabled: (disabled || uploading) as boolean,
+                          inner: <FileInput />
+                        },
+                        hash: {
+                          label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
+                          disabled: (disabled || uploading) as boolean,
+                          inner: <HashInput />
+                        }
+                      }}
+                      sx={{
+                        '.MuiTabs-indicator': {
+                          display: 'none'
+                        }
+                      }}
+                    />
                   )}
+                />
+                <SubmissionProfileInput />
 
-                  <UploadProgress />
-
-                  <LeftPanelAction adjust={adjust}>
-                    <CancelButton />
-                    <div style={{ flex: 1 }} />
-                    {/* <FindButton /> */}
-                    <AdjustButton />
-                    <AnalyzeSubmission />
-                  </LeftPanelAction>
-
-                  <ToS />
-                </LeftInnerPanel>
-              </LeftPanel>
-
-              <RightPanel adjust={adjust}>
                 {loading ? null : (
-                  <Collapse
-                    in={adjust}
-                    sx={{
-                      '& .MuiCollapse-wrapperInner': {
-                        display: 'flex',
-                        flexDirection: 'column',
-                        rowGap: theme.spacing(2),
-                        flex: 1,
-                        justifyContent: 'start',
-                        textAlign: 'start'
-                      }
-                    }}
-                  >
-                    <CustomizabilityAlert />
-                    <SubmissionOptions />
-                    <ServiceParameters />
-                    <SubmissionMetadata />
-                  </Collapse>
+                  <>
+                    <PasswordInput />
+                    <MaliciousInput />
+                    <ExternalSources />
+                    <ExternalServices />
+                  </>
                 )}
-              </RightPanel>
-            </Container>
-          );
-        }}
+
+                <UploadProgress />
+
+                <LeftPanelAction adjust={adjust}>
+                  <CancelButton />
+                  <div style={{ flex: 1 }} />
+                  {/* <FindButton /> */}
+                  <AdjustButton />
+                  <AnalyzeSubmission />
+                </LeftPanelAction>
+
+                <ToS />
+              </LeftInnerPanel>
+            </LeftPanel>
+
+            <RightPanel adjust={adjust}>
+              {loading ? null : (
+                <Collapse
+                  in={adjust}
+                  sx={{
+                    '& .MuiCollapse-wrapperInner': {
+                      display: 'flex',
+                      flexDirection: 'column',
+                      rowGap: theme.spacing(2),
+                      flex: 1,
+                      justifyContent: 'start',
+                      textAlign: 'start'
+                    }
+                  }}
+                >
+                  <CustomizabilityAlert />
+                  <SubmissionOptions />
+                  <ServiceParameters />
+                  <SubmissionMetadata />
+                </Collapse>
+              )}
+            </RightPanel>
+          </Container>
+        )}
       />
 
       <div style={{ height: '200px' }} />
