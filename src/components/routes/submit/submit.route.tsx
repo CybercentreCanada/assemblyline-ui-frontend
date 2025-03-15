@@ -186,7 +186,9 @@ const WrappedSubmitRoute = () => {
       )}
 
       <form.Subscribe
-        selector={state => [state.values.state.adjust, state.values.state.loading, state.values.state.disabled]}
+        selector={state =>
+          [state.values.state.adjust, state.values.state.loading, state.values.state.disabled] as const
+        }
         children={([adjust, loading, disabled]) => (
           <Container adjust={adjust}>
             <LeftPanel adjust={adjust}>
@@ -194,24 +196,24 @@ const WrappedSubmitRoute = () => {
                 <ClassificationInput />
 
                 <form.Subscribe
-                  selector={state => [state.values.state.tab, state.values.state.uploading]}
+                  selector={state => [state.values.state.tab, state.values.state.uploading] as const}
                   children={([type, uploading]) => (
                     <TabContainer
                       paper
                       centered
                       variant="standard"
                       style={{ margin: '0px' }}
-                      value={type as SubmitStore['state']['tab']}
+                      value={type}
                       onChange={(e, v: SubmitStore['state']['tab']) => form.setFieldValue('state.tab', v)}
                       tabs={{
                         file: {
                           label: t('tab.label.file'),
-                          disabled: (disabled || uploading) as boolean,
+                          disabled: disabled || uploading,
                           inner: <FileInput />
                         },
                         hash: {
                           label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
-                          disabled: (disabled || uploading) as boolean,
+                          disabled: disabled || uploading,
                           inner: <HashInput />
                         }
                       }}

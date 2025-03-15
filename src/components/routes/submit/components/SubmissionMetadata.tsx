@@ -95,7 +95,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
         onChange: (e, v) => handleChange(v),
         onReset: () => handleReset()
       }),
-      [disabled, handleChange, handleReset, loading, metadata.validator_type, name, theme]
+      [disabled, handleChange, handleReset, loading, metadata.validator_type, name, theme, uploading]
     );
 
     return (
@@ -198,14 +198,16 @@ const ExtraMetadata = React.memo(() => {
   return (
     <>
       <form.Subscribe
-        selector={state => [
-          state.values.state.disabled,
-          state.values.state.customize,
-          state.values.state.uploading,
-          state.values.metadata.edit
-        ]}
+        selector={state =>
+          [
+            state.values.state.disabled,
+            state.values.state.customize,
+            state.values.state.uploading,
+            state.values.metadata.edit
+          ] as const
+        }
         children={([disabled, customize, uploading, data]) => {
-          const error = isValidMetadata(data as string, configuration);
+          const error = isValidMetadata(data, configuration);
 
           return (
             <Dialog
@@ -220,7 +222,7 @@ const ExtraMetadata = React.memo(() => {
               <DialogContent sx={{ display: 'flex', flexDirection: 'column', height: 'min(600px, 80vh)' }}>
                 <MonacoEditor
                   language="json"
-                  value={data as string}
+                  value={data}
                   error={!!error}
                   options={{ wordWrap: 'on' }}
                   onChange={v => form.setFieldValue('metadata.edit', v)}
@@ -243,14 +245,18 @@ const ExtraMetadata = React.memo(() => {
       />
 
       <form.Subscribe
-        selector={state => [
-          state.values.state.disabled,
-          state.values.state.customize,
-          state.values.state.uploading,
-          state.values.metadata.data
-        ]}
+        selector={state =>
+          [
+            state.values.state.disabled,
+            state.values.state.customize,
+            state.values.state.uploading,
+            state.values.metadata.data
+          ] as const
+        }
         children={([disabled, customize, uploading, data]) => {
-          const metadata = Object.entries(data).filter(([key]) => !(key in configuration.submission.metadata.submit));
+          const metadata = Object.entries(data).filter(
+            ([key]) => !(key in configuration.submission.metadata.submit)
+          ) as [string, string][];
 
           return !metadata.length ? null : (
             <div style={{ margin: theme.spacing(1) }}>
@@ -260,7 +266,7 @@ const ExtraMetadata = React.memo(() => {
                 </Typography>
 
                 <IconButton
-                  disabled={(disabled || uploading) as boolean}
+                  disabled={disabled || uploading}
                   preventRender={!customize}
                   size="small"
                   tooltip={t('metadata.edit.tooltip')}
@@ -271,7 +277,7 @@ const ExtraMetadata = React.memo(() => {
                   <EditIcon fontSize="small" />
                 </IconButton>
                 <IconButton
-                  disabled={(disabled || uploading) as boolean}
+                  disabled={disabled || uploading}
                   size="small"
                   tooltip={t('metadata.clear.tooltip')}
                   onClick={handleClear}
@@ -317,7 +323,9 @@ export const SubmissionMetadata = React.memo(() => {
       <Typography variant="h6">{t('metadata.title')}</Typography>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <form.Subscribe
-          selector={state => [state.values.state.loading, state.values.state.disabled, state.values.state.uploading]}
+          selector={state =>
+            [state.values.state.loading, state.values.state.disabled, state.values.state.uploading] as const
+          }
           children={([loading, disabled, uploading]) =>
             Object.entries(configuration.submission.metadata.submit).map(([name, metadata]) => (
               <MetadataParam

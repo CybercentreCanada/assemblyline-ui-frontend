@@ -1,28 +1,53 @@
-import type { FormApi, FormOptions, ReactFormApi, Validator } from '@tanstack/react-form';
+import type { FormAsyncValidateOrFn, FormOptions, FormValidateOrFn, ReactFormExtendedApi } from '@tanstack/react-form';
 import { useForm as useTanStackForm } from '@tanstack/react-form';
-import React, { createContext, useCallback, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
 
 export function createFormContext<
   TFormData,
-  TFormValidator extends Validator<TFormData, string> = Validator<TFormData, string>
->(options: FormOptions<TFormData, TFormValidator>) {
-  type FormContextProps = (FormApi<TFormData, TFormValidator> & ReactFormApi<TFormData, TFormValidator>) | null;
+  TOnMount extends FormValidateOrFn<TFormData> = FormValidateOrFn<TFormData>,
+  TOnChange extends FormValidateOrFn<TFormData> = FormValidateOrFn<TFormData>,
+  TOnChangeAsync extends FormAsyncValidateOrFn<TFormData> = FormAsyncValidateOrFn<TFormData>,
+  TOnBlur extends FormValidateOrFn<TFormData> = FormValidateOrFn<TFormData>,
+  TOnBlurAsync extends FormAsyncValidateOrFn<TFormData> = FormAsyncValidateOrFn<TFormData>,
+  TOnSubmit extends FormValidateOrFn<TFormData> = FormValidateOrFn<TFormData>,
+  TOnSubmitAsync extends FormAsyncValidateOrFn<TFormData> = FormAsyncValidateOrFn<TFormData>,
+  TOnServer extends FormAsyncValidateOrFn<TFormData> = FormAsyncValidateOrFn<TFormData>,
+  TSubmitMeta = unknown
+>(
+  options: FormOptions<
+    TFormData,
+    TOnMount,
+    TOnChange,
+    TOnChangeAsync,
+    TOnBlur,
+    TOnBlurAsync,
+    TOnSubmit,
+    TOnSubmitAsync,
+    TOnServer,
+    TSubmitMeta
+  >
+) {
+  type FormContextProps = ReactFormExtendedApi<
+    TFormData,
+    TOnMount,
+    TOnChange,
+    TOnChangeAsync,
+    TOnBlur,
+    TOnBlurAsync,
+    TOnSubmit,
+    TOnSubmitAsync,
+    TOnServer,
+    TSubmitMeta
+  > | null;
 
   const FormContext = createContext<FormContextProps>(null);
 
   type FormProviderProps = {
     children: React.ReactNode;
-    onSubmit?: FormOptions<TFormData, TFormValidator>['onSubmit'];
   };
 
-  const FormProvider = ({ children, onSubmit = () => null }: FormProviderProps) => {
-    const form = useTanStackForm({
-      ...options,
-      onSubmit: props => {
-        'onSubmit' in options ? options.onSubmit(props) : null;
-        onSubmit(props);
-      }
-    });
+  const FormProvider = ({ children }: FormProviderProps) => {
+    const form = useTanStackForm(options);
     return <FormContext.Provider value={form}>{children}</FormContext.Provider>;
   };
 
@@ -32,14 +57,7 @@ export function createFormContext<
       throw new Error('Store not found');
     }
 
-    const setStore = useCallback(
-      (updater: (data: TFormData) => TFormData) => {
-        form.store.setState(s => ({ ...s, values: updater(s.values) }));
-      },
-      [form.store]
-    );
-
-    return { ...form, setStore };
+    return form;
   };
 
   return { FormProvider, useForm };
