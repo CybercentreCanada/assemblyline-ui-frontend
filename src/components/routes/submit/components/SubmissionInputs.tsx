@@ -735,14 +735,13 @@ const AnalyzeButton = React.memo(({ children = null, ...props }: ButtonProps) =>
         <Button
           disabled={disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)}
           loading={loading}
-          // startIcon={<PublishIcon />}
-          tooltip={t('analyze.button.tooltip')}
+          tooltip={t('submit.button.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           variant="contained"
           onClick={() => form.setFieldValue('autoURLServiceSelection.open', s => !s)}
           {...props}
         >
-          {children ? children : t('analyze.button.label')}
+          {children ? children : t('submit.button.label')}
         </Button>
       )}
     />
