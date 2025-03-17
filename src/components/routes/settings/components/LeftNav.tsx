@@ -12,11 +12,11 @@ export const LeftNav = React.memo(() => {
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.tab, state.values.state.loading]}
+      selector={state => [state.values.state.tab, state.values.state.loading] as const}
       children={([tab, loading]) => (
         <PageNavigation
           subheader={loading ? null : t('settings')}
-          loading={loading as boolean}
+          loading={loading}
           variant="left"
           options={[
             {

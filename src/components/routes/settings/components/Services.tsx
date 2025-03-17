@@ -42,7 +42,7 @@ const Parameter = React.memo(
         key={param_id}
         selector={state => {
           const param = state.values.settings.service_spec[spec_id].params[param_id];
-          return [param.type, param.name, param.default, param.editable, param.list];
+          return [param.type, param.name, param.default, param.editable, param.list] as const;
         }}
         children={([type, name, defaultValue, editable, list]) => {
           const field = `settings.service_spec[${spec_id}].params[${param_id}].value` as const;
@@ -51,14 +51,14 @@ const Parameter = React.memo(
           return (
             <form.Subscribe
               key={param_id}
-              selector={state => state.values.settings.service_spec[spec_id].params[param_id].value}
-              children={value => {
+              selector={state => [state.values.settings.service_spec[spec_id].params[param_id].value] as const}
+              children={([value]) => {
                 switch (type) {
                   case 'str':
                     return (
                       <TextListInput
                         id={`${spec_id}-${param_id}`}
-                        primary={(name as string).replaceAll('_', ' ')}
+                        primary={name.replaceAll('_', ' ')}
                         capitalize
                         disabled={paramDisabled}
                         loading={loading}
@@ -72,7 +72,7 @@ const Parameter = React.memo(
                     return (
                       <NumberListInput
                         id={`${spec_id}-${param_id}`}
-                        primary={(name as string).replaceAll('_', ' ')}
+                        primary={name.replaceAll('_', ' ')}
                         capitalize
                         disabled={paramDisabled}
                         loading={loading}
@@ -86,7 +86,7 @@ const Parameter = React.memo(
                     return (
                       <BooleanListInput
                         id={`${spec_id}-${param_id}`}
-                        primary={(name as string).replaceAll('_', ' ')}
+                        primary={name.replaceAll('_', ' ')}
                         capitalize
                         disabled={paramDisabled}
                         loading={loading}
@@ -100,13 +100,13 @@ const Parameter = React.memo(
                     return (
                       <SelectListInput
                         id={`${spec_id}-${param_id}`}
-                        primary={(name as string).replaceAll('_', ' ')}
+                        primary={name.replaceAll('_', ' ')}
                         capitalize
                         disabled={paramDisabled}
                         loading={loading}
                         reset={defaultValue !== null && value !== defaultValue}
                         value={value as string}
-                        options={(list as string[]).map(item => ({ value: item, primary: item.replaceAll('_', ' ') }))}
+                        options={list.map(item => ({ value: item, primary: item.replaceAll('_', ' ') }))}
                         onChange={(event, v) => form.setFieldValue(field, v)}
                         onReset={() => form.setFieldValue(field, defaultValue as string)}
                       />
@@ -181,10 +181,10 @@ const Service = React.memo(
           const specID = state.values.settings.service_spec.findIndex(spec => spec.name === service.name);
           const spec = specID >= 0 ? state.values.settings.service_spec[specID] : null;
           const params = JSON.stringify(calculateParams(spec, svr.selected));
-          return [svr.selected, svr.default, svr.editable, specID, spec, params];
+          return [svr.selected, svr.default, svr.editable, specID, spec, params] as const;
         }}
         children={([selected, defaultValue, editable, specID, spec, p]) => {
-          const params = JSON.parse(p as string) as SpecParamList;
+          const params = JSON.parse(p) as SpecParamList;
 
           return (
             <div
@@ -196,11 +196,11 @@ const Service = React.memo(
                 primary={service.name}
                 primaryProps={{ className: 'Anchor' }}
                 secondary={service.description}
-                checked={selected as boolean}
+                checked={selected}
                 anchor
                 reset={defaultValue !== null && selected !== defaultValue}
                 onChange={!customize && !editable ? null : (event, checked) => handleChange(!checked)}
-                onReset={!customize && !editable ? null : () => handleChange(defaultValue as boolean)}
+                onReset={!customize && !editable ? null : () => handleChange(defaultValue)}
               />
 
               {params && (
@@ -208,13 +208,13 @@ const Service = React.memo(
                   {params.show.map(param_id => (
                     // For restricted users, they should only see what they can edit until they select the "Show more" button
                     <Parameter
-                      key={`${(spec as ProfileSettings['service_spec'][number]).params[param_id].name}-${param_id}`}
+                      key={`${spec.params[param_id].name}-${param_id}`}
                       customize={customize}
                       disabled={disabled}
                       loading={loading}
                       param_id={param_id}
-                      selected={selected as boolean}
-                      spec_id={specID as number}
+                      selected={selected}
+                      spec_id={specID}
                     />
                   ))}
                   {!customize && params.hidden.length > 0 && (
@@ -224,13 +224,13 @@ const Service = React.memo(
                       children={params.hidden.map(param_id => (
                         // For restricted users, they should only see what they can edit until they select the "Show more" button
                         <Parameter
-                          key={`${(spec as ProfileSettings['service_spec'][number]).params[param_id].name}-${param_id}`}
+                          key={`${spec.params[param_id].name}-${param_id}`}
                           customize={customize}
                           disabled={disabled}
                           loading={loading}
                           param_id={param_id}
-                          selected={selected as boolean}
-                          spec_id={specID as number}
+                          selected={selected}
+                          spec_id={specID}
                         />
                       ))}
                     />
@@ -286,7 +286,7 @@ const Category = React.memo(
         selector={state => {
           const cat = state.values.settings.services[cat_id];
           const list = state.values.settings.services[cat_id].services.map(svr => svr.selected);
-          return [cat.selected, cat.default, cat.editable, !list.every(i => i) && list.some(i => i)];
+          return [cat.selected, cat.default, cat.editable, !list.every(i => i) && list.some(i => i)] as const;
         }}
         children={([selected, defaultValue, editable, indeterminate]) => (
           <div
@@ -332,7 +332,9 @@ export const ServicesSection = React.memo(() => {
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.customize, state.values.state.disabled, state.values.state.loading]}
+      selector={state =>
+        [state.values.state.customize, state.values.state.disabled, state.values.state.loading] as const
+      }
       children={([customize, disabled, loading]) => (
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
           <PageSection
@@ -345,8 +347,8 @@ export const ServicesSection = React.memo(() => {
           />
 
           <form.Subscribe
-            selector={state => state.values.settings.services}
-            children={categories =>
+            selector={state => [state.values.settings.services] as const}
+            children={([categories]) =>
               categories.map((category, cat_id) => (
                 <Category
                   key={`${category.name}-${cat_id}`}

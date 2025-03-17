@@ -17,7 +17,9 @@ export const SubmissionSection = React.memo(() => {
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.customize, state.values.state.disabled, state.values.state.loading]}
+      selector={state =>
+        [state.values.state.customize, state.values.state.disabled, state.values.state.loading] as const
+      }
       children={([customize, disabled, loading]) => (
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
           <PageSection
@@ -34,16 +36,16 @@ export const SubmissionSection = React.memo(() => {
               <form.Subscribe
                 selector={state => {
                   const param = state.values.settings.classification;
-                  return [param.value, param.default, param.editable];
+                  return [param.value, param.default, param.editable] as const;
                 }}
                 children={([value, defaultValue, editable]) => (
                   <ClassificationListInput
                     id="settings:submissions.classification"
                     primary={t('settings:submissions.classification')}
                     secondary={t('settings:submissions.classification_desc')}
-                    value={(value || defaultValue) as string}
+                    value={value || defaultValue}
                     loading={loading}
-                    disabled={disabled || !(customize || (editable as boolean))}
+                    disabled={disabled || !(customize || editable)}
                     onChange={v => form.setFieldValue(`settings.classification.value`, v)}
                   />
                 )}
@@ -53,7 +55,7 @@ export const SubmissionSection = React.memo(() => {
             <form.Subscribe
               selector={state => {
                 const param = state.values.settings.ttl;
-                return [param.value, param.default, param.editable];
+                return [param.value, param.default, param.editable] as const;
               }}
               children={([value, defaultValue, editable]) => (
                 <NumberListInput
@@ -61,14 +63,14 @@ export const SubmissionSection = React.memo(() => {
                   primary={t('settings:submissions.ttl')}
                   secondary={t('settings:submissions.ttl_desc')}
                   endAdornment={t('settings:submissions.ttl_days')}
-                  value={value as number}
+                  value={value}
                   loading={loading}
                   disabled={disabled || (!customize && !editable)}
                   reset={defaultValue !== null && value !== defaultValue}
                   min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                   max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
                   onChange={(event, v) => form.setFieldValue(`settings.ttl.value`, v)}
-                  onReset={() => form.setFieldValue(`settings.ttl.value`, defaultValue as number)}
+                  onReset={() => form.setFieldValue(`settings.ttl.value`, defaultValue)}
                 />
               )}
             />
@@ -76,7 +78,7 @@ export const SubmissionSection = React.memo(() => {
             <form.Subscribe
               selector={state => {
                 const param = state.values.settings.deep_scan;
-                return [param.value, param.default, param.editable];
+                return [param.value, param.default, param.editable] as const;
               }}
               children={([value, defaultValue, editable]) => (
                 <BooleanListInput
@@ -96,7 +98,7 @@ export const SubmissionSection = React.memo(() => {
             <form.Subscribe
               selector={state => {
                 const param = state.values.settings.ignore_recursion_prevention;
-                return [param.value, param.default, param.editable];
+                return [param.value, param.default, param.editable] as const;
               }}
               children={([value, defaultValue, editable]) => (
                 <BooleanListInput
@@ -116,7 +118,7 @@ export const SubmissionSection = React.memo(() => {
             <form.Subscribe
               selector={state => {
                 const param = state.values.settings.ignore_filtering;
-                return [param.value, param.default, param.editable];
+                return [param.value, param.default, param.editable] as const;
               }}
               children={([value, defaultValue, editable]) => (
                 <BooleanListInput
@@ -136,7 +138,7 @@ export const SubmissionSection = React.memo(() => {
             <form.Subscribe
               selector={state => {
                 const param = state.values.settings.generate_alert;
-                return [param.value, param.default, param.editable];
+                return [param.value, param.default, param.editable] as const;
               }}
               children={([value, defaultValue, editable]) => (
                 <BooleanListInput
@@ -156,7 +158,7 @@ export const SubmissionSection = React.memo(() => {
             <form.Subscribe
               selector={state => {
                 const param = state.values.settings.ignore_cache;
-                return [param.value, param.default, param.editable];
+                return [param.value, param.default, param.editable] as const;
               }}
               children={([value, defaultValue, editable]) => (
                 <BooleanListInput

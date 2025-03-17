@@ -23,7 +23,7 @@ export const ExternalSourcesSection = React.memo(() => {
 
   return fileSources.length === 0 ? null : (
     <form.Subscribe
-      selector={state => [state.values.state.disabled, state.values.state.loading]}
+      selector={state => [state.values.state.disabled, state.values.state.loading] as const}
       children={([disabled, loading]) => (
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
           <PageSection
@@ -46,8 +46,8 @@ export const ExternalSourcesSection = React.memo(() => {
             {fileSources.map((source, i) => (
               <form.Subscribe
                 key={`${source}-${i}`}
-                selector={state => state.values.settings.default_external_sources.value.includes(source)}
-                children={value => (
+                selector={state => [state.values.settings.default_external_sources.value.includes(source)] as const}
+                children={([value]) => (
                   <BooleanListInput
                     primary={source}
                     value={value}

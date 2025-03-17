@@ -62,7 +62,7 @@ const WrappedSettingsRoute = () => {
   else
     return (
       <form.Subscribe
-        selector={state => [state.values.state.tab, !!state.values.settings]}
+        selector={state => [state.values.state.tab, !!state.values.settings] as const}
         children={([tab, hasNext]) => (
           <PageLayout
             rootRef={rootRef}
@@ -71,7 +71,7 @@ const WrappedSettingsRoute = () => {
             leftNav={!hasNext ? null : <LeftNav />}
             rightNav={!hasNext ? null : <RightNav />}
           >
-            {!hasNext ? null : (tab as string) in settings.submission_profiles ? (
+            {!hasNext ? null : tab in settings.submission_profiles ? (
               <>
                 <SubmissionSection />
                 <ExternalSourcesSection />
