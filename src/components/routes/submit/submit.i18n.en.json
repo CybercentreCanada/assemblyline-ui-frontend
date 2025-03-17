@@ -24,6 +24,7 @@
   "find.button.title": "Find",
   "find.button.tooltip": "Check if a file matching your input exist in the system",
   "find.close.title": "Close",
+  "find.file.label": "File",
   "find.found.title": "A file matching your input was found!",
   "find.link.title": "Go to file",
   "find.not_found.title": "No files matching your input were found.",

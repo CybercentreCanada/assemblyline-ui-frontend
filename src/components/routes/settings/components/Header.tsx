@@ -1,4 +1,4 @@
-import { Button, CircularProgress, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -12,6 +12,7 @@ import {
   resetPreviousSubmissionValues,
   updatePreviousSubmissionValues
 } from 'components/routes/settings/settings.utils';
+import { Button } from 'components/visual/Buttons/Button';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
@@ -119,64 +120,31 @@ export const HeaderSection = React.memo(() => {
                 <Button
                   variant="outlined"
                   color="secondary"
+                  loading={submitting}
                   disabled={submitting || !modified}
                   onClick={() => form.setFieldValue('settings', s => resetPreviousSubmissionValues(s))}
                 >
                   {t('cancel')}
-                  {submitting && (
-                    <CircularProgress
-                      size={24}
-                      style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        marginTop: -12,
-                        marginLeft: -12
-                      }}
-                    />
-                  )}
                 </Button>
 
                 <Button
                   variant="outlined"
                   color="primary"
+                  loading={submitting}
                   disabled={submitting || !hasReset}
                   onClick={() => form.setFieldValue('settings', s => resetDefaultSubmissionValues(s))}
                 >
                   {t('reset')}
-                  {submitting && (
-                    <CircularProgress
-                      size={24}
-                      style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        marginTop: -12,
-                        marginLeft: -12
-                      }}
-                    />
-                  )}
                 </Button>
 
                 <Button
                   variant="contained"
                   color="primary"
+                  loading={submitting}
                   disabled={submitting || !modified}
                   onClick={() => form.setFieldValue('state.confirm', true)}
                 >
                   {t('save')}
-                  {submitting && (
-                    <CircularProgress
-                      size={24}
-                      style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        marginTop: -12,
-                        marginLeft: -12
-                      }}
-                    />
-                  )}
                 </Button>
               </div>
             }

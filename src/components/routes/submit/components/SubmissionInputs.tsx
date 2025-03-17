@@ -582,9 +582,9 @@ export const FindButton = React.memo(() => {
                 <ListItemText
                   primary={
                     <>
-                      {t('find.button.title')}
+                      {`${t('find.button.title')} `}
                       {tab === 'file' ? (
-                        'File'
+                        t('find.file.label')
                       ) : (
                         <span style={{ textTransform: 'uppercase' }}>{hashType as string}</span>
                       )}

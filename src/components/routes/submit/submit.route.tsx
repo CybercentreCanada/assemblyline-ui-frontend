@@ -28,6 +28,7 @@ import {
   ExternalServices,
   ExternalSources,
   FileInput,
+  FindButton,
   HashInput,
   MaliciousInput,
   PasswordInput,
@@ -250,7 +251,7 @@ const WrappedSubmitRoute = () => {
                 <LeftPanelAction adjust={adjust}>
                   <CancelButton />
                   <div style={{ flex: 1 }} />
-                  {/* <FindButton /> */}
+                  <FindButton />
                   <AdjustButton />
                   <AnalyzeSubmission />
                 </LeftPanelAction>
