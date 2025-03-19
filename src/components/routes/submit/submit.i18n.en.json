@@ -1,8 +1,6 @@
 {
   "adjust.button.close.tooltip": "Close the panel that displays the submit parameters",
   "adjust.button.open.tooltip": "Open the panel to adjust the submit parameters",
-  "analyze.button.label": "Analyze",
-  "analyze.button.tooltip": "Submit the input for analysis",
   "cancel.button.label": "Cancel",
   "cancel.button.tooltip": "Cancel the submission and reset all values",
   "classification.input.label": "The following classification will be applied to your submission:",
@@ -24,6 +22,7 @@
   "find.button.title": "Find",
   "find.button.tooltip": "Check if a file matching your input exist in the system",
   "find.close.title": "Close",
+  "find.file.label": "File",
   "find.found.title": "A file matching your input was found!",
   "find.link.title": "Go to file",
   "find.not_found.title": "No files matching your input were found.",

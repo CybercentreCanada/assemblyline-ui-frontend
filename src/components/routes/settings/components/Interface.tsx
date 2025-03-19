@@ -18,7 +18,7 @@ export const InterfaceSection = React.memo(() => {
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.loading, state.values.state.disabled]}
+      selector={state => [state.values.state.loading, state.values.state.disabled] as const}
       children={([loading, disabled]) => (
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
           <ListHeader
@@ -30,8 +30,8 @@ export const InterfaceSection = React.memo(() => {
 
           <List>
             <form.Subscribe
-              selector={state => state.values.settings.preferred_submission_profile.value}
-              children={value => (
+              selector={state => [state.values.settings.preferred_submission_profile.value] as const}
+              children={([value]) => (
                 <SelectListInput
                   primary={t('settings:submissions.submission_profile')}
                   secondary={t('settings:submissions.submission_profile_desc')}
@@ -55,8 +55,8 @@ export const InterfaceSection = React.memo(() => {
             />
 
             <form.Subscribe
-              selector={state => state.values.settings.submission_view.value}
-              children={value => (
+              selector={state => [state.values.settings.submission_view.value] as const}
+              children={([value]) => (
                 <SelectListInput
                   primary={t('interface.view')}
                   secondary={t('interface.view_desc')}
@@ -75,8 +75,8 @@ export const InterfaceSection = React.memo(() => {
             />
 
             <form.Subscribe
-              selector={state => state.values.settings.download_encoding.value}
-              children={download_encoding => (
+              selector={state => [state.values.settings.download_encoding.value] as const}
+              children={([download_encoding]) => (
                 <SelectListInput
                   primary={t('interface.encoding')}
                   secondary={t('interface.encoding_desc')}
@@ -100,25 +100,27 @@ export const InterfaceSection = React.memo(() => {
             />
 
             <form.Subscribe
-              selector={state => [
-                state.values.settings.default_zip_password.value,
-                state.values.settings.download_encoding.value !== 'zip'
-              ]}
+              selector={state =>
+                [
+                  state.values.settings.default_zip_password.value,
+                  state.values.settings.download_encoding.value !== 'zip'
+                ] as const
+              }
               children={([default_zip_password, preventRender]) => (
                 <TextListInput
                   primary={t('interface.encoding_password')}
-                  value={default_zip_password as string}
+                  value={default_zip_password}
                   loading={loading}
                   disabled={disabled}
-                  preventRender={preventRender as boolean}
+                  preventRender={preventRender}
                   onChange={(event, v) => form.setFieldValue('settings.default_zip_password.value', v)}
                 />
               )}
             />
 
             <form.Subscribe
-              selector={state => state.values.settings.expand_min_score.value}
-              children={value => (
+              selector={state => [state.values.settings.expand_min_score.value]}
+              children={([value]) => (
                 <SelectListInput
                   primary={t('interface.score')}
                   secondary={t('interface.score_desc')}
@@ -139,8 +141,8 @@ export const InterfaceSection = React.memo(() => {
             />
             {configuration.ui.ai.enabled && (
               <form.Subscribe
-                selector={state => state.values.settings.executive_summary.value}
-                children={value => (
+                selector={state => [state.values.settings.executive_summary.value]}
+                children={([value]) => (
                   <BooleanListInput
                     primary={t('interface.executive_summary')}
                     secondary={t('interface.executive_summary_desc')}

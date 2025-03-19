@@ -136,7 +136,11 @@ const WrappedSelectListInput = ({
             renderValue={option => (
               <ListItemText
                 primary={options.find(o => o.value === option)?.primary || ''}
-                primaryTypographyProps={{ variant: primaryVariant, sx: { cursor: 'pointer' } }}
+                primaryTypographyProps={{
+                  ...(!(disabled || readOnly) && { sx: { cursor: 'pointer' } }),
+                  ...(tiny && { variant: 'body2' })
+                }}
+                style={{ margin: 0 }}
               />
             )}
             onChange={event => {

@@ -2,8 +2,10 @@ import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material'
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
+import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Metadata } from 'components/models/base/submission';
+import type { UserSettings } from 'components/models/base/user_settings';
 import {
   initializeSettings,
   loadDefaultProfile,
@@ -26,6 +28,7 @@ import {
   ExternalServices,
   ExternalSources,
   FileInput,
+  FindButton,
   HashInput,
   MaliciousInput,
   PasswordInput,
@@ -120,8 +123,9 @@ const WrappedSubmitRoute = () => {
   const theme = useTheme();
   const banner = useAppBanner();
   const location = useLocation();
+  const { apiCall } = useMyAPI();
   const { closeSnackbar } = useMySnackbar();
-  const { user: currentUser, configuration, settings } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
 
   const form = useForm();
 
@@ -133,47 +137,53 @@ const WrappedSubmitRoute = () => {
     form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('submission_create'));
     form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
 
-    form.setFieldValue('settings', initializeSettings(settings));
-    const profile = getPreferredSubmissionProfile(settings);
-    form.setFieldValue('state.profile', profile);
-    if (profile === 'default') form.setFieldValue('settings', s => loadDefaultProfile(s, settings));
-    else
-      form.setFieldValue('settings', s =>
-        loadSubmissionProfile(s, settings, configuration.submission.profiles, profile)
-      );
-    form.setFieldValue('settings.default_external_sources', getDefaultExternalSources(settings, configuration));
+    apiCall<UserSettings>({
+      url: `/api/v4/user/settings/${currentUser.username}/`,
+      onSuccess: ({ api_response: settings }) => {
+        form.setFieldValue('settings', initializeSettings(settings));
+        const profile = getPreferredSubmissionProfile(settings);
+        form.setFieldValue('state.profile', profile);
+        if (profile === 'default') form.setFieldValue('settings', s => loadDefaultProfile(s, settings));
+        else
+          form.setFieldValue('settings', s =>
+            loadSubmissionProfile(s, settings, configuration.submission.profiles, profile)
+          );
+        form.setFieldValue('settings.default_external_sources', getDefaultExternalSources(settings, configuration));
 
-    const search = new URLSearchParams(location.search);
-    const state = location.state as SubmitState;
+        const search = new URLSearchParams(location.search);
+        const state = location.state as SubmitState;
 
-    if (state?.c12n) {
-      form.setFieldValue('settings.classification.value', state.c12n);
-    } else if (search.get('classification')) {
-      form.setFieldValue('settings.classification.value', search.get('classification'));
-    }
+        if (state?.c12n) {
+          form.setFieldValue('settings.classification.value', state.c12n);
+        } else if (search.get('classification')) {
+          form.setFieldValue('settings.classification.value', search.get('classification'));
+        }
 
-    if (state?.hash) {
-      const [type, value] = getSubmitType(state?.hash || '', configuration);
-      form.setFieldValue('state.tab', 'hash');
-      form.setFieldValue('hash.type', type);
-      form.setFieldValue('hash.value', value);
-    } else if (search.get('hash')) {
-      const [type, value] = getSubmitType(search.get('hash'), configuration);
-      form.setFieldValue('state.tab', 'hash');
-      form.setFieldValue('hash.type', type);
-      form.setFieldValue('hash.value', value);
-    }
+        if (state?.hash) {
+          const [type, value] = getSubmitType(state?.hash || '', configuration);
+          form.setFieldValue('state.tab', 'hash');
+          form.setFieldValue('hash.type', type);
+          form.setFieldValue('hash.value', value);
+        } else if (search.get('hash')) {
+          const [type, value] = getSubmitType(search.get('hash'), configuration);
+          form.setFieldValue('state.tab', 'hash');
+          form.setFieldValue('hash.type', type);
+          form.setFieldValue('hash.value', value);
+        }
 
-    if (state?.metadata && typeof state.metadata === 'object' && Object.keys(state.metadata).length > 0) {
-      form.setFieldValue('metadata.data', state.metadata);
-    } else if (isValidJSON(search.get('metadata'))) {
-      const metadata = JSON.parse(search.get('metadata')) as Metadata;
-      form.setFieldValue('metadata.data', metadata);
-    }
+        if (state?.metadata && typeof state.metadata === 'object' && Object.keys(state.metadata).length > 0) {
+          form.setFieldValue('metadata.data', state.metadata);
+        } else if (isValidJSON(search.get('metadata'))) {
+          const metadata = JSON.parse(search.get('metadata')) as Metadata;
+          form.setFieldValue('metadata.data', metadata);
+        }
 
-    form.setFieldValue('state.loading', false);
+        form.setFieldValue('state.loading', false);
+      }
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration, currentUser, settings]);
+  }, [configuration, currentUser]);
 
   return (
     <PageCenter maxWidth={downMD ? '100%' : `${theme.breakpoints.values.md}px`} margin={4} width="100%">
@@ -186,7 +196,9 @@ const WrappedSubmitRoute = () => {
       )}
 
       <form.Subscribe
-        selector={state => [state.values.state.adjust, state.values.state.loading, state.values.state.disabled]}
+        selector={state =>
+          [state.values.state.adjust, state.values.state.loading, state.values.state.disabled] as const
+        }
         children={([adjust, loading, disabled]) => (
           <Container adjust={adjust}>
             <LeftPanel adjust={adjust}>
@@ -194,24 +206,24 @@ const WrappedSubmitRoute = () => {
                 <ClassificationInput />
 
                 <form.Subscribe
-                  selector={state => [state.values.state.tab, state.values.state.uploading]}
+                  selector={state => [state.values.state.tab, state.values.state.uploading] as const}
                   children={([type, uploading]) => (
                     <TabContainer
                       paper
                       centered
                       variant="standard"
                       style={{ margin: '0px' }}
-                      value={type as SubmitStore['state']['tab']}
+                      value={type}
                       onChange={(e, v: SubmitStore['state']['tab']) => form.setFieldValue('state.tab', v)}
                       tabs={{
                         file: {
                           label: t('tab.label.file'),
-                          disabled: (disabled || uploading) as boolean,
+                          disabled: disabled || uploading,
                           inner: <FileInput />
                         },
                         hash: {
                           label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
-                          disabled: (disabled || uploading) as boolean,
+                          disabled: disabled || uploading,
                           inner: <HashInput />
                         }
                       }}
@@ -239,7 +251,7 @@ const WrappedSubmitRoute = () => {
                 <LeftPanelAction adjust={adjust}>
                   <CancelButton />
                   <div style={{ flex: 1 }} />
-                  {/* <FindButton /> */}
+                  <FindButton />
                   <AdjustButton />
                   <AnalyzeSubmission />
                 </LeftPanelAction>

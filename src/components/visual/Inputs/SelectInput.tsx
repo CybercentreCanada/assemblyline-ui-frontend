@@ -212,7 +212,6 @@ const WrappedSelectInput = ({
                     ...(tiny && { variant: 'body2' })
                   }}
                   secondaryTypographyProps={{
-                    textTransform: 'capitalize',
                     overflow: 'auto',
                     textOverflow: 'initial',
                     whiteSpace: 'normal',

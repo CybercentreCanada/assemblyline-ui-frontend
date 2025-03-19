@@ -1,17 +1,15 @@
-import type { IconButtonProps, TypographyProps } from '@mui/material';
-import { IconButton, Skeleton, Typography, useTheme } from '@mui/material';
+import type { TypographyProps } from '@mui/material';
+import { Skeleton, Typography, useTheme } from '@mui/material';
+import type { ButtonProps } from 'components/visual/Buttons/Button';
+import { Button } from 'components/visual/Buttons/Button';
+import type { IconButtonProps } from 'components/visual/Buttons/IconButton';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
-import type { TooltipProps } from 'components/visual/Tooltip';
-import { Tooltip } from 'components/visual/Tooltip';
 import type { ReactNode } from 'react';
 import React, { isValidElement } from 'react';
 
-type TitleActionPartialProps = IconButtonProps & {
-  icon: React.ReactNode;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children'>;
-};
+type TitleActionPartialProps = (IconButtonProps & { type?: 'icon' }) | (ButtonProps & { type?: 'button' });
 
 export type TitleActionProps = ReactNode | TitleActionPartialProps;
 
@@ -70,7 +68,16 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
             rowGap: theme.spacing(1)
           }}
         >
-          <div style={{ flex: 1, width: '100%', display: 'flex', flexWrap: 'wrap', alignContent: 'flex-start' }}>
+          <div
+            style={{
+              flex: 1,
+              width: '100%',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignContent: 'flex-start',
+              columnGap: theme.spacing(1)
+            }}
+          >
             <Typography
               variant="h4"
               whiteSpace="nowrap"
@@ -82,42 +89,39 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
               {primary}
             </Typography>
 
-            <Typography
-              variant="caption"
-              whiteSpace="nowrap"
-              overflow="hidden"
-              textOverflow="ellipsis"
-              width="100%"
-              {...secondaryProps}
-            >
+            <Typography variant="caption" color="textSecondary" width="100%" {...secondaryProps}>
               {loading ? <Skeleton style={{ width: '10rem' }} /> : secondary}
             </Typography>
           </div>
 
           {loading ? null : (
             <div
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', rowGap: theme.spacing(1) }}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                rowGap: theme.spacing(1),
+                paddingTop: theme.spacing(0.5)
+              }}
             >
-              <div>
-                {Array.isArray(actions) && (
-                  <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
-                    {actions.map((action, i) => {
-                      if (isValidAction(action)) {
-                        const { icon = null, tooltip = null, tooltipProps, ...iconButtonProps } = action;
-                        return (
-                          <div key={i}>
-                            <Tooltip title={tooltip} placement="bottom" {...tooltipProps}>
-                              <IconButton size="large" {...iconButtonProps}>
-                                {icon}
-                              </IconButton>
-                            </Tooltip>
-                          </div>
-                        );
-                      } else return action;
-                    })}
-                  </div>
-                )}
-              </div>
+              {Array.isArray(actions) && (
+                <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', columnGap: theme.spacing(1) }}>
+                  {actions.map((action, i) => {
+                    if (isValidAction(action)) {
+                      const { children = null, type = 'icon', ...buttonProps } = action;
+                      return type === 'icon' ? (
+                        <IconButton key={i} size="large" {...(buttonProps as IconButtonProps)}>
+                          {children}
+                        </IconButton>
+                      ) : (
+                        <Button key={i} {...(buttonProps as ButtonProps)}>
+                          {children}
+                        </Button>
+                      );
+                    } else return action;
+                  })}
+                </div>
+              )}
 
               {endAdornment}
             </div>

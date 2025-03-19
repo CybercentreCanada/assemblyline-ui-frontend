@@ -1,6 +1,5 @@
 import { Typography, useTheme } from '@mui/material';
 import type { ProfileSettings } from 'components/routes/settings/settings.utils';
-import type { SubmitStore } from 'components/routes/submit/submit.form';
 import { useForm } from 'components/routes/submit/submit.form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
@@ -40,19 +39,9 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
           state.values.state.disabled,
           state.values.state.customize,
           state.values.state.uploading
-        ];
+        ] as const;
       }}
-      children={props => {
-        const type = props[0] as ProfileSettings['service_spec'][number]['params'][number]['type'];
-        const name = props[1] as ProfileSettings['service_spec'][number]['params'][number]['name'];
-        const value = props[2];
-        const defaultValue = props[3];
-        const editable = props[4] as ProfileSettings['service_spec'][number]['params'][number]['editable'];
-        const list = props[5] as ProfileSettings['service_spec'][number]['params'][number]['list'];
-        const disabled = props[6] as SubmitStore['state']['disabled'];
-        const customize = props[7] as SubmitStore['state']['customize'];
-        const uploading = props[8] as SubmitStore['state']['uploading'];
-
+      children={([type, name, value, defaultValue, editable, list, disabled, customize, uploading]) => {
         switch (type) {
           case 'bool':
             return (
@@ -225,46 +214,44 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
           state.values.state.disabled,
           state.values.state.customize,
           state.values.state.uploading
-        ];
+        ] as const;
       }}
-      children={props => {
-        const selected = props[0] as ProfileSettings['services'][number]['selected'];
-        const defaultValue = props[1] as ProfileSettings['services'][number]['default'];
-        const editable = props[2] as ProfileSettings['services'][number]['editable'];
-        const specID = props[3] as number;
-        const spec = props[4] as ProfileSettings['service_spec'][number];
-        const hasParams = props[5] as boolean;
-        const disabled = props[6] as SubmitStore['state']['disabled'];
-        const customize = props[7] as SubmitStore['state']['customize'];
-        const uploading = props[8] as SubmitStore['state']['uploading'];
+      children={([selected, defaultValue, editable, specID, spec, hasParams, disabled, customize, uploading]) => (
+        <CollapseSection
+          header={({ open, setOpen }) => (
+            <CheckboxInput
+              label={service.name}
+              disabled={disabled || uploading || !(customize || editable)}
+              expand={!hasParams ? null : open}
+              preventRender={!customize && !editable && !selected}
+              reset={defaultValue !== null && selected !== defaultValue}
+              value={selected}
+              onChange={!customize && !editable ? null : (e, v) => handleChange(v)}
+              onExpand={() => setOpen(o => !o)}
+              onReset={!customize && !editable ? null : () => handleChange(defaultValue)}
+            />
+          )}
+          closed
+          preventRender={!(customize || editable) && !selected}
+        >
+          {!hasParams ? null : (
+            <>
+              <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '48px' }}>
+                {(() => {
+                  const params = calculateParams(spec, customize);
 
-        return (
-          <CollapseSection
-            header={({ open, setOpen }) => (
-              <CheckboxInput
-                label={service.name}
-                disabled={disabled || uploading || !(customize || editable)}
-                expand={!hasParams ? null : open}
-                preventRender={!customize && !editable && !selected}
-                reset={defaultValue !== null && selected !== defaultValue}
-                value={selected}
-                onChange={!customize && !editable ? null : (e, v) => handleChange(v)}
-                onExpand={() => setOpen(o => !o)}
-                onReset={!customize && !editable ? null : () => handleChange(defaultValue)}
-              />
-            )}
-            closed
-            preventRender={!(customize || editable) && !selected}
-          >
-            {!hasParams ? null : (
-              <>
-                <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '48px' }}>
-                  {(() => {
-                    const params = calculateParams(spec, customize);
-
-                    return (
-                      <>
-                        {params.show.map(param_id => (
+                  return (
+                    <>
+                      {params.show.map(param_id => (
+                        <Param
+                          key={`${spec.params[param_id].name}-${param_id}`}
+                          param_id={param_id}
+                          service={service}
+                          spec_id={specID}
+                        />
+                      ))}
+                      <ShowMore variant="tiny" preventRender={!params.hidden.length}>
+                        {params.hidden.map(param_id => (
                           <Param
                             key={`${spec.params[param_id].name}-${param_id}`}
                             param_id={param_id}
@@ -272,25 +259,15 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
                             spec_id={specID}
                           />
                         ))}
-                        <ShowMore variant="tiny" preventRender={!params.hidden.length}>
-                          {params.hidden.map(param_id => (
-                            <Param
-                              key={`${spec.params[param_id].name}-${param_id}`}
-                              param_id={param_id}
-                              service={service}
-                              spec_id={specID}
-                            />
-                          ))}
-                        </ShowMore>
-                      </>
-                    );
-                  })()}
-                </div>
-              </>
-            )}
-          </CollapseSection>
-        );
-      }}
+                      </ShowMore>
+                    </>
+                  );
+                })()}
+              </div>
+            </>
+          )}
+        </CollapseSection>
+      )}
     />
   );
 });
@@ -339,7 +316,7 @@ const Category = React.memo(({ cat_id, category }: CategoryProps) => {
           state.values.state.customize,
           state.values.state.disabled,
           state.values.state.uploading
-        ];
+        ] as const;
       }}
       children={([selected, defaultValue, editable, indeterminate, customize, disabled, uploading]) => (
         <CollapseSection
@@ -381,7 +358,7 @@ export const ServiceParameters = React.memo(() => {
     <div>
       <Typography variant="h6">{t('options.services.title')}</Typography>
       <form.Subscribe
-        selector={state => [state.values.settings.services]}
+        selector={state => [state.values.settings.services] as const}
         children={([categories]) => (
           <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.25) }}>
             {categories?.map((category, cat_id) => (
