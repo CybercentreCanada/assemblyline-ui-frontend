@@ -169,8 +169,9 @@ const Service = React.memo(
               specID >= 0 && (
                 <List inset>
                   {specs[specID].params
-                    .sort((p1, p2) => (customize ? 1 : (p2.editable ? 1 : 0) - (p1.editable ? 1 : 0)))
-                    .map((param, param_id) => (
+                    .map((param, param_id) => [param, param_id] as const)
+                    .sort(([p1], [p2]) => (customize ? 1 : (p2.editable ? 1 : 0) - (p1.editable ? 1 : 0)))
+                    .map(([param, param_id]) => (
                       <Parameter
                         key={`${svr.name}-${param.name}`}
                         spec_id={specID}
