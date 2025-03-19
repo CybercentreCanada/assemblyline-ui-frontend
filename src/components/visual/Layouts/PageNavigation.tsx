@@ -159,6 +159,10 @@ export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((
           margin={`${theme.spacing(0.25)} 0px`}
           variant="body2"
           {...primaryProps}
+          sx={{
+            ...(checkboxProps && !checkboxProps?.checked && !checkboxProps?.indeterminate && { opacity: 0.38 }),
+            ...primaryProps?.sx
+          }}
         >
           {primary}
         </Typography>

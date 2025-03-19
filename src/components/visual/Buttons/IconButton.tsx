@@ -4,7 +4,7 @@ import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
 import { CircularProgress } from './CircularProgress';
 
-type IconButtonProps = MuiIconButtonProps & {
+export type IconButtonProps = MuiIconButtonProps & {
   loading?: boolean;
   preventRender?: boolean;
   tooltip?: TooltipProps['title'];

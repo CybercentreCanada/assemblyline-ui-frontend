@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/material';
+import { Alert, Tooltip, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -12,7 +12,6 @@ import {
   resetPreviousSubmissionValues,
   updatePreviousSubmissionValues
 } from 'components/routes/settings/settings.utils';
-import { Button } from 'components/visual/Buttons/Button';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
@@ -20,7 +19,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const HeaderSection = React.memo(() => {
-  const { t } = useTranslation(['settings']);
+  const { t } = useTranslation(['settings', 'submit']);
   const theme = useTheme();
   const form = useForm();
   const { apiCall } = useMyAPI();
@@ -97,8 +96,7 @@ export const HeaderSection = React.memo(() => {
             waiting={submitting}
           />
           <PageHeader
-            primary={t('title')}
-            secondary={
+            primary={
               !tab
                 ? null
                 : tab === 'interface'
@@ -107,46 +105,71 @@ export const HeaderSection = React.memo(() => {
                 ? t('profile.custom')
                 : configuration.submission.profiles[tab].display_name
             }
+            secondary={
+              !tab
+                ? null
+                : tab === 'interface'
+                ? null
+                : tab === 'default'
+                ? t('profile.custom_desc')
+                : configuration.submission.profiles[tab].description
+            }
             loading={loading}
+            actions={[
+              {
+                children: t('button.cancel.label'),
+                color: 'primary',
+                disabled: submitting || !modified,
+                loading: submitting,
+                tooltip: t('button.cancel.tooltip'),
+                tooltipProps: { placement: 'bottom' },
+                type: 'button',
+                variant: 'outlined',
+                onClick: () => form.setFieldValue('settings', s => resetPreviousSubmissionValues(s))
+              },
+              {
+                children: t('button.reset.label'),
+                color: 'secondary',
+                disabled: submitting || !hasReset,
+                loading: submitting,
+                tooltip: t('button.reset.tooltip'),
+                tooltipProps: { placement: 'bottom' },
+                type: 'button',
+                variant: 'contained',
+                onClick: () => form.setFieldValue('settings', s => resetDefaultSubmissionValues(s))
+              },
+              {
+                children: t('button.save.label'),
+                color: 'primary',
+                disabled: submitting || !modified,
+                loading: submitting,
+                tooltip: t('button.save.tooltip'),
+                tooltipProps: { placement: 'bottom' },
+                type: 'button',
+                variant: 'contained',
+                onClick: () => form.setFieldValue('state.confirm', true)
+              }
+            ]}
             endAdornment={
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  columnGap: theme.spacing(2)
-                }}
-              >
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  loading={submitting}
-                  disabled={submitting || !modified}
-                  onClick={() => form.setFieldValue('settings', s => resetPreviousSubmissionValues(s))}
-                >
-                  {t('cancel')}
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  loading={submitting}
-                  disabled={submitting || !hasReset}
-                  onClick={() => form.setFieldValue('settings', s => resetDefaultSubmissionValues(s))}
-                >
-                  {t('reset')}
-                </Button>
-
-                <Button
-                  variant="contained"
-                  color="primary"
-                  loading={submitting}
-                  disabled={submitting || !modified}
-                  onClick={() => form.setFieldValue('state.confirm', true)}
-                >
-                  {t('save')}
-                </Button>
-              </div>
+              <form.Subscribe
+                selector={state => [state.values.state.customize] as const}
+                children={([customize]) => (
+                  <Tooltip
+                    placement="bottom"
+                    title={customize ? t('submit:customize.full.tooltip') : t('submit:customize.limited.tooltip')}
+                    slotProps={{ tooltip: { sx: { backgroundColor: 'rgba(97, 97, 97, 1)' } } }}
+                  >
+                    <div>
+                      <Alert
+                        severity={customize ? 'info' : 'warning'}
+                        sx={{ paddingTop: theme.spacing(0.25), paddingBottom: theme.spacing(0.25), width: '100%' }}
+                      >
+                        {customize ? t('submit:customize.full.label') : t('submit:customize.limited.label')}
+                      </Alert>
+                    </div>
+                  </Tooltip>
+                )}
+              />
             }
           />
         </>
