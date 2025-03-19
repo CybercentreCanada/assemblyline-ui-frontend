@@ -16,49 +16,13 @@ import {
   ListItem,
   ListItemButton,
   ListSubheader,
+  Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import React, { useMemo, useState } from 'react';
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-
-const useStyles = makeStyles(theme => ({
-  readOnly: {
-    padding: `${theme.spacing(0.5)} ${theme.spacing(2)} ${theme.spacing(0.5)} ${theme.spacing(1.5)}`
-  },
-  button: {
-    paddingLeft: theme.spacing(3),
-    '&:not(.Active)': {
-      marginLeft: '1px'
-    }
-  },
-  subheader: {
-    paddingLeft: theme.spacing(1.5)
-  },
-  isDownLG: {
-    '&.Active': {
-      color: theme.palette.primary.main,
-      backgroundColor: alpha(theme.palette.primary.main, 0.1)
-    }
-  },
-  leftNav: {
-    borderRadius: '0 18px 18px  0',
-    '&.Active': {
-      color: theme.palette.primary.main,
-      backgroundColor: alpha(theme.palette.primary.main, 0.1)
-    }
-  },
-  rightNav: {
-    '&.Active': {
-      color: theme.palette.primary.main,
-      borderLeft: `1px solid ${theme.palette.primary.main}`
-    }
-  }
-}));
 
 type PageNavigationDrawerProps = {
   children?: React.ReactNode;
@@ -93,8 +57,6 @@ export type PageNavigationItemProp = ListItemProps & {
   primary: React.ReactNode;
   primaryProps?: ListItemTextProps['primaryTypographyProps'];
   readOnly?: boolean;
-  secondary?: React.ReactNode;
-  secondaryProps?: ListItemTextProps['secondaryTypographyProps'];
   subheader?: boolean;
   to?: LinkProps['to'];
   variant?: DrawerProps['anchor'];
@@ -103,7 +65,6 @@ export type PageNavigationItemProp = ListItemProps & {
 
 export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((props: PageNavigationItemProp) => {
   const theme = useTheme();
-  const classes = useStyles();
 
   const {
     active = false,
@@ -113,8 +74,6 @@ export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((
     primary,
     primaryProps = null,
     readOnly = false,
-    secondary = null,
-    secondaryProps = null,
     subheader = false,
     to = null,
     variant = 'left',
@@ -125,14 +84,22 @@ export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((
   const isDownLG = useMediaQuery(theme.breakpoints.down('lg'));
 
   return preventRender ? null : readOnly ? (
-    <ListItem className={clsx(classes.readOnly)} disablePadding {...listItemProps}>
-      <ListItemText
-        id={id}
-        primary={primary}
-        primaryTypographyProps={{ color: 'textSecondary', ...primaryProps }}
-        secondary={secondary}
-        secondaryTypographyProps={secondaryProps}
-      />
+    <ListItem
+      disablePadding
+      {...listItemProps}
+      sx={{
+        padding: `${theme.spacing(0.5)} ${theme.spacing(2)} ${theme.spacing(0.5)} ${theme.spacing(1.5)}`,
+        ...listItemProps?.sx
+      }}
+    >
+      <Typography
+        color={active ? 'primary' : subheader ? 'textSecondary' : 'textPrimary'}
+        margin={`${theme.spacing(0.25)} 0px`}
+        variant="body2"
+        {...primaryProps}
+      >
+        {primary}
+      </Typography>
     </ListItem>
   ) : (
     <ListItem
@@ -141,8 +108,12 @@ export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((
         !checkboxProps ? null : (
           <Checkbox
             edge="end"
+            size="small"
             inputProps={{ id: id || primary.toString(), ...checkboxProps?.inputProps }}
             {...checkboxProps}
+            sx={{
+              padding: theme.spacing(0.75)
+            }}
           />
         )
       }
@@ -150,34 +121,47 @@ export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((
     >
       <ListItemButton
         id={id || primary.toString()}
-        className={clsx(
-          classes.button,
-          subheader && classes.subheader,
-          isDownLG ? classes.isDownLG : variant === 'left' ? classes.leftNav : classes.rightNav,
-          active && 'Active'
-        )}
+        className={active && 'Active'}
+        sx={{
+          paddingLeft: theme.spacing(3),
+          '&:not(.Active)': {
+            marginLeft: '1px'
+          },
+          ...(subheader && {
+            paddingLeft: theme.spacing(1.5)
+          }),
+          ...(variant === 'left'
+            ? {
+                borderRadius: '0 18px 18px  0',
+                '&.Active': {
+                  color: theme.palette.primary.main,
+                  backgroundColor: alpha(theme.palette.primary.main, 0.1)
+                }
+              }
+            : {
+                '&.Active': {
+                  color: theme.palette.primary.main,
+                  borderLeft: `1px solid ${theme.palette.primary.main}`
+                }
+              }),
+          ...(isDownLG && {
+            '&.Active': {
+              color: theme.palette.primary.main,
+              backgroundColor: alpha(theme.palette.primary.main, 0.1)
+            }
+          })
+        }}
         onClick={event => onPageNavigation(event, props)}
         {...(to !== null && { LinkComponent: Link, to: to })}
       >
-        <ListItemText
-          primary={primary}
-          primaryTypographyProps={{
-            color: active ? 'primary' : subheader ? 'textSecondary' : 'textPrimary',
-            sx: {
-              ...(checkboxProps && !checkboxProps?.checked && !checkboxProps?.indeterminate && { opacity: 0.38 }),
-              ...primaryProps?.sx
-            },
-            ...primaryProps
-          }}
-          secondary={secondary}
-          secondaryTypographyProps={{
-            sx: {
-              ...(checkboxProps && !checkboxProps?.checked && !checkboxProps?.indeterminate && { opacity: 0.38 }),
-              ...secondaryProps?.sx
-            },
-            ...secondaryProps
-          }}
-        />
+        <Typography
+          color={active ? 'primary' : subheader ? 'textSecondary' : 'textPrimary'}
+          margin={`${theme.spacing(0.25)} 0px`}
+          variant="body2"
+          {...primaryProps}
+        >
+          {primary}
+        </Typography>
       </ListItemButton>
     </ListItem>
   );
