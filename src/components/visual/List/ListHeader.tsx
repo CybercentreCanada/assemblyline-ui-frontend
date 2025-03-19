@@ -78,7 +78,7 @@ export const ListHeader: FC<ListHeaderProps> = ({
               <ListItemIcon>
                 <Checkbox
                   checked={checked}
-                  disabled={disabled}
+                  disabled
                   disableRipple
                   edge={edge}
                   indeterminate={indeterminate}

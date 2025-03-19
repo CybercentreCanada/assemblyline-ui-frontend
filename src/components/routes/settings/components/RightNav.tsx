@@ -2,14 +2,23 @@ import { useTableOfContent } from 'components/core/TableOfContent/TableOfContent
 import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/settings/settings.form';
 import { PageNavigation, PageNavigationItem } from 'components/visual/Layouts/PageNavigation';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const RightNav = React.memo(() => {
   const { t } = useTranslation(['settings']);
   const form = useForm();
-  const { settings } = useALContext();
+  const { configuration, settings } = useALContext();
   const { ActiveAnchor, scrollTo } = useTableOfContent();
+
+  const fileSources = useMemo<string[]>(
+    () =>
+      Object.values(configuration?.submission?.file_sources || {})
+        .flatMap(file => file?.sources)
+        .filter((value, index, array) => value && array.indexOf(value) === index)
+        .sort(),
+    [configuration]
+  );
 
   const handleCategoryChange = useCallback(
     (selected: boolean, cat_id: number) => {
@@ -70,18 +79,20 @@ export const RightNav = React.memo(() => {
               />
             )}
           />
-          <ActiveAnchor
-            activeID="default_external_sources"
-            children={active => (
-              <PageNavigationItem
-                primary={t('submissions.default_external_sources')}
-                variant="right"
-                active={active}
-                subheader
-                onPageNavigation={event => scrollTo(event, 'default_external_sources')}
-              />
-            )}
-          />
+          {fileSources.length === 0 ? null : (
+            <ActiveAnchor
+              activeID="default_external_sources"
+              children={active => (
+                <PageNavigationItem
+                  primary={t('submissions.default_external_sources')}
+                  variant="right"
+                  active={active}
+                  subheader
+                  onPageNavigation={event => scrollTo(event, 'default_external_sources')}
+                />
+              )}
+            />
+          )}
           <ActiveAnchor
             activeID="services"
             children={active => (

@@ -28,7 +28,6 @@ const ExpandMore = styled(({ expand = false, ...other }: ExpandMoreProps) => {
 
 const useStyles = makeStyles(theme => ({
   root: {
-    marginTop: theme.spacing(2),
     display: 'flex',
     flexDirection: 'column',
     flex: 1
@@ -166,7 +165,7 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
                   textAlign="start"
                   textOverflow="ellipsis"
                   textTransform="initial"
-                  variant="caption"
+                  variant="body2"
                   whiteSpace="nowrap"
                   width="100%"
                   sx={{ ...(!collapsible && { cursor: 'text', userSelect: 'initial' }), ...secondaryProps?.sx }}

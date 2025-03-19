@@ -2,7 +2,6 @@ import { Alert, Tooltip, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { UserSettings } from 'components/models/base/user_settings';
 import { useForm } from 'components/routes/settings/settings.form';
 import {
   hasDifferentDefaultSubmissionValues,
@@ -12,7 +11,6 @@ import {
   resetPreviousSubmissionValues,
   updatePreviousSubmissionValues
 } from 'components/routes/settings/settings.utils';
-import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { useCallback } from 'react';
@@ -32,29 +30,22 @@ export const HeaderSection = React.memo(() => {
       const profileSettings = form.getFieldValue('settings');
       if (!profileSettings) return;
 
-      const body: UserSettings = parseSubmissionProfile(settings, profileSettings, tab);
-
       apiCall({
         url: `/api/v4/user/settings/${currentUser.username}/`,
         method: 'POST',
-        body: body,
+        body: parseSubmissionProfile(settings, profileSettings, tab),
         onSuccess: () => {
           showSuccessMessage(t('success_save'));
           form.setFieldValue('settings', s => updatePreviousSubmissionValues(s));
         },
-        onFailure: api_data => {
-          if (api_data.api_status_code === 403 || api_data.api_status_code === 401) {
-            showErrorMessage(api_data.api_error_message);
+        onFailure: ({ api_status_code, api_error_message }) => {
+          showErrorMessage(api_error_message);
+          if (api_status_code === 403 || api_status_code === 401) {
+            showErrorMessage(api_error_message);
           }
         },
-        onEnter: () => {
-          form.setFieldValue('state.confirm', true);
-          form.setFieldValue('state.submitting', true);
-        },
-        onExit: () => {
-          form.setFieldValue('state.confirm', false);
-          form.setFieldValue('state.submitting', false);
-        }
+        onEnter: () => form.setFieldValue('state.submitting', true),
+        onExit: () => form.setFieldValue('state.submitting', false)
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,12 +59,11 @@ export const HeaderSection = React.memo(() => {
           state.values.state.tab,
           state.values.state.loading,
           state.values.state.submitting,
-          state.values.state.confirm,
           hasDifferentPreviousSubmissionValues(state.values.settings),
           hasDifferentDefaultSubmissionValues(state.values.settings)
         ] as const
       }
-      children={([tab, loading, submitting, confirm, modified, hasReset]) => (
+      children={([tab, loading, submitting, modified, hasReset]) => (
         <>
           {!modified ? null : (
             <RouterPrompt
@@ -84,17 +74,6 @@ export const HeaderSection = React.memo(() => {
               }}
             />
           )}
-
-          <ConfirmationDialog
-            open={confirm}
-            handleClose={() => form.setFieldValue('state.confirm', false)}
-            handleAccept={() => handleSubmit()}
-            title={t('save.title')}
-            cancelText={t('save.cancelText')}
-            acceptText={t('save.acceptText')}
-            text={t('save.text')}
-            waiting={submitting}
-          />
           <PageHeader
             primary={
               !tab
@@ -147,7 +126,7 @@ export const HeaderSection = React.memo(() => {
                 tooltipProps: { placement: 'bottom' },
                 type: 'button',
                 variant: 'contained',
-                onClick: () => form.setFieldValue('state.confirm', true)
+                onClick: () => handleSubmit()
               }
             ]}
             endAdornment={

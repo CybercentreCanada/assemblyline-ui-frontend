@@ -35,14 +35,14 @@ const useStyles = makeStyles(theme => ({
     top: -1,
     zIndex: 1000,
     backgroundColor: theme.palette.background.default,
-    paddingBottom: theme.spacing(2),
+    paddingBottom: theme.spacing(1),
     margin: theme.spacing(4),
     marginBottom: 0
   },
   content: {
     display: 'flex',
     flexDirection: 'column',
-    rowGap: theme.spacing(4),
+    rowGap: theme.spacing(2),
     padding: '1px',
     margin: theme.spacing(4),
     marginTop: 0

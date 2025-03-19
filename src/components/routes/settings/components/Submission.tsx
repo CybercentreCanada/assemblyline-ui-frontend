@@ -21,7 +21,7 @@ export const SubmissionSection = React.memo(() => {
         [state.values.state.customize, state.values.state.disabled, state.values.state.loading] as const
       }
       children={([customize, disabled, loading]) => (
-        <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
+        <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.5) }}>
           <PageSection
             id="submissions"
             primary={t('submissions')}

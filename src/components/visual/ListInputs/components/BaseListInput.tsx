@@ -13,7 +13,10 @@ export const BaseListItem: React.FC<BaseListItemProps> = React.memo(
     const theme = useTheme();
 
     return (
-      <ListItem {...props}>
+      <ListItem
+        {...props}
+        sx={{ minHeight: '50px', paddingTop: theme.spacing(0.5), paddingBottom: theme.spacing(0.5), ...props?.sx }}
+      >
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 0, width: '100%' }}>
           <div
             style={{ display: 'flex', alignItems: 'center', minWidth: 0, width: '100%', columnGap: theme.spacing(1) }}
@@ -41,7 +44,18 @@ export const BaseListItem: React.FC<BaseListItemProps> = React.memo(
 
 interface BaseListItemButtonProps extends ListItemButtonProps {}
 
-export const BaseListItemButton: FC<BaseListItemButtonProps> = ({ sx, ...other }) => {
+export const BaseListItemButton: FC<BaseListItemButtonProps> = props => {
   const theme = useTheme();
-  return <ListItemButton role={undefined} sx={{ gap: theme.spacing(0.5), ...sx }} {...other} />;
+  return (
+    <ListItemButton
+      role={undefined}
+      {...props}
+      sx={{
+        gap: theme.spacing(0.5),
+        paddingTop: theme.spacing(0.5),
+        paddingBottom: theme.spacing(0.5),
+        ...props?.sx
+      }}
+    />
+  );
 };

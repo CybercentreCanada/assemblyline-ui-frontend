@@ -121,7 +121,7 @@ export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((
     >
       <ListItemButton
         id={id || primary.toString()}
-        className={active && 'Active'}
+        className={active ? 'Active' : ''}
         sx={{
           paddingLeft: theme.spacing(3),
           '&:not(.Active)': {

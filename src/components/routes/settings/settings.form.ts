@@ -4,9 +4,6 @@ import type { ProfileSettings } from './settings.utils';
 export type SettingsStore = {
   /** State related to the interface of the Settings page */
   state: {
-    /** Is the confirmation dialog opened */
-    confirm: boolean;
-
     /** User is allowed to customize all service-specific parameters. Otherwise, they may only change the parameters that are editable */
     customize: boolean;
 
@@ -30,7 +27,6 @@ export type SettingsStore = {
 export const { FormProvider, useForm } = createFormContext<SettingsStore>({
   defaultValues: {
     state: {
-      confirm: false,
       customize: false,
       disabled: false,
       loading: false,
