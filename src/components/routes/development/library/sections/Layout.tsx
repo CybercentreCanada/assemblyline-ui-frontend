@@ -55,8 +55,8 @@ export const LayoutSection = React.memo(() => {
                 secondary="Description of the Page Header"
                 classification={value}
                 actions={[
-                  { icon: <InfoOutlinedIcon />, tooltip: 'Information' },
-                  { icon: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
+                  { children: <InfoOutlinedIcon />, tooltip: 'Information' },
+                  { children: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
                   <Tooltip key={3} title="Cancel">
                     <div>
                       <IconButton size="large">
@@ -79,8 +79,8 @@ export const LayoutSection = React.memo(() => {
   secondary="Description of the Page Header"
   classification={value}
   actions={[
-    { icon: <InfoOutlinedIcon />, tooltip: 'Information' },
-    { icon: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
+    { children: <InfoOutlinedIcon />, tooltip: 'Information' },
+    { children: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
     <Tooltip key={3} title="Cancel">
       <div>
         <IconButton size="large">
@@ -150,8 +150,8 @@ export const LayoutSection = React.memo(() => {
                 classification={value}
                 loading
                 actions={[
-                  { icon: <InfoOutlinedIcon />, tooltip: 'Information' },
-                  { icon: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
+                  { children: <InfoOutlinedIcon />, tooltip: 'Information' },
+                  { children: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
                   <Tooltip key={3} title="Cancel">
                     <div>
                       <IconButton size="large">
@@ -175,8 +175,8 @@ export const LayoutSection = React.memo(() => {
   classification={value}
   loading
   actions={[
-    { icon: <InfoOutlinedIcon />, tooltip: 'Information' },
-    { icon: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
+    { children: <InfoOutlinedIcon />, tooltip: 'Information' },
+    { children: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
     <Tooltip key={3} title="Cancel">
       <div>
         <IconButton size="large">
@@ -204,8 +204,8 @@ export const LayoutSection = React.memo(() => {
                 secondary="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque, fringilla consequat diam suscipit. Donec sed arcu blandit, luctus lorem quis, sodales elit. Phasellus blandit posuere sapien, ut pharetra ipsum efficitur at. Sed vel nulla risus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce efficitur nunc at urna imperdiet mattis. Sed condimentum vel ex et semper."
                 classification={value}
                 actions={[
-                  { icon: <InfoOutlinedIcon />, tooltip: 'Information' },
-                  { icon: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
+                  { children: <InfoOutlinedIcon />, tooltip: 'Information' },
+                  { children: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
                   <Tooltip key={3} title="Cancel">
                     <div>
                       <IconButton size="large">
@@ -229,8 +229,8 @@ export const LayoutSection = React.memo(() => {
   classification={value}
   loading
   actions={[
-    { icon: <InfoOutlinedIcon />, tooltip: 'Information' },
-    { icon: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
+    { children: <InfoOutlinedIcon />, tooltip: 'Information' },
+    { children: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
     <Tooltip key={3} title="Cancel">
       <div>
         <IconButton size="large">
