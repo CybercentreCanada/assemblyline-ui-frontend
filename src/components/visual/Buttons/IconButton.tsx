@@ -1,12 +1,13 @@
 import type { IconButtonProps as MuiIconButtonProps, TooltipProps } from '@mui/material';
-import { CircularProgress, IconButton as MuiIconButton } from '@mui/material';
+import { IconButton as MuiIconButton } from '@mui/material';
 import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
+import { CircularProgress } from './CircularProgress';
 
 type IconButtonProps = MuiIconButtonProps & {
   loading?: boolean;
   preventRender?: boolean;
-  tooltip?: string;
+  tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
 };
 
@@ -24,12 +25,7 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
       <Tooltip title={tooltip} placement="bottom" {...tooltipProps}>
         <MuiIconButton disabled={loading || disabled} {...props}>
           {children}
-          {loading && (
-            <CircularProgress
-              size={24}
-              style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -12, marginLeft: -12 }}
-            />
-          )}
+          <CircularProgress loading={loading} />
         </MuiIconButton>
       </Tooltip>
     )
