@@ -16,6 +16,8 @@ export type SubmitMetadata = {
   edit: string;
 };
 
+export type SubmitPhase = 'loading' | 'editing' | 'uploading' | 'redirecting';
+
 // [Category Index, Service Index, Previous Value]
 export type AutoURLServiceIndices = [number, number, boolean][];
 
@@ -39,8 +41,8 @@ export type SubmitStore = {
     /** disable the inputs */
     disabled: boolean;
 
-    /** loading the settings */
-    loading: boolean;
+    /** Phase of the submit process */
+    phase: SubmitPhase;
 
     /** Selected profile for the submission */
     profile: string;
@@ -48,11 +50,8 @@ export type SubmitStore = {
     /** Type of submission being made */
     tab: 'file' | 'hash';
 
-    /** Is a submission being sent? */
-    uploading: boolean;
-
     /** Upload progress of a file submission */
-    uploadProgress: number;
+    progress: number;
 
     /** UUID of the submission */
     uuid: string;
@@ -85,11 +84,10 @@ export const DEFAULT_SUBMIT_FORM: SubmitStore = Object.freeze({
     adjust: false,
     customize: false,
     disabled: false,
-    loading: true,
+    phase: 'loading',
     profile: null,
     tab: 'file' as const,
-    uploading: false,
-    uploadProgress: 0,
+    progress: 0,
     uuid: generateUUID()
   },
   autoURLServiceSelection: {

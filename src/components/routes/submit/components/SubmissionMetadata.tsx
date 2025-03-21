@@ -33,11 +33,11 @@ type MetadataParamParam = {
   metadata: Metadata;
   loading: boolean;
   disabled: boolean;
-  uploading: boolean;
+  editing: boolean;
 };
 
 export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
-  ({ name, metadata, loading = false, disabled = false, uploading = false }) => {
+  ({ name, metadata, loading = false, disabled = false, editing = false }) => {
     const { t } = useTranslation(['submit', 'settings']);
     const theme = useTheme();
     const form = useForm();
@@ -88,14 +88,14 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
         id: `metadata-${name.replace('_', ' ')}`,
         label: `${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`,
         labelProps: { textTransform: 'capitalize' },
-        disabled: disabled || uploading,
+        disabled: disabled || !editing,
         loading: loading,
         width: '60%',
         rootProps: { style: { margin: theme.spacing(1) } },
         onChange: (e, v) => handleChange(v),
         onReset: () => handleReset()
       }),
-      [disabled, handleChange, handleReset, loading, metadata.validator_type, name, theme, uploading]
+      [disabled, handleChange, handleReset, loading, metadata.validator_type, name, theme, editing]
     );
 
     return (
@@ -202,16 +202,16 @@ const ExtraMetadata = React.memo(() => {
           [
             state.values.state.disabled,
             state.values.state.customize,
-            state.values.state.uploading,
+            state.values.state.phase === 'editing',
             state.values.metadata.edit
           ] as const
         }
-        children={([disabled, customize, uploading, data]) => {
+        children={([disabled, customize, isEditing, data]) => {
           const error = isValidMetadata(data, configuration);
 
           return (
             <Dialog
-              open={!(data === null || disabled || !customize || uploading)}
+              open={!(data === null || disabled || !customize || !isEditing)}
               maxWidth="lg"
               fullWidth
               onClose={() => form.setFieldValue('metadata.edit', null)}
@@ -249,11 +249,11 @@ const ExtraMetadata = React.memo(() => {
           [
             state.values.state.disabled,
             state.values.state.customize,
-            state.values.state.uploading,
+            state.values.state.phase === 'editing',
             state.values.metadata.data
           ] as const
         }
-        children={([disabled, customize, uploading, data]) => {
+        children={([disabled, customize, isEditing, data]) => {
           const metadata = Object.entries(data).filter(
             ([key]) => !(key in configuration.submission.metadata.submit)
           ) as [string, string][];
@@ -266,7 +266,7 @@ const ExtraMetadata = React.memo(() => {
                 </Typography>
 
                 <IconButton
-                  disabled={disabled || uploading}
+                  disabled={disabled || !isEditing}
                   preventRender={!customize}
                   size="small"
                   tooltip={t('metadata.edit.tooltip')}
@@ -277,7 +277,7 @@ const ExtraMetadata = React.memo(() => {
                   <EditIcon fontSize="small" />
                 </IconButton>
                 <IconButton
-                  disabled={disabled || uploading}
+                  disabled={disabled || !isEditing}
                   size="small"
                   tooltip={t('metadata.clear.tooltip')}
                   onClick={handleClear}
@@ -323,18 +323,16 @@ export const SubmissionMetadata = React.memo(() => {
       <Typography variant="h6">{t('metadata.title')}</Typography>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <form.Subscribe
-          selector={state =>
-            [state.values.state.loading, state.values.state.disabled, state.values.state.uploading] as const
-          }
-          children={([loading, disabled, uploading]) =>
+          selector={state => [state.values.state.phase, state.values.state.disabled] as const}
+          children={([phase, disabled]) =>
             Object.entries(configuration.submission.metadata.submit).map(([name, metadata]) => (
               <MetadataParam
                 key={name}
                 name={name}
                 metadata={metadata}
-                loading={loading}
+                loading={phase === 'loading'}
                 disabled={disabled}
-                uploading={uploading}
+                editing={phase === 'editing'}
               />
             ))
           }

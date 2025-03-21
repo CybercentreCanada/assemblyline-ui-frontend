@@ -19,6 +19,7 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { ServiceParameters } from './components/ServiceParameters';
+import { SubmissionData } from './components/SubmissionData';
 import {
   AdjustButton,
   AnalyzeSubmission,
@@ -31,10 +32,8 @@ import {
   FindButton,
   HashInput,
   MaliciousInput,
-  PasswordInput,
   SubmissionProfileInput,
-  ToS,
-  UploadProgress
+  ToS
 } from './components/SubmissionInputs';
 import { SubmissionMetadata } from './components/SubmissionMetadata';
 import { SubmissionOptions } from './components/SubmissionOptions';
@@ -178,7 +177,7 @@ const WrappedSubmitRoute = () => {
           form.setFieldValue('metadata.data', metadata);
         }
 
-        form.setFieldValue('state.loading', false);
+        form.setFieldValue('state.phase', 'editing');
       }
     });
 
@@ -197,7 +196,7 @@ const WrappedSubmitRoute = () => {
 
       <form.Subscribe
         selector={state =>
-          [state.values.state.adjust, state.values.state.loading, state.values.state.disabled] as const
+          [state.values.state.adjust, state.values.state.phase === 'loading', state.values.state.disabled] as const
         }
         children={([adjust, loading, disabled]) => (
           <Container adjust={adjust}>
@@ -206,8 +205,8 @@ const WrappedSubmitRoute = () => {
                 <ClassificationInput />
 
                 <form.Subscribe
-                  selector={state => [state.values.state.tab, state.values.state.uploading] as const}
-                  children={([type, uploading]) => (
+                  selector={state => [state.values.state.tab, state.values.state.phase === 'editing'] as const}
+                  children={([type, editing]) => (
                     <TabContainer
                       paper
                       centered
@@ -218,13 +217,11 @@ const WrappedSubmitRoute = () => {
                       tabs={{
                         file: {
                           label: t('tab.label.file'),
-                          disabled: disabled || uploading,
-                          inner: <FileInput />
+                          disabled: disabled || !editing
                         },
                         hash: {
                           label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
-                          disabled: disabled || uploading,
-                          inner: <HashInput />
+                          disabled: disabled || !editing
                         }
                       }}
                       sx={{
@@ -235,18 +232,21 @@ const WrappedSubmitRoute = () => {
                     />
                   )}
                 />
+
+                <form.Subscribe
+                  selector={state => [state.values.state.tab] as const}
+                  children={([tab]) => (tab === 'file' ? <FileInput /> : tab === 'hash' ? <HashInput /> : null)}
+                />
+
                 <SubmissionProfileInput />
 
                 {loading ? null : (
                   <>
-                    <PasswordInput />
                     <MaliciousInput />
                     <ExternalSources />
                     <ExternalServices />
                   </>
                 )}
-
-                <UploadProgress />
 
                 <LeftPanelAction adjust={adjust}>
                   <CancelButton />
@@ -277,6 +277,7 @@ const WrappedSubmitRoute = () => {
                 >
                   <CustomizabilityAlert />
                   <SubmissionOptions />
+                  <SubmissionData />
                   <ServiceParameters />
                   <SubmissionMetadata />
                 </Collapse>

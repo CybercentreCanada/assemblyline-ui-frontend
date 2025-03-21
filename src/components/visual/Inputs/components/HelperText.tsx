@@ -24,16 +24,7 @@ export const HelperText = React.memo(
   }: HelperTextProps) => {
     const theme = useTheme();
 
-    return disabled ? null : errorText ? (
-      <FormHelperText
-        id={`${id || label}-helper-text`}
-        variant="outlined"
-        {...errorProps}
-        sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
-      >
-        {errorText}
-      </FormHelperText>
-    ) : helperText ? (
+    return helperText ? (
       <FormHelperText
         id={`${id || label}-helper-text`}
         variant="outlined"
@@ -41,6 +32,15 @@ export const HelperText = React.memo(
         sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
       >
         {helperText}
+      </FormHelperText>
+    ) : disabled ? null : errorText ? (
+      <FormHelperText
+        id={`${id || label}-helper-text`}
+        variant="outlined"
+        {...errorProps}
+        sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
+      >
+        {errorText}
       </FormHelperText>
     ) : null;
   }
