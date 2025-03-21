@@ -20,7 +20,7 @@ export const InterfaceSection = React.memo(() => {
     <form.Subscribe
       selector={state => [state.values.state.loading, state.values.state.disabled] as const}
       children={([loading, disabled]) => (
-        <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
+        <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.5) }}>
           <ListHeader
             id="interface"
             data-anchor="interface"

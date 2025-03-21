@@ -18,7 +18,6 @@ import useALContext from 'components/hooks/useALContext';
 import type { APIResponseProps } from 'components/hooks/useMyAPI';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { HashPatternMap } from 'components/models/base/config';
 import type { File } from 'components/models/base/file';
 import type { Submission } from 'components/models/base/submission';
 import type { SearchResult } from 'components/models/ui/search';
@@ -293,11 +292,13 @@ export const ExternalSources = React.memo(() => {
           state.values.state.loading,
           state.values.state.disabled,
           state.values.state.uploading,
-          ...(configuration.submission.file_sources?.[state.values.state.tab as HashPatternMap]?.sources || [])
+          state.values.hash.type
         ] as const
       }
-      children={([isHash, loading, disabled, uploading, ...sources]) =>
-        !isHash || sources.length === 0 ? null : (
+      children={([isHash, loading, disabled, uploading, hashType]) => {
+        const sources = configuration.submission.file_sources?.[hashType]?.sources || [];
+
+        return !isHash || sources.length === 0 ? null : (
           <div style={{ textAlign: 'left' }}>
             <Typography color="textSecondary" variant="body2">
               {t('options.submission.default_external_sources.label')}
@@ -326,8 +327,8 @@ export const ExternalSources = React.memo(() => {
               />
             ))}
           </div>
-        )
-      }
+        );
+      }}
     />
   );
 });
@@ -1040,7 +1041,7 @@ export const ToS = React.memo(() => {
     <div style={{ textAlign: 'center' }}>
       <Typography variant="body2">
         {t('tos.terms1')}
-        <i>{t('analyze.button.label')}</i>
+        <i>{t('submit.button.label')}</i>
         {t('tos.terms2')}
         <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
           {t('tos.terms3')}
