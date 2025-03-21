@@ -30,13 +30,16 @@ export const HeaderSection = React.memo(() => {
       const profileSettings = form.getFieldValue('settings');
       if (!profileSettings) return;
 
+      const body = parseSubmissionProfile(settings, profileSettings, tab);
+
       apiCall({
         url: `/api/v4/user/settings/${currentUser.username}/`,
         method: 'POST',
-        body: parseSubmissionProfile(settings, profileSettings, tab),
+        body: body,
         onSuccess: () => {
           showSuccessMessage(t('success_save'));
           form.setFieldValue('settings', s => updatePreviousSubmissionValues(s));
+          form.setFieldValue('user', body);
         },
         onFailure: ({ api_status_code, api_error_message }) => {
           showErrorMessage(api_error_message);

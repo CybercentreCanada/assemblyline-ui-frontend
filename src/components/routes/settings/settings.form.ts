@@ -1,4 +1,5 @@
 import { createFormContext } from 'components/core/form/createFormContext';
+import type { UserSettings } from 'components/models/base/user_settings';
 import type { ProfileSettings } from './settings.utils';
 
 export type SettingsStore = {
@@ -22,6 +23,9 @@ export type SettingsStore = {
 
   /** Aggregate user settings */
   settings: ProfileSettings;
+
+  /** Aggregate user settings */
+  user: UserSettings;
 };
 
 export const { FormProvider, useForm } = createFormContext<SettingsStore>({
@@ -33,6 +37,7 @@ export const { FormProvider, useForm } = createFormContext<SettingsStore>({
       submitting: false,
       tab: null
     },
-    settings: null
+    settings: null,
+    user: null
   }
 });

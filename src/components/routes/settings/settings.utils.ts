@@ -288,7 +288,7 @@ export const parseSubmissionProfile = (
   // Applying the profile parameters
   Object.keys(out).forEach(key => {
     const p = profile[key] as ProfileSettings[ProfileKey];
-    if (PROFILE_KEYS.includes(key as ProfileKey) && p.value !== p.default) {
+    if (PROFILE_KEYS.includes(key as ProfileKey) && p.editable && p.value !== p.default) {
       params[key] = p.value;
     }
   });
@@ -308,7 +308,7 @@ export const parseSubmissionProfile = (
   params.service_spec = {};
   profile.service_spec.forEach(svr => {
     svr.params.forEach(param => {
-      if (param.value !== param.default)
+      if (param.value !== param.default && param.editable)
         params.service_spec = {
           ...params.service_spec,
           [svr.name]: { ...params.service_spec[svr.name], [param.name]: param.value }

@@ -4,7 +4,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { UserSettings } from 'components/models/base/user_settings';
 import ForbiddenPage from 'components/routes/403';
 import { PageLayout } from 'components/visual/Layouts/PageLayout';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { ExternalSourcesSection } from './components/ExternalSources';
 import { HeaderSection } from './components/Header';
@@ -15,7 +15,6 @@ import { ServicesSection } from './components/Services';
 import { SubmissionSection } from './components/Submission';
 import type { SettingsStore } from './settings.form';
 import { useForm } from './settings.form';
-import type { ProfileSettings } from './settings.utils';
 import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from './settings.utils';
 
 type Params = {
@@ -30,25 +29,20 @@ const WrappedSettingsRoute = () => {
   const { tab: tabParam } = useParams<Params>();
   const { user: currentUser, configuration, settings } = useALContext();
 
-  const [userSettings, setUserSettings] = useState<UserSettings>(null);
+  const handleProfileChange = useCallback(() => {
+    let s = form.getFieldValue('settings');
+    const tab = form.getFieldValue('state.tab');
+    const userSettings = form.getFieldValue('user');
 
-  useEffect(() => {
-    form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('self_manage'));
-    form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
+    if (!s || !tab || !userSettings) return;
 
-    apiCall<UserSettings>({
-      url: `/api/v4/user/settings/${currentUser.username}/`,
-      onSuccess: ({ api_response }) => {
-        setUserSettings(api_response);
+    if (tab === 'interface') s = form.getFieldValue('settings');
+    else if (tab === 'default') s = loadDefaultProfile(s, userSettings);
+    else s = loadSubmissionProfile(s, userSettings, configuration.submission.profiles, tab);
 
-        const s = initializeSettings(api_response);
-        form.setFieldValue('settings', s);
-      },
-      onEnter: () => form.setFieldValue('state.loading', true),
-      onExit: () => form.setFieldValue('state.loading', false)
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.is_admin, currentUser.roles, currentUser.username, form]);
+    form.setFieldValue('settings', s);
+    form.setFieldValue('state.tab', tab);
+  }, [configuration.submission.profiles, form]);
 
   useEffect(() => {
     if (tabParam === form.getFieldValue('state.tab')) return;
@@ -59,16 +53,27 @@ const WrappedSettingsRoute = () => {
   }, [form, navigate, settings.submission_profiles, tabParam]);
 
   useEffect(() => {
-    if (tabParam === form.getFieldValue('state.tab') || !userSettings) return;
-
-    let s: ProfileSettings = form.getFieldValue('settings');
-    if (tabParam === 'interface') s = form.getFieldValue('settings');
-    else if (tabParam === 'default') s = loadDefaultProfile(s, userSettings);
-    else s = loadSubmissionProfile(s, userSettings, configuration.submission.profiles, tabParam);
-
+    if (tabParam === form.getFieldValue('state.tab')) return;
     form.setFieldValue('state.tab', tabParam);
-    form.setFieldValue('settings', s);
-  }, [configuration.submission.profiles, form, tabParam, userSettings]);
+    handleProfileChange();
+  }, [form, handleProfileChange, tabParam]);
+
+  useEffect(() => {
+    form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('self_manage'));
+    form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
+
+    apiCall<UserSettings>({
+      url: `/api/v4/user/settings/${currentUser.username}/`,
+      onSuccess: ({ api_response }) => {
+        form.setFieldValue('user', api_response);
+        form.setFieldValue('settings', initializeSettings(api_response));
+        handleProfileChange();
+      },
+      onEnter: () => form.setFieldValue('state.loading', true),
+      onExit: () => form.setFieldValue('state.loading', false)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser.is_admin, currentUser.roles, currentUser.username, form]);
 
   if (!currentUser.is_admin && !currentUser.roles.includes('self_manage')) return <ForbiddenPage />;
   else
