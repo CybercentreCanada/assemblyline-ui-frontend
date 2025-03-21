@@ -38,10 +38,10 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
           p?.list,
           state.values.state.disabled,
           state.values.state.customize,
-          state.values.state.uploading
+          state.values.state.phase === 'editing'
         ] as const;
       }}
-      children={([type, name, value, defaultValue, editable, list, disabled, customize, uploading]) => {
+      children={([type, name, value, defaultValue, editable, list, disabled, customize, isEditing]) => {
         switch (type) {
           case 'bool':
             return (
@@ -50,7 +50,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as boolean}
-                disabled={disabled || uploading || !(customize || editable)}
+                disabled={disabled || !isEditing || !(customize || editable)}
                 preventRender={!customize && !editable}
                 reset={value !== defaultValue}
                 onChange={(e, v) =>
@@ -74,7 +74,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as number}
-                disabled={disabled || uploading || !(customize || editable)}
+                disabled={disabled || !isEditing || !(customize || editable)}
                 preventRender={!customize && !editable}
                 reset={value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
@@ -99,7 +99,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as string}
-                disabled={disabled || uploading || !(customize || editable)}
+                disabled={disabled || !isEditing || !(customize || editable)}
                 preventRender={!customize && !editable}
                 options={list}
                 reset={value !== defaultValue}
@@ -125,7 +125,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as string}
-                disabled={disabled || uploading || !(customize || editable)}
+                disabled={disabled || !isEditing || !(customize || editable)}
                 preventRender={!customize && !editable}
                 options={list.map(key => ({ primary: key.replaceAll('_', ' '), value: key })).sort()}
                 reset={value !== defaultValue}
@@ -213,15 +213,15 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
           hasParams,
           state.values.state.disabled,
           state.values.state.customize,
-          state.values.state.uploading
+          state.values.state.phase === 'editing'
         ] as const;
       }}
-      children={([selected, defaultValue, editable, specID, spec, hasParams, disabled, customize, uploading]) => (
+      children={([selected, defaultValue, editable, specID, spec, hasParams, disabled, customize, isEditing]) => (
         <CollapseSection
           header={({ open, setOpen }) => (
             <CheckboxInput
               label={service.name}
-              disabled={disabled || uploading || !(customize || editable)}
+              disabled={disabled || !isEditing || !(customize || editable)}
               expand={!hasParams ? null : open}
               preventRender={!customize && !editable && !selected}
               reset={defaultValue !== null && selected !== defaultValue}
@@ -315,16 +315,16 @@ const Category = React.memo(({ cat_id, category }: CategoryProps) => {
           !list.every(i => i) && list.some(i => i),
           state.values.state.customize,
           state.values.state.disabled,
-          state.values.state.uploading
+          state.values.state.phase === 'editing'
         ] as const;
       }}
-      children={([selected, defaultValue, editable, indeterminate, customize, disabled, uploading]) => (
+      children={([selected, defaultValue, editable, indeterminate, customize, disabled, isEditing]) => (
         <CollapseSection
           header={({ open, setOpen }) => (
             <CheckboxInput
               label={category.name}
               labelProps={{ color: 'textSecondary' }}
-              disabled={disabled || uploading || !(customize || editable)}
+              disabled={disabled || !isEditing || !(customize || editable)}
               divider
               expand={open}
               indeterminate={indeterminate}

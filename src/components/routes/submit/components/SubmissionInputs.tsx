@@ -3,7 +3,6 @@ import TuneIcon from '@mui/icons-material/Tune';
 import {
   Alert,
   CircularProgress,
-  LinearProgress,
   ListItemText,
   Button as MuiButton,
   Tooltip,
@@ -56,22 +55,22 @@ export const ClassificationInput = React.memo(() => {
     <form.Subscribe
       selector={state =>
         [
-          state.values.state.loading,
+          state.values.state.phase === 'loading',
           state.values.state.disabled,
           state.values.state.customize,
-          state.values.state.uploading,
+          state.values.state.phase === 'editing',
           state.values.settings?.classification?.value,
           state.values.settings?.classification?.editable
         ] as const
       }
-      children={([loading, disabled, customize, uploading, value, editable]) => (
+      children={([loading, disabled, customize, isEditing, value, editable]) => (
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
           <Typography>{t('classification.input.label')}</Typography>
           <Classification
             format="long"
             type="picker"
             c12n={loading ? null : value}
-            disabled={disabled || uploading || !(customize || editable)}
+            disabled={disabled || !isEditing || !(customize || editable)}
             setClassification={v => form.setFieldValue('settings.classification.value', v)}
           />
         </div>
@@ -87,13 +86,13 @@ export const FileInput = React.memo(() => {
     <form.Subscribe
       selector={state =>
         [
-          state.values.state.loading,
+          state.values.state.phase === 'loading',
           state.values.state.disabled,
-          state.values.state.uploading,
+          state.values.state.phase === 'editing',
           state.values.file
         ] as const
       }
-      children={([loading, disabled, uploading, file]) => (
+      children={([loading, disabled, isEditing, file]) => (
         <div style={{ width: '100%' }}>
           <FileDropper
             file={file}
@@ -110,7 +109,7 @@ export const FileInput = React.memo(() => {
                 // eslint-disable-next-line no-console
                 .catch(e => console.error(e));
             }}
-            disabled={loading || disabled || uploading}
+            disabled={loading || disabled || !isEditing}
           />
         </div>
       )}
@@ -128,21 +127,22 @@ export const HashInput = React.memo(() => {
     <form.Subscribe
       selector={state =>
         [
-          state.values.state.loading,
+          state.values.state.phase === 'loading',
           state.values.state.disabled,
-          state.values.state.uploading,
+          state.values.state.phase === 'editing',
           state.values.hash.type,
           state.values.hash.value
         ] as const
       }
-      children={([loading, disabled, uploading, type, value]) => (
+      children={([loading, disabled, isEditing, type, value]) => (
         <TextInput
           id={'Hash Input'}
           label={configuration.ui.allow_url_submissions ? t('url.input.label') : t('hash.input.label')}
+          tooltip={configuration.ui.allow_url_submissions ? t('url.input.tooltip') : t('hash.input.tooltip')}
           helperText={configuration.ui.allow_url_submissions ? t('url.input.helperText') : ''}
           value={value}
           loading={loading}
-          disabled={disabled || uploading}
+          disabled={disabled || !isEditing}
           sx={{ flex: 1 }}
           onChange={(e, v) => {
             closeSnackbar();
@@ -189,19 +189,20 @@ export const SubmissionProfileInput = React.memo(() => {
     <form.Subscribe
       selector={state =>
         [
-          state.values.state.loading,
+          state.values.state.phase === 'loading',
           state.values.state.disabled,
-          state.values.state.uploading,
+          state.values.state.phase === 'editing',
           state.values.state.profile
         ] as const
       }
-      children={([loading, disabled, uploading, value]) => (
+      children={([loading, disabled, isEditing, value]) => (
         <SelectInput
           id="submission profile name"
           label={t('profile.input.label')}
+          tooltip={t('profile.input.tooltip')}
           value={value}
           loading={loading}
-          disabled={disabled || uploading}
+          disabled={disabled || !isEditing}
           options={options}
           onChange={(e, profile: string) => {
             form.setFieldValue('state.profile', profile);
@@ -209,41 +210,6 @@ export const SubmissionProfileInput = React.memo(() => {
           }}
         />
       )}
-    />
-  );
-});
-
-export const PasswordInput = React.memo(() => {
-  const { t } = useTranslation(['submit']);
-  const form = useForm();
-
-  return (
-    <form.Subscribe
-      selector={state =>
-        [
-          state.values.state.loading,
-          state.values.state.disabled,
-          state.values.state.uploading,
-          state.values.settings.initial_data.value?.password || ''
-        ] as const
-      }
-      children={([loading, disabled, uploading, password]) => {
-        return (
-          <TextInput
-            label={t('options.submission.password.label')}
-            tooltip={t('options.submission.password.tooltip')}
-            value={password as string}
-            loading={loading}
-            disabled={disabled || uploading}
-            onChange={(e, v) => {
-              form.setFieldValue('settings.initial_data.value', s => {
-                s.password = v;
-                return s;
-              });
-            }}
-          />
-        );
-      }}
     />
   );
 });
@@ -258,19 +224,19 @@ export const MaliciousInput = React.memo(() => {
         [
           state.values.state.tab === 'file' && !!state.values.file,
           state.values.settings.malicious.value,
-          state.values.state.loading,
+          state.values.state.phase === 'loading',
           state.values.state.disabled,
-          state.values.state.uploading
+          state.values.state.phase === 'editing'
         ] as const
       }
-      children={([isFile, value, loading, disabled, uploading]) => (
+      children={([isFile, value, loading, disabled, isEditing]) => (
         <SwitchInput
           label={t('malicious.switch.label')}
           labelProps={{ color: 'textPrimary' }}
           tooltip={t('malicious.switch.tooltip')}
           value={value}
           loading={loading}
-          disabled={disabled || uploading}
+          disabled={disabled || !isEditing}
           preventRender={!isFile}
           onChange={(e, v) => form.setFieldValue('settings.malicious.value', v)}
         />
@@ -289,13 +255,13 @@ export const ExternalSources = React.memo(() => {
       selector={state =>
         [
           state.values.state.tab === 'hash',
-          state.values.state.loading,
+          state.values.state.phase === 'loading',
           state.values.state.disabled,
-          state.values.state.uploading,
+          state.values.state.phase === 'editing',
           state.values.hash.type
         ] as const
       }
-      children={([isHash, loading, disabled, uploading, hashType]) => {
+      children={([isHash, loading, disabled, isEditing, hashType]) => {
         const sources = configuration.submission.file_sources?.[hashType]?.sources || [];
 
         return !isHash || sources.length === 0 ? null : (
@@ -315,7 +281,7 @@ export const ExternalSources = React.memo(() => {
                     labelProps={{ color: 'textPrimary' }}
                     value={value}
                     loading={loading}
-                    disabled={disabled || uploading}
+                    disabled={disabled || !isEditing}
                     onChange={() => {
                       form.setFieldValue('settings.default_external_sources.value', s => {
                         s.indexOf(source) >= 0 ? s.splice(s.indexOf(source), 1) : s.push(source);
@@ -413,13 +379,13 @@ export const ExternalServices = React.memo(() => {
       <form.Subscribe
         selector={state =>
           [
-            state.values.state.loading,
+            state.values.state.phase === 'loading',
             state.values.state.disabled,
-            state.values.state.uploading,
+            state.values.state.phase === 'editing',
             state.values.autoURLServiceSelection.prev
           ] as const
         }
-        children={([loading, disabled, uploading, autoURLServiceSelection]) =>
+        children={([loading, disabled, isEditing, autoURLServiceSelection]) =>
           autoURLServiceSelection.length === 0 ? null : (
             <div style={{ textAlign: 'left' }}>
               <Typography color="textSecondary" variant="body2">
@@ -444,7 +410,7 @@ export const ExternalServices = React.memo(() => {
                         labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
                         value={selected}
                         loading={loading}
-                        disabled={disabled || uploading}
+                        disabled={disabled || !isEditing}
                         onChange={() => {
                           form.setFieldValue('settings', s => {
                             s.services[cat].services[svr].selected = !selected;
@@ -501,7 +467,7 @@ export const CancelButton = React.memo(() => {
     <form.Subscribe
       selector={state =>
         [
-          state.values.state.loading,
+          state.values.state.phase === 'loading',
           state.values.state.disabled,
           state.values.state.tab,
           !state.values.file,
@@ -520,8 +486,8 @@ export const CancelButton = React.memo(() => {
             form.setFieldValue('file', null);
             form.setFieldValue('hash.type', null);
             form.setFieldValue('hash.value', '');
-            form.setFieldValue('state.uploading', false);
-            form.setFieldValue('state.uploadProgress', null);
+            form.setFieldValue('state.phase', 'editing');
+            form.setFieldValue('state.progress', null);
             form.setFieldValue('state.uuid', generateUUID());
 
             FLOW.cancel();
@@ -641,9 +607,9 @@ export const FindButton = React.memo(() => {
       <form.Subscribe
         selector={state =>
           [
-            state.values.state.loading,
+            state.values.state.phase === 'loading',
             state.values.state.disabled,
-            state.values.state.uploading,
+            state.values.state.phase === 'editing',
             state.values.state.customize,
             state.values.state.tab,
             state.values.file,
@@ -651,10 +617,10 @@ export const FindButton = React.memo(() => {
             state.values.hash.value
           ] as const
         }
-        children={([loading, disabled, uploading, customize, tab, file, hashType, hashValue]) => (
+        children={([loading, disabled, isEditing, customize, tab, file, hashType, hashValue]) => (
           <IconButton
             disabled={disabled || (tab === 'file' ? !file : tab === 'hash' ? !hashType : false)}
-            loading={loading || uploading}
+            loading={loading || !isEditing}
             preventRender={!customize}
             tooltip={t('find.button.tooltip')}
             tooltipProps={{ placement: 'bottom' }}
@@ -673,27 +639,6 @@ export const FindButton = React.memo(() => {
         )}
       />
     </>
-  );
-});
-
-export const UploadProgress = React.memo(() => {
-  const { t } = useTranslation(['submit']);
-  const form = useForm();
-
-  return (
-    <form.Subscribe
-      selector={state => [state.values.state.uploading, state.values.state.uploadProgress] as const}
-      children={([uploading, progress]) =>
-        !uploading ? null : (
-          <div>
-            <LinearProgress value={progress} variant={progress ? 'determinate' : 'indeterminate'} />
-            <Typography variant="body2">
-              {progress ? `${progress}% ${t('upload.progress.determinate')}` : t('upload.progress.indeterminate')}
-            </Typography>
-          </div>
-        )
-      }
-    />
   );
 });
 
@@ -717,7 +662,7 @@ export const AdjustButton = React.memo(() => {
   );
 });
 
-const AnalyzeButton = React.memo(({ children = null, ...props }: ButtonProps) => {
+const AnalyzeButton = React.memo((props: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
 
@@ -725,24 +670,35 @@ const AnalyzeButton = React.memo(({ children = null, ...props }: ButtonProps) =>
     <form.Subscribe
       selector={state =>
         [
-          state.values.state.loading,
+          state.values.state.phase,
           state.values.state.disabled,
           state.values.state.tab,
           !state.values.file,
-          !state.values.hash.type
+          !state.values.hash.type,
+          state.values.state.progress
         ] as const
       }
-      children={([loading, disabled, tab, file, hash]) => (
+      children={([phase, disabled, tab, file, hash, progress]) => (
         <Button
           disabled={disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)}
-          loading={loading}
+          loading={phase !== 'editing'}
           tooltip={t('submit.button.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           variant="contained"
           onClick={() => form.setFieldValue('autoURLServiceSelection.open', s => !s)}
           {...props}
         >
-          {children ? children : t('submit.button.label')}
+          {phase === 'redirecting'
+            ? t('submit.button.redirecting.label')
+            : phase === 'uploading'
+            ? progress
+              ? `${progress}% ${t('submit.button.uploadProgress.label')}`
+              : t('submit.button.uploading.label')
+            : phase === 'editing'
+            ? t('submit.button.editing.label')
+            : phase === 'loading'
+            ? t('submit.button.loading.label')
+            : null}
         </Button>
       )}
     />
@@ -761,8 +717,8 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
     form.setFieldValue('file', null);
     form.setFieldValue('hash.type', null);
     form.setFieldValue('hash.value', '');
-    form.setFieldValue('state.uploading', false);
-    form.setFieldValue('state.uploadProgress', null);
+    form.setFieldValue('state.phase', 'editing');
+    form.setFieldValue('state.progress', null);
     form.setFieldValue('state.uuid', generateUUID());
 
     FLOW.cancel();
@@ -781,8 +737,8 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
       const metadata = form.getFieldValue('metadata');
       const profile = form.getFieldValue('state.profile');
 
-      form.setFieldValue('state.uploading', true);
-      form.setFieldValue('state.uploadProgress', 0);
+      form.setFieldValue('state.phase', 'uploading');
+      form.setFieldValue('state.progress', 0);
       form.setFieldValue('autoURLServiceSelection.open', false);
 
       FLOW.opts.generateUniqueIdentifier = selectedFile => {
@@ -819,7 +775,7 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
       });
 
       FLOW.on('progress', () => {
-        form.setFieldValue('state.uploadProgress', Math.trunc(FLOW.progress() * 100));
+        form.setFieldValue('state.progress', Math.trunc(FLOW.progress() * 100));
       });
 
       FLOW.on('complete', () => {
@@ -843,6 +799,7 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
           },
           onSuccess: ({ api_response }) => {
             showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
+            form.setFieldValue('state.phase', 'redirecting');
             setTimeout(() => {
               navigate(`/submission/detail/${api_response.sid}`);
             }, 1000);
@@ -851,9 +808,6 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
             if ([400, 403, 404, 503].includes(api_status_code)) showErrorMessage(api_error_message);
             else showErrorMessage(t('upload.snackbar.file.failure'));
             handleCancel();
-          },
-          onExit: () => {
-            form.setFieldValue('state.uploading', false);
           }
         });
       });
@@ -904,6 +858,7 @@ const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
         },
         onSuccess: ({ api_response }) => {
           showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
+          form.setFieldValue('state.phase', 'redirecting');
           setTimeout(() => {
             navigate(`/submission/detail/${api_response.sid}`);
           }, 1000);
@@ -912,11 +867,8 @@ const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
           showErrorMessage(api_error_message);
         },
         onEnter: () => {
-          form.setFieldValue('state.uploading', true);
+          form.setFieldValue('state.phase', 'uploading');
           form.setFieldValue('autoURLServiceSelection.open', false);
-        },
-        onExit: () => {
-          form.setFieldValue('state.uploading', false);
         }
       });
     },
@@ -1014,7 +966,7 @@ export const AnalyzeSubmission = React.memo(() => {
         [
           state.values.state.tab === 'file' && !!state.values.file,
           state.values.state.tab === 'hash' && !!state.values.hash.type,
-          state.values.state.loading ? false : isUsingExternalServices(state.values.settings, configuration)
+          state.values.state.phase === 'loading' ? false : isUsingExternalServices(state.values.settings, configuration)
         ] as const
       }
       children={([isFile, isHash, isExternal]) =>
@@ -1041,7 +993,7 @@ export const ToS = React.memo(() => {
     <div style={{ textAlign: 'center' }}>
       <Typography variant="body2">
         {t('tos.terms1')}
-        <i>{t('submit.button.label')}</i>
+        <i>{t('submit.button.editing.label')}</i>
         {t('tos.terms2')}
         <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
           {t('tos.terms3')}
