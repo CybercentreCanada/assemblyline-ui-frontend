@@ -1190,7 +1190,7 @@ function WrappedSubmissionDetail() {
                 {submission ? (
                   submission.state === 'completed' ? (
                     <div style={{ display: 'flex' }}>
-                      {(currentUser.roles.includes('administration') || (currentUser.roles.includes('submission_delete') && submission.params.submitter === currentUser.uname)) && (
+                      {(currentUser.roles.includes('administration') || (currentUser.roles.includes('submission_delete') && submission.params.submitter === currentUser.username)) && (
                         <Tooltip title={t('delete')}>
                           <IconButton
                             onClick={() => setDeleteDialog(true)}
