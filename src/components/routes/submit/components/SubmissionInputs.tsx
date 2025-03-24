@@ -166,7 +166,7 @@ export const HashInput = React.memo(() => {
 
 export const SubmissionProfileInput = React.memo(() => {
   const { t } = useTranslation(['submit']);
-  const { configuration, settings } = useALContext();
+  const { user: currentUser, configuration, settings } = useALContext();
   const form = useForm();
 
   const options = useMemo<{ value: string; primary: string; secondary: string }[]>(
@@ -206,7 +206,7 @@ export const SubmissionProfileInput = React.memo(() => {
           options={options}
           onChange={(e, profile: string) => {
             form.setFieldValue('state.profile', profile);
-            form.setFieldValue('settings', s => switchProfile(s, configuration, settings, profile));
+            form.setFieldValue('settings', s => switchProfile(s, configuration, settings, currentUser, profile));
           }}
         />
       )}

@@ -1,5 +1,6 @@
 import type { Configuration } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
+import type { CustomUser } from 'components/models/ui/user';
 import {
   loadDefaultProfile,
   loadSubmissionProfile,
@@ -47,11 +48,12 @@ export const switchProfile = (
   out: ProfileSettings,
   configuration: Configuration,
   settings: UserSettings,
+  user: CustomUser,
   name: string
 ): ProfileSettings =>
   name === 'default'
-    ? loadDefaultProfile(out, settings)
-    : loadSubmissionProfile(out, settings, configuration.submission.profiles, name);
+    ? loadDefaultProfile(out, settings, user)
+    : loadSubmissionProfile(out, settings, configuration.submission.profiles, user, name);
 
 export const isValidJSON = (value: string): boolean => {
   try {
