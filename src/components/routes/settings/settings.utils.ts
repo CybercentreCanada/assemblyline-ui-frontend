@@ -31,7 +31,7 @@ export type ProfileParam<T> = {
   default: T;
   prev: T;
   value: T;
-  editable: boolean;
+  restricted: boolean;
 };
 
 export type ProfileSettings = {
@@ -44,13 +44,13 @@ export type ProfileSettings = {
   } & {
     default: boolean;
     prev: boolean;
-    editable: boolean;
+    restricted: boolean;
     services?: ({
       [P in keyof UserSettings['services'][number]['services'][number]]: UserSettings['services'][number]['services'][number][P];
     } & {
       default: boolean;
       prev: boolean;
-      editable: boolean;
+      restricted: boolean;
     })[];
   })[];
 } & {
@@ -60,7 +60,7 @@ export type ProfileSettings = {
       [K in keyof UserSettings['service_spec'][number]['params'][number]]: UserSettings['service_spec'][number]['params'][number][K];
     } & {
       prev: UserSettings['service_spec'][number]['params'][number]['value'];
-      editable: boolean;
+      restricted: boolean;
     })[];
   }[];
 } & {
@@ -73,7 +73,7 @@ export const initializeSettings = (settings: UserSettings): ProfileSettings => {
   if (!settings) return null;
 
   const out = {
-    description: { prev: '', value: '', default: '', editable: true },
+    description: { prev: '', value: '', default: '', restricted: false },
     malicious: { prev: false, value: false }
   } as ProfileSettings;
 
@@ -87,7 +87,7 @@ export const initializeSettings = (settings: UserSettings): ProfileSettings => {
   // Applying the profile parameters
   Object.entries(settings).forEach(([key, value]: [string, unknown]) => {
     if (PROFILE_KEYS.includes(key as ProfileKey)) {
-      out[key] = { default: value, value: value, prev: value, editable: false };
+      out[key] = { default: value, value: value, prev: value, restricted: true };
     }
   });
 
@@ -98,10 +98,10 @@ export const initializeSettings = (settings: UserSettings): ProfileSettings => {
       ...category,
       default: false,
       prev: category.selected,
-      editable: false,
+      restricted: true,
       services: category.services
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map(service => ({ ...service, default: false, prev: service.selected, editable: false }))
+        .map(service => ({ ...service, default: false, prev: service.selected, restricted: true }))
     }));
 
   // Applying the service spec parameters
@@ -111,7 +111,7 @@ export const initializeSettings = (settings: UserSettings): ProfileSettings => {
       ...spec,
       params: spec.params
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map(param => ({ ...param, prev: param.value, editable: false }))
+        .map(param => ({ ...param, prev: param.value, restricted: true }))
     }));
 
   //Applying the initial data
@@ -134,7 +134,7 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings)
   Object.keys(settings).forEach((key: ProfileKey) => {
     if (PROFILE_KEYS.includes(key)) {
       out[key].value = settings?.submission_profiles?.default?.[key] || settings[key];
-      out[key].editable = true;
+      out[key].restricted = false;
       out[key].default = settings[key];
       out[key].prev = out[key].value;
     }
@@ -143,7 +143,7 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings)
   // Applying the services parameter
   out.services.forEach((cat, i) => {
     out.services[i].selected = settings.submission_profiles?.default?.services?.selected?.includes(cat?.name) || false;
-    out.services[i].editable = true;
+    out.services[i].restricted = false;
     out.services[i].default = out.services[i].selected;
     out.services[i].prev = out.services[i].selected;
 
@@ -153,7 +153,7 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings)
         settings.submission_profiles?.default?.services?.selected?.includes(svr?.name) ||
         false;
 
-      out.services[i].services[j].editable = true;
+      out.services[i].services[j].restricted = false;
       out.services[i].services[j].default = out.services[i].services[j].selected;
       out.services[i].services[j].prev = out.services[i].services[j].selected;
     });
@@ -171,7 +171,7 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings)
         settingsSpec?.value ||
         out.service_spec[i].params[j].value;
 
-      out.service_spec[i].params[j].editable = true;
+      out.service_spec[i].params[j].restricted = false;
       out.service_spec[i].params[j].default = settingsSpec?.default || out.service_spec[i].params[j].default;
       out.service_spec[i].params[j].prev = out.service_spec[i].params[j].value;
     });
@@ -202,33 +202,26 @@ export const loadSubmissionProfile = (
   Object.keys(out).forEach((key: ProfileKey) => {
     if (PROFILE_KEYS.includes(key)) {
       out[key].value = settings?.submission_profiles?.[name]?.[key] || settings[key];
-      out[key].editable = profiles?.[name]?.editable_params?.submission?.includes(key) || false;
+      out[key].restricted = profiles?.[name]?.restricted_params?.submission?.includes(key);
       out[key].default = profiles?.[name]?.params?.[key] || settings[key];
       out[key].prev = out[key].value;
     }
   });
 
   // Applying the services parameter
+  const restricted = profiles?.[name].params?.services?.excluded || [];
+  const defaults = profiles?.[name].params?.services?.selected || [];
+  const selected = settings.submission_profiles?.[name]?.services?.selected || [];
   out.services.forEach((cat, i) => {
-    out.services[i].selected = settings.submission_profiles?.[name]?.services?.selected?.includes(cat?.name) || false;
-    out.services[i].editable = profiles?.[name].editable_params?.submission?.includes('services') || false;
-    out.services[i].default = profiles?.[name].params?.services?.selected?.includes(cat.name) || false;
+    out.services[i].selected = selected.includes(cat?.name);
+    out.services[i].restricted = restricted.includes(cat?.name);
+    out.services[i].default = defaults.includes(cat.name) || false;
     out.services[i].prev = out.services[i].selected;
 
     cat.services.forEach((svr, j) => {
-      out.services[i].services[j].selected =
-        settings.submission_profiles?.[name]?.services?.selected?.includes(svr?.category) ||
-        settings.submission_profiles?.[name]?.services?.selected?.includes(svr?.name) ||
-        false;
-
-      out.services[i].services[j].editable =
-        profiles?.[name].editable_params?.submission?.includes('services') || false;
-
-      out.services[i].services[j].default =
-        profiles?.[name].params?.services?.selected?.includes(svr?.name) ||
-        profiles?.[name].params?.services?.selected?.includes(svr?.category) ||
-        false;
-
+      out.services[i].services[j].selected = selected.includes(svr?.category) || selected.includes(svr?.name);
+      out.services[i].services[j].restricted = restricted.includes(svr?.category) || restricted.includes(svr?.name);
+      out.services[i].services[j].default = defaults.includes(svr?.name) || defaults.includes(svr?.category);
       out.services[i].services[j].prev = out.services[i].services[j].selected;
     });
   });
@@ -250,8 +243,7 @@ export const loadSubmissionProfile = (
         settingsSpec?.default ||
         out.service_spec[i].params[j].default;
 
-      out.service_spec[i].params[j].editable =
-        profiles?.[name].editable_params?.[svr.name]?.includes(param.name) || false;
+      out.service_spec[i].params[j].restricted = profiles?.[name].restricted_params?.[svr.name]?.includes(param.name);
 
       out.service_spec[i].params[j].prev = out.service_spec[i].params[j].value;
     });
@@ -288,7 +280,7 @@ export const parseSubmissionProfile = (
   // Applying the profile parameters
   Object.keys(out).forEach(key => {
     const p = profile[key] as ProfileSettings[ProfileKey];
-    if (PROFILE_KEYS.includes(key as ProfileKey) && p.editable && p.value !== p.default) {
+    if (PROFILE_KEYS.includes(key as ProfileKey) && !p.restricted && p.value !== p.default) {
       params[key] = p.value;
     }
   });
@@ -308,7 +300,7 @@ export const parseSubmissionProfile = (
   params.service_spec = {};
   profile.service_spec.forEach(svr => {
     svr.params.forEach(param => {
-      if (param.value !== param.default && param.editable)
+      if (param.value !== param.default && !param.restricted)
         params.service_spec = {
           ...params.service_spec,
           [svr.name]: { ...params.service_spec[svr.name], [param.name]: param.value }

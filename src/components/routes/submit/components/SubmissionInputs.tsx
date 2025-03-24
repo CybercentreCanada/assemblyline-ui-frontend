@@ -60,17 +60,17 @@ export const ClassificationInput = React.memo(() => {
           state.values.state.customize,
           state.values.state.phase === 'editing',
           state.values.settings?.classification?.value,
-          state.values.settings?.classification?.editable
+          state.values.settings?.classification?.restricted
         ] as const
       }
-      children={([loading, disabled, customize, isEditing, value, editable]) => (
+      children={([loading, disabled, customize, isEditing, value, restricted]) => (
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
           <Typography>{t('classification.input.label')}</Typography>
           <Classification
             format="long"
             type="picker"
             c12n={loading ? null : value}
-            disabled={disabled || !isEditing || !(customize || editable)}
+            disabled={disabled || !isEditing || (!customize && restricted)}
             setClassification={v => form.setFieldValue('settings.classification.value', v)}
           />
         </div>
@@ -610,18 +610,16 @@ export const FindButton = React.memo(() => {
             state.values.state.phase === 'loading',
             state.values.state.disabled,
             state.values.state.phase === 'editing',
-            state.values.state.customize,
             state.values.state.tab,
             state.values.file,
             state.values.hash.type,
             state.values.hash.value
           ] as const
         }
-        children={([loading, disabled, isEditing, customize, tab, file, hashType, hashValue]) => (
+        children={([loading, disabled, isEditing, tab, file, hashType, hashValue]) => (
           <IconButton
             disabled={disabled || (tab === 'file' ? !file : tab === 'hash' ? !hashType : false)}
             loading={loading || !isEditing}
-            preventRender={!customize}
             tooltip={t('find.button.tooltip')}
             tooltipProps={{ placement: 'bottom' }}
             onClick={() => {
@@ -905,7 +903,7 @@ const ExternalServicesDialog = React.memo(() => {
 
       return categories;
     });
-  }, []);
+  }, [configuration.ui.url_submission_auto_service_selection, form]);
 
   return (
     <>

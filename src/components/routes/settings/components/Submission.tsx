@@ -36,16 +36,16 @@ export const SubmissionSection = React.memo(() => {
               <form.Subscribe
                 selector={state => {
                   const param = state.values.settings.classification;
-                  return [param.value, param.default, param.editable] as const;
+                  return [param.value, param.default, param.restricted] as const;
                 }}
-                children={([value, defaultValue, editable]) => (
+                children={([value, defaultValue, restricted]) => (
                   <ClassificationListInput
                     id="settings:submissions.classification"
                     primary={t('settings:submissions.classification')}
                     secondary={t('settings:submissions.classification_desc')}
                     value={value || defaultValue}
                     loading={loading}
-                    disabled={disabled || !(customize || editable)}
+                    disabled={disabled || !(customize || !restricted)}
                     onChange={v => form.setFieldValue(`settings.classification.value`, v)}
                   />
                 )}
@@ -55,9 +55,9 @@ export const SubmissionSection = React.memo(() => {
             <form.Subscribe
               selector={state => {
                 const param = state.values.settings.ttl;
-                return [param.value, param.default, param.editable] as const;
+                return [param.value, param.default, param.restricted] as const;
               }}
-              children={([value, defaultValue, editable]) => (
+              children={([value, defaultValue, restricted]) => (
                 <NumberListInput
                   id="settings:submissions.ttl"
                   primary={t('settings:submissions.ttl')}
@@ -65,7 +65,7 @@ export const SubmissionSection = React.memo(() => {
                   endAdornment={t('settings:submissions.ttl_days')}
                   value={value}
                   loading={loading}
-                  disabled={disabled || (!customize && !editable)}
+                  disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
                   min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                   max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
@@ -78,16 +78,16 @@ export const SubmissionSection = React.memo(() => {
             <form.Subscribe
               selector={state => {
                 const param = state.values.settings.deep_scan;
-                return [param.value, param.default, param.editable] as const;
+                return [param.value, param.default, param.restricted] as const;
               }}
-              children={([value, defaultValue, editable]) => (
+              children={([value, defaultValue, restricted]) => (
                 <BooleanListInput
                   id="settings:submissions.deep_scan"
                   primary={t('settings:submissions.deep_scan')}
                   secondary={t('settings:submissions.deep_scan_desc')}
                   value={value}
                   loading={loading}
-                  disabled={disabled || (!customize && !editable)}
+                  disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
                   onChange={(event, v) => form.setFieldValue(`settings.deep_scan.value`, v)}
                   onReset={() => form.setFieldValue(`settings.deep_scan.value`, defaultValue)}
@@ -98,16 +98,16 @@ export const SubmissionSection = React.memo(() => {
             <form.Subscribe
               selector={state => {
                 const param = state.values.settings.ignore_recursion_prevention;
-                return [param.value, param.default, param.editable] as const;
+                return [param.value, param.default, param.restricted] as const;
               }}
-              children={([value, defaultValue, editable]) => (
+              children={([value, defaultValue, restricted]) => (
                 <BooleanListInput
                   id="settings:submissions.recursion_prevention"
                   primary={t('settings:submissions.recursion_prevention')}
                   secondary={t('settings:submissions.recursion_prevention_desc')}
                   value={value}
                   loading={loading}
-                  disabled={disabled || (!customize && !editable)}
+                  disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
                   onChange={(event, v) => form.setFieldValue(`settings.ignore_recursion_prevention.value`, v)}
                   onReset={() => form.setFieldValue(`settings.ignore_recursion_prevention.value`, defaultValue)}
@@ -118,16 +118,16 @@ export const SubmissionSection = React.memo(() => {
             <form.Subscribe
               selector={state => {
                 const param = state.values.settings.ignore_filtering;
-                return [param.value, param.default, param.editable] as const;
+                return [param.value, param.default, param.restricted] as const;
               }}
-              children={([value, defaultValue, editable]) => (
+              children={([value, defaultValue, restricted]) => (
                 <BooleanListInput
                   id="settings:submissions.filtering"
                   primary={t('settings:submissions.filtering')}
                   secondary={t('settings:submissions.filtering_desc')}
                   value={value}
                   loading={loading}
-                  disabled={disabled || (!customize && !editable)}
+                  disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
                   onChange={(event, v) => form.setFieldValue(`settings.ignore_filtering.value`, v)}
                   onReset={() => form.setFieldValue(`settings.ignore_filtering.value`, defaultValue)}
@@ -138,16 +138,16 @@ export const SubmissionSection = React.memo(() => {
             <form.Subscribe
               selector={state => {
                 const param = state.values.settings.generate_alert;
-                return [param.value, param.default, param.editable] as const;
+                return [param.value, param.default, param.restricted] as const;
               }}
-              children={([value, defaultValue, editable]) => (
+              children={([value, defaultValue, restricted]) => (
                 <BooleanListInput
                   id="settings:submissions.generate_alert"
                   primary={t('settings:submissions.generate_alert')}
                   secondary={t('settings:submissions.generate_alert_desc')}
                   value={value}
                   loading={loading}
-                  disabled={disabled || (!customize && !editable)}
+                  disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
                   onChange={(event, v) => form.setFieldValue(`settings.generate_alert.value`, v)}
                   onReset={() => form.setFieldValue(`settings.generate_alert.value`, defaultValue)}
@@ -158,16 +158,16 @@ export const SubmissionSection = React.memo(() => {
             <form.Subscribe
               selector={state => {
                 const param = state.values.settings.ignore_cache;
-                return [param.value, param.default, param.editable] as const;
+                return [param.value, param.default, param.restricted] as const;
               }}
-              children={([value, defaultValue, editable]) => (
+              children={([value, defaultValue, restricted]) => (
                 <BooleanListInput
                   id="settings:submissions.result_caching"
                   primary={t('settings:submissions.result_caching')}
                   secondary={t('settings:submissions.result_caching_desc')}
                   value={value}
                   loading={loading}
-                  disabled={disabled || (!customize && !editable)}
+                  disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
                   onChange={(event, v) => form.setFieldValue(`settings.ignore_cache.value`, v)}
                   onReset={() => form.setFieldValue(`settings.ignore_cache.value`, defaultValue)}
