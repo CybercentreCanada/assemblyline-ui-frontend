@@ -49,16 +49,16 @@ export const SubmissionOptions = React.memo(() => {
                     state.values.hash.value,
                     param.value,
                     param.default,
-                    param.editable
+                    param.restricted
                   ] as const;
                 }}
-                children={([tab, file, hashType, hashValue, value, defaultValue, editable]) => (
+                children={([tab, file, hashType, hashValue, value, defaultValue, restricted]) => (
                   <TextInput
                     label={t('options.submission.description.label')}
                     value={value}
                     loading={loading}
-                    disabled={disabled || !editing}
-                    preventRender={!customize && !editable}
+                    disabled={disabled || restricted}
+                    preventRender={!customize && restricted}
                     reset={value !== defaultValue}
                     placeholder={
                       tab === 'file' && file
@@ -78,16 +78,16 @@ export const SubmissionOptions = React.memo(() => {
                 <form.Subscribe
                   selector={state => {
                     const param = state.values.settings.priority;
-                    return [param.value, param.default, param.editable] as const;
+                    return [param.value, param.default, param.restricted] as const;
                   }}
-                  children={([value, defaultValue, editable]) => (
+                  children={([value, defaultValue, restricted]) => (
                     <SelectInput
                       label={t('options.submission.priority.label')}
                       value={value}
                       fullWidth
                       loading={loading}
-                      disabled={disabled || !editing}
-                      preventRender={!customize && !editable}
+                      disabled={disabled || restricted}
+                      preventRender={!customize && restricted}
                       reset={value !== defaultValue}
                       options={priorityOptions}
                       error={v =>
@@ -107,9 +107,9 @@ export const SubmissionOptions = React.memo(() => {
                 <form.Subscribe
                   selector={state => {
                     const param = state.values.settings.ttl;
-                    return [param.value, param.default, param.editable] as const;
+                    return [param.value, param.default, param.restricted] as const;
                   }}
-                  children={([value, defaultValue, editable]) => (
+                  children={([value, defaultValue, restricted]) => (
                     <NumberInput
                       label={`${t('options.submission.ttl.label')} (${
                         configuration.submission.max_dtl !== 0
@@ -120,8 +120,8 @@ export const SubmissionOptions = React.memo(() => {
                       endAdornment={t('options.submission.ttl.endAdornment')}
                       value={value}
                       loading={loading}
-                      disabled={disabled || !editing}
-                      preventRender={!customize && !editable}
+                      disabled={disabled || restricted}
+                      preventRender={!customize && restricted}
                       reset={value !== defaultValue}
                       min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                       max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
@@ -136,16 +136,16 @@ export const SubmissionOptions = React.memo(() => {
               <form.Subscribe
                 selector={state => {
                   const param = state.values.settings.generate_alert;
-                  return [param.value, param.default, param.editable] as const;
+                  return [param.value, param.default, param.restricted] as const;
                 }}
-                children={([value, defaultValue, editable]) => (
+                children={([value, defaultValue, restricted]) => (
                   <CheckboxInput
                     label={t('options.submission.generate_alert.label')}
                     tooltip={t('options.submission.generate_alert.tooltip')}
                     value={value}
                     loading={loading}
-                    disabled={disabled || !editing}
-                    preventRender={!customize && !editable}
+                    disabled={disabled || restricted}
+                    preventRender={!customize && restricted}
                     reset={value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.generate_alert.value', v)}
@@ -157,16 +157,16 @@ export const SubmissionOptions = React.memo(() => {
               <form.Subscribe
                 selector={state => {
                   const param = state.values.settings.ignore_filtering;
-                  return [param.value, param.default, param.editable] as const;
+                  return [param.value, param.default, param.restricted] as const;
                 }}
-                children={([value, defaultValue, editable]) => (
+                children={([value, defaultValue, restricted]) => (
                   <CheckboxInput
                     label={t('options.submission.ignore_filtering.label')}
                     tooltip={t('options.submission.ignore_filtering.tooltip')}
                     value={value}
                     loading={loading}
-                    disabled={disabled || !editing}
-                    preventRender={!customize && !editable}
+                    disabled={disabled || restricted}
+                    preventRender={!customize && restricted}
                     reset={value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.ignore_filtering.value', v)}
@@ -178,16 +178,16 @@ export const SubmissionOptions = React.memo(() => {
               <form.Subscribe
                 selector={state => {
                   const param = state.values.settings.ignore_cache;
-                  return [param.value, param.default, param.editable] as const;
+                  return [param.value, param.default, param.restricted] as const;
                 }}
-                children={([value, defaultValue, editable]) => (
+                children={([value, defaultValue, restricted]) => (
                   <CheckboxInput
                     label={t('options.submission.ignore_cache.label')}
                     tooltip={t('options.submission.ignore_cache.tooltip')}
                     value={value}
                     loading={loading}
-                    disabled={disabled || !editing}
-                    preventRender={!customize && !editable}
+                    disabled={disabled || restricted}
+                    preventRender={!customize && restricted}
                     reset={value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.ignore_cache.value', v)}
@@ -199,16 +199,16 @@ export const SubmissionOptions = React.memo(() => {
               <form.Subscribe
                 selector={state => {
                   const param = state.values.settings.ignore_recursion_prevention;
-                  return [param.value, param.default, param.editable] as const;
+                  return [param.value, param.default, param.restricted] as const;
                 }}
-                children={([value, defaultValue, editable]) => (
+                children={([value, defaultValue, restricted]) => (
                   <CheckboxInput
                     label={t('options.submission.ignore_recursion_prevention.label')}
                     tooltip={t('options.submission.ignore_recursion_prevention.tooltip')}
                     value={value}
                     loading={loading}
-                    disabled={disabled || !editing}
-                    preventRender={!customize && !editable}
+                    disabled={disabled || restricted}
+                    preventRender={!customize && restricted}
                     reset={value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.ignore_recursion_prevention.value', v)}
@@ -220,16 +220,16 @@ export const SubmissionOptions = React.memo(() => {
               <form.Subscribe
                 selector={state => {
                   const param = state.values.settings.deep_scan;
-                  return [param.value, param.default, param.editable] as const;
+                  return [param.value, param.default, param.restricted] as const;
                 }}
-                children={([value, defaultValue, editable]) => (
+                children={([value, defaultValue, restricted]) => (
                   <CheckboxInput
                     label={t('options.submission.deep_scan.label')}
                     tooltip={t('options.submission.deep_scan.tooltip')}
                     value={value}
                     loading={loading}
-                    disabled={disabled || !editing}
-                    preventRender={!customize && !editable}
+                    disabled={disabled || restricted}
+                    preventRender={!customize && restricted}
                     reset={value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.deep_scan.value', v)}

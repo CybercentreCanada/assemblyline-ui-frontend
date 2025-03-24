@@ -472,7 +472,7 @@ export type SubmissionProfile = {
   display_name: string;
 
   /** A list of service-specific parameters that can be configured */
-  editable_params: { [service: string]: string[] };
+  restricted_params: { [service: string]: string[] };
 
   /** Default submission parameters for profile */
   params: SubmissionProfileParams;

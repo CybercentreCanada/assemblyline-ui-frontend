@@ -131,7 +131,7 @@ export const RightNav = React.memo(() => {
                             checkboxProps={{
                               checked: categoryProps[0],
                               indeterminate: categoryProps[1],
-                              disabled: disabled || !(customize || category.editable),
+                              disabled: disabled || (!customize && category.restricted),
                               onChange: () => handleCategoryChange(categoryProps[0], cat_id)
                             }}
                           />
@@ -161,7 +161,7 @@ export const RightNav = React.memo(() => {
                                   onPageNavigation={event => scrollTo(event, `${service.category}-${service.name}`)}
                                   checkboxProps={{
                                     checked: serviceProps[0],
-                                    disabled: disabled || !(customize || category.editable),
+                                    disabled: disabled || (!customize && category.restricted),
                                     onChange: () => handleServiceChange(serviceProps[0], cat_id, svr_id)
                                   }}
                                 />

@@ -34,14 +34,14 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
           p.name,
           p.value,
           p.default,
-          p.editable,
+          p.restricted,
           p?.list,
           state.values.state.disabled,
           state.values.state.customize,
           state.values.state.phase === 'editing'
         ] as const;
       }}
-      children={([type, name, value, defaultValue, editable, list, disabled, customize, isEditing]) => {
+      children={([type, name, value, defaultValue, restricted, list, disabled, customize, isEditing]) => {
         switch (type) {
           case 'bool':
             return (
@@ -50,8 +50,8 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as boolean}
-                disabled={disabled || !isEditing || !(customize || editable)}
-                preventRender={!customize && !editable}
+                disabled={disabled || !isEditing || (!customize && restricted)}
+                preventRender={!customize && restricted}
                 reset={value !== defaultValue}
                 onChange={(e, v) =>
                   form.setFieldValue('settings.service_spec', s => {
@@ -74,8 +74,8 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as number}
-                disabled={disabled || !isEditing || !(customize || editable)}
-                preventRender={!customize && !editable}
+                disabled={disabled || !isEditing || (!customize && restricted)}
+                preventRender={!customize && restricted}
                 reset={value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
                 onChange={(e, v) =>
@@ -99,8 +99,8 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as string}
-                disabled={disabled || !isEditing || !(customize || editable)}
-                preventRender={!customize && !editable}
+                disabled={disabled || !isEditing || (!customize && restricted)}
+                preventRender={!customize && restricted}
                 options={list}
                 reset={value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
@@ -125,8 +125,8 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as string}
-                disabled={disabled || !isEditing || !(customize || editable)}
-                preventRender={!customize && !editable}
+                disabled={disabled || !isEditing || (!customize && restricted)}
+                preventRender={!customize && restricted}
                 options={list.map(key => ({ primary: key.replaceAll('_', ' '), value: key })).sort()}
                 reset={value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
@@ -161,7 +161,7 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
 
   const handleHasParams = useCallback(
     (spec: ProfileSettings['service_spec'][number], customize: boolean) =>
-      !spec ? false : spec.params.some(p => p.editable || customize),
+      !spec ? false : spec.params.some(p => !p.restricted || customize),
     []
   );
 
@@ -187,7 +187,7 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
 
       return service_spec.params.reduce(
         (prev, current, i) => {
-          if (!customize && !current.editable) return prev;
+          if (!customize && current.restricted) return prev;
           else if (current.hide) return { ...prev, hidden: [...prev.hidden, i] };
           else return { ...prev, show: [...prev.show, i] };
         },
@@ -207,7 +207,7 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
         return [
           svr.selected,
           svr.default,
-          svr.editable,
+          svr.restricted,
           specID,
           spec,
           hasParams,
@@ -216,23 +216,23 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
           state.values.state.phase === 'editing'
         ] as const;
       }}
-      children={([selected, defaultValue, editable, specID, spec, hasParams, disabled, customize, isEditing]) => (
+      children={([selected, defaultValue, restricted, specID, spec, hasParams, disabled, customize, isEditing]) => (
         <CollapseSection
           header={({ open, setOpen }) => (
             <CheckboxInput
               label={service.name}
-              disabled={disabled || !isEditing || !(customize || editable)}
+              disabled={disabled || !isEditing || (!customize && restricted)}
               expand={!hasParams ? null : open}
-              preventRender={!customize && !editable && !selected}
+              preventRender={!customize && restricted && !selected}
               reset={defaultValue !== null && selected !== defaultValue}
               value={selected}
-              onChange={!customize && !editable ? null : (e, v) => handleChange(v)}
+              onChange={!customize && restricted ? null : (e, v) => handleChange(v)}
               onExpand={() => setOpen(o => !o)}
-              onReset={!customize && !editable ? null : () => handleChange(defaultValue)}
+              onReset={!customize && restricted ? null : () => handleChange(defaultValue)}
             />
           )}
           closed
-          preventRender={!(customize || editable) && !selected}
+          preventRender={!customize && restricted && !selected}
         >
           {!hasParams ? null : (
             <>
@@ -311,32 +311,32 @@ const Category = React.memo(({ cat_id, category }: CategoryProps) => {
         return [
           cat.selected,
           cat.default,
-          cat.editable,
+          cat.restricted,
           !list.every(i => i) && list.some(i => i),
           state.values.state.customize,
           state.values.state.disabled,
           state.values.state.phase === 'editing'
         ] as const;
       }}
-      children={([selected, defaultValue, editable, indeterminate, customize, disabled, isEditing]) => (
+      children={([selected, defaultValue, restricted, indeterminate, customize, disabled, isEditing]) => (
         <CollapseSection
           header={({ open, setOpen }) => (
             <CheckboxInput
               label={category.name}
               labelProps={{ color: 'textSecondary' }}
-              disabled={disabled || !isEditing || !(customize || editable)}
+              disabled={disabled || !isEditing || (!customize && restricted)}
               divider
               expand={open}
               indeterminate={indeterminate}
-              preventRender={!customize && !editable && !selected && !indeterminate}
+              preventRender={!customize && restricted && !selected && !indeterminate}
               reset={defaultValue !== null && selected !== defaultValue}
               value={selected}
-              onChange={!customize && !editable ? null : (e, v) => handleChange(v)}
+              onChange={!customize && restricted ? null : (e, v) => handleChange(v)}
               onExpand={() => setOpen(o => !o)}
-              onReset={!customize && !editable ? null : () => handleChange(defaultValue)}
+              onReset={!customize && restricted ? null : () => handleChange(defaultValue)}
             />
           )}
-          preventRender={!(customize || editable) && !(selected || indeterminate)}
+          preventRender={!customize && restricted && !(selected || indeterminate)}
         >
           <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '38px' }}>
             {category.services.map((service, svr_id) => (

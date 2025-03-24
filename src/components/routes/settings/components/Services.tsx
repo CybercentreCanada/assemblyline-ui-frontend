@@ -38,9 +38,9 @@ const Parameter = React.memo(
       <form.Subscribe
         selector={state => {
           const param = state.values.settings.service_spec[spec_id].params[param_id];
-          return [param.type, param.name, param.value, param.default, param.editable, param.list] as const;
+          return [param.type, param.name, param.value, param.default, param.restricted, param.list] as const;
         }}
-        children={([type, name, value, defaultValue, editable, list]) => {
+        children={([type, name, value, defaultValue, restricted, list]) => {
           switch (type) {
             case 'str':
               return (
@@ -48,7 +48,7 @@ const Parameter = React.memo(
                   id={`${spec_id}-${param_id}`}
                   primary={name.replaceAll('_', ' ')}
                   capitalize
-                  disabled={disabled || !(customize || editable)}
+                  disabled={disabled || (!customize && restricted)}
                   loading={loading}
                   reset={defaultValue !== null && value !== defaultValue}
                   value={value as string}
@@ -62,7 +62,7 @@ const Parameter = React.memo(
                   id={`${spec_id}-${param_id}`}
                   primary={name.replaceAll('_', ' ')}
                   capitalize
-                  disabled={disabled || !(customize || editable)}
+                  disabled={disabled || (!customize && restricted)}
                   loading={loading}
                   reset={defaultValue !== null && value !== defaultValue}
                   value={value as number}
@@ -76,7 +76,7 @@ const Parameter = React.memo(
                   id={`${spec_id}-${param_id}`}
                   primary={name.replaceAll('_', ' ')}
                   capitalize
-                  disabled={disabled || !(customize || editable)}
+                  disabled={disabled || (!customize && restricted)}
                   loading={loading}
                   reset={defaultValue !== null && value !== defaultValue}
                   value={value as boolean}
@@ -90,7 +90,7 @@ const Parameter = React.memo(
                   id={`${spec_id}-${param_id}`}
                   primary={name.replaceAll('_', ' ')}
                   capitalize
-                  disabled={disabled || !(customize || editable)}
+                  disabled={disabled || (!customize && restricted)}
                   loading={loading}
                   reset={defaultValue !== null && value !== defaultValue}
                   value={value as string}
@@ -140,9 +140,9 @@ const Service = React.memo(
         <form.Subscribe
           selector={state => {
             const svr = state.values.settings.services[cat_id].services[svr_id];
-            return [svr.name, svr.category, svr.description, svr.selected, svr.default, svr.editable] as const;
+            return [svr.name, svr.category, svr.description, svr.selected, svr.default, svr.restricted] as const;
           }}
-          children={([name, category, description, selected, defaultValue, editable]) => (
+          children={([name, category, description, selected, defaultValue, restricted]) => (
             <ListHeader
               id={`${category}-${name}`}
               primary={name}
@@ -151,8 +151,8 @@ const Service = React.memo(
               checked={selected}
               anchor
               reset={defaultValue !== null && selected !== defaultValue}
-              onChange={!customize && !editable ? null : (event, checked) => handleChange(!checked)}
-              onReset={!customize && !editable ? null : () => handleChange(defaultValue)}
+              onChange={!customize && restricted ? null : (event, checked) => handleChange(!checked)}
+              onReset={!customize && restricted ? null : () => handleChange(defaultValue)}
             />
           )}
         />
@@ -170,7 +170,7 @@ const Service = React.memo(
                 <List inset>
                   {specs[specID].params
                     .map((param, param_id) => [param, param_id] as const)
-                    .sort(([p1], [p2]) => (customize ? 1 : (p2.editable ? 1 : 0) - (p1.editable ? 1 : 0)))
+                    .sort(([p1], [p2]) => (customize ? 1 : (p2.restricted ? 0 : 1) - (p1.restricted ? 0 : 1)))
                     .map(([param, param_id]) => (
                       <Parameter
                         key={`${svr.name}-${param.name}`}
@@ -236,11 +236,11 @@ const Category = React.memo(
               cat.name,
               cat.selected,
               cat.default,
-              cat.editable,
+              cat.restricted,
               !list.every(i => i) && list.some(i => i)
             ] as const;
           }}
-          children={([name, selected, defaultValue, editable, indeterminate]) => (
+          children={([name, selected, defaultValue, restricted, indeterminate]) => (
             <ListHeader
               id={name}
               anchorProps={{ subheader: true }}
@@ -251,8 +251,8 @@ const Category = React.memo(
               divider
               anchor
               reset={defaultValue !== null && selected !== defaultValue}
-              onChange={!customize && !editable ? null : (event, checked) => handleChange(!checked)}
-              onReset={!customize && !editable ? null : () => handleChange(defaultValue)}
+              onChange={!customize && restricted ? null : (event, checked) => handleChange(!checked)}
+              onReset={!customize && restricted ? null : () => handleChange(defaultValue)}
             />
           )}
         />
