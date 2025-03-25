@@ -660,7 +660,7 @@ export const AdjustButton = React.memo(() => {
   );
 });
 
-const AnalyzeButton = React.memo((props: ButtonProps) => {
+const AnalyzeButton = React.memo(({ children, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
 
@@ -686,7 +686,9 @@ const AnalyzeButton = React.memo((props: ButtonProps) => {
           onClick={() => form.setFieldValue('autoURLServiceSelection.open', s => !s)}
           {...props}
         >
-          {phase === 'redirecting'
+          {children
+            ? children
+            : phase === 'redirecting'
             ? t('submit.button.redirecting.label')
             : phase === 'uploading'
             ? progress
@@ -712,9 +714,6 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
   const { settings } = useALContext();
 
   const handleCancel = useCallback(() => {
-    form.setFieldValue('file', null);
-    form.setFieldValue('hash.type', null);
-    form.setFieldValue('hash.value', '');
     form.setFieldValue('state.phase', 'editing');
     form.setFieldValue('state.progress', null);
     form.setFieldValue('state.uuid', generateUUID());
@@ -863,6 +862,7 @@ const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
         },
         onFailure: ({ api_error_message }) => {
           showErrorMessage(api_error_message);
+          form.setFieldValue('state.phase', 'editing');
         },
         onEnter: () => {
           form.setFieldValue('state.phase', 'uploading');

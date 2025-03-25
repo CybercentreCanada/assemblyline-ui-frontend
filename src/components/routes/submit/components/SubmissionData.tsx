@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Typography, useTheme } from '@mui/material';
 import { useForm } from 'components/routes/submit/submit.form';
 import { TextInput } from 'components/visual/Inputs/TextInput';
 import React from 'react';
@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 export const PasswordInput = React.memo(() => {
   const { t } = useTranslation(['submit']);
+  const theme = useTheme();
   const form = useForm();
 
   return (
@@ -31,6 +32,7 @@ export const PasswordInput = React.memo(() => {
               return s;
             });
           }}
+          rootProps={{ style: { margin: theme.spacing(1) } }}
         />
       )}
     />
