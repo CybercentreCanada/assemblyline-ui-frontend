@@ -142,10 +142,10 @@ const WrappedSubmitRoute = () => {
         form.setFieldValue('settings', initializeSettings(settings));
         const profile = getPreferredSubmissionProfile(settings);
         form.setFieldValue('state.profile', profile);
-        if (profile === 'default') form.setFieldValue('settings', s => loadDefaultProfile(s, settings));
+        if (profile === 'default') form.setFieldValue('settings', s => loadDefaultProfile(s, settings, currentUser));
         else
           form.setFieldValue('settings', s =>
-            loadSubmissionProfile(s, settings, configuration.submission.profiles, profile)
+            loadSubmissionProfile(s, settings, configuration.submission.profiles, currentUser, profile)
           );
         form.setFieldValue('settings.default_external_sources', getDefaultExternalSources(settings, configuration));
 

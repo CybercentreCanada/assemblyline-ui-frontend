@@ -1,5 +1,6 @@
 import type { Submission, SubmissionProfileParams } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
+import type { CustomUser } from 'components/models/ui/user';
 
 const INTERFACE_KEYS = [
   'default_external_sources',
@@ -120,8 +121,10 @@ export const initializeSettings = (settings: UserSettings): ProfileSettings => {
   return out;
 };
 
-export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings): ProfileSettings => {
+export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings, user: CustomUser): ProfileSettings => {
   if (!settings || !settings?.submission_profiles?.default) return out;
+
+  const customize = user.is_admin || user.roles.includes('submission_customize');
 
   // Applying interface parameters
   Object.entries(settings).forEach(([key, value]) => {
@@ -134,7 +137,7 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings)
   Object.keys(settings).forEach((key: ProfileKey) => {
     if (PROFILE_KEYS.includes(key)) {
       out[key].value = settings?.submission_profiles?.default?.[key] || settings[key];
-      out[key].restricted = false;
+      out[key].restricted = !customize;
       out[key].default = settings[key];
       out[key].prev = out[key].value;
     }
@@ -143,7 +146,7 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings)
   // Applying the services parameter
   out.services.forEach((cat, i) => {
     out.services[i].selected = settings.submission_profiles?.default?.services?.selected?.includes(cat?.name) || false;
-    out.services[i].restricted = false;
+    out.services[i].restricted = !customize;
     out.services[i].default = out.services[i].selected;
     out.services[i].prev = out.services[i].selected;
 
@@ -153,7 +156,7 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings)
         settings.submission_profiles?.default?.services?.selected?.includes(svr?.name) ||
         false;
 
-      out.services[i].services[j].restricted = false;
+      out.services[i].services[j].restricted = !customize;
       out.services[i].services[j].default = out.services[i].services[j].selected;
       out.services[i].services[j].prev = out.services[i].services[j].selected;
     });
@@ -171,7 +174,7 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings)
         settingsSpec?.value ||
         out.service_spec[i].params[j].value;
 
-      out.service_spec[i].params[j].restricted = false;
+      out.service_spec[i].params[j].restricted = !customize;
       out.service_spec[i].params[j].default = settingsSpec?.default || out.service_spec[i].params[j].default;
       out.service_spec[i].params[j].prev = out.service_spec[i].params[j].value;
     });
@@ -187,9 +190,12 @@ export const loadSubmissionProfile = (
   out: ProfileSettings,
   settings: UserSettings,
   profiles: Submission['profiles'],
+  user: CustomUser,
   name: string
 ): ProfileSettings => {
   if (!settings || !(name in settings.submission_profiles)) return out;
+
+  const customize = user.is_admin || user.roles.includes('submission_customize');
 
   // Applying interface parameters
   Object.entries(settings).forEach(([key, value]) => {
@@ -202,7 +208,7 @@ export const loadSubmissionProfile = (
   Object.keys(out).forEach((key: ProfileKey) => {
     if (PROFILE_KEYS.includes(key)) {
       out[key].value = settings?.submission_profiles?.[name]?.[key] || settings[key];
-      out[key].restricted = profiles?.[name]?.restricted_params?.submission?.includes(key);
+      out[key].restricted = !customize && profiles?.[name]?.restricted_params?.submission?.includes(key);
       out[key].default = profiles?.[name]?.params?.[key] || settings[key];
       out[key].prev = out[key].value;
     }
@@ -214,13 +220,14 @@ export const loadSubmissionProfile = (
   const selected = settings.submission_profiles?.[name]?.services?.selected || [];
   out.services.forEach((cat, i) => {
     out.services[i].selected = selected.includes(cat?.name);
-    out.services[i].restricted = restricted.includes(cat?.name);
+    out.services[i].restricted = !customize && restricted.includes(cat?.name);
     out.services[i].default = defaults.includes(cat.name) || false;
     out.services[i].prev = out.services[i].selected;
 
     cat.services.forEach((svr, j) => {
       out.services[i].services[j].selected = selected.includes(svr?.category) || selected.includes(svr?.name);
-      out.services[i].services[j].restricted = restricted.includes(svr?.category) || restricted.includes(svr?.name);
+      out.services[i].services[j].restricted =
+        !customize && (restricted.includes(svr?.category) || restricted.includes(svr?.name));
       out.services[i].services[j].default = defaults.includes(svr?.name) || defaults.includes(svr?.category);
       out.services[i].services[j].prev = out.services[i].services[j].selected;
     });
@@ -243,7 +250,8 @@ export const loadSubmissionProfile = (
         settingsSpec?.default ||
         out.service_spec[i].params[j].default;
 
-      out.service_spec[i].params[j].restricted = profiles?.[name].restricted_params?.[svr.name]?.includes(param.name);
+      out.service_spec[i].params[j].restricted =
+        !customize && profiles?.[name].restricted_params?.[svr.name]?.includes(param.name);
 
       out.service_spec[i].params[j].prev = out.service_spec[i].params[j].value;
     });

@@ -37,12 +37,12 @@ const WrappedSettingsRoute = () => {
     if (!s || !tab || !userSettings) return;
 
     if (tab === 'interface') s = form.getFieldValue('settings');
-    else if (tab === 'default') s = loadDefaultProfile(s, userSettings);
-    else s = loadSubmissionProfile(s, userSettings, configuration.submission.profiles, tab);
+    else if (tab === 'default') s = loadDefaultProfile(s, userSettings, currentUser);
+    else s = loadSubmissionProfile(s, userSettings, configuration.submission.profiles, currentUser, tab);
 
     form.setFieldValue('settings', s);
     form.setFieldValue('state.tab', tab);
-  }, [configuration.submission.profiles, form]);
+  }, [configuration.submission.profiles, currentUser, form]);
 
   useEffect(() => {
     if (tabParam === form.getFieldValue('state.tab')) return;
