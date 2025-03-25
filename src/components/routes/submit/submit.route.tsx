@@ -185,7 +185,7 @@ const WrappedSubmitRoute = () => {
   }, [configuration, currentUser]);
 
   return (
-    <PageCenter maxWidth={downMD ? '100%' : `${theme.breakpoints.values.md}px`} margin={4} width="100%">
+    <PageCenter maxWidth={downMD ? '100%' : `${theme.breakpoints.values.md}px`} margin={3.5} width="100%">
       {banner}
 
       {configuration.ui.banner && (
