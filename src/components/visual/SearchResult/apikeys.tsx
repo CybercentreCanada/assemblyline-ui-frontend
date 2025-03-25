@@ -73,10 +73,10 @@ const WrappedUsersApiTable: React.FC<ApiTableProps> = ({ apikeySearchResults, se
                                     <DivTableCell>{userApikey.expiry_ts ? (<Moment variant="fromNow">{userApikey.expiry_ts}</Moment>) : (<></>)}</DivTableCell>
                                     <DivTableCell>{userApikey.last_used ? (<Moment variant="fromNow">{userApikey.last_used}</Moment>) : (<></>)}</DivTableCell>
                                     <DivTableCell>{userApikey.acl.sort().map((e, x) => (
-                                        <CustomChip type="rounded" label={e} size="tiny" color="primary" />
+                                        <CustomChip key={e} type="rounded" label={e} size="tiny" color="primary" />
                                     ))}</DivTableCell>
                                     <DivTableCell>{userApikey.roles.sort().map((e, x) => (
-                                        <CustomChip type="rounded" label={t(`role.${e}`)} size="tiny" color="secondary" />
+                                        <CustomChip key={e} type="rounded" label={t(`role.${e}`)} size="tiny" color="secondary" />
                                     ))}</DivTableCell>
                                 </LinkRow>
                             ))

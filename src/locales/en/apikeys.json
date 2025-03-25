@@ -67,7 +67,7 @@
     "delete.text": "Are you sure you want to remove this apikey? There will be no way to recover it once removed.",
     "delete.title": "Remove Apikey",
     "username": "Username",
-    "apikey": "Api Key",
+    "apikey": "API Key",
     "acl": "ACL",
     "no_results_desc": "The query that you ran did not return any results.",
     "expiry.change": "Change expiry date",

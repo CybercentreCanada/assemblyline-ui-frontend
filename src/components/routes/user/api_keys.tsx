@@ -29,7 +29,7 @@ import { ApiKey, User } from 'components/models/base/user';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
 import Moment from 'components/visual/Moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 
@@ -43,7 +43,7 @@ type APIKeyCardProps = {
 };
 
 const APIKeyCard = ({ name, apikey, askForDelete, changeApikey }: APIKeyCardProps) => {
-  const { t } = useTranslation(['user']);
+  const { t } = useTranslation(['apikeys']);
   const theme = useTheme();
 
 
@@ -63,16 +63,9 @@ const APIKeyCard = ({ name, apikey, askForDelete, changeApikey }: APIKeyCardProp
 
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), alignItems: 'center' }}>
             <Typography style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{apikey.key_name}</Typography>
-            {apikey.expiry_ts ? (
-              <div>
-                Expiry:
-                <Moment format="YYYY-MM-DD">{apikey.expiry_ts}</Moment>
 
-              </div>
-            ) : ""}
 
             <div>
-
               <IconButton size="small" onClick={() => changeApikey(apikey)}>
                 <EditOutlinedIcon />
               </IconButton>
@@ -81,6 +74,16 @@ const APIKeyCard = ({ name, apikey, askForDelete, changeApikey }: APIKeyCardProp
                 <DeleteOutlineOutlinedIcon />
               </IconButton>
             </div>
+
+            {apikey.expiry_ts ? (
+              <div>
+                {t("expiration_date")}: <span />
+                <Moment format="YYYY-MM-DD">{apikey.expiry_ts}</Moment>
+
+              </div>
+            ) : ""}
+
+
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             {apikey.roles?.sort().map((e, x) => (
@@ -98,9 +101,10 @@ const APIKeyCard = ({ name, apikey, askForDelete, changeApikey }: APIKeyCardProp
 type APIKeysProps = {
   user: User;
   toggleAPIKey: (name: string, apiKey?: ApiKey) => void;
+  reloadApiKey: () => void;
 };
 
-export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
+export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysProps) {
   const { t } = useTranslation(['apikeys']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -117,6 +121,8 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   const [tempExpiryTs, setTempExpiryTs] = useState(null);
   const [tempKeyPriv, setTempKeyPriv] = useState(['R']);
   const [tempKeyRoles, setTempKeyRoles] = useState(configuration.user.priv_role_dependencies.R);
+
+  const [apikeys, SetApikeys] = useState(user.apikeys);
 
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_]*$');
@@ -207,7 +213,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
     setTempKeyName('');
     setTempExpiryTs(null);
     setTempKeyPriv(['R']);
-
+    reloadApiKey();
 
     setTempKeyRoles(configuration.user.priv_role_dependencies.R);
   }
@@ -225,6 +231,12 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
     setTempKeyName(apikey.key_name);
   }
 
+
+  useEffect(() => {
+    SetApikeys(user.apikeys);
+  }, [reloadApiKey, apikeys]);
+
+
   return (
     <>
       <div style={{ display: 'flex', marginBottom: theme.spacing(1), alignItems: 'center' }}>
@@ -233,7 +245,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
         </Typography>
         <Tooltip title={t('apikeys.add')}>
           <IconButton
-            onClick={() => { setCreateNewKey(true) }}
+            onClick={() => { setCreateNewKey(true); }}
             style={{
               color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
             }}
@@ -249,8 +261,8 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
         <Typography variant="subtitle1" gutterBottom>
           {t('apikeys.list')}
         </Typography>
-        {Object.keys(user.apikeys).length !== 0 ? (
-          Object.entries(user.apikeys).map(([name, apikey]) => (
+        {Object.keys(apikeys).length !== 0 ? (
+          Object.entries(apikeys).map(([name, apikey]) => (
             <APIKeyCard key={apikey.id} name={name} apikey={apikey} askForDelete={askForDelete} changeApikey={changeApikey} />
           ))
         ) : (
@@ -263,7 +275,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
       <Dialog
         fullScreen={fullScreen}
         open={createMessage !== null}
-        onClose={() => { setCreateMessage(null) }}
+        onClose={() => { setCreateMessage(null); }}
         aria-labelledby="new-dialog-title"
         aria-describedby="new-dialog-description"
         PaperProps={{ style: { minWidth: '650px' } }}
@@ -385,7 +397,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
               setDate={date => setTempExpiryTs(date)}
               type="input"
               minDateTomorrow
-              defaultDateOffset={createNewKey ? configuration.auth.apikey_max_dtl - 1 : null}
+              defaultDateOffset={createNewKey && configuration.auth.apikey_max_dtl ? configuration.auth.apikey_max_dtl - 1 : null}
             />
           </div>
         </DialogContent>

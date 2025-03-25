@@ -77,9 +77,8 @@ export default function Apikeys() {
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTION);
   const filterValue = useRef<string>('');
-  const [disableButton, setDisableButton] = useState(true);
 
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
+  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer, subscribeCloseDrawer } = useDrawer();
 
   const setApikeyID = useCallback(
     (key_id: string) => {
@@ -88,18 +87,25 @@ export default function Apikeys() {
     [location.pathname, location.search, navigate]
   );
 
-
-
-
-
-  const closeApikeyDrawer = () => {
-    navigate(`${location.pathname}${location.search || ''}`);
-  }
-
   useEffect(() => {
+
+    function reload() {
+      if (!location.hash) closeGlobalDrawer();
+    }
+
+    function closeApikeyDrawer() {
+      navigate(location.pathname);
+      setTimeout(() => reload(), 1000);
+    }
+
     if (!location.hash) closeGlobalDrawer();
-    else setGlobalDrawer(<ApikeyDetail key_id={location.hash.slice(1)} close={closeApikeyDrawer} />);
+    else {
+      setGlobalDrawer(<ApikeyDetail key_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
+      subscribeCloseDrawer(closeApikeyDrawer);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+
+
   }, [location.hash]);
 
   useEffect(() => {
@@ -114,7 +120,7 @@ export default function Apikeys() {
       apiCall({
         url: `/api/v4/apikey/list/?${query.toString()}`,
         onSuccess: api_data => {
-          setApikeySearchResults(api_data.api_response)
+          setApikeySearchResults(api_data.api_response);
 
 
         },
@@ -125,7 +131,7 @@ export default function Apikeys() {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
+  }, [query, location.hash]);
 
 
 
@@ -154,7 +160,7 @@ export default function Apikeys() {
         <Grid container alignItems="center">
           <Grid item xs>
 
-            <Typography variant="h4">Api Keys</Typography>
+            <Typography variant="h4">{t("apikeys.title")}</Typography>
           </Grid>
 
 

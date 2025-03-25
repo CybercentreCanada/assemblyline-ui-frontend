@@ -99,13 +99,12 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
       onEnter: () => { setWaitingDialog(true); },
       onExit: () => {
         setWaitingDialog(false);
-        reload();
         setModified(false);
+        reload();
+        setTimeout(() => close(), 1000);
       }
     });
-
-
-  }
+  };
 
   const handleExpiryDateChange = date => {
     setApikey({ ...apikey, expiry_ts: date });
@@ -153,7 +152,7 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
     <PageCenter margin={!id ? 2 : 4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
-        handleClose={() => setDeleteDialog(false)}
+        handleClose={() => { setDeleteDialog(false); }}
         handleAccept={removeApikey}
         title={t('delete.title')}
         cancelText={t('delete.cancelText')}
@@ -283,7 +282,6 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
 
               </div>
               ) : (<div></div>)}
-
               {apikey ? (<div style={{ marginTop: theme.spacing(2) }}>
                 {currentUser.roles.sort().map((role, role_id) => (
                   <CustomChip
@@ -298,12 +296,7 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
                 }
 
               </div>
-
-
-
               )
-
-
                 : (<div></div>)}
               <RouterPrompt when={modified} />
             </Grid>
@@ -311,7 +304,7 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
 
           <Grid container>
             <Grid item xs={8} sm={8} style={{ textAlign: 'left', flexGrow: 0 }}>
-              <Typography variant="h6">{"Timing Information"}</Typography>
+              <Typography variant="h6">{t("timing.title")}</Typography>
               <Grid item xs={4} sm={4} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                 {
                   apikey ? (
@@ -345,7 +338,7 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
                     </Grid>
 
                     <Grid item xs={6} sm={6}>
-                      <span style={{ fontWeight: 500 }}>Expiration Date</span>
+                      <span style={{ fontWeight: 500 }}>{t("expiration_date")}</span>
                     </Grid>
                     <Grid item xs={6} sm={6} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                       {apikey.expiry_ts ? (<Moment format="YYYY-MM-DD">{apikey.expiry_ts}</Moment>) : <></>}

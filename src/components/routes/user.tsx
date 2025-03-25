@@ -314,11 +314,7 @@ function User({ username = null }: UserProps) {
     });
   }
 
-  useEffectOnce(() => {
-    // Make interface editable
-    setEditable(currentUser.is_admin || currentUser.roles.includes('self_manage'));
-
-    // Load user on start
+  const reloadUser = () => {
     if (currentUser.is_admin || !location.pathname.includes('/admin/')) {
       apiCall({
         url: `/api/v4/user/${username || id}/?load_avatar`,
@@ -327,6 +323,14 @@ function User({ username = null }: UserProps) {
         }
       });
     }
+  };
+
+  useEffectOnce(() => {
+    // Make interface editable
+    setEditable(currentUser.is_admin || currentUser.roles.includes('self_manage'));
+
+    // Load user on start
+    reloadUser();
 
     getQuotas();
   });
@@ -355,159 +359,159 @@ function User({ username = null }: UserProps) {
           >
             {drawerType && user
               ? {
-                  api_quota: (
-                    <>
-                      <Typography variant="h4">{t('api_quota')}</Typography>
-                      <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('api_quota_edit_title')}
-                      </Typography>
-                      <TextField
-                        autoFocus
-                        type="number"
-                        margin="dense"
-                        size="small"
-                        variant="outlined"
-                        InputProps={{ inputProps: { min: 0 } }}
-                        onChange={event => setAPIQuota(event.target.value)}
-                        value={user.api_quota}
-                      />
-                    </>
-                  ),
-                  api_daily_quota: (
-                    <>
-                      <Typography variant="h4">{t('api_daily_quota')}</Typography>
-                      <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('api_daily_quota_edit_title')}
-                      </Typography>
-                      <TextField
-                        autoFocus
-                        type="number"
-                        margin="dense"
-                        size="small"
-                        variant="outlined"
-                        InputProps={{ inputProps: { min: 0 } }}
-                        onChange={event => setDailyAPIQuota(event.target.value)}
-                        value={user.api_daily_quota}
-                      />
-                    </>
-                  ),
-                  change_password: (
-                    <>
-                      <Typography variant="h4" gutterBottom>
-                        {t('change_password')}
-                      </Typography>
-                      <TextField
-                        autoFocus
-                        type="password"
-                        margin="normal"
-                        variant="outlined"
-                        label={t('new_password')}
-                        onChange={event => setNewPassword(event.target.value)}
-                      />
-                      <TextField
-                        type="password"
-                        margin="normal"
-                        variant="outlined"
-                        label={t('confirm_password')}
-                        onChange={event => setConfirmPassword(event.target.value)}
-                      />
-                    </>
-                  ),
-                  groups: (
-                    <>
-                      <Typography variant="h4">{t('groups')}</Typography>
-                      <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('groups_edit_title')}
-                      </Typography>
-                      <Autocomplete
-                        sx={{ margin: theme.spacing(2, 0) }}
-                        multiple
-                        freeSolo
-                        options={[]}
-                        value={user.groups}
-                        renderInput={params => <TextField {...params} />}
-                        renderTags={(value, getTagProps) =>
-                          value.map((option, index) => (
-                            <Chip key={index} variant="outlined" label={option} {...getTagProps({ index })} />
-                          ))
-                        }
-                        onChange={(_, value) => setGroups([...new Set(value.map(x => x.toUpperCase()))])}
-                      />
-                    </>
-                  ),
-                  name: (
-                    <>
-                      <Typography variant="h4">{t('name')}</Typography>
-                      <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('name_edit_title')}
-                      </Typography>
-                      <TextField
-                        autoFocus
-                        margin="normal"
-                        variant="outlined"
-                        onChange={event => setName(event.target.value)}
-                        value={user.name}
-                      />
-                    </>
-                  ),
-                  submission_quota: (
-                    <>
-                      <Typography variant="h4">{t('submission_quota')}</Typography>
-                      <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('submission_quota_edit_title')}
-                      </Typography>
-                      <TextField
-                        autoFocus
-                        type="number"
-                        margin="normal"
-                        variant="outlined"
-                        InputProps={{ inputProps: { min: 0 } }}
-                        onChange={event => setSubmissionQuota(event.target.value)}
-                        value={user.submission_quota}
-                      />
-                    </>
-                  ),
-                  submission_async_quota: (
-                    <>
-                      <Typography variant="h4">{t('submission_async_quota')}</Typography>
-                      <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('submission_async_quota_edit_title')}
-                      </Typography>
-                      <TextField
-                        autoFocus
-                        type="number"
-                        margin="normal"
-                        variant="outlined"
-                        InputProps={{ inputProps: { min: 0 } }}
-                        onChange={event => setAsyncSubmissionQuota(event.target.value)}
-                        value={user.submission_async_quota}
-                      />
-                    </>
-                  ),
-                  submission_daily_quota: (
-                    <>
-                      <Typography variant="h4">{t('submission_daily_quota')}</Typography>
-                      <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('submission_daily_quota_edit_title')}
-                      </Typography>
-                      <TextField
-                        autoFocus
-                        type="number"
-                        margin="dense"
-                        size="small"
-                        variant="outlined"
-                        InputProps={{ inputProps: { min: 0 } }}
-                        onChange={event => setDailySubmissionQuota(event.target.value)}
-                        value={user.submission_daily_quota}
-                      />
-                    </>
-                  ),
-                  otp: <OTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
-                  disable_otp: <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
-                  token: <SecurityToken user={user} toggleToken={toggleToken} />,
-                  api_key: <APIKeys user={user} toggleAPIKey={toggleAPIKey} />,
-                  apps: <Apps user={user} toggleApp={toggleApp} />
-                }[drawerType]
+                api_quota: (
+                  <>
+                    <Typography variant="h4">{t('api_quota')}</Typography>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('api_quota_edit_title')}
+                    </Typography>
+                    <TextField
+                      autoFocus
+                      type="number"
+                      margin="dense"
+                      size="small"
+                      variant="outlined"
+                      InputProps={{ inputProps: { min: 0 } }}
+                      onChange={event => setAPIQuota(event.target.value)}
+                      value={user.api_quota}
+                    />
+                  </>
+                ),
+                api_daily_quota: (
+                  <>
+                    <Typography variant="h4">{t('api_daily_quota')}</Typography>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('api_daily_quota_edit_title')}
+                    </Typography>
+                    <TextField
+                      autoFocus
+                      type="number"
+                      margin="dense"
+                      size="small"
+                      variant="outlined"
+                      InputProps={{ inputProps: { min: 0 } }}
+                      onChange={event => setDailyAPIQuota(event.target.value)}
+                      value={user.api_daily_quota}
+                    />
+                  </>
+                ),
+                change_password: (
+                  <>
+                    <Typography variant="h4" gutterBottom>
+                      {t('change_password')}
+                    </Typography>
+                    <TextField
+                      autoFocus
+                      type="password"
+                      margin="normal"
+                      variant="outlined"
+                      label={t('new_password')}
+                      onChange={event => setNewPassword(event.target.value)}
+                    />
+                    <TextField
+                      type="password"
+                      margin="normal"
+                      variant="outlined"
+                      label={t('confirm_password')}
+                      onChange={event => setConfirmPassword(event.target.value)}
+                    />
+                  </>
+                ),
+                groups: (
+                  <>
+                    <Typography variant="h4">{t('groups')}</Typography>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('groups_edit_title')}
+                    </Typography>
+                    <Autocomplete
+                      sx={{ margin: theme.spacing(2, 0) }}
+                      multiple
+                      freeSolo
+                      options={[]}
+                      value={user.groups}
+                      renderInput={params => <TextField {...params} />}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                          <Chip key={index} variant="outlined" label={option} {...getTagProps({ index })} />
+                        ))
+                      }
+                      onChange={(_, value) => setGroups([...new Set(value.map(x => x.toUpperCase()))])}
+                    />
+                  </>
+                ),
+                name: (
+                  <>
+                    <Typography variant="h4">{t('name')}</Typography>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('name_edit_title')}
+                    </Typography>
+                    <TextField
+                      autoFocus
+                      margin="normal"
+                      variant="outlined"
+                      onChange={event => setName(event.target.value)}
+                      value={user.name}
+                    />
+                  </>
+                ),
+                submission_quota: (
+                  <>
+                    <Typography variant="h4">{t('submission_quota')}</Typography>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('submission_quota_edit_title')}
+                    </Typography>
+                    <TextField
+                      autoFocus
+                      type="number"
+                      margin="normal"
+                      variant="outlined"
+                      InputProps={{ inputProps: { min: 0 } }}
+                      onChange={event => setSubmissionQuota(event.target.value)}
+                      value={user.submission_quota}
+                    />
+                  </>
+                ),
+                submission_async_quota: (
+                  <>
+                    <Typography variant="h4">{t('submission_async_quota')}</Typography>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('submission_async_quota_edit_title')}
+                    </Typography>
+                    <TextField
+                      autoFocus
+                      type="number"
+                      margin="normal"
+                      variant="outlined"
+                      InputProps={{ inputProps: { min: 0 } }}
+                      onChange={event => setAsyncSubmissionQuota(event.target.value)}
+                      value={user.submission_async_quota}
+                    />
+                  </>
+                ),
+                submission_daily_quota: (
+                  <>
+                    <Typography variant="h4">{t('submission_daily_quota')}</Typography>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('submission_daily_quota_edit_title')}
+                    </Typography>
+                    <TextField
+                      autoFocus
+                      type="number"
+                      margin="dense"
+                      size="small"
+                      variant="outlined"
+                      InputProps={{ inputProps: { min: 0 } }}
+                      onChange={event => setDailySubmissionQuota(event.target.value)}
+                      value={user.submission_daily_quota}
+                    />
+                  </>
+                ),
+                otp: <OTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
+                disable_otp: <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
+                token: <SecurityToken user={user} toggleToken={toggleToken} />,
+                api_key: <APIKeys user={user} toggleAPIKey={toggleAPIKey} reloadApiKey={reloadUser} />,
+                apps: <Apps user={user} toggleApp={toggleApp} />
+              }[drawerType]
               : null}
           </div>
         </Drawer>

@@ -66,7 +66,7 @@ export const PRIV_TO_ACL_MAP = {
   "READ_WRITE": ["R", "W"],
   "EXTENDED": ["E"],
   "CUSTOM": ["C"]
-}
+};
 
 
 export type Type = (typeof TYPES)[number];
