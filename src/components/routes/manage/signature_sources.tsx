@@ -139,11 +139,18 @@ const queueSourceUpdate = (source: UpdateSource) => ({
 type SourceDetailDrawerProps = {
   service: string;
   base: UpdateSource;
+  defaults: UpdateSource;
   generatesSignatures: UpdateConfig['generates_signatures'];
   onClose?: () => void;
 };
 
-const WrappedSourceDetailDrawer = ({ service, base, onClose, generatesSignatures }: SourceDetailDrawerProps) => {
+const WrappedSourceDetailDrawer = ({
+  service,
+  base,
+  defaults,
+  onClose,
+  generatesSignatures
+}: SourceDetailDrawerProps) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -168,13 +175,13 @@ const WrappedSourceDetailDrawer = ({ service, base, onClose, generatesSignatures
 
   const saveChanges = () => {
     apiCall({
-      method: base ? 'POST' : 'PUT',
-      url: base
+      method: base?.name ? 'POST' : 'PUT',
+      url: base?.name
         ? `/api/v4/signature/sources/${service}/${encodeURIComponent(source.name)}/`
         : `/api/v4/signature/sources/${service}/`,
       body: source,
       onSuccess: () => {
-        showSuccessMessage(t(base ? 'change.success' : 'add.success'));
+        showSuccessMessage(t(base?.name ? 'change.success' : 'add.success'));
         setModified(false);
         if (!base || !isXL) onClose();
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadUpdateSources')), 1000);
@@ -324,8 +331,8 @@ const WrappedSourceDetailDrawer = ({ service, base, onClose, generatesSignatures
         </div>
         <SourceDetail
           source={source}
-          defaults={null}
-          addMode={!base}
+          defaults={defaults}
+          addMode={!base?.name}
           setSource={setSource}
           setModified={setModified}
           showDetails={false}
@@ -503,12 +510,21 @@ type ServiceDetailProps = {
   service: string;
   sources: UpdateConfig['sources'];
   generatesSignatures: UpdateConfig['generates_signatures'];
+  updateIntervalSeconds: UpdateConfig['update_interval_seconds'];
+  defaultPattern: UpdateConfig['default_pattern'];
 };
 
-const ServiceDetail = ({ service, sources, generatesSignatures }: ServiceDetailProps) => {
+const ServiceDetail = ({
+  service,
+  sources,
+  generatesSignatures,
+  updateIntervalSeconds,
+  defaultPattern
+}: ServiceDetailProps) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const classes = useStyles();
+  const { c12nDef } = useALContext();
   const { apiCall } = useMyAPI();
   const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const { showSuccessMessage } = useMySnackbar();
@@ -527,11 +543,12 @@ const ServiceDetail = ({ service, sources, generatesSignatures }: ServiceDetailP
     });
   };
 
-  const openDrawer = useCallback((currentService: string, source) => {
+  const openDrawer = useCallback((currentService: string, source, defaults) => {
     setGlobalDrawer(
       <SourceDetailDrawer
         service={currentService}
         base={source}
+        defaults={defaults}
         generatesSignatures={generatesSignatures}
         onClose={closeGlobalDrawer}
       />
@@ -561,7 +578,22 @@ const ServiceDetail = ({ service, sources, generatesSignatures }: ServiceDetailP
                   color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
                   margin: '-4px 0'
                 }}
-                onClick={() => openDrawer(service, null)}
+                onClick={() =>
+                  openDrawer(
+                    service,
+                    {
+                      ...DEFAULT_SOURCE,
+                      update_interval: updateIntervalSeconds,
+                      default_classification: c12nDef.UNRESTRICTED,
+                      pattern: defaultPattern
+                    },
+                    {
+                      update_interval: updateIntervalSeconds,
+                      default_classification: c12nDef.UNRESTRICTED,
+                      pattern: defaultPattern
+                    }
+                  )
+                }
                 size="large"
               >
                 <AddCircleOutlineOutlinedIcon />
@@ -610,7 +642,7 @@ const ServiceDetail = ({ service, sources, generatesSignatures }: ServiceDetailP
                   key={id}
                   source={source}
                   service={service}
-                  onClick={() => openDrawer(service, source)}
+                  onClick={() => openDrawer(service, source, source)}
                   generatesSignatures={generatesSignatures}
                 />
               ))
@@ -623,7 +655,18 @@ const ServiceDetail = ({ service, sources, generatesSignatures }: ServiceDetailP
         </Collapse>
       </div>
     ),
-    [classes.title, generatesSignatures, open, openDrawer, service, sources, t, theme, triggerSourceUpdateAll]
+    [
+      classes.title,
+      generatesSignatures,
+      open,
+      openDrawer,
+      service,
+      sources,
+      t,
+      theme,
+      triggerSourceUpdateAll,
+      updateIntervalSeconds
+    ]
   );
 };
 
@@ -674,6 +717,8 @@ export default function SignatureSources() {
                 service={key}
                 sources={sources[key].sources}
                 generatesSignatures={sources[key].generates_signatures}
+                updateIntervalSeconds={sources[key].update_interval_seconds}
+                defaultPattern={sources[key].default_pattern}
               />
             ))
           : [...Array(2)].map((item, i) => (

@@ -52,7 +52,7 @@ const WrappedSourceDialog = ({ open, setOpen, source = null, defaults, onSave }:
           <DialogContent>
             <SourceDetail
               source={tempSource}
-              addMode={!source}
+              addMode={!source?.name}
               defaults={defaults}
               setSource={setTempSource}
               setModified={setModified}

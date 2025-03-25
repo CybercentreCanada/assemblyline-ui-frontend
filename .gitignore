@@ -20,6 +20,7 @@ __pycache__
 /docker/classification.yml
 /docker/.env
 .DS_Store
+.env
 .env*.local
 
 npm-debug.log*

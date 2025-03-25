@@ -239,14 +239,7 @@ export default function Services() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(
-        <ServiceDetail
-          name={location.hash.slice(1)}
-          serviceNames={serviceNames}
-          onDeleted={onDeleted}
-          onUpdated={onUpdated}
-        />
-      );
+      setGlobalDrawer(<ServiceDetail name={location.hash.slice(1)} onDeleted={onDeleted} onUpdated={onUpdated} />);
     } else {
       closeGlobalDrawer();
     }
