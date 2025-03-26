@@ -86,8 +86,9 @@ function RouteActions() {
 
     // Patch window title
     const currentLocation = pathname.split('/').join(' ').trim();
-    document.title = `${APP_NAME} | ${currentLocation ? currentLocation.charAt(0).toUpperCase() + currentLocation.slice(1) : 'Submit'
-      }`;
+    document.title = `${APP_NAME} | ${
+      currentLocation ? currentLocation.charAt(0).toUpperCase() + currentLocation.slice(1) : 'Submit'
+    }`;
 
     closeTemporaryDrawer();
 

@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-  Grid,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
+import { Grid, useMediaQuery, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -23,9 +19,7 @@ import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import ApikeyDetail from './apikey_detail';
 
-
 const PAGE_SIZE = 25;
-
 
 const useStyles = makeStyles(theme => ({
   searchresult: {
@@ -51,16 +45,12 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-
 type ApikeyResponse = {
   items: ApiKey[];
   rows: number;
   offset: number;
   total: number;
-}
-
-
-
+};
 
 export default function Apikeys() {
   const { t } = useTranslation(['apikeys']);
@@ -88,7 +78,6 @@ export default function Apikeys() {
   );
 
   useEffect(() => {
-
     function reload() {
       if (!location.hash) closeGlobalDrawer();
     }
@@ -104,8 +93,6 @@ export default function Apikeys() {
       subscribeCloseDrawer(closeApikeyDrawer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-
-
   }, [location.hash]);
 
   useEffect(() => {
@@ -121,8 +108,6 @@ export default function Apikeys() {
         url: `/api/v4/apikey/list/?${query.toString()}`,
         onSuccess: api_data => {
           setApikeySearchResults(api_data.api_response);
-
-
         },
         onFinalize: () => {
           setSearching(false);
@@ -132,8 +117,6 @@ export default function Apikeys() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, location.hash]);
-
-
 
   const onClear = () => {
     navigate(location.pathname);
@@ -152,18 +135,13 @@ export default function Apikeys() {
     filterValue.current = inputValue;
   };
 
-
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
-
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
           <Grid item xs>
-
-            <Typography variant="h4">{t("apikeys.title")}</Typography>
+            <Typography variant="h4">{t('apikeys.title')}</Typography>
           </Grid>
-
-
         </Grid>
       </div>
 
@@ -194,7 +172,6 @@ export default function Apikeys() {
                     )}
                   </Typography>
                 )}
-
               </div>
             )}
           </SearchBar>

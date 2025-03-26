@@ -53,21 +53,20 @@ export const SCOPES = ['r', 'w', 'rw', 'c'] as const;
 export const ACL_VALUES = ['R', 'W', 'E', 'C'] as const;
 
 export const ACL_TO_PRIV_MAP = {
-  "R": "READ",
-  "W": "WRITE",
-  "RW": "READ_WRITE",
-  "E": "EXTENDED",
-  "C": "CUSTOM"
+  R: 'READ',
+  W: 'WRITE',
+  RW: 'READ_WRITE',
+  E: 'EXTENDED',
+  C: 'CUSTOM'
 } as const;
 
 export const PRIV_TO_ACL_MAP = {
-  "READ": ["R"],
-  "WRITE": ["W"],
-  "READ_WRITE": ["R", "W"],
-  "EXTENDED": ["E"],
-  "CUSTOM": ["C"]
+  READ: ['R'],
+  WRITE: ['W'],
+  READ_WRITE: ['R', 'W'],
+  EXTENDED: ['E'],
+  CUSTOM: ['C']
 };
-
 
 export type Type = (typeof TYPES)[number];
 export type Role = (typeof ROLES)[number];
@@ -96,8 +95,6 @@ export type ApiKey = {
   last_used?: string;
 
   id?: string;
-
-
 };
 
 /** Model of Apps used of OBO (On Behalf Of) */

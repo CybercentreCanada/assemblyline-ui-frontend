@@ -33,8 +33,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 
-
-
 type APIKeyCardProps = {
   name: string;
   apikey: ApiKey;
@@ -45,7 +43,6 @@ type APIKeyCardProps = {
 const APIKeyCard = ({ name, apikey, askForDelete, changeApikey }: APIKeyCardProps) => {
   const { t } = useTranslation(['apikeys']);
   const theme = useTheme();
-
 
   return (
     <Card
@@ -58,12 +55,9 @@ const APIKeyCard = ({ name, apikey, askForDelete, changeApikey }: APIKeyCardProp
       variant="outlined"
     >
       <CardActionArea>
-        <CardContent >
-
-
+        <CardContent>
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), alignItems: 'center' }}>
             <Typography style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{apikey.key_name}</Typography>
-
 
             <div>
               <IconButton size="small" onClick={() => changeApikey(apikey)}>
@@ -77,13 +71,12 @@ const APIKeyCard = ({ name, apikey, askForDelete, changeApikey }: APIKeyCardProp
 
             {apikey.expiry_ts ? (
               <div>
-                {t("expiration_date")}: <span />
+                {t('expiration_date')}: <span />
                 <Moment format="YYYY-MM-DD">{apikey.expiry_ts}</Moment>
-
               </div>
-            ) : ""}
-
-
+            ) : (
+              ''
+            )}
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             {apikey.roles?.sort().map((e, x) => (
@@ -94,7 +87,7 @@ const APIKeyCard = ({ name, apikey, askForDelete, changeApikey }: APIKeyCardProp
           </div>
         </CardContent>
       </CardActionArea>
-    </Card >
+    </Card>
   );
 };
 
@@ -142,18 +135,19 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
   }
 
   function handleCreate() {
-
     apiCall({
       method: 'PUT',
       body: {
-        'key_name': tempKeyName,
-        'roles': tempKeyRoles,
-        'expiry_ts': tempExpiryTs,
-        'priv': tempKeyPriv,
+        key_name: tempKeyName,
+        roles: tempKeyRoles,
+        expiry_ts: tempExpiryTs,
+        priv: tempKeyPriv
       },
-      url: `/api/v4/apikey/add/` + (createNewKey ? "" : `?keyid=${encodeURIComponent(tempAPIKey.id)}`),
+      url: `/api/v4/apikey/add/` + (createNewKey ? '' : `?keyid=${encodeURIComponent(tempAPIKey.id)}`),
       onSuccess: api_data => {
-        createNewKey ? setCreateMessage(api_data.api_response.keypassword) : showSuccessMessage(`Key ${api_data.api_response.key_name} Successfully updated.`);
+        createNewKey
+          ? setCreateMessage(api_data.api_response.keypassword)
+          : showSuccessMessage(`Key ${api_data.api_response.key_name} Successfully updated.`);
 
         setCreateNewKey(false);
         setModifyApikey(false);
@@ -169,7 +163,6 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
         });
       }
     });
-
   }
 
   function handleKeyNameChange(event) {
@@ -231,11 +224,9 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
     setTempKeyName(apikey.key_name);
   }
 
-
   useEffect(() => {
     SetApikeys(user.apikeys);
   }, [reloadApiKey, apikeys]);
-
 
   return (
     <>
@@ -245,7 +236,9 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
         </Typography>
         <Tooltip title={t('apikeys.add')}>
           <IconButton
-            onClick={() => { setCreateNewKey(true); }}
+            onClick={() => {
+              setCreateNewKey(true);
+            }}
             style={{
               color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
             }}
@@ -263,7 +256,13 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
         </Typography>
         {Object.keys(apikeys).length !== 0 ? (
           Object.entries(apikeys).map(([name, apikey]) => (
-            <APIKeyCard key={apikey.id} name={name} apikey={apikey} askForDelete={askForDelete} changeApikey={changeApikey} />
+            <APIKeyCard
+              key={apikey.id}
+              name={name}
+              apikey={apikey}
+              askForDelete={askForDelete}
+              changeApikey={changeApikey}
+            />
           ))
         ) : (
           <Typography variant="subtitle2" color="secondary">
@@ -275,7 +274,9 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
       <Dialog
         fullScreen={fullScreen}
         open={createMessage !== null}
-        onClose={() => { setCreateMessage(null); }}
+        onClose={() => {
+          setCreateMessage(null);
+        }}
         aria-labelledby="new-dialog-title"
         aria-describedby="new-dialog-description"
         PaperProps={{ style: { minWidth: '650px' } }}
@@ -295,9 +296,13 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
                 }}
               >
                 <Typography component="span" style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  {createMessage ? createMessage : ""}
+                  {createMessage ? createMessage : ''}
                 </Typography>
-                <IconButton color="primary" size="large" onClick={() => copy(createMessage ? createMessage : "", 'drawerTop')}>
+                <IconButton
+                  color="primary"
+                  size="large"
+                  onClick={() => copy(createMessage ? createMessage : '', 'drawerTop')}
+                >
                   <BsClipboard fontSize="large" />
                 </IconButton>
               </Card>
@@ -349,7 +354,9 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{createNewKey ? t('apikeys.add_title') : t("apikeys.modify_title")}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {createNewKey ? t('apikeys.add_title') : t('apikeys.modify_title')}
+        </DialogTitle>
         <DialogContent>
           <TextField
             style={{ width: '100%' }}
@@ -365,13 +372,11 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
           <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
             <div style={{ alignSelf: 'center', flexGrow: 2 }}>
               <FormControl size="small">
-                <Select id="priv" value={tempKeyPriv.join("")} onChange={handleSelectChange} variant="outlined">
+                <Select id="priv" value={tempKeyPriv.join('')} onChange={handleSelectChange} variant="outlined">
                   <MenuItem value="R">{t('apikeys.r_token')}</MenuItem>
                   <MenuItem value="RW">{t('apikeys.rw_token')}</MenuItem>
                   <MenuItem value="W">{t('apikeys.w_token')}</MenuItem>
-                  {configuration.auth.allow_extended_apikeys && (
-                    <MenuItem value="E">{t('apikeys.e_token')}</MenuItem>
-                  )}
+                  {configuration.auth.allow_extended_apikeys && <MenuItem value="E">{t('apikeys.e_token')}</MenuItem>}
                   <MenuItem value="C">{t('apikeys.c_token')}</MenuItem>
                 </Select>
               </FormControl>
@@ -390,14 +395,16 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
             ))}
           </div>
           <div>
-            {t("expiration_date")} <span />
+            {t('expiration_date')} <span />
             <DatePicker
               aria-labelledby="expiry_ts-label"
               date={tempExpiryTs}
               setDate={date => setTempExpiryTs(date)}
               type="input"
               minDateTomorrow
-              defaultDateOffset={createNewKey && configuration.auth.apikey_max_dtl ? configuration.auth.apikey_max_dtl - 1 : null}
+              defaultDateOffset={
+                createNewKey && configuration.auth.apikey_max_dtl ? configuration.auth.apikey_max_dtl - 1 : null
+              }
             />
           </div>
         </DialogContent>
