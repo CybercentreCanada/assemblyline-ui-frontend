@@ -17,7 +17,7 @@ import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { type ApiKey } from 'components/models/base/user';
+import { ACL, Role, type ApiKey } from 'components/models/base/user';
 import ForbiddenPage from 'components/routes/403';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
@@ -49,19 +49,12 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const navigate = useNavigate();
-  const [modified, setModified] = useState(false);
-  const [buttonLoading, setButtonLoading] = useState(false);
+  const [modified, setModified] = useState<boolean>(false);
+  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
 
-  const [tempExpiryTs, setTempExpiryTs] = useState(null);
-  const [tempKeyPriv, setTempKeyPriv] = useState(['R']);
-  const [tempKeyRoles, setTempKeyRoles] = useState(configuration.user.priv_role_dependencies.R);
-
-  useEffect(() => {
-    if (key_id || id) {
-      reload();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key_id, id]);
+  const [tempExpiryTs, setTempExpiryTs] = useState<string>(null);
+  const [tempKeyPriv, setTempKeyPriv] = useState<ACL[]>(['R']);
+  const [tempKeyRoles, setTempKeyRoles] = useState<Role[]>(configuration.user.priv_role_dependencies.R);
 
   const reload = () => {
     apiCall({
@@ -153,6 +146,13 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
 
     setModified(true);
   }
+
+  useEffect(() => {
+    if (key_id || id) {
+      reload();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key_id, id]);
 
   return currentUser.is_admin ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">

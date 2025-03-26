@@ -25,7 +25,7 @@ import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { ApiKey, User } from 'components/models/base/user';
+import { ACL, ApiKey, Role, User } from 'components/models/base/user';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
 import Moment from 'components/visual/Moment';
@@ -105,15 +105,15 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
   const { copy } = useClipboard();
   const { showSuccessMessage } = useMySnackbar();
 
-  const [modifyApikey, setModifyApikey] = useState(false);
-  const [createNewKey, setCreateNewKey] = useState(false);
-  const [deleteApikeyId, setDeleteApikeyId] = useState(null);
+  const [modifyApikey, setModifyApikey] = useState<boolean>(false);
+  const [createNewKey, setCreateNewKey] = useState<boolean>(false);
+  const [deleteApikeyId, setDeleteApikeyId] = useState<string>(null);
   const [tempAPIKey, setTempAPIKey] = useState<ApiKey>(null);
-  const [createMessage, setCreateMessage] = useState(null);
-  const [tempKeyName, setTempKeyName] = useState('');
-  const [tempExpiryTs, setTempExpiryTs] = useState(null);
-  const [tempKeyPriv, setTempKeyPriv] = useState(['R']);
-  const [tempKeyRoles, setTempKeyRoles] = useState(configuration.user.priv_role_dependencies.R);
+  const [createMessage, setCreateMessage] = useState<string>(null);
+  const [tempKeyName, setTempKeyName] = useState<string>('');
+  const [tempExpiryTs, setTempExpiryTs] = useState<string>(null);
+  const [tempKeyPriv, setTempKeyPriv] = useState<ACL[]>(['R']);
+  const [tempKeyRoles, setTempKeyRoles] = useState<Role[]>(configuration.user.priv_role_dependencies.R);
 
   const [apikeys, SetApikeys] = useState(user.apikeys);
 

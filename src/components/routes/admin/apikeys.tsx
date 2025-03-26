@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Grid, useMediaQuery, useTheme } from '@mui/material';
+import { Grid, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -54,8 +54,8 @@ type ApikeyResponse = {
 
 export default function Apikeys() {
   const { t } = useTranslation(['apikeys']);
-  const [pageSize] = useState(PAGE_SIZE);
-  const [searching, setSearching] = useState(false);
+  const [pageSize] = useState<number>(PAGE_SIZE);
+  const [searching, setSearching] = useState<boolean>(false);
   const { user: currentUser, c12nDef, configuration } = useALContext();
   const [apikeySearchResults, setApikeySearchResults] = useState<ApikeySearchResults>(null);
   const location = useLocation();
@@ -64,8 +64,7 @@ export default function Apikeys() {
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const upMD = useMediaQuery(theme.breakpoints.up('md'));
-  const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTION);
+  const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
   const filterValue = useRef<string>('');
 
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer, subscribeCloseDrawer } = useDrawer();
@@ -76,6 +75,23 @@ export default function Apikeys() {
     },
     [location.pathname, location.search, navigate]
   );
+
+  const onClear = () => {
+    navigate(location.pathname);
+  };
+
+  const onSearch = () => {
+    if (filterValue.current !== '') {
+      query.set('query', filterValue.current);
+      navigate(`${location.pathname}?${query.toString()}`);
+    } else {
+      onClear();
+    }
+  };
+
+  const onFilterValueChange = (inputValue: string) => {
+    filterValue.current = inputValue;
+  };
 
   useEffect(() => {
     function reload() {
@@ -117,23 +133,6 @@ export default function Apikeys() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, location.hash]);
-
-  const onClear = () => {
-    navigate(location.pathname);
-  };
-
-  const onSearch = () => {
-    if (filterValue.current !== '') {
-      query.set('query', filterValue.current);
-      navigate(`${location.pathname}?${query.toString()}`);
-    } else {
-      onClear();
-    }
-  };
-
-  const onFilterValueChange = (inputValue: string) => {
-    filterValue.current = inputValue;
-  };
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>

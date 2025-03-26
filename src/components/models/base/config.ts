@@ -67,6 +67,7 @@ export type Auth = {
   /** Allow security tokens? */
   allow_security_tokens: boolean;
 
+  /** maximum days to live for API keys */
   apikey_max_dtl: number;
 };
 
