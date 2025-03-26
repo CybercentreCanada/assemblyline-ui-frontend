@@ -266,6 +266,9 @@ export type UpdateSource = {
   /** Pattern used to find files of interest from source */
   pattern?: string;
 
+  /** Data that's sent in POST requests */
+  data?: string;
+
   /** Private key used to authenticate with source */
   private_key?: string;
 
@@ -295,6 +298,9 @@ export type UpdateSource = {
 export type UpdateConfig = {
   /** Custom delimiter definition */
   custom_delimiter?: string;
+
+  /** Default pattern for finding signatures*/
+  default_pattern: string
 
   /** Does the updater produce signatures? */
   generates_signatures: boolean;
@@ -450,6 +456,7 @@ export const DEFAULT_SOURCE: UpdateSource = {
   override_classification: false,
   password: '',
   pattern: '',
+  data: null,
   private_key: '',
   proxy: '',
   ssl_ignore_errors: false,

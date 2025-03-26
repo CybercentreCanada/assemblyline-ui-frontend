@@ -69,6 +69,7 @@ const WrappedSourceDetail = ({
   const [showPrivateKey, setShowPrivateKey] = useState<boolean>(false);
 
   const gitFetch = useMemo<boolean>(() => source.fetch_method === 'GIT', [source.fetch_method]);
+  const postFetch = useMemo<boolean>(() => source.fetch_method === 'POST', [source.fetch_method]);
 
   const handleFieldChange = useCallback(
     event => {
@@ -114,6 +115,14 @@ const WrappedSourceDetail = ({
           return { name: header[0], value: header[1] } as EnvironmentVariable;
         })
       });
+      setModified(true);
+    },
+    [setModified, setSource, source]
+  );
+
+  const handlePostDataChange = useCallback(
+    event => {
+      setSource({ ...source, data: event.updated_src });
       setModified(true);
     },
     [setModified, setSource, source]
@@ -470,7 +479,22 @@ const WrappedSourceDetail = ({
                         }}
                       />
                     </Grid>
-
+                    {postFetch && (
+                      <Grid item xs={12}>
+                        <div className={classes.label}>{t('post_data')}</div>
+                        <TextField
+                          id="data"
+                          size="small"
+                          value={source.data}
+                          multiline
+                          rows={6}
+                          fullWidth
+                          variant="outlined"
+                          InputProps={{ style: { fontFamily: 'monospace' } }}
+                          onChange={handleFieldChange}
+                        />
+                      </Grid>
+                    )}
                     <Grid item xs={12}>
                       <div className={classes.label}>
                         {t('proxy')}
