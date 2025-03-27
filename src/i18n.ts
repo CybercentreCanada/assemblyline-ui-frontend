@@ -18,6 +18,7 @@ import adminSiteMapEN from 'locales/en/admin/site_map.json';
 import adminTagSafelistEN from 'locales/en/admin/tag_safelist.json';
 import adminUsersEN from 'locales/en/admin/users.json';
 import alertsEN from 'locales/en/alerts.json';
+import apikeysEN from 'locales/en/apikeys.json';
 import archiveEN from 'locales/en/archive.json';
 import assistantEN from 'locales/en/assistant.json';
 import authorizeEN from 'locales/en/authorize.json';
@@ -71,6 +72,7 @@ import adminSiteMapFR from 'locales/fr/admin/site_map.json';
 import adminTagSafelistFR from 'locales/fr/admin/tag_safelist.json';
 import adminUsersFR from 'locales/fr/admin/users.json';
 import alertsFR from 'locales/fr/alerts.json';
+import apikeysFR from 'locales/fr/apikeys.json';
 import archiveFR from 'locales/fr/archive.json';
 import assistantFR from 'locales/fr/assistant.json';
 import authorizeFR from 'locales/fr/authorize.json';
@@ -126,6 +128,7 @@ const resources = {
     adminTagSafelist: adminTagSafelistEN,
     adminUsers: adminUsersEN,
     alerts: alertsEN,
+    apikeys: apikeysEN,
     archive: archiveEN,
     assistant: assistantEN,
     authorize: authorizeEN,
@@ -184,6 +187,7 @@ const resources = {
     adminTagSafelist: adminTagSafelistFR,
     adminUsers: adminUsersFR,
     alerts: alertsFR,
+    apikeys: apikeysFR,
     archive: archiveFR,
     assistant: assistantFR,
     authorize: authorizeFR,

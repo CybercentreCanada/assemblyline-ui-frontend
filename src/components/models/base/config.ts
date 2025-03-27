@@ -69,6 +69,9 @@ export type Auth = {
 
   /** Allow security tokens? */
   allow_security_tokens: boolean;
+
+  /** maximum days to live for API keys */
+  apikey_max_dtl: number;
 };
 
 /** Malware Archive Configuration */
@@ -600,7 +603,8 @@ export const CONFIGURATION: Configuration = {
     allow_2fa: false,
     allow_apikeys: false,
     allow_extended_apikeys: false,
-    allow_security_tokens: false
+    allow_security_tokens: false,
+    apikey_max_dtl: null
   },
   core: {
     archiver: {

@@ -16,6 +16,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
@@ -372,6 +373,13 @@ const useMyPreferences = () => {
               i18nKey: 'adminmenu.users',
               route: '/admin/users',
               icon: <SupervisorAccountOutlinedIcon />,
+              nested: true
+            },
+            {
+              id: 'adminmenu.apikeys',
+              i18nKey: 'adminmenu.apikeys',
+              route: '/admin/apikeys',
+              icon: <KeyOutlinedIcon />,
               nested: true
             }
           ]
