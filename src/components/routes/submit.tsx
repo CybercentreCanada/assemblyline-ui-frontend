@@ -140,12 +140,12 @@ const Submit = () => {
     flow.off('fileError');
     flow.off('progress');
     setUUID(generateUUID());
-    warnOnReload(false);
+    warnOnUnload(false);
   };
 
   // If true, will show a "Reload Site?" warning when the user tries to navigate away from the page
   // If false, will not show the warning
-  const warnOnReload = (warn: boolean) => {
+  const warnOnUnload = (warn: boolean) => {
     window.onbeforeunload = warn ? () => true : null;
   };
 
@@ -153,7 +153,7 @@ const Submit = () => {
     flow.opts.generateUniqueIdentifier = getFileUUID;
     setAllowClick(false);
     setUploadProgress(0);
-    warnOnReload(true);
+    warnOnUnload(true);
 
     flow.on('fileError', (event, api_data) => {
       try {
@@ -182,7 +182,7 @@ const Submit = () => {
       setUploadProgress(Math.trunc(flow.progress() * 100));
     });
     flow.on('complete', () => {
-      warnOnReload(false);
+      warnOnUnload(false);
 
       if (flow.files.length === 0) {
         return;
