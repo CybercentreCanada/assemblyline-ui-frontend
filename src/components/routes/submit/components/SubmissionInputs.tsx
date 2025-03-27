@@ -310,7 +310,7 @@ const AutoURLServicesSelection = React.memo(({ hasURLservices = false }: { hasUR
       categories.forEach((category, i) => {
         category.services.forEach((service, j) => {
           if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
-            current.push([i, j, categories[i].services[j].selected]);
+            current.push([i, j]);
             categories[i].services[j].selected = true;
           }
         });
@@ -335,8 +335,8 @@ const AutoURLServicesSelection = React.memo(({ hasURLservices = false }: { hasUR
     if (urlServices.length == 0) return;
 
     form.setFieldValue('settings.services', categories => {
-      urlServices.forEach(([i, j, value]) => {
-        categories[i].services[j].selected = value;
+      urlServices.forEach(([i, j]) => {
+        categories[i].services[j].selected = categories[i].services[j].default;
       });
 
       categories.forEach((category, i) => {
@@ -369,8 +369,14 @@ export const ExternalServices = React.memo(() => {
           [
             state.values.state.tab === 'hash' &&
               state.values.hash.type === 'url' &&
-              state.values.settings.services.some(cat =>
-                cat.services.some(svr => configuration.ui.url_submission_auto_service_selection.includes(svr.name))
+              state.values.settings.services.some(
+                cat =>
+                  (state.values.state.customize || !cat.restricted) &&
+                  cat.services.some(
+                    svr =>
+                      (state.values.state.customize || !svr.restricted) &&
+                      configuration.ui.url_submission_auto_service_selection.includes(svr.name)
+                  )
               )
           ] as const
         }
@@ -382,10 +388,11 @@ export const ExternalServices = React.memo(() => {
             state.values.state.phase === 'loading',
             state.values.state.disabled,
             state.values.state.phase === 'editing',
+            state.values.state.customize,
             state.values.autoURLServiceSelection.prev
           ] as const
         }
-        children={([loading, disabled, isEditing, autoURLServiceSelection]) =>
+        children={([loading, disabled, isEditing, customize, autoURLServiceSelection]) =>
           autoURLServiceSelection.length === 0 ? null : (
             <div style={{ textAlign: 'left' }}>
               <Typography color="textSecondary" variant="body2">
@@ -396,31 +403,26 @@ export const ExternalServices = React.memo(() => {
                   key={i}
                   selector={state => {
                     const service = state.values.settings.services[cat].services[svr];
-                    return [service.name, service.selected];
+                    return [service.name, service.selected, service.restricted] as const;
                   }}
-                  children={props2 => {
-                    const name = props2[0] as string;
-                    const selected = props2[1] as boolean;
-
-                    return (
-                      <CheckboxInput
-                        key={i}
-                        id={`url_submission_auto_service_selection-${name.replace('_', ' ')}`}
-                        label={name.replace('_', ' ')}
-                        labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
-                        value={selected}
-                        loading={loading}
-                        disabled={disabled || !isEditing}
-                        onChange={() => {
-                          form.setFieldValue('settings', s => {
-                            s.services[cat].services[svr].selected = !selected;
-                            s.services[cat].selected = s.services[cat].services.every(val => val.selected);
-                            return s;
-                          });
-                        }}
-                      />
-                    );
-                  }}
+                  children={([name, selected, restricted]) => (
+                    <CheckboxInput
+                      key={i}
+                      id={`url_submission_auto_service_selection-${name.replace('_', ' ')}`}
+                      label={name.replace('_', ' ')}
+                      labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
+                      value={selected}
+                      loading={loading}
+                      disabled={disabled || !isEditing || (!customize && restricted)}
+                      onChange={() => {
+                        form.setFieldValue('settings', s => {
+                          s.services[cat].services[svr].selected = !selected;
+                          s.services[cat].selected = s.services[cat].services.every(val => val.selected);
+                          return s;
+                        });
+                      }}
+                    />
+                  )}
                 />
               ))}
             </div>

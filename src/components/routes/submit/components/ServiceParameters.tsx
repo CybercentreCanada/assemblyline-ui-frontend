@@ -1,3 +1,4 @@
+import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import { Typography, useTheme } from '@mui/material';
 import type { ProfileSettings } from 'components/routes/settings/settings.utils';
 import { useForm } from 'components/routes/submit/submit.form';
@@ -157,6 +158,7 @@ type ServiceProps = {
 };
 
 const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service }) => {
+  const theme = useTheme();
   const form = useForm();
 
   const handleHasParams = useCallback(
@@ -208,6 +210,7 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
           svr.selected,
           svr.default,
           svr.restricted,
+          svr.is_external,
           specID,
           spec,
           hasParams,
@@ -216,12 +219,25 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
           state.values.state.phase === 'editing'
         ] as const;
       }}
-      children={([selected, defaultValue, restricted, specID, spec, hasParams, disabled, customize, isEditing]) => (
+      children={([
+        selected,
+        defaultValue,
+        restricted,
+        external,
+        specID,
+        spec,
+        hasParams,
+        disabled,
+        customize,
+        isEditing
+      ]) => (
         <CollapseSection
           header={({ open, setOpen }) => (
             <CheckboxInput
+              id={service.name}
               label={service.name}
               disabled={disabled || !isEditing || (!customize && restricted)}
+              endAdornment={!external ? null : <OpenInNewOutlinedIcon style={{ fontSize: 'small' }} />}
               expand={!hasParams ? null : open}
               preventRender={!customize && restricted && !selected}
               reset={defaultValue !== null && selected !== defaultValue}
