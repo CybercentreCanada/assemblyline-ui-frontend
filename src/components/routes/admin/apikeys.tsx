@@ -7,7 +7,6 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { ApiKey } from 'components/models/base/user';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -45,13 +44,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type ApikeyResponse = {
-  items: ApiKey[];
-  rows: number;
-  offset: number;
-  total: number;
-};
-
 export default function Apikeys() {
   const { t } = useTranslation(['apikeys']);
   const [pageSize] = useState<number>(PAGE_SIZE);
@@ -76,22 +68,22 @@ export default function Apikeys() {
     [location.pathname, location.search, navigate]
   );
 
-  const onClear = () => {
+  const onClear = useCallback(() => {
     navigate(location.pathname);
-  };
+  }, [navigate, location.pathname]);
 
-  const onSearch = () => {
+  const onSearch = useCallback(() => {
     if (filterValue.current !== '') {
       query.set('query', filterValue.current);
       navigate(`${location.pathname}?${query.toString()}`);
     } else {
       onClear();
     }
-  };
+  }, [filterValue.current, query, navigate, location.pathname]);
 
-  const onFilterValueChange = (inputValue: string) => {
+  const onFilterValueChange = useCallback((inputValue: string) => {
     filterValue.current = inputValue;
-  };
+  }, []);
 
   useEffect(() => {
     function reload() {
@@ -99,7 +91,7 @@ export default function Apikeys() {
     }
 
     function closeApikeyDrawer() {
-      navigate(location.pathname);
+      navigate('/admin/apikeys');
       setTimeout(() => reload(), 1000);
     }
 
@@ -158,7 +150,7 @@ export default function Apikeys() {
             {apikeySearchResults !== null && (
               <div className={classes.searchresult}>
                 {apikeySearchResults.total !== 0 && (
-                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                  <Typography variant="subtitle1" color="secondary" sx={{ flexGrow: 1 }}>
                     {searching ? (
                       <span>{t('apikeys')}</span>
                     ) : (

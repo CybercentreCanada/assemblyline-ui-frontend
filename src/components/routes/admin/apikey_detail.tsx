@@ -24,7 +24,7 @@ import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
 import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useParams } from 'react-router-dom';
@@ -56,7 +56,7 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
   const [tempKeyPriv, setTempKeyPriv] = useState<ACL[]>(['R']);
   const [tempKeyRoles, setTempKeyRoles] = useState<Role[]>(configuration.user.priv_role_dependencies.R);
 
-  const reload = () => {
+  const reload = useCallback(() => {
     apiCall({
       url: `/api/v4/apikey/${key_id || id}/`,
       onSuccess: api_data => {
@@ -66,16 +66,16 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
         setTempKeyRoles(api_data.api_response.roles);
       }
     });
-  };
+  }, [key_id, id]);
 
-  const removeApikey = () => {
+  const removeApikey = useCallback(() => {
     apiCall({
       url: `/api/v4/apikey/${key_id || id}/`,
       method: 'DELETE',
       onSuccess: () => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
-        if (id) {
+        if (id || key_id) {
           setTimeout(() => navigate('/admin/apikeys'), 1000);
         }
         close();
@@ -83,9 +83,9 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
       onEnter: () => setWaitingDialog(true),
       onExit: () => setWaitingDialog(false)
     });
-  };
+  }, [key_id, id]);
 
-  const saveApikey = () => {
+  const saveApikey = useCallback(() => {
     apiCall({
       method: 'PUT',
       body: {
@@ -106,46 +106,55 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
         setTimeout(() => close(), 1000);
       }
     });
-  };
+  }, [apikey, tempKeyRoles, tempExpiryTs, tempKeyPriv]);
 
-  const handleExpiryDateChange = date => {
-    setApikey({ ...apikey, expiry_ts: date });
-    setTempExpiryTs(date);
-    setModified(true);
-  };
+  const handleExpiryDateChange = useCallback(
+    date => {
+      setApikey({ ...apikey, expiry_ts: date });
+      setTempExpiryTs(date);
+      setModified(true);
+    },
+    [apikey]
+  );
 
-  function handleSelectChange(event) {
-    const acl = event.target.value.split('');
-    let roles = [];
+  const handleSelectChange = useCallback(
+    event => {
+      const acl = event.target.value.split('');
+      let roles = [];
 
-    if (acl) {
-      for (const ac of acl) {
-        const aclRoles = configuration.user.priv_role_dependencies[ac];
-        if (aclRoles) {
-          roles.push(...aclRoles.filter(r => currentUser.roles.includes(r)));
+      if (acl) {
+        for (const ac of acl) {
+          const aclRoles = configuration.user.priv_role_dependencies[ac];
+          if (aclRoles) {
+            roles.push(...aclRoles.filter(r => currentUser.roles.includes(r)));
+          }
         }
       }
-    }
-    setApikey({ ...apikey, roles, acl });
-    setTempKeyPriv(acl);
-    setTempKeyRoles(roles);
-    setModified(true);
-  }
+      setApikey({ ...apikey, roles, acl });
+      setTempKeyPriv(acl);
+      setTempKeyRoles(roles);
+      setModified(true);
+    },
+    [apikey]
+  );
 
-  function toggleRole(role) {
-    const newRoles = [...apikey.roles];
-    if (newRoles.indexOf(role) === -1) {
-      newRoles.push(role);
-    } else {
-      newRoles.splice(newRoles.indexOf(role), 1);
-    }
+  const toggleRole = useCallback(
+    role => {
+      const newRoles = [...apikey.roles];
+      if (newRoles.indexOf(role) === -1) {
+        newRoles.push(role);
+      } else {
+        newRoles.splice(newRoles.indexOf(role), 1);
+      }
 
-    setApikey({ ...apikey, roles: newRoles, acl: ['C'] });
-    setTempKeyPriv(['C']);
-    setTempKeyRoles(newRoles);
+      setApikey({ ...apikey, roles: newRoles, acl: ['C'] });
+      setTempKeyPriv(['C']);
+      setTempKeyRoles(newRoles);
 
-    setModified(true);
-  }
+      setModified(true);
+    },
+    [apikey]
+  );
 
   useEffect(() => {
     if (key_id || id) {
@@ -160,6 +169,7 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
         open={deleteDialog}
         handleClose={() => {
           setDeleteDialog(false);
+          close();
         }}
         handleAccept={removeApikey}
         title={t('delete.title')}
@@ -170,21 +180,21 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
       />
 
       <div style={{ textAlign: 'left' }}>
-        <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Grid container alignItems="center" spacing={1}>
-            <Grid item xs>
+        <div style={{ paddingBottom: theme.spacing(3) }}>
+          <Grid container alignItems="center" spacing={2}>
+            <Grid item md={9}>
               <Typography variant="h4">{t('apikey')}</Typography>
             </Grid>
 
-            <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
+            <Grid item md={3} sx={{ textAlign: 'right', flexGrow: 0 }}>
               {apikey ? (
                 <>
                   {(key_id || id) && (
-                    <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
+                    <div style={{ textAlign: 'left', display: 'flex', marginBottom: theme.spacing(1) }}>
                       {
                         <Tooltip title={t('remove')}>
                           <IconButton
-                            style={{
+                            sx={{
                               color:
                                 theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                             }}
@@ -201,21 +211,11 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
               ) : (
                 <>
                   <div style={{ display: 'flex' }}>
-                    <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
+                    <Skeleton variant="circular" height="3rem" width="3rem" sx={{ margin: theme.spacing(0.5) }} />
                     {
                       <>
-                        <Skeleton
-                          variant="circular"
-                          height="3rem"
-                          width="3rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
-                        <Skeleton
-                          variant="circular"
-                          height="3rem"
-                          width="3rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
+                        <Skeleton variant="circular" height="3rem" width="3rem" sx={{ margin: theme.spacing(0.5) }} />
+                        <Skeleton variant="circular" height="3rem" width="3rem" sx={{ margin: theme.spacing(0.5) }} />
                       </>
                     }
                   </div>
@@ -225,53 +225,45 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
           </Grid>
         </div>
 
-        <Grid container spacing={3} alignItems="center">
-          <div style={{ paddingBottom: theme.spacing(4) }}>
-            <Grid container>
-              <Grid item xs={12} style={{ textAlign: 'left', flexGrow: 0 }}>
-                <Typography variant="h6">{t('key.detail.title')}</Typography>
-                <Divider />
-              </Grid>
-
-              {apikey ? (
-                <div style={{ textAlign: 'left', flexGrow: 0 }}>
-                  <Grid container>
-                    <Grid item xs={6} sm={6}>
-                      <span style={{ fontWeight: 500 }}>{t('key.name.title')}</span>
-                    </Grid>
-                    <Grid
-                      item
-                      xs={6}
-                      sm={6}
-                      style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-                    >
-                      <span style={{ fontWeight: 500 }}>{apikey.key_name}</span>
-                    </Grid>
-                    <Grid item xs={6} sm={6}>
-                      <span style={{ fontWeight: 500 }}>{t('username.title')}</span>
-                    </Grid>
-                    <Grid
-                      item
-                      xs={6}
-                      sm={6}
-                      style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-                    >
-                      <span style={{ fontWeight: 500 }}>{apikey.uname}</span>
-                    </Grid>
-                  </Grid>
-                </div>
-              ) : (
-                <div></div>
-              )}
-            </Grid>
-          </div>
-
-          <Grid container>
-            <Grid item xs={12} style={{ textAlign: 'left', flexGrow: 0 }}>
-              <Typography variant="h6">{t('permissions.title')}</Typography>
+        <Grid container spacing={2} alignItems="center">
+          <Grid container sx={{ marginBottom: theme.spacing(1) }}>
+            <Grid item xs={12} sx={{ textAlign: 'left', flexGrow: 0 }}>
+              <Typography variant="h6" sx={{ marginBottom: theme.spacing(1) }}>
+                {t('key.detail.title')}
+              </Typography>
               <Divider />
             </Grid>
+          </Grid>
+          <Grid container sx={{ marginBottom: theme.spacing(1) }}>
+            {apikey ? (
+              <div style={{ textAlign: 'left', flexGrow: 0 }}>
+                <Grid container>
+                  <Grid item md={4}>
+                    <span style={{ fontWeight: 500 }}>{t('key.name.title')}</span>
+                  </Grid>
+                  <Grid item md={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                    <span style={{ fontWeight: 500 }}>{apikey.key_name}</span>
+                  </Grid>
+                  <Grid item md={4}>
+                    <span style={{ fontWeight: 500 }}>{t('username.title')}</span>
+                  </Grid>
+                  <Grid item md={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                    <span style={{ fontWeight: 500 }}>{apikey.uname}</span>
+                  </Grid>
+                </Grid>
+              </div>
+            ) : (
+              <div></div>
+            )}
+          </Grid>
 
+          <Grid container sx={{ marginBottom: theme.spacing(1) }}>
+            <Grid item xs={12} sx={{ textAlign: 'left', flexGrow: 0, marginBottom: theme.spacing(1) }}>
+              <Typography variant="h6" sx={{ marginBottom: theme.spacing(1) }}>
+                {t('permissions.title')}
+              </Typography>
+              <Divider />
+            </Grid>
             <Grid container>
               {apikey ? (
                 <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
@@ -310,10 +302,11 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
             </Grid>
           </Grid>
 
-          <Grid container>
-            <Grid item xs={8} sm={8} style={{ textAlign: 'left', flexGrow: 0 }}>
-              <Typography variant="h6">{t('timing.title')}</Typography>
-              <Grid item xs={4} sm={4} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+          <Grid container sx={{ marginBottom: theme.spacing(1) }}>
+            <Grid container>
+              <Grid item sx={{ textAlign: 'left', flexGrow: 0 }}>
+                <Typography variant="h6">{t('timing.title')}</Typography>
+
                 {apikey ? (
                   <DatePicker
                     date={apikey.expiry_ts}
@@ -324,8 +317,9 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
                 ) : (
                   <div></div>
                 )}
+
+                <Divider />
               </Grid>
-              <Divider />
             </Grid>
 
             {apikey ? (
@@ -334,35 +328,20 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
                   <Grid item xs={6} sm={6}>
                     <span style={{ fontWeight: 500 }}>{t('creation_date')}</span>
                   </Grid>
-                  <Grid
-                    item
-                    xs={6}
-                    sm={6}
-                    style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-                  >
+                  <Grid item xs={6} sm={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                     <Moment format="YYYY-MM-DD">{apikey.creation_date}</Moment>
                   </Grid>
                   <Grid item xs={6} sm={6}>
                     <span style={{ fontWeight: 500 }}>{t('last_used')}</span>
                   </Grid>
-                  <Grid
-                    item
-                    xs={6}
-                    sm={6}
-                    style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-                  >
+                  <Grid item xs={6} sm={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                     {apikey.last_used ? <Moment format="YYYY-MM-DD">{apikey.last_used}</Moment> : <></>}
                   </Grid>
 
                   <Grid item xs={6} sm={6}>
                     <span style={{ fontWeight: 500 }}>{t('expiration_date')}</span>
                   </Grid>
-                  <Grid
-                    item
-                    xs={6}
-                    sm={6}
-                    style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-                  >
+                  <Grid item xs={6} sm={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                     {apikey.expiry_ts ? <Moment format="YYYY-MM-DD">{apikey.expiry_ts}</Moment> : <></>}
                   </Grid>
                 </Grid>
@@ -372,28 +351,33 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
             )}
           </Grid>
         </Grid>
-
-        {apikey && modified ? (
-          <div
-            style={{
-              paddingTop: theme.spacing(1),
-              paddingBottom: theme.spacing(1),
-              position: 'fixed',
-              bottom: 0,
-              left: 0,
-              width: '100%',
-              zIndex: theme.zIndex.drawer - 1,
-              backgroundColor: theme.palette.background.default,
-              boxShadow: theme.shadows[4]
-            }}
-          >
-            <Button variant="contained" color="primary" disabled={buttonLoading || !modified} onClick={saveApikey}>
-              {t('save')}
-              {buttonLoading && <CircularProgress size={24} />}
-            </Button>
-          </div>
-        ) : null}
       </div>
+      {apikey && modified ? (
+        <div
+          style={{
+            paddingTop: theme.spacing(1),
+            paddingBottom: theme.spacing(1),
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            zIndex: theme.zIndex.drawer - 1,
+            backgroundColor: theme.palette.background.default,
+            boxShadow: theme.shadows[4]
+          }}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={buttonLoading || !modified}
+            onClick={saveApikey}
+            sx={{ justifyContent: 'center', align: 'center' }}
+          >
+            {t('save')}
+            {buttonLoading && <CircularProgress size={24} />}
+          </Button>
+        </div>
+      ) : null}
     </PageCenter>
   ) : (
     <ForbiddenPage />

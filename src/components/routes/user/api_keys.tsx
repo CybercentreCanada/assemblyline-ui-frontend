@@ -29,7 +29,7 @@ import { ACL, ApiKey, Role, User } from 'components/models/base/user';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
 import Moment from 'components/visual/Moment';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 
@@ -115,12 +115,12 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
   const [tempKeyPriv, setTempKeyPriv] = useState<ACL[]>(['R']);
   const [tempKeyRoles, setTempKeyRoles] = useState<Role[]>(configuration.user.priv_role_dependencies.R);
 
-  const [apikeys, SetApikeys] = useState(user.apikeys);
+  const [apikeys, setApikeys] = useState(user.apikeys);
 
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_]*$');
 
-  function handleDelete() {
+  const handleDelete = useCallback(() => {
     apiCall({
       url: `/api/v4/apikey/${deleteApikeyId}/`,
       method: 'DELETE',
@@ -132,9 +132,9 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
         setModifyApikey(false);
       }
     });
-  }
+  }, [deleteApikeyId]);
 
-  function handleCreate() {
+  const handleCreate = useCallback(() => {
     apiCall({
       method: 'PUT',
       body: {
@@ -163,43 +163,49 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
         });
       }
     });
-  }
+  }, [tempKeyName, tempKeyPriv, tempKeyRoles, tempExpiryTs, createNewKey, tempAPIKey]);
 
-  function handleKeyNameChange(event) {
+  const handleKeyNameChange = useCallback(event => {
     if (regex.test(event.target.value) || event.target.value === '') {
       setTempKeyName(event.target.value);
     } else {
       event.preventDefault();
     }
-  }
+  }, []);
 
-  function handleSelectChange(event) {
-    setTempKeyPriv(event.target.value.split());
-    let roles = [];
-    if (tempKeyPriv) {
-      for (const ac of tempKeyPriv) {
-        const aclRoles = configuration.user.priv_role_dependencies[ac];
-        if (aclRoles) {
-          roles.push(...aclRoles.filter(r => currentUser.roles.includes(r)));
+  const handleSelectChange = useCallback(
+    event => {
+      setTempKeyPriv(event.target.value.split());
+      let roles = [];
+      if (tempKeyPriv) {
+        for (const ac of tempKeyPriv) {
+          const aclRoles = configuration.user.priv_role_dependencies[ac];
+          if (aclRoles) {
+            roles.push(...aclRoles.filter(r => currentUser.roles.includes(r)));
+          }
         }
       }
-    }
-    setTempKeyRoles(roles);
-  }
+      setTempKeyRoles(roles);
+    },
+    [tempKeyPriv]
+  );
 
-  function toggleRole(role) {
-    const newRoles = [...tempKeyRoles];
-    if (newRoles.indexOf(role) === -1) {
-      newRoles.push(role);
-    } else {
-      newRoles.splice(newRoles.indexOf(role), 1);
-    }
+  const toggleRole = useCallback(
+    role => {
+      const newRoles = [...tempKeyRoles];
+      if (newRoles.indexOf(role) === -1) {
+        newRoles.push(role);
+      } else {
+        newRoles.splice(newRoles.indexOf(role), 1);
+      }
 
-    setTempKeyPriv(['C']);
-    setTempKeyRoles(newRoles);
-  }
+      setTempKeyPriv(['C']);
+      setTempKeyRoles(newRoles);
+    },
+    [tempKeyRoles]
+  );
 
-  function handleNew() {
+  const handleNew = useCallback(() => {
     setModifyApikey(false);
     setCreateNewKey(false);
     setTempAPIKey(null);
@@ -209,29 +215,29 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
     reloadApiKey();
 
     setTempKeyRoles(configuration.user.priv_role_dependencies.R);
-  }
+  }, []);
 
-  function askForDelete(keyId: string) {
+  const askForDelete = useCallback((keyId: string) => {
     setDeleteApikeyId(keyId);
-  }
+  }, []);
 
-  function changeApikey(apikey: ApiKey) {
+  const changeApikey = useCallback((apikey: ApiKey) => {
     setModifyApikey(true);
     setCreateNewKey(false);
     setTempAPIKey(apikey);
     setTempExpiryTs(apikey.expiry_ts);
     setTempKeyPriv(apikey.acl);
     setTempKeyName(apikey.key_name);
-  }
+  }, []);
 
   useEffect(() => {
-    SetApikeys(user.apikeys);
-  }, [reloadApiKey, apikeys]);
+    setApikeys(user.apikeys);
+  }, [user.apikeys, apikeys]);
 
   return (
     <>
       <div style={{ display: 'flex', marginBottom: theme.spacing(1), alignItems: 'center' }}>
-        <Typography variant="h4" style={{ flexGrow: 1 }}>
+        <Typography variant="h4" sx={{ flexGrow: 1 }}>
           {t('apikeys.title')}
         </Typography>
         <Tooltip title={t('apikeys.add')}>
@@ -239,7 +245,7 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
             onClick={() => {
               setCreateNewKey(true);
             }}
-            style={{
+            sx={{
               color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
             }}
           >
@@ -295,7 +301,7 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
                   padding: `${theme.spacing(1)} ${theme.spacing(2)}`
                 }}
               >
-                <Typography component="span" style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                <Typography component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                   {createMessage ? createMessage : ''}
                 </Typography>
                 <IconButton
@@ -359,7 +365,7 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
         </DialogTitle>
         <DialogContent>
           <TextField
-            style={{ width: '100%' }}
+            sx={{ width: '100%' }}
             size="small"
             margin="normal"
             variant="outlined"
