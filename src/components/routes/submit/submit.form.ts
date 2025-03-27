@@ -19,7 +19,7 @@ export type SubmitMetadata = {
 export type SubmitPhase = 'loading' | 'editing' | 'uploading' | 'redirecting';
 
 // [Category Index, Service Index, Previous Value]
-export type AutoURLServiceIndices = [number, number, boolean][];
+export type AutoURLServiceIndices = [number, number][];
 
 export const FLOW = new Flow({
   target: '/api/v4/ui/flowjs/',

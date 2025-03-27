@@ -10,6 +10,7 @@ import { ResetInput } from './components/ResetInput';
 
 export type CheckboxInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   divider?: boolean;
+  endAdornment?: React.ReactNode;
   error?: (value: boolean) => string;
   errorProps?: FormHelperTextProps;
   expand?: boolean;
@@ -42,6 +43,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
   ({
     disabled = false,
     divider = false,
+    endAdornment = null,
     error = () => null,
     errorProps = null,
     expand = null,
@@ -140,7 +142,14 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
                 )
               }
               disabled={loading || disabled || readOnly}
-              label={label}
+              label={
+                <div
+                  style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}
+                >
+                  <span>{label}</span>
+                  {endAdornment}
+                </div>
+              }
               slotProps={{
                 typography: {
                   color: !disabled && errorValue ? 'error' : focused ? 'primary' : 'textPrimary',
