@@ -37,7 +37,7 @@ export const SubmissionOptions = React.memo(() => {
               state.values.state.phase === 'editing'
             ] as const
           }
-          children={([loading, disabled, customize, editing]) => (
+          children={([loading, disabled, customize, isEditing]) => (
             <>
               <form.Subscribe
                 selector={state => {
@@ -57,7 +57,7 @@ export const SubmissionOptions = React.memo(() => {
                     label={t('options.submission.description.label')}
                     value={value}
                     loading={loading}
-                    disabled={disabled || restricted}
+                    disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
                     reset={value !== defaultValue}
                     placeholder={
@@ -86,7 +86,7 @@ export const SubmissionOptions = React.memo(() => {
                       value={value}
                       fullWidth
                       loading={loading}
-                      disabled={disabled || restricted}
+                      disabled={disabled || !isEditing || (!customize && restricted)}
                       preventRender={!customize && restricted}
                       reset={value !== defaultValue}
                       options={priorityOptions}
@@ -120,7 +120,7 @@ export const SubmissionOptions = React.memo(() => {
                       endAdornment={t('options.submission.ttl.endAdornment')}
                       value={value}
                       loading={loading}
-                      disabled={disabled || restricted}
+                      disabled={disabled || !isEditing || (!customize && restricted)}
                       preventRender={!customize && restricted}
                       reset={value !== defaultValue}
                       min={configuration.submission.max_dtl !== 0 ? 1 : 0}
@@ -144,7 +144,7 @@ export const SubmissionOptions = React.memo(() => {
                     tooltip={t('options.submission.generate_alert.tooltip')}
                     value={value}
                     loading={loading}
-                    disabled={disabled || restricted}
+                    disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
                     reset={value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
@@ -165,7 +165,7 @@ export const SubmissionOptions = React.memo(() => {
                     tooltip={t('options.submission.ignore_filtering.tooltip')}
                     value={value}
                     loading={loading}
-                    disabled={disabled || restricted}
+                    disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
                     reset={value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
@@ -186,7 +186,7 @@ export const SubmissionOptions = React.memo(() => {
                     tooltip={t('options.submission.ignore_cache.tooltip')}
                     value={value}
                     loading={loading}
-                    disabled={disabled || restricted}
+                    disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
                     reset={value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
@@ -207,7 +207,7 @@ export const SubmissionOptions = React.memo(() => {
                     tooltip={t('options.submission.ignore_recursion_prevention.tooltip')}
                     value={value}
                     loading={loading}
-                    disabled={disabled || restricted}
+                    disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
                     reset={value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
@@ -228,7 +228,7 @@ export const SubmissionOptions = React.memo(() => {
                     tooltip={t('options.submission.deep_scan.tooltip')}
                     value={value}
                     loading={loading}
-                    disabled={disabled || restricted}
+                    disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
                     reset={value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}

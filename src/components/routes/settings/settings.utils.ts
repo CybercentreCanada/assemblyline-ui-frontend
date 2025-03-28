@@ -2,7 +2,7 @@ import type { Submission, SubmissionProfileParams } from 'components/models/base
 import type { UserSettings } from 'components/models/base/user_settings';
 import type { CustomUser } from 'components/models/ui/user';
 
-const INTERFACE_KEYS = [
+export const INTERFACE_KEYS = [
   'default_external_sources',
   'default_zip_password',
   'download_encoding',
@@ -13,7 +13,7 @@ const INTERFACE_KEYS = [
   'submission_view'
 ] as const;
 
-const PROFILE_KEYS = [
+export const PROFILE_KEYS = [
   'classification',
   'deep_scan',
   'description',
@@ -25,8 +25,8 @@ const PROFILE_KEYS = [
   'ttl'
 ] as const;
 
-type InterfaceKey = keyof Pick<UserSettings, (typeof INTERFACE_KEYS)[number]>;
-type ProfileKey = keyof Pick<UserSettings, (typeof PROFILE_KEYS)[number]>;
+export type InterfaceKey = keyof Pick<UserSettings, (typeof INTERFACE_KEYS)[number]>;
+export type ProfileKey = keyof Pick<UserSettings, (typeof PROFILE_KEYS)[number]>;
 
 export type ProfileParam<T> = {
   default: T;

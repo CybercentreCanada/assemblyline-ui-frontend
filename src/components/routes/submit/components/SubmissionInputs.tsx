@@ -20,13 +20,14 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { File } from 'components/models/base/file';
 import type { Submission } from 'components/models/base/submission';
 import type { SearchResult } from 'components/models/ui/search';
-import { getProfileNames, parseSubmissionProfile } from 'components/routes/settings/settings.utils';
+import { getProfileNames } from 'components/routes/settings/settings.utils';
 import type { AutoURLServiceIndices, SubmitStore } from 'components/routes/submit/submit.form';
 import { FLOW, useForm } from 'components/routes/submit/submit.form';
 import {
   calculateFileHash,
   getHashQuery,
   isUsingExternalServices,
+  parseSubmitProfile,
   switchProfile
 } from 'components/routes/submit/submit.utils';
 import type { ButtonProps } from 'components/visual/Buttons/Button';
@@ -611,17 +612,16 @@ export const FindButton = React.memo(() => {
           [
             state.values.state.phase === 'loading',
             state.values.state.disabled,
-            state.values.state.phase === 'editing',
             state.values.state.tab,
             state.values.file,
             state.values.hash.type,
             state.values.hash.value
           ] as const
         }
-        children={([loading, disabled, isEditing, tab, file, hashType, hashValue]) => (
+        children={([loading, disabled, tab, file, hashType, hashValue]) => (
           <IconButton
             disabled={disabled || (tab === 'file' ? !file : tab === 'hash' ? !hashType : false)}
-            loading={loading || !isEditing}
+            loading={loading}
             tooltip={t('find.button.tooltip')}
             tooltipProps={{ placement: 'bottom' }}
             onClick={() => {
@@ -791,7 +791,7 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
           url: `/api/v4/ui/start/${uuid}/`,
           method: 'POST',
           body: {
-            ...parseSubmissionProfile(settings, params, profile),
+            ...parseSubmitProfile(params),
             submission_profile: profile,
             filename: file.path,
             metadata: metadata.data
@@ -850,7 +850,7 @@ const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
         url: '/api/v4/submit/',
         method: 'POST',
         body: {
-          ui_params: parseSubmissionProfile(settings, params, profile),
+          ui_params: parseSubmitProfile(params),
           submission_profile: profile,
           [hash.type]: hash.value,
           metadata: metadata.data
