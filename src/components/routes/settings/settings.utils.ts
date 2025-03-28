@@ -182,6 +182,8 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings,
 
   //Applying the initial data
   out.initial_data = { value: { password: '' }, prev: { password: '' } };
+  out.description = { value: null, prev: null, default: null, restricted: false };
+  out.malicious = { value: false, prev: false };
 
   return out;
 };
@@ -259,6 +261,8 @@ export const loadSubmissionProfile = (
 
   //Applying the initial data
   out.initial_data = { value: { password: '' }, prev: { password: '' } };
+  out.description = { value: null, prev: null, default: null, restricted: false };
+  out.malicious = { value: false, prev: false };
 
   return out;
 };
