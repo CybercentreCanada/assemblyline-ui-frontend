@@ -192,11 +192,11 @@ export const parseSubmitProfile = (profile: ProfileSettings): UserSettings => {
 
     svr.params.forEach(param => {
       spec.params.push({
-        ...(param.type && { type: param.type }),
-        ...(param.hide && { hide: param.hide }),
-        ...(param.name && { name: param.name }),
-        ...(param.value && { value: param.value }),
-        ...(param.default && { default: param.default }),
+        type: param.type,
+        hide: param.hide,
+        name: param.name,
+        value: param.value,
+        default: param.default,
         ...(param.list && { list: param.list })
       });
     });
