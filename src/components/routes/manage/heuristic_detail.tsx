@@ -1,5 +1,6 @@
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Grid, IconButton, Paper, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
+import { Grid, IconButton, Paper, Skeleton, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
@@ -23,7 +24,8 @@ const useStyles = makeStyles(theme => ({
     margin: 0,
     padding: theme.spacing(0.75, 1),
     whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
+    wordBreak: 'break-word',
+    borderStyle: 'dashed'
   },
   drawerPaper: {
     maxWidth: '1200px',
@@ -37,7 +39,8 @@ const useStyles = makeStyles(theme => ({
     left: '50%',
     marginTop: -12,
     marginLeft: -12
-  }
+  },
+  no_padding: { '& .MuiFormControl-root': { padding: '0' }, }
 }));
 
 type ParamProps = {
@@ -60,6 +63,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
   const classes = useStyles();
   const { c12nDef } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
+  const [scoreOverride, setScoreOverride] = useState<any>();
 
   useEffect(() => {
     if (currentUser.roles.includes('heuristic_view')) {
@@ -112,6 +116,8 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
       } else if (heuristic.stats) {
         setStats(heuristic.stats);
       }
+
+      setScoreOverride(heuristic.score);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [heuristic]);
@@ -188,9 +194,29 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
           <Grid item xs={12} sm={6} md={4}>
             <Typography variant="subtitle2">{t('score')}</Typography>
             {heuristic ? (
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {heuristic.score}
-              </Paper>
+              <div style={{display: 'flex', gap: '0.5rem'}}>
+                <TextField
+                variant="outlined" className={classes.no_padding}
+                type="number"
+                size={'small'}
+                value={scoreOverride}
+                onChange={event => setScoreOverride(event.target.value)}
+                InputProps={{
+                  inputProps: {
+                    style: { padding: '6px 8px', minWidth: '4rem' },
+                    max: heuristic.max_score,
+                    min: 0 }
+                }}
+              />
+            {/*  Show button if default value is not same as scoreoverride*/}
+            {heuristic.score !== scoreOverride && (
+              <Tooltip title={t('restore_score', {default: heuristic.score})}>
+                <IconButton size={"small"} onClick={() => setScoreOverride(heuristic.score)}>
+                  <SettingsBackupRestoreIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            </div>
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
             )}
