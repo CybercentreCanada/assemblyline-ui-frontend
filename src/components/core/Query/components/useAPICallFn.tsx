@@ -1,12 +1,12 @@
-import { DEFAULT_RETRY_MS } from 'components/core/API/utils/constants';
-import type { APIRequest, APIResponse } from 'components/core/API/utils/models';
-import { isAPIData } from 'components/core/API/utils/utils';
 import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useQuota from 'components/hooks/useQuota';
 import getXSRFCookie from 'helpers/xsrf';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { APIRequest, APIResponse } from './api.models';
+import { DEFAULT_RETRY_MS } from './constants';
+import { isAPIData } from './utils';
 
 export type UseAPICallFnProps<
   Response extends APIResponse,

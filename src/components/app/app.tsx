@@ -6,7 +6,7 @@ import AppProvider from 'commons/components/app/AppProvider';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useAppSwitcher from 'commons/components/app/hooks/useAppSwitcher';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
-import { APIProvider } from 'components/core/API/APIProvider';
+import { APIProvider } from 'components/core/Query/components/APIProvider';
 import useALContext from 'components/hooks/useALContext';
 import type { LoginParamsProps } from 'components/hooks/useMyAPI';
 import useMyAPI from 'components/hooks/useMyAPI';
