@@ -51,8 +51,8 @@ export const useAPIQuery = <
     {
       ...queryProps,
       enabled: !!enabled && !debouncing,
-      queryKey: [{ ...params }],
-      queryFn: async ({ signal }) => apiCallFn({ signal, ...params }),
+      queryKey: [{ ...params, enabled }],
+      queryFn: async ({ signal }) => apiCallFn({ signal, enabled, ...params }),
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
       retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000)),
       initialData: {

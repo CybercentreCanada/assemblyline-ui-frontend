@@ -59,11 +59,11 @@ const BadlistSearch = () => {
     url: '/api/v4/search/badlist/',
     method: 'POST',
     enabled: currentUser.roles.includes('badlist_view'),
+    initialData: { items: [], offset: 0, rows: 0, total: 0 },
     body: search
       .set(o => ({ ...o, query: o.query || '*' }))
       .omit(['refresh'])
-      .toObject(),
-    initialData: { items: [], offset: 0, rows: 0, total: 0 }
+      .toObject()
   });
 
   const handleToggleFilter = useCallback(

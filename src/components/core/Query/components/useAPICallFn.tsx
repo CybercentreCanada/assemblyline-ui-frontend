@@ -15,6 +15,7 @@ export type UseAPICallFnProps<
 > = Request &
   Omit<RequestInit, 'url' | 'method' | 'body'> & {
     contentType?: string;
+    enabled?: boolean;
     reloadOnUnauthorize?: boolean;
     retryAfter?: number;
     signal?: AbortSignal;
@@ -39,6 +40,7 @@ export const useAPICallFn = <
       body = null,
       contentType = 'application/json',
       credentials = 'same-origin',
+      enabled = true,
       headers = null,
       method = 'GET',
       reloadOnUnauthorize = true,
@@ -53,12 +55,12 @@ export const useAPICallFn = <
       onEnter();
 
       // Reject if the query is not enabled
-      // if (!enabled) {
-      //   return Promise.reject(null).then(data => {
-      //     onExit();
-      //     return data;
-      //   });
-      // }
+      if (!enabled) {
+        return Promise.reject(null).then(data => {
+          onExit();
+          return data;
+        });
+      }
 
       // fetching the API's data
       const res = await fetch(url, {
