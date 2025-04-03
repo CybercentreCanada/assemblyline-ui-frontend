@@ -1,7 +1,8 @@
-import { AlertTitle, Skeleton } from '@mui/material';
+import { AlertTitle, IconButton, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import { ApiKey } from 'components/models/base/user';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import { ApiKey, Role } from 'components/models/base/user';
 import {
   DivTable,
   DivTableBody,
@@ -11,12 +12,14 @@ import {
   LinkRow,
   SortableHeaderCell
 } from 'components/visual/DivTable';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import CustomChip from '../CustomChip';
 import InformativeAlert from '../InformativeAlert';
 import Moment from '../Moment';
+
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
 export type ApikeySearchResults = {
   items: ApiKey[];
@@ -28,6 +31,64 @@ export type ApikeySearchResults = {
 type ApiTableProps = {
   apikeySearchResults: ApikeySearchResults;
   setApikeyID?: (id: string) => void;
+};
+
+type RolesChipProps = {
+  roles: Role[];
+};
+
+const RolesCustomChips = ({ roles }: RolesChipProps) => {
+  const { t } = useTranslation(['apikeys']);
+  const [showMore, setShowMore] = useState<Boolean>(false);
+  const [showLess, setShowLess] = useState<Boolean>(false);
+  const MAX_DISPLAY_ROLES = 5;
+
+  const [displayRoles, setDisplayRoles] = useState<Role[]>(roles.slice());
+
+  useEffectOnce(() => {
+    if (roles.length > MAX_DISPLAY_ROLES) {
+      setShowMore(true);
+      setDisplayRoles(roles.slice(0, MAX_DISPLAY_ROLES));
+    }
+  });
+
+  return (
+    <div>
+      {displayRoles.map((e, x) => (
+        <CustomChip key={e} type="rounded" label={t(`role.${e}`)} size="tiny" color="secondary" />
+      ))}
+      {showMore ? (
+        <IconButton
+          size="small"
+          onClick={event => {
+            setShowMore(false);
+            setShowLess(true);
+            setDisplayRoles(roles.slice());
+            event.preventDefault();
+          }}
+        >
+          <ExpandMore />{' '}
+        </IconButton>
+      ) : (
+        <></>
+      )}
+      {showLess ? (
+        <IconButton
+          size="small"
+          onClick={event => {
+            setShowMore(true);
+            setShowLess(false);
+            setDisplayRoles(roles.slice(0, MAX_DISPLAY_ROLES));
+            event.preventDefault();
+          }}
+        >
+          <ExpandLess />{' '}
+        </IconButton>
+      ) : (
+        <></>
+      )}
+    </div>
+  );
 };
 
 const WrappedUsersApiTable: React.FC<ApiTableProps> = ({ apikeySearchResults, setApikeyID = null }) => {
@@ -57,7 +118,7 @@ const WrappedUsersApiTable: React.FC<ApiTableProps> = ({ apikeySearchResults, se
                 component={Link}
                 to={`/admin/apikeys/#${userApikey.id}`}
                 onClick={event => {
-                  if (setApikeyID && event) {
+                  if (setApikeyID && event.target == event.currentTarget) {
                     event.preventDefault();
                     setApikeyID(userApikey.id);
                   }
@@ -82,9 +143,7 @@ const WrappedUsersApiTable: React.FC<ApiTableProps> = ({ apikeySearchResults, se
                   ))}
                 </DivTableCell>
                 <DivTableCell>
-                  {userApikey.roles.sort().map((e, x) => (
-                    <CustomChip key={e} type="rounded" label={t(`role.${e}`)} size="tiny" color="secondary" />
-                  ))}
+                  <RolesCustomChips roles={userApikey.roles} />
                 </DivTableCell>
               </LinkRow>
             ))}

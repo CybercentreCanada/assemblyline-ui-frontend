@@ -180,9 +180,9 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
       />
 
       <div style={{ textAlign: 'left' }}>
-        <div style={{ paddingBottom: theme.spacing(3) }}>
-          <Grid container alignItems="center" spacing={2}>
-            <Grid item md={9}>
+        <Grid container sx={{ marginBottom: theme.spacing(1) }}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item md={9} sx={{ textAlign: 'left', flexGrow: 0 }}>
               <Typography variant="h4">{t('apikey')}</Typography>
             </Grid>
 
@@ -190,7 +190,7 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
               {apikey ? (
                 <>
                   {(key_id || id) && (
-                    <div style={{ textAlign: 'left', display: 'flex', marginBottom: theme.spacing(1) }}>
+                    <div>
                       {
                         <Tooltip title={t('remove')}>
                           <IconButton
@@ -223,9 +223,7 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
               )}
             </Grid>
           </Grid>
-        </div>
 
-        <Grid container spacing={2} alignItems="center">
           <Grid container sx={{ marginBottom: theme.spacing(1) }}>
             <Grid item xs={12} sx={{ textAlign: 'left', flexGrow: 0 }}>
               <Typography variant="h6" sx={{ marginBottom: theme.spacing(1) }}>
@@ -304,22 +302,23 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
 
           <Grid container sx={{ marginBottom: theme.spacing(1) }}>
             <Grid container>
-              <Grid item sx={{ textAlign: 'left', flexGrow: 0 }}>
+              <Grid item md={9} sx={{ textAlign: 'left', flexGrow: 0 }}>
                 <Typography variant="h6">{t('timing.title')}</Typography>
-
-                {apikey ? (
+              </Grid>
+              {apikey ? (
+                <Grid item md={3} sx={{ textAlign: 'right', flexGrow: 0 }}>
                   <DatePicker
                     date={apikey.expiry_ts}
                     setDate={handleExpiryDateChange}
                     tooltip={t('expiry.change')}
                     minDateTomorrow
                   />
-                ) : (
-                  <div></div>
-                )}
+                </Grid>
+              ) : (
+                <div></div>
+              )}
 
-                <Divider />
-              </Grid>
+              <Divider />
             </Grid>
 
             {apikey ? (
