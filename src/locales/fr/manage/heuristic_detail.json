@@ -19,7 +19,6 @@
   "score.avg": "Moyen",
   "score.max": "Maximum",
   "score.min": "Minimum",
-  "restore_score": "Restaurer le score par défaut ({{default}})",
   "section_stat_contrib": "Statistiques sur les contributions aux sections",
   "signature_score_map": "Score des différentes signatures",
   "statistics": "Statistiques",

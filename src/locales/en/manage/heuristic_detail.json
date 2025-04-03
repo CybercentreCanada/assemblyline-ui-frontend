@@ -19,7 +19,6 @@
   "score.avg": "Average",
   "score.max": "Maximum",
   "score.min": "Minimum",
-  "restore_score": "Restore default score ({{default}})",
   "signature_score_map": "Scores of the different signatures",
   "statistics": "Statistics",
   "title": "Heuristic Details",
