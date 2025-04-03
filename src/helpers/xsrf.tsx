@@ -5,7 +5,7 @@
  * @returns the CSRF token
  *
  */
-export default function getXSRFCookie(): string {
+export default function getXSRFCookie() {
   let xsrfToken = null;
   if (document.cookie !== undefined) {
     try {
@@ -18,5 +18,5 @@ export default function getXSRFCookie(): string {
       // Ignore... we will return null
     }
   }
-  return xsrfToken as string;
+  return xsrfToken;
 }
