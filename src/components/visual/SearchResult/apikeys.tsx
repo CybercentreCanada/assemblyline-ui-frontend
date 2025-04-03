@@ -1,3 +1,4 @@
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { AlertTitle, IconButton, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
@@ -18,8 +19,6 @@ import { Link } from 'react-router-dom';
 import CustomChip from '../CustomChip';
 import InformativeAlert from '../InformativeAlert';
 import Moment from '../Moment';
-
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
 export type ApikeySearchResults = {
   items: ApiKey[];
