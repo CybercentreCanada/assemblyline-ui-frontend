@@ -1,6 +1,5 @@
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { keepPreviousData, QueryClient } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { compress, decompress } from 'lz-string';
 import React from 'react';
@@ -41,6 +40,6 @@ const persister = createSyncStoragePersister({
 export const APIProvider: React.FC<Props> = React.memo(({ children }: Props) => (
   <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
     {children}
-    {false && <ReactQueryDevtools initialIsOpen={true} />}
+    {/* <ReactQueryDevtools initialIsOpen={true} /> */}
   </PersistQueryClientProvider>
 ));
