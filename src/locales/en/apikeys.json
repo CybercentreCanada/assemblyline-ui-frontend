@@ -57,7 +57,7 @@
   "apikeys.temp_token": "API Key name",
   "apikeys.title": "API Keys",
   "apikeys.w_token": "Write",
-  "filter": "Filter apikeys ...",
+  "filter": "Filter API keys ...",
   "expiration_date": "Expiration Date",
   "last_used": "Last Used",
   "creation_date": "Creation Date",

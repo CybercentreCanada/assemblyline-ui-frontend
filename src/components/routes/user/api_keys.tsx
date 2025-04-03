@@ -4,13 +4,13 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import {
   Button,
   Card,
-  CardActionArea,
   CardContent,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Grid,
   IconButton,
   MenuItem,
   Select,
@@ -54,39 +54,60 @@ const APIKeyCard = ({ name, apikey, askForDelete, changeApikey }: APIKeyCardProp
       }}
       variant="outlined"
     >
-      <CardActionArea>
-        <CardContent>
-          <div style={{ display: 'flex', marginBottom: theme.spacing(1), alignItems: 'center' }}>
-            <Typography style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{apikey.key_name}</Typography>
+      <CardContent>
+        <div
+          style={{
+            display: 'flex',
+            marginBottom: theme.spacing(1),
+            alignItems: 'center'
+          }}
+        >
+          <Grid container>
+            <Grid item xs={9}>
+              <Typography
+                style={{
+                  display: 'flex',
+                  marginRight: theme.spacing(1),
+                  fontFamily: 'monospace',
+                  wordBreak: 'break-word'
+                }}
+              >
+                {apikey.key_name}
+              </Typography>
 
-            <div>
-              <IconButton size="small" onClick={() => changeApikey(apikey)}>
-                <EditOutlinedIcon />
-              </IconButton>
+              {apikey.expiry_ts ? (
+                <div style={{ fontSize: 'small', display: 'flex' }}>
+                  <span /> {t('expiration_date')}:<Moment format="YYYY-MM-DD">{apikey.expiry_ts}</Moment>
+                </div>
+              ) : (
+                ''
+              )}
+            </Grid>
 
-              <IconButton size="small" onClick={() => askForDelete(apikey.id)}>
-                <DeleteOutlineOutlinedIcon />
-              </IconButton>
-            </div>
+            <Grid item xs={3}>
+              <div style={{ float: 'right' }}>
+                <IconButton size="small" onClick={() => changeApikey(apikey)}>
+                  <EditOutlinedIcon />
+                </IconButton>
 
-            {apikey.expiry_ts ? (
-              <div>
-                {t('expiration_date')}: <span />
-                <Moment format="YYYY-MM-DD">{apikey.expiry_ts}</Moment>
+                <IconButton size="small" onClick={() => askForDelete(apikey.id)}>
+                  <DeleteOutlineOutlinedIcon />
+                </IconButton>
               </div>
-            ) : (
-              ''
-            )}
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            {apikey.roles?.sort().map((e, x) => (
-              <div key={x} style={{ marginRight: theme.spacing(0.5), marginBottom: theme.spacing(0.25) }}>
-                <CustomChip type="rounded" label={t(`role.${e}`)} size="tiny" color="primary" />
+            </Grid>
+
+            <Grid item xs={12}>
+              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                {apikey.roles?.sort().map((e, x) => (
+                  <div key={x} style={{ marginRight: theme.spacing(0.5), marginBottom: theme.spacing(0.25) }}>
+                    <CustomChip type="rounded" label={t(`role.${e}`)} size="tiny" color="primary" />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </CardActionArea>
+            </Grid>
+          </Grid>
+        </div>
+      </CardContent>
     </Card>
   );
 };
@@ -175,19 +196,20 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
 
   const handleSelectChange = useCallback(
     event => {
-      setTempKeyPriv(event.target.value.split());
+      let priv = event.target.value.split('');
       let roles = [];
-      if (tempKeyPriv) {
-        for (const ac of tempKeyPriv) {
+      if (priv) {
+        for (const ac of priv) {
           const aclRoles = configuration.user.priv_role_dependencies[ac];
           if (aclRoles) {
             roles.push(...aclRoles.filter(r => currentUser.roles.includes(r)));
           }
         }
       }
+      setTempKeyPriv(priv);
       setTempKeyRoles(roles);
     },
-    [tempKeyPriv]
+    [tempKeyPriv, tempKeyRoles]
   );
 
   const toggleRole = useCallback(
@@ -202,7 +224,7 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
       setTempKeyPriv(['C']);
       setTempKeyRoles(newRoles);
     },
-    [tempKeyRoles]
+    [tempKeyRoles, tempKeyPriv]
   );
 
   const handleNew = useCallback(() => {
@@ -212,9 +234,9 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
     setTempKeyName('');
     setTempExpiryTs(null);
     setTempKeyPriv(['R']);
-    reloadApiKey();
 
     setTempKeyRoles(configuration.user.priv_role_dependencies.R);
+    reloadApiKey();
   }, []);
 
   const askForDelete = useCallback((keyId: string) => {
@@ -228,11 +250,12 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
     setTempExpiryTs(apikey.expiry_ts);
     setTempKeyPriv(apikey.acl);
     setTempKeyName(apikey.key_name);
+    setTempKeyRoles(apikey.roles);
   }, []);
 
   useEffect(() => {
     setApikeys(user.apikeys);
-  }, [user.apikeys, apikeys]);
+  }, [user, apikeys]);
 
   return (
     <>

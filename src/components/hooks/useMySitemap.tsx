@@ -308,6 +308,12 @@ export default function useMySitemap() {
         breadcrumbs: ['/admin']
       },
       {
+        path: '/admin/apikeys:id',
+        title: t('adminmenu.apikeys'),
+        icon: <KeyOutlinedIcon />,
+        breadcrumbs: ['/admin', '/admin/apikeys']
+      },
+      {
         path: '/admin/users/:id',
         title: '{:id}',
         isRoot: true,

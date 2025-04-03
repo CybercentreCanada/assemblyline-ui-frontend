@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import PersonIcon from '@mui/icons-material/Person';
 import { Grid, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
@@ -12,6 +13,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import ApikeysTable, { ApikeySearchResults } from 'components/visual/SearchResult/apikeys';
 import SearchResultCount from 'components/visual/SearchResultCount';
+import { safeFieldValue } from 'helpers/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
@@ -51,7 +53,9 @@ export default function Apikeys() {
   const { user: currentUser, c12nDef, configuration } = useALContext();
   const [apikeySearchResults, setApikeySearchResults] = useState<ApikeySearchResults>(null);
   const location = useLocation();
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
+  const [query, setQuery] = useState<SimpleSearchQuery>(
+    new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0`)
+  );
   const navigate = useNavigate();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -86,22 +90,12 @@ export default function Apikeys() {
   }, []);
 
   useEffect(() => {
-    function reload() {
-      if (!location.hash) closeGlobalDrawer();
-    }
-
-    function closeApikeyDrawer() {
-      navigate('/admin/apikeys');
-      setTimeout(() => reload(), 1000);
-    }
-
     if (!location.hash) closeGlobalDrawer();
     else {
       setGlobalDrawer(<ApikeyDetail key_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
-      subscribeCloseDrawer(closeApikeyDrawer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
+  }, [location.hash, location.pathname]);
 
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0`));
@@ -146,6 +140,25 @@ export default function Apikeys() {
             onValueChange={onFilterValueChange}
             onClear={onClear}
             onSearch={onSearch}
+            buttons={[
+              {
+                icon: <PersonIcon />,
+                props: {
+                  color: query.get('query') ? 'default' : 'primary',
+                  onClick: () => {
+                    let curQueryString = query.get('query') ? query.get('query') : '';
+
+                    if (curQueryString.includes(`uname:${safeFieldValue(currentUser.username)}`)) {
+                      onFilterValueChange('');
+                      onSearch();
+                    } else {
+                      onFilterValueChange(`uname:${safeFieldValue(currentUser.username)}`);
+                      onSearch();
+                    }
+                  }
+                }
+              }
+            ]}
           >
             {apikeySearchResults !== null && (
               <div className={classes.searchresult}>
