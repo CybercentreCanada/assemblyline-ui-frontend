@@ -1,4 +1,5 @@
 import type { AppSwitcherItem } from 'commons/components/app/AppConfigs';
+import type { ServiceSelection } from './submission';
 import type { ACL, Role, Type } from './user';
 
 export const API_PRIV = ['READ', 'READ_WRITE', 'WRITE', 'CUSTOM', 'EXTENDED'] as const;
@@ -6,6 +7,7 @@ export const AUTO_PROPERTY_TYPES = ['access', 'classification', 'type', 'role', 
 export const BANNER_LEVELS = ['info', 'warning', 'success', 'error'] as const;
 export const DOWNLOAD_ENCODINGS = ['raw', 'cart', 'zip'] as const;
 export const EXTERNAL_LINK_TYPES = ['hash', 'metadata', 'tag'] as const;
+export const URI_HASH_PATTERN_MAP = ['url', 'ip', 'domain'] as const;
 export const HASH_PATTERN_MAP = ['sha256', 'sha1', 'md5', 'tlsh', 'ssdeep', 'url'] as const;
 export const KUBERNETES_LABEL_OPS = ['In', 'NotIn', 'Exists', 'DoesNotExist'] as const;
 export const METADATA_FIELDTYPE_MAP = [
@@ -52,6 +54,7 @@ export type ServiceCategory = (typeof SERVICE_CATEGORIES)[number];
 export type ServiceStage = (typeof SERVICE_STAGES)[number];
 export type SystemType = (typeof SYSTEM_TYPES)[number];
 export type TemporaryKeyType = (typeof TEMPORARY_KEY_TYPES)[number];
+export type URIHashPatternMap = (typeof URI_HASH_PATTERN_MAP)[number];
 
 /** Authentication Methods */
 export type Auth = {
@@ -66,6 +69,9 @@ export type Auth = {
 
   /** Allow security tokens? */
   allow_security_tokens: boolean;
+
+  /** maximum days to live for API keys */
+  apikey_max_dtl: number;
 };
 
 /** Malware Archive Configuration */
@@ -315,7 +321,6 @@ export type UI = {
   /** Feed of all the services built by the Assemblyline community. */
   community_feed: string;
 
-
   /** Default user-defined password for creating password protected ZIPs when downloading files */
   default_zip_password: string;
 
@@ -360,7 +365,6 @@ export type UI = {
 
   /** List of services auto-selected by the UI when submitting URLs */
   url_submission_auto_service_selection: string[];
-
 };
 
 /** A file source entry for remote fetching via string */
@@ -412,6 +416,72 @@ export type MetadataConfig = {
 
   /** Metadata specification for submission */
   submit: Record<string, Metadata>;
+};
+
+/** Submission Parameters for profile */
+export type SubmissionProfileParams = {
+  /** Does the submission automatically goes into the archive when completed? */
+  auto_archive?: boolean;
+
+  /** Should a deep scan be performed? */
+  deep_scan?: boolean;
+
+  /** When the submission is archived, should we delete it from hot storage right away? */
+  delete_after_archive?: boolean;
+
+  /** Default submission classification */
+  classification?: string;
+
+  /** Should this submission generate an alert? */
+  generate_alert?: boolean;
+
+  /** Ignore the cached service results? */
+  ignore_cache?: boolean;
+
+  /** Should we ignore dynamic recursion prevention? */
+  ignore_recursion_prevention?: boolean;
+
+  /** Should we ignore filtering services? */
+  ignore_filtering?: boolean;
+
+  /** Ignore the file size limits? */
+  ignore_size?: boolean;
+
+  /** Max number of extracted files */
+  max_extracted?: number;
+
+  /** Max number of supplementary files */
+  max_supplementary?: number;
+
+  /** Priority of the scan */
+  priority?: number;
+
+  /** Service-specific parameters */
+  service_spec?: { [service: string]: { [param: string]: any } };
+
+  /** Service selection */
+  services?: ServiceSelection;
+
+  /** Time, in days, to live for this submission */
+  ttl?: number;
+
+  /** Should we use the alternate dtl while archiving? */
+  use_archive_alternate_dtl?: boolean;
+};
+
+/** Configuration for defining submission profiles for basic users */
+export type SubmissionProfile = {
+  /** Submission profile display name */
+  display_name: string;
+
+  /** A list of service-specific parameters that can be configured */
+  restricted_params: { [service: string]: string[] };
+
+  /** Default submission parameters for profile */
+  params: SubmissionProfileParams;
+
+  /** A description of the submission profile */
+  description?: string;
 };
 
 /** Options regarding all submissions, regardless of their input method */
@@ -469,6 +539,9 @@ export type Submission = {
 
   /** Metadata compliance rules */
   metadata: MetadataConfig;
+
+  /** Submission profiles with preset submission parameters */
+  profiles: { [profile_name: string]: SubmissionProfile };
 
   /** List of external source to fetch file via their SHA256 hashes */
   sha256_sources: string[];
@@ -530,7 +603,8 @@ export const CONFIGURATION: Configuration = {
     allow_2fa: false,
     allow_apikeys: false,
     allow_extended_apikeys: false,
-    allow_security_tokens: false
+    allow_security_tokens: false,
+    apikey_max_dtl: null
   },
   core: {
     archiver: {
@@ -571,7 +645,7 @@ export const CONFIGURATION: Configuration = {
       sha256: { pattern: '^[a-f0-9]{64}$', sources: [], auto_selected: [] },
       tlsh: { pattern: '^((?:T1)?[0-9a-fA-F]{70})$', sources: [], auto_selected: [] },
       ssdeep: { pattern: '^[0-9]{1,18}:[a-zA-Z0-9/+]{0,64}:[a-zA-Z0-9/+]{0,64}$', sources: [], auto_selected: [] },
-      url: { pattern: '([/?#]S*)', sources: [], auto_selected: [] }
+      url: { pattern: '^$', sources: [], auto_selected: [] }
     },
     max_dtl: 0,
     max_extraction_depth: 0,
@@ -583,6 +657,7 @@ export const CONFIGURATION: Configuration = {
       strict_schemes: [],
       submit: {}
     },
+    profiles: {},
     sha256_sources: [],
     tag_types: {
       attribution: [],

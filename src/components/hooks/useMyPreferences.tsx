@@ -6,6 +6,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
+import CodeIcon from '@mui/icons-material/Code';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
@@ -15,9 +16,12 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
+import PaletteIcon from '@mui/icons-material/Palette';
 import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchIcon from '@mui/icons-material/Search';
@@ -370,6 +374,13 @@ const useMyPreferences = () => {
               route: '/admin/users',
               icon: <SupervisorAccountOutlinedIcon />,
               nested: true
+            },
+            {
+              id: 'adminmenu.apikeys',
+              i18nKey: 'adminmenu.apikeys',
+              route: '/admin/apikeys',
+              icon: <KeyOutlinedIcon />,
+              nested: true
             }
           ]
         }
@@ -419,6 +430,57 @@ const useMyPreferences = () => {
               i18nKey: 'drawer.help.services',
               icon: <AccountTreeOutlinedIcon />,
               route: '/help/services',
+              nested: true
+            }
+          ]
+        }
+      },
+      {
+        type: 'group' as 'group',
+        element: {
+          id: 'development',
+          i18nKey: 'drawer.development',
+          userPropValidators: [
+            { prop: 'user.is_admin', value: true, enforce: true },
+            { prop: 'configuration.system.type', value: 'development' },
+            { prop: 'configuration.system.type', value: 'staging' }
+          ],
+          icon: <CodeIcon />,
+          items: [
+            // {
+            //   id: 'development.api',
+            //   i18nKey: 'drawer.development.api',
+            //   userPropValidators: [
+            //     { prop: 'user.is_admin', value: true, enforce: true },
+            //     { prop: 'configuration.system.type', value: 'development' },
+            //     { prop: 'configuration.system.type', value: 'staging' }
+            //   ],
+            //   icon: <ApiIcon />,
+            //   route: '/development/api',
+            //   nested: true
+            // },
+            {
+              id: 'development.library',
+              i18nKey: 'drawer.development.library',
+              userPropValidators: [
+                { prop: 'user.is_admin', value: true, enforce: true },
+                { prop: 'configuration.system.type', value: 'development' },
+                { prop: 'configuration.system.type', value: 'staging' }
+              ],
+              icon: <LibraryBooksIcon />,
+              route: '/development/library',
+              nested: true
+            },
+            {
+              id: 'development.theme',
+              i18nKey: 'drawer.development.theme',
+              userPropValidators: [
+                { prop: 'user.is_admin', value: true, enforce: true },
+                { prop: 'configuration.system.type', value: 'development' },
+                { prop: 'configuration.system.type', value: 'staging' }
+              ],
+              icon: <PaletteIcon />,
+              route: '/development/theme',
               nested: true
             }
           ]

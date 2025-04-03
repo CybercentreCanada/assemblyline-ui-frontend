@@ -314,11 +314,7 @@ function User({ username = null }: UserProps) {
     });
   }
 
-  useEffectOnce(() => {
-    // Make interface editable
-    setEditable(currentUser.is_admin || currentUser.roles.includes('self_manage'));
-
-    // Load user on start
+  const reloadUser = () => {
     if (currentUser.is_admin || !location.pathname.includes('/admin/')) {
       apiCall({
         url: `/api/v4/user/${username || id}/?load_avatar`,
@@ -327,6 +323,14 @@ function User({ username = null }: UserProps) {
         }
       });
     }
+  };
+
+  useEffectOnce(() => {
+    // Make interface editable
+    setEditable(currentUser.is_admin || currentUser.roles.includes('self_manage'));
+
+    // Load user on start
+    reloadUser();
 
     getQuotas();
   });
@@ -505,7 +509,7 @@ function User({ username = null }: UserProps) {
                   otp: <OTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   disable_otp: <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   token: <SecurityToken user={user} toggleToken={toggleToken} />,
-                  api_key: <APIKeys user={user} toggleAPIKey={toggleAPIKey} />,
+                  api_key: <APIKeys user={user} toggleAPIKey={toggleAPIKey} reloadApiKey={reloadUser} />,
                   apps: <Apps user={user} toggleApp={toggleApp} />
                 }[drawerType]
               : null}
