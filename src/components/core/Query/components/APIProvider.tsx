@@ -41,6 +41,6 @@ const persister = createSyncStoragePersister({
 export const APIProvider: React.FC<Props> = React.memo(({ children }: Props) => (
   <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
     {children}
-    <ReactQueryDevtools initialIsOpen={true} />
+    {false && <ReactQueryDevtools initialIsOpen={true} />}
   </PersistQueryClientProvider>
 ));
