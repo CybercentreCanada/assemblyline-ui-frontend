@@ -1,5 +1,6 @@
 {
   "attack_id": "IDs Att&ck associés",
+  "attack_id.helper": "Liste séparée par des virgules d'ID d'attaque",
   "chart.title": "Nombre de fois utilisé dans les derniers 30 jours",
   "contribution": "Contribution au score",
   "desc": "Description",
@@ -23,5 +24,6 @@
   "signature_score_map": "Score des différentes signatures",
   "statistics": "Statistiques",
   "title": "Détails de l'heuristique",
-  "usage": "Afficher l'utilisation de l'heuristique"
+  "usage": "Afficher l'utilisation de l'heuristique",
+  "restore_value": "Restaurer la valeur par défaut {{default}}"
 }

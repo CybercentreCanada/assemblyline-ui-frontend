@@ -1,5 +1,6 @@
 {
   "attack_id": "Associated Att&ck IDs",
+  "attack_id.helper": "Comma-separated list of attack IDs",
   "chart.title": "Number of hits in the last 30 days",
   "contribution": "Score contribution",
   "desc": "Description",
@@ -22,5 +23,6 @@
   "signature_score_map": "Scores of the different signatures",
   "statistics": "Statistics",
   "title": "Heuristic Details",
-  "usage": "Show heuristic usage"
+  "usage": "Show heuristic usage",
+  "restore_value": "Restore default value {{default}}"
 }
