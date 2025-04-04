@@ -213,7 +213,7 @@ const WrappedFileViewer = () => {
                     <CodeSection sha256={sha256} />
                   </div>
                 ),
-                disabled: isMdUp || !codeAllowed
+                preventRender: isMdUp || !codeAllowed
               },
               strings: {
                 label: t('strings'),
