@@ -163,6 +163,8 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
 
   return currentUser.is_admin ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">
+      <RouterPrompt when={modified} />
+
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => {
@@ -178,98 +180,153 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
       />
 
       <div style={{ textAlign: 'left' }}>
-        <Grid container sx={{ marginBottom: theme.spacing(1) }}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item md={9} sx={{ textAlign: 'left', flexGrow: 0 }}>
+        <div style={{ paddingBottom: theme.spacing(4) }}>
+          <Grid container alignItems="center" spacing={1}>
+            <Grid item xs>
               <Typography variant="h4">{t('apikey')}</Typography>
             </Grid>
-
-            <Grid item md={3} sx={{ textAlign: 'right', flexGrow: 0 }}>
+            <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
               {apiKey ? (
-                <>
-                  {(key_id || id) && (
-                    <div>
-                      {
-                        <Tooltip title={t('remove')}>
-                          <IconButton
-                            disabled={loading}
-                            size="large"
-                            onClick={() => setDeleteDialog(true)}
-                            sx={{
-                              color:
-                                theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                            }}
-                          >
-                            <DeleteOutlineOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                      }
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div style={{ display: 'flex' }}>
-                    <Skeleton variant="circular" height="3rem" width="3rem" sx={{ margin: theme.spacing(0.5) }} />
-                    {
-                      <>
-                        <Skeleton variant="circular" height="3rem" width="3rem" sx={{ margin: theme.spacing(0.5) }} />
-                        <Skeleton variant="circular" height="3rem" width="3rem" sx={{ margin: theme.spacing(0.5) }} />
-                      </>
-                    }
+                (key_id || id) && (
+                  <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
+                    <Tooltip title={t('remove')}>
+                      <IconButton
+                        disabled={loading}
+                        size="large"
+                        onClick={() => setDeleteDialog(true)}
+                        sx={{
+                          color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        }}
+                      >
+                        <DeleteOutlineOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
                   </div>
-                </>
+                )
+              ) : (
+                <div style={{ display: 'flex' }}>
+                  <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
+                </div>
               )}
             </Grid>
           </Grid>
+        </div>
 
-          <Grid container sx={{ marginBottom: theme.spacing(1) }}>
-            <Grid item xs={12} sx={{ textAlign: 'left', flexGrow: 0 }}>
-              <Typography variant="h6" sx={{ marginBottom: theme.spacing(1) }}>
-                {t('key.detail.title')}
-              </Typography>
+        <Grid container spacing={3}>
+          {apiKey && (
+            <Grid item xs={12}>
+              <Typography variant="h6"> {t('key.detail.title')}</Typography>
               <Divider />
-            </Grid>
-          </Grid>
-          <Grid container sx={{ marginBottom: theme.spacing(1) }}>
-            {apiKey ? (
-              <div style={{ textAlign: 'left', flexGrow: 0 }}>
-                <Grid container>
-                  <Grid item md={4}>
-                    <span style={{ fontWeight: 500 }}>{t('key.name.title')}</span>
-                  </Grid>
-                  <Grid item md={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                    <span style={{ fontWeight: 500 }}>{apiKey.key_name}</span>
-                  </Grid>
-                  <Grid item md={4}>
-                    <span style={{ fontWeight: 500 }}>{t('username.title')}</span>
-                  </Grid>
-                  <Grid item md={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                    <span style={{ fontWeight: 500 }}>{apiKey.uname}</span>
-                  </Grid>
+              <Grid container>
+                <Grid item xs={4} sm={3}>
+                  <span style={{ fontWeight: 500 }}>{t('key.name.title')}</span>
                 </Grid>
-              </div>
-            ) : (
-              <div></div>
-            )}
+                <Grid item xs={8} sm={9}>
+                  <span style={{ fontWeight: 500 }}>{apiKey.key_name}</span>
+                </Grid>
+                <Grid item xs={4} sm={3}>
+                  <span style={{ fontWeight: 500 }}>{t('username.title')}</span>
+                </Grid>
+                <Grid item xs={8} sm={9} style={{ wordBreak: 'break-word' }}>
+                  <span style={{ fontWeight: 500 }}>{apiKey.uname}</span>
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
+
+          <Grid item xs={12}>
+            <Grid container alignItems={'end'}>
+              <Grid item xs={11}>
+                <Typography variant="h6">{t('timing.title')}</Typography>
+              </Grid>
+              <Grid item xs={1} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                {apiKey ? (
+                  <DatePicker
+                    date={apiKey.expiry_ts}
+                    setDate={date => setApiKey(prev => ({ ...prev, expiry_ts: date }))}
+                    tooltip={t('expiry.change')}
+                    minDateTomorrow
+                  />
+                ) : (
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                )}
+              </Grid>
+            </Grid>
+            <Divider />
+            <Grid container>
+              <Grid item xs={4} sm={3}>
+                <span style={{ fontWeight: 500 }}>{t('creation_date')}</span>
+              </Grid>
+              <Grid item xs={8} sm={9}>
+                {apiKey ? (
+                  apiKey?.creation_date ? (
+                    <div>
+                      <Moment format="YYYY-MM-DD">{apiKey.creation_date}</Moment>&nbsp; (
+                      <Moment variant="fromNow">{apiKey.creation_date}</Moment>)
+                    </div>
+                  ) : (
+                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                      {t('none')}
+                    </Typography>
+                  )
+                ) : (
+                  <Skeleton />
+                )}
+              </Grid>
+              <Grid item xs={4} sm={3}>
+                <span style={{ fontWeight: 500 }}>{t('last_used')}</span>
+              </Grid>
+              <Grid item xs={8} sm={9}>
+                {apiKey ? (
+                  apiKey?.last_used ? (
+                    <div>
+                      <Moment format="YYYY-MM-DD">{apiKey.last_used}</Moment>&nbsp; (
+                      <Moment variant="fromNow">{apiKey.last_used}</Moment>)
+                    </div>
+                  ) : (
+                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                      {t('none')}
+                    </Typography>
+                  )
+                ) : (
+                  <Skeleton />
+                )}
+              </Grid>
+              <Grid item xs={4} sm={3}>
+                <span style={{ fontWeight: 500 }}>{t('expiration_date')}</span>
+              </Grid>
+              <Grid item xs={8} sm={9}>
+                {apiKey ? (
+                  apiKey.expiry_ts ? (
+                    <div>
+                      <Moment format="YYYY-MM-DD">{apiKey.expiry_ts}</Moment>&nbsp; (
+                      <Moment variant="fromNow">{apiKey.expiry_ts}</Moment>)
+                    </div>
+                  ) : (
+                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                      {t('expiry.forever')}
+                    </Typography>
+                  )
+                ) : (
+                  <Skeleton />
+                )}
+              </Grid>
+            </Grid>
           </Grid>
 
-          <Grid container sx={{ marginBottom: theme.spacing(1) }}>
-            <Grid item xs={12} sx={{ textAlign: 'left', flexGrow: 0, marginBottom: theme.spacing(1) }}>
-              <Typography variant="h6" sx={{ marginBottom: theme.spacing(1) }}>
-                {t('permissions.title')}
-              </Typography>
-              <Divider />
-            </Grid>
-            <Grid container>
-              {apiKey ? (
-                <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+          <Grid item xs={12}>
+            <Grid container alignItems={'end'}>
+              <Grid item xs={9}>
+                <Typography variant="h6">{t('permissions.title')}</Typography>
+              </Grid>
+              <Grid item xs={3} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                {apiKey && (
                   <FormControl size="small">
                     <Select
                       id="priv"
+                      variant="outlined"
                       value={apiKey.acl.join('')}
                       onChange={event => handleACLChange(event)}
-                      variant="outlined"
                     >
                       <MenuItem value="R">{t('apikeys.r_token')}</MenuItem>
                       <MenuItem value="RW">{t('apikeys.rw_token')}</MenuItem>
@@ -280,11 +337,12 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
                       <MenuItem value="C">{t('apikeys.c_token')}</MenuItem>
                     </Select>
                   </FormControl>
-                </div>
-              ) : (
-                <div></div>
-              )}
-              {apiKey ? (
+                )}
+              </Grid>
+            </Grid>
+            <Divider />
+            <Grid container>
+              {apiKey && (
                 <div style={{ marginTop: theme.spacing(2) }}>
                   {currentUser.roles.sort().map((role, role_id) => (
                     <CustomChip
@@ -297,61 +355,8 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
                     />
                   ))}
                 </div>
-              ) : (
-                <div></div>
               )}
-              <RouterPrompt when={modified} />
             </Grid>
-          </Grid>
-
-          <Grid container sx={{ marginBottom: theme.spacing(1) }}>
-            <Grid container>
-              <Grid item md={9} sx={{ textAlign: 'left', flexGrow: 0 }}>
-                <Typography variant="h6">{t('timing.title')}</Typography>
-              </Grid>
-              {apiKey ? (
-                <Grid item md={3} sx={{ textAlign: 'right', flexGrow: 0 }}>
-                  <DatePicker
-                    date={apiKey.expiry_ts}
-                    setDate={date => setApiKey(prev => ({ ...prev, expiry_ts: date }))}
-                    tooltip={t('expiry.change')}
-                    minDateTomorrow
-                  />
-                </Grid>
-              ) : (
-                <div></div>
-              )}
-
-              <Divider />
-            </Grid>
-
-            {apiKey ? (
-              <div>
-                <Grid container>
-                  <Grid item xs={6} sm={6}>
-                    <span style={{ fontWeight: 500 }}>{t('creation_date')}</span>
-                  </Grid>
-                  <Grid item xs={6} sm={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                    <Moment format="YYYY-MM-DD">{apiKey.creation_date}</Moment>
-                  </Grid>
-                  <Grid item xs={6} sm={6}>
-                    <span style={{ fontWeight: 500 }}>{t('last_used')}</span>
-                  </Grid>
-                  <Grid item xs={6} sm={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                    {apiKey.last_used ? <Moment format="YYYY-MM-DD">{apiKey.last_used}</Moment> : <></>}
-                  </Grid>
-
-                  <Grid item xs={6} sm={6}>
-                    <span style={{ fontWeight: 500 }}>{t('expiration_date')}</span>
-                  </Grid>
-                  <Grid item xs={6} sm={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                    {apiKey.expiry_ts ? <Moment format="YYYY-MM-DD">{apiKey.expiry_ts}</Moment> : <></>}
-                  </Grid>
-                </Grid>
-              </div>
-            ) : (
-              <div></div>
-            )}
           </Grid>
         </Grid>
       </div>

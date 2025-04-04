@@ -50,13 +50,6 @@ function WrappedDatePicker({
     tempToday.setDate(tempToday.getDate() + 1);
     tempToday.setHours(0, 0, 0, 0);
     setToday(moment(tempToday));
-
-    if (defaultDateOffset) {
-      const defaultDate = new Date();
-      defaultDate.setDate(defaultDate.getDate() + defaultDateOffset);
-      defaultDate.setHours(0, 0, 0, 0);
-      setDate(moment(defaultDate).format('YYYY-MM-DDThh:mm:ss.SSSSSS') + 'Z');
-    }
   });
 
   useEffect(() => {
