@@ -278,10 +278,6 @@ const APIKeyUpsertingDialog = React.memo(
       [prevApiKey, showSuccessMessage]
     );
 
-    if (open) {
-      console.log(apikey, prevApiKey, newApiKey);
-    }
-
     return (
       <>
         {children(() => setOpen(true))}
@@ -394,8 +390,6 @@ type APIKeyCardProps = {
 const APIKeyCard = ({ apikey, onAPIKeysChange = () => null }: APIKeyCardProps) => {
   const { t } = useTranslation(['adminAPIkeys']);
   const theme = useTheme();
-
-  console.log(apikey);
 
   return (
     <Card
