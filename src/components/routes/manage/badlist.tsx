@@ -7,21 +7,18 @@ import Typography from '@mui/material/Typography';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
+import { useALQuery } from 'components/core/Query/AL/useALQuery';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
 import { createSearchParams } from 'components/core/SearchParams/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
-import type { SearchParamsResult } from 'components/core/SearchParams/SearchParser';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
-import useMyAPI from 'components/hooks/useMyAPI';
-import type { Badlist } from 'components/models/base/badlist';
-import type { SearchResult } from 'components/models/ui/search';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import BadlistTable from 'components/visual/SearchResult/badlist';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
@@ -38,21 +35,17 @@ const BADLIST_PARAMS = createSearchParams(p => ({
   refresh: p.boolean(false).hidden().ignored()
 }));
 
-type BadlistParams = SearchParams<typeof BADLIST_PARAMS>;
+export type BadlistParams = SearchParams<typeof BADLIST_PARAMS>;
 
 const BadlistSearch = () => {
   const { t } = useTranslation(['manageBadlist']);
   const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
-  const { apiCall } = useMyAPI();
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { search, setSearchParams, setSearchObject } = useSearchParams<BadlistParams>();
-
-  const [badlistResults, setBadlistResults] = useState<SearchResult<Badlist>>(null);
-  const [searching, setSearching] = useState<boolean>(false);
 
   const suggestions = useMemo<string[]>(
     () =>
@@ -61,6 +54,17 @@ const BadlistSearch = () => {
         : [...DEFAULT_SUGGESTION],
     [indexes.badlist]
   );
+
+  const badlists = useALQuery({
+    url: '/api/v4/search/badlist/',
+    method: 'POST',
+    enabled: currentUser.roles.includes('badlist_view'),
+    initialData: { items: [], offset: 0, rows: 0, total: 0 },
+    body: search
+      .set(o => ({ ...o, query: o.query || '*' }))
+      .omit(['refresh'])
+      .toObject()
+  });
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
@@ -72,33 +76,8 @@ const BadlistSearch = () => {
     [setSearchObject]
   );
 
-  const handleReload = useCallback(
-    (body: SearchParamsResult<BadlistParams>) => {
-      if (!currentUser.roles.includes('badlist_view')) return;
-
-      apiCall<SearchResult<Badlist>>({
-        url: '/api/v4/search/badlist/',
-        method: 'POST',
-        body: body
-          .set(o => ({ ...o, query: o.query || '*' }))
-          .omit(['refresh'])
-          .toObject(),
-        onSuccess: ({ api_response }) => setBadlistResults(api_response),
-        onEnter: () => setSearching(true),
-        onExit: () => setSearching(false)
-      });
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.roles]
-  );
-
-  const setBadlistID = useCallback(
-    (wf_id: string) => navigate(`${location.pathname}${location.search || ''}#${wf_id}`),
-    [location.pathname, location.search, navigate]
-  );
-
   useEffect(() => {
-    if (!location.hash || globalDrawerOpened || !badlistResults) return;
+    if (!location.hash || globalDrawerOpened || !badlists.data) return;
     navigate(`${location.pathname}${location.search || ''}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalDrawerOpened]);
@@ -109,10 +88,6 @@ const BadlistSearch = () => {
     else setGlobalDrawer(<BadlistDetail badlist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash]);
-
-  useEffect(() => {
-    handleReload(search);
-  }, [handleReload, search]);
 
   useEffect(() => {
     function reload() {
@@ -155,12 +130,12 @@ const BadlistSearch = () => {
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
-            loading={searching}
-            results={badlistResults}
+            loading={badlists.isFetching}
+            results={badlists.data}
             resultLabel={
               search.get('query')
-                ? t(`filtered${badlistResults?.total === 1 ? '' : 's'}`)
-                : t(`total${badlistResults?.total === 1 ? '' : 's'}`)
+                ? t(`filtered${badlists.data.total === 1 ? '' : 's'}`)
+                : t(`total${badlists.data.total === 1 ? '' : 's'}`)
             }
             onChange={v => setSearchParams(v)}
             paramDefaults={search.defaults().toObject()}
@@ -200,7 +175,7 @@ const BadlistSearch = () => {
       </PageHeader>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <BadlistTable badlistResults={badlistResults} setBadlistID={setBadlistID} />
+        <BadlistTable badlistResults={badlists.data} isLoading={badlists.isLoading} />
       </div>
     </PageFullWidth>
   ) : (

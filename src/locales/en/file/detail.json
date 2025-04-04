@@ -55,6 +55,7 @@
   "resubmit.dynamic": "Resubmit for Dynamic analysis",
   "resubmit.modify": "Adjust parameters before submission",
   "resubmit.success": "File successfully resubmitted for dynamic analysis. You will be redirected...",
+  "resubmit.with": "Resubmit with",
   "results": "Service Results",
   "safelist": "Add file to the safelist",
   "safelist.acceptText": "Yes, add it!",
