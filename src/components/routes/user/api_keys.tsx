@@ -5,15 +5,16 @@ import {
   Button,
   Card,
   CardContent,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Grid,
   IconButton,
   MenuItem,
   Select,
+  Skeleton,
   TextField,
   Tooltip,
   Typography,
@@ -21,6 +22,7 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
+import makeStyles from '@mui/styles/makeStyles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -33,6 +35,16 @@ import Moment from 'components/visual/Moment';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
+
+const useStyles = makeStyles(() => ({
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
+  }
+}));
 
 /**
  * @name useAPIKeyUtilities
@@ -81,7 +93,7 @@ export const useAPIKeyUtilities = () => {
       const index = roles.indexOf(role);
       const nextRoles = index < 0 ? [...roles, role].sort() : roles.filter(r => r !== role);
       const acl = Object.entries(PRIV_TO_ACL_MAP).find(([, values]) =>
-        arraysEqual([...new Set(values.flatMap(v => configuration.user.priv_role_dependencies[v]))], roles)
+        arraysEqual([...new Set(values.flatMap(v => configuration.user.priv_role_dependencies[v]))], nextRoles)
       );
       return { acl: !acl ? (['C'] as ACL[]) : acl[1], roles: nextRoles };
     },
@@ -106,10 +118,12 @@ const APIKeyDeleteDialog = React.memo(
   ({ apikey = null, children = () => null, onAPIKeysChange = () => null }: APIKeyDeleteDialogProps) => {
     const { t } = useTranslation(['adminAPIkeys']);
     const theme = useTheme();
+    const classes = useStyles();
     const { apiCall } = useMyAPI();
     const { showSuccessMessage } = useMySnackbar();
 
     const [open, setOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -119,13 +133,15 @@ const APIKeyDeleteDialog = React.memo(
           url: `/api/v4/apikey/${values.id}/`,
           method: 'DELETE',
           onSuccess: () => {
-            showSuccessMessage(t('apikeys.removed'));
+            showSuccessMessage(t('apiKeys.removed'));
             setOpen(false);
             onAPIKeysChange(prev => {
               delete prev[values.key_name];
               return prev;
             });
-          }
+          },
+          onEnter: () => setLoading(true),
+          onExit: () => setLoading(false)
         });
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -143,11 +159,13 @@ const APIKeyDeleteDialog = React.memo(
             <DialogContentText>{t('apikeys.remove_text')}</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button color="primary" autoFocus onClick={() => setOpen(false)}>
+            <Button color="primary" autoFocus disabled={loading} onClick={() => setOpen(false)}>
               {t('cancel')}
+              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </Button>
-            <Button color="primary" onClick={() => handleDelete(apikey)}>
+            <Button color="primary" disabled={loading} onClick={() => handleDelete(apikey)}>
               {t('apikeys.remove')}
+              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </Button>
           </DialogActions>
         </Dialog>
@@ -179,7 +197,7 @@ const NewAPIKeyDialog = React.memo(({ apikey = null, onClose = () => null }: New
 
   return (
     <Dialog fullScreen={fullScreen} open={!!apikey} onClose={onClose} PaperProps={{ style: { minWidth: '650px' } }}>
-      <DialogTitle>{t('apikeys.new_title')}</DialogTitle>
+      <DialogTitle>{t('apiKeys.new_title')}</DialogTitle>
       {apikey && (
         <DialogContent>
           <DialogContentText component="div">
@@ -237,6 +255,7 @@ const APIKeyUpsertingDialog = React.memo(
   ({ apikey: prevApiKey = null, children = () => null, onAPIKeysChange = () => null }: APIKeyUpsertingDialogProps) => {
     const { t } = useTranslation(['adminAPIkeys']);
     const theme = useTheme();
+    const classes = useStyles();
     const { apiCall } = useMyAPI();
     const { configuration, user: currentUser } = useALContext();
     const { defaults, selectACL, toggleRole } = useAPIKeyUtilities();
@@ -245,6 +264,7 @@ const APIKeyUpsertingDialog = React.memo(
     const [apikey, setApiKey] = useState<ApiKey>(prevApiKey || defaults);
     const [newApiKey, setNewApiKey] = useState<NewApiKey>(null);
     const [open, setOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -271,7 +291,9 @@ const APIKeyUpsertingDialog = React.memo(
 
             setOpen(false);
             onAPIKeysChange(prev => ({ ...prev, [api_response.key_name]: api_response }));
-          }
+          },
+          onEnter: () => setLoading(true),
+          onExit: () => setLoading(false)
         });
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -294,7 +316,7 @@ const APIKeyUpsertingDialog = React.memo(
           <DialogContent>
             <TextField
               autoFocus
-              disabled={!!prevApiKey}
+              disabled={!!prevApiKey || loading}
               label={t('apikeys.temp_token')}
               margin="normal"
               size="small"
@@ -309,23 +331,45 @@ const APIKeyUpsertingDialog = React.memo(
                 }
               }}
             />
-            <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-              <div style={{ alignSelf: 'center', flexGrow: 2 }}>
-                <FormControl size="small">
-                  <Select
-                    id="priv"
-                    variant="outlined"
-                    value={apikey.acl.join('')}
-                    onChange={event => setApiKey(prev => ({ ...prev, ...selectACL(event.target.value) }))}
-                  >
-                    <MenuItem value="R">{t('apikeys.r_token')}</MenuItem>
-                    <MenuItem value="RW">{t('apikeys.rw_token')}</MenuItem>
-                    <MenuItem value="W">{t('apikeys.w_token')}</MenuItem>
-                    {configuration.auth.allow_extended_apikeys && <MenuItem value="E">{t('apikeys.e_token')}</MenuItem>}
-                    <MenuItem value="C">{t('apikeys.c_token')}</MenuItem>
-                  </Select>
-                </FormControl>
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                columnGap: theme.spacing(1)
+              }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                {t('expiration_date')} <span />
+                <DatePicker
+                  aria-labelledby="expiry_ts-label"
+                  date={apikey.expiry_ts}
+                  disabled={loading}
+                  setDate={date => setApiKey(prev => ({ ...prev, expiry_ts: date }))}
+                  type="input"
+                  minDateTomorrow
+                  defaultDateOffset={
+                    !prevApiKey && configuration.auth.apikey_max_dtl ? configuration.auth.apikey_max_dtl - 1 : null
+                  }
+                />
               </div>
+
+              <FormControl size="small" fullWidth sx={{ flex: 1 }}>
+                <Select
+                  id="priv"
+                  variant="outlined"
+                  value={apikey.acl.join('')}
+                  disabled={loading}
+                  onChange={event => setApiKey(prev => ({ ...prev, ...selectACL(event.target.value) }))}
+                >
+                  <MenuItem value="R">{t('apikeys.r_token')}</MenuItem>
+                  <MenuItem value="RW">{t('apikeys.rw_token')}</MenuItem>
+                  <MenuItem value="W">{t('apikeys.w_token')}</MenuItem>
+                  {configuration.auth.allow_extended_apikeys && <MenuItem value="E">{t('apikeys.e_token')}</MenuItem>}
+                  <MenuItem value="C">{t('apikeys.c_token')}</MenuItem>
+                </Select>
+              </FormControl>
             </div>
             <div style={{ marginTop: theme.spacing(2) }}>
               {currentUser.roles.sort().map((role, role_id) => (
@@ -335,40 +379,31 @@ const APIKeyUpsertingDialog = React.memo(
                   size="small"
                   color={apikey.roles.includes(role) ? 'primary' : 'default'}
                   label={t(`role.${role}`)}
+                  disabled={loading}
                   onClick={() => setApiKey(prev => ({ ...prev, ...toggleRole(prev.roles, role) }))}
                 />
               ))}
-            </div>
-            <div>
-              {t('expiration_date')} <span />
-              <DatePicker
-                aria-labelledby="expiry_ts-label"
-                date={apikey.expiry_ts}
-                setDate={date => setApiKey(prev => ({ ...prev, expiry_ts: date }))}
-                type="input"
-                minDateTomorrow
-                defaultDateOffset={
-                  !prevApiKey && configuration.auth.apikey_max_dtl ? configuration.auth.apikey_max_dtl - 1 : null
-                }
-              />
             </div>
           </DialogContent>
           <DialogActions>
             <Button
               color="primary"
+              disabled={loading}
               onClick={() => {
                 setOpen(false);
                 setApiKey(defaults);
               }}
             >
               {t('cancel')}
+              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </Button>
             <Button
               color="primary"
-              disabled={!apikey.key_name || !apikey.roles.length}
+              disabled={!apikey.key_name || !apikey.roles.length || loading}
               onClick={() => handleUpsert(apikey)}
             >
               {!prevApiKey ? t('apikeys.add') : t('apikeys.save')}
+              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </Button>
           </DialogActions>
         </Dialog>
@@ -392,75 +427,94 @@ const APIKeyCard = ({ apikey, onAPIKeysChange = () => null }: APIKeyCardProps) =
   const theme = useTheme();
 
   return (
-    <Card
-      style={{
-        backgroundColor: '#00000015',
-        padding: theme.spacing(1),
-        borderRadius: theme.spacing(0.5),
-        marginBottom: theme.spacing(1)
-      }}
-      variant="outlined"
-    >
+    <Card variant="outlined" sx={{ backgroundColor: '#00000015', marginBottom: theme.spacing(1) }}>
       <CardContent>
-        <div
-          style={{
-            display: 'flex',
-            marginBottom: theme.spacing(1),
-            alignItems: 'center'
-          }}
-        >
-          <Grid container>
-            <Grid item xs={9}>
-              <Typography
-                style={{
-                  display: 'flex',
-                  marginRight: theme.spacing(1),
-                  fontFamily: 'monospace',
-                  wordBreak: 'break-word'
-                }}
-              >
-                {apikey.key_name}
-              </Typography>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', rowGap: theme.spacing(1) }}>
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <Typography
+              style={{ flex: 1, marginRight: theme.spacing(1), fontFamily: 'monospace', wordBreak: 'break-word' }}
+            >
+              {apikey.key_name}
+            </Typography>
 
-              {apikey.expiry_ts ? (
-                <div style={{ fontSize: 'small', display: 'flex' }}>
-                  <span /> {t('expiration_date')}:<Moment format="YYYY-MM-DD">{apikey.expiry_ts}</Moment>
+            <div>
+              <APIKeyUpsertingDialog apikey={apikey} onAPIKeysChange={onAPIKeysChange}>
+                {onOpen => (
+                  <IconButton size="small" onClick={() => onOpen()}>
+                    <EditOutlinedIcon />
+                  </IconButton>
+                )}
+              </APIKeyUpsertingDialog>
+            </div>
+
+            <div>
+              <APIKeyDeleteDialog apikey={apikey} onAPIKeysChange={onAPIKeysChange}>
+                {onOpen => (
+                  <IconButton size="small" onClick={() => onOpen()}>
+                    <DeleteOutlineOutlinedIcon />
+                  </IconButton>
+                )}
+              </APIKeyDeleteDialog>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: theme.spacing(1) }}>
+            <span style={{ fontWeight: 500 }}>{t('creation_date')}</span>
+            {apikey ? (
+              apikey?.creation_date ? (
+                <div>
+                  <Moment format="YYYY-MM-DD">{apikey.creation_date}</Moment>&nbsp; (
+                  <Moment variant="fromNow">{apikey.creation_date}</Moment>)
                 </div>
               ) : (
-                ''
-              )}
-            </Grid>
+                <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                  {t('none')}
+                </Typography>
+              )
+            ) : (
+              <Skeleton />
+            )}
 
-            <Grid item xs={3}>
-              <div style={{ float: 'right' }}>
-                <APIKeyUpsertingDialog apikey={apikey} onAPIKeysChange={onAPIKeysChange}>
-                  {onOpen => (
-                    <IconButton size="small" onClick={() => onOpen()}>
-                      <EditOutlinedIcon />
-                    </IconButton>
-                  )}
-                </APIKeyUpsertingDialog>
+            <span style={{ fontWeight: 500 }}>{t('last_used')}</span>
+            {apikey ? (
+              apikey?.last_used ? (
+                <div>
+                  <Moment format="YYYY-MM-DD">{apikey.last_used}</Moment>&nbsp; (
+                  <Moment variant="fromNow">{apikey.last_used}</Moment>)
+                </div>
+              ) : (
+                <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                  {t('none')}
+                </Typography>
+              )
+            ) : (
+              <Skeleton />
+            )}
 
-                <APIKeyDeleteDialog apikey={apikey} onAPIKeysChange={onAPIKeysChange}>
-                  {onOpen => (
-                    <IconButton size="small" onClick={() => onOpen()}>
-                      <DeleteOutlineOutlinedIcon />
-                    </IconButton>
-                  )}
-                </APIKeyDeleteDialog>
+            <span style={{ fontWeight: 500 }}>{t('expiration_date')}</span>
+            {apikey ? (
+              apikey.expiry_ts ? (
+                <div>
+                  <Moment format="YYYY-MM-DD">{apikey.expiry_ts}</Moment>&nbsp; (
+                  <Moment variant="fromNow">{apikey.expiry_ts}</Moment>)
+                </div>
+              ) : (
+                <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                  {t('expiry.forever')}
+                </Typography>
+              )
+            ) : (
+              <Skeleton />
+            )}
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {apikey.roles?.sort().map((e, x) => (
+              <div key={x} style={{ marginRight: theme.spacing(0.5), marginBottom: theme.spacing(0.25) }}>
+                <CustomChip type="rounded" label={t(`role.${e}`)} size="tiny" color="primary" />
               </div>
-            </Grid>
-
-            <Grid item xs={12}>
-              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                {apikey.roles?.sort().map((e, x) => (
-                  <div key={x} style={{ marginRight: theme.spacing(0.5), marginBottom: theme.spacing(0.25) }}>
-                    <CustomChip type="rounded" label={t(`role.${e}`)} size="tiny" color="primary" />
-                  </div>
-                ))}
-              </div>
-            </Grid>
-          </Grid>
+            ))}
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -477,11 +531,9 @@ type APIKeysProps = {
   onAPIKeysChange?: (setApiKeys: (prevState: User['apikeys']) => User['apikeys']) => void;
 };
 
-export default function APIKeys({ apiKeys, onAPIKeysChange = () => null }: APIKeysProps) {
+export default function APIKeys({ apiKeys = {}, onAPIKeysChange = () => null }: APIKeysProps) {
   const { t } = useTranslation(['adminAPIkeys']);
   const theme = useTheme();
-
-  console.log(apiKeys);
 
   return (
     <>

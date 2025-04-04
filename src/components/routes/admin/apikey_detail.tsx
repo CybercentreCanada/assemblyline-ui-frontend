@@ -1,5 +1,4 @@
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import type { SelectChangeEvent } from '@mui/material';
 import {
   Button,
   CircularProgress,
@@ -18,8 +17,9 @@ import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { PRIV_TO_ACL_MAP, type ACL, type ApiKey, type Role } from 'components/models/base/user';
+import { type ApiKey } from 'components/models/base/user';
 import ForbiddenPage from 'components/routes/403';
+import { useAPIKeyUtilities } from 'components/routes/user/api_keys';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
@@ -29,11 +29,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useParams } from 'react-router-dom';
-
-const arraysEqual = (array1: unknown[], array2: unknown[]): boolean => {
-  const arr2 = array2.sort();
-  return array1.length === array2.length && array1.sort().every((value, index) => value === arr2[index]);
-};
 
 type ParamProps = {
   id: string;
@@ -50,6 +45,7 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { configuration, user: currentUser } = useALContext();
+  const { selectACL, toggleRole } = useAPIKeyUtilities();
   const { id } = useParams<ParamProps>();
   const { showSuccessMessage } = useMySnackbar();
 
@@ -124,35 +120,6 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
-  );
-
-  const handleACLChange = useCallback(
-    (event: SelectChangeEvent<string>) => {
-      const acl = event.target.value.split('') as ACL[];
-      const roles = [
-        ...new Set(
-          acl.flatMap(item =>
-            configuration.user.priv_role_dependencies[item].filter(r => currentUser.roles.includes(r))
-          )
-        )
-      ].sort();
-      setApiKey(prev => ({ ...prev, roles, acl }));
-    },
-    [configuration.user.priv_role_dependencies, currentUser.roles]
-  );
-
-  const handleRoleChange = useCallback(
-    (role: Role) => {
-      setApiKey(prev => {
-        const index = prev.roles.indexOf(role);
-        const roles = index < 0 ? [...prev.roles, role].sort() : prev.roles.filter(r => r !== role);
-        const acl = Object.entries(PRIV_TO_ACL_MAP).find(([, values]) =>
-          arraysEqual([...new Set(values.flatMap(v => configuration.user.priv_role_dependencies[v]))], roles)
-        );
-        return { ...prev, acl: !acl ? ['C'] : acl[1], roles: roles };
-      });
-    },
-    [configuration.user.priv_role_dependencies]
   );
 
   useEffect(() => {
@@ -326,7 +293,7 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
                       id="priv"
                       variant="outlined"
                       value={apiKey.acl.join('')}
-                      onChange={event => handleACLChange(event)}
+                      onChange={event => setApiKey(prev => ({ ...prev, ...selectACL(event.target.value) }))}
                     >
                       <MenuItem value="R">{t('apikeys.r_token')}</MenuItem>
                       <MenuItem value="RW">{t('apikeys.rw_token')}</MenuItem>
@@ -347,11 +314,11 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
                   {currentUser.roles.sort().map((role, role_id) => (
                     <CustomChip
                       key={role_id}
+                      label={t(`role.${role}`)}
                       type="rounded"
                       size="small"
                       color={apiKey.roles.includes(role) ? 'primary' : 'default'}
-                      onClick={() => handleRoleChange(role)}
-                      label={t(`role.${role}`)}
+                      onClick={() => setApiKey(prev => ({ ...prev, ...toggleRole(prev.roles, role) }))}
                     />
                   ))}
                 </div>
