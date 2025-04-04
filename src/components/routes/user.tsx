@@ -186,17 +186,6 @@ function User({ username = null }: UserProps) {
     setUser({ ...user, apps: newApps });
   }
 
-  function toggleAPIKey(name, apiKey) {
-    const newKeys = { ...user.apikeys };
-    if (name in user.apikeys) {
-      delete newKeys[name];
-      setUser({ ...user, apikeys: newKeys });
-    } else {
-      newKeys[name] = apiKey;
-      setUser({ ...user, apikeys: newKeys });
-    }
-  }
-
   function setName(value) {
     setModified(true);
     setUser({ ...user, name: value });
@@ -509,7 +498,7 @@ function User({ username = null }: UserProps) {
                   otp: <OTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   disable_otp: <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   token: <SecurityToken user={user} toggleToken={toggleToken} />,
-                  api_key: <APIKeys user={user} toggleAPIKey={toggleAPIKey} reloadApiKey={reloadUser} />,
+                  api_key: <APIKeys keyUser={user} />,
                   apps: <Apps user={user} toggleApp={toggleApp} />
                 }[drawerType]
               : null}

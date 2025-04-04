@@ -38,7 +38,7 @@ function WrappedDatePicker({
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffectOnce(() => {
     const tempTomorrow = new Date();
@@ -55,9 +55,8 @@ function WrappedDatePicker({
       const defaultDate = new Date();
       defaultDate.setDate(defaultDate.getDate() + defaultDateOffset);
       defaultDate.setHours(0, 0, 0, 0);
-      setDate(moment(defaultDate).format('YYYY-MM-DDThh:mm:ss.SSSSSS') + "Z");
+      setDate(moment(defaultDate).format('YYYY-MM-DDThh:mm:ss.SSSSSS') + 'Z');
     }
-
   });
 
   useEffect(() => {
@@ -71,12 +70,11 @@ function WrappedDatePicker({
     } else if (date === undefined || date === null) {
       setTempDate(null);
     }
-
   }, [date, defaultDateOffset]);
 
   // Build chip based on computed values
   return (
-    <LocalizationProvider dateAdapter={AdapterMoment}>
+    <LocalizationProvider adapterLocale={i18n.language} dateAdapter={AdapterMoment}>
       {type === 'button' ? (
         <>
           <Tooltip title={tooltip ? tooltip : t('date.open')}>
