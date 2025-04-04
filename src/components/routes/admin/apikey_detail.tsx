@@ -308,6 +308,7 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
               {apikey ? (
                 <Grid item md={3} sx={{ textAlign: 'right', flexGrow: 0 }}>
                   <DatePicker
+                    aria-labelledby="expiry_ts-label"
                     date={apikey.expiry_ts}
                     setDate={handleExpiryDateChange}
                     tooltip={t('expiry.change')}

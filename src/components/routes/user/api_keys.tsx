@@ -29,7 +29,7 @@ import { ACL, ApiKey, Role, User } from 'components/models/base/user';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
 import Moment from 'components/visual/Moment';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 
@@ -113,12 +113,10 @@ const APIKeyCard = ({ name, apikey, askForDelete, changeApikey }: APIKeyCardProp
 };
 
 type APIKeysProps = {
-  user: User;
-  toggleAPIKey: (name: string, apiKey?: ApiKey) => void;
-  reloadApiKey: () => void;
+  keyUser: User;
 };
 
-export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysProps) {
+export default function APIKeys({ keyUser }: APIKeysProps) {
   const { t } = useTranslation(['apikeys']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -135,8 +133,7 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
   const [tempExpiryTs, setTempExpiryTs] = useState<string>(null);
   const [tempKeyPriv, setTempKeyPriv] = useState<ACL[]>(['R']);
   const [tempKeyRoles, setTempKeyRoles] = useState<Role[]>(configuration.user.priv_role_dependencies.R);
-
-  const [apikeys, setApikeys] = useState(user.apikeys);
+  const [apikeys, setApikeys] = useState(keyUser.apikeys);
 
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_]*$');
@@ -151,9 +148,21 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
         setDeleteApikeyId(null);
         setCreateNewKey(false);
         setModifyApikey(false);
+
+        let newApikeys = apikeys;
+
+        const delKeyname = Object.values(newApikeys)
+          .filter(key => {
+            return key.id ? key.id === deleteApikeyId : false;
+          })
+          .flatMap(key => key.key_name);
+        if (delKeyname.length == 1) {
+          delete newApikeys[delKeyname[0]];
+        }
+        setApikeys(newApikeys);
       }
     });
-  }, [deleteApikeyId]);
+  }, [deleteApikeyId, apikeys]);
 
   const handleCreate = useCallback(() => {
     apiCall({
@@ -174,17 +183,21 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
         setModifyApikey(false);
         handleNew();
 
-        toggleAPIKey(api_data.api_response.name, {
-          acl: api_data.api_response.apikey.acl,
-          roles: api_data.api_response.apikey.roles,
-          key_name: api_data.api_response.apikey.key_name,
-          uname: api_data.api_response.apikey.uname,
-          expiry_ts: api_data.api_response.apikey.expiry_ts,
-          id: api_data.api_response.apikeye.id
-        });
+        let newApikeys = apikeys;
+
+        newApikeys[api_data.api_response.key_name] = {
+          acl: api_data.api_response.acl,
+          roles: api_data.api_response.roles,
+          key_name: api_data.api_response.key_name,
+          uname: api_data.api_response.uname,
+          expiry_ts: api_data.api_response.expiry_ts,
+          id: api_data.api_response.id
+        };
+
+        setApikeys(newApikeys);
       }
     });
-  }, [tempKeyName, tempKeyPriv, tempKeyRoles, tempExpiryTs, createNewKey, tempAPIKey]);
+  }, [tempKeyName, tempKeyPriv, tempKeyRoles, tempExpiryTs, createNewKey, tempAPIKey, apikeys]);
 
   const handleKeyNameChange = useCallback(event => {
     if (regex.test(event.target.value) || event.target.value === '') {
@@ -236,7 +249,6 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
     setTempKeyPriv(['R']);
 
     setTempKeyRoles(configuration.user.priv_role_dependencies.R);
-    reloadApiKey();
   }, []);
 
   const askForDelete = useCallback((keyId: string) => {
@@ -252,10 +264,6 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
     setTempKeyName(apikey.key_name);
     setTempKeyRoles(apikey.roles);
   }, []);
-
-  useEffect(() => {
-    setApikeys(user.apikeys);
-  }, [user, apikeys]);
 
   return (
     <>
@@ -423,12 +431,13 @@ export default function APIKeys({ user, toggleAPIKey, reloadApiKey }: APIKeysPro
               />
             ))}
           </div>
-          <div>
-            {t('expiration_date')} <span />
+          <div style={{ display: 'flex', flexDirection: 'row', width: '100%', marginTop: theme.spacing(2) }}>
             <DatePicker
               aria-labelledby="expiry_ts-label"
               date={tempExpiryTs}
               setDate={date => setTempExpiryTs(date)}
+              tooltip={t('expiration_date')}
+              textFieldProps={{ style: { width: '100%' } }}
               type="input"
               minDateTomorrow
               defaultDateOffset={
