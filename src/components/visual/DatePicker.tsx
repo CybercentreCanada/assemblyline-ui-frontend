@@ -55,9 +55,8 @@ function WrappedDatePicker({
       const defaultDate = new Date();
       defaultDate.setDate(defaultDate.getDate() + defaultDateOffset);
       defaultDate.setHours(0, 0, 0, 0);
-      setDate(moment(defaultDate).format('YYYY-MM-DDThh:mm:ss.SSSSSS') + "Z");
+      setDate(moment(defaultDate).format('YYYY-MM-DDThh:mm:ss.SSSSSS') + 'Z');
     }
-
   });
 
   useEffect(() => {
@@ -71,7 +70,6 @@ function WrappedDatePicker({
     } else if (date === undefined || date === null) {
       setTempDate(null);
     }
-
   }, [date, defaultDateOffset]);
 
   // Build chip based on computed values

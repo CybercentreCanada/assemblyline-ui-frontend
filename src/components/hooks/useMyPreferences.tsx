@@ -317,6 +317,13 @@ const useMyPreferences = () => {
           icon: <BusinessOutlinedIcon />,
           items: [
             {
+              id: 'adminmenu.apikeys',
+              i18nKey: 'adminmenu.apikeys',
+              route: '/admin/apikeys',
+              icon: <KeyOutlinedIcon />,
+              nested: true
+            },
+            {
               id: 'adminmenu.errors',
               i18nKey: 'adminmenu.errors',
               route: '/admin/errors',
@@ -370,13 +377,6 @@ const useMyPreferences = () => {
               i18nKey: 'adminmenu.users',
               route: '/admin/users',
               icon: <SupervisorAccountOutlinedIcon />,
-              nested: true
-            },
-            {
-              id: 'adminmenu.apikeys',
-              i18nKey: 'adminmenu.apikeys',
-              route: '/admin/apikeys',
-              icon: <KeyOutlinedIcon />,
               nested: true
             }
           ]

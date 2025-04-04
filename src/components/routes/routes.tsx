@@ -25,6 +25,7 @@ const AdminSiteMap = lazy(() => import('components/routes/admin/site_map'));
 const AdminTagSafelist = lazy(() => import('components/routes/admin/tag_safelist'));
 const AdminUsers = lazy(() => import('components/routes/admin/users'));
 const AdminApikeys = lazy(() => import('components/routes/admin/apikeys'));
+const AdminApikeysDetail = lazy(() => import('components/routes/admin/apikey_detail'));
 const AlertDetails = lazy(() => import('components/routes/alerts/detail'));
 const Alerts = lazy(() => import('components/routes/alerts'));
 const AlertsRedirect = lazy(() => import('components/routes/alerts/redirect'));
@@ -145,6 +146,7 @@ const WrappedRoutes = () => {
         <Route path="/admin/tag_safelist" element={<AdminTagSafelist />} />
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/apikeys" element={<AdminApikeys />} />
+        <Route path="/admin/apikeys/:id" element={<AdminApikeysDetail />} />
         <Route path="/admin/users/:id" element={<User />} />
         <Route path="/archive" element={<MalwareArchive />} />
         <Route path="/archive/:id" element={<ArchiveDetail />} />

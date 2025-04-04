@@ -301,7 +301,7 @@ export type UI = {
   allow_zip_downloads: boolean;
 
   /** Proxy requests to the configured API target and add headers */
-  api_proxies: { [proxy: string]: any };
+  api_proxies: { [proxy: string]: unknown };
 
   /** Hogwarts App data */
   apps: AppSwitcherItem[];
@@ -382,7 +382,7 @@ export type Metadata = {
   aliases: string[];
 
   /** Default value for the field */
-  default?: any;
+  default?: unknown;
 
   /** Is this field required? */
   required: boolean;
@@ -394,7 +394,7 @@ export type Metadata = {
   suggestions: string[];
 
   /** Configuration parameters to apply to validator */
-  validator_params: Record<string, any>;
+  validator_params: Record<string, unknown>;
 
   /** Type of validation to apply to metadata value */
   validator_type: MetadataFieldTypeMap;
@@ -617,7 +617,7 @@ export const CONFIGURATION: Configuration = {
     allow_replay: false,
     allow_url_submissions: false,
     allow_zip_downloads: false,
-    api_proxies: [],
+    api_proxies: {},
     apps: [],
     audit: false,
     banner: {},

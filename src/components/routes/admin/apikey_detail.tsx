@@ -1,4 +1,5 @@
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import type { SelectChangeEvent } from '@mui/material';
 import {
   Button,
   CircularProgress,
@@ -17,17 +18,22 @@ import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { ACL, Role, type ApiKey } from 'components/models/base/user';
+import { PRIV_TO_ACL_MAP, type ACL, type ApiKey, type Role } from 'components/models/base/user';
 import ForbiddenPage from 'components/routes/403';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
 import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useParams } from 'react-router-dom';
+
+const arraysEqual = (array1: unknown[], array2: unknown[]): boolean => {
+  const arr2 = array2.sort();
+  return array1.length === array2.length && array1.sort().every((value, index) => value === arr2[index]);
+};
 
 type ParamProps = {
   id: string;
@@ -35,133 +41,125 @@ type ParamProps = {
 
 type ApikeyDetailProps = {
   key_id?: string;
-  close?: () => void;
+  onClose?: () => void;
 };
 
-const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) => {
-  const { t } = useTranslation(['apikeys']);
-  const { id } = useParams<ParamProps>();
-  const theme = useTheme();
-  const [apikey, setApikey] = useState<ApiKey>(null);
-  const [deleteDialog, setDeleteDialog] = useState(false);
-  const [waitingDialog, setWaitingDialog] = useState(false);
-  const { configuration, user: currentUser, c12nDef } = useALContext();
-  const { showSuccessMessage } = useMySnackbar();
-  const { apiCall } = useMyAPI();
+const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps) => {
+  const { t } = useTranslation(['adminAPIkeys']);
   const navigate = useNavigate();
-  const [modified, setModified] = useState<boolean>(false);
-  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
+  const theme = useTheme();
+  const { apiCall } = useMyAPI();
+  const { configuration, user: currentUser } = useALContext();
+  const { id } = useParams<ParamProps>();
+  const { showSuccessMessage } = useMySnackbar();
 
-  const [tempExpiryTs, setTempExpiryTs] = useState<string>(null);
-  const [tempKeyPriv, setTempKeyPriv] = useState<ACL[]>(['R']);
-  const [tempKeyRoles, setTempKeyRoles] = useState<Role[]>(configuration.user.priv_role_dependencies.R);
+  const [apiKey, setApiKey] = useState<ApiKey>(null);
+  const [prevApiKey, setPrevApiKey] = useState<ApiKey>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
+  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
 
-  const reload = useCallback(() => {
-    apiCall({
+  const modified = useMemo<boolean>(() => JSON.stringify(apiKey) !== JSON.stringify(prevApiKey), [apiKey, prevApiKey]);
+
+  const handleReload = useCallback(() => {
+    apiCall<ApiKey>({
       url: `/api/v4/apikey/${key_id || id}/`,
-      onSuccess: api_data => {
-        setApikey(api_data.api_response);
-        setTempExpiryTs(api_data.api_response.expiry_ts);
-        setTempKeyPriv(api_data.api_response.acl);
-        setTempKeyRoles(api_data.api_response.roles);
-      }
+      onSuccess: ({ api_response }) => {
+        setApiKey({ ...api_response, roles: api_response.roles.sort() });
+        setPrevApiKey({ ...api_response, roles: api_response.roles.sort() });
+      },
+      onEnter: () => setLoading(true),
+      onExit: () => setLoading(false)
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key_id, id]);
 
-  const removeApikey = useCallback(() => {
+  const handleDelete = useCallback(() => {
     apiCall({
       url: `/api/v4/apikey/${key_id || id}/`,
       method: 'DELETE',
       onSuccess: () => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
-        if (id || key_id) {
-          setTimeout(() => navigate('/admin/apikeys'), 1000);
-        }
-        close();
+        if (id || key_id) setTimeout(() => navigate('/admin/apikeys'), 1000);
+        onClose();
       },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-  }, [key_id, id]);
-
-  const saveApikey = useCallback(() => {
-    apiCall({
-      method: 'PUT',
-      body: {
-        key_name: apikey.key_name,
-        roles: tempKeyRoles,
-        expiry_ts: tempExpiryTs,
-        priv: tempKeyPriv,
-        uname: apikey.uname
-      },
-      url: `/api/v4/apikey/add/?keyid=${encodeURIComponent(apikey.id)}`,
       onEnter: () => {
+        setLoading(true);
         setWaitingDialog(true);
       },
       onExit: () => {
+        setLoading(false);
         setWaitingDialog(false);
-        setModified(false);
-        reload();
-        setTimeout(() => close(), 1000);
       }
     });
-  }, [apikey, tempKeyRoles, tempExpiryTs, tempKeyPriv]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key_id, id, showSuccessMessage, t, onClose, navigate]);
 
-  const handleExpiryDateChange = useCallback(
-    date => {
-      setApikey({ ...apikey, expiry_ts: date });
-      setTempExpiryTs(date);
-      setModified(true);
-    },
-    [apikey]
-  );
-
-  const handleSelectChange = useCallback(
-    event => {
-      const acl = event.target.value.split('');
-      let roles = [];
-
-      if (acl) {
-        for (const ac of acl) {
-          const aclRoles = configuration.user.priv_role_dependencies[ac];
-          if (aclRoles) {
-            roles.push(...aclRoles.filter(r => currentUser.roles.includes(r)));
-          }
+  const handleSave = useCallback(
+    (value: ApiKey) => {
+      apiCall({
+        url: `/api/v4/apikey/add/?keyid=${encodeURIComponent(value.id)}`,
+        method: 'PUT',
+        body: {
+          expiry_ts: value.expiry_ts,
+          key_name: value.key_name,
+          priv: value.acl,
+          roles: value.roles,
+          uname: value.uname
+        },
+        onSuccess: () => {
+          setPrevApiKey({ ...value });
+          setTimeout(() => window.dispatchEvent(new CustomEvent('reloadAPIKeys')), 1000);
+        },
+        onEnter: () => {
+          setLoading(true);
+          setWaitingDialog(true);
+        },
+        onExit: () => {
+          setLoading(false);
+          setWaitingDialog(false);
         }
-      }
-      setApikey({ ...apikey, roles, acl });
-      setTempKeyPriv(acl);
-      setTempKeyRoles(roles);
-      setModified(true);
+      });
     },
-    [apikey]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
-  const toggleRole = useCallback(
-    role => {
-      const newRoles = [...apikey.roles];
-      if (newRoles.indexOf(role) === -1) {
-        newRoles.push(role);
-      } else {
-        newRoles.splice(newRoles.indexOf(role), 1);
-      }
-
-      setApikey({ ...apikey, roles: newRoles, acl: ['C'] });
-      setTempKeyPriv(['C']);
-      setTempKeyRoles(newRoles);
-
-      setModified(true);
+  const handleACLChange = useCallback(
+    (event: SelectChangeEvent<string>) => {
+      const acl = event.target.value.split('') as ACL[];
+      const roles = [
+        ...new Set(
+          acl.flatMap(item =>
+            configuration.user.priv_role_dependencies[item].filter(r => currentUser.roles.includes(r))
+          )
+        )
+      ].sort();
+      setApiKey(prev => ({ ...prev, roles, acl }));
     },
-    [apikey]
+    [configuration.user.priv_role_dependencies, currentUser.roles]
+  );
+
+  const handleRoleChange = useCallback(
+    (role: Role) => {
+      setApiKey(prev => {
+        const index = prev.roles.indexOf(role);
+        const roles = index < 0 ? [...prev.roles, role].sort() : prev.roles.filter(r => r !== role);
+        const acl = Object.entries(PRIV_TO_ACL_MAP).find(([, values]) =>
+          arraysEqual([...new Set(values.flatMap(v => configuration.user.priv_role_dependencies[v]))], roles)
+        );
+        return { ...prev, acl: !acl ? ['C'] : acl[1], roles: roles };
+      });
+    },
+    [configuration.user.priv_role_dependencies]
   );
 
   useEffect(() => {
     if (key_id || id) {
-      reload();
+      handleReload();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key_id, id]);
+  }, [key_id, id, handleReload]);
 
   return currentUser.is_admin ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">
@@ -169,9 +167,9 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
         open={deleteDialog}
         handleClose={() => {
           setDeleteDialog(false);
-          close();
+          onClose();
         }}
-        handleAccept={removeApikey}
+        handleAccept={() => handleDelete()}
         title={t('delete.title')}
         cancelText={t('delete.cancelText')}
         acceptText={t('delete.acceptText')}
@@ -187,19 +185,20 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
             </Grid>
 
             <Grid item md={3} sx={{ textAlign: 'right', flexGrow: 0 }}>
-              {apikey ? (
+              {apiKey ? (
                 <>
                   {(key_id || id) && (
                     <div>
                       {
                         <Tooltip title={t('remove')}>
                           <IconButton
+                            disabled={loading}
+                            size="large"
+                            onClick={() => setDeleteDialog(true)}
                             sx={{
                               color:
                                 theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                             }}
-                            onClick={() => setDeleteDialog(true)}
-                            size="large"
                           >
                             <DeleteOutlineOutlinedIcon />
                           </IconButton>
@@ -233,20 +232,20 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
             </Grid>
           </Grid>
           <Grid container sx={{ marginBottom: theme.spacing(1) }}>
-            {apikey ? (
+            {apiKey ? (
               <div style={{ textAlign: 'left', flexGrow: 0 }}>
                 <Grid container>
                   <Grid item md={4}>
                     <span style={{ fontWeight: 500 }}>{t('key.name.title')}</span>
                   </Grid>
                   <Grid item md={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                    <span style={{ fontWeight: 500 }}>{apikey.key_name}</span>
+                    <span style={{ fontWeight: 500 }}>{apiKey.key_name}</span>
                   </Grid>
                   <Grid item md={4}>
                     <span style={{ fontWeight: 500 }}>{t('username.title')}</span>
                   </Grid>
                   <Grid item md={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                    <span style={{ fontWeight: 500 }}>{apikey.uname}</span>
+                    <span style={{ fontWeight: 500 }}>{apiKey.uname}</span>
                   </Grid>
                 </Grid>
               </div>
@@ -263,10 +262,15 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
               <Divider />
             </Grid>
             <Grid container>
-              {apikey ? (
+              {apiKey ? (
                 <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
                   <FormControl size="small">
-                    <Select id="priv" value={apikey.acl.join('')} onChange={handleSelectChange} variant="outlined">
+                    <Select
+                      id="priv"
+                      value={apiKey.acl.join('')}
+                      onChange={event => handleACLChange(event)}
+                      variant="outlined"
+                    >
                       <MenuItem value="R">{t('apikeys.r_token')}</MenuItem>
                       <MenuItem value="RW">{t('apikeys.rw_token')}</MenuItem>
                       <MenuItem value="W">{t('apikeys.w_token')}</MenuItem>
@@ -280,15 +284,15 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
               ) : (
                 <div></div>
               )}
-              {apikey ? (
+              {apiKey ? (
                 <div style={{ marginTop: theme.spacing(2) }}>
                   {currentUser.roles.sort().map((role, role_id) => (
                     <CustomChip
                       key={role_id}
                       type="rounded"
                       size="small"
-                      color={apikey.roles.includes(role) ? 'primary' : 'default'}
-                      onClick={() => toggleRole(role)}
+                      color={apiKey.roles.includes(role) ? 'primary' : 'default'}
+                      onClick={() => handleRoleChange(role)}
                       label={t(`role.${role}`)}
                     />
                   ))}
@@ -305,11 +309,11 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
               <Grid item md={9} sx={{ textAlign: 'left', flexGrow: 0 }}>
                 <Typography variant="h6">{t('timing.title')}</Typography>
               </Grid>
-              {apikey ? (
+              {apiKey ? (
                 <Grid item md={3} sx={{ textAlign: 'right', flexGrow: 0 }}>
                   <DatePicker
-                    date={apikey.expiry_ts}
-                    setDate={handleExpiryDateChange}
+                    date={apiKey.expiry_ts}
+                    setDate={date => setApiKey(prev => ({ ...prev, expiry_ts: date }))}
                     tooltip={t('expiry.change')}
                     minDateTomorrow
                   />
@@ -321,27 +325,27 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
               <Divider />
             </Grid>
 
-            {apikey ? (
+            {apiKey ? (
               <div>
                 <Grid container>
                   <Grid item xs={6} sm={6}>
                     <span style={{ fontWeight: 500 }}>{t('creation_date')}</span>
                   </Grid>
                   <Grid item xs={6} sm={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                    <Moment format="YYYY-MM-DD">{apikey.creation_date}</Moment>
+                    <Moment format="YYYY-MM-DD">{apiKey.creation_date}</Moment>
                   </Grid>
                   <Grid item xs={6} sm={6}>
                     <span style={{ fontWeight: 500 }}>{t('last_used')}</span>
                   </Grid>
                   <Grid item xs={6} sm={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                    {apikey.last_used ? <Moment format="YYYY-MM-DD">{apikey.last_used}</Moment> : <></>}
+                    {apiKey.last_used ? <Moment format="YYYY-MM-DD">{apiKey.last_used}</Moment> : <></>}
                   </Grid>
 
                   <Grid item xs={6} sm={6}>
                     <span style={{ fontWeight: 500 }}>{t('expiration_date')}</span>
                   </Grid>
                   <Grid item xs={6} sm={6} sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                    {apikey.expiry_ts ? <Moment format="YYYY-MM-DD">{apikey.expiry_ts}</Moment> : <></>}
+                    {apiKey.expiry_ts ? <Moment format="YYYY-MM-DD">{apiKey.expiry_ts}</Moment> : <></>}
                   </Grid>
                 </Grid>
               </div>
@@ -351,7 +355,7 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
           </Grid>
         </Grid>
       </div>
-      {apikey && modified ? (
+      {apiKey && modified ? (
         <div
           style={{
             paddingTop: theme.spacing(1),
@@ -368,12 +372,12 @@ const ApikeyDetail = ({ key_id = null, close = () => null }: ApikeyDetailProps) 
           <Button
             variant="contained"
             color="primary"
-            disabled={buttonLoading || !modified}
-            onClick={saveApikey}
+            disabled={loading || !modified}
+            onClick={() => handleSave(apiKey)}
             sx={{ justifyContent: 'center', align: 'center' }}
           >
             {t('save')}
-            {buttonLoading && <CircularProgress size={24} />}
+            {loading && <CircularProgress size={24} />}
           </Button>
         </div>
       ) : null}

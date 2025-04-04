@@ -1,6 +1,7 @@
 {
   "adminmenu": "Administration",
   "adminmenu.actions": "Post-process actions",
+  "adminmenu.apikeys": "API keys",
   "adminmenu.errors": "Error Viewer",
   "adminmenu.identify": "File Identification",
   "adminmenu.service_review": "Service Review",
@@ -8,7 +9,6 @@
   "adminmenu.sitemap": "Site Map",
   "adminmenu.tag_safelist": "System Safelist",
   "adminmenu.users": "Users",
-  "adminmenu.apikeys": "Apikeys",
   "ai_truncated": "The AI output was truncated because it was too long.",
   "already_badlist": "Already in the badlist",
   "already_safelist": "Already in the safelist",

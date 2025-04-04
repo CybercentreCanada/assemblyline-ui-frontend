@@ -53,13 +53,19 @@ export const SCOPES = ['r', 'w', 'rw', 'c'] as const;
 export const ACL_VALUES = ['R', 'W', 'E', 'C'] as const;
 export const PRIV_VALUES = ['READ', 'WRITE', 'READ_WRITE', 'EXTENDED', 'CUSTOM'] as const;
 
+export type Type = (typeof TYPES)[number];
+export type Role = (typeof ROLES)[number];
+export type Scope = (typeof SCOPES)[number];
+export type ACL = (typeof ACL_VALUES)[number];
+export type PRIV = (typeof PRIV_VALUES)[number];
+
 export const ACL_TO_PRIV_MAP = {
   R: 'READ',
   W: 'WRITE',
   RW: 'READ_WRITE',
   E: 'EXTENDED',
   C: 'CUSTOM'
-} as const;
+} as Record<string, PRIV>;
 
 export const PRIV_TO_ACL_MAP = {
   READ: ['R'],
@@ -67,13 +73,7 @@ export const PRIV_TO_ACL_MAP = {
   READ_WRITE: ['R', 'W'],
   EXTENDED: ['E'],
   CUSTOM: ['C']
-} as const;
-
-export type Type = (typeof TYPES)[number];
-export type Role = (typeof ROLES)[number];
-export type Scope = (typeof SCOPES)[number];
-export type ACL = (typeof ACL_VALUES)[number];
-export type PRIV = (typeof PRIV_VALUES)[number];
+} as Record<PRIV, ACL[]>;
 
 /** Model for API keys */
 export type ApiKey = {
