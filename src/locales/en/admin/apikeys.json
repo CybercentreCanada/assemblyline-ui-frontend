@@ -32,6 +32,8 @@
   "expiration_date": "Expiration Date",
   "expiry.change": "Change expiry date",
   "filter": "Filter API keys ...",
+  "filter.personal.add": "Add filter to show your API keys",
+  "filter.personal.remove": "Remove filter to show your API keys",
   "key.detail.title": "Key Details",
   "key.name.title": "Key Name",
   "last_used": "Last Used",
