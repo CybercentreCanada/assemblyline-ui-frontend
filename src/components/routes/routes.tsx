@@ -8,7 +8,6 @@ import { resetFavicon } from 'helpers/utils';
 import { lazy, memo, Suspense, useEffect, useState } from 'react';
 import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router';
 import LoadingScreen from './loading';
-import Theme from './theme';
 
 const ForbiddenPage = lazy(() => import('components/routes/403'));
 const NotFoundPage = lazy(() => import('components/routes/404_dl'));
@@ -19,6 +18,8 @@ const AdminErrorDetail = lazy(() => import('components/routes/admin/error_detail
 const AdminErrorViewer = lazy(() => import('components/routes/admin/error_viewer'));
 const AdminIdentify = lazy(() => import('components/routes/admin/identify'));
 const AdminServices = lazy(() => import('components/routes/admin/services'));
+const DevelopmentLibrary = lazy(() => import('components/routes/development/library'));
+const DevelopmentTheme = lazy(() => import('components/routes/development/theme'));
 const Service = lazy(() => import('components/routes/admin/service_detail'));
 const ServiceReview = lazy(() => import('components/routes/admin/service_review'));
 const AdminSiteMap = lazy(() => import('components/routes/admin/site_map'));
@@ -59,11 +60,11 @@ const WorkflowDetail = lazy(() => import('components/routes/manage/workflows/det
 const RetroHunt = lazy(() => import('components/routes/retrohunt'));
 const RetroHuntDetail = lazy(() => import('components/routes/retrohunt/detail'));
 const Search = lazy(() => import('components/routes/search'));
-const Settings = lazy(() => import('components/routes/settings'));
+const Settings = lazy(() => import('components/routes/settings/settings'));
 const SubmissionDetail = lazy(() => import('components/routes/submission/detail'));
 const SubmissionReport = lazy(() => import('components/routes/submission/report'));
 const Submissions = lazy(() => import('components/routes/submissions'));
-const Submit = lazy(() => import('components/routes/submit'));
+const Submit = lazy(() => import('components/routes/submit/submit'));
 const Tos = lazy(() => import('components/routes/tos'));
 const User = lazy(() => import('components/routes/user'));
 
@@ -154,6 +155,8 @@ const WrappedRoutes = () => {
         <Route path="/authorize" element={<AppRegistration />} />
         <Route path="/crash" element={<CrashTest />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/development/library" element={<DevelopmentLibrary />} />
+        <Route path="/development/theme" element={<DevelopmentTheme />} />
         <Route path="/file/detail/:id" element={<FileFullDetail />} />
         <Route path="/file/viewer/:id/:tab" element={<FileViewer />} />
         <Route path="/file/viewer/:id" element={<FileViewer />} />
@@ -183,13 +186,13 @@ const WrappedRoutes = () => {
         <Route path="/search" element={<Search />} />
         <Route path="/search/:id" element={<Search />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/settings/:tab" element={<Settings />} />
         <Route path="/submit" element={<Submit />} />
         <Route path="/submission/detail/:id/:fid" element={<SubmissionDetail />} />
         <Route path="/submission/detail/:id" element={<SubmissionDetail />} />
         <Route path="/submission/report/:id" element={<SubmissionReport />} />
         <Route path="/submission/:id" element={<RedirectSubmission />} />
         <Route path="/submissions" element={<Submissions />} />
-        <Route path="/theme" element={<Theme />} />
         <Route path="/tos" element={<Tos />} />
         <Route path="/forbidden" element={<ForbiddenPage />} />
         <Route path="/notfound" element={<NotFoundPage />} />

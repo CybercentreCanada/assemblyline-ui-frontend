@@ -6,6 +6,7 @@ import AppProvider from 'commons/components/app/AppProvider';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useAppSwitcher from 'commons/components/app/hooks/useAppSwitcher';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import { APIProvider } from 'components/core/Query/components/APIProvider';
 import useALContext from 'components/hooks/useALContext';
 import type { LoginParamsProps } from 'components/hooks/useMyAPI';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -33,7 +34,7 @@ declare module '@mui/styles/defaultTheme' {
   interface DefaultTheme extends Theme {}
 }
 
-type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos';
+type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos' | 'quota';
 
 const MyAppMain = () => {
   const storedLoginParams = localStorage.getItem('loginParams');
@@ -103,13 +104,15 @@ export const MyApp: React.FC<any> = () => {
   const myUser: CustomAppUserService = useMyUser();
   return (
     <BrowserRouter basename="/">
-      <SafeResultsProvider>
-        <QuotaProvider>
-          <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
-            <MyAppMain />
-          </AppProvider>
-        </QuotaProvider>
-      </SafeResultsProvider>
+      <APIProvider>
+        <SafeResultsProvider>
+          <QuotaProvider>
+            <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
+              <MyAppMain />
+            </AppProvider>
+          </QuotaProvider>
+        </SafeResultsProvider>
+      </APIProvider>
     </BrowserRouter>
   );
 };

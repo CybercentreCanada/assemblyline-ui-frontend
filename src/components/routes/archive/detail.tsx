@@ -281,7 +281,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             code: {
               label: t('code'),
               inner: <CodeSection sha256={sha256} archiveOnly />,
-              disabled: isMdUp || !codeAllowed
+              preventRender: isMdUp || !codeAllowed
             },
             strings: { label: t('strings'), inner: <StringsSection sha256={sha256} type={file?.file_info?.type} /> },
             hex: { label: t('hex'), inner: <HexSection sha256={sha256} /> },

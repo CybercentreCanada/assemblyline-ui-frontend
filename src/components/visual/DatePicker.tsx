@@ -1,24 +1,24 @@
-import { Button, Dialog, DialogActions, IconButton, TextField, Tooltip, useTheme } from '@mui/material';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-
 import EventIcon from '@mui/icons-material/Event';
+import type { TextFieldProps } from '@mui/material';
+import { Button, Dialog, DialogActions, IconButton, TextField, Tooltip, useTheme } from '@mui/material';
 import { LocalizationProvider, DatePicker as MuiDatePicker, StaticDatePicker } from '@mui/x-date-pickers';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import type { Moment } from 'moment';
 import moment from 'moment';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface DatePickerProps {
+export type DatePickerProps = {
   date: string;
   setDate: (date: string) => void;
   tooltip?: string;
   type?: 'button' | 'input';
   defaultDateOffset?: number | null;
-  textFieldProps?: any;
+  textFieldProps?: TextFieldProps;
   minDateTomorrow?: boolean;
   maxDateToday?: boolean;
   disabled?: boolean;
-}
+};
 
 function WrappedDatePicker({
   date,
@@ -26,21 +26,20 @@ function WrappedDatePicker({
   tooltip = null,
   type = 'button',
   defaultDateOffset = null,
-  textFieldProps = {},
+  textFieldProps = null,
   minDateTomorrow = false,
   maxDateToday = false,
   disabled = false
 }: DatePickerProps) {
-  const [tempDate, setTempDate] = React.useState(null);
-  const [tomorrow, setTomorrow] = React.useState(null);
-  const [today, setToday] = React.useState(null);
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
   const theme = useTheme();
   const { t, i18n } = useTranslation();
 
-  useEffectOnce(() => {
+  const [tempDate, setTempDate] = useState<Moment>(null);
+  const [tomorrow, setTomorrow] = useState<Moment>(null);
+  const [today, setToday] = useState<Moment>(null);
+  const [open, setOpen] = useState<boolean>(false);
+
+  useEffect(() => {
     const tempTomorrow = new Date();
     tempTomorrow.setDate(tempTomorrow.getDate() + 1);
     tempTomorrow.setHours(0, 0, 0, 0);
@@ -71,16 +70,11 @@ function WrappedDatePicker({
       {type === 'button' ? (
         <>
           <Tooltip title={tooltip ? tooltip : t('date.open')}>
-            <IconButton onClick={handleOpen}>
+            <IconButton onClick={() => setOpen(true)}>
               <EventIcon />
             </IconButton>
           </Tooltip>
-          <Dialog
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
+          <Dialog open={open} onClose={() => setOpen(false)}>
             <StaticDatePicker
               displayStaticWrapperAs="desktop"
               value={tempDate}
@@ -96,29 +90,24 @@ function WrappedDatePicker({
                 style={{ margin: theme.spacing(1) }}
                 onClick={() => {
                   setDate(null);
-                  handleClose();
+                  setOpen(false);
                 }}
                 color="secondary"
               >
                 {t('date.clear')}
               </Button>
               <DialogActions>
-                <Button
-                  onClick={() => {
-                    handleClose();
-                  }}
-                  color="secondary"
-                >
+                <Button color="secondary" onClick={() => setOpen(false)}>
                   {t('date.cancel')}
                 </Button>
                 <Button
-                  onClick={() => {
-                    setDate(tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null);
-                    handleClose();
-                  }}
                   color="primary"
                   autoFocus
                   disabled={tempDate === null}
+                  onClick={() => {
+                    setDate(tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null);
+                    setOpen(false);
+                  }}
                 >
                   {t('date.select')}
                 </Button>
@@ -138,9 +127,9 @@ function WrappedDatePicker({
               size="small"
               label={tooltip ? tooltip : null}
               ref={inputRef}
-              inputProps={{ ...inputProps }}
-              InputProps={{ ...InputProps }}
               {...textFieldProps}
+              inputProps={{ ...inputProps, ...textFieldProps?.inputProps }}
+              InputProps={{ ...InputProps, ...textFieldProps?.InputProps }}
             />
           )}
           minDate={minDateTomorrow ? tomorrow : null}
