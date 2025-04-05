@@ -385,7 +385,7 @@ export type Metadata = {
   aliases: string[];
 
   /** Default value for the field */
-  default?: any;
+  default?: unknown;
 
   /** Is this field required? */
   required: boolean;
@@ -690,7 +690,7 @@ export const CONFIGURATION: Configuration = {
     allow_replay: false,
     allow_url_submissions: false,
     allow_zip_downloads: false,
-    api_proxies: [],
+    api_proxies: {},
     apps: [],
     audit: false,
     banner: {},

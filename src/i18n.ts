@@ -9,6 +9,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
 import error404EN from 'locales/en/404.json';
 import adminActionsEN from 'locales/en/admin/actions.json';
+import adminAPIkeysEN from 'locales/en/admin/apikeys.json';
 import adminCommunityServicesEN from 'locales/en/admin/community_services.json';
 import adminErrorViewerEN from 'locales/en/admin/error_viewer.json';
 import adminIdentifyEN from 'locales/en/admin/identify.json';
@@ -18,7 +19,6 @@ import adminSiteMapEN from 'locales/en/admin/site_map.json';
 import adminTagSafelistEN from 'locales/en/admin/tag_safelist.json';
 import adminUsersEN from 'locales/en/admin/users.json';
 import alertsEN from 'locales/en/alerts.json';
-import apikeysEN from 'locales/en/apikeys.json';
 import archiveEN from 'locales/en/archive.json';
 import assistantEN from 'locales/en/assistant.json';
 import authorizeEN from 'locales/en/authorize.json';
@@ -63,6 +63,7 @@ import userEN from 'locales/en/user.json';
 import error403FR from 'locales/fr/403.json';
 import error404FR from 'locales/fr/404.json';
 import adminActionsFR from 'locales/fr/admin/actions.json';
+import adminAPIkeysFR from 'locales/fr/admin/apikeys.json';
 import adminCommunityServicesFR from 'locales/fr/admin/community_services.json';
 import adminErrorViewerFR from 'locales/fr/admin/error_viewer.json';
 import adminIdentifyFR from 'locales/fr/admin/identify.json';
@@ -72,7 +73,6 @@ import adminSiteMapFR from 'locales/fr/admin/site_map.json';
 import adminTagSafelistFR from 'locales/fr/admin/tag_safelist.json';
 import adminUsersFR from 'locales/fr/admin/users.json';
 import alertsFR from 'locales/fr/alerts.json';
-import apikeysFR from 'locales/fr/apikeys.json';
 import archiveFR from 'locales/fr/archive.json';
 import assistantFR from 'locales/fr/assistant.json';
 import authorizeFR from 'locales/fr/authorize.json';
@@ -127,8 +127,8 @@ const resources = {
     adminSiteMap: adminSiteMapEN,
     adminTagSafelist: adminTagSafelistEN,
     adminUsers: adminUsersEN,
+    adminAPIkeys: adminAPIkeysEN,
     alerts: alertsEN,
-    apikeys: apikeysEN,
     archive: archiveEN,
     assistant: assistantEN,
     authorize: authorizeEN,
@@ -186,8 +186,8 @@ const resources = {
     adminSiteMap: adminSiteMapFR,
     adminTagSafelist: adminTagSafelistFR,
     adminUsers: adminUsersFR,
+    adminAPIkeys: adminAPIkeysFR,
     alerts: alertsFR,
-    apikeys: apikeysFR,
     archive: archiveFR,
     assistant: assistantFR,
     authorize: authorizeFR,
