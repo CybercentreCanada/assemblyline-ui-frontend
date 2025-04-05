@@ -38,7 +38,7 @@ function WrappedDatePicker({
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffectOnce(() => {
     const tempTomorrow = new Date();
@@ -67,7 +67,7 @@ function WrappedDatePicker({
 
   // Build chip based on computed values
   return (
-    <LocalizationProvider dateAdapter={AdapterMoment}>
+    <LocalizationProvider adapterLocale={i18n.language} dateAdapter={AdapterMoment}>
       {type === 'button' ? (
         <>
           <Tooltip title={tooltip ? tooltip : t('date.open')}>
