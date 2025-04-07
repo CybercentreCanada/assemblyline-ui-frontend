@@ -15,7 +15,6 @@ export type UseAPIQueryProps<Response = unknown, Request extends APIRequest = AP
   enabled?: boolean;
   retryAfter?: number;
   delay?: number;
-  initialData?: Response;
 } & Omit<UseAPICallFnProps<APIResponse<Response>, Request, APIResponse<Error>>, 'signal' | 'enabled' | 'retryAfter'>;
 
 export const useAPIQuery = <
@@ -27,7 +26,6 @@ export const useAPIQuery = <
   queryProps = null,
   retryAfter = DEFAULT_RETRY_MS,
   delay = null,
-  initialData = null,
   ...params
 }: UseAPIQueryProps<Response, Request, Error>) => {
   const queryClient = useQueryClient();
@@ -54,13 +52,7 @@ export const useAPIQuery = <
       queryKey: [{ ...params, enabled }],
       queryFn: async ({ signal }) => apiCallFn({ signal, enabled, ...params }),
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
-      retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000)),
-      initialData: {
-        api_error_message: null,
-        api_response: initialData,
-        api_server_version: null,
-        api_status_code: null
-      }
+      retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000))
     },
     queryClient
   );
