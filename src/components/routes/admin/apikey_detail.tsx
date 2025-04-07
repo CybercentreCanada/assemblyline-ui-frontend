@@ -156,17 +156,19 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
               {apiKey ? (
                 (key_id || id) && (
                   <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
-                    <Tooltip title={t('remove')}>
-                      <IconButton
-                        disabled={loading}
-                        size="large"
-                        onClick={() => setDeleteDialog(true)}
-                        sx={{
-                          color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                        }}
-                      >
-                        <DeleteOutlineOutlinedIcon />
-                      </IconButton>
+                    <Tooltip title={t('apikey.remove.tooltip')}>
+                      <div>
+                        <IconButton
+                          disabled={loading}
+                          size="large"
+                          onClick={() => setDeleteDialog(true)}
+                          sx={{
+                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                          }}
+                        >
+                          <DeleteOutlineOutlinedIcon />
+                        </IconButton>
+                      </div>
                     </Tooltip>
                   </div>
                 )
@@ -184,7 +186,7 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
             <Grid item xs={12}>
               <Typography variant="h6"> {t('key.detail.title')}</Typography>
               <Divider />
-              <Grid container>
+              <Grid container marginTop={1}>
                 <Grid item xs={4} sm={3}>
                   <span style={{ fontWeight: 500 }}>{t('key.name.title')}</span>
                 </Grid>
@@ -221,7 +223,7 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
               </Grid>
             </Grid>
             <Divider />
-            <Grid container>
+            <Grid container marginTop={1}>
               <Grid item xs={4} sm={3}>
                 <span style={{ fontWeight: 500 }}>{t('creation_date')}</span>
               </Grid>
@@ -287,41 +289,47 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
               <Grid item xs={9}>
                 <Typography variant="h6">{t('permissions.title')}</Typography>
               </Grid>
-              <Grid item xs={3} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                {apiKey && (
-                  <FormControl size="small">
-                    <Select
-                      id="priv"
-                      variant="outlined"
-                      value={apiKey.acl.join('')}
-                      onChange={event => setApiKey(prev => ({ ...prev, ...selectACL(event.target.value) }))}
-                    >
-                      <MenuItem value="R">{t('apikeys.r_token')}</MenuItem>
-                      <MenuItem value="RW">{t('apikeys.rw_token')}</MenuItem>
-                      <MenuItem value="W">{t('apikeys.w_token')}</MenuItem>
-                      {configuration.auth.allow_extended_apikeys && (
-                        <MenuItem value="E">{t('apikeys.e_token')}</MenuItem>
-                      )}
-                      <MenuItem value="C">{t('apikeys.c_token')}</MenuItem>
-                    </Select>
-                  </FormControl>
-                )}
-              </Grid>
+              <Grid item xs={3} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}></Grid>
             </Grid>
             <Divider />
-            <Grid container>
+            <Grid container marginTop={1}>
+              {apiKey && (
+                <FormControl size="small">
+                  <Typography component="label" htmlFor="priv" variant="body2">
+                    {t('acl.label')}
+                  </Typography>
+                  <Select
+                    id="priv"
+                    variant="outlined"
+                    value={apiKey.acl.join('')}
+                    onChange={event => setApiKey(prev => ({ ...prev, ...selectACL(event.target.value) }))}
+                  >
+                    <MenuItem value="R">{t('apikeys.r_token')}</MenuItem>
+                    <MenuItem value="RW">{t('apikeys.rw_token')}</MenuItem>
+                    <MenuItem value="W">{t('apikeys.w_token')}</MenuItem>
+                    {configuration.auth.allow_extended_apikeys && <MenuItem value="E">{t('apikeys.e_token')}</MenuItem>}
+                    <MenuItem value="C">{t('apikeys.c_token')}</MenuItem>
+                  </Select>
+                </FormControl>
+              )}
+
               {apiKey && (
                 <div style={{ marginTop: theme.spacing(2) }}>
-                  {currentUser.roles.sort().map((role, role_id) => (
-                    <CustomChip
-                      key={role_id}
-                      label={t(`role.${role}`)}
-                      type="rounded"
-                      size="small"
-                      color={apiKey.roles.includes(role) ? 'primary' : 'default'}
-                      onClick={() => setApiKey(prev => ({ ...prev, ...toggleRole(prev.roles, role) }))}
-                    />
-                  ))}
+                  <Typography component="label" htmlFor="priv" variant="body2">
+                    {t('roles')}
+                  </Typography>
+                  <div>
+                    {currentUser.roles.sort().map((role, role_id) => (
+                      <CustomChip
+                        key={role_id}
+                        label={t(`role.${role}`)}
+                        type="rounded"
+                        size="small"
+                        color={apiKey.roles.includes(role) ? 'primary' : 'default'}
+                        onClick={() => setApiKey(prev => ({ ...prev, ...toggleRole(prev.roles, role) }))}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
             </Grid>
