@@ -1,4 +1,4 @@
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { AlertTitle, IconButton, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
@@ -16,7 +16,7 @@ import {
 } from 'components/visual/DivTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import Moment from 'components/visual/Moment';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -30,50 +30,26 @@ const RolesCustomChips = ({ roles }: RolesChipProps) => {
   const { t } = useTranslation(['adminAPIkeys']);
 
   const [showMore, setShowMore] = useState<boolean>(false);
-  const [showLess, setShowLess] = useState<boolean>(false);
-  const [displayRoles, setDisplayRoles] = useState<Role[]>(roles.slice());
-
-  useEffect(() => {
-    if (roles.length > MAX_DISPLAY_ROLES) {
-      setShowMore(true);
-      setDisplayRoles(roles.slice(0, MAX_DISPLAY_ROLES));
-    }
-  }, [roles]);
 
   return (
     <div>
-      {displayRoles.map((e, x) => (
-        <CustomChip key={e} type="rounded" label={t(`role.${e}`)} size="tiny" color="secondary" />
-      ))}
-      {showMore ? (
+      {roles
+        .filter((role, i) => showMore || i < MAX_DISPLAY_ROLES)
+        .map((role, i) => (
+          <CustomChip key={`${role}-${i}`} type="rounded" label={t(`role.${role}`)} size="tiny" color="primary" />
+        ))}
+      {showMore ? null : (
         <IconButton
           size="small"
+          style={{ padding: 0 }}
           onClick={event => {
-            setShowMore(false);
-            setShowLess(true);
-            setDisplayRoles(roles.slice());
             event.preventDefault();
-          }}
-        >
-          <ExpandMore />
-        </IconButton>
-      ) : (
-        <></>
-      )}
-      {showLess ? (
-        <IconButton
-          size="small"
-          onClick={event => {
+            event.stopPropagation();
             setShowMore(true);
-            setShowLess(false);
-            setDisplayRoles(roles.slice(0, MAX_DISPLAY_ROLES));
-            event.preventDefault();
           }}
         >
-          <ExpandLess />
+          <MoreHorizOutlinedIcon />
         </IconButton>
-      ) : (
-        <></>
       )}
     </div>
   );

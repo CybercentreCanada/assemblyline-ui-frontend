@@ -133,7 +133,7 @@ const APIKeyDeleteDialog = React.memo(
           url: `/api/v4/apikey/${values.id}/`,
           method: 'DELETE',
           onSuccess: () => {
-            showSuccessMessage(t('apiKeys.removed'));
+            showSuccessMessage(t('apikeys.removed'));
             setOpen(false);
             onAPIKeysChange(prev => {
               delete prev[values.key_name];
@@ -197,7 +197,7 @@ const NewAPIKeyDialog = React.memo(({ apikey = null, onClose = () => null }: New
 
   return (
     <Dialog fullScreen={fullScreen} open={!!apikey} onClose={onClose} PaperProps={{ style: { minWidth: '650px' } }}>
-      <DialogTitle>{t('apiKeys.new_title')}</DialogTitle>
+      <DialogTitle>{t('apikeys.new_title')}</DialogTitle>
       {apikey && (
         <DialogContent>
           <DialogContentText component="div">
@@ -286,7 +286,7 @@ const APIKeyUpsertingDialog = React.memo(
               setNewApiKey(api_response);
               setApiKey(defaults);
             } else {
-              showSuccessMessage(`Key ${api_response.key_name} Successfully updated.`);
+              showSuccessMessage(`${t('apikey.updated')} ${api_response.key_name}`);
             }
 
             setOpen(false);
@@ -314,23 +314,29 @@ const APIKeyUpsertingDialog = React.memo(
         >
           <DialogTitle>{!prevApiKey ? t('apikeys.add_title') : t('apikeys.modify_title')}</DialogTitle>
           <DialogContent>
-            <TextField
-              autoFocus
-              disabled={!!prevApiKey || loading}
-              label={t('apikeys.temp_token')}
-              margin="normal"
-              size="small"
-              sx={{ width: '100%' }}
-              value={apikey.key_name}
-              variant="outlined"
-              onChange={event => {
-                if (keynameRegex.test(event.target.value) || event.target.value === '') {
-                  setApiKey(a => ({ ...a, key_name: event.target.value }));
-                } else {
-                  event.preventDefault();
-                }
-              }}
-            />
+            <div>
+              <Typography component="label" htmlFor="temp_token" variant="body2">
+                {t('apikeys.temp_token')}
+              </Typography>
+              <TextField
+                id="temp_token"
+                autoFocus
+                disabled={!!prevApiKey || loading}
+                margin="normal"
+                size="small"
+                sx={{ width: '100%', marginTop: '0px' }}
+                value={apikey.key_name}
+                variant="outlined"
+                onChange={event => {
+                  if (keynameRegex.test(event.target.value) || event.target.value === '') {
+                    setApiKey(a => ({ ...a, key_name: event.target.value }));
+                  } else {
+                    event.preventDefault();
+                  }
+                }}
+              />
+            </div>
+
             <div
               style={{
                 width: '100%',
@@ -341,7 +347,9 @@ const APIKeyUpsertingDialog = React.memo(
               }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                {t('expiration_date')} <span />
+                <Typography component="label" htmlFor="expiry_ts" variant="body2">
+                  {t('expiration_date')}
+                </Typography>
                 <DatePicker
                   aria-labelledby="expiry_ts-label"
                   date={apikey.expiry_ts}
@@ -356,6 +364,9 @@ const APIKeyUpsertingDialog = React.memo(
               </div>
 
               <FormControl size="small" fullWidth sx={{ flex: 1 }}>
+                <Typography component="label" htmlFor="priv" variant="body2">
+                  {t('acl.label')}
+                </Typography>
                 <Select
                   id="priv"
                   variant="outlined"
@@ -437,25 +448,29 @@ const APIKeyCard = ({ apikey, onAPIKeysChange = () => null }: APIKeyCardProps) =
               {apikey.key_name}
             </Typography>
 
-            <div>
-              <APIKeyUpsertingDialog apikey={apikey} onAPIKeysChange={onAPIKeysChange}>
-                {onOpen => (
-                  <IconButton size="small" onClick={() => onOpen()}>
-                    <EditOutlinedIcon />
-                  </IconButton>
-                )}
-              </APIKeyUpsertingDialog>
-            </div>
+            <APIKeyUpsertingDialog apikey={apikey} onAPIKeysChange={onAPIKeysChange}>
+              {onOpen => (
+                <Tooltip title={t('edit.button.label')}>
+                  <div>
+                    <IconButton size="small" onClick={() => onOpen()}>
+                      <EditOutlinedIcon />
+                    </IconButton>
+                  </div>
+                </Tooltip>
+              )}
+            </APIKeyUpsertingDialog>
 
-            <div>
-              <APIKeyDeleteDialog apikey={apikey} onAPIKeysChange={onAPIKeysChange}>
-                {onOpen => (
-                  <IconButton size="small" onClick={() => onOpen()}>
-                    <DeleteOutlineOutlinedIcon />
-                  </IconButton>
-                )}
-              </APIKeyDeleteDialog>
-            </div>
+            <APIKeyDeleteDialog apikey={apikey} onAPIKeysChange={onAPIKeysChange}>
+              {onOpen => (
+                <Tooltip title={t('delete.button.label')}>
+                  <div>
+                    <IconButton size="small" onClick={() => onOpen()}>
+                      <DeleteOutlineOutlinedIcon />
+                    </IconButton>
+                  </div>
+                </Tooltip>
+              )}
+            </APIKeyDeleteDialog>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: theme.spacing(1) }}>
