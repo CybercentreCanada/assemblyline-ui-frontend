@@ -494,8 +494,7 @@ const APIKeyCard = ({ apikey, onAPIKeysChange = () => null }: APIKeyCardProps) =
             {apikey ? (
               apikey?.last_used ? (
                 <div>
-                  <Moment format="YYYY-MM-DD">{apikey.last_used}</Moment>&nbsp; (
-                  <Moment variant="fromNow">{apikey.last_used}</Moment>)
+                  <Moment format="YYYY-MM-DD">{apikey.last_used}</Moment>
                 </div>
               ) : (
                 <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
