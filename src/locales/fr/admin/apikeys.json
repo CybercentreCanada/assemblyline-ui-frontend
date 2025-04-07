@@ -79,6 +79,7 @@
   "role.signature_manage": "Gérer la signature",
   "role.signature_view": "Affichage de la signature",
   "role.submission_create": "Créer une soumission",
+  "role.submission_customize": "Personnalisation des Soumissions",
   "role.submission_delete": "Supprimer une soumission",
   "role.submission_manage": "Gérer la soumission",
   "role.submission_view": "Affichage de la soumission",
