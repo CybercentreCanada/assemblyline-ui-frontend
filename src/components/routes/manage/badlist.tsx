@@ -59,7 +59,6 @@ const BadlistSearch = () => {
     url: '/api/v4/search/badlist/',
     method: 'POST',
     enabled: currentUser.roles.includes('badlist_view'),
-    initialData: { items: [], offset: 0, rows: 0, total: 0 },
     body: search
       .set(o => ({ ...o, query: o.query || '*' }))
       .omit(['refresh'])
@@ -134,8 +133,8 @@ const BadlistSearch = () => {
             results={badlists.data}
             resultLabel={
               search.get('query')
-                ? t(`filtered${badlists.data.total === 1 ? '' : 's'}`)
-                : t(`total${badlists.data.total === 1 ? '' : 's'}`)
+                ? t(`filtered${badlists.data?.total === 1 ? '' : 's'}`)
+                : t(`total${badlists.data?.total === 1 ? '' : 's'}`)
             }
             onChange={v => setSearchParams(v)}
             paramDefaults={search.defaults().toObject()}

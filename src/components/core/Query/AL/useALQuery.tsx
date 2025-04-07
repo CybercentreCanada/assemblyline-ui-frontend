@@ -13,7 +13,6 @@ export type UseALQueryProps<Request extends ALRequests> = {
   enabled?: boolean;
   retryAfter?: number;
   delay?: number;
-  initialData?: ALResponses<Request>;
 } & UseAPICallFnProps<APIResponse<ALResponses<Request>>, Request>;
 
 export const useALQuery = <Request extends ALRequests>({
