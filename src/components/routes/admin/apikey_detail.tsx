@@ -255,7 +255,7 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
                     </div>
                   ) : (
                     <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                      {t('none')}
+                      {t('never')}
                     </Typography>
                   )
                 ) : (
