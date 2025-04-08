@@ -43,6 +43,7 @@
   "key.detail.title": "Key Details",
   "key.name.title": "Key Name",
   "last_used": "Last Used",
+  "never": "Never",
   "no_apikey_title": "No API key found.",
   "no_results_desc": "The query that you ran did not return any results.",
   "none": "None",
