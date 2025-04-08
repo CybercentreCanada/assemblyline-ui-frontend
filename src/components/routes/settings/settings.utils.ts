@@ -68,7 +68,7 @@ export type ProfileSettings = {
   initial_data: { prev: { [key: string]: unknown }; value: { [key: string]: unknown } };
 };
 
-export const getProfileNames = (settings: UserSettings) => Object.keys(settings?.submission_profiles || {}).sort();
+export const getProfileNames = (settings: UserSettings) => Object.keys(settings?.submission_profiles || {});
 
 export const initializeSettings = (settings: UserSettings): ProfileSettings => {
   if (!settings) return null;
@@ -94,24 +94,24 @@ export const initializeSettings = (settings: UserSettings): ProfileSettings => {
 
   // Applying the services parameter
   out.services = settings.services
-    .sort((a, b) => a.name.localeCompare(b.name))
+    // .sort((a, b) => a.name.localeCompare(b.name))
     .map(category => ({
       ...category,
       default: false,
       prev: category.selected,
       restricted: true,
       services: category.services
-        .sort((a, b) => a.name.localeCompare(b.name))
+        // .sort((a, b) => a.name.localeCompare(b.name))
         .map(service => ({ ...service, default: false, prev: service.selected, restricted: true }))
     }));
 
   // Applying the service spec parameters
   out.service_spec = settings.service_spec
-    .sort((a, b) => a.name.localeCompare(b.name))
+    // .sort((a, b) => a.name.localeCompare(b.name))
     .map(spec => ({
       ...spec,
       params: spec.params
-        .sort((a, b) => a.name.localeCompare(b.name))
+        // .sort((a, b) => a.name.localeCompare(b.name))
         .map(param => ({ ...param, prev: param.value, restricted: true }))
     }));
 
@@ -136,6 +136,7 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings,
   // Applying the profile parameters
   Object.keys(settings).forEach((key: ProfileKey) => {
     if (PROFILE_KEYS.includes(key)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       out[key].value = settings?.submission_profiles?.default?.[key] || settings[key];
       out[key].restricted = !customize;
       out[key].default = settings[key];
@@ -209,8 +210,10 @@ export const loadSubmissionProfile = (
   // Applying the profile parameters
   Object.keys(out).forEach((key: ProfileKey) => {
     if (PROFILE_KEYS.includes(key)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       out[key].value = settings?.submission_profiles?.[name]?.[key] || settings[key];
       out[key].restricted = !customize && profiles?.[name]?.restricted_params?.submission?.includes(key);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       out[key].default = profiles?.[name]?.params?.[key] || settings[key];
       out[key].prev = out[key].value;
     }
