@@ -266,10 +266,10 @@ const ExtraMetadata = React.memo(() => {
                 </Typography>
 
                 <IconButton
+                  label={t('metadata.edit.tooltip')}
                   disabled={disabled || !isEditing}
                   preventRender={!customize}
                   size="small"
-                  tooltip={t('metadata.edit.tooltip')}
                   onClick={() =>
                     form.setFieldValue('metadata.edit', JSON.stringify(Object.fromEntries(metadata), undefined, 2))
                   }
@@ -277,9 +277,9 @@ const ExtraMetadata = React.memo(() => {
                   <EditIcon fontSize="small" />
                 </IconButton>
                 <IconButton
+                  label={t('metadata.clear.tooltip')}
                   disabled={disabled || !isEditing}
                   size="small"
-                  tooltip={t('metadata.clear.tooltip')}
                   onClick={handleClear}
                 >
                   <ClearIcon fontSize="small" />
