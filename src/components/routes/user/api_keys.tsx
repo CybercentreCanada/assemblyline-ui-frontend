@@ -24,10 +24,11 @@ import {
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { ACL, ApiKey, Role, User } from 'components/models/base/user';
+import type { ACL, ApiKey, Role } from 'components/models/base/user';
 import { PRIV_TO_ACL_MAP } from 'components/models/base/user';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
@@ -111,7 +112,7 @@ export const useAPIKeyUtilities = () => {
 type APIKeyDeleteDialogProps = {
   apikey: ApiKey;
   children: (onOpen: () => void) => React.ReactNode;
-  onAPIKeysChange?: (setApiKeys: (prevState: User['apikeys']) => User['apikeys']) => void;
+  onAPIKeysChange?: (changeApiKeys: (prev: ApiKey[]) => ApiKey[]) => void;
 };
 
 const APIKeyDeleteDialog = React.memo(
@@ -130,14 +131,13 @@ const APIKeyDeleteDialog = React.memo(
     const handleDelete = useCallback(
       (values: ApiKey) => {
         apiCall({
-          url: `/api/v4/apikey/${values.id}/`,
+          url: `/api/v4/apikey/` + values.id + '/',
           method: 'DELETE',
           onSuccess: () => {
             showSuccessMessage(t('apikeys.removed'));
             setOpen(false);
             onAPIKeysChange(prev => {
-              delete prev[values.key_name];
-              return prev;
+              return prev.filter(x => x.id != values.id);
             });
           },
           onEnter: () => setLoading(true),
@@ -145,7 +145,7 @@ const APIKeyDeleteDialog = React.memo(
         });
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [showSuccessMessage, t]
+      [showSuccessMessage, t, onAPIKeysChange]
     );
 
     return (
@@ -248,7 +248,7 @@ const NewAPIKeyDialog = React.memo(({ apikey = null, onClose = () => null }: New
 type APIKeyUpsertingDialogProps = {
   apikey?: ApiKey;
   children: (onOpen: () => void) => React.ReactNode;
-  onAPIKeysChange?: (setApiKeys: (prevState: User['apikeys']) => User['apikeys']) => void;
+  onAPIKeysChange?: (changeApiKeys: (prev: ApiKey[]) => ApiKey[]) => void;
 };
 
 const APIKeyUpsertingDialog = React.memo(
@@ -290,7 +290,9 @@ const APIKeyUpsertingDialog = React.memo(
             }
 
             setOpen(false);
-            onAPIKeysChange(prev => ({ ...prev, [api_response.key_name]: api_response }));
+            onAPIKeysChange(prev => {
+              return prev.filter(x => x.key_name != api_response.key_name).concat(api_response);
+            });
           },
           onEnter: () => setLoading(true),
           onExit: () => setLoading(false)
@@ -430,7 +432,7 @@ const APIKeyUpsertingDialog = React.memo(
 
 type APIKeyCardProps = {
   apikey: ApiKey;
-  onAPIKeysChange?: (setApiKeys: (prevState: User['apikeys']) => User['apikeys']) => void;
+  onAPIKeysChange?: (changeApiKeys: (prev: ApiKey[]) => ApiKey[]) => void;
 };
 
 const APIKeyCard = ({ apikey, onAPIKeysChange = () => null }: APIKeyCardProps) => {
@@ -494,8 +496,7 @@ const APIKeyCard = ({ apikey, onAPIKeysChange = () => null }: APIKeyCardProps) =
             {apikey ? (
               apikey?.last_used ? (
                 <div>
-                  <Moment format="YYYY-MM-DD">{apikey.last_used}</Moment>&nbsp; (
-                  <Moment variant="fromNow">{apikey.last_used}</Moment>)
+                  <Moment format="YYYY-MM-DD">{apikey.last_used}</Moment>
                 </div>
               ) : (
                 <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
@@ -542,13 +543,27 @@ const APIKeyCard = ({ apikey, onAPIKeysChange = () => null }: APIKeyCardProps) =
  */
 
 type APIKeysProps = {
-  apiKeys: Record<string, ApiKey>;
-  onAPIKeysChange?: (setApiKeys: (prevState: User['apikeys']) => User['apikeys']) => void;
+  username: string;
 };
 
-export default function APIKeys({ apiKeys = {}, onAPIKeysChange = () => null }: APIKeysProps) {
+export default function APIKeys({ username }: APIKeysProps) {
   const { t } = useTranslation(['adminAPIkeys']);
+  const { apiCall } = useMyAPI();
   const theme = useTheme();
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+
+  useEffectOnce(() => {
+    apiCall({
+      url: `/api/v4/apikey/username/${username}/`,
+      onSuccess: api_data => {
+        setApiKeys(api_data.api_response);
+      }
+    });
+  });
+
+  const onAPIKeysChange = (changeApiKeys: (prev: ApiKey[]) => ApiKey[]) => {
+    setApiKeys(changeApiKeys(apiKeys));
+  };
 
   return (
     <>
@@ -579,10 +594,14 @@ export default function APIKeys({ apiKeys = {}, onAPIKeysChange = () => null }: 
         <Typography variant="subtitle1" gutterBottom>
           {t('apikeys.list')}
         </Typography>
-        {Object.keys(apiKeys).length !== 0 ? (
-          Object.entries(apiKeys).map(([, apikey], i) => (
-            <APIKeyCard key={`${apikey.id}-${i}`} apikey={apikey} onAPIKeysChange={onAPIKeysChange} />
-          ))
+        {apiKeys.length !== 0 ? (
+          apiKeys
+            .sort((a, b) => {
+              return a.key_name.localeCompare(b.key_name);
+            })
+            .map((apikey, i) => (
+              <APIKeyCard key={`${apikey.id}-${i}`} apikey={apikey} onAPIKeysChange={onAPIKeysChange} />
+            ))
         ) : (
           <Typography variant="subtitle2" color="secondary">
             {t('apikeys.none')}

@@ -250,8 +250,7 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
                 {apiKey ? (
                   apiKey?.last_used ? (
                     <div>
-                      <Moment format="YYYY-MM-DD">{apiKey.last_used}</Moment>&nbsp; (
-                      <Moment variant="fromNow">{apiKey.last_used}</Moment>)
+                      <Moment format="YYYY-MM-DD">{apiKey.last_used}</Moment>
                     </div>
                   ) : (
                     <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>

@@ -498,12 +498,7 @@ function User({ username = null }: UserProps) {
                   otp: <OTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   disable_otp: <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   token: <SecurityToken user={user} toggleToken={toggleToken} />,
-                  api_key: (
-                    <APIKeys
-                      apiKeys={user?.apikeys || {}}
-                      onAPIKeysChange={setApiKeys => setUser(prev => ({ ...prev, apikeys: setApiKeys(prev.apikeys) }))}
-                    />
-                  ),
+                  api_key: <APIKeys username={user?.uname} />,
                   apps: <Apps user={user} toggleApp={toggleApp} />
                 }[drawerType]
               : null}
