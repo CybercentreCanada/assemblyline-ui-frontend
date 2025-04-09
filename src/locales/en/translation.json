@@ -1,7 +1,7 @@
 {
   "adminmenu": "Administration",
   "adminmenu.actions": "Post-process actions",
-  "adminmenu.apikeys": "API keys",
+  "adminmenu.apikeys": "API Keys",
   "adminmenu.errors": "Error Viewer",
   "adminmenu.identify": "File Identification",
   "adminmenu.service_review": "Service Review",
