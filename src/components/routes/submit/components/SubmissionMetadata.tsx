@@ -296,7 +296,12 @@ const ExtraMetadata = React.memo(() => {
               >
                 {metadata.map(([k, v]) => (
                   <div key={`${k}-${v}`} style={{ display: 'contents' }}>
-                    <Typography color="textSecondary" variant="body2" textTransform="capitalize">
+                    <Typography
+                      color="textSecondary"
+                      variant="body2"
+                      textTransform="capitalize"
+                      sx={{ wordBreak: 'break-word' }}
+                    >
                       {k.replaceAll('_', ' ')}
                     </Typography>
                     <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
