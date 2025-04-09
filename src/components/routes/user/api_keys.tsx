@@ -131,7 +131,7 @@ const APIKeyDeleteDialog = React.memo(
     const handleDelete = useCallback(
       (values: ApiKey) => {
         apiCall({
-          url: `/api/v4/apikey/${values.id}/`,
+          url: `/api/v4/apikey/` + values.id + '/',
           method: 'DELETE',
           onSuccess: () => {
             showSuccessMessage(t('apikeys.removed'));
@@ -543,7 +543,7 @@ const APIKeyCard = ({ apikey, onAPIKeysChange = () => null }: APIKeyCardProps) =
  */
 
 type APIKeysProps = {
-  username: String;
+  username: string;
 };
 
 export default function APIKeys({ username }: APIKeysProps) {
