@@ -35,21 +35,3 @@ export const updateALQuery = <Request extends ALRequests>(
     },
     prev => ({ ...prev, api_response: updater(prev?.api_response) })
   );
-
-//   import type { Query } from '@tanstack/react-query';
-// import { queryClient } from 'components/core/API/APIProvider';
-// import { DEFAULT_INVALIDATE_DELAY } from 'components/core/API/utils/constants';
-// import type { ALRequests, ALResponses } from 'components/core/Query/models/models';
-
-// export const invalidateALQuery = (filter: (key: ALRequests) => boolean, delay: number = DEFAULT_INVALIDATE_DELAY) =>
-//   setTimeout(async () => {
-//     await queryClient.invalidateQueries({
-//       predicate: ({ queryKey }: Query<unknown, Error, unknown, [ALRequests]>) => {
-//         try {
-//           return typeof queryKey[0] === 'object' && queryKey[0] && filter(queryKey[0]);
-//         } catch (err) {
-//           return false;
-//         }
-//       }
-//     });
-//   }, delay);
