@@ -6,11 +6,15 @@ import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import { Divider, Grid, IconButton, MenuItem, Skeleton, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
+import { invalidateALQuery } from 'components/core/Query/AL/invalidateALQuery';
+import { updateALQuery } from 'components/core/Query/AL/updateALQuery';
+import { useALMutation } from 'components/core/Query/AL/useALMutation';
+import { useALQuery } from 'components/core/Query/AL/useALQuery';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Badlist } from 'components/models/base/badlist';
 import { ATTRIBUTION_TYPES, DEFAULT_TEMP_ATTRIBUTION } from 'components/models/base/badlist';
+import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
@@ -19,11 +23,10 @@ import Histogram from 'components/visual/Histogram';
 import InputDialog from 'components/visual/InputDialog';
 import Moment from 'components/visual/Moment';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
-import ForbiddenPage from 'components/routes/403';
 
 type ParamProps = {
   id: string;
@@ -35,46 +38,36 @@ type BadlistDetailProps = {
 };
 
 const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailProps) => {
-  const { t, i18n } = useTranslation(['manageBadlistDetail']);
-  const { id } = useParams<ParamProps>();
+  const { t } = useTranslation(['manageBadlistDetail']);
   const theme = useTheme();
-  const [badlist, setBadlist] = useState<Badlist>(null);
-  const [histogram, setHistogram] = useState<Record<string, number>>(null);
+  const navigate = useNavigate();
+  const { id } = useParams<ParamProps>();
+  const { showSuccessMessage } = useMySnackbar();
+  const { user: currentUser, c12nDef } = useALContext();
+
   const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
-  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [enableDialog, setEnableDialog] = useState<boolean>(false);
   const [addAttributionDialog, setAddAttributionDialog] = useState<boolean>(false);
   const [disableDialog, setDisableDialog] = useState<boolean>(false);
-  const [removeAttributionDialog, setRemoveAttributionDialog] = useState(null);
-  const [removeSourceData, setRemoveSourceData] = useState(null);
-  const [addAttributionData, setAddAttributionData] = useState({ ...DEFAULT_TEMP_ATTRIBUTION });
-  const { user: currentUser, c12nDef } = useALContext();
-  const { showSuccessMessage } = useMySnackbar();
-  const { apiCall } = useMyAPI();
-  const navigate = useNavigate();
+  const [removeAttributionDialog, setRemoveAttributionDialog] = useState<{ type: string; value: string }>(null);
+  const [removeSourceData, setRemoveSourceData] = useState<{ name: string; type: string }>(null);
+  const [addAttributionData, setAddAttributionData] = useState<{ type: string; value: string }>({
+    ...DEFAULT_TEMP_ATTRIBUTION
+  });
 
-  useEffect(() => {
-    if ((badlist_id || id) && currentUser.roles.includes('badlist_view')) {
-      reload();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [badlist_id, id]);
+  const { data: badlist } = useALQuery({
+    url: `/api/v4/badlist/${badlist_id || id}/`,
+    enabled: (badlist_id || id) && currentUser.roles.includes('badlist_view'),
+    body: null
+  });
 
-  const reload = () => {
-    apiCall({
-      url: `/api/v4/badlist/${badlist_id || id}/`,
-      onSuccess: api_data => {
-        setBadlist(api_data.api_response);
-      }
-    });
-  };
-
-  useEffect(() => {
-    if (badlist && currentUser.roles.includes('submission_view')) {
-      apiCall({
-        method: 'POST',
-        url: '/api/v4/search/histogram/result/created/',
-        body: {
+  const { data: histogram } = useALQuery({
+    url: '/api/v4/search/histogram/result/created/',
+    method: 'POST',
+    enabled: badlist && currentUser.roles.includes('badlist_view'),
+    body: !badlist
+      ? null
+      : {
           query:
             badlist.type === 'file'
               ? `result.sections.heuristic.signature.name:"BADLIST_${badlist_id || id}"`
@@ -83,215 +76,152 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
           start: 'now-30d/d',
           end: 'now+1d/d-1s',
           gap: '+1d'
-        },
-        onSuccess: api_data => {
-          setHistogram(api_data.api_response);
         }
-      });
+  });
+
+  const handleRemoveBadlist = useALMutation(() => ({
+    url: `/api/v4/badlist/${badlist_id || id}/`,
+    method: 'DELETE',
+    onSuccess: () => {
+      setDeleteDialog(false);
+      showSuccessMessage(t('delete.success'));
+      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      if (id) setTimeout(() => navigate('/manage/badlist'), 1000);
+      close();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [badlist]);
+  }));
 
-  const removeBadlist = () => {
-    apiCall({
-      url: `/api/v4/badlist/${badlist_id || id}/`,
-      method: 'DELETE',
-      onSuccess: () => {
-        setDeleteDialog(false);
-        showSuccessMessage(t('delete.success'));
-        if (id) {
-          setTimeout(() => navigate('/manage/badlist'), 1000);
-        }
-        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadBadlist')), 1000);
-        close();
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-  };
+  const handleEnableHash = useALMutation((enabled: boolean) => ({
+    url: `/api/v4/badlist/enable/${badlist_id || id}/`,
+    method: 'PUT',
+    body: enabled,
+    onSuccess: () => {
+      setEnableDialog(false);
+      setDisableDialog(false);
+      showSuccessMessage(enabled ? t('enable.success') : t('disable.success'));
+      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      updateALQuery({ url: `/api/v4/badlist/${badlist_id || id}/` }, prev => ({ ...prev, enabled }));
+    }
+  }));
 
-  const enableHash = () => {
-    apiCall({
-      body: true,
-      url: `/api/v4/badlist/enable/${badlist_id || id}/`,
-      method: 'PUT',
-      onSuccess: () => {
-        setEnableDialog(false);
-        showSuccessMessage(t('enable.success'));
-        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadBadlist')), 1000);
-        setBadlist({ ...badlist, enabled: true });
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-  };
+  const handleExpiryDateChange = useALMutation((expiry_ts: string) => ({
+    url: `/api/v4/badlist/expiry/${badlist_id || id}/`,
+    method: 'DELETE',
+    ...(expiry_ts && { method: 'PUT', body: expiry_ts }),
+    onSuccess: () => {
+      setDisableDialog(false);
+      showSuccessMessage(t(expiry_ts ? 'expiry.update.success' : 'expiry.clear.success'));
+      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      updateALQuery({ url: `/api/v4/badlist/${badlist_id || id}/` }, prev => ({ ...prev, expiry_ts }));
+    }
+  }));
 
-  const disableHash = () => {
-    apiCall({
-      body: false,
-      url: `/api/v4/badlist/enable/${badlist_id || id}/`,
-      method: 'PUT',
-      onSuccess: () => {
-        setDisableDialog(false);
-        showSuccessMessage(t('disable.success'));
-        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadBadlist')), 1000);
-        setBadlist({ ...badlist, enabled: false });
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-  };
+  const handleClassificationChange = useALMutation((classification: string, source: string, type: string) => ({
+    url: `/api/v4/badlist/classification/${badlist_id || id}/${source}/${type}/`,
+    method: 'PUT',
+    body: classification,
+    onSuccess: () => {
+      showSuccessMessage(t('classification.update.success'));
+      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      invalidateALQuery({ url: `/api/v4/badlist/${badlist_id || id}/` }, 1000);
+    }
+  }));
 
-  const handleExpiryDateChange = date => {
-    apiCall({
-      body: date,
-      url: `/api/v4/badlist/expiry/${badlist_id || id}/`,
-      method: date ? 'PUT' : 'DELETE',
-      onSuccess: () => {
-        setDisableDialog(false);
-        showSuccessMessage(t(date ? 'expiry.update.success' : 'expiry.clear.success'));
-        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadBadlist')), 1000);
-        setBadlist({ ...badlist, expiry_ts: date });
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-  };
+  const handleDeleteSource = useALMutation((name: string, type: string) => ({
+    url: `/api/v4/badlist/source/${badlist_id || id}/${name}/${type}/`,
+    method: 'DELETE',
+    onSuccess: () => {
+      showSuccessMessage(t('remove.source.success'));
+      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      invalidateALQuery({ url: `/api/v4/badlist/${badlist_id || id}/` }, 1000);
+      setRemoveSourceData(null);
+    }
+  }));
 
-  const handleClassificationChange = (classification, source, type) => {
-    apiCall({
-      body: classification,
-      url: `/api/v4/badlist/classification/${badlist_id || id}/${source}/${type}/`,
-      method: 'PUT',
-      onSuccess: () => {
-        showSuccessMessage(t('classification.update.success'));
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('reloadBadlist'));
-          reload();
-        }, 1000);
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-  };
+  const handleDeleteAttribution = useALMutation((type: string, value: string) => ({
+    url: `/api/v4/badlist/attribution/${badlist_id || id}/${type}/${value}/`,
+    method: 'DELETE',
+    onSuccess: () => {
+      showSuccessMessage(t('remove.attribution.success'));
+      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      invalidateALQuery({ url: `/api/v4/badlist/${badlist_id || id}/` }, 1000);
+      setRemoveAttributionDialog(null);
+    }
+  }));
 
-  const deleteSource = () => {
-    apiCall({
-      url: `/api/v4/badlist/source/${badlist_id || id}/${removeSourceData.name}/${removeSourceData.type}/`,
-      method: 'DELETE',
-      onSuccess: () => {
-        showSuccessMessage(t('remove.source.success'));
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('reloadBadlist'));
-          reload();
-        }, 1000);
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => {
-        setWaitingDialog(false);
-        setRemoveSourceData(null);
-      }
-    });
-  };
-
-  const deleteAttribution = () => {
-    apiCall({
-      url: `/api/v4/badlist/attribution/${badlist_id || id}/${removeAttributionDialog.type}/${
-        removeAttributionDialog.value
-      }/`,
-      method: 'DELETE',
-      onSuccess: () => {
-        setRemoveAttributionDialog(null);
-        showSuccessMessage(t('remove.attribution.success'));
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('reloadBadlist'));
-          reload();
-        }, 1000);
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-  };
-
-  const addAttribution = () => {
-    apiCall({
-      url: `/api/v4/badlist/attribution/${badlist_id || id}/${addAttributionData.type}/${addAttributionData.value}/`,
-      method: 'PUT',
-      onSuccess: () => {
-        setAddAttributionDialog(false);
-        showSuccessMessage(t('add.attribution.success'));
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('reloadBadlist'));
-          setAddAttributionData({ ...DEFAULT_TEMP_ATTRIBUTION });
-          reload();
-        }, 1000);
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-  };
+  const handleAddAttribution = useALMutation((type: string, value: string) => ({
+    url: `/api/v4/badlist/attribution/${badlist_id || id}/${type}/${value}/`,
+    method: 'PUT',
+    onSuccess: () => {
+      setAddAttributionDialog(false);
+      showSuccessMessage(t('add.attribution.success'));
+      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      invalidateALQuery({ url: `/api/v4/badlist/${badlist_id || id}/` }, 1000);
+      setTimeout(() => setAddAttributionData({ ...DEFAULT_TEMP_ATTRIBUTION }), 1000);
+    }
+  }));
 
   return currentUser.roles.includes('badlist_view') ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
-        handleAccept={removeBadlist}
+        handleAccept={() => handleRemoveBadlist.mutate()}
         title={t('delete.title')}
         cancelText={t('delete.cancelText')}
         acceptText={t('delete.acceptText')}
         text={t('delete.text')}
-        waiting={waitingDialog}
+        waiting={handleRemoveBadlist.isPending}
       />
       <ConfirmationDialog
         open={enableDialog}
         handleClose={() => setEnableDialog(false)}
-        handleAccept={enableHash}
+        handleAccept={() => handleEnableHash.mutate(true)}
         title={t('enable.title')}
         cancelText={t('enable.cancelText')}
         acceptText={t('enable.acceptText')}
         text={t('enable.text')}
-        waiting={waitingDialog}
+        waiting={handleEnableHash.isPending}
       />
       <ConfirmationDialog
         open={disableDialog}
         handleClose={() => setDisableDialog(false)}
-        handleAccept={disableHash}
+        handleAccept={() => handleEnableHash.mutate(false)}
         title={t('disable.title')}
         cancelText={t('disable.cancelText')}
         acceptText={t('disable.acceptText')}
         text={t('disable.text')}
-        waiting={waitingDialog}
+        waiting={handleEnableHash.isPending}
       />
       <ConfirmationDialog
         open={removeAttributionDialog !== null}
         handleClose={() => setRemoveAttributionDialog(null)}
-        handleAccept={deleteAttribution}
+        handleAccept={() => handleDeleteAttribution.mutate(removeAttributionDialog.type, removeAttributionDialog.value)}
         title={t('remove.attribution.title')}
         cancelText={t('remove.attribution.cancelText')}
         acceptText={t('remove.attribution.acceptText')}
         text={t('remove.attribution.text')}
-        waiting={waitingDialog}
+        waiting={handleDeleteAttribution.isPending}
       />
       <ConfirmationDialog
         open={removeSourceData !== null}
         handleClose={() => setRemoveSourceData(null)}
-        handleAccept={deleteSource}
+        handleAccept={() => handleDeleteSource.mutate(removeSourceData.name, removeSourceData.type)}
         title={t('remove.source.title')}
         cancelText={t('remove.source.cancelText')}
         acceptText={t('remove.source.acceptText')}
         text={t('remove.source.text')}
-        waiting={waitingDialog}
+        waiting={handleDeleteSource.isPending}
       />
       <InputDialog
         open={addAttributionDialog}
         handleClose={() => setAddAttributionDialog(false)}
-        handleAccept={addAttribution}
+        handleAccept={() => handleAddAttribution.mutate(addAttributionData.type, addAttributionData.value)}
         title={t('add.attribution.title')}
         cancelText={t('add.attribution.cancelText')}
         acceptText={t('add.attribution.acceptText')}
         text={t('add.attribution.text')}
-        waiting={waitingDialog}
+        waiting={handleAddAttribution.isPending}
         handleInputChange={event => setAddAttributionData({ ...addAttributionData, value: event.target.value })}
         inputValue={addAttributionData.value}
         inputLabel={t('add.attribution.inputlabel')}
@@ -420,7 +350,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
             <Divider />
             <Grid container>
               <Grid item xs={4} sm={3}>
-                <span style={{ fontWeight: 500 }}>MD5</span>
+                <span style={{ fontWeight: 500 }}>{'MD5'}</span>
               </Grid>
               <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {badlist ? (
@@ -430,7 +360,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 )}
               </Grid>
               <Grid item xs={4} sm={3}>
-                <span style={{ fontWeight: 500 }}>SHA1</span>
+                <span style={{ fontWeight: 500 }}>{'SHA1'}</span>
               </Grid>
               <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {badlist ? (
@@ -440,7 +370,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 )}
               </Grid>
               <Grid item xs={4} sm={3}>
-                <span style={{ fontWeight: 500 }}>SHA256</span>
+                <span style={{ fontWeight: 500 }}>{'SHA256'}</span>
               </Grid>
               <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {badlist ? (
@@ -450,7 +380,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 )}
               </Grid>
               <Grid item xs={4} sm={3}>
-                <span style={{ fontWeight: 500 }}>SSDeep</span>
+                <span style={{ fontWeight: 500 }}>{'SSDeep'}</span>
               </Grid>
               <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {badlist ? (
@@ -460,7 +390,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 )}
               </Grid>
               <Grid item xs={4} sm={3}>
-                <span style={{ fontWeight: 500 }}>TLSH</span>
+                <span style={{ fontWeight: 500 }}>{'TLSH'}</span>
               </Grid>
               <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {badlist ? (
@@ -558,13 +488,15 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
             {badlist &&
               (!badlist.attribution ||
                 Object.keys(badlist.attribution).every(
-                  k => !badlist.attribution[k] || badlist.attribution[k].length === 0
+                  (k: keyof Badlist['attribution']) => !badlist.attribution[k] || badlist.attribution[k].length === 0
                 )) && <span style={{ color: theme.palette.action.disabled }}>{t('attribution.empty')}</span>}
             {badlist &&
               badlist.attribution &&
               Object.keys(badlist.attribution)
-                .filter(k => badlist.attribution[k] && badlist.attribution[k].length !== 0)
-                .map((k, kid) => (
+                .filter(
+                  (k: keyof Badlist['attribution']) => badlist.attribution[k] && badlist.attribution[k].length !== 0
+                )
+                .map((k: keyof Badlist['attribution'], kid) => (
                   <Grid key={kid} container spacing={2}>
                     <Grid item xs={4} sm={3}>
                       <span style={{ fontWeight: 500 }}>{t(`attribution.${k}`)}</span>
@@ -623,7 +555,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                         type={currentUser.is_admin || currentUser.username === src.name ? 'picker' : 'outlined'}
                         setClassification={
                           currentUser.is_admin || currentUser.username === src.name
-                            ? classification => handleClassificationChange(classification, src.name, src.type)
+                            ? classification => handleClassificationChange.mutate(classification, src.name, src.type)
                             : null
                         }
                       />
@@ -645,7 +577,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                   (badlist ? (
                     <DatePicker
                       date={badlist.expiry_ts}
-                      setDate={handleExpiryDateChange}
+                      setDate={date => handleExpiryDateChange.mutate(date)}
                       tooltip={t('expiry.change')}
                       defaultDateOffset={1}
                       minDateTomorrow
