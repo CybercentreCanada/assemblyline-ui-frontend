@@ -1,6 +1,7 @@
 {
   "adminmenu": "Administration",
   "adminmenu.actions": "Actions post-traitement",
+  "adminmenu.apikeys": "Clés d'API",
   "adminmenu.errors": "Visualisateur d'erreurs",
   "adminmenu.identify": "Identification des fichiers",
   "adminmenu.service_review": "Examen des services",
@@ -61,6 +62,10 @@
   "drawer.archive": "Archive",
   "drawer.collapse": "Fermer le Menu",
   "drawer.dashboard": "Tableau de bord",
+  "drawer.development": "Développement",
+  "drawer.development.api": "Appel API",
+  "drawer.development.library": "Bibliothèque",
+  "drawer.development.theme": "Thème",
   "drawer.expand": "Ouvrir le Menu",
   "drawer.help": "Aide",
   "drawer.help.api": "Documentation de l'API",

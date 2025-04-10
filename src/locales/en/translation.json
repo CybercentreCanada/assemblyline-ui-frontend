@@ -1,6 +1,7 @@
 {
   "adminmenu": "Administration",
   "adminmenu.actions": "Post-process actions",
+  "adminmenu.apikeys": "API Keys",
   "adminmenu.errors": "Error Viewer",
   "adminmenu.identify": "File Identification",
   "adminmenu.service_review": "Service Review",
@@ -61,6 +62,10 @@
   "drawer.archive": "Archive",
   "drawer.collapse": "Collapse Menu",
   "drawer.dashboard": "Dashboard",
+  "drawer.development": "Development",
+  "drawer.development.api": "API Call",
+  "drawer.development.library": "Library",
+  "drawer.development.theme": "Theme",
   "drawer.expand": "Expand Menu",
   "drawer.help": "Help",
   "drawer.help.api": "API Documentation",

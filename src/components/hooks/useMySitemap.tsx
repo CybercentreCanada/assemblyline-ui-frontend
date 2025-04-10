@@ -8,6 +8,7 @@ import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOutlined';
+import CodeIcon from '@mui/icons-material/Code';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
@@ -18,13 +19,16 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
+import PaletteIcon from '@mui/icons-material/Palette';
 import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined';
@@ -244,6 +248,7 @@ export default function useMySitemap() {
       { path: '/tos', title: t('breadcrumb.tos'), isRoot: true, icon: <ReceiptOutlinedIcon /> },
       { path: '/account', title: t('usermenu.account'), isRoot: true, icon: <AccountCircleOutlinedIcon /> },
       { path: '/settings', title: t('usermenu.settings'), isRoot: true, icon: <SettingsOutlinedIcon /> },
+      { path: '/settings/:tab', title: t('usermenu.settings'), isRoot: true, icon: <SettingsOutlinedIcon /> },
       { path: '/admin', title: t('adminmenu'), isRoot: true, icon: <BusinessOutlinedIcon /> },
       {
         path: '/admin/service_review',
@@ -301,11 +306,43 @@ export default function useMySitemap() {
         breadcrumbs: ['/admin']
       },
       {
+        path: '/admin/apikeys',
+        title: t('adminmenu.apikeys'),
+        icon: <KeyOutlinedIcon />,
+        breadcrumbs: ['/admin']
+      },
+      {
+        path: '/admin/apikeys/:id',
+        title: '{:id}',
+        icon: <KeyOutlinedIcon />,
+        breadcrumbs: ['/admin', '/admin/apikeys']
+      },
+      {
         path: '/admin/users/:id',
         title: '{:id}',
         isRoot: true,
         icon: <AccountCircleOutlinedIcon />,
         breadcrumbs: ['/admin', '/admin/users']
+      },
+
+      { path: '/development', title: t('drawer.development'), isRoot: true, icon: <CodeIcon /> },
+      // {
+      //   path: '/development/api',
+      //   title: t('drawer.development.api'),
+      //   icon: <ApiIcon />,
+      //   breadcrumbs: ['/development']
+      // },
+      {
+        path: '/development/library',
+        title: t('drawer.development.library'),
+        icon: <LibraryBooksIcon />,
+        breadcrumbs: ['/development']
+      },
+      {
+        path: '/development/theme',
+        title: t('drawer.development.theme'),
+        icon: <PaletteIcon />,
+        breadcrumbs: ['/development']
       }
     ]
   };
