@@ -14,6 +14,7 @@ import type { ResetInputProps } from './components/ResetInput';
 import { ResetInput } from './components/ResetInput';
 
 export type SwitchInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
+  endAdornment?: React.ReactNode;
   error?: (value: boolean) => string;
   errorProps?: FormHelperTextProps;
   helperText?: string;
@@ -38,11 +39,12 @@ export type SwitchInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value
 export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
   ({
     disabled = false,
+    endAdornment = null,
     error = () => null,
     errorProps = null,
     helperText = null,
     helperTextProps = null,
-    id = null,
+    id: idProp = null,
     label = null,
     labelProps = null,
     loading = false,
@@ -63,6 +65,8 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);
+
+    const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
     const errorValue = useMemo<string>(() => error(value), [error, value]);
 
@@ -125,7 +129,14 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
                 )
               }
               disabled={loading || disabled || readOnly}
-              label={label}
+              label={
+                <div
+                  style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}
+                >
+                  <span style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{label}</span>
+                  {endAdornment}
+                </div>
+              }
               slotProps={{
                 typography: {
                   color: !disabled && errorValue ? 'error' : focused ? 'primary' : 'textPrimary',
@@ -159,7 +170,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
           <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
             <div>
               <ResetInput
-                id={id || label}
+                id={id}
                 preventRender={loading || !reset || disabled || readOnly}
                 tiny={tiny}
                 onReset={onReset}

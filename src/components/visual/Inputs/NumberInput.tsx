@@ -46,7 +46,7 @@ const WrappedNumberInput = ({
   errorProps = null,
   helperText = null,
   helperTextProps = null,
-  id = null,
+  id: idProp = null,
   label,
   labelProps,
   loading = false,
@@ -73,6 +73,8 @@ const WrappedNumberInput = ({
 
   const [focused, setFocused] = useState<boolean>(false);
 
+  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
@@ -82,7 +84,7 @@ const WrappedNumberInput = ({
           color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
           component={InputLabel}
           gutterBottom
-          htmlFor={id || label}
+          htmlFor={id}
           variant="body2"
           whiteSpace="nowrap"
           {...labelProps}
@@ -101,7 +103,7 @@ const WrappedNumberInput = ({
           <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
         ) : (
           <TextField
-            id={id || label}
+            id={id}
             type="number"
             size="small"
             fullWidth
@@ -137,7 +139,7 @@ const WrappedNumberInput = ({
                   {loading || !reset || disabled || readOnly ? null : (
                     <InputAdornment position="end">
                       <ResetInput
-                        id={id || label}
+                        id={id}
                         preventRender={loading || !reset || disabled || readOnly}
                         tiny={tiny}
                         onReset={onReset}
