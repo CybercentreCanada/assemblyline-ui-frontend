@@ -213,7 +213,7 @@ const WrappedFileViewer = () => {
                     <CodeSection sha256={sha256} />
                   </div>
                 ),
-                disabled: isMdUp || !codeAllowed
+                preventRender: isMdUp || !codeAllowed
               },
               strings: {
                 label: t('strings'),
@@ -238,7 +238,7 @@ const WrappedFileViewer = () => {
               },
               image: {
                 label: t('image'),
-                disabled: !imageAllowed,
+                preventRender: !imageAllowed,
                 inner: (
                   <div className={classes.tab}>
                     <ImageSection sha256={sha256} name={sha256} />

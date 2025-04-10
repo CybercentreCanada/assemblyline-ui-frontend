@@ -4,7 +4,7 @@ trigger: ['*']
 pr: ['*']
 
 pool:
-  vmImage: 'ubuntu-20.04'
+  vmImage: 'ubuntu-latest'
 
 jobs:
   - job: run_test
@@ -35,17 +35,17 @@ jobs:
 
       - script: |
           set -xv  # Echo commands before they are run
-          npm run tsc
+          yarn run tsc
         displayName: TypeScript
 
       - script: |
           set -xv  # Echo commands before they are run
-          npm run ci-test
+          yarn run ci-test
         displayName: Test
 
       - script: |
           set -xv  # Echo commands before they are run
-          npm run ci-lint
+          yarn run ci-lint
         displayName: ESLint
 
       - task: PublishCodeCoverageResults@2

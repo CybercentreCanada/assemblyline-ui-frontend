@@ -12,6 +12,7 @@ import { SearchParamsProvider, useSearchParams } from 'components/core/SearchPar
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Error } from 'components/models/base/error';
+import type { FacetResult, HistogramResult, SearchResult } from 'components/models/ui/search';
 import type { CustomUser } from 'components/models/ui/user';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
@@ -24,13 +25,6 @@ import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import { ErrorDetail } from './error_detail';
-
-type SearchResults = {
-  items: Error[];
-  offset: number;
-  rows: number;
-  total: number;
-};
 
 const TIME_CONTRAINTS = ['24h', '4d', '7d', '1m', '1y'] as const;
 
@@ -86,10 +80,10 @@ const ErrorViewer = () => {
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { search, setSearchParams, setSearchObject } = useSearchParams<ErrorViewerParams>();
 
-  const [errorResults, setErrorResults] = useState<SearchResults>(null);
-  const [histogram, setHistogram] = useState<{ [s: string]: number }>(null);
-  const [types, setTypes] = useState<{ [s: string]: number }>(null);
-  const [names, setNames] = useState<{ [s: string]: number }>(null);
+  const [errorResults, setErrorResults] = useState<SearchResult<Error>>(null);
+  const [histogram, setHistogram] = useState<HistogramResult>(null);
+  const [types, setTypes] = useState<FacetResult>(null);
+  const [names, setNames] = useState<FacetResult>(null);
   const [searching, setSearching] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
 
@@ -118,23 +112,16 @@ const ErrorViewer = () => {
       filters: o.tc in TC_MAP && o.tc !== '1y' ? [...o.filters, TC_MAP[o.tc]] : o.filters
     }));
 
-    apiCall({
+    apiCall<SearchResult<Error>>({
       url: `/api/v4/error/list/?${body
         .pick(['query', 'filters', 'offset', 'rows', 'sort', 'track_total_hits'])
         .toString()}`,
-      onSuccess: ({ api_response }) => setErrorResults(api_response as SearchResults),
+      onSuccess: ({ api_response }) => setErrorResults(api_response),
       onEnter: () => setSearching(true),
       onExit: () => setSearching(false)
     });
 
-    apiCall({
-      url: '/api/v4/search/facet/error/response.service_name/',
-      method: 'POST',
-      body: body.pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only']).toObject(),
-      onSuccess: ({ api_response }) => setNames(api_response as { [s: string]: number })
-    });
-
-    apiCall({
+    apiCall<HistogramResult>({
       url: '/api/v4/search/histogram/error/created/',
       method: 'POST',
       body: {
@@ -143,14 +130,47 @@ const ErrorViewer = () => {
         end: 'now',
         gap: GAP_MAP[body.get('tc')]
       },
-      onSuccess: ({ api_response }) => setHistogram(api_response as { [s: string]: number })
+      onSuccess: ({ api_response }) => setHistogram(api_response)
     });
 
-    apiCall({
+    apiCall<FacetResult>({
+      url: '/api/v4/search/facet/error/response.service_name/',
+      method: 'POST',
+      body: body
+        .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'])
+        .set(s => {
+          s.mincount = 1;
+          return s;
+        })
+        .toObject(),
+      onSuccess: ({ api_response }) =>
+        setNames(
+          Object.fromEntries(
+            Object.keys(api_response)
+              .sort((a, b) => api_response[b] - api_response[a])
+              .map(k => [k, api_response[k]])
+          )
+        )
+    });
+
+    apiCall<FacetResult>({
       url: '/api/v4/search/facet/error/type/',
       method: 'POST',
-      body: body.pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only']).toObject(),
-      onSuccess: ({ api_response }) => setTypes(api_response as { [s: string]: number })
+      body: body
+        .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'])
+        .set(s => {
+          s.mincount = 1;
+          return s;
+        })
+        .toObject(),
+      onSuccess: ({ api_response }) =>
+        setTypes(
+          Object.fromEntries(
+            Object.keys(api_response)
+              .sort((a, b) => api_response[b] - api_response[a])
+              .map(k => [k, api_response[k]])
+          )
+        )
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
