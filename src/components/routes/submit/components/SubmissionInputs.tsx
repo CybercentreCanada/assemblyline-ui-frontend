@@ -715,6 +715,10 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useMySnackbar();
   const { settings } = useALContext();
 
+  const warnOnUnload = useCallback((warn: boolean) => {
+    window.onbeforeunload = warn ? () => true : null;
+  }, []);
+
   const handleCancel = useCallback(() => {
     form.setFieldValue('state.phase', 'editing');
     form.setFieldValue('state.progress', null);
@@ -749,6 +753,8 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
         return `${uuid}_${size}_${relativePath.replace(/[^0-9a-zA-Z_-]/gim, '')}`;
       };
 
+      warnOnUnload(true);
+
       FLOW.on('fileError', (event, api_data) => {
         try {
           const data = JSON.parse(api_data) as APIResponseProps<unknown>;
@@ -778,6 +784,8 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
       });
 
       FLOW.on('complete', () => {
+        warnOnUnload(false);
+
         if (FLOW.files.length === 0) {
           return;
         }
