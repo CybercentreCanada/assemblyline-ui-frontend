@@ -82,7 +82,7 @@ const WrappedMoment = ({ children = null, format = null, variant = null }: Momen
     }
   }, [children, format, i18n.language, variant]);
 
-  return <>{data}</>;
+  return <>{data.toString()}</>;
 };
 
 export const Moment = memo(WrappedMoment);

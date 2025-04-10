@@ -39,6 +39,7 @@ export const TabContent = React.memo(WrappedTabContent);
 
 interface TabElement extends TabProps {
   inner?: ReactNode;
+  preventRender?: boolean;
 }
 
 type TabElements = Record<string, TabElement>;
@@ -128,8 +129,8 @@ const WrappedTabContainer = <T extends TabElements>({
           {...props}
         >
           {Object.entries(tabs).map(
-            ([value, { label = '', disabled = false, icon = null, iconPosition = 'top', ...other }], i) =>
-              disabled ? null : (
+            ([value, { label = '', icon = null, iconPosition = 'top', preventRender = false, ...other }], i) =>
+              preventRender ? null : (
                 <Tab
                   key={i}
                   tabIndex={0}
