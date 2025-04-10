@@ -19,6 +19,7 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
@@ -303,6 +304,18 @@ export default function useMySitemap() {
         title: t('adminmenu.users'),
         icon: <SupervisorAccountOutlinedIcon />,
         breadcrumbs: ['/admin']
+      },
+      {
+        path: '/admin/apikeys',
+        title: t('adminmenu.apikeys'),
+        icon: <KeyOutlinedIcon />,
+        breadcrumbs: ['/admin']
+      },
+      {
+        path: '/admin/apikeys/:id',
+        title: '{:id}',
+        icon: <KeyOutlinedIcon />,
+        breadcrumbs: ['/admin', '/admin/apikeys']
       },
       {
         path: '/admin/users/:id',

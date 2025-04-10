@@ -9,6 +9,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
 import error404EN from 'locales/en/404.json';
 import adminActionsEN from 'locales/en/admin/actions.json';
+import adminAPIkeysEN from 'locales/en/admin/apikeys.json';
 import adminCommunityServicesEN from 'locales/en/admin/community_services.json';
 import adminErrorViewerEN from 'locales/en/admin/error_viewer.json';
 import adminIdentifyEN from 'locales/en/admin/identify.json';
@@ -62,6 +63,7 @@ import userEN from 'locales/en/user.json';
 import error403FR from 'locales/fr/403.json';
 import error404FR from 'locales/fr/404.json';
 import adminActionsFR from 'locales/fr/admin/actions.json';
+import adminAPIkeysFR from 'locales/fr/admin/apikeys.json';
 import adminCommunityServicesFR from 'locales/fr/admin/community_services.json';
 import adminErrorViewerFR from 'locales/fr/admin/error_viewer.json';
 import adminIdentifyFR from 'locales/fr/admin/identify.json';
@@ -117,6 +119,7 @@ import { initReactI18next } from 'react-i18next';
 const resources = {
   en: {
     adminActions: adminActionsEN,
+    adminAPIkeys: adminAPIkeysEN,
     adminCommunityServices: adminCommunityServicesEN,
     adminErrorViewer: adminErrorViewerEN,
     adminIdentify: adminIdentifyEN,
@@ -175,6 +178,7 @@ const resources = {
   },
   fr: {
     adminActions: adminActionsFR,
+    adminAPIkeys: adminAPIkeysFR,
     adminCommunityServices: adminCommunityServicesFR,
     adminErrorViewer: adminErrorViewerFR,
     adminIdentify: adminIdentifyFR,

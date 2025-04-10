@@ -69,6 +69,9 @@ export type Auth = {
 
   /** Allow security tokens? */
   allow_security_tokens: boolean;
+
+  /** maximum days to live for API keys */
+  apikey_max_dtl: number;
 };
 
 /** Malware Archive Configuration */
@@ -382,7 +385,7 @@ export type Metadata = {
   aliases: string[];
 
   /** Default value for the field */
-  default?: any;
+  default?: unknown;
 
   /** Is this field required? */
   required: boolean;
@@ -600,7 +603,8 @@ export const CONFIGURATION: Configuration = {
     allow_2fa: false,
     allow_apikeys: false,
     allow_extended_apikeys: false,
-    allow_security_tokens: false
+    allow_security_tokens: false,
+    apikey_max_dtl: null
   },
   core: {
     archiver: {
@@ -686,7 +690,7 @@ export const CONFIGURATION: Configuration = {
     allow_replay: false,
     allow_url_submissions: false,
     allow_zip_downloads: false,
-    api_proxies: [],
+    api_proxies: {},
     apps: [],
     audit: false,
     banner: {},
