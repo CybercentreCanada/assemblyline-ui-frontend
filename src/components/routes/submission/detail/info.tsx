@@ -107,30 +107,29 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                   </>
                 )}
 
-                {[
-                  'generate_alert',
-                  'deep_scan',
-                  'ignore_cache',
-                  'ignore_dynamic_recursion_prevention',
-                  'ignore_filtering'
-                ].map((k, i) => (
-                  <Fragment key={i}>
-                    <Grid item xs={4} sm={3} lg={2} style={{ paddingTop: theme.spacing(0.5) }}>
-                      <span style={{ fontWeight: 500 }}>{t(`params.${k}`)}</span>
-                    </Grid>
-                    <Grid item xs={8} sm={9} lg={10} style={{ height: theme.spacing(3.75) }}>
-                      {submission ? (
-                        submission.params[k] ? (
-                          <CheckBoxOutlinedIcon />
+                {['generate_alert', 'deep_scan', 'ignore_cache', 'ignore_recursion_prevention', 'ignore_filtering'].map(
+                  (k, i) => (
+                    <Fragment key={i}>
+                      <Grid item xs={4} sm={3} lg={2} style={{ paddingTop: theme.spacing(0.5) }}>
+                        <span style={{ fontWeight: 500 }}>{t(`params.${k}`)}</span>
+                      </Grid>
+                      <Grid item xs={8} sm={9} lg={10} style={{ height: theme.spacing(3.75) }}>
+                        {submission ? (
+                          submission.params[k] ? (
+                            <CheckBoxOutlinedIcon />
+                          ) : (
+                            <CheckBoxOutlineBlankOutlinedIcon />
+                          )
                         ) : (
-                          <CheckBoxOutlineBlankOutlinedIcon />
-                        )
-                      ) : (
-                        <Skeleton variant="rectangular" style={{ width: theme.spacing(3), height: theme.spacing(3) }} />
-                      )}
-                    </Grid>
-                  </Fragment>
-                ))}
+                          <Skeleton
+                            variant="rectangular"
+                            style={{ width: theme.spacing(3), height: theme.spacing(3) }}
+                          />
+                        )}
+                      </Grid>
+                    </Fragment>
+                  )
+                )}
 
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>{t('params.submitter')}</span>

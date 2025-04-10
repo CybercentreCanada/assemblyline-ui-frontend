@@ -1,19 +1,23 @@
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { default as React, KeyboardEvent, memo, PropsWithChildren, useMemo } from 'react';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList, FixedSizeList as List, ListOnItemsRenderedProps } from 'react-window';
+import type { StoreProps } from 'components/visual/HexViewer';
 import {
   HexRow,
   HexScrollBar,
   LAYOUT_SIZE,
   scrollToWindowIndexAsync,
-  StoreProps,
   useDispatch,
   useEventListener,
   useStore,
   WindowRow
-} from '../..';
+} from 'components/visual/HexViewer';
+import type { KeyboardEvent, PropsWithChildren } from 'react';
+import { memo, default as React, useMemo } from 'react';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import type { FixedSizeListProps, ListOnItemsRenderedProps } from 'react-window';
+import { FixedSizeList } from 'react-window';
+
+const List = FixedSizeList as unknown as React.FC<FixedSizeListProps<unknown> & { ref: unknown }>;
 
 export * from './cell';
 export * from './offset';
@@ -145,7 +149,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
   } = useDispatch();
   const { dispatch } = useStore();
 
-  const listRef = React.useRef<FixedSizeList<any>>(null);
+  const listRef = React.useRef<FixedSizeListProps<unknown>>(null);
   const bodyRef = React.useRef<HTMLDivElement>(null);
 
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));

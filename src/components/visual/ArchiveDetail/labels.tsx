@@ -32,11 +32,11 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { LabelCategories } from 'components/models/base/file';
 import { DEFAULT_LABELS, LABELS_COLOR_MAP } from 'components/models/base/file';
-import type { PossibleColor } from 'components/models/utils/color';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import { useDebounce } from 'components/visual/HexViewer';
 import SectionContainer from 'components/visual/SectionContainer';
+import type { PossibleColor } from 'helpers/colors';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

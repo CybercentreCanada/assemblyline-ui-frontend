@@ -23,8 +23,8 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { Role } from 'components/models/base/user';
 import type { SiteMap } from 'components/models/ui';
 import type { CustomUser } from 'components/models/ui/user';
-import type { PossibleColor } from 'components/models/utils/color';
 import CustomChip from 'components/visual/CustomChip';
+import type { PossibleColor } from 'helpers/colors';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
@@ -86,6 +86,7 @@ export default function SiteMapPage() {
     signature_manage: 'info',
     signature_view: 'default',
     submission_create: 'success',
+    submission_customize: 'info',
     submission_delete: 'error',
     submission_manage: 'info',
     submission_view: 'default',
