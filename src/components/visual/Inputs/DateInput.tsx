@@ -51,7 +51,7 @@ const WrappedDateInput = ({
   errorProps = null,
   helperText = null,
   helperTextProps = null,
-  id = null,
+  id: idProp = null,
   label,
   labelProps,
   loading = false,
@@ -78,6 +78,8 @@ const WrappedDateInput = ({
   const [tomorrow, setTomorrow] = useState<Moment>(null);
   const [today, setToday] = useState<Moment>(null);
   const [focused, setFocused] = useState<boolean>(false);
+
+  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
   const errorValue = useMemo<string>(
     () => error(tempDate && tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null),
@@ -115,7 +117,7 @@ const WrappedDateInput = ({
         <Tooltip title={tooltip} {...tooltipProps}>
           <Typography
             component={InputLabel}
-            htmlFor={id || label}
+            htmlFor={id}
             color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
             variant="body2"
             whiteSpace="nowrap"
@@ -151,7 +153,7 @@ const WrappedDateInput = ({
               }}
               renderInput={({ inputRef, inputProps, InputProps }) => (
                 <TextField
-                  id={id || label}
+                  id={id}
                   size="small"
                   ref={inputRef}
                   error={!!errorValue && !disabled}
@@ -210,7 +212,7 @@ const WrappedDateInput = ({
                             sx={{ paddingLeft: theme.spacing(0.5), marginRight: theme.spacing(-0.5) }}
                           >
                             <ResetInput
-                              id={id || label}
+                              id={id}
                               preventRender={loading || !reset || disabled || readOnly}
                               tiny={tiny}
                               onReset={onReset}

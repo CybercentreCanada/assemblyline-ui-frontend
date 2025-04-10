@@ -50,7 +50,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
     expandProps = null,
     helperText = null,
     helperTextProps = null,
-    id = null,
+    id: idProp = null,
     indeterminate = false,
     label = null,
     labelProps = null,
@@ -73,6 +73,8 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);
+
+    const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
     const errorValue = useMemo<string>(() => error(value), [error, value]);
 
@@ -146,7 +148,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
                 <div
                   style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}
                 >
-                  <span>{label}</span>
+                  <span style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{label}</span>
                   {endAdornment}
                 </div>
               }
@@ -182,13 +184,13 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
 
           <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
             <ResetInput
-              id={id || label}
+              id={id}
               preventRender={loading || !reset || disabled || readOnly}
               tiny={tiny}
               onReset={onReset}
               {...resetProps}
             />
-            <ExpandInput id={id || label} open={expand} onExpand={onExpand} {...expandProps} />
+            <ExpandInput id={id} open={expand} onExpand={onExpand} {...expandProps} />
           </div>
         </FormControl>
       </Tooltip>

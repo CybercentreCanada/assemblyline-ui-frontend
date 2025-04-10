@@ -42,7 +42,7 @@ const WrappedSliderInput = ({
   errorProps = null,
   helperText = null,
   helperTextProps = null,
-  id = null,
+  id: idProp = null,
   label,
   labelProps,
   loading,
@@ -63,6 +63,8 @@ const WrappedSliderInput = ({
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
+
+  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
@@ -96,8 +98,8 @@ const WrappedSliderInput = ({
             <div style={{ display: 'flex', alignItems: 'flex-start' }}>
               <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
                 <Slider
-                  aria-label={id || label}
-                  id={id || label}
+                  aria-label={id}
+                  id={id}
                   color={!disabled && errorValue ? 'error' : 'primary'}
                   disabled={disabled || readOnly}
                   valueLabelDisplay="auto"
@@ -115,7 +117,7 @@ const WrappedSliderInput = ({
                 />
               </div>
               <ResetInput
-                id={id || label}
+                id={id}
                 preventRender={loading || !reset || disabled || readOnly}
                 onReset={onReset}
                 {...resetProps}

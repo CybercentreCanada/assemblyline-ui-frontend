@@ -73,7 +73,7 @@ const WrappedTextInput = <
   errorProps = null,
   helperText = null,
   helperTextProps = null,
-  id = null,
+  id: idProp = null,
   label,
   labelProps,
   loading = false,
@@ -101,6 +101,8 @@ const WrappedTextInput = <
     useState<AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>>(null);
   const [focused, setFocused] = useState<boolean>(false);
 
+  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
@@ -110,7 +112,7 @@ const WrappedTextInput = <
           color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
           component={InputLabel}
           gutterBottom
-          htmlFor={id || label}
+          htmlFor={id}
           variant="body2"
           whiteSpace="nowrap"
           {...labelProps}
@@ -129,7 +131,7 @@ const WrappedTextInput = <
           <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
         ) : (
           <Autocomplete
-            id={id || label}
+            id={id}
             autoComplete
             disableClearable
             disabled={disabled}
@@ -157,14 +159,14 @@ const WrappedTextInput = <
             )}
             renderInput={params => (
               <TextField
-                id={id || label}
+                id={id}
                 variant="outlined"
                 error={!!errorValue}
                 {...(readOnly && !disabled && { focused: null })}
                 {...params}
                 InputProps={{
                   ...params?.InputProps,
-                  'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id || label}-helper-text`,
+                  'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id}-helper-text`,
                   placeholder: placeholder,
                   readOnly: readOnly,
                   startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
@@ -173,7 +175,7 @@ const WrappedTextInput = <
                       {loading || !reset || disabled || readOnly ? null : (
                         <InputAdornment position="end">
                           <ResetInput
-                            id={id || label}
+                            id={id}
                             preventRender={loading || !reset || disabled || readOnly}
                             tiny={tiny}
                             onReset={onReset}

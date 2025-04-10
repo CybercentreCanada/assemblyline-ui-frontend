@@ -67,7 +67,7 @@ const WrappedSelectInput = ({
   hasEmpty = false,
   helperText = null,
   helperTextProps = null,
-  id = null,
+  id: idProp = null,
   label,
   labelProps,
   loading = false,
@@ -92,6 +92,8 @@ const WrappedSelectInput = ({
 
   const [focused, setFocused] = useState<boolean>(false);
 
+  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
@@ -99,7 +101,7 @@ const WrappedSelectInput = ({
       <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
           component={InputLabel}
-          htmlFor={id || label}
+          htmlFor={id}
           color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
           variant="body2"
           whiteSpace="nowrap"
@@ -141,8 +143,9 @@ const WrappedSelectInput = ({
             value={options.some(o => o.value === value) ? value : ''}
             variant="outlined"
             inputProps={{
-              id: id || label,
+              id: id,
               sx: {
+                'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id}-helper-text`,
                 display: 'flex',
                 alignItems: 'center',
                 ...(tiny && {
@@ -173,7 +176,7 @@ const WrappedSelectInput = ({
                 {loading || !reset || disabled || readOnly ? null : (
                   <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
                     <ResetInput
-                      id={id || label}
+                      id={id}
                       preventRender={loading || !reset || disabled || readOnly}
                       tiny={tiny}
                       onReset={onReset}
