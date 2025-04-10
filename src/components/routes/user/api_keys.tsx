@@ -24,7 +24,6 @@ import {
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -33,7 +32,7 @@ import { PRIV_TO_ACL_MAP } from 'components/models/base/user';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
 import Moment from 'components/visual/Moment';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 
@@ -131,14 +130,12 @@ const APIKeyDeleteDialog = React.memo(
     const handleDelete = useCallback(
       (values: ApiKey) => {
         apiCall({
-          url: `/api/v4/apikey/` + values.id + '/',
+          url: `/api/v4/apikey/${values.id}/`,
           method: 'DELETE',
           onSuccess: () => {
             showSuccessMessage(t('apikeys.removed'));
             setOpen(false);
-            onAPIKeysChange(prev => {
-              return prev.filter(x => x.id != values.id);
-            });
+            onAPIKeysChange(prev => prev.filter(x => x.id != values.id));
           },
           onEnter: () => setLoading(true),
           onExit: () => setLoading(false)
@@ -290,9 +287,7 @@ const APIKeyUpsertingDialog = React.memo(
             }
 
             setOpen(false);
-            onAPIKeysChange(prev => {
-              return prev.filter(x => x.key_name != api_response.key_name).concat(api_response);
-            });
+            onAPIKeysChange(prev => prev.filter(x => x.key_name != api_response.key_name).concat(api_response));
           },
           onEnter: () => setLoading(true),
           onExit: () => setLoading(false)
@@ -552,18 +547,17 @@ export default function APIKeys({ username }: APIKeysProps) {
   const theme = useTheme();
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
 
-  useEffectOnce(() => {
-    apiCall({
-      url: `/api/v4/apikey/username/${username}/`,
-      onSuccess: api_data => {
-        setApiKeys(api_data.api_response);
-      }
-    });
-  });
-
   const onAPIKeysChange = (changeApiKeys: (prev: ApiKey[]) => ApiKey[]) => {
     setApiKeys(changeApiKeys(apiKeys));
   };
+
+  useEffect(() => {
+    apiCall<ApiKey[]>({
+      url: `/api/v4/apikey/username/${username}/`,
+      onSuccess: ({ api_response }) => setApiKeys(api_response)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username]);
 
   return (
     <>
