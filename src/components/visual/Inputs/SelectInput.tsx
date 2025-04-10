@@ -134,6 +134,7 @@ const WrappedSelectInput = ({
           <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
         ) : (
           <Select
+            aria-describedby={disabled || !(errorValue || helperText) ? null : `${id}-helper-text`}
             disabled={disabled}
             displayEmpty
             fullWidth
@@ -145,7 +146,6 @@ const WrappedSelectInput = ({
             inputProps={{
               id: id,
               sx: {
-                'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id}-helper-text`,
                 display: 'flex',
                 alignItems: 'center',
                 ...(tiny && {
