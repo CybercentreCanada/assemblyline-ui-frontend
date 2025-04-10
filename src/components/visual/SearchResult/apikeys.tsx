@@ -106,13 +106,13 @@ const WrappedUsersApiTable: React.FC<ApiTableProps> = ({ apikeySearchResults, se
               <DivTableCell>{userApikey.key_name}</DivTableCell>
 
               <DivTableCell>
-                <Moment variant="fromNow">{userApikey.creation_date}</Moment>
+                {!userApikey.creation_date ? null : <Moment variant="fromNow">{userApikey.creation_date}</Moment>}
               </DivTableCell>
               <DivTableCell>
-                {userApikey.expiry_ts ? <Moment variant="fromNow">{userApikey.expiry_ts}</Moment> : <></>}
+                {!userApikey.expiry_ts ? null : <Moment variant="fromNow">{userApikey.expiry_ts}</Moment>}
               </DivTableCell>
               <DivTableCell>
-                {userApikey.last_used ? <Moment format="YYYY-MM-DD">{userApikey.last_used}</Moment> : <></>}
+                {!userApikey.last_used ? null : <Moment format="YYYY-MM-DD">{userApikey.last_used}</Moment>}
               </DivTableCell>
               <DivTableCell>
                 {userApikey.acl.sort().map((e, x) => (
