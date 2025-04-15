@@ -30,22 +30,22 @@ jobs:
           export BRANCH_NAME=${BRANCH_NAME:-"$BUILD_SOURCEBRANCHNAME"}
           git checkout -b $BRANCH_NAME -t origin/$BRANCH_NAME || true
 
-          yarn install
+          pnpm install
         displayName: Install assemblyline-ui-frontend
 
       - script: |
           set -xv  # Echo commands before they are run
-          yarn run tsc
+          pnpm run tsc
         displayName: TypeScript
 
       - script: |
           set -xv  # Echo commands before they are run
-          yarn run ci-test
+          pnpm run ci-test
         displayName: Test
 
       - script: |
           set -xv  # Echo commands before they are run
-          yarn run ci-lint
+          pnpm run ci-lint
         displayName: ESLint
 
       - task: PublishCodeCoverageResults@2
