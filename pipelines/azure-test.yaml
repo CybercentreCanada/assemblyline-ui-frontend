@@ -10,8 +10,8 @@ jobs:
   - job: run_test
     strategy:
       matrix:
-        node_18:
-          node.version: '18.x'
+        node_21:
+          node.version: '21.x'
 
     timeoutInMinutes: 15
 
