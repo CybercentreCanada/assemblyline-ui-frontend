@@ -1,5 +1,4 @@
-import { useTheme } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
+import { Grid, useTheme } from '@mui/material';
 import { PageSection } from 'components/visual/Layouts/PageSection';
 import React from 'react';
 
