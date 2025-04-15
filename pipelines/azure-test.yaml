@@ -17,22 +17,22 @@ jobs:
 
     steps:
       - task: NodeTool@0
-        displayName: 'Set node version'
         inputs:
           versionSpec: $(node.version)
+        displayName: 'Install Node.js'
 
       - checkout: self
         displayName: Checkout assemblyline-ui-frontend
+
+      - script: |
+          npm install -g pnpm
+        displayName: 'Install PNPM'
 
       - script: |
           # Try to checkout the matching branch, if the command fails, don't care.
           export BRANCH_NAME=$(basename -- "$SYSTEM_PULLREQUEST_SOURCEBRANCH")
           export BRANCH_NAME=${BRANCH_NAME:-"$BUILD_SOURCEBRANCHNAME"}
           git checkout -b $BRANCH_NAME -t origin/$BRANCH_NAME || true
-
-          npm install --global corepack@latest
-          corepack enable pnpm
-          corepack use pnpm@latest-10
 
           pnpm install
         displayName: Install assemblyline-ui-frontend
