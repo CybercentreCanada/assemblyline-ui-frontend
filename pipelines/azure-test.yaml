@@ -10,8 +10,8 @@ jobs:
   - job: run_test
     strategy:
       matrix:
-        node_21:
-          node.version: '21.x'
+        node_20:
+          node.version: '20.x'
 
     timeoutInMinutes: 15
 
@@ -23,6 +23,14 @@ jobs:
 
       - checkout: self
         displayName: Checkout assemblyline-ui-frontend
+
+      - script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm use v20
+            npm install -g corepack@latest
+            corepack enable pnpm
+        displayName: "use Node v$(node.version)"
 
       - script: |
           # Try to checkout the matching branch, if the command fails, don't care.
