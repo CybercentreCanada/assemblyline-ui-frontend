@@ -25,18 +25,14 @@ jobs:
         displayName: Checkout assemblyline-ui-frontend
 
       - script: |
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm use v20
-            npm install -g corepack@latest
-            corepack enable pnpm
-        displayName: "use Node v$(node.version)"
-
-      - script: |
           # Try to checkout the matching branch, if the command fails, don't care.
           export BRANCH_NAME=$(basename -- "$SYSTEM_PULLREQUEST_SOURCEBRANCH")
           export BRANCH_NAME=${BRANCH_NAME:-"$BUILD_SOURCEBRANCHNAME"}
           git checkout -b $BRANCH_NAME -t origin/$BRANCH_NAME || true
+
+          npm install --global corepack@latest
+          corepack enable pnpm
+          corepack use pnpm@latest-10
 
           pnpm install
         displayName: Install assemblyline-ui-frontend
