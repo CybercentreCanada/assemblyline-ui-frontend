@@ -109,7 +109,7 @@ const WrappedImageSection = ({ name = null, sha256 = null }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const dragTimer = useRef<number>(null);
-  const animationID = useRef<number>();
+  const animationID = useRef<number>(null);
   const data = useRef<Data>({
     isDown: false,
     prevZoom: 0,

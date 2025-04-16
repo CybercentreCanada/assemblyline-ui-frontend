@@ -167,7 +167,7 @@ const WrappedASCIISection: React.FC<Props> = ({
   else
     return (
       <Grid container style={{ flexGrow: 1 }}>
-        <Grid item flexGrow={1} style={{ display: 'flex' }}>
+        <Grid flexGrow={1} style={{ display: 'flex' }}>
           <MonacoEditor
             value={data}
             language={LANGUAGE_SELECTOR[type]}
@@ -177,7 +177,7 @@ const WrappedASCIISection: React.FC<Props> = ({
         </Grid>
         {codeAllowed && isMdUp && (
           <>
-            <Grid item flexGrow={showCodeSummary ? 0.5 : 0}>
+            <Grid flexGrow={showCodeSummary ? 0.5 : 0}>
               <div style={{ position: 'relative', height: '100%' }}>
                 {showCodeSummary && (
                   <div className={classes.code}>

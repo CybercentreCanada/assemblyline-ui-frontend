@@ -7,7 +7,7 @@ import {
   DialogTitle,
   Grid,
   List,
-  ListItem,
+  ListItemButton,
   ListItemText,
   Skeleton,
   useMediaQuery,
@@ -278,9 +278,8 @@ function WrappedClassificationInput({
                       {c12nDef.original_definition.levels.map(
                         (lvl, idx) =>
                           (isUser || (lvl.lvl <= uParts.lvlIdx && !lvl.is_hidden)) && (
-                            <ListItem
+                            <ListItemButton
                               key={idx}
-                              button
                               disabled={
                                 validated.disabled.levels.includes(lvl.name) ||
                                 validated.disabled.levels.includes(lvl.short_name)
@@ -289,7 +288,7 @@ function WrappedClassificationInput({
                               onClick={() => selectLevel(lvl.lvl)}
                             >
                               <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
-                            </ListItem>
+                            </ListItemButton>
                           )
                       )}
                     </List>
@@ -305,16 +304,15 @@ function WrappedClassificationInput({
                           (req, idx) =>
                             (isUser ||
                               ([req.name, req.short_name].some(r => uParts.req.includes(r)) && !req.is_hidden)) && (
-                              <ListItem
+                              <ListItemButton
                                 key={idx}
-                                button
                                 selected={
                                   validated.parts.req.includes(req.name) || validated.parts.req.includes(req.short_name)
                                 }
                                 onClick={() => toggleRequired(req)}
                               >
                                 <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
-                              </ListItem>
+                              </ListItemButton>
                             )
                         )}
                       </List>
@@ -338,9 +336,8 @@ function WrappedClassificationInput({
                             {c12nDef.original_definition.groups
                               .filter(grp => isUser || !grp.is_hidden)
                               .map((grp, idx) => (
-                                <ListItem
+                                <ListItemButton
                                   key={idx}
-                                  button
                                   disabled={
                                     validated.disabled.groups.includes(grp.name) ||
                                     validated.disabled.groups.includes(grp.short_name)
@@ -355,13 +352,12 @@ function WrappedClassificationInput({
                                     style={{ textAlign: 'center' }}
                                     primary={applyAliases(grp.name, classificationAliases)}
                                   />
-                                </ListItem>
+                                </ListItemButton>
                               ))}
                             {c12nDef.dynamic_groups &&
                               ['email', 'all'].includes(c12nDef.dynamic_groups_type) &&
                               currentUser.email && (
-                                <ListItem
-                                  button
+                                <ListItemButton
                                   disabled={validated.disabled.groups.includes(dynGroup || currentUser.dynamic_group)}
                                   selected={validated.parts.groups.includes(dynGroup || currentUser.dynamic_group)}
                                   onClick={() =>
@@ -375,7 +371,7 @@ function WrappedClassificationInput({
                                     style={{ textAlign: 'center' }}
                                     primary={applyAliases(dynGroup || currentUser.dynamic_group, classificationAliases)}
                                   />
-                                </ListItem>
+                                </ListItemButton>
                               )}
                             {c12nDef.dynamic_groups &&
                               ['group', 'all'].includes(c12nDef.dynamic_groups_type) &&
@@ -390,9 +386,8 @@ function WrappedClassificationInput({
                                     )
                                 )
                                 .map((group, idx_group) => (
-                                  <ListItem
+                                  <ListItemButton
                                     key={idx_group}
-                                    button
                                     disabled={validated.disabled.groups.includes(group)}
                                     selected={validated.parts.groups.includes(group)}
                                     onClick={() =>
@@ -406,7 +401,7 @@ function WrappedClassificationInput({
                                       style={{ textAlign: 'center' }}
                                       primary={applyAliases(group, classificationAliases)}
                                     />
-                                  </ListItem>
+                                  </ListItemButton>
                                 ))}
                           </List>
                         </Card>
@@ -420,9 +415,8 @@ function WrappedClassificationInput({
                           {c12nDef.original_definition.subgroups
                             .filter(sgrp => isUser || !sgrp.is_hidden)
                             .map((sgrp, idx) => (
-                              <ListItem
+                              <ListItemButton
                                 key={idx}
-                                button
                                 selected={
                                   validated.parts.subgroups.includes(sgrp.name) ||
                                   validated.parts.subgroups.includes(sgrp.short_name)
@@ -430,7 +424,7 @@ function WrappedClassificationInput({
                                 onClick={() => toggleSubGroups(sgrp)}
                               >
                                 <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
-                              </ListItem>
+                              </ListItemButton>
                             ))}
                         </List>
                       </Card>

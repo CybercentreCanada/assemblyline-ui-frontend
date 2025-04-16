@@ -1,4 +1,4 @@
-import { ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,8 +24,7 @@ const LeftNavItem = ({ item, onClick }: LeftNavItemProps) => {
       <ListItem disablePadding>{render(leftnav.open)}</ListItem>
     ) : (
       <Tooltip title={!leftnav.open && !nested ? label : ''} aria-label={label} placement="right">
-        <ListItem
-          button
+        <ListItemButton
           component={route ? Link : null}
           to={route}
           dense={!!nested}
@@ -39,7 +38,7 @@ const LeftNavItem = ({ item, onClick }: LeftNavItemProps) => {
             <ListItemIcon>{icon}</ListItemIcon>
           )}
           <ListItemText primary={label} />
-        </ListItem>
+        </ListItemButton>
       </Tooltip>
     )
   ) : null;

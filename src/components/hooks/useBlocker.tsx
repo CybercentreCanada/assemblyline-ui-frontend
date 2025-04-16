@@ -24,7 +24,7 @@ export function useBlocker(blocker: Blocker, when = true) {
   const { navigator } = useContext(NavigationContext) as NavigationContextWithBlock;
 
   //main tweak required to OP was wrapping unblock in ref so we're only pushing one blocker on the stack for this when expression (i.e. not for every render)
-  const refUnBlock = useRef<() => void>();
+  const refUnBlock = useRef<() => void>(null);
 
   useEffect(() => {
     if (!when) {

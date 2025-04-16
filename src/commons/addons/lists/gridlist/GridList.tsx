@@ -138,7 +138,7 @@ export default function GridList<T extends LineItem>({
           {items.length === 0
             ? emptyValue
             : items.map((item: T, index: number) => (
-                <Grid key={item.id} item {...computeBreakpoints()}>
+                <Grid key={item.id} {...computeBreakpoints()}>
                   <ListItemBase
                     noDivider
                     card={view !== 'table'}
