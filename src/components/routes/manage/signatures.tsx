@@ -156,11 +156,11 @@ const SignaturesSearch = () => {
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
-          <Grid item xs>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
           {currentUser.roles.includes('signature_download') && (
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+            <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
               <FileDownloader
                 icon={<GetAppOutlinedIcon />}
                 link={`/api/v4/signature/download/?${downloadLink}`}

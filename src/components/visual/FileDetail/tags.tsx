@@ -68,7 +68,7 @@ export const TooltipGrid: React.FC<TooltipGridProps> = ({ title = '', ...props }
       disableInteractive={disabled}
       disableTouchListener={disabled}
     >
-      <Grid ref={ref} className={classes.meta_key} item xs={12} sm={3} lg={2} paddingTop={0.375} {...props} />
+      <Grid ref={ref} className={classes.meta_key} size={{ xs: 12, sm: 3, lg: 2 }} paddingTop={0.375} {...props} />
     </Tooltip>
   );
 };
@@ -118,7 +118,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
               <TooltipGrid title={'heuristic.signature'}>
                 <span style={{ fontWeight: 500 }}>heuristic.signature</span>
               </TooltipGrid>
-              <Grid item xs={12} sm={9} lg={10}>
+              <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
                 <AutoHideTagList
                   tag_type={'heuristic.signature'}
                   items={signatures.map(item => ({ value: item[0], lvl: item[1], safelisted: item[2] }))}
@@ -134,7 +134,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
                     <TooltipGrid title={tag_type}>
                       <span style={{ fontWeight: 500 }}>{tag_type}</span>
                     </TooltipGrid>
-                    <Grid item xs={12} sm={9} lg={10}>
+                    <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
                       <AutoHideTagList
                         tag_type={tag_type}
                         items={tags[tag_type].map(item => ({
@@ -151,10 +151,10 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
               )
             : [...Array(3)].map((_, i) => (
                 <Grid container key={i} spacing={1}>
-                  <Grid item xs={12} sm={3} lg={2}>
+                  <Grid size={{ xs: 12, sm: 3, lg: 2 }}>
                     <Skeleton style={{ height: '2rem' }} />
                   </Grid>
-                  <Grid item xs={12} sm={9} lg={10}>
+                  <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
                     <Skeleton style={{ height: '2rem' }} />
                   </Grid>
                 </Grid>

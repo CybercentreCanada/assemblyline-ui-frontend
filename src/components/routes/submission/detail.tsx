@@ -1124,21 +1124,19 @@ function WrappedSubmissionDetail() {
           >
             <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
             <Grid container style={{ marginTop: theme.spacing(1) }}>
-              <Grid item xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <b>{t('outstanding.services')}</b>
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <b>{t('outstanding.files')}</b>
               </Grid>
             </Grid>
             {Object.keys(outstanding).map(service => (
               <Grid key={service} container>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <b>{service}</b>
                 </Grid>
-                <Grid item xs={6}>
-                  {outstanding[service]}
-                </Grid>
+                <Grid size={{ xs: 6 }}>{outstanding[service]}</Grid>
               </Grid>
             ))}
           </Alert>
@@ -1152,7 +1150,7 @@ function WrappedSubmissionDetail() {
         )}
         <div style={{ paddingBottom: sp4 }}>
           <Grid container>
-            <Grid item xs>
+            <Grid size={{ xs: 12 }}>
               <div>
                 <Typography variant="h4">{t('title')}</Typography>
                 <Typography variant="caption" component={'div'}>
@@ -1205,7 +1203,7 @@ function WrappedSubmissionDetail() {
                 </div>
               )}
             </Grid>
-            <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
+            <Grid size={{ xs: 12, sm: 12, md: 4 }} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {submission ? (
                   submission.state === 'completed' ? (
@@ -1372,7 +1370,7 @@ function WrappedSubmissionDetail() {
                           <VerdictBar verdicts={submission.verdict} />
                           {currentUser.roles.includes('submission_manage') && (
                             <Grid container>
-                              <Grid item xs={5} style={{ textAlign: 'left' }}>
+                              <Grid size={{ xs: 5 }} style={{ textAlign: 'left' }}>
                                 <Tooltip
                                   title={t(
                                     `verdict.${
@@ -1392,8 +1390,8 @@ function WrappedSubmissionDetail() {
                                   </IconButton>
                                 </Tooltip>
                               </Grid>
-                              <Grid item xs={2} />
-                              <Grid item xs={5} style={{ textAlign: 'right' }}>
+                              <Grid size={{ xs: 2 }} />
+                              <Grid size={{ xs: 5 }} style={{ textAlign: 'right' }}>
                                 <Tooltip
                                   title={t(
                                     `verdict.${

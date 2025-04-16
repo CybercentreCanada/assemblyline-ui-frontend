@@ -120,7 +120,7 @@ const WrappedAlertDefaultSearchParameters = () => {
         <DialogContent className={classes.dialogContent}>
           <div className={classes.dialogDescription}>{t('session.description')}</div>
 
-          <Grid item style={{ width: '100%' }}>
+          <Grid style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.existing')}</Typography>
             <Paper component="pre" variant="outlined" className={classes.preview}>
               {defaults.toString() === '' ? (
@@ -131,7 +131,7 @@ const WrappedAlertDefaultSearchParameters = () => {
             </Paper>
           </Grid>
 
-          <Grid item style={{ width: '100%' }}>
+          <Grid style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.current')}</Typography>
             <Paper component="pre" variant="outlined" className={classes.preview}>
               {filteredSearch.toString() === '' ? (
@@ -148,8 +148,8 @@ const WrappedAlertDefaultSearchParameters = () => {
             {isSameParams
               ? t('session.save.same')
               : filteredSearch.toString() === ''
-              ? t('session.save.none')
-              : t('session.save.confirm')}
+                ? t('session.save.none')
+                : t('session.save.confirm')}
           </div>
         </DialogContent>
         <DialogActions>

@@ -96,10 +96,10 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
                 .filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
                 .map((meta, i) => (
                   <Grid container key={i}>
-                    <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                    <Grid className={classes.meta_key} size={{ xs: 12, sm: 3, lg: 2 }}>
                       <span style={{ fontWeight: 500 }}>{meta}</span>
                     </Grid>
-                    <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                    <Grid size={{ xs: 12, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                       <ActionableText
                         category="metadata"
                         type={meta}
@@ -117,10 +117,10 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
           ) : (
             [...Array(3)].map((_, i) => (
               <Grid container key={i} spacing={1}>
-                <Grid item xs={12} sm={3} lg={2}>
+                <Grid size={{ xs: 12, sm: 3, lg: 2 }}>
                   <Skeleton style={{ height: '2rem' }} />
                 </Grid>
-                <Grid item xs={12} sm={9} lg={10}>
+                <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
                   <Skeleton style={{ height: '2rem' }} />
                 </Grid>
               </Grid>
@@ -134,10 +134,10 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
                   .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
                   .map((meta, i) => (
                     <Grid container key={i}>
-                      <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                      <Grid className={classes.meta_key} size={{ xs: 12, sm: 3, lg: 2 }}>
                         <span style={{ fontWeight: 500 }}>{meta}</span>
                       </Grid>
-                      <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                      <Grid size={{ xs: 12, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                         <ActionableText
                           category="metadata"
                           type={meta}

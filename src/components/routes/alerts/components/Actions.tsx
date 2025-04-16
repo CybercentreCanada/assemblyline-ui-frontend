@@ -377,7 +377,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
               search.get('group_by') ? (
                 <Grid container rowGap={2}>
                   <Grid>{t('actions.takeownershipdiag.content.grouped')}</Grid>
-                  <Grid item style={{ width: '100%' }}>
+                  <Grid style={{ width: '100%' }}>
                     <Typography variant="subtitle2">{t('actions.takeownershipdiag.properties')}</Typography>
                     <Paper component="pre" variant="outlined" className={classes.preview}>
                       {!query || query.toString() === '' ? (

@@ -388,10 +388,10 @@ export default function Services() {
         </DialogActions>
       </Dialog>
       <Grid container alignItems="center" spacing={3}>
-        <Grid item xs>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="h4">{t('title')}</Typography>
         </Grid>
-        <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+        <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
             <Tooltip
               PopperProps={{
@@ -479,7 +479,7 @@ export default function Services() {
       </Grid>
 
       <Grid container alignItems="center" spacing={3}>
-        <Grid item xs>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="h5">{t('title.loaded')}</Typography>
           {serviceResults ? (
             <Typography variant="caption" component="p">{`${serviceResults.length} ${t('count')}`}</Typography>
@@ -493,7 +493,7 @@ export default function Services() {
       </div>
 
       <Grid container alignItems="center" spacing={3} style={{ marginTop: theme.spacing(2) }}>
-        <Grid item xs>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="h5">{t('title.available')}</Typography>
           {availableServices ? (
             <Typography variant="caption" component="p">{`${availableServices.length} ${t(
@@ -513,7 +513,7 @@ export default function Services() {
       </div>
 
       <Grid container alignItems="center" spacing={3} style={{ marginTop: theme.spacing(2) }}>
-        <Grid item xs>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="h5">{t('title.available.community')}</Typography>
           {availableCommunityServices ? (
             <Typography variant="caption" component="p">{`${availableCommunityServices.length} ${t(

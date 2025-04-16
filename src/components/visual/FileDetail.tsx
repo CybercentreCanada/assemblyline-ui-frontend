@@ -419,7 +419,7 @@ const WrappedFileDetail: React.FC<Props> = ({
       )}
       <div style={{ paddingBottom: sp4 }}>
         <Grid container alignItems="center">
-          <Grid item xs>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">
               {file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
             </Typography>
@@ -433,7 +433,7 @@ const WrappedFileDetail: React.FC<Props> = ({
               )}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
+          <Grid size={{ xs: 12, sm: 12, md: 4 }} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
             {file ? (
               <>
                 <Tooltip title={t('related')}>

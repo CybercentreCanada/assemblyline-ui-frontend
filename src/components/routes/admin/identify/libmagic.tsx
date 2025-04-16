@@ -148,19 +148,19 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
         </DialogActions>
       </Dialog>
       <Grid container justifyContent="flex-end" spacing={1} style={{ marginBottom: theme.spacing(1) }}>
-        <Grid item style={{ flexGrow: 1 }}>
+        <Grid style={{ flexGrow: 1 }}>
           <div>
             <Typography variant="h5">{t('title.magic')}</Typography>
           </div>
         </Grid>
-        <Grid item>
+        <Grid>
           <Grid container spacing={1}>
-            <Grid item>
+            <Grid>
               <Button size="small" variant="outlined" onClick={() => reload(true, setOpen)}>
                 {t('reset')}
               </Button>
             </Grid>
-            <Grid item>
+            <Grid>
               <Button
                 size="small"
                 variant="contained"
@@ -170,7 +170,7 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
                 {t('undo')}
               </Button>
             </Grid>
-            <Grid item>
+            <Grid>
               <Button
                 variant="contained"
                 size="small"

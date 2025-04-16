@@ -131,11 +131,11 @@ const SafelistSearch = () => {
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
-          <Grid item xs>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
           {currentUser.roles.includes('safelist_manage') && (
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+            <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
               <Tooltip title={t('add_safelist')}>
                 <IconButton
                   style={{

@@ -126,14 +126,14 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: theme.spacing(4) }}>
           <Grid container alignItems="center">
-            <Grid item xs>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="h4">{t('title')}</Typography>
               <Typography variant="caption">
                 {heuristic ? heuristic.heur_id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
             {currentUser.roles.includes('submission_view') && (
-              <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
+              <Grid size={{ xs: 12, sm: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
                 {heuristic ? (
                   <Tooltip title={t('usage')}>
                     <IconButton
@@ -155,7 +155,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
           </Grid>
         </div>
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">{t('name')}</Typography>
             {heuristic ? (
               <Paper component="pre" variant="outlined" className={classes.preview}>
@@ -165,7 +165,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">{t('filetype')}</Typography>
             {heuristic ? (
               <Paper component="pre" variant="outlined" className={classes.preview}>
@@ -175,7 +175,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle2">{t('desc')}</Typography>
             {heuristic ? (
               <Paper component="pre" variant="outlined" className={classes.preview}>
@@ -185,7 +185,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Typography variant="subtitle2">{t('score')}</Typography>
             {heuristic ? (
               <Paper component="pre" variant="outlined" className={classes.preview}>
@@ -195,7 +195,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Typography variant="subtitle2">{t('max_score')}</Typography>
             {heuristic ? (
               <Paper component="pre" variant="outlined" className={classes.preview}>
@@ -205,7 +205,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Typography variant="subtitle2">{t('attack_id')}</Typography>
             {heuristic ? (
               <Paper component="pre" variant="outlined" className={classes.preview}>
@@ -217,14 +217,14 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle2">{t('signature_score_map')}</Typography>
             {heuristic ? (
               <Paper component="pre" variant="outlined" className={classes.preview}>
                 {heuristic.signature_score_map && Object.keys(heuristic.signature_score_map).length !== 0 ? (
                   <Grid container spacing={1}>
                     {Object.keys(heuristic.signature_score_map).map((key, i) => (
-                      <Grid key={i} item xs={12} sm={6} md={4}>
+                      <Grid key={i} size={{ xs: 12, sm: 6, md: 4 }}>
                         {`${key} = ${heuristic.signature_score_map[key]}`}
                       </Grid>
                     ))}
@@ -237,24 +237,22 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h6">{t('statistics')}</Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
               {t('hits')}
             </Typography>
             <Grid container>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
-                {heuristic && stats ? stats.count : <Skeleton />}
-              </Grid>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>{heuristic && stats ? stats.count : <Skeleton />}</Grid>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>
                 {heuristic && stats ? (
                   stats.first_hit ? (
                     <Moment variant="fromNow">{stats.first_hit}</Moment>
@@ -265,10 +263,10 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>
                 {heuristic && stats ? (
                   stats.last_hit ? (
                     <Moment variant="fromNow">{stats.last_hit}</Moment>
@@ -281,34 +279,30 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
               {t('contribution')}
             </Typography>
             <Grid container>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('score.min')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
-                {heuristic && stats ? stats.min : <Skeleton />}
-              </Grid>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>{heuristic && stats ? stats.min : <Skeleton />}</Grid>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('score.avg')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>
                 {heuristic && stats ? Number(stats.avg).toFixed(0) : <Skeleton />}
               </Grid>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('score.max')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
-                {heuristic && stats ? stats.max : <Skeleton />}
-              </Grid>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>{heuristic && stats ? stats.max : <Skeleton />}</Grid>
             </Grid>
           </Grid>
           {currentUser.roles.includes('submission_view') && (
             <>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Histogram
                   dataset={histogram}
                   height="300px"
@@ -318,10 +312,10 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
                   verticalLine
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="h6">{t('last10')}</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <ResultsTable resultResults={results} allowSort={false} />
               </Grid>
             </>

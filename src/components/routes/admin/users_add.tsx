@@ -181,7 +181,7 @@ const WrappedAddUserPage = () => {
             </Box>
           )}
           <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="caption">{t('newuser.uname')}</Typography>
               <TextField
                 autoFocus
@@ -193,7 +193,7 @@ const WrappedAddUserPage = () => {
                 value={newUser.uname}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="caption">{t('newuser.name')}</Typography>
               <TextField
                 fullWidth
@@ -204,7 +204,7 @@ const WrappedAddUserPage = () => {
                 value={newUser.name}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="caption">{t('newuser.groups')}</Typography>
               <Autocomplete
                 sx={{ display: 'block', margin: theme.spacing(2, 0) }}
@@ -222,7 +222,7 @@ const WrappedAddUserPage = () => {
                 onChange={(event, chips) => setNewUser(u => ({ ...u, groups: chips }))}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Typography variant="caption">{t('newuser.new_pass')}</Typography>
               <TextField
                 fullWidth
@@ -234,7 +234,7 @@ const WrappedAddUserPage = () => {
                 value={newUser.new_pass}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Typography variant="caption">{t('newuser.email')}</Typography>
               <TextField
                 fullWidth
@@ -245,7 +245,7 @@ const WrappedAddUserPage = () => {
                 value={newUser.email}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Typography variant="caption">{t('newuser.identity_id')}</Typography>
               <TextField
                 fullWidth
@@ -256,7 +256,7 @@ const WrappedAddUserPage = () => {
                 value={newUser.identity_id}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="caption">{t('newuser.user_type')}</Typography>
               <div>
                 {configuration.user.types.map((uType, type_id) => (
@@ -272,7 +272,7 @@ const WrappedAddUserPage = () => {
                 ))}
               </div>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="caption">{t('newuser.api_quota')}</Typography>
               <TextField
                 fullWidth
@@ -284,7 +284,7 @@ const WrappedAddUserPage = () => {
                 value={String(newUser.api_quota)}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="caption">{t('newuser.api_daily_quota')}</Typography>
               <TextField
                 fullWidth
@@ -296,7 +296,7 @@ const WrappedAddUserPage = () => {
                 value={String(newUser.api_daily_quota)}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Typography variant="caption">{t('newuser.submission_quota')}</Typography>
               <TextField
                 fullWidth
@@ -308,7 +308,7 @@ const WrappedAddUserPage = () => {
                 value={String(newUser.submission_quota)}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Typography variant="caption">{t('newuser.submission_async_quota')}</Typography>
               <TextField
                 fullWidth
@@ -320,7 +320,7 @@ const WrappedAddUserPage = () => {
                 value={String(newUser.submission_async_quota)}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Typography variant="caption">{t('newuser.submission_daily_quota')}</Typography>
               <TextField
                 fullWidth

@@ -91,8 +91,8 @@ const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
                                   ? a.img_d
                                   : null
                                 : typeof a.img_l === 'string'
-                                ? a.img_l
-                                : null
+                                  ? a.img_l
+                                  : null
                             }
                             style={
                               a.img_d === null || typeof a.img_d === 'string'
@@ -110,8 +110,8 @@ const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
                                 ? a.img_d
                                 : a.alt
                               : a.img_l !== null && typeof a.img_l !== 'string'
-                              ? a.img_l
-                              : a.alt}
+                                ? a.img_l
+                                : a.alt}
                           </Avatar>
                         </div>
                         <Typography key={`text-${i}`} variant="caption">

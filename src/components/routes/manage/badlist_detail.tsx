@@ -255,13 +255,13 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: theme.spacing(4) }}>
           <Grid container alignItems="center" spacing={1}>
-            <Grid item xs>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="h4">{badlist ? t(`title.${badlist.type}`) : t('title')}</Typography>
               <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
                 {badlist ? badlist_id || id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
-            <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
+            <Grid size={{ xs: 12, sm: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
               {badlist ? (
                 <>
                   {(badlist_id || id) && (
@@ -345,54 +345,69 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
           </Grid>
         </div>
         <Grid container spacing={3}>
-          <Grid item xs={12} style={{ display: badlist && badlist.type === 'file' ? 'initial' : 'none' }}>
+          <Grid size={{ xs: 12 }} style={{ display: badlist && badlist.type === 'file' ? 'initial' : 'none' }}>
             <Typography variant="h6">{t('hashes')}</Typography>
             <Divider />
             <Grid container>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{'MD5'}</span>
               </Grid>
-              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid
+                size={{ xs: 8, sm: 9 }}
+                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+              >
                 {badlist ? (
                   badlist.hashes.md5 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{'SHA1'}</span>
               </Grid>
-              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid
+                size={{ xs: 8, sm: 9 }}
+                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+              >
                 {badlist ? (
                   badlist.hashes.sha1 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{'SHA256'}</span>
               </Grid>
-              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid
+                size={{ xs: 8, sm: 9 }}
+                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+              >
                 {badlist ? (
                   badlist.hashes.sha256 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{'SSDeep'}</span>
               </Grid>
-              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid
+                size={{ xs: 8, sm: 9 }}
+                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+              >
                 {badlist ? (
                   badlist.hashes.ssdeep || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{'TLSH'}</span>
               </Grid>
-              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid
+                size={{ xs: 8, sm: 9 }}
+                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+              >
                 {badlist ? (
                   badlist.hashes.tlsh || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
@@ -402,20 +417,20 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
             </Grid>
           </Grid>
           {badlist && badlist.file && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="h6">{t('file.title')}</Typography>
               <Divider />
               <Grid container>
-                <Grid item xs={4} sm={3}>
+                <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9}>
+                <Grid size={{ xs: 8, sm: 9 }}>
                   {badlist ? badlist.file.name.map((name, i) => <div key={i}>{name}</div>) : <Skeleton />}
                 </Grid>
-                <Grid item xs={4} sm={3}>
+                <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9}>
+                <Grid size={{ xs: 8, sm: 9 }}>
                   {badlist.file.size ? (
                     <span>
                       {badlist.file.size}
@@ -426,41 +441,39 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                   )}
                 </Grid>
 
-                <Grid item xs={4} sm={3}>
+                <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} style={{ wordBreak: 'break-word' }}>
+                <Grid size={{ xs: 8, sm: 9 }} style={{ wordBreak: 'break-word' }}>
                   {badlist.file.type || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>}
                 </Grid>
               </Grid>
             </Grid>
           )}
           {badlist && badlist.tag && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="h6">{t('tag.title')}</Typography>
               <Divider />
               <Grid container>
-                <Grid item xs={4} sm={3}>
+                <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('tag.type')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9}>
-                  {badlist.tag.type}
-                </Grid>
-                <Grid item xs={4} sm={3}>
+                <Grid size={{ xs: 8, sm: 9 }}>{badlist.tag.type}</Grid>
+                <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('tag.value')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} style={{ wordBreak: 'break-word' }}>
+                <Grid size={{ xs: 8, sm: 9 }} style={{ wordBreak: 'break-word' }}>
                   {badlist.tag.value}
                 </Grid>
               </Grid>
             </Grid>
           )}
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Grid container alignItems={'end'}>
-              <Grid item xs={11}>
+              <Grid size={{ xs: 11 }}>
                 <Typography variant="h6">{t('attribution.title')}</Typography>
               </Grid>
-              <Grid item xs={1} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Grid size={{ xs: 11 }} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                 {currentUser.roles.includes('badlist_manage') &&
                   (badlist ? (
                     <Tooltip title={t('add.attribution')}>
@@ -498,10 +511,10 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 )
                 .map((k: keyof Badlist['attribution'], kid) => (
                   <Grid key={kid} container spacing={2}>
-                    <Grid item xs={4} sm={3}>
+                    <Grid size={{ xs: 4, sm: 3 }}>
                       <span style={{ fontWeight: 500 }}>{t(`attribution.${k}`)}</span>
                     </Grid>
-                    <Grid item xs={8} sm={9}>
+                    <Grid size={{ xs: 8, sm: 9 }}>
                       {badlist.attribution[k].map((x, i) => (
                         <CustomChip
                           key={i}
@@ -519,13 +532,13 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                   </Grid>
                 ))}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h6">{t('sources')}</Typography>
             <Divider />
             {badlist ? (
               badlist.sources.map((src, src_id) => (
                 <Grid key={src_id} container>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm: 3 }}>
                     <span style={{ fontWeight: 500 }}>
                       {src.name} ({t(src.type)})
                       {(currentUser.is_admin || currentUser.username === src.name) && badlist.sources.length !== 1 && (
@@ -540,13 +553,13 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                       )}
                     </span>
                   </Grid>
-                  <Grid item xs={12} sm={c12nDef.enforce ? 7 : 9}>
+                  <Grid size={{ xs: 12, sm: c12nDef.enforce ? 7 : 9 }}>
                     {src.reason.map((reason, i) => (
                       <div key={i}>{reason}</div>
                     ))}
                   </Grid>
                   {c12nDef.enforce && (
-                    <Grid item xs={12} sm={2}>
+                    <Grid size={{ xs: 12, sm: 2 }}>
                       <Classification
                         fullWidth
                         size="small"
@@ -567,12 +580,12 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
               <Skeleton />
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Grid container alignItems={'end'}>
-              <Grid item xs={11}>
+              <Grid size={{ xs: 11 }}>
                 <Typography variant="h6">{t('timing')}</Typography>
               </Grid>
-              <Grid item xs={1} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Grid size={{ xs: 11 }} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                 {currentUser.roles.includes('badlist_manage') &&
                   (badlist ? (
                     <DatePicker
@@ -594,10 +607,10 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
             </Grid>
             <Divider />
             <Grid container>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{t('timing.added')}</span>
               </Grid>
-              <Grid item xs={8} sm={9}>
+              <Grid size={{ xs: 8, sm: 9 }}>
                 {badlist ? (
                   <div>
                     <Moment format="YYYY-MM-DD">{badlist.added}</Moment>&nbsp; (
@@ -607,10 +620,10 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{t('timing.updated')}</span>
               </Grid>
-              <Grid item xs={8} sm={9}>
+              <Grid size={{ xs: 8, sm: 9 }}>
                 {badlist ? (
                   <div>
                     <Moment format="YYYY-MM-DD">{badlist.updated}</Moment>&nbsp; (
@@ -620,10 +633,10 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{t('timing.expiry_ts')}</span>
               </Grid>
-              <Grid item xs={8} sm={9}>
+              <Grid size={{ xs: 8, sm: 9 }}>
                 {badlist ? (
                   badlist.expiry_ts ? (
                     <div>
@@ -640,7 +653,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
             </Grid>
           </Grid>
           {currentUser.roles.includes('submission_view') && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Histogram
                 dataset={histogram}
                 height="300px"

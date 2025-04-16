@@ -241,11 +241,11 @@ const WrappedAlertsContent = () => {
     return (
       <PageFullWidth margin={4}>
         <Grid container alignItems="center" paddingBottom={2}>
-          <Grid item xs>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">{t('alerts')}</Typography>
           </Grid>
 
-          <Grid item xs style={{ display: 'flex', textAlign: 'right', flex: 0 }}>
+          <Grid size={{ xs: 'grow' }} style={{ display: 'flex', textAlign: 'right', flex: 0 }}>
             <AlertDefaultSearchParameters />
             {currentUser.roles.includes('workflow_manage') && (
               <Tooltip title={t('workflow.tooltip')}>

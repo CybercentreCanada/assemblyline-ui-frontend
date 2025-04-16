@@ -83,7 +83,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
   const [runWorkflow, setRunWorkflow] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const inputRef = useRef(null);
+  const inputRef = useRef();
 
   const defaultWorkflow = useMemo<Workflow>(
     () => ({
@@ -247,7 +247,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
         <div style={{ textAlign: 'left' }}>
           <div style={{ paddingBottom: theme.spacing(2) }}>
             <Grid container alignItems="center">
-              <Grid item xs>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="h4">{t(id ? 'edit.title' : 'add.title')}</Typography>
                 <Typography variant="caption">
                   {!id ? null : workflow ? id : <Skeleton style={{ width: '10rem' }} />}
@@ -255,9 +255,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               </Grid>
 
               <Grid
-                item
-                xs={12}
-                sm
+                size={{ xs: 12, sm: 'grow' }}
                 style={{ display: 'flex', justifyContent: 'flex-end', columnGap: theme.spacing(1) }}
               >
                 {id ? (
@@ -311,7 +309,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
         </div>
 
         <Grid container spacing={2} textAlign="start">
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle2">{`${t('name')} ${t('required')}`}</Typography>
             {!workflow ? (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -327,7 +325,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               />
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle2">{`${t('query')} ${t('required')}`}</Typography>
             {!workflow ? (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -344,7 +342,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               />
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle2">{t('labels')}</Typography>
             {!workflow ? (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -364,7 +362,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">{t('priority')}</Typography>
             {workflow ? (
               <FormControl size="small" fullWidth>
@@ -386,7 +384,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">{t('status')}</Typography>
             {workflow ? (
               <FormControl size="small" fullWidth>
@@ -410,7 +408,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
           </Grid>
 
           {!id && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               {!workflow ? (
                 <Skeleton style={{ height: '2.5rem' }} />
               ) : (

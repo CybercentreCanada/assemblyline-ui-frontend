@@ -132,7 +132,7 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
       }`}
     >
       <Grid container spacing={1}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           {status && (error || ingester.error) && (
             <Tooltip title={error || ingester.error}>
               <div className={classes.error_icon}>
@@ -157,7 +157,7 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
             )}
           </div>
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid size={{ xs: 12, sm: 3 }}>
           <div>
             <label>{t('ingest')}</label>
           </div>
@@ -170,7 +170,7 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <div>
             <label>{t('queued')}</label>
           </div>
@@ -217,7 +217,7 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid size={{ xs: 12, sm: 3 }}>
           <div>
             <label>{t('processing')}</label>
           </div>
@@ -242,7 +242,7 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid size={{ xs: 12, sm: 3 }}>
           <div>
             <label>{t('caching')}</label>
           </div>
@@ -261,7 +261,7 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={9}>
+        <Grid size={{ xs: 12, sm: 9 }}>
           <div>
             <label>{t('throughput')}</label>
           </div>
@@ -368,7 +368,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
       }`}
     >
       <Grid container spacing={1}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           {status && (error || dispatcher.error) && (
             <Tooltip title={error || dispatcher.error}>
               <div className={classes.error_icon}>
@@ -393,7 +393,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
             )}
           </div>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <div>
             <label>{t('services')}</label>
           </div>
@@ -410,7 +410,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
             </div>
           )}
         </Grid>
-        <Grid item xs={12} sm={3} md={2}>
+        <Grid size={{ xs: 12, sm: 3, md: 2 }}>
           <div>
             <label>{t('submissions')}</label>
           </div>
@@ -427,7 +427,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <div>
             <label>{t('queued')}</label>
           </div>
@@ -476,7 +476,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
             )}
           </div>
         </Grid>
-        <Grid item xs={12} sm={3} md={2}>
+        <Grid size={{ xs: 12, sm: 3, md: 2 }}>
           <div>
             <label>{t('busyness')}</label>
           </div>
@@ -489,7 +489,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
             />
           </div>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <div>
             <label>{t('throughput')}</label>
           </div>
@@ -541,7 +541,7 @@ const WrappedArchiveCard = ({ archive }) => {
   return (
     <Card className={`${classes.core_card} ${error || archive.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           {(error || archive.error) && (
             <Tooltip title={error || archive.error}>
               <div className={classes.error_icon}>
@@ -551,7 +551,7 @@ const WrappedArchiveCard = ({ archive }) => {
           )}
           <div className={classes.title}>{`${t('archiver')} :: x${archive.instances}`}</div>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <div>
             <label>{t('queued')}</label>
           </div>
@@ -559,7 +559,7 @@ const WrappedArchiveCard = ({ archive }) => {
             <MetricCounter init={archive.initialized} value={archive.queued} title="Q" tooltip={t('archive.queue')} />
           </div>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <div>
             <label>{t('throughput')}</label>
           </div>
@@ -584,7 +584,7 @@ const WrappedArchiveCard = ({ archive }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <div>
             <label>{t('archived.error')}</label>
           </div>
@@ -638,7 +638,7 @@ const WrappedExpiryCard = ({ expiry }) => {
   return (
     <Card className={`${classes.core_card} ${error || expiry.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           {(error || expiry.error) && (
             <Tooltip title={error || expiry.error}>
               <div className={classes.error_icon}>
@@ -648,7 +648,7 @@ const WrappedExpiryCard = ({ expiry }) => {
           )}
           <div className={classes.title}>{`${t('expiry')} :: x${expiry.instances}`}</div>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <div>
             <label>{t('queued')}</label>
           </div>
@@ -697,7 +697,7 @@ const WrappedExpiryCard = ({ expiry }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <div>
             <label>{t('throughput')}</label>
           </div>
@@ -746,7 +746,7 @@ const WrappedExpiryCard = ({ expiry }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={6} />
+        <Grid size={{ xs: 12, sm: 6 }} />
       </Grid>
     </Card>
   );
@@ -776,7 +776,7 @@ const WrappedAlerterCard = ({ alerter }) => {
   return (
     <Card className={`${classes.core_card} ${error || alerter.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           {(error || alerter.error) && (
             <Tooltip title={error || alerter.error}>
               <div className={classes.error_icon}>
@@ -786,7 +786,7 @@ const WrappedAlerterCard = ({ alerter }) => {
           )}
           <div className={classes.title}>{`${t('alerter')} :: x${alerter.instances}`}</div>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <div>
             <label>{t('queued')}</label>
           </div>
@@ -805,7 +805,7 @@ const WrappedAlerterCard = ({ alerter }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={8}>
+        <Grid size={{ xs: 12, sm: 8 }}>
           <div>
             <label>{t('throughput')}</label>
           </div>
@@ -869,7 +869,7 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
   return (
     <Card className={`${classes.core_card} ${error || scaler.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           {(error || scaler.error) && (
             <Tooltip title={error || scaler.error}>
               <div className={classes.error_icon}>
@@ -879,7 +879,7 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
           )}
           <div className={classes.title}>{t('resources')}</div>
         </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Grid size={{ xs: 6 }} style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block' }}>
             <ArcGauge
               initialized={scaler ? scaler.initialized : false}
@@ -896,7 +896,7 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Grid size={{ xs: 6 }} style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block' }}>
             <ArcGauge
               initialized={scaler ? scaler.initialized : false}
@@ -939,7 +939,7 @@ const WrappedServiceCard = ({ service, max_inflight }) => {
   return (
     <Card className={`${classes.card} ${error || service.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           {(error || service.error) && (
             <Tooltip title={error || service.error}>
               <div className={classes.error_icon}>
@@ -951,16 +951,16 @@ const WrappedServiceCard = ({ service, max_inflight }) => {
             {`${service.service_name} :: ${service.instances} / ${service.scaler.target}`}
           </div>
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={{ xs: 6 }}>
           <MetricCounter init value={service.queue} title="Q" tooltip={t('service.queue')} />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={{ xs: 6 }}>
           <MetricCounter init value={service.activity.busy} title="B" tooltip={t('service.busy')} />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={{ xs: 6 }}>
           <MetricCounter init value={service.metrics.execute} title="P" tooltip={t('service.processed')} />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={{ xs: 6 }}>
           <MetricCounter init value={service.metrics.fail_nonrecoverable} title="F" tooltip={t('service.failed')} />
           <MetricCounter init value={service.metrics.fail_recoverable} title="R" tooltip={t('service.retried')} />
         </Grid>
@@ -1009,7 +1009,7 @@ const WrappedElasticCard = ({ elastic }) => {
   return (
     <Card className={`${classes.core_card} ${error || elastic.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           {(error || elastic.error) && (
             <Tooltip title={error || elastic.error}>
               <div className={classes.error_icon}>
@@ -1019,7 +1019,7 @@ const WrappedElasticCard = ({ elastic }) => {
           )}
           <div className={classes.title}>{`${t('elasticsearch')} :: x${elastic.instances}`}</div>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <MetricCounter
             init={elastic.initialized}
             value={humanSeconds(elastic.request_time, t)}
@@ -1033,7 +1033,7 @@ const WrappedElasticCard = ({ elastic }) => {
             tooltip={t('elasticsearch.unassigned')}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <div>
             <label>{t('big_index')}</label>
           </div>
@@ -1088,7 +1088,7 @@ const WrappedRetrohuntCard = ({ retrohunt }) => {
   return (
     <Card className={`${classes.core_card} ${error || retrohunt.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           {(error || retrohunt.error) && (
             <Tooltip title={error || retrohunt.error}>
               <div className={classes.error_icon}>
@@ -1098,7 +1098,7 @@ const WrappedRetrohuntCard = ({ retrohunt }) => {
           )}
           <div className={classes.title}>{`${t('retrohunt')} :: x${retrohunt.instances}`}</div>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <MetricCounter
             init={retrohunt.initialized}
             value={humanSeconds(retrohunt.request_time, t)}
@@ -1106,7 +1106,7 @@ const WrappedRetrohuntCard = ({ retrohunt }) => {
             tooltip={t('retrohunt.request_time')}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={{ xs: 6 }}>
           <div>
             <label>{t('retrohunt.label.stats')}</label>
           </div>
@@ -1129,7 +1129,7 @@ const WrappedRetrohuntCard = ({ retrohunt }) => {
             tooltip={t('retrohunt.ingested')}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={{ xs: 6 }}>
           <div>
             <label>{t('retrohunt.label.worker')}</label>
           </div>
@@ -1577,10 +1577,10 @@ const Dashboard = () => {
         {t('title')}
       </Typography>
       <Grid container spacing={2}>
-        <Grid item xs={12} xl={6}>
+        <Grid size={{ xs: 12, xl: 6 }}>
           <IngestCard ingester={ingester} handleStatusChange={handleIngesterStatusChange} status={ingestStatus} />
         </Grid>
-        <Grid item xs={12} xl={6}>
+        <Grid size={{ xs: 12, xl: 6 }}>
           <DispatcherCard
             dispatcher={dispatcher}
             up={servicesList.up}
@@ -1590,68 +1590,69 @@ const Dashboard = () => {
           />
         </Grid>
         <Grid
-          item
-          xs={12}
-          md={6}
-          xl={
-            configuration.datastore.archive.enabled && configuration.retrohunt.enabled
-              ? 4
-              : !configuration.datastore.archive.enabled && !configuration.retrohunt.enabled
-              ? 3
-              : 6
-          }
+          size={{
+            xs: 12,
+            md: 6,
+            xl:
+              configuration.datastore.archive.enabled && configuration.retrohunt.enabled
+                ? 4
+                : !configuration.datastore.archive.enabled && !configuration.retrohunt.enabled
+                  ? 3
+                  : 6
+          }}
         >
           <ExpiryCard expiry={expiry} />
         </Grid>
         {configuration.datastore.archive.enabled && (
-          <Grid item xs={12} md={6} xl={configuration.retrohunt.enabled ? 4 : 6}>
+          <Grid size={{ xs: 12, md: 6, xl: configuration.retrohunt.enabled ? 4 : 6 }}>
             <ArchiveCard archive={archive} />
           </Grid>
         )}
         {configuration.retrohunt.enabled && (
-          <Grid key="retrohunt" item xs={12} md={6} xl={configuration.datastore.archive.enabled ? 4 : 6}>
+          <Grid key="retrohunt" size={{ xs: 12, md: 6, xl: configuration.retrohunt.enabled ? 4 : 6 }}>
             <RetrohuntCard retrohunt={retrohunt} />
           </Grid>
         )}
         <Grid
           key="elastic"
-          item
-          xs={12}
-          md={
-            (!configuration.datastore.archive.enabled && configuration.retrohunt.enabled) ||
-            (configuration.datastore.archive.enabled && !configuration.retrohunt.enabled)
-              ? 4
-              : 6
-          }
-          xl={!configuration.datastore.archive.enabled && !configuration.retrohunt.enabled ? 3 : 4}
+          size={{
+            xs: 12,
+            md:
+              (!configuration.datastore.archive.enabled && configuration.retrohunt.enabled) ||
+              (configuration.datastore.archive.enabled && !configuration.retrohunt.enabled)
+                ? 4
+                : 6,
+            xl: !configuration.datastore.archive.enabled && !configuration.retrohunt.enabled ? 3 : 4
+          }}
         >
           <ElasticCard elastic={elastic} />
         </Grid>
         <Grid
-          item
-          xs={12}
-          md={
-            (!configuration.datastore.archive.enabled && configuration.retrohunt.enabled) ||
-            (configuration.datastore.archive.enabled && !configuration.retrohunt.enabled)
-              ? 4
-              : 8
-          }
-          xl={!configuration.datastore.archive.enabled && !configuration.retrohunt.enabled ? 3 : 4}
+          size={{
+            xs: 12,
+            md:
+              (!configuration.datastore.archive.enabled && configuration.retrohunt.enabled) ||
+              (configuration.datastore.archive.enabled && !configuration.retrohunt.enabled)
+                ? 4
+                : 8,
+            xl: !configuration.datastore.archive.enabled && !configuration.retrohunt.enabled ? 3 : 4
+          }}
         >
           <AlerterCard alerter={alerter} />
         </Grid>
         <Grid
-          item
-          xs={12}
-          md={4}
-          xl={!configuration.datastore.archive.enabled && !configuration.retrohunt.enabled ? 3 : 4}
+          size={{
+            xs: 12,
+            md: 4,
+            xl: !configuration.datastore.archive.enabled && !configuration.retrohunt.enabled ? 3 : 4
+          }}
         >
           <ScalerResourcesCard scaler={scaler} />
         </Grid>
         {Object.keys(services)
           .sort()
           .map(key => (
-            <Grid key={key} item xs={12} sm={6} md={4} lg={3} xl={2}>
+            <Grid key={key} size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
               <ServiceCard service={services[key]} max_inflight={dispatcher.inflight.max} />
             </Grid>
           ))}

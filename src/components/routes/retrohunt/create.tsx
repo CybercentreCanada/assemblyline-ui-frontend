@@ -168,7 +168,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
 
           <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={1}>
             {c12nDef.enforce && (
-              <Grid item paddingBottom={theme.spacing(2)}>
+              <Grid paddingBottom={theme.spacing(2)}>
                 <Classification
                   format="long"
                   type="picker"
@@ -179,12 +179,12 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
               </Grid>
             )}
 
-            <Grid item>
+            <Grid>
               <Grid container flexDirection="row">
-                <Grid item flexGrow={1}>
+                <Grid size="grow">
                   <Typography variant="h4" children={t('header.add')} />
                 </Grid>
-                <Grid item>
+                <Grid>
                   <Button
                     variant="contained"
                     color="primary"
@@ -198,7 +198,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
               </Grid>
             </Grid>
 
-            <Grid item>
+            <Grid>
               <Typography variant="subtitle2">{t('details.description')}</Typography>
               <TextField
                 fullWidth
@@ -213,10 +213,10 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
               />
             </Grid>
 
-            <Grid item>
+            <Grid>
               <Grid container flexDirection="row" rowGap={2}>
                 {configuration?.datastore?.archive?.enabled && (
-                  <Grid item flexGrow={3}>
+                  <Grid flexGrow={3}>
                     <Typography variant="subtitle2">{t('details.search')}</Typography>
                     <RadioGroup
                       row
@@ -244,7 +244,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
                     </RadioGroup>
                   </Grid>
                 )}
-                <Grid item flexGrow={2}>
+                <Grid flexGrow={2}>
                   <Typography variant="subtitle2">
                     {`${t('ttl')} (${maxDaysToLive ? `${t('ttl.max')}: ${maxDaysToLive}` : t('ttl.forever')})`}
                   </Typography>
@@ -267,7 +267,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
             </Grid>
 
             {c12nDef.enforce && (
-              <Grid item marginBottom={1}>
+              <Grid marginBottom={1}>
                 <Tooltip title={t('tooltip.search_classification')} placement="top">
                   <div
                     style={{
@@ -292,7 +292,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
               </Grid>
             )}
 
-            <Grid item flex={1}>
+            <Grid flex={1}>
               <Grid container flexDirection="column" height="100%" minHeight="500px">
                 <Typography variant="h6" children={t('details.yara_rule')} />
                 <MonacoEditor

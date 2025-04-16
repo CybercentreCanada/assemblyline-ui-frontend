@@ -272,7 +272,7 @@ function WrappedClassificationInput({
             </DialogTitle>
             <DialogContent>
               <Grid container spacing={2}>
-                <Grid item xs={12} md>
+                <Grid size={{ xs: 12, md: 'grow' }}>
                   <Card variant="outlined">
                     <List disablePadding style={{ borderRadius: '6px' }}>
                       {c12nDef.original_definition.levels.map(
@@ -298,7 +298,7 @@ function WrappedClassificationInput({
                 {((isUser && c12nDef.original_definition.required.length !== 0) ||
                   (uParts.req.length !== 0 &&
                     c12nDef.original_definition.required.filter(r => !r.is_hidden).length !== 0)) && (
-                  <Grid item xs={12} md>
+                  <Grid size={{ xs: 12, md: 'grow' }}>
                     <Card variant="outlined">
                       <List disablePadding>
                         {c12nDef.original_definition.required.map(
@@ -328,7 +328,7 @@ function WrappedClassificationInput({
                     c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0) ||
                   (uParts.subgroups.length !== 0 &&
                     c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
-                  <Grid item xs={12} md>
+                  <Grid size={{ xs: 12, md: 'grow' }}>
                     {((isUser && (c12nDef.original_definition.groups.length !== 0 || c12nDef.dynamic_groups)) ||
                       (uParts.groups.length !== 0 &&
                         c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0)) && (

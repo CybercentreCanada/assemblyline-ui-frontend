@@ -71,7 +71,7 @@ const WrappedCommentSection: React.FC<Props> = ({
   const [confirmation, setConfirmation] = useState<Confirmation>({ open: false, type: 'add' });
   const [waiting, setWaiting] = useState<boolean>(false);
 
-  const socket = useRef(null);
+  const socket = useRef();
 
   const sortedComments = useMemo<Comment[]>(
     () => (!comments ? [] : comments.sort((c1, c2) => c2?.date.localeCompare(c1?.date))),
@@ -275,8 +275,8 @@ const WrappedCommentSection: React.FC<Props> = ({
                   color: !comments
                     ? theme.palette.text.disabled
                     : theme.palette.mode === 'dark'
-                    ? theme.palette.success.light
-                    : theme.palette.success.dark
+                      ? theme.palette.success.light
+                      : theme.palette.success.dark
                 }}
                 onClick={handleAddConfirmation}
               >
@@ -312,13 +312,13 @@ const WrappedCommentSection: React.FC<Props> = ({
         <DialogContent>
           <DialogContentText component="div">
             <Grid container flexDirection="column" spacing={2}>
-              <Grid item>
+              <Grid>
                 {confirmation.type === 'add' && t('comment.confirmation.content.add')}
                 {confirmation.type === 'edit' && t('comment.confirmation.content.edit')}
                 {confirmation.type === 'delete' && t('comment.confirmation.content.delete')}
               </Grid>
               {['add', 'edit'].includes(confirmation.type) && (
-                <Grid item>
+                <Grid>
                   <TextField
                     value={currentComment?.text}
                     disabled={waiting}
@@ -335,14 +335,14 @@ const WrappedCommentSection: React.FC<Props> = ({
                 </Grid>
               )}
               {confirmation.type === 'delete' && (
-                <Grid item>
+                <Grid>
                   <Typography variant="subtitle2" children={t('comment.content')} />
                   <Paper component="pre" variant="outlined" className={classes.preview}>
                     {currentComment?.text}
                   </Paper>
                 </Grid>
               )}
-              <Grid item>{t('comment.confirmation.confirm')}</Grid>
+              <Grid>{t('comment.confirmation.confirm')}</Grid>
             </Grid>
           </DialogContentText>
         </DialogContent>
@@ -375,10 +375,10 @@ const WrappedCommentSection: React.FC<Props> = ({
               confirmation.type === 'add'
                 ? handleAddComment(currentComment)
                 : confirmation.type === 'edit'
-                ? handleEditComment(currentComment)
-                : confirmation.type === 'delete'
-                ? handleDeleteComment(currentComment)
-                : null
+                  ? handleEditComment(currentComment)
+                  : confirmation.type === 'delete'
+                    ? handleDeleteComment(currentComment)
+                    : null
             }
           />
         </DialogActions>

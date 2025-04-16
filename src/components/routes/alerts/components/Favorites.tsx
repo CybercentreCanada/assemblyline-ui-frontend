@@ -137,21 +137,21 @@ const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
           cancelText={t('cancel')}
           children={
             <>
-              <Grid item component="span">
+              <Grid component="span">
                 {t('confirmation.content.add')}
                 <b style={{ wordBreak: 'break-all' }}>{favorite ? favorite.name : null}</b>
                 {t('confirmation.content.add2')}
                 {global ? t('confirmation.content.public') : t('confirmation.content.private')}
               </Grid>
 
-              <Grid item style={{ width: '100%' }}>
+              <Grid style={{ width: '100%' }}>
                 <Typography variant="subtitle2">{t('confirmation.query')}</Typography>
                 <Paper component="pre" variant="outlined" className={classes.preview}>
                   {favorite.query}
                 </Paper>
               </Grid>
 
-              <Grid item component="span" children={t('confirmation.confirm')} />
+              <Grid component="span" children={t('confirmation.confirm')} />
             </>
           }
         />
@@ -237,14 +237,14 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
           cancelText={t('cancel')}
           children={
             <>
-              <Grid item component="span">
+              <Grid component="span">
                 {t('confirmation.content.update')}
                 <b style={{ wordBreak: 'break-all' }}>{favorite ? favorite.name : null}</b>
                 {t('confirmation.content.update2')}
                 {global ? t('confirmation.content.public') : t('confirmation.content.private')}
               </Grid>
 
-              <Grid item style={{ width: '100%' }}>
+              <Grid style={{ width: '100%' }}>
                 <Typography variant="subtitle2">{t('confirmation.from')}</Typography>
                 <Paper component="pre" variant="outlined" className={classes.preview}>
                   {global
@@ -253,14 +253,14 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
                 </Paper>
               </Grid>
 
-              <Grid item style={{ width: '100%' }}>
+              <Grid style={{ width: '100%' }}>
                 <Typography variant="subtitle2">{t('confirmation.to')}</Typography>
                 <Paper component="pre" variant="outlined" className={classes.preview}>
                   {favorite.query}
                 </Paper>
               </Grid>
 
-              <Grid item component="span" children={t('confirmation.confirm')} />
+              <Grid component="span" children={t('confirmation.confirm')} />
             </>
           }
         />
@@ -332,21 +332,21 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
           acceptText={t('confirmation.ok.delete')}
           children={
             <>
-              <Grid item component="span">
+              <Grid component="span">
                 {t('confirmation.content.delete')}
                 <b style={{ wordBreak: 'break-all' }}>{favorite ? favorite.name : null}</b>
                 {t('confirmation.content.delete2')}
                 {global ? t('confirmation.content.public') : t('confirmation.content.private')}
               </Grid>
 
-              <Grid item style={{ width: '100%' }}>
+              <Grid style={{ width: '100%' }}>
                 <Typography variant="subtitle2">{t('confirmation.query')}</Typography>
                 <Paper component="pre" variant="outlined" className={classes.preview}>
                   {favorite.query}
                 </Paper>
               </Grid>
 
-              <Grid item component="span" children={t('confirmation.confirm')} />
+              <Grid component="span" children={t('confirmation.confirm')} />
             </>
           }
         />

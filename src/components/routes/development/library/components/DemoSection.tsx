@@ -18,15 +18,13 @@ export const DemoSection: React.FC<DemoSectionProps> = React.memo(
       <PageSection id={id} primary={primary} secondary={secondary} anchor>
         <Grid container spacing={2}>
           <Grid
-            md={6}
-            xs={12}
+            size={{ xs: 12, md: 6 }}
             sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2), minHeight: '300px' }}
           >
             {left}
           </Grid>
           <Grid
-            md={6}
-            xs={12}
+            size={{ xs: 12, md: 6 }}
             sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2), minHeight: '300px' }}
           >
             {right}

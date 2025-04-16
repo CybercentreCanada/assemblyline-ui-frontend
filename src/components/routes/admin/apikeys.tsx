@@ -134,7 +134,7 @@ const APIKeysSearch = () => {
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
-          <Grid item xs>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">{t('apikeys.title')}</Typography>
           </Grid>
         </Grid>

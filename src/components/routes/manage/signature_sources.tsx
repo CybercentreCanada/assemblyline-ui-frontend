@@ -249,13 +249,13 @@ const WrappedSourceDetailDrawer = ({
 
         <div style={{ paddingBottom: theme.spacing(2) }}>
           <Grid container alignItems="center">
-            <Grid item xs>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="h4">{service}</Typography>
               <Typography variant="caption">
                 {`${t(base ? 'editing_source' : 'adding_source')}${base ? ` (${base.name})` : ''}`}
               </Typography>
             </Grid>
-            <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 1 }}>
+            <Grid size={{ xs: 12, sm: 'grow' }} style={{ textAlign: 'right', flexGrow: 1 }}>
               {base && (
                 <Tooltip title={t(source.enabled ? 'disable' : 'enable')}>
                   <IconButton onClick={toggleSource} size="large">
@@ -286,8 +286,8 @@ const WrappedSourceDetailDrawer = ({
                       color: isSourceUpdating(source)
                         ? theme.palette.action.disabled
                         : theme.palette.mode === 'dark'
-                        ? theme.palette.info.light
-                        : theme.palette.info.dark
+                          ? theme.palette.info.light
+                          : theme.palette.info.dark
                     }}
                     disabled={isSourceUpdating(source)}
                     onClick={triggerSourceUpdate}
@@ -382,8 +382,8 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
           !source.enabled
             ? classes.disableCard
             : source.status && source.status.state === 'ERROR'
-            ? classes.errorCard
-            : classes.card
+              ? classes.errorCard
+              : classes.card
         }
         onClick={onClick}
       >
@@ -443,8 +443,8 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
                       color: isSourceUpdating(source)
                         ? theme.palette.action.disabled
                         : theme.palette.mode === 'dark'
-                        ? theme.palette.info.light
-                        : theme.palette.info.dark
+                          ? theme.palette.info.light
+                          : theme.palette.info.dark
                     }}
                     disabled={isSourceUpdating(source)}
                     onClick={triggerSourceUpdate}
@@ -489,17 +489,16 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
         <Grid container>
           {source.pattern && (
             <>
-              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('pattern')}:`}</Grid>
-              <Grid item xs={7} sm={8} md={10} className={classes.mono}>
+              <Grid size={{ xs: 5, sm: 4, md: 2 }} className={classes.label}>{`${t('pattern')}:`}</Grid>
+              <Grid size={{ xs: 7, sm: 8, md: 10 }} className={classes.mono}>
                 {source.pattern}
               </Grid>
             </>
           )}
           {c12nDef.enforce && (
             <>
-              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('classification')}:`}</Grid>
-
-              <Grid item xs={7} sm={8} md={10}>
+              <Grid size={{ xs: 5, sm: 4, md: 2 }} className={classes.label}>{`${t('classification')}:`}</Grid>
+              <Grid size={{ xs: 7, sm: 8, md: 10 }}>
                 <Classification type="text" c12n={source.default_classification || c12nDef.UNRESTRICTED} />
               </Grid>
             </>
@@ -624,8 +623,8 @@ const ServiceDetail = ({
                     color: sources.some(isSourceUpdating)
                       ? theme.palette.action.disabled
                       : theme.palette.mode === 'dark'
-                      ? theme.palette.info.light
-                      : theme.palette.info.dark
+                        ? theme.palette.info.light
+                        : theme.palette.info.dark
                   }}
                   disabled={sources.some(isSourceUpdating)}
                   onClick={triggerSourceUpdateAll}

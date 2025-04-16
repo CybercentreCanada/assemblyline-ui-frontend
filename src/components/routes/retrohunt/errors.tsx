@@ -95,15 +95,15 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
       !retrohunt?.total_warnings || retrohunt?.total_warnings === 0
         ? null
         : retrohunt?.total_warnings === 1
-        ? `1 ${t('warning')}`
-        : `${retrohunt?.total_warnings} ${t('warnings')}`;
+          ? `1 ${t('warning')}`
+          : `${retrohunt?.total_warnings} ${t('warnings')}`;
 
     const errors =
       !retrohunt?.total_errors || retrohunt?.total_errors === 0
         ? null
         : retrohunt?.total_errors === 1
-        ? `1 ${t('error')}`
-        : `${retrohunt?.total_errors} ${t('errors')}`;
+          ? `1 ${t('error')}`
+          : `${retrohunt?.total_errors} ${t('errors')}`;
 
     return warnings && errors ? `${warnings} ${t('and')} ${errors}` : warnings ? warnings : errors ? errors : null;
   }, [retrohunt, t]);
@@ -148,11 +148,11 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
 
   return (
     <>
-      <Grid item>
+      <Grid>
         <Typography variant="h6">{t('errors.view.title')}</Typography>
         <Divider />
       </Grid>
-      <Grid item>
+      <Grid>
         {!errorResults ? (
           <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
         ) : !('total' in errorResults) || errorResults.total === 0 ? (

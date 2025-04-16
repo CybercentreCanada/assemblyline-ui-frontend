@@ -208,7 +208,7 @@ const WrappedASCIISection: React.FC<Props> = ({
                 )}
               </div>
             </Grid>
-            <Grid item style={{ minWidth: theme.spacing(6), height: '100%' }}>
+            <Grid style={{ minWidth: theme.spacing(6), height: '100%' }}>
               <Tooltip title={t(`${showCodeSummary ? 'hide' : 'show'}_analyse_code`)} placement="top">
                 <Button
                   onClick={() => setShowCodeSummary(!showCodeSummary)}

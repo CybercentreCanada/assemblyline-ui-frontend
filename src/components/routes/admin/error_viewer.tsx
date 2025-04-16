@@ -202,10 +202,10 @@ const ErrorViewer = () => {
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
       <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid item xs={12} sm={7} md={9} xl={10}>
+        <Grid size={{ xs: 12, sm: 7, md: 9, xl: 10 }}>
           <Typography variant="h4">{t('title')}</Typography>
         </Grid>
-        <Grid item xs={12} sm={5} md={3} xl={2}>
+        <Grid size={{ xs: 12, sm: 5, md: 3, xl: 2 }}>
           <FormControl size="small" fullWidth>
             <Select
               disabled={searching}
@@ -277,7 +277,7 @@ const ErrorViewer = () => {
 
       {errorResults !== null && errorResults.total !== 0 && (
         <Grid container spacing={2}>
-          <Grid item xs={12} lg={4}>
+          <Grid size={{ xs: 12, lg: 4 }}>
             <Histogram
               dataset={histogram}
               height="200px"
@@ -287,7 +287,7 @@ const ErrorViewer = () => {
               verticalLine
             />
           </Grid>
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
             <LineGraph
               dataset={names}
               height="200px"
@@ -301,7 +301,7 @@ const ErrorViewer = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
             <LineGraph
               dataset={types}
               height="200px"

@@ -46,10 +46,10 @@ function SubmissionMetadata({ submissionMetadata, setSubmissionMetadata }: Exter
         <div>
           {Object.keys(submissionMetadata).map((meta, i) => (
             <Grid container key={i}>
-              <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+              <Grid className={classes.meta_key} size={{ xs: 12, sm: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{meta}</span>
               </Grid>
-              <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+              <Grid size={{ xs: 12, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                 {submissionMetadata[meta].toString()}
               </Grid>
             </Grid>

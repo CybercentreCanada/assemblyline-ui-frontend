@@ -97,13 +97,17 @@ export function WrappedAttributionBanner({ report }: Props) {
       }}
     >
       <Grid container alignItems="center" justifyContent="center">
-        <Grid className="no-print" item xs style={{ color: textColor, display: isXS ? 'none' : 'inherit' }}>
+        <Grid
+          className="no-print"
+          size={{ xs: 'grow' }}
+          style={{ color: textColor, display: isXS ? 'none' : 'inherit' }}
+        >
           {icon}
         </Grid>
-        <Grid className="print-only" item xs style={{ color: textColor }}>
+        <Grid className="print-only" size={{ xs: 'grow' }} style={{ color: textColor }}>
           {icon}
         </Grid>
-        <Grid item xs style={{ flexGrow: 10 }}>
+        <Grid size={{ xs: 'grow' }} style={{ flexGrow: 10 }}>
           <div className={classes.banner_title}>
             {report ? <Verdict type="text" size="medium" score={report.max_score} /> : <Skeleton />}
           </div>
@@ -167,8 +171,7 @@ export function WrappedAttributionBanner({ report }: Props) {
           </table>
         </Grid>
         <Grid
-          item
-          xs
+          size={{ xs: 'grow' }}
           style={{ color: textColor, marginLeft: theme.spacing(1), marginRight: theme.spacing(1), minHeight: '100px' }}
         >
           {report ? (

@@ -16,10 +16,10 @@ const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = fa
   return (
     <SectionContainer title={t('frequency')} nocollapse={nocollapse}>
       <Grid container>
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500 }}>{t('seen.first')}</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10}>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
           {seen ? (
             <>
               <Typography component="span" variant="body2">
@@ -36,10 +36,10 @@ const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = fa
           )}
         </Grid>
 
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500 }}>{t('seen.last')}</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10}>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
           {seen ? (
             <>
               <Typography component="span" variant="body2">
@@ -56,12 +56,10 @@ const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = fa
           )}
         </Grid>
 
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500 }}>{t('seen.count')}</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10}>
-          {seen ? seen?.count : <Skeleton />}
-        </Grid>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{seen ? seen?.count : <Skeleton />}</Grid>
       </Grid>
     </SectionContainer>
   );

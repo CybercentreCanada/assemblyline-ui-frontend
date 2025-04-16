@@ -47,15 +47,17 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
 
     const Anchors = useMemo<TableOfContentContextProps['Anchors']>(
       () =>
-        ({ children: render }) =>
-          <form.Subscribe selector={state => state.values.anchors} children={anchors => render(anchors)} />,
+        ({ children: render }) => (
+          <form.Subscribe selector={state => state.values.anchors} children={anchors => render(anchors)} />
+        ),
       [form]
     );
 
     const ActiveAnchor = useMemo<TableOfContentContextProps['ActiveAnchor']>(
       () =>
-        ({ activeID, children: render }) =>
-          <form.Subscribe selector={state => activeID === state.values.activeID} children={active => render(active)} />,
+        ({ activeID, children: render }) => (
+          <form.Subscribe selector={state => activeID === state.values.activeID} children={active => render(active)} />
+        ),
       [form]
     );
 

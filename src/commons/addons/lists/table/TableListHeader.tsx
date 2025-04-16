@@ -1,3 +1,5 @@
+import { Delete } from '@mui/icons-material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
   ClickAwayListener,
   Fade,
@@ -9,9 +11,7 @@ import {
   Popper,
   useTheme
 } from '@mui/material';
-import { Delete } from '@mui/icons-material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import React, { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSorters from '../hooks/useSorters';
 import { LineItem } from '../item/ListItemBase';

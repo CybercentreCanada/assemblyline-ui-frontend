@@ -275,11 +275,11 @@ export default function ServiceReview() {
         spacing={3}
         style={{ paddingBottom: theme.spacing(2) }}
       >
-        <Grid item xs={12} md>
+        <Grid size={{ xs: 12, md: 'grow' }}>
           <Typography variant="h4">{t('title')}</Typography>
           <Typography variant="subtitle1">{t('subtitle')}</Typography>
         </Grid>
-        <Grid item xs={12} md style={{ flexGrow: 0 }}>
+        <Grid size={{ xs: 12, md: 'grow' }} style={{ flexGrow: 0 }}>
           {services ? (
             <>
               <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
@@ -324,7 +324,7 @@ export default function ServiceReview() {
             spacing={3}
             style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}
           >
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <VersionSelector
                 possibleVersions={possibleVersions}
                 selectedService={selectedService}
@@ -334,7 +334,7 @@ export default function ServiceReview() {
               />
               <ServiceDetail stats={stats1} comp={stats2} show={version1 !== ''} />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <VersionSelector
                 possibleVersions={possibleVersions}
                 selectedService={selectedService}

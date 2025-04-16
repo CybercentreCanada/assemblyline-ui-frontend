@@ -47,7 +47,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
       <Grid container>
         {c12nDef.enforce && (
           <>
-            <Grid item xs={4} sm={3} lg={2}>
+            <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
               <span
                 style={{
                   fontWeight: 500,
@@ -58,23 +58,23 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
                 {t('file_classification')}
               </span>
             </Grid>
-            <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+            <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
               <Classification type="text" format="long" c12n={fileinfo ? fileinfo.classification : null} />
             </Grid>
           </>
         )}
 
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>MD5</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
           <ActionableText category="hash" type="md5" value={fileinfo?.md5} classification={fileinfo?.classification} />
         </Grid>
 
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>SHA1</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
           <ActionableText
             category="hash"
             type="sha1"
@@ -83,10 +83,10 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
           />
         </Grid>
 
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>SHA256</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
           <ActionableText
             category="hash"
             type="sha256"
@@ -95,10 +95,10 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
           />
         </Grid>
 
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>SSDEEP</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
           <ActionableText
             category="hash"
             type="ssdeep"
@@ -107,10 +107,10 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
           />
         </Grid>
 
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500 }}>TLSH</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
           {fileinfo ? (
             fileinfo?.tlsh ? (
               <ActionableText
@@ -129,10 +129,10 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
 
         {!fileinfo?.expiry_ts ? null : (
           <>
-            <Grid item xs={4} sm={3} lg={2}>
+            <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
               <span style={{ fontWeight: 500 }}>{t('expiry.ts')}</span>
             </Grid>
-            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+            <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
               <Typography component="span" variant="body2">
                 <Moment variant="fromNow">{fileinfo.expiry_ts}</Moment>
               </Typography>
@@ -145,10 +145,10 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
           </>
         )}
 
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500 }}>{t('size')}</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10}>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
           {fileinfo ? (
             <span>
               {fileinfo.size}
@@ -159,35 +159,33 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
           )}
         </Grid>
 
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500 }}>{t('type')}</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
           {fileinfo ? fileinfo.type : <Skeleton />}
         </Grid>
 
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500 }}>{t('mime')}</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
           {fileinfo ? fileinfo.mime : <Skeleton />}
         </Grid>
 
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500 }}>{t('magic')}</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
           {fileinfo ? fileinfo.magic : <Skeleton />}
         </Grid>
 
-        <Grid item xs={4} sm={3} lg={2}>
+        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500 }}>{t('entropy')}</span>
         </Grid>
-        <Grid item xs={8} sm={9} lg={10}>
-          {fileinfo ? fileinfo.entropy : <Skeleton />}
-        </Grid>
-        <Grid item xs={0} sm={3} lg={2} />
-        <Grid item xs={12} sm={9} lg={10}>
+        <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{fileinfo ? fileinfo.entropy : <Skeleton />}</Grid>
+        <Grid size={{ xs: 0, sm: 3, lg: 2 }} />
+        <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
           {promotedSections
             ? promotedSections
                 .filter(section => section.promote_to === 'ENTROPY')

@@ -87,19 +87,19 @@ export default function AdminTagSafelist() {
       <RouterPrompt when={tagSafelist !== originalTagSafelist} />
       <div style={{ marginBottom: theme.spacing(4), textAlign: 'left' }}>
         <Grid container alignItems="center" spacing={2}>
-          <Grid item style={{ flexGrow: 1 }}>
+          <Grid style={{ flexGrow: 1 }}>
             <div>
               <Typography variant="h4">{t('title')}</Typography>
             </div>
           </Grid>
-          <Grid item>
+          <Grid>
             <Grid container spacing={2}>
-              <Grid item>
+              <Grid>
                 <Button variant="outlined" onClick={() => reload(true)}>
                   {t('reset')}
                 </Button>
               </Grid>
-              <Grid item>
+              <Grid>
                 <Button
                   variant="contained"
                   onClick={() => setTagSafelist(originalTagSafelist)}
@@ -108,7 +108,7 @@ export default function AdminTagSafelist() {
                   {t('undo')}
                 </Button>
               </Grid>
-              <Grid item>
+              <Grid>
                 <Button
                   variant="contained"
                   color="primary"

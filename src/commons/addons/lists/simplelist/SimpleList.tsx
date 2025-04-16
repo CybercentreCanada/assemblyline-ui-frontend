@@ -210,8 +210,8 @@ const SimpleList: React.FC<SimpleListProps> = ({
               </ListItemBase>
             ))
           : !loading
-          ? emptyValue
-          : null}
+            ? emptyValue
+            : null}
       </div>
     </div>
   );

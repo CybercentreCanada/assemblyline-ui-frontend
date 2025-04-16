@@ -5,7 +5,7 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  Unstable_Grid2 as Grid,
+  Grid,
   Radio,
   RadioGroup,
   TextField,
@@ -239,10 +239,10 @@ const BadlistNew = ({}: Props) => {
         </Button>
       </div>
       <Grid container spacing={2}>
-        <Grid xs>
+        <Grid size={{ xs: 'grow' }}>
           <Typography variant="h4">{t('title')}</Typography>
         </Grid>
-        <Grid xs={12} md="auto" alignSelf="end">
+        <Grid size={{ xs: 12, md: 'auto' }} alignSelf="end">
           <FormControl required>
             <FormLabel id="type-radio-buttons-group-label">{t('type.title')}</FormLabel>
             <RadioGroup
@@ -258,10 +258,10 @@ const BadlistNew = ({}: Props) => {
           </FormControl>
         </Grid>
         {badlist?.type === 'tag' && (
-          <Grid container xs={12}>
+          <Grid container size={{ xs: 12 }}>
             <Typography variant="h6">{t('information.tag')}</Typography>
             <Grid container spacing={1} width={'100%'}>
-              <Grid xs={12} md={6} paddingLeft={theme.spacing(1)}>
+              <Grid size={{ xs: 12, md: 6 }} paddingLeft={theme.spacing(1)}>
                 <FormControl fullWidth required>
                   <FormLabel id="tag-type-label">{t('tag.type.title')}</FormLabel>
                   <Autocomplete
@@ -276,7 +276,7 @@ const BadlistNew = ({}: Props) => {
                   />
                 </FormControl>
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <FormControl fullWidth required>
                   <FormLabel id="tag-value-label">{t('tag.value.title')}</FormLabel>
                   <TextField
@@ -294,10 +294,10 @@ const BadlistNew = ({}: Props) => {
         )}
         {badlist?.type === 'file' && (
           <>
-            <Grid container xs={12} width={'100%'}>
+            <Grid container size={{ xs: 12 }} width={'100%'}>
               <Typography variant="h6">{t('file.prop')}</Typography>
               <Grid container spacing={1} width={'100%'} paddingLeft={theme.spacing(1)}>
-                <Grid xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <FormLabel>{t('file.name')}</FormLabel>
                   <TextField
                     value={badlist?.file?.name[0]}
@@ -309,7 +309,7 @@ const BadlistNew = ({}: Props) => {
                     fullWidth
                   />
                 </Grid>
-                <Grid xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <FormLabel>{t('file.type')}</FormLabel>
                   <Autocomplete
                     options={fileTypes}
@@ -322,7 +322,7 @@ const BadlistNew = ({}: Props) => {
                     renderInput={params => <TextField {...params} />}
                   />
                 </Grid>
-                <Grid xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <FormLabel>{t('file.size')}</FormLabel>
                   <TextField
                     type="number"
@@ -337,12 +337,12 @@ const BadlistNew = ({}: Props) => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid container xs={12} width={'100%'} paddingTop={theme.spacing(2)}>
+            <Grid container size={{ xs: 12 }} width={'100%'} paddingTop={theme.spacing(2)}>
               <Typography variant="h6">{t('file.hashes')}</Typography>
               <Grid container spacing={1} paddingLeft={theme.spacing(1)}>
                 {badlist?.type === 'file' &&
                   HASHES.map((hash, idx) => (
-                    <Grid key={idx} xs={12} md={6}>
+                    <Grid key={idx} size={{ xs: 12, md: 6 }}>
                       <FormLabel>{hash.toUpperCase()}</FormLabel>
                       <TextField
                         error={!!(badlist?.hashes[hash] && !badlist?.hashes[hash].match(HASH_MAP[hash]))}
@@ -361,10 +361,10 @@ const BadlistNew = ({}: Props) => {
           </>
         )}
         {badlist?.type && (
-          <Grid container xs={12} width={'100%'} paddingTop={theme.spacing(2)}>
+          <Grid container size={{ xs: 12 }} width={'100%'} paddingTop={theme.spacing(2)}>
             <Typography variant="h6">{t('details')}</Typography>
             <Grid container spacing={1} width={'100%'}>
-              <Grid xs={12} md={9}>
+              <Grid size={{ xs: 12, md: 9 }}>
                 <FormControl fullWidth required>
                   <FormLabel id="reason-label">{t('reason.title')}</FormLabel>
                   <TextField
@@ -396,7 +396,7 @@ const BadlistNew = ({}: Props) => {
                   />
                 </FormControl>
               </Grid>
-              <Grid xs={12} md={3}>
+              <Grid size={{ xs: 12, md: 3 }}>
                 <FormControl fullWidth>
                   <FormLabel id="expiry_ts-label">{t('expiry.title')}</FormLabel>
                   <DatePicker
@@ -413,11 +413,11 @@ const BadlistNew = ({}: Props) => {
         )}
         {badlist?.type && (
           <>
-            <Grid container xs={12} width={'100%'} paddingTop={theme.spacing(2)}>
+            <Grid container size={{ xs: 12 }} width={'100%'} paddingTop={theme.spacing(2)}>
               <Typography variant="h6">{t('attribution')}</Typography>
               <Grid container spacing={1} width={'100%'} paddingLeft={theme.spacing(1)}>
                 {ATTRIBUTION_TYPES.map((atype, idx) => (
-                  <Grid key={idx} xs={12} md={6}>
+                  <Grid key={idx} size={{ xs: 12, md: 6 }}>
                     <FormLabel id="tag-value-label">{t(`attribution.${atype}.title`)}</FormLabel>
                     <Autocomplete
                       size="small"

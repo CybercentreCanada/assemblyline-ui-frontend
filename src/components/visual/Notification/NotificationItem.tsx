@@ -255,12 +255,12 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                         tag === 'new'
                           ? 'info'
                           : tag === 'current'
-                          ? 'success'
-                          : tag === 'dev' || tag === 'community'
-                          ? 'warning'
-                          : tag === 'service'
-                          ? 'secondary'
-                          : 'default'
+                            ? 'success'
+                            : tag === 'dev' || tag === 'community'
+                              ? 'warning'
+                              : tag === 'service'
+                                ? 'secondary'
+                                : 'default'
                       }
                       label={tag}
                     />

@@ -64,8 +64,7 @@ function TagTable({ group, items }: TagTableProps) {
           {Object.keys(orderedItems).map((k, idx) => (
             <Grid
               key={idx}
-              item
-              xs={12}
+              size={{ xs: 12 }}
               style={{
                 marginBottom: theme.spacing(2)
               }}

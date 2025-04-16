@@ -100,7 +100,7 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
           }}
         >
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={8}>
+            <Grid size={{ xs: 12, sm: 8 }}>
               <Typography variant="h5">{error.response.service_name}</Typography>
               <Typography variant="caption">
                 {error.response.service_version !== 0 &&
@@ -109,7 +109,7 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
                 {error.response.service_tool_version && ` (${error.response.service_tool_version})`}
               </Typography>
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <div style={{ display: 'inline-block', textAlign: 'start' }}>
                 <Typography component="div" variant="body1">
                   <Moment variant="fromNow">{error.created}</Moment>
@@ -119,22 +119,22 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
                 </Typography>
               </div>
             </Grid>
-            <Grid item xs={12} sm={8}>
+            <Grid size={{ xs: 12, sm: 8 }}>
               <span style={{ verticalAlign: 'middle' }}>{errorMap[error.type]}&nbsp;</span>
               <span style={{ verticalAlign: 'middle' }}>{t(`type.${error.type}`)}</span>
             </Grid>
-            <Grid item xs={12} sm={4} style={{ alignSelf: 'center' }}>
+            <Grid size={{ xs: 12, sm: 4 }} style={{ alignSelf: 'center' }}>
               <span style={{ verticalAlign: 'middle' }}>{t(`fail.${error.response.status}`)}</span>
             </Grid>
 
-            <Grid item xs={12} md={8}>
+            <Grid size={{ xs: 12, md: 8 }}>
               <label>{t('file_info')}</label>
               <div style={{ wordBreak: 'break-all' }}>
                 <BsClipboard className={classes.clipboardIcon} onClick={() => copy(error.sha256, 'drawerTop')} />
                 {error.sha256}
               </div>
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
                 <Tooltip title={t('related')}>
                   <IconButton
@@ -163,7 +163,7 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
               </div>
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <label>{t('message')}</label>
               <Card variant="outlined">
                 <pre
@@ -181,7 +181,7 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
             </Grid>
 
             {error.response.service_debug_info && (
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <label>{t('debug_info')}</label>
                 <Card variant="outlined">
                   <pre

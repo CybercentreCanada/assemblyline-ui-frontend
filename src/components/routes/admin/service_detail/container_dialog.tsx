@@ -68,10 +68,10 @@ const WrappedEnvironment = ({
 
   return envVar ? (
     <Grid container spacing={1} alignItems="center">
-      <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
+      <Grid size={{ xs: 10, sm: 3 }} style={{ wordBreak: 'break-word' }}>
         {`${envVar.name} :`}
       </Grid>
-      <Grid item xs={10} sm={8}>
+      <Grid size={{ xs: 10, sm: 8 }}>
         <TextField
           fullWidth
           size="small"
@@ -82,7 +82,7 @@ const WrappedEnvironment = ({
           style={{ margin: 0 }}
         />
       </Grid>
-      <Grid item xs={2} sm={1}>
+      <Grid size={{ xs: 2, sm: 1 }}>
         <Tooltip title={t('params.user.remove')}>
           <IconButton
             style={{
@@ -98,7 +98,7 @@ const WrappedEnvironment = ({
     </Grid>
   ) : (
     <Grid container spacing={1} alignItems="center">
-      <Grid item xs={10} sm={3}>
+      <Grid size={{ xs: 10, sm: 3 }}>
         <TextField
           fullWidth
           placeholder={t('container.dialog.environment.name')}
@@ -110,7 +110,7 @@ const WrappedEnvironment = ({
           style={{ margin: 0 }}
         />
       </Grid>
-      <Grid item xs={10} sm={8}>
+      <Grid size={{ xs: 10, sm: 8 }}>
         <TextField
           fullWidth
           placeholder={t('container.dialog.environment.value')}
@@ -122,7 +122,7 @@ const WrappedEnvironment = ({
           style={{ margin: 0 }}
         />
       </Grid>
-      <Grid item xs={2} sm={1} style={{ height: theme.spacing(8) }}>
+      <Grid size={{ xs: 2, sm: 1 }} style={{ height: theme.spacing(8) }}>
         {tempEnvVar.name !== '' && tempEnvVar.value !== '' && (
           <Tooltip title={t('params.user.add')}>
             <IconButton
@@ -179,13 +179,13 @@ const WrappedVolumeControl = ({
 
   return name && vol ? (
     <Grid container spacing={1} alignItems="center">
-      <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
+      <Grid size={{ xs: 10, sm: 3 }} style={{ wordBreak: 'break-word' }}>
         {`${name} :`}
       </Grid>
-      <Grid item xs={10} sm={8}>
+      <Grid size={{ xs: 10, sm: 8 }}>
         {`${vol.mount_path} (${vol.storage_class} | ${vol.access_mode} | ${vol.capacity}B)`}
       </Grid>
-      <Grid item xs={2} sm={1}>
+      <Grid size={{ xs: 2, sm: 1 }}>
         <Tooltip title={t('params.user.remove')}>
           <IconButton
             style={{
@@ -201,7 +201,7 @@ const WrappedVolumeControl = ({
     </Grid>
   ) : (
     <Grid container spacing={1}>
-      <Grid item xs={10} sm={3}>
+      <Grid size={{ xs: 10, sm: 3 }}>
         <TextField
           fullWidth
           placeholder={t('container.dialog.volumes.name')}
@@ -213,7 +213,7 @@ const WrappedVolumeControl = ({
           style={{ margin: 0 }}
         />
       </Grid>
-      <Grid item xs={10} sm={8}>
+      <Grid size={{ xs: 10, sm: 8 }}>
         <FormControl size="small" fullWidth>
           <Select
             fullWidth
@@ -259,7 +259,7 @@ const WrappedVolumeControl = ({
           style={{ margin: 0 }}
         />
       </Grid>
-      <Grid item xs={2} sm={1} style={{ height: theme.spacing(8) }}>
+      <Grid size={{ xs: 2, sm: 1 }} style={{ height: theme.spacing(8) }}>
         {tempName !== '' && tempVol.capacity !== '' && tempVol.mount_path !== '' && tempVol.storage_class !== '' && (
           <Tooltip title={t('params.user.add')}>
             <IconButton
@@ -430,7 +430,7 @@ const WrappedContainerDialog = ({
         <DialogContent>
           <Grid container spacing={2}>
             {name !== null && (
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="subtitle2">{t('container.dialog.name')}</Typography>
                 <TextField
                   fullWidth
@@ -442,7 +442,7 @@ const WrappedContainerDialog = ({
                 />
               </Grid>
             )}
-            <Grid item xs={8}>
+            <Grid size={{ xs: 8 }}>
               <Typography variant="subtitle2">
                 {t('container.dialog.image')}
                 <ResetButton
@@ -464,7 +464,7 @@ const WrappedContainerDialog = ({
                 value={tempContainer.image}
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid size={{ xs: 4 }}>
               <Typography variant="subtitle2">
                 {t('container.dialog.registry_type')}
                 <ResetButton
@@ -491,7 +491,7 @@ const WrappedContainerDialog = ({
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="subtitle2">
                 {t('container.dialog.cpu')}
                 <ResetButton
@@ -514,7 +514,7 @@ const WrappedContainerDialog = ({
                 value={tempContainer.cpu_cores}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="subtitle2">
                 {t('container.dialog.ram')}
                 <ResetButton
@@ -528,7 +528,7 @@ const WrappedContainerDialog = ({
                 />
               </Typography>
               <Grid container spacing={1}>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     fullWidth
                     type="number"
@@ -539,7 +539,7 @@ const WrappedContainerDialog = ({
                     value={tempContainer.ram_mb_min}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     fullWidth
                     type="number"
@@ -552,7 +552,7 @@ const WrappedContainerDialog = ({
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="subtitle2">
                 {t('container.dialog.registry_username')}
                 <ResetButton
@@ -574,7 +574,7 @@ const WrappedContainerDialog = ({
                 value={tempContainer.registry_username ? tempContainer.registry_username : ''}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="subtitle2">
                 {t('container.dialog.registry_password')}
                 <ResetButton
@@ -596,7 +596,7 @@ const WrappedContainerDialog = ({
                 value={tempContainer.registry_password ? tempContainer.registry_password : ''}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="subtitle2">
                 {t('container.dialog.service_account')}
                 <ResetButton
@@ -618,7 +618,7 @@ const WrappedContainerDialog = ({
                 value={tempContainer.service_account ? tempContainer.service_account : ''}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="subtitle2">
                 {t('container.dialog.command')}
                 <ResetButton
@@ -640,7 +640,7 @@ const WrappedContainerDialog = ({
                 value={tempContainer.command ? tempContainer.command.join(' ') : ''}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="subtitle2">
                 {t('container.dialog.allow_internet')}
                 <ResetButton
@@ -658,27 +658,27 @@ const WrappedContainerDialog = ({
                 <FormControlLabel value={false} control={<Radio />} label={t('container.dialog.allow_internet.no')} />
               </RadioGroup>
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="subtitle2">{t('container.dialog.environment')}</Typography>
               {tempContainer.environment.map((env, i) => (
                 <Environment key={i} envVar={env} onUpdate={handleEnvAddUpdate} onDelete={handleEnvDelete} />
               ))}
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Environment onAdd={handleEnvAddUpdate} />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="subtitle2">{t('container.dialog.labels')}</Typography>
               {(tempContainer.labels || []).map((env, i) => (
                 <Environment key={i} envVar={env} onUpdate={handleLabelAddUpdate} onDelete={handleLabelDelete} />
               ))}
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Environment onAdd={handleLabelAddUpdate} />
             </Grid>
             {name !== null && (
               <>
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <Typography variant="subtitle2">{t('container.dialog.volumes')}</Typography>
                   {Object.keys(tempVolumes).map(vol_name => (
                     <VolumeControl
@@ -690,7 +690,7 @@ const WrappedContainerDialog = ({
                   ))}
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <VolumeControl onAdd={handleVolAdd} />
                 </Grid>
               </>

@@ -179,17 +179,17 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
 
   return param ? (
     <Grid container spacing={1} alignItems="center">
-      <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
+      <Grid size={{ xs: 10, sm: 3 }} style={{ wordBreak: 'break-word' }}>
         {`${param.name} [${param.type}]:`}
       </Grid>
-      <Grid item xs={2} sm={1}>
+      <Grid size={{ xs: 2, sm: 1 }}>
         <Tooltip title={t(param.hide ? 'params.user.show' : 'params.user.hide')}>
           <IconButton onClick={handleParamHide} size="large">
             {param.hide ? <VisibilityOffIcon /> : <VisibilityIcon />}
           </IconButton>
         </Tooltip>
       </Grid>
-      <Grid item xs={10} sm={7}>
+      <Grid size={{ xs: 10, sm: 7 }}>
         {param.type === 'bool' ? (
           <FormControl size="small" fullWidth>
             <Select
@@ -228,7 +228,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           />
         )}
       </Grid>
-      <Grid item xs={2} sm={1}>
+      <Grid size={{ xs: 2, sm: 1 }}>
         <Tooltip title={t('params.user.remove')}>
           <IconButton
             style={{
@@ -244,7 +244,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
     </Grid>
   ) : (
     <Grid container spacing={1} alignItems="center">
-      <Grid item xs={10} sm={3}>
+      <Grid size={{ xs: 10, sm: 3 }}>
         <TextField
           fullWidth
           size="small"
@@ -255,7 +255,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           style={{ margin: 0 }}
         />
       </Grid>
-      <Grid item xs={10} sm={2}>
+      <Grid size={{ xs: 10, sm: 2 }}>
         <FormControl size="small" fullWidth>
           <Select
             id="user_spec_params"
@@ -271,7 +271,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={10} sm={6}>
+      <Grid size={{ xs: 10, sm: 6 }}>
         {tempUserParams.type === 'bool' ? (
           <FormControl size="small" fullWidth>
             <Select
@@ -310,7 +310,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           />
         )}
       </Grid>
-      <Grid item xs={2} sm={1} style={{ height: theme.spacing(8) }}>
+      <Grid size={{ xs: 2, sm: 1 }} style={{ height: theme.spacing(8) }}>
         {tempUserParams.name !== '' && (
           <Tooltip title={t('params.user.add')}>
             <IconButton
@@ -325,7 +325,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           </Tooltip>
         )}
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <FormControlLabel
           control={
             <Checkbox

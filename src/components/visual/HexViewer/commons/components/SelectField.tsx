@@ -4,7 +4,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
-import { default as React, memo, PropsWithChildren, useState } from 'react';
+import { memo, PropsWithChildren, default as React, useState } from 'react';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -55,12 +55,12 @@ export const WrappedSelectField = ({
 
   return (
     <>
-      <Grid item sm={4} xs={12} style={{ wordBreak: 'break-word' }}>
+      <Grid size={{ xs: 12, sm: 4 }} style={{ wordBreak: 'break-word' }}>
         <Tooltip title={description} placement={upSM ? 'right' : 'bottom-start'}>
           <Typography variant="subtitle2">{label}</Typography>
         </Tooltip>
       </Grid>
-      <Grid item sm={8} xs={12} style={{ textAlign: 'right' }}>
+      <Grid size={{ xs: 12, sm: 8 }} style={{ textAlign: 'right' }}>
         <FormControl style={{ width: '100%' }} size={size}>
           <Select
             className={classes.select}

@@ -72,7 +72,7 @@ const WrappedTagSection: React.FC<Props> = ({ tag_group, tags, force = false }) 
                   <span style={{ fontWeight: 500 }}>{tag_type}</span>
                 </TooltipGrid>
 
-                <Grid item xs={12} sm={9} lg={10}>
+                <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
                   <AutoHideTagList
                     tag_type={tag_type}
                     items={tags[tag_type].map(item => {

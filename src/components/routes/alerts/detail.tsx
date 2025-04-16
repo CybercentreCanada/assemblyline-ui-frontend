@@ -190,11 +190,11 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
         {!inDrawer && (
           <div style={{ paddingBottom: theme.spacing(3), textAlign: 'left' }}>
             <Grid container alignItems="center">
-              <Grid item flexGrow={1}>
+              <Grid size="grow">
                 <Typography variant="h4">{t('detail.title')}</Typography>
               </Grid>
 
-              <Grid item style={{ display: 'flex', flexDirection: 'row', textAlign: 'right', flexGrow: 0 }}>
+              <Grid style={{ display: 'flex', flexDirection: 'row', textAlign: 'right', flexGrow: 0 }}>
                 <AlertHistory alert={alert} />
                 <AlertGroup alert={alert} />
                 <AlertOwnership alert={alert} />
@@ -213,7 +213,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
             </div>
           )}
           <Grid container spacing={1}>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               {/* Alert Information Section */}
               <div className={classes.section}>
                 <Typography className={classes.sectionTitle}>{t('alert_info')}</Typography>
@@ -221,38 +221,26 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 <div className={classes.sectionContent}>
                   <Grid container alignItems="center">
                     {/* Alert ID */}
-                    <Grid item xs={3} sm={2} md={4}>
-                      {t('alert_id')}
-                    </Grid>
-                    <Grid item xs={9} sm={10} md={8}>
+                    <Grid size={{ xs: 3, sm: 2, md: 4 }}>{t('alert_id')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10, md: 8 }}>
                       <span style={{ wordBreak: 'break-word' }}>{alert ? alert.alert_id : <Skeleton />}</span>
                     </Grid>
                     {/* Alert Type */}
-                    <Grid item xs={3} sm={2} md={4}>
-                      {t('type')}
-                    </Grid>
-                    <Grid item xs={9} sm={10} md={8}>
-                      {alert ? alert.type : <Skeleton />}
-                    </Grid>
+                    <Grid size={{ xs: 3, sm: 2, md: 4 }}>{t('type')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10, md: 8 }}>{alert ? alert.type : <Skeleton />}</Grid>
                     {/* Submission received date */}
-                    <Grid item xs={3} sm={2} md={4}>
-                      {t('received_date')}
-                    </Grid>
-                    <Grid item xs={9} sm={10} md={8}>
+                    <Grid size={{ xs: 3, sm: 2, md: 4 }}>{t('received_date')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10, md: 8 }}>
                       {alert ? `${alert.ts.replace('T', ' ').replace('Z', '')} (UTC)` : <Skeleton />}
                     </Grid>
                     {/* Alerted date */}
-                    <Grid item xs={3} sm={2} md={4}>
-                      {t('alerted_date')}
-                    </Grid>
-                    <Grid item xs={9} sm={10} md={8}>
+                    <Grid size={{ xs: 3, sm: 2, md: 4 }}>{t('alerted_date')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10, md: 8 }}>
                       {alert ? `${alert.reporting_ts.replace('T', ' ').replace('Z', '')} (UTC)` : <Skeleton />}
                     </Grid>
                     {/* Alert owner */}
-                    <Grid item xs={3} sm={2} md={4}>
-                      {t('ownership')}
-                    </Grid>
-                    <Grid item xs={9} sm={10} md={8}>
+                    <Grid size={{ xs: 3, sm: 2, md: 4 }}>{t('ownership')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10, md: 8 }}>
                       {alert ? (
                         alert.owner ? (
                           alert.owner
@@ -266,24 +254,18 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                       )}
                     </Grid>
                     {/* Alert Extended scan status */}
-                    <Grid item xs={3} sm={2} md={4}>
-                      {t('extended')}
-                    </Grid>
-                    <Grid item xs={9} sm={10} md={8} style={{ marginTop: theme.spacing(0.5) }}>
+                    <Grid size={{ xs: 3, sm: 2, md: 4 }}>{t('extended')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10, md: 8 }} style={{ marginTop: theme.spacing(0.5) }}>
                       {alert ? <AlertExtendedScan name={alert.extended_scan} withChip /> : <Skeleton />}
                     </Grid>
                     {/* Alert Priority */}
-                    <Grid item xs={3} sm={2} md={4}>
-                      {t('priority')}
-                    </Grid>
-                    <Grid item xs={9} sm={10} md={8} style={{ marginTop: theme.spacing(0.5) }}>
+                    <Grid size={{ xs: 3, sm: 2, md: 4 }}>{t('priority')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10, md: 8 }} style={{ marginTop: theme.spacing(0.5) }}>
                       {alert ? <AlertPriority name={alert ? alert.priority : null} withChip /> : <ChipSkeleton />}
                     </Grid>
                     {/* Alert Status */}
-                    <Grid item xs={3} sm={2} md={4}>
-                      {t('status')}
-                    </Grid>
-                    <Grid item xs={9} sm={10} md={8} style={{ marginTop: theme.spacing(0.5) }}>
+                    <Grid size={{ xs: 3, sm: 2, md: 4 }}>{t('status')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10, md: 8 }} style={{ marginTop: theme.spacing(0.5) }}>
                       {alert ? (
                         alert.status ? (
                           <AlertStatus name={alert.status} />
@@ -298,7 +280,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 </div>
               </div>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <div>
                 {/* Score Section. */}
                 <div className={classes.section}>
@@ -306,16 +288,14 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   <Divider />
                   <div className={classes.sectionContent}>
                     <Grid container>
-                      <Grid item xs={3} sm={2} md={4}>
-                        {t('score')}
-                      </Grid>
-                      <Grid item xs={9} sm={10} md={8}>
+                      <Grid size={{ xs: 3, sm: 2, md: 4 }}>{t('score')}</Grid>
+                      <Grid size={{ xs: 9, sm: 10, md: 8 }}>
                         {alert ? <Verdict size="tiny" score={alert.al.score} fullWidth /> : <Skeleton />}
                       </Grid>
-                      <Grid item xs={3} sm={2} md={4}>
+                      <Grid size={{ xs: 3, sm: 2, md: 4 }}>
                         <div style={{ marginTop: theme.spacing(0.5) }}>{t('user_verdict')}</div>
                       </Grid>
-                      <Grid item xs={9} sm={10} md={8}>
+                      <Grid size={{ xs: 9, sm: 10, md: 8 }}>
                         {alert ? (
                           <div style={{ marginTop: theme.spacing(0.5), marginBottom: theme.spacing(0.5) }}>
                             <VerdictBar verdicts={alert.verdict} />
@@ -367,8 +347,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
             >
               <Grid container>
                 <Grid
-                  item
-                  xs={12}
+                  size={{ xs: 12 }}
                   style={{ marginBottom: theme.spacing(1), display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}
                 >
                   <div style={{ marginRight: theme.spacing(1), wordBreak: 'break-word' }}>
@@ -385,7 +364,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                     {alert ? `${alert.file.size} (${(alert.file.size / 1024).toFixed(2)} Kb)` : <SkeletonInline />}
                   </Typography>
                 </Grid>
-                <Grid item xs={3} sm={2}>
+                <Grid size={{ xs: 3, sm: 2 }}>
                   <BsClipboard
                     className={classes.clipboardIcon}
                     onClick={alert ? () => copy(alert.file.md5, 'drawerTop') : null}
@@ -394,7 +373,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                     {'MD5:'}
                   </Typography>
                 </Grid>
-                <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
+                <Grid size={{ xs: 9, sm: 10 }} style={{ wordBreak: 'break-word' }}>
                   {alert ? (
                     <ActionableText
                       category="hash"
@@ -406,7 +385,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                     <SkeletonInline />
                   )}
                 </Grid>
-                <Grid item xs={3} sm={2}>
+                <Grid size={{ xs: 3, sm: 2 }}>
                   <BsClipboard
                     className={classes.clipboardIcon}
                     onClick={alert ? () => copy(alert.file.sha1, 'drawerTop') : null}
@@ -415,7 +394,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                     {'SHA1:'}
                   </Typography>
                 </Grid>
-                <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
+                <Grid size={{ xs: 9, sm: 10 }} style={{ wordBreak: 'break-word' }}>
                   {alert ? (
                     <ActionableText
                       category="hash"
@@ -427,7 +406,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                     <SkeletonInline />
                   )}
                 </Grid>
-                <Grid item xs={3} sm={2}>
+                <Grid size={{ xs: 3, sm: 2 }}>
                   <BsClipboard
                     className={classes.clipboardIcon}
                     onClick={alert ? () => copy(alert.file.sha256, 'drawerTop') : null}
@@ -436,7 +415,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                     {'SHA256:'}
                   </Typography>
                 </Grid>
-                <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
+                <Grid size={{ xs: 9, sm: 10 }} style={{ wordBreak: 'break-word' }}>
                   {alert ? (
                     <ActionableText
                       category="hash"
@@ -496,14 +475,12 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                         .map(k => (
                           <Grid container spacing={1} key={`alert-metadata-${k}`}>
                             <Grid
-                              item
-                              xs={3}
-                              sm={2}
+                              size={{ xs: 3, sm: 2 }}
                               style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                             >
                               {k}
                             </Grid>
-                            <Grid item xs={9} sm={10}>
+                            <Grid size={{ xs: 9, sm: 10 }}>
                               <ActionableText
                                 category="metadata"
                                 type={k}
@@ -531,14 +508,12 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                               .map(k => (
                                 <Grid container spacing={1} key={`alert-metadata-${k}`}>
                                   <Grid
-                                    item
-                                    xs={3}
-                                    sm={2}
+                                    size={{ xs: 3, sm: 2 }}
                                     style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                                   >
                                     {k}
                                   </Grid>
-                                  <Grid item xs={9} sm={10}>
+                                  <Grid size={{ xs: 9, sm: 10 }}>
                                     <ActionableText
                                       category="metadata"
                                       type={k}
@@ -590,10 +565,8 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 {/* AL Attributions Section */}
                 {!alert || alert.al.attrib.length !== 0 ? (
                   <>
-                    <Grid item xs={3} sm={2}>
-                      {t('attributions')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
+                    <Grid size={{ xs: 3, sm: 2 }}>{t('attributions')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10 }}>
                       <div className={classes.sectionContent}>
                         {alert && alert.al.detailed ? (
                           <ActionableChipList
@@ -639,10 +612,8 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 {/* AL AV Hits */}
                 {!alert || alert.al.av.length !== 0 ? (
                   <>
-                    <Grid item xs={3} sm={2}>
-                      {t('avhits')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
+                    <Grid size={{ xs: 3, sm: 2 }}>{t('avhits')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10 }}>
                       <div className={classes.sectionContent}>
                         {alert && alert.al.detailed ? (
                           <AutoHideChipList
@@ -671,14 +642,12 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 {/* IPs sections */}
                 {!alert || alert.al.ip.length !== 0 ? (
                   <>
-                    <Grid item xs={3} sm={2}>
-                      {t('ip')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
+                    <Grid size={{ xs: 3, sm: 2 }}>{t('ip')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10 }}>
                       <div className={classes.sectionContent}>
                         <Grid container spacing={1}>
                           {(!alert || alert.al.ip_dynamic.length !== 0) && (
-                            <Grid item xs={12} md={!alert || alert.al.ip_static.length !== 0 ? 6 : 12}>
+                            <Grid size={{ xs: 12, md: !alert || alert.al.ip_static.length !== 0 ? 6 : 12 }}>
                               <Typography variant="caption" component={'div'}>
                                 <i>{t('ip_dynamic')}</i>
                               </Typography>
@@ -704,7 +673,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             </Grid>
                           )}
                           {(!alert || alert.al.ip_static.length !== 0) && (
-                            <Grid item xs={12} md={!alert || alert.al.ip_dynamic.length !== 0 ? 6 : 12}>
+                            <Grid size={{ xs: 12, md: !alert || alert.al.ip_dynamic.length !== 0 ? 6 : 12 }}>
                               <Typography variant="caption" component={'div'}>
                                 <i>{t('ip_static')}</i>
                               </Typography>
@@ -738,14 +707,12 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 {/* Domains sections */}
                 {!alert || alert.al.domain.length !== 0 ? (
                   <>
-                    <Grid item xs={3} sm={2}>
-                      {t('domain')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
+                    <Grid size={{ xs: 3, sm: 2 }}>{t('domain')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10 }}>
                       <div className={classes.sectionContent}>
                         <Grid container spacing={1}>
                           {(!alert || alert.al.domain_dynamic.length !== 0) && (
-                            <Grid item xs={12} md={!alert || alert.al.domain_static.length !== 0 ? 6 : 12}>
+                            <Grid size={{ xs: 12, md: !alert || alert.al.domain_static.length !== 0 ? 6 : 12 }}>
                               <Typography variant="caption" component={'div'}>
                                 <i>{t('domain_dynamic')}</i>
                               </Typography>
@@ -773,7 +740,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             </Grid>
                           )}
                           {(!alert || alert.al.domain_static.length !== 0) && (
-                            <Grid item xs={12} md={!alert || alert.al.domain_dynamic.length !== 0 ? 6 : 12}>
+                            <Grid size={{ xs: 12, md: !alert || alert.al.domain_dynamic.length !== 0 ? 6 : 12 }}>
                               <Typography variant="caption" component={'div'}>
                                 <i>{t('domain_static')}</i>
                               </Typography>
@@ -809,14 +776,12 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 {/* uri sections */}
                 {!alert || (alert.al.uri && alert.al.uri.length !== 0) ? (
                   <>
-                    <Grid item xs={3} sm={2}>
-                      {t('uri')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
+                    <Grid size={{ xs: 3, sm: 2 }}>{t('uri')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10 }}>
                       <div className={classes.sectionContent}>
                         <Grid container spacing={1}>
                           {(!alert || alert.al.uri_dynamic.length !== 0) && (
-                            <Grid item xs={12} md={!alert || alert.al.uri_static.length !== 0 ? 6 : 12}>
+                            <Grid size={{ xs: 12, md: !alert || alert.al.uri_static.length !== 0 ? 6 : 12 }}>
                               <Typography variant="caption" component={'div'}>
                                 <i>{t('uri_dynamic')}</i>
                               </Typography>
@@ -842,7 +807,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             </Grid>
                           )}
                           {(!alert || alert.al.uri_static.length !== 0) && (
-                            <Grid item xs={12} md={!alert || alert.al.uri_dynamic.length !== 0 ? 6 : 12}>
+                            <Grid size={{ xs: 12, md: !alert || alert.al.uri_dynamic.length !== 0 ? 6 : 12 }}>
                               <Typography variant="caption" component={'div'}>
                                 <i>{t('uri_static')}</i>
                               </Typography>
@@ -876,10 +841,8 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 {/* Heuristics Section */}
                 {!alert || (alert.heuristic && alert.heuristic.name && alert.heuristic.name.length !== 0) ? (
                   <>
-                    <Grid item xs={3} sm={2}>
-                      {t('heuristic')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
+                    <Grid size={{ xs: 3, sm: 2 }}>{t('heuristic')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10 }}>
                       <div className={classes.sectionContent}>
                         {alert && alert.al.detailed ? (
                           <AutoHideChipList
@@ -910,10 +873,8 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 {/* AL Behaviours Section */}
                 {!alert || alert.al.behavior.length !== 0 ? (
                   <>
-                    <Grid item xs={3} sm={2}>
-                      {t('behaviors')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
+                    <Grid size={{ xs: 3, sm: 2 }}>{t('behaviors')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10 }}>
                       <div className={classes.sectionContent}>
                         {alert && alert.al.detailed ? (
                           <AutoHideChipList
@@ -942,10 +903,8 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 {/* YARA Hits */}
                 {!alert || alert.al.yara.length !== 0 ? (
                   <>
-                    <Grid item xs={3} sm={2}>
-                      {t('yara')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
+                    <Grid size={{ xs: 3, sm: 2 }}>{t('yara')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10 }}>
                       <div className={classes.sectionContent}>
                         {alert && alert.al.detailed ? (
                           <AutoHideChipList
@@ -974,13 +933,11 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 {/* Attack Section */}
                 {!alert || alert.attack.category.length !== 0 ? (
                   <>
-                    <Grid item xs={3} sm={2}>
-                      {t('attack')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
+                    <Grid size={{ xs: 3, sm: 2 }}>{t('attack')}</Grid>
+                    <Grid size={{ xs: 9, sm: 10 }}>
                       <div className={classes.sectionContent}>
                         <Grid container spacing={1}>
-                          <Grid item xs={12} md={6}>
+                          <Grid size={{ xs: 12, md: 6 }}>
                             <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component={'div'}>
                               <i>{t('attack_category')}</i>
                             </Typography>
@@ -1006,7 +963,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                               />
                             )}
                           </Grid>
-                          <Grid item xs={12} md={6}>
+                          <Grid size={{ xs: 12, md: 6 }}>
                             <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component={'div'}>
                               <i>{t('attack_pattern')}</i>
                             </Typography>

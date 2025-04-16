@@ -249,7 +249,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   return (
     <PageHeader isSticky>
       <Grid container>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <FilterListIcon />
@@ -265,7 +265,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <TablePagination
             className={classes.flexItem}
             labelRowsPerPage={t('pager.rows')}

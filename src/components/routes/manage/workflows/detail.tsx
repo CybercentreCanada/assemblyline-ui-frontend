@@ -92,11 +92,11 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
         <div style={{ textAlign: 'left' }}>
           <div style={{ paddingBottom: theme.spacing(2) }}>
             <Grid container alignItems="center">
-              <Grid item xs>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="h4">{t('title')}</Typography>
                 <Typography variant="caption">{workflow ? id : <Skeleton style={{ width: '10rem' }} />}</Typography>
               </Grid>
-              <Grid item xs={12} sm style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Grid size={{ xs: 12, sm: 'grow' }} style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <RunWorkflowAction id={id} workflow={workflow} />
                 <ShowRelatedAlertsAction id={id} workflow={workflow} />
                 <DuplicateWorkflowAction id={id} workflow={workflow} />
@@ -111,7 +111,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
             </Grid>
           </div>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="subtitle2">{t('name')}</Typography>
               {!workflow ? (
                 <Skeleton style={{ height: '2.5rem' }} />
@@ -126,7 +126,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                 />
               )}
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="subtitle2">{t('query')}</Typography>
               {!workflow ? (
                 <Skeleton style={{ height: '2.5rem' }} />
@@ -141,7 +141,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                 />
               )}
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="subtitle2">{t('labels')}</Typography>
               {!workflow ? (
                 <Skeleton style={{ height: '2.5rem' }} />
@@ -162,7 +162,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                 />
               )}
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Typography variant="subtitle2">{t('priority')}</Typography>
               {!workflow ? (
                 <Skeleton style={{ height: '2.5rem' }} />
@@ -177,7 +177,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                 />
               )}
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Typography variant="subtitle2">{t('status')}</Typography>
               {!workflow ? (
                 <Skeleton style={{ height: '2.5rem' }} />
@@ -196,34 +196,32 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
 
           <Grid style={{ paddingTop: theme.spacing(4) }}>
             <Grid container>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="h6">{t('statistics')}</Typography>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
                   {t('hits')}
                 </Typography>
                 <Grid container>
-                  <Grid item xs={3} sm={4} md={3} lg={3}>
+                  <Grid size={{ xs: 3, sm: 4, md: 3, lg: 3 }}>
                     <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
                   </Grid>
-                  <Grid item xs={9} sm={8} md={9} lg={9}>
-                    {workflow ? workflow.hit_count : 0}
-                  </Grid>
-                  <Grid item xs={3} sm={4} md={3} lg={3}>
+                  <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>{workflow ? workflow.hit_count : 0}</Grid>
+                  <Grid size={{ xs: 3, sm: 4, md: 3, lg: 3 }}>
                     <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
                   </Grid>
-                  <Grid item xs={9} sm={8} md={9} lg={9}>
+                  <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
                     {workflow && workflow.first_seen ? (
                       <Moment variant="fromNow">{workflow.first_seen}</Moment>
                     ) : (
                       t('hit.none')
                     )}
                   </Grid>
-                  <Grid item xs={3} sm={4} md={3} lg={3}>
+                  <Grid size={{ xs: 3, sm: 4, md: 3, lg: 3 }}>
                     <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
                   </Grid>
-                  <Grid item xs={9} sm={8} md={9} lg={9}>
+                  <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
                     {workflow && workflow.last_seen ? (
                       <Moment variant="fromNow">{workflow.last_seen}</Moment>
                     ) : (
@@ -232,15 +230,15 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                   </Grid>
                 </Grid>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
                   {t('details')}
                 </Typography>
                 <Grid container>
-                  <Grid item xs={3} sm={4} md={3} lg={3}>
+                  <Grid size={{ xs: 3, sm: 4, md: 3, lg: 3 }}>
                     <span style={{ fontWeight: 500 }}>{t('created_by')}:</span>
                   </Grid>
-                  <Grid item xs={9} sm={8} md={9} lg={9}>
+                  <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
                     {workflow && workflow.creator ? (
                       <>
                         {workflow.creator} {'['}
@@ -251,10 +249,10 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                       <Skeleton />
                     )}
                   </Grid>
-                  <Grid item xs={3} sm={4} md={3} lg={3}>
+                  <Grid size={{ xs: 3, sm: 4, md: 3, lg: 3 }}>
                     <span style={{ fontWeight: 500 }}>{t('edited_by')}:</span>
                   </Grid>
-                  <Grid item xs={9} sm={8} md={9} lg={9}>
+                  <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
                     {workflow && workflow.edited_by ? (
                       <>
                         {workflow.edited_by} {'['}
@@ -265,10 +263,10 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                       <Skeleton />
                     )}
                   </Grid>
-                  <Grid item xs={3} sm={4} md={3} lg={3}>
+                  <Grid size={{ xs: 3, sm: 4, md: 3, lg: 3 }}>
                     <span style={{ fontWeight: 500 }}>{t('origin')}:</span>
                   </Grid>
-                  <Grid item xs={9} sm={8} md={9} lg={9}>
+                  <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
                     {workflow && workflow ? workflow.origin : <Skeleton />}
                   </Grid>
                 </Grid>
@@ -278,13 +276,13 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
 
           {!currentUser.roles.includes('alert_view') ? null : (
             <>
-              <Grid item xs={12} style={{ paddingTop: '10px' }}>
+              <Grid size={{ xs: 12 }} style={{ paddingTop: '10px' }}>
                 <AlertHistogram id={id} />
               </Grid>
-              <Grid item xs={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+              <Grid size={{ xs: 12 }} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
                 <Typography variant="h6">{t('last10')}</Typography>
               </Grid>
-              <Grid item xs={12} style={{ paddingTop: '10px' }}>
+              <Grid size={{ xs: 12 }} style={{ paddingTop: '10px' }}>
                 <AlertResults id={id} />
               </Grid>
             </>

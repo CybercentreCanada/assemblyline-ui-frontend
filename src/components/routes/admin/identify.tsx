@@ -122,10 +122,10 @@ export default function AdminIdentify() {
       />
       <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
         <Grid container alignItems="center" spacing={1}>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Hidden lgDown>
               <Alert severity="warning">{t('warning')}</Alert>
             </Hidden>

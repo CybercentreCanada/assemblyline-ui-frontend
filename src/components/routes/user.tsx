@@ -112,7 +112,7 @@ const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => 
 function User({ username = null }: UserProps) {
   const { id } = useParams<ParamProps>();
   const location = useLocation();
-  const inputRef = useRef(null);
+  const inputRef = useRef();
   const { t } = useTranslation(['user']);
   const theme = useTheme();
   const navigate = useNavigate();
@@ -518,10 +518,10 @@ function User({ username = null }: UserProps) {
       />
 
       <Grid container spacing={2} justifyContent="center">
-        <Grid item xs={12} sm={12} md={3}>
+        <Grid size={{ xs: 12, sm: 12, md: 3 }}>
           <Grid container className={classes.group}>
             {id && (
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <div style={{ paddingBottom: sp4 }}>
                   {user ? (
                     <DeleteButton
@@ -543,7 +543,7 @@ function User({ username = null }: UserProps) {
                 </div>
               </Grid>
             )}
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               {user ? (
                 <>
                   <input
@@ -593,7 +593,7 @@ function User({ username = null }: UserProps) {
               )}
               <Typography gutterBottom>{user ? user.uname : <Skeleton />}</Typography>
             </Grid>
-            <Grid item style={{ marginTop: '2rem' }} xs={12}>
+            <Grid size={{ xs: 12 }} style={{ marginTop: '2rem' }}>
               <div style={{ paddingBottom: id ? 0 : sp4 }}>
                 {user ? (
                   <CustomChip
@@ -616,7 +616,7 @@ function User({ username = null }: UserProps) {
           </Grid>
         </Grid>
 
-        <Grid item sm={12} md={9} style={{ width: '100%' }}>
+        <Grid size={{ sm: 12, md: 9 }} style={{ width: '100%' }}>
           <Classification
             type={currentUser.is_admin ? 'picker' : 'pill'}
             size="medium"

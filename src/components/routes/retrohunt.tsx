@@ -301,11 +301,11 @@ export default function RetrohuntPage() {
       <PageFullWidth margin={4}>
         <div className={classes.header}>
           <Grid container alignItems="center">
-            <Grid item xs>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="h4">{t('title')}</Typography>
             </Grid>
             {currentUser.roles.includes('retrohunt_run') && (
-              <Grid className={classes.headerButton} item xs>
+              <Grid className={classes.headerButton} size={{ xs: 'grow' }}>
                 <Tooltip title={t('tooltip.add')}>
                   <IconButton color="success" size="large" onClick={handleOpenCreatePage}>
                     <AddCircleOutlineOutlinedIcon />

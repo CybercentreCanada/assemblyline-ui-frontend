@@ -159,10 +159,10 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <Typography variant="h6">{t('updater')}</Typography>
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <Typography variant="subtitle2">
           {t('updater.interval')}
           <ResetButton
@@ -173,7 +173,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           />
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={9}>
+          <Grid size={{ xs: 12, sm: 9 }}>
             <div style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}>
               <Slider
                 min={3600}
@@ -191,7 +191,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
               />
             </div>
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, sm: 3 }}>
             {service ? (
               <OutlinedInput
                 fullWidth
@@ -209,7 +209,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
         </Grid>
       </Grid>
 
-      <Grid item xs={12} sm={6}>
+      <Grid size={{ xs: 12, sm: 6 }}>
         <Typography variant="subtitle2">
           {t('updater.signatures')}
           <ResetButton
@@ -233,7 +233,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           <FormControlLabel value={false} control={<Radio />} label={t('updater.signatures.no')} />
         </RadioGroup>
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid size={{ xs: 12, sm: 6 }}>
         <Typography variant="subtitle2">
           {t('updater.wait')}
           <ResetButton
@@ -259,7 +259,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
       </Grid>
 
       {service && service.update_config.generates_signatures && (
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle2">
             {t('updater.signature_delimiter')}
             <ResetButton
@@ -281,10 +281,11 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           </Typography>
           <Grid container spacing={1}>
             <Grid
-              item
-              xs={12}
-              sm={service.update_config.signature_delimiter === 'custom' ? 7 : 12}
-              md={service.update_config.signature_delimiter === 'custom' ? 8 : 12}
+              size={{
+                xs: 12,
+                sm: service.update_config.signature_delimiter === 'custom' ? 7 : 12,
+                md: service.update_config.signature_delimiter === 'custom' ? 8 : 12
+              }}
             >
               <FormControl size="small" fullWidth>
                 <Select
@@ -307,7 +308,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
               </FormControl>
             </Grid>
             {service.update_config.signature_delimiter === 'custom' && (
-              <Grid item xs={12} sm={5} md={4}>
+              <Grid size={{ xs: 12, sm: 5, md: 4 }}>
                 <TextField
                   fullWidth
                   size="small"
@@ -322,7 +323,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
         </Grid>
       )}
 
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <Typography variant="subtitle2">{t('updater.sources')}</Typography>
         <SourceDialog
           open={editDialog}
@@ -366,7 +367,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
         )}
       </Grid>
 
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <SourceDialog
           open={dialog}
           source={{
