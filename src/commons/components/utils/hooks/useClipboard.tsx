@@ -1,4 +1,4 @@
-import { OptionsObject, useSnackbar } from 'notistack';
+import { type OptionsObject, useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 
 export default function useClipboard() {
@@ -11,16 +11,18 @@ export default function useClipboard() {
       vertical: 'bottom',
       horizontal: 'center'
     },
-    onClose: _snack => {
-      closeSnackbar();
+    SnackbarProps: {
+      onClick: () => {
+        closeSnackbar();
+      }
     }
   };
 
-  const copy = async (text: string, targetId = 'root') => {
+  const copy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
       enqueueSnackbar(`${text} ${t('clipboard.success')}`, { variant: 'success', ...snackBarOptions });
-    } catch (error) {
+    } catch {
       enqueueSnackbar(`${text} ${t('clipboard.failure')}`, { variant: 'error', ...snackBarOptions });
     }
   };

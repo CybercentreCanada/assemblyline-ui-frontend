@@ -4,7 +4,7 @@ import type {
   AppSiteMapConfigs,
   AppThemeConfigs,
   AppTopNavConfigs
-} from './AppConfigs';
+} from 'commons/components/app/AppConfigs';
 
 // AppPreferenceConfigs defaults.
 export const AppDefaultsPreferencesConfigs: AppPreferenceConfigs = {
@@ -26,22 +26,22 @@ export const AppDefaultsPreferencesConfigs: AppPreferenceConfigs = {
   allowLayoutSelection: true,
   allowThemeSelection: true,
   allowTranslate: true,
-  allowShowSafeResults: true,
-  avatarD: 'mp'
+  allowShowSafeResults: true
 };
 
 // AppLeftNavConfigs defaults.
 export const AppDefaultsLeftNavConfigs: AppLeftNavConfigs = {
   elements: [],
-  width: 240
+  width: 240,
+  hideNestedIcons: false,
+  longMenu: true
 };
 
 // AppTopNavConfigs defaults.
 export const AppDefaultsTopNavConfigs: AppTopNavConfigs = {
   themeSelectionMode: 'profile',
   quickSearchURI: '/search/',
-  quickSearchParam: 'q',
-  userMenuType: 'list'
+  quickSearchParam: 'q'
 };
 
 // AppSiteMapConfigs defaults.

@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
-import React, { memo } from 'react';
-import PageContent from './PageContent';
-import type { PageProps } from './hooks/usePageProps';
+import { type PageProps } from 'commons/components/pages/hooks/usePageProps';
+import PageContent from 'commons/components/pages/PageContent';
+import { memo } from 'react';
 
 type PageCenterProps = PageProps & {
   children: React.ReactNode;
@@ -31,7 +31,7 @@ const PageCenter = ({
         flexDirection: 'column',
         margin: '0 auto 0 auto',
         maxWidth,
-        [theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('sm')]: {
           maxWidth: '100%'
         }
       })}

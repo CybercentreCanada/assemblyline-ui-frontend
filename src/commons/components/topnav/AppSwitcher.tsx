@@ -1,4 +1,4 @@
-import AppsIcon from '@mui/icons-material/Apps';
+import { Apps } from '@mui/icons-material';
 import {
   Avatar,
   Button,
@@ -8,24 +8,16 @@ import {
   Link,
   Paper,
   Popper,
-  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useAppSwitcher from 'commons/components/app/hooks/useAppSwitcher';
-import React, { memo, useCallback, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import type { AppSwitcherItem } from '../app/AppConfigs';
+import { useAppSwitcher } from 'commons/components/app/hooks/useAppSwitcher';
+import { memo, useCallback, useRef, useState } from 'react';
 
-type AppsSwitcherProps = {
-  apps: AppSwitcherItem[];
-};
-
-const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
-  const { t } = useTranslation();
+const AppSwitcher = () => {
   const theme = useTheme();
-  const anchorRef = useRef(null);
+  const anchorRef = useRef<HTMLButtonElement>(undefined);
   const appSwitcher = useAppSwitcher();
   const [open, setOpen] = useState<boolean>(false);
   const isDarkTheme = theme.palette.mode === 'dark';
@@ -42,12 +34,8 @@ const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
 
   return (
     <ClickAwayListener onClickAway={onClickAway}>
-      <div>
-        <Tooltip title={t('apps')}>
-          <IconButton ref={anchorRef} color="inherit" onClick={onTogglePopper} size="large">
-            <AppsIcon />
-          </IconButton>
-        </Tooltip>
+      <IconButton ref={anchorRef} color="inherit" onClick={onTogglePopper} size="large">
+        <Apps />
         <Popper
           sx={{ zIndex: theme.zIndex.drawer + 2 }}
           open={open}
@@ -73,12 +61,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
                         target={a.newWindow ? '_blank' : null}
                         href={a.route}
                         key={`button-${i}`}
-                        style={{
-                          display: 'inherit',
-                          textDecoration: 'none',
-                          fontWeight: 400,
-                          color: theme.palette.text.primary
-                        }}
+                        style={{ display: 'inherit', textDecoration: 'none', fontWeight: 400, color: 'inherit' }}
                       >
                         <div style={{ display: 'inline-flex' }}>
                           <Avatar
@@ -125,7 +108,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
             </Fade>
           )}
         </Popper>
-      </div>
+      </IconButton>
     </ClickAwayListener>
   );
 };

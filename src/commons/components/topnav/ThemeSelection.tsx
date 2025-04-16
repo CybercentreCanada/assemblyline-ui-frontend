@@ -1,8 +1,8 @@
 import {
   Divider,
   List,
+  ListItem,
   ListItemButton,
-  ListItemSecondaryAction,
   ListItemText,
   ListSubheader,
   Switch,
@@ -10,18 +10,21 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useAppBreadcrumbs from 'commons/components/app/hooks/useAppBreadcrumbs';
-import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
-import useAppLanguage from 'commons/components/app/hooks/useAppLanguage';
-import useAppLayout from 'commons/components/app/hooks/useAppLayout';
-import useAppQuickSearch from 'commons/components/app/hooks/useAppQuickSearch';
-import useSafeResults from 'components/hooks/useSafeResults';
-import { memo } from 'react';
+import useLocalStorage from 'commons/components//utils/hooks/useLocalStorage';
+import { APP_STORAGE_PREFIX } from 'commons/components/app/AppConstants';
+import { AppThemePicker } from 'commons/components/app/AppThemePicker';
+import {
+  useAppBar,
+  useAppBreadcrumbs,
+  useAppConfigs,
+  useAppLanguage,
+  useAppLayout,
+  useAppQuickSearch,
+  useAppTheme
+} from 'commons/components/app/hooks';
+import { AppThemesContext } from 'commons/components/app/providers/AppThemesProvider';
+import { memo, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { APP_STORAGE_PREFIX } from '../app/AppConstants';
-import useAppBar from '../app/hooks/useAppBar';
-import useAppTheme from '../app/hooks/useAppTheme';
-import useLocalStorage from '../utils/hooks/useLocalStorage';
 
 const ThemeSelection = () => {
   const theme = useTheme();
@@ -33,10 +36,9 @@ const ThemeSelection = () => {
   const appbar = useAppBar();
   const appTheme = useAppTheme();
   const quicksearch = useAppQuickSearch();
+  const { themes } = useContext(configs.overrides?.providers?.themesProvider?.context ?? AppThemesContext);
   const localStorage = useLocalStorage(APP_STORAGE_PREFIX);
   const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
-
-  const { showSafeResults, toggleShowSafeResults } = useSafeResults();
 
   const clearStorage = () => {
     localStorage.clear();
@@ -47,7 +49,7 @@ const ThemeSelection = () => {
     <div>
       {configs.preferences.allowTranslate && (
         <List dense subheader={<ListSubheader disableSticky>{t('app.language')}</ListSubheader>}>
-          <ListItemButton dense onClick={language.toggle}>
+          <ListItemButton dense onClick={language.toggle} id="language">
             <ListItemText style={{ margin: 0 }}>
               <div
                 style={{
@@ -76,72 +78,89 @@ const ThemeSelection = () => {
       {configs.preferences.allowTranslate && configs.allowPersonalization && <Divider />}
       {configs.allowPersonalization && (
         <List dense subheader={<ListSubheader disableSticky>{t('personalization')}</ListSubheader>}>
-          {configs.preferences.allowThemeSelection && (
-            <ListItemButton onClick={appTheme.toggle}>
-              <ListItemText>{t('personalization.dark')}</ListItemText>
-              <ListItemSecondaryAction>
-                <Switch edge="end" onChange={appTheme.toggle} checked={theme.palette.mode === 'dark'} />
-              </ListItemSecondaryAction>
-            </ListItemButton>
-          )}
           {configs.preferences.allowLayoutSelection && (
-            <ListItemButton onClick={layout.toggle}>
-              <ListItemText>{t('personalization.sticky')}</ListItemText>
-              <ListItemSecondaryAction onClick={layout.toggle}>
-                <Switch edge="end" checked={layout.current === 'top'} />
-              </ListItemSecondaryAction>
-            </ListItemButton>
+            <ListItem
+              disablePadding
+              secondaryAction={<Switch edge="end" checked={layout.current === 'top'} onClick={layout.toggle} />}
+            >
+              <ListItemButton onClick={layout.toggle} id="personalization-sticky">
+                <ListItemText>{t('personalization.sticky')}</ListItemText>
+              </ListItemButton>
+            </ListItem>
           )}
-          {configs.preferences.allowQuickSearch && (
-            <ListItemButton onClick={quicksearch.toggle}>
-              <ListItemText>{t('personalization.quicksearch')}</ListItemText>
-              <ListItemSecondaryAction>
-                <Switch edge="end" checked={quicksearch.show} onClick={quicksearch.toggle} />
-              </ListItemSecondaryAction>
-            </ListItemButton>
+          {configs.preferences.allowQuickSearch && !isSmDown && (
+            <ListItem
+              disablePadding
+              secondaryAction={<Switch edge="end" checked={quicksearch.show} onClick={quicksearch.toggle} />}
+            >
+              <ListItemButton onClick={quicksearch.toggle}>
+                <ListItemText>{t('personalization.quicksearch')}</ListItemText>
+              </ListItemButton>
+            </ListItem>
           )}
           {configs.preferences.allowAutoHideTopbar && (
-            <ListItemButton disabled={layout.current === 'top'} onClick={appbar.toggleAutoHide}>
-              <ListItemText>{t('personalization.autohideappbar')}</ListItemText>
-              <ListItemSecondaryAction>
+            <ListItem
+              disablePadding
+              secondaryAction={
                 <Switch
                   edge="end"
                   disabled={layout.current === 'top'}
                   checked={appbar.autoHide && layout.current !== 'top'}
                   onClick={appbar.toggleAutoHide}
                 />
-              </ListItemSecondaryAction>
-            </ListItemButton>
+              }
+            >
+              <ListItemButton
+                disabled={layout.current === 'top'}
+                onClick={appbar.toggleAutoHide}
+                id="personalization-autohideappbar"
+              >
+                <ListItemText>{t('personalization.autohideappbar')}</ListItemText>
+              </ListItemButton>
+            </ListItem>
           )}
           {configs.preferences.allowBreadcrumbs && !isSmDown && (
-            <>
-              <ListItemButton onClick={breadcrumbs.toggle}>
+            <ListItem
+              disablePadding
+              secondaryAction={<Switch edge="end" checked={breadcrumbs.show} onClick={breadcrumbs.toggle} />}
+            >
+              <ListItemButton onClick={breadcrumbs.toggle} id="personalization-showbreadcrumbs">
                 <ListItemText>{t('personalization.showbreadcrumbs')}</ListItemText>
-                <ListItemSecondaryAction>
-                  <Switch edge="end" checked={breadcrumbs.show} onClick={breadcrumbs.toggle} />
-                </ListItemSecondaryAction>
               </ListItemButton>
-            </>
-          )}
-
-          {configs.preferences.allowShowSafeResults && (
-            <ListItemButton onClick={toggleShowSafeResults}>
-              <ListItemText>{t('personalization.showsaferesults')}</ListItemText>
-              <ListItemSecondaryAction>
-                <Switch edge="end" checked={showSafeResults} onClick={toggleShowSafeResults} />
-              </ListItemSecondaryAction>
-            </ListItemButton>
+            </ListItem>
           )}
         </List>
       )}
 
-      {(configs.preferences.allowTranslate || configs.allowPersonalization) && configs.preferences.allowReset && (
-        <Divider />
+      {configs.preferences.allowThemeSelection && (
+        <>
+          <Divider />
+          <List dense subheader={<ListSubheader disableSticky>{t('thememenu')}</ListSubheader>}>
+            {themes?.length > 1 && (
+              <ListItem sx={{ mb: 1 }}>
+                <AppThemePicker />
+              </ListItem>
+            )}
+            <ListItem
+              disablePadding
+              secondaryAction={<Switch edge="end" onChange={appTheme.toggle} checked={theme.palette.mode === 'dark'} />}
+            >
+              <ListItemButton onClick={appTheme.toggle} id="personalization -dark">
+                <ListItemText>{t('personalization.dark')}</ListItemText>
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </>
       )}
+
+      {(configs.preferences.allowThemeSelection ||
+        configs.preferences.allowTranslate ||
+        configs.allowPersonalization) &&
+        configs.preferences.allowReset && <Divider />}
 
       {configs.preferences.allowReset && (
         <List dense>
-          <ListItemButton dense onClick={clearStorage}>
+          <ListItemButton dense onClick={clearStorage} id="personalization-reset">
             <ListItemText>{t('personalization.reset_text')}</ListItemText>
           </ListItemButton>
         </List>

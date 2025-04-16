@@ -1,22 +1,41 @@
-import { Components, PaletteMode, PaletteOptions, Theme } from '@mui/material';
-import { ReactElement, ReactNode } from 'react';
-import { To } from 'react-router-dom';
-import { GravatarD } from '../display/AppAvatar';
-import { AppUserValidatedProp } from './AppUserService';
+import type { Components, PaletteMode, PaletteOptions, Theme, TypographyVariantsOptions } from '@mui/material';
+import type { AppBrandProps } from 'commons/branding/AppBrand';
+import type { AppBreadcrumbsContextType } from 'commons/components/app/AppContexts';
+import type { AppUserValidatedProp } from 'commons/components/app/AppUserService';
+import type { AppThemeContextProps } from 'commons/components/app/providers/AppThemesProvider';
+import type { Context, FC, HTMLAttributeAnchorTarget, PropsWithChildren, ReactElement, ReactNode } from 'react';
+import type { To } from 'react-router';
 
 // Specification interface for the 'useAppConfigs' hook.
 export type AppConfigs = {
+  overrides?: AppOverrideConfigs; // Application override of embedded TemplateUI elements.
   preferences?: AppPreferenceConfigs; // The app's preferences config.
   theme?: AppThemeConfigs; // The app's theme config.
   sitemap?: AppSiteMapConfigs; // The apps's sitemap configs.
 };
 
+export type CustomProvider<T> = {
+  provider: FC<PropsWithChildren>;
+  context?: Context<T>;
+  element?: FC;
+};
+
+// Specification interface for client application overrides.
+export type AppOverrideConfigs = {
+  providers: {
+    breadcrumbs: CustomProvider<AppBreadcrumbsContextType>;
+    styledEngine: CustomProvider<unknown>;
+    themesProvider: CustomProvider<AppThemeContextProps>;
+  };
+};
+
 // Specification interface for the AppProvider's 'preferences' attribute.
 export type AppPreferenceConfigs = {
-  appName: string; // Name of your app, it will show up in the drawer and the top nav bar
+  appName?: string; // Name of your app, it will show up in the drawer and the top nav bar
   appLink?: To; // Route to navigate to when the icon on the left nav bar is pressed
-  appIconDark: ReactElement<any>; // Small dark mode logo of your app used in drawer and top nav bar
-  appIconLight: ReactElement<any>; // Small light mode logo of your app used in drawer and top nav bar
+  appBrand?: { component: FC<AppBrandProps>; application: string }; // Application branding component and configs.
+  appIconDark?: ReactElement<any>; // Small dark mode logo of your app used in drawer and top nav bar
+  appIconLight?: ReactElement<any>; // Small light mode logo of your app used in drawer and top nav bar
   bannerDark?: ReactElement<any>; // Your dark mode app banner, will be use in the loading screen, login and logout pages
   bannerLight?: ReactElement<any>; // Your dark mode app banner, will be use in the loading screen, login and logout pages
   bannerVertDark?: ReactElement<any>; // Your dark mode app banner, will be use in the loading screen, login and logout pages
@@ -29,6 +48,7 @@ export type AppPreferenceConfigs = {
   allowLayoutSelection?: boolean; // Allow the user to switch between "top" and "side" layout
   allowThemeSelection?: boolean; // Allow the user to toggle between 'dark' and 'light' mode
   allowTranslate?: boolean; // Allow the user to switch language
+  allowFocusMode?: boolean; // Allow user to remove navigation elements (side nav, top bar) from layout.
   defaultLayout?: AppLayoutMode; // Either "top" (sticky topbar) or "side" (invisible top bar)
   defaultTheme?: PaletteMode; // The default theme of the application.  'dark' or 'light'.
   defaultDrawerOpen?: boolean; // Should the lef nav drawer be opened by default
@@ -36,15 +56,24 @@ export type AppPreferenceConfigs = {
   defaultAutoHideAppbar?: boolean; // Should the top bar autohide (applies only to "side" layout)
   defaultShowBreadcrumbs?: boolean; // Indicate whether breadcrumbs should be shown by default.
   allowShowSafeResults?: boolean; // Indicate whether Show Safe Results should be shown by default.
-  topnav?: AppTopNavConfigs; // top nav appbar specific configurations.
+  opnav?: AppTopNavConfigs; // top nav appbar specific configurations.
   leftnav?: AppLeftNavConfigs; // left nav drawer specific configurations.
-  avatarD?: GravatarD; // The gravatar api uses this parameter to generate a themed image unique to an email address.
+  notificationURLs?: string[]; // The list of notification URLs.  If no item is provided, the top nav icon is hidden.
+};
+
+// Specification interface for supported application themes.
+export type AppTheme = {
+  id: string; // Unique identifier for application theme.
+  configs: AppThemeConfigs; // Material UI theme configs.
+  i18nKey: string; // An i18nKey to use as the option displayed in the select menu.
+  default?: boolean; // Indicates if the theme should be default.
 };
 
 // Specification interface for the AppProvider's 'theme' attribute.
 export type AppThemeConfigs = {
   components?: Components<Omit<Theme, 'components'>>; // Override MaterialUI components styles.
   palette?: AppPaletteConfigs; // MaterialUI theme.palette configuration object.
+  typography?: TypographyVariantsOptions; //
   appbar?: AppBarThemeConfigs; // Appbar theme/style configuration.
 };
 
@@ -82,7 +111,8 @@ export type AppTopNavConfigs = {
 export type AppLeftNavConfigs = {
   elements: AppLeftNavElement[]; // The list of menu elements in the left navigation drawer
   width?: number; // The the width of the left nav drawer when open.
-  hideNestedIcons?: boolean; // Hide the icons for nested menu items
+  hideNestedIcons?: boolean; // Hide the icons for menu items nested within a group
+  longMenu?: boolean; // Stick expand/collapse to the bottom and make the inner menu scrollable.
 };
 
 // Specification interface to customize default material-ui 'light' and 'dark' themes.
@@ -138,7 +168,8 @@ export type AppLeftNavItem = {
   userPropValidators?: AppUserValidatedProp[]; // The list of user props to assert before rendering the item.
   icon?: ReactElement<any>; // The icon to render to the left of the 'text'.
   route?: string; // If specified, the leftnav item will render a Link component to this route.
-  nested?: boolean; // If the item should be rendered as a nested item.
+  target?: HTMLAttributeAnchorTarget | undefined; // If specified, the browser target for the route.
+  nested?: boolean; // If the item is within a group and rendered as a nested item. (defaults to true)
   render?: (open: boolean) => ReactElement; // If specified, will be used to render the left nav element (takes precendence over [i18nKey, text, icon, route])
 };
 
@@ -148,12 +179,12 @@ export type AppLeftNavGroup = {
   open?: boolean; // Indicates whether the leftnav group is open or closed.
   i18nKey?: string; // (RECOMMENDED over 'title') i18n key used to resolve item label/text. (Use this if you are dynamically updating the leftnav menu)
   title?: string; // The text/label to use when rendering the group header if not using i18nKey (for some reason).
+  userPropValidators?: AppUserValidatedProp[]; // The list of user props to assert before rendering the item.
   icon: React.ReactElement<any>; // The icon to render on the left of the group header's 'text'
   items: AppLeftNavItem[]; // A list of items to render for this group.
-  userPropValidators?: AppUserValidatedProp[]; // The list of user props to assert before rendering the item.
 };
 
-// Specification interface for an item provided to the app swithcer.
+// Specification interface for an item provided to the app switcher.
 export type AppSwitcherItem = {
   alt: string;
   name: string;
