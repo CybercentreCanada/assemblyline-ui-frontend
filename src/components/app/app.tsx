@@ -1,5 +1,4 @@
 // TODO: change syntax to "import type {theme}" to avoid potential problems like type-only imports being incorrectly bundled.
-import type { Theme } from '@mui/material/styles';
 import { useBorealis } from 'borealis-ui';
 import type { AppPreferenceConfigs, AppSiteMapConfigs, AppTheme } from 'commons/components/app/AppConfigs';
 import AppProvider from 'commons/components/app/AppProvider';
@@ -29,11 +28,11 @@ import { getProvider } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router';
 
-// Constructs the theme object with the default parameters
-declare module '@mui/styles/defaultTheme' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface DefaultTheme extends Theme {}
-}
+// TODO: Remove this. Constructs the theme object with the default parameters
+// declare module '@mui/styles/defaultTheme' {
+//   // eslint-disable-next-line @typescript-eslint/no-empty-interface
+//   interface DefaultTheme extends Theme {}
+// }
 
 type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos' | 'quota';
 
@@ -103,6 +102,7 @@ export const MyApp: React.FC = () => {
   const myThemes: AppTheme[] = useMyTheme();
   const mySitemap: AppSiteMapConfigs = useMySitemap();
   const myUser: AppUserService<CustomUser> = useMyUser();
+  // TODO: add this back in
   // const mySearch: AppSearchService<SearchItem> = useMySearch();
   // const myNotification = useMyNotification();
 
