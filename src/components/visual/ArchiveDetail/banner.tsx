@@ -13,7 +13,7 @@ import {
   Collapse,
   IconButton,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Popover,
@@ -534,8 +534,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                       }}
                     >
                       <List disablePadding>
-                        <ListItem
-                          button
+                        <ListItemButton
                           component={Link}
                           to={`/submit?hash=${file.file_info.sha256}`}
                           state={{
@@ -548,13 +547,13 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                             <TuneOutlinedIcon />
                           </ListItemIcon>
                           <ListItemText primary={t('resubmit.modify')} />
-                        </ListItem>
-                        <ListItem button dense onClick={resubmit}>
+                        </ListItemButton>
+                        <ListItemButton dense onClick={resubmit}>
                           <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                             <OndemandVideoOutlinedIcon />
                           </ListItemIcon>
                           <ListItemText primary={t('resubmit.dynamic')} />
-                        </ListItem>
+                        </ListItemButton>
                       </List>
                     </Popover>
                   </>

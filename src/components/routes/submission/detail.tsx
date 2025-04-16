@@ -23,7 +23,7 @@ import {
   IconButton,
   LinearProgress,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Popover,
@@ -1274,8 +1274,7 @@ function WrappedSubmissionDetail() {
                             }}
                           >
                             <List disablePadding>
-                              <ListItem
-                                button
+                              <ListItemButton
                                 component={Link}
                                 to={`/submit?hash=${submission.files[0].sha256}`}
                                 state={{
@@ -1289,28 +1288,28 @@ function WrappedSubmissionDetail() {
                                   <TuneOutlinedIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={t('resubmit.modify')} />
-                              </ListItem>
-                              <ListItem button dense onClick={() => resubmitWithType('dynamic')}>
+                              </ListItemButton>
+                              <ListItemButton dense onClick={() => resubmitWithType('dynamic')}>
                                 <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                   <OndemandVideoOutlinedIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={t('resubmit.dynamic')} />
-                              </ListItem>
+                              </ListItemButton>
                               {submissionProfiles &&
                                 Object.entries(submissionProfiles).map(([name, display]) => (
-                                  <ListItem key={name} button dense onClick={() => resubmitWithType(name)}>
+                                  <ListItemButton key={name} dense onClick={() => resubmitWithType(name)}>
                                     <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                       <OndemandVideoOutlinedIcon />
                                     </ListItemIcon>
                                     <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
-                                  </ListItem>
+                                  </ListItemButton>
                                 ))}
-                              <ListItem button dense onClick={resubmit}>
+                              <ListItemButton dense onClick={resubmit}>
                                 <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                   <RepeatOutlinedIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={t('resubmit.carbon_copy')} />
-                              </ListItem>
+                              </ListItemButton>
                             </List>
                           </Popover>
                         </>

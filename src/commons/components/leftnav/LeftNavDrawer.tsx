@@ -6,7 +6,7 @@ import {
   Divider,
   Drawer,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   styled,
@@ -123,10 +123,10 @@ const LeftNavDrawer = () => {
 
         <Tooltip title={leftnav.open ? '' : t('drawer.expand')} aria-label={t('drawer.expand')} placement="right">
           <List disablePadding>
-            <ListItem button key="chevron" onClick={leftnav.toggle}>
+            <ListItemButton key="chevron" onClick={leftnav.toggle}>
               <ListItemIcon>{leftnav.open ? <ChevronLeftIcon /> : <ChevronRightIcon />}</ListItemIcon>
               <ListItemText primary={t('drawer.collapse')} />
-            </ListItem>
+            </ListItemButton>
           </List>
         </Tooltip>
 

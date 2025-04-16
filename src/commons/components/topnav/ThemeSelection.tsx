@@ -1,7 +1,7 @@
 import {
   Divider,
   List,
-  ListItem,
+  ListItemButton,
   ListItemSecondaryAction,
   ListItemText,
   ListSubheader,
@@ -47,7 +47,7 @@ const ThemeSelection = () => {
     <div>
       {configs.preferences.allowTranslate && (
         <List dense subheader={<ListSubheader disableSticky>{t('app.language')}</ListSubheader>}>
-          <ListItem dense button onClick={language.toggle}>
+          <ListItemButton dense onClick={language.toggle}>
             <ListItemText style={{ margin: 0 }}>
               <div
                 style={{
@@ -70,38 +70,38 @@ const ThemeSelection = () => {
                 </Typography>
               </div>
             </ListItemText>
-          </ListItem>
+          </ListItemButton>
         </List>
       )}
       {configs.preferences.allowTranslate && configs.allowPersonalization && <Divider />}
       {configs.allowPersonalization && (
         <List dense subheader={<ListSubheader disableSticky>{t('personalization')}</ListSubheader>}>
           {configs.preferences.allowThemeSelection && (
-            <ListItem button onClick={appTheme.toggle}>
+            <ListItemButton onClick={appTheme.toggle}>
               <ListItemText>{t('personalization.dark')}</ListItemText>
               <ListItemSecondaryAction>
                 <Switch edge="end" onChange={appTheme.toggle} checked={theme.palette.mode === 'dark'} />
               </ListItemSecondaryAction>
-            </ListItem>
+            </ListItemButton>
           )}
           {configs.preferences.allowLayoutSelection && (
-            <ListItem button onClick={layout.toggle}>
+            <ListItemButton onClick={layout.toggle}>
               <ListItemText>{t('personalization.sticky')}</ListItemText>
               <ListItemSecondaryAction onClick={layout.toggle}>
                 <Switch edge="end" checked={layout.current === 'top'} />
               </ListItemSecondaryAction>
-            </ListItem>
+            </ListItemButton>
           )}
           {configs.preferences.allowQuickSearch && (
-            <ListItem button onClick={quicksearch.toggle}>
+            <ListItemButton onClick={quicksearch.toggle}>
               <ListItemText>{t('personalization.quicksearch')}</ListItemText>
               <ListItemSecondaryAction>
                 <Switch edge="end" checked={quicksearch.show} onClick={quicksearch.toggle} />
               </ListItemSecondaryAction>
-            </ListItem>
+            </ListItemButton>
           )}
           {configs.preferences.allowAutoHideTopbar && (
-            <ListItem button disabled={layout.current === 'top'} onClick={appbar.toggleAutoHide}>
+            <ListItemButton disabled={layout.current === 'top'} onClick={appbar.toggleAutoHide}>
               <ListItemText>{t('personalization.autohideappbar')}</ListItemText>
               <ListItemSecondaryAction>
                 <Switch
@@ -111,26 +111,26 @@ const ThemeSelection = () => {
                   onClick={appbar.toggleAutoHide}
                 />
               </ListItemSecondaryAction>
-            </ListItem>
+            </ListItemButton>
           )}
           {configs.preferences.allowBreadcrumbs && !isSmDown && (
             <>
-              <ListItem button onClick={breadcrumbs.toggle}>
+              <ListItemButton onClick={breadcrumbs.toggle}>
                 <ListItemText>{t('personalization.showbreadcrumbs')}</ListItemText>
                 <ListItemSecondaryAction>
                   <Switch edge="end" checked={breadcrumbs.show} onClick={breadcrumbs.toggle} />
                 </ListItemSecondaryAction>
-              </ListItem>
+              </ListItemButton>
             </>
           )}
 
           {configs.preferences.allowShowSafeResults && (
-            <ListItem button onClick={toggleShowSafeResults}>
+            <ListItemButton onClick={toggleShowSafeResults}>
               <ListItemText>{t('personalization.showsaferesults')}</ListItemText>
               <ListItemSecondaryAction>
                 <Switch edge="end" checked={showSafeResults} onClick={toggleShowSafeResults} />
               </ListItemSecondaryAction>
-            </ListItem>
+            </ListItemButton>
           )}
         </List>
       )}
@@ -141,9 +141,9 @@ const ThemeSelection = () => {
 
       {configs.preferences.allowReset && (
         <List dense>
-          <ListItem dense button onClick={clearStorage}>
+          <ListItemButton dense onClick={clearStorage}>
             <ListItemText>{t('personalization.reset_text')}</ListItemText>
-          </ListItem>
+          </ListItemButton>
         </List>
       )}
     </div>

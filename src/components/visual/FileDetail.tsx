@@ -12,7 +12,7 @@ import {
   Grid,
   IconButton,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Popover,
@@ -487,8 +487,7 @@ const WrappedFileDetail: React.FC<Props> = ({
                       }}
                     >
                       <List disablePadding>
-                        <ListItem
-                          button
+                        <ListItemButton
                           component={Link}
                           to={`/submit?hash=${file.file_info.sha256}`}
                           state={{
@@ -501,21 +500,21 @@ const WrappedFileDetail: React.FC<Props> = ({
                             <TuneOutlinedIcon />
                           </ListItemIcon>
                           <ListItemText primary={t('resubmit.modify')} />
-                        </ListItem>
-                        <ListItem button dense onClick={() => resubmit('dynamic')}>
+                        </ListItemButton>
+                        <ListItemButton dense onClick={() => resubmit('dynamic')}>
                           <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                             <OndemandVideoOutlinedIcon />
                           </ListItemIcon>
                           <ListItemText primary={t('resubmit.dynamic')} />
-                        </ListItem>
+                        </ListItemButton>
                         {submissionProfiles &&
                           Object.entries(submissionProfiles).map(([name, display]) => (
-                            <ListItem key={name} button dense onClick={() => resubmit(name)}>
+                            <ListItemButton key={name} dense onClick={() => resubmit(name)}>
                               <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                 <OndemandVideoOutlinedIcon />
                               </ListItemIcon>
                               <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
-                            </ListItem>
+                            </ListItemButton>
                           ))}
                       </List>
                     </Popover>

@@ -1,6 +1,6 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, List, ListItem, ListItemIcon, ListItemText, Popover, Tooltip } from '@mui/material';
+import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Popover, Tooltip } from '@mui/material';
 import LeftNavItem from 'commons/components/leftnav/LeftNavItem';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,11 +20,11 @@ const WrappedGroupListItem = ({ group, leftNavOpen, collapsed, onClick }: GroupL
   const title = group.i18nKey ? t(group.i18nKey) : group.title;
   return (
     <Tooltip title={!leftNavOpen ? title : ''} aria-label={title} placement="right">
-      <ListItem button key={group.id} onClick={onClick}>
+      <ListItemButton key={group.id} onClick={onClick}>
         <ListItemIcon>{group.icon}</ListItemIcon>
         <ListItemText primary={title} />
         {collapsed ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
-      </ListItem>
+      </ListItemButton>
     </Tooltip>
   );
 };

@@ -7,6 +7,7 @@ import {
   LinearProgress,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   ListSubheader,
@@ -123,10 +124,10 @@ const UserProfile = () => {
                 a.element ? (
                   <ListItem key={`${type}-${i}`}>{a.element}</ListItem>
                 ) : (
-                  <ListItem button component={Link} to={a.route} key={`${type}-${i}`}>
+                  <ListItemButton component={Link} to={a.route} key={`${type}-${i}`}>
                     {a.icon && <ListItemIcon>{a.icon}</ListItemIcon>}
                     <ListItemText>{a.i18nKey ? t(a.i18nKey) : a.title}</ListItemText>
-                  </ListItem>
+                  </ListItemButton>
                 )
               )}
             </List>
