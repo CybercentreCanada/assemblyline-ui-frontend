@@ -7,7 +7,7 @@ import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { Card, Grid, IconButton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -130,7 +130,7 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
             <Grid size={{ xs: 12, md: 8 }}>
               <label>{t('file_info')}</label>
               <div style={{ wordBreak: 'break-all' }}>
-                <BsClipboard className={classes.clipboardIcon} onClick={() => copy(error.sha256, 'drawerTop')} />
+                <BsClipboard className={classes.clipboardIcon} onClick={() => copy(error.sha256)} />
                 {error.sha256}
               </div>
             </Grid>

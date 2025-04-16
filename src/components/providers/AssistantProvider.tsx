@@ -24,7 +24,7 @@ import MuiPopper from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import type { AppUser } from 'commons/components/app/AppUserService';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import AppAvatar from 'commons/components/display/AppAvatar';
 import { isEnter } from 'commons/components/utils/keyboard';
 import useALContext from 'components/hooks/useALContext';

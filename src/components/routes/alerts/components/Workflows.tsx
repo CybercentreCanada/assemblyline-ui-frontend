@@ -19,7 +19,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import makeStyles from '@mui/styles/makeStyles';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { AlertItem } from 'components/models/base/alert';
@@ -202,8 +202,8 @@ export const AlertWorkflowDrawer = React.memo(
                 {isSingleAlert
                   ? t('workflow.impact.low')
                   : hasParams
-                  ? t('workflow.impact.high')
-                  : t('workflow.impact.all')}
+                    ? t('workflow.impact.high')
+                    : t('workflow.impact.all')}
               </Alert>
             </div>
 

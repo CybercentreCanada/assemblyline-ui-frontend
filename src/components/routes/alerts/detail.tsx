@@ -6,7 +6,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import { Fetcher } from 'borealis-ui';
 import ListCarousel from 'commons/addons/lists/carousel/ListCarousel';
 import ListNavigator from 'commons/addons/lists/navigator/ListNavigator';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
@@ -365,10 +365,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   </Typography>
                 </Grid>
                 <Grid size={{ xs: 3, sm: 2 }}>
-                  <BsClipboard
-                    className={classes.clipboardIcon}
-                    onClick={alert ? () => copy(alert.file.md5, 'drawerTop') : null}
-                  />
+                  <BsClipboard className={classes.clipboardIcon} onClick={alert ? () => copy(alert.file.md5) : null} />
                   <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
                     {'MD5:'}
                   </Typography>
@@ -386,10 +383,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   )}
                 </Grid>
                 <Grid size={{ xs: 3, sm: 2 }}>
-                  <BsClipboard
-                    className={classes.clipboardIcon}
-                    onClick={alert ? () => copy(alert.file.sha1, 'drawerTop') : null}
-                  />
+                  <BsClipboard className={classes.clipboardIcon} onClick={alert ? () => copy(alert.file.sha1) : null} />
                   <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
                     {'SHA1:'}
                   </Typography>
@@ -409,7 +403,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 <Grid size={{ xs: 3, sm: 2 }}>
                   <BsClipboard
                     className={classes.clipboardIcon}
-                    onClick={alert ? () => copy(alert.file.sha256, 'drawerTop') : null}
+                    onClick={alert ? () => copy(alert.file.sha256) : null}
                   />
                   <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
                     {'SHA256:'}

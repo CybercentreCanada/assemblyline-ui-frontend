@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
+import { useAppUser } from 'commons/components/app/hooks';
 import useAppBannerVert from 'commons/components/app/hooks/useAppBannerVert';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import useALContext from 'components/hooks/useALContext';
 import type { Role, Scope } from 'components/models/base/user';

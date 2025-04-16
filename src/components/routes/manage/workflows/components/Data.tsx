@@ -1,4 +1,4 @@
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Alert } from 'components/models/base/alert';
 import type { SearchResult } from 'components/models/ui/search';

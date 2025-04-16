@@ -56,7 +56,7 @@ export type AppPreferenceConfigs = {
   defaultAutoHideAppbar?: boolean; // Should the top bar autohide (applies only to "side" layout)
   defaultShowBreadcrumbs?: boolean; // Indicate whether breadcrumbs should be shown by default.
   allowShowSafeResults?: boolean; // Indicate whether Show Safe Results should be shown by default.
-  opnav?: AppTopNavConfigs; // top nav appbar specific configurations.
+  topnav?: AppTopNavConfigs; // top nav appbar specific configurations.
   leftnav?: AppLeftNavConfigs; // left nav drawer specific configurations.
   notificationURLs?: string[]; // The list of notification URLs.  If no item is provided, the top nav icon is hidden.
 };

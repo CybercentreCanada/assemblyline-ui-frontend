@@ -10,8 +10,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useAppTheme from 'commons/components/app/hooks/useAppTheme';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppTheme, useAppUser } from 'commons/components/app/hooks';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';

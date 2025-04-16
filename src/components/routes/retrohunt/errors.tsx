@@ -4,7 +4,7 @@ import { AlertTitle, Divider, Grid, Pagination, Paper, Skeleton, Typography, use
 import LinearProgress from '@mui/material/LinearProgress';
 import TableContainer from '@mui/material/TableContainer';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Retrohunt } from 'components/models/base/retrohunt';

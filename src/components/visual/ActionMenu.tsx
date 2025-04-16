@@ -193,7 +193,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   );
 
   const handleMenuCopy = useCallback(() => {
-    copy(value, 'clipID');
+    copy(value);
     handleClose();
   }, [copy, handleClose, value]);
 

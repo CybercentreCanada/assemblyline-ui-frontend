@@ -2,7 +2,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import { Menu, MenuItem } from '@mui/material';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -75,7 +75,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
   }, []);
 
   const handleMenuCopy = useCallback(() => {
-    copy(text, 'clipID');
+    copy(text);
     handleClose();
   }, [copy, handleClose, text]);
 

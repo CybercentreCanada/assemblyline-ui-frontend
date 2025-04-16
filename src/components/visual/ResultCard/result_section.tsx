@@ -206,7 +206,7 @@ const WrappedResultSection: React.FC<Props> = ({
   }, [showHeur, handleClose]);
 
   const handleMenuCopy = useCallback(() => {
-    copy(typeof section.body === 'string' ? section.body : JSON.stringify(section.body, undefined, 2), 'clipID');
+    copy(typeof section.body === 'string' ? section.body : JSON.stringify(section.body, undefined, 2));
     handleClose();
   }, [copy, handleClose, section.body]);
 

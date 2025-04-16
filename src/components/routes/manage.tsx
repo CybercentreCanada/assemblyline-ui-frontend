@@ -1,4 +1,4 @@
-import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
+import { useAppConfigs } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import LinkGrid from 'components/layout/linkgrid';

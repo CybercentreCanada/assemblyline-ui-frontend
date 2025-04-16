@@ -1,5 +1,5 @@
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
-import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import { useAppBanner } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';

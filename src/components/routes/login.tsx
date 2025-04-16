@@ -2,9 +2,8 @@
 import { Box, Button, CircularProgress, Link, Stack, Typography } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import { useAppBanner, useAppLayout } from 'commons/components/app/hooks';
 import useAppBannerVert from 'commons/components/app/hooks/useAppBannerVert';
-import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';

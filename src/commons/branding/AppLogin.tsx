@@ -57,12 +57,26 @@ const UserLoginForm = () => {
       }
 
       setUser({
-        username: 'user',
-        name: 'Default User',
-        email: 'user@cyber.gc.ca',
+        api_quota: 0,
+        apikeys: undefined,
+        apps: undefined,
         avatar: 'https://img.icons8.com/cotton/2x/gender-neutral-user--v1.png',
+        can_impersonate: false,
+        classification: '',
+        dynamic_group: '',
+        email: 'user@cyber.gc.ca',
+        groups: [],
+        id: '',
+        is_active: false,
         is_admin: true,
-        roles: ['administration']
+        name: 'Default User',
+        password: '',
+        roles: ['administration'],
+        security_tokens: [],
+        submission_quota: 0,
+        type: [],
+        uname: '',
+        username: 'user'
       });
       return true;
     },
