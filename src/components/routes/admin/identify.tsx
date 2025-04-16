@@ -1,5 +1,5 @@
 import { loader } from '@monaco-editor/react';
-import { Alert, Grid, Hidden, Paper, Tab, Tabs, Typography, useTheme } from '@mui/material';
+import { Alert, Box, Grid, Paper, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
@@ -126,9 +126,9 @@ export default function AdminIdentify() {
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <Hidden lgDown>
+            <Box sx={{ display: { xs: 'block', lg: 'none' } }}>
               <Alert severity="warning">{t('warning')}</Alert>
-            </Hidden>
+            </Box>
           </Grid>
         </Grid>
       </div>

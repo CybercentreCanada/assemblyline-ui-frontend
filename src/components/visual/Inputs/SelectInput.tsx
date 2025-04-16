@@ -138,7 +138,7 @@ const WrappedSelectInput = ({
             disabled={disabled}
             displayEmpty
             fullWidth
-            placeholder={placeholder}
+            // TODO: Add placeholder
             readOnly={readOnly}
             size="small"
             value={options.some(o => o.value === value) ? value : ''}

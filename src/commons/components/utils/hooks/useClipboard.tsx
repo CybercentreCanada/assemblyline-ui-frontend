@@ -11,7 +11,7 @@ export default function useClipboard() {
       vertical: 'bottom',
       horizontal: 'center'
     },
-    onClick: _snack => {
+    onClose: _snack => {
       closeSnackbar();
     }
   };

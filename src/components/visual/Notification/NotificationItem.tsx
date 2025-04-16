@@ -206,7 +206,8 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
           {notification.content_md && notification.content_md !== '' ? (
             <div className={classes.content}>
               <Markdown
-                className={classes.description}
+                // TODO: check this
+                // className={classes.description}
                 components={{ a: props => <Link href={props.href}>{props.children}</Link> }}
                 children={notification.content_md}
               />
