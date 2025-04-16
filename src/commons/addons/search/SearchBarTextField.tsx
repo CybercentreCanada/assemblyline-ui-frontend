@@ -105,8 +105,8 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     items: options
   });
   const [open, setOpen] = useState<boolean>(false);
-  const element = useRef<HTMLDivElement>();
-  const optionsElement = useRef<HTMLDivElement>();
+  const element = useRef<HTMLDivElement>(null);
+  const optionsElement = useRef<HTMLDivElement>(null);
   const isLTEMedium = useMediaQuery(theme.breakpoints.up('md'));
 
   // Ensure we update options if a new list is provided.

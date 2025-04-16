@@ -25,7 +25,7 @@ type AppsSwitcherProps = {
 const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const anchorRef = useRef();
+  const anchorRef = useRef(null);
   const appSwitcher = useAppSwitcher();
   const [open, setOpen] = useState<boolean>(false);
   const isDarkTheme = theme.palette.mode === 'dark';

@@ -112,7 +112,7 @@ const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => 
 function User({ username = null }: UserProps) {
   const { id } = useParams<ParamProps>();
   const location = useLocation();
-  const inputRef = useRef();
+  const inputRef = useRef(null);
   const { t } = useTranslation(['user']);
   const theme = useTheme();
   const navigate = useNavigate();

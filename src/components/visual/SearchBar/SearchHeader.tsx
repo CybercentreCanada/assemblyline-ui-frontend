@@ -118,7 +118,7 @@ const WrappedPopoverChip = ({ chip, popover, children }: PopoverChipProps) => {
 
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 
-  const ref = useRef();
+  const ref = useRef(null);
 
   const handleClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);
@@ -240,8 +240,8 @@ const WrappedSearchHeader = ({
 
   const [queryValue, setQueryValue] = useState<string>(!params.has(queryKey) ? defaultQuery : params.get(queryKey));
 
-  const rootRef = useRef<HTMLInputElement>();
-  const inputRef = useRef<HTMLInputElement>();
+  const rootRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const filters = useMemo(() => params.getAll(filtersKey) || defaultFilters, [defaultFilters, filtersKey, params]);
 

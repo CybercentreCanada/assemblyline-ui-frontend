@@ -447,10 +447,10 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                                           ? '#414f65'
                                           : '#BADDFB'
                                         : message.isError
-                                        ? theme.palette.mode === 'dark'
-                                          ? '#4f1717'
-                                          : '#ffe2e2'
-                                        : theme.palette.background.paper
+                                          ? theme.palette.mode === 'dark'
+                                            ? '#4f1717'
+                                            : '#ffe2e2'
+                                          : theme.palette.background.paper
                                     }}
                                   >
                                     <AIMarkdown markdown={message.content} truncated={false} dense />

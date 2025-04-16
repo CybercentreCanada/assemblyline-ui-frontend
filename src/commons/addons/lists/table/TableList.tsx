@@ -85,11 +85,11 @@ export default function TableList<T extends LineItem>(props: TableListProps<T>) 
   const classes = useTableStyles();
 
   // refs
-  const containerRef = useRef<HTMLDivElement>();
-  const headerRef = useRef<HTMLDivElement>();
-  const bodyOuterRef = useRef<HTMLDivElement>();
-  const bodyInnerRef = useRef<HTMLDivElement>();
-  const bodyContentRef = useRef<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const bodyOuterRef = useRef<HTMLDivElement>(null);
+  const bodyInnerRef = useRef<HTMLDivElement>(null);
+  const bodyContentRef = useRef<HTMLDivElement>(null);
 
   // Scroll hook to monitor position of scrollbar.
   // TODO: implement infinite scroll support.

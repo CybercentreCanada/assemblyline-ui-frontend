@@ -28,8 +28,8 @@ loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 export default function AdminActions() {
   const { t, i18n } = useTranslation(['adminActions']);
   const theme = useTheme();
-  const containerEL = useRef<HTMLDivElement>();
-  const containerDialogEL = useRef<HTMLDivElement>();
+  const containerEL = useRef<HTMLDivElement>(null);
+  const containerDialogEL = useRef<HTMLDivElement>(null);
   const [actions, setActions] = useState(null);
   const [originalActions, setOriginalActions] = useState(null);
   const [open, setOpen] = useState(false);

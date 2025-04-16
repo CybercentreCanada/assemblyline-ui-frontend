@@ -1,8 +1,8 @@
-import { Paper } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import Divider from '@mui/material/Divider';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShareIcon from '@mui/icons-material/Share';
+import { Paper } from '@mui/material';
+import Divider from '@mui/material/Divider';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { memo, PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HexSearchBar, HexSearchTypes, StoreProps, TooltipIconButton, useDispatch } from '../..';

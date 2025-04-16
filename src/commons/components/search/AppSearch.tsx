@@ -26,26 +26,27 @@ import AppSearchResult from './AppSearchResult';
 
 const MENU_LIST_SX = { maxHeight: 500, overflow: 'auto' };
 
-const AppSearchRoot = styled(Box, { shouldForwardProp: prop => prop !== 'menuOpen' })<{ menuOpen: boolean }>(
-  ({ theme, menuOpen }) => {
-    const backgroundColor = emphasize(theme.palette.background.default, theme.palette.mode === 'dark' ? 0.1 : 0.033);
-    return {
-      position: 'relative',
-      borderRadius: theme.shape.borderRadius,
-      '.app-search-input': {
-        backgroundColor: backgroundColor,
-        boxShadow: menuOpen && theme.shadows[4]
-      },
-      '.app-search-result': {
-        backgroundColor: theme.palette.mode === 'dark' ? backgroundColor : theme.palette.background.default,
-        borderBottomLeftRadius: theme.shape.borderRadius,
-        borderBottomRightRadius: theme.shape.borderRadius,
-        boxShadow: menuOpen && theme.shadows[4],
-        color: theme.palette.text.primary
-      }
-    };
-  }
-);
+const AppSearchRoot = styled(Box, { shouldForwardProp: prop => prop !== 'menuOpen' })<{ menuOpen: boolean }>(({
+  theme,
+  menuOpen
+}) => {
+  const backgroundColor = emphasize(theme.palette.background.default, theme.palette.mode === 'dark' ? 0.1 : 0.033);
+  return {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    '.app-search-input': {
+      backgroundColor: backgroundColor,
+      boxShadow: menuOpen && theme.shadows[4]
+    },
+    '.app-search-result': {
+      backgroundColor: theme.palette.mode === 'dark' ? backgroundColor : theme.palette.background.default,
+      borderBottomLeftRadius: theme.shape.borderRadius,
+      borderBottomRightRadius: theme.shape.borderRadius,
+      boxShadow: menuOpen && theme.shadows[4],
+      color: theme.palette.text.primary
+    }
+  };
+});
 
 const ModalTransition = forwardRef(function Transition(props: any, ref: any) {
   const { children, ..._props } = props;

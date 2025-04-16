@@ -23,8 +23,8 @@ loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
-  const containerEL = useRef<HTMLDivElement>();
-  const containerDialogEL = useRef<HTMLDivElement>();
+  const containerEL = useRef<HTMLDivElement>(null);
+  const containerDialogEL = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();

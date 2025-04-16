@@ -42,8 +42,8 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
   ({ behavior = 'smooth', children = null }: TableOfContentProps) => {
     const form = useForm();
 
-    const rootRef = useRef<HTMLDivElement>();
-    const headerRef = useRef<HTMLDivElement>();
+    const rootRef = useRef<HTMLDivElement>(null);
+    const headerRef = useRef<HTMLDivElement>(null);
 
     const Anchors = useMemo<TableOfContentContextProps['Anchors']>(
       () =>

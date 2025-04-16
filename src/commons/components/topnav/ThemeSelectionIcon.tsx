@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const ThemeSelectionIcon = () => {
-  const anchorEl = useRef();
+  const anchorEl = useRef(null);
   const { t } = useTranslation();
   const theme = useTheme();
   const { allowPersonalization, preferences } = useAppConfigs();

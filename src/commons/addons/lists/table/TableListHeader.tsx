@@ -109,7 +109,7 @@ const TableListHeaderCellMenu = memo(
     const { t } = useTranslation();
     const { icon } = useSorters();
     const classes = useTableStyles();
-    const actionMenuRef = useRef();
+    const actionMenuRef = useRef(null);
 
     const onDeleteSorter = () => {
       onSort('remove', sorter);

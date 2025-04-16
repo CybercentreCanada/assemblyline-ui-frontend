@@ -37,8 +37,8 @@ export default function AdminTagSafelist() {
   const [originalTagSafelist, setOriginalTagSafelist] = useState<string>(null);
   const [open, setOpen] = useState<boolean>(false);
 
-  const containerEL = useRef<HTMLDivElement>();
-  const containerDialogEL = useRef<HTMLDivElement>();
+  const containerEL = useRef<HTMLDivElement>(null);
+  const containerDialogEL = useRef<HTMLDivElement>(null);
 
   useEffectOnce(() => {
     if (currentUser.is_admin) {

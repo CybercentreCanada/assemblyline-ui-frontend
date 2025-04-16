@@ -211,7 +211,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   const fileName = file ? params.get('name') || sha256 : null;
   const popoverOpen = Boolean(resubmitAnchor);
 
-  const ref = useRef<HTMLDivElement>();
+  const ref = useRef<HTMLDivElement>(null);
 
   const isURI = useMemo<boolean>(() => file?.file_info?.type.startsWith('uri/'), [file?.file_info?.type]);
 

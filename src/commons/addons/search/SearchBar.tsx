@@ -72,7 +72,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const { t } = useTranslation();
   const theme = useTheme();
   const classes = useStyles();
-  const element = useRef<HTMLInputElement>();
+  const element = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState<string>(initValue);
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
 

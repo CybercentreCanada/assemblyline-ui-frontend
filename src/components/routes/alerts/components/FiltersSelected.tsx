@@ -209,8 +209,8 @@ const WrappedAlertFiltersSelected = ({
           filter.filter !== f
             ? f
             : filter.not
-            ? f.replace(`NOT(${filter.value})`, filter.value)
-            : f.replace(filter.value, `NOT(${filter.value})`)
+              ? f.replace(`NOT(${filter.value})`, filter.value)
+              : f.replace(filter.value, `NOT(${filter.value})`)
         )
       }));
     },

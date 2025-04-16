@@ -67,8 +67,8 @@ const magicConfig = {
 function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile }) {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
-  const containerEL = useRef<HTMLDivElement>();
-  const containerDialogEL = useRef<HTMLDivElement>();
+  const containerEL = useRef<HTMLDivElement>(null);
+  const containerDialogEL = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();

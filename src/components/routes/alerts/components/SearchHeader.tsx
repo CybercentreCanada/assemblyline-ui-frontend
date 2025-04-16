@@ -160,8 +160,8 @@ const WrappedSearchHeader = ({
     !params.has(queryKey) ? queryDefaultValue : params.get(queryKey)
   );
 
-  const rootRef = useRef<HTMLInputElement>();
-  const inputRef = useRef<HTMLInputElement>();
+  const rootRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const page = useMemo<number>(
     () =>
@@ -330,37 +330,37 @@ const WrappedSearchHeader = ({
             {disablePagination
               ? null
               : renderPagination
-              ? renderPagination()
-              : count &&
-                page && (
-                  <Pagination
-                    count={count}
-                    page={page}
-                    disabled={loading}
-                    size="small"
-                    shape="rounded"
-                    onChange={handlePageChange}
-                  />
-                )}
+                ? renderPagination()
+                : count &&
+                  page && (
+                    <Pagination
+                      count={count}
+                      page={page}
+                      disabled={loading}
+                      size="small"
+                      shape="rounded"
+                      onChange={handlePageChange}
+                    />
+                  )}
           </div>
 
           {disableFilterList
             ? null
             : renderFilterList
-            ? renderFilterList()
-            : params && (
-                <div>
-                  <ChipList
-                    items={params.getAll(filtersKey).map(v => ({
-                      variant: 'outlined',
-                      label: v.startsWith('NOT(') && v.endsWith(')') ? v.substring(4, v.length - 1) : v,
-                      color: v.startsWith('NOT(') && v.endsWith(')') ? 'error' : null,
-                      onClick: () => handleFilterClick(v),
-                      onDelete: () => handleFilterDelete(v)
-                    }))}
-                  />
-                </div>
-              )}
+              ? renderFilterList()
+              : params && (
+                  <div>
+                    <ChipList
+                      items={params.getAll(filtersKey).map(v => ({
+                        variant: 'outlined',
+                        label: v.startsWith('NOT(') && v.endsWith(')') ? v.substring(4, v.length - 1) : v,
+                        color: v.startsWith('NOT(') && v.endsWith(')') ? 'error' : null,
+                        onClick: () => handleFilterClick(v),
+                        onDelete: () => handleFilterDelete(v)
+                      }))}
+                    />
+                  </div>
+                )}
         </div>
       </div>
     </PageHeader>

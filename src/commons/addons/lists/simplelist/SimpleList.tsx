@@ -89,9 +89,9 @@ const SimpleList: React.FC<SimpleListProps> = ({
   const { register } = useListNavigator(id);
 
   // Some refs.
-  const outerEL = useRef<HTMLDivElement>();
-  const scrollEL = useRef<HTMLElement>();
-  const innerEL = useRef<HTMLDivElement>();
+  const outerEL = useRef<HTMLDivElement>(null);
+  const scrollEL = useRef<HTMLElement>(null);
+  const innerEL = useRef<HTMLDivElement>(null);
   const nextScrollThreshold = useRef<number>(scrollLoadNextThreshold);
 
   // Some states.

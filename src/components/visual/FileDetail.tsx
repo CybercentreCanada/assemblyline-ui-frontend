@@ -97,7 +97,7 @@ const WrappedFileDetail: React.FC<Props> = ({
   const [loaded, setLoaded] = useState<boolean>(false);
   const [heuristics, setHeuristics] = useState<string[]>([]);
 
-  const ref = useRef();
+  const ref = useRef(null);
 
   const sp2 = useMemo(() => theme.spacing(2), [theme]);
   const sp4 = useMemo(() => theme.spacing(4), [theme]);

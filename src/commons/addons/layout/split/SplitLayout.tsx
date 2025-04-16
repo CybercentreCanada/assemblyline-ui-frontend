@@ -84,8 +84,8 @@ const SplitLayout = ({
   const mouseDownRef = useRef<boolean>(false);
 
   // Some DOM refs
-  const containerRef = useRef<HTMLDivElement>();
-  const anchorRef = useRef<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   // Utility function the get the current width of container.
   const getWidth = (): number => containerRef.current.getBoundingClientRect().width;

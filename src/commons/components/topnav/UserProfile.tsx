@@ -43,7 +43,7 @@ const UserProfile = () => {
   const { t } = useTranslation();
   const configs = useAppConfigs();
   const { user, configuration } = useALContext();
-  const anchorRef = useRef();
+  const anchorRef = useRef(null);
   const { apiQuotaRemaining, submissionQuotaRemaining } = useQuota();
   const [open, setOpen] = useState<boolean>(false);
   const onProfileClick = useCallback(() => setOpen(_open => !_open), []);

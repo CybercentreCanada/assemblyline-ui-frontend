@@ -83,7 +83,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
   const [runWorkflow, setRunWorkflow] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const inputRef = useRef();
+  const inputRef = useRef(null);
 
   const defaultWorkflow = useMemo<Workflow>(
     () => ({

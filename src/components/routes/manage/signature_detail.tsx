@@ -244,7 +244,7 @@ const SignatureDetail = ({
   const classes = useStyles();
   const { user: currentUser, c12nDef } = useALContext();
   const { isDark: isDarkTheme } = useAppTheme();
-  // const editorRef = useRef();
+  // const editorRef = useRef(null);
 
   useEffectOnce(() => {
     // I cannot find a way to hot switch monaco editor's locale but at least I can load

@@ -71,7 +71,7 @@ const WrappedCommentSection: React.FC<Props> = ({
   const [confirmation, setConfirmation] = useState<Confirmation>({ open: false, type: 'add' });
   const [waiting, setWaiting] = useState<boolean>(false);
 
-  const socket = useRef();
+  const socket = useRef(null);
 
   const sortedComments = useMemo<Comment[]>(
     () => (!comments ? [] : comments.sort((c1, c2) => c2?.date.localeCompare(c1?.date))),

@@ -70,16 +70,16 @@ const PageFullscreen = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 
             ...(!isFirefox
               ? null
               : !isFullscreen
-              ? {
-                  position: 'fixed',
-                  top: '96px',
-                  right: '32px'
-                }
-              : {
-                  position: 'fixed',
-                  top: '32px',
-                  right: '32px'
-                })
+                ? {
+                    position: 'fixed',
+                    top: '96px',
+                    right: '32px'
+                  }
+                : {
+                    position: 'fixed',
+                    top: '32px',
+                    right: '32px'
+                  })
           }}
         >
           {fullscreenSupported ? null : (

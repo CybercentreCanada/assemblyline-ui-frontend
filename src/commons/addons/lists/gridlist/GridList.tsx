@@ -57,8 +57,8 @@ export default function GridList<T extends LineItem>({
   const classes = useStyles();
 
   // Some refs.
-  const outerEL = useRef<HTMLDivElement>();
-  const scrollEL = useRef<HTMLElement>();
+  const outerEL = useRef<HTMLDivElement>(null);
+  const scrollEL = useRef<HTMLElement>(null);
 
   // Some States
   const [scroller, setScroller] = useState<ListScroller>();
