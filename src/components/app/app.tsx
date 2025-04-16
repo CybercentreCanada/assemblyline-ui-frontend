@@ -1,8 +1,9 @@
 // TODO: change syntax to "import type {theme}" to avoid potential problems like type-only imports being incorrectly bundled.
 import type { Theme } from '@mui/material/styles';
 import { useBorealis } from 'borealis-ui';
-import type { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
+import type { AppPreferenceConfigs, AppSiteMapConfigs, AppTheme } from 'commons/components/app/AppConfigs';
 import AppProvider from 'commons/components/app/AppProvider';
+import type { AppUserService } from 'commons/components/app/AppUserService';
 import { useAppLayout } from 'commons/components/app/hooks';
 import { useAppSwitcher } from 'commons/components/app/hooks/useAppSwitcher';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
@@ -13,8 +14,8 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMyPreferences from 'components/hooks/useMyPreferences';
 import useMySitemap from 'components/hooks/useMySitemap';
 import useMyTheme from 'components/hooks/useMyTheme';
-import type { CustomAppUserService } from 'components/hooks/useMyUser';
 import useMyUser from 'components/hooks/useMyUser';
+import type { CustomUser } from 'components/models/ui/user';
 import QuotaProvider from 'components/providers/QuotaProvider';
 import SafeResultsProvider from 'components/providers/SafeResultsProvider';
 import LoadingScreen from 'components/routes/loading';
@@ -26,7 +27,7 @@ import Tos from 'components/routes/tos';
 import setMomentFRLocale from 'helpers/moment-fr-locale';
 import { getProvider } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router';
 
 // Constructs the theme object with the default parameters
 declare module '@mui/styles/defaultTheme' {
@@ -97,17 +98,27 @@ const MyAppMain = () => {
   }[renderedApp];
 };
 
-export const MyApp: React.FC<any> = () => {
+export const MyApp: React.FC = () => {
   const myPreferences: AppPreferenceConfigs = useMyPreferences();
-  const myTheme: AppThemeConfigs = useMyTheme();
+  const myThemes: AppTheme[] = useMyTheme();
   const mySitemap: AppSiteMapConfigs = useMySitemap();
-  const myUser: CustomAppUserService = useMyUser();
+  const myUser: AppUserService<CustomUser> = useMyUser();
+  // const mySearch: AppSearchService<SearchItem> = useMySearch();
+  // const myNotification = useMyNotification();
+
   return (
     <BrowserRouter basename="/">
       <APIProvider>
         <SafeResultsProvider>
           <QuotaProvider>
-            <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
+            <AppProvider
+              preferences={myPreferences}
+              themes={myThemes}
+              sitemap={mySitemap}
+              user={myUser}
+              // search={mySearch}
+              // notification={myNotification}
+            >
               <MyAppMain />
             </AppProvider>
           </QuotaProvider>

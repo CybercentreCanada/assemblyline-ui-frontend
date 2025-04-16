@@ -1,3 +1,4 @@
+import { BorealisProvider } from 'borealis-ui';
 import type {
   AppOverrideConfigs,
   AppPreferenceConfigs,
@@ -18,6 +19,10 @@ import AppSnackbarProvider from 'commons/components/app/providers/AppSnackbarPro
 import { AppStyledEngineProvider } from 'commons/components/app/providers/AppStyledEngineProvider';
 import { AppThemesContext, AppThemesProvider } from 'commons/components/app/providers/AppThemesProvider';
 import AppUserProvider from 'commons/components/app/providers/AppUserProvider';
+import AssistantProvider from 'components/providers/AssistantProvider';
+import CarouselProvider from 'components/providers/CarouselProvider';
+import { ExternalLookupProvider } from 'components/providers/ExternalLookupProvider';
+import HighlightProvider from 'components/providers/HighlightProvider';
 import i18n from 'i18n';
 import { useCallback, useContext, useMemo, type ReactNode } from 'react';
 
@@ -66,17 +71,29 @@ export const AppProviderInner = <U extends AppUser>({
       <AppStyledEngineProvider>
         <AppUserProvider service={user}>
           <AppSnackbarProvider>
-            <AppDrawerProvider>
-              <AppBarProvider search={search} notification={notification}>
-                <AppBreadcrumbsProvider>
-                  <AppLeftNavProvider>
-                    <AppDrawerContainer>
-                      <AppLayoutProvider>{children}</AppLayoutProvider>
-                    </AppDrawerContainer>
-                  </AppLeftNavProvider>
-                </AppBreadcrumbsProvider>
-              </AppBarProvider>
-            </AppDrawerProvider>
+            <BorealisProvider baseURL={location.origin + '/api/v4/proxy/borealis'} getToken={() => null}>
+              <AppUserProvider service={user}>
+                <AssistantProvider>
+                  <HighlightProvider>
+                    <ExternalLookupProvider>
+                      <CarouselProvider>
+                        <AppDrawerProvider>
+                          <AppBarProvider search={search} notification={notification}>
+                            <AppBreadcrumbsProvider>
+                              <AppLeftNavProvider>
+                                <AppDrawerContainer>
+                                  <AppLayoutProvider>{children}</AppLayoutProvider>
+                                </AppDrawerContainer>
+                              </AppLeftNavProvider>
+                            </AppBreadcrumbsProvider>
+                          </AppBarProvider>
+                        </AppDrawerProvider>
+                      </CarouselProvider>
+                    </ExternalLookupProvider>
+                  </HighlightProvider>
+                </AssistantProvider>
+              </AppUserProvider>
+            </BorealisProvider>
           </AppSnackbarProvider>
         </AppUserProvider>
       </AppStyledEngineProvider>
