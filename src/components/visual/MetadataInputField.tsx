@@ -7,9 +7,9 @@ import {
   MenuItem,
   TextField,
   Tooltip,
-  Typography
+  Typography,
+  useTheme
 } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Metadata } from 'components/models/base/config';
 import DatePicker from 'components/visual/DatePicker';
@@ -24,16 +24,6 @@ interface MetadataInputFieldProps {
   onReset?: () => void;
   disabled?: boolean;
 }
-
-const useStyles = makeStyles(theme => ({
-  checkbox: {
-    marginLeft: 0,
-    width: '100%',
-    '&:hover': {
-      background: theme.palette.action.hover
-    }
-  }
-}));
 
 const isValid = (input: string, field_cfg: Metadata) => {
   if (!input) {
@@ -66,11 +56,10 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
   onReset = null,
   disabled = false
 }) => {
-  const classes = useStyles();
   const theme = useTheme();
-  const [options, setOptions] = useState([]);
-
   const { apiCall } = useMyAPI();
+
+  const [options, setOptions] = useState([]);
 
   useEffect(() => {
     if (disabled || configuration.validator_type in ['enum', 'boolean', 'integer', 'date']) {
@@ -126,9 +115,9 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
           <IconButton
             size="small"
             onClick={() => onReset()}
-            style={{ marginTop: theme.spacing(-0.625), marginBottom: theme.spacing(-0.625) }}
+            sx={{ marginTop: theme.spacing(-0.625), marginBottom: theme.spacing(-0.625) }}
           >
-            <ClearIcon style={{ width: theme.spacing(2.5), height: theme.spacing(2.5) }} />
+            <ClearIcon sx={{ width: theme.spacing(2.5), height: theme.spacing(2.5) }} />
           </IconButton>
         )}
       </div>
@@ -153,15 +142,21 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
                   event.preventDefault();
                   event.stopPropagation();
                 }}
-                style={{ marginTop: theme.spacing(-0.625), marginBottom: theme.spacing(-0.625) }}
+                sx={{ marginTop: theme.spacing(-0.625), marginBottom: theme.spacing(-0.625) }}
               >
-                <ClearIcon style={{ width: theme.spacing(2.5), height: theme.spacing(2.5) }} />
+                <ClearIcon sx={{ width: theme.spacing(2.5), height: theme.spacing(2.5) }} />
               </IconButton>
             )}
           </div>
         }
-        className={classes.checkbox}
         disabled={disabled}
+        sx={{
+          marginLeft: 0,
+          width: '100%',
+          '&:hover': {
+            background: theme.palette.action.hover
+          }
+        }}
       />
     );
   } else if (configuration.validator_type === 'enum') {

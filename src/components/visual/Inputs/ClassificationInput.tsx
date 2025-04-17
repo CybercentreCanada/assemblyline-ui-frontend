@@ -10,10 +10,10 @@ import {
   ListItemButton,
   ListItemText,
   Skeleton,
+  styled,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import type { PossibleColors } from 'components/visual/CustomChip';
 import CustomChip, { ColorMap } from 'components/visual/CustomChip';
@@ -28,47 +28,36 @@ import {
   getParts,
   normalizedClassification
 } from 'helpers/classificationParser';
+import { PossibleColor } from 'helpers/colors';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  classification: {
-    fontWeight: 500
-  },
-  inlineSkel: {
-    display: 'inline-block',
-    width: '8rem',
-    verticalAlign: 'bottom'
-  },
-  // Text Color
-  default: {
-    fontWeight: 500,
-    color: theme.palette.mode === 'dark' ? '#AAA' : '#888'
-  },
-  primary: {
-    fontWeight: 500,
-    color: theme.palette.primary.main
-  },
-  secondary: {
-    fontWeight: 500,
-    color: theme.palette.secondary.main
-  },
-  success: {
-    fontWeight: 500,
-    color: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
-  },
-  info: {
-    fontWeight: 500,
-    color: theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
-  },
-  warning: {
-    fontWeight: 500,
-    color: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
-  },
-  error: {
-    fontWeight: 500,
-    color: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
-  }
+type ClassificationTextProps = {
+  color: PossibleColor;
+};
+
+const ClassificationText = styled('span', {
+  shouldForwardProp: prop => prop !== 'color'
+})<ClassificationTextProps>(({ theme, color }) => ({
+  fontWeight: 500,
+  color: (() => {
+    switch (color) {
+      case 'default':
+        return theme.palette.mode === 'dark' ? '#AAA' : '#888';
+      case 'primary':
+        return theme.palette.primary.main;
+      case 'secondary':
+        return theme.palette.secondary.main;
+      case 'success':
+        return theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light;
+      case 'info':
+        return theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light;
+      case 'warning':
+        return theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light;
+      case 'error':
+        return theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light;
+    }
+  })()
 }));
 
 export interface ClassificationInputProps {
@@ -96,7 +85,6 @@ function WrappedClassificationInput({
   dynGroup = null,
   disabled = false
 }: ClassificationInputProps) {
-  const classes = useStyles();
   const { t } = useTranslation();
   const theme = useTheme();
   const { user: currentUser, c12nDef, classificationAliases } = useALContext();
@@ -219,9 +207,9 @@ function WrappedClassificationInput({
     (!!validated?.parts?.lvl && c12n ? (
       <>
         {type === 'text' ? (
-          <span className={classes[computeColor()]}>
+          <ClassificationText color={computeColor()}>
             {normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser, classificationAliases)}
-          </span>
+          </ClassificationText>
         ) : (
           <div style={{ display: inline ? 'inline-block' : null }}>
             <CustomChip
@@ -229,7 +217,6 @@ function WrappedClassificationInput({
               variant={type === 'outlined' ? 'outlined' : 'filled'}
               size={size}
               color={computeColor()}
-              className={classes.classification}
               label={normalizedClassification(
                 validated.parts,
                 c12nDef,
@@ -241,6 +228,7 @@ function WrappedClassificationInput({
               onClick={type === 'picker' ? () => setShowPicker(true) : null}
               fullWidth={fullWidth}
               disabled={disabled}
+              sx={{ fontWeight: 500 }}
             />
           </div>
         )}
@@ -258,7 +246,6 @@ function WrappedClassificationInput({
                 variant="outlined"
                 size={size}
                 color={computeColor()}
-                className={classes.classification}
                 label={normalizedClassification(
                   validated.parts,
                   c12nDef,
@@ -268,6 +255,7 @@ function WrappedClassificationInput({
                   classificationAliases
                 )}
                 fullWidth={fullWidth}
+                sx={{ fontWeight: 500 }}
               />
             </DialogTitle>
             <DialogContent>
@@ -444,9 +432,15 @@ function WrappedClassificationInput({
     ) : (
       <Skeleton
         variant={type === 'text' ? 'text' : 'rectangular'}
-        className={inline ? classes.inlineSkel : null}
         height={type !== 'text' ? skelheight[size] : null}
-        style={{ borderRadius: theme.spacing(0.5) }}
+        style={{
+          borderRadius: theme.spacing(0.5),
+          ...(inline && {
+            display: 'inline-block',
+            width: '8rem',
+            verticalAlign: 'bottom'
+          })
+        }}
       />
     ))
   );

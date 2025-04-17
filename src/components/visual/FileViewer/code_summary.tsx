@@ -1,5 +1,4 @@
-import { Alert, CircularProgress, Tooltip, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { Alert, CircularProgress, styled, Tooltip, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/models/ui/user';
@@ -8,20 +7,19 @@ import AIMarkdown from 'components/visual/AiMarkdown';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  spinner: {
-    textAlign: 'center',
-    position: 'relative',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)'
-  },
-  watermark: {
-    float: 'right',
-    color: theme.palette.text.disabled,
-    fontSize: 'smaller',
-    cursor: 'pointer'
-  }
+const Spinner = styled('div')(({ theme }) => ({
+  textAlign: 'center',
+  position: 'relative',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)'
+}));
+
+const Watermark = styled('div')(({ theme }) => ({
+  float: 'right',
+  color: theme.palette.text.disabled,
+  fontSize: 'smaller',
+  cursor: 'pointer'
 }));
 
 type Props = {
@@ -33,7 +31,6 @@ const WrappedCodeSection: React.FC<Props> = ({ sha256, archiveOnly = false }) =>
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { t, i18n } = useTranslation(['fileViewer']);
-  const classes = useStyles();
   const theme = useTheme();
 
   const [analysing, setAnalysing] = useState(false);
@@ -90,10 +87,10 @@ const WrappedCodeSection: React.FC<Props> = ({ sha256, archiveOnly = false }) =>
     <>
       <div style={{ flexGrow: 1, marginTop: !analysing && !codeError ? theme.spacing(-4) : null }}>
         {analysing ? (
-          <div className={classes.spinner}>
+          <Spinner>
             <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_code')}</div>
             <CircularProgress variant="indeterminate" />
-          </div>
+          </Spinner>
         ) : codeError ? (
           <Alert severity="error">{codeError}</Alert>
         ) : (
@@ -103,9 +100,7 @@ const WrappedCodeSection: React.FC<Props> = ({ sha256, archiveOnly = false }) =>
       {!analysing && (codeSummary || codeError) && (
         <div>
           <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
-            <div className={classes.watermark} onClick={() => getCodeSummary(true)}>
-              {t('powered_by_ai')}
-            </div>
+            <Watermark onClick={() => getCodeSummary(true)}>{t('powered_by_ai')}</Watermark>
           </Tooltip>
         </div>
       )}

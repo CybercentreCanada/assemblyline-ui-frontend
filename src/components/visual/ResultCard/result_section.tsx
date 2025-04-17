@@ -17,7 +17,6 @@ import {
   Tooltip,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -65,28 +64,6 @@ const ATTACK_ICON = (
   </span>
 );
 
-const useStyles = makeStyles(theme => ({
-  section_title: {
-    display: 'flex',
-    alignItems: 'center',
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover,
-      cursor: 'pointer'
-    },
-    minHeight: theme.spacing(4.5),
-    marginLeft: theme.spacing(-1),
-    padding: theme.spacing(0.25, 0, 0.25, 1),
-    borderRadius: theme.spacing(0.5)
-  },
-  printable_section_title: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-  muted: {
-    color: theme.palette.text.secondary
-  }
-}));
-
 type Props = {
   section: Section;
   section_list?: Section[];
@@ -109,7 +86,6 @@ const WrappedResultSection: React.FC<Props> = ({
   force = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
-  const classes = useStyles();
   const theme = useTheme();
   const { c12nDef } = useALContext();
   const { copy } = useClipboard();
@@ -319,7 +295,25 @@ const WrappedResultSection: React.FC<Props> = ({
         )}
 
         <div style={{ width: `calc(100% - ${!nested ? 8 : 0}px)` }}>
-          <Box className={printable ? classes.printable_section_title : classes.section_title} onClick={handleClick}>
+          <Box
+            onClick={handleClick}
+            sx={
+              printable
+                ? { display: 'flex', alignItems: 'center' }
+                : {
+                    display: 'flex',
+                    alignItems: 'center',
+                    '&:hover': {
+                      backgroundColor: theme.palette.action.hover,
+                      cursor: 'pointer'
+                    },
+                    minHeight: theme.spacing(4.5),
+                    marginLeft: theme.spacing(-1),
+                    padding: theme.spacing(0.25, 0, 0.25, 1),
+                    borderRadius: theme.spacing(0.5)
+                  }
+            }
+          >
             {c12nDef.enforce && !printable && (
               <>
                 <Classification c12n={section.classification} type="text" />
@@ -396,7 +390,11 @@ const WrappedResultSection: React.FC<Props> = ({
                     )}
                 </div>
                 {!printable &&
-                  (open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />)}
+                  (open ? (
+                    <ExpandLess sx={{ color: theme.palette.text.secondary }} />
+                  ) : (
+                    <ExpandMore sx={{ color: theme.palette.text.secondary }} />
+                  ))}
               </>
             )}
           </Box>

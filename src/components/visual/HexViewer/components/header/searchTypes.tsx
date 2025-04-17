@@ -5,34 +5,13 @@ import { Fade, ListItemButton, Paper, Popper, useTheme } from '@mui/material';
 import List from '@mui/material/List';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import makeStyles from '@mui/styles/makeStyles';
 import { isEscape } from 'commons/components/utils/keyboard';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SearchType, StoreProps, useDispatch, useEventListener } from '../..';
 import { TooltipIconButton } from '../../commons/components';
 
-const useStyles = makeStyles(theme => ({
-  clickAway: {
-    zIndex: theme.zIndex.appBar + 200
-  },
-  popper: {
-    zIndex: theme.zIndex.appBar + 200,
-    minWidth: '280px',
-    marginTop: '16px',
-    padding: theme.spacing(0),
-    backgroundColor: theme.palette.background.paper
-  },
-  searchPaper: {
-    marginTop: '16px',
-    padding: theme.spacing(0),
-    minWidth: '200px',
-    backgroundColor: theme.palette.background.paper
-  }
-}));
-
 export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
-  const classes = useStyles();
   const theme = useTheme();
   const { t } = useTranslation(['hexViewer']);
   const { onSearchTypeChange } = useDispatch();
@@ -95,10 +74,16 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
       <Popper
         open={isPopperOpen}
         anchorEl={popperAnchorEl}
-        className={classes.popper}
         placement="bottom-start"
         disablePortal={true}
         transition
+        sx={{
+          zIndex: theme.zIndex.appBar + 200,
+          minWidth: '280px',
+          marginTop: '16px',
+          padding: theme.spacing(0),
+          backgroundColor: theme.palette.background.paper
+        }}
       >
         {({ TransitionProps }) => (
           <Fade {...TransitionProps} timeout={250}>

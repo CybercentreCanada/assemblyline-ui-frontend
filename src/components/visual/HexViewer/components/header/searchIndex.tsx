@@ -1,4 +1,4 @@
-import { Tooltip } from '@mui/material';
+import { Tooltip, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import React, { useCallback } from 'react';
@@ -35,7 +35,7 @@ const useHexStyles = makeStyles(theme => ({
 
 export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
-  const classes = useHexStyles();
+  const theme = useTheme();
   const { onSelectedSearchIndexChange } = useDispatch();
   const { inputValue, results, selectedResult } = store.search;
 
@@ -69,10 +69,20 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
         />
         <Tooltip title={t('search')}>
           <Typography
-            className={classes.resultIndexes}
             variant="subtitle1"
             color="textPrimary"
             onClick={e => handleClick(e)}
+            sx={{
+              textAlign: 'center',
+              cursor: 'pointer',
+              padding: 8,
+              [theme.breakpoints.only('sm')]: {
+                padding: 2
+              },
+              [theme.breakpoints.only('xs')]: {
+                padding: 0
+              }
+            }}
           >
             {selectedResult !== null ? selectedResult + 1 + t('of') + results.length : t('of') + results.length}
           </Typography>
@@ -112,7 +122,21 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
   } else {
     return (
       <Tooltip title={t('search')}>
-        <Typography className={classes.resultNoneIndexes} variant="subtitle1" color="error">
+        <Typography
+          variant="subtitle1"
+          color="error"
+          sx={{
+            textAlign: 'center',
+            cursor: 'default',
+            padding: 8,
+            [theme.breakpoints.only('sm')]: {
+              padding: 2
+            },
+            [theme.breakpoints.only('xs')]: {
+              padding: 0
+            }
+          }}
+        >
           {t('no-results')}
         </Typography>
       </Tooltip>

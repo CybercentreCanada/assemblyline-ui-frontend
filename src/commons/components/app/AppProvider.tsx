@@ -21,6 +21,7 @@ import { AppThemesContext, AppThemesProvider } from 'commons/components/app/prov
 import AppUserProvider from 'commons/components/app/providers/AppUserProvider';
 import AssistantProvider from 'components/providers/AssistantProvider';
 import CarouselProvider from 'components/providers/CarouselProvider';
+import DrawerProvider from 'components/providers/DrawerProvider';
 import { ExternalLookupProvider } from 'components/providers/ExternalLookupProvider';
 import HighlightProvider from 'components/providers/HighlightProvider';
 import i18n from 'i18n';
@@ -78,15 +79,17 @@ export const AppProviderInner = <U extends AppUser>({
                     <ExternalLookupProvider>
                       <CarouselProvider>
                         <AppDrawerProvider>
-                          <AppBarProvider search={search} notification={notification}>
-                            <AppBreadcrumbsProvider>
-                              <AppLeftNavProvider>
-                                <AppDrawerContainer>
-                                  <AppLayoutProvider>{children}</AppLayoutProvider>
-                                </AppDrawerContainer>
-                              </AppLeftNavProvider>
-                            </AppBreadcrumbsProvider>
-                          </AppBarProvider>
+                          <DrawerProvider>
+                            <AppBarProvider search={search} notification={notification}>
+                              <AppBreadcrumbsProvider>
+                                <AppLeftNavProvider>
+                                  <AppDrawerContainer>
+                                    <AppLayoutProvider>{children}</AppLayoutProvider>
+                                  </AppDrawerContainer>
+                                </AppLeftNavProvider>
+                              </AppBreadcrumbsProvider>
+                            </AppBarProvider>
+                          </DrawerProvider>
                         </AppDrawerProvider>
                       </CarouselProvider>
                     </ExternalLookupProvider>

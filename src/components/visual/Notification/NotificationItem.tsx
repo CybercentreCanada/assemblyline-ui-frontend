@@ -1,6 +1,4 @@
-import { Divider, Link, Typography } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import { Divider, Link, styled, Typography, useTheme } from '@mui/material';
 import Moment from 'components/visual/Moment';
 import DOMPurify from 'dompurify';
 import React, { useCallback } from 'react';
@@ -9,110 +7,37 @@ import Markdown from 'react-markdown';
 import { JSONFeedAuthor, JSONFeedItem } from '.';
 import CustomChip from '../CustomChip';
 
-const useStyles = makeStyles(theme => ({
-  container: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    padding: theme.spacing(1.25)
-  },
-  row: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  header: {
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  time: { lineHeight: 'revert' },
-  icon: { color: theme.palette.warning.main },
-  link: {
-    width: '100%',
-    flex: 1,
-    overflow: 'hidden',
-    textDecoration: 'none'
-  },
-  title: {
-    flex: 1,
-    fontWeight: 500,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    color: theme.palette.primary.main,
-    fontSize: 'large'
-  },
-  launch: {
+const Container = styled('div')(({ theme }) => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  padding: theme.spacing(1.25)
+}));
+
+const Time = styled(Typography)(({ theme }) => ({
+  lineHeight: 'revert'
+}));
+
+const Header = styled(Typography)(({ theme }) => ({
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center'
+}));
+
+const Content = styled('div')(({ theme }) => ({}));
+
+const Description = styled(Typography)(({ theme }) => ({
+  '& a': {
+    textDecoration: 'none',
     color: theme.palette.primary.main,
     transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
     '&:hover': {
       color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
     }
   },
-  isNew: {
-    fontWeight: 800
-  },
-  userRow: {
-    color: theme.palette.secondary.main,
-    justifyContent: 'right',
-    paddingTop: theme.spacing(1),
-    paddingRight: theme.spacing(1)
-  },
-
-  userItem: {
-    display: 'contents'
-  },
-  userElement: {
-    marginLeft: theme.spacing(0.25),
-    marginRight: theme.spacing(0.25),
-    color: theme.palette.text.secondary
-  },
-  userLink: {
-    transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
-    '&:hover': {
-      color: theme.palette.mode === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark
-    }
-  },
-  userImg: {
-    maxHeight: '25px',
-    borderRadius: '50%'
-  },
-  tags: {
-    flexGrow: 1
-  },
-  content: {},
-  badge: {
-    marginLeft: theme.spacing(0.25),
-    marginRight: theme.spacing(0.25),
-    textTransform: 'capitalize'
-  },
-  center: { display: 'grid', justifyContent: 'center' },
-  descriptionImage: {
-    maxWidth: '256px',
-    maxHeight: '256px',
-    borderRadius: '5px',
-    marginTop: '8px'
-  },
-  description: {
-    '& a': {
-      textDecoration: 'none',
-      color: theme.palette.primary.main,
-      transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
-      '&:hover': {
-        color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
-      }
-    },
-    '&>*': {
-      marginBlockStart: theme.spacing(0.5),
-      marginBlockEnd: theme.spacing(0.5)
-    }
-  },
-  divider: {
-    width: '95%',
-    '@media print': {
-      backgroundColor: '#0000001f !important'
-    }
+  '&>*': {
+    marginBlockStart: theme.spacing(0.5),
+    marginBlockEnd: theme.spacing(0.5)
   }
 }));
 
@@ -122,132 +47,210 @@ type Props = {
 };
 
 const WrappedNotificationItem = ({ notification = null, hideDivider = false }: Props) => {
-  const classes = useStyles();
   const { i18n } = useTranslation('notification');
+  const theme = useTheme();
 
   const Author = useCallback(
     ({ author, index, last }: { author: JSONFeedAuthor; index: number; last: number }) => (
       <>
         {author?.url && author?.url !== '' ? (
           <Link
-            className={clsx(classes.userItem)}
             title={author.url}
             href={author.url}
             target="_blank"
             rel="noopener noreferrer"
+            style={{ display: 'contents' }}
           >
             {author?.avatar && (
-              <img className={clsx(classes.userElement, classes.userImg)} src={author.avatar} alt={author.avatar} />
+              <img
+                src={author.avatar}
+                alt={author.avatar}
+                style={{
+                  marginLeft: theme.spacing(0.25),
+                  marginRight: theme.spacing(0.25),
+                  color: theme.palette.text.secondary,
+                  maxHeight: '25px',
+                  borderRadius: '50%'
+                }}
+              />
             )}
             {author?.name && (
               <Typography
-                className={clsx(classes.userElement, classes.userLink)}
                 variant="caption"
                 color="textSecondary"
                 children={author.name}
+                sx={{
+                  marginLeft: theme.spacing(0.25),
+                  marginRight: theme.spacing(0.25),
+                  color: theme.palette.text.secondary,
+
+                  transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+                  '&:hover': {
+                    color: theme.palette.mode === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark
+                  }
+                }}
               />
             )}
           </Link>
         ) : (
-          <div className={clsx(classes.userItem)}>
+          <div style={{ display: 'contents' }}>
             {author?.avatar && (
-              <img className={clsx(classes.userElement, classes.userImg)} src={author.avatar} alt={author.avatar} />
+              <img
+                src={author.avatar}
+                alt={author.avatar}
+                style={{
+                  marginLeft: theme.spacing(0.25),
+                  marginRight: theme.spacing(0.25),
+                  color: theme.palette.text.secondary,
+                  maxHeight: '25px',
+                  borderRadius: '50%'
+                }}
+              />
             )}
             {author?.name && (
               <Typography
-                className={clsx(classes.userElement)}
                 variant="caption"
                 color="textSecondary"
                 children={author.name}
+                sx={{
+                  marginLeft: theme.spacing(0.25),
+                  marginRight: theme.spacing(0.25),
+                  color: theme.palette.text.secondary
+                }}
               />
             )}
           </div>
         )}
       </>
     ),
-    [classes]
+    [theme]
   );
 
   if (notification === null) return <></>;
   else
     return (
       <>
-        <div className={classes.container}>
-          <Typography className={classes.time} variant="caption" color="secondary">
+        <Container>
+          <Time variant="caption" color="secondary">
             <Moment variant="localeDate">{notification.date_published}</Moment>
-          </Typography>
-          <div className={classes.header}>
+          </Time>
+          <Header>
             {notification.url ? (
               <div>
                 <Link
-                  className={clsx(classes.link)}
                   title={notification.url}
                   href={notification.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  style={{
+                    width: '100%',
+                    flex: 1,
+                    overflow: 'hidden',
+                    textDecoration: 'none'
+                  }}
                 >
                   <Typography
-                    className={clsx(classes.title, classes.launch, notification._isNew && classes.isNew)}
                     variant="body1"
                     color="secondary"
                     children={notification.title}
+                    sx={{
+                      flex: 1,
+                      fontWeight: 500,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      color: theme.palette.primary.main,
+                      fontSize: 'large',
+
+                      transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+                      '&:hover': {
+                        color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
+                      },
+
+                      ...(notification._isNew && {
+                        fontWeight: 800
+                      })
+                    }}
                   />
                 </Link>
               </div>
             ) : (
               <Typography
-                className={clsx(classes.title, notification._isNew && classes.isNew)}
                 variant="body1"
                 color="secondary"
                 children={notification.title}
+                sx={{
+                  flex: 1,
+                  fontWeight: 500,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  color: theme.palette.primary.main,
+                  fontSize: 'large',
+
+                  ...(notification._isNew && {
+                    fontWeight: 800
+                  })
+                }}
               />
             )}
-          </div>
+          </Header>
           {notification.content_md && notification.content_md !== '' ? (
-            <div className={classes.content}>
+            <Content>
               <Markdown
                 // TODO: check this
                 // className={classes.description}
                 components={{ a: props => <Link href={props.href}>{props.children}</Link> }}
                 children={notification.content_md}
               />
-            </div>
+            </Content>
           ) : notification.content_html && notification.content_html !== '' ? (
-            <div className={classes.content}>
-              <Typography
-                className={classes.description}
+            <Content>
+              <Description
                 variant="body2"
                 color="textPrimary"
                 dangerouslySetInnerHTML={{
                   __html: DOMPurify.sanitize(notification.content_html, { USE_PROFILES: { html: true } })
                 }}
               />
-            </div>
+            </Content>
           ) : notification.content_text && notification.content_text !== '' ? (
-            <div className={classes.content}>
-              <Typography
-                className={classes.description}
-                variant="body2"
-                color="textPrimary"
-                children={notification.content_text}
-              />
-            </div>
+            <Content>
+              <Description variant="body2" color="textPrimary" children={notification.content_text} />
+            </Content>
           ) : (
             <></>
           )}
           {notification.image && (
-            <div className={classes.center}>
-              <img className={classes.descriptionImage} src={notification.image} alt={notification.image} />
+            <div style={{ display: 'grid', justifyContent: 'center' }}>
+              <img
+                src={notification.image}
+                alt={notification.image}
+                style={{
+                  maxWidth: '256px',
+                  maxHeight: '256px',
+                  borderRadius: '5px',
+                  marginTop: '8px'
+                }}
+              />
             </div>
           )}
           {notification.authors && (
-            <div className={clsx(classes.row, classes.userRow)}>
-              <div className={classes.tags}>
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                color: theme.palette.secondary.main,
+                justifyContent: 'right',
+                paddingTop: theme.spacing(1),
+                paddingRight: theme.spacing(1)
+              }}
+            >
+              <div style={{ flexGrow: 1 }}>
                 {notification.tags
                   .filter(tag => ['new', 'current', 'dev', 'service', 'blog', 'community'].includes(tag))
                   .map((tag, i) => (
                     <CustomChip
-                      className={classes.badge}
                       key={'tag-' + i}
                       type="round"
                       size="small"
@@ -264,6 +267,11 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                                 : 'default'
                       }
                       label={tag}
+                      sx={{
+                        marginLeft: theme.spacing(0.25),
+                        marginRight: theme.spacing(0.25),
+                        textTransform: 'capitalize'
+                      }}
                     />
                   ))}
               </div>
@@ -279,8 +287,18 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                 ))}
             </div>
           )}
-        </div>
-        {!hideDivider && <Divider className={classes.divider} variant="fullWidth" />}
+        </Container>
+        {!hideDivider && (
+          <Divider
+            variant="fullWidth"
+            sx={{
+              width: '95%',
+              '@media print': {
+                backgroundColor: '#0000001f !important'
+              }
+            }}
+          />
+        )}
       </>
     );
 };

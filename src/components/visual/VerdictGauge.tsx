@@ -1,45 +1,44 @@
-import { Tooltip, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { styled, Tooltip, useTheme } from '@mui/material';
 import { SubmissionVerdict } from 'components/models/base/alert';
 import { scaleLinear } from 'd3-scale';
 import { arc } from 'd3-shape';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  circle: {
-    position: 'relative',
-    zIndex: 1,
-    top: '-90px',
-    left: '15px',
-    borderRadius: '50%',
-    width: '70px',
-    height: '70px',
-    boxShadow: theme.shadows[2],
-    backgroundColor: theme.palette.background.paper,
-    textAlign: 'center',
-    '@media print': {
-      backgroundColor: '#FFFFFF'
-    }
-  },
-  text: {
-    fontSize: '30px',
-    lineHeight: '30px',
-    paddingTop: '15px',
-    fontWeight: 900,
-    color: theme.palette.text.secondary,
-    '@media print': {
-      color: '#00000066'
-    }
-  },
-  under_text: {
-    fontSize: '13px',
-    lineHeight: '13px',
-    fontWeight: 300,
-    color: theme.palette.text.secondary,
-    '@media print': {
-      color: '#00000066'
-    }
+const Circle = styled('div')(({ theme }) => ({
+  position: 'relative',
+  zIndex: 1,
+  top: '-90px',
+  left: '15px',
+  borderRadius: '50%',
+  width: '70px',
+  height: '70px',
+  boxShadow: theme.shadows[2],
+  backgroundColor: theme.palette.background.paper,
+  textAlign: 'center',
+  '@media print': {
+    backgroundColor: '#FFFFFF'
+  }
+}));
+
+const Text = styled('div')(({ theme }) => ({
+  fontSize: '30px',
+  lineHeight: '30px',
+  paddingTop: '15px',
+  fontWeight: 900,
+  color: theme.palette.text.secondary,
+  '@media print': {
+    color: '#00000066'
+  }
+}));
+
+const UnderText = styled('div')(({ theme }) => ({
+  fontSize: '13px',
+  lineHeight: '13px',
+  fontWeight: 300,
+  color: theme.palette.text.secondary,
+  '@media print': {
+    color: '#00000066'
   }
 }));
 
@@ -52,7 +51,6 @@ type Props = {
 
 const VerdictGauge: React.FC<Props> = ({ verdicts, max = 20, colorBack = '#68686815', autoHide = false }) => {
   const { t } = useTranslation();
-  const classes = useStyles();
   const theme = useTheme();
   const colorMalicious = theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark;
   const colorNonMalicious = theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark;
@@ -96,24 +94,23 @@ const VerdictGauge: React.FC<Props> = ({ verdicts, max = 20, colorBack = '#68686
               <path d={filledArcRight} fill={colorMalicious} />
             </g>
           </svg>
-          <div className={classes.circle}>
-            <div
-              className={classes.text}
+          <Circle>
+            <Text
               style={{
                 color:
                   verdicts.non_malicious.length > verdicts.malicious.length
                     ? colorNonMalicious
                     : verdicts.malicious.length > verdicts.non_malicious.length
-                    ? colorMalicious
-                    : null
+                      ? colorMalicious
+                      : null
               }}
             >
               {verdicts.non_malicious.length > verdicts.malicious.length
                 ? verdicts.non_malicious.length
                 : verdicts.malicious.length}
-            </div>
-            <div className={classes.under_text}>{`/ ${verdicts.non_malicious.length + verdicts.malicious.length}`}</div>
-          </div>
+            </Text>
+            <UnderText>{`/ ${verdicts.non_malicious.length + verdicts.malicious.length}`}</UnderText>
+          </Circle>
         </div>
       </Tooltip>
     </div>

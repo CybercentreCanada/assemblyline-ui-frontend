@@ -19,7 +19,7 @@ import { SorterField } from '../sorters/SorterSelector';
 import SorterTrigger from '../sorters/SorterTrigger';
 import { TableListLayout } from './TableListLayout';
 import { TableColumnField } from './types';
-import { useItemStyles, useTableStyles } from './useStyles';
+import { useTableStyles } from './useStyles';
 
 interface TableListHeaderProps<T extends LineItem> {
   items: T[];
@@ -43,7 +43,6 @@ const TableListHeader = memo(
   }: TableListHeaderProps<T>) => {
     const { t } = useTranslation();
     const classes = useTableStyles();
-    const itemClasses = useItemStyles();
     const [menuOpenIndex, onMenuBtnClick] = useState<number>(-1);
     const cellRenderer = useCallback(
       (column: TableColumnField, sorter, cellIndex, cellWidth, menuOpen) => {

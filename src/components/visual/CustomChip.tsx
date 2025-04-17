@@ -1,14 +1,35 @@
-import { Chip, ChipProps, Tooltip, TooltipProps } from '@mui/material';
+import { Chip, ChipProps, Tooltip, TooltipProps, styled } from '@mui/material';
 import { darken } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 
-declare module '@mui/material/Chip' {
-  interface ChipPropsSizeOverrides {
-    tiny: true;
-  }
-}
+type StyledChipProps = ChipProps & {
+  type?: 'round' | 'square' | 'rounded';
+};
+
+const StyledChip = memo(
+  styled(({ type = 'round', ...props }: StyledChipProps) => <Chip {...props} />, {
+    shouldForwardProp: prop => prop !== 'forcePaper'
+  })<StyledChipProps>(({ theme }) => {
+    const typeStyles = useMemo(
+      () => ({
+        square: {
+          borderRadius: '0px',
+          margin: '2px 4px 2px 0'
+        },
+        rounded: {
+          borderRadius: '3px',
+          margin: '2px 4px 2px 0'
+        },
+        round: null
+      }),
+      []
+    );
+
+    return {};
+  })
+);
 
 export const ColorMap = {
   'label-default': 'default' as 'default',
@@ -158,7 +179,7 @@ const WrappedCustomChip: React.FC<CustomChipProps> = ({
   children,
   ...otherProps
 }) => {
-  const classes = useStyles();
+  return <StyledChip />;
 
   // Define classnames maps
   const typeClassMap = {

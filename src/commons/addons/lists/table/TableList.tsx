@@ -15,7 +15,6 @@ import TableListHeader from './TableListHeader';
 import TableListItem from './TableListItem';
 import TableListLayoutComputer, { TableListLayout } from './TableListLayout';
 import { TableColumnField } from './types';
-import { useTableStyles } from './useStyles';
 
 const DEFAULT_EMPTY_LIST = [];
 
@@ -80,9 +79,6 @@ export default function TableList<T extends LineItem>(props: TableListProps<T>) 
     onRenderActions,
     children = DEFAULT_CELL_RENDERER
   } = props;
-
-  // styles
-  const classes = useTableStyles();
 
   // refs
   const containerRef = useRef<HTMLDivElement>(null);

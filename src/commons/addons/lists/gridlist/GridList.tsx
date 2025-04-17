@@ -1,13 +1,13 @@
-import { CircularProgress, Grid, useTheme } from '@mui/material';
+import { Grid, useTheme } from '@mui/material';
 import useListKeyboard from 'commons/addons/lists/hooks/useListKeyboard';
 import useListNavigator from 'commons/addons/lists/hooks/useListNavigator';
 import ListItemBase, { LineItem } from 'commons/addons/lists/item/ListItemBase';
 import ListScroller from 'commons/addons/lists/scrollers/ListScroller';
 import SimpleListScroller from 'commons/addons/lists/scrollers/SimpleListScroller';
-import { useStyles } from 'commons/addons/lists/simplelist/SimpleList';
 import TableListMoreBtn, { TableListMoreConfig } from 'commons/addons/lists/table/TableListMoreBtn';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Outer, ProgressCt, ProgressSpinner, Inner } from '../simplelist/SimpleList';
 
 interface Breakpoints {
   xs?: 1 | 2 | 3 | 4 | 6 | 12;
@@ -54,7 +54,6 @@ export default function GridList<T extends LineItem>({
 }: GridListProps<T>) {
   // React hooks.
   const theme = useTheme();
-  const classes = useStyles();
 
   // Some refs.
   const outerEL = useRef<HTMLDivElement>(null);
@@ -121,15 +120,14 @@ export default function GridList<T extends LineItem>({
   );
 
   return (
-    <div ref={outerEL} className={classes.outer}>
+    <Outer ref={outerEL}>
       {loading && (
-        <div className={classes.progressCt}>
-          <CircularProgress className={classes.progressSpinner} />
-        </div>
+        <ProgressCt>
+          <ProgressSpinner />
+        </ProgressCt>
       )}
-      <div
+      <Inner
         id={id}
-        className={classes.inner}
         tabIndex={0}
         onKeyDown={!loading ? onKeyDown : null}
         style={{ overflow: disableOverflow ? 'unset' : null, padding: theme.spacing(spacing) }}
@@ -159,7 +157,7 @@ export default function GridList<T extends LineItem>({
             <TableListMoreBtn {...moreConfig} />
           </PageCenter>
         )}
-      </div>
-    </div>
+      </Inner>
+    </Outer>
   );
 }

@@ -1,5 +1,4 @@
-import { Alert, LinearProgress } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { Alert, LinearProgress, styled } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -9,17 +8,15 @@ import { HexViewerApp } from 'components/visual/HexViewer';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  wrapper: {
-    backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FAFAFA',
-    border: `1px solid ${theme.palette.divider}`,
-    padding: theme.spacing(1),
-    flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    paddingBottom: theme.spacing(2),
-    paddingTop: theme.spacing(2)
-  }
+const Wrapper = styled('div')(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FAFAFA',
+  border: `1px solid ${theme.palette.divider}`,
+  padding: theme.spacing(1),
+  flexGrow: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  paddingBottom: theme.spacing(2),
+  paddingTop: theme.spacing(2)
 }));
 
 type Props = {
@@ -29,7 +26,6 @@ type Props = {
 
 const WrappedHexSection: React.FC<Props> = ({ sha256, onDataTruncated = () => null }) => {
   const { t } = useTranslation(['fileViewer']);
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -66,9 +62,9 @@ const WrappedHexSection: React.FC<Props> = ({ sha256, onDataTruncated = () => nu
   else if (data === null) return <LinearProgress />;
   else
     return (
-      <div className={classes.wrapper}>
+      <Wrapper>
         <HexViewerApp data={data} />
-      </div>
+      </Wrapper>
     );
 };
 
