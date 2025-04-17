@@ -81,6 +81,8 @@ type AlertExtendedScanProps = {
 
 export const AlertExtendedScan: React.FC<AlertExtendedScanProps> = React.memo(
   ({ name, withChip = false, size = 'small' }: AlertExtendedScanProps) => {
+    //TODO
+    return null;
     const { t } = useTranslation('alerts');
     const classes = useStyles();
 
@@ -123,6 +125,8 @@ type AlertPriorityProps = {
 
 export const AlertPriority: React.FC<AlertPriorityProps> = React.memo(
   ({ name, withChip = false, size = 'small' }: AlertPriorityProps) => {
+    //TODO
+    return null;
     const { t } = useTranslation('alerts');
     const classes = useStyles();
 
@@ -288,7 +292,7 @@ export const AutoHideChipList: React.FC<AutoHideChipListProps> = React.memo(
               index: index,
               label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
               variant: 'outlined'
-            } as ActionableCustomChipProps)
+            }) as ActionableCustomChipProps
         ),
       [category, defaultClassification, index, items, type]
     );

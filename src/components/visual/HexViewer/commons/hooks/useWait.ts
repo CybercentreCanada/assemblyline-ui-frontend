@@ -5,7 +5,7 @@ export const useWaitEffect = (callback: () => void, condition: () => boolean, de
   const callbackRef = useRef(null);
   const conditionRef = useRef(null);
   const timerRef = useRef(null);
-  const delayRef = useRef();
+  const delayRef = useRef(null);
 
   useEffect(() => {
     callbackRef.current = callback;
@@ -14,8 +14,6 @@ export const useWaitEffect = (callback: () => void, condition: () => boolean, de
   useEffect(() => {
     conditionRef.current = condition;
   }, [condition]);
-
-
 
   useEffect(() => {
     timerRef.current = setInterval(() => {
@@ -29,14 +27,13 @@ export const useWaitEffect = (callback: () => void, condition: () => boolean, de
 
 export default useWaitEffect;
 
-
 // import { useCallback, useEffect, useRef } from 'react';
 
 // export const useWait = (callback, condition, delay) => {
 //   const callbackRef = useRef(null);
 //   const conditionRef = useRef(null);
 //   const timerRef = useRef(null);
-//   const delayRef = useRef();
+//   const delayRef = useRef(null);
 
 //   uuseEffect(() => {
 //     callbackRef.current = callback;

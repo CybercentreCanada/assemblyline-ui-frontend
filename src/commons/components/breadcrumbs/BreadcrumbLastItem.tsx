@@ -1,8 +1,6 @@
 import { Tooltip, Typography } from '@mui/material';
-import type { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
-import useAppSitemap from 'commons/components/app/hooks/useAppSitemap';
+import { useAppSitemap, type BreadcrumbItem } from 'commons/components/app/hooks';
 import BreadcrumbIcon from 'commons/components/breadcrumbs/BreadcrumbIcon';
-import * as React from 'react';
 
 type BreadcrumbLastItemProps = {
   textOnly?: boolean;

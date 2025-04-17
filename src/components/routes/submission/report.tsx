@@ -19,8 +19,7 @@ import Classification from 'components/visual/Classification';
 import { filterObject } from 'helpers/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 import AISummarySection from './detail/ai_summary';
 import Attack from './report/attack';
 import AttributionBanner from './report/attribution_banner';
@@ -210,7 +209,7 @@ export default function SubmissionReportPage() {
         )}
         <div style={{ marginBottom: theme.spacing(4) }}>
           <Grid container alignItems="center">
-            <Grid item xs>
+            <Grid size={{ xs: 12 }}>
               <div>
                 <Typography variant="h4">{t('title')}</Typography>
                 <Typography variant="caption">
@@ -218,10 +217,10 @@ export default function SubmissionReportPage() {
                 </Typography>
               </div>
             </Grid>
-            <Grid item xs className="print-only" style={{ textAlign: 'right' }}>
+            <Grid size={{ xs: 'grow' }} className="print-only" style={{ textAlign: 'right' }}>
               <img src={`/images/banner.svg`} alt="Assemblyline Banner" style={{ height: theme.spacing(8) }} />
             </Grid>
-            <Grid item xs={12} sm={3} className="no-print">
+            <Grid size={{ xs: 12, sm: 3 }} className="no-print">
               <div style={{ textAlign: 'right' }}>
                 {report ? (
                   <>

@@ -1,5 +1,4 @@
-import { Button, Typography, useTheme } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
+import { Button, Grid, Typography, useTheme } from '@mui/material';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
 import { useForm } from 'components/routes/development/library/contexts/form';
@@ -229,7 +228,7 @@ export const InputsSection = React.memo(() => {
         anchor
       >
         <Grid container spacing={2}>
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.text}
               children={value => (
@@ -244,7 +243,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.text}
               children={value => (
@@ -256,7 +255,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.number}
               children={value => (
@@ -271,7 +270,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.number}
               children={value => (
@@ -283,7 +282,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.select}
               children={value => (
@@ -303,7 +302,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.select}
               children={value => (
@@ -315,7 +314,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.date}
               children={value => (
@@ -330,7 +329,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.date}
               children={value => (
@@ -342,7 +341,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
@@ -357,7 +356,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
@@ -369,7 +368,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.checkbox}
               children={value => (
@@ -384,7 +383,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.checkbox}
               children={value => (
@@ -396,7 +395,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.switch}
               children={value => (
@@ -411,7 +410,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.switch}
               children={value => (

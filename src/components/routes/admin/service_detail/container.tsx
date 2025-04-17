@@ -64,10 +64,10 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <Typography variant="h6">{t('container')}</Typography>
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <Typography variant="subtitle2">
           {t('container.channel')}
           <ResetButton
@@ -100,7 +100,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           <Skeleton style={{ height: '2.5rem' }} />
         )}
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <Typography variant="subtitle2">
           {t('container.privileged')}
           <ResetButton
@@ -122,7 +122,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           <Skeleton style={{ height: '2.5rem' }} />
         )}
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <Typography variant="subtitle2">{t('container.image')}</Typography>
         {service ? (
           <ContainerCard
@@ -134,7 +134,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           <Skeleton style={{ height: '8rem' }} />
         )}
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <Typography variant="subtitle2">{t('container.dependencies')}</Typography>
         {service ? (
           Object.keys(service.dependencies).length !== 0 ? (
@@ -173,7 +173,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           <Skeleton style={{ height: '8rem' }} />
         )}
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <ContainerDialog open={dialog} setOpen={setDialog} name="" volumes={{}} onSave={handleDependencyChange} />
         <Button variant="contained" color="primary" onClick={() => setDialog(true)}>
           {t('container.dependencies.add')}

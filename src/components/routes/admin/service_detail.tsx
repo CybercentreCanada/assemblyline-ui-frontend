@@ -29,8 +29,7 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { getVersionQuery } from 'helpers/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router';
 import ServiceContainer from './service_detail/container';
 import ServiceGeneral from './service_detail/general';
 import ServiceParams from './service_detail/parameters';
@@ -216,11 +215,11 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
         waiting={buttonLoading}
       />
       <Grid container alignItems="center" spacing={3} style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid item xs>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="h4">{service ? service.name : <Skeleton style={{ width: '20rem' }} />}</Typography>
           <Typography variant="caption">{t('title.detail')}</Typography>
         </Grid>
-        <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+        <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
           {service ? (
             <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
               <Tooltip title={t('errors')}>

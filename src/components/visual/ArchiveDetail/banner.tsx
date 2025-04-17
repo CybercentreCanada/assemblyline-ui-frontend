@@ -13,7 +13,7 @@ import {
   Collapse,
   IconButton,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Popover,
@@ -34,8 +34,7 @@ import Moment from 'components/visual/Moment';
 import { bytesToSize } from 'helpers/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router';
 import Classification from '../Classification';
 import FileDownloader from '../FileDownloader';
 import InputDialog from '../InputDialog';
@@ -534,8 +533,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                       }}
                     >
                       <List disablePadding>
-                        <ListItem
-                          button
+                        <ListItemButton
                           component={Link}
                           to={`/submit?hash=${file.file_info.sha256}`}
                           state={{
@@ -548,13 +546,13 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                             <TuneOutlinedIcon />
                           </ListItemIcon>
                           <ListItemText primary={t('resubmit.modify')} />
-                        </ListItem>
-                        <ListItem button dense onClick={resubmit}>
+                        </ListItemButton>
+                        <ListItemButton dense onClick={resubmit}>
                           <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                             <OndemandVideoOutlinedIcon />
                           </ListItemIcon>
                           <ListItemText primary={t('resubmit.dynamic')} />
-                        </ListItem>
+                        </ListItemButton>
                       </List>
                     </Popover>
                   </>

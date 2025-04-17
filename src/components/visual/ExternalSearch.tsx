@@ -186,12 +186,12 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, v
           {names.map((keyName, k) => {
             return (
               <React.Fragment key={k}>
-                <Grid item xs={4} sm={4}>
+                <Grid size={{ xs: 4, sm: 4 }}>
                   <Tooltip title={ndMap[keyName]}>
                     <Typography>{keyName}</Typography>
                   </Tooltip>
                 </Grid>
-                <Grid item xs={8} sm={8}>
+                <Grid size={{ xs: 8, sm: 8 }}>
                   <div>
                     <AutoHideChipList items={valueMap[keyName]} />
                   </div>

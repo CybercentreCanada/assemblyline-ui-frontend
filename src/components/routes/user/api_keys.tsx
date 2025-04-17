@@ -212,7 +212,7 @@ const NewAPIKeyDialog = React.memo(({ apikey = null, onClose = () => null }: New
                 <Typography component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                   {apikey.keypassword}
                 </Typography>
-                <IconButton color="primary" size="large" onClick={() => copy(apikey.keypassword, 'drawerTop')}>
+                <IconButton color="primary" size="large" onClick={() => copy(apikey.keypassword)}>
                   <BsClipboard fontSize="large" />
                 </IconButton>
               </Card>

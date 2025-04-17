@@ -42,7 +42,7 @@ const Carousel: React.FC<CarouselProps> = ({
   const touchY = useRef<number>(-1);
   const touchStartX = useRef<number>(-1);
   const touchStartY = useRef<number>(-1);
-  const touchDirection = useRef<'left' | 'right' | 'scroll'>();
+  const touchDirection = useRef<'left' | 'right' | 'scroll'>(null);
   const touchStale = useRef<boolean>(false);
 
   const carouselRef = useRef<HTMLDivElement>(null);

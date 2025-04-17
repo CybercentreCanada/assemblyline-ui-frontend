@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/models/ui/user';
@@ -279,8 +279,8 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
                       value.label !== item.label
                         ? value
                         : typeof value !== 'string'
-                        ? { ...value, not: !value.not }
-                        : { label: value, value: value, not: true }
+                          ? { ...value, not: !value.not }
+                          : { label: value, value: value, not: true }
                     )
                   )
                 }

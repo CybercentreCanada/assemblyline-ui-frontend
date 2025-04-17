@@ -6,7 +6,7 @@ import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WrapTextOutlinedIcon from '@mui/icons-material/WrapTextOutlined';
 import { Grid, IconButton, Skeleton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
@@ -20,8 +20,7 @@ import CodeSection from 'components/visual/FileViewer/code_summary';
 import { TabContainer } from 'components/visual/TabContainer';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
@@ -112,7 +111,7 @@ const WrappedFileViewer = () => {
   return currentUser.roles.includes('file_detail') ? (
     <PageFullSize margin={4}>
       <Grid container alignItems="center">
-        <Grid item xs>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="h4">{t('title')}</Typography>
           {dataTruncated ? (
             <Tooltip title={t('error.truncated')} placement="bottom-start">
@@ -135,7 +134,7 @@ const WrappedFileViewer = () => {
             </Typography>
           )}
         </Grid>
-        <Grid item xs={12} sm={12} md={4} style={{ textAlign: 'right', flexGrow: 0 }}>
+        <Grid size={{ xs: 12, sm: 12, md: 4 }} style={{ textAlign: 'right', flexGrow: 0 }}>
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
             {currentUser.roles.includes('submission_view') && (
               <Tooltip title={wordwrap == 'on' ? t('linewrap.off') : t('linewrap.on')}>

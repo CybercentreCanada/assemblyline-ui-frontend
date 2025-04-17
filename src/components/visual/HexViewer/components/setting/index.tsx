@@ -1,9 +1,9 @@
 import { Button, Grid } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import makeStyles from '@mui/styles/makeStyles';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -46,7 +46,7 @@ export const WrappedHexSettings = ({ store }: StoreProps) => {
         <DialogTitle>{t('settings.title')}</DialogTitle>
         <DialogContent>
           <Grid container spacing={1} alignItems="center">
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Grid container spacing={1} alignItems="center">
                 {/* <HexBodyTypeSetting store={store} /> */}
                 <HexColumnSetting store={store} />

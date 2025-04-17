@@ -20,7 +20,7 @@ import SectionContainer from 'components/visual/SectionContainer';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
   container: {

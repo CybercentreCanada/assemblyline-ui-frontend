@@ -1,7 +1,6 @@
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Tooltip } from '@mui/material';
-import MuiBreadcrumbs from '@mui/material/Breadcrumbs';
-import type { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
+import { MoreHoriz } from '@mui/icons-material';
+import { Tooltip, Breadcrumbs as MuiBreadcrumbs } from '@mui/material';
+import { type BreadcrumbItem } from 'commons/components/app/hooks';
 import BreadcrumbLastItem from 'commons/components/breadcrumbs/BreadcrumbLastItem';
 import BreadcrumbLinkItem from 'commons/components/breadcrumbs/BreadcrumbLinkItem';
 import { useState } from 'react';
@@ -37,7 +36,7 @@ const BreadcrumbsEllipsis = ({ onClick, expanded }) => {
   const { t } = useTranslation();
   return (
     <Tooltip title={t(expanded ? 'tooltip.breadcrumbs.min' : 'tooltip.breadcrumbs.max')}>
-      <MoreHorizIcon
+      <MoreHoriz
         fontSize="small"
         sx={{
           verticalAlign: 'bottom',

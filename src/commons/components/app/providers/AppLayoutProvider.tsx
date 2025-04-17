@@ -1,14 +1,13 @@
 import { CssBaseline, styled, useMediaQuery, useTheme } from '@mui/material';
-import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { type AppLayoutMode } from 'commons/components/app/AppConfigs';
+import { AppStorageKeys } from 'commons/components/app/AppConstants';
+import { AppLayoutContext } from 'commons/components/app/AppContexts';
+import { AppQuickNav } from 'commons/components/app/AppQuickNav';
+import { useAppConfigs, useAppUser } from 'commons/components/app/hooks';
 import LeftNavDrawer from 'commons/components/leftnav/LeftNavDrawer';
 import AppBar from 'commons/components/topnav/AppBar';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
-import type { ReactNode } from 'react';
-import { createContext, useCallback, useMemo, useState } from 'react';
-import type { AppLayoutMode } from '../AppConfigs';
-import { AppStorageKeys } from '../AppConstants';
-import type { AppLayoutContextType } from '../AppContexts';
+import { type ReactNode, useCallback, useMemo, useState } from 'react';
 
 const { LS_KEY_LAYOUT_MODE } = AppStorageKeys;
 
@@ -54,9 +53,7 @@ type AppLayoutProps = {
   children: ReactNode;
 };
 
-export const AppLayoutContext = createContext<AppLayoutContextType>(null);
-
-export default function AppLayoutProvider({ children }: AppLayoutProps) {
+const AppLayoutProvider = ({ children }: AppLayoutProps) => {
   const muiTheme = useTheme();
   const { preferences } = useAppConfigs();
   const user = useAppUser();
@@ -67,6 +64,7 @@ export default function AppLayoutProvider({ children }: AppLayoutProps) {
   const [current, setCurrent] = useLocalStorageItem<AppLayoutMode>(LS_KEY_LAYOUT_MODE, preferences.defaultLayout);
   const [layoutReady, setLayoutReady] = useState<boolean>(false);
   const [showMenus, setShowMenus] = useState<boolean>(true);
+  const [focus, setFocus] = useState<boolean>(false);
 
   // Callback to toggle between 'side' and 'top' layouts.
   const toggle = useCallback(() => setCurrent(current === 'top' ? 'side' : 'top'), [current, setCurrent]);
@@ -75,46 +73,74 @@ export default function AppLayoutProvider({ children }: AppLayoutProps) {
   const hideMenus = useCallback(() => setShowMenus(false), []);
 
   // Callback to indicate whether the app layout is ready to be fully rendered.
-  const setReady = useCallback(isReady => setLayoutReady(isReady), []);
+  const setReady = useCallback((isReady: boolean) => setLayoutReady(isReady), []);
+
+  // Union between AppLayoutMode + 'zen'.
+  const mode = useMemo(() => {
+    return focus ? ('focus' as const) : current;
+  }, [focus, current]);
+
+  const showNavs = useMemo(() => {
+    return !focus && showMenus;
+  }, [focus, showMenus]);
 
   // Memoize the value of the context provider.
   const context = useMemo(() => {
     return {
+      mode,
       ready: layoutReady,
       current: preferences.allowLayoutSelection ? current : preferences.defaultLayout,
       hideMenus,
       setReady,
-      toggle
+      toggle,
+      setFocus
     };
-  }, [current, preferences.allowLayoutSelection, preferences.defaultLayout, hideMenus, layoutReady, setReady, toggle]);
+  }, [
+    current,
+    mode,
+    preferences.allowLayoutSelection,
+    preferences.defaultLayout,
+    hideMenus,
+    layoutReady,
+    setReady,
+    setFocus,
+    toggle
+  ]);
 
   return (
     <AppLayoutContext.Provider value={context}>
       <CssBaseline enableColorScheme />
-      {context.current === 'side' ? (
-        <AppVertical>
-          <AppVerticalLeft>{user.isReady() && layoutReady && showMenus && <LeftNavDrawer />}</AppVerticalLeft>
-          <AppVerticalRight
-            id="app-scrollct"
-            style={{ overflow: 'auto', paddingLeft: showMenus && isSM && !isPrinting ? muiTheme.spacing(7) : 0 }}
-          >
-            <div id="top"></div>
-            {user.isReady() && layoutReady && showMenus && <AppBar />}
-            {children}
-          </AppVerticalRight>
-        </AppVertical>
-      ) : (
-        <AppHorizontal id="app-scrollct" style={{ overflow: 'auto' }}>
-          <div id="top"></div>
-          {user.isReady() && layoutReady && showMenus && <AppBar />}
-          <AppVertical>
-            <AppVerticalLeft>{user.isReady() && layoutReady && showMenus && <LeftNavDrawer />}</AppVerticalLeft>
-            <AppVerticalRight style={{ paddingLeft: showMenus && isSM && !isPrinting ? muiTheme.spacing(7) : 0 }}>
-              {children}
-            </AppVerticalRight>
-          </AppVertical>
-        </AppHorizontal>
-      )}
+      <AppQuickNav />
+
+      {
+        {
+          side: (
+            <AppVertical>
+              <AppVerticalLeft>{user.isReady() && layoutReady && showNavs && <LeftNavDrawer />}</AppVerticalLeft>
+              <AppVerticalRight
+                id="app-scrollct"
+                style={{ overflow: 'auto', paddingLeft: showNavs && isSM && !isPrinting ? muiTheme.spacing(7) : 0 }}
+              >
+                {user.isReady() && layoutReady && showNavs && <AppBar />}
+                {children}
+              </AppVerticalRight>
+            </AppVertical>
+          ),
+          top: (
+            <AppHorizontal id="app-scrollct" style={{ overflow: 'auto' }}>
+              {user.isReady() && layoutReady && showNavs && <AppBar />}
+              <AppVertical>
+                <AppVerticalLeft>{user.isReady() && layoutReady && showNavs && <LeftNavDrawer />}</AppVerticalLeft>
+                <AppVerticalRight style={{ paddingLeft: showNavs && isSM && !isPrinting ? muiTheme.spacing(7) : 0 }}>
+                  {children}
+                </AppVerticalRight>
+              </AppVertical>
+            </AppHorizontal>
+          )
+        }[current]
+      }
     </AppLayoutContext.Provider>
   );
-}
+};
+
+export default AppLayoutProvider;

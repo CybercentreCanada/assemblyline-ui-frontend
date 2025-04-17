@@ -1,7 +1,6 @@
 import BlockIcon from '@mui/icons-material/Block';
+import { styled } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { makeStyles } from '@mui/styles';
-import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import React, { memo, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -9,47 +8,53 @@ import { useTranslation } from 'react-i18next';
 import { AiOutlineSecurityScan } from 'react-icons/ai';
 import { ByteNumber } from './ByteNumber';
 
-type FileDropperProps = {
-  file: File;
-  setFile: (file: File) => void;
-  disabled: boolean;
+type DropZoneProps = {
+  enter?: boolean;
+  hover?: boolean;
 };
 
-const useStyles = makeStyles(theme => ({
-  drop_zone: {
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: theme.spacing(3),
-    backgroundColor: theme.palette.action.hover,
-    outline: 'none',
-    border: `2px ${theme.palette.action.disabled} dashed`,
-    borderRadius: '6px',
-    color: theme.palette.action.disabled
-  },
-  drag_enter: {
+const DropZone = styled('div', {
+  shouldForwardProp: prop => prop !== 'enter' && prop !== 'hover'
+})<DropZoneProps>(({ theme, enter = false, hover = false }) => ({
+  flex: '1',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: theme.spacing(3),
+  backgroundColor: theme.palette.action.hover,
+  outline: 'none',
+  border: `2px ${theme.palette.action.disabled} dashed`,
+  borderRadius: '6px',
+  color: theme.palette.action.disabled,
+
+  ...(enter && {
     border: `2px ${theme.palette.text.disabled} dashed`,
     backgroundColor: theme.palette.action.selected,
     color: theme.palette.text.disabled
-  },
-  drop_zone_hover_enabled: {
+  }),
+
+  ...(hover && {
     transition: '150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-    '-webkit-transition': '150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+    // '-webkit-transition': '150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
     '&:hover': {
       border: `2px ${theme.palette.text.disabled} dashed`,
       backgroundColor: theme.palette.action.selected,
       color: theme.palette.text.disabled,
       cursor: 'pointer'
     }
-  }
+  })
 }));
+
+type FileDropperProps = {
+  file: File;
+  setFile: (file: File) => void;
+  disabled: boolean;
+};
 
 const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) => {
   const { t } = useTranslation(['submit']);
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({ disabled });
   const { user: currentUser, configuration } = useALContext();
-  const classes = useStyles();
 
   useEffect(() => {
     if (acceptedFiles.length !== 0) {
@@ -59,14 +64,7 @@ const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) =>
   }, [acceptedFiles]);
 
   return (
-    <div
-      {...getRootProps()}
-      className={clsx(
-        classes.drop_zone,
-        isDragActive && !disabled && classes.drag_enter,
-        !disabled && classes.drop_zone_hover_enabled
-      )}
-    >
+    <DropZone {...getRootProps()} enter={isDragActive && !disabled} hover={!disabled}>
       <input id="file_dropper" {...getInputProps()} />
       {currentUser.roles.includes('submission_create') ? (
         <AiOutlineSecurityScan style={{ fontSize: '140px' }} />
@@ -79,8 +77,10 @@ const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) =>
             {isDragActive && !disabled
               ? t('file_dropper.drophere')
               : file
-              ? file.name
-              : t(currentUser.roles.includes('submission_create') ? 'file_dropper.dragzone' : 'file_dropper.disabled')}
+                ? file.name
+                : t(
+                    currentUser.roles.includes('submission_create') ? 'file_dropper.dragzone' : 'file_dropper.disabled'
+                  )}
           </b>
         </Typography>
         {file && (!isDragActive || disabled) ? (
@@ -91,7 +91,7 @@ const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) =>
           </ByteNumber>
         )}
       </div>
-    </div>
+    </DropZone>
   );
 };
 

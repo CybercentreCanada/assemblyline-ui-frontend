@@ -159,10 +159,10 @@ export default function ApiDoc() {
       <div style={{ textAlign: 'left' }}>
         <div style={{ marginBottom: theme.spacing(4) }}>
           <Grid container>
-            <Grid item xs={12} sm>
+            <Grid size={{ xs: 12, sm: 'grow' }}>
               <Typography variant="h4">{t('title')}</Typography>
             </Grid>
-            <Grid item xs={12} sm={12} md style={{ textAlign: 'end' }}>
+            <Grid size={{ xs: 12, sm: 12, md: 'grow' }} style={{ textAlign: 'end' }}>
               {apiList && apiSelected ? (
                 <FormControl size="small">
                   <Select
@@ -284,10 +284,10 @@ export default function ApiDoc() {
                           >
                             <Grid container alignItems="center">
                               <>
-                                <Grid item xs={8} sm={4} md={3} lg={2}>
+                                <Grid size={{ xs: 8, sm: 4, md: 3, lg: 2 }}>
                                   <div style={{ fontWeight: 500 }}>{t('complete')}:</div>
                                 </Grid>
-                                <Grid item xs={4} sm={8} md={9} lg={4}>
+                                <Grid size={{ xs: 4, sm: 8, md: 9, lg: 4 }}>
                                   {api.complete ? (
                                     <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
                                   ) : (
@@ -296,10 +296,10 @@ export default function ApiDoc() {
                                 </Grid>
                               </>
                               <>
-                                <Grid item xs={8} sm={4} md={3} lg={2}>
+                                <Grid size={{ xs: 8, sm: 4, md: 3, lg: 2 }}>
                                   <div style={{ fontWeight: 500 }}>{t('protected')}:</div>
                                 </Grid>
-                                <Grid item xs={4} sm={8} md={9} lg={4}>
+                                <Grid size={{ xs: 4, sm: 8, md: 9, lg: 4 }}>
                                   {api.protected ? (
                                     <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
                                   ) : (
@@ -309,10 +309,10 @@ export default function ApiDoc() {
                               </>
                               {configuration.ui.enforce_quota && (
                                 <>
-                                  <Grid item xs={12} sm={4} md={3} lg={2}>
+                                  <Grid size={{ xs: 12, sm: 4, md: 3, lg: 2 }}>
                                     <div style={{ fontWeight: 500 }}>{t('quota')}:</div>
                                   </Grid>
-                                  <Grid item xs={12} sm={8} md={9} lg={4}>
+                                  <Grid size={{ xs: 12, sm: 8, md: 9, lg: 4 }}>
                                     {api.count_towards_quota ? (
                                       <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
                                     ) : (
@@ -322,10 +322,10 @@ export default function ApiDoc() {
                                 </>
                               )}
                               <>
-                                <Grid item xs={12} sm={4} md={3} lg={2}>
+                                <Grid size={{ xs: 12, sm: 4, md: 3, lg: 2 }}>
                                   <div style={{ fontWeight: 500 }}>{t('require_role')}:</div>
                                 </Grid>
-                                <Grid item xs={12} sm={8} md={9} lg={4}>
+                                <Grid size={{ xs: 12, sm: 8, md: 9, lg: 4 }}>
                                   {api.require_role.map((utype, uidx) => (
                                     <CustomChip
                                       key={uidx}
@@ -338,10 +338,10 @@ export default function ApiDoc() {
                                 </Grid>
                               </>
                               <>
-                                <Grid item xs={12} sm={4} md={3} lg={2}>
+                                <Grid size={{ xs: 12, sm: 4, md: 3, lg: 2 }}>
                                   <div style={{ fontWeight: 500 }}>{t('methods')}:</div>
                                 </Grid>
-                                <Grid item xs={12} sm={8} md={9} lg={4}>
+                                <Grid size={{ xs: 12, sm: 8, md: 9, lg: 4 }}>
                                   {api.methods.map((met, metid) => (
                                     <CustomChip
                                       key={metid}
@@ -354,20 +354,20 @@ export default function ApiDoc() {
                                 </Grid>
                               </>
                               <>
-                                <Grid item xs={12} sm={4} md={3} lg={2}>
+                                <Grid size={{ xs: 12, sm: 4, md: 3, lg: 2 }}>
                                   <div style={{ fontWeight: 500 }}>{t('path')}:</div>
                                 </Grid>
-                                <Grid item xs={12} sm={8} md={9} lg={4}>
+                                <Grid size={{ xs: 12, sm: 8, md: 9, lg: 4 }}>
                                   <div style={{ lineHeight: 2, fontFamily: 'Monospace', wordBreak: 'break-word' }}>
                                     {api.path}
                                   </div>
                                 </Grid>
                               </>
                               <>
-                                <Grid item xs={12}>
+                                <Grid size={{ xs: 12 }}>
                                   <div style={{ fontWeight: 500, lineHeight: 2 }}>{t('description')}:</div>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid size={{ xs: 12 }}>
                                   <Card variant="outlined" style={{ overflowX: 'auto' }}>
                                     <pre style={{ paddingLeft: sp2, paddingRight: sp2 }}>{api.description}</pre>
                                   </Card>

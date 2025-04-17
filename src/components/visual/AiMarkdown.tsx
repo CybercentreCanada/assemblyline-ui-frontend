@@ -3,7 +3,6 @@ import makeStyles from '@mui/styles/makeStyles';
 import { t } from 'i18next';
 import React from 'react';
 import Markdown from 'react-markdown';
-import { ReactMarkdownProps } from 'react-markdown/lib/complex-types';
 
 const useStyles = makeStyles(theme => ({
   codeSpan: {
@@ -55,6 +54,8 @@ type AIMarkdownProps = {
   truncated: boolean;
   dense?: boolean;
 };
+
+type ReactMarkdownProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
 const Title: React.FC<ReactMarkdownProps> = props => {
   const classes = useStyles();

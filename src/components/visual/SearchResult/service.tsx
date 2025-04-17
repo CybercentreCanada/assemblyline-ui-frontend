@@ -13,7 +13,7 @@ import InformativeAlert from 'components/visual/InformativeAlert';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 type Props = {
   serviceResults: ServiceIndexed[];

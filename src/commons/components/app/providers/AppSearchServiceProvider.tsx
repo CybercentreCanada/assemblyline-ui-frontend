@@ -1,27 +1,26 @@
-import type { ReactElement } from 'react';
-import { createContext, useMemo, useState } from 'react';
+import { type ReactElement, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import type { AppSearchServiceContextType, AppSearchServiceState } from '../AppContexts';
-import type { AppSearchService } from '../AppSearchService';
-import useAppConfigs from '../hooks/useAppConfigs';
+import {
+  AppSearchServiceContext,
+  type AppSearchServiceContextType,
+  type AppSearchServiceState
+} from 'commons/components/app/AppContexts';
+import type { AppSearchService } from 'commons/components/app/AppSearchService';
+import { useAppConfigs } from 'commons/components/app/hooks';
 
 const DEFAULT_CONTEXT: AppSearchServiceContextType = {
   provided: false,
   service: {
-    itemRenderer: (item: any) => <div />
+    itemRenderer: () => <div />
   },
   state: {
     searching: false,
     menu: false,
     mode: 'inline',
     items: null,
-    autoReset: true,
-    focused: false,
     set: () => null
   }
 };
-
-export const AppSearchServiceContext = createContext<AppSearchServiceContextType>(DEFAULT_CONTEXT);
 
 export default function AppSearchServiceProvider<T = any>({
   service,
@@ -42,7 +41,7 @@ export default function AppSearchServiceProvider<T = any>({
       onEnter: (value: string) => {
         navigate(`${searchUri}?${params}=${encodeURIComponent(value)}`);
       },
-      itemRenderer: (item: any) => <div />
+      itemRenderer: () => <div />
     };
   }, [preferences, navigate]);
 

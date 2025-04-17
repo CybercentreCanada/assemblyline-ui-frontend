@@ -23,7 +23,7 @@ import {
   IconButton,
   LinearProgress,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Popover,
@@ -64,8 +64,7 @@ import { setNotifyFavicon } from 'helpers/utils';
 import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 import AISummarySection from './detail/ai_summary';
@@ -1124,21 +1123,19 @@ function WrappedSubmissionDetail() {
           >
             <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
             <Grid container style={{ marginTop: theme.spacing(1) }}>
-              <Grid item xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <b>{t('outstanding.services')}</b>
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <b>{t('outstanding.files')}</b>
               </Grid>
             </Grid>
             {Object.keys(outstanding).map(service => (
               <Grid key={service} container>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <b>{service}</b>
                 </Grid>
-                <Grid item xs={6}>
-                  {outstanding[service]}
-                </Grid>
+                <Grid size={{ xs: 6 }}>{outstanding[service]}</Grid>
               </Grid>
             ))}
           </Alert>
@@ -1152,7 +1149,7 @@ function WrappedSubmissionDetail() {
         )}
         <div style={{ paddingBottom: sp4 }}>
           <Grid container>
-            <Grid item xs>
+            <Grid size={{ xs: 12 }}>
               <div>
                 <Typography variant="h4">{t('title')}</Typography>
                 <Typography variant="caption" component={'div'}>
@@ -1205,7 +1202,7 @@ function WrappedSubmissionDetail() {
                 </div>
               )}
             </Grid>
-            <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
+            <Grid size={{ xs: 12, sm: 12, md: 4 }} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {submission ? (
                   submission.state === 'completed' ? (
@@ -1276,8 +1273,7 @@ function WrappedSubmissionDetail() {
                             }}
                           >
                             <List disablePadding>
-                              <ListItem
-                                button
+                              <ListItemButton
                                 component={Link}
                                 to={`/submit?hash=${submission.files[0].sha256}`}
                                 state={{
@@ -1291,28 +1287,28 @@ function WrappedSubmissionDetail() {
                                   <TuneOutlinedIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={t('resubmit.modify')} />
-                              </ListItem>
-                              <ListItem button dense onClick={() => resubmitWithType('dynamic')}>
+                              </ListItemButton>
+                              <ListItemButton dense onClick={() => resubmitWithType('dynamic')}>
                                 <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                   <OndemandVideoOutlinedIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={t('resubmit.dynamic')} />
-                              </ListItem>
+                              </ListItemButton>
                               {submissionProfiles &&
                                 Object.entries(submissionProfiles).map(([name, display]) => (
-                                  <ListItem key={name} button dense onClick={() => resubmitWithType(name)}>
+                                  <ListItemButton key={name} dense onClick={() => resubmitWithType(name)}>
                                     <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                       <OndemandVideoOutlinedIcon />
                                     </ListItemIcon>
                                     <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
-                                  </ListItem>
+                                  </ListItemButton>
                                 ))}
-                              <ListItem button dense onClick={resubmit}>
+                              <ListItemButton dense onClick={resubmit}>
                                 <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                   <RepeatOutlinedIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={t('resubmit.carbon_copy')} />
-                              </ListItem>
+                              </ListItemButton>
                             </List>
                           </Popover>
                         </>
@@ -1372,7 +1368,7 @@ function WrappedSubmissionDetail() {
                           <VerdictBar verdicts={submission.verdict} />
                           {currentUser.roles.includes('submission_manage') && (
                             <Grid container>
-                              <Grid item xs={5} style={{ textAlign: 'left' }}>
+                              <Grid size={{ xs: 5 }} style={{ textAlign: 'left' }}>
                                 <Tooltip
                                   title={t(
                                     `verdict.${
@@ -1392,8 +1388,8 @@ function WrappedSubmissionDetail() {
                                   </IconButton>
                                 </Tooltip>
                               </Grid>
-                              <Grid item xs={2} />
-                              <Grid item xs={5} style={{ textAlign: 'right' }}>
+                              <Grid size={{ xs: 2 }} />
+                              <Grid size={{ xs: 5 }} style={{ textAlign: 'right' }}>
                                 <Tooltip
                                   title={t(
                                     `verdict.${

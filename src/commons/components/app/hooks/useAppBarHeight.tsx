@@ -2,7 +2,7 @@ import { useLayoutEffect, useState } from 'react';
 
 export const APPBAR_READY_EVENT = 'tui.event.appbar.ready';
 
-export default function useAppBarHeight(): number {
+export function useAppBarHeight(): number {
   const [height, setHeight] = useState<number>(-1);
 
   const updateHeight = () => {

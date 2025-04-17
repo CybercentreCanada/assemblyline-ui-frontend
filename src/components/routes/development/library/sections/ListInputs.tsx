@@ -1,5 +1,4 @@
-import { Typography, useTheme } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
+import { Grid, Typography, useTheme } from '@mui/material';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
 import { useForm } from 'components/routes/development/library/contexts/form';
@@ -217,7 +216,7 @@ export const ListInputsSection = React.memo(() => {
         </div>
 
         <Grid container spacing={2}>
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.text}
               children={value => (
@@ -231,7 +230,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="center">
+          <Grid size={{ xs: 12, md: 6 }} alignItems="center">
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.text}
               children={value => (
@@ -243,7 +242,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.number}
               children={value => (
@@ -257,7 +256,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="center">
+          <Grid size={{ xs: 12, md: 6 }} alignItems="center">
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.number}
               children={value => (
@@ -269,7 +268,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.select}
               children={value => (
@@ -288,7 +287,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="center">
+          <Grid size={{ xs: 12, md: 6 }} alignItems="center">
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.select}
               children={value => (
@@ -300,7 +299,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.classification}
               children={value => (
@@ -314,7 +313,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="center">
+          <Grid size={{ xs: 12, md: 6 }} alignItems="center">
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.classification}
               children={value => (
@@ -326,7 +325,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.boolean}
               children={value => (
@@ -340,7 +339,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="center">
+          <Grid size={{ xs: 12, md: 6 }} alignItems="center">
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.boolean}
               children={value => (

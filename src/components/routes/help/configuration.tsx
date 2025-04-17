@@ -83,7 +83,7 @@ export default function Configuration() {
                   {Object.entries(constants.priorities)
                     .sort((a: [string, [number, number]], b: [string, [number, number]]) => a[1][0] - b[1][0])
                     .map((priority: [string, [number, number]], id) => (
-                      <Grid key={id} item xs={12} sm={6} md={4} lg={3} xl={2}>
+                      <Grid key={id} size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
                         <div style={{ display: 'inline-block', fontWeight: 500 }}>{priority[0]}:&nbsp;&nbsp;</div>
                         <div
                           style={{ display: 'inline-block', fontWeight: 300 }}
@@ -93,7 +93,7 @@ export default function Configuration() {
                 </>
               ) : (
                 [...Array(8)].map((_, i) => (
-                  <Grid item key={i} xs={12} sm={6} md={4} lg={3} xl={2}>
+                  <Grid key={i} size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
                     <div style={{ display: 'inline-block', fontWeight: 500 }}>
                       <Skeleton key={i} style={{ height: '2rem', width: '5rem', margin: '2px' }} />
                     </div>
@@ -125,7 +125,7 @@ export default function Configuration() {
               {constants
                 ? constants.file_types.map((type, id) =>
                     type[0] !== '*' && type[1].length !== 0 ? (
-                      <Grid key={id} item xs={12} md={6} lg={4} xl={3}>
+                      <Grid key={id} size={{ xs: 12, md: 6, lg: 4, xl: 3 }}>
                         <div style={{ display: 'inline-block', fontWeight: 500 }}>{type[0]}</div>
                         <div style={{ display: 'inline-block', fontWeight: 300 }}>
                           &nbsp;::&nbsp;{type[1].join(', ')}
@@ -134,7 +134,7 @@ export default function Configuration() {
                     ) : null
                   )
                 : [...Array(40)].map((_, i) => (
-                    <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
+                    <Grid key={i} size={{ xs: 12, md: 6, lg: 4, xl: 3 }}>
                       <div style={{ display: 'inline-block', fontWeight: 500 }}>
                         <Skeleton style={{ height: '2rem', width: '4rem', margin: '2px' }} />
                       </div>
@@ -153,13 +153,13 @@ export default function Configuration() {
               {constants
                 ? constants.file_types.map((type, id) =>
                     type[0] !== '*' && type[1].length === 0 ? (
-                      <Grid key={id} item xs={12} sm={6} md={4} lg={3}>
+                      <Grid key={id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                         <div style={{ display: 'inline-block', fontWeight: 500 }}>{type[0]}</div>
                       </Grid>
                     ) : null
                   )
                 : [...Array(60)].map((_, i) => (
-                    <Grid key={i} item xs={12} sm={6} md={4} lg={3}>
+                    <Grid key={i} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                       <div style={{ display: 'inline-block', fontWeight: 500 }}>
                         <Skeleton style={{ height: '2rem', width: '8rem', margin: '2px' }} />
                       </div>
@@ -189,11 +189,7 @@ export default function Configuration() {
               ? Object.keys(configuration).map((key, idx) => (
                   <Grid key={idx} container spacing={1}>
                     <Grid
-                      item
-                      xs={12}
-                      sm={5}
-                      md={4}
-                      lg={3}
+                      size={{ xs: 12, sm: 5, md: 4, lg: 3 }}
                       style={{
                         overflowX: 'hidden',
                         whiteSpace: 'nowrap',
@@ -202,7 +198,7 @@ export default function Configuration() {
                     >
                       <span style={{ fontWeight: 500 }}>{key}</span>
                     </Grid>
-                    <Grid item xs={12} sm={7} md={8} lg={9}>
+                    <Grid size={{ xs: 12, sm: 7, md: 8, lg: 9 }}>
                       <div style={{ fontWeight: 300 }}>
                         {typeof configuration[key] !== 'object' ? (
                           <div>{String(configuration[key])}</div>
@@ -222,10 +218,10 @@ export default function Configuration() {
                 ))
               : [...Array(10)].map((_, i) => (
                   <Grid key={i} container spacing={1}>
-                    <Grid key={i} item xs={12} sm={5} md={4} lg={3}>
+                    <Grid key={i} size={{ xs: 12, sm: 5, md: 4, lg: 3 }}>
                       <Skeleton style={{ height: '2rem' }} />
                     </Grid>
-                    <Grid item xs={12} sm={7} md={8} lg={9}>
+                    <Grid size={{ xs: 12, sm: 7, md: 8, lg: 9 }}>
                       <Skeleton style={{ height: '2rem' }} />
                     </Grid>
                   </Grid>

@@ -1,6 +1,6 @@
 import { useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppTheme from 'commons/components/app/hooks/useAppTheme';
+import { useAppTheme } from 'commons/components/app/hooks';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ACTIONS, DataProps, HexLoading, HexPageLayout, ModeLanguage, ModeTheme, ModeWidth, useStore } from '..';

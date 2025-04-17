@@ -1,4 +1,4 @@
-import ListItem from '@mui/material/ListItem';
+import { ListItemButton } from '@mui/material';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { default as React } from 'react';
@@ -11,10 +11,10 @@ export type ListElementProps = {
 
 export const WrappedListElement = ({ title = '', icon = null, onClick = () => null }: ListElementProps) => {
   return (
-    <ListItem button dense onClick={onClick}>
+    <ListItemButton dense onClick={onClick}>
       <ListItemIcon>{icon}</ListItemIcon>
       <ListItemText primary={title} />
-    </ListItem>
+    </ListItemButton>
   );
 };
 

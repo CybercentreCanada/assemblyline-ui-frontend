@@ -42,7 +42,7 @@ import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import FileDropper from './FileDropper';
 
 export const ClassificationInput = React.memo(() => {
@@ -691,16 +691,16 @@ const AnalyzeButton = React.memo(({ children, ...props }: ButtonProps) => {
           {children
             ? children
             : phase === 'redirecting'
-            ? t('submit.button.redirecting.label')
-            : phase === 'uploading'
-            ? progress
-              ? `${progress}% ${t('submit.button.uploadProgress.label')}`
-              : t('submit.button.uploading.label')
-            : phase === 'editing'
-            ? t('submit.button.editing.label')
-            : phase === 'loading'
-            ? t('submit.button.loading.label')
-            : null}
+              ? t('submit.button.redirecting.label')
+              : phase === 'uploading'
+                ? progress
+                  ? `${progress}% ${t('submit.button.uploadProgress.label')}`
+                  : t('submit.button.uploading.label')
+                : phase === 'editing'
+                  ? t('submit.button.editing.label')
+                  : phase === 'loading'
+                    ? t('submit.button.loading.label')
+                    : null}
         </Button>
       )}
     />
