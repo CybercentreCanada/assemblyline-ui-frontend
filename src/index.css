@@ -63,3 +63,11 @@
     display: none !important;
   }
 }
+
+.development-customize-div-class {
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  margin: 4px;
+  padding: 4px;
+}
