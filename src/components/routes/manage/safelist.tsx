@@ -23,8 +23,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import SafelistTable from 'components/visual/SearchResult/safelist';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import SafelistNew from './safelist_add';
 import SafelistDetail from './safelist_detail';
 

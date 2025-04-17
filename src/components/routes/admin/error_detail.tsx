@@ -19,8 +19,7 @@ import Moment from 'components/visual/Moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { Navigate } from 'react-router';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useParams } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
   clipboardIcon: {

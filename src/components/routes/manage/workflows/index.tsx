@@ -21,8 +21,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import WorkflowTable from 'components/visual/SearchResult/workflow';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import WorkflowCreate from './create';
 import WorkflowDetail from './detail';
 

@@ -23,8 +23,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import SignatureDetail from './signature_detail';
 
 const SIGNATURES_PARAMS = createSearchParams(p => ({

@@ -20,8 +20,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import BadlistTable from 'components/visual/SearchResult/badlist';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import BadlistNew from './badlist_add';
 import BadlistDetail from './badlist_detail';
 

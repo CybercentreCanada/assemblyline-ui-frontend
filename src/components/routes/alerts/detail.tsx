@@ -28,7 +28,7 @@ import { verdictToColor } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import AlertActions, {
   AlertBadlist,
   AlertGroup,

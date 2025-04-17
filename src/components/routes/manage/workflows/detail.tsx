@@ -10,7 +10,7 @@ import CustomChip from 'components/visual/CustomChip';
 import Moment from 'components/visual/Moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import {
   DeleteWorkflowAction,
   DuplicateWorkflowAction,

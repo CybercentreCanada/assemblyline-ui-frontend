@@ -34,8 +34,7 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX } from 'helpers/constants';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
   endAdornment: {

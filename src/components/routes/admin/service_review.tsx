@@ -16,8 +16,7 @@ import { getVersionQuery } from 'helpers/utils';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router';
 
 // TODO: version doesn't seem to be set correctly
 type ServiceStats = ServiceStatsData & { version: string };

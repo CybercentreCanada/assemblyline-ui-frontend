@@ -13,7 +13,7 @@ import CustomChip from 'components/visual/CustomChip';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;

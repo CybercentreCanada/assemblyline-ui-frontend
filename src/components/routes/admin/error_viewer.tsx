@@ -22,8 +22,7 @@ import ErrorsTable from 'components/visual/SearchResult/errors';
 import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import { ErrorDetail } from './error_detail';
 
 const TIME_CONTRAINTS = ['24h', '4d', '7d', '1m', '1y'] as const;

@@ -41,7 +41,7 @@ import type { CSSProperties } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 import { AlertEventsTable } from './Components';
 import AlertFiltersSelected from './FiltersSelected';
 import { AlertWorkflowDrawer } from './Workflows';

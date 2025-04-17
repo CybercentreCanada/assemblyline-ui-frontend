@@ -16,7 +16,7 @@ import ResultsTable from 'components/visual/SearchResult/results';
 import { safeFieldValueURI } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
   preview: {

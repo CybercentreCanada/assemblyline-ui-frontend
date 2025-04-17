@@ -17,8 +17,7 @@ import TextDivider from 'components/visual/TextDivider';
 import { getProvider, getSAMLData } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 
 const useStyles = makeStyles(() =>
   createStyles({

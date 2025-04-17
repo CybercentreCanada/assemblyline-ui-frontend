@@ -27,7 +27,7 @@ import { MonacoEditor } from 'components/visual/MonacoEditor';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
   circularProgress: {

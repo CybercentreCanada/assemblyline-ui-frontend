@@ -20,8 +20,7 @@ import RetrohuntTable from 'components/visual/SearchResult/retrohunt';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 

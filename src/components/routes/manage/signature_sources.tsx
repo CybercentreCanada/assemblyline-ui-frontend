@@ -40,7 +40,7 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiGitBranch } from 'react-icons/di';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { SourceDetail } from './signature_sources_details';
 
 const useStyles = makeStyles(theme => ({

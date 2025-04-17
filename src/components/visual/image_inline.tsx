@@ -6,7 +6,7 @@ import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Image, ImageBody } from 'components/models/base/result_body';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const useStyles = makeStyles((theme: Theme) => ({
   printable: {

@@ -35,8 +35,7 @@ import Classification from 'components/visual/Classification';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router';
 
 const useStyles = makeStyles(() => ({
   buttonProgress: {

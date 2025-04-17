@@ -35,8 +35,7 @@ import { searchResultsDisplay } from 'helpers/utils';
 import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import ForbiddenPage from './403';
 
 const PAGE_SIZE = 25;

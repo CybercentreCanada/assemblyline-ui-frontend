@@ -9,8 +9,7 @@ import { SCOPES } from 'components/models/base/user';
 import type { CustomUser } from 'components/models/ui/user';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 
 const VALID_SCOPES: Omit<Scope, 'c'>[] = SCOPES.filter(s => s !== 'c');
 

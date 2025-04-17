@@ -20,8 +20,7 @@ import CodeSection from 'components/visual/FileViewer/code_summary';
 import { TabContainer } from 'components/visual/TabContainer';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 

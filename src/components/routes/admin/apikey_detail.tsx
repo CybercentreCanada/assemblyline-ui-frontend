@@ -27,8 +27,7 @@ import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
 type ParamProps = {
   id: string;

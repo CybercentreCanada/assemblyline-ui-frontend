@@ -42,8 +42,7 @@ import { yaraConfig, yaraDef } from 'helpers/yara';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TbUserX } from 'react-icons/tb';
-import { useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 

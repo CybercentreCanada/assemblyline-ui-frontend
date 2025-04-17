@@ -6,8 +6,8 @@
 import type { Blocker, History, Transition } from 'history';
 import type { ContextType } from 'react';
 import { useContext, useEffect, useRef } from 'react';
-import type { Navigator as BaseNavigator } from 'react-router-dom';
-import { UNSAFE_NavigationContext as NavigationContext } from 'react-router-dom';
+import type { Navigator as BaseNavigator } from 'react-router';
+import { UNSAFE_NavigationContext as NavigationContext } from 'react-router';
 
 interface Navigator extends BaseNavigator {
   block: History['block'];

@@ -42,8 +42,7 @@ import CustomChip from 'components/visual/CustomChip';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { memo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import Apps from './user/apps';
 
 type UserProps = {

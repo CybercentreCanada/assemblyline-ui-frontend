@@ -25,8 +25,7 @@ import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
   searchresult: {

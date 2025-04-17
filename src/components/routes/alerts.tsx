@@ -14,8 +14,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import ForbiddenPage from './403';
 import AlertActions from './alerts/components/Actions';
 import { AlertDefaultSearchParameters } from './alerts/components/DefaultSearchParameters';

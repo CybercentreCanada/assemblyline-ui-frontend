@@ -18,8 +18,7 @@ import Moment from 'components/visual/Moment';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 
 type ParamProps = {
   id: string;
