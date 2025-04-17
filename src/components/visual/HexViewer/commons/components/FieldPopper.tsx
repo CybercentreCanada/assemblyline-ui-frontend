@@ -43,8 +43,6 @@ export const WrappedFieldPopper = (
   { paperClassName = null, popperPlacement = 'bottom', component = <div /> }: FieldPopperProps,
   ref
 ) => {
-  const classes = useHexStyles();
-
   const [open, setOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 

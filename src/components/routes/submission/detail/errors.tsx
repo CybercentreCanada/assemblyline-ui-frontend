@@ -17,7 +17,7 @@ import type { Submission } from 'components/models/base/submission';
 import { getErrorIDFromKey, getErrorTypeFromKey, getHashFromKey, getServiceFromKey } from 'helpers/errors';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const MAX_ERROR_COUNT = 500;
 

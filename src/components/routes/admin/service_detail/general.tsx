@@ -79,7 +79,7 @@ const ServiceGeneral = ({
     return (
       <div>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">{t('general.name')}</Typography>
             {service ? (
               <TextField fullWidth size="small" margin="dense" variant="outlined" disabled value={service.name} />
@@ -87,7 +87,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.version')}
               <ResetButton
@@ -144,7 +144,7 @@ const ServiceGeneral = ({
             />
           </Grid>
           {c12nDef.enforce && (
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Typography variant="subtitle2">
                 {t('general.classification')}
                 <ResetButton
@@ -168,7 +168,7 @@ const ServiceGeneral = ({
             </Grid>
           )}
           {c12nDef.enforce && (
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Typography variant="subtitle2">
                 {t('general.result_classification')}
                 <ResetButton
@@ -191,7 +191,7 @@ const ServiceGeneral = ({
               />
             </Grid>
           )}
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle2">
               {t('general.description')}
               <ResetButton
@@ -222,7 +222,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.stage')}
               <ResetButton
@@ -263,7 +263,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.category')}
               <ResetButton
@@ -304,7 +304,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.accept')}
               <ResetButton
@@ -333,7 +333,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.reject')}
               <ResetButton
@@ -362,7 +362,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.recursion_prevention')}
               <ResetButton
@@ -418,7 +418,7 @@ const ServiceGeneral = ({
             )}
           </Grid>
 
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <Typography variant="subtitle2" noWrap>
               {t('general.timeout')}
               <ResetButton
@@ -449,7 +449,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <Typography variant="subtitle2" noWrap>
               {t('general.instances')}
               <ResetButton
@@ -467,7 +467,7 @@ const ServiceGeneral = ({
               />
             </Typography>
             <Grid container spacing={theme.spacing(1)}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 {service ? (
                   <TextField
                     fullWidth
@@ -495,7 +495,7 @@ const ServiceGeneral = ({
                   <Skeleton style={{ height: '2.5rem' }} />
                 )}
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 {service ? (
                   <TextField
                     fullWidth
@@ -527,7 +527,7 @@ const ServiceGeneral = ({
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <Typography variant="subtitle2" noWrap>
               {t('general.max_queue_length')}
               <ResetButton
@@ -560,7 +560,7 @@ const ServiceGeneral = ({
             )}
             <Typography variant="caption">{t('general.max_queue_length.desc')}</Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.location')}
               <ResetButton
@@ -588,7 +588,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.caching')}
               <ResetButton

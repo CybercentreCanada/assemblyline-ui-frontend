@@ -18,8 +18,7 @@ import ApikeysTable from 'components/visual/SearchResult/apikeys';
 import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import ApikeyDetail from './apikey_detail';
 
 const API_KEYS_PARAMS = createSearchParams(p => ({
@@ -134,7 +133,7 @@ const APIKeysSearch = () => {
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
-          <Grid item xs>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">{t('apikeys.title')}</Typography>
           </Grid>
         </Grid>

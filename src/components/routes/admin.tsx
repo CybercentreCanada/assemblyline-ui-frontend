@@ -1,5 +1,4 @@
-import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppConfigs, useAppUser } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import LinkGrid from 'components/layout/linkgrid';
 import type { CustomUser } from 'components/models/ui/user';

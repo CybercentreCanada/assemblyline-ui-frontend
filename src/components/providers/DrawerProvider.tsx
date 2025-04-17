@@ -1,8 +1,6 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import DoubleArrowOutlinedIcon from '@mui/icons-material/DoubleArrowOutlined';
-import { Drawer, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import { Drawer, IconButton, styled, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,75 +12,28 @@ const MDWidth = '85%';
 const SMWidth = '100%';
 const MAXIMIZE_CLASS = 'maximize';
 
-const useStyles = makeStyles(theme => ({
-  appMain: {
-    '@media print': {
-      overflow: 'unset !important'
-    },
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-    position: 'relative',
-    overflowX: 'hidden',
-    '-webkit-transform': 'translate3d(0, 0, 0)'
+const AppMain = styled('div')(({ theme }) => ({
+  '@media print': {
+    overflow: 'unset !important'
   },
-  appContent: {
-    '@media print': {
-      overflow: 'unset !important'
-    },
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    flex: 1,
-    height: '100%',
-    overflowX: 'hidden'
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'row',
+  position: 'relative',
+  overflowX: 'hidden',
+  '-webkit-transform': 'translate3d(0, 0, 0)'
+}));
+
+const AppContent = styled('div')(({ theme }) => ({
+  '@media print': {
+    overflow: 'unset !important'
   },
-  appRightDrawer: {
-    '@media print': {
-      display: 'none'
-    },
-    transition: 'width 225ms cubic-bezier(0, 0, 0.2, 1) 0ms'
-  },
-  paper: {
-    transition: `${theme.transitions.create(['all'])} !important`,
-    [theme.breakpoints.only('xl')]: {
-      width: XLWidth
-    },
-    [theme.breakpoints.only('lg')]: {
-      width: LGWidth
-    },
-    [theme.breakpoints.only('md')]: {
-      width: MDWidth
-    },
-    [theme.breakpoints.down('md')]: {
-      width: SMWidth
-    },
-    [`&.${MAXIMIZE_CLASS}`]: {
-      width: '90vw'
-    }
-  },
-  drawerTop: {
-    display: 'flex',
-    flexDirection: 'row',
-    columnGap: theme.spacing(1),
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(1),
-    position: 'sticky',
-    top: 0,
-    zIndex: 5
-  },
-  drawerContent: {
-    height: '100%',
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2)
-  },
-  maximizeIcon: {
-    transform: 'rotate(180deg)',
-    transition: theme.transitions.create(['all']),
-    [`&.${MAXIMIZE_CLASS}`]: {
-      transform: 'rotate(0deg)'
-    }
-  }
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'relative',
+  flex: 1,
+  height: '100%',
+  overflowX: 'hidden'
 }));
 
 export type DrawerContextProps = {
@@ -104,7 +55,6 @@ export const DrawerContext = React.createContext<DrawerContextProps>(null);
 function DrawerProvider({ children }: DrawerProviderProps) {
   const { t } = useTranslation();
   const theme = useTheme();
-  const classes = useStyles();
   const isMD = useMediaQuery(theme.breakpoints.only('md'));
   const isLG = useMediaQuery(theme.breakpoints.only('lg'));
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
@@ -174,46 +124,102 @@ function DrawerProvider({ children }: DrawerProviderProps) {
         globalDrawerOpened
       }}
     >
-      <div className={classes.appMain} id="globalDrawer">
+      <AppMain id="globalDrawer">
         {useMemo(
           () => (
-            <div className={classes.appContent}>{children}</div>
+            <AppContent>{children}</AppContent>
           ),
-          [children, classes.appContent]
+          [children]
         )}
         <Drawer
-          classes={{ root: classes.appRightDrawer, paper: clsx(classes.paper, isMaximized && MAXIMIZE_CLASS) }}
           open={globalDrawerOpened}
           anchor="right"
           variant={isXL ? 'persistent' : 'temporary'}
           style={{ width: globalDrawer ? drawerWidth : 0 }}
           ModalProps={{ disableEnforceFocus: true }}
           onClose={closeGlobalDrawer}
+          slotProps={{
+            root: {
+              sx: {
+                '@media print': {
+                  display: 'none'
+                },
+                transition: 'width 225ms cubic-bezier(0, 0, 0.2, 1) 0ms'
+              }
+            },
+            paper: {
+              className: isMaximized && MAXIMIZE_CLASS,
+              sx: {
+                transition: `${theme.transitions.create(['all'])} !important`,
+                [theme.breakpoints.only('xl')]: {
+                  width: XLWidth
+                },
+                [theme.breakpoints.only('lg')]: {
+                  width: LGWidth
+                },
+                [theme.breakpoints.only('md')]: {
+                  width: MDWidth
+                },
+                [theme.breakpoints.down('md')]: {
+                  width: SMWidth
+                },
+                [`&.${MAXIMIZE_CLASS}`]: {
+                  width: '90vw'
+                }
+              }
+            }
+          }}
         >
           {useMemo(
             () => (
               <>
-                <div id="drawerTop" className={classes.drawerTop}>
+                <div
+                  id="drawerTop"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    columnGap: theme.spacing(1),
+                    backgroundColor: theme.palette.background.paper,
+                    padding: theme.spacing(1),
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 5
+                  }}
+                >
                   <IconButton size="large" onClick={closeGlobalDrawer} children={<CloseOutlinedIcon />} />
                   {isXL && isMaximized !== null && (
                     <Tooltip title={isMaximized ? t('drawer.minimize') : t('drawer.maximize')}>
                       <IconButton size="large" onClick={() => setIsMaximized(v => !v)}>
                         <DoubleArrowOutlinedIcon
-                          className={clsx(classes.maximizeIcon, isMaximized && MAXIMIZE_CLASS)}
+                          className={isMaximized && MAXIMIZE_CLASS}
+                          sx={{
+                            transform: 'rotate(180deg)',
+                            transition: theme.transitions.create(['all']),
+                            [`&.${MAXIMIZE_CLASS}`]: {
+                              transform: 'rotate(0deg)'
+                            }
+                          }}
                         />
                       </IconButton>
                     </Tooltip>
                   )}
                 </div>
-                <div id="drawerContent" className={classes.drawerContent}>
+                <div
+                  id="drawerContent"
+                  style={{
+                    height: '100%',
+                    paddingLeft: theme.spacing(2),
+                    paddingRight: theme.spacing(2)
+                  }}
+                >
                   {globalDrawer}
                 </div>
               </>
             ),
-            [classes, t, closeGlobalDrawer, isXL, isMaximized, globalDrawer]
+            [t, closeGlobalDrawer, isXL, isMaximized, globalDrawer]
           )}
         </Drawer>
-      </div>
+      </AppMain>
     </DrawerContext.Provider>
   );
 }

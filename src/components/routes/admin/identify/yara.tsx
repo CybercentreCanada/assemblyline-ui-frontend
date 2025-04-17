@@ -10,7 +10,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useAppTheme from 'commons/components/app/hooks/useAppTheme';
+import { useAppTheme } from 'commons/components/app/hooks';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -24,8 +24,8 @@ loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
-  const containerEL = useRef<HTMLDivElement>();
-  const containerDialogEL = useRef<HTMLDivElement>();
+  const containerEL = useRef<HTMLDivElement>(null);
+  const containerDialogEL = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
@@ -107,19 +107,19 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
         </DialogActions>
       </Dialog>
       <Grid container justifyContent="flex-end" spacing={1} style={{ marginBottom: theme.spacing(1) }}>
-        <Grid item style={{ flexGrow: 1 }}>
+        <Grid style={{ flexGrow: 1 }}>
           <div>
             <Typography variant="h5">{t('title.yara')}</Typography>
           </div>
         </Grid>
-        <Grid item>
+        <Grid>
           <Grid container spacing={1}>
-            <Grid item>
+            <Grid>
               <Button size="small" variant="outlined" onClick={() => reload(true, setOpen)}>
                 {t('reset')}
               </Button>
             </Grid>
-            <Grid item>
+            <Grid>
               <Button
                 size="small"
                 variant="contained"
@@ -129,7 +129,7 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
                 {t('undo')}
               </Button>
             </Grid>
-            <Grid item>
+            <Grid>
               <Button
                 size="small"
                 variant="contained"

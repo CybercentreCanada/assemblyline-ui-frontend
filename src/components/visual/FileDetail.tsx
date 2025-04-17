@@ -12,7 +12,7 @@ import {
   Grid,
   IconButton,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Popover,
@@ -21,7 +21,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
 import useDrawer from 'components/hooks/useDrawer';
@@ -40,8 +40,7 @@ import Classification from 'components/visual/Classification';
 import { emptyResult } from 'components/visual/ResultCard';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
 import Detection from './FileDetail/detection';
@@ -97,7 +96,7 @@ const WrappedFileDetail: React.FC<Props> = ({
   const [loaded, setLoaded] = useState<boolean>(false);
   const [heuristics, setHeuristics] = useState<string[]>([]);
 
-  const ref = useRef();
+  const ref = useRef(null);
 
   const sp2 = useMemo(() => theme.spacing(2), [theme]);
   const sp4 = useMemo(() => theme.spacing(4), [theme]);
@@ -419,7 +418,7 @@ const WrappedFileDetail: React.FC<Props> = ({
       )}
       <div style={{ paddingBottom: sp4 }}>
         <Grid container alignItems="center">
-          <Grid item xs>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">
               {file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
             </Typography>
@@ -433,7 +432,7 @@ const WrappedFileDetail: React.FC<Props> = ({
               )}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
+          <Grid size={{ xs: 12, sm: 12, md: 4 }} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
             {file ? (
               <>
                 <Tooltip title={t('related')}>
@@ -487,8 +486,7 @@ const WrappedFileDetail: React.FC<Props> = ({
                       }}
                     >
                       <List disablePadding>
-                        <ListItem
-                          button
+                        <ListItemButton
                           component={Link}
                           to={`/submit?hash=${file.file_info.sha256}`}
                           state={{
@@ -501,21 +499,21 @@ const WrappedFileDetail: React.FC<Props> = ({
                             <TuneOutlinedIcon />
                           </ListItemIcon>
                           <ListItemText primary={t('resubmit.modify')} />
-                        </ListItem>
-                        <ListItem button dense onClick={() => resubmit('dynamic')}>
+                        </ListItemButton>
+                        <ListItemButton dense onClick={() => resubmit('dynamic')}>
                           <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                             <OndemandVideoOutlinedIcon />
                           </ListItemIcon>
                           <ListItemText primary={t('resubmit.dynamic')} />
-                        </ListItem>
+                        </ListItemButton>
                         {submissionProfiles &&
                           Object.entries(submissionProfiles).map(([name, display]) => (
-                            <ListItem key={name} button dense onClick={() => resubmit(name)}>
+                            <ListItemButton key={name} dense onClick={() => resubmit(name)}>
                               <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                 <OndemandVideoOutlinedIcon />
                               </ListItemIcon>
                               <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
-                            </ListItem>
+                            </ListItemButton>
                           ))}
                       </List>
                     </Popover>

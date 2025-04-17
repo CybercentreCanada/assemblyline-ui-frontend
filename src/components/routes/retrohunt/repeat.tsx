@@ -16,7 +16,7 @@ import {
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -115,19 +115,19 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
             {data && (
               <DialogContentText component="div">
                 <Grid container flexDirection="column" spacing={2}>
-                  <Grid item>
+                  <Grid>
                     <span>{t('repeat.content1')}</span>
                     <b>{retrohunt.key}</b>
                     <span>{t('repeat.content2')}</span>
                   </Grid>
 
-                  <Grid item style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
+                  <Grid style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
                     <InfoOutlinedIcon />
                     <span>{t('repeat.note')}</span>
                   </Grid>
 
                   {c12nDef.enforce && (
-                    <Grid item>
+                    <Grid>
                       <Tooltip title={t('tooltip.search_classification')} placement="top">
                         <div
                           style={{
@@ -152,7 +152,7 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
                     </Grid>
                   )}
 
-                  <Grid item flexGrow={2}>
+                  <Grid flexGrow={2}>
                     <Typography variant="subtitle2">
                       {`${t('ttl')} (${maxDaysToLive ? `${t('ttl.max')}: ${maxDaysToLive}` : t('ttl.forever')})`}
                     </Typography>
@@ -170,7 +170,7 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
                     />
                   </Grid>
 
-                  <Grid item>{t('repeat.confirm')}</Grid>
+                  <Grid>{t('repeat.confirm')}</Grid>
                 </Grid>
               </DialogContentText>
             )}

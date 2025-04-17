@@ -1,6 +1,6 @@
-import { AppContext } from 'commons/components/app/AppProvider';
+import { AppContext } from 'commons/components/app/AppContexts';
 import { useContext } from 'react';
 
-export default function useApp() {
+export function useApp() {
   return useContext(AppContext);
 }

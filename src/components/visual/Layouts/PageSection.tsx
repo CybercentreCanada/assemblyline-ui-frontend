@@ -1,9 +1,7 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { SvgIconProps, TypographyProps } from '@mui/material';
-import { Button, Collapse, Divider, Typography } from '@mui/material';
+import { Button, Collapse, Divider, Typography, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import type { AnchorProps } from 'components/core/TableOfContent/Anchor';
 import { Anchor } from 'components/core/TableOfContent/Anchor';
 import type { CSSProperties } from 'react';
@@ -26,47 +24,49 @@ const ExpandMore = styled(({ expand = false, ...other }: ExpandMoreProps) => {
   ]
 }));
 
-const useStyles = makeStyles(theme => ({
-  root: {
+const Root = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1
+}));
+
+const Container = styled('div')(({ theme }) => ({
+  position: 'relative',
+  width: '100%',
+  minHeight: 'auto'
+}));
+
+const Titles = styled('div')(({ theme }) => ({
+  flex: 1,
+  minWidth: 0,
+  display: 'flex',
+  flexDirection: 'column'
+}));
+
+const EndAdornment = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  right: 0,
+  top: 0,
+  bottom: 0,
+  display: 'flex',
+  alignItems: 'center'
+}));
+
+type SpacerProps = {
+  flex?: boolean;
+};
+
+const Spacer = styled('div', {
+  shouldForwardProp: prop => prop !== 'flex'
+})<SpacerProps>(({ theme, flex }) => ({
+  paddingBottom: theme.spacing(2),
+  paddingTop: theme.spacing(2),
+
+  ...(flex && {
     display: 'flex',
     flexDirection: 'column',
     flex: 1
-  },
-  container: {
-    position: 'relative',
-    width: '100%',
-    minHeight: 'auto'
-  },
-  button: {
-    borderRadius: `${theme.spacing(0.5)} ${theme.spacing(0.5)} 0 0`,
-    justifyContent: 'flex-start',
-    paddingBottom: 0,
-    paddingLeft: 0,
-    paddingTop: 0
-  },
-  titles: {
-    flex: 1,
-    minWidth: 0,
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  endAdornment: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    bottom: 0,
-    display: 'flex',
-    alignItems: 'center'
-  },
-  spacer: {
-    paddingBottom: theme.spacing(2),
-    paddingTop: theme.spacing(2)
-  },
-  flex: {
-    display: 'flex',
-    flexDirection: 'column',
-    flex: 1
-  }
+  })
 }));
 
 export type PageSectionProps = {
@@ -109,7 +109,7 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
     wrapperProps = null,
     onChange = () => null
   }: PageSectionProps) => {
-    const classes = useStyles();
+    const theme = useTheme();
 
     const [open, setOpen] = useState<boolean>(!closedInitially);
     const [render, setRender] = useState<boolean>(!closedInitially);
@@ -132,16 +132,22 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
 
     return (
       <Anchor anchor={id} label={primary} subheader={subheader} disabled={!anchor} {...anchorProps}>
-        <div className={classes.root}>
-          <div className={classes.container}>
+        <Root>
+          <Container>
             <Button
-              className={classes.button}
               color="inherit"
               fullWidth
               disabled={!collapsible}
               onClick={() => (openProp !== null ? onChange(!openProp) : setOpen(o => !o))}
+              sx={{
+                borderRadius: `${theme.spacing(0.5)} ${theme.spacing(0.5)} 0 0`,
+                justifyContent: 'flex-start',
+                paddingBottom: 0,
+                paddingLeft: 0,
+                paddingTop: 0
+              }}
             >
-              <div className={classes.titles}>
+              <Titles>
                 <Typography
                   color="textPrimary"
                   overflow="hidden"
@@ -173,17 +179,13 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
                 >
                   {secondary}
                 </Typography>
-              </div>
+              </Titles>
 
               {!collapsible ? null : <ExpandMore expand={openProp !== null ? openProp : open} />}
               {!endAdornment ? null : <div style={{ width: width }} />}
             </Button>
-            {!endAdornment ? null : (
-              <div className={classes.endAdornment} ref={endRef}>
-                {endAdornment}
-              </div>
-            )}
-          </div>
+            {!endAdornment ? null : <EndAdornment ref={endRef}>{endAdornment}</EndAdornment>}
+          </Container>
 
           {!divider ? null : <Divider />}
 
@@ -200,16 +202,16 @@ export const PageSection: React.FC<PageSectionProps> = React.memo(
                 })
               }}
             >
-              <div className={clsx(classes.spacer, flex && classes.flex)} {...wrapperProps}>
+              <Spacer flex={flex} {...(wrapperProps as any)}>
                 {render && children}
-              </div>
+              </Spacer>
             </Collapse>
           ) : (
-            <div className={clsx(classes.spacer, flex && classes.flex)} {...wrapperProps}>
+            <Spacer flex={flex} {...(wrapperProps as any)}>
               {render && children}
-            </div>
+            </Spacer>
           )}
-        </div>
+        </Root>
       </Anchor>
     );
   }

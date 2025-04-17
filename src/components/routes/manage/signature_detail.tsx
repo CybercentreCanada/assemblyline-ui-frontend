@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppTheme from 'commons/components/app/hooks/useAppTheme';
+import { useAppTheme } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
@@ -42,8 +42,7 @@ import { yaraConfig, yaraDef } from 'helpers/yara';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TbUserX } from 'react-icons/tb';
-import { useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
@@ -459,7 +458,7 @@ const SignatureDetail = ({
       )}
       <div style={{ textAlign: 'left' }}>
         <Grid container alignItems="center" spacing={2.5}>
-          <Grid item xs>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">{t('title')}</Typography>
             <Typography variant="caption">
               {signature ? (
@@ -469,7 +468,7 @@ const SignatureDetail = ({
               )}
             </Typography>
           </Grid>
-          <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+          <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
             {signature ? (
               <>
                 <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
@@ -531,7 +530,7 @@ const SignatureDetail = ({
           </Grid>
 
           {signature?.state_change_user && signature?.state_change_date && (
-            <Grid item xs={12} textAlign="center">
+            <Grid size={{ xs: 12 }} textAlign="center">
               <Alert severity="info">
                 <Typography color="secondary" variant="body2">
                   <b> {signature?.state_change_user}</b>
@@ -542,7 +541,7 @@ const SignatureDetail = ({
             </Grid>
           )}
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             {signature ? (
               <div
                 style={{
@@ -571,24 +570,22 @@ const SignatureDetail = ({
               <Skeleton variant="rectangular" height="6rem" />
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h6">{t('statistics')}</Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
               {t('hits')}
             </Typography>
             <Grid container>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && stats ? stats.count : <Skeleton />}
-              </Grid>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>{signature && stats ? stats.count : <Skeleton />}</Grid>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>
                 {signature && stats ? (
                   stats.first_hit ? (
                     <Moment variant="fromNow">{stats.first_hit}</Moment>
@@ -599,10 +596,10 @@ const SignatureDetail = ({
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>
                 {signature && stats ? (
                   stats.last_hit ? (
                     <Moment variant="fromNow">{stats.last_hit}</Moment>
@@ -615,34 +612,30 @@ const SignatureDetail = ({
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
               {t('contribution')}
             </Typography>
             <Grid container>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('score.min')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && stats ? stats.min : <Skeleton />}
-              </Grid>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>{signature && stats ? stats.min : <Skeleton />}</Grid>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('score.avg')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>
                 {signature && stats ? Number(stats.avg).toFixed(0) : <Skeleton />}
               </Grid>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('score.max')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && stats ? stats.max : <Skeleton />}
-              </Grid>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>{signature && stats ? stats.max : <Skeleton />}</Grid>
             </Grid>
           </Grid>
           {currentUser.roles.includes('submission_view') && (
             <>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Histogram
                   dataset={histogram}
                   height="250px"
@@ -652,10 +645,10 @@ const SignatureDetail = ({
                   verticalLine
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="h6">{t('last10')}</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <ResultsTable resultResults={results} allowSort={false} />
               </Grid>
             </>

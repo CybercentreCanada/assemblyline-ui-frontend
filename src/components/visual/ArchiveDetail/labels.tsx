@@ -229,8 +229,8 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                   color: !labels
                     ? theme.palette.text.disabled
                     : theme.palette.mode === 'dark'
-                    ? theme.palette.success.light
-                    : theme.palette.success.dark
+                      ? theme.palette.success.light
+                      : theme.palette.success.dark
                 }}
                 onClick={handleAddConfirmation}
               >
@@ -246,11 +246,11 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
         <DialogContent>
           <DialogContentText component="div">
             <Grid container flexDirection="column" spacing={2}>
-              <Grid item children={t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.content`)} />
+              <Grid children={t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.content`)} />
 
               {confirmation.type === 'add' && (
                 <>
-                  <Grid item>
+                  <Grid>
                     <FormLabel>{t('category')}</FormLabel>
                     <RadioGroup
                       value={newLabel.category}
@@ -264,7 +264,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                       <FormControlLabel value="info" label={t('info')} control={<Radio size="small" />} />
                     </RadioGroup>
                   </Grid>
-                  <Grid item>
+                  <Grid>
                     <Autocomplete
                       classes={{
                         listbox: classes.searchTextFieldOptionsInner,
@@ -277,8 +277,8 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                           [null, undefined].includes(newValue)
                             ? { ...l, value: '' }
                             : typeof newValue === 'string'
-                            ? { ...l, value: newValue }
-                            : { category: newValue?.category, value: newValue?.label }
+                              ? { ...l, value: newValue }
+                              : { category: newValue?.category, value: newValue?.label }
                         );
                       }}
                       inputValue={newLabel?.value}
@@ -299,7 +299,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                         const parts = parse(option?.label, matches);
                         return (
                           <Grid component="li" container {...props} key={JSON.stringify(option)}>
-                            <Grid item md={3}>
+                            <Grid size={{ md: 3 }}>
                               <CustomChip
                                 size="small"
                                 label={t(option?.category)}
@@ -307,14 +307,14 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                                 variant="outlined"
                               />
                             </Grid>
-                            <Grid item md={8}>
+                            <Grid size={{ md: 8 }}>
                               {parts.map((part, index) => (
                                 <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
                                   {part.text}
                                 </span>
                               ))}
                             </Grid>
-                            <Grid item md={1}>
+                            <Grid size={{ md: 1 }}>
                               <CustomChip size="small" label={option?.count} />
                             </Grid>
                           </Grid>
@@ -340,7 +340,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
               )}
 
               {confirmation.type === 'delete' && (
-                <Grid item>
+                <Grid>
                   <Typography variant="subtitle2" children={t(newLabel.category)} />
                   <Paper component="pre" variant="outlined" className={classes.preview}>
                     {newLabel.value}
@@ -349,7 +349,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
               )}
 
               {newLabel?.category in LABELS && ![null, undefined, ''].includes(newLabel?.value) && (
-                <Grid item children={t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.confirm`)} />
+                <Grid children={t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.confirm`)} />
               )}
             </Grid>
           </DialogContentText>
@@ -388,10 +388,10 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
 
       {Object.keys(LABELS).map((cat, i) => (
         <Grid key={i} container>
-          <Grid item xs={12} sm={3} lg={2}>
+          <Grid size={{ xs: 12, sm: 3, lg: 2 }}>
             <span style={{ fontWeight: 500 }}>{t(cat)}</span>
           </Grid>
-          <Grid item xs={12} sm={9} lg={10}>
+          <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
             {!labels || !(cat in labels) ? (
               <Skeleton />
             ) : sortedLabels[cat].length === 0 ? (

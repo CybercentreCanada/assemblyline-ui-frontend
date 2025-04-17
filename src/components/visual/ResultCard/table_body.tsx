@@ -1,22 +1,12 @@
 import type { Theme } from '@mui/material';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, useTheme } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
 import type { TableBody as TableData } from 'components/models/base/result_body';
 import TitleKey from 'components/visual/TitleKey';
 import { default as React } from 'react';
 import { KVBody } from './kv_body';
 import { TextBody } from './text_body';
-
-const useStyles = printable =>
-  makeStyles(theme => ({
-    root: {
-      [theme.breakpoints.down('sm')]: {
-        width: printable ? '100%' : 'max-content'
-      }
-    }
-  }))();
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -62,7 +52,8 @@ type Props = {
 };
 
 const WrappedTblBody = ({ body, printable, order }: Props) => {
-  const classes = useStyles(printable);
+  const theme = useTheme();
+
   const headers = [];
 
   if (!Array.isArray(body)) {
@@ -99,7 +90,17 @@ const WrappedTblBody = ({ body, printable, order }: Props) => {
       <TableContainer
         style={{ fontSize: '90%', maxHeight: printable ? null : '500px', maxWidth: printable ? '100%' : null }}
       >
-        <Table stickyHeader size="small" classes={{ root: classes.root }}>
+        <Table
+          stickyHeader
+          size="small"
+          sx={{
+            root: {
+              [theme.breakpoints.down('sm')]: {
+                width: printable ? '100%' : 'max-content'
+              }
+            }
+          }}
+        >
           <TableHead>
             <TableRow>
               {headers.map((th, id) => (

@@ -26,7 +26,7 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { AlertItem } from 'components/models/base/alert';
@@ -41,7 +41,7 @@ import type { CSSProperties } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 import { AlertEventsTable } from './Components';
 import AlertFiltersSelected from './FiltersSelected';
 import { AlertWorkflowDrawer } from './Workflows';
@@ -377,7 +377,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
               search.get('group_by') ? (
                 <Grid container rowGap={2}>
                   <Grid>{t('actions.takeownershipdiag.content.grouped')}</Grid>
-                  <Grid item style={{ width: '100%' }}>
+                  <Grid style={{ width: '100%' }}>
                     <Typography variant="subtitle2">{t('actions.takeownershipdiag.properties')}</Typography>
                     <Paper component="pre" variant="outlined" className={classes.preview}>
                       {!query || query.toString() === '' ? (

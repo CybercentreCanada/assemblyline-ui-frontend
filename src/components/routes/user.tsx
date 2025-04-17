@@ -42,8 +42,7 @@ import CustomChip from 'components/visual/CustomChip';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { memo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import Apps from './user/apps';
 
 type UserProps = {
@@ -518,10 +517,10 @@ function User({ username = null }: UserProps) {
       />
 
       <Grid container spacing={2} justifyContent="center">
-        <Grid item xs={12} sm={12} md={3}>
+        <Grid size={{ xs: 12, sm: 12, md: 3 }}>
           <Grid container className={classes.group}>
             {id && (
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <div style={{ paddingBottom: sp4 }}>
                   {user ? (
                     <DeleteButton
@@ -543,7 +542,7 @@ function User({ username = null }: UserProps) {
                 </div>
               </Grid>
             )}
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               {user ? (
                 <>
                   <input
@@ -593,7 +592,7 @@ function User({ username = null }: UserProps) {
               )}
               <Typography gutterBottom>{user ? user.uname : <Skeleton />}</Typography>
             </Grid>
-            <Grid item style={{ marginTop: '2rem' }} xs={12}>
+            <Grid size={{ xs: 12 }} style={{ marginTop: '2rem' }}>
               <div style={{ paddingBottom: id ? 0 : sp4 }}>
                 {user ? (
                   <CustomChip
@@ -616,7 +615,7 @@ function User({ username = null }: UserProps) {
           </Grid>
         </Grid>
 
-        <Grid item sm={12} md={9} style={{ width: '100%' }}>
+        <Grid size={{ sm: 12, md: 9 }} style={{ width: '100%' }}>
           <Classification
             type={currentUser.is_admin ? 'picker' : 'pill'}
             size="medium"

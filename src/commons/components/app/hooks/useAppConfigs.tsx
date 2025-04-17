@@ -1,19 +1,20 @@
-import { AppContext } from 'commons/components/app/AppProvider';
-import { useContext, useMemo } from 'react';
+import { AppContext } from 'commons/components/app/AppContexts';
 import {
   AppDefaultsLeftNavConfigs,
   AppDefaultsPreferencesConfigs,
   AppDefaultsSitemapConfigs,
   AppDefaultsThemeConfigs,
   AppDefaultsTopNavConfigs
-} from '../AppDefaults';
+} from 'commons/components/app/AppDefaults';
+import { useContext, useMemo } from 'react';
 
-export default function useAppConfigs() {
+export function useAppConfigs() {
   const { configs } = useContext(AppContext);
   return useMemo(() => {
     // Merge user provided configs with defaults.
-    const { preferences, sitemap, theme } = configs;
+    const { overrides, preferences, sitemap, theme } = configs;
     const _configs = {
+      overrides,
       preferences: {
         ...AppDefaultsPreferencesConfigs,
         ...(preferences || {}),

@@ -1,7 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import { AlertTitle, Grid, IconButton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import SimpleList from 'commons/addons/lists/simplelist/SimpleList';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
@@ -14,8 +14,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import ForbiddenPage from './403';
 import AlertActions from './alerts/components/Actions';
 import { AlertDefaultSearchParameters } from './alerts/components/DefaultSearchParameters';
@@ -241,11 +240,11 @@ const WrappedAlertsContent = () => {
     return (
       <PageFullWidth margin={4}>
         <Grid container alignItems="center" paddingBottom={2}>
-          <Grid item xs>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">{t('alerts')}</Typography>
           </Grid>
 
-          <Grid item xs style={{ display: 'flex', textAlign: 'right', flex: 0 }}>
+          <Grid size={{ xs: 'grow' }} style={{ display: 'flex', textAlign: 'right', flex: 0 }}>
             <AlertDefaultSearchParameters />
             {currentUser.roles.includes('workflow_manage') && (
               <Tooltip title={t('workflow.tooltip')}>

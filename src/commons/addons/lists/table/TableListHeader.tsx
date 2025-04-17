@@ -1,3 +1,5 @@
+import { Delete } from '@mui/icons-material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
   ClickAwayListener,
   Fade,
@@ -9,9 +11,7 @@ import {
   Popper,
   useTheme
 } from '@mui/material';
-import { Delete } from '@mui/icons-material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import React, { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSorters from '../hooks/useSorters';
 import { LineItem } from '../item/ListItemBase';
@@ -19,7 +19,7 @@ import { SorterField } from '../sorters/SorterSelector';
 import SorterTrigger from '../sorters/SorterTrigger';
 import { TableListLayout } from './TableListLayout';
 import { TableColumnField } from './types';
-import { useItemStyles, useTableStyles } from './useStyles';
+import { useTableStyles } from './useStyles';
 
 interface TableListHeaderProps<T extends LineItem> {
   items: T[];
@@ -43,7 +43,6 @@ const TableListHeader = memo(
   }: TableListHeaderProps<T>) => {
     const { t } = useTranslation();
     const classes = useTableStyles();
-    const itemClasses = useItemStyles();
     const [menuOpenIndex, onMenuBtnClick] = useState<number>(-1);
     const cellRenderer = useCallback(
       (column: TableColumnField, sorter, cellIndex, cellWidth, menuOpen) => {
@@ -109,7 +108,7 @@ const TableListHeaderCellMenu = memo(
     const { t } = useTranslation();
     const { icon } = useSorters();
     const classes = useTableStyles();
-    const actionMenuRef = useRef();
+    const actionMenuRef = useRef(null);
 
     const onDeleteSorter = () => {
       onSort('remove', sorter);

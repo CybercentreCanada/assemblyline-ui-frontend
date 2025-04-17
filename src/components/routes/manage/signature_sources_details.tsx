@@ -152,7 +152,7 @@ const WrappedSourceDetail = ({
     source && (
       <>
         {c12nDef.enforce && (
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <div className={classes.label}>
               {t('classification')}
               <ResetButton service={source} defaults={defaults} field="default_classification" reset={resetField} />
@@ -180,7 +180,7 @@ const WrappedSourceDetail = ({
               inner: (
                 <>
                   <Grid container spacing={1}>
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                       <Badge color="error" variant="dot" invisible={source.name !== ''}>
                         <div className={classes.label} style={{ whiteSpace: 'pre-wrap' }}>{`${t('name')} `}</div>
                       </Badge>
@@ -194,7 +194,7 @@ const WrappedSourceDetail = ({
                         onChange={handleFieldChange}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                       <div className={classes.label}>
                         {t('pattern')}
                         <ResetButton service={source} defaults={defaults} field="pattern" reset={resetField} />
@@ -213,13 +213,13 @@ const WrappedSourceDetail = ({
                     </Grid>
                   </Grid>
                   <Grid container spacing={1} style={{ paddingTop: theme.spacing(1) }}>
-                    <Grid item xs={12} md={12}>
+                    <Grid size={{ xs: 12, md: 12 }}>
                       <div className={classes.label}>
                         {t('update_interval')}
                         <ResetButton service={source} defaults={defaults} field="update_interval" reset={resetField} />
                       </div>
                       <Grid container spacing={2}>
-                        <Grid item xs={12} sm={9}>
+                        <Grid size={{ xs: 12, sm: 9 }}>
                           <div style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}>
                             <Slider
                               min={3600}
@@ -256,7 +256,7 @@ const WrappedSourceDetail = ({
                             />
                           </div>
                         </Grid>
-                        <Grid item xs={12} sm={3}>
+                        <Grid size={{ xs: 12, sm: 3 }}>
                           {source ? (
                             <OutlinedInput
                               fullWidth
@@ -273,7 +273,7 @@ const WrappedSourceDetail = ({
                         </Grid>
                       </Grid>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                       <div className={classes.label}>{t('configuration')}</div>
                       <JSONEditor
                         src={source.configuration}
@@ -293,7 +293,7 @@ const WrappedSourceDetail = ({
                     </Grid>
                     {['ignore_cache', 'override_classification', 'sync'].map(field => {
                       return (
-                        <Grid key={field} item xs={6}>
+                        <Grid key={field} size={{ xs: 6 }}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -330,7 +330,7 @@ const WrappedSourceDetail = ({
               inner: (
                 <>
                   <Grid container spacing={1}>
-                    <Grid item xs={12} sm={2}>
+                    <Grid size={{ xs: 12, sm: 2 }}>
                       <div className={classes.label}>
                         {t('fetch_method')}
                         <ResetButton service={source} defaults={defaults} field="fetch_method" reset={resetField} />
@@ -351,7 +351,7 @@ const WrappedSourceDetail = ({
                         })}
                       </Select>
                     </Grid>
-                    <Grid item xs={12} sm={gitFetch ? 7 : 10}>
+                    <Grid size={{ xs: 12, sm: gitFetch ? 7 : 10 }}>
                       <Badge color="error" variant="dot" invisible={source.uri !== ''}>
                         <div className={classes.label} style={{ whiteSpace: 'pre-wrap' }}>
                           {`${t('uri')} `}
@@ -369,7 +369,7 @@ const WrappedSourceDetail = ({
                       />
                     </Grid>
                     {gitFetch && (
-                      <Grid item xs={12} sm={3}>
+                      <Grid size={{ xs: 12, sm: 3 }}>
                         <div className={classes.label}>{t('git_branch')}</div>
                         <TextField
                           id="git_branch"
@@ -381,7 +381,7 @@ const WrappedSourceDetail = ({
                         />
                       </Grid>
                     )}
-                    <Grid item xs={12} md={6} style={{ paddingTop: theme.spacing(1) }}>
+                    <Grid size={{ xs: 12, md: 6 }} style={{ paddingTop: theme.spacing(1) }}>
                       <div className={classes.label}>
                         {t('username')}
                         <ResetButton service={source} defaults={defaults} field="username" reset={resetField} />
@@ -395,7 +395,7 @@ const WrappedSourceDetail = ({
                         onChange={handleFieldChange}
                       />
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                       <div className={classes.label}>
                         {t('password')}
                         <ResetButton service={source} defaults={defaults} field="password" reset={resetField} />
@@ -424,7 +424,7 @@ const WrappedSourceDetail = ({
                         }}
                       />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                       <div className={classes.label}>
                         {t('private_key')}
                         <ResetButton service={source} defaults={defaults} field="private_key" reset={resetField} />
@@ -455,7 +455,7 @@ const WrappedSourceDetail = ({
                         }}
                       />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                       <div className={classes.label}>{t('headers')}</div>
                       <JSONEditor
                         name={false}
@@ -480,7 +480,7 @@ const WrappedSourceDetail = ({
                       />
                     </Grid>
                     {postFetch && (
-                      <Grid item xs={12}>
+                      <Grid size={{ xs: 12 }}>
                         <div className={classes.label}>{t('post_data')}</div>
                         <TextField
                           id="data"
@@ -495,7 +495,7 @@ const WrappedSourceDetail = ({
                         />
                       </Grid>
                     )}
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                       <div className={classes.label}>
                         {t('proxy')}
                         <ResetButton service={source} defaults={defaults} field="proxy" reset={resetField} />
@@ -510,7 +510,7 @@ const WrappedSourceDetail = ({
                         onChange={handleFieldChange}
                       />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                       <div className={classes.label}>
                         {t('ca')}
                         <ResetButton service={source} defaults={defaults} field="ca_cert" reset={resetField} />
@@ -527,7 +527,7 @@ const WrappedSourceDetail = ({
                         onChange={handleFieldChange}
                       />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid size={{ xs: 6 }}>
                       <FormControlLabel
                         control={
                           <Checkbox

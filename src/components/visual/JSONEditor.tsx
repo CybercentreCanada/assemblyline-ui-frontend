@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material';
-import useAppTheme from 'commons/components/app/hooks/useAppTheme';
+import { useAppTheme } from 'commons/components/app/hooks';
 import React from 'react';
 import type { ReactJsonViewProps } from 'react-json-view';
 import ReactJson from 'react-json-view';

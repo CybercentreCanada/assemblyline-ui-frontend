@@ -10,7 +10,7 @@ import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { isArrowDown, isArrowUp, isEnter } from 'commons/components/utils/keyboard';
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { CSSProperties, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export type NumericFieldProps = {
   id?: string;
-  classes?: { root?: string; formControl?: string; input?: string };
+  classes?: { root?: CSSProperties; formControl?: CSSProperties; input?: CSSProperties };
   label?: string;
   placeholder?: string;
   value?: number;

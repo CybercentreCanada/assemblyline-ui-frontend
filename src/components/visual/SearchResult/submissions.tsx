@@ -25,7 +25,7 @@ import Verdict from 'components/visual/Verdict';
 import { maxLenStr } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 type Props = {
   submissionResults: SearchResult<SubmissionIndexed>;

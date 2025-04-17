@@ -2,7 +2,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import { Menu, MenuItem } from '@mui/material';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -13,7 +13,7 @@ import CustomChip from 'components/visual/CustomChip';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -75,7 +75,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
   }, []);
 
   const handleMenuCopy = useCallback(() => {
-    copy(text, 'clipID');
+    copy(text);
     handleClose();
   }, [copy, handleClose, text]);
 

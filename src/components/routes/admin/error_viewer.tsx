@@ -3,7 +3,7 @@ import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import { Grid, MenuItem, Select, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
@@ -22,8 +22,7 @@ import ErrorsTable from 'components/visual/SearchResult/errors';
 import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import { ErrorDetail } from './error_detail';
 
 const TIME_CONTRAINTS = ['24h', '4d', '7d', '1m', '1y'] as const;
@@ -202,10 +201,10 @@ const ErrorViewer = () => {
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
       <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid item xs={12} sm={7} md={9} xl={10}>
+        <Grid size={{ xs: 12, sm: 7, md: 9, xl: 10 }}>
           <Typography variant="h4">{t('title')}</Typography>
         </Grid>
-        <Grid item xs={12} sm={5} md={3} xl={2}>
+        <Grid size={{ xs: 12, sm: 5, md: 3, xl: 2 }}>
           <FormControl size="small" fullWidth>
             <Select
               disabled={searching}
@@ -277,7 +276,7 @@ const ErrorViewer = () => {
 
       {errorResults !== null && errorResults.total !== 0 && (
         <Grid container spacing={2}>
-          <Grid item xs={12} lg={4}>
+          <Grid size={{ xs: 12, lg: 4 }}>
             <Histogram
               dataset={histogram}
               height="200px"
@@ -287,7 +286,7 @@ const ErrorViewer = () => {
               verticalLine
             />
           </Grid>
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
             <LineGraph
               dataset={names}
               height="200px"
@@ -301,7 +300,7 @@ const ErrorViewer = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
             <LineGraph
               dataset={types}
               height="200px"

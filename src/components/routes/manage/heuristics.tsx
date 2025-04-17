@@ -1,6 +1,6 @@
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
@@ -19,8 +19,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import HeuristicsTable from 'components/visual/SearchResult/heuristics';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import HeuristicDetail from './heuristic_detail';
 
 const HEURISTICS_PARAMS = createSearchParams(p => ({

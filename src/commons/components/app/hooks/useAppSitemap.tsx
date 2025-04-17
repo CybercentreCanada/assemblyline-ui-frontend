@@ -1,9 +1,8 @@
+import type { AppSiteMapRoute } from 'commons/components/app/AppConfigs';
+import { useAppConfigs } from 'commons/components/app/hooks';
 import i18n from 'i18n';
 import { useMemo } from 'react';
-import type { PathMatch } from 'react-router-dom';
-import { matchPath } from 'react-router-dom';
-import type { AppSiteMapRoute } from '../AppConfigs';
-import useAppConfigs from './useAppConfigs';
+import { matchPath, type PathMatch } from 'react-router';
 
 const TITLE_404 = i18n.t('breadcrumb.404');
 
@@ -40,7 +39,6 @@ const appendRoute = (breadcrumbs: BreadcrumbItem[], breadcrumb: BreadcrumbItem):
     }
     // If the last element of bread is a leaf, then we remove it.
     if (breadcrumbs[breadcrumbs.length - 1].route.isLeaf) {
-      // eslint-disable-next-line no-param-reassign
       breadcrumbs = breadcrumbs.slice(0, breadcrumbs.length - 1);
     }
     // See if the route is already in the breadcrumbs.
@@ -71,7 +69,7 @@ const resolveTitle = (breadcrumb: BreadcrumbItem, siteMap: AppSiteMapRoute[]) =>
 const is404 = (breadcrumb: BreadcrumbItem) => breadcrumb.route.title === TITLE_404;
 
 //
-export default function useAppSitemap() {
+export function useAppSitemap() {
   const { sitemap } = useAppConfigs();
   return useMemo(
     () => ({

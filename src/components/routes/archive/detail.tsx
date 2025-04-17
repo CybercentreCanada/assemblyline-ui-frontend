@@ -36,8 +36,7 @@ import { emptyResult } from 'components/visual/ResultCard';
 import { TabContainer } from 'components/visual/TabContainer';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 
 type Params = {
   id?: string;

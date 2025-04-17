@@ -4,7 +4,7 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import type { TypographyProps } from '@mui/material';
 import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -16,8 +16,7 @@ import { getVersionQuery } from 'helpers/utils';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router';
 
 // TODO: version doesn't seem to be set correctly
 type ServiceStats = ServiceStatsData & { version: string };
@@ -275,11 +274,11 @@ export default function ServiceReview() {
         spacing={3}
         style={{ paddingBottom: theme.spacing(2) }}
       >
-        <Grid item xs={12} md>
+        <Grid size={{ xs: 12, md: 'grow' }}>
           <Typography variant="h4">{t('title')}</Typography>
           <Typography variant="subtitle1">{t('subtitle')}</Typography>
         </Grid>
-        <Grid item xs={12} md style={{ flexGrow: 0 }}>
+        <Grid size={{ xs: 12, md: 'grow' }} style={{ flexGrow: 0 }}>
           {services ? (
             <>
               <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
@@ -324,7 +323,7 @@ export default function ServiceReview() {
             spacing={3}
             style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}
           >
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <VersionSelector
                 possibleVersions={possibleVersions}
                 selectedService={selectedService}
@@ -334,7 +333,7 @@ export default function ServiceReview() {
               />
               <ServiceDetail stats={stats1} comp={stats2} show={version1 !== ''} />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <VersionSelector
                 possibleVersions={possibleVersions}
                 selectedService={selectedService}

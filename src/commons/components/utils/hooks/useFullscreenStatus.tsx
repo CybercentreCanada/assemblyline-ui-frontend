@@ -1,4 +1,20 @@
-import { MutableRefObject, useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import { type MutableRefObject, useCallback, useLayoutEffect, useMemo, useState } from 'react';
+
+const getBrowserFullscreenElementProp = () => {
+  if (typeof document.fullscreenElement !== 'undefined') {
+    return 'fullscreenElement';
+  }
+  if (typeof document['mozFullScreenElement'] !== 'undefined') {
+    return 'mozFullScreenElement';
+  }
+  if (typeof document['msFullscreenElement'] !== 'undefined') {
+    return 'msFullscreenElement';
+  }
+  if (typeof document['webkitFullscreenElement'] !== 'undefined') {
+    return 'webkitFullscreenElement';
+  }
+  throw new Error('fullscreenElement is not supported by this browser');
+};
 
 export default function useFullscreenStatus(elRef: MutableRefObject<any>) {
   const [isFullscreen, setIsFullscreen] = useState(document[getBrowserFullscreenElementProp()] != null);
@@ -25,23 +41,4 @@ export default function useFullscreenStatus(elRef: MutableRefObject<any>) {
   });
 
   return useMemo(() => [isFullscreen, setFullscreen], [isFullscreen, setFullscreen]) as [boolean, () => void];
-}
-
-function getBrowserFullscreenElementProp() {
-  if (typeof document.fullscreenElement !== 'undefined') {
-    return 'fullscreenElement';
-  }
-  // eslint-disable-next-line @typescript-eslint/dot-notation
-  if (typeof document['mozFullScreenElement'] !== 'undefined') {
-    return 'mozFullScreenElement';
-  }
-  // eslint-disable-next-line @typescript-eslint/dot-notation
-  if (typeof document['msFullscreenElement'] !== 'undefined') {
-    return 'msFullscreenElement';
-  }
-  // eslint-disable-next-line @typescript-eslint/dot-notation
-  if (typeof document['webkitFullscreenElement'] !== 'undefined') {
-    return 'webkitFullscreenElement';
-  }
-  throw new Error('fullscreenElement is not supported by this browser');
 }

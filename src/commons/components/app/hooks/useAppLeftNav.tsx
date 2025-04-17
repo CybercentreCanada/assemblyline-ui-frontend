@@ -1,6 +1,6 @@
-import { AppLeftNavContext } from 'commons/components/app/providers/AppLeftNavProvider';
+import { AppLeftNavContext } from 'commons/components/app/AppContexts';
 import { useContext } from 'react';
 
-export default function useAppLeftNav() {
+export function useAppLeftNav() {
   return useContext(AppLeftNavContext);
 }

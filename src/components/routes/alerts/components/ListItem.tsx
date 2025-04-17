@@ -61,7 +61,7 @@ const WrappedAlertListItem = ({ item }: Props) => {
   return (
     <div style={{ padding: theme.spacing(2) }}>
       <Grid container spacing={1}>
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <div style={{ display: 'flex' }}>
             <AlertExtendedScan name={item.extended_scan} />
             <AlertPriority name={item.priority} />
@@ -89,7 +89,7 @@ const WrappedAlertListItem = ({ item }: Props) => {
             </div>
           </div>
         </Grid>
-        <Grid item xs={6} md={2} style={{ minHeight: theme.spacing(5) }}>
+        <Grid size={{ xs: 6, md: 2 }} style={{ minHeight: theme.spacing(5) }}>
           <CustomChip
             size="tiny"
             label={item.file.type}
@@ -128,20 +128,20 @@ const WrappedAlertListItem = ({ item }: Props) => {
             </>
           ) : null}
         </Grid>
-        <Grid item xs={6} md={2} style={{ textAlign: 'right' }}>
+        <Grid size={{ xs: 6, md: 2 }} style={{ textAlign: 'right' }}>
           <Moment variant="fromNow">{item.reporting_ts}</Moment>
         </Grid>
-        <Grid item xs={12} md={2}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <Grid container spacing={1}>
-            <Grid item>
+            <Grid>
               <CustomChip size="tiny" variant="outlined" label={item.type} style={{ cursor: 'inherit' }} />
             </Grid>
-            <Grid item>
+            <Grid>
               <AlertStatus name={item.status} size={'tiny' as const} />
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <ChipList
             items={item.label
               .sort()
@@ -169,7 +169,7 @@ const WrappedAlertListItem = ({ item }: Props) => {
               )}
           />
         </Grid>
-        <Grid item xs={12} md={2}>
+        <Grid size={{ xs: 12, md: 2 }}>
           {item.al.detailed ? (
             <>
               <AlertListChipDetailed items={item.al.detailed.av} title="AV" size="tiny" />
@@ -186,7 +186,7 @@ const WrappedAlertListItem = ({ item }: Props) => {
             </>
           )}
         </Grid>
-        <Grid item xs={12} md={2} style={{ textAlign: 'right' }}>
+        <Grid size={{ xs: 12, md: 2 }} style={{ textAlign: 'right' }}>
           <Verdict score={item.al.score} />
         </Grid>
       </Grid>

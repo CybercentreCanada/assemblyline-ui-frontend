@@ -5,8 +5,7 @@ import withStyles from '@mui/styles/withStyles';
 import type SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React from 'react';
 import type { To } from 'react-router';
-import { useNavigate } from 'react-router';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router';
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({

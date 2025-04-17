@@ -4,7 +4,7 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  Unstable_Grid2 as Grid,
+  Grid,
   Radio,
   RadioGroup,
   TextField,
@@ -33,8 +33,7 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX } from 'helpers/constants';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
   endAdornment: {
@@ -220,8 +219,8 @@ const SafelistNew = ({}: Props) => {
       event.target.value === 'tag'
         ? DEFAULT_SAFELIST_TAG
         : event.target.value === 'signature'
-        ? DEFAULT_SAFELIST_SIGNATURE
-        : DEFAULT_SAFELIST_FILE;
+          ? DEFAULT_SAFELIST_SIGNATURE
+          : DEFAULT_SAFELIST_FILE;
     setSafelist({ ...safelist, ...extras, type: event.target.value });
   };
 
@@ -257,10 +256,10 @@ const SafelistNew = ({}: Props) => {
         </Button>
       </div>
       <Grid container spacing={2}>
-        <Grid xs>
+        <Grid size={{ xs: 'grow' }}>
           <Typography variant="h4">{t('title')}</Typography>
         </Grid>
-        <Grid xs={12} md="auto" alignSelf="end">
+        <Grid size={{ xs: 12, md: 'auto' }} alignSelf="end">
           <FormControl required>
             <FormLabel id="type-radio-buttons-group-label">{t('type.title')}</FormLabel>
             <RadioGroup
@@ -277,10 +276,10 @@ const SafelistNew = ({}: Props) => {
           </FormControl>
         </Grid>
         {safelist?.type === 'tag' && (
-          <Grid container xs={12}>
+          <Grid container size={{ xs: 12 }}>
             <Typography variant="h6">{t('information.tag')}</Typography>
             <Grid container spacing={1} width={'100%'}>
-              <Grid xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <FormControl fullWidth required>
                   <FormLabel id="tag-type-label">{t('tag.type.title')}</FormLabel>
                   <Autocomplete
@@ -295,7 +294,7 @@ const SafelistNew = ({}: Props) => {
                   />
                 </FormControl>
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <FormControl fullWidth required>
                   <FormLabel id="tag-value-label">{t('tag.value.title')}</FormLabel>
                   <TextField
@@ -314,10 +313,10 @@ const SafelistNew = ({}: Props) => {
           </Grid>
         )}
         {safelist?.type === 'signature' && (
-          <Grid container xs={12}>
+          <Grid container size={{ xs: 12 }}>
             <Typography variant="h6">{t('information.signature')}</Typography>
             <Grid container spacing={1} width={'100%'}>
-              <Grid xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <FormControl fullWidth required>
                   <FormLabel id="signature-label">{t('signature.name.title')}</FormLabel>
                   <TextField
@@ -335,10 +334,10 @@ const SafelistNew = ({}: Props) => {
         )}
         {safelist?.type === 'file' && (
           <>
-            <Grid container xs={12}>
+            <Grid container size={{ xs: 12 }}>
               <Typography variant="h6">{t('file.prop')}</Typography>
               <Grid container spacing={1} width={'100%'} paddingLeft={theme.spacing(1)}>
-                <Grid xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <FormLabel>{t('file.name')}</FormLabel>
                   <TextField
                     value={safelist?.file?.name[0]}
@@ -350,7 +349,7 @@ const SafelistNew = ({}: Props) => {
                     fullWidth
                   />
                 </Grid>
-                <Grid xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <FormLabel>{t('file.type')}</FormLabel>
                   <Autocomplete
                     options={fileTypes}
@@ -363,7 +362,7 @@ const SafelistNew = ({}: Props) => {
                     renderInput={params => <TextField {...params} />}
                   />
                 </Grid>
-                <Grid xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <FormLabel>{t('file.size')}</FormLabel>
                   <TextField
                     type="number"
@@ -378,12 +377,12 @@ const SafelistNew = ({}: Props) => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid container xs={12} paddingTop={theme.spacing(2)}>
+            <Grid container size={{ xs: 12 }} paddingTop={theme.spacing(2)}>
               <Typography variant="h6">{t('file.hashes')}</Typography>
               <Grid container spacing={1} width={'100%'} paddingLeft={theme.spacing(1)}>
                 {safelist?.type === 'file' &&
                   HASHES.map((hash, idx) => (
-                    <Grid key={idx} xs={12} md={6}>
+                    <Grid key={idx} size={{ xs: 12, md: 6 }}>
                       <FormLabel>{hash.toUpperCase()}</FormLabel>
                       <TextField
                         error={!!(safelist?.hashes[hash] && !safelist?.hashes[hash].match(HASH_MAP[hash]))}
@@ -402,10 +401,10 @@ const SafelistNew = ({}: Props) => {
           </>
         )}
         {safelist?.type && (
-          <Grid container xs={12} paddingTop={theme.spacing(2)}>
+          <Grid container size={{ xs: 12 }} paddingTop={theme.spacing(2)}>
             <Typography variant="h6">{t('details')}</Typography>
             <Grid container spacing={1} width={'100%'}>
-              <Grid xs={12} md={9}>
+              <Grid size={{ xs: 12, md: 9 }}>
                 <FormControl fullWidth required>
                   <FormLabel id="reason-label">{t('reason.title')}</FormLabel>
                   <TextField
@@ -437,7 +436,7 @@ const SafelistNew = ({}: Props) => {
                   />
                 </FormControl>
               </Grid>
-              <Grid xs={12} md={3}>
+              <Grid size={{ xs: 12, md: 3 }}>
                 <FormControl fullWidth>
                   <FormLabel id="expiry_ts-label">{t('expiry.title')}</FormLabel>
                   <DatePicker

@@ -4,7 +4,7 @@ import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import { useALQuery } from 'components/core/Query/AL/useALQuery';
@@ -20,8 +20,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import BadlistTable from 'components/visual/SearchResult/badlist';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import BadlistNew from './badlist_add';
 import BadlistDetail from './badlist_detail';
 
@@ -103,12 +102,12 @@ const BadlistSearch = () => {
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
-          <Grid item xs>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
 
           {currentUser.roles.includes('badlist_manage') && (
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+            <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
               <Tooltip title={t('add_badlist')}>
                 <IconButton
                   style={{

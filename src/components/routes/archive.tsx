@@ -25,8 +25,7 @@ import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
   searchresult: {
@@ -293,7 +292,7 @@ export default function MalwareArchive() {
     return (
       <PageFullWidth margin={4}>
         <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
-          <Grid item xs={12} md={8} xl={10}>
+          <Grid size={{ xs: 12, md: 8, xl: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
               <Typography variant="h4">{t('title')}</Typography>
               <Tooltip title={t('beta.description')}>
@@ -303,7 +302,7 @@ export default function MalwareArchive() {
               </Tooltip>
             </div>
           </Grid>
-          <Grid item xs={12} md={4} xl={2}>
+          <Grid size={{ xs: 12, md: 4, xl: 2 }}>
             <FormControl size="small" fullWidth>
               <Select
                 disabled={searching}
@@ -427,7 +426,7 @@ export default function MalwareArchive() {
 
         {fileResults !== null && fileResults.total !== 0 && (
           <Grid container spacing={2}>
-            <Grid item xs={12} lg={4}>
+            <Grid size={{ xs: 12, lg: 4 }}>
               <Histogram
                 dataset={histogram}
                 height="200px"
@@ -448,7 +447,7 @@ export default function MalwareArchive() {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={6} lg={4}>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }}>
               <LineGraph
                 dataset={labels}
                 height="200px"
@@ -463,7 +462,7 @@ export default function MalwareArchive() {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={6} lg={4}>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }}>
               <LineGraph
                 dataset={types}
                 height="200px"

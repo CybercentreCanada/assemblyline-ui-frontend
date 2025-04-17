@@ -3,7 +3,7 @@ import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
@@ -21,8 +21,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import WorkflowTable from 'components/visual/SearchResult/workflow';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import WorkflowCreate from './create';
 import WorkflowDetail from './detail';
 
@@ -151,11 +150,11 @@ const WorkflowsSearch = () => {
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
-          <Grid item xs>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
           {currentUser.roles.includes('workflow_manage') && (
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+            <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
               <Tooltip title={t('add_workflow')}>
                 <IconButton
                   style={{

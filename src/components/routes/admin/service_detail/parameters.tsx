@@ -96,41 +96,41 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
   return (
     <div>
       <Grid container spacing={1} alignItems="center">
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="h6">{t('params.user')}</Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle2">{t('params.user.current')}</Typography>
         </Grid>
         {service.submission_params.length !== 0 ? (
           service.submission_params.map((param, i) => (
-            <Grid item key={i} xs={12}>
+            <Grid key={i} size={{ xs: 12 }}>
               <MultiTypeParam param={param} id={i} onUpdate={onParamUpdate} onDelete={onParamDelete} />
             </Grid>
           ))
         ) : (
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="caption" color="textSecondary">
               {t('params.user.none')}
             </Typography>
           </Grid>
         )}
-        <Grid item xs={12} style={{ marginTop: theme.spacing(2) }}>
+        <Grid size={{ xs: 12 }} style={{ marginTop: theme.spacing(2) }}>
           <Typography variant="subtitle2">{t('params.user.new')}</Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <MultiTypeParam onAdd={onParamAdd} />
         </Grid>
 
-        <Grid item xs={12} style={{ marginTop: theme.spacing(2) }}>
+        <Grid size={{ xs: 12 }} style={{ marginTop: theme.spacing(2) }}>
           <Typography variant="h6">{t('params.config')}</Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle2">{t('params.config.current')}</Typography>
         </Grid>
         {Object.keys(service.config).length !== 0 ? (
           Object.keys(service.config).map((name, i) => (
-            <Grid item key={i} xs={12}>
+            <Grid key={i} size={{ xs: 12 }}>
               <MultiTypeConfig
                 config={{ name, value: service.config[name] }}
                 onUpdate={onConfigAddUpdate}
@@ -139,16 +139,16 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
             </Grid>
           ))
         ) : (
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="caption" color="textSecondary">
               {t('params.config.none')}
             </Typography>
           </Grid>
         )}
-        <Grid item xs={12} style={{ marginTop: theme.spacing(2) }}>
+        <Grid size={{ xs: 12 }} style={{ marginTop: theme.spacing(2) }}>
           <Typography variant="subtitle2">{t('params.config.new')}</Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <MultiTypeConfig onAdd={onConfigAddUpdate} />
         </Grid>
       </Grid>

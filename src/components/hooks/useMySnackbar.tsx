@@ -3,13 +3,13 @@ import { useSnackbar } from 'notistack';
 
 export default function useMySnackbar() {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const snackBarOptions: OptionsObject = {
+  const snackBarOptions: OptionsObject<'default' | 'error' | 'info' | 'success' | 'warning'> = {
     preventDuplicate: true,
     anchorOrigin: {
       vertical: 'bottom',
       horizontal: 'center'
     },
-    onClick: snack => {
+    onClose: snack => {
       closeSnackbar();
     }
   };

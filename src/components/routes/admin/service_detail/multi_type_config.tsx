@@ -125,10 +125,10 @@ const WrappedMultiTypeConfig = ({
 
   return config ? (
     <Grid container spacing={1} alignItems="center">
-      <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
+      <Grid size={{ xs: 10, sm: 3 }} style={{ wordBreak: 'break-word' }}>
         {`${parsedConfig.name} [${parsedConfig.type}]:`}
       </Grid>
-      <Grid item xs={10} sm={8}>
+      <Grid size={{ xs: 10, sm: 8 }}>
         {parsedConfig.type === 'bool' ? (
           <FormControl size="small" fullWidth>
             <Select
@@ -181,7 +181,7 @@ const WrappedMultiTypeConfig = ({
           />
         )}
       </Grid>
-      <Grid item xs={2} sm={1}>
+      <Grid size={{ xs: 2, sm: 1 }}>
         <Tooltip title={t('params.user.remove')}>
           <IconButton
             style={{
@@ -197,7 +197,7 @@ const WrappedMultiTypeConfig = ({
     </Grid>
   ) : (
     <Grid container spacing={1}>
-      <Grid item xs={10} sm={3}>
+      <Grid size={{ xs: 10, sm: 3 }}>
         <TextField
           fullWidth
           size="small"
@@ -208,7 +208,7 @@ const WrappedMultiTypeConfig = ({
           style={{ margin: 0 }}
         />
       </Grid>
-      <Grid item xs={10} sm={2}>
+      <Grid size={{ xs: 10, sm: 2 }}>
         <FormControl size="small" fullWidth>
           <Select
             id="user_spec_params"
@@ -225,7 +225,7 @@ const WrappedMultiTypeConfig = ({
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={10} sm={6}>
+      <Grid size={{ xs: 10, sm: 6 }}>
         {tempConfig.type === 'bool' ? (
           <FormControl size="small" fullWidth>
             <Select
@@ -277,7 +277,7 @@ const WrappedMultiTypeConfig = ({
           />
         )}
       </Grid>
-      <Grid item xs={2} sm={1} style={{ height: theme.spacing(8) }}>
+      <Grid size={{ xs: 2, sm: 1 }} style={{ height: theme.spacing(8) }}>
         {tempConfig.name !== '' && (
           <Tooltip title={t('params.user.add')}>
             <IconButton
