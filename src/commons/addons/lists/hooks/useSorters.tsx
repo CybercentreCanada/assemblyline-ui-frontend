@@ -1,7 +1,7 @@
 import { ArrowDownward, ArrowUpward, Remove } from '@mui/icons-material';
 import { SorterField } from 'commons/addons/lists/sorters/SorterSelector';
 import lodash from 'lodash';
-import * as React from 'react';
+import React from 'react';
 
 //
 const isNumber = (value: any): boolean => lodash.isNumber(value) || (!lodash.isEmpty(value) && !isNaN(value));

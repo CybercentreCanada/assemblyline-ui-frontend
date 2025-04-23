@@ -1,10 +1,7 @@
 import ArchiveIcon from '@mui/icons-material/Archive';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
-import type { Theme } from '@mui/material';
 import { IconButton, Paper, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -19,6 +16,7 @@ import type { SubmissionIndexed } from 'components/models/base/submission';
 import type { Role } from 'components/models/base/user';
 import type { SearchResult } from 'components/models/ui/search';
 import type { Indexes } from 'components/models/ui/user';
+import ForbiddenPage from 'components/routes/403';
 import Empty from 'components/visual/Empty';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -36,38 +34,8 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
-import ForbiddenPage from './403';
 
 const PAGE_SIZE = 25;
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    tweaked_tabs: {
-      minHeight: 'unset',
-      [theme.breakpoints.up('md')]: {
-        '& [role=tab]': {
-          padding: '8px 20px',
-          fontSize: '13px',
-          minHeight: 'unset',
-          minWidth: 'unset'
-        }
-      },
-      [theme.breakpoints.down('sm')]: {
-        minHeight: 'unset',
-        '& [role=tab]': {
-          fontSize: '12px',
-          minHeight: 'unset',
-          minWidth: 'unset'
-        }
-      }
-    },
-    searchresult: {
-      paddingLeft: theme.spacing(1),
-      color: theme.palette.primary.main,
-      fontStyle: 'italic'
-    }
-  })
-);
 
 type SearchIndexes = Pick<Indexes, 'submission' | 'file' | 'result' | 'signature' | 'alert' | 'retrohunt'>;
 
@@ -88,7 +56,6 @@ function Search({ index = null }: Props) {
   const location = useLocation();
   const navigate = useNavigate();
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [searchSuggestion, setSearchSuggestion] = useState<string[]>(null);
@@ -323,13 +290,31 @@ function Search({ index = null }: Props) {
           {!currentIndex && query && query.get('query') && (
             <Paper square style={{ marginBottom: theme.spacing(0.5) }}>
               <Tabs
-                className={classes.tweaked_tabs}
                 value={tab}
                 onChange={handleChangeTab}
                 indicatorColor="primary"
                 textColor="primary"
                 scrollButtons="auto"
                 variant="scrollable"
+                sx={{
+                  minHeight: 'unset',
+                  [theme.breakpoints.up('md')]: {
+                    '& [role=tab]': {
+                      padding: '8px 20px',
+                      fontSize: '13px',
+                      minHeight: 'unset',
+                      minWidth: 'unset'
+                    }
+                  },
+                  [theme.breakpoints.down('sm')]: {
+                    minHeight: 'unset',
+                    '& [role=tab]': {
+                      fontSize: '12px',
+                      minHeight: 'unset',
+                      minWidth: 'unset'
+                    }
+                  }
+                }}
               >
                 {currentUser.roles.includes(permissionMap.submission) ? (
                   <Tab
@@ -410,7 +395,13 @@ function Search({ index = null }: Props) {
             }}
           >
             {resMap[tab] && resMap[tab].total !== 0 && currentIndex && (
-              <div className={classes.searchresult}>
+              <div
+                style={{
+                  paddingLeft: theme.spacing(1),
+                  color: theme.palette.primary.main,
+                  fontStyle: 'italic'
+                }}
+              >
                 <SearchResultCount count={resMap[tab].total} />
                 {t(resMap[tab].total === 1 ? 'matching_result' : 'matching_results')}
               </div>

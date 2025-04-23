@@ -14,7 +14,6 @@ import {
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -22,23 +21,6 @@ import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  drawerPaper: {
-    width: '80%',
-    maxWidth: '800px',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  },
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
 
 type User = {
   avatar: string;
@@ -61,7 +43,6 @@ type User = {
 
 const WrappedAddUserPage = () => {
   const { t } = useTranslation(['adminUsers']);
-  const classes = useStyles();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
@@ -146,11 +127,21 @@ const WrappedAddUserPage = () => {
       </Tooltip>
       <Drawer
         anchor="right"
-        classes={{ paper: classes.drawerPaper }}
         open={drawer}
         onClose={() => {
           setNewUser(defaultUser);
           setDrawer(false);
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              width: '80%',
+              maxWidth: '800px',
+              [theme.breakpoints.down('sm')]: {
+                width: '100%'
+              }
+            }
+          }
         }}
       >
         <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
@@ -341,7 +332,18 @@ const WrappedAddUserPage = () => {
               onClick={() => handleAddUser(newUser)}
             >
               {t('newuser.save')}
-              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {loading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: -12,
+                    marginLeft: -12
+                  }}
+                />
+              )}
             </Button>
           </Box>
         </div>

@@ -1,14 +1,5 @@
-import makeStyles from '@mui/styles/makeStyles';
 import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEscape } from 'commons/components/utils/keyboard';
 import React, { useEffect, useRef } from 'react';
-
-// TODO: Add in the commons
-
-const useStyles = makeStyles(() => ({
-  container: {
-    outline: 'none'
-  }
-}));
 
 export interface CarouselProps {
   autofocus?: boolean;
@@ -37,7 +28,6 @@ const Carousel: React.FC<CarouselProps> = ({
   onNext,
   style
 }) => {
-  const classes = useStyles();
   const touchX = useRef<number>(-1);
   const touchY = useRef<number>(-1);
   const touchStartX = useRef<number>(-1);
@@ -127,12 +117,11 @@ const Carousel: React.FC<CarouselProps> = ({
   return (
     <div
       tabIndex={-1}
-      className={classes.container}
       onKeyDown={onKeyDown}
       onTouchStart={enableSwipe && onTouchStart}
       onTouchMove={enableSwipe && onTouchMove}
       onTouchEnd={enableSwipe && onTouchEnd}
-      style={style}
+      style={{ outline: 'none', ...style }}
       ref={carouselRef}
     >
       {children}

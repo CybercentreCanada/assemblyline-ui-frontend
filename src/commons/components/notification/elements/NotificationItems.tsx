@@ -1,10 +1,10 @@
 import { Divider, Stack, useTheme } from '@mui/material';
 import { type ItemComponentProps } from 'commons/components/app/AppNotificationService';
-import { type FC, memo } from 'react';
 import { type FeedItem } from 'commons/components/notification';
-import { NotificationEndOfPage } from './NotificationEndOfPage';
-import { NotificationError } from './NotificationError';
-import { NotificationSkeleton } from './NotificationSkeleton';
+import { NotificationEndOfPage } from 'commons/components/notification/elements/NotificationEndOfPage';
+import { NotificationError } from 'commons/components/notification/elements/NotificationError';
+import { NotificationSkeleton } from 'commons/components/notification/elements/NotificationSkeleton';
+import { type FC, memo } from 'react';
 
 type NotificationListsProps = {
   notifications: FeedItem[];

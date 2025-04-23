@@ -16,6 +16,23 @@ import type { AlertItem } from 'components/models/base/alert';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import { ALERT_DEFAULT_PARAMS, ALERT_SIMPLELIST_ID } from 'components/routes/alerts';
+import AlertActions, {
+  AlertBadlist,
+  AlertGroup,
+  AlertHistory,
+  AlertOwnership,
+  AlertSafelist,
+  AlertSubmission,
+  AlertWorkflow
+} from 'components/routes/alerts/components/Actions';
+import {
+  AlertExtendedScan,
+  AlertPriority,
+  AlertStatus,
+  AutoHideChipList,
+  SkeletonInline
+} from 'components/routes/alerts/components/Components';
+import { SearchParamsProvider } from 'components/routes/alerts/contexts/SearchParamsContext';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
 import ActionableText from 'components/visual/ActionableText';
 import { ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
@@ -29,23 +46,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { useParams } from 'react-router';
-import AlertActions, {
-  AlertBadlist,
-  AlertGroup,
-  AlertHistory,
-  AlertOwnership,
-  AlertSafelist,
-  AlertSubmission,
-  AlertWorkflow
-} from './components/Actions';
-import {
-  AlertExtendedScan,
-  AlertPriority,
-  AlertStatus,
-  AutoHideChipList,
-  SkeletonInline
-} from './components/Components';
-import { SearchParamsProvider } from './contexts/SearchParamsContext';
 
 const useStyles = makeStyles(theme => ({
   section: {
@@ -367,7 +367,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 <Grid size={{ xs: 3, sm: 2 }}>
                   <BsClipboard className={classes.clipboardIcon} onClick={alert ? () => copy(alert.file.md5) : null} />
                   <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
-                    {'MD5:'}
+                    MD5:
                   </Typography>
                 </Grid>
                 <Grid size={{ xs: 9, sm: 10 }} style={{ wordBreak: 'break-word' }}>
@@ -385,7 +385,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 <Grid size={{ xs: 3, sm: 2 }}>
                   <BsClipboard className={classes.clipboardIcon} onClick={alert ? () => copy(alert.file.sha1) : null} />
                   <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
-                    {'SHA1:'}
+                    SHA1:
                   </Typography>
                 </Grid>
                 <Grid size={{ xs: 9, sm: 10 }} style={{ wordBreak: 'break-word' }}>
@@ -406,7 +406,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                     onClick={alert ? () => copy(alert.file.sha256) : null}
                   />
                   <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
-                    {'SHA256:'}
+                    SHA256:
                   </Typography>
                 </Grid>
                 <Grid size={{ xs: 9, sm: 10 }} style={{ wordBreak: 'break-word' }}>
@@ -642,7 +642,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                         <Grid container spacing={1}>
                           {(!alert || alert.al.ip_dynamic.length !== 0) && (
                             <Grid size={{ xs: 12, md: !alert || alert.al.ip_static.length !== 0 ? 6 : 12 }}>
-                              <Typography variant="caption" component={'div'}>
+                              <Typography variant="caption" component="div">
                                 <i>{t('ip_dynamic')}</i>
                               </Typography>
                               {alert && alert.al.detailed ? (
@@ -668,7 +668,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                           )}
                           {(!alert || alert.al.ip_static.length !== 0) && (
                             <Grid size={{ xs: 12, md: !alert || alert.al.ip_dynamic.length !== 0 ? 6 : 12 }}>
-                              <Typography variant="caption" component={'div'}>
+                              <Typography variant="caption" component="div">
                                 <i>{t('ip_static')}</i>
                               </Typography>
                               {alert && alert.al.detailed ? (
@@ -707,7 +707,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                         <Grid container spacing={1}>
                           {(!alert || alert.al.domain_dynamic.length !== 0) && (
                             <Grid size={{ xs: 12, md: !alert || alert.al.domain_static.length !== 0 ? 6 : 12 }}>
-                              <Typography variant="caption" component={'div'}>
+                              <Typography variant="caption" component="div">
                                 <i>{t('domain_dynamic')}</i>
                               </Typography>
                               {alert && alert.al.detailed ? (
@@ -735,7 +735,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                           )}
                           {(!alert || alert.al.domain_static.length !== 0) && (
                             <Grid size={{ xs: 12, md: !alert || alert.al.domain_dynamic.length !== 0 ? 6 : 12 }}>
-                              <Typography variant="caption" component={'div'}>
+                              <Typography variant="caption" component="div">
                                 <i>{t('domain_static')}</i>
                               </Typography>
                               {alert && alert.al.detailed ? (
@@ -776,7 +776,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                         <Grid container spacing={1}>
                           {(!alert || alert.al.uri_dynamic.length !== 0) && (
                             <Grid size={{ xs: 12, md: !alert || alert.al.uri_static.length !== 0 ? 6 : 12 }}>
-                              <Typography variant="caption" component={'div'}>
+                              <Typography variant="caption" component="div">
                                 <i>{t('uri_dynamic')}</i>
                               </Typography>
                               {alert && alert.al.detailed ? (
@@ -802,7 +802,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                           )}
                           {(!alert || alert.al.uri_static.length !== 0) && (
                             <Grid size={{ xs: 12, md: !alert || alert.al.uri_dynamic.length !== 0 ? 6 : 12 }}>
-                              <Typography variant="caption" component={'div'}>
+                              <Typography variant="caption" component="div">
                                 <i>{t('uri_static')}</i>
                               </Typography>
                               {alert && alert.al.detailed ? (
@@ -932,7 +932,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                       <div className={classes.sectionContent}>
                         <Grid container spacing={1}>
                           <Grid size={{ xs: 12, md: 6 }}>
-                            <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component={'div'}>
+                            <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component="div">
                               <i>{t('attack_category')}</i>
                             </Typography>
                             {alert && alert.al.detailed ? (
@@ -958,7 +958,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             )}
                           </Grid>
                           <Grid size={{ xs: 12, md: 6 }}>
-                            <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component={'div'}>
+                            <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component="div">
                               <i>{t('attack_pattern')}</i>
                             </Typography>
                             {alert && alert.al.detailed ? (

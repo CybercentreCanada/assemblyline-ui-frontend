@@ -1,19 +1,7 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import { Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme =>
-  createStyles({
-    meta_key: {
-      overflowX: 'hidden',
-      whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis'
-    }
-  })
-);
 
 type ExternalSourcesProps = {
   submissionMetadata: { [field_name: string]: any };
@@ -22,7 +10,6 @@ type ExternalSourcesProps = {
 
 function SubmissionMetadata({ submissionMetadata, setSubmissionMetadata }: ExternalSourcesProps) {
   const { t } = useTranslation(['submit']);
-  const classes = useStyles();
   const theme = useTheme();
   const { configuration } = useALContext();
   var fileSources = [];
@@ -46,7 +33,14 @@ function SubmissionMetadata({ submissionMetadata, setSubmissionMetadata }: Exter
         <div>
           {Object.keys(submissionMetadata).map((meta, i) => (
             <Grid container key={i}>
-              <Grid className={classes.meta_key} size={{ xs: 12, sm: 3, lg: 2 }}>
+              <Grid
+                size={{ xs: 12, sm: 3, lg: 2 }}
+                sx={{
+                  overflowX: 'hidden',
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis'
+                }}
+              >
                 <span style={{ fontWeight: 500 }}>{meta}</span>
               </Grid>
               <Grid size={{ xs: 12, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>

@@ -14,12 +14,15 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { ServiceConstants, Service as ServiceData } from 'components/models/base/service';
+import ServiceContainer from 'components/routes/admin/service_detail/container';
+import ServiceGeneral from 'components/routes/admin/service_detail/general';
+import ServiceParams from 'components/routes/admin/service_detail/parameters';
+import ServiceUpdater from 'components/routes/admin/service_detail/updater';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
@@ -30,20 +33,6 @@ import { getVersionQuery } from 'helpers/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useNavigate, useParams } from 'react-router';
-import ServiceContainer from './service_detail/container';
-import ServiceGeneral from './service_detail/general';
-import ServiceParams from './service_detail/parameters';
-import ServiceUpdater from './service_detail/updater';
-
-const useStyles = makeStyles(() => ({
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
 
 const TAB_TYPES = ['general', 'docker', 'updater', 'params'] as const;
 type TabType = (typeof TAB_TYPES)[number];
@@ -62,7 +51,6 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
   const navigate = useNavigate();
-  const classes = useStyles();
   const { svc } = useParams<ParamProps>();
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration } = useALContext();
@@ -179,8 +167,6 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
   useEffect(() => {
     // Set the global error flag based on each sub-error value
     setOverallError(serviceGeneralError);
-
-    // eslint-disable-next-line
   }, [serviceGeneralError]);
 
   useEffect(() => {
@@ -354,7 +340,18 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
             onClick={saveService}
           >
             {t('save')}
-            {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+            {buttonLoading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: -12,
+                  marginLeft: -12
+                }}
+              />
+            )}
           </Button>
         </div>
       ) : null}

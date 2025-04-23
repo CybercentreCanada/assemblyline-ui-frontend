@@ -5,8 +5,7 @@ import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { Card, Grid, IconButton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { Box, Card, Grid, IconButton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
@@ -20,16 +19,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { Link, Navigate, useLocation, useParams } from 'react-router';
-
-const useStyles = makeStyles(theme => ({
-  clipboardIcon: {
-    marginRight: theme.spacing(1),
-    '&:hover': {
-      cursor: 'pointer',
-      transform: 'scale(1.1)'
-    }
-  }
-}));
 
 interface Error extends ErrorModel {
   key: string;
@@ -48,7 +37,6 @@ type ErrorDetailProps = {
 
 export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
   const { t } = useTranslation(['adminErrorViewer']);
-  const classes = useStyles();
   const theme = useTheme();
   const { copy } = useClipboard();
   const [error, setError] = useState<Error>(null);
@@ -128,10 +116,23 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
 
             <Grid size={{ xs: 12, md: 8 }}>
               <label>{t('file_info')}</label>
-              <div style={{ wordBreak: 'break-all' }}>
-                <BsClipboard className={classes.clipboardIcon} onClick={() => copy(error.sha256)} />
+              <Box
+                sx={{
+                  wordBreak: 'break-all',
+                  '&:hover': {
+                    cursor: 'pointer',
+                    transform: 'scale(1.1)'
+                  }
+                }}
+              >
+                <BsClipboard
+                  onClick={() => copy(error.sha256)}
+                  style={{
+                    marginRight: theme.spacing(1)
+                  }}
+                />
                 {error.sha256}
-              </div>
+              </Box>
             </Grid>
             <Grid size={{ xs: 12, md: 4 }}>
               <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>

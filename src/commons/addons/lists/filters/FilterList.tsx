@@ -1,5 +1,5 @@
 import { styled, useMediaQuery, useTheme } from '@mui/material';
-import * as React from 'react';
+import React from 'react';
 import FilterInput from './FilterInput';
 import { FilterField } from './FilterSelector';
 

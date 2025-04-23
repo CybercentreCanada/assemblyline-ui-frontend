@@ -2,8 +2,8 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
-import { Card, Grid, Skeleton, Switch, Theme, Tooltip, Typography } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import type { CardProps } from '@mui/material';
+import { Card, Grid, Skeleton, styled, Switch, Tooltip, Typography, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageFullScreen from 'commons/components/pages/PageFullScreen';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
@@ -19,60 +19,49 @@ import io from 'socket.io-client';
 
 const NAMESPACE = '/status';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  card: {
-    flexGrow: 1,
-    padding: theme.spacing(1),
-    minHeight: '120px',
-    '&:hover': {
-      boxShadow: theme.shadows[6]
-    }
+type StyledCardProps = CardProps & {
+  disabled?: boolean;
+  error?: boolean;
+};
+
+const CoreCard = styled(Card, {
+  shouldForwardProp: prop => prop !== 'error' && prop !== 'disabled'
+})<StyledCardProps>(({ theme, disabled = false, error = false }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(1),
+  minHeight: '120px',
+  '&:hover': {
+    boxShadow: theme.shadows[6]
   },
-  core_card: {
-    flexGrow: 1,
-    padding: theme.spacing(1),
-    minHeight: '170px',
-    '&:hover': {
-      boxShadow: theme.shadows[6]
-    }
-  },
-  disabled: {
-    color: theme.palette.text.disabled,
-    backgroundColor: theme.palette.mode === 'dark' ? '#63636317' : '#EAEAEA',
-    border: `solid 1px ${theme.palette.divider}`
-  },
-  error: {
-    backgroundColor: theme.palette.mode === 'dark' ? '#ff000017' : '#FFE4E4',
-    border: `solid 1px ${theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`
-  },
-  error_icon: {
-    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
-    float: 'right'
-  },
-  icon: {
-    marginRight: '4px',
-    verticalAlign: 'middle',
-    height: '20px',
-    color: theme.palette.action.active
-  },
-  metric: {
-    display: 'inline-block',
-    marginRight: theme.spacing(1)
-  },
-  muted: {
-    color: theme.palette.text.secondary
-  },
-  ok: {
-    border: `solid 1px ${theme.palette.divider}`
-  },
-  title: {
-    fontWeight: 500,
-    fontSize: '120%'
-  }
+
+  ...(disabled
+    ? {
+        color: theme.palette.text.disabled,
+        backgroundColor: theme.palette.mode === 'dark' ? '#63636317' : '#EAEAEA',
+        border: `solid 1px ${theme.palette.divider}`
+      }
+    : error
+      ? {
+          backgroundColor: theme.palette.mode === 'dark' ? '#ff000017' : '#FFE4E4',
+          border: `solid 1px ${theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`
+        }
+      : {
+          border: `solid 1px ${theme.palette.divider}`
+        })
+}));
+
+const TitleBox = styled('div')(() => ({
+  fontWeight: 500,
+  fontSize: '120%'
+}));
+
+const ErrorIcon = styled('div')(({ theme }) => ({
+  color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
+  float: 'right'
 }));
 
 const WrappedMetricCounter = ({ value, title, tooltip, init = false, margin = '8px' }) => {
-  const classes = useStyles();
+  const theme = useTheme();
 
   return !init ? (
     <Skeleton
@@ -83,7 +72,12 @@ const WrappedMetricCounter = ({ value, title, tooltip, init = false, margin = '8
     />
   ) : (
     <Tooltip title={tooltip}>
-      <span className={classes.metric}>
+      <span
+        style={{
+          display: 'inline-block',
+          marginRight: theme.spacing(1)
+        }}
+      >
         <CustomChip size="tiny" type="rounded" mono label={title} />
         {value}
       </span>
@@ -94,9 +88,10 @@ const MetricCounter = React.memo(WrappedMetricCounter);
 
 const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
   const { t } = useTranslation(['dashboard']);
+  const theme = useTheme();
+
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
-  const classes = useStyles();
   const busyness = (ingester.metrics.cpu_seconds * ingester.metrics.cpu_seconds_count) / ingester.instances / 60;
   const { user: currentUser } = useAppUser<CustomUser>();
 
@@ -126,21 +121,17 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
   }, [ingester]);
 
   return (
-    <Card
-      className={`${classes.core_card} ${
-        status ? (error || ingester.error ? classes.error : classes.ok) : classes.disabled
-      }`}
-    >
+    <CoreCard disabled={!status} error={!!error || !!ingester.error}>
       <Grid container spacing={1}>
         <Grid size={{ xs: 12 }}>
           {status && (error || ingester.error) && (
             <Tooltip title={error || ingester.error}>
-              <div className={classes.error_icon}>
+              <ErrorIcon>
                 <ErrorOutlineOutlinedIcon />
-              </div>
+              </ErrorIcon>
             </Tooltip>
           )}
-          <div className={classes.title}>
+          <TitleBox>
             {`${t('ingester')} :: x${ingester.instances}`}
             {status !== null && (
               <Tooltip title={t(`ingest.status.${status}`)}>
@@ -155,7 +146,7 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
                 </div>
               </Tooltip>
             )}
-          </div>
+          </TitleBox>
         </Grid>
         <Grid size={{ xs: 12, sm: 3 }}>
           <div>
@@ -305,7 +296,14 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
             />
             <Tooltip title={t('throughput.bytes')}>
               <span style={{ display: 'inline-block' }}>
-                <SpeedOutlinedIcon className={classes.icon} />
+                <SpeedOutlinedIcon
+                  sx={{
+                    marginRight: '4px',
+                    verticalAlign: 'middle',
+                    height: '20px',
+                    color: theme.palette.action.active
+                  }}
+                />
                 {ingester.initialized ? (
                   `${Number(
                     ((1.0 * ingester.metrics.bytes_completed) / ((1024 * 1024 * 60) / 8)).toFixed(2)
@@ -318,15 +316,16 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
           </div>
         </Grid>
       </Grid>
-    </Card>
+    </CoreCard>
   );
 };
 
 const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, status }) => {
   const { t } = useTranslation(['dashboard']);
+  const theme = useTheme();
+
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
-  const classes = useStyles();
   const busyness = (dispatcher.metrics.cpu_seconds * dispatcher.metrics.cpu_seconds_count) / dispatcher.instances / 60;
   const startQueue = dispatcher.queues.start.reduce((x, y) => x + y, 0);
   const resultQueue = dispatcher.queues.result.reduce((x, y) => x + y, 0);
@@ -362,21 +361,17 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
   }, [dispatcher]);
 
   return (
-    <Card
-      className={`${classes.core_card} ${
-        status ? (error || dispatcher.error ? classes.error : classes.ok) : classes.disabled
-      }`}
-    >
+    <CoreCard disabled={!status} error={!!error || !!dispatcher.error}>
       <Grid container spacing={1}>
         <Grid size={{ xs: 12 }}>
           {status && (error || dispatcher.error) && (
             <Tooltip title={error || dispatcher.error}>
-              <div className={classes.error_icon}>
+              <ErrorIcon>
                 <ErrorOutlineOutlinedIcon />
-              </div>
+              </ErrorIcon>
             </Tooltip>
           )}
-          <div className={classes.title}>
+          <TitleBox>
             {`${t('dispatcher')} :: x${dispatcher.instances}`}
             {status !== null && (
               <Tooltip title={t(`dispatcher.status.${status}`)}>
@@ -391,7 +386,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
                 </div>
               </Tooltip>
             )}
-          </div>
+          </TitleBox>
         </Grid>
         <Grid size={{ xs: 12 }}>
           <div>
@@ -399,7 +394,9 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
           </div>
           {dispatcher.initialized ? (
             <div>
-              {up.length === 0 && down.length === 0 && <span className={classes.muted}>{t('no_services')}</span>}
+              {up.length === 0 && down.length === 0 && (
+                <span style={{ color: theme.palette.text.secondary }}>{t('no_services')}</span>
+              )}
               {up.length !== 0 && <span>{up.sort().join(' | ')}</span>}
               {up.length !== 0 && down.length !== 0 && <span> :: </span>}
               {down.length !== 0 && <span>{down.sort().join(' | ')}</span>}
@@ -509,15 +506,16 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
           </div>
         </Grid>
       </Grid>
-    </Card>
+    </CoreCard>
   );
 };
 
 const WrappedArchiveCard = ({ archive }) => {
   const { t } = useTranslation(['dashboard']);
+  const theme = useTheme();
+
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
-  const classes = useStyles();
 
   useEffect(() => {
     if (archive.initialized && archive.metrics.exception > 0) {
@@ -539,17 +537,17 @@ const WrappedArchiveCard = ({ archive }) => {
   }, [archive]);
 
   return (
-    <Card className={`${classes.core_card} ${error || archive.error ? classes.error : classes.ok}`}>
+    <CoreCard error={!!error || !!archive.error}>
       <Grid container spacing={1}>
         <Grid size={{ xs: 12 }}>
           {(error || archive.error) && (
             <Tooltip title={error || archive.error}>
-              <div className={classes.error_icon}>
+              <ErrorIcon>
                 <ErrorOutlineOutlinedIcon />
-              </div>
+              </ErrorIcon>
             </Tooltip>
           )}
-          <div className={classes.title}>{`${t('archiver')} :: x${archive.instances}`}</div>
+          <TitleBox>{`${t('archiver')} :: x${archive.instances}`}</TitleBox>
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <div>
@@ -610,7 +608,7 @@ const WrappedArchiveCard = ({ archive }) => {
           </div>
         </Grid>
       </Grid>
-    </Card>
+    </CoreCard>
   );
 };
 
@@ -618,7 +616,6 @@ const WrappedExpiryCard = ({ expiry }) => {
   const { t } = useTranslation(['dashboard']);
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
-  const classes = useStyles();
 
   useEffect(() => {
     if (expiry.initialized && sumValues(expiry.queues) > 0 && sumValues(expiry.metrics) === 0) {
@@ -636,17 +633,17 @@ const WrappedExpiryCard = ({ expiry }) => {
   }, [expiry]);
 
   return (
-    <Card className={`${classes.core_card} ${error || expiry.error ? classes.error : classes.ok}`}>
+    <CoreCard error={!!error || !!expiry.error}>
       <Grid container spacing={1}>
         <Grid size={{ xs: 12 }}>
           {(error || expiry.error) && (
             <Tooltip title={error || expiry.error}>
-              <div className={classes.error_icon}>
+              <ErrorIcon>
                 <ErrorOutlineOutlinedIcon />
-              </div>
+              </ErrorIcon>
             </Tooltip>
           )}
-          <div className={classes.title}>{`${t('expiry')} :: x${expiry.instances}`}</div>
+          <TitleBox>{`${t('expiry')} :: x${expiry.instances}`}</TitleBox>
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <div>
@@ -748,7 +745,7 @@ const WrappedExpiryCard = ({ expiry }) => {
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }} />
       </Grid>
-    </Card>
+    </CoreCard>
   );
 };
 
@@ -756,7 +753,6 @@ const WrappedAlerterCard = ({ alerter }) => {
   const { t } = useTranslation(['dashboard']);
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
-  const classes = useStyles();
 
   useEffect(() => {
     if (alerter.metrics.error > 0) {
@@ -774,17 +770,17 @@ const WrappedAlerterCard = ({ alerter }) => {
   }, [alerter]);
 
   return (
-    <Card className={`${classes.core_card} ${error || alerter.error ? classes.error : classes.ok}`}>
+    <CoreCard error={!!error || !!alerter.error}>
       <Grid container spacing={1}>
         <Grid size={{ xs: 12 }}>
           {(error || alerter.error) && (
             <Tooltip title={error || alerter.error}>
-              <div className={classes.error_icon}>
+              <ErrorIcon>
                 <ErrorOutlineOutlinedIcon />
-              </div>
+              </ErrorIcon>
             </Tooltip>
           )}
-          <div className={classes.title}>{`${t('alerter')} :: x${alerter.instances}`}</div>
+          <TitleBox>{`${t('alerter')} :: x${alerter.instances}`}</TitleBox>
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
           <div>
@@ -843,7 +839,7 @@ const WrappedAlerterCard = ({ alerter }) => {
           </div>
         </Grid>
       </Grid>
-    </Card>
+    </CoreCard>
   );
 };
 
@@ -851,7 +847,6 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
   const { t } = useTranslation(['dashboard']);
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
-  const classes = useStyles();
 
   useEffect(() => {
     if ((timer !== null && scaler.initialized) || (timer === null && !scaler.initialized)) {
@@ -867,17 +862,17 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
   }, [scaler]);
 
   return (
-    <Card className={`${classes.core_card} ${error || scaler.error ? classes.error : classes.ok}`}>
+    <CoreCard error={!!error || !!scaler.error}>
       <Grid container spacing={1}>
         <Grid size={{ xs: 12 }}>
           {(error || scaler.error) && (
             <Tooltip title={error || scaler.error}>
-              <div className={classes.error_icon}>
+              <ErrorIcon>
                 <ErrorOutlineOutlinedIcon />
-              </div>
+              </ErrorIcon>
             </Tooltip>
           )}
-          <div className={classes.title}>{t('resources')}</div>
+          <TitleBox>{t('resources')}</TitleBox>
         </Grid>
         <Grid size={{ xs: 6 }} style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block' }}>
@@ -914,14 +909,15 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
           </div>
         </Grid>
       </Grid>
-    </Card>
+    </CoreCard>
   );
 };
 
 const WrappedServiceCard = ({ service, max_inflight }) => {
   const { t } = useTranslation(['dashboard']);
+  const theme = useTheme();
+
   const [error, setError] = useState(null);
-  const classes = useStyles();
 
   useEffect(() => {
     if (service.scaler.target !== 0 && service.instances === 0) {
@@ -937,19 +933,17 @@ const WrappedServiceCard = ({ service, max_inflight }) => {
   }, [service]);
 
   return (
-    <Card className={`${classes.card} ${error || service.error ? classes.error : classes.ok}`}>
+    <CoreCard error={!!error || !!service.error}>
       <Grid container spacing={1}>
         <Grid size={{ xs: 12 }}>
           {(error || service.error) && (
             <Tooltip title={error || service.error}>
-              <div className={classes.error_icon}>
+              <ErrorIcon>
                 <ErrorOutlineOutlinedIcon />
-              </div>
+              </ErrorIcon>
             </Tooltip>
           )}
-          <div className={classes.title}>
-            {`${service.service_name} :: ${service.instances} / ${service.scaler.target}`}
-          </div>
+          <TitleBox>{`${service.service_name} :: ${service.instances} / ${service.scaler.target}`}</TitleBox>
         </Grid>
         <Grid size={{ xs: 6 }}>
           <MetricCounter init value={service.queue} title="Q" tooltip={t('service.queue')} />
@@ -965,7 +959,7 @@ const WrappedServiceCard = ({ service, max_inflight }) => {
           <MetricCounter init value={service.metrics.fail_recoverable} title="R" tooltip={t('service.retried')} />
         </Grid>
       </Grid>
-    </Card>
+    </CoreCard>
   );
 };
 
@@ -975,12 +969,11 @@ const WrappedElasticCard = ({ elastic }) => {
   const { t } = useTranslation(['dashboard']);
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
-  const classes = useStyles();
 
   let largestIndex = null;
   let shardSize = null;
   if (elastic.shard_sizes.length > 0) {
-    let row = elastic.shard_sizes.reduce((a, b) => (a.shard_size > b.shard_size ? a : b));
+    const row = elastic.shard_sizes.reduce((a, b) => (a.shard_size > b.shard_size ? a : b));
     largestIndex = row.name;
     shardSize = row.shard_size;
   }
@@ -1007,17 +1000,17 @@ const WrappedElasticCard = ({ elastic }) => {
   }, [elastic]);
 
   return (
-    <Card className={`${classes.core_card} ${error || elastic.error ? classes.error : classes.ok}`}>
+    <CoreCard error={!!error || !!elastic.error}>
       <Grid container spacing={1}>
         <Grid size={{ xs: 12 }}>
           {(error || elastic.error) && (
             <Tooltip title={error || elastic.error}>
-              <div className={classes.error_icon}>
+              <ErrorIcon>
                 <ErrorOutlineOutlinedIcon />
-              </div>
+              </ErrorIcon>
             </Tooltip>
           )}
-          <div className={classes.title}>{`${t('elasticsearch')} :: x${elastic.instances}`}</div>
+          <TitleBox>{`${t('elasticsearch')} :: x${elastic.instances}`}</TitleBox>
         </Grid>
         <Grid size={{ xs: 12 }}>
           <MetricCounter
@@ -1051,7 +1044,7 @@ const WrappedElasticCard = ({ elastic }) => {
           />
         </Grid>
       </Grid>
-    </Card>
+    </CoreCard>
   );
 };
 
@@ -1061,7 +1054,6 @@ const WrappedRetrohuntCard = ({ retrohunt }) => {
   const { t } = useTranslation(['dashboard']);
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
-  const classes = useStyles();
 
   let pendingFiles = retrohunt.pending_files;
   if (pendingFiles === 1_000_000) {
@@ -1086,17 +1078,17 @@ const WrappedRetrohuntCard = ({ retrohunt }) => {
   }, [retrohunt]);
 
   return (
-    <Card className={`${classes.core_card} ${error || retrohunt.error ? classes.error : classes.ok}`}>
+    <CoreCard error={!!error || !!retrohunt.error}>
       <Grid container spacing={1}>
         <Grid size={{ xs: 12 }}>
           {(error || retrohunt.error) && (
             <Tooltip title={error || retrohunt.error}>
-              <div className={classes.error_icon}>
+              <ErrorIcon>
                 <ErrorOutlineOutlinedIcon />
-              </div>
+              </ErrorIcon>
             </Tooltip>
           )}
-          <div className={classes.title}>{`${t('retrohunt')} :: x${retrohunt.instances}`}</div>
+          <TitleBox>{`${t('retrohunt')} :: x${retrohunt.instances}`}</TitleBox>
         </Grid>
         <Grid size={{ xs: 12 }}>
           <MetricCounter
@@ -1153,7 +1145,7 @@ const WrappedRetrohuntCard = ({ retrohunt }) => {
           />
         </Grid>
       </Grid>
-    </Card>
+    </CoreCard>
   );
 };
 

@@ -96,7 +96,7 @@ export default class SimpleSearchQuery {
     return this;
   }
 
-  public getAll(key: string, defaultVal = null) {
+  public getAll(key: string, defaultVal: string[] = null) {
     return this.params.getAll(key) || defaultVal;
   }
 

@@ -43,7 +43,7 @@ const WrappedContainerCard = ({ container, defaults, name = null, volumes = null
   const { t } = useTranslation(['adminServices']);
   const [dialog, setDialog] = useState(false);
   const theme = useTheme();
-  const classes = useStyles();
+  const classes;
   const yesColor = theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark;
   const noColor = theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark;
 

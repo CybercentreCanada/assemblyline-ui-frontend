@@ -1,7 +1,4 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import { Box, Button, CircularProgress, Link, Stack, Typography } from '@mui/material';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import { useAppBanner, useAppLayout } from 'commons/components/app/hooks';
 import useAppBannerVert from 'commons/components/app/hooks/useAppBannerVert';
 import PageCardCentered from 'commons/components/pages/PageCardCentered';
@@ -19,18 +16,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  })
-);
-
 type LoginScreenProps = {
   allowUserPass: boolean;
   allowSAML: boolean;
@@ -43,7 +28,6 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const { t } = useTranslation(['login']);
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const bannerVert = useAppBannerVert();
   const banner = useAppBanner();
@@ -271,7 +255,18 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
                           href={`/api/v4/auth/login/?oauth_provider=${item}`}
                         >
                           {`${t('button_oauth')} ${item.replace(/_/g, ' ')}`}
-                          {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                          {buttonLoading && (
+                            <CircularProgress
+                              size={24}
+                              sx={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                marginTop: -12,
+                                marginLeft: -12
+                              }}
+                            />
+                          )}
                         </Button>
                       ))}
                     {allowSAML && (
@@ -291,7 +286,18 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
                         href={'/api/v4/auth/saml/sso/'}
                       >
                         {t('button_saml')}
-                        {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                        {buttonLoading && (
+                          <CircularProgress
+                            size={24}
+                            sx={{
+                              position: 'absolute',
+                              top: '50%',
+                              left: '50%',
+                              marginTop: -12,
+                              marginLeft: -12
+                            }}
+                          />
+                        )}
                       </Button>
                     )}
                   </Stack>

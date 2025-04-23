@@ -3,7 +3,6 @@ import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
 import { Chip, Grid, MenuItem, Select, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -26,29 +25,6 @@ import { safeFieldValue } from 'helpers/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
-
-const useStyles = makeStyles(theme => ({
-  searchresult: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    paddingBottom: theme.spacing(0.5),
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end'
-  },
-  drawerPaper: {
-    width: '80%',
-    maxWidth: '800px',
-    [theme.breakpoints.down('xl')]: {
-      width: '100%'
-    }
-  },
-  tableWrapper: {
-    paddingTop: theme.spacing(2),
-    paddingLeft: theme.spacing(0.5),
-    paddingRight: theme.spacing(0.5)
-  }
-}));
 
 const PAGE_SIZE = 25;
 
@@ -94,7 +70,6 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
 export default function MalwareArchive() {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
-  const classes = useStyles();
   const location = useLocation();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -369,7 +344,16 @@ export default function MalwareArchive() {
               ]}
             >
               {fileResults !== null && (
-                <div className={classes.searchresult}>
+                <div
+                  style={{
+                    fontStyle: 'italic',
+                    paddingTop: theme.spacing(0.5),
+                    paddingBottom: theme.spacing(0.5),
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'flex-end'
+                  }}
+                >
                   {fileResults.total !== 0 && (
                     <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                       {searching ? (
@@ -480,7 +464,13 @@ export default function MalwareArchive() {
           </Grid>
         )}
 
-        <div className={classes.tableWrapper}>
+        <div
+          style={{
+            paddingTop: theme.spacing(2),
+            paddingLeft: theme.spacing(0.5),
+            paddingRight: theme.spacing(0.5)
+          }}
+        >
           <ArchivesTable fileResults={fileResults} setFileID={handleFileChange} onLabelClick={handleLabelClick} />
         </div>
       </PageFullWidth>

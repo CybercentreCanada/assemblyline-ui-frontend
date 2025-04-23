@@ -116,7 +116,7 @@ export default tseslint.config(
       '@stylistic/jsx-curly-brace-presence': 'warn',
       '@stylistic/jsx-curly-brace-presence': 'warn',
       '@stylistic/jsx-curly-newline': 'off',
-      '@stylistic/jsx-one-expression-per-line': 'warn',
+      '@stylistic/jsx-one-expression-per-line': 'off',
       '@stylistic/jsx-wrap-multilines': 'warn',
       '@stylistic/linebreak-style': 'off',
       '@stylistic/max-len': ['off', { code: 120, ignoreComments: true, ignoreRegExpLiterals: true, tabWidth: 2 }],
