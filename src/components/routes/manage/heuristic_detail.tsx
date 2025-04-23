@@ -126,7 +126,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: theme.spacing(4) }}>
           <Grid container alignItems="center">
-            <Grid size={{ xs: 12 }}>
+            <Grid flexGrow={1}>
               <Typography variant="h4">{t('title')}</Typography>
               <Typography variant="caption">
                 {heuristic ? heuristic.heur_id : <Skeleton style={{ width: '10rem' }} />}

@@ -37,29 +37,29 @@ import HeuristicDetail from 'components/routes/manage/heuristic_detail';
 import SignatureDetail from 'components/routes/manage/signature_detail';
 import AISummarySection from 'components/routes/submission/detail/ai_summary';
 import Classification from 'components/visual/Classification';
+import AttackSection from 'components/visual/FileDetail/attacks';
+import ChildrenSection from 'components/visual/FileDetail/childrens';
+import Detection from 'components/visual/FileDetail/detection';
+import EmptySection from 'components/visual/FileDetail/emptys';
+import ErrorSection from 'components/visual/FileDetail/errors';
+import FrequencySection from 'components/visual/FileDetail/frequency';
+import IdentificationSection from 'components/visual/FileDetail/ident';
+import MetadataSection from 'components/visual/FileDetail/metadata';
+import ParentSection from 'components/visual/FileDetail/parents';
+import ResultSection from 'components/visual/FileDetail/results';
+import TagSection from 'components/visual/FileDetail/tags';
+import URIIdentificationSection from 'components/visual/FileDetail/uriIdent';
+import FileDownloader from 'components/visual/FileDownloader';
+import InputDialog from 'components/visual/InputDialog';
 import { emptyResult } from 'components/visual/ResultCard';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router';
-import AttackSection from './FileDetail/attacks';
-import ChildrenSection from './FileDetail/childrens';
-import Detection from './FileDetail/detection';
-import EmptySection from './FileDetail/emptys';
-import ErrorSection from './FileDetail/errors';
-import FrequencySection from './FileDetail/frequency';
-import IdentificationSection from './FileDetail/ident';
-import MetadataSection from './FileDetail/metadata';
-import ParentSection from './FileDetail/parents';
-import ResultSection from './FileDetail/results';
-import TagSection from './FileDetail/tags';
-import URIIdentificationSection from './FileDetail/uriIdent';
-import FileDownloader from './FileDownloader';
-import InputDialog from './InputDialog';
 
 type Props = {
   sha256: string;
   sid?: string;
-  metadata?: { [key: string]: string };
+  metadata?: Record<string, string>;
   liveResultKeys?: string[];
   liveErrors?: Error[];
   force?: boolean;
@@ -103,7 +103,7 @@ const WrappedFileDetail: React.FC<Props> = ({
 
   const popoverOpen = Boolean(resubmitAnchor);
 
-  const submissionProfiles: { [name: string]: string } = useMemo<{ [name: string]: string }>(() => {
+  const submissionProfiles: Record<string, string> = useMemo<Record<string, string>>(() => {
     let profileMap = {};
     Object.entries(configuration.submission.profiles).map(([name, config]) => {
       profileMap = { ...profileMap, [name]: config.display_name };
@@ -174,7 +174,6 @@ const WrappedFileDetail: React.FC<Props> = ({
         }
       });
       setResubmitAnchor(null);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [sha256]
   );
@@ -352,7 +351,7 @@ const WrappedFileDetail: React.FC<Props> = ({
         setGlobalDrawer(null);
       } else if (file) {
         // Set the drawer content based on the hash
-        var id = location.hash.slice(1);
+        const id = location.hash.slice(1);
         if (heuristics.includes(id)) {
           setGlobalDrawer(<HeuristicDetail heur_id={id} />);
         } else {
@@ -418,7 +417,7 @@ const WrappedFileDetail: React.FC<Props> = ({
       )}
       <div style={{ paddingBottom: sp4 }}>
         <Grid container alignItems="center">
-          <Grid size={{ xs: 12 }}>
+          <Grid flexGrow={1}>
             <Typography variant="h4">
               {file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
             </Typography>

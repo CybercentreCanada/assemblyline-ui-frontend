@@ -249,7 +249,7 @@ const WrappedSourceDetailDrawer = ({
 
         <div style={{ paddingBottom: theme.spacing(2) }}>
           <Grid container alignItems="center">
-            <Grid size={{ xs: 12 }}>
+            <Grid flexGrow={1}>
               <Typography variant="h4">{service}</Typography>
               <Typography variant="caption">
                 {`${t(base ? 'editing_source' : 'adding_source')}${base ? ` (${base.name})` : ''}`}

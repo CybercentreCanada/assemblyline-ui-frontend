@@ -1,41 +1,9 @@
-import { Divider, Skeleton, Typography } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { Box, Divider, Skeleton, Typography, useTheme } from '@mui/material';
 import type { SubmissionReport } from 'components/models/ui/submission_report';
 import Verdict from 'components/visual/Verdict';
 import { bytesToSize } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  file_details: {
-    fontFamily: 'monospace',
-    color: theme.palette.text.secondary,
-    wordBreak: 'break-word',
-    marginBottom: theme.spacing(1),
-    '@media print': {
-      color: 'rgba(0, 0, 0, 0.54)'
-    }
-  },
-  divider: {
-    '@media print': {
-      backgroundColor: '#0000001f !important'
-    }
-  },
-  section_title: {
-    marginTop: theme.spacing(4),
-    pageBreakAfter: 'avoid',
-    pageBreakInside: 'avoid'
-  },
-  section_content: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-    pageBreakBefore: 'avoid',
-    pageBreakInside: 'avoid'
-  },
-  section: {
-    pageBreakInside: 'avoid'
-  }
-}));
 
 type Props = {
   tree: SubmissionReport['file_tree'];
@@ -43,7 +11,7 @@ type Props = {
 };
 
 function FileTree({ tree, important_files }: Props) {
-  const classes = useStyles();
+  const theme = useTheme();
 
   return tree && important_files ? (
     <div>
@@ -64,11 +32,21 @@ function FileTree({ tree, important_files }: Props) {
                   <tr>
                     <td />
                     <td>
-                      <div className={classes.file_details}>
+                      <Box
+                        sx={{
+                          fontFamily: 'monospace',
+                          color: theme.palette.text.secondary,
+                          wordBreak: 'break-word',
+                          marginBottom: theme.spacing(1),
+                          '@media print': {
+                            color: 'rgba(0, 0, 0, 0.54)'
+                          }
+                        }}
+                      >
                         {`${tree[f].sha256} - ${tree[f].type} - `}
                         <b>{tree[f].size}</b>
                         <span style={{ fontWeight: 300 }}> ({bytesToSize(tree[f].size)})</span>
-                      </div>
+                      </Box>
                     </td>
                   </tr>
                   <tr>
@@ -114,16 +92,35 @@ function FileTreeSkel() {
 
 function WrappedFileTreeSection({ report }) {
   const { t } = useTranslation(['submissionReport']);
-  const classes = useStyles();
+  const theme = useTheme();
 
   return (
     (!report || report.important_files.length !== 0) && (
-      <div className={classes.section}>
-        <div className={classes.section_title}>
+      <div style={{ pageBreakInside: 'avoid' }}>
+        <div
+          style={{
+            marginTop: theme.spacing(4),
+            pageBreakAfter: 'avoid',
+            pageBreakInside: 'avoid'
+          }}
+        >
           <Typography variant="h6">{t('important_files')}</Typography>
-          <Divider className={classes.divider} />
+          <Divider
+            sx={{
+              '@media print': {
+                backgroundColor: '#0000001f !important'
+              }
+            }}
+          />
         </div>
-        <div className={classes.section_content}>
+        <div
+          style={{
+            marginTop: theme.spacing(2),
+            marginBottom: theme.spacing(2),
+            pageBreakBefore: 'avoid',
+            pageBreakInside: 'avoid'
+          }}
+        >
           {report ? (
             <FileTree
               tree={report?.file_tree[report?.files[0]?.sha256]?.children}

@@ -1,6 +1,6 @@
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import { IconButton, Link, Tooltip, useTheme } from '@mui/material';
-import { File } from 'components/models/base/result';
+import type { File } from 'components/models/base/result';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -1,41 +1,11 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Alert, CircularProgress, Collapse, Divider, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import AIMarkdown from 'components/visual/AiMarkdown';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  },
-  container: {
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  spinner: {
-    textAlign: 'center',
-    position: 'relative',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)'
-  },
-  watermark: {
-    float: 'right',
-    color: theme.palette.text.disabled,
-    fontSize: 'smaller',
-    cursor: 'pointer'
-  }
-}));
 
 type AISummarySectionProps = {
   type: 'submission' | 'file';
@@ -56,10 +26,10 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
 }) => {
   const { t, i18n } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
   const { configuration } = useALContext();
   const { apiCall } = useMyAPI();
+
+  const [open, setOpen] = useState(true);
   const [analysing, setAnalysing] = useState(false);
   const [summary, setSummary] = useState(null);
   const [truncated, setTruncated] = useState(false);
@@ -126,7 +96,17 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
                     setOpen(!open);
                   }
             }
-            className={noCollapse ? null : classes.title}
+            sx={{
+              ...(!noCollapse && {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+                '&:hover, &:focus': {
+                  color: theme.palette.text.secondary
+                }
+              })
+            }}
           >
             <span>{t('ai_summary')}</span>
             {noCollapse ? null : open ? <ExpandLess /> : <ExpandMore />}
@@ -138,13 +118,21 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
         <Collapse in={open} timeout="auto">
           {analysing || (!summary && !error) ? (
             <div style={{ height: '12rem', borderRadius: '4px' }}>
-              <div className={classes.spinner}>
+              <div
+                style={{
+                  textAlign: 'center',
+                  position: 'relative',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)'
+                }}
+              >
                 <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_report')}</div>
                 <CircularProgress variant="indeterminate" />
               </div>
             </div>
           ) : summary ? (
-            <div className={classes.container}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
               <AIMarkdown markdown={summary} truncated={truncated} />
             </div>
           ) : error ? (
@@ -157,7 +145,15 @@ const WrappedAISummarySection: React.FC<AISummarySectionProps> = ({
           {(summary || error) && (
             <div>
               <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
-                <div className={classes.watermark} onClick={() => getReportSummary(true)}>
+                <div
+                  onClick={() => getReportSummary(true)}
+                  style={{
+                    float: 'right',
+                    color: theme.palette.text.disabled,
+                    fontSize: 'smaller',
+                    cursor: 'pointer'
+                  }}
+                >
                   {t('powered_by_ai')}
                 </div>
               </Tooltip>

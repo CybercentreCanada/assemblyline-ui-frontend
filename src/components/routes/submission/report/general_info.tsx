@@ -1,5 +1,4 @@
 import { Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import type { BodyFormat, SectionBody } from 'components/models/base/result_body';
 import type { SubmissionReport } from 'components/models/ui/submission_report';
 import Moment from 'components/visual/Moment';
@@ -8,28 +7,6 @@ import { ImageInlineBody } from 'components/visual/image_inline';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  divider: {
-    '@media print': {
-      backgroundColor: '#0000001f !important'
-    }
-  },
-  section_title: {
-    marginTop: theme.spacing(4),
-    pageBreakAfter: 'avoid',
-    pageBreakInside: 'avoid'
-  },
-  section_content: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-    pageBreakBefore: 'avoid',
-    pageBreakInside: 'avoid'
-  },
-  section: {
-    pageBreakInside: 'avoid'
-  }
-}));
 
 const parseValue = (value: any): ReactNode => {
   if (value instanceof Array) {
@@ -98,24 +75,32 @@ type Props = {
 function WrappedGeneralInformation({ report }: Props) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
-  const classes = useStyles();
 
   const sp2 = theme.spacing(2);
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
 
   return (
-    <div className={classes.section}>
-      <div className={classes.section_title}>
+    <div style={{ pageBreakInside: 'avoid' }}>
+      <div style={{ marginTop: theme.spacing(4), pageBreakAfter: 'avoid', pageBreakInside: 'avoid' }}>
         <Typography variant="h6">{t('general')}</Typography>
-        <Divider className={classes.divider} />
+        <Divider
+          sx={{
+            '@media print': {
+              backgroundColor: '#0000001f !important'
+            }
+          }}
+        />
       </div>
       <div
-        className={classes.section_content}
         style={{
           display: 'flex',
           alignItems: upSM ? 'start' : 'center',
           flexDirection: upSM ? 'row' : 'column',
-          rowGap: sp2
+          rowGap: sp2,
+          marginTop: theme.spacing(2),
+          marginBottom: theme.spacing(2),
+          pageBreakBefore: 'avoid',
+          pageBreakInside: 'avoid'
         }}
       >
         <Grid container spacing={1}>

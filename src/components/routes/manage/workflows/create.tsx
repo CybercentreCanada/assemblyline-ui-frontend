@@ -246,7 +246,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
         <div style={{ textAlign: 'left' }}>
           <div style={{ paddingBottom: theme.spacing(2) }}>
             <Grid container alignItems="center">
-              <Grid size={{ xs: 12 }}>
+              <Grid flexGrow={1}>
                 <Typography variant="h4">{t(id ? 'edit.title' : 'add.title')}</Typography>
                 <Typography variant="caption">
                   {!id ? null : workflow ? id : <Skeleton style={{ width: '10rem' }} />}

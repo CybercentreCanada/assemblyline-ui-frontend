@@ -1,10 +1,10 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Box, Collapse, useTheme } from '@mui/material';
-import { File } from 'components/models/base/result';
+import type { File } from 'components/models/base/result';
+import ExtractedFile from 'components/visual/ResultCard/extracted_file';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ExtractedFile from './extracted_file';
 
 type ExtractedSectionProps = {
   extracted: File[];

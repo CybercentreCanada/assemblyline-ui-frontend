@@ -1,24 +1,11 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useHighlighter from 'components/hooks/useHighlighter';
-import { AttackMatrix } from 'components/models/ui/file';
+import type { AttackMatrix } from 'components/models/ui/file';
 import Attack from 'components/visual/Attack';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  }
-}));
 
 type AttackSectionProps = {
   attack_matrix: AttackMatrix;
@@ -29,7 +16,6 @@ const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attack_matrix, for
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
-  const classes = useStyles();
   const sp2 = theme.spacing(2);
   const { getKey } = useHighlighter();
 
@@ -40,7 +26,15 @@ const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attack_matrix, for
         onClick={() => {
           setOpen(!open);
         }}
-        className={classes.title}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          '&:hover, &:focus': {
+            color: theme.palette.text.secondary
+          }
+        }}
       >
         <span>{t('attack_matrix')}</span>
         {open ? <ExpandLess /> : <ExpandMore />}

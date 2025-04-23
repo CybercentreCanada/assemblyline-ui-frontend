@@ -190,7 +190,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
         {!inDrawer && (
           <div style={{ paddingBottom: theme.spacing(3), textAlign: 'left' }}>
             <Grid container alignItems="center">
-              <Grid size="grow">
+              <Grid flexGrow={1}>
                 <Typography variant="h4">{t('detail.title')}</Typography>
               </Grid>
 

@@ -4,9 +4,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
-import { Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import withStyles from '@mui/styles/withStyles';
+import { Box, Grid, IconButton, Skeleton, styled, Tooltip, TooltipProps, Typography, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
@@ -15,52 +13,37 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { SubmissionReport } from 'components/models/ui/submission_report';
 import ForbiddenPage from 'components/routes/403';
+import AISummarySection from 'components/routes/submission/detail/ai_summary';
+import Attack from 'components/routes/submission/report/attack';
+import AttributionBanner from 'components/routes/submission/report/attribution_banner';
+import FileTreeSection from 'components/routes/submission/report/file_tree';
+import GeneralInformation from 'components/routes/submission/report/general_info';
+import Heuristics from 'components/routes/submission/report/heuristics';
+import Metadata from 'components/routes/submission/report/metadata';
+import Tags from 'components/routes/submission/report/tags';
 import Classification from 'components/visual/Classification';
 import { filterObject } from 'helpers/utils';
-import { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
-import AISummarySection from './detail/ai_summary';
-import Attack from './report/attack';
-import AttributionBanner from './report/attribution_banner';
-import FileTreeSection from './report/file_tree';
-import GeneralInformation from './report/general_info';
-import Heuristics from './report/heuristics';
-import Metadata from './report/metadata';
-import Tags from './report/tags';
 
 type ParamProps = {
   id: string;
 };
 
-const NoPrintTooltip = withStyles(() => ({
-  tooltip: {
+const NoPrintTooltip = memo(
+  styled(Tooltip)<TooltipProps>(() => ({
     '@media print': {
       display: 'none !important'
     }
-  }
-}))(Tooltip);
-
-const useStyles = makeStyles(theme => ({
-  section_title: {
-    marginTop: theme.spacing(4),
-    pageBreakAfter: 'avoid',
-    pageBreakInside: 'avoid'
-  },
-  page: {
-    '@media print': {
-      fontSize: '90%'
-    },
-    textAlign: 'left'
-  }
-}));
+  }))
+);
 
 export default function SubmissionReportPage() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
   const { user: currentUser, c12nDef, configuration, settings } = useALContext();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
-  const classes = useStyles();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const theme = useTheme();
@@ -201,7 +184,14 @@ export default function SubmissionReportPage() {
 
   return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
-      <div className={classes.page}>
+      <Box
+        sx={{
+          '@media print': {
+            fontSize: '90%'
+          },
+          textAlign: 'left'
+        }}
+      >
         {c12nDef.enforce && (
           <div style={{ marginBottom: theme.spacing(4) }}>
             <Classification size="tiny" c12n={report ? report.classification : null} />
@@ -209,7 +199,7 @@ export default function SubmissionReportPage() {
         )}
         <div style={{ marginBottom: theme.spacing(4) }}>
           <Grid container alignItems="center">
-            <Grid size={{ xs: 12 }}>
+            <Grid flexGrow={1}>
               <div>
                 <Typography variant="h4">{t('title')}</Typography>
                 <Typography variant="caption">
@@ -218,7 +208,7 @@ export default function SubmissionReportPage() {
               </div>
             </Grid>
             <Grid size={{ xs: 'grow' }} className="print-only" style={{ textAlign: 'right' }}>
-              <img src={`/images/banner.svg`} alt="Assemblyline Banner" style={{ height: theme.spacing(8) }} />
+              <img src="/images/banner.svg" alt="Assemblyline Banner" style={{ height: theme.spacing(8) }} />
             </Grid>
             <Grid size={{ xs: 12, sm: 3 }} className="no-print">
               <div style={{ textAlign: 'right' }}>
@@ -293,14 +283,26 @@ export default function SubmissionReportPage() {
         <AttributionBanner report={report} />
         <GeneralInformation report={report} />
         {report && report.report_filtered && (
-          <div className={classes.section_title}>
+          <div
+            style={{
+              marginTop: theme.spacing(4),
+              pageBreakAfter: 'avoid',
+              pageBreakInside: 'avoid'
+            }}
+          >
             <Typography variant="subtitle1">
               <b>**{t('warning')}</b>: {t('warning.text')}
             </Typography>
           </div>
         )}
         {report && report.report_partial && (
-          <div className={classes.section_title}>
+          <div
+            style={{
+              marginTop: theme.spacing(4),
+              pageBreakAfter: 'avoid',
+              pageBreakInside: 'avoid'
+            }}
+          >
             <Typography variant="subtitle1">
               <b>**{t('warning')}</b>: {t('warning.partial')}
             </Typography>
@@ -314,7 +316,7 @@ export default function SubmissionReportPage() {
         {!useAIReport && <Attack report={report} />}
         <Tags report={report} />
         <FileTreeSection report={report} />
-      </div>
+      </Box>
     </PageCenter>
   ) : (
     <ForbiddenPage />

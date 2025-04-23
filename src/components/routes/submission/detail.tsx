@@ -1149,7 +1149,7 @@ function WrappedSubmissionDetail() {
         )}
         <div style={{ paddingBottom: sp4 }}>
           <Grid container>
-            <Grid size={{ xs: 12 }}>
+            <Grid flex={1}>
               <div>
                 <Typography variant="h4">{t('title')}</Typography>
                 <Typography variant="caption" component={'div'}>

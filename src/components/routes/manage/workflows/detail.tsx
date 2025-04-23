@@ -92,7 +92,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
         <div style={{ textAlign: 'left' }}>
           <div style={{ paddingBottom: theme.spacing(2) }}>
             <Grid container alignItems="center">
-              <Grid size={{ xs: 12 }}>
+              <Grid flexGrow={1}>
                 <Typography variant="h4">{t('title')}</Typography>
                 <Typography variant="caption">{workflow ? id : <Skeleton style={{ width: '10rem' }} />}</Typography>
               </Grid>

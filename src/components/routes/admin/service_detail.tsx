@@ -2,18 +2,7 @@ import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import {
-  Button,
-  CircularProgress,
-  Grid,
-  IconButton,
-  Paper,
-  Skeleton,
-  Tab,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@mui/material';
+import { Button, CircularProgress, IconButton, Paper, Skeleton, Tab, Tooltip, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -26,6 +15,7 @@ import ServiceUpdater from 'components/routes/admin/service_detail/updater';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import type { JSONFeedItem } from 'components/visual/Notification';
 import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
@@ -200,57 +190,73 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
         text={t('delete.text')}
         waiting={buttonLoading}
       />
-      <Grid container alignItems="center" spacing={3} style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid size={{ xs: 12 }}>
-          <Typography variant="h4">{service ? service.name : <Skeleton style={{ width: '20rem' }} />}</Typography>
-          <Typography variant="caption">{t('title.detail')}</Typography>
-        </Grid>
-        <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
-          {service ? (
-            <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-              <Tooltip title={t('errors')}>
-                <IconButton
-                  component={Link}
-                  style={{ color: theme.palette.action.active }}
-                  to={`/admin/errors?filters=response.service_name%3A${service.name}&filters=${getVersionQuery(
-                    service.version
-                  )}`}
-                  size="large"
-                >
-                  <ErrorOutlineOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('compare')}>
-                <IconButton
-                  component={Link}
-                  style={{ color: theme.palette.action.active }}
-                  to={`/admin/service_review?service=${service.name}&v1=${service.version}`}
-                  size="large"
-                >
-                  <CompareArrowsOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('remove')}>
-                <IconButton
-                  style={{
-                    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                  }}
-                  onClick={handleDeleteButtonClick}
-                  size="large"
-                >
-                  <RemoveCircleOutlineOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-            </div>
-          )}
-        </Grid>
-      </Grid>
+
+      <PageHeader
+        primary={service ? service.name : <Skeleton style={{ width: '20rem' }} />}
+        secondary={t('title.detail')}
+        style={{ paddingBottom: theme.spacing(2) }}
+        actions={
+          service
+            ? [
+                <Tooltip key="action-1" title={t('errors')}>
+                  <IconButton
+                    component={Link}
+                    style={{ color: theme.palette.action.active }}
+                    to={`/admin/errors?filters=response.service_name%3A${service.name}&filters=${getVersionQuery(
+                      service.version
+                    )}`}
+                    size="large"
+                  >
+                    <ErrorOutlineOutlinedIcon />
+                  </IconButton>
+                </Tooltip>,
+                <Tooltip key="action-2" title={t('compare')}>
+                  <IconButton
+                    component={Link}
+                    style={{ color: theme.palette.action.active }}
+                    to={`/admin/service_review?service=${service.name}&v1=${service.version}`}
+                    size="large"
+                  >
+                    <CompareArrowsOutlinedIcon />
+                  </IconButton>
+                </Tooltip>,
+                <Tooltip key="action-3" title={t('remove')}>
+                  <IconButton
+                    style={{
+                      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                    }}
+                    onClick={handleDeleteButtonClick}
+                    size="large"
+                  >
+                    <RemoveCircleOutlineOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              ]
+            : [
+                <Skeleton
+                  key="loading-1"
+                  variant="circular"
+                  height="2.5rem"
+                  width="2.5rem"
+                  style={{ margin: theme.spacing(0.5) }}
+                />,
+                <Skeleton
+                  key="loading-2"
+                  variant="circular"
+                  height="2.5rem"
+                  width="2.5rem"
+                  style={{ margin: theme.spacing(0.5) }}
+                />,
+                <Skeleton
+                  key="loading-3"
+                  variant="circular"
+                  height="2.5rem"
+                  width="2.5rem"
+                  style={{ margin: theme.spacing(0.5) }}
+                />
+              ]
+        }
+      />
 
       {service ? (
         <CustomChip

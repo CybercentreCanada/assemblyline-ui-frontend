@@ -3,25 +3,12 @@ import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import { ParsedSubmission } from 'components/models/base/submission';
+import type { ParsedSubmission } from 'components/models/base/submission';
 import Moment from 'components/visual/Moment';
 import Priority from 'components/visual/Priority';
 import Verdict from 'components/visual/Verdict';
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  }
-}));
 
 type Props = {
   submission: ParsedSubmission;
@@ -29,10 +16,13 @@ type Props = {
 
 const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
   const { t } = useTranslation(['submissionDetail']);
-  const [open, setOpen] = React.useState(true);
+
   const theme = useTheme();
-  const classes = useStyles();
+
+  const [open, setOpen] = useState(true);
+
   const sp2 = theme.spacing(2);
+
   return (
     <div style={{ paddingTop: sp2 }}>
       <Typography
@@ -40,7 +30,15 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
         onClick={() => {
           setOpen(!open);
         }}
-        className={classes.title}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          '&:hover, &:focus': {
+            color: theme.palette.text.secondary
+          }
+        }}
       >
         <span>{t('information')}</span>
         {open ? <ExpandLess /> : <ExpandMore />}

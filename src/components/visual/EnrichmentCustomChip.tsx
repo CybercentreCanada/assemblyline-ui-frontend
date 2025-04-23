@@ -60,8 +60,8 @@ const StyledEnrichedChip: FC<StyledEnrichedChipProps> = memo(
         hideDetails={hideDetails}
         showPreview={showPreview}
         hideLoading={hideLoading}
-        color={color in COLOR_MAP ? COLOR_MAP[color] : 'default'}
-        size={size in SIZE_MAP ? SIZE_MAP[size as keyof typeof SIZE_MAP] : 'medium'}
+        color={COLOR_MAP?.[color]}
+        size={SIZE_MAP?.[size]}
         variant={variant}
         forceDetails={forceDetails}
         setForceDetails={setForceDetails}
@@ -127,45 +127,45 @@ const StyledEnrichedChip: FC<StyledEnrichedChipProps> = memo(
             default: {
               backgroundColor: theme.palette.mode === 'dark' ? '#616161' : '#999',
               color: theme.palette.common.white,
-              '[role=button]&:hover, [role=button]&:focus': {
+              ['[role=button]&:hover, [role=button]&:focus']: {
                 backgroundColor: darken(theme.palette.mode === 'dark' ? '#616161' : '#999', 0.2)
               }
             },
             primary: {
-              '[role=button]&:hover, [role=button]&:focus': {
+              ['[role=button]&:hover, [role=button]&:focus']: {
                 backgroundColor: theme.palette.primary.dark
               }
             },
             secondary: {
-              '[role=button]&:hover, [role=button]&:focus': {
+              ['[role=button]&:hover, [role=button]&:focus']: {
                 backgroundColor: theme.palette.secondary.dark
               }
             },
             success: {
               backgroundColor: theme.palette.success.main,
               color: theme.palette.success.contrastText,
-              '[role=button]&:hover, [role=button]&:focus': {
+              ['[role=button]&:hover, [role=button]&:focus']: {
                 backgroundColor: theme.palette.success.dark
               }
             },
             warning: {
               backgroundColor: theme.palette.warning.main,
               color: theme.palette.warning.contrastText,
-              '[role=button]&:hover, [role=button]&:focus': {
+              ['[role=button]&:hover, [role=button]&:focus']: {
                 backgroundColor: theme.palette.warning.dark
               }
             },
             error: {
               backgroundColor: theme.palette.error.dark,
               color: theme.palette.error.contrastText,
-              '[role=button]&:hover, [role=button]&:focus': {
+              ['[role=button]&:hover, [role=button]&:focus']: {
                 backgroundColor: darken(theme.palette.error.dark, 0.25)
               }
             },
             info: {
               backgroundColor: theme.palette.info.main,
               color: theme.palette.info.contrastText,
-              '[role=button]&:hover, [role=button]&:focus': {
+              ['[role=button]&:hover, [role=button]&:focus']: {
                 backgroundColor: theme.palette.info.dark
               }
             }
