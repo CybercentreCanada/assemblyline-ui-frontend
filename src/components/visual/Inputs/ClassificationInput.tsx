@@ -15,8 +15,7 @@ import {
   useTheme
 } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
-import type { PossibleColors } from 'components/visual/CustomChip';
-import CustomChip, { ColorMap } from 'components/visual/CustomChip';
+import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
 import type { FormatProp } from 'helpers/classificationParser';
 import {
   applyAliases,
@@ -28,7 +27,7 @@ import {
   getParts,
   normalizedClassification
 } from 'helpers/classificationParser';
-import { PossibleColor } from 'helpers/colors';
+import type { PossibleColor } from 'helpers/colors';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -177,12 +176,12 @@ function WrappedClassificationInput({
     );
   }
 
-  const computeColor = (): PossibleColors => {
+  const computeColor = (): PossibleColor => {
     const levelStyles = c12nDef.levels_styles_map[validated.parts.lvl];
     if (!levelStyles) {
       return 'default' as const;
     }
-    return ColorMap[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
+    return COLOR_MAP[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
   };
 
   const skelheight = {
