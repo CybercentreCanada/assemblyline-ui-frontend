@@ -460,6 +460,18 @@ const useMyPreferences = () => {
             //   nested: true
             // },
             {
+              id: 'development.customize',
+              i18nKey: 'drawer.development.customize',
+              userPropValidators: [
+                { prop: 'user.is_admin', value: true, enforce: true },
+                { prop: 'configuration.system.type', value: 'development' },
+                { prop: 'configuration.system.type', value: 'staging' }
+              ],
+              icon: <PaletteIcon />,
+              route: '/development/customize',
+              nested: true
+            },
+            {
               id: 'development.library',
               i18nKey: 'drawer.development.library',
               userPropValidators: [

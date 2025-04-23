@@ -21,7 +21,7 @@ const AppMain = styled('div')(({ theme }) => ({
   flexDirection: 'row',
   position: 'relative',
   overflowX: 'hidden',
-  '-webkit-transform': 'translate3d(0, 0, 0)'
+  WebkitTransform: 'translate3d(0, 0, 0)'
 }));
 
 const AppContent = styled('div')(({ theme }) => ({

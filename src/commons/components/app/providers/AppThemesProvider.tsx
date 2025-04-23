@@ -1,4 +1,5 @@
 import { ThemeProvider, useMediaQuery, type PaletteMode } from '@mui/material';
+import type {} from '@mui/material/themeCssVarsAugmentation';
 import type { AppPreferenceConfigs, AppTheme, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import { AppStorageKeys } from 'commons/components/app/AppConstants';
 import { AppDefaultsPreferencesConfigs } from 'commons/components/app/AppDefaults';

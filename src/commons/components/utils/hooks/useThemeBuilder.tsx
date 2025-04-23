@@ -20,6 +20,7 @@ export const createTuiTheme = (
 ) =>
   createTheme(
     {
+      cssVariables: true,
       components: {
         ...components,
         MuiCssBaseline: {

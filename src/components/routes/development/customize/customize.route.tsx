@@ -1,8 +1,28 @@
-import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, useTheme } from '@mui/material';
+import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, styled, useTheme } from '@mui/material';
+import type { CustomizeMethod } from 'components/routes/development/customize/customize.form';
+import { CUSTOMIZE_METHODS, useForm } from 'components/routes/development/customize/customize.form';
+import 'components/routes/development/customize/customize.styles.css';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { PageLayout } from 'components/visual/Layouts/PageLayout';
-import { memo, Profiler } from 'react';
-import { CUSTOMIZE_METHODS, CustomizeMethod, useForm } from './customize.form';
+import { memo, Profiler, useEffect } from 'react';
+
+const Performance = ({ method, children }) => {
+  const form = useForm();
+
+  // Save the start time before the component renders
+  const startRenderTime = performance.now();
+
+  useEffect(() => {
+    // Measure the end time after the component has mounted
+    const endRenderTime = performance.now();
+    const timeToRender = endRenderTime - startRenderTime;
+
+    // Update the state with the time to render in milliseconds
+    form.setFieldValue('performances', p => ({ ...p, [method]: timeToRender.toFixed(2) }));
+  }, [method]); // Empty dependency array ensures this only runs once after mount
+
+  return children;
+};
 
 const StyledDiv = ({ children }) => {
   const theme = useTheme();
@@ -10,8 +30,8 @@ const StyledDiv = ({ children }) => {
   return (
     <div
       style={{
-        color: theme.palette.text.secondary,
-        border: `1px solid ${theme.palette.text.secondary}`,
+        color: theme.vars.palette.text.secondary,
+        border: `1px solid ${theme.vars.palette.text.secondary}`,
         borderRadius: theme.spacing(0.5),
         margin: theme.spacing(0.5),
         padding: theme.spacing(0.5)
@@ -22,6 +42,28 @@ const StyledDiv = ({ children }) => {
   );
 };
 
+const StyledDiv2 = styled('div')(({ theme }) => ({
+  color: theme.vars.palette.text.secondary,
+  border: `1px solid ${theme.vars.palette.text.secondary}`,
+  borderRadius: theme.spacing(0.5),
+  margin: theme.spacing(0.5),
+  padding: theme.spacing(0.5),
+  '&:hover': {
+    backgroundColor: theme.vars.palette.primary.main
+  }
+}));
+
+const StyledBox2 = styled(Box)(({ theme }) => ({
+  color: theme.vars.palette.text.secondary,
+  border: `1px solid ${theme.vars.palette.text.secondary}`,
+  borderRadius: theme.spacing(0.5),
+  margin: theme.spacing(0.5),
+  padding: theme.spacing(0.5),
+  '&:hover': {
+    backgroundColor: theme.vars.palette.primary.main
+  }
+}));
+
 export const CustomizeRoute = memo(() => {
   const theme = useTheme();
   const form = useForm();
@@ -31,15 +73,15 @@ export const CustomizeRoute = memo(() => {
       header={
         <PageHeader
           primary="Customize"
-          secondary={'This page is used to test the performance of different styling methods.'}
+          secondary="This page is used to test the performance of different styling methods."
         />
       }
       leftNav={null}
       rightNav={null}
     >
       <form.Subscribe
-        selector={state => [state.values.method, state.values.times] as const}
-        children={([method, times]) => (
+        selector={state => [state.values.method, state.values.times, state.values.performances] as const}
+        children={([method, times, performances]) => (
           <FormControl>
             <FormLabel>Method</FormLabel>
             <RadioGroup
@@ -57,9 +99,12 @@ export const CustomizeRoute = memo(() => {
                     <>
                       <span>{label}</span>
                       {!times?.[label] ? null : (
-                        <span
-                          style={{ color: theme.palette.text.secondary }}
-                        >{` (${times?.[label]?.toFixed(2)} ms)`}</span>
+                        <span style={{ color: theme.vars.palette.text.secondary }}>{` (${times?.[label]} ms)`}</span>
+                      )}
+                      {!performances?.[label] ? null : (
+                        <span style={{ color: theme.vars.palette.text.secondary }}>
+                          {` (${performances?.[label]} ms)`}
+                        </span>
                       )}
                     </>
                   }
@@ -74,66 +119,96 @@ export const CustomizeRoute = memo(() => {
         <form.Subscribe
           selector={state => [state.values.method, state.values.count] as const}
           children={([method, count]) => (
-            <Profiler
-              id={'test'}
-              onRender={(id, phase, actualDuration, baseDuration, startTime, commitTime) =>
-                form.setFieldValue('times', times => ({ ...times, [method]: actualDuration }))
-              }
-            >
-              {method &&
-                Array.from({ length: count }, (_, i) => {
-                  switch (method) {
-                    case 'Pure <div /> using style':
-                      return (
-                        <div
-                          key={i}
-                          style={{
-                            color: theme.palette.text.secondary,
-                            border: `1px solid ${theme.palette.text.secondary}`,
-                            borderRadius: theme.spacing(0.5),
-                            margin: theme.spacing(0.5),
-                            padding: theme.spacing(0.5)
-                          }}
-                        >{`Div ${i}`}</div>
-                      );
+            <Performance method={method}>
+              <Profiler
+                id="test"
+                onRender={(id, phase, actualDuration, baseDuration, startTime, commitTime) =>
+                  form.setFieldValue('times', times => ({ ...times, [method]: actualDuration.toFixed(2) }))
+                }
+              >
+                {method &&
+                  Array.from({ length: count }, (_, i) => {
+                    switch (method) {
+                      case 'Pure <div /> using style':
+                        return (
+                          <div
+                            key={i}
+                            style={{
+                              color: theme.vars.palette.text.secondary,
+                              border: `1px solid ${theme.vars.palette.text.secondary}`,
+                              borderRadius: theme.spacing(0.5),
+                              margin: theme.spacing(0.5),
+                              padding: theme.spacing(0.5)
+                            }}
+                          >
+                            {`Div ${i}`}
+                          </div>
+                        );
 
-                    case 'Pure <div /> using className':
-                      return <div key={i} className="development-customize-div-class">{`Div ${i}`}</div>;
+                      case 'Pure <div /> using className':
+                        return (
+                          <div key={i} className="development-customize-div-class">
+                            {`Div ${i}`}
+                          </div>
+                        );
 
-                    case '<div /> component with style':
-                      return <StyledDiv key={i}>{`Div ${i}`}</StyledDiv>;
+                      case '<div /> component with style':
+                        return <StyledDiv key={i}>{`Div ${i}`}</StyledDiv>;
 
-                    case 'Box component with style':
-                      return (
-                        <Box
-                          key={i}
-                          style={{
-                            color: theme.palette.text.secondary,
-                            border: `1px solid ${theme.palette.text.secondary}`,
-                            borderRadius: theme.spacing(0.5),
-                            margin: theme.spacing(0.5),
-                            padding: theme.spacing(0.5)
-                          }}
-                        >{`Box ${i}`}</Box>
-                      );
-                    case 'Box component with sx':
-                      return (
-                        <Box
-                          key={i}
-                          sx={{
-                            color: theme.palette.text.secondary,
-                            border: `1px solid ${theme.palette.text.secondary}`,
-                            borderRadius: theme.spacing(0.5),
-                            margin: theme.spacing(0.5),
-                            padding: theme.spacing(0.5)
-                          }}
-                        >{`SX Box ${i}`}</Box>
-                      );
-                    default:
-                      return null;
-                  }
-                })}
-            </Profiler>
+                      case "<div /> component with MUI's style":
+                        return <StyledDiv2 key={i}>{`Div ${i}`}</StyledDiv2>;
+
+                      case 'Box component using className':
+                        return (
+                          <Box key={i} className="development-customize-div-class">
+                            {`Box ${i}`}
+                          </Box>
+                        );
+
+                      case 'Box component with style':
+                        return (
+                          <Box
+                            key={i}
+                            style={{
+                              color: theme.vars.palette.text.secondary,
+                              border: `1px solid ${theme.vars.palette.text.secondary}`,
+                              borderRadius: theme.spacing(0.5),
+                              margin: theme.spacing(0.5),
+                              padding: theme.spacing(0.5)
+                            }}
+                          >
+                            {`Box ${i}`}
+                          </Box>
+                        );
+
+                      case 'Box component with sx':
+                        return (
+                          <Box
+                            key={i}
+                            sx={{
+                              color: theme.vars.palette.text.secondary,
+                              border: `1px solid ${theme.vars.palette.text.secondary}`,
+                              borderRadius: theme.spacing(0.5),
+                              margin: theme.spacing(0.5),
+                              padding: theme.spacing(0.5),
+                              '&:hover': {
+                                backgroundColor: theme.vars.palette.primary.main
+                              }
+                            }}
+                          >
+                            {`SX Box ${i}`}
+                          </Box>
+                        );
+
+                      case 'Box component with styled':
+                        return <StyledBox2 key={i}>{`Div ${i}`}</StyledBox2>;
+
+                      default:
+                        return null;
+                    }
+                  })}
+              </Profiler>
+            </Performance>
           )}
         />
       </div>
