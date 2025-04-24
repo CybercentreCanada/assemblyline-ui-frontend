@@ -47,12 +47,12 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
             sx={{
               textAlign: 'center',
               cursor: 'pointer',
-              padding: 8,
+              padding: '8px',
               [theme.breakpoints.only('sm')]: {
-                padding: 2
+                padding: '2px'
               },
               [theme.breakpoints.only('xs')]: {
-                padding: 0
+                padding: '0px'
               }
             }}
           >
@@ -100,12 +100,12 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
           sx={{
             textAlign: 'center',
             cursor: 'default',
-            padding: 8,
+            padding: '8px',
             [theme.breakpoints.only('sm')]: {
-              padding: 2
+              padding: '2px'
             },
             [theme.breakpoints.only('xs')]: {
-              padding: 0
+              padding: '0px'
             }
           }}
         >

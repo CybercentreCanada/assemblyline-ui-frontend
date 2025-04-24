@@ -100,8 +100,8 @@ export const WrappedHexSearchbar = ({ store }: StoreProps) => {
         },
         listbox: {
           sx: {
-            margin: 0,
-            padding: 0,
+            margin: '0px',
+            padding: '0px',
             maxHeight: `180px`
           }
         }

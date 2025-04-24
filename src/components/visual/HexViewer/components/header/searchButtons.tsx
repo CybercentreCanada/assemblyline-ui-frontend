@@ -22,12 +22,12 @@ export const WrappedHexSearchButtons = ({ store }: StoreProps) => {
         icon={<ArrowUpward />}
         slotSX={{
           iconButton: {
-            padding: 10,
+            padding: '10px',
             [theme.breakpoints.only('sm')]: {
-              padding: 4
+              padding: '4px'
             },
             [theme.breakpoints.only('xs')]: {
-              padding: 2
+              padding: '2px'
             }
           }
         }}
@@ -39,12 +39,12 @@ export const WrappedHexSearchButtons = ({ store }: StoreProps) => {
         icon={<ArrowDownward />}
         slotSX={{
           iconButton: {
-            padding: 10,
+            padding: '10px',
             [theme.breakpoints.only('sm')]: {
-              padding: 4
+              padding: '4px'
             },
             [theme.breakpoints.only('xs')]: {
-              padding: 2
+              padding: '2px'
             }
           }
         }}
@@ -56,12 +56,12 @@ export const WrappedHexSearchButtons = ({ store }: StoreProps) => {
         icon={<ClearIcon />}
         slotSX={{
           iconButton: {
-            padding: 10,
+            padding: '10px',
             [theme.breakpoints.only('sm')]: {
-              padding: 4
+              padding: '4px'
             },
             [theme.breakpoints.only('xs')]: {
-              padding: 2
+              padding: '2px'
             }
           }
         }}

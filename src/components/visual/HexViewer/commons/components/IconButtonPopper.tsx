@@ -65,12 +65,12 @@ export const WrappedIconButtonPopper = ({
           onClick={handleOpen}
           size={iconButtonSize}
           sx={{
-            padding: 10,
+            padding: '10px',
             [theme.breakpoints.only('sm')]: {
-              padding: 4
+              padding: '4px'
             },
             [theme.breakpoints.only('xs')]: {
-              padding: 2
+              padding: '2px'
             },
             ...buttonSX
           }}

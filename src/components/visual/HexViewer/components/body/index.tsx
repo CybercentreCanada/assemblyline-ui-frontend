@@ -81,8 +81,8 @@ const HexTableBody = memo(({ store }: StoreProps) => {
       {store.loading.status === 'initialized' ? (
         <>
           <div style={{ flex: 1 }} />
-          <table style={{ padding: 0, margin: 0, borderSpacing: 0 }}>
-            <tbody style={{ padding: 0, margin: 0 }}>
+          <table style={{ padding: '0px', margin: '0px', borderSpacing: '0px' }}>
+            <tbody style={{ padding: '0px', margin: '0px' }}>
               {rowIndexes.map(rowIndex => (
                 <HexRow key={rowIndex} store={store} rowIndex={rowIndex} Tag="tr" />
               ))}

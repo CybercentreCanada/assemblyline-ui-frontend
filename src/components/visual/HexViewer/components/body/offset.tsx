@@ -23,8 +23,8 @@ export const WrappedHexOffset = ({ store, index = -1, Tag = 'div', style = null 
     <Tag
       onMouseEnter={() => onBodyMouseLeave()}
       style={{
-        margin: 0,
-        padding: 0,
+        margin: '0px',
+        padding: '0px',
         display: 'block',
         color: theme.palette.text.secondary,
         fontWeight: theme.palette.mode === 'dark' ? 400 : 600,

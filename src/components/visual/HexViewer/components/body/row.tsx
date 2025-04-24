@@ -34,8 +34,8 @@ export const WrappedHexRow = ({ store, rowIndex = 0, style = null, Tag = 'div' }
     return (
       <Tag
         style={{
-          padding: 0,
-          margin: 0,
+          padding: '0px',
+          margin: '0px',
           height: LAYOUT_SIZE.rowHeight,
           ...(Tag === 'div' && {
             display: 'flex',
@@ -68,8 +68,8 @@ export const WrappedHexRow = ({ store, rowIndex = 0, style = null, Tag = 'div' }
     return (
       <Tag
         style={{
-          padding: 0,
-          margin: 0,
+          padding: '0px',
+          margin: '0px',
           height: LAYOUT_SIZE.rowHeight,
           ...(Tag === 'div' && {
             display: 'flex',
@@ -80,25 +80,25 @@ export const WrappedHexRow = ({ store, rowIndex = 0, style = null, Tag = 'div' }
         }}
       >
         <HexOffset store={store} index={hexRowIndex * store.layout.column.size} Tag={cellTag} />
-        <HexSpacer Tag={cellTag} style={{ width: LAYOUT_SIZE.spacingWidth, padding: 0, margin: 0 }} />
+        <HexSpacer Tag={cellTag} style={{ width: LAYOUT_SIZE.spacingWidth, padding: '0px', margin: '0px' }} />
         {indexes.map((index, columnIndex) =>
           index >= hexcodes.size ? (
             <HexSpacer
               key={index}
               Tag={cellTag}
-              style={{ padding: 0, margin: 0, ...(cellTag === 'div' && { width: LAYOUT_SIZE.hexWidth }) }}
+              style={{ padding: '0px', margin: '0px', ...(cellTag === 'div' && { width: LAYOUT_SIZE.hexWidth }) }}
             />
           ) : (
             <HexCell key={index} store={store} Tag={cellTag} type="hex" columnIndex={columnIndex} index={index} />
           )
         )}
-        <HexSpacer Tag={cellTag} style={{ width: LAYOUT_SIZE.spacingWidth, padding: 0, margin: 0 }} />
+        <HexSpacer Tag={cellTag} style={{ width: LAYOUT_SIZE.spacingWidth, padding: '0px', margin: '0px' }} />
         {indexes.map((index, columnIndex) =>
           index >= hexcodes.size ? (
             <HexSpacer
               key={index}
               Tag={cellTag}
-              style={{ padding: 0, margin: 0, ...(cellTag === 'div' && { width: LAYOUT_SIZE.textWidth }) }}
+              style={{ padding: '0px', margin: '0px', ...(cellTag === 'div' && { width: LAYOUT_SIZE.textWidth }) }}
             />
           ) : (
             <HexCell
@@ -111,7 +111,7 @@ export const WrappedHexRow = ({ store, rowIndex = 0, style = null, Tag = 'div' }
             />
           )
         )}
-        <HexSpacer Tag={cellTag} style={{ width: LAYOUT_SIZE.spacingWidth, padding: 0, margin: 0 }} />
+        <HexSpacer Tag={cellTag} style={{ width: LAYOUT_SIZE.spacingWidth, padding: '0px', margin: '0px' }} />
       </Tag>
     );
 };

@@ -35,7 +35,7 @@ export const WrappedHexScrollBar = ({ store }: StoreProps) => {
             minWidth: '28px',
             minHeight: '28px',
             fontSize: '0.8125rem',
-            padding: 0
+            padding: '0px'
           }}
         >
           <ArrowDropUpIcon />
@@ -69,7 +69,7 @@ export const WrappedHexScrollBar = ({ store }: StoreProps) => {
             minWidth: '28px',
             minHeight: '28px',
             fontSize: '0.8125rem',
-            padding: 0
+            padding: '0px'
           }}
         >
           <ArrowDropDownIcon />

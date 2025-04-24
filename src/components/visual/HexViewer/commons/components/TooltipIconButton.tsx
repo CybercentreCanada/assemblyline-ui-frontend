@@ -1,5 +1,6 @@
 import AdbIcon from '@mui/icons-material/Adb';
-import { SxProps, Tooltip, useTheme } from '@mui/material';
+import type { SxProps } from '@mui/material';
+import { Tooltip, useTheme } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import { default as React } from 'react';
 
@@ -33,12 +34,12 @@ export const WrappedTooltipIconButton = ({
           size={size}
           disabled={disabled}
           sx={{
-            padding: 10,
+            padding: '10px',
             [theme.breakpoints.only('sm')]: {
-              padding: 4
+              padding: '4px'
             },
             [theme.breakpoints.only('xs')]: {
-              padding: 2
+              padding: '2px'
             },
             ...slotSX?.iconButton
           }}

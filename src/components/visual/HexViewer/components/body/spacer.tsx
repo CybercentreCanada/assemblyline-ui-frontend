@@ -16,7 +16,7 @@ export const WrappedHexSpacer = ({ Tag = 'div', style = null }: HexSpacerProps) 
     <Tag
       onMouseEnter={() => onBodyMouseLeave()}
       style={{
-        margin: 0,
+        margin: '0px',
         height: 'auto',
         fontWeight: theme.palette.mode === 'dark' ? 400 : 600,
         userSelect: 'none',

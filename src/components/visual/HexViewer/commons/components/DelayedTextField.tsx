@@ -162,13 +162,18 @@ export const WrappedDelayedTextField = ({
           if (preventSubmit) event.preventDefault();
           onSubmit(event);
         }}
-        sx={{ paddingRight: '4px', ...slotSX?.outlinedInput }}
+        sx={{
+          paddingRight: '4px',
+          '& .MuiOutlinedInput-notchedOutline': {
+            border: 'none'
+          },
+          ...slotSX?.outlinedInput
+        }}
         slotProps={{
           root: {
             sx: {
-              '& > fieldset': {
-                border: 'none !important',
-                borderWidth: '0px'
+              '& .MuiOutlinedInput-notchedOutline': {
+                border: 'none'
               },
               ...slotSX?.root
             }

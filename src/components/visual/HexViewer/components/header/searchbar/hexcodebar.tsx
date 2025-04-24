@@ -76,12 +76,12 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
             sx={{
               textAlign: 'center',
               cursor: 'default',
-              padding: 8,
+              padding: '8px',
               [theme.breakpoints.only('sm')]: {
-                padding: 2
+                padding: '2px'
               },
               [theme.breakpoints.only('xs')]: {
-                padding: 0
+                padding: '0px'
               }
             }}
           >
@@ -94,12 +94,12 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
             sx={{
               textAlign: 'center',
               cursor: 'default',
-              padding: 8,
+              padding: '8px',
               [theme.breakpoints.only('sm')]: {
-                padding: 2
+                padding: '2px'
               },
               [theme.breakpoints.only('xs')]: {
-                padding: 0
+                padding: '0px'
               }
             }}
           >
@@ -132,9 +132,8 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
             // onKeyDown={event => onSearchBarKeyDown(event, store)}
             slotSX={{
               root: {
-                '& > fieldset': {
-                  border: 'none !important',
-                  borderWidth: '0px'
+                '& .MuiOutlinedInput-notchedOutline': {
+                  border: 'none'
                 }
               },
               input: {
@@ -149,12 +148,12 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
             icon={<ClearIcon />}
             slotSX={{
               iconButton: {
-                padding: 10,
+                padding: '10px',
                 [theme.breakpoints.only('sm')]: {
-                  padding: 4
+                  padding: '4px'
                 },
                 [theme.breakpoints.only('xs')]: {
-                  padding: 2
+                  padding: '2px'
                 }
               }
             }}

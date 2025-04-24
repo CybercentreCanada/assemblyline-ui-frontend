@@ -54,10 +54,14 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
         onChange={event => onCursorIndexChange({ index: event.target.valueAsNumber as number })}
         onKeyDown={event => onSearchBarKeyDown({ event }, { store })}
         slotSX={{
+          outlinedInput: {
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none'
+            }
+          },
           root: {
-            '& > fieldset': {
-              border: 'none !important',
-              borderWidth: '0px'
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none'
             }
           }
         }}
@@ -69,12 +73,12 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
         icon={<ClearIcon />}
         slotSX={{
           iconButton: {
-            padding: 10,
+            padding: '10px',
             [theme.breakpoints.only('sm')]: {
-              padding: 4
+              padding: '4px'
             },
             [theme.breakpoints.only('xs')]: {
-              padding: 2
+              padding: '2px'
             }
           }
         }}

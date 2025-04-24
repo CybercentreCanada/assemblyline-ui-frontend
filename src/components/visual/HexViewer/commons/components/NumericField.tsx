@@ -356,7 +356,7 @@ export const WrappedNumericField = ({
                 disabled={disabledArrow}
                 sx={{
                   height: '20px',
-                  borderRadius: 0,
+                  borderRadius: '0px',
                   minWidth: '20px'
                 }}
               >
@@ -369,7 +369,7 @@ export const WrappedNumericField = ({
                 disabled={disabledArrow}
                 sx={{
                   height: '20px',
-                  borderRadius: 0,
+                  borderRadius: '0px',
                   minWidth: '20px'
                 }}
               >

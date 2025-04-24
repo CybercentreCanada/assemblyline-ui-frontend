@@ -46,7 +46,7 @@ const WrappedHexDesktopHeader = ({ store }: StoreProps) => {
       >
         <HexSearchTypes store={store} />
         <HexSearchBar store={store} />
-        <Divider orientation="vertical" sx={{ height: 28, margin: 4 }} />
+        <Divider orientation="vertical" sx={{ height: '28px', margin: '4px' }} />
         <TooltipIconButton title={t('share')} onClick={() => onLocationShare()} icon={<ShareIcon />} />
         <TooltipIconButton title={t('settings.label')} onClick={() => onSettingOpen()} icon={<SettingsIcon />} />
       </Paper>

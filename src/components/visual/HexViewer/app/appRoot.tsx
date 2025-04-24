@@ -1,20 +1,12 @@
 import { useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import { useAppTheme } from 'commons/components/app/hooks';
+import 'components/visual/HexViewer/styles/hex.css';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ACTIONS, DataProps, HexLoading, HexPageLayout, ModeLanguage, ModeTheme, ModeWidth, useStore } from '..';
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column'
-  }
-}));
+import type { DataProps, ModeLanguage, ModeTheme, ModeWidth } from '..';
+import { ACTIONS, HexLoading, HexPageLayout, useStore } from '..';
 
 const WrappedAppRoot = ({ data = '' }: DataProps) => {
-  const classes = useStyles();
   const { store, dispatch, update } = useStore();
 
   // Data
@@ -65,7 +57,13 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   }, [dispatch, store.loading.conditions.hasSettingsFetched, store.loading.conditions.hasSettingsLoaded]);
 
   return (
-    <div className={classes.root}>
+    <div
+      style={{
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
       <HexLoading store={store} />
       {store.hex.codes.size !== 0 && store.loading.conditions.hasLocationInit && <HexPageLayout store={store} />}
     </div>
