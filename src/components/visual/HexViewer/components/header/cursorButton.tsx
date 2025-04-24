@@ -1,7 +1,8 @@
 import NavigationIcon from '@mui/icons-material/Navigation';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { NumericField, PopperIconButton, useDispatch } from 'components/visual/HexViewer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { NumericField, PopperIconButton, StoreProps, useDispatch } from '../..';
 
 export const WrappedHexCursorButton = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
@@ -27,7 +28,7 @@ export const WrappedHexCursorButton = ({ store }: StoreProps) => {
           size="small"
           margin="dense"
           range="loop"
-          value={cursorIndex as number}
+          value={cursorIndex}
           labelWidth={100}
           min={0}
           max={hexcodes.size - 1}

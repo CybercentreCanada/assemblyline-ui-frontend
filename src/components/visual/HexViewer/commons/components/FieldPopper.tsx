@@ -1,28 +1,10 @@
-import { ClickAwayListener, Fade, Paper, Popper } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import type { SxProps } from '@mui/material';
+import { ClickAwayListener, Fade, Paper, Popper, useTheme } from '@mui/material';
 import { isEnter, isEscape } from 'commons/components/utils/keyboard';
 import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 
-const useHexStyles = makeStyles(theme => ({
-  button: {
-    color: 'inherit',
-    background: 'inherit',
-    border: 'inherit',
-    '&:hover': {
-      background: 'inherit'
-    }
-  },
-  paper: {
-    marginTop: '16px',
-    padding: theme.spacing(1),
-    minWidth: '200px',
-    backgroundColor: theme.palette.background.paper
-  }
-}));
-
 export type FieldPopperProps = {
-  paperClassName?: string;
+  paperSX?: SxProps;
   popperPlacement?:
     | 'bottom-end'
     | 'bottom-start'
@@ -40,9 +22,11 @@ export type FieldPopperProps = {
 };
 
 export const WrappedFieldPopper = (
-  { paperClassName = null, popperPlacement = 'bottom', component = <div /> }: FieldPopperProps,
+  { paperSX = null, popperPlacement = 'bottom', component = <div /> }: FieldPopperProps,
   ref
 ) => {
+  const theme = useTheme();
+
   const [open, setOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -73,7 +57,16 @@ export const WrappedFieldPopper = (
       {({ TransitionProps }) => (
         <ClickAwayListener onClickAway={handleClickAway} mouseEvent="onMouseDown" touchEvent="onTouchStart">
           <Fade {...TransitionProps} timeout={200}>
-            <Paper className={clsx(classes.paper, paperClassName)} onKeyDown={handleCloseKeyDown}>
+            <Paper
+              onKeyDown={handleCloseKeyDown}
+              sx={{
+                marginTop: '16px',
+                padding: theme.spacing(1),
+                minWidth: '200px',
+                backgroundColor: theme.palette.background.paper,
+                ...paperSX
+              }}
+            >
               {component}
             </Paper>
           </Fade>

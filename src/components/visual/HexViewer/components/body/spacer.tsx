@@ -1,31 +1,31 @@
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import { useTheme } from '@mui/material';
+import { LAYOUT_SIZE, useDispatch } from 'components/visual/HexViewer';
+import type { CSSProperties } from 'react';
 import React from 'react';
-import { LAYOUT_SIZE, useDispatch } from '../..';
-
-const useHexStyles = makeStyles(theme => ({
-  offset: {
-    margin: 0,
-    height: 'auto',
-    fontWeight: theme.palette.mode === 'dark' ? 400 : 600,
-    userSelect: 'none',
-    width: LAYOUT_SIZE.spacingWidth,
-    'td&': {},
-    'div&': {
-      display: 'block'
-    }
-  }
-}));
 
 export type HexSpacerProps = {
   Tag?: 'div' | 'td';
-  style?: string;
+  style?: CSSProperties;
 };
 
-export const WrappedHexSpacer = ({ Tag = 'div', style = '' }: HexSpacerProps) => {
-  const classes = useHexStyles();
+export const WrappedHexSpacer = ({ Tag = 'div', style = null }: HexSpacerProps) => {
+  const theme = useTheme();
   const { onBodyMouseLeave } = useDispatch();
-  return <Tag className={clsx(classes.offset, style)} onMouseEnter={() => onBodyMouseLeave()} />;
+
+  return (
+    <Tag
+      onMouseEnter={() => onBodyMouseLeave()}
+      style={{
+        margin: 0,
+        height: 'auto',
+        fontWeight: theme.palette.mode === 'dark' ? 400 : 600,
+        userSelect: 'none',
+        width: LAYOUT_SIZE.spacingWidth,
+        ...(Tag === 'div' && { display: 'block' }),
+        ...style
+      }}
+    />
+  );
 };
 
 export const HexSpacer = React.memo(WrappedHexSpacer);

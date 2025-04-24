@@ -1,41 +1,13 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import { Button, Slider } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import { Button, Slider, useTheme } from '@mui/material';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { useDispatch } from 'components/visual/HexViewer';
 import { default as React } from 'react';
-import { StoreProps, useDispatch } from '../..';
-
-export const useStyles = makeStyles(theme => ({
-  root: {
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  buttonBox: {
-    display: 'grid',
-    height: '42px',
-    minHeight: '42px'
-  },
-  buttonUpBox: {
-    placeSelf: 'center',
-    placeItems: 'start'
-  },
-  buttonDownBox: {
-    placeSelf: 'center',
-    placeItems: 'end'
-  },
-  button: {
-    color: theme.palette.primary.main,
-    cursor: 'pointer',
-    minWidth: '28px',
-    minHeight: '28px',
-    fontSize: '0.8125rem',
-    padding: 0
-  }
-}));
 
 export const WrappedHexScrollBar = ({ store }: StoreProps) => {
-  const classes = useStyles();
+  const theme = useTheme();
+
   const { onScrollButtonClick, onScrollSliderChange } = useDispatch();
 
   const {
@@ -43,32 +15,62 @@ export const WrappedHexScrollBar = ({ store }: StoreProps) => {
   } = store;
 
   return (
-    <div className={clsx(classes.root)}>
-      <div className={clsx(classes.buttonBox, classes.buttonUpBox)}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div
+        style={{
+          display: 'grid',
+          height: '42px',
+          minHeight: '42px',
+          placeSelf: 'center',
+          placeItems: 'start'
+        }}
+      >
         <Button
-          className={clsx(classes.button)}
           onClick={() => onScrollButtonClick({ value: -1 })}
-          size={'small'}
+          size="small"
           disabled={rowIndex === 0}
+          sx={{
+            color: theme.palette.primary.main,
+            cursor: 'pointer',
+            minWidth: '28px',
+            minHeight: '28px',
+            fontSize: '0.8125rem',
+            padding: 0
+          }}
         >
           <ArrowDropUpIcon />
         </Button>
       </div>
       <Slider
         value={maxRowIndex - rowIndex}
-        orientation={'vertical'}
+        orientation="vertical"
         track={false}
         min={0}
         step={speed}
         max={maxRowIndex}
         onChange={(event, newValue) => onScrollSliderChange({ event, newValue })}
       />
-      <div className={clsx(classes.buttonBox, classes.buttonDownBox)}>
+      <div
+        style={{
+          display: 'grid',
+          height: '42px',
+          minHeight: '42px',
+          placeSelf: 'center',
+          placeItems: 'end'
+        }}
+      >
         <Button
-          className={clsx(classes.button)}
           onClick={() => onScrollButtonClick({ value: 1 })}
-          size={'small'}
+          size="small"
           disabled={rowIndex === maxRowIndex}
+          sx={{
+            color: theme.palette.primary.main,
+            cursor: 'pointer',
+            minWidth: '28px',
+            minHeight: '28px',
+            fontSize: '0.8125rem',
+            padding: 0
+          }}
         >
           <ArrowDropDownIcon />
         </Button>

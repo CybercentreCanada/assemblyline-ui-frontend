@@ -5,43 +5,18 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import { Theme } from '@mui/material/styles';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import type { SxProps } from '@mui/material/styles';
 import { isArrowDown, isArrowUp, isEnter } from 'commons/components/utils/keyboard';
-import React, { CSSProperties, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      // '& > fieldset': {
-      //   border: 'none !important',
-      //   borderWidth: '0px'
-      // }
-    },
-    formControl: {},
-    outlinedInput: {
-      paddingRight: '4px'
-    },
-    buttonGroup: {
-      display: 'flex',
-      flexDirection: 'column'
-    },
-    iconButton: {
-      height: '20px',
-      borderRadius: 0,
-      minWidth: '20px'
-    },
-    input: {
-      textAlign: 'left'
-    }
-  })
-);
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 export type NumericFieldProps = {
   id?: string;
-  classes?: { root?: CSSProperties; formControl?: CSSProperties; input?: CSSProperties };
+  slotSX?: {
+    formControl?: SxProps;
+    outlinedInput?: SxProps;
+    root?: SxProps;
+    input?: SxProps;
+  };
   label?: string;
   placeholder?: string;
   value?: number;
@@ -61,7 +36,7 @@ export type NumericFieldProps = {
   range?: 'none' | 'clamp' | 'loop';
   direction?: 'normal' | 'inverse';
   allowNull?: boolean;
-  options?: Array<number>;
+  options?: number[];
   startAdornment?: React.ReactElement;
   endAdornment?: React.ReactElement;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement | any>) => void;
@@ -82,7 +57,12 @@ export type NumericFieldProps = {
 
 export const WrappedNumericField = ({
   id = '',
-  classes = { root: null, formControl: null, input: null },
+  slotSX = {
+    formControl: null,
+    outlinedInput: null,
+    root: null,
+    input: null
+  },
   label = '',
   placeholder = '',
   value = null,
@@ -119,8 +99,6 @@ export const WrappedNumericField = ({
   preventSubmit = false,
   inputRef = { current: null }
 }: NumericFieldProps) => {
-  const fieldClasses = useStyles();
-
   const [textValue, setTextValue] = useState<string>('');
 
   const loaded = useRef<boolean>(false);
@@ -336,17 +314,14 @@ export const WrappedNumericField = ({
   return (
     <FormControl
       fullWidth={fullWidth}
-      className={clsx(fieldClasses.formControl, classes.formControl)}
       variant={variant}
       size={size}
+      sx={{
+        ...slotSX?.formControl
+      }}
     >
       <InputLabel htmlFor={id}>{label}</InputLabel>
       <OutlinedInput
-        className={fieldClasses.outlinedInput}
-        classes={{
-          root: clsx(fieldClasses.root, classes.root),
-          input: clsx(fieldClasses.input, classes.input)
-        }}
         id={id}
         type="text"
         margin={margin}
@@ -368,28 +343,58 @@ export const WrappedNumericField = ({
         endAdornment={
           <InputAdornment position="end" onClick={() => _inputRef.current?.focus()}>
             {endAdornment}
-            <div className={fieldClasses.buttonGroup}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+            >
               <IconButton
-                className={fieldClasses.iconButton}
                 onClick={click('up')}
                 edge="end"
                 size="small"
                 disabled={disabledArrow}
+                sx={{
+                  height: '20px',
+                  borderRadius: 0,
+                  minWidth: '20px'
+                }}
               >
                 <ArrowDropUpIcon fontSize="small" />
               </IconButton>
               <IconButton
-                className={fieldClasses.iconButton}
                 onClick={click('down')}
                 edge="end"
                 size="small"
                 disabled={disabledArrow}
+                sx={{
+                  height: '20px',
+                  borderRadius: 0,
+                  minWidth: '20px'
+                }}
               >
                 <ArrowDropDownIcon fontSize="small" />
               </IconButton>
             </div>
           </InputAdornment>
         }
+        sx={{
+          paddingRight: '4px',
+          ...slotSX?.outlinedInput
+        }}
+        slotProps={{
+          root: {
+            sx: {
+              ...slotSX?.root
+            }
+          },
+          input: {
+            sx: {
+              textAlign: 'left',
+              ...slotSX?.input
+            }
+          }
+        }}
         // label={<InputLabel sx={{ width: labelWidth }} />}
       />
     </FormControl>

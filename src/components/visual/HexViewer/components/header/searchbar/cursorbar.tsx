@@ -1,33 +1,13 @@
 import ClearIcon from '@mui/icons-material/Clear';
-import makeStyles from '@mui/styles/makeStyles';
+import { useTheme } from '@mui/material';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { NumericField, TooltipIconButton, useDispatch, useEventListener } from 'components/visual/HexViewer';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NumericField, StoreProps, TooltipIconButton, useDispatch, useEventListener } from '../../..';
-
-const useHexStyles = makeStyles(theme => ({
-  root: {
-    '& > fieldset': {
-      border: 'none !important',
-      borderWidth: '0px'
-    }
-  },
-  endAdornment: {
-    color: theme.palette.secondary.light
-  },
-  iconButton: {
-    padding: 10,
-    [theme.breakpoints.only('sm')]: {
-      padding: 4
-    },
-    [theme.breakpoints.only('xs')]: {
-      padding: 2
-    }
-  }
-}));
 
 export const WrappedHexCursorBar = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
-  const classes = useHexStyles();
+  const theme = useTheme();
   const { onCursorIndexChange, onCursorClear, onSearchBarFocus, onSearchBarKeyDown } = useDispatch();
 
   const {
@@ -47,7 +27,6 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
   return (
     <>
       <NumericField
-        classes={{ root: classes.root }}
         // label={t('offset.label')}
         inputRef={inputRef}
         labelWidth={0}
@@ -56,7 +35,7 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
         size="small"
         margin="dense"
         range="loop"
-        value={cursorIndex as number}
+        value={cursorIndex}
         min={0}
         max={hexcodes.size - 1}
         base={offsetBase}
@@ -67,18 +46,38 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
         preventWheel
         preventSubmit
         endAdornment={
-          <div className={classes.endAdornment}>{t('of') + (hexcodes.size - 1).toString(offsetBase).toUpperCase()}</div>
+          <div style={{ color: theme.palette.secondary.light }}>
+            {t('of') + (hexcodes.size - 1).toString(offsetBase).toUpperCase()}
+          </div>
         }
         onFocus={() => onSearchBarFocus()}
         onChange={event => onCursorIndexChange({ index: event.target.valueAsNumber as number })}
         onKeyDown={event => onSearchBarKeyDown({ event }, { store })}
+        slotSX={{
+          root: {
+            '& > fieldset': {
+              border: 'none !important',
+              borderWidth: '0px'
+            }
+          }
+        }}
       />
       <TooltipIconButton
-        classes={{ iconButton: classes.iconButton }}
         title={t('clear')}
         onClick={() => onCursorClear()}
         disabled={cursorIndex === null}
         icon={<ClearIcon />}
+        slotSX={{
+          iconButton: {
+            padding: 10,
+            [theme.breakpoints.only('sm')]: {
+              padding: 4
+            },
+            [theme.breakpoints.only('xs')]: {
+              padding: 2
+            }
+          }
+        }}
       />
     </>
   );

@@ -1,51 +1,70 @@
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ClearIcon from '@mui/icons-material/Clear';
-import makeStyles from '@mui/styles/makeStyles';
+import { useTheme } from '@mui/material';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { TooltipIconButton, useDispatch } from 'components/visual/HexViewer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { StoreProps, TooltipIconButton, useDispatch } from '../..';
-
-const useHexStyles = makeStyles(theme => ({
-  iconButton: {
-    padding: 10,
-    [theme.breakpoints.only('sm')]: {
-      padding: 4
-    },
-    [theme.breakpoints.only('xs')]: {
-      padding: 2
-    }
-  }
-}));
 
 export const WrappedHexSearchButtons = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
-  const classes = useHexStyles();
+  const theme = useTheme();
   const { onSelectedSearchIndexChange, onSearchClear } = useDispatch();
   const { inputValue, selectedResult } = store.search;
 
   return (
     <>
       <TooltipIconButton
-        classes={{ iconButton: classes.iconButton }}
         title={t('previous-match')}
         onClick={() => onSelectedSearchIndexChange({ index: selectedResult - 1 })}
         disabled={selectedResult === null}
         icon={<ArrowUpward />}
+        slotSX={{
+          iconButton: {
+            padding: 10,
+            [theme.breakpoints.only('sm')]: {
+              padding: 4
+            },
+            [theme.breakpoints.only('xs')]: {
+              padding: 2
+            }
+          }
+        }}
       />
       <TooltipIconButton
-        classes={{ iconButton: classes.iconButton }}
         title={t('next-match')}
         disabled={selectedResult === null}
         onClick={() => onSelectedSearchIndexChange({ index: selectedResult + 1 })}
         icon={<ArrowDownward />}
+        slotSX={{
+          iconButton: {
+            padding: 10,
+            [theme.breakpoints.only('sm')]: {
+              padding: 4
+            },
+            [theme.breakpoints.only('xs')]: {
+              padding: 2
+            }
+          }
+        }}
       />
       <TooltipIconButton
-        classes={{ iconButton: classes.iconButton }}
         title={t('clear')}
         onClick={() => onSearchClear()}
         disabled={inputValue === null || inputValue === ''}
         icon={<ClearIcon />}
+        slotSX={{
+          iconButton: {
+            padding: 10,
+            [theme.breakpoints.only('sm')]: {
+              padding: 4
+            },
+            [theme.breakpoints.only('xs')]: {
+              padding: 2
+            }
+          }
+        }}
       />
     </>
   );

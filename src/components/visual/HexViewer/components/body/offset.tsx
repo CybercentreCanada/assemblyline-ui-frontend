@@ -1,27 +1,18 @@
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import { useTheme } from '@mui/material';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { getAddressValue, useDispatch } from 'components/visual/HexViewer';
+import type { CSSProperties } from 'react';
 import React from 'react';
-import { getAddressValue, StoreProps, useDispatch } from '../..';
-
-const useHexStyles = makeStyles(theme => ({
-  offset: {
-    margin: 0,
-    padding: 0,
-    display: 'block',
-    color: theme.palette.text.secondary,
-    fontWeight: theme.palette.mode === 'dark' ? 400 : 600,
-    userSelect: 'none'
-  }
-}));
 
 export type HexOffsetProps = StoreProps & {
   index?: number;
   Tag?: 'div' | 'td';
-  style?: string;
+  style?: CSSProperties;
 };
 
-export const WrappedHexOffset = ({ store, index = -1, Tag = 'div', style = '' }: HexOffsetProps) => {
-  const classes = useHexStyles();
+export const WrappedHexOffset = ({ store, index = -1, Tag = 'div', style = null }: HexOffsetProps) => {
+  const theme = useTheme();
+
   const { onBodyMouseLeave } = useDispatch();
 
   const {
@@ -29,7 +20,18 @@ export const WrappedHexOffset = ({ store, index = -1, Tag = 'div', style = '' }:
   } = store;
 
   return (
-    <Tag className={clsx(classes.offset, style)} onMouseEnter={() => onBodyMouseLeave()}>
+    <Tag
+      onMouseEnter={() => onBodyMouseLeave()}
+      style={{
+        margin: 0,
+        padding: 0,
+        display: 'block',
+        color: theme.palette.text.secondary,
+        fontWeight: theme.palette.mode === 'dark' ? 400 : 600,
+        userSelect: 'none',
+        ...style
+      }}
+    >
       {getAddressValue(base, size, index)}
     </Tag>
   );
