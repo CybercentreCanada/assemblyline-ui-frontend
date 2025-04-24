@@ -130,7 +130,8 @@ export function humanReadableNumber(num: number | null) {
  */
 export function resetFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
-  favicon.href = `/favicon.ico`;
+  // TODO: remove query test
+  favicon.href = `/favicon.ico?query=test`;
 }
 
 /**
@@ -142,7 +143,8 @@ export function resetFavicon() {
  */
 export function setNotifyFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
-  favicon.href = `/favicon_done.ico`;
+  // TODO: remove query test
+  favicon.href = `/favicon_done.ico?query=test`;
 }
 
 /**

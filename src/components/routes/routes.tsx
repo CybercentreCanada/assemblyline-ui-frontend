@@ -4,10 +4,10 @@ import RedirectSubmission from 'commons/components/utils/RedirectSubmission';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import LoadingScreen from 'components/routes/loading';
 import { resetFavicon } from 'helpers/utils';
 import { lazy, memo, Suspense, useEffect, useState } from 'react';
 import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router';
-import LoadingScreen from './loading';
 
 const ForbiddenPage = lazy(() => import('components/routes/403'));
 const NotFoundPage = lazy(() => import('components/routes/404_dl'));
@@ -79,7 +79,7 @@ function RouteActions() {
   useEffect(() => {
     // Scroll to top
     const { params } = { params: { id: null }, ...matchPath(pathname, '/submission/detail/:id') };
-    // eslint-disable-next-line prefer-destructuring, @typescript-eslint/dot-notation
+
     const id = params['id'];
     if (id === null || id === undefined || id === oldID) {
       window.scrollTo(0, 0);
