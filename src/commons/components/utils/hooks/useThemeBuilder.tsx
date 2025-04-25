@@ -1,12 +1,7 @@
-import {
-  createTheme,
-  type CSSObject,
-  type Components,
-  type PaletteOptions,
-  type Theme,
-  type TypographyVariantsOptions
-} from '@mui/material';
-import { enUS, frFR, type Localization } from '@mui/material/locale';
+import type { Components, CSSObject, PaletteOptions, Theme, TypographyVariantsOptions } from '@mui/material';
+import { createTheme } from '@mui/material';
+import type { Localization } from '@mui/material/locale';
+import { enUS, frFR } from '@mui/material/locale';
 import type { AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import { AppDefaultsThemeConfigs } from 'commons/components/app/AppDefaults';
 import { useMemo } from 'react';
@@ -21,6 +16,15 @@ export const createTuiTheme = (
   createTheme(
     {
       cssVariables: true,
+      breakpoints: {
+        values: {
+          xs: 0,
+          sm: 600,
+          md: 960,
+          lg: 1280,
+          xl: 1920
+        }
+      },
       components: {
         ...components,
         MuiCssBaseline: {
@@ -32,6 +36,9 @@ export const createTuiTheme = (
               height: '100%'
             },
             body: {
+              fontSize: '0.875rem',
+              lineHeight: 1.43,
+              letterSpacing: '0.01071em',
               width: '100%',
               height: '100%'
             },
