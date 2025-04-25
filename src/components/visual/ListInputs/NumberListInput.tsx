@@ -1,12 +1,5 @@
-import type {
-  InputAdornment,
-  TextField,
-  TextFieldProps,
-  useTheme,
-  type FormHelperTextProps,
-  type IconButtonProps,
-  type ListItemTextProps
-} from '@mui/material';
+import type { FormHelperTextProps, IconButtonProps, ListItemTextProps, TextFieldProps } from '@mui/material';
+import { InputAdornment, TextField, useTheme } from '@mui/material';
 import { ListItemText } from 'components/visual/List/ListItemText';
 import { BaseListItem } from 'components/visual/ListInputs/components/BaseListInput';
 import type { ResetListInputProps } from 'components/visual/ListInputs/components/ResetListInput';

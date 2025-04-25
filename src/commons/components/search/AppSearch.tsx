@@ -133,7 +133,7 @@ export default function AppSearch() {
       } else if (isEscape) {
         state.set({ ...state, menu: !state.menu });
       } else if (isArrowDown) {
-        const result = document.querySelector('[data-tui-id="tui-app-search-result"]');
+        const result = document.querySelector('[data-tui-id="tui-app-search-result"]') as HTMLElement;
         if (result) {
           // Prevent scolling before menu list gets focus.
           // Doing this prevents the menu list from scrolling down

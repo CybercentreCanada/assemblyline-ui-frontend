@@ -1,4 +1,5 @@
-import type { FormHelperTextProps, useTheme, type IconButtonProps, type ListItemTextProps } from '@mui/material';
+import type { FormHelperTextProps, IconButtonProps, ListItemTextProps } from '@mui/material';
+import { useTheme } from '@mui/material';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
 import { ListItemText } from 'components/visual/List/ListItemText';
