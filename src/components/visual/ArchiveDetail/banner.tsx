@@ -9,7 +9,9 @@ import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
+import type { SvgIconProps, Theme } from '@mui/material';
 import {
+  Box,
   Collapse,
   IconButton,
   List,
@@ -18,12 +20,11 @@ import {
   ListItemText,
   Popover,
   Skeleton,
+  styled,
   Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -35,7 +36,8 @@ import FileDownloader from 'components/visual/FileDownloader';
 import InputDialog from 'components/visual/InputDialog';
 import Moment from 'components/visual/Moment';
 import { bytesToSize } from 'helpers/utils';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router';
 
@@ -47,73 +49,74 @@ const VERDICTS = {
   info: { className: 'info' }
 };
 
-const useStyles = makeStyles(theme => ({
-  border: {
-    border: `1px solid ${theme.palette.mode === 'light' ? '#AAA' : '#888'}`,
-    [`&.${VERDICTS.malicious.className}`]: {
-      border: `1px solid ${theme.palette.mode === 'light' ? theme.palette.error.dark : theme.palette.error.light}`
-    },
-    [`&.${VERDICTS.highly_suspicious.className}`]: {
-      border: `1px solid ${theme.palette.mode === 'light' ? '#ff9d12' : '#ed8b00'}`
-    },
-    [`&.${VERDICTS.suspicious.className}`]: {
-      border: `1px solid ${theme.palette.mode === 'light' ? '#ff9d12' : '#ed8b00'}`
-    },
-    [`&.${VERDICTS.safe.className}`]: {
-      border: `1px solid ${theme.palette.mode === 'light' ? theme.palette.success.dark : theme.palette.success.light}`
+const getColor = (variant: keyof typeof VERDICTS, theme: Theme): CSSProperties => {
+  switch (variant) {
+    case 'safe':
+      return { color: theme.palette.mode === 'light' ? theme.palette.success.dark : theme.palette.success.light };
+    case 'suspicious':
+      return { color: theme.palette.mode === 'light' ? '#ff9d12' : '#ed8b00' };
+    case 'highly_suspicious':
+      return { color: theme.palette.mode === 'light' ? '#ff9d12' : '#ed8b00' };
+    case 'malicious':
+      return { color: theme.palette.mode === 'light' ? theme.palette.error.dark : theme.palette.error.light };
+    default:
+      return { color: theme.palette.mode === 'light' ? '#AAA' : '#888' };
+  }
+};
+
+const getBackgroundColor = (variant: keyof typeof VERDICTS, theme: Theme): CSSProperties => {
+  switch (variant) {
+    case 'safe':
+      return { backgroundColor: '#00f20015' };
+    case 'suspicious':
+      return { backgroundColor: '#ff970015' };
+    case 'highly_suspicious':
+      return { backgroundColor: '#ff970015' };
+    case 'malicious':
+      return { backgroundColor: '#f2000015' };
+    default:
+      return { backgroundColor: '#6e6e6e15' };
+  }
+};
+
+const getBorderColor = (variant: keyof typeof VERDICTS, theme: Theme): CSSProperties => {
+  switch (variant) {
+    case 'safe':
+      return {
+        border: `1px solid ${theme.palette.mode === 'light' ? theme.palette.success.dark : theme.palette.success.light}`
+      };
+    case 'suspicious':
+      return { border: `1px solid ${theme.palette.mode === 'light' ? '#ff9d12' : '#ed8b00'}` };
+    case 'highly_suspicious':
+      return { border: `1px solid ${theme.palette.mode === 'light' ? '#ff9d12' : '#ed8b00'}` };
+    case 'malicious':
+      return {
+        border: `1px solid ${theme.palette.mode === 'light' ? theme.palette.error.dark : theme.palette.error.light}`
+      };
+    default:
+      return { border: `1px solid ${theme.palette.mode === 'light' ? '#AAA' : '#888'}` };
+  }
+};
+
+type IconProps = SvgIconProps & { variant: keyof typeof VERDICTS };
+
+const Icon = memo(
+  styled(({ variant, ...props }: IconProps) => {
+    switch (variant) {
+      case 'info':
+        return <HelpOutlineIcon {...props} />;
+      case 'safe':
+        return <VerifiedUserOutlinedIcon {...props} />;
+      case 'suspicious':
+        return <MoodBadIcon {...props} />;
+      case 'highly_suspicious':
+        return <MoodBadIcon {...props} />;
+      case 'malicious':
+        return <BugReportOutlinedIcon {...props} />;
+      default:
+        return null;
     }
-  },
-  backgroundColor: {
-    backgroundColor: '#6e6e6e15',
-    [`&.${VERDICTS.malicious.className}`]: {
-      backgroundColor: '#f2000015'
-    },
-    [`&.${VERDICTS.highly_suspicious.className}`]: {
-      backgroundColor: '#ff970015'
-    },
-    [`&.${VERDICTS.suspicious.className}`]: {
-      backgroundColor: '#ff970015'
-    },
-    [`&.${VERDICTS.safe.className}`]: {
-      backgroundColor: '#00f20015'
-    }
-  },
-  color: {
-    color: theme.palette.mode === 'light' ? '#AAA' : '#888',
-    [`&.${VERDICTS.malicious.className}`]: {
-      color: theme.palette.mode === 'light' ? theme.palette.error.dark : theme.palette.error.light
-    },
-    [`&.${VERDICTS.highly_suspicious.className}`]: {
-      color: theme.palette.mode === 'light' ? '#ff9d12' : '#ed8b00'
-    },
-    [`&.${VERDICTS.suspicious.className}`]: {
-      color: theme.palette.mode === 'light' ? '#ff9d12' : '#ed8b00'
-    },
-    [`&.${VERDICTS.safe.className}`]: {
-      color: theme.palette.mode === 'light' ? theme.palette.success.dark : theme.palette.success.light
-    }
-  },
-  root: {
-    width: '100%',
-    display: 'grid',
-    gridTemplateColumns: 'auto 1fr',
-    alignItems: 'center',
-    borderRadius: theme.spacing(1),
-    padding: theme.spacing(1)
-  },
-  container: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'auto'
-  },
-  row: {
-    width: '100%',
-    display: 'flex',
-    alignItems: 'flex-start',
-    flexWrap: 'wrap'
-  },
-  icon: {
+  })<IconProps>(({ theme, variant }) => ({
     marginLeft: theme.spacing(3),
     marginRight: theme.spacing(4.5),
     fontSize: '400%',
@@ -124,52 +127,11 @@ const useStyles = makeStyles(theme => ({
     },
     [theme.breakpoints.only('xs')]: {
       display: 'none'
-    }
-  },
-  header: {},
-  content: {
-    display: 'grid',
-    gridTemplateColumns: '3fr repeat(3, auto)',
-    gridTemplateRows: 'repeat(2, auto)',
-    gridAutoFlow: 'column',
-    columnGap: theme.spacing(4),
-    margin: `${theme.spacing(1)} 0`,
-    '&:hover>div': {
-      wordBreak: 'break-word',
-      whiteSpace: 'wrap !important'
     },
-    '&>div:nth-child(1)': {
-      gridRow: 'span 2',
-      fontWeight: 500
-    },
-    '&>div:nth-child(2n + 2)': {
-      fontWeight: 500
-    },
-    '&>div:nth-child(2n + 3)': {
-      fontWeight: 400
-      // overflowX: 'hidden',
-      // whiteSpace: 'nowrap',
-      // textOverflow: 'ellipsis'
-    },
-    [theme.breakpoints.down('md')]: {
-      gridAutoFlow: 'row',
-      columnGap: theme.spacing(2),
-      gridTemplateColumns: 'auto 1fr',
-      gridTemplateRows: 'repeat(4, auto)',
-      '&>div:nth-child(1)': {
-        gridRow: 'span 1',
-        gridColumn: 'span 2'
-      }
-    }
-  },
-  iconContainer: {
-    display: 'grid',
-    placeItems: 'center'
-  },
-  text: {
-    wordBreak: 'break-word'
-  }
-}));
+
+    ...getColor(variant, theme)
+  }))
+);
 
 const LABELS: Record<
   keyof LabelCategories,
@@ -243,22 +205,6 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
             .map(label => ({ category, label }))
       ),
     [file?.file_info?.label_categories]
-  );
-
-  const Icon = useCallback<React.FC<{ variant: keyof typeof VERDICTS }>>(
-    ({ variant }) => {
-      const className = clsx(classes.icon, classes.color, VERDICTS[variant].className);
-      return Object.keys(VERDICTS).includes(variant)
-        ? {
-            info: <HelpOutlineIcon className={className} />,
-            safe: <VerifiedUserOutlinedIcon className={className} />,
-            suspicious: <MoodBadIcon className={className} />,
-            highly_suspicious: <MoodBadIcon className={className} />,
-            malicious: <BugReportOutlinedIcon className={className} />
-          }[variant]
-        : null;
-    },
-    [classes.color, classes.icon]
   );
 
   const resubmit = useCallback(() => {
@@ -409,7 +355,19 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   }, [initiate, initiated, sha256]);
 
   return (
-    <div className={clsx(classes.root, classes.backgroundColor, classes.border, VERDICTS[currentVerdict].className)}>
+    <div
+      style={{
+        width: '100%',
+        display: 'grid',
+        gridTemplateColumns: 'auto 1fr',
+        alignItems: 'center',
+        borderRadius: theme.spacing(1),
+        padding: theme.spacing(1),
+
+        ...getBackgroundColor(currentVerdict, theme),
+        ...getBorderColor(currentVerdict, theme)
+      }}
+    >
       <InputDialog
         open={safelistDialog}
         handleClose={() => setSafelistDialog(false)}
@@ -453,14 +411,44 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
       {file ? (
         <Icon variant={currentVerdict} />
       ) : (
-        <Skeleton className={classes.icon} variant="circular" height="2.5rem" width="2.5rem" />
+        <Skeleton
+          variant="circular"
+          height="2.5rem"
+          width="2.5rem"
+          sx={{
+            marginLeft: theme.spacing(3),
+            marginRight: theme.spacing(4.5),
+            fontSize: '400%',
+            [theme.breakpoints.down('md')]: {
+              marginLeft: theme.spacing(2),
+              marginRight: theme.spacing(2.5),
+              fontSize: '350%'
+            },
+            [theme.breakpoints.only('xs')]: {
+              display: 'none'
+            }
+          }}
+        />
       )}
 
-      <div className={classes.container}>
-        <div className={classes.row}>
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'auto'
+        }}
+      >
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'flex-start',
+            flexWrap: 'wrap'
+          }}
+        >
           <div style={{ flex: 1 }}>
             <Typography
-              className={clsx(classes.text, classes.color, VERDICTS[currentVerdict].className)}
               children={
                 !file ? (
                   <Skeleton style={{ width: '100%' }} />
@@ -469,10 +457,15 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                 )
               }
               variant="h4"
-              style={{ flex: 1, whiteSpace: 'nowrap', marginRight: theme.spacing(2) }}
+              sx={{
+                flex: 1,
+                whiteSpace: 'nowrap',
+                marginRight: theme.spacing(2),
+                wordBreak: 'break-word',
+                ...getColor(currentVerdict, theme)
+              }}
             />
             <Typography
-              className={classes.text}
               variant="body2"
               children={
                 !file ? (
@@ -483,6 +476,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                   file?.file_info?.sha256
                 )
               }
+              sx={{ wordBreak: 'break-word' }}
             />
           </div>
           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -587,7 +581,43 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
           </div>
         </div>
 
-        <div className={classes.content}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: '3fr repeat(3, auto)',
+            gridTemplateRows: 'repeat(2, auto)',
+            gridAutoFlow: 'column',
+            columnGap: theme.spacing(4),
+            margin: `${theme.spacing(1)} 0`,
+            '&:hover>div': {
+              wordBreak: 'break-word',
+              whiteSpace: 'wrap !important'
+            },
+            '&>div:nth-child(1)': {
+              gridRow: 'span 2',
+              fontWeight: 500
+            },
+            '&>div:nth-child(2n + 2)': {
+              fontWeight: 500
+            },
+            '&>div:nth-child(2n + 3)': {
+              fontWeight: 400
+              // overflowX: 'hidden',
+              // whiteSpace: 'nowrap',
+              // textOverflow: 'ellipsis'
+            },
+            [theme.breakpoints.down('md')]: {
+              gridAutoFlow: 'row',
+              columnGap: theme.spacing(2),
+              gridTemplateColumns: 'auto 1fr',
+              gridTemplateRows: 'repeat(4, auto)',
+              '&>div:nth-child(1)': {
+                gridRow: 'span 1',
+                gridColumn: 'span 2'
+              }
+            }
+          }}
+        >
           <div>
             {!file ? (
               <>
@@ -596,7 +626,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               </>
             ) : verdicts && ['malicious', 'highly_suspicious', 'suspicious'].includes(currentVerdict) ? (
               <>
-                <div className={clsx(classes.color, VERDICTS.malicious.className)}>
+                <div style={{ ...getColor('malicious', theme) }}>
                   {`${verdicts.malicious} ${t(
                     `${isURI ? 'uri' : 'file'}.result${verdicts.malicious > 1 ? 's' : ''}.malicious`,
                     {
@@ -604,7 +634,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                     }
                   )}`}
                 </div>
-                <div className={clsx(classes.color, VERDICTS.suspicious.className)}>
+                <div style={{ ...getColor('suspicious', theme) }}>
                   {`${verdicts.suspicious + verdicts.highly_suspicious} ${t(
                     `${isURI ? 'uri' : 'file'}.result${
                       verdicts.suspicious + verdicts.highly_suspicious > 1 ? 's' : ''
@@ -616,7 +646,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                 </div>
               </>
             ) : (
-              <div className={clsx(classes.color, VERDICTS.safe.className)}>
+              <div style={{ ...getColor('safe', theme) }}>
                 {t(`${isURI ? 'uri' : 'file'}.result.info`, {
                   ns: 'archive'
                 })}
@@ -633,7 +663,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
           )}
           <div>{t('seen.last')}</div>
           <div>{file ? <Moment variant="fromNow">{file?.file_info?.seen?.last}</Moment> : <Skeleton />}</div>
-        </div>
+        </Box>
 
         {labels?.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(1) }}>
